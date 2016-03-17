@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SkuInventory.liquidateSkuInventory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode 和 count 来减少库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku_inventory 
+					set available_qty= available_qty - :count
+					where extention_code = :extentionCode and available_qty >= :count
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SkuInventory.findSkuInventoryByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode查询SkuInventory</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku_inventory WHERE extention_code= :extentionCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SkuInventory.findSkuInventoryByExtentionCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode查询SkuInventory</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku_inventory 
+					WHERE extention_code in (
+						#foreach($extentionCode in $extentionCodeList)
+							'$extentionCode',
+						#end
+						'-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SkuInventory.addSkuInventory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode 和 count 来增加库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku_inventory 
+					set available_qty = available_qty + :count
+					where extention_code = :extentionCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SkuInventory.getSkuInventoryByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode查询SkuInventory</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku_inventory 
+					WHERE extention_code in (
+						#foreach($extentionCode in $extentionCodeList)
+							'$extentionCode',
+						#end
+						'-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SkuInventory.updateInventoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id更新库存信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku_inventory
+					set available_qty =:availableQty,
+					    version = now()
+					    #if($lastSyncTime)
+					        ,last_syns_time=:lastSyncTime
+					    #end
+					    #if($baselineTime)
+					        ,baseline_time=:baselineTime
+					    #end
+					where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SkuInventory.addSkuInventoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id更新库存信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku_inventory
+					set available_qty = available_qty + :availableQty,
+					    version = now()
+					    #if($lastSyncTime)
+					        ,last_syns_time=:lastSyncTime
+					    #end
+					where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

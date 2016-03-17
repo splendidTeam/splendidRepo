@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Contact.findAllContactListByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CONTACT 
+		       			 where member_id =:memberId order by id asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="Contact.findContactById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CONTACT 
+		       			 where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Contact.findContactByCantactIdAndMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from T_MEM_CONTACT where id = :contactId and member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Contact.updateContactByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_CONTACT set IS_DEFAULT =false 
+		       			 where 1=1
+		       			#if($memberId)
+	       		     		and MEMBER_ID =:memberId
+	       		  		#end  
+	       		  		and IS_DEFAULT=true
+	       		  		
+		       			
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="Contact.updateContactByContactId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_CONTACT set IS_DEFAULT =:isDefault 
+		       			 where 
+		       			 ID =:contactId
+		       			 and member_id =:memberId
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="Contact.findContactByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+				select  t.ID as ID,t.NAME as NAME ,t.MEMBER_id as memberId,
+				        t.country_id as countryId,t.province_id as provinceId,t.city_id as cityId,
+				        t.area_id as areaId,t.town_id as townId,t.address AS address , 
+				        t.email as email, t.telphone AS telphone,t.mobile as mobile, t.post_code as postcode,
+				        t.IS_DEFAULT AS isDefault
+				from T_MEM_CONTACT AS t 
+		       	 where 1=1
+	       		  #if($memberId)
+	       		     and t.member_id =:memberId	
+	       		  #end  
+	       		  
+	       		  #if($startDate)
+		       		and	t.modifytime>=:startDate
+		       	#end
+		       			
+		       	#if($endDate)
+		       		and	t.modifytime<=:endDate
+		       	#end
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="Contact.updateContact" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+		       		update T_MEM_CONTACT
+		       		set 
+		       			name=:name,
+		       			country_id=:countryId,
+		       			province_id=:provinceId,
+                    	city_id=:cityId,
+                    	area_id=:areaId,
+		       			town_id=:townId,
+                    	post_code=:postcode,
+                    	address=:address,
+		       			telphone=:telphone,
+                    	mobile=:mobile,
+                    	IS_DEFAULT=:ifDefault,
+                    	version=now(),
+		       			modifytime=now()
+                    
+		       		 where 
+		       			id=:id
+		       			and member_id =:memberId
+		       			
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Contact.removeContactById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+					delete from T_MEM_CONTACT where id=:id  and member_id =:memberId	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

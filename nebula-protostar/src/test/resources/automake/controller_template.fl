@@ -1,0 +1,137 @@
+/**
+ * Copyright (c) 2012 Baozun All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Baozun.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Baozun.
+ *
+ * BAOZUN MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. BAOZUN SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
+package com.baozun.nebula.web.controller.${packagName};
+
+
+import java.util.Arrays;
+import java.util.List;
+
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.baozun.nebula.model.${packagName}.${entityName};
+import com.baozun.nebula.sdk.manager.Sdk${entityName}Manager;
+import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.bind.QueryBeanParam;
+import com.baozun.nebula.utils.query.bean.QueryBean;
+import com.baozun.nebula.web.command.BackWarnEntity;
+ <#assign daovar =  "${entityName[0]?lower_case}${entityName[1..]}Manager" />
+/**
+ * ${entityName}Controller
+ * @author  ${authName}
+ *
+ */
+ @Controller
+public class ${entityName}Controller extends BaseController{
+
+
+	@Autowired
+	private Sdk${entityName}Manager ${daovar};
+	
+	@RequestMapping("/${entityName?uncap_first}/list.htm")
+	public String list(){
+		return "/${packagName}/${entityName?uncap_first}";
+	}
+	/**
+	 * 保存${entityName}
+	 * 
+	 */
+	@RequestMapping("/${entityName?uncap_first}/save.json")
+	@ResponseBody
+	public BackWarnEntity save${entityName}(${entityName} model){
+			 ${daovar}.save${entityName}(model);
+		return SUCCESS;
+	}
+	
+	/**
+	 * 通过id获取${entityName}
+	 * 
+	 */
+	@RequestMapping("/${entityName?uncap_first}/findByid.json")
+	@ResponseBody
+	public ${entityName} find${entityName}ById(Long id){
+	
+		return ${daovar}.find${entityName}ById(id);
+	}
+
+	/**
+	 * 获取所有${entityName}列表
+	 * @return
+	 */
+	@RequestMapping("/${entityName?uncap_first}/findAll.json")
+	@ResponseBody
+	public List<${entityName}> findAll${entityName}List(){
+	
+		return ${daovar}.findAll${entityName}List();
+	};
+	
+	/**
+	 * 通过ids获取${entityName}列表
+	 * @param ids
+	 * @return
+	 */
+	@RequestMapping("/${entityName?uncap_first}/findByIds.json")
+	@ResponseBody
+	public List<${entityName}> find${entityName}ListByIds(Long[] ids){
+	
+		return ${daovar}.find${entityName}ListByIds(Arrays.asList(ids));
+	};
+	
+	/**
+	* @Description: 分页获取${entityName}列表
+	* @param queryBean
+	* @return   
+	* Pagination<${entityName}>
+	* @throws
+	 */
+	@RequestMapping("/${entityName?uncap_first}/page.json")
+	@ResponseBody
+	public Pagination<${entityName}> find${entityName}ListByQueryMapWithPage(@QueryBeanParam QueryBean queryBean) {
+		Sort[] sorts = queryBean.getSorts();
+		return  ${daovar}.find${entityName}ListByQueryMapWithPage(queryBean.getPage(),
+				sorts, queryBean.getParaMap());
+	}
+	/**
+	 * 通过ids批量启用或禁用${entityName}
+	 * 设置${lifecycle} =0 或 1
+	 * @param ids
+	 * @return
+	 */
+	@RequestMapping("/${entityName?uncap_first}/enableOrDisableByIds.json")
+	@ResponseBody
+	public BackWarnEntity  enableOrDisable${entityName}ByIds(Long[] ids,Integer state) {
+		${daovar}.enableOrDisable${entityName}ByIds(Arrays.asList(ids), state);
+		return SUCCESS;
+	}
+	
+	/**
+	 * 通过ids批量删除${entityName}
+	 * 设置${lifecycle} =2
+	 * @param ids
+	 * @return
+	 */
+	@RequestMapping("/${entityName?uncap_first}/removeByIds.json")
+	@ResponseBody
+	public BackWarnEntity remove${entityName}ByIds(Long[] ids){
+		${daovar}.remove${entityName}ByIds(Arrays.asList(ids));
+		return SUCCESS;
+	}
+}

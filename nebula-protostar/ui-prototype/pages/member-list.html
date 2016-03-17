@@ -1,0 +1,255 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+
+function editMember(data, args, idx){
+	if(loxia.getObject("lifecycle", data)){
+		return "<a href='javascript:void(0);' class='func-button disable'>禁用</a>";
+	}
+	else
+		return "<a href='javascript:void(0);' class='func-button enable'>启用</a>";
+	
+}
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("name", data)+"'/>";
+}
+
+function drawIcon(data, args, idx){
+	return "<a style='cursor:pointer;'><img src='../images/main/portrait.gif' width=60 height=60></a>";
+}
+
+function drawName(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('member-details.html','aaa',null,[0,1]);\">"+loxia.getObject("name", data)+"</a>";
+}
+
+
+
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime asc", firstPage: true, lastPage: false,
+		items: [
+					{name:"张三",nickname:"昵称1",regsource:"QQ登录", type:"类型1", lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"QQ登录", type:"类型2", lifecycle:3,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"QQ登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1,分组2"},
+					{name:"aaatt",nickname:"昵称",regsource:"QQ登录", type:"类型", lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", lifecycle:3,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1,分组2"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型",lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", lifecycle:3,createtime:"2013-03-05", recentlytime:"2013-03-05",groups:"分组1,分组2"}
+				]
+		});
+
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+    $j("#table1").on("reload", function(){
+    	$j("td.col-1 a",this).click(function(){
+    		loxia.openPage('member-details.html','aaa',null,[0,1]);
+    	});
+    	
+    	
+    });
+    
+    $j.ui.loxiasimpletable().typepainter.threeState= {
+        getContent: function(data){
+        	if(data==0){
+        		return "<span class='ui-pyesno ui-pyesno-no' title='无效'></span>";
+        	}
+        	else if(data==1){
+        		return "<span class='ui-pyesno ui-pyesno-yes' title='有效'></span>";
+        	}
+			else if(data==3){
+				return "<span class='ui-pyesno ui-pyesno-wait' title='待激活'></span>";
+        	}
+            
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+		{label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"},
+		{label:"会员头像",width:"6%",template:"drawIcon"},
+		{label:"会员名",width:"15%",template:"drawName",sort:"username"},
+		{name:"nickname",label:"昵称",width:"10%"},
+		{name:"regsource",label:"来源",width:"10%"},
+		{name:"type",label:"类型",width:"10%"},
+		{name:"groups",label:"分组",width:"15%"},
+		{name:"lifecycle",label:"状态",width:"5%",type:"threeState"},
+		{name:"createtime",label:"创建时间",width:"10%",sort:"createTime"},
+		{name:"recentlytime",label:"最近登录时间",width:"10%"},
+		{label:"操作",width:"15%", template:"editMember"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime desc", firstPage: true, lastPage: false,
+			items: [
+					
+					{name:"张三",nickname:"昵称1",regsource:"淘宝登录", type:"类型1", lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称",regsource:"淘宝登录", type:"类型2", lifecycle:3,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称",regsource:"淘宝登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称3",regsource:"淘宝登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称4",regsource:"淘宝登录", type:"类型", lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称5",regsource:"淘宝登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称6",regsource:"淘宝登录", type:"类型", lifecycle:3,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称7",regsource:"淘宝登录", type:"类型", lifecycle:3,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"王五",nickname:"昵称8",regsource:"淘宝登录", type:"类型", lifecycle:1,createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"王五",nickname:"昵称9",regsource:"淘宝登录", type:"类型", lifecycle:0,createtime:"2013-03-05", recentlytime:"2013-03-05"}
+					
+			]
+			}
+	});
+
+	refreshData();
+});
+
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/users.png">会员管理
+		
+		<input class="button orange batchEnable" type="button" value="批量启用" title="批量启用">
+		<input class="button orange batchDisable" type="button" value="批量禁用" title="批量禁用">
+    </div>
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+        <table>
+            <tr>
+                <td><label>会员名</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="会员登录名"></input></span>
+                </td>
+                <td><label>登录邮箱</label></td>
+                <td>
+                   <span> <input type="text" loxiaType="input" mandatory="false" placeholder="member@abc.com"></input></span>
+                </td>
+                <td><label>登录手机</label></td>
+                <td>
+                   <span><input type="text" loxiaType="input" mandatory="false" placeholder="13xxxxxxxxx"></input></span>
+                </td>
+            </tr>
+            <tr>
+                <td><label>来源</label></td>
+                <td>
+                <span>
+					<select loxiaType="select"  >
+                        <option value="1">不限</option>
+                        <option value="2">注册</option>
+                        <option value="3">QQ登录</option>
+                        <option value="4">新浪登录</option>
+                    </select>
+				</span>
+                </td>
+                <td><label>分组</label></td>
+                <td>
+               <span>
+					<select  loxiaType="select">
+                        <option value="1">分组1</option>
+                        <option value="2">分组2</option>
+                        <option value="3">分组3</option>
+                        <option value="4">分组4</option>
+                    </select>
+				</span>
+                </td>
+            <td><label>类型</label></td>
+            <td>
+               <span>
+					<select  loxiaType="select" >
+                        <option value="0">不限</option>
+                        <option value="1">自有会员</option>
+                        <option value="2">自注册会员</option>
+                        <option value="3">第三方会员</option>
+                    </select>
+				</span>
+            </td>
+            </tr><tr>
+            <td><label>创建时间</label></td>
+            <td>
+               <span><input type="text" id="startTime" name="startTime"  value="" loxiaType="date" mandatory="false" /></span>
+            </td>
+            <td><label>——</label></td>
+            <td>
+                <span><input type="text" id="endTime" name="endTime"  value="" loxiaType="date" mandatory="false"/></span>
+            </td>
+            <td><label>状态</label></td>
+            <td>
+               <span>
+					<select  loxiaType="select" >
+                        <option value="2">不限</option>
+                        <option value="3">有效</option>
+                        <option value="4">无效</option>
+                    </select>
+				</span>
+            </td>
+        </tr>
+        </table>
+        <div class="button-line1">
+        <a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+
+    
+    <div class="ui-block">
+   	 	<div class="border-grey" id="table1" caption="会员列表"></div>
+    </div>
+    
+    
+	
+    <div class="button-line">
+		<input class="button orange batchDisable" type="button" value="批量禁用" title="批量禁用">
+		<input class="button orange batchEnable" type="button" value="批量启用" title="批量启用">
+
+         
+    </div>
+</div>
+
+
+</body>
+</html>

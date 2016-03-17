@@ -1,0 +1,611 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+<script type="text/javascript">
+
+
+	$j(document).ready(function(){
+		loxia.init({debug: true, region: 'zh-CN'});
+	    nps.init();
+	
+
+	});
+	
+	
+	$j(document).ready(function(){
+		
+			//点击每一行的点击事件响应
+	 		$j("#paymentInfo").find("tr[class='paymentLine']").each(function(){
+	 				var currentObj=$j(this);
+	 				currentObj.on("click",function(){
+	 				//alert(currentObj.children().eq(0).html());
+	 				$j("#payment-dialog").dialogff({type:'open',close:'in',width:'600px',height:'300px'});
+	 				
+	 			});
+	 		});
+	 		
+	 		//列表字属性复层的取消按钮
+			 $j("#payment-dialog").on("click","input.button.orange.close",function(){	    	
+				   $j("#payment-dialog").dialogff({type:'close'});
+			    });
+	
+
+	});
+	
+	
+	
+	
+	
+	
+
+</script>
+<style type="text/css">
+	.div-tab table tr th{
+		height:40px;
+		background:#F0F0F0;
+		color:black;
+		}
+		
+	#paymentInfo table .paymentLine {
+		cursor:pointer;
+	}	
+
+</style>
+</head>
+<body>
+
+<div class="content-box width-percent100">
+   
+   <!-- 订单摘要begin -->
+	<div class="ui-title1">
+	<img src="../images/wmi/blacks/32x32/user.png">
+	订单详情</div>
+	<div class="ui-tag-change">
+		 <div class="tag-change-content" style="width: 100%;">
+		 	<div  style="float:left;margin-left:10px;">
+							
+						    <div class="ui-block-line ui-block-line-37">
+								<label> 订单号</label>
+								<label>SO2013112000001</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>OMS订单号</label>
+						        <label style="width: 200px;">OMS2013112000001</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>会员昵称</label>
+						        <label> 紫川飘寒</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label> 游客标识</label>
+						      <label style="width: 200px;">  YmdasxaDDX00hhhZZZ</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label> 商品总数量</label>
+						       	<label>  2件</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  总价</label>
+						      	<label>  ￥2000.00元</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  折扣</label>
+						      	<label>  ￥500.00元</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  订单物流状态</label>
+						      	<label>  备货中</label>
+						    </div>
+								    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  订单财务状态</label>
+						      	<label>  已付款</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  支付方式</label>
+						      	<label>  在线支付</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  订单来源</label>
+						      	<label>  本站</label>
+						    </div>
+						      
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  下单IP</label>
+						      	<label>  127.0.0.1</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  运费</label>
+						      	<label>  
+						      		<div>应付运费:15.00元</div></br>
+						      		<div>实付运费:15.00元</div>
+						      	</label>
+						    </div>
+						     
+						     <div class="ui-block-line ui-block-line-37">
+						        <label>  物流信息</label>
+						      	<label> <div>韵达快运</div>
+						      			</br>
+						      		<div>LP00000000001</div>
+						      	</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>发票信息</label>
+						      	<label style="width:600px;">
+						      		<div>发票号:20000000000001113013</div></br>
+						      		<div>发票类型:增值税发票</div></br>
+						      		<div>发票抬头:个人</div></br>
+						      		<div>发票内容:鼠标    1个  49.00元   税率:17%  税额:8.33元</div>
+						      	</label>
+						    </div>
+						    
+						      <div class="ui-block-line ui-block-line-37">
+						        <label>  备注</label>
+						      	<label> 请开发票</label>
+						    </div>
+						      <div class="ui-block-line ui-block-line-37">
+						        <label>  创建时间</label>
+						      	<label> 2013-11-20</label>
+						    </div>
+						    
+						    
+		 	</div>
+		 </div>
+	
+	</div>
+	<!-- 订单摘要end -->
+	
+	<!-- 商品清单begin -->
+	<div class="ui-block-title1" style="color:black;background:white;" >商品清单</div>
+	<div class="ui-tag-change">
+		 <div class="tag-change-content">
+		 	<div  class="border-grey ui-loxia-simple-table" caption="商品列表">	 	
+		 			<table width="100%" cellspacing="0" cellpadding="0">
+		 				<tr>
+			 				<th>UPC</th>
+			 				<th>商品主图</th>			 				
+			 				<th>商品名称</th>
+			 				<th>销售属性信息</th>
+			 				<th>商品数量</th>
+			 				<th>建议零售价</th>
+			 				<th>原销售单价</th>
+			 				<th>现销售单价</th>
+			 				<th>折扣</th>	
+			 				<th>行小计</th> 
+			 				<th>行类型</th>
+			 				<th>评价状态</th>
+		 				</tr>
+		 				<tr>
+			 				<td>634472</td>
+			 				<td><a href="#" target="_blank"><img alt="" src="../images/productDmoe.jpg"></a></td>
+			 				<td><a href="#" target="_blank">路由器</a></td>			 				
+			 				<td><div><label>颜色：</label>红色</div><div><label>尺寸：</label>X</div></td>
+			 				<td>1</td>
+			 				<td>1500.00</td>
+			 				<td>1500.00</td>
+			 				<td>1000.00</td>
+			 				<td>500.00</td> 
+			 				<td>1000.00</td>
+			 				<td>主卖品</td>
+			 				<td>是</td>
+		 				</tr>
+		 				<tr>
+			 				<td>634473</td>
+			 				<td><a href="#" target="_blank"><img alt="" src="../images/productDemo2.jpg"></a></td>
+			 				<td><a href="#" target="_blank">鼠标500</a></td>
+			 				<td><div><label>颜色：</label>黑色</div><div><label>尺寸：</label>小号</div></td>
+			 				<td>1</td>
+			 				<td>500.00</td>
+			 				<td>500.00</td>
+			 				<td>500.00</td>
+			 				<td>0.00</td>
+			 				<td>500.00</td>			 					
+			 				<td>主卖品</td>
+			 				<td>否</td>
+			 			</tr>
+			 			<tr>
+			 				<td>634474</td>
+			 				<td><a href="#" target="_blank"><img alt="" src="../images/productDemo2.jpg"></a></td>
+			 				<td><a href="#" target="_blank">鼠标</a></td>
+			 				<td><div><label>颜色：</label>黑色</div><div><label>尺寸：</label>小号</div></td>
+			 				<td>1</td>
+			 				<td>49.00</td>
+			 				<td>49.00</td>
+			 				<td>0.00</td>
+			 				<td>49.00</td>
+			 				<td>0.00</td>			 					
+			 				<td>赠品</td>
+			 				<td>否</td>
+			 			</tr>
+		 			</table>			
+						   
+		 	</div>
+		 </div>
+	
+	</div>	
+	
+	<!-- 商品清单end -->
+		
+	<!-- tab开始 -->
+	<div class="ui-tag-change">
+               <ul class="tag-change-ul">
+                 
+                   <li class="receivePersoninfo">收货人信息</li>
+                   <li class="paymentdetail">支付详细</li>
+                   <!--  li class="paymentNo">支付流水</li>-->
+                   <li class="orderStatusUpdateLog">订单状态变更日志</li>
+                   <li class="orderHistroy">订单历史记录</li>
+                   <li class="promotionOrder">促销订单</li>
+                   <li class="wmsHistroyInfo">订单物流信息</li>
+               </ul>
+              
+               <div class="tag-change-content">
+               
+                    <!-- 收货信息begin -->
+                    <div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">收货人信息</div>
+												    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label> 收货人</label>
+						        <label> 张三</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>地址</label>
+						      <label>  上海市xx街</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label> 手机</label>
+						       	<label>  130xxxxxx</label>
+						    </div>
+						    
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  固话</label>
+						      	<label>  021-3470xxxxx</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  email</label>
+						      	<label>  test@test.com</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  指定收货</label>
+						      	<label>		<!-- 如果指定了类型为双休日或者工作日就不需要指定时间段和日期了 -->
+						      				<!--  div>时间段 : 8:00-20:00</div></br>
+						      				<div>日期 : 2013/11/20</div></br>-->
+						      				<div>类型 : 双休日</div>
+						      	</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  国家</label>
+						      	<label>   中国</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  省</label>
+						      	<label>  上海市</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  市</label>
+						      	<label>   上海市</label>
+						    </div>
+						    <div class="ui-block-line ui-block-line-37">
+						        <label>  县/区</label>
+						      	<label>  闸北区</label>
+						    </div>
+
+							</div>
+                    </div>
+                    <!-- 收货信息end -->
+                    
+                    <!-- 支付详细开始  -->
+                     <div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">支付详细</div>
+						    
+							<div id="paymentInfo"  class="border-grey  ui-loxia-simple-table div-tab">	
+								<div style="width:100%">
+						 			<table  cellspacing="0" cellpadding="0">
+						 				<tr>
+						 					<th>序号</th>
+							 				<th>支付数值</th>
+							 				<th>支付金额</th>			 				
+							 				<th>支付类型</th>
+							 				<th>付款详细</th>
+							 				<th>第三方支付流水</th>
+							 				<th>第三方支付帐号</th>
+						 				</tr>
+						 				<tr class="paymentLine">
+						 					<td>1</td>
+							 				<td>5</td>
+							 				<td>2000.00</td>
+							 				<td>网银支付</td>			 				
+							 				<td> 打死打伤大声</td>
+							 				<td>xyxxzz0000001</td>
+							 				<td> xxxxxxxxxxxx</td>
+						 				</tr>
+						 				<tr class="paymentLine">
+						 					<td>2</td>
+							 				<td>3</td>
+							 				<td>100.00</td>
+							 				<td>支付宝支付</td>
+							 				<td> 打死打伤大声</td>
+							 				<td>xyxxzz0000002</td>
+							 				<td>yyyyyyyy</td>
+							 			</tr>
+						 			</table>	
+					 			</div>		
+									   
+					 		</div>
+						</div>	
+                    </div>
+                    
+                   <!-- 支付详细end -->
+                   
+                   
+                    <!-- 支付流水begin -->
+                     <!--  div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">支付流水</div>
+						    
+						    
+						    <div  class="border-grey  ui-loxia-simple-table div-tab">	
+						    	<div style="width:50%">
+						 			<table  cellspacing="0" cellpadding="0">
+						 				<tr>
+						 					<th>序号</th>
+							 				<th>支付流水号</th>
+							 				<th>支付详细ID</th>			 				
+							 				<th>创建时间</th>
+						 				</tr>
+						 				<tr>
+						 					<td>1</td>
+							 				<td>xxxy11dadasdz01</td>
+							 				<td>222</td>
+							 				<td>2013-11-20</td>			 				
+						 				</tr>
+						 				<tr>
+						 					<td>2</td>
+							 				<td>xxxy11dadasdz02</td>
+							 				<td>3333</td>
+							 				<td>2013-11-21</td>
+							 			</tr>
+						 			</table>
+					 			</div>			
+									   
+					 		</div>
+						
+						</div>
+                    </div>
+                    -->
+                   <!-- 支付流水end -->
+                   
+                   
+                   <!-- 订单状态变更日志begin -->
+                     <div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">订单状态变更日志</div>
+						    
+						    
+						    <div  class="border-grey  ui-loxia-simple-table div-tab">	
+						    	<div style="width:100%">
+						 			<table  cellspacing="0" cellpadding="0">
+						 				<tr>
+						 					<th>序号</th>
+							 				<th>变更前状态</th>
+							 				<th>变更后状态</th>			 				
+							 				<th>名称</th>
+							 				<th>时间</th>
+							 				<th>客服操作员</th>
+						 				</tr>
+						 				<tr>
+						 					<td>1</td>
+							 				<td>新建</td>
+							 				<td>备货</td>
+							 				<td>aaa</td>			 				
+							 				<td>2013-11-20</td>			 				
+							 				<td>johnny</td>			 				
+						 				</tr>
+						 				<tr>
+						 					<td>2</td>
+							 				<td>备货</td>
+							 				<td>出库</td>
+							 				<td>bb</td>			 				
+							 				<td>2013-11-21</td>			 				
+							 				<td>johnny</td>	
+							 			</tr>
+						 			</table>
+					 			</div>			
+									   
+					 		</div>
+					 		
+						</div>
+                    </div>
+                    
+                   <!-- 订单状态变更日志end -->
+                   
+                   <!-- 订单历史记录begin -->
+                     <div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">订单历史记录</div>
+						    
+						    
+						    <div id="table1" class="border-grey  ui-loxia-simple-table div-tab" >	
+						    	<div style="width:50%">
+						 			<table  cellspacing="0" cellpadding="0">
+						 				<tr>
+						 					<th>序号</th>
+							 				<th>时间</th>
+							 				<th>操作员</th>			 				
+							 				<th>数据对象</th>
+						 				</tr>
+						 				<tr>
+						 					<td>1</td>
+							 				<td>2013-11-20</td>
+							 				<td>aa</td>
+							 				<td>{xxx:aa,yyy:aa}</td>			 				
+						 				</tr>
+						 				<tr>
+						 					<td>2</td>
+							 				<td>2013-11-21</td>
+							 				<td>bb</td>
+							 				<td>{xxx:aa,yyy:aa}</td>
+							 			</tr>
+						 			</table>			
+								</div>		   
+					 		</div>
+					 		
+					 		
+					 	</div>
+                    </div>
+                    
+                   <!-- 订单历史记录end -->
+                   
+                   
+                   <!-- 订单促销begin -->
+                     <div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">订单促销</div>
+							    <div class="ui-block-line ui-block-line-37">
+									<label>促销码</label>
+									<label> 1000</label>
+							    </div>
+							    
+							    <div class="ui-block-line ui-block-line-37">
+							        <label>促销类型</label>
+							        <label> 立减</label>
+							    </div>
+							    
+							    <div class="ui-block-line ui-block-line-37">
+							        <label>折扣金额</label>
+							        <label> 60.00元</label>
+							    </div>
+							    
+							    <div class="ui-block-line ui-block-line-37">
+							        <label>优惠券</label>
+							        <label> 20.00元</label>
+							    </div>
+							    
+							    <div class="ui-block-line ui-block-line-37">
+							        <label>描述</label>
+							        <label> 满300立减20元</label>
+							    </div>							    
+												
+							</div>
+                    </div>
+                    
+                   <!-- 订单促销end -->
+                   
+                   
+                   <!-- 订单物流信息begin -->
+                     <div class="tag-change-in"  >
+							<div class="ui-block" style="">
+						    <div class="ui-block-title1">订单物流信息</div>	
+						   					    						    
+							    <div class="ui-block-line ui-block-line-37">
+							        <label>订单是否完成</label>
+							        <label> 是</label>
+							    </div>
+							    							    
+							    <div class="ui-block-line ui-block-line-37">
+							        <label>物流跟踪描述</label>
+							        <label><div>已收件</div><div>离开天津到上海途中</div> <div>已经到达上海市扫描</div><div>正在派件...</div></label>
+							    </div>
+						
+							</div>
+                    </div>
+                    
+                   <!-- 订单物流信息end -->
+                    
+               </div>
+          </div>
+	
+</div>
+
+
+          
+          
+   <!-- 支付流水详细隐藏开始 -->
+	<div id="payment-dialog" class="proto-dialog">
+		<h5>支付流水</h5>
+		  
+		 <div class="proto-dialog-content">
+		 	<div class="ui-block"> 
+		 	    <div class="ui-block-content payment-dialogInfo" id="payment-dialogInfo">
+		 	   
+		 	    
+		 	         <div  class="border-grey  ui-loxia-simple-table div-tab">	
+						    	<div style="width:100%">
+						 			<table  cellspacing="0" cellpadding="0">
+						 				<tr>
+						 					<th>序号</th>
+							 				<th>支付流水号</th>
+							 				<th>支付详细ID</th>			 				
+							 				<th>创建时间</th>
+						 				</tr>
+						 				<tr>
+						 					<td>1</td>
+							 				<td>xxxy11dadasdz01</td>
+							 				<td>222</td>
+							 				<td>2013-11-20</td>			 				
+						 				</tr>
+						 				<tr>
+						 					<td>2</td>
+							 				<td>xxxy11dadasdz02</td>
+							 				<td>3333</td>
+							 				<td>2013-11-21</td>
+							 			</tr>
+						 			</table>
+					 			</div>			
+									   
+					 		</div>
+		 	    	
+		 
+			  
+		 	  </div>
+	
+		 	  
+		 </div>
+		 
+		</div>
+		
+		
+		<div class="proto-dialog-button-line">
+			<input type="button" value="关闭" class="button orange close"/>
+		</div>
+		 
+	</div>
+	<!-- 支付流水详细数结束 -->
+
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="EmailSendLog.findAllEmailSendLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailSendLog.findEmailSendLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="EmailSendLog.findEmailSendLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG where 
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailSendLog.findEmailSendLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG where 
+		       			    1 = 1
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="EmailSendLog.enableOrDisableEmailSendLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_EMAILSENDLOG
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EmailSendLog.removeEmailSendLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_EMAILSENDLOG
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EmailSendLog.findAllEffectEmailSendLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="EmailSendLog.findEffectEmailSendLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG where
+		       		       1 = 1
+					
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailSendLog.findEffectEmailSendLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAILSENDLOG where
+		       		
+					
+		       			    1 = 1
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

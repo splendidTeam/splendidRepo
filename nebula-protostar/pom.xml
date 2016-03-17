@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.baozun.nebula</groupId>
+		<artifactId>nebula</artifactId>
+		<version>5.3.0</version>
+	</parent>
+	<artifactId>nebula-protostar</artifactId>
+	<version>${version.nebula}</version>
+	<name>nebula-protostar</name>
+	<packaging>war</packaging>
+	<properties>
+		<version.poi>3.8</version.poi>
+		<version.commons-compress>1.5</version.commons-compress>
+		<version.freemarker>2.3.9</version.freemarker>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.baozun.nebula</groupId>
+			<artifactId>nebula-repo</artifactId>
+			<version>${version.nebula}</version>
+		</dependency>
+		<!-- jstl -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+
+		<!-- jsp-api -->
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${version.commons-compress}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${version.poi}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${version.poi}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>c3p0</groupId>
+			<artifactId>c3p0</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+
+		<!-- 上传使用 -->
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+		</dependency>
+
+		<!-- -->
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>janino</groupId>
+			<artifactId>janino</artifactId>
+		</dependency>
+
+		<!-- freemarker -->
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${version.freemarker}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1.4</version>
+		</dependency>
+
+		<!--svn 开发包 -->
+		<dependency>
+			<groupId>org.tmatesoft.svnkit</groupId>
+			<artifactId>svnkit</artifactId>
+			<version>1.8.5</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- 生成图片缩略图 -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.im4java</groupId>
+			<artifactId>im4java</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+
+		<!-- 图片空间 -->
+		<dependency>
+			<groupId>com.ckfinder.connector</groupId>
+			<artifactId>ckfinder</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<env>dev</env>
+				<webpath>target/protostar/WEB-INF/web.xml</webpath>
+				<compliepath>target/classes</compliepath>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<env>test</env>
+				<webpath>target/protostar/WEB-INF/web.xml</webpath>
+				<compliepath>target/classes</compliepath>
+			</properties>
+		</profile>
+		<profile>
+			<id>pro</id>
+			<properties>
+				<env>pro</env>
+				<webpath>nebula-protostar/branches/5.1.15b-SNAPSHOT/target/protostar/WEB-INF/web.xml</webpath>
+				<compliepath>nebula-protostar/branches/5.1.15b-SNAPSHOT/target/classes</compliepath>
+			</properties>
+		</profile>
+	</profiles>
+
+	<build>
+		<finalName>protostar</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>1.5.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<id>replace web.xml</id>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>${webpath}</file>
+							<token>&lt;param-value&gt;dev&lt;/param-value&gt;</token>
+							<value>&lt;param-value&gt;${env}&lt;/param-value&gt;</value>
+							<regexFlags>
+								<regexFlag>CASE_INSENSITIVE</regexFlag>
+								<regexFlag>MULTILINE</regexFlag>
+							</regexFlags>
+						</configuration>
+					</execution>
+					<execution>
+						<phase>prepare-package</phase>
+						<id>replace ckfinder</id>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>${compliepath}/ckfinder/ckfinder-config.xml</file>
+							<tokenValueMap>${compliepath}/config/${env}/metainfo.properties</tokenValueMap>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

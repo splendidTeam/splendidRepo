@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+	<bean id="Role.findAllList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取所有角色</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_role where lifecycle=1 
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Role.findByOrgaTypeId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过机构类型获取角色</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_role where lifecycle=1 and org_type_id=:orgaTypeId
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Role.findRoleById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id查找角色</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_role where id=:id 
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Role.findByParaMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页获取角色列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select r.*,t.name as orgTypeName,t.id as orgTypeId from t_au_role r INNER JOIN t_au_org_type t on r.org_type_id=t.id
+					where r.lifecycle!=2
+		       		#if($name)
+		       		 and r.name like :name
+		       		#end
+		       		#if($lifecycle)
+		       			and r.lifecycle= :lifecycle
+		       		#end
+		       		#if($orgTypeId)
+		       			and t.id=:orgTypeId
+		       		#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Role.disableRole" class="loxia.dao.support.DynamicQueryHolder">
+		<description>禁用角色(逻辑删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_au_role
+		       		set lifecycle=2
+		       		where id in (
+		       			#foreach( $id in $ids )
+    					$id,
+						#end
+						-1
+		       		) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Role.insertRole" class="loxia.dao.support.DynamicQueryHolder">
+		<description>插入角色</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					insert into t_au_role values(nextval('s_t_au_role'),:description,1,:name,now(),:orgTypeId)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Role.updateRole" class="loxia.dao.support.DynamicQueryHolder">
+		<description>插入角色</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_au_role values(nextval('s_t_au_role'),:description,1,:name,now(),:orgTypeId)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

@@ -1,0 +1,141 @@
+package com.baozun.nebula.command;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class MemberConductCommand  implements Command{
+	/**
+	 * 
+	 */
+	private static final long	serialVersionUID	= 228221051958999914L;
+
+	/**
+	 * id
+	 */
+	private Long id;
+	
+	/**
+	 * 登录次数
+	 */
+	private Integer loginCount;
+	
+	/**
+	 * 注册时间
+	 */
+	private Date registerTime;
+	
+	/**
+	 * 登录时间(最近)
+	 */
+	private Date loginTime;
+	
+	/**
+	 * 付款时间(最近)
+	 */
+	private Date payTime;
+	/**
+	 * 注册ip
+	 */
+	private String registerIp;
+	
+	/**
+	 * 登录ip(最近)
+	 */
+	private String loginIp;
+	
+	/**
+	 * 累积消费金额
+	 */
+	private BigDecimal cumulativeConAmount;
+
+	
+	public MemberConductCommand() {
+		super();
+	}
+
+
+	public MemberConductCommand(Date loginTime, String loginIp) {
+		super();
+		this.loginTime = loginTime;
+		this.loginIp = loginIp;
+	}
+
+
+
+	public MemberConductCommand(Long id, Integer loginCount, Date registerTime,
+			Date loginTime, String registerIp, String loginIp) {
+		super();
+		this.id = id;
+		this.loginCount = loginCount;
+		this.registerTime = registerTime;
+		this.loginTime = loginTime;
+		this.registerIp = registerIp;
+		this.loginIp = loginIp;
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getLoginCount() {
+		return loginCount;
+	}
+
+	public void setLoginCount(Integer loginCount) {
+		this.loginCount = loginCount;
+	}
+
+	public Date getRegisterTime() {
+		return registerTime;
+	}
+
+	public void setRegisterTime(Date registerTime) {
+		this.registerTime = registerTime;
+	}
+
+	public Date getLoginTime() {
+		return loginTime;
+	}
+
+	public void setLoginTime(Date loginTime) {
+		this.loginTime = loginTime;
+	}
+
+	public Date getPayTime() {
+		return payTime;
+	}
+
+	public void setPayTime(Date payTime) {
+		this.payTime = payTime;
+	}
+
+	public String getRegisterIp() {
+		return registerIp;
+	}
+
+	public void setRegisterIp(String registerIp) {
+		this.registerIp = registerIp;
+	}
+
+	public String getLoginIp() {
+		return loginIp;
+	}
+
+	public void setLoginIp(String loginIp) {
+		this.loginIp = loginIp;
+	}
+
+	public BigDecimal getCumulativeConAmount() {
+		return cumulativeConAmount;
+	}
+
+	public void setCumulativeConAmount(BigDecimal cumulativeConAmount) {
+		this.cumulativeConAmount = cumulativeConAmount;
+	}
+	
+}

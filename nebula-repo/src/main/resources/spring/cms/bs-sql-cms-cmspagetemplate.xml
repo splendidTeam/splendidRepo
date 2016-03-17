@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="CmsPageTemplate.findAllCmsPageTemplateList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageTemplate.findCmsPageTemplateListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsPageTemplate.findCmsPageTemplateListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($useCommonHeader)
+		       					and USE_COMMON_HEADER=:useCommonHeader
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageTemplate.findCmsPageTemplateListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($useCommonHeader)
+		       					and USE_COMMON_HEADER=:useCommonHeader
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsPageTemplate.enableOrDisableCmsPageTemplateByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_PAGE_TEMPLATE
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageTemplate.removeCmsPageTemplateByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_PAGE_TEMPLATE
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageTemplate.findAllEffectCmsPageTemplateList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="CmsPageTemplate.findEffectCmsPageTemplateListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($useCommonHeader)
+		       					and USE_COMMON_HEADER=:useCommonHeader
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageTemplate.findEffectCmsPageTemplateListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_TEMPLATE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($useCommonHeader)
+		       					and USE_COMMON_HEADER=:useCommonHeader
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

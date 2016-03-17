@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="CmsPublished.findAllCmsPublishedList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PUBLISHED 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPublished.findCmsPublishedListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PUBLISHED where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsPublished.findCmsPublishedListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PUBLISHED where 
+		       			1=1	
+		       		
+		       				#if($pageCode)
+		       					and PAGE_CODE=:pageCode
+		       				#end
+		       			
+		       				#if($areaCode)
+		       					and AREA_CODE=:areaCode
+		       				#end
+		       				
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPublished.findCmsPublishedListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PUBLISHED where 
+		       		
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($pageCode)
+		       					and PAGE_CODE=:pageCode
+		       				#end
+
+		       			
+		       				#if($areaCode)
+		       					and AREA_CODE=:areaCode
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPublished.removeCmsPubulishedByPageCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_cms_published where page_code = :pageCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPublished.removeCmsPubulishedByPageCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_cms_published where page_code in (
+		       			#foreach($pageCode in $pageCodes)
+							'$pageCode',
+						#end
+						'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPublished.removeCmsPubulishedByModuleCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_cms_published where module_code = :moduleCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPublished.removeCmsPubulishedByModuleCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_cms_published where module_code in (
+		       			#foreach($moduleCode in $moduleCodes)
+							'$moduleCode',
+						#end
+						'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

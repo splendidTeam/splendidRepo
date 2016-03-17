@@ -1,0 +1,6 @@
+2016-02-18:
+	添加订单用户信息：	
+	OrderMemberV5增加vipCode,商城会员VIP CODE
+	
+	
+	

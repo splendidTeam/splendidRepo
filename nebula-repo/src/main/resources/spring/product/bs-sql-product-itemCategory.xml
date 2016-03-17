@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemCategory.unBindItemCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>把一个或者多个商品从一个分类下解除关联</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM t_pd_item_category WHERE category_id = :categoryId 
+					    AND item_id IN (
+					    #foreach( $id in $itemIds )
+    					$id,
+						#end
+						'-1'
+					    )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findItemCategoryByItemIdAndCategoryId"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出所有 商品id 在itemIds和 分类id 在caztegoryIds中的ItemCategory
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+					SELECT * FROM t_pd_item_category WHERE 
+					category_id IN (
+					  #foreach($categoryId in $categoryIds)
+					  $categoryId,
+					  #end
+					  '-1'
+					) AND item_id IN (
+					  #foreach($itemId in $itemIds)
+					  $itemId,
+					  #end
+					  '-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.bindItemCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>将一个商品关联到一个商品分类下</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				INSERT INTO t_pd_item_category(id, create_time, item_id, modify_time, sort_no, version, category_id, is_default)
+                VALUES (nextval('S_t_pd_item_category'), now(),:itemId, NULL, null, now(), :categoryId, :isDefault);
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findItemIdByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品分类ID查询出所有在它类别下的商品id</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT item_id as cnt FROM t_pd_item_category WHERE  category_id = :categoryId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="ItemCategory.findItemListByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品分类ID查询出所有在它类别下的商品id</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE id IN(
+					SELECT item_id FROM t_pd_item_category WHERE  category_id = :categoryId
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findCategoryItemListByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品分类ID查询出所有在它类别下的有效商品id</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE id IN(
+					SELECT item_id FROM t_pd_item_category WHERE  
+					category_id in (
+					   #foreach( $categoryId in $categoryId )
+    					$categoryId ,
+						#end
+						'-1'
+					  ) 
+					  )
+					  and LIFECYCLE='1'
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.deleteItemCategoryByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID删除所有分类条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM t_pd_item_category WHERE  item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.deleteItemCategoryByCategoryIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据分类ID删除所有分类条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM t_pd_item_category 
+					WHERE 1=1
+					and category_id in(
+						#foreach($categoryId in $categoryIds)
+							$categoryId,
+						#end
+						-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemCategory.findItemCategoryListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID查找所有分类条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * FROM t_pd_item_category 
+					WHERE  item_id = :itemId
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findItemCategoryListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ids查找所有分类条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * FROM t_pd_item_category WHERE  item_id IN (
+					    #foreach( $itemId in $itemIds )
+    					$itemId,
+						#end
+						'-1'
+					    )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+
+
+	<bean id="ItemCategory.findItemListEmptyCategoryByQueryMapWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>已分类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.lifecycle as lifecycle,tpifo.sale_price as salePrice, tpifo.list_price as listPrice,
+						tpifo.title as title
+						#if($categoryId)
+							, tpic.is_default as isDefault
+						#end
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+							#if($categoryId)
+								,t_pd_item_category tpic 
+							#end
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.isaddcategory=1
+						and tpit.shop_id =:shopId
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+		       				#if($categoryId)
+		       					and tpit.id = tpic.item_id 
+		       					and tpic.category_id = :categoryId
+		       				#end
+		       				
+		       				#if($minPrice)
+		       					and tpifo.sale_price >= :minPrice
+		       				#end
+		       				#if($maxPrice)
+		       					and tpifo.sale_price <= :maxPrice
+		       				#end
+		       				#if($type==1)
+		       					and (tpifo.type = 1 or tpifo.type is null)
+		       				#end
+		       				#if($type==0)
+		       					and tpifo.type = 0
+		       				#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="ItemCategory.findItemListEmptyCategoryByQueryMapWithPageByCIDS"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>已分类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.lifecycle as lifecycle,tpifo.sale_price as salePrice, tpifo.list_price as listPrice,
+						tpifo.title as title
+							, 
+							tpic.is_default as isDefault
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+								,t_pd_item_category tpic 
+							
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.isaddcategory=1
+						and tpit.shop_id =:shopId
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+		       				#if($categoryId)
+		       					and tpit.id = tpic.item_id 
+		       					and tpic.category_id IN (
+					  				#foreach($cid in $categoryId)
+					  				$cid,
+					  				#end
+					  				'-1'
+									) 
+		       				#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findItemCommandByQueryItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>已分类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.lifecycle as lifecycle,
+						tpifo.title as title
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+							
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.isaddcategory=1
+						
+						and tpit.LIFECYCLE!=2
+						
+						and tpit.id = :itemId
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findAllItemCategoryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpic.item_id as itemId,tpct.name as categoryName,tpct.code as categoryCode from t_pd_item tpit,t_pd_item_category tpic,t_pd_category tpct
+					where tpic.item_id=tpit.id and tpic.category_id=tpct.id
+					 and tpit.lifecycle!=2
+							
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findAllItemCategoryListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpic.item_id as itemId,tpct.name as categoryName,tpct.code as categoryCode  from t_pd_item tpit,t_pd_item_category tpic,t_pd_category tpct
+					where tpic.item_id=tpit.id and tpic.category_id=tpct.id
+					 and tpit.lifecycle!=2
+					 and tpic.item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="ItemCategory.findItemNoctListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>可考虑和findItemListEmptyCategoryByQueryMapWithPage合并
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.lifecycle as lifecycle,
+						tpifo.title as title
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id 
+						and tpit.isaddcategory=0
+						and tpit.shop_id =:shopId
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+                       
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findDefaultCategoryByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpic.id as id, tpic.category_id as categoryId, tpic.item_id as itemId,tpct.name as categoryName,tpct.code as categoryCode 
+					from t_pd_item tpit,t_pd_item_category tpic,t_pd_category tpct
+					where tpic.item_id=tpit.id and tpic.category_id=tpct.id
+					 and tpit.lifecycle!=2
+					 and tpic.item_id = :itemId
+					 and tpic.is_default = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findItemByDefaultCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * FROM t_pd_item_category 
+					WHERE  category_id = :categoryId
+					and is_default = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findDefaultCateoryByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * FROM t_pd_item_category 
+					WHERE  item_id = :itemId
+					and is_default = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findEffectItemIdListByCategoryIdList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据分类ID列表查询所包含的有效商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						ic.item_id AS id
+					FROM
+						t_pd_item_category ic
+					JOIN t_pd_category c ON ic.category_id = c.id
+					JOIN t_pd_item i ON ic.item_id = i.id
+					WHERE 
+						i.shop_id = :shopId AND
+						c.lifecycle != 2 AND
+						i.lifecycle != 2 AND
+						ic.category_id IN (
+						#foreach($cid in $cidList)
+							$cid,
+						#end
+						-1)					
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findAllEffectProductIdListByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效的商品ID列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						id
+					FROM
+						t_pd_item
+					WHERE
+						lifecycle != 2
+					AND shop_id = :shopId
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findDistinctItemIdByCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效的商品ID列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT DISTINCT item_id as itemId FROM t_pd_item_category where category_id in(  
+						#foreach( $id in $categoryIds)
+	    					$id,
+						#end
+		       		 	-1)
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemCategory.findItemCategoryListByCategoryIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询与该分类Id关联的商品Id</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT
+						id,
+						category_id as categoryId,
+						item_id as itemId,
+						sort_no as sortNo,
+						is_default as isDefault
+					FROM t_pd_item_category 
+					where category_id in(
+						#foreach($categoryId in $categoryIds)
+							$categoryId,
+						#end
+						-1
+					)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemCategory.findItemListEmptyCategoryByQueryMapWithPageNoShopid"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>已分类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.lifecycle as lifecycle,tpifo.sale_price as salePrice, tpifo.list_price as listPrice,
+						tpifo.title as title
+						#if($categoryId)
+							, tpic.is_default as isDefault
+						#end
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+							#if($categoryId)
+								,t_pd_item_category tpic 
+							#end
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.isaddcategory=1
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+		       				#if($categoryId)
+		       					and tpit.id = tpic.item_id 
+		       					and tpic.category_id = :categoryId
+		       				#end
+		       				
+		       				#if($minPrice)
+		       					and tpifo.sale_price >= :minPrice
+		       				#end
+		       				#if($maxPrice)
+		       					and tpifo.sale_price <= :maxPrice
+		       				#end
+		       				#if($type==1)
+		       					and (tpifo.type = 1 or tpifo.type is null)
+		       				#end
+		       				#if($type==0)
+		       					and tpifo.type = 0
+		       				#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemCategory.findItemCategoryCommandByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>已分类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						item.id as itemId,
+						item.code as itemCode,
+						category.id as categoryId,
+						category.code as categoryCode,
+						category.name as categoryName,
+						itemCategory.is_default as isDefault
+					from t_pd_item_category itemCategory 
+					left join t_pd_category category on itemCategory.category_id = category.id
+					left join  t_pd_item item on itemCategory.item_id = item.id
+					where item.shop_id = :shopId
+					and item.industry_id = :industryId
+					and item.lifecycle != 2
+					and category.lifecycle = 1
+					and item.code in (
+						#foreach($itemCode in $itemCodeList)
+							'$itemCode',
+						#end
+						'-1')
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemCategory.findDefaultCategoryByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpic.id as id, tpic.category_id as categoryId, tpic.item_id as itemId,tpct.name as categoryName from t_pd_item tpit,t_pd_item_category tpic,t_pd_category tpct
+					where tpic.item_id=tpit.id and tpic.category_id=tpct.id
+					 and tpit.lifecycle!=2
+					 and tpic.item_id in (
+					 	#foreach($itemId in $itemIds)
+							$itemId,
+						#end
+						-1)
+					 and tpic.is_default = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

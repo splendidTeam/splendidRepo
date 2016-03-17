@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="stylesheet" type="text/css" href="../css/demo.css" />
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+	var $j = jQuery.noConflict();
+</script>
+<script type="text/javascript"
+	src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+<script type="text/javascript">
+	$j.extend(loxia.regional['zh-CN'], {
+		"ROLE_NAME" : "角色名称",
+	});
+
+	var addTagUrl = '添加标签的url';
+
+	//标签表格 公用的表单列定义
+	var tagTableColumnDefine = [ {
+		label : "<input type='checkbox'/>",
+		witdh : "5%",
+		template : "drawCheckbox"
+	}, {
+		name : "pdCode",
+		label : "商品编码",
+		width : "16%",
+		sort:["code asc","code desc"]
+	}, {
+		name : "pdName",
+		label : "商品名称",
+		width : "16%",
+		sort:["title asc","title desc"]
+	}, {
+		name : "pdCategory",
+		label : "所属分类",
+		width : "16%",
+		sort:["category asc","category desc"]
+	}, {
+		name : "pdIndustry",
+		label : "所属行业",
+		width : "16%"
+	}, {
+		name : "status",
+		label : "状态",
+		width : "16%",
+		type : "yesno"
+	}, {		
+		name:"createTime",
+		label : "创建时间",
+		width : "15%",
+		formatter:"formatDate",
+		sort:["create_time asc","create_time desc"]
+	} ];
+
+	//行业树的配置
+	var categorySetting = {
+		check : {
+			enable : true,
+			chkStyle : "radio",
+			radioType : "all"
+		},
+		view : {
+			dblClickExpand : false,
+			showIcon : false
+		},
+		data : {
+			simpleData : {
+				enable : true
+			}
+		},
+		callback : {
+			onClick : onCategoryClick,
+			onCheck : onCategoryCheck,
+		}
+	};
+
+	var categoryzNodes = [ {
+		id : 19,
+		pId : 0,
+		name : "ROOT",
+		open : true
+	}, {
+		id : 20,
+		pId : 19,
+		name : "电脑",
+		open : true
+	}, {
+		id : 21,
+		pId : 20,
+		name : "电脑整机",
+		open : false
+	}, {
+		id : 22,
+		pId : 21,
+		name : "笔记本",
+		open : false
+	}, {
+		id : 23,
+		pId : 21,
+		name : "平板电脑配件",
+		open : false
+	}, {
+		id : 24,
+		pId : 21,
+		name : "笔记本配件",
+		open : false
+	}, {
+		id : 25,
+		pId : 20,
+		name : "电脑外设",
+		open : false
+	}, {
+		id : 26,
+		pId : 20,
+		name : "网络产品",
+		open : false
+	}, {
+		id : 27,
+		pId : 25,
+		name : "键盘",
+		open : false
+	}, {
+		id : 28,
+		pId : 25,
+		name : "摄像头",
+		open : false
+	}, {
+		id : 29,
+		pId : 25,
+		name : "线缆",
+		open : false
+	}, {
+		id : 30,
+		pId : 25,
+		name : "耳机",
+		open : false
+	}, {
+		id : 31,
+		pId : 26,
+		name : "网络设备",
+		open : false
+	}, {
+		id : 32,
+		pId : 26,
+		name : "路由器",
+		open : false
+	}, {
+		id : 33,
+		pId : 26,
+		name : "网卡",
+		open : false
+	}, {
+		id : 34,
+		pId : 26,
+		name : "网络存储",
+		open : false
+	}, {
+		id : 35,
+		pId : 19,
+		name : "家电",
+		open : true
+	}, {
+		id : 36,
+		pId : 19,
+		name : "汽车",
+		open : true
+	}, {
+		id : 37,
+		pId : 35,
+		name : "厨房电器",
+		open : false
+	}, {
+		id : 38,
+		pId : 35,
+		name : "个人护理",
+		open : false
+	}, {
+		id : 39,
+		pId : 35,
+		name : "生活电器",
+		open : false
+	}, {
+		id : 40,
+		pId : 35,
+		name : "视听影音",
+		open : false
+	}, {
+		id : 46,
+		pId : 37,
+		name : "榨汁机",
+		open : false
+	}, {
+		id : 47,
+		pId : 37,
+		name : "搅拌机",
+		open : false
+	}, {
+		id : 48,
+		pId : 37,
+		name : "空炸机",
+		open : false
+	}, {
+		id : 49,
+		pId : 37,
+		name : "咖啡机",
+		open : false
+	}, {
+		id : 50,
+		pId : 37,
+		name : "电饭煲",
+		open : false
+	}, {
+		id : 51,
+		pId : 37,
+		name : "电压力煲",
+		open : false
+	}, {
+		id : 52,
+		pId : 37,
+		name : "其他",
+		open : false
+	}, {
+		id : 53,
+		pId : 38,
+		name : "个人护理",
+		open : false
+	}, {
+		id : 54,
+		pId : 38,
+		name : "剃须刀",
+		open : false
+	}, {
+		id : 55,
+		pId : 38,
+		name : "电动牙刷",
+		open : false
+	}, {
+		id : 56,
+		pId : 38,
+		name : "电吹风",
+		open : false
+	}, {
+		id : 57,
+		pId : 38,
+		name : "脱/剃毛器",
+		open : false
+	}, {
+		id : 58,
+		pId : 39,
+		name : "生活电器",
+		open : false
+	}, {
+		id : 59,
+		pId : 39,
+		name : "吸尘器",
+		open : false
+	}, {
+		id : 60,
+		pId : 39,
+		name : "电熨斗",
+		open : false
+	}, {
+		id : 61,
+		pId : 39,
+		name : "挂烫机",
+		open : false
+	}, {
+		id : 62,
+		pId : 39,
+		name : "空气净化器",
+		open : false
+	}, {
+		id : 63,
+		pId : 39,
+		name : "其他",
+		open : false
+	}, {
+		id : 64,
+		pId : 40,
+		name : "视听数码",
+		open : false
+	}, {
+		id : 65,
+		pId : 40,
+		name : "液晶电视",
+		open : false
+	}, {
+		id : 66,
+		pId : 40,
+		name : "音响",
+		open : false
+	}, {
+		id : 67,
+		pId : 40,
+		name : "iphone等苹果音乐底座",
+		open : false
+	}, {
+		id : 68,
+		pId : 40,
+		name : "数码配件",
+		open : false
+	}, {
+		id : 69,
+		pId : 36,
+		name : "汽车用品",
+		open : false
+	}, {
+		id : 70,
+		pId : 36,
+		name : "汽车美容",
+		open : false
+	}, {
+		id : 71,
+		pId : 69,
+		name : "汽车用品",
+		open : false
+	}, {
+		id : 72,
+		pId : 69,
+		name : "车用香水",
+		open : false
+	}, {
+		id : 73,
+		pId : 69,
+		name : "车用头枕",
+		open : false
+	}, {
+		id : 74,
+		pId : 69,
+		name : "车用腰枕",
+		open : false
+	}, {
+		id : 75,
+		pId : 69,
+		name : "小套饰",
+		open : false
+	}, {
+		id : 76,
+		pId : 69,
+		name : "方向盘套",
+		open : false
+	}, {
+		id : 77,
+		pId : 69,
+		name : "汽车座垫",
+		open : false
+	}, {
+		id : 78,
+		pId : 69,
+		name : "儿童安全座椅",
+		open : false
+	}, {
+		id : 79,
+		pId : 69,
+		name : "通用座套",
+		open : false
+	}, {
+		id : 80,
+		pId : 69,
+		name : "其他",
+		open : false
+	}, {
+		id : 82,
+		pId : 70,
+		name : "其他",
+		open : false
+	}
+
+	];
+
+	function formatDate(val){
+		if(val==null||val==''){
+			return "&nbsp;";
+		}
+		else{
+			var date=new Date(val);
+			return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getMinutes();
+		}
+	}
+	
+	function onCategoryClick(e, treeId, treeNode) {
+		var zTree = $j.fn.zTree.getZTreeObj("categoryTree");
+		zTree.checkNode(treeNode, !treeNode.checked, null, true);
+		return false;
+	}
+
+	function onCategoryCheck(e, treeId, treeNode) {
+		var zTree = $j.fn.zTree.getZTreeObj("categoryTree"), nodes = zTree
+				.getCheckedNodes(true), v = "";
+		for ( var i = 0, l = nodes.length; i < l; i++) {
+			v += nodes[i].name + ",";
+		}
+		if (v.length > 0)
+			v = v.substring(0, v.length - 1);
+		var categoryObj = $j("#category");
+		categoryObj.attr("value", v);
+		hideMenu();
+	}
+
+	//隐藏行业树菜单
+	function hideMenu() {
+		$j("#categoryContent").fadeOut("fast");
+		$j("body").unbind("mousedown", onBodyDown);
+	}
+	function onBodyDown(event) {
+		if (!(event.target.id == "menuBtn" || event.target.id == "category"
+				|| event.target.id == "categoryContent" || $j(event.target)
+				.parents("#categoryContent").length > 0)) {
+			hideMenu1();
+		}
+	}
+
+	//清除搜索的条件
+	function cleanSearchCondition() {
+
+	}
+
+	//设置左下选中标签之后，被选中的标签变为默认的
+	function setTableSelected() {
+		//选中memberbase 的第一个元素，添加selected样式。同时它的兄弟移除selected样式
+		$j(".memberbase").first().next().addClass("selected").siblings(".memberbase").removeClass("selected");
+		$j(".tag-change-in").first().next().addClass("block").siblings(
+				".tag-change-in").removeClass("block");
+	}
+
+	//生成选择标签 左下角的标签使用
+	function drawSelectTagName(data, args, idx) {
+		return "<a href='javascript:void(0);' class='func-button selectTagType' val='"
+				+ loxia.getObject("id", data)
+				+ "'>"
+				+ loxia.getObject("tagName", data) + "</a>";
+	}
+
+	//左边的 标签列表选中按钮
+	function drawTagTypeCheckbox(data, args, idx) {
+		return "<input type='checkbox' name='id' class='tagTypeCheckId' value='"
+				+ loxia.getObject("id", data) + "'/>";
+	}
+
+	//选择标签的checkbox
+	function drawCheckbox(data, args, idx) {
+		return "<input type='checkbox' name='id' class='tagCheckId' value='"
+				+ loxia.getObject("tagName", data) + "'/>";
+	}
+
+	//删除标签
+	function drawDelTagType(data, args, idx) {
+		return "<a href='javascript:void(0);' class='func-button delTagType' val='"
+				+ loxia.getObject("id", data) + "'>删除</a>";
+	}
+
+	function delTag() {
+		var curObj = $j(this);
+		alert("要删除的标签的id " + curObj.attr("val"));
+		//TODO  和用户确认这个操作，  发送请求后 根据结果显示不同的提示
+	}
+
+	//检测字符串是否为空
+	function checkStrIsNotNull(str) {
+		if (str != null && str.trim() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	$j(document).ready(
+			function() {
+				loxia.init({
+					debug : true,
+					region : 'zh-CN'
+				});
+				nps.init();
+				
+				//显示category 分类 下拉树
+			    $j.fn.zTree.init($j("#categoryTree"), categorySetting, categoryzNodes);
+				//让商品分类下拉树只有叶子节点可选
+				var treeObjCategory = $j.fn.zTree.getZTreeObj("categoryTree");
+				//1.将所有的节点转换为简单 Array 格式
+				var nodesCategory = treeObjCategory.transformToArray(treeObjCategory.getNodes());
+				
+				for(var i = 0;i<nodesCategory.length;i++){
+					//2.如果此节点为父节点 或者 为ROOT节点 ，则让此节点没有radio选框
+					if(nodesCategory[i].isParent || nodesCategory[i].id == 0){
+						nodesCategory[i].nocheck = true;
+					}
+					treeObjCategory.refresh();
+				}
+			    $j("#category").click(function() {
+					var categoryObj = $j(this);
+					var categoryOffset = $j(this).offset();
+					$j("#categoryContent").css({left:categoryOffset.left + "px", top:categoryOffset.top + categoryObj.outerHeight() + "px"}).slideDown("fast");
+
+					$j("body").bind("mousedown", onBodyDown);
+				});
+
+				$j(".button.orange.bind").click(function() {
+					alert("加入标签");
+				});
+
+				$j(".button.unbind").click(function() {
+					alert("脱离标签");
+				});
+
+				//左下标签表格 
+				$j("#tagListTable").loxiasimpletable({
+					form:"searchTagTypeForm",
+					cols : [ {
+						label : "<input type='checkbox'/>",
+						witdh : "20%",
+						template : "drawTagTypeCheckbox"
+					}, {
+						label : "名称",
+						width : "25%",
+						template : "drawSelectTagName",
+						sort:["tagName asc","tagName desc"]
+					}, {
+						name : "typeName",
+						label : "类型",
+						width : "25%",
+						sort:["typeName asc","typeName desc"]
+					}, {
+						label : "操作",
+						width : "30%",
+						template : "drawDelTagType"
+					} ],
+					dataurl : {
+						currentPage : 1,
+						totalPages : 10,
+						count : 99,
+						size : 2,
+						firstPage : true,
+						lastPage : false,
+						items : [ {
+							id : 1,
+							tagName : "直降",
+							typeName : "销售"
+						}, {
+							id : 2,
+							tagName : "五折",
+							typeName : "促销 "
+						}
+
+						]
+					}
+
+				});
+
+				//全部标签 表格
+				$j("#allTagsTable").loxiasimpletable({
+					page : true,
+					cols : tagTableColumnDefine,
+					form:"searchForm",
+					dataurl : {
+						currentPage : 1,
+						totalPages : 10,
+						count : 99,
+						size : 2,
+						firstPage : true,
+						lastPage : false,
+						sortStr:"create_time desc",
+						items : [ {
+							id : 1,
+							pdCode : "1",
+							pdName : "butterfly",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : true,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 2,
+							pdCode : "2",
+							pdName : "one",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : true,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 3,
+							pdCode : "3",
+							pdName : "mi 3",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : false,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 4,
+							pdCode : "4",
+							pdName : "s4",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : false,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 5,
+							pdCode : "5",
+							pdName : "lumei920",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : true,
+							createTime : "2013-9-12 15:45:09"
+						}
+
+						]
+					}
+
+				});
+
+				//已打标签 表格
+				$j("#useTagsTable").loxiasimpletable({
+					page : true,
+					form:"searchForm",
+					cols : tagTableColumnDefine,
+					dataurl : {
+						currentPage : 1,
+						totalPages : 10,
+						count : 99,
+						size : 2,
+						firstPage : true,
+						lastPage : false,
+						sortStr:"create_time desc",
+						items : [ {
+							id : 1,
+							pdCode : "1",
+							pdName : "butterfly",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : true,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 4,
+							pdCode : "4",
+							pdName : "s4",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : false,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 5,
+							pdCode : "5",
+							pdName : "lumei920",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : true,
+							createTime : "2013-9-12 15:45:09"
+						}
+
+						]
+					}
+
+				});
+
+				////未打标签 表格
+				$j("#unUseTagsTable").loxiasimpletable({
+					page : true,
+					form:"searchForm",
+					cols : tagTableColumnDefine,
+					dataurl : {
+						currentPage : 1,
+						totalPages : 10,
+						count : 99,
+						size : 2,
+						firstPage : true,
+						lastPage : false,
+						sortStr:"create_time desc",
+						items : [ {
+							id : 2,
+							pdCode : "2",
+							pdName : "one",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : true,
+							createTime : "2013-9-12 15:45:09"
+						}, {
+							id : 3,
+							pdCode : "3",
+							pdName : "mi 3",
+							pdCategory : "手机",
+							pdIndustry : "3c",
+							status : false,
+							createTime : "2013-9-12 15:45:09"
+						} ]
+					}
+
+				});
+
+				$j("#tagListTable").loxiasimpletable("refresh");
+				$j("#allTagsTable").loxiasimpletable("refresh");
+				$j("#useTagsTable").loxiasimpletable("refresh");
+				$j("#unUseTagsTable").loxiasimpletable("refresh");
+				// 		refreshData();
+
+				$j("#tagListTable").on("click", ".func-button.delTagType",
+						function() {
+							var curObj = $j(this);
+							nps.confirm("标签删除", "确认删除选中的标签吗？", function() {
+								alert("要删除的标签的id " + curObj.attr("val"));
+								//TODO 发送请求  刷新 标签表格
+							});
+						});
+
+				$j("#tagListTable")
+						.on(
+								"click",
+								".func-button.selectTagType",
+								function() {
+									var tableTitle = "【" + $j(this).text()
+											+ "】" + "标签";
+									setTableSelected();
+									$j("#useTagsTable .ui-loxia-table-title")
+											.html(tableTitle);
+
+									//取数据 刷新表格
+								});
+
+				$j("#allTagsTable").on("click", ".func-button.delTag", delTag);
+				$j("#useTagsTable").on("click", ".func-button.delTag", delTag);
+				$j("#unUseTagsTable")
+						.on("click", ".func-button.delTag", delTag);
+
+				$j(".func-button.addTag").click(function() {
+					var tagName = $j("#tagName").val();
+					var tagType = $j("#tagType").val();
+					if (!checkStrIsNotNull(tagName)) {
+						nps.info("操作错误", "标签名称为空");
+						return;
+					}
+					alert("新增标签的类型 " + tagType + " 新增标签名称 " + tagName);
+
+					//TODO 发送请求 ，刷新 标签表格
+				});
+
+				//批量删除标签
+				$j(".func-button.deleteMultyTag").click(function() {
+					//TODO  在提示确认之后进行操作
+					nps.confirm("标签删除", "确认删除选中的标签吗？", function() {
+						var data = "";
+						$j(".tagTypeCheckId:checked").each(function(i, n) {
+							if (i != 0) {
+								data += ",";
+							}
+							data += $j(this).val();
+						});
+
+						if (!checkStrIsNotNull(data)) {
+							nps.info("操作错误", "未选择标签");
+							return;
+						}
+
+						alert("要删除的元素的id列表" + data);
+						//TODO 发送请求  刷新 标签表格
+					});
+
+				});
+
+			});
+</script>
+
+</head>
+<body>
+
+	<div class="content-box width-percent100">
+		<!-- 正文部分  定义整个正文的css -->
+		<div class="ui-title1">
+			<!-- 标题横行部分  -->
+			<img src="../images/wmi/blacks/32x32/tag.png">商品标签 <input
+				type="button" value="脱离标签" class="button unbind" title="脱离标签" /> <input
+				type="button" value="加入标签" class="button orange bind" title="加入标签" />
+		</div>
+
+		<div class="ui-block">
+			<form action="" id="searchForm">
+			<!-- 商品标签搜索 -->
+			<div class="ui-block-content ui-block-content-lb">
+				<table>
+					<tr>
+						<td><label>商品编码</label></td>
+						<td><input name="q_sl_code" type="text" id="codeKey"
+							loxiatype="input" placeholder="输入商品编码快速定位" /></td>
+
+						<td><label>商品名称</label></td>
+						<td><input name="q_sl_title" type="text" id="title"
+							loxiatype="input" placeholder="输入商品名称快速定位" /></td>
+
+						<td><label>是否有效</label></td>
+						<td>
+							<!-- TODO 换为标签 --> <select loxiaType="select" id="isTagEnabled">
+								<option value="1">有效</option>
+								<option value="2">无效</option>
+						</select>
+						</td>
+
+						<td><label>所属行业</label></td>
+						<td>
+							<!--name="q_s_industry" 可能有错  --> 
+							<input type="text" name="category" id="category" class="ui-loxia-default" loxiatype="input" placeholder="点击选择所属行业" />
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label>商品创建时间</label></td>
+						<td><input type="text" id="createStartDate" loxiaType="date"
+							mandatory="false"></input></td>
+
+						<td><label>———</label></td>
+						<td><input type="text" id="createEndDate" loxiaType="date"
+							mandatory="false"></input></td>
+
+						<td><label>商品修改时间</label></td>
+						<td><input type="text" id="updateStartDate" loxiaType="date"
+							mandatory="false"></input></td>
+
+						<td><label>———</label></td>
+						<td><input type="text" id="updateEndDate" loxiaType="date"
+							mandatory="false"></input></td>
+					</tr>
+				</table>
+				<div class="button-line1">
+					<a href="javascript:void(0);" class="func-button search" title="搜索">搜索</a>
+				</div>
+			</div>
+			</form>
+		</div>
+
+		<div class="ui-block ui-block-fleft w240">
+			<!-- 左下div  -->
+
+			<div class="ui-block-content ui-block-content-lb w240">
+				<!-- 搜索form的div -->
+				<form action="" id="searchTagTypeForm">
+					<table>
+						<tr>
+							<td><input type="text" id="tagName" name="q_sl_tagName"
+								loxiaType="input" mandatory="false" style="width: 140px;margin-right: 10px;"
+								placeHolder="请输入标签名称"></input></td>
+							<td>
+								<!-- TODO 换为标签 --> <select loxiaType="select" id="tagType" class="ui-block-content-lb label"
+								style="width: 69px;margin-right: 5px;">
+									<option value="1">打折</option>
+									<option value="2">促销</option>
+									<option value="3">用券</option>
+							</select>
+							</td>
+						</tr>
+					</table>
+					<div class="button-line1">
+						<a href="javascript:void(0);" class="func-button searchGroup"
+							title="搜索"><span>搜索</span></a> <a href="javascript:void(0);"
+							class="func-button addTag" title="新增"><span>新增</span></a>
+					</div>
+
+				</form>
+
+				<div class="clear-line height10"></div>
+			</div>
+
+			<div class="ui-block">
+				<!-- 商品标签列表 -->
+
+				<div id="tagListTable" class="border-grey" caption="标签"></div>
+
+				<!-- 多个删除的文字连接 -->
+				<div class="button-line1">
+					<a href="javascript:void(0);" class="func-button deleteMultyTag"><span>批量删除</span></a>
+				</div>
+			</div>
+		</div>
+
+		<div class="ui-block ml240">
+			<div class="ui-block-content" style="padding-top: 0">
+				<div class="ui-tag-change">
+					<ul class="tag-change-ul">
+						<li class="memberbase">全部</li>
+						<li class="memberbase">已打标签</li>
+						<li class="memberbase">未打标签</li>
+					</ul>
+					<div class="tag-change-content">
+						<div class="tag-change-in">
+							<div class="border-grey ui-loxia-simple-table" id="allTagsTable"
+								caption="全部"></div>
+						</div>
+						<div class="tag-change-in">
+							<div class="border-grey ui-loxia-simple-table" id="useTagsTable"
+								caption="已打标签"></div>
+						</div>
+						<div class="tag-change-in">
+							<div class="border-grey ui-loxia-simple-table"
+								id="unUseTagsTable" caption="未打标签"></div>
+						</div>
+					</div>
+				</div>
+				<div class="button-line">
+					<input type="button" value="加入标签" class="button orange bind"
+						title="加入标签" /> <input type="button" value="脱离标签"
+						class="button unbind" title="脱离标签" />
+				</div>
+
+			</div>
+		</div>
+		<div id="categoryContent" class="menuContent"
+			style="z-index: 999; display: none; position: absolute; background-color: #f0f6e4; border: 1px solid #617775; padding: 3px;">
+			<ul id="categoryTree" class="ztree"
+				style="margin-top: 0; width: 180px; height: 100%;"></ul>
+		</div>
+
+	</div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j(document).ready(function(){
+loxia.init({debug: true, region: 'zh-CN'});
+nps.init();
+});
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+<body>
+
+<div class="content-box width-percent100">
+    <form name="userForm" action="/aaaa" method="post">
+    
+	<div class="ui-title1">通用选项维护
+	    <input type="button" value="返回" class="button" onclick="location.href='choose-option2.html'"/>
+        <input type="button" value="保存" class="button orange" onclick="nps.submitForm('userForm',{mode:'sync'})"/>
+	</div>
+	
+	<div class="ui-block">
+    <div class="ui-block-title1">新增分组及选项</div>
+    <div class="ui-block-line ui-block-line-37">
+		<label>分组编码：</label>
+		<div class="wl-right">
+			<input name="groupCode" type="text" loxiaType="input" value="" mandatory="true"/>
+		</div>
+    </div>
+    
+    <div class="ui-block-line ui-block-line-37">
+        <label>分组描述：</label>
+        <div class="wl-right">
+			<input name="groupDesc" type="text" loxiaType="input" value="" mandatory="true"/>
+        </div>
+    </div>
+    
+        
+    <div class="ui-block-line ui-block-line-37">
+        <label>选项名称：</label>
+        <div class="wl-right">
+			<input name="optionLabel" type="text" loxiaType="input" value="" mandatory="true"/>
+        </div>
+    </div>
+    
+    <div class="ui-block-line ui-block-line-37">
+        <label>选项值：</label>
+        <div class="wl-right">
+			<input name="optionValue" type="text" loxiaType="input" value="" mandatory="true"/>
+        </div>
+    </div>
+    
+    <div class="ui-block-line ui-block-line-37">
+        <label>排序号：</label>
+        <div class="wl-right">
+			<input name="sortNo" type="text" loxiaType="input" value="5" mandatory="true"/>
+        </div>
+    </div>
+    
+	</div>
+	</form>
+    
+    <div class="button-line">
+        <input type="button" value="保存" class="button orange" onclick="nps.submitForm('userForm',{mode:'sync'})"/>
+        <input type="button" value="返回" class="button" onclick="location.href='choose-option2.html'"/>
+        
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<!-- 商品 sku schema.xml -->
+<schema name="Nebula SkuItem" version="1.4">
+	<types>
+		<fieldtype name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true" />
+		<fieldtype name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true" />
+		<fieldtype name="integer" class="solr.IntField" omitNorms="true" />
+		<fieldtype name="long" class="solr.LongField" omitNorms="true" />
+		<fieldtype name="float" class="solr.FloatField" omitNorms="true" />
+		<fieldtype name="double" class="solr.DoubleField" omitNorms="true" />
+		<fieldtype name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true" />
+		<fieldtype name="sdouble" class="solr.SortableDoubleField" sortMissingLast="true" omitNorms="true"/> 
+		<fieldtype name="sint" class="solr.SortableIntField" sortMissingLast="true" omitNorms="true"/>
+		<fieldtype name="slong" class="solr.SortableLongField" sortMissingLast="true" omitNorms="true"/> 
+        <fieldtype name="sfloat" class="solr.SortableFloatField" sortMissingLast="true" omitNorms="true"/> 
+
+		<fieldType name="text" class="solr.TextField">
+			<analyzer type="index">
+				<tokenizer class="org.wltea.analyzer.solr.IKTokenizerFactory" isMaxWordLength="false"/>
+					<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true"/>
+					<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+					<filter class="solr.LowerCaseFilterFactory"/>
+					<filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+				</analyzer>
+				<!--    -->
+				<analyzer type="query">
+					<tokenizer class="org.wltea.analyzer.solr.IKTokenizerFactory" isMaxWordLength="true"/>
+					<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt" enablePositionIncrements="true"/>
+					<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+					<filter class="solr.LowerCaseFilterFactory"/>
+				</analyzer>
+		</fieldType>
+	</types>
+
+	<fields>
+	<!--默认语言为简体中文 -->
+		<!-- ********from Sku ******** -->
+		<!-- id 商品标识 -->
+		<field name="id" type="long" indexed="true" stored="true" multiValued="false" />
+
+		<!--  code 商品编码 -->
+		<field name="code" type="string" indexed="true" stored="true" multiValued="false" />		
+
+		<!-- 关键字搜索 -->
+		<field name="keyword" type="text" indexed="true" stored="false" multiValued="true" /> 
+
+		<!-- 商品名称 -->
+		<field name="title" type="text" indexed="true" stored="true" multiValued="false" /> 
+		
+		<!-- 副标题 -->
+		<field name="subTitle" type="text" indexed="true" stored="true" multiValued="false" /> 
+		
+		<!-- 商品概述 -->
+		<field name="sketch" type="text" indexed="true" stored="true" multiValued="false" /> 
+		
+		<!-- 商品详述 -->
+		<field name="description" type="string" indexed="false" stored="true" multiValued="false" />
+		
+		<!-- 商品详述 用于搜索 -->
+		<field name="descriptionForSearch" type="text" indexed="true" stored="true" multiValued="false" />  
+		
+		<!-- 店铺或供货商名称 -->
+		<field name="shopName" type="text" indexed="true" stored="true" multiValued="false" /> 
+		
+		<!-- 行业名称 -->
+		<field name="industryName" type="string" indexed="false" stored="true" multiValued="false" /> 
+		
+		<!-- 商品款式 -->
+		<field name="style" type="string" indexed="true" stored="true" multiValued="false" /> 
+		
+		<!--商品分组款式 -->
+		<field name="groupStyle" type="string" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 商品在分组中顺序 -->
+		<field name="sort_no" type="integer" indexed="true" stored="true" multiValued="false"/> 
+		
+		
+		<!-- 商品默认排序的分数 (分数从大到小) -->
+		<field name="default_sort" type="integer" indexed="true" stored="true" multiValued="false"/> 
+		
+		
+		<!-- 吊牌价 -->
+		<field name="list_price" type="sdouble" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 销售价 -->
+		<field name="sale_price" type="sdouble" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 修改时间  -->
+		<field name="modifyTime" type="date" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 上架时间  -->
+		<field name="listTime" type="date" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 活动开始时间  -->
+		<field name="activeBeginTime" type="date" indexed="true" stored="true"   multiValued="false" />
+		
+		<!-- 销售量 -->
+		<field name="salesCount" type="integer" indexed="true" stored="true" multiValued="false" />
+
+		<!-- 商品评分  -->
+		<field name="rankavg" type="float" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 浏览量  -->
+		<field name="viewCount" type="integer" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 商品收藏量  -->
+		<field name="favoredCount" type="integer" indexed="true" stored="true" multiValued="false" />
+		
+		<!-- 库存 -->
+		<field name="itemCount" type="integer" indexed="true" stored="true" multiValued="false"/>
+
+		<field name="seoTitle" type="string" indexed="false" stored="true" multiValued="false"/>
+
+		<field name="seoDescription" type="string" indexed="false" stored="true" multiValued="false"/>
+
+		<field name="seoKeywords" type="string" indexed="false" stored="true" multiValued="false"/>
+		
+		<!-- 图片 -->
+		<field name="imageUrl" type="text" indexed="false" stored="true" multiValued="true"/>
+		
+		<!-- 全场是否可见 值为y/n (用于商品可见性) -->
+		<field name="allDisplay" type="string" indexed="true" stored="true" multiValued="false"/>
+		
+		<!-- 商品可见人群ids (用于商品可见性) -->
+		<field name="visiblePersons" type="string" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 可搜索动态属性 -->
+		<dynamicField name="dynamic_forsearch_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 不可搜索动态属性（仅限于关键字搜索） -->
+		<dynamicField name="dynamic_withoutsearch_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 分类排序 -->
+		<dynamicField name="category_order_*" type="integer" indexed="true" stored="true" multiValued="false"/>
+		
+		<!-- 分类 -->
+		<dynamicField name="category_name_*" type="text" indexed="true" stored="true" multiValued="false"/>
+		
+		<!-- 分类CODE -->
+		<dynamicField name="category_code_*" type="text" indexed="true" stored="true" multiValued="false"/>
+		
+		<!-- 分类CODE集合 -->
+		<field name="all_category_codes" type="string" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 分类ID集合 -->
+		<field name="all_category_ids" type="long" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 分类父级 -->
+		<dynamicField name="category_Parent_*" type="long" indexed="true" stored="true" multiValued="false"/>
+		
+		
+		<!-- 可搜索动态属性值 -->
+		<dynamicField name="dynamic_forsearchName_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 不可搜索动态属性（仅限于关键字搜索） -->
+		<dynamicField name="dynamic_withoutsearchName_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 可搜索用户自定义动态属性值 -->
+		<dynamicField name="dynamic_customerValue_*" type="text" indexed="true" stored="true" multiValued="true"/>
+
+		<!-- 拼音汉字在前 -->
+		<field name="pinyin_b" type="string" indexed="true" stored="true" multiValued="true"/>
+		
+		<!-- 拼音汉字在后 -->
+		<field name="pinyin_a" type="string" indexed="true" stored="true" multiValued="true"/>
+		
+		<field name="suggestion" type="string" indexed="true" stored="true" termVectors="true" multiValued="true"/>
+		
+		<!-- 国际化动态属性 -->
+		<dynamicField name="dynamic_title_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		<dynamicField name="dynamic_subTitle_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		<dynamicField name="dynamic_sketch_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		<dynamicField name="dynamic_seoTitle_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		<dynamicField name="dynamic_seoKeywords_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		<dynamicField name="dynamic_seoDescription_*" type="text" indexed="true" stored="true" multiValued="true"/>
+		<dynamicField name="dynamic_descriptionForSearch_*"  type="text" indexed="true" stored="true" multiValued="true" /> 
+		<dynamicField name="dynamic_description_*"  type="text" indexed="true" stored="true" multiValued="true" />  
+		<!-- 分类 -->
+		<dynamicField name="dynamic_category_name_*" type="text" indexed="true" stored="true" multiValued="false"/>
+
+		<dynamicField name="dynamic_image_url_*"  type="string" indexed="true" stored="true" multiValued="true" />  
+		
+	</fields>
+	
+	<copyField source="seoTitle" dest="keyword" />
+	<copyField source="title" dest="keyword" />
+	<copyField source="subTitle" dest="keyword" />
+	<copyField source="sketch" dest="keyword" />
+	<copyField source="shopName" dest="keyword" />
+	<copyField source="seoKeywords" dest="keyword" />
+	<copyField source="category_name_*" dest="keyword" />
+	<copyField source="dynamic_forsearchName_*" dest="keyword" />
+	<copyField source="dynamic_customerValue_*" dest="keyword" />
+	<copyField source="code" dest="keyword" />
+	<copyField source="descriptionForSearch" dest="keyword" />
+	
+	<copyField source="pinyin_a" dest="suggestion" />
+	<copyField source="pinyin_b" dest="suggestion" />
+	
+	<!-- 国际化动态属性 -->
+	<copyField source="dynamic_title_*" dest="keyword" />
+	<copyField source="dynamic_subTitle_*" dest="keyword" />
+	<copyField source="dynamic_sketch_*" dest="keyword" />
+	<copyField source="dynamic_seoTitle_*" dest="keyword" />
+	<copyField source="dynamic_category_name_*" dest="keyword" />
+	<copyField source="dynamic_descriptionForSearch_*" dest="keyword" />
+	<!-- field to use to determine and enforce document uniqueness. -->
+	<uniqueKey>id</uniqueKey>
+
+	<!-- field for the QueryParser to use when an explicit fieldname is absent -->
+	<defaultSearchField>keyword</defaultSearchField>
+
+	<!-- SolrQueryParser configuration: defaultOperator="AND|OR" 這裡defaultOperator設為 "AND", 就是說當你輸入的查尋詞句有空白時 ex. "遠東 餐廳", Solr搜尋解析器會當做你的query指令為"遠東AND餐廳". 
+		若是設為 "OR" 就會變成"遠東OR餐廳". -->
+	<solrQueryParser defaultOperator="AND" />
+</schema>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="EmailCheck.findNextval" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT nextval ('T_SEQ_EMAILCHCEKSERIAL') as seqValue
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EmailCheck.findEmailCheckByEncryptedS" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			*
+		       		 from t_pd_account_emailcheck
+		       			 where encrypted_s =:EncryptedS
+		       			  and creatime >(SELECT date_trunc('day', TIMESTAMP 'now()'))
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="EmailCheck.findEmailCheckByLoginEmail" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			*
+		       		 from t_pd_account_emailcheck
+		       			 where EMAILADDRESS =:emailAddress 
+		       			  and status =:status
+		       			  and creatime >(SELECT date_trunc('day', TIMESTAMP 'now()'))
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailCheck.findEmailCheckByMidAndEncryptedS" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			*
+		       		 from t_pd_account_emailcheck
+		       			 where member_id =:memberId 
+		       			  and encrypted_s =:EncryptedS
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailCheck.updateEmailCheckStatusByMemberid" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_account_emailcheck set status = :status
+		       			 where 
+		       			 member_id =:memberId 
+		       			  and creatime <= :createtime
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailCheck.updateEmailCheckStatusById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_account_emailcheck set status =:status
+		       			 where 
+		       			 ID =:id
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="EmailCheck.findEmailCheckListByDay" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_account_emailcheck 
+		       			 where member_id =:memberId 
+		       			  and creatime >(SELECT date_trunc('day', TIMESTAMP 'now()'))
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailCheck.findCountsByLoginEmail" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT sum(COUNT) as total from t_pd_account_emailcheck
+		       		where EMAILADDRESS =:emailAddress 
+		       			  and MODIFYTIME >(SELECT date_trunc('day', TIMESTAMP 'now()'))
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+</beans>

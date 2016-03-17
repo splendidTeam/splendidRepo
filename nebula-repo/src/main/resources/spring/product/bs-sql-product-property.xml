@@ -1,0 +1,1129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Property.updatePropertyById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				UPDATE t_pd_property
+   				SET  name=:name, required=:required, searchable=:searchable, hasthumb=:hasThumb, 
+   				sort_no=:sortNo, lifecycle=:lifecycle, industry_id=:industryId, group_name=:groupName,
+       			version=now(),  modify_time=now()
+ 				WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CommonProperty.updateCommonPropertyById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				UPDATE t_pd_common_property
+   				SET  name=:name, editing_type=:editingType, value_type=:valueType, is_salep_rop=:isSaleProp, 
+   				is_color_prop=:isColorProp, version=now(),  modify_time=now()
+ 				WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="Property.findAllPropertyList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version , tpp.common_property_id  as common_property_id
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+					AND tpp.lifecycle != 2
+					AND tpp.is_common_industry = TRUE
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.findPropertyListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID 
+		       		AND tpp.id in (
+			       		#foreach( $id in $ids )
+	    					$id,
+						#end
+		       		 	-1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Property.findPropertyListByIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select  property_lang.name as name, property.id as id,  property.sort_no as sort_no,
+					 common_property.version as version,  property.industry_id as industry_id,  common_property.editing_type as editing_type,
+					 common_property.value_type as value_type,  common_property.create_time as create_time,  common_property.modify_time as modify_time,
+					 property.lifecycle as lifecycle,  common_property.is_salep_rop as is_salep_rop,  common_property.is_color_prop as is_color_prop,
+					 property.required as required,  property.searchable as searchable,  property.hasthumb as hasthumb,
+					 property.is_common_industry as is_common_industry,  property_lang.group_name as group_name 
+					 from t_pd_property property, t_pd_common_property common_property, t_pd_property_lang property_lang 
+					 where property_lang.lang =:lang and common_property.id = property.common_property_id and property.id = property_lang.property_id
+					 and property.id  in (
+			       		#foreach( $id in $ids )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+
+
+	<bean id="Property.findPropertyListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+		       		
+							#if($isSystem)
+		       					and tpp.is_common_industry=:isSystem
+		       				#end
+		       			
+		       				#if($industryId)
+		       					and tpp.INDUSTRY_ID=:industryId
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and tpp.NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and tpp.NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and tpp.SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and tpcp.CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and tpcp.CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and tpcp.MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and tpcp.MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+
+
+		       			
+		       				#if($lifecycle!=0)
+		       					and tpp.LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($editingType)
+		       					and tpcp.EDITING_TYPE=:editingType
+		       				#end
+
+		       			
+		       				#if($valueType)
+		       					and tpcp.VALUE_TYPE=:valueType
+		       				#end
+
+		       			
+		       				#if($isSaleProp)
+		       					and tpcp.IS_SALEP_ROP=:isSaleProp
+		       				#end
+
+		       			
+		       				#if($isColorProp)
+		       					and tpcp.IS_COLOR_PROP=:isColorProp
+		       				#end
+
+		       			
+		       				#if($required)
+		       					and tpp.REQUIRED=:required
+		       				#end
+
+		       			
+		       				#if($searchable)
+		       					and tpp.SEARCHABLE=:searchable
+		       				#end
+
+		       			
+		       				#if($hasThumb)
+		       					and tpp.HASTHUMB=:hasThumb
+		       				#end 
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.findPropertyListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+							select tpp.id as id,tpcp.create_time as createtime,tpcp.editing_type as editingType,tpp.group_name as groupName,
+							tpp.hasthumb as hasthumb,tpp.industry_id as industryid,tpcp.is_color_prop as iscolorprop,
+							tpcp.is_salep_rop as issaleprop,tpp.lifecycle as lifecycle,tpcp.modify_time as modifytime,
+							tpp.name as name,tpp.required as required,tpp.searchable as searchable,
+							tpp.sort_no as sortno,tpcp.value_type as valuetype,tpcp.version as version,
+							tpcp.value_type as valuetype,tpp.is_common_industry as issystem, tpi.name as industryName 
+							from t_pd_property tpp,t_pd_industry tpi,t_pd_common_property tpcp where tpp.industry_id=tpi.id and tpp.common_property_id = tpcp.id and tpp.LIFECYCLE!=2
+							
+							#if($isSystem)
+		       					and tpp.is_common_industry=:isSystem
+		       				#end
+		       				
+		       				#if($industryId)
+		       					and tpp.INDUSTRY_ID=:industryId
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and tpp.NAME like :name
+		       				#end
+		       				#if($nameForLike)
+		       					and tpp.NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and tpp.SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and tpcp.CREATETIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and tpcp.CREATETIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and tpcp.MODIFYTIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and tpcp.MODIFYTIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($shopId)
+		       					and tpp.SHOPID=:shopId
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and tpp.LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($editingType)
+		       					and tpcp.EDITINGTYPE=:editingType
+		       				#end
+
+		       			
+		       				#if($valueType)
+		       					and tpcp.VALUETYPE=:valueType
+		       				#end
+
+		       			
+		       				#if($isSaleProp)
+		       					and tpcp.ISSALEP_ROP=:isSaleProp
+		       				#end
+
+		       			
+		       				#if($isColorProp)
+		       					and tpcp.ISCOLOR_PROP=:isColorProp
+		       				#end
+
+		       			
+		       				#if($required)
+		       					and tpp.REQUIRED=:required
+		       				#end
+
+		       			
+		       				#if($searchable)
+		       					and tpp.SEARCHABLE=:searchable
+		       				#end
+
+		       			
+		       				#if($hasThumb)
+		       					and tpp.HASTHUMB=:hasThumb
+		       				#end 
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="Property.enableOrDisablePropertyByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach($id in $ids)
+    					$id,
+					 #end 
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.removePropertyByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end 
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.findAllEffectPropertyList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version ,tpp.common_property_id as  common_property_id
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+					AND tpp.lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.findEffectPropertyListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+			       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version  ,tpp.common_property_id  as common_property_id
+						FROM
+							t_pd_property tpp,
+							t_pd_common_property tpcp
+						WHERE
+							tpp.common_property_id = tpcp. ID
+						AND tpp.lifecycle=1 
+		       			
+		       				#if($industryId)
+		       					and tpp.INDUSTRY_ID=:industryId
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and tpp.NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and tpp.NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and tpp.SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and tpcp.CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and tpcp.CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and tpcp.MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and tpcp.MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and tpp.LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($editingType)
+		       					and tpcp.EDITING_TYPE=:editingType
+		       				#end
+
+		       			
+		       				#if($valueType)
+		       					and tpcp.VALUE_TYPE=:valueType
+		       				#end
+
+		       			
+		       				#if($isSaleProp)
+		       					and tpcp.IS_SALEP_ROP=:isSaleProp
+		       				#end
+
+		       			
+		       				#if($isColorProp)
+		       					and tpcp.IS_COLOR_PROP=:isColorProp
+		       				#end
+
+		       			
+		       				#if($required)
+		       					and tpp.REQUIRED=:required
+		       				#end
+
+		       			
+		       				#if($searchable)
+		       					and tpp.SEARCHABLE=:searchable
+		       				#end
+
+		       			
+		       				#if($hasThumb)
+		       					and tpp.HASTHUMB=:hasThumb
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.findEffectPropertyListByQueryMapWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       			SELECT
+							tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+							tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+							tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+							tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+						FROM
+							t_pd_property tpp,
+							t_pd_common_property tpcp
+						WHERE
+							tpp.common_property_id = tpcp. ID
+						AND tpp.lifecycle=1 
+		       		
+		       				#if($industryId)
+		       					and tpp.INDUSTRY_ID=:industryId
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and tpp.NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and tpp.NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and tpp.SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and tpcp.CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and tpcp.CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and tpcp.MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and tpcp.MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+
+
+		       			
+		       				#if($lifecycle)
+		       					and tpp.LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($editingType)
+		       					and tpcp.EDITING_TYPE=:editingType
+		       				#end
+
+		       			
+		       				#if($valueType)
+		       					and tpcp.VALUE_TYPE=:valueType
+		       				#end
+
+		       			
+		       				#if($isSaleProp)
+		       					and tpcp.IS_SALEP_ROP=:isSaleProp
+		       				#end
+
+		       			
+		       				#if($isColorProp)
+		       					and tpcp.IS_COLOR_PROP=:isColorProp
+		       				#end
+
+		       			
+		       				#if($required)
+		       					and tpp.REQUIRED=:required
+		       				#end
+
+		       			
+		       				#if($searchable)
+		       					and tpp.SEARCHABLE=:searchable
+		       				#end
+
+		       			
+		       				#if($hasThumb)
+		       					and tpp.HASTHUMB=:hasThumb
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.findPropertyById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpp. VERSION as version, tpp.common_property_id as common_property_id
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+					AND tpp.id =:propertyId
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Property.findPropertyByIdI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT property_lang.name as name, property.id as id,  property.sort_no as sort_no,
+					 common_property.version as version,  property.industry_id as industry_id,  common_property.editing_type as editing_type,
+					 common_property.value_type as value_type,  common_property.create_time as create_time,  common_property.modify_time as modify_time,
+					 property.lifecycle as lifecycle,  common_property.is_salep_rop as is_salep_rop,  common_property.is_color_prop as is_color_prop,
+					 property.required as required,  property.searchable as searchable,  property.hasthumb as hasthumb,
+					 property.is_common_industry as is_common_industry,  property_lang.group_name as group_name 
+					FROM
+						t_pd_property property,
+						t_pd_common_property common_property,
+						t_pd_property_lang property_lang
+					WHERE
+						property_lang.lang = :lang
+					AND common_property.ID = property.common_property_id
+					AND property.ID = property_lang.property_id
+					AND property.ID = :propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Property.findPropertyByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+					AND tpp.lifecycle = 1
+					AND tpp.name =:name
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PropertyValue.findPropertyValueListById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_property_value where property_id =:propertyId order by sort_No
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PropertyValue.deleteByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_pd_property_value
+		       		where property_Id =:propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PropertyValue.findValuesByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select pv.id as id from t_pd_property_value pv
+		       		where property_id =:propertyId
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.updateById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property_value
+		       		set value =:value,
+		       		#if($thumb)
+		       			thumb = :thumb,
+		       		#end
+		       		sort_no = :sortNo,
+		       		modify_time=now()
+		       		where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.deleteById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_pd_property_value where id in(
+		       		 #foreach($tid in $ids)
+		       		 $tid,
+		       		 #end
+		       		-1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.findIdListByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_property_value
+		       		where property_id =:propertyId
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.countSameValue" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select count(1) as count
+		       		from t_pd_property_value
+		       		 where property_id =:propertyId
+		       		and value =:value
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+
+	<bean id="Property.findPropertyListByIndustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version,tpp.common_property_id as common_property_id 
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+					AND tpp.industry_id = :industryId 
+					AND tpp.lifecycle !=2
+					AND tpp.is_common_industry= true 
+					order by tpp.sort_No asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Property.updateSortById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property set modify_time = now() , sort_No = :sortNo  where id =:propertyId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PropertyValue.findPropertyValueListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据值id查找值list</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_property_value
+		       		where
+                    id in (
+		       		#foreach($id in $ids)
+    					$id,
+					 #end 
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.findPropertyValueListByIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据值id查找值list</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select  value_lang.value as value, value.id as id,  value.version as version,
+					 value.create_time as create_time,  value.property_id as property_id,  value.thumb as thumb,
+					 value.modify_time as modify_time,  value.sort_no as sort_no 
+					 from t_pd_property_value value,t_pd_property_value_lang value_lang 
+					 where value_lang.lang =:lang and value.id = value_lang.property_value_id
+					 and value.id  in (
+		       		#foreach($id in $ids)
+    					$id,
+					 #end 
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="PropertyValue.findPropertyValueListByPropIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据值propertyIds查找值list</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_property_value
+		       		where property_id 
+		       		in (
+		       		#foreach($id in $propertyIds)
+    					$id,
+					 #end 
+		       		 -1)
+		       		 order by property_id;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PropertyValue.findPropertyValueListByPropertyName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据属性名称查询对应的属性值列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select pv.* 
+					from t_pd_property_value pv
+					join t_pd_property p on p.id = pv.property_id
+					where p.name = :propertyName
+					order by pv.sort_no
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="PropertyValue.findPropertyValueById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id查询属性值</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_property_value
+		       		where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.findPropertyValueByIdI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id和语言查询属性值</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select  value_lang.value as value, value.id as id,  value.version as version,
+					value.create_time as create_time,  value.property_id as property_id,  value.thumb as thumb,
+					value.modify_time as modify_time,  value.sort_no as sort_no 
+					from t_pd_property_value value,t_pd_property_value_lang value_lang 
+					where value_lang.lang = :lang and value.id = value_lang.property_value_id
+					and value.id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+
+	<bean id="PropertyValue.findPropertyValueByPropertyIdAndValue" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据propertyId和属性值查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						*
+					FROM
+						t_pd_property_value
+					WHERE
+						property_id = :propertyId
+					AND value = :value
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="PropertyValue.findPropertyValueByCommonPropertyIdAndValue" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据commonPropertyId和属性值查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						*
+					FROM
+						t_pd_property_value
+					WHERE
+						COMMON_PROPERTY_ID = :commonPropertyId
+					AND value = :value
+					ORDER BY ID
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<!-- 查询所有销售属性的属性值,一般用于 wormhole同步商品时候,来判断同步过来的商品 属性值是否存在于DB中 -->
+	<bean id="PropertyValue.findSalesPropertyValues" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有销售属性的属性值,一般用于 wormhole同步商品时候,来判断同步过来的商品 属性值是否存在于DB中 </description>
+		<constructor-arg>
+			<value> 
+				<![CDATA[
+					select propertyValue.* 
+					from t_pd_property_value propertyValue 
+					left join t_pd_property property ON propertyValue.property_id = property.id 
+					WHERE property.is_salep_rop = true
+			     ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Property.updatePropertyLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据propertyId和属性值查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property_lang 
+					set name = :name,
+					group_name = :groupName 
+					where property_id = :propertyId 
+					AND lang = :lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PropertyValue.updatePropertyValueLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据propertyId和属性值查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property_value_lang 
+					set value = :value 
+					where property_value_id = :propertyValueId 
+					AND lang = :lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Property.findPropertyLangByPids" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表查询简要的分类信息</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_property_lang 
+                   where property_id in(
+                   	#foreach($id in $pids)
+                   		$id,
+                   	#end
+                   	-1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PropertyValue.findPropertyValueLangByPvids" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表查询简要的分类信息</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_property_value_lang 
+                   where property_value_id in(
+                   	#foreach($id in $pvIds)
+                   		$id,
+                   	#end
+                   	-1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Property.findPropertyLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_property_lang   
+                   where property_id =:id 
+                   and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.findPropertyValueLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_property_value_lang  
+                   where property_value_id =:id 
+                   and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CommonProperty.findAllCommonProperty" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select * from t_pd_common_property  
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PropertyValue.findPropertyValueListByCommonPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select * from t_pd_property_value where common_property_id=:commonPropertyId and
+                    value not in(select DISTINCT value from  t_pd_property_value where property_id=:propertyId and value is not null) ORDER BY value
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Property.validatePropertyname" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	select count(*) num from t_pd_property where id!=:propertyId and industry_id=:industryId and name=:proname and lifecycle!=2
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Property.validatecommonProperty" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select count(*) num from t_pd_property where id!=:propertyId and industry_id=:industryId and common_property_id=:commonPropertyId and lifecycle!=2
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="CommonProperty.findAllCommonPropertyByindustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据行业ID查找通用属性表中没有被该行业属性关联过的且其通用属性名与该行业的属性名没有发生过重复的记录</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                  select * from t_pd_common_property where 
+                  id not in(select common_property_id from t_pd_property where  industry_id=:industryId and common_property_id is not null) 
+                  and name not in(select name from t_pd_property where  industry_id=:industryId and name is not null)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CommonProperty.validatecommonPropertyName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>验证通用属性名是否存在</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                 select count(*) num from t_pd_common_property where name=:commonPropertyName
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.findpropervalueId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            SELECT * FROM T_PD_PROPERTY_VALUE  WHERE  PROPERTY_ID IN (SELECT  ID FROM 
+                       (SELECT * FROM T_PD_PROPERTY  WHERE ID IN 
+                             (SELECT PROPERTY_ID FROM T_PD_ITEM_PROPERTIES  WHERE   ITEM_ID=
+                                   (SELECT ID FROM T_PD_ITEM WHERE CODE=:code)) 
+                       ) AS ITMEPROPERTY  WHERE 
+            GROUP_NAME =:item_color OR GROUP_NAME =:filter_color ) AND VALUE=:valuecolor
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PropertyValue.findPropertyValueListByCommonPropertyIdAndPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select * from t_pd_property_value where common_property_id=:commonPropertyId and property_id=:propertyId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="PropertyValue.findPropertyValueByCommonPropertyIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据CommonPropertyIds列表查询信息</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+              	  select * from  t_pd_property_value 
+                   where common_property_id in(
+                   	#foreach($common_property_id in $commonProIds)
+                   		$common_property_id,
+                   	#end
+                   	-1
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+</beans>

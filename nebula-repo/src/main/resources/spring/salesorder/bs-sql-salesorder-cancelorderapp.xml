@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="CancelOrderApp.findCancelOrdersByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询申请取消订单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					#if($sdkQueryType == 1) 
+					select 
+					sco.ID,
+					sco.ORDER_CODE as orderCode,
+					sco.MEMBER_ID as memberId,
+					sco.MEMBER_NAME as memberName,
+					sco.REASON ,
+					sco.MESSAGE,
+					sco.MOBILE,
+					sco.STATUS,
+					sco.HANDLE_ID as handleId,
+					sco.HANDLE_NAME as handleName,
+					sco.CREATE_TIME as createTime,
+					sco.VERSION,
+					sco.FEEDBACK
+					from t_so_cancelorderapp as sco
+					
+					#else
+					select
+					sco.ID,
+					sco.ORDER_CODE as orderCode,
+					sco.MEMBER_ID as memberId,
+					sco.MEMBER_NAME as memberName,
+					sco.REASON ,
+					sco.MESSAGE,
+					sco.MOBILE,
+					sco.STATUS,
+					sco.HANDLE_ID as handleId,
+					sco.HANDLE_NAME as handleName,
+					sco.CREATE_TIME as createTime,
+					sco.VERSION,
+					sco.FEEDBACK
+					from t_so_cancelorderapp as sco
+					
+				
+					#end
+					where 1 = 1
+					#if($memberId)
+						and sco.MEMBER_ID = :memberId
+					#end
+					#if($memberName)
+						and sco.MEMBER_NAME like :memberName
+					#end
+					#if($orderCode)
+						and sco.ORDER_CODE = :orderCode
+					#end
+					#if($state)
+						and sco.STATUS = :state
+					#end
+					#if($mobile)
+						and sco.MOBILE like :mobile
+					#end
+					#if($handleId)
+						and sco.HANDLE_ID = :handleId
+					#end
+					#if($startDate)
+		       			and	sco.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	sco.CREATE_TIME<=:endDate
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="CancelOrderApp.updateCancelOrders" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 更改取消订单申请状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_cancelorderapp
+		       		set 
+		       		HANDLE_ID = :handleId 
+		       		,STATUS = :state
+		       		,FEEDBACK = :feedback
+		       		,MODIFY_TIME= :modifyTime
+		       		where ORDER_CODE = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="CancelOrderApp.findCancelOrderAppByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据memberId查询申请取消订单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					sa.ID,
+					sa.ORDER_CODE as orderCode,
+					sa.MEMBER_ID as memberId,
+					sa.REASON,
+					sa.MESSAGE,
+					sa.MOBILE,
+					sa.STATUS,
+					sa.HANDLE_ID as handleId,
+					sa.HANDLE_NAME as handleName,
+					sa.CREATE_TIME as createTime,
+					sa.VERSION,
+					sa.FEEDBACK
+					from t_so_cancelorderapp as sa
+					where 
+					 sa.ORDER_CODE = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

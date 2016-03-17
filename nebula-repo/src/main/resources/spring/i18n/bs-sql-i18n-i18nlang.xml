@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="I18nLang.findAllI18nLangList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_i18n_lang where lifecycle = 1 order by sort 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="I18nLang.findI18nLangListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_I18N_LANG where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="I18nLang.findI18nLangListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_I18N_LANG where 
+		       				lifecycle != 2	
+		       		
+		       				#if($key)
+		       					and KEY=:key
+		       				#end
+		       			
+		       				#if($value)
+		       					and VALUE=:value
+		       				#end
+		       			
+		       				#if($tokenizer)
+		       					and TOKENIZER=:tokenizer
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+				       		
+				       		#if($tokenizer)
+		       					and default_lang=:defaultlang
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="I18nLang.findI18nLangListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_I18N_LANG where 
+		       				lifecycle !=2 	
+		       		
+		       				#if($key)
+		       					and KEY=:key
+		       				#end
+		       			
+		       				#if($value)
+		       					and VALUE=:value
+		       				#end
+		       			
+		       				#if($tokenizer)
+		       					and TOKENIZER=:tokenizer
+		       				#end
+		       				
+		       				#if($tokenizer)
+		       					and default_lang=:defaultlang
+		       				#end
+		       				
+		       				#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="I18nLang.updateDefaultLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update  t_i18n_lang set default_lang = 0 where id != :id 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="I18nLang.updateLifecycle" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update  t_i18n_lang set lifecycle = :lifecycle where id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="I18nLang.selectSort" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select COALESCE(max(sort),0) as sort from t_i18n_lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

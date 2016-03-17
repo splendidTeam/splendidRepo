@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ShippingFeeConfig.findShippingFeeConfigsByTemeplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据模板id查找模板对应的运费配置</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       		
+		       		sfc.id as id,
+					sfc.base_price as basePrice,
+					sfc.dest_area_id as destAreaId,
+					sfc.distribution_mode_id as distributionModeId,
+					sfd.name as distributionModeName,
+					sfc.first_part_price as firstPartPrice,
+					sfc.first_part_unit as firstPartUnit,
+					sfc.shipping_temeplate_id as shippingTemeplateId,
+					sfc.subsequent_part_price as subsequentPartPrice,
+					sfc.subsequent_part_unit as subsequentPartUnit
+					
+		       		from T_SF_SHIPPING_CONFIG sfc 
+		       		, t_sf_distribution_mode sfd 
+		       		where sfc.distribution_mode_id = sfd.id
+		       		and sfc.SHIPPING_TEMEPLATE_ID = :temeplateId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ShippingFeeConfig.deleteShippingFeeConfigsByTemeplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据模板id删除模板对应的运费配置</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from T_SF_SHIPPING_CONFIG 
+		       		where SHIPPING_TEMEPLATE_ID = :temeplateId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ShippingFeeConfig.deleteShippingFeeConfigsByTemeplateIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据模板ids批量删除模板对应的运费配置</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from T_SF_SHIPPING_CONFIG 
+		       		where 
+		       		SHIPPING_TEMEPLATE_ID in (
+		       		#foreach($tid in $temeplateIds )
+    					$tid,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="ShippingFeeConfig.findAllShippingFeeConfig" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取所有的运费配置</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from T_SF_SHIPPING_CONFIG
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PageItem.findPageItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据code查询PageItem</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_base_page_item WHERE id= :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PageItem.findPageItemListByPageTemplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       	select 
+		       		pi.id as id,
+		       		pi.code as code,
+		       		pi.create_time as create_time,
+		       		pi.lifecycle as lifecycle,
+		       		pi.modify_time as modify_time,
+                    pi.name as name,
+		       		pi.opeartor_id as opeartor_id,
+		       		pi.page_template_id as page_template_id,
+                    pi.version as version,
+                    pi.sort as sort
+                  
+         from		t_base_page_item     pi
+                  	
+         where      pi.lifecycle!=2
+		       		and pi.page_template_id=:ptId
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PageItem.findPageItemListByCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过多个元素编码查询页面元素列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_base_page_item 
+					where page_code in (
+		       			#foreach( $un in $codes )
+    					'$un',
+						#end
+						'-1'
+		       		)  
+		       		and lifecycle=1 
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PageItem.removePageItemByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>(逻辑删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_base_page_item
+		       		set lifecycle=2
+		       		where id in (
+		       			#foreach( $id in $ids )
+    					$id,
+						#end
+						-1
+		       		) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

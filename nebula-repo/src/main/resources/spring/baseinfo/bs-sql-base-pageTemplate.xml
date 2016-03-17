@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PageTemplate.findPageTemplateById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询PageTemplate</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_base_page_template WHERE id= :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PageTemplate.findPageTemplateListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       	select 
+		       		p.id as id,
+		       		p.lifecycle as lifecycle,
+		       		p.create_time as create_time,
+		       		p.img as img,
+		       		p.modify_time as modify_time,
+		       		p.opeartor_id as opeartor_id,
+		       		p.page_code as page_code,
+                    p.page_name as page_name,
+                    p.version as version
+                  
+         from       t_base_page_template p
+             
+         where      p.lifecycle!=2
+		       		
+		       		#if($pageCode)
+		       		 and p.page_code like :pageCode
+		       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PageTemplate.findPageTemplateListByPageCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过多个页面编码查询会员列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_base_page_template 
+					where page_code in (
+		       			#foreach( $un in $pageCodes )
+    					'$un',
+						#end
+						'-1'
+		       		)  
+		       		and lifecycle=1 
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PageTemplate.enableOrDisablePageTemplateById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用或禁用模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		update t_base_page_template
+		       		set lifecycle=:state
+		       		 where 
+		       		id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PageTemplate.updatePageTemplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		update t_base_page_template
+		       		set 
+		       			img=:img,
+		       			opeartor_id=:opeartorId,
+		       			page_code=:pageCode,
+                    	page_name=:pageName,
+                    	version=now(),
+		       			modify_time=now()
+                    
+		       		 where 
+		       			id=:id
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+    	<bean id="PageTemplate.removePageTemplateByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>(逻辑删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_base_page_template
+		       		set lifecycle=2
+		       		where id in (
+		       			#foreach( $id in $ids )
+    					$id,
+						#end
+						-1
+		       		) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="PageTemplate.findPageTemplateListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据Ids数组查询PageTemplate</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_base_page_template WHERE id IN(
+					#foreach($id in $Ids)
+					$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+
+
+</beans>

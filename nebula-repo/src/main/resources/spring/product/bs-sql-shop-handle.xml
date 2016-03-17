@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ShopCommand.findShopListByOrgaTypeId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>店铺列表 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		SELECT 
+		       		s.id as shopid,
+		       		t.id as organizationid,
+		       		t.name as shopname,
+		       		t.code as shopcode,
+		       		t.description as description,
+		       		t.lifecycle as lifecycle,
+		       		s.create_time as createTime  
+		       		from t_au_organization t 
+		       		LEFT JOIN 
+		       		t_ma_shop  s 
+		       		ON t.id=s.org_id  
+		       		where 
+		       		t.org_type_id=:orgaTypeId 
+		       		and 
+		       		t.lifecycle!=2
+		       		#if($name)
+		       		 and t.name like :name
+		       		#end
+		       		#if($lifecycle)
+		       			and t.lifecycle= :lifecycle
+		       		#end
+		       		#if($code)
+		       			and t.code like :code
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.updateOrganization" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改t_au_organization表中</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_au_organization set name=:name,code = :code ,description = :description,lifecycle=:lifecycle
+					where id = :id					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.createshop" class="loxia.dao.support.DynamicQueryHolder">
+		<description>添加店铺信息至t_ma_shop表中</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					insert into t_ma_shop (ID,ORG_ID,VERSION,createTime,modifyTime)
+					VALUES
+					(:shopId,:orgId,now(),now())	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.findShopIdbyOrgId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据OgrId查找shop主键Id</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select id as CNT from t_ma_shop where ORG_ID=:orgId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.createShopproperty" class="loxia.dao.support.DynamicQueryHolder">
+		<description>添加店铺信息至t_pd_shopproperty表中</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					insert into t_pd_shopproperty (id,industry_id,SHOP_ID,property_id)
+					values
+					(nextval('S_T_PD_SHOPPROPERTY'),:industryId,:shopId,:propertyId)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.updateShopproperty" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改t_pd_shopproperty表中店铺信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_shopproperty set industry_id=:industryId, property_id=:propertyId
+					where SHOP_ID=:shopId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.removeShopPropertyByshopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shopId删除shopProperty的相关属性</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				delete from t_pd_shopproperty where 
+				id in 
+				(select a.id  from t_pd_shopproperty a,t_pd_property b 
+				 where a.shop_id =:shopId 
+				 and a.property_id = b.id 
+				 and b.is_common_industry is true)
+				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.findSysPropertyListByIndustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据行业Id查询行业系统属性</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+					FROM
+						t_pd_property tpp,
+						t_pd_common_property tpcp
+					WHERE
+						tpp.common_property_id = tpcp. ID
+					AND tpp.lifecycle != 2
+					AND tpp.is_common_industry is true
+						#if($industryId) 
+						 AND tpp.industry_id=:industryId
+					    #end
+                 ]]>
+
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.enableOrDisableShopByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用或禁用店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		UPDATE t_au_organization SET lifecycle = :type  WHERE id IN (
+		       			#foreach($id in $shopIds)
+		       			$id,
+		       			#end
+		       			'-1'
+		       		)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.removeShopByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>逻辑删除店铺 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		UPDATE t_au_organization SET lifecycle = 2  WHERE id IN (
+		       			#foreach($id in $shopIds)
+		       			$id,
+		       			#end
+		       			'-1'
+		       		)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.findShopById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据店铺id查询店铺 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		SELECT t.id AS organizationid,s.id AS shopid,t.name as shopname,t.code as shopcode,
+		       		t.description as description,t.lifecycle as lifecycle,s.create_time as createTime  
+					from t_au_organization t 
+					LEFT JOIN 
+					t_ma_shop  s 
+					ON t.id=s.org_id  
+					where 
+					s.id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.findShopByOrgId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据组织id查询店铺 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		SELECT s.id AS shopid  from t_ma_shop  s  where 
+					s.org_id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.findIndustryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description> </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		 select * from t_pd_industry where lifecycle=1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShopProperty.findShopPertyByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		select * from t_pd_shopproperty where property_id =:propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Shop.findPropertyListByIndustryIdAndShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 根据行业id和店铺id查询 属性</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		
+		       		SELECT p.id,cp.create_time,cp.editing_type,p.hasthumb,p.industry_id,cp.is_color_prop,cp.is_salep_rop,
+		       		p.lifecycle,cp.modify_time,p.name,p.required,p.searchable,
+					p.sort_no,cp.value_type ,cp.version,p.is_common_industry 
+					FROM t_pd_property p 
+					JOIN t_pd_common_property cp ON p.common_property_id = cp.id
+					LEFT JOIN t_pd_shopproperty s
+					ON p.id = s.property_id
+					WHERE  p.lifecycle != 2 and s.shop_id =:shopId AND s.industry_id =:industryId
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="Shop.enableOrDisablePropertyByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过ids批量启用或禁用Property   </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property set lifecycle=:state where id in (
+		       		#foreach($id in $ids)
+    				$id,
+					#end 
+		       		'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Shop.removePropertyByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过ids批量删除Property</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_property set lifecycle=2 where id in (
+		       		#foreach( $id in $ids )
+    				$id,
+					#end 
+		       		'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Shop.findCreatePropertyDefaultSortNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>在新增店铺属性的时候给出默认的排序</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				 
+				 SELECT COALESCE(MAX(sort_no),0)+1 AS RANKS  FROM t_pd_property p
+				 LEFT JOIN t_pd_shopproperty s
+				 ON p.id = s.property_id
+				 WHERE s.shop_id = :shopId AND s.industry_id = :industryId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Shop.countRepeatNameNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据属性名查询 属性数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				SELECT COUNT(*) AS COUNT FROM t_pd_property  WHERE 1=1
+				#if($industryId)
+				 AND industry_id=:industryId  
+				 #end
+				 AND name = :propertyName AND lifecycle !=2;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.findIsSysByIidAndIsShopBySidAndIid" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 根据行业id和店铺id查询 属性并查询行业系统属性</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+					FROM
+						t_pd_property tpp
+						LEFT JOIN t_pd_common_property tpcp ON tpp.common_property_id = tpcp. ID
+						LEFT JOIN t_pd_shopproperty tps ON tpp.id = tps.property_id
+					WHERE  tpp.lifecycle != 2 
+					AND tps.shop_id =:shopId 
+					AND tps.industry_id =:industryId 
+					AND tpp.is_common_industry is false 
+					
+					UNION ALL
+										
+					SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpcp.create_time as create_time, tpcp.editing_type as editing_type, tpcp.is_color_prop as is_color_prop, tpcp.is_salep_rop as is_salep_rop,
+						tpcp.modify_time as modify_time, tpcp.value_type as value_type, tpcp. VERSION as version
+					FROM
+						t_pd_property tpp
+						LEFT JOIN t_pd_common_property tpcp ON tpp.common_property_id = tpcp. ID
+					WHERE tpp.lifecycle != 2 
+					AND tpp.is_common_industry is true 
+					AND tpp.industry_id =:industryId
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Shop.findShopCommandByOrgName" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过店铺名称, 查询店铺信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tms.id as shopId,
+						tao.code as shopCode,
+						tao.name as shopName,
+						tao.description as description,
+						tao.id as organizationid
+					from t_au_organization tao
+					left join t_ma_shop tms on tms.org_id = tao.id 
+					where tao.name = :orgName and tao.lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.countRepeatNameNoi18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据属性名查询 属性数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				select count(*) as count from t_pd_property_lang  where 1=1
+				#if($propertyId)
+				 and property_id=:propertyId  
+				 #end
+				 and name = :name and lang =:lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Shop.findAllEnabledIndustryByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据店铺ID查询商品所在的行业(可用行业)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						DISTINCT industry.* 
+					from t_pd_industry industry
+					left join t_pd_shopproperty shopproperty on industry.id = shopproperty.industry_id
+					join t_ma_shop shop on shopproperty.shop_id = shop.id 
+					where industry.lifecycle = 1 and shop.id = :shopId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

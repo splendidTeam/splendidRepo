@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="CmsPageInstance.findAllCmsPageInstanceList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageInstance.findCmsPageInstanceListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageInstance.findCmsPageInstanceListByTemplateIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE where lifecycle !=2
+		       		and TEMPLATE_ID in (
+		       		#foreach( $id in $templateIds )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstance.findCmsPageInstanceListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($seoTitle)
+		       					and SEO_TITLE=:seoTitle
+		       				#end
+
+		       			
+		       				#if($seoKeywords)
+		       					and SEO_KEYWORDS=:seoKeywords
+		       				#end
+
+		       			
+		       				#if($seoDescription)
+		       					and SEO_DESCRIPTION=:seoDescription
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageInstance.findCmsPageInstanceListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE 
+		       		where lifecycle !=2
+	       			
+	       				#if($name)
+	       					and NAME=:name
+	       				#end
+	       				#if($nameForLike)
+	       					and NAME like :nameForLike
+	       				#end
+	       			
+	       				#if($code)
+	       					and CODE=:code
+	       				#end
+
+	       				#if($codeForLike)
+	       					and CODE like :codeForLike
+	       				#end
+	       			
+	       				#if($templateId)
+	       					and TEMPLATE_ID=:templateId
+	       				#end
+	       			
+	       				#if($url)
+	       					and URL=:url
+	       				#end
+
+	       				#if($urlForLike)
+	       					and URL like :urlForLike
+	       				#end
+	       			
+	       				#if($seoTitle)
+	       					and SEO_TITLE=:seoTitle
+	       				#end
+	       			
+	       				#if($seoKeywords)
+	       					and SEO_KEYWORDS=:seoKeywords
+	       				#end
+	       			
+	       				#if($seoDescription)
+	       					and SEO_DESCRIPTION=:seoDescription
+	       				#end
+	       			
+	       				#if($createTime)
+	       					and CREATE_TIME >= :createTimeStart
+	       				#end
+	       				#if($createTime)
+	       					and CREATE_TIME <= :createTimeEnd
+	       				#end
+	       			
+	       				#if($modifyTime)
+	       					and MODIFY_TIME >= :modifyTimeStart
+	       				#end
+	       				#if($modifyTime)
+	       					and MODIFY_TIME <= :modifyTimeEnd
+	       				#end
+	       			
+	       				#if($lifecycle)
+	       					and LIFECYCLE = :lifecycle
+	       				#end
+
+	       				#if($ispublished == false)
+	       					and ispublished = :ispublished
+	       				#end
+
+	       				#if($ispublished == true)
+	       					and ispublished = :ispublished
+	       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsPageInstance.enableOrDisableCmsPageInstanceByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_PAGE_INSTANCE
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstance.removeCmsPageInstanceByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_PAGE_INSTANCE
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstance.findAllEffectCmsPageInstanceList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="CmsPageInstance.findAllPublishedCmsPageInstanceList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select page.*,tmp.support_type supportType from T_CMS_PAGE_INSTANCE page,T_CMS_PAGE_TEMPLATE  tmp 
+		       		 where page.lifecycle=1 and page.ispublished = true 
+		       		 and  page.TEMPLATE_ID = tmp.id 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	
+	<bean id="CmsPageInstance.findEffectCmsPageInstanceListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE where lifecycle=1
+		       		
+							#if($id)
+		       					and id=:id
+		       				#end
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($seoTitle)
+		       					and SEO_TITLE=:seoTitle
+		       				#end
+
+		       			
+		       				#if($seoKeywords)
+		       					and SEO_KEYWORDS=:seoKeywords
+		       				#end
+
+		       			
+		       				#if($seoDescription)
+		       					and SEO_DESCRIPTION=:seoDescription
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageInstance.findEffectCmsPageInstanceListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($seoTitle)
+		       					and SEO_TITLE=:seoTitle
+		       				#end
+
+		       			
+		       				#if($seoKeywords)
+		       					and SEO_KEYWORDS=:seoKeywords
+		       				#end
+
+		       			
+		       				#if($seoDescription)
+		       					and SEO_DESCRIPTION=:seoDescription
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageInstance.checkPageInstanceCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE 
+		       		where lifecycle != 2
+		       		and CODE=:code
+					#if($pageId)
+						and id != :pageId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsPageInstance.checkPageInstanceUrl" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select page.* from T_CMS_PAGE_INSTANCE page ,t_cms_page_template tmp 
+		       		where page.lifecycle != 2
+		       		and page.URL=:url
+		       		#if($type!=0)
+		       		and (tmp.SUPPORT_TYPE = :type 
+		       		or tmp.SUPPORT_TYPE = 0)
+		       		#end
+		       		#if($type==0)
+		       		and (tmp.SUPPORT_TYPE = :type 
+		       		or tmp.SUPPORT_TYPE = 1 
+		       		or tmp.SUPPORT_TYPE = 2)
+		       		#end
+		       		and page.template_id = tmp.id
+					#if($pageId)
+						and page.id != :pageId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

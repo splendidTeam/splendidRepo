@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE></TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../css/main.css" type="text/css">
+	<link rel="stylesheet" href="../css/demo.css" type="text/css">
+
+	<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+	<SCRIPT type="text/javascript">
+	
+		<!--
+		var setting = {
+			
+			check: {
+				enable: true,
+				chkStyle: "radio",
+				radioType: "all"
+			},
+			view: {
+				showIcon:false,
+				fontCss: getFontCss
+			},
+			edit: {
+				enable: false,
+				showRenameBtn: false
+			},
+			data: {
+				keep: {
+					parent:false,
+					leaf:false
+				},
+				key: {
+					title: "name"
+				},
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				
+				onCheck: onCheck,
+				beforeRemove:beforeRemove
+			}
+		};
+
+		function beforeRemove(treeId, treeNode,e) {
+			
+		}
+
+		var zNodes =[
+			{ id:0, name:"ROOT",state:"0",sort:1, open:true,root:"true",nocheck:true},
+			{ id:1, pId:0, name:"鞋",state:"0",sort:1, open:true,root:"true",nocheck:true},
+			{ id:11, pId:1, name:"运动鞋",state:"1",sort:1},
+			{ id:12, pId:1, name:"休闲鞋",state:"0",sort:2},
+			{ id:2, pId:0, name:"服装",state:"0",sort:2, open:true,root:"true",nocheck:true},
+			{ id:21, pId:2, name:"T恤",state:"1",sort:1},
+			{ id:22, pId:2, name:"裤子",state:"0",sort:2},
+			{ id:23, pId:2, name:"卫衣",state:"0",sort:3},
+			{ id:3, pId:0, name:"配件",state:"0",sort:3, open:true,root:"true",nocheck:true},
+			{ id:31, pId:3, name:"帽子",state:"1",sort:1},
+			{ id:32, pId:3, name:"手套",state:"0",sort:2},
+			{ id:33, pId:3, name:"袜子",state:"0",sort:3}
+		];
+		var log, className = "dark";
+		
+		
+		function onClick(event, treeId, treeNode)  {
+			 //alert(treeNode.id + ", " + treeNode.name);
+
+			 $j("#listTitle").html("【"+treeNode.name+"】行业属性维护");
+			 onCheck(event, treeId, treeNode);
+				
+		}
+		function onCheck(event, treeId, treeNode)  {
+			 //alert(treeNode.id + ", " + treeNode.name);
+
+			 $j("#listTitle").html("【"+treeNode.name+"】行业属性维护"+'<a href="javascript:void(0)" style="color:#ffffff;float:right;" class="func-button addProerpty">添加属性</a>');
+				
+		}
+		function focusKey(e) {
+			if (key.hasClass("empty")) {
+				key.removeClass("empty");
+			}
+		}
+		function blurKey(e) {
+			if (key.get(0).value === "") {
+				key.addClass("empty");
+			}
+		}
+		var lastValue = "", nodeList = [], fontCss = {};
+		
+		function searchNode(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			var value = $j.trim(key.get(0).value);
+				
+				if (key.hasClass("empty")) {
+					value = "";
+				}
+				if (lastValue === value) return;
+				lastValue = value;
+				if (value === "") return;
+				updateNodes(false);
+				
+			nodeList = zTree.getNodesByParamFuzzy("name", value);
+
+			if (nodeList.length > 0) {
+			$j.each(nodeList, function(i, node){      
+         		 zTree.expandNode(node.getParentNode(),true, true, true);
+　　			}); 
+			}
+			updateNodes(true);
+			$j("#key").focus();
+		}
+		function updateNodes(highlight) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			for( var i=0, l=nodeList.length; i<l; i++) {
+				nodeList[i].highlight = highlight;
+				zTree.updateNode(nodeList[i]);
+			}
+		}
+		function getFontCss(treeId, treeNode) {
+			return (!!treeNode.highlight) ? {color:"#333","background-color":"yellow"} : {color:"#333", "font-weight":"normal","background-color":""};		
+		}
+	
+		var key;
+
+		
+		
+		var newCount = 1;
+		function addRoot(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode&& treeNode.getParentNode()!=null) {
+				treeNode=treeNode.getParentNode();
+				treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:false, name:$j("#add_name").val()});
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:false, name:$j("#add_name").val()});
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+		
+		function add(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode) {
+				treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:isParent, name:$j("#add_name").val()});
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:isParent, name:$j("#add_name").val()});
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+		//-->
+		
+function refreshData(){
+	$j("#table1").loxiasimpletable("refresh",
+			industryProperti
+	);
+
+   
+}		
+		//行业及选中属性
+var industryProperti=[
+          			{id:1,name:"尺寸",createtime:"2013-03-05",status:1},
+        			{id:2,name:"颜色",createtime:"2013-03-05",status:1},
+        			{id:3,name:"版本",createtime:"2013-03-05",status:1},
+        			{id:4,name:"产地",createtime:"2013-03-05",status:0},
+        			{id:5,name:"型号",createtime:"2013-03-05",status:2},
+        			{id:11,name:"品牌",createtime:"2013-03-05",status:2}
+        			];
+		
+		function formatType(val){
+			if(val == 1) return "系统属性";
+			else return "店铺属性";
+		}
+
+		function editProp(data, args, idx){
+			 var html="";
+
+			 var status=loxia.getObject("status", data);
+
+			 if(status==2){
+				 html+="<a href='javascript:void(0);' val='"+loxia.getObject("id", data)+"' class='func-button modify'>修改</a>";
+				 html+='&nbsp;<a href="javascript:void(0);" val="'+loxia.getObject("id", data)+'" class="func-button enable">禁用</a>'
+				 html+='&nbsp;<a href="javascript:void(0);" val="'+loxia.getObject("id", data)+'" class="func-button remove">删除</a>'
+				 html+='&nbsp;<a href="javascript:void(0);" val="'+loxia.getObject("id", data)+'" class="func-button setoption">设置属性可选值</a>'
+			 }
+			 
+			
+			 return html;
+		}
+		
+		$j(document).ready(function(){
+			$j.fn.zTree.init($j("#tree"), setting, zNodes);
+			key = $j("#key");
+			key.bind("focus", focusKey)
+			.bind("blur", blurKey)
+			.bind("propertychange", searchNode)
+			.bind("input", searchNode);
+			$j("#addParent").bind("click", {isParent:true}, addRoot);
+			$j("#addLeaf").bind("click", {isParent:false}, add);
+
+			loxia.init({debug: true, region: 'zh-CN'});
+		    nps.init();
+
+		    $j("#table1").loxiasimpletable({
+				cols:
+				[
+					{name:"name",label:"属性名称",width:"7%"},
+					{name:"editClass",label:"编辑类型",width:"10%"},
+					{name:"valClass",label:"值类型",width:"10%"},
+					{name:"isSale",label:"是否销售",width:"7%"},
+					{name:"isColor",label:"是否颜色",width:"7%"},
+					{name:"number",label:"序号",width:"10%"},
+					{name:"status",label:"状态",width:"7%",type:"yesno"},
+					{name:"isSystemProp",label:"是否系统属性",width:"7%", formatter:"formatType"},
+					{name:"createtime",label:"创建时间",width:"10%"},
+					{label:"操作",width:"25%", template:"editProp"}
+				]
+			});
+
+		  //删除
+			$j("#table1").on("click",".func-button.remove",function(){
+				var curId=$j(this).attr("val");
+
+				nps.confirm("操作提示","确认删除?", function(){
+
+					for(var o in industryProperti){
+
+						if(industryProperti[o].id==parseInt(curId)){
+							industryProperti.splice(o,1);
+							refreshData();
+							return ;
+						}
+						
+					}
+				});
+				
+				
+			});	
+
+		  //修改
+			$j("#table1").on("click",".func-button.modify",function(){
+				
+				window.location.href='shop-properties.html';
+			});
+
+			$j("#table1").on("click",".func-button.setoption",function(){
+				
+				window.location.href='shop-property-value.html';
+			});
+
+			$j(".button.orange.addshopprop").on("click",function(){
+
+				window.location.href='shop-properties.html';
+			});
+
+			refreshData()
+		});
+
+		
+		
+
+	</SCRIPT>
+</HEAD>
+
+<BODY>
+<div class="content-box width-percent100">
+
+    <div class="ui-title1"><img src="../images/wmi/blacks/32x32/cube.png">店铺管理</div>
+    <div class="ui-block">
+        <div class="ui-block-content ui-block-content-lb" style="padding-bottom: 10px;">
+            <table>
+                <tr>
+                    <td><label>店铺编码</label></td>
+                    <td><span>xxxxxx</span></td>
+                    <td><label>店铺名称</label></td>
+                    <td><span>Nike官方旗舰店</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="ui-tag-change">
+        <ul class="tag-change-ul">
+            <li ><a href="javascript:void(0)" onclick="location.href='update-shop.html'">修改店铺</a></li>
+            <li class="selected">设置店铺属性</li>
+        </ul>
+
+        <div class="tag-change-content">
+            <div class="tag-change-in" ></div>
+            <div class="tag-change-in block" >
+                <div class="ui-block ui-block-fleft w240">
+                    <div class="ui-block-content ui-block-content-lb">
+                        <div class="tree-control">
+                            <input type="text" id="key" loxiatype="input" placeholder="输入关键字快速定位" />
+                        </div>
+                        <ul id="tree" class="ztree"></ul>
+
+                    </div>
+                </div>
+                <div class="ui-block ml240" style="padding-left: 10px;">
+                    <div class="ui-block-content" style="padding-top: 0;">
+                        <div class="border-grey ui-loxia-simple-table" id="table1"></div>
+                    </div>
+                    <div class="button-line">
+                        <input type="button" value="新增" title="新增"  class="button orange addshopprop">
+                        <input type="button" value="返回" title="返回"  class="button" onclick="location.href='shop.html'"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</BODY>
+  
+</HTML>

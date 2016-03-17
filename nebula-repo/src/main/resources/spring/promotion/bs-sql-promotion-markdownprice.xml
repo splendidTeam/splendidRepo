@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PromotionMarkdownPrice.getPromotionMarkdownPriceList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件分页查询待启用的促销列表（包含步骤不完整的）</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT * FROM t_prm_promotionmarkdownprice where LIFECYCLE = 1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemInfo.findItemInfoByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询ItemInfo</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_iteminfo WHERE item_id= :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findItemInfoListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询ItemInfo</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_iteminfo WHERE item_id in(
+						#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findAllItemInfoList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findItemInfoListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="ItemInfo.findItemCommandListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+		       			tpii.item_id as id,
+		       			tpii.sketch as sketch,
+		       			tpii.title as title,
+		       			tpii.sale_price as salePrice,
+		       			tpii.list_price as listPrice,
+		       			tpii.description  as description,
+		       			tpii.type  as type,
+		       			tpi.pic_url as picUrl,
+		       			tpi.code as code
+		       		from  t_pd_item tpi left join t_pd_iteminfo tpii 
+		       		on tpi.id = tpii.item_id
+		       		where tpi.id in (
+		       		#foreach( $id in $itemIds )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findItemCommandListByItemIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpii.item_id as id,
+						tpiil.sketch as sketch,
+						tpiil.title as title,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpiil.description  as description,
+						tpii.type  as type,
+						tpi.pic_url as picUrl,
+						tpi.code as code
+					  from  t_pd_item tpi 
+						left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+						left join t_pd_iteminfo_lang tpiil on tpii.id = tpiil.item_info_id 
+		 			  where tpiil.lang = :lang and 
+		       		    tpi.id in (
+			       		#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemInfo.findItemInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($subTitle)
+		       					and SUB_TITLE=:subTitle
+		       				#end
+
+		       			
+		       				#if($sketch)
+		       					and SKETCH=:sketch
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findItemInfoListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($subTitle)
+		       					and SUB_TITLE=:subTitle
+		       				#end
+
+		       			
+		       				#if($sketch)
+		       					and SKETCH=:sketch
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="ItemInfo.enableOrDisableItemInfoByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_iteminfo
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.removeItemInfoByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_pd_iteminfo 
+		       		where item_id in (
+		       		#foreach( $itemId in $ids )
+    					$itemId,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findAllEffectItemInfoList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findEffectItemInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo where lifecycle=1
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($subTitle)
+		       					and SUB_TITLE=:subTitle
+		       				#end
+
+		       			
+		       				#if($sketch)
+		       					and SKETCH=:sketch
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findEffectItemInfoListByQueryMapWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo where lifecycle=1
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($subTitle)
+		       					and SUB_TITLE=:subTitle
+		       				#end
+
+		       			
+		       				#if($sketch)
+		       					and SKETCH=:sketch
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.updateItemInfoLSPIdByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_iteminfo
+		       		set last_select_property_id = :lastSelectPropertyId
+		       		where item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.updateItemInfoLSPVIdByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_iteminfo
+		       		set last_select_property_value_id = :lastSelectPropertyValueId
+		       		where item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.findMiniTagRuleCommandByIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表查询简要的item信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			i.id AS id, 
+		       			s.sale_price AS price, 
+		       			ii.title AS name,
+		       			i.code AS code
+					from t_pd_item i
+					JOIN t_pd_iteminfo ii ON i.id = ii.item_id
+					JOIN t_pd_sku s ON i.id = s.item_id
+					WHERE i.id IN (
+					#foreach($id in $idList)
+						$id,
+					#end
+					-1
+					)
+					GROUP BY s.sale_price, i.id, ii.title
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.syncItemPriceByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>同步商品的价格(item级别)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_iteminfo set sale_price = :salesPrice
+					#if($listPrice)
+						,list_Price = :listPrice 
+					#end
+					where item_id = (select id from t_pd_item where code = :itemCode and lifecycle  != 2)
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemInfo.updateActiveBeginTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改商品定时启用时间</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					
+					UPDATE t_pd_iteminfo
+					SET active_begin_time = :activeBeginTime
+					WHERE item_id IN (#foreach($id in $idList)
+						$id,
+					#end
+					-1)
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 何波 添加通过 分类id 查询 商品 -->
+	<bean id="ItemInfo.findItemInfosByCateIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过分类id查询item </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT ii.item_id  as item_id, 
+					ii.sale_price as sale_price  
+					from  t_pd_iteminfo ii LEFT JOIN t_pd_item_category ic 
+					on ii.item_id = ic.item_id
+					where ic.category_id in(
+						#foreach( $id in $cateIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemInfo.findItemInfosByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询ItemInfo</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT item_id ,sale_price  FROM t_pd_sku WHERE item_id in(
+						#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+        
+    <bean id="ItemInfo.findCallItemInfos" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询ItemInfo</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				SELECT  item_id ,sale_price  FROM t_pd_sku WHERE item_id 
+				not in (SELECT ii.item_id  as item_id from  t_pd_iteminfo ii LEFT JOIN t_pd_item_category ic 
+					on ii.item_id = ic.item_id
+					where ic.category_id in (
+						#foreach( $id in $cateIds )
+	    					$id,
+						 #end
+			       		-1))
+					and	item_id not in (SELECT item_id  FROM t_pd_iteminfo WHERE
+					item_id in (
+					#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		-1))
+        		ORDER BY sale_price LIMIT 1;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!--  何波  根据skuid 查询商品信息  -->
+	<bean id="ItemInfo.findItemInfosBySkuids" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_iteminfo 
+		       		where
+		       		item_id  in (select item_id from t_pd_sku where  
+		       		id  in (
+					#foreach( $id in $skuIds )
+	    					$id,
+						 #end
+			       		-1))
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemInfo.updateItemInfoLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改商品信息国际化</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_iteminfo_lang 
+					set title = :title, 
+					sub_title = :subTitle, 
+					sketch = :sketch, 
+					description = :description, 
+					seoDescription = :seoDescription, 
+					seokeywords = :seoKeywords, 
+					seoTitle = :seoTitle 
+					where item_info_id = :itemInfoId 
+					and lang = :lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemInfo.findItemInfoLangList" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_iteminfo_lang 
+                   where item_info_id in(
+                   	#foreach($id in $ids)
+                   		$id,
+                   	#end
+                   	-1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemInfo.findItemInfoLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_iteminfo_lang 
+                   where item_info_id =:id 
+                   and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="BaseItemForSolrCommand.findItemCommandByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					it.id,code,title,sub_title as subTitle, sketch,itf.description,it.lifecycle,it.create_time as createTime,it.delist_time,
+					itf.list_price,itf.sale_price,it.modify_time as modifyTime,it.list_time as listTime,
+					it.template_id,
+					itf.active_begin_time as activeBeginTime,
+					isaddcategory,isAddTag,ind.id as industryId,ind.name as industryName,ind.sort_no as industry_sortNo,shopInfo.id as shopId,shopInfo.name as shopName,
+					seodescription as seoDescription,seokeywords as seoKeywords,seotitle as seoTitle,style
+					from t_pd_item it LEFT JOIN t_pd_iteminfo itf on it.id=itf.item_id LEFT JOIN 
+					(select id,name,sort_no from t_pd_industry where lifecycle='1') ind on it.industry_id=ind.id
+					LEFT JOIN (select shop.id,org.name from t_ma_shop shop LEFT JOIN t_au_organization org ON shop.org_id=org.id) shopInfo ON shopInfo.id=it.shop_id
+					where it.lifecycle='1' and (itf.type<>0 or itf.type is null) and it.id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="BaseItemForSolrCommand.findItemCommand" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					it.id,code,title,sub_title as subTitle, sketch,itf.description,it.lifecycle,it.create_time  as createTime,it.delist_time,
+					itf.list_price,itf.sale_price,it.modify_time as modifyTime,it.list_time as listTime,
+					it.template_id,
+					itf.active_begin_time as activeBeginTime,
+					isaddcategory,isAddTag,ind.id as industryId,ind.name as industryName,ind.sort_no as industry_sortNo,shopInfo.id as shopId,shopInfo.name as shopName,
+					seodescription as seoDescription,seokeywords as seoKeywords,seotitle as seoTitle,style
+					from t_pd_item it LEFT JOIN t_pd_iteminfo itf on it.id=itf.item_id LEFT JOIN 
+					(select id,name,sort_no from t_pd_industry where lifecycle='1') ind on it.industry_id=ind.id
+					LEFT JOIN (select shop.id,org.name from t_ma_shop shop LEFT JOIN t_au_organization org ON shop.org_id=org.id) shopInfo ON shopInfo.id=it.shop_id
+					where it.lifecycle='1' and (itf.type<>0 or itf.type is null)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemPropertiesCommand.findItemPropertiesByItemIdForSearch"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					ip.id as item_properties_id,ip.item_id as itemId,ip.property_id,
+					ip.propertyvalue_id as propertyValue,case when pcp.editing_type=1 THEN ip.property_value ELSE ppv.value end as proValue,
+					ppv.sort_no as proSort,pcp.is_color_prop
+					from t_pd_item_properties ip 
+					LEFT JOIN t_pd_property pp ON ip.property_id=pp.id 
+					LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID 
+					LEFT JOIN t_pd_property_value ppv ON ip.propertyvalue_id=ppv.id
+					where pcp.editing_type in (1,2,3,4) and pp.lifecycle=1 and pp.searchable=TRUE and ip.item_id in (#foreach($itemid in $itemIds)
+																$itemid,
+									#end
+									-1)
+					UNION
+					select 
+					it.id as item_properties_id,it.item_id as itemId,sc.property_id as property_id,
+					sc.id as propertyValue,sc.name as proValue,
+					sc.sort as proSort,sc.is_color_prop
+					from 
+					(select tpsci.id,tpsci.name,tpsci.codition_id,tpsci.property_id,tpsci.sort,pcp.is_color_prop,
+					pcp.editing_type,pp.lifecycle,pp.searchable
+					from t_pd_search_con_item tpsci LEFT JOIN t_pd_property pp ON pp.id=tpsci.property_id LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID)
+					sc LEFT JOIN (select ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id from t_pd_item_properties ip LEFT JOIN t_pd_item_reference tpir ON ip.id=tpir.item_property_id
+					GROUP BY ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id) it ON sc.property_id=it.property_id
+					where sc.editing_type=5 and sc.lifecycle=1 and sc.searchable=TRUE and it.item_id in (#foreach($itemid in $itemIds)
+																$itemid,
+									#end
+									-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemPropertiesCommand.findItemPropertiesForSearch"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					ip.id as item_properties_id,ip.item_id as itemId,ip.property_id,
+					ip.propertyvalue_id as propertyValue,case when pcp.editing_type=1 THEN ip.property_value ELSE ppv.value end as proValue,
+					ppv.sort_no as proSort,pcp.is_color_prop
+					from t_pd_item_properties ip 
+					LEFT JOIN t_pd_property pp ON ip.property_id=pp.id 
+					LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID 
+					LEFT JOIN t_pd_property_value ppv ON ip.propertyvalue_id=ppv.id
+					where pcp.editing_type in (1,2,3,4) and pp.lifecycle=1 and pp.searchable=TRUE
+					UNION
+					select 
+					it.id as item_properties_id,it.item_id as itemId,sc.property_id as property_id,
+					sc.id as propertyValue,sc.name as proValue,
+					sc.sort as proSort,sc.is_color_prop
+					from 
+					(select tpsci.id,tpsci.name,tpsci.codition_id,tpsci.property_id,tpsci.sort,pcp.is_color_prop,
+					pcp.editing_type,pp.lifecycle,pp.searchable
+					from t_pd_search_con_item tpsci LEFT JOIN t_pd_property pp ON pp.id=tpsci.property_id LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID)
+					sc LEFT JOIN (select ip.id ,ip.item_id,tpir.search_condition_item_id,ip.property_id from t_pd_item_properties ip LEFT JOIN t_pd_item_reference tpir ON ip.id=tpir.item_property_id
+					GROUP BY ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id) it ON sc.property_id=it.property_id
+					where sc.editing_type=5 and sc.lifecycle=1 and sc.searchable=TRUE
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemPropertiesCommand.findItemPropertiesByItemIdWithOutSearch"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					ip.id as item_properties_id,ip.item_id as itemId,ip.property_id,
+					ip.propertyvalue_id as propertyValue,case when pcp.editing_type=1 THEN ip.property_value ELSE ppv.value end as proValue,
+					ppv.sort_no as proSort,pcp.is_color_prop
+					from t_pd_item_properties ip 
+					LEFT JOIN t_pd_property pp ON ip.property_id=pp.id 
+					LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID 
+					LEFT JOIN t_pd_property_value ppv ON ip.propertyvalue_id=ppv.id
+					where pcp.editing_type in (1,2,3,4) and pp.lifecycle=1 and pp.searchable=FALSE and ip.item_id in (#foreach($itemid in $itemIds)
+																$itemid,
+									#end
+									-1)
+					UNION
+					select 
+					it.id as item_properties_id,it.item_id as itemId,sc.property_id as property_id,
+					sc.id as propertyValue,sc.name as proValue,
+					sc.sort as proSort,sc.is_color_prop
+					from 
+					(select tpsci.id,tpsci.name,tpsci.codition_id,tpsci.property_id,tpsci.sort,pcp.is_color_prop,
+					pcp.editing_type,pp.lifecycle,pp.searchable
+					from t_pd_search_con_item tpsci LEFT JOIN t_pd_property pp ON pp.id=tpsci.property_id LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID)
+					sc LEFT JOIN (select ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id from t_pd_item_properties ip LEFT JOIN t_pd_item_reference tpir ON ip.id=tpir.item_property_id
+					GROUP BY ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id) it ON sc.property_id=it.property_id
+					where sc.editing_type=5 and sc.lifecycle=1 and sc.searchable=FALSE and it.item_id in (#foreach($itemid in $itemIds)
+																$itemid,
+									#end
+									-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemPropertiesCommand.findItemPropertiesWithOutSearch"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					ip.id as item_properties_id,ip.item_id as itemId,ip.property_id,
+					ip.propertyvalue_id as propertyValue,case when pcp.editing_type=1 THEN ip.property_value ELSE ppv.value end as proValue,
+					ppv.sort_no as proSort,pcp.is_color_prop
+					from t_pd_item_properties ip 
+					LEFT JOIN t_pd_property pp ON ip.property_id=pp.id 
+					LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID 
+					LEFT JOIN t_pd_property_value ppv ON ip.propertyvalue_id=ppv.id
+					where pcp.editing_type in (1,2,3,4) and pp.lifecycle=1 and pp.searchable=FALSE
+					UNION
+					select 
+					it.id as item_properties_id,it.item_id as itemId,sc.property_id as property_id,
+					sc.id as propertyValue,sc.name as proValue,
+					sc.sort as proSort,sc.is_color_prop
+					from 
+					(select tpsci.id,tpsci.name,tpsci.codition_id,tpsci.property_id,tpsci.sort,pcp.is_color_prop,
+					pcp.editing_type,pp.lifecycle,pp.searchable
+					from t_pd_search_con_item tpsci LEFT JOIN t_pd_property pp ON pp.id=tpsci.property_id LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID)
+					sc LEFT JOIN (select ip.id ,ip.item_id,tpir.search_condition_item_id,ip.property_id from t_pd_item_properties ip LEFT JOIN t_pd_item_reference tpir ON ip.id=tpir.item_property_id
+					GROUP BY ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id) it ON sc.property_id=it.property_id
+					where sc.editing_type=5 and sc.lifecycle=1 and sc.searchable=FALSE;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemForCategoryCommand.findItemCategoryByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT item_id as itemId,pdc.id as categoryId,pdic.sort_no,name as categoryName,parent_id,pdc.code from t_pd_item_category pdic LEFT JOIN t_pd_category pdc ON pdic.category_id=pdc.id where pdc.lifecycle=1 and item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemPropertiesCommand.findItemPropertiesCustomerForSearch"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemId,id as property_id,property_Value as propertyValue from t_pd_item_properties
+					where property_id is null and propertyvalue_id is null
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemPropertiesCommand.findItemPropertiesCustomerForSearchById"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemId,id as propertyName,property_Value as propertyValue from t_pd_item_properties
+					where property_id is null and propertyvalue_id is null and item_id in (#foreach($itemid in $itemIds)
+																$itemid,
+									#end
+									-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemForCategoryCommand.findItemCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT item_id as itemId,pdc.id as categoryId,pdic.sort_no,name as categoryName,parent_id,pdc.code from t_pd_item_category pdic LEFT JOIN t_pd_category pdc ON pdic.category_id=pdc.id where pdc.lifecycle=1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemForCategoryCommand.findParentCategoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select pc.id as categoryId,pic.sort_no,name as categoryName,parent_id,code from t_pd_category pc LEFT JOIN t_pd_item_category pic ON pic.id=pc.parent_id where pc.lifecycle=1 and pc.id = :categoryId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemImageCommand.findItemImageByInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select tpip.item_id as itemId,img.pic_url as picUrl,img.position from t_pd_item_image img LEFT JOIN t_pd_item_properties tpip ON img.item_properties=tpip.id
+					LEFT JOIN t_pd_property tpp ON tpip.property_id=tpp.id 
+					LEFT JOIN t_pd_common_property tpcp ON tpp.common_property_id = tpcp. ID 
+					LEFT JOIN t_pd_property_value tppv ON tppv.id=tpip.propertyvalue_id
+					where tpcp.editing_type in (2,3,4) and tpcp.is_color_prop=TRUE and tpp.lifecycle=1 and tpp.id =:pid and tppv.id =:pvid and img.type= :imageType and
+					img.item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1)
+					UNION
+					select it.item_id as itemId,img.pic_url as picUrl,img.position from t_pd_item_image img, 
+					(select tpip.item_id,tpip.id from t_pd_item_properties tpip LEFT JOIN t_pd_property tpp ON tpip.property_id=tpp.id LEFT JOIN t_pd_common_property tpcp ON tpp.common_property_id = tpcp. ID where tpip.id in 
+					(select tpir.item_property_id from t_pd_item_reference tpir LEFT JOIN t_pd_search_con_item tpsci ON tpir.search_condition_item_id=tpsci.id where tpsci.id =:pvid GROUP BY tpir.item_property_id)
+					and tpcp.editing_type=5 and tpcp.is_color_prop=TRUE and tpp.lifecycle=1 and tpp.id =:pid GROUP BY tpip.item_id,tpip.id) it
+					where img.item_properties=it.id and img.type=:imageType and img.item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1)
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemImageCommand.findItemImage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       			select item_id as itemId,pic_url as picUrl,position from t_pd_item_image where type=:imageType  order by position asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemImageCommand.findItemImageByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       			select id, item_id as itemId,pic_url as picUrl,position from t_pd_item_image where type=:type and item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1) order by position asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- <bean id="ItemImageCommand.findItemImageByItemId" class="loxia.dao.support.DynamicQueryHolder"> 
+		<description></description> <constructor-arg> <value> <![CDATA[ select tpip.item_id 
+		as itemId,img.pic_url as picUrl,img.position from t_pd_item_image img LEFT 
+		JOIN t_pd_item_properties tpip ON img.item_properties=tpip.id LEFT JOIN t_pd_property 
+		tpp ON tpip.property_id=tpp.id LEFT JOIN t_pd_property_value tppv ON tppv.id=tpip.propertyvalue_id 
+		where tpp.editing_type in (2,3,4) and tpp.is_color_prop=TRUE and tpp.lifecycle=1 
+		and (img.type=1 or img.type=3) and img.item_id in (#foreach($itemid in $itemIds) 
+		$itemid, #end -1) UNION select it.item_id as itemId,img.pic_url as picUrl,img.position 
+		from t_pd_item_image img, (select tpip.item_id,tpip.id from t_pd_item_properties 
+		tpip LEFT JOIN t_pd_property tpp ON tpip.property_id=tpp.id where tpip.id 
+		in (select tpir.item_property_id from t_pd_item_reference tpir LEFT JOIN 
+		t_pd_search_con_item tpsci ON tpir.search_condition_item_id=tpsci.id GROUP 
+		BY tpir.item_property_id) and tpp.editing_type=5 and tpp.is_color_prop=TRUE 
+		and tpp.lifecycle=1 GROUP BY tpip.item_id,tpip.id) it where img.item_properties=it.id 
+		and (img.type=1 or img.type=3) and img.item_id in (#foreach($itemid in $itemIds) 
+		$itemid, #end -1) ]]> </value> </constructor-arg> </bean> -->
+
+	<!-- <bean id="ItemImageCommand.findItemImage" class="loxia.dao.support.DynamicQueryHolder"> 
+		<description></description> <constructor-arg> <value> <![CDATA[ select tpip.item_id 
+		as itemId,img.pic_url as picUrl,img.position from t_pd_item_image img LEFT 
+		JOIN t_pd_item_properties tpip ON img.item_properties=tpip.id LEFT JOIN t_pd_property 
+		tpp ON tpip.property_id=tpp.id LEFT JOIN t_pd_property_value tppv ON tppv.id=tpip.propertyvalue_id 
+		where tpp.editing_type in (2,3,4) and tpp.is_color_prop=TRUE and tpp.lifecycle=1 
+		and (img.type=1 or img.type=3) UNION select it.item_id as itemId,img.pic_url 
+		as picUrl,img.position from t_pd_item_image img, (select tpip.item_id,tpip.id 
+		from t_pd_item_properties tpip LEFT JOIN t_pd_property tpp ON tpip.property_id=tpp.id 
+		where tpip.id in (select tpir.item_property_id from t_pd_item_reference tpir 
+		LEFT JOIN t_pd_search_con_item tpsci ON tpir.search_condition_item_id=tpsci.id 
+		GROUP BY tpir.item_property_id) and tpp.editing_type=5 and tpp.is_color_prop=TRUE 
+		and tpp.lifecycle=1 GROUP BY tpip.item_id,tpip.id) it where img.item_properties=it.id 
+		and (img.type=1 or img.type=3) ]]> </value> </constructor-arg> </bean> -->
+
+	<bean id="ItemTagCommand.findItemTagByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemid,name,tag_id from T_PD_ITEMTAG pdi LEFT JOIN t_pd_item_tag_relation pdr ON pdi.id=tag_id where pdi.lifecycle=1 and item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagCommand.findItemTag" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemid,name,tag_id from T_PD_ITEMTAG pdi LEFT JOIN t_pd_item_tag_relation pdr ON pdi.id=tag_id where pdi.lifecycle=1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemRateForSolrCommand.findItemRate" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemId,SUM(score) as sum,COUNT(item_id) as count from t_pd_item_rate where lifecycle=1 GROUP BY item_id;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemRateForSolrCommand.findItemRateById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemId,SUM(score) as sum,COUNT(item_id) as count from t_pd_item_rate where lifecycle=1 and item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1) GROUP BY item_id;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemSalesCountForSolrCommand.findItemCount" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemId,sum(count) as count from t_so_salesorder so,t_so_orderline sol where so.id=sol.order_id and (so.payment=1 or (so.payment!=1 and so.financial_status=3)) and so.logistics_status!=9 and 
+					so.logistics_status!=10
+					GROUP BY item_id;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemSalesCountForSolrCommand.findItemCountById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select item_id as itemId,sum(count) as count from t_so_salesorder so,t_so_orderline sol where so.id=sol.order_id and (so.payment=1 or (so.payment!=1 and so.financial_status=3)) and so.logistics_status!=9 and 
+					so.logistics_status!=10 and item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1) GROUP BY item_id;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemFavouriteCountForSolrCommand.findItemCountById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+									
+					SELECT item_id as itemId, count(0) as count from t_member_favorites where item_id in (#foreach($itemid in $itemIds)
+										$itemid,
+									#end
+									-1) GROUP BY item_id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemFavouriteCountForSolrCommand.findItemCount" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+									
+					SELECT item_id  as itemId, count(0) as count from t_member_favorites GROUP BY item_id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

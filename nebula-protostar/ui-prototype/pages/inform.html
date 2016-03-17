@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+<script type="text/javascript" src="../scripts/main.js"></script>
+</head>
+
+<body>
+<div id="edittable" loxiaType="edittable" >
+<table operation="add,delete" append="1" width="2000" class="inform-person">
+	<thead>
+		<tr>
+			<th width="5%"><input type="checkbox"/></th>
+			<th width="15%">姓名</th>
+			<th width="10%">性别</th>
+			<th width="15%">部门</th>
+			<th width="15%">工作情况</th>			
+			<th width="15%">本月工作时间（h）</th>
+			<th width="10%">人工单价</th>
+			<th width="15%" formula="$4/100*$5*$6:2">总价</th>
+		</tr>
+	</thead>
+    
+    <tbody>
+    </tbody>
+    
+	<tbody>
+		<tr>
+			<td width="5%"><input type="checkbox"/></td>
+			<td width="15%"><input type="text" loxiaType="input" id="input3" name="name(#)" style="width:95%" mandatory="true"/></td>
+			<td width="15%"><input type="radio" name="gender(#)" value="male"/>男<input type="radio" name="gender(#)" value="female"/>女</td>
+			<td width="15%"><select name="department(#)" loxiaType="select" style="width:95%" mandatory="true"><option value="">请选择</option><option value="sales">销售部</option><option value="it">IT技术部</option><option value="marketing">市场部</option><option value="hr">人事部</option></select></td>
+			<td width="15%" ><input type="text" loxiaType="number" style="width:95%" name="workHours(#)" decimal="1"/></td>
+			<td width="10%" class="decimal">20</td>
+			<td width="10%" class="decimal">100</td>
+            <td width="10%" class="decimal">&nbsp;</td>
+		</tr>
+	</tbody>
+    
+	<tfoot>
+		<tr>
+			<td colspan="6" >&nbsp;</td>
+            <td class="decimal" >总计:</td>
+			<td class="decimal" decimal="2">&nbsp;</td>
+		</tr>
+	</tfoot>
+</table>
+</div>
+<script type="text/javascript"><!--
+var $j = jQuery.noConflict();
+
+var s1 = ["c++", "java", "php", "coldfusion", "javascript", "asp", "ruby"];
+var s2 = [{value:"1",label:"c++"},{value:"2",label:"java"},{value:"3",label:"php"},
+                  {value:"4",label:"coldfusion"},{value:"5",label:"javascript"},{value:"6",label:"asp"},
+                  {value:"7",label:"ruby"}];
+$j(document).ready(function(){
+	
+	loxia.init({debug: true, region: 'zh-CN'});
+	
+	$j("#btn_ctle").click(function(){
+		var $btn = $j(this);
+		var flag = $btn.attr("value") === "disable";
+		if(flag){
+			$btn.attr("value","enable");
+			$btn.attr("title","启用");
+			$btn.button("option","label","启用");
+		}else{
+			$btn.attr("value","disable");
+			$btn.attr("title","禁用");
+			$btn.button("option","label","禁用");
+		}
+		loxia.byId("input2").setEnable(!flag);
+	});
+	
+	$j("#btn_ctlro").click(function(){
+		var $btn = $j(this);
+		var flag = $btn.attr("value") === "readonly";
+		if(flag){
+			$btn.attr("value","writable");
+			$btn.attr("title","读写");
+			$btn.button("option","label","读写");
+		}else{
+			$btn.attr("value","readonly");
+			$btn.attr("title","只读");
+			$btn.button("option","label","只读");
+		}
+		loxia.byId("input2").setReadonly(flag);
+        //$j("[name='input21']").tooltip({content:"HHH"}).tooltip("open");
+	});
+
+	$j("#btn_setmax").click(function(){
+		var value = loxia.byId($j(this).next("input").get(0)).val();
+		if(value != null)
+			loxia.byId("input3").max(value);
+	});
+	
+	$j("#btn_setmin").click(function(){
+		var value = loxia.byId($j(this).next("input").get(0)).val();
+		if(value != null)
+			loxia.byId("input4").min(value);
+	});
+	
+	$j("#edittable").bind("rowchanged", function(event,data){
+		console.log("rowchanged");
+	});
+});
+
+function checkFieldLength(value, obj){
+	if(value.length > 10)
+		return "此处最多只能输入10个字符";
+	return loxia.SUCCESS;
+}
+
+function setInput5(value, obj){
+	alert("value:" + value);
+	if(value === "date"){
+		loxia.byId($j(obj.element).next("input").get(0)).val("2010-12-10");
+	}else if(value === "number"){
+		loxia.byId($j(obj.element).next("input").get(0)).val("100");
+	}
+	return loxia.SUCCESS;
+}
+--></script>
+
+<script class="javascript" src="../scripts/syntaxhighlighter/shCore.js"></script> 
+<script class="javascript" src="../scripts/syntaxhighlighter/shBrushJScript.js"></script> 
+<script class="javascript" src="../scripts/syntaxhighlighter/shBrushJava.js"></script> 
+<script class="javascript" src="../scripts/syntaxhighlighter/shBrushSql.js"></script> 
+<script class="javascript" src="../scripts/syntaxhighlighter/shBrushXml.js"></script> 
+<script class="javascript" src="../scripts/syntaxhighlighter/shBrushCss.js"></script> 
+<script class="javascript"> 
+dp.SyntaxHighlighter.HighlightAll('code'); 
+</script> 
+</body>
+</html>

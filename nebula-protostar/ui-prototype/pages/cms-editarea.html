@@ -1,0 +1,785 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" href="../css/demo.css" type="text/css">
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<style type="text/css">
+.wl-right-auto2
+{
+
+
+border:1px solid #ccc;
+overflow-y:scroll;
+
+}
+.wl-right-auto2  input[type="checkbox"]
+{
+clear:both;
+}
+
+.wl-right-auto2  input[type="radio"]
+{
+clear:both;
+}
+.wl-right-auto2  p
+{
+width:80%;
+}
+</style>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j.extend(loxia.regional['zh-CN'],{
+    "PWD_NOT_MATCH":"密码输入不一致",
+    "EMAIL_NOT_VALID":"邮箱不符合规则",
+    "MOBILE_NOT_VALID":"手机不符合规则",
+    "ORG_NOT_SELECT":"请选择所属组织"
+});
+
+var curSelTreeObj=null;
+
+var setting = {
+
+	check : {
+		enable: true,
+		chkStyle: "radio",
+		radioType: "all"
+	},
+	view : {
+		showIcon : false,
+		fontCss : getFontCss
+	},
+	edit : {
+		enable : false,
+		showRenameBtn : false
+	},
+	data : {
+		keep : {
+			parent : false,
+			leaf : false
+		},
+		key : {
+			title : "name"
+		},
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+		onClick : onClick
+	}
+};
+
+var zNodes = [ {
+	id : 0,
+	pId : -1,
+	name : "root",
+	open : true,
+	nocheck : true
+}, {
+	id : 1,
+	pId : 0,
+	name : "区域",
+	open : true,
+	nocheck : true
+}, {
+	id : 11,
+	pId : 1,
+	name : "顶部区域",
+	type:1,
+	uri:"/area/top"
+}, {
+	id : 12,
+	pId : 1,
+	name : "正文区域",
+	type:1,
+	uri:"/area/body"
+	
+}, {
+	id : 13,
+	pId : 1,
+	name : "底部区域",
+	type:1,
+	uri:"/area/bottom"
+},{
+	id : 2,
+	pId : 0,
+	name : "组件",
+	open : true,
+	nocheck : true
+}, {
+	id : 21,
+	pId : 2,
+	name : "KV组件",
+	type:2,
+	uri:"/comp/kv"
+}, {
+	id : 22,
+	pId : 2,
+	name : "图片链接组件",
+	type:2,
+	uri:"/comp/img"
+}, {
+	id : 23,
+	pId : 2,
+	name : "商品组件",
+	type:2,
+	uri:"/comp/pro"
+}];
+
+function getFontCss(treeId, treeNode) {
+	return (!!treeNode.highlight) ? {
+		color : "#333",
+		"background-color" : "yellow"
+	} : {
+		color : "#333",
+		"font-weight" : "normal",
+		"background-color" : ""
+	};
+}
+
+function onClick(event, treeId, treeNode) {
+	var zTree = $j.fn.zTree.getZTreeObj("areaOrComp");
+	zTree.checkNode(treeNode, !treeNode.checked, null, true);
+	return false;
+	//refreshData();
+}
+
+
+
+var tempSetting = {
+
+		check : {
+			enable: true,
+			chkStyle: "radio",
+			radioType: "all"
+		},
+		view : {
+			showIcon : false,
+			fontCss : getFontCss
+		},
+		edit : {
+			enable : false,
+			showRenameBtn : false
+		},
+		data : {
+			keep : {
+				parent : false,
+				leaf : false
+			},
+			key : {
+				title : "name"
+			},
+			simpleData : {
+				enable : true
+			}
+		},
+		callback : {
+			onClick : onClickTemp
+		}
+	};
+
+	var tempzNodes = [ {
+		id : 0,
+		pId : -1,
+		name : "root",
+		open : true,
+		nocheck : true
+	}, {
+		id : 1,
+		pId : 0,
+		name : "栏目页",
+		open : true,
+		nocheck : true
+	}, {
+		id : 11,
+		pId : 1,
+		name : "A栏目页",
+		type:1,
+		uri:"/temp/page/colum/a"
+	}, {
+		id : 12,
+		pId : 1,
+		name : "B栏目页",
+		type:1,
+		uri:"/temp/page/column/b"
+		
+	}, {
+		id : 13,
+		pId : 1,
+		name : "C栏目页",
+		type:1,
+		uri:"/temp/page/column/c"
+	},{
+		id : 2,
+		pId : 0,
+		name : "列表页",
+		open : true,
+		nocheck : true
+	}, {
+		id : 21,
+		pId : 2,
+		name : "A列表页",
+		type:2,
+		uri:"/temp/page/list/a"
+	}, {
+		id : 22,
+		pId : 2,
+		name : "B列表页",
+		type:2,
+		uri:"/temp/page/list/b"
+	}, {
+		id : 23,
+		pId : 2,
+		name : "C列表页",
+		type:2,
+		uri:"/temp/page/list/c"
+	}];
+	
+	function onClickTemp(event, treeId, treeNode) {
+		var zTree = $j.fn.zTree.getZTreeObj("tempTree");
+		zTree.checkNode(treeNode, !treeNode.checked, null, true);
+		return false;
+		//refreshData();
+	}
+
+function userFormValidate(form){
+   
+    console.log("xxx");
+    if($j("input[name='pwd']").val() != $j("input[name='pwd1']").val()){
+    	 return loxia.getLocaleMsg("PWD_NOT_MATCH");
+        
+    }
+
+    var emailreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+   
+    if(!emailreg.test($j("input[name='email']").val()))
+     {
+                 
+         return loxia.getLocaleMsg("EMAIL_NOT_VALID");
+                
+     }
+
+    var mobilereg=/^((13[0-9]{1})|(15[0-9]{1}))+\d{8}$/;
+    if(!mobilereg.test($j("input[name='mobile']").val()))
+    {
+                
+        return loxia.getLocaleMsg("MOBILE_NOT_VALID");
+               
+    }
+
+    var selVal=$j("input[name='rad_user_org']:checked").val();
+   
+    if(selVal== undefined ||selVal==''){
+    	 return loxia.getLocaleMsg("ORG_NOT_SELECT");
+      }
+    
+    return loxia.SUCCESS;  
+}
+
+function changeOrg(){
+
+	var selVal=$j("input[name='rad_user_org']:checked").val();
+
+	if(selVal=='系统'){
+		var html=' <li>系统</li><li>店铺系统一</li><li>店铺系统二</li><li>店铺常规一</li><li>店铺常规二</li>';
+		$j(".org_list").html(html);
+		
+	}
+	else{
+		$j(".org_list").html("<li>"+selVal+"</li>");
+	}
+
+	refreshRoleSel();
+
+	$j("#org_role").show();
+}
+function refreshAreaOrCompTree(){
+	
+	var ztree = $j.fn.zTree.getZTreeObj("areaOrComp");
+	
+	ztree.refresh();		//重置树
+}
+
+function refreshRoleSel(){
+	$j(".ui-tag-change").each(function(){
+		$j(this).find("li").eq(0).addClass("selected");
+		$j(this).find(".tag-change-content").find(".tag-change-in").eq(0).show();
+		$j(this).find("li").on("click",function(){
+			var thisindex=$j(".ui-tag-change ul li").index($j(this));
+			$j(this).addClass("selected").siblings("li").removeClass("selected");
+			$j(".tag-change-in").eq(thisindex).css("display","block").siblings(".tag-change-in").css("display","none");
+		});
+	});
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+
+	$j.fn.zTree.init($j("#tempTree"), tempSetting, tempzNodes);
+    
+    $j.fn.zTree.init($j("#areaOrComp"), setting, zNodes);
+    $j(".orgSelect").change(function(){
+
+    	var selVal=$j(".orgSelect").val();
+    	
+    	
+    	if(selVal=='系统'){
+
+    		if($j(".orgRel").attr("checked")=="checked"){
+    			$j(".org_list").html("<li>系统(联动选择所有店铺)</li>");
+        	}
+
+    		else{
+    			var html=' <li>系统</li><li>店铺1</li><li>店铺2</li><li>店铺3</li>';
+    			$j(".org_list").html(html);
+    		}
+    	}
+
+    	else{
+    		$j(".org_list").html("<li>"+selVal+"</li>");
+    	}
+
+    	refreshRoleSel();
+
+    	$j("#org_role").show();
+    });
+    
+    $j(".button.viewTemplate").click(function(){
+    	
+    	loxia.openPage('view-template.html','查看模板',null,[0,1]);
+    	
+    });
+	$j(".button.orange.selok").on("click",function(){
+		var ztree = $j.fn.zTree.getZTreeObj("areaOrComp");
+		var uri=null;
+		var id=null;
+		var type=null;
+		var nodes_ = ztree.getCheckedNodes(true);
+		if(nodes_.length == 0){
+			nps.info("错误提示：","请选择区域或组件!");
+		}else{
+			//取到选择的行业名称
+			for (var i=0, l=nodes_.length; i<l; i++) {
+				uri = nodes_[i].uri ;
+				id = nodes_[i].id ;
+				type=nodes_[i].type;
+			}
+			
+			var selectObj=curSelTreeObj.parent().children().eq(0);
+			var inputObj=curSelTreeObj.parent().children().eq(1);
+
+			selectObj.val(type);
+			inputObj.val(uri);
+		}
+		
+		$j("#areaOrcomp-dialog").dialogff({type:'close'});
+		
+	});
+    
+    $j(".button.orange.selcancel").on("click",function(){
+    	
+    	$j("#areaOrcomp-dialog").dialogff({type:'close'});
+		
+    	refreshAreaOrCompTree();
+    });
+    
+    
+    $j(".button.orange.tempselok").on("click",function(){
+		var ztree = $j.fn.zTree.getZTreeObj("tempTree");
+		var uri=null;
+		var id=null;
+		var type=null;
+		var nodes_ = ztree.getCheckedNodes(true);
+		if(nodes_.length == 0){
+			nps.info("错误提示：","请选择模板!");
+		}else{
+			//取到选择的行业名称
+			for (var i=0, l=nodes_.length; i<l; i++) {
+				uri = nodes_[i].uri ;
+				id = nodes_[i].id ;
+				
+			}
+			
+			var inputObj=curSelTreeObj.parent().children().eq(0);
+
+			inputObj.val(uri);
+		}
+		
+		$j("#template-dialog").dialogff({type:'close'});
+		
+	});
+    
+    $j(".button.orange.tempselcancel").on("click",function(){
+    	$j("#template-dialog").dialogff({type:'close'});
+    	
+    	
+    });
+
+});
+
+</script>
+
+
+<SCRIPT type="text/javascript">
+
+		
+		$(document).ready(function(){
+		
+			$j("#edittable1").bind("rowchanged", function(event,data){
+				console.log("rowchanged");
+			});
+			
+			$j("#edittable2").bind("rowchanged", function(event,data){
+				console.log("rowchanged");
+			});
+			
+			$j("#edittable3").bind("rowchanged", function(event,data){
+				console.log("rowchanged");
+			});
+
+			
+			$j(".button.orange.save").on("click",function(){
+		    	
+		    	nps.submitForm('userForm',{mode:'async'})
+		    })
+		    
+		     $j(".button.return").on("click",function(){
+		    	
+		    	 location.href='cms-area-list.html'
+		    })
+		    
+		    $j(".addAreaChildren").on("click",function(){
+		    	
+		    	var html=$j('<div style="margin-bottom:10px;"><select loxiaType="select"><option value="1">区域</option><option value="2">组件</option></select><input type="text" loxiaType="input" style="width:600px;" placeHolder="区域或组件path路径"><span class="findArea zoom-ic"></span></div>');
+		    	
+		    	loxia.initContext(html[0]);
+		    	$j(this).before(html[0]);
+		    })
+			
+			 $j("#editArea").on("click","span.findArea",function(){
+				curSelTreeObj=$j(this);
+			
+				$j("#areaOrcomp-dialog").dialogff({type:'open',close:'in',width:'600px'});
+			});
+			
+			 $j(".sel-dialog").on("click",function(){
+				
+					curSelTreeObj=$j(this);
+					$j("#template-dialog").dialogff({type:'open',close:'in',width:'600px'});
+			 });
+		});
+		//-->
+	</SCRIPT>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+    
+     <form name="userForm" action="" method="post">
+	<div class="ui-title1">
+		<img src="../images/wmi/blacks/32x32/users.png">
+	区域管理
+	<input type="button" value="返回" class="button return" title="返回"/>
+	<input type="button" value="查看模板" title="查看模板"  class="button viewTemplate"/>
+	 <input type="button" value="预览" class="button preview" title="预览"/>
+	</div>
+	
+	
+	
+	
+	<div class="ui-tag-change">
+    <ul class="tag-change-ul">
+       <li >基本信息</li>
+       <li >编辑区域</li>
+       <li >编辑属性</li>
+    </ul>
+              
+    <div class="tag-change-content">
+
+		<div class="tag-change-in">
+        	<div class="ui-block">  
+			   <div class="ui-block-title1">基本信息</div>
+			    <div class="ui-block-content ">
+			    				<div class="ui-block-line">
+							         <label>path</label>
+							         <div >    
+							    			/area/aaa/ppp/<input type="text" loxiaType="input" value="" mandatory="true" style="width:100px;"/>
+							    			
+							         </div>
+							    </div>
+			    
+        					    <div class="ui-block-line">
+							         <label>区域名称</label>
+							         <div >
+							              <input type="text" loxiaType="input" value="" mandatory="true"/>
+							         </div>
+							    </div>
+							    
+							
+							    
+							    <div class="ui-block-line">
+							         <label>选择模版</label>
+							         <div>    
+							    			<input type="input" loxiaType="input" name="tempelate" />
+							    			<span class="common-ic sel-dialog zoom-ic"></span>
+											<span class="common-ic delete-ic"></span>
+							         </div>
+							    </div>
+							    
+							    
+
+
+        
+        		</div>
+			</div>
+			
+			<div class="button-line">
+		         <input type="button" value="保存" class="button orange save" title="保存"/>
+		
+		        
+		         
+		    </div>
+        </div>
+
+	    <div class="tag-change-in" >
+		
+
+		<!-- 编辑页面 start -->
+		<div class="ui-block">  
+		   <div class="ui-block-title1">编辑区域</div>
+		    <div class="ui-block-content " id="editArea">
+		    
+		    
+		        
+	    		<div class="ui-block-content border-grey" style="margin-bottom:10px;">
+	   
+			    <div class="ui-block-line ">
+				         <label class="">区域1</label>
+				         
+				         <div id="area1">
+				              <div style="margin-bottom:10px;">
+				              			
+										<select loxiaType="select" disabled="true">
+												<option value="1">区域</option>
+												<option value="2">组件</option>
+												
+										</select>
+										<input type="text" style="width:600px;" loxiaType="input" placeHolder="区域或组件path路径"/>
+										<span class="findArea zoom-ic"></span>
+										
+							</div>			
+							 
+							<div class="new-list-add addAreaChildren" style="width:62%;">
+								<span >+新增</span>
+							</div>
+				        </div>
+				        
+				    </div>
+	   
+	   			</div>
+	   
+		    
+		    
+		   <div class="ui-block-content border-grey" style="margin-bottom:10px;">
+	   
+			    <div class="ui-block-line ">
+				         <label class="">区域2</label>
+				         
+				         <div id="area1">
+				              <div style="margin-bottom:10px;">
+										<select loxiaType="select" >
+												<option value="1">区域</option>
+												<option value="2">组件</option>
+												
+										</select>
+										<input type="text" style="width:600px;" loxiaType="input" placeHolder="区域或组件path路径">
+										<span class="findArea zoom-ic"></span>
+										
+							</div>			
+							
+							<div class="new-list-add addAreaChildren" style="width:62%;">
+								<span >+新增</span>
+							</div>
+				        </div>
+				        
+				    </div>
+	   
+	   			</div>
+		    
+		
+		    <div class="ui-block-content border-grey" style="margin-bottom:10px;">
+	   
+			    <div class="ui-block-line ">
+				         <label class="">区域3</label>
+				         
+				         <div id="area1">
+				              <div style="margin-bottom:10px;">
+										<select loxiaType="select">
+												<option value="1">区域</option>
+												<option value="2">组件</option>
+												
+										</select>
+										<input type="text" style="width:600px;" loxiaType="input" placeHolder="区域或组件path路径">
+										<span class="findArea zoom-ic"></span>
+										
+							</div>			
+							
+							<div class="new-list-add addAreaChildren" style="width:62%;">
+								<span >+新增</span>
+							</div>
+				        </div>
+				        
+				    </div>
+	   
+	   			</div>
+
+		    
+		    <div class="ui-block-line">
+		         <label>CSS</label>
+		         <div >    
+		    			
+		    			<textarea style="width:780px;" rows="5" cols="100" loxiaType="input">
+		    			
+		    			</textarea>
+		         </div>
+		    </div>
+		    
+		    
+		    <div class="ui-block-line">
+		         <label>JS</label>
+		         <div >    
+		    			<textarea style="width:780px;" rows="5" cols="100" loxiaType="input">
+		    			
+		    			</textarea>
+		    			
+		         </div>
+		    </div>
+		    
+
+		    </div>
+			</div>
+			<!-- 编码页面 end -->
+			
+			<div class="button-line">
+		
+		          <input type="button" value="保存" class="button orange save" title="保存"/>
+		         
+		    </div>
+			
+		</div>
+        
+        <div class="tag-change-in">
+        	<div class="ui-block">  
+			   <div class="ui-block-title1">编辑属性</div>
+			    <div class="ui-block-content ">
+        					    <div class="ui-block-line">
+							         <label>属性1</label>
+							         <div >
+							              <input type="text" loxiaType="input" value="" mandatory="true"/>
+							         </div>
+							    </div>
+							    
+							
+							    
+							    <div class="ui-block-line">
+							         <label>属性2</label>
+							         <div>    
+							    			<input type="text" loxiaType="input" value="" mandatory="true" readonly="true"/>
+							    			
+							         </div>
+							    </div>
+							    <div class="ui-block-line">
+							         <label>属性3</label>
+							         <div >    
+							    			<input type="text" loxiaType="input" value="" mandatory="true"/>
+							    			
+							         </div>
+							    </div>
+							    
+							    
+        
+        		</div>
+			</div>
+			
+			
+			<div class="button-line">
+		         <input type="button" value="保存" class="button orange save" title="保存"/>
+		
+		         
+		         
+		    </div>
+        </div>
+        
+       </div>
+    </div>
+	
+	
+	
+	
+	
+    </form>
+    
+ 	<div class="button-line">
+          <input type="button" value="预览" class="button preview" title="预览"/>
+
+         <input type="button" value="查看模板" title="查看模板"  class="button viewTemplate"/>
+         
+         <input type="button" value="返回" class="button return" title="返回"/>
+         
+    </div>
+</div>
+<div id="areaOrcomp-dialog" class="proto-dialog">
+		 <h5>选择区域或组件</h5>
+		 <div class="proto-dialog-content">
+		 	
+		 	<ul id="areaOrComp" class="ztree"></ul>
+		 </div>
+		 <div class="proto-dialog-button-line">
+		 	  <input type="button" value="确定" class="button orange selok"/>
+		 	  
+		 	  <input type="button" value="取消" class="button orange selcancel"/>
+		 </div>
+	</div>
+	
+	<div id="template-dialog" class="proto-dialog">
+		 <h5>选择模板</h5>
+		 <div class="proto-dialog-content">
+		 	
+		 	<ul id="tempTree" class="ztree"></ul>
+		 </div>
+		 <div class="proto-dialog-button-line">
+		 	  <input type="button" value="确定" class="button orange tempselok"/>
+		 	  
+		 	  <input type="button" value="取消" class="button orange tempselcancel"/>
+		 </div>
+	</div>
+
+</body>
+</html>

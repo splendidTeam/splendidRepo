@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SalesOrderExt.findSalesOrderByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单code查询订单扩展</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select sso.* from t_so_salesorder so,t_store_ext_so_sales_order sso
+					where so.id = sso.so_id and so.code=:code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+		
+</beans>

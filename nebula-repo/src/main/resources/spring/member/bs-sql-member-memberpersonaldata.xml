@@ -1,0 +1,1006 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+	
+	
+	<bean id="MemberPersonalData.findById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id获取用户</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+				    a.id as memberId,
+		       		a.login_name as loginName,
+		       		a.login_email as loginEmail,
+		       		a.lifecycle as lifeCycle,
+		       		a.login_mobile as loginMobile,
+		       		a.source as source,
+		       		a.type as type,
+		       		b.id as memberPersonalId,
+		       		b.user_pic as userPic,
+		       		b.nickname as nickName,
+		       		b.local_real_name as localRealName,
+		       		b.intel_real_name as intelRealName,
+		       		b.sex as sex,
+		       		b.blood_type as bloodType,
+		       		b.birthday as birthday,
+		       		b.marriage as marriage,
+		       		b.country as country,
+		       		b.province as province,
+		       		b.city as city,
+		       		b.AREA as area,
+		       		b.COUNTRY_ID as countryId,
+		       		b.PROVINCE_ID as provinceId,
+		       		b.CITY_ID as cityId,
+		       		b.AREA_ID as areaId,
+		       		b.address as address,
+		       		b.credentials_type as credentialsType,
+		       		b.credentials_no as credentialsNo,
+		       		b.email as email,
+		       		b.mobile as mobile,
+		       		b.QQ as QQ,
+		       		b.weibo as weibo,
+		       		b.weixin as weixin,
+		       		b.edu as edu,
+		       		b.industy as industy,
+		       		b.position as position,
+		       		b.salary as salary,
+		       		b.working_life as workingLife,
+		       		b.company as company,
+		       		b.interest as interest,
+		       		b.postcode as postcode,
+		       		b.short2 as short2,
+		       		c.id as memberConductId,
+		       		c.cumulative_con_amount as cumulativeConAmount,
+		       		c.login_count as loginCount,
+		       		c.login_ip as loginIp,
+		       		c.login_time as loginTime,
+		       		c.pay_time as payTime,
+		       		c.register_ip as registerIp,
+		       		c.register_time as registerTime
+		       		
+         from       t_mem_member a,
+                    t_mem_personal_data b,
+                    t_mem_conduct c
+         where      a.id=b.id
+         and        a.id=c.id
+         and        a.lifecycle!=2
+         and        a.id=:memberId
+				    
+		       	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberPersonalData.findMemberPersonalDataListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberPersonalData.findMemberPersonalDataListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($userPic)
+		       					and USER_PIC=:userPic
+		       				#end
+
+		       			
+		       				#if($nickname)
+		       					and NICKNAME=:nickname
+		       				#end
+		       				#if($nicknameForLike)
+		       					and NICKNAME like :nicknameForLike
+		       				#end
+
+		       			
+		       				#if($localRealName)
+		       					and LOCAL_REAL_NAME=:localRealName
+		       				#end
+		       				#if($localRealNameForLike)
+		       					and LOCAL_REAL_NAME like :localRealNameForLike
+		       				#end
+
+		       			
+		       				#if($intelRealName)
+		       					and INTEL_REAL_NAME=:intelRealName
+		       				#end
+		       				#if($intelRealNameForLike)
+		       					and INTEL_REAL_NAME like :intelRealNameForLike
+		       				#end
+
+		       			
+		       				#if($sex)
+		       					and SEX=:sex
+		       				#end
+
+		       			
+		       				#if($bloodType)
+		       					and BLOOD_TYPE=:bloodType
+		       				#end
+
+		       			
+		       				#if($birthday)
+		       					and BIRTHDAY >= :birthdayStart
+		       				#end
+		       				#if($birthday)
+		       					and BIRTHDAY <= :birthdayEnd
+		       				#end
+
+		       			
+		       				#if($marriage)
+		       					and MARRIAGE=:marriage
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($credentialsType)
+		       					and CREDENTIALS_TYPE=:credentialsType
+		       				#end
+
+		       			
+		       				#if($credentialsNo)
+		       					and CREDENTIALS_NO=:credentialsNo
+		       				#end
+
+		       			
+		       				#if($email)
+		       					and EMAIL=:email
+		       				#end
+
+		       			
+		       				#if($mobile)
+		       					and MOBILE=:mobile
+		       				#end
+
+		       			
+		       				#if($qq)
+		       					and QQ=:qq
+		       				#end
+
+		       			
+		       				#if($weibo)
+		       					and WEIBO=:weibo
+		       				#end
+
+		       			
+		       				#if($weixin)
+		       					and WEIXIN=:weixin
+		       				#end
+
+		       			
+		       				#if($edu)
+		       					and EDU=:edu
+		       				#end
+
+		       			
+		       				#if($industy)
+		       					and INDUSTY=:industy
+		       				#end
+
+		       			
+		       				#if($position)
+		       					and POSITION=:position
+		       				#end
+
+		       			
+		       				#if($salary)
+		       					and SALARY=:salary
+		       				#end
+
+		       			
+		       				#if($workingLife)
+		       					and WORKING_LIFE=:workingLife
+		       				#end
+
+		       			
+		       				#if($company)
+		       					and COMPANY=:company
+		       				#end
+
+		       			
+		       				#if($interest)
+		       					and INTEREST=:interest
+		       				#end
+
+		       			
+		       				#if($short1)
+		       					and SHORT1=:short1
+		       				#end
+
+		       			
+		       				#if($short2)
+		       					and SHORT2=:short2
+		       				#end
+
+		       			
+		       				#if($short3)
+		       					and SHORT3=:short3
+		       				#end
+
+		       			
+		       				#if($short4)
+		       					and SHORT4=:short4
+		       				#end
+
+		       			
+		       				#if($short5)
+		       					and SHORT5=:short5
+		       				#end
+
+		       			
+		       				#if($long1)
+		       					and LONG1=:long1
+		       				#end
+
+		       			
+		       				#if($long2)
+		       					and LONG2=:long2
+		       				#end
+
+		       			
+		       				#if($long3)
+		       					and LONG3=:long3
+		       				#end
+
+		       			
+		       				#if($long4)
+		       					and LONG4=:long4
+		       				#end
+
+		       			
+		       				#if($long5)
+		       					and LONG5=:long5
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberPersonalData.findMemberPersonalDataListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($userPic)
+		       					and USER_PIC=:userPic
+		       				#end
+
+		       			
+		       				#if($nickname)
+		       					and NICKNAME=:nickname
+		       				#end
+		       				#if($nicknameForLike)
+		       					and NICKNAME like :nicknameForLike
+		       				#end
+
+		       			
+		       				#if($localRealName)
+		       					and LOCAL_REAL_NAME=:localRealName
+		       				#end
+		       				#if($localRealNameForLike)
+		       					and LOCAL_REAL_NAME like :localRealNameForLike
+		       				#end
+
+		       			
+		       				#if($intelRealName)
+		       					and INTEL_REAL_NAME=:intelRealName
+		       				#end
+		       				#if($intelRealNameForLike)
+		       					and INTEL_REAL_NAME like :intelRealNameForLike
+		       				#end
+
+		       			
+		       				#if($sex)
+		       					and SEX=:sex
+		       				#end
+
+		       			
+		       				#if($bloodType)
+		       					and BLOOD_TYPE=:bloodType
+		       				#end
+
+		       			
+		       				#if($birthday)
+		       					and BIRTHDAY >= :birthdayStart
+		       				#end
+		       				#if($birthday)
+		       					and BIRTHDAY <= :birthdayEnd
+		       				#end
+
+		       			
+		       				#if($marriage)
+		       					and MARRIAGE=:marriage
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($credentialsType)
+		       					and CREDENTIALS_TYPE=:credentialsType
+		       				#end
+
+		       			
+		       				#if($credentialsNo)
+		       					and CREDENTIALS_NO=:credentialsNo
+		       				#end
+
+		       			
+		       				#if($email)
+		       					and EMAIL=:email
+		       				#end
+
+		       			
+		       				#if($mobile)
+		       					and MOBILE=:mobile
+		       				#end
+
+		       			
+		       				#if($qq)
+		       					and QQ=:qq
+		       				#end
+
+		       			
+		       				#if($weibo)
+		       					and WEIBO=:weibo
+		       				#end
+
+		       			
+		       				#if($weixin)
+		       					and WEIXIN=:weixin
+		       				#end
+
+		       			
+		       				#if($edu)
+		       					and EDU=:edu
+		       				#end
+
+		       			
+		       				#if($industy)
+		       					and INDUSTY=:industy
+		       				#end
+
+		       			
+		       				#if($position)
+		       					and POSITION=:position
+		       				#end
+
+		       			
+		       				#if($salary)
+		       					and SALARY=:salary
+		       				#end
+
+		       			
+		       				#if($workingLife)
+		       					and WORKING_LIFE=:workingLife
+		       				#end
+
+		       			
+		       				#if($company)
+		       					and COMPANY=:company
+		       				#end
+
+		       			
+		       				#if($interest)
+		       					and INTEREST=:interest
+		       				#end
+
+		       			
+		       				#if($short1)
+		       					and SHORT1=:short1
+		       				#end
+
+		       			
+		       				#if($short2)
+		       					and SHORT2=:short2
+		       				#end
+
+		       			
+		       				#if($short3)
+		       					and SHORT3=:short3
+		       				#end
+
+		       			
+		       				#if($short4)
+		       					and SHORT4=:short4
+		       				#end
+
+		       			
+		       				#if($short5)
+		       					and SHORT5=:short5
+		       				#end
+
+		       			
+		       				#if($long1)
+		       					and LONG1=:long1
+		       				#end
+
+		       			
+		       				#if($long2)
+		       					and LONG2=:long2
+		       				#end
+
+		       			
+		       				#if($long3)
+		       					and LONG3=:long3
+		       				#end
+
+		       			
+		       				#if($long4)
+		       					and LONG4=:long4
+		       				#end
+
+		       			
+		       				#if($long5)
+		       					and LONG5=:long5
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberPersonalData.enableOrDisableMemberPersonalDataByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_PERSONAL_DATA
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberPersonalData.removeMemberPersonalDataByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_PERSONAL_DATA
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberPersonalData.findAllEffectMemberPersonalDataList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="MemberPersonalData.findEffectMemberPersonalDataListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where lifecycle=1
+		       		
+					
+		       			
+		       				#if($userPic)
+		       					and USER_PIC=:userPic
+		       				#end
+
+		       			
+		       				#if($nickname)
+		       					and NICKNAME=:nickname
+		       				#end
+		       				#if($nicknameForLike)
+		       					and NICKNAME like :nicknameForLike
+		       				#end
+
+		       			
+		       				#if($localRealName)
+		       					and LOCAL_REAL_NAME=:localRealName
+		       				#end
+		       				#if($localRealNameForLike)
+		       					and LOCAL_REAL_NAME like :localRealNameForLike
+		       				#end
+
+		       			
+		       				#if($intelRealName)
+		       					and INTEL_REAL_NAME=:intelRealName
+		       				#end
+		       				#if($intelRealNameForLike)
+		       					and INTEL_REAL_NAME like :intelRealNameForLike
+		       				#end
+
+		       			
+		       				#if($sex)
+		       					and SEX=:sex
+		       				#end
+
+		       			
+		       				#if($bloodType)
+		       					and BLOOD_TYPE=:bloodType
+		       				#end
+
+		       			
+		       				#if($birthday)
+		       					and BIRTHDAY >= :birthdayStart
+		       				#end
+		       				#if($birthday)
+		       					and BIRTHDAY <= :birthdayEnd
+		       				#end
+
+		       			
+		       				#if($marriage)
+		       					and MARRIAGE=:marriage
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($credentialsType)
+		       					and CREDENTIALS_TYPE=:credentialsType
+		       				#end
+
+		       			
+		       				#if($credentialsNo)
+		       					and CREDENTIALS_NO=:credentialsNo
+		       				#end
+
+		       			
+		       				#if($email)
+		       					and EMAIL=:email
+		       				#end
+
+		       			
+		       				#if($mobile)
+		       					and MOBILE=:mobile
+		       				#end
+
+		       			
+		       				#if($qq)
+		       					and QQ=:qq
+		       				#end
+
+		       			
+		       				#if($weibo)
+		       					and WEIBO=:weibo
+		       				#end
+
+		       			
+		       				#if($weixin)
+		       					and WEIXIN=:weixin
+		       				#end
+
+		       			
+		       				#if($edu)
+		       					and EDU=:edu
+		       				#end
+
+		       			
+		       				#if($industy)
+		       					and INDUSTY=:industy
+		       				#end
+
+		       			
+		       				#if($position)
+		       					and POSITION=:position
+		       				#end
+
+		       			
+		       				#if($salary)
+		       					and SALARY=:salary
+		       				#end
+
+		       			
+		       				#if($workingLife)
+		       					and WORKING_LIFE=:workingLife
+		       				#end
+
+		       			
+		       				#if($company)
+		       					and COMPANY=:company
+		       				#end
+
+		       			
+		       				#if($interest)
+		       					and INTEREST=:interest
+		       				#end
+
+		       			
+		       				#if($short1)
+		       					and SHORT1=:short1
+		       				#end
+
+		       			
+		       				#if($short2)
+		       					and SHORT2=:short2
+		       				#end
+
+		       			
+		       				#if($short3)
+		       					and SHORT3=:short3
+		       				#end
+
+		       			
+		       				#if($short4)
+		       					and SHORT4=:short4
+		       				#end
+
+		       			
+		       				#if($short5)
+		       					and SHORT5=:short5
+		       				#end
+
+		       			
+		       				#if($long1)
+		       					and LONG1=:long1
+		       				#end
+
+		       			
+		       				#if($long2)
+		       					and LONG2=:long2
+		       				#end
+
+		       			
+		       				#if($long3)
+		       					and LONG3=:long3
+		       				#end
+
+		       			
+		       				#if($long4)
+		       					and LONG4=:long4
+		       				#end
+
+		       			
+		       				#if($long5)
+		       					and LONG5=:long5
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberPersonalData.findEffectMemberPersonalDataListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where lifecycle=1
+		       		
+					
+		       			
+		       				#if($userPic)
+		       					and USER_PIC=:userPic
+		       				#end
+
+		       			
+		       				#if($nickname)
+		       					and NICKNAME=:nickname
+		       				#end
+		       				#if($nicknameForLike)
+		       					and NICKNAME like :nicknameForLike
+		       				#end
+
+		       			
+		       				#if($localRealName)
+		       					and LOCAL_REAL_NAME=:localRealName
+		       				#end
+		       				#if($localRealNameForLike)
+		       					and LOCAL_REAL_NAME like :localRealNameForLike
+		       				#end
+
+		       			
+		       				#if($intelRealName)
+		       					and INTEL_REAL_NAME=:intelRealName
+		       				#end
+		       				#if($intelRealNameForLike)
+		       					and INTEL_REAL_NAME like :intelRealNameForLike
+		       				#end
+
+		       			
+		       				#if($sex)
+		       					and SEX=:sex
+		       				#end
+
+		       			
+		       				#if($bloodType)
+		       					and BLOOD_TYPE=:bloodType
+		       				#end
+
+		       			
+		       				#if($birthday)
+		       					and BIRTHDAY >= :birthdayStart
+		       				#end
+		       				#if($birthday)
+		       					and BIRTHDAY <= :birthdayEnd
+		       				#end
+
+		       			
+		       				#if($marriage)
+		       					and MARRIAGE=:marriage
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($credentialsType)
+		       					and CREDENTIALS_TYPE=:credentialsType
+		       				#end
+
+		       			
+		       				#if($credentialsNo)
+		       					and CREDENTIALS_NO=:credentialsNo
+		       				#end
+
+		       			
+		       				#if($email)
+		       					and EMAIL=:email
+		       				#end
+
+		       			
+		       				#if($mobile)
+		       					and MOBILE=:mobile
+		       				#end
+
+		       			
+		       				#if($qq)
+		       					and QQ=:qq
+		       				#end
+
+		       			
+		       				#if($weibo)
+		       					and WEIBO=:weibo
+		       				#end
+
+		       			
+		       				#if($weixin)
+		       					and WEIXIN=:weixin
+		       				#end
+
+		       			
+		       				#if($edu)
+		       					and EDU=:edu
+		       				#end
+
+		       			
+		       				#if($industy)
+		       					and INDUSTY=:industy
+		       				#end
+
+		       			
+		       				#if($position)
+		       					and POSITION=:position
+		       				#end
+
+		       			
+		       				#if($salary)
+		       					and SALARY=:salary
+		       				#end
+
+		       			
+		       				#if($workingLife)
+		       					and WORKING_LIFE=:workingLife
+		       				#end
+
+		       			
+		       				#if($company)
+		       					and COMPANY=:company
+		       				#end
+
+		       			
+		       				#if($interest)
+		       					and INTEREST=:interest
+		       				#end
+
+		       			
+		       				#if($short1)
+		       					and SHORT1=:short1
+		       				#end
+
+		       			
+		       				#if($short2)
+		       					and SHORT2=:short2
+		       				#end
+
+		       			
+		       				#if($short3)
+		       					and SHORT3=:short3
+		       				#end
+
+		       			
+		       				#if($short4)
+		       					and SHORT4=:short4
+		       				#end
+
+		       			
+		       				#if($short5)
+		       					and SHORT5=:short5
+		       				#end
+
+		       			
+		       				#if($long1)
+		       					and LONG1=:long1
+		       				#end
+
+		       			
+		       				#if($long2)
+		       					and LONG2=:long2
+		       				#end
+
+		       			
+		       				#if($long3)
+		       					and LONG3=:long3
+		       				#end
+
+		       			
+		       				#if($long4)
+		       					and LONG4=:long4
+		       				#end
+
+		       			
+		       				#if($long5)
+		       					and LONG5=:long5
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="MemberPersonalData.findByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where 
+		       				 id=:memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		<bean id="MemberPersonalData.findMemberPersonDataByMobile" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where mobile=:mobile
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberPersonalData.findByNickname" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_PERSONAL_DATA where 
+		       		        nickname=:nickname
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

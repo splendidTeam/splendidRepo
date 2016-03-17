@@ -1,0 +1,13 @@
+20140805-10：19更改版本号，相对于5.0.1修改了：因为5.0.1是非正常生成的版本，所以这个版本需要测试一下5.0.1所做过的变更
+1.【新增】wormhole的OrderMemberV5增加了一个loginname字段，存放的是order表中对应的membername(应该就是member的loginname字段)
+2.【新增】bs-sql-salesorder-order.xml中SalesOrder.findOrderById 返回数据添加物流信息字段，logisticsProviderCode、logisticsProviderName
+3.【新增】发送邮件增加扩展点 SalesOrderHandler 增加两个接口方法 下单邮件所需数据 getEmailDataOfCreateOrder 除下单之外的其他邮件 如取消订单 getEmailData
+4.【更新】contains方法，数据类型不一致。影响订单确认页中的Coupon使用（Combo类型的绑定）。
+5.【改bug】批量上传商品时，校验商品code不能重复(跨行业，跨店铺)  
+6.【改bug】批量上传商品时，upc校验修改成：整个系统upc值必须唯一,不分店铺或者行业 --增加同行业下面不同商品，upc唯一校验
+7.【改bug】修改促销优先级在某一个时刻所有促销都参与计算优先级
+8.【改bug】促销活动编辑第四步 选择商品范围时 没有拿到对应的商品范围的bug
+9.【调整】促销活动编辑中 去掉 角标 "无"的选项
+10.【调整】促销活动编辑中，选购商品条目，改成可以添加最多5条 且 选购商品必须是商品 
+11.【改bug】商品导入 找不到属性值 是由于查询属性值的时候属性id不连续 map后面的key值覆盖前面 修改为：PropertyValue.findPropertyValueListByPropIds方法添加order by property_id排序
+12.【改bug】cache的setObject方法序列化错误

@@ -1,0 +1,7 @@
+2016-01-14:
+	增加退换货相关类：
+	ReturnApplicationV5：退换货申请
+	ReturnApplicationLineV5：退换货申请明细
+	ReturnApplicationDeliveryInfoV5：换货出库配送信息
+	
+	OrderStatusV5增加bsRaCode，商城退换货编码，商城发起退换货时非空

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SkuInventoryLog.findAllSkuInventoryLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SkuInventoryLog.findSkuInventoryLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="SkuInventoryLog.findSkuInventoryLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log where 
+		       				1=1
+		       				#if($qty)
+		       					and QTY=:qty
+		       				#end
+		       			
+		       				#if($extentionCode)
+		       					and EXTENTION_CODE=:extentionCode
+		       				#end
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+				       		#if($userId)
+				       			and USER_ID =:userId
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SkuInventoryLog.findSkuInventoryLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log where 
+		       				1=1
+		       				#if($qty)
+		       					and QTY=:qty
+		       				#end
+		       			
+		       				#if($extentionCode)
+		       					and EXTENTION_CODE=:extentionCode
+		       				#end
+
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+				       		#if($userId)
+				       			and USER_ID =:userId
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="SkuInventoryLog.findAllEffectSkuInventoryLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="SkuInventoryLog.findEffectSkuInventoryLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log where 1=1
+		       			
+		       				#if($qty)
+		       					and QTY=:qty
+		       				#end
+
+		       				#if($extentionCode)
+		       					and EXTENTION_CODE=:extentionCode
+		       				#end
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       				#if($userId)
+				       			and USER_ID =:userId
+				       		#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SkuInventoryLog.findEffectSkuInventoryLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_log where 1=1
+		       			
+		       				#if($qty)
+		       					and QTY=:qty
+		       				#end
+		       			
+		       				#if($extentionCode)
+		       					and EXTENTION_CODE=:extentionCode
+		       				#end
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       				#if($userId)
+				       			and USER_ID =:userId
+				       		#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

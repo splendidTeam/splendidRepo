@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PayNo.findPayNosByPayInfoId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据payInfoId查询支付流水</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					sp.ID,
+					sp.PAY_NO as payNo,
+					sp.PAY_INFO_ID as payInfoId,
+					sp.CREATE_TIME as createTime,
+					sp.VERSION
+					from t_so_payno as sp
+					where 
+					 sp.PAY_INFO_ID = :payInfoId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PayNo.findPayNosByPayInfoIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据payInfoIds查询支付流水</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					sp.ID,
+					sp.PAY_NO as payNo,
+					sp.PAY_INFO_ID as payInfoId,
+					sp.CREATE_TIME as createTime,
+					sp.VERSION
+					from t_so_payno as sp
+					where 
+					 sp.PAY_INFO_ID in (
+		       		#foreach( $payInfoId in $payInfoIds )
+    					$payInfoId,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

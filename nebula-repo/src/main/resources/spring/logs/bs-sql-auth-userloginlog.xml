@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="UserLoginLog.loginLog" class="loxia.dao.support.DynamicQueryHolder">
+		<description>登记登录日志</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					insert into T_AU_USER_LOGIN_LOG
+		       		(id, user_id, ip, login_time, session_id) values
+		       		(nextval('s_t_au_user_login_log'),:userId, :ip, now(), :sessionId)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="UserLoginLog.logoutLog" class="loxia.dao.support.DynamicQueryHolder">
+		<description>登记登出日志</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					 update T_AU_USER_LOGIN_LOG
+		       			set logout_time = now()
+		       		where user_id=:userId and session_id=:sessionId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="UserLoginLog.findUserLoginLogByUserId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询用户登录记录</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					 select * from T_AU_USER_LOGIN_LOG
+		       			
+		       		where user_id=:userId order by id desc;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		
+</beans>

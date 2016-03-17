@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="CustomizeFilterClass.findAllCustomizeFilterClassList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PRM_CUSTOMIZEFILTERCLASSES
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CustomizeFilterClass.findCustomizeFilterClassListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       		*
+		       		from T_PRM_CUSTOMIZEFILTERCLASSES t where
+		       		t.lifecycle = 1 and 
+		       		t.id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		<bean id="CustomizeFilterClass.findCustomizeFilterClassListByServiceName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       		*
+		       		from T_PRM_CUSTOMIZEFILTERCLASSES t where
+		       		t.lifecycle = 1  
+       				#if($svcName)
+       					and t.service_name=:svcName
+       				#end
+       				LIMIT 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CustomizeFilterClass.findCustomizeFilterClassListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PRM_CUSTOMIZEFILTERCLASSES where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($scopeType)
+		       					and scope_type=:scopeType
+		       				#end
+
+		       			
+		       				#if($scopeName)
+		       					and scope_name=:scopeName
+		       				#end
+		       				#if($scopeNameForLike)
+		       					and scope_name like :scopeNameForLike
+		       				#end
+
+		       			
+		       				#if($serviceName)
+		       					and service_name=:serviceName
+		       				#end
+		       				#if($serviceNameForLike)
+		       					and service_name like :serviceNameForLike
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+
+		       			
+		       				#if($shopId)
+		       					and shop_id=:shopId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CustomizeFilterClass.findCustomizeFilterClassListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select id,cache_second as cacheSecond,cacheversion as cacheVersion,lifecycle,scope_name as scopeName,
+						service_name as serviceName,shop_id as shopId,version,scope_type as scopeType,
+						'' as scopeTypeName  from T_PRM_CUSTOMIZEFILTERCLASSES  
+		       		
+		       		where   lifecycle !=2
+		       		
+		       				#if($scopeType)
+		       					and scope_type=:scopeType
+		       				#end
+		       				#if($scopeName)
+		       					and scope_name like :scopeName
+		       				#end
+
+		       				#if($serviceName)
+		       					and service_name=:serviceName
+		       				#end
+		       				#if($serviceNameForLike)
+		       					and service_name like :serviceNameForLike
+		       				#end
+							#if($shopId)
+		       					and shop_id=:shopId
+		       				#end
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CustomizeFilterClass.enableOrDisableCustomizeFilterClassByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PRM_CUSTOMIZEFILTERCLASSES
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CustomizeFilterClass.removeCustomizeFilterClassByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PRM_CUSTOMIZEFILTERCLASSES
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CustomizeFilterClass.findAllEffectCustomizeFilterClassList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PRM_CUSTOMIZEFILTERCLASSES where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="CustomizeFilterClass.findEffectCustomizeFilterClassListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PRM_CUSTOMIZEFILTERCLASSES where lifecycle=1
+		       		
+					
+		       			
+		       				#if($scopeType)
+		       					and scope_type=:scopeType
+		       				#end
+
+		       			
+		       				#if($scopeName)
+		       					and scope_name=:scopeName
+		       				#end
+		       				#if($scopeNameForLike)
+		       					and scope_name like :scopeNameForLike
+		       				#end
+
+		       			
+		       				#if($serviceName)
+		       					and service_name=:serviceName
+		       				#end
+		       				#if($serviceNameForLike)
+		       					and service_name like :serviceNameForLike
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+
+		       			
+		       				#if($shopId)
+		       					and shop_id=:shopId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CustomizeFilterClass.findEffectCustomizeFilterClassListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PRM_CUSTOMIZEFILTERCLASSES where lifecycle=1
+		       		
+					
+		       			
+		       				#if($scopeType)
+		       					and scope_type=:scopeType
+		       				#end
+
+		       			
+		       				#if($scopeName)
+		       					and scope_name=:scopeName
+		       				#end
+		       				#if($scopeNameForLike)
+		       					and scope_name like :scopeNameForLike
+		       				#end
+
+		       			
+		       				#if($serviceName)
+		       					and service_name=:serviceName
+		       				#end
+		       				#if($serviceNameForLike)
+		       					and service_name like :serviceNameForLike
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+
+		       			
+		       				#if($shopId)
+		       					and shop_id=:shopId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="CustomizeFilterClass.findCustomizeFilterClassListByQueryMapAndShopIdWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ShopId分页获取CustomizeFilterClass列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select id,cache_second as cacheSecond,cacheversion as cacheVersion,lifecycle,scope_name as scopeName,
+						service_name as serviceName,shop_id as shopId,version,scope_type as scopeType,
+						'' as scopeTypeName  from T_PRM_CUSTOMIZEFILTERCLASSES  
+		       		
+		       		where   lifecycle !=2
+		       		
+							
+							and shop_id=:shopId
+		       			
+		       				#if($scopeType)
+		       					and scope_type=:scopeType
+		       				#end
+							#if($scopeName)
+		       					and scope_name=:scopeName
+		       				#end
+		       				#if($scopeNameForLike)
+		       					and scope_name like :scopeNameForLike
+		       				#end
+
+		       			
+		       				#if($serviceName)
+		       					and service_name=:serviceName
+		       				#end
+		       				#if($serviceNameForLike)
+		       					and service_name like :serviceNameForLike
+		       				#end
+
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="CustomizeFilterClass.findCustomizerFilterListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select id, scope_name as name from T_PRM_CUSTOMIZEFILTERCLASSES 
+		       		where id in (
+					#foreach( $id in $ids )
+    					$id,
+					#end
+		       		-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="CustomizeFilterClass.findEffectCustomizeFilterClassListByTypeAndShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from T_PRM_CUSTOMIZEFILTERCLASSES 
+					where lifecycle = 1 and scope_type = :type
+					#if($shopId)
+						and shop_id =:shopId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

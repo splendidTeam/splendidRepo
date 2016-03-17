@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="CmsEditArea.findAllCmsEditAreaList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsEditArea.findCmsEditAreaListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsEditArea.findCmsEditAreaListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA where 
+		       			lifecycle !=2
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       				
+		       				#if($moduleId)
+		       					and MODULE_ID=:moduleId
+		       				#end
+		       				
+		       				#if($moduleTemplateId)
+		       					and MODULE_TEMPLATE_ID=:moduleTemplateId
+		       				#end
+		       				
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsEditArea.findCmsEditAreaListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsEditArea.enableOrDisableCmsEditAreaByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_EDIT_AREA
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsEditArea.removeCmsEditAreaByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_EDIT_AREA
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsEditArea.findAllEffectCmsEditAreaList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="CmsEditArea.findEffectCmsEditAreaListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA where lifecycle=1
+		       		
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsEditArea.findEffectCmsEditAreaListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_EDIT_AREA where lifecycle=1
+		       		
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+
+		       			
+		       				#if($data)
+		       					and DATA=:data
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsEditArea.removeCmsEditAreaByPageId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete  from  T_CMS_EDIT_AREA 
+		       		where page_id = :pageId
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsEditArea.removeCmsEditAreaByTemplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete  from  T_CMS_EDIT_AREA 
+		       		where TEMPLATE_ID = :templateId
+		       		and code = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsEditArea.removeCmsModuleEditAreaByTemplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete  from   T_CMS_EDIT_AREA 
+		       		where MODULE_TEMPLATE_ID = :templateId
+		       		and MODULE_CODE = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CmsEditArea.editAreaHide" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_EDIT_AREA
+		       		set hide= :hide where  
+		       		#if($type=='module')
+		       			MODULE_TEMPLATE_ID = :templateId
+		       			and  MODULE_CODE = :areaCode
+						and  MODULE_ID = :pageId
+		       		#end
+		       		#if($type=='page')
+			       		TEMPLATE_ID = :templateId
+			       		and  CODE = :areaCode
+						and  PAGE_ID = :pageId
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsEditArea.queryEditAreaHide" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT *FROM T_CMS_EDIT_AREA
+		       		WHERE 
+		       		#if($type=='module')
+		       			MODULE_TEMPLATE_ID = :templateId
+		       			and  MODULE_CODE = :areaCode
+						and  MODULE_ID = :pageId
+		       		#end
+		       		#if($type=='page')
+			       		TEMPLATE_ID = :templateId
+			       		and  CODE = :areaCode
+						and  PAGE_ID = :pageId
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

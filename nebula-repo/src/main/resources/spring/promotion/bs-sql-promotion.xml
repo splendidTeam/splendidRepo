@@ -1,0 +1,826 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PromotionHead.findInactivePromotionListConditionallyWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件分页查询待启用的促销列表（包含步骤不完整的）</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT
+					h.promotion_id AS id,
+					h.shop_id AS shopId,
+					h.promotion_name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.copy_from AS copyFrom,
+					h.promotion_logo_type AS logoType,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.last_update_time AS updateTime,
+					h.last_update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.audiences_id AS audienceId,
+					au.mem_combo_id AS memberComboId,
+					au.mem_combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.mem_combo_name AS memberComboText,
+					au.mem_combo_expression AS memberComboExpression,
+					sc.scope_id AS scopeId,
+					sc.product_combo_id AS productComboId,
+					sc.product_combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.product_combo_name AS productComboText,
+					sc.product_combo_expression AS productComboExpression,
+					cn.condition_type  AS conditionType
+				FROM t_prm_promotionhead h
+				LEFT JOIN t_prm_promotionaudiences au ON au.promotion_id = h.promotion_id
+				LEFT JOIN t_prm_promotionscope sc ON sc.promotion_id = h.promotion_id
+				LEFT JOIN t_prm_promotioncondition_normal cn ON cn.promotion_id = h.promotion_id
+				LEFT JOIN t_mem_tag_rule mc ON mc.id = au.mem_combo_id
+				LEFT JOIN t_pd_tag_rule pc ON pc.id = sc.product_combo_id
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.last_update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE	h.shop_id = :shopId
+				AND h.lifecycle = 0
+				#if($promotionName)
+					AND h.promotion_name LIKE :promotionName
+				#end
+				#if($startTime) 
+					AND :startTime between h.start_time and h.end_time
+				#end
+				#if($endTime) 
+					AND :endTime between h.start_time and h.end_time
+				#end
+				#if($memComboType)
+					AND au.mem_combo_type = :memComboType
+				#end
+				#if($conditionType) 
+					AND cn.condition_type = :conditionType
+				#end
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionHead.findCompletePromotionListConditionallyWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件分页查询步骤完整的促销列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT
+					h.promotion_id AS id,
+					h.shop_id AS shopId,
+					h.promotion_name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.copy_from AS copyFrom,
+					h.promotion_logo_type AS logoType,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.last_update_time AS updateTime,
+					h.last_update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.audiences_id AS audienceId,
+					au.mem_combo_id AS memberComboId,
+					au.mem_combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.mem_combo_name AS memberComboText,
+					au.mem_combo_expression AS memberComboExpression,
+					sc.scope_id AS scopeId,
+					sc.product_combo_id AS productComboId,
+					sc.product_combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.product_combo_name AS productComboText,
+					sc.product_combo_expression AS productComboExpression,
+					cn.condition_type  AS conditionType
+				FROM t_prm_promotionhead h
+				JOIN t_prm_promotionaudiences au ON au.promotion_id = h.promotion_id
+				JOIN t_prm_promotionscope sc ON sc.promotion_id = h.promotion_id
+				JOIN t_mem_tag_rule mc ON mc.id = au.mem_combo_id
+				JOIN t_pd_tag_rule pc ON pc.id = sc.product_combo_id
+				JOIN t_prm_promotioncondition_normal cn ON cn.promotion_id = h.promotion_id
+				JOIN t_prm_promotionsetting_normal sn ON sn.promotion_id = h.promotion_id 
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.last_update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE	h.shop_id = :shopId
+				#if($promotionName)
+					AND h.promotion_name LIKE :promotionName
+				#end
+				#if($startTime) 
+					AND :startTime between h.start_time and h.end_time
+				#end
+				#if($endTime) 
+					AND :endTime between h.start_time and h.end_time
+				#end
+				#if($memComboType)
+					AND au.mem_combo_type = :memComboType
+				#end
+				#if($lifecycle == 0)
+   					and h.lifecycle = 0 and h.end_time >= now()
+   				#end
+   				#if($lifecycle == 1)
+   					and h.lifecycle = 1
+   					and h.start_time > now()
+   				#end
+   				#if($lifecycle == 2)
+   					and (h.lifecycle = 1 or h.lifecycle = 2)
+   					and now() between h.start_time and h.end_time
+   				#end
+   				#if($lifecycle == 3)
+   					and (h.lifecycle = 3 or h.end_time < now())
+   				#end
+   				#if($conditionType) 
+					AND cn.condition_type = :conditionType
+				#end
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionHead.findActivePromotionListByTimeScope" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询与该促销时间上冲突的已启用的促销列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT
+					h.promotion_id AS id,
+					h.shop_id AS shopId,
+					h.promotion_name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.copy_from AS copyFrom,
+					h.promotion_logo_type AS logoType,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.last_update_time AS updateTime,
+					h.last_update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.audiences_id AS audienceId,
+					au.mem_combo_id AS memberComboId,
+					au.mem_combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.mem_combo_name AS memberComboText,
+					au.mem_combo_expression AS memberComboExpression,
+					sc.scope_id AS scopeId,
+					sc.product_combo_id AS productComboId,
+					sc.product_combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.product_combo_name AS productComboText,
+					sc.product_combo_expression AS productComboExpression
+				FROM t_prm_promotionhead h
+				JOIN t_prm_promotionaudiences au ON au.promotion_id = h.promotion_id
+				JOIN t_prm_promotionscope sc ON sc.promotion_id = h.promotion_id
+				JOIN t_mem_tag_rule mc ON mc.id = au.mem_combo_id
+				JOIN t_pd_tag_rule pc ON pc.id = sc.product_combo_id
+				JOIN t_prm_promotioncondition_normal cn ON cn.promotion_id = h.promotion_id
+				JOIN t_prm_promotionsetting_normal sn ON sn.promotion_id = h.promotion_id 
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.last_update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE
+					h.lifecycle = 1 
+				AND h.shop_id = :shopId
+				AND h.promotion_id != :id
+				AND	(
+						(SELECT start_time FROM t_prm_promotionhead WHERE promotion_id = :id) BETWEEN h.start_time AND h.end_time
+					OR 
+						(SELECT end_time FROM t_prm_promotionhead WHERE promotion_id = :id) BETWEEN h.start_time AND h.end_time
+				)
+				ORDER BY h.start_time, h.end_time
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionHead.findPromotionQueryCommandById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询促销VO</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT
+					h.promotion_id AS id,
+					h.shop_id AS shopId,
+					h.promotion_name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.copy_from AS copyFrom,
+					h.promotion_logo_type AS logoType,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.last_update_time AS updateTime,
+					h.last_update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.audiences_id AS audienceId,
+					au.mem_combo_id AS memberComboId,
+					au.mem_combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.mem_combo_name AS memberComboText,
+					au.mem_combo_expression AS memberComboExpression,
+					sc.scope_id AS scopeId,
+					sc.product_combo_id AS productComboId,
+					sc.product_combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.product_combo_name AS productComboText,
+					sc.product_combo_expression AS productComboExpression
+				FROM t_prm_promotionhead h
+				JOIN t_prm_promotionaudiences au ON au.promotion_id = h.promotion_id
+				JOIN t_prm_promotionscope sc ON sc.promotion_id = h.promotion_id
+				JOIN t_mem_tag_rule mc ON mc.id = au.mem_combo_id
+				JOIN t_pd_tag_rule pc ON pc.id = sc.product_combo_id
+				JOIN t_prm_promotioncondition_normal cn ON cn.promotion_id = h.promotion_id
+				JOIN t_prm_promotionsetting_normal sn ON sn.promotion_id = h.promotion_id 
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.last_update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE	
+					h.promotion_id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionHead.activatePromotionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用促销</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	UPDATE t_prm_promotionhead
+            	SET 
+            		lifecycle = 1, 
+            		publish_id = :userId,
+            		publish_time = now(),
+            		copy_from = null
+            	WHERE promotion_id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionHead.inactivatePromotionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>取消促销</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	UPDATE t_prm_promotionhead
+            	SET 
+            		lifecycle = 3, 
+            		cancel_id = :userId,
+            		cancel_time = now()
+            	WHERE promotion_id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionHead.findPromotionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询促销</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+            		h.promotion_id, 
+					h.cancel_id, 
+					h.cancel_time, 
+					h.copy_from, 
+					h.create_id, 
+					h.create_time,
+					h.default_priority,
+					h.end_time, 
+					h.last_update_id, 
+					h.last_update_time, 
+					h.lifecycle, 
+					h.promotion_logo_type, 
+					h.promotion_name, 
+					h.publish_id, 
+					h.publish_time, 
+					h.shop_id,
+					h.start_time, 
+					CASE h.last_update_id WHEN NULL THEN u1.realname ELSE u2.realname END
+				FROM t_prm_promotionhead h
+				LEFT JOIN t_prm_promotionaudiences au 
+				ON h.promotion_id = au.promotion_id
+				LEFT JOIN t_au_user u1
+				ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2
+				ON u2.id = h.last_update_id
+				WHERE h.promotion_id = :promotionId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+  
+	<bean id="PromotionScope.findByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询范围列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+            		*
+				FROM t_prm_promotionscope
+				WHERE promotion_id = :promotionId
+				and ACTIVE_MARK=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionConditionNormal.findByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询Normal条件列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotioncondition_normal
+				WHERE promotion_id = :promotionId
+				and ACTIVE_MARK=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionConditionNormal.findPromotionConditionNormalByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询Normal条件列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotioncondition_normal
+				WHERE promotion_id = :promotionId
+				and ACTIVE_MARK=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+		<bean id="PromotionConditionComplex.findPromotionConditionComplexByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询Normal条件列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotioncondition_complex
+				WHERE promotion_id = :promotionId
+					AND active_mark=1
+				ORDER BY step_priority ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+		<bean id="PromotionConditionComplex.findPromotionConditionComplexListByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询Normal条件列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotioncondition_complex
+				WHERE promotion_id = :promotionId
+					AND active_mark=1
+				ORDER BY step_priority ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionSettingComplex.findPromotionSettingComplexByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销条件id查询复合优惠活动列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotionsetting_complex
+				WHERE promotion_id = :promotionId
+					AND active_mark=1
+				ORDER BY setting_id ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionSettingComplex.findPromotionSettingComplexByConditionComplexId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销条件id查询复合优惠活动列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotionsetting_complex
+				WHERE complex_condition_id = :conditionId
+					AND active_mark=1
+				ORDER BY setting_id ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionSettingNormal.findByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询优惠Normal列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotionsetting_normal
+				WHERE promotion_id = :promotionId
+					AND active_mark=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionSettingNormal.findPromotionSettingNormalByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询优惠Normal列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT 
+					*
+				FROM t_prm_promotionsetting_normal
+				WHERE promotion_id = :promotionId
+					AND active_mark=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+ 
+
+	<bean id="PromotionPriorityChanelAdjust.findPromotionPriorityChanelAdjustListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>按条件查询促销渠道列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT
+					p.id AS id,
+					a.audience_value AS chanelId,
+					g.name AS chanelName,
+					h.promotion_id AS promotionId,
+					h.promotion_name AS promotionName,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					p.priority AS priority,
+					p.effect_mark AS effectMark,
+					p.last_update_id AS lastUpdateId,
+					p.last_update_time AS lastUpdateTime
+				FROM t_prm_promotionprioritychaneladjust p
+				JOIN t_prm_promotionhead h
+				ON p.promotion_id = h.promotion_id
+				JOIN t_prm_promotionaudiences a
+				ON a.promotion_id = h.promotion_id
+				JOIN t_mem_group g
+				ON g.id = a.audience_value
+				WHERE h.lifecycle in (1,2)
+				#if($audienceValue)
+					AND a.audience_value = :audienceValue
+				#end
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionPriorityChanelAdjust.findPriorityConditionCommandListByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>按促销id查询促销优先级条件列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT
+					p.promotion_id,
+					c.item_id,
+					(SELECT sale_price FROM t_pd_sku WHERE item_id = c.item_id GROUP BY sale_price),
+					c.condition_type,
+					c.condition_value,
+					s.setting_type,
+					s.setting_value
+				FROM t_prm_promotionprioritychaneladjust p
+				JOIN t_prm_promotioncondition c
+				ON c.promotion_id = p.promotion_id
+				JOIN t_prm_promotionsetting s
+				ON s.promotion_id = p.promotion_id
+				WHERE 
+					s.condition_id = c.condition_id AND
+					p.promotion_id = :promotionId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+<bean id="PromotionHead.findPromotionEnableList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>取得所有启动活动有效期包含在当前时间</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			SELECT 	          
+					h.promotion_id, 
+					h.promotion_name, 
+					h.start_time,
+					h.end_time, 
+					h.lifecycle,
+					h.PROMOTION_LOGO_TYPE,
+					h.shop_id,
+					h.default_priority,
+					h.publish_time,
+					au.audiences_id,
+					au.mem_combo_type,
+					au.mem_combo_name,
+					au.mem_combo_expression,
+					au.mem_combo_id as memComboId,
+					sc.scope_id as scopeId, 
+					sc.product_combo_type, 
+					sc.product_combo_name,
+					sc.product_combo_expression,
+					sc.product_combo_id as productComboId,
+					cn.condition_id,
+					cn.condition_express,
+					cn.condition_name,
+					cn.condition_type,
+					sn.setting_id,
+					sn.setting_name,
+					sn.setting_expression
+			FROM t_prm_promotionhead h
+			JOIN t_prm_promotionaudiences au 
+			ON h.promotion_id = au.promotion_id
+			JOIN t_prm_promotionscope sc 
+			ON h.promotion_id = sc.promotion_id
+			JOIN t_prm_promotioncondition_normal cn
+			ON h.promotion_id = cn.promotion_id
+			JOIN t_prm_promotionsetting_normal sn
+			ON h.promotion_id = sn.promotion_id
+			where :currentTime < h.end_time and
+				h.lifecycle='1'
+			 ORDER BY h.shop_id,h.default_priority ASC,h.publish_time desc		
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionHead.findAllPromotionEnableList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>取已经启用的活动</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			SELECT 	          
+					h.promotion_id, 
+					h.promotion_name, 
+					h.start_time,
+					h.end_time, 
+					h.lifecycle,
+					h.PROMOTION_LOGO_TYPE,
+					h.shop_id,
+					h.default_priority,
+					h.publish_time,
+					au.audiences_id,
+					au.mem_combo_type,
+					au.mem_combo_name,
+					au.mem_combo_expression,
+					au.mem_combo_id as memComboId,
+					sc.scope_id as scopeId, 
+					sc.product_combo_type, 
+					sc.product_combo_name,
+					sc.product_combo_expression,
+					sc.product_combo_id as productComboId,
+					cn.condition_id,
+					cn.condition_express,
+					cn.condition_name,
+					cn.condition_type,
+					sn.setting_id,
+					sn.setting_name,
+					sn.setting_expression
+			FROM t_prm_promotionhead h
+			JOIN t_prm_promotionaudiences au 
+			ON h.promotion_id = au.promotion_id
+			JOIN t_prm_promotionscope sc 
+			ON h.promotion_id = sc.promotion_id
+			JOIN t_prm_promotioncondition_normal cn
+			ON h.promotion_id = cn.promotion_id
+			JOIN t_prm_promotionsetting_normal sn
+			ON h.promotion_id = sn.promotion_id
+			where h.lifecycle='1'
+			 AND now() < h.end_time
+			 ORDER BY h.shop_id,cn.condition_type DESC,h.default_priority ASC,h.publish_time desc		
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionHead.findPromotionByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据名称查询促销</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT
+					promotion_id,
+					cancel_id,
+					cancel_time,
+					copy_from,
+					create_id,
+					create_time,
+					default_priority,
+					end_time,
+					last_update_id,
+					last_update_time,
+					lifecycle,
+					promotion_logo_type,
+					promotion_name,
+					publish_id,
+					publish_time,
+					shop_id,
+					start_time
+				FROM t_prm_promotionhead
+				WHERE 
+					promotion_name = :name
+					and  lifecycle != 3 
+					and end_time > now() 					
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionConditionNormal.findByTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销id查询条件列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT tpc.* FROM 
+					t_prm_promotioncondition_normal tpc, t_prm_promotionhead tph
+				WHERE 
+					tph.start_time < :time and
+					tph.end_time > :time and
+					tph.promotion_id = tpc.promotion_id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionHead.checkPromtionTimeEffectiveByID" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据启动时间和活动id查询活动</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			SELECT 	          
+					h.promotion_id, 
+					h.promotion_name, 
+					h.start_time,
+					h.end_time, 
+					h.lifecycle 
+			FROM t_prm_promotionhead h  
+			where   h.start_time >= :currentTime 
+			        and h.promotion_id =:pId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionHead.findPromotionHeadById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询活动头部</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			SELECT 	          
+				*
+			FROM t_prm_promotionhead
+			where  
+				promotion_id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionConditionNormal.deleteByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销ID删除条件</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			DELETE FROM t_prm_promotioncondition_normal
+			WHERE promotion_id = :promotionId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionConditionComplex.deleteByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销ID删除条件</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			DELETE FROM t_prm_promotioncondition_complex
+			WHERE promotion_id = :promotionId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionSettingNormal.deleteByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销ID删除优惠设置</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			DELETE FROM t_prm_promotionsetting_normal
+			WHERE promotion_id = :promotionId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionSettingComplex.deleteByPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据促销ID删除优惠设置</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			DELETE FROM t_prm_promotionsetting_complex
+			WHERE promotion_id = :promotionId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	 	<bean id="PromotionHead.findConflictingPromotionListByTimePoint" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据时间点获取冲突的促销</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			SELECT
+				h.promotion_id,
+				h.promotion_name,
+				h.start_time,
+				h.end_time,
+				h.lifecycle,
+				h.promotion_logo_type,
+				h.last_update_time,
+				h.last_update_id,
+				au.mem_combo_name,
+				au.mem_combo_expression,
+				au.mem_combo_type,
+				sc.product_combo_name,
+				sc.product_combo_expression,
+				sc.product_combo_type,
+				u.realname
+			FROM
+				t_prm_promotionhead h
+			JOIN t_prm_promotionaudiences au ON h.promotion_id = au.promotion_id
+			JOIN t_prm_promotionscope sc ON h.promotion_id = sc.promotion_id
+			LEFT JOIN t_au_user u ON h.last_update_id = u.id
+			WHERE
+				h.lifecycle = 1
+			AND h.shop_id = :shopId
+			AND h.start_time <= :timePoint
+			AND h.end_time >= :timePoint
+			AND h.end_time >= now()
+			ORDER BY h.default_priority, h.start_time, h.end_time
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionHead.updatePriorityByConditionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件ID更新促销优先级</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+			UPDATE t_prm_promotionhead 
+			SET default_priority = :priority
+			WHERE promotion_id = (
+				SELECT promotion_id
+				FROM t_prm_promotioncondition_normal 
+				WHERE condition_id = :conditionId
+			)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

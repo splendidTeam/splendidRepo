@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Menu.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效menu信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+		       		select * from T_AU_MENU where LIFECYCLE = 1 order by parent_id desc, sort_no asc
+		       	]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Menu.findUserMenu" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询用户在某个机构下的菜单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+			  	WITH RECURSIVE r AS (
+			           select * 
+			           from T_AU_MENU 
+			           where 
+			           		LIFECYCLE = 1 
+			           and url in(
+				           select 
+				           		distinct url 
+				           from T_AU_PRIVILEGE_URL 
+				           where pri_id in(
+								select pri_id 
+								from t_au_role_privilege role_privilege, t_au_privilege privilege 
+								where 
+										privilege.lifecycle=1 
+									and privilege.id= role_privilege.pri_id 
+									and exists 
+									(
+										select 1 from t_au_user_role user_role,t_au_role role 
+										where user_role.role_id=role.id and role.lifecycle=1 
+										and user_role.org_id=:orgaId 
+										and user_role.user_id=:userId 
+										and user_role.role_id=role_privilege.role_id
+									)
+							)
+					   ) 
+			      union ALL 
+			        SELECT 
+			        	tree.* 
+			        FROM T_AU_MENU as tree, r 
+			        WHERE r.parent_id = tree.id 
+			   )
+			    SELECT distinct * 
+			    FROM r 
+			    ORDER BY parent_id desc, sort_no asc 
+		       	]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Menu.getAllMenus" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有菜单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+			           select * 
+			           from T_AU_MENU 
+			           where 
+			           LIFECYCLE = 1 
+			    	   ORDER BY parent_id desc, sort_no asc 
+		       	]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Menu.getMenuByUrl" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				#if($url)
+		       	select  menu.*,pri.id priId, pri.acl,pri.description,pri.group_name,
+				 pri.name,pri.org_type_id from  t_au_privilege_url  pri_url 
+				 LEFT JOIN  t_au_menu menu  on menu.url = pri_url.url
+				 LEFT JOIN t_au_privilege pri on pri_url.pri_id = pri.id
+				 where menu.url = :url 
+				 #end
+				 #if($name)
+				 select  menu.*,pri.id priId, pri.acl,pri.description,pri.group_name,
+				 pri.name,pri.org_type_id from  t_au_menu menu 
+				 LEFT JOIN t_au_privilege pri on pri.name = menu.label
+				 where  menu.label = :name
+						and menu.id = :id
+				 #end
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		<bean id="Menu.findChildrenMenus" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				 select  count(*) CNT from  t_au_menu  where parent_id =:pid
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+
+</beans>

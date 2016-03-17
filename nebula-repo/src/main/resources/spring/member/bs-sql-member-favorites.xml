@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MemberFavorites.memberFavoritesList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		
+		       		select tmf.member_id as memberId,
+		       			   tmf.create_time as createTime,
+		       			   tmf.id as id,
+		       			   tp.id as itemId,
+		       			   tpi.title as itemName,		       			   
+						   tpi.sale_price AS salePrice,
+						   tpi.list_price AS listPrice,
+		       			   tp.pic_url as picUrl 
+		       		from T_MEMBER_FAVORITES tmf 
+		       			join t_pd_item  tp on  tmf.item_id=tp.id
+		       			join t_pd_iteminfo tpi on tpi.item_id=tp.id
+		       		where 1=1
+		       		#if($memberId)
+		       		 and tmf.member_id= :memberId	
+		       		#end       		
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="MemberFavorites.findFavoritesList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						favorites.member_id as memberId,
+						favorites.create_time as createTime,
+						favorites.sku_id as skuId,
+						favorites.id as id,
+						item.id as itemId,
+						itemInfo.title as itemName,	
+						item.code as itemCode,
+						(case when favorites.sku_id is not null then sku.sale_price else itemInfo.sale_price end) as salePrice,
+						(case when favorites.sku_id is not null then sku.list_price else itemInfo.list_price end) as listPrice,
+						item.lifecycle as lifecycle,
+						(case when favorites.sku_id is not null then sku.properties else '' end ) as properties,
+						(case when favorites.sku_id is not null then sku.out_id else '' end) as extentionCode
+					from t_member_favorites favorites 
+						left join t_pd_item  item on  favorites.item_id = item.id
+						left join t_pd_iteminfo itemInfo on itemInfo.item_id = item.id
+						left join t_pd_sku sku on favorites.sku_id = sku.id
+					where favorites.member_id = :memberId
+					#if($beginTime)
+						and favorite.create_time >= beginTime
+					#end
+					#if($endTime)
+						and favorite.create_time <= endTime
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberFavorites.findMemberFavoritesByIdAndMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select tmf.id as id, 
+						   tmf.item_id as itemId, 
+						   tmf.member_id as memberId 
+					from t_member_favorites tmf
+					where tmf.id = :id 
+					and tmf.member_id = :memberId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberFavorites.removeFavoritesByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					delete from t_member_favorites 
+					where member_id = :memberId 
+					
+					#if($itemIds)
+						and item_id in (
+			       			#foreach( $itemId in $itemIds )
+	    						$itemId,
+							#end
+							-1
+		       			)
+	       			#end
+	       			
+	       			#if($skuIds)
+	       				and sku_id in (
+						#foreach( $skuId in $skuIds )
+	    						$skuId,
+							#end
+							-1
+		       			)
+	       			#end
+	       			
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		
+	<bean id="MemberFavorites.findMemberFavoritesByMemberIdAndItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * 
+		       		from t_member_favorites
+		       		where item_id= :itemId  
+       			    and member_id= :memberId 
+       			    #if($skuId)
+       			  	  and sku_id = :skuId
+       			    #end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+</beans>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SearchCondition.findConditionByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据CategoryId查询该分类下的所有搜索选项条件（同时返回所有CategoryId为null 的记录） </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_pd_search_con where (category_id is NULL or category_id = :cid ) and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SearchCondition.findConditionByCategoryIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据CategoryId查询分类列表下的所有搜索选项条件（同时返回所有CategoryId为null 的记录） </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_pd_search_con where (category_id is NULL or category_id in (#foreach( $id in $cids )
+	    					$id,
+						 #end
+			       		 -1) ) and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SearchCondition.findConditionByCategoryIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据CategoryId查询分类列表下的所有搜索选项条件（同时返回所有CategoryId为null 的记录） </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_pd_search_con where (category_id is NULL or category_id in (#foreach( $id in $cids )
+	    					$id,
+						 #end
+			       		 -1) ) and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SearchCondition.updateSearchConditionLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID更新searchCondition</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_lang set 
+					name=:name
+					where search_condition_id=:searchconditionid 
+					and lang=:lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SearchCondition.findSearchConditionLangByScids" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表查询简要的分类信息</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_search_con_lang 
+                   where search_condition_id in(
+                   	#foreach($id in $scids)
+                   		$id,
+                   	#end
+                   	-1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.findSearchConditionLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_search_con_lang 
+                   where search_condition_id =:id 
+                   and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

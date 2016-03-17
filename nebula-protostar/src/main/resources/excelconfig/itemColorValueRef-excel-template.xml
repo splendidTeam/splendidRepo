@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sheets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="exceltemplate-1.0.xsd">
+	<sheet name="itemColorRefValue">
+		<block start="A4" end="D4" dataName="ItemColorValueReflist" loop="true" loopClass="com.baozun.nebula.model.product.ItemColorValueRef">
+			<cell position="A4" dataName="filterColor" mandatory="true"  />
+			<cell position="B4" dataName="filterColorValue" mandatory="true" />
+			<cell position="C4" dataName="itemColor" mandatory="true"/>
+			<cell position="D4" dataName="itemtColorValue" mandatory="true"/>
+		</block>
+	</sheet>
+
+	<!--******************************************************************************************-->
+</sheets>

@@ -1,0 +1,5 @@
+#图片文件根路径
+image_root=/home/jmuser/webroot/nebula
+
+#缩略图处理主文件，位于当前用户拥有写权限的目录下，并且链接到%NGINX_HOME%/lua/lib下
+config_file=/home/jmuser/webroot/image_handler.lua

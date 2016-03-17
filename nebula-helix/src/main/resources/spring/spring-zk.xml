@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:loxia="http://loxia.benjamin.cn/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		">
+	<bean id="systemConfigWatchInvoke" class="com.baozun.nebula.zk.SystemConfigWatchInvoke"></bean>
+
+	<bean id="engineWatchInvoke" class="com.baozun.nebula.zk.EngineWatchInvoke"></bean>
+
+	<bean id="freightWatchInvoke"  class="com.baozun.nebula.zk.FreightWatchInvoke"></bean>
+	
+	<bean id="urlMapWatchInvoke"  class="com.baozun.nebula.zk.UrlMapWatchInvoke"></bean>
+	
+	<bean id="moduleMapWatchInvoke"  class="com.baozun.nebula.zk.ModuleMapWatchInvoke"></bean>
+	
+	<bean id="i18nLangWatchInvoke"  class="com.baozun.nebula.zk.I18nLangWatchInvoke"></bean>
+
+	<bean id="watchControl" class="com.baozun.nebula.zk.WatchControl">
+		<constructor-arg>
+			<list>
+			  <ref bean="engineWatchInvoke" />
+ 			  <ref bean="freightWatchInvoke" />
+			  <ref bean="urlMapWatchInvoke" />
+			  <ref bean="systemConfigWatchInvoke"/>
+			  <ref bean="moduleMapWatchInvoke"/>
+			  <ref bean="i18nLangWatchInvoke"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="zkoperator" class="com.baozun.nebula.zk.ZooKeeperOperator">
+		
+		<constructor-arg>
+			<value><![CDATA[#{meta['zk.host']}]]></value>
+			
+		</constructor-arg>
+		
+		
+	</bean>
+	
+</beans>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<bean id="PresellItemPriceInfo.finditemPresellItemPriceInfoByitemIdAndExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId和extentionCode查询预售商品价格信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * from t_sto_presell_item_price_Info where itemId=:itemId and extentioncode=:extentionCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PresellItemPriceInfo.findItemPresalseSkuInfoByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemCode获取该商品的预售SKU信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * from t_sto_presell_item_price_Info where itemId=:itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

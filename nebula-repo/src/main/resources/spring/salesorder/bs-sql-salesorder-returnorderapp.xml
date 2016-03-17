@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ReturnOrderApp.findReturnOrdersByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据筛选条件分页查询申请退换货订单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					
+					#if($sdkQueryType == 1)
+					select 
+					sro.ID,
+					sro.ORDER_CODE as orderCode,
+					sro.MEMBER_ID as memberId,
+					sro.MEMBER_NAME as memberName,
+					sro.ORDER_LINE_ID as orderLineId,
+					sro.COUNT,
+					sro.SERVICE_TYPE as serviceType,
+					sro.DESCRIBE,
+					sro.IS_RECEIPT as isReceipt,
+					sro.PIC,
+					sro.NAME,
+					sro.ADDRESS,
+					sro.MOBILE,
+					sro.STATUS,
+					sro.HANDLE_ID as handleId,
+					sro.HANDLE_NAME as handleName,
+					sro.CREATE_TIME as createTime,
+					sro.FEEDBACK
+					from t_so_returnorderapp as sro
+					
+					
+					#else
+					select 
+					sro.ID,
+					sro.ORDER_CODE as orderCode,
+					sro.MEMBER_ID as memberId,
+					sro.MEMBER_NAME as memberName,
+					sro.ORDER_LINE_ID as orderLineId,
+					sro.COUNT,
+					sro.SERVICE_TYPE as serviceType,
+					sro.DESCRIBE,
+					sro.IS_RECEIPT as isReceipt,
+					sro.PIC,
+					sro.NAME,
+					sro.ADDRESS,
+					sro.MOBILE,
+					sro.STATUS,
+					sro.HANDLE_ID as handleId,
+					sro.HANDLE_NAME as handleName,
+					sro.CREATE_TIME as createTime,
+					sro.FEEDBACK
+					from t_so_returnorderapp as sro
+					
+					#end
+					
+					
+					where 1 = 1
+					#if($name)
+						and sro.NAME like :name
+					#end
+					#if($memberId)
+						and sro.MEMBER_ID = :memberId
+					#end
+					#if($memberName)
+						and sro.MEMBER_NAME like :memberName
+					#end
+					#if($orderCode)
+						and sro.ORDER_CODE like :orderCode
+					#end
+					#if($state)
+						and sro.STATUS = :state
+					#end
+					#if($serviceType)
+						and sro.SERVICE_TYPE = :serviceType
+					#end
+					#if($isReceipt)
+						and sro.IS_RECEIPT = :isReceipt
+					#end
+					#if($mobile)
+						and sro.MOBILE like :mobile
+					#end
+					#if($handleId)
+						and sro.HANDLE_ID = :handleId
+					#end
+					#if($handleName)
+						and sro.HANDLE_NAME like :handleName
+					#end
+					#if($startDate)
+		       			and	sro.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	sro.CREATE_TIME<=:endDate
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ReturnOrderApp.updateReturnOrders" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 更改退换货订单申请状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_returnorderapp
+		       		set 
+		       		HANDLE_ID = :handleId 
+		       		, STATUS = :state
+		       		, FEEDBACK = :feedback
+		       		, MODIFY_TIME= :modifyTime
+		       		where ORDER_CODE = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ReturnOrderApp.findReturnOrderAppByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单号查询退换货申请</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						sr.id,
+						sr.order_code as orderCode,
+						sr.order_line_id as orderLineId,
+						sr.member_id as memberId,
+						sr."count",
+						sr.service_type as serviceType,
+						sr."describe",
+						sr.feedback,
+						sr.is_receipt as isReceipt,
+						sr.pic,
+						sr.name,
+						sr.address,
+						sr.mobile,
+						sr.status,
+						sr.handle_id as handleId,
+						sr.handle_name as handleName,
+						sr.create_time as creatTime,
+						sr.modify_time as modifyTime,
+						sr."version",
+						sr.member_name as memberName
+					from 
+						t_so_returnorderapp sr
+					where 
+						sr.order_code = :orderCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

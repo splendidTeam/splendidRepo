@@ -1,0 +1,769 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css" />
+<link rel="stylesheet" type="text/css"
+	href="../css/demo.css" />
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+	var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript"
+	src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+	<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+	<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+
+<script type="text/javascript"
+	src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<script type="text/javascript">
+	
+	function drawItemInfo(data, args, idx){
+		return "<label>"+
+					"<div>编码:b1801182</div>"+
+						"</br>"+
+					"<div>名称:波司登羽绒服</div>"+
+				"</label>";
+	}
+	function drawEvaInfo(data, args, idx){
+		return "<label class='movetitletd'>"+
+					"<div><span class='product-star-content'><span class='product-star'></span><span class='product-star'></span><span class='product-star'></span><span class='product-star'></span><span class='product-star'></span></span> 2014-01-08 19:09:25  <label style='color: red'>(已回复)</label></div>"+
+						"</br>"+
+					"<div custtalk='坑爹啊！腊八活动价买408元，13号才收到货。结果15号才卖399元-50元=349元！！！我擦，才一天时间有60元差价！询问客服，叫补差价。客服态度恶劣，嚣张的很！差价也不补！' servicetalk='客服回复：退换货服务流程请咨询本店客服' class='movetitle'>坑爹啊！腊八活动价买408元，13号才收到货。结果15号才卖399元-50元=349元！！！我擦，才一天时间......</div>"+
+						"</br>"+
+				"</label>";
+	}
+	
+	function drawEditTodo(data, args, idx){
+		var result="";
+		var state=loxia.getObject("lifecycle", data);
+		result+="<a href='javascript:void(0);' class='func-button modify' val='"+loxia.getObject("shopid", data)+"'>审核通过</a>";
+		result+="<a href='javascript:void(0);' val='"+loxia.getObject("organizationid", data)+"' class='func-button enable'>删除</a>";
+		result+="<a href='javascript:void(0);' class='func-button lookupDetails' val='"+loxia.getObject("organizationid", data)+"'>查看详细</a>";
+		
+		return result;
+	}
+	function drawEditDone(data, args, idx){
+		var result="";
+		var state=loxia.getObject("lifecycle", data);
+		result+="<a href='javascript:void(0);' val='"+loxia.getObject("organizationid", data)+"' class='func-button enable'>删除</a>";
+		result+="<a href='javascript:void(0);' class='func-button lookupDetails' val='"+loxia.getObject("organizationid", data)+"'>查看详细</a>";
+		
+		return result;
+	}
+	
+	$j(document).ready(function() {
+		loxia.init({
+			debug : true,
+			region : 'zh-CN'
+		});
+		nps.init();
+	
+		$j("#table1").loxiasimpletable({
+			page : true,
+			
+			cols : [ 
+			{label : "<input type='checkbox'/>",template : "drawCheckbox" },
+			{label:"商品",width:"15%",sort:"orderCode",template:"drawItemInfo"},
+			{name:"evaluate",label:"评价",width:"60%",template:"drawEvaInfo"},
+			{name:"member",label:"会员",width:"10%"},
+			{label:"操作",width:"15%", align:"left", template:"drawEditTodo"}
+		  ],
+			dataurl : {
+				currentPage : 1,
+				totalPages : 10,
+				count : 99,
+				size : 10,
+				sortStr : "createtime desc",
+				firstPage : true,
+				lastPage : false,
+				items : [ {
+					member : "zhang1"
+				}, {
+					member : "zhang2"
+				},{
+					member : "zhang3"
+				},{
+					member : "zhang4"
+				},{
+					member : "zhang5"
+				},{
+					member : "zhang6"
+				}
+				]
+			}
+		});
+
+		
+		$j("#table2").loxiasimpletable({
+			page : true,
+
+			cols : [ 
+			           {label : "<input type='checkbox'/>",template : "drawCheckbox" },
+						{label:"商品",width:"15%",sort:"orderCode",template:"drawItemInfo"},
+						{name:"evaluate",label:"评价",width:"60%",template:"drawEvaInfo"},
+						{name:"member",label:"会员",width:"10%"},
+						{label:"操作",width:"15%", align:"left", template:"drawEditDone"}
+			],
+			dataurl : {
+				currentPage : 1,
+				totalPages : 10,
+				count : 99,
+				size : 5,
+				sortStr : "createtime desc",
+				firstPage : true,
+				lastPage : false,
+				items : [ {
+					member : "zhang1"
+				}, {
+					member : "zhang2"
+				},{
+					member : "zhang3"
+				},{
+					member : "zhang4"
+				},{
+					member : "zhang5"
+				}
+				]
+			}
+		});
+		
+		refreshData();
+
+		$j(".button.orange.pass").on("click", function(){
+	        alert("通过")
+	    });
+		$j(".button.orange.reject").on("click", function(){
+	        alert("删除成功")
+	    });
+		$j(".button.orange.export").on("click", function(){
+	        alert("导出成功")
+	    });
+		
+		//  详细弹出	
+		$j(".ui-block").on("click",".lookupDetails",function(){
+			$j("#detail-dialog").dialogff({type:'open',close:'in',width:'700px',height:'430px'});
+		})
+		
+		$j(".button.orange.copyok").on("click",function(){
+			$j("#detail-dialog").dialogff({type:'close'});
+		})
+		
+		$j(".button.orange.copycancel").on("click",function(){
+			
+			$j("#detail-dialog").dialogff({type:'close'});
+		})
+		
+		//搜索会员
+		$j(".button.orange.dialogPass").on("click",function(){
+			$j("#member-dialog").dialogff({type:'close'});
+		})
+		
+		$j(".button.orange.dialogDelete").on("click",function(){
+			
+			$j("#member-dialog").dialogff({type:'close'});
+		})
+		
+	  
+		     /**
+		      * dialog
+		      * 查询会员生成列表
+		      */
+		 
+			$j("#table3").loxiasimpletable({
+				page : true,
+				size : 10,
+				nodatamessage:'<span>'+nps.i18n("NO_DATA")+'</span>',
+				form : "dialogSearchForm",
+				
+				cols:
+					[ {
+						label : "",
+						template : "drawRadio",
+						width:"5%"
+					}, {
+						name : "title",
+						label : "会员名",
+						width:"15%"
+					} , {
+						name : "name",
+						label : "昵称",
+						width:"15%"
+						
+					}, {
+						name : "published",
+						label : "来源",
+						width:"15%"
+						
+					}, {
+						name : "modified",
+						label : "类型",
+						width:"15%"
+						
+					}, {
+						name:"lifecycle",
+						label:"创建时间",
+						width:"15%"
+					}, {
+						name : "template",
+						label : "最近登录时间",
+						width:"15%"
+					}
+					
+					],
+				dataurl : 
+				{
+					currentPage : 1,
+					totalPages : 10,
+					count : 99,
+					size : 10,
+					sortStr : "createtime desc",
+					firstPage : true,
+					lastPage : false,
+					items : [ 
+					          {title:"",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:false,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:false,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : false,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : false,publishDate:"2013-02-05",modified:false,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					          {title:"",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : "有效",template : "tempindexaa"},
+					]
+				}
+			});
+			
+			refreshData1();
+
+			//筛选
+			$j(".func-button.search").click(function(){
+				 $j("#table3").data().uiLoxiasimpletable.options.currentPage=1;
+				 refreshData1();
+			});
+		
+		    //待处理评价 搜索评分范围操作 
+		    $j("#scoreRange").change(function() {
+	            if (!$j("#scoreRange").attr("checked")) {
+	                $j("#minScore").attr("disabled",true);
+	                $j("#maxScore").attr("disabled",true);
+	                $j("#score").attr("disabled",false);
+	                $j("#scoreTd").hide();
+	            }else if($j("#scoreRange").attr("checked")){
+	            	$j("#minScore").attr("disabled",false);
+	            	$j("#maxScore").attr("disabled",false);
+	            	$j("#score").attr("disabled",true);
+	            	$j("#scoreTd").show();
+	            }
+	        });
+		    //已处理评价 搜索评分范围操作 
+		    $j("#scoreRangeOfEvaluateDone").change(function() {
+	            if (!$j("#scoreRangeOfEvaluateDone").attr("checked")) {
+	                $j("#minScoreOfEvaluateDone").attr("disabled",true);
+	                $j("#maxScoreOfEvaluateDone").attr("disabled",true);
+	                $j("#scoreOfEvaluateDone").attr("disabled",false);
+	                $j("#scoreTdOfEvaluateDone").hide();
+	            }else if($j("#scoreRangeOfEvaluateDone").attr("checked")){
+	            	$j("#minScoreOfEvaluateDone").attr("disabled",false);
+	            	$j("#maxScoreOfEvaluateDone").attr("disabled",false);
+	            	$j("#scoreOfEvaluateDone").attr("disabled",true);
+	            	$j("#scoreTdOfEvaluateDone").show();
+	            }
+	        });
+			
+			//移动弹出title层
+			var ssetim=0;
+			$j("<div class='moveoutdialog' style='display:none; clear:both; position:absolute; width:500px; height:auto; padding:20px; background:#fff; border:1px solid #888888; line-height:1.5; z-index:50; border-radius:5px;'></div>").appendTo("body").mouseenter(function(){
+				clearTimeout(ssetim);
+			}).mouseleave(function(){
+				ssetim=setTimeout(function(){$j(".moveoutdialog").stop(true,true).fadeOut(100);},500);
+			});
+		
+			$j(".ui-block").on("mouseenter",".movetitle",function(e){
+				e.stopPropagation();
+				clearTimeout(ssetim);
+				var ex=parseInt($j(this).parent("label").offset().left);
+				var ey=parseInt($j(this).parent("label").offset().top);
+				
+				var thiscust=$j(this).attr("custtalk");
+				var thisserver=$j(this).attr("servicetalk");
+				$j(".moveoutdialog").stop(true,true).fadeOut(100).html("").append($j(this).parent("label").html()).append("<div class='blue pt5'>"+thisserver+"</div>").find(".movetitle").text(thiscust);
+
+				$j(".moveoutdialog").css({"left":ex,"top":ey+60}).stop(true,true).fadeIn(300);
+			}).on("mouseleave",".movetitle",function(e){
+				ssetim=setTimeout(function(){$j(".moveoutdialog").stop(true,true).fadeOut(100);},500);
+			});
+
+
+	});
+	
+
+	function drawCheckbox(data, args, idx) {
+		return "<input type='checkbox' name='id' value='"
+				+ loxia.getObject("name", data) + "'/>";
+	}
+	
+	function drawRadio(data, args, idx) {
+		return "<input type='radio' name='id' value='"
+				+ loxia.getObject("name", data) + "'/>";
+	}
+
+	function refreshData() {
+		$j("#table1").loxiasimpletable("refresh", {
+			currentPage : 1,
+			totalPages : 10,
+			count : 99,
+			size : 10,
+			sortStr : "createtime asc",
+			firstPage : true,
+			lastPage : false,
+			items : [  {
+				member : "zhang1"
+			}, {
+				member : "zhang2"
+			},{
+				member : "zhang3"
+			},{
+				member : "zhang4"
+			},{
+				member : "zhang5"
+			}]
+		});
+
+		
+		$j("#table2").loxiasimpletable("refresh", {
+			currentPage : 1,
+			totalPages : 5,
+			count : 99,
+			size : 10,
+			sortStr : "createtime asc",
+			firstPage : true,
+			lastPage : false,
+			items : [ {
+				member : "zhang1"
+			}, {
+				member : "zhang2"
+			},{
+				member : "zhang3"
+			},{
+				member : "zhang4"
+			},{
+				member : "zhang5"
+			}]
+		});
+	}
+	
+	function refreshData1() {
+		$j("#table3").loxiasimpletable("refresh", {
+			currentPage : 1,
+			totalPages : 10,
+			count : 99,
+			size : 10,
+			sortStr : "createtime asc",
+			firstPage : true,
+			lastPage : false,
+			items : [ 
+			          {title:"/page/body/nike",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : 0,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : false,publishDate:null,modified:false,null:"2013-08-08",lifecycle : 1,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : 3,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : 0,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : false,publishDate:"2013-02-05",modified:false,modifiydate:"2013-08-08",lifecycle : 1,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : 3,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : false,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : 0,template : "tempindexaa"},
+			          {title:"/page/body/nike",name : "搜索列表页",published : true,publishDate:"2013-02-05",modified:true,modifiydate:"2013-08-08",lifecycle : 0,template : "tempindexaa"},
+			]
+		});
+
+	}
+	
+    //高级选项
+	function slideAdvancedOptions(){
+		$j("#advancedOptions").slideToggle(10);
+		$j(".advancedOptionsButton").hide();
+		$j(".advancedOptionsButtonHide").show();
+	}
+	//隐藏高级选项
+	function slideAdvancedOptionsHide(){
+		$j("#advancedOptions").slideToggle(10);
+		$j(".advancedOptionsButton").show();
+		$j(".advancedOptionsButtonHide").hide();
+	}
+	//待审核评价列表
+	function doUnchecked(){
+		$j(".title_checked").hide();
+		$j(".title_unchecked").show();
+	}
+	//已审核评价列表
+	function doChecked(){
+		$j(".title_unchecked").hide();
+		$j(".title_checked").show();
+	}
+	
+	function searchMember(){
+		$j("#member-dialog").dialogff({type:'open',close:'in',width:'900px',height:'500px'});
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+    <div class="content-box width-percent100">
+        <div class="ui-block">
+        	<div class="ui-title1 title_unchecked"><img src="../images/wmi/blacks/32x32/tag.png">评价管理
+                            	        <input type="button" value="批量删除" title="批量删除"  class="button  reject" />
+						                <input type="button" value="批量通过" title="批量通过"  class="button orange pass" />
+			</div>
+			
+			<div class="ui-title1 title_checked" style="display: none"><img src="../images/wmi/blacks/32x32/tag.png">评价列表
+				                        <input type="button" value="批量删除" title="批量删除"  class="button  reject" />
+				                        <input type="button" value="导出" title="导出"  class="button orange export" />
+			</div>
+            <div class="ui-block-content" style="padding-top:0">
+                <form action="/property/list.json" id="searchForm">
+                    <div class="ui-tag-change">
+                        <ul class="tag-change-ul">
+                            <li class="memberbase" onclick="doUnchecked()">待审核评价列表</li>
+                            <li class="memberbase" onclick="doChecked()">已审核评价列表</li>
+                        </ul>
+                        <div class="tag-change-content">
+                        
+                            <div class="tag-change-in">
+                            
+                            <!-- 搜索开始 -->
+                                <div class="ui-block-content ui-block-content-lb">
+						                <table>
+						                <tr>
+						                        <td><label>商品编码</label></td>
+						                        <td><input loxiatype="input" placeholder="平台商品编码"/></td>
+						                        <td><label>商品名称</label></td>
+						                        <td colspan="3"><input loxiatype="input" placeholder="商品显示名称"/></td>
+						                        <td></td>
+				                        </tr>
+				                        
+				                         <tr>
+				                                <td><label>评分</label></td>
+						                        <td><select loxiatype="select" id="score">
+						                                <option value="1">1分</option>
+						                                <option value="2">2分</option>
+						                                <option value="3">3分</option>
+						                                <option value="4">4分</option>
+						                                <option value="5">5分</option>
+						                        </select></td>
+						                        <td><input type="checkbox" id="scoreRange" /><label>范围</label></td>
+						                        <td  id="scoreTd" style="display: none">
+							                        <label>最低</label>
+	                                                <select loxiatype="select" id="minScore" disabled>
+							                                <option value="1">1分</option>
+							                                <option value="2">2分</option>
+							                                <option value="3">3分</option>
+							                                <option value="4">4分</option>
+							                                <option value="5">5分</option>
+							                        </select>
+							                        
+							                        <label>最高</label>
+							                        <select loxiatype="select" id="maxScore"  disabled>
+							                                <option value="5">5分</option>
+							                                <option value="4">4分</option>
+							                                <option value="3">3分</option>
+							                                <option value="2">2分</option>
+							                                <option value="1">1分</option>
+							                        </select>
+						                        </td>
+						                    </tr>
+				                       
+						                </table>
+						                <div class="button-line1">
+						                <a href="javascript:void(0);"
+						                   class="func-button search"><span>查询</span></a>
+						                </div>
+						            </div>
+						            <br>
+						            <!-- 搜索结束 -->
+                                <div class="border-grey" id="table1" caption="待审核评价列表"></div>
+                            </div>
+                            <div class="tag-change-in">
+                            <!-- 搜索开始 -->
+                                <div class="ui-block-content ui-block-content-lb">
+						                <table>
+						                   <tr>
+						                        <td><label>商品编码</label></td>
+						                        <td><input loxiatype="input" placeholder="平台商品编码"/></td>
+						                        <td><label>商品名称</label></td>
+						                        <td><input loxiatype="input" placeholder="商品显示名称"/></td>
+						                    </tr>
+						                     
+						                      <tr>
+				                                <td><label>评分</label></td>
+						                        <td><select loxiatype="select" id="scoreOfEvaluateDone">
+						                                <option value="1">1分</option>
+						                                <option value="2">2分</option>
+						                                <option value="3">3分</option>
+						                                <option value="4">4分</option>
+						                                <option value="5">5分</option>
+						                        </select></td>
+						                        <td><input type="checkbox" id="scoreRangeOfEvaluateDone" /><label>范围</label></td>
+						                        <td  id="scoreTdOfEvaluateDone" style="display: none" colspan="4">
+							                        <label>最低</label>
+	                                                <select loxiatype="select" id="minScoreOfEvaluateDone" disabled>
+							                                <option value="1">1分</option>
+							                                <option value="2">2分</option>
+							                                <option value="3">3分</option>
+							                                <option value="4">4分</option>
+							                                <option value="5">5分</option>
+							                        </select>
+							                        
+							                        <label>最高</label>
+							                        <select loxiatype="select" id="maxScoreOfEvaluateDone"  disabled>
+							                                <option value="5">5分</option>
+							                                <option value="4">4分</option>
+							                                <option value="3">3分</option>
+							                                <option value="2">2分</option>
+							                                <option value="1">1分</option>
+							                        </select>
+						                        </td>
+						                    </tr>
+						                    
+						                    <tr>    
+						                        <td><label>会员账号</label></td>
+						                        <td><input loxiatype="input" placeholder="会员账号"/></td>
+						                        <td><label>类型</label></td>
+						                        <td><input loxiatype="input" readonly placeholder="类型"/></td>
+						                         <td><label>昵称</label></td>
+						                        <td><input loxiatype="input" readonly placeholder="昵称"/></td>
+						                        <td><a href="javascript:void(0);"
+						                   class="func-button search"><span onclick="searchMember()">查找会员</span></a></td>
+						                    </tr>
+						                    
+						                    <tr>
+						                        <td><label>评价时间</label></td>
+						                        <td> <input loxiaType="date"
+						                                mandatory="false" id="createStartDate"
+						                                name="q_date_createDate"></input>
+						                        </td>
+						                        <td align="center"><label>——</label></td>
+						                         <td><input id="createEndDate"
+						                            loxiaType="date"
+						                            mandatory="false"></input>
+						                        </td>
+						
+						
+						                        <td><label>审核时间</label></td>
+						                        <td> <input loxiaType="date"
+						                                mandatory="false" id="appearStartDate"
+						                                name="q_date_createDate"></input>
+						                        </td>
+						                        <td align="center"><label>——</label></td>
+						
+						                        <td> <input type="text" id="appearEndDate"
+						                            name="q_date_startDate"
+						                            loxiaType="date" mandatory="false"></input>
+						                        </td>
+						                        <td colspan="2"><a href="javascript:void(0);"
+						                   class="func-button advancedOptionsButton"><span onclick="slideAdvancedOptions()">高级选项</span></a></td>
+						                    </tr>
+						                     <tr id="advancedOptions" style="display: none">
+						                        <td><label>状态</label></td>
+						                        <td><select loxiatype="select">
+						                                <option value="0">通过</option>
+						                                <option value="1">删除</option>
+						                        </select></td>
+						                        <td><label>审核人</label></td>
+						                        <td><input loxiatype="input" placeholder="审核人"/></td>
+						                       
+						                        <td><label>是否回复</label></td>
+						                        <td><select loxiatype="select">
+						                                <option value="1">是</option>
+						                                <option value="0">否</option>
+						                        </select></td>
+						                        <td></td>
+						                        <td></td>
+						                    </tr>
+						                    
+						                </table>
+						                <div class="button-line1">
+						                <a href="javascript:void(0);"
+						                   class="func-button search"><span>查询</span></a>
+						                <a href="javascript:void(0);"
+						                   class="func-button advancedOptionsButtonHide" style="display: none"><span onclick="slideAdvancedOptionsHide()">隐藏高级选项</span></a>
+						                </div>
+						            </div>
+						            <br>
+                            
+                            <!-- 搜索结束 -->
+                                <div class="border-grey" id="table2" caption="已审核评价列表" ></div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+              <div class="ui-title1 title_unchecked" >
+				                        <input type="button" value="批量删除" title="批量删除"  class="button  reject" />
+				                        <input type="button" value="批量通过" title="批量通过"  class="button orange pass" />
+			  </div>
+				  
+               <div class="ui-title1 title_checked" style="display: none">
+				                        <input type="button" value="批量删除" title="批量删除"  class="button  reject" />
+				                        <input type="button" value="导出" title="导出"  class="button orange export" />
+			  </div>
+             
+        </div>
+    </div>
+    <div id="categoryContent" class="menuContent" style="z-index:999;display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
+	   <ul id="categoryDemo" class="ztree" style="margin-top:0; width:180px; height: 100%;"></ul>
+    </div>
+    
+    <!-- 评价详细  dialog-->
+    <div id="detail-dialog" class="proto-dialog">
+		 <h5>评价详细</h5>
+		 <div class="proto-dialog-content p10">	
+		   <div class="ui-block-line">
+		   		<label>商品名称：</label>
+				<div class="pt7">
+					<a href="#" class="blue">Nike Air Max</a>
+				</div>
+			</div>
+			
+			<div class="ui-block-line">
+		   		<label>用户名称：</label>
+				<div class="pt7 grey">
+					<a href="javascript:void(0);">abc</a> 于 2014-1-22 19:34:18 针对<a href="javascript:void(0);"> MBP2014</a> 的评价
+				</div>
+			</div>
+			
+			<div class="ui-block-line">
+		   		<label>评价内容：</label>
+				<div>
+					<span class="product-star-content"><span class="product-star"></span><span class="product-star"></span><span class="product-star"></span><span class="product-star"></span><span class="product-star"></span></span>
+					<p class="mt5"> 坑爹啊！腊八活动价买408元，13号才收到货。结果15号才卖399元-50元=349元！！！我擦，才一天时间有60元差价！询问客服，叫补差价。客服态度恶劣，嚣张的很！差价也不补！</p>
+				</div>
+			</div>
+			
+			<div class="ui-block-line">
+		   		<label>上次回复：</label>
+				<div class="pt7">
+					<p class="yellow">您好，售后问题请咨询客服</p>
+				</div>
+			</div>
+			
+			<div class="ui-block-line bold pt10">
+		   		<label>修改回复：</label>
+				<div class="pt7">
+					&nbsp;
+				</div>
+			</div>
+			
+			<form>
+			<input type="hidden" value="id">
+			<textarea aria-disabled="false" class="ui-loxia-default ui-corner-all mt10" rows="3" cols="30" style="width:100%; height:100px; resize:none">历史回答123123123123132 此处可更新</textarea>
+		
+			
+			</form>
+			
+		 </div>
+		 <div class="proto-dialog-button-line">
+		 	  <input type="button" value="提交回复" class="button orange copyok"/>
+		 	  
+		 	  <input type="button" value="取消" class="button black copycancel"/>
+		 </div>
+	</div>
+	
+	<!-- 会员信息查询 dialog-->
+	<div id="member-dialog" class="proto-dialog">
+		 <h5>会员信息查询</h5>
+		 <div class="proto-dialog-content">
+			<div class="proto-dialog-content">		
+	 
+		             <form id="dialogSearchForm">
+						    <div class="ui-block">
+						    	<div class="ui-block-content ui-block-content-lb">
+						             <table>
+						                <tr>
+						                    <td><label>账号</label>
+						                    	</td>
+						                    <td>
+						                    	<input loxiatype="input" name="q_string_code" placeholder=""/>
+						                    	</td>
+						                       
+						                    <td><label>名称</label>
+						                    	</td>
+						                    <td>
+						                    	<input loxiatype="input" placeholder=""/>
+						                    </td>
+						                    <td><label>类型</label></td>	
+						                     <td><select loxiatype="select">
+						                                <option value="1">自有会员</option>
+						                                <option value="0">第三方会员</option>
+						                        </select>
+						                      </td>
+						                      
+						                    </tr>
+						                    
+						                    <tr>
+						                        <td><label>注册时间</label></td>
+						                        <td> <input loxiaType="date"
+						                                mandatory="false" id="createStartDate"
+						                                name="q_date_createDate"></input>
+						                        </td>
+						                        <td align="center"><label>——</label></td>
+						                         <td><input id="createEndDate"
+						                            loxiaType="date"
+						                            mandatory="false"></input>
+						                        </td> 	
+						                </tr>
+						                </table>
+						        <div class="button-line1">
+						                <a href="javascript:void(0);"
+						                   class="func-button search"><span>搜索</span></a>
+						                   
+						        </div>
+						    </div>
+						 </div>
+					</form>
+		    	<div class="ui-block">
+			    	<div id="table3" class="border-grey" caption="商品列表" >
+			    	</div>   
+		    	</div> 	
+			</div>
+		 </div>
+		 <div class="proto-dialog-button-line">
+		 	  <input type="button" value="确定" class="button orange dialogPass"/>
+		 	  
+		 	  <input type="button" value="取消" class="button black dialogDelete"/>
+		 </div>
+	</div>
+</body>
+</html>

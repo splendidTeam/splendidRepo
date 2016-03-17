@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+
+function editUser(data, args, idx){
+	return "<a href='javascript:void(0);' class='func-button modify'>修改</a><a href='javascript:void(0);' class='func-button disable'>禁用</a><a href='javascript:void(0);' class='func-button delete'>删除</a>";
+}
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("name", data)+"'/>";
+}
+
+function drawName(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('add-role.html','aaa',null,[0,1]);\">"+loxia.getObject("name", data)+"</a>";
+}
+
+
+
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+		{label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"},
+		{name:"name",label:"角色名称",width:"35%"},
+		{name:"dept",label:"机构类型",width:"30%"},
+		{name:"lifecycle",label:"状态",width:"10%",type:"yesno"},
+
+		{label:"操作",width:"20%", template:"editUser"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"date desc", firstPage: true, lastPage: false,
+			items: [
+					
+					{name:"系统管理员1",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+					{name:"aaatt",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true}
+					
+			]
+			}
+	});
+
+	refreshData();
+	
+});
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"date asc", firstPage: true, lastPage: false,
+		items: [
+{name:"系统管理员1",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt2",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt3",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt4",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt5",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt6",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt7",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt8",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt9",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true},
+{name:"aaatt10",realname:"真实名",email:"ttt@baozun.cn", dept:"店铺1", date:"2013-03-05",mobile:"13025896532", lifecycle:true}
+				]
+		});
+
+    $j(".button.adduser").click(function(){
+        window.location.href="add-role.html";
+    });
+
+    $j(".func-button.modify").on("click",function(){
+        window.location.href="add-role.html";
+    });
+
+    $j(".func-button.delete").on("click",function(){
+        nps.confirm("确认删除","确定要删除选定的用户么？", function(){
+            alert("Deleted");
+            refreshData();
+        });
+    });
+}
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1">
+	<img src="../images/wmi/blacks/32x32/users.png">
+	角色管理
+	 <input type="button" value="批量删除" class="button delete" title="批量删除"/>
+        <input type="button" value="新增" class="button orange adduser" title="新增"/>
+    </div>
+
+	<div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+    <table  >
+        <tr>
+            <td ><label>角色名称：</label></td>
+            <td >
+                <input type="text" loxiaType="input" mandatory="false" placeHolder="角色名称"></input>
+            </td>
+            <td><label>机构类型：</label></td>
+            <td >
+            	<select class="orgSelect" loxiaType="select">
+    				<option value="系统">系统</option>
+    				<option value="店铺1">店铺</option>
+    			</select>
+            </td>
+            <td ><label>状态：</label></td>
+            <td >
+            	<select class="orgSelect" loxiaType="select">
+            		<option>不限</option>
+    				<option value="有效">有效</option>
+    				<option value="无效">无效</option>
+    			</select>
+            </td>
+        </tr>
+
+        
+    </table>
+    <div class="button-line1">
+        <a href="javascript:void(0);" class="func-button search" title="搜索">搜索</a>
+        </div>
+    </div>
+    </div>
+    
+   
+    <div class="ui-block">
+    	
+   	 	<div class="table-border0 border-grey" id="table1" caption="角色列表"></div>   
+    </div>
+    
+    
+	<div class="button-line">
+
+
+        <input type="button" value="新增" class="button orange adduser" title="新增"/>
+        <input type="button" value="批量删除" class="button delete" title="批量删除"/>
+
+
+         
+    </div>
+    
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SupportedArea.getAllSuppoertedArea" class="loxia.dao.support.DynamicQueryHolder">
+		<description>得到所有的所支持的区域</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * FROM t_sf_supported_area  ORDER BY id asc;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SupportedArea.deleteSupportedAreas" class="loxia.dao.support.DynamicQueryHolder">
+		<description>批量删除区域</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_sf_supported_area 
+		       		where id in (
+			       			#foreach( $id in $ids )
+	    						$id,
+							#end
+							-1
+		       			) ;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="SupportedArea.findSupportedAreaByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+				select  sa.ID as id, sa.area_id as areaId, sa.designate as designate,
+						sa.distribution_mode_id as distributionModeId, sa.group_no as groupNo,
+						sa.type as type, sa.version as version
+				from t_sf_supported_area AS sa 
+		       	 where 1=1
+	       		  #if($distributionModeId)
+	       		     and sa.distribution_mode_id =:distributionModeId	
+	       		  #end  
+	       		  
+	       		  #if($type)
+		       		and	sa.type =:type
+		       	#end
+		       			
+		       	#if($groupNo)
+		       		and	sa.group_no =:groupNo
+		       	#end
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="SupportedArea.deleteSupportedAreasByDistributionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据模板id删除物流对应的支持区域配置</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_sf_supported_area 
+		       		where distribution_mode_id = :distributionId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="SupportedArea.findSupportedAreasByDistributionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据模板id查找物流对应的支持区域配置</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       		id as id,
+      				area_id as areaId,
+					designate as designate,
+					distribution_mode_id as distributionModeId,
+    				group_no as groupNo,
+					type as type
+		       		
+		       		 from t_sf_supported_area 
+		       		where distribution_mode_id = :distributionId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

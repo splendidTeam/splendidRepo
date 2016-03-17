@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+});
+
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/users.png">网页模版编辑</div>
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+        <table>
+            <tr>
+                <td><label>订单号</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="订单编码"></input></span>
+                </td>
+                <td><label>申请状态</label></td>
+                <td>
+                      <span>
+						<select  loxiaType="select" >
+							<option value="0">新建</option>
+	                        <option value="1">完成</option>
+	                    </select>
+					</span>
+                </td>
+                <td><label>会员名称</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="会员名"></input></span>
+                </td>
+        	</tr>
+			<tr>
+				<td><label>联系人电话</label></td>
+	            <td>
+	                  <span><input type="text" loxiaType="input" mandatory="false" placeholder="13800000000"></input></span>
+	            </td>
+	            <td><label>创建时间</label></td>
+	            <td>
+	               <span><input type="text" id="startTime" name="startTime"  value="" loxiaType="date" mandatory="false" /></span>
+	            </td>
+	            <td><label>——</label></td>
+	            <td>
+	                <span><input type="text" id="endTime" name="endTime"  value="" loxiaType="date" mandatory="false"/></span>
+	            </td>
+	            
+	        </tr>
+        </table>
+        <div class="button-line1">
+        	<a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+    
+    
+    <div class="ui-block">
+         <script type="text/javascript" src="../scripts/z-model.js"></script>
+   	 	 <iframe src="rookie-new/index.html" width="100%" class="web-update" frameborder="0"></iframe>
+    </div>
+</div>
+
+
+<div class="web-update-dialog proto-dialog">
+     <h5>编辑信息</h5>
+     <div class="proto-dialog-content">
+         <input type="hidden" id="jordan-flag" value="" />
+         <input type="hidden" name="columnComp-id" value="" />
+         <input type="hidden" name="module-id" value="" />
+         <input type="hidden" name="itemId" value="" />
+         <input type="hidden" name="itemCode" value="" />
+         <div class="width-percent100 center pt15 pb15"><img src="${ defaultNonItemImgUrl }"  width="150px" height="150px"/></div>
+          <div class="ui-block-line">
+                <label>商品名称：</label>
+                <div >    
+                    <span class="text"></span>
+                </div>
+         </div>	
+         <div class="ui-block-line">
+                <label>商品code：</label>
+                <div >    
+                    <input loxiaType="input" value="" class="jordan-dialog-code" name="jordan-dialog"  mandatory="false"/>
+                </div>
+         </div>	
+         <div class="ui-block-line propmt" style="display:none;">
+                <div style="color: red;">    
+                    <span>商品Code不存在!</span>
+                </div>
+         </div>
+     </div>
+     <div class="proto-dialog-button-line">
+          <input type="button" value="确定" class="button orange mr5 jordan-dialog-confirm disabled" />
+          <input type="button" value="取消" class="button cencal"/>	
+     </div>
+</div>
+</body>
+</html>

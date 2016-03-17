@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Category.insertCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>在父级分类.父节点下面添加新的分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   INSERT INTO t_pd_category
+                   (ID,CODE,CREATE_TIME,LIFECYCLE,NAME,PARENT_ID,SORT_NO,VERSION) 
+                   VALUES
+                (nextval('S_T_PD_CATEGORY'),:code,now(),1,:name,:parentId,(SELECT COALESCE(MAX(sort_no),0) FROM t_pd_category WHERE parent_id= :parentId)+1,now())
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 修改一个商品分类 -->
+	<bean id="Category.updateCategoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改一个商品分类 </description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   UPDATE 
+                       t_pd_category  
+                   SET 
+                       CODE= :code , 
+                       NAME= :name , 
+                       MODIFY_TIME=now() , 
+                       VERSION = now() 
+                   WHERE ID= :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<!-- ************************************tree 操作*********************************************************** -->
+
+
+	<!-- 在父级分类.父节点下面添加新的分类(带sortNo) -->
+	<bean id="Category.treeInsertNodeWithSortNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>在父级分类.父节点下面添加新的分类(带sortNo)</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   INSERT INTO t_pd_category
+                   (ID,CODE,CREATE_TIME,LIFECYCLE,NAME,PARENT_ID,SORT_NO,VERSION) 
+                   VALUES
+                (nextval('S_T_PD_CATEGORY'),:code,now(),1,:name,:parentId,:sortNo,now())
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<!-- 修改Category ParentId(sortNo修改成 parentId 子 sortNo+1) -->
+	<bean id="Category.treeUpdateNodeParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 修改Category ParentId(sortNo修改成 parentId 子 sortNo+1)</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   UPDATE 
+                       t_pd_category  
+                   SET 
+                       parent_Id= :parentId , 
+                       sort_no=(SELECT COALESCE(MAX(sort_no),0) FROM t_pd_category WHERE parent_id= :parentId)+1,
+                       MODIFY_TIME=now() , 
+                       VERSION = now() 
+                   WHERE 
+                        ID= :categoryId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 修改 category 父类id和 sortNo -->
+	<bean id="Category.treeUpdateNodeParentIdAndSortNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改 category 父类id和 sortNo</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   UPDATE 
+                       t_pd_category  
+                   SET 
+                   	   parent_Id= :parentId, 
+                       sort_no=:sortNo,
+                       MODIFY_TIME=now(),
+                       VERSION = now()
+                   WHERE 
+                        ID= :categoryId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<!-- 将当前父类下 ,sortNo >= 目标分类 sortNo +1 -->
+	<bean id="Category.treeIncrSortNoGtAndEqTargetNodeSortNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>将当前父类下 ,sortNo >= 选择的分类 ++sortNo</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   update 
+                       t_pd_category 
+                   set 
+                       SORT_NO=SORT_NO+1
+                   WHERE 
+                           parent_id=(select parent_id from t_pd_category where id=:targetNodeId)
+                       and SORT_NO>=(select SORT_NO from t_pd_category where id=:targetNodeId)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 将当前父类下 ,sortNo<=目标分类 的 sortNo -1 . -->
+	<bean id="Category.treeDecrSortNoLtAndEqTargetNodeSortNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>将当前父类下 ,sortNo介于选择分类之间的分类sortNo -1 .</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   update 
+                       t_pd_category 
+                   set 
+                       SORT_NO=SORT_NO-1
+                   WHERE 
+                           parent_id=(select parent_id from t_pd_category where id=:targetNodeId)
+                       and SORT_NO<=(select SORT_NO from t_pd_category where id=:targetNodeId)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- ************************************remove 移除************************************************************ -->
+
+	<bean id="Category.removeCategoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>(逻辑上)移除一个分类 </description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   UPDATE 
+                       t_pd_category 
+                   SET 
+                       lifecycle = 0 ,
+                       modify_time = now(),
+                       VERSION = now() 
+                   WHERE 
+                       ID= :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 移除多个分类 -->
+	<bean id="Category.removeCategoryByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>移除多个分类 </description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   UPDATE 
+                       t_pd_category 
+                   SET 
+                       lifecycle = 0 ,
+                       modify_time = now(),
+                       VERSION = now() 
+                   WHERE ID IN (
+                       #foreach($id in $categoryIds)
+                        $id,
+                        #end
+                        -1
+                       )
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- ************************************find 查询************************************************************ -->
+
+	<bean id="Category.findCategoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category
+                   WHERE ID= :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Category.findCategoryByIdI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                     SELECT c.id as id ,c.code as code, c.create_time as create_time ,
+						c.lifecycle as lifecycle, c.modify_time as modify_time,
+						c.parent_id as parent_id ,c.sort_no sort_no,c.version as version,
+						cl.name as name  
+                   FROM t_pd_category c ,t_pd_category_lang cl 
+                   WHERE c.ID= :id and cl.lang = :lang 
+                   and c.id = cl.category_id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<!-- 根据code查询商品分类 -->
+	<bean id="Category.findCategoryByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据code查询商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category
+                   WHERE code= :code
+                   and lifecycle=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findCategoryByCodeI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据code查询商品分类国际化</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT c.id as id ,c.code as code, c.create_time as create_time ,
+						c.lifecycle as lifecycle, c.modify_time as modify_time,
+						c.parent_id as parent_id ,c.sort_no sort_no,c.version as version,
+						cl.name as name  
+                   FROM t_pd_category c ,t_pd_category_lang cl 
+                   WHERE c.code= :code and cl.lang = :lang 
+                   and c.id = cl.category_id and c.lifecycle=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!--根据名称 和 parentid 查询可用的. -->
+	<bean id="Category.findEnableCategoryByNameAndParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据名称 和 parentid 查询可用的.</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category
+                   WHERE name= :name
+                   and parent_Id=:parentId
+                   and lifecycle=1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<!-- 查询出所有可用的叶子节点的商品分类 -->
+	<bean id="Category.findEnableLeafNodeCategoryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出所有可用的商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category  
+                   WHERE lifecycle = 1 
+                   AND ID not in(select distinct parent_id  from t_pd_category where lifecycle = 1)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 查询出所有可用的商品分类 -->
+	<bean id="Category.findEnableCategoryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出所有可用的商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category 
+                   WHERE lifecycle = 1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 查询出所有可用的商品分类国际化 -->
+	<bean id="Category.findCategoryLangList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出所有可用的商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category_lang 
+                   WHERE category_id in (
+                    #foreach($id in $categoryIds)
+                    $id,
+                    #end
+                    -1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 根据分类Id数组查询商品分类 -->
+	<bean id="Category.findCategoryListByCategoryIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据分类Id数组查询商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category  
+                   WHERE ID IN (
+                    #foreach($id in $categoryIds)
+                    $id,
+                    #end
+                    -1
+                   )
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- 基于 parentId 查询 分类 -->
+	<bean id="Category.findCategoryListByParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>基于 parentId 查询 分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category  
+                   WHERE parent_id=:parentId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 基于 parentId 查询 可用 分类 -->
+	<bean id="Category.findEnableCategoryListByParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>基于 parentId 查询 可用 分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category  
+                   WHERE parent_id=:parentId and lifecycle = 1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findEnableAllCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询 可用 分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category  
+                   WHERE lifecycle = 1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findEnableCategoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询可用商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category
+                   WHERE ID= :id and lifecycle = 1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Category.findCategoryListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询可用商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category
+                   WHERE lifecycle = 1 and id in(
+                   	#foreach($id in $ids)
+                   		$id,
+                   	#end
+                   	-1
+                   )
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findCategoryListByCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据Codes查询可用商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_category
+                   WHERE lifecycle = 1 and code in(
+                   	#foreach($code in $codes)
+                   		'$code',
+                   	#end
+                   	NULL
+                   ) ORDER BY sort_no ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findCategoryListByCodesI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据Codes查询可用商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT  c.id as id ,c.code as code, c.create_time as create_time ,
+						c.lifecycle as lifecycle, c.modify_time as modify_time,
+						c.parent_id as parent_id ,c.sort_no sort_no,c.version as version,
+						cl.name as name 
+                   FROM t_pd_category c ,t_pd_category_lang cl 
+                   WHERE lifecycle = 1 
+                    and cl.lang = :lang  
+                    and c.id = cl.category_id 
+                   and code in(
+                   	#foreach($code in $codes)
+                   		'$code',
+                   	#end
+                   	NULL
+                   ) ORDER BY sort_no ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Category.findSubCategoryListByParentCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据Code查询该code下的可用商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                SELECT *
+				FROM t_pd_category
+				WHERE parent_id = (
+						SELECT id
+						FROM t_pd_category
+						WHERE code = '$code'
+						)
+					AND lifecycle = 1
+				ORDER BY sort_no ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findSubCategoryListByParentCodeI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据Code查询该code下的可用商品分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                SELECT  c.id as id ,c.code as code, c.create_time as create_time ,
+						c.lifecycle as lifecycle, c.modify_time as modify_time,
+						c.parent_id as parent_id ,c.sort_no sort_no,c.version as version,
+						cl.name as name 
+				FROM t_pd_category c ,t_pd_category_lang cl 
+				WHERE parent_id = (
+						SELECT id
+						FROM t_pd_category
+						WHERE code = '$code'
+						)
+					AND lifecycle = 1 
+				    and cl.lang = :lang  
+                    and c.id = cl.category_id
+				ORDER BY sort_no ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	 
+
+	<bean id="Category.findMiniTagRuleCommandByIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表查询简要的分类信息</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT id, name
+                   FROM t_pd_category
+                   WHERE id in(
+                   	#foreach($id in $idList)
+                   		$id,
+                   	#end
+                   	-1
+                   )
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Category.findCategorySeqByParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>在父级分类.父节点下面添加新的分类</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                  SELECT COALESCE(MAX(sort_no),0) as seq FROM t_pd_category WHERE parent_id= :parentId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findCategoryLangByNameAndParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>校验同级名称是否重复</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT count(*) as count 
+                   FROM t_pd_category_lang 
+                   WHERE name= :name
+                   and lang=:lang
+                   and category_id in(
+                   	#foreach($id in $cIds)
+                   		$id,
+                   	#end
+                   	-1
+                   )
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Category.updateCategoryLangByCategoryIdAndLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询分类国际化信息</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   update  t_pd_category_lang set name=:name  
+                   where lang=:lang  and category_id = :cId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Category.findCategoryLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_category_lang 
+                   where category_id =:id 
+                   and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

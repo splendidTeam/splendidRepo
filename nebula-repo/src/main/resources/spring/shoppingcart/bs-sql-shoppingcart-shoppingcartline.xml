@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ShoppingCartLine.findShopCartLineByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shoppingCartId查询购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					ss.ID,
+					ss.SKU_ID as skuId,
+					ss.QUANTITY,
+					ss.EXTENTION_CODE as extentionCode,
+					ss.MEMBER_ID as memberId,
+					ss.CREATE_TIME as createTime,
+					ss.SETTLEMENT_STATE as settlementState,
+					ss.SHOP_ID as shopId,
+					ss.is_gift as isGift,
+					ss.line_group as lineGroup,
+					ss.promotion_id as promotionId
+					from t_sc_shoppingcartline as ss
+					where 
+					 ss.MEMBER_ID = :memberId 
+					 #if($settlementState)
+		       			and ss.SETTLEMENT_STATE = :settlementState
+		       		 #end
+		       		 and (ss.is_gift is null or ss.is_gift = 'f')
+					  order by createTime
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ShoppingCartLine.findShopCartGiftLineByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shoppingCartId查询购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					ss.ID,
+					ss.SKU_ID as skuId,
+					ss.QUANTITY,
+					ss.EXTENTION_CODE as extentionCode,
+					ss.MEMBER_ID as memberId,
+					ss.CREATE_TIME as createTime,
+					ss.SETTLEMENT_STATE as settlementState,
+					ss.SHOP_ID as shopId,
+					ss.is_gift as isGift,
+					ss.line_group as lineGroup,
+					ss.promotion_id as promotionId,
+					sk.item_id as itemId
+					from t_sc_shoppingcartline as ss LEFT JOIN t_pd_sku as sk
+					on ss.SKU_ID = sk.id
+					where 
+					 ss.MEMBER_ID = :memberId 
+					 #if($settlementState)
+		       			and ss.SETTLEMENT_STATE = :settlementState
+		       		 #end
+		       		 and ss.is_gift = 't'
+					  order by createTime
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ShoppingCartLine.findShopCartLine" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据memberId\extentionCode查询购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					ss.ID,
+					ss.SKU_ID as skuId,
+					ss.QUANTITY,
+					ss.EXTENTION_CODE as extentionCode,
+					ss.MEMBER_ID as memberId,
+					ss.CREATE_TIME as createTime,
+					ss.SETTLEMENT_STATE as settlementState,
+					ss.SHOP_ID as shopId
+					from t_sc_shoppingcartline as ss
+					where 
+					 ss.MEMBER_ID = :memberId and ss.EXTENTION_CODE = :extentionCode
+					 and (ss.is_gift is null or ss.is_gift = 'f')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="ShoppingCartLine.findShopCartLineByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shoppingCartId查询购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					ss.ID,
+					ss.SKU_ID as skuId,
+					ss.QUANTITY,
+					ss.EXTENTION_CODE as extentionCode,
+					ss.MEMBER_ID as memberId,
+					ss.CREATE_TIME as createTime,
+					ss.SETTLEMENT_STATE as settlementState,
+					ss.SHOP_ID as shopId
+					from t_sc_shoppingcartline as ss
+					where 
+					 id in (
+		       		#foreach($id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.updateCartLineQuantity" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_sc_shoppingcartline
+					set quantity = :quantity
+					where member_id = :memberId 
+					and extention_code= :extentionCode
+					and (is_gift is null or is_gift = 'f')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.addCartLineQuantity" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_sc_shoppingcartline
+					set quantity = quantity + :quantity 
+					where member_id = :memberId 
+					and extention_code= :extentionCode
+					and (is_gift is null or is_gift = 'f')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.deleteByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据购物车id删除所有购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					delete from t_sc_shoppingcartline
+					where MEMBER_ID = :memberId AND settlement_state = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.deleteByExtentionCodeAndMemberId"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据购物车memberId和sku删除购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					delete from t_sc_shoppingcartline
+					where MEMBER_ID = :memberId  and EXTENTION_CODE=:extentionCode
+					and (is_gift is null or is_gift = 'f')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.deleteByCartLineIdAndMemberId">
+		<description>根据购物车memberId和cartLineId删除购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					delete from t_sc_shoppingcartline
+					where MEMBER_ID = :memberId  and id = :shoppingCartLineId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.updateCartLineSettleState" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改购物车行的选中状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_sc_shoppingcartline
+					set settlement_state = :settleState
+					where member_id = :memberId 
+					and 
+					extention_code in (
+		       		#foreach($extention_code in $extentionCodes )
+    					'$extention_code',
+					 #end
+		       		 '-1')
+		       		 and (is_gift is null or is_gift = 'f')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.updateCartLineQuantityByLineId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_sc_shoppingcartline
+					set quantity = :quantity
+					where member_id = :memberId 
+					and id = :cartLineId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.insertShoppingCartLine" class="loxia.dao.support.DynamicQueryHolder">
+		<description>保存购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				  
+		       		insert into t_sc_shoppingcartline(id,extention_code,sku_id,quantity, member_id,create_time, settlement_state,shop_id,
+		       		is_gift,promotion_id, line_group) values (nextval('S_T_SC_SHOPPINGCARTLINE'),:extentionCode,:skuId,:quantity,:memberId,
+		       		:createTime,:settlementState,:shopId,:isGift,:promotionId, :lineGroup)
+		       		
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.insertShoppingCartLineWithLineGroup"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>保存购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				  
+		       		insert into t_sc_shoppingcartline(id,extention_code,sku_id,quantity,
+		       				member_id,create_time,settlement_state,shop_id,line_group,is_gift,promotion_id) values (nextval('S_T_SC_SHOPPINGCARTLINE'),:extentionCode,:skuId,:quantity,
+		       				:memberId,:createTime,:settlementState,:shopId,:lineGroup,:isGift,:promotionId)
+		       		
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.updateCartLinePromotionInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+		       		update t_sc_shoppingcartline
+					set line_group = :lineGroup,
+					    is_gift = :gift,
+					    promotion_id = :promotionId
+					where id=:id
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.findShopCartLineCountByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据memberId查询购物车商品数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					SUM(ss.QUANTITY) as count
+					from t_sc_shoppingcartline as ss
+					where 
+					 ss.MEMBER_ID = :memberId 
+					 #if($settlementState)
+		       			and ss.SETTLEMENT_STATE = :settlementState
+		       		 #end
+		       		 and (ss.is_gift is null or ss.is_gift = 'f')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.findShopCartLineByLineGroupAndSkuId"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据分组id和skuId获取购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						ss.ID,
+						ss.SKU_ID as skuId,
+						ss.QUANTITY,
+						ss.EXTENTION_CODE as extentionCode,
+						ss.MEMBER_ID as memberId,
+						ss.CREATE_TIME as createTime,
+						ss.SETTLEMENT_STATE as settlementState,
+						ss.SHOP_ID as shopId,
+						ss.LINE_GROUP as lineGroup,
+						ss.PROMOTION_ID as promotionId
+					from t_sc_shoppingcartline as ss
+					where 
+					    ss.MEMBER_ID = :memberId 
+		       		    and ss.line_group = :lineGroup
+		       		    #if($skuId)
+		       			and ss.sku_id = :skuId
+		       			#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShoppingCartLine.deleteGiftLineByMemberIdAndPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户ID和活动ID删除用户已选中的赠品行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					delete from t_sc_shoppingcartline
+					where member_id = :memberId 
+					and promotion_id = :promotionId
+					and is_gift = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

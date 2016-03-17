@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		
+	<bean id="PayInfo.findPayInfoByOrderIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单号查询支付详细</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+					p.id,
+					p.order_id as orderId,
+					p.pay_info as payInfo,
+					p.pay_money as payMoney,
+					p.pay_numerical as payNumerical,
+					p.pay_type as payType,
+					p.third_pay_account as thirdPayAccount,
+					p.third_pay_no as thirdPayNo,
+					p.modify_time as modifyTime,
+					p.pay_success_status as paySuccessStatus,
+					p.periods as periods,
+					p.create_time as createTime
+					FROM t_so_payinfo AS p
+					WHERE p.order_id in
+					(
+					#foreach($orderId in $orderIds)
+					 $orderId,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayInfo.findPayInfoCommandByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单Id查询支付信息 用于oms</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+					p.id,
+					p.order_id as orderId,
+					p.pay_info as payInfo,
+					p.pay_money as payMoney,
+					p.pay_numerical as payNumerical,
+					p.pay_type as payType,
+					s.PAYMENT as mainPayType,
+					p.third_pay_account as thirdPayAccount,
+					p.third_pay_no as thirdPayNo,
+					p.modify_time as modifyTime,
+					p.pay_success_status as paySuccessStatus,
+					p.create_time as createTime,
+					p.periods as periods,
+                    s.code as orderCode,
+                    pl.sub_ordinate as subOrdinate
+					FROM t_so_payinfo AS p LEFT JOIN t_so_salesorder AS s
+		            ON p.order_id = s.id
+		            left join t_so_payinfo_log pl on p.id = pl.pay_info_id
+		            WHERE p.order_id = :orderId
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayInfo.findPayInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO where 
+		       			1 = 1
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       	
+		       				#if($payNumerical)
+		       					and PAY_NUMERICAL=:payNumerical
+		       				#end
+
+		       			
+		       				#if($payMoney)
+		       					and PAY_MONEY=:payMoney
+		       				#end
+
+		       			
+		       				#if($payType)
+		       					and PAY_TYPE=:payType
+		       				#end
+
+		       			
+		       				#if($payInfo)
+		       					and PAY_INFO=:payInfo
+		       				#end
+
+		       			
+		       				#if($thirdPayNo)
+		       					and THIRD_PAY_NO=:thirdPayNo
+		       				#end
+
+		       			
+		       				#if($thirdPayAccount)
+		       					and THIRD_PAY_ACCOUNT=:thirdPayAccount
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($paySuccessStatusStr ==1)
+		       					and PAY_SUCCESS_STATUS=true
+		       				#end
+		       				
+		       				#if($paySuccessStatusStr ==2)
+		       					and PAY_SUCCESS_STATUS=false
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       			
+		       				#if($picUrl)
+		       					and picUrl=:picUrl
+		       				#end
+
+		       			
+		       				#if($bankCode)
+		       					and bankCode=:bankCode
+		       				#end
+				       		
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

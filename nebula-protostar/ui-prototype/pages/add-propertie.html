@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+<script type="text/javascript" src="../scripts/dragarraylist.js"></script>
+<script type="text/javascript" src="../scripts/property/common-property.js"></script>
+<script type="text/javascript">
+
+var setting = {
+			check: {
+				enable: true,
+				chkStyle: "radio",
+				radioType: "all"
+			},
+			view: {
+				dblClickExpand: false,
+				showIcon:false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: onClick,
+				onCheck: onCheck
+			}
+		};
+
+var zNodes =[
+			{ id:1, pId:0, name:"鞋", open:true,nocheck:true},
+			{ id:11, pId:1, name:"运动鞋"},
+			{ id:12, pId:1, name:"休闲鞋"},
+			{ id:2, pId:0, name:"服装", open:true,nocheck:true},
+			{ id:21, pId:2, name:"T恤"},
+			{ id:22, pId:2, name:"裤子"},
+			{ id:23, pId:2, name:"卫衣"},
+			{ id:3, pId:0, name:"配件", open:true,nocheck:true},
+			{ id:31, pId:3, name:"帽子"},
+			{ id:32, pId:3, name:"手套"},
+			{ id:33, pId:3, name:"袜子"}
+		 ];
+
+		function onClick(e, treeId, treeNode) {
+			var zTree = $j.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return false;
+		}
+
+		function onCheck(e, treeId, treeNode) {
+			var zTree = $j.fn.zTree.getZTreeObj("treeDemo"),
+			nodes = zTree.getCheckedNodes(true),
+			v = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $j("#industry");
+			cityObj.attr("value", v);
+			hideMenu();
+		}
+
+		
+		function hideMenu() {
+			$j("#menuContent").fadeOut("fast");
+			$j("body").unbind("mousedown", onBodyDown);
+		}
+		function onBodyDown(event) {
+			if (!(event.target.id == "menuBtn" || event.target.id == "industry" || event.target.id == "menuContent" || $j(event.target).parents("#menuContent").length>0)) {
+				hideMenu();
+			}
+		}
+
+
+function chooseFilterType(){
+	var sel=$j("#typeSelect").val();
+	if(sel=="1"){
+		$j("#industryDiv").show();	
+	}
+	else{
+		$j("#industryDiv").hide();
+	}
+	
+}
+var jsonArray=[{"name":"未定义名称股份个人","id":440,"version":1374656499590,"lifecycle":1,"required":false,"sortNo":1,"isSystem":true,"createTime":1374656499465,"modifyTime":1375340698183,"industryName":null,"industryId":147,"editingType":1,"valueType":1,"isSaleProp":false,"isColorProp":false,"searchable":true,"hasThumb":false}];
+function makeList(){
+	
+	
+	
+	
+		$j("#industryId").val(440);
+		$j("#industrySelDiv").css("display","none");
+		$j("#propertySelDiv").css("display","block");
+		$j("#industryPropertyDiv").html(name+nps.i18n("SYSTEM_PROPERTY_INDUSTY_LIST"));
+	
+		
+		$j.each(jsonArray,function(i,val){
+			jsonArray[i].state = parseInt(jsonArray[i].lifecycle);
+			jsonArray[i].num = parseInt(jsonArray[i].sortNo);
+			jsonArray[i].text = jsonArray[i].name;
+			jsonArray[i].type = formatEditingType(jsonArray[i].editingType);
+		});
+		
+		$j("#property-list").dragarraylist({
+			newarray:jsonArray
+			, add:true
+			, callBack:function(o){
+			     setValue(o);
+			},deleteli:function(o){
+			     deleteValue(o);
+			},beforecallBack:function(o){
+					beforeValue(o);
+				}
+		});					
+		 
+	
+}
+
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+	nps.init();
+		
+	$j.fn.zTree.init($j("#treeDemo"), setting, zNodes);
+	
+	$j("#industry").click(function() {
+		var cityObj = $j(this);
+		var cityOffset = $j(this).offset();
+		$j("#menuContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
+
+		$j("body").bind("mousedown", onBodyDown);
+	});
+
+	$j(".button.orange.comfirm").click(function(){
+
+		if($j("#industry").val()==''){
+			nps.info("错误提示","请先选择行业!");
+			return;
+		}
+
+		$j("#industryPropertyDiv").html($j("#industry").val()+'行业属性列表');
+		
+		$j("#industrySelDiv").hide();
+
+		$j("#propertySelDiv").show();
+		//makeList();
+	});
+
+
+	
+	
+	
+	$j(window.top.document).find(".button-cancel").click(function(e){
+		if($j(".nyyy").length==1){
+			if($j(".list-all li.selected").prev("li").length>0){
+				var beforeli=$j(".list-all li.selected").prev("li");
+				$j(".no-sign").remove();
+				beforeli.click();
+			}
+			else{
+				var nextli=$j(".list-all li.selected").next("li");
+				$j(".no-sign").remove();
+				nextli.click();
+			}
+		}
+		
+        $j(".no-sign").removeClass("nyyy");
+    });
+});
+
+
+</script>
+
+
+</head>
+<body>
+
+<!-- new -->
+<div class="content-box">
+	<div class="ui-title1">
+		<img src="../images/wmi/blacks/32x32/spechbubble.png">商品属性管理
+	</div>
+<!-- sel industry -->
+	<div class="ui-block">
+
+	<div id="industrySelDiv" style="">
+		<div class="ui-block p10" >
+	    	<div class="ui-block-title1">选择所属行业</div>
+	    
+		     <div class="ui-block-content border-grey" id="industryDiv" >
+		     	 <div class="ui-block-line">	
+		         	<label>所属行业</label>
+		         	<div class="wl-right">
+		              <input type="text" id="industry" loxiaType="input" value="" placeholder="行业"/>
+		         	</div>
+		         </div>
+		    </div>
+		</div>
+		
+		<div class="button-line">
+	         <input type="button" value="确认" class="button orange comfirm" title="确认"/>
+	    </div>
+	</div>
+
+
+	<div id="propertySelDiv" style="display:none;">
+		<!-- left -->
+		
+	    <div class="ui-block ui-block-fleft w240"> 
+	    	<div class="ui-block-content ui-block-content-lb">
+				<div class="ui-block-title1" id="industryPropertyDiv">属性列表</div>
+		
+				<ul id="property-list" class="list-all">
+	
+				</ul>
+	            
+	          
+	            
+	            <div class="button-line1">
+		      
+		         <input type="button" value="保存顺序" class="button" />
+		         
+		   		</div>	
+	          </div>
+	    </div>
+	    
+	    <div class="ui-block ml240" style="padding-left: 10px;">
+	    	<div class=" width-percent100">
+		   		<form name="propertieForm" action="" method="post">
+				<div class="ui-block-title1">添加属性</div>
+			    <div class="ui-block-content border-grey" style="margin-bottom: 10px;">	    
+				    <div class="ui-block-line">
+				         <label>名称</label>
+				         <div class="wl-right">
+				              <input name="name" type="text" loxiaType="input" value="" mandatory="true" size="50" placeholder="名称"/>
+				         </div>
+				    </div>
+				    <div class="ui-block-line">
+				         <label>编辑类型</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">单行输入</option>
+				    				<option value="3">可输入单选</option>
+				    				<option value="4">单选</option>
+				    				<option value="5">多选</option>
+				    			</select>
+				         </div>
+				    </div>
+				    <div class="ui-block-line">
+				         <label>值类型</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">文本</option>
+				    				<option value="3">数值</option>
+				    				<option value="4">日期</option>
+				    				<option value="5">日期时间</option>
+				    			</select>
+				         </div>
+				    </div>
+				    <div class="ui-block-line">
+				         <label>是否销售属性</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">是</option>
+				    				<option value="3">否</option>
+				    			</select>
+				         </div>
+				    </div>
+					<div class="ui-block-line">
+				         <label>是否颜色属性</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">是</option>
+				    				<option value="3">否</option>
+				    			</select>
+				         </div>
+				    </div>
+					<div class="ui-block-line">
+				         <label>是否必输</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">是</option>
+				    				<option value="3">否</option>
+				    			</select>
+				         </div>
+				    </div>
+					<div class="ui-block-line">
+				         <label>是否用于检索</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">是</option>
+				    				<option value="3">否</option>
+				    			</select>
+				         </div>
+				    </div>
+					<div class="ui-block-line">
+				         <label>是否配图</label>
+				         <div class="wl-right">
+				              <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">				
+				    				<option value="2">是</option>
+				    				<option value="3">否</option>
+				    			</select>
+				         </div>
+				    </div>
+			    </div>
+			    </form>
+		    </div>
+	    </div>
+		<div class="button-line">
+			<input type="button" value="保存" class="button orange add" title="保存"/>
+			<input type="button" value="保存并设置属性可选值" class="button orange" onclick="location.href='industry-property-value.html'" title="保存并设置属性可选值" />
+		    <input type="button" value="返回" class="button" onclick="location.href='list-properties.html'" title="返回"/>
+		</div>
+	</div>
+
+	</div>
+</div>
+<input name="industryId" type="hidden" value="" id="industryId"/>
+<input name="propertyId" type="hidden" value="" id="propertyId"/>
+<div id="menuContent" class="menuContent" style="display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
+		<ul id="treeDemo" class="ztree" style="margin-top:0; width:180px; height: 100%;"></ul>
+</div>
+
+</body>
+</html>

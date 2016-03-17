@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/user-role.js"></script>
+<style type="text/css">
+.wl-right-auto2
+{
+
+
+border:1px solid #ccc;
+overflow-y:scroll;
+
+}
+.wl-right-auto2  input[type="checkbox"]
+{
+clear:both;
+}
+
+.wl-right-auto2  input[type="radio"]
+{
+clear:both;
+}
+.wl-right-auto2  p
+{
+width:80%;
+}
+</style>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+
+
+});
+
+
+
+//对象相关
+
+
+</script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+    
+   <form name="memberGroupForm" action="" method="post">
+	<div class="ui-title1">修改会员分组</div>
+	<div class="ui-block">
+    <div class="ui-block-title1">会员分组</div>
+    <div class="ui-block-line ui-block-line-37">
+         <label>分组编码：</label>
+         <div class="wl-right">
+              <input type="text" loxiaType="input" value="001" mandatory="true"/>
+         </div>
+    </div>
+    
+    <div class="ui-block-line ui-block-line-37">
+         <label>名称：</label>
+         <div class="wl-right">
+              <input name="pwd" type="text" loxiaType="input" value="分组1" mandatory="true"/>
+         </div>
+    </div>
+    
+    <div class="ui-block-line ui-block-line-37">
+         <label>状态：</label>
+             <td>
+                <span id="searchkeytext">
+					<select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" >				
+						<option value="2">不限</option>
+						<option value="3">有效</option>
+						<option value="4">无效</option>
+					</select>
+				</span>
+            </td>
+    </div>
+    
+     
+
+    
+    
+    
+
+	</div>
+   </form>
+    
+    <div class="button-line">
+         <input type="button" value="保存" class="button orange" onclick="nps.submitForm('memberGroupForm',{mode:'async'})"/>
+
+    </div>
+</div>
+
+
+</body>
+</html>

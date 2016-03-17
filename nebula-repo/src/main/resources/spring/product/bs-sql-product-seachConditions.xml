@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Industry.findIndustryByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据类型查询行业</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT 
+					DISTINCT t2.id AS id,
+					t2.lifecycle AS lifecycle,
+					t2.name AS name,
+					t2.parent_id AS parentId
+					FROM t_pd_search_con t0
+					LEFT JOIN t_pd_property t1 ON t1.id=t0.property_id
+					LEFT JOIN t_pd_industry t2 ON t2.id=t1.industry_id
+					where t0.property_id is not null
+					#if($categoryId) 
+						AND t0.category_id=:categoryId 
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	
+	<bean id="Property.findPropertyByCategoryIdAndIndustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过categoryId与industryId查询属性值</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT 
+					t1.id AS id,
+					t1.lifecycle AS lifecycle,
+					t1.name AS name
+					FROM t_pd_search_con t0
+					LEFT JOIN t_pd_property t1 ON t1.id=t0.property_id
+					LEFT JOIN t_pd_industry t2 ON t2.id=t1.industry_id
+					where t0.property_id is not null
+					#if($industryId)
+						AND t2.id=:industryId 
+					#end
+					#if($categoryId)
+						AND t0.category_id=:categoryId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.findSearchConditionByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询筛选条件</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+					t1."id" as id,
+					t1."name" as name,
+					t1.sort as sort,
+					t1.lifecycle as lifecycle,
+					t1.property_id as propertyId,
+					t1."type" as type,
+					t2."name" as propertyName,
+					t3."name" as industryName,
+					t4."name" as categoryName
+					from t_pd_search_con t1 
+					LEFT JOIN t_pd_property t2 on t2.id=t1.property_id
+					LEFT JOIN t_pd_industry t3 on t2.industry_id=t3.id
+					LEFT JOIN t_pd_category t4 on t1.category_id=t4.id
+					where t1.lifecycle BETWEEN 0 AND 1
+					#if($name)
+						AND t1."name" like :name
+					#end
+					#if($type)
+						AND t1."type" = :type
+					#end
+					#if($categoryId)
+						AND (t1.category_id=:categoryId or t1.category_id is null)
+					#end
+					#if($propertyId)
+						AND (t1.property_id=:propertyId or t1.property_id is null)
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.findSearchConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询筛选条件</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+					t1."id" as id,
+					t1."name" as name,
+					t1.sort as sort,
+					t1.lifecycle as lifecycle,
+					t1.property_id as propertyId,
+					t1."type" as type,
+					t2."name" as propertyName,
+					t3."id" as industryId,
+					t3."name" as industryName,
+					t1.category_id as categoryId,
+					t4."name" as categoryName
+					from t_pd_search_con t1 
+					LEFT JOIN t_pd_property t2 on t2.id=t1.property_id
+					LEFT JOIN t_pd_industry t3 on t2.industry_id=t3.id
+					LEFT JOIN t_pd_category t4 on t1.category_id=t4.id
+					where t1.lifecycle BETWEEN 0 AND 1
+					#if($id)
+						AND t1.id=:id
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="SearchCondition.insertSearchCondition" class="loxia.dao.support.DynamicQueryHolder">
+		<description>新增</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					INSERT INTO 
+					t_pd_search_con 
+					(
+						id,
+						name,
+						#if($sc.propertyId)
+							property_id,
+						#end
+						sort,
+						type,
+						category_id,
+						lifecycle,
+						create_time,
+						modify_time,
+						version
+					) 
+					VALUES (
+						nextval('S_T_PD_SEARCH_CON'),
+						:name,
+						#if($sc.propertyId)
+							:sc.propertyId,
+						#end
+						:sc.sort,
+						:sc.type,
+						:sc.categoryId,
+						1,
+						now(),
+						now(),
+						now()
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.updateSearchConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID更新searchCondition</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					UPDATE t_pd_search_con SET
+					modify_time=now()
+					#if($sc.name)
+						,name=:sc.name
+					#end
+					#if($sc.propertyId)
+						,property_id=:sc.propertyId
+					#end
+					#if($sc.sort)
+						,sort=:sc.sort
+					#end
+					#if($sc.type)
+						,type=:sc.type
+					#end
+					#if($sc.categoryId)
+						,category_id=:sc.categoryId
+					#end
+					WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.enableSearchConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用searchCondition</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					UPDATE t_pd_search_con SET lifecycle=1 WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.disableSearchConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>禁用searchCondition</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					UPDATE t_pd_search_con SET lifecycle=0 WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.deleteSearchConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID删除searchCondition</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					UPDATE t_pd_search_con SET lifecycle=2 WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchCondition.deleteSearchConditionByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>批量删除</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					UPDATE t_pd_search_con SET lifecycle=2 WHERE id in
+					( 
+						#foreach($id in $ids)
+							$id,
+						#end
+					-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SearchConditionItem.findSearchConditionItemByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询选项 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT 
+					t1."id" as id,
+					t1.codition_id as coditionId,
+					t1."name" as name,
+					t1.opeartor_id as opeartorId,
+					t1.lifecycle as lifecycle,
+					t1.sort as sort,
+					t1.area_max as areaMax,
+					t1.area_min as areaMin,
+					t1.property_id as propertyId,
+					t1.property_value_id as propertyValueId,
+					t2."name" as propertyName,
+					t3."value" as propertyValueName
+					from t_pd_search_con_item t1 
+					LEFT JOIN t_pd_property t2 on t2.id=t1.property_id
+					LEFT JOIN t_pd_property_value t3 on t1.property_value_id=t3.id
+					WHERE t1.lifecycle BETWEEN 0 AND 1
+					#if($type)
+						AND t1.codition_id is null
+					#end
+					#if($coditionId)
+						AND t1.codition_id = :coditionId
+					#end
+					#if($name)
+						AND t1."name" like :name
+					#end
+					#if($propertyId)
+						AND t1.property_id = :propertyId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchConditionItem.findSearchConditionItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询选项 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT 
+					t1."id" as id,
+					t1."name" as name,
+					t1.opeartor_id as opeartorId,
+					t1.lifecycle as lifecycle,
+					t1.sort as sort,
+					t1.area_max as areaMax,
+					t1.area_min as areaMin,
+					t1.property_id as propertyId,
+					t1.property_value_id as propertyValueId,
+					t2."name" as propertyName,
+					t3."value" as propertyValueName
+					from t_pd_search_con_item t1 
+					LEFT JOIN t_pd_property t2 on t2.id=t1.property_id
+					LEFT JOIN t_pd_property_value t3 on t1.property_value_id=t3.id
+					WHERE t1.lifecycle BETWEEN 0 AND 1
+					#if($id)
+						AND t1.id = :id
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchConditionItem.insertSearchConditionItem" class="loxia.dao.support.DynamicQueryHolder">
+		<description>新增搜索项</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					INSERT INTO t_pd_search_con_item 
+					(
+						id,
+						codition_id,
+						name,
+						sort,
+						area_max,
+						area_min,
+						property_value_id,
+						property_id,
+						lifecycle,
+						create_time,
+						modify_time,
+						version
+					)
+					VALUES(
+						nextval('S_T_PD_SEARCH_CON'),
+						:sci.coditionId,
+						:sci.name,
+						:sci.sort,
+						:sci.areaMax,
+						:sci.areaMin,
+						:sci.propertyValueId,
+						:sci.propertyId,
+						1,
+						now(),
+						now(),
+						now()
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SearchConditionItem.updateSearchConditionItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新搜索项根据ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_item 
+					set
+					modify_time=now()
+					#if($sci.name)
+						,name=:sci.name
+					#end
+					#if($sci.sort)
+						,sort=:sci.sort
+					#end
+					#if($sci.areaMax)
+						,area_max=:sci.areaMax
+					#end
+					#if($sci.areaMin)
+						,area_min=:sci.areaMin
+					#end
+					#if($sci.propertyValueId)
+						,property_value_id=:sci.propertyValueId
+					#end
+					#if($sci.propertyId)
+						,property_id=:sci.propertyId
+					#end
+					where id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchConditionItem.disableSearchConditionItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>禁用搜索项根据ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_item 
+					set
+						lifecycle=0
+					where id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchConditionItem.enableSearchConditionItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用搜索项根据ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_item 
+					set
+						lifecycle=1
+					where id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SearchConditionItem.deleteSearchConditionItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>删除搜索项根据ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_item 
+					set
+						lifecycle=2
+					where id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchConditionItem.deleteSearchConditionItemByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>批量删除搜索项</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_item 
+					set
+						lifecycle=2
+					where id in 
+					(	
+						#foreach($id in $ids)
+							$id,
+						#end
+						-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SearchConditionItem.deleteSearchConditionItemByParentIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>批量删除搜索项根据父ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_search_con_item 
+					set
+						lifecycle=2
+					where condition_id in 
+					(	
+						#foreach($id in $pids)
+							$id,
+						#end
+						-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

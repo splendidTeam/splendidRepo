@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PrivilegeUrl.findAllPrivilegeUrlList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_AU_PRIVILEGE_URL 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PrivilegeUrl.findPrivilegeUrlListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_AU_PRIVILEGE_URL where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="PrivilegeUrl.findPrivilegeUrlListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_AU_PRIVILEGE_URL where 
+		       				1=1	
+		       			
+		       				#if($privilege)
+		       					and PRI_ID=:privilege
+		       				#end
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PrivilegeUrl.findPrivilegeUrlListByQueryMapWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_AU_PRIVILEGE_URL where 
+		       				1=1	
+		       				#if($privilege)
+		       					and PRI_ID=:privilege
+		       				#end
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="PrivilegeUrl.removePrivilegeUrlByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from  T_AU_PRIVILEGE_URL
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PrivilegeUrl.removePrivilegeUrlByParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from  T_AU_PRIVILEGE_URL
+		       		 where 
+		       		 PRI_ID = :parentId
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PrivilegeUrl.removePrivilegeUrlBypIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from  t_au_privilege_url
+		       		 where 
+		       		pri_id in (
+		       		#foreach( $id in $pIds )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

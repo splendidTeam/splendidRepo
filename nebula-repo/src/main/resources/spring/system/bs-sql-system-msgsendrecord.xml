@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MsgSendRecord.findAllMsgSendRecordList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_SEND_RECORD 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MsgSendRecord.findAllNoFeedbackMsgSendRecordList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_SEND_RECORD 
+		       		
+		       		where FEEDBACK_TIME is  null order by id asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	<bean id="MsgSendRecord.findMsgSendRecordListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_SEND_RECORD where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MsgSendRecord.findMsgSendRecordListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_SEND_RECORD where 
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($ifIdentify)
+		       					and IF_IDENTIFY=:ifIdentify
+		       				#end
+
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID=:targetId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($feedbackTime)
+		       					and FEEDBACK_TIME >= :feedbackTimeStart
+		       				#end
+		       				#if($feedbackTime)
+		       					and FEEDBACK_TIME <= :feedbackTimeEnd
+		       				#end
+
+		       			
+		       				#if($sendCount)
+		       					and SEND_COUNT=:sendCount
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MsgSendRecord.findMsgSendRecordListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_SEND_RECORD where 
+		       		
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($ifIdentify)
+		       					and IF_IDENTIFY=:ifIdentify
+		       				#end
+
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID=:targetId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($feedbackTime)
+		       					and FEEDBACK_TIME >= :feedbackTimeStart
+		       				#end
+		       				#if($feedbackTime)
+		       					and FEEDBACK_TIME <= :feedbackTimeEnd
+		       				#end
+
+		       			
+		       				#if($sendCount)
+		       					and SEND_COUNT=:sendCount
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

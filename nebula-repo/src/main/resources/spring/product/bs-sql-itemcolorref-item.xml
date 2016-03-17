@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	
+	<bean id="ItemColorValueRef.findItemColorRefList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询ItemColorValueRef</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM 
+					T_PD_ITEM_COLOR_VALUE_REFERENCE
+					#if($filterColor)
+						WHERE FILTER_COLOR LIKE :filterColor
+					#end
+					ORDER BY CREATE_TIME DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<bean id="ItemColorValueRef.itemColorValueReflistMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询ItemColorValueRef</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM 
+					T_PD_ITEM_COLOR_VALUE_REFERENCE  ORDER BY CREATE_TIME DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemColorValueRef.deletetemColorRef" class="loxia.dao.support.DynamicQueryHolder">
+		<description>删除ItemColorValueRef</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					   DELETE FROM 
+					   T_PD_ITEM_COLOR_VALUE_REFERENCE 
+					   WHERE ID=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="ItemColorValueRef.findAllItemCololr" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找所有的颜色对照</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					  SELECT * FROM 
+					  T_PD_ITEM_COLOR_VALUE_REFERENCE ORDER BY CREATE_TIME DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	<bean id="ItemColorReference.findItItemColorReferenceList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询筛选数据</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					  SELECT  * FROM  T_PD_ITEM_COLOR_REFERENCE  WHERE SYS_COLOR_ID=:syscolorid AND ITEM_COLOR_ID=:itemcolorid
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	
+	<!--根据页数条件查找模板 -->
+	<bean id="InstationMessageTemplate.findTempletByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		 SELECT INFO.ID AS ID,
+				       		INFO.ID AS STATIONINFOID,
+				       		INFO.CREATETIME AS CREATETIME, 
+							INFO.MODIFYTIME AS MODIFYTIME, 
+							INFO.TYPE AS INFOTYPE, 
+							INFO.MESSAGE AS MESSAGE, 
+							INFO.TITLE AS TITLE,
+							INFO.TYPE AS TYPE
+		       		 FROM T_SYS_INSTATION_MESSAGE_TEMPLATE INFO
+		       		 #if($name)
+						Where info.title LIKE :name or info.message LIKE :name
+		       		 #end
+		       		 ORDER BY  CREATETIME  DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="InstationMessageTemplate.updateinstationMessageTemplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改模板状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		  UPDATE  T_SYS_INSTATION_MESSAGE_TEMPLATE SET TYPE=:type , MODIFYTIME=now() WHERE ID=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="InstationMessageTemplate.finInstationMessageTemplatelist" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询有效的模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT  * FROM  T_SYS_INSTATION_MESSAGE_TEMPLATE  WHERE TYPE=1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="InstationMessageTemplate.findTempletByid" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询有效的模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT  * FROM  T_SYS_INSTATION_MESSAGE_TEMPLATE  WHERE ID=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+</beans>
+
+
+

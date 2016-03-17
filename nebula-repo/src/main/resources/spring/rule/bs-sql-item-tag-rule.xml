@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<bean id="ItemTagRule.findCustomProductComboList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name as name,
+						r.expression as expression,
+						r.text as text,
+						r.lifecycle as lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					WHERE 1 = 1
+					#if($name)
+						AND r.name LIKE :name
+					#end
+					#if($type)
+						AND r.type = :type
+					#end
+					#if($lifecycle)
+						AND r.lifecycle = :lifecycle
+					#end
+					AND r.shop_id = :shopId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findTagRuleByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					WHERE r.name = :name
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					ORDER BY r.create_time DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findCustomProductComboById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+		       		WHERE r.id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findCustomProductComboListByType" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据类型查询列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					WHERE
+						r.type = :type
+					AND r.shop_id = :shopId
+					AND r.lifecycle = 1
+					ORDER BY
+						r.create_time DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findAllAvailableCustomProductComboList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					WHERE r.lifecycle = 1
+					ORDER BY r.type ASC, r.create_time DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findAllAvailableCustomProductComboListByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					WHERE r.lifecycle = 1 and r.shop_id = :shopId
+					ORDER BY r.type ASC, r.create_time DESC
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemTagRule.findEffectItemTagRuleListByIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表，查询商品筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						r.id,
+						r.type,
+						r.name,
+						r.expression,
+						r.text,
+						r.lifecycle,
+						r.create_id AS createId,
+						r.create_time AS createTime,
+						u.realname AS createName,
+						r.shop_id AS shopId
+					FROM t_pd_tag_rule r
+					LEFT JOIN t_au_user u ON u.id = r.create_id
+					WHERE r.lifecycle = 1
+					AND r.id IN (
+					#foreach($id in $idList)
+						$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

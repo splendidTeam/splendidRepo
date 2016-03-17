@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+<TITLE></TITLE>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../css/main.css" type="text/css">
+<link rel="stylesheet" href="../css/demo.css" type="text/css">
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript"
+	src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript"
+	src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+<script type="text/javascript"
+	src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+<SCRIPT type="text/javascript">
+	var $j = jQuery.noConflict();
+		<!--
+		var setting = {
+			
+			check: {
+				enable: false
+			},
+			view: {
+				showIcon:false,
+				fontCss: getFontCss
+			},
+			edit: {
+				enable: false,
+				showRenameBtn: false
+			},
+			data: {
+				keep: {
+					parent:false,
+					leaf:false
+				},
+				key: {
+					title: "name"
+				},
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: onClick,
+				beforeRemove: beforeRemove,
+				onRemove: onRemove,
+				onNodeCreated: onNodeCreated
+			}
+		};
+		
+		
+		var selectSetting = {
+				
+				check: {
+					enable: true,
+					chkStyle :"radio",
+					radioType: "all"
+				},
+				view: {
+					showIcon:false,
+					fontCss: getFontCss
+				},
+				edit: {
+					enable: false,
+					showRenameBtn: false
+				},
+				data: {
+					keep: {
+						parent:false,
+						leaf:false
+					},
+					key: {
+						title: "name"
+					},
+					simpleData: {
+						enable: true
+					}
+				},
+				callback: {
+					onClick: onClick,
+					beforeRemove: beforeRemove,
+					onRemove: onRemove,
+					onNodeCreated: onNodeCreated
+				}
+			};
+
+		var zNodes =[
+			{ id:0, name:"ROOT",state:"0",sort:1, open:true,root:"true"},
+			{ id:1, pId:0, name:"work",state:"0",sort:1, open:true,root:"true"},
+			{ id:11, pId:1, name:"docs",state:"1",sort:1,path:"aaa/aaa111"},
+			{ id:12, pId:1, name:"codes",state:"0",sort:2},
+			{ id:2, pId:0, name:"images",state:"0",sort:2, open:true,root:"true"},
+			{ id:21, pId:2, name:"grils",state:"1",sort:1,path:"bbb/bbb11"},
+			{ id:22, pId:2, name:"rivers",state:"0",sort:2},
+			{ id:23, pId:2, name:"water",state:"0",sort:3},
+			{ id:3, pId:0, name:"learn",state:"0",sort:3, open:true,root:"true"},
+			{ id:31, pId:3, name:"java",state:"1",sort:1,path:"ccc/ccc1"},
+			{ id:32, pId:3, name:"jquery",state:"0",sort:2},
+			{ id:33, pId:3, name:"html",state:"0",sort:3}
+		];
+		var log, className = "dark";
+		
+		function onClickTemp(){
+			
+		}
+		
+		function beforeRemove(treeId, treeNode,e) {
+			className = (className === "dark" ? "":"dark");	
+			if(confirm("确认删除 节点 -- " + treeNode.name + " 吗？")){
+   				removeNode(treeNode,null);
+   			}
+		}
+		
+		function showDivByTreeNode(treeNode){
+			if(treeNode==null){
+				return;
+			}
+			var state=treeNode.state;
+// 			$j("#addNewResourceDiv").hide();
+// 			$j("#updateFileDiv").hide();
+// 			$j("#save_father_Name").hide();
+			
+			if(state==1){
+				$j("#handlerDiv").show();
+// 				$j("#save_father_Name").show();
+			}else{
+// 				$j("#addNewResourceDiv").show();
+				$j("#handlerDiv").hide();
+			}
+		}
+		
+		function showDivByType(type){
+// 			$j("#addNewResourceDiv").hide();
+// 			$j("#updateFileDiv").hide();
+			
+// 			if(type==1){
+// 				$j("#updateFileDiv").show();
+// 			}else{
+// 				$j("#addNewResourceDiv").show();
+// 			}
+		}
+		
+		
+		
+		
+		function onRemove(e, treeId, treeNode) {
+		}
+		function onClick(event, treeId, treeNode)  {
+			 //alert(treeNode.id + ", " + treeNode.name);
+				$j("#tree_fid").val(treeNode.name).attr("readonly","readonly");
+				$j("#tree_state").val(treeNode.state);
+				$j("#tree_sort").val(treeNode.sort);
+				$j("#tree_fid").attr("treeId",treeId);
+				$j("#tree_fid").data("treeNode",treeNode);
+				$j("#tree_fid").data("event",event);
+				if(treeNode.id==0){
+					$j(".percent70-content-right").css("display","none");
+				}else{
+					$j(".percent70-content-right").css("display","block");
+				}
+				
+				showDivByTreeNode(treeNode);
+		}
+		function onNodeCreated(e, treeId, treeNode) {
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var node = zTree.getNodeByParam("id", treeId, null);
+				zTree.moveNode(treeNode,  node  , "prev");
+		}
+		
+		
+		
+		function focusKey(e) {
+			if (key.hasClass("empty")) {
+				key.removeClass("empty");
+			}
+		}
+		function blurKey(e) {
+			if (key.get(0).value === "") {
+				key.addClass("empty");
+			}
+		}
+		var lastValue = "", nodeList = [], fontCss = {};
+		
+		function searchNode(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			var value = $j.trim(key.get(0).value);
+				
+				if (key.hasClass("empty")) {
+					value = "";
+				}
+				if (lastValue === value) return;
+				lastValue = value;
+				if (value === "") return;
+				updateNodes(false);
+				
+			nodeList = zTree.getNodesByParamFuzzy("name", value);
+
+			if (nodeList.length > 0) {
+			$j.each(nodeList, function(i, node){      
+         		 zTree.expandNode(node.getParentNode(),true, true, true);
+　　			}); 
+			}
+			updateNodes(true);
+			$j("#key").focus();
+		}
+		function updateNodes(highlight) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			for( var i=0, l=nodeList.length; i<l; i++) {
+				nodeList[i].highlight = highlight;
+				zTree.updateNode(nodeList[i]);
+			}
+		}
+		function getFontCss(treeId, treeNode) {
+			return (!!treeNode.highlight) ? {color:"#333","background-color":"yellow"} : {color:"#333", "font-weight":"normal","background-color":""};		
+		}
+	
+		var key;
+		
+		var newCount = 1;
+		function addRoot(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode&& treeNode.getParentNode()!=null) {
+				treeNode=treeNode.getParentNode();
+				var new_id = treeNode.id *10  +  treeNode.children.length+1;
+				treeNode = zTree.addNodes(treeNode, {id:new_id, pId:treeNode.id, isParent:false, name:$j("#add_name").val()});
+				onNodeCreated(e,new_id,nodes[0]);
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:false, name:$j("#add_name").val()});
+				
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+
+		//添加子节点
+		function add(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			
+			var type=$j("#add_tree_state").val();
+			
+			if (treeNode) {
+				if(type==0){
+					treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:isParent, name:$j("#add_name").val()});
+				}else{
+					treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:isParent, name:$j("#add_name").val(),state:$j("#add_tree_state").val()});
+				}
+				
+			} else {
+				if(type==0){
+					treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:isParent, name:$j("#add_name").val()});
+				}else{
+					treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:isParent, name:$j("#add_name").val(),state:$j("#add_tree_state").val()});
+				}			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+			
+			$j("#add_name").val("");
+			$j("#add_tree_state").val("");
+			$j("#addFile").val("");
+			
+// 			$j("#addNewResourceDiv").hide();
+// 			$j("#updateFileDiv").hide();
+// 			$j("#addFileDiv").hide();
+			
+// 			alert($j("#"+treeNode[0].id+"_span"));
+// 			zTree.editName(treeNode[0]);
+// 			alert(treeNode[0].id+" s "+$j("#tree_"+treeNode[0].id+"_span").length);
+			$j("#tree_"+treeNode[0].id+"_span").click();
+			$j("#key").focus();
+			
+// 			alert(treeNode);
+// 			showDivByType(type);
+// 			showDivByTreeNode(treeNode);
+		};
+		
+		var tmpPathDlgTreeId = "dlg"; //树的divId 在jsp中定义的  必需
+		var tmpPathDlgRootName = "ROOT";//根节点的显示名称  必需
+		var tmpPathDlgRootPath = "/instance";//根节点的实际路径  必需
+		var tmpPathDlgNodeType = "cms:instance";  //构建树的节点的仓库类型
+		var tmpPathDlgOnClickHandler = onClickTemp;   //点击树节点时候的响应事件， 必需
+		var tmpPathDlgCheckEnable = true;    //节点是否能够被选择
+		var tmpPathDlgChkStyle = "radio";//如果可以被选择，选择的类型： checkbox radio
+		var tmpPathDlgChkType = "all";//选择类型的参数  参见 ztree API setting.check.chkStyle 
+		var tmpPathDlgSelectType = "cms:instance";//能够被选中的仓库类型
+		var tmpPathDlgCNodeLevel = 3;//能够被选中的节点类型    0 父子节点均被选择    1父子节点均不被选择   2只选择父节点   3只选择子节点
+
+		var tmpPathDlgTreeSetting={
+				"treeId":tmpPathDlgTreeId,
+				"rootName":tmpPathDlgRootName,
+				"rootPath":tmpPathDlgRootPath,
+				"nodeType":tmpPathDlgNodeType,
+				"onClickHandler":tmpPathDlgOnClickHandler,
+				"checkEnable":tmpPathDlgCheckEnable,
+				"chkStyle":tmpPathDlgChkStyle,
+				"chkType":tmpPathDlgChkType,
+				"selectType":tmpPathDlgSelectType,
+				"nodeLevel":tmpPathDlgCNodeLevel
+		};
+		
+		$j(document).ready(function(){
+			loxia.init({
+                debug : true,
+                region : 'zh-CN'
+            });
+            nps.init();
+			$j.fn.zTree.init($j("#tree"), setting, zNodes);
+			key = $j("#key");
+			key.bind("focus", focusKey)
+			.bind("blur", blurKey)
+			.bind("propertychange", searchNode)
+			.bind("input", searchNode);
+			$j("#addParent").bind("click", {isParent:true}, addRoot);
+			$j("#addLeaf").bind("click", {isParent:false}, add);
+// 			$j("#add_tree_state").change(function(){
+// 				var type=$j("#add_tree_state").val();
+// 				if(type==1){
+// 					$j("#addFileDiv").show();
+// 				}else{
+// 					$j("#addFileDiv").hide();
+// 				}
+// 			});
+			
+// 			$j("#addFileDiv").hide();
+// 			$j("#addNewResourceDiv").hide();
+// 			$j("#updateFileDiv").hide();
+			
+			//修改节点名称
+			$j("#save_father_Name").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+				var sortNode ;
+				if (nodes.length>0) {
+					nodes[0].name = $j("#tree_fid").val();
+					nodes[0].state = $j("#tree_state").val();
+					if(nodes[0].sort == $j("#tree_sort").val()){
+						sortNode = 0;
+					}else{
+						nodes[0].sort = $j("#tree_sort").val()
+						sortNode = 1;
+					}
+					zTree.updateNode(nodes[0]);
+					if(sortNode==1){
+						var nlist ;
+						if(nodes[0].getParentNode()==null){
+							nlist = zTree.getNodesByParam("root", "true", null);
+						}else{
+							nlist = nodes[0].getParentNode().children;
+						}
+						for( var i=0; i<nlist.length; i++) {
+							if(parseInt(nodes[0].sort)<parseInt(nlist[i].sort)){
+								zTree.moveNode(nlist[i],nodes[0] , "prev");
+								break;
+							}
+							if(i==nlist.length-1){
+								zTree.moveNode(nlist[i],nodes[0], "next");
+							}
+						}	
+					}
+				}
+				//$j(".curSelectedNode span:eq(1)").html($j("#tree_fid").val());
+			});	
+
+			//上移
+			$j("#up_element").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+
+				if (nodes.length > 0) {
+					var node = nodes[0].getPreNode();
+				}
+				if(node!=null){
+					zTree.moveNode(node,nodes[0] , "prev");
+					var up_value = nodes[0].sort
+					var down_value  = node.sort
+					node.sort = up_value;
+					nodes[0].sort = down_value;
+					zTree.updateNode(nodes[0]);
+					zTree.updateNode(node);
+					$j("#tree_sort").val(down_value);
+				} 
+			});	
+
+			//下移
+			$j("#down_element").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+
+				if (nodes.length > 0) {
+					var node = nodes[0].getNextNode();
+				}
+				if(node!=null){
+					zTree.moveNode(node,nodes[0] , "next");
+					var up_value = nodes[0].sort
+					var down_value  = node.sort
+					node.sort = up_value;
+					nodes[0].sort = down_value;
+					zTree.updateNode(nodes[0]);
+					zTree.updateNode(node);
+					$j("#tree_sort").val(down_value);
+				} 
+			});				
+			
+			//删除节点
+			$j("#remove_element").click(function(){
+				 	//beforeRemove($j("#tree_fid").attr("treeId"),$j("#tree_fid").data("treeNode"),$j("#tree_fid").data("event"));
+				 	var treeObj = $j.fn.zTree.getZTreeObj("tree");
+					var nodes = treeObj.getSelectedNodes();
+					if (nodes && nodes.length>0  && nodes[0].id!=0 && !nodes[0].isParent) {
+						treeObj.removeNode(nodes[0]);
+					}
+			});	
+			
+			
+			$j("#tree_state").change(function(){
+				var type=$j("#tree_state").val();
+				if(type==1){
+					$j("#handlerDiv").show();
+//	 				$j("#save_father_Name").show();
+				}else{
+//	 				$j("#addNewResourceDiv").show();
+					$j("#handlerDiv").hide();
+				}
+			});
+			
+			$j("#add_tree_state").change(function(){
+				var type=$j("#add_tree_state").val();
+				if(type==1){
+					$j("#handlerAddDiv").show();
+//	 				$j("#save_father_Name").show();
+				}else{
+//	 				$j("#addNewResourceDiv").show();
+					$j("#handlerAddDiv").hide();
+				}
+			});
+			
+			$j(".common-ic.template.zoom-ic").on("click", function() {
+				$j.fn.zTree.init($j("#tempTree"), selectSetting, zNodes);
+				curSelTreeObj = $j(this);
+				$j("#template-dialog").dialogff({
+					type : 'open',
+					close : 'in',
+					width : '600px',
+					height: '300px'
+				});
+			});
+			
+			$j(".common-ic.dialog.zoom-ic").on("click", function() {
+				$j.fn.zTree.init($j("#dlgTree"), selectSetting, zNodes);
+				curSelTreeObj = $j(this);
+				$j("#dlg-dialog").dialogff({
+					type : 'open',
+					close : 'in',
+					width : '600px',
+					height: '300px'
+				});
+			});
+			
+			$j(".button.orange.selok").on("click",function(){
+				//TODO 根据所选的进行赋值
+				$j("#dlg-dialog").dialogff({
+					type : 'close'
+				});
+			});
+			
+			$j(".button.orange.selcancel").on("click",function(){
+				//TODO 根据所选的进行赋值
+				$j("#dlg-dialog").dialogff({
+					type : 'close'
+				});
+			});
+			
+			$j(".button.orange.tempselok").on("click",function(){
+				//TODO 根据所选的进行赋值
+				$j("#template-dialog").dialogff({
+					type : 'close'
+				});
+			});
+			
+			$j(".button.orange.tempselcancel").on("click",function(){
+				//TODO 根据所选的进行赋值
+				$j("#template-dialog").dialogff({
+					type : 'close'
+				});
+			});
+			
+			$j(".common-ic.dialog.update-ic").on("click",function(){
+				alert("update");
+			});
+		});
+		
+		
+		//-->
+	</SCRIPT>
+	<script type="text/javascript" src="../scripts/main.js"></script>
+</HEAD>
+
+<BODY>
+	<div class="content-box width-percent100">
+		<div class="ui-title1">
+			<img src="../images/wmi/blacks/32x32/wrench_plus_2.png">模板定义管理
+		</div>
+		<div class="ui-block ui-block-fleft w240">
+			<div class="ui-block-content ui-block-content-lb">
+				<div class="tree-control">
+					<input type="text" id="key" loxiatype="input"
+						placeholder="输入关键字快速定位" />
+				</div>
+				<ul id="tree" class="ztree"></ul>
+
+			</div>
+		</div>
+		<div class="ui-block ml240" style="padding-left: 10px;">
+			<div class="ui-block-title1">您当前选中的模板</div>
+			<div class="ui-block-content border-grey"
+				style="margin-bottom: 10px;">
+				<div class="ui-block-line">
+					<label>名称</label>
+					<div>
+						<input type="text" id="tree_fid" loxiatype="input"
+							mandatory="true" placeholder="模板名称" />
+					</div>
+				</div>
+				<div class="ui-block-line">
+					<label>类型</label>
+					<div>
+						<span><select id="tree_state" ><option value="1">动态</option>
+								<option value="0">静态</option></select>
+					</div>
+				</div>
+				
+				<div class="ui-block-line">
+					<label>描述</label>
+					<div>
+						<input type="text" id="description" loxiatype="input"
+							mandatory="true" placeholder="模板描述" />
+					</div>
+				</div>
+				
+				<div class="ui-block-line">
+					<label>模板文件路径</label>
+					<div>
+						<input type="text" id="templatePath" name="templatePath" checkmaster="validatePath"  placeholder="模板文件路径" class="ui-loxia-default ui-corner-all" aria-disabled="false">
+						<span class="common-ic template zoom-ic"></span>
+					</div>
+				</div>
+				
+				<div class="ui-block-line">
+					<label>属性定义路径</label>
+					<div>
+						<input type="text" id="dialogPath" name="dialogPath" checkmaster="validatePath"  placeholder="属性定义路径" class="ui-loxia-default ui-corner-all" aria-disabled="false">
+						<span class="common-ic dialog zoom-ic"></span>
+						<span class="common-ic dialog update-ic"></span>
+					</div>
+				</div>
+				
+				<div id="handlerDiv" class="ui-block-line">
+					<label>处理类</label>
+					<div>
+						<input type="text" id="dialogPath" loxiatype="input"
+							mandatory="true" placeholder="处理类" />
+					</div>
+				</div>
+				
+
+				<div class="button-line1">
+					<a href="javascript:void(0);" class="func-button persist"
+						id="save_father_Name"><span>保存</span></a> <a
+						href="javascript:void(0);" class="func-button delete"
+						id="remove_element"><span>删除</span></a>
+						<a href="javascript:void(0);" class="func-button export"
+						id="export_element"><span>导出</span></a>
+				</div>
+			</div>
+			<div id="addNewResourceDiv">
+				<div class="ui-block-title1">添加子模板</div>
+			<div class="ui-block-content border-grey">
+				<div class="ui-block-line">
+					<label>名称</label>
+					<div>
+						<input type="text" id="add_name" loxiatype="input"
+							mandatory="true" placeholder="模板名称" />
+					</div>
+				</div>
+				<div class="ui-block-line">
+					<label>类型</label>
+					<div>
+						<span><select id="add_tree_state">
+							<option value="1">动态</option>
+								<option value="0">静态</option>
+								
+								</select>
+						</span>
+					</div>
+				</div>
+				
+				<div class="ui-block-line">
+					<label>描述</label>
+					<div>
+						<input type="text" id="descriptionAdd" loxiatype="input"
+							mandatory="true" placeholder="模板描述" />
+					</div>
+				</div>
+				
+				<div class="ui-block-line">
+					<label>模板文件路径</label>
+					<div style="margin-bottom:10px;">
+						<input type="text" id="templatePathAdd" name="templatePathAdd" checkmaster="validatePath"  placeholder="模板文件路径" class="ui-loxia-default ui-corner-all" aria-disabled="false">
+						<span class="common-ic template zoom-ic"></span>
+					</div>
+				</div>
+				
+				<div class="ui-block-line">
+					<label>属性定义路径</label>
+					<div>
+					<input type="text" id="dlgPathAdd" name="dlgPathAdd" checkmaster="validatePath"  placeholder="属性定义路径" class="ui-loxia-default ui-corner-all" aria-disabled="false">
+					<span class="common-ic dialog zoom-ic"></span>
+					</div>
+				</div>
+				
+				<div id="handlerAddDiv" class="ui-block-line">
+					<label>处理类</label>
+					<div>
+						<input type="text" id="dialogPathAdd" loxiatype="input"
+							mandatory="true" placeholder="处理类" />
+					</div>
+				</div>
+
+				<div class="button-line1">
+					<a id="addLeaf" href="javascript:void(0);"
+						class="func-button insertLeaf"><span>添加子模板</span></a>
+				<a id="addFolder" href="javascript:void(0);"
+						class="func-button insertLeaf"><span>添加目录</span></a>
+				</div>
+			</div>
+			</div>
+		</div>
+		
+		<div id="dlg-dialog" class="proto-dialog">
+		<h5>选择属性定义</h5>
+			<div class="proto-dialog-content">
+				<ul id="dlgTree" class="ztree"></ul>
+			</div>
+			<div class="proto-dialog-button-line">
+				<input type="button" value="确定" class="button orange selok" />
+				<input type="button" value="取消" class="button orange selcancel" />
+			</div>
+		</div>
+		<div id="template-dialog" class="proto-dialog">
+		<h5>选择模板</h5>
+			<div class="proto-dialog-content">
+
+				<ul id="tempTree" class="ztree"></ul>
+			</div>
+			<div class="proto-dialog-button-line">
+				<input type="button" value="确定" class="button orange tempselok" /> <input
+				type="button" value="取消" class="button orange tempselcancel" />
+			</div>
+		</div>
+	</div>
+</BODY>
+
+</HTML>

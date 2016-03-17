@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Member.findAllMemberList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Member.updatePasswd" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER  set PASSWORD =:newPwd 
+		       			 where id=:memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		
+	<bean id="Member.findMemberListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	<bean id="Member.findMemberList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where lifecycle=1
+		       		#if($type==1)
+		       		and	id in (
+		       		#foreach( $sy in $synthesize )
+    					$sy,
+					 #end
+		       		 -1)
+		       		#end
+		       		   
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	<bean id="Member.findMembertypeList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where  lifecycle=1
+		       		#if($type==2)
+		       		and	login_email in (
+		       		#foreach( $sy in $synthesize )
+    					'$sy',
+					 #end
+		       		 '')
+		       		#end
+		       		#if($type==3)
+		       		and	login_name in (
+		       		#foreach( $sy in $synthesize )
+    					'$sy',
+					 #end
+		       		 '')
+		       		#end
+		       		   
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	<bean id="Member.findMemberListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($loginName)
+		       					and LOGIN_NAME=:loginName
+		       				#end
+		       				#if($loginNameForLike)
+		       					and LOGIN_NAME like :loginNameForLike
+		       				#end
+
+		       			
+		       				#if($loginEmail)
+		       					and LOGIN_EMAIL=:loginEmail
+		       				#end
+
+		       			
+		       				#if($loginMobile)
+		       					and LOGIN_MOBILE=:loginMobile
+		       				#end
+
+		       			
+		       				#if($password)
+		       					and PASSWORD=:password
+		       				#end
+
+		       			
+		       				#if($thirdPartyIdentify)
+		       					and THIRD_PARTY_IDENTIFY=:thirdPartyIdentify
+		       				#end
+
+		       			
+		       				#if($source)
+		       					and SOURCE=:source
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	
+	
+	
+	<bean id="Member.findMemberListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       	select 
+		       		a.id as id,
+		       		a.lifecycle as lifecycle,
+		       		a.login_name as loginName,
+		       		a.source as source,
+		       		a.type as type,
+		       		a.login_email as loginEmail,
+		       		a.login_mobile as loginMobile,
+                    b.nickname as nickName,
+                    b.user_pic as userPic,
+                    c.login_time as loginTime,
+		       		c.register_time as registerTime
+         		from t_mem_member a,
+                    t_mem_personal_data b,
+                    t_mem_conduct c
+                    #if($groupId)
+                    , t_mem_member_group_relation d
+                    #end
+	         	where a.id=b.id
+	         	and a.id=c.id
+	         	and a.lifecycle!=2
+	         	
+		       		#if($loginName)
+		       		 and a.login_name like :loginName
+		       		#end
+		       		
+		       		#if($loginEmail)
+		       		 and a.login_email like :loginEmail
+		       		#end
+		       		
+		       		#if($loginMobile)
+		       		 and a.login_mobile like :loginMobile
+		       		#end
+		       		
+		       		#if($lifeCycle)
+		       		 and a.lifecycle =:lifeCycle
+		       		#end
+		       		
+		       		#if($Source)
+		       		 and a.source=:Source
+		       		#end
+		       		
+		       		#if($Type)
+		       		 and a.type=:Type
+		       		#end
+		       	
+		            #if($startTime)
+		       			and	c.register_time>=:startTime
+		       		#end
+		       		
+		       		#if($endTime)
+		       			and	c.register_time<=:endTime
+		       		#end
+		       		#if($groupId)
+		       		    and d.member_id=a.id
+		       		    and d.group_id=:groupId
+		       		#end
+		       		
+		       		#if($isAddGroup == 1)
+		       			and EXISTS (select id from t_mem_member_group_relation tmmgr where tmmgr.member_id = a.ID)
+		       		#end
+		       		
+		       		#if($isAddGroup == 0)
+		       			and NOT EXISTS (select id from t_mem_member_group_relation tmmgr where tmmgr.member_id = a.ID)
+		       		#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="Member.findAllMemberGroupList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					
+                    select 
+		       		a.id as memberId,
+		       		
+                    b.name as groupName 
+          from      t_mem_member a,
+                    t_mem_group  b,
+                    t_mem_member_group_relation c
+          where     a.id=c.member_id
+          and       b.id=c.group_id 
+          and       a.lifecycle!=2
+          
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	
+
+	
+	
+		<bean id="Member.enableOrDisableMemberByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach($id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="Member.findMemberListByLoginNams" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过多个会员名称查询会员列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_mem_member 
+					where login_name in (
+		       			#foreach( $un in $loginNames )
+    					'$un',
+						#end
+						'-1'
+		       		)  
+		       		and lifecycle=1 
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="Member.removeMemberByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Member.findAllEffectMemberList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="Member.findEffectMemberListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where lifecycle=1
+		       		
+					
+		       			
+		       				#if($loginName)
+		       					and LOGIN_NAME=:loginName
+		       				#end
+		       				#if($loginNameForLike)
+		       					and LOGIN_NAME like :loginNameForLike
+		       				#end
+
+		       			
+		       				#if($loginEmail)
+		       					and LOGIN_EMAIL=:loginEmail
+		       				#end
+
+		       			
+		       				#if($loginMobile)
+		       					and LOGIN_MOBILE=:loginMobile
+		       				#end
+
+		       			
+		       				#if($password)
+		       					and PASSWORD=:password
+		       				#end
+
+		       			
+		       				#if($thirdPartyIdentify)
+		       					and THIRD_PARTY_IDENTIFY=:thirdPartyIdentify
+		       				#end
+
+		       			
+		       				#if($source)
+		       					and SOURCE=:source
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Member.findEffectMemberListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER where lifecycle=1
+		       		
+					
+		       			
+		       				#if($loginName)
+		       					and LOGIN_NAME=:loginName
+		       				#end
+		       				#if($loginNameForLike)
+		       					and LOGIN_NAME like :loginNameForLike
+		       				#end
+
+		       			
+		       				#if($loginEmail)
+		       					and LOGIN_EMAIL=:loginEmail
+		       				#end
+
+		       			
+		       				#if($loginMobile)
+		       					and LOGIN_MOBILE=:loginMobile
+		       				#end
+
+		       			
+		       				#if($password)
+		       					and PASSWORD=:password
+		       				#end
+
+		       			
+		       				#if($thirdPartyIdentify)
+		       					and THIRD_PARTY_IDENTIFY=:thirdPartyIdentify
+		       				#end
+
+		       			
+		       				#if($source)
+		       					and SOURCE=:source
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Member.updateMemberIsAddGroup" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER 
+		       		set isaddgroup =:state 
+		       		where id in (
+		       		#foreach($id in $memberIds)
+					$id,
+					#end
+					-1
+					)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="Member.findMemberByLoginEmail" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2 and upper(login_email) =:loginEmail
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+			<bean id="Member.findMemberByLoginNameAndPasswd" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2 and login_name =:loginName and password =:password
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+			<bean id="Member.findMemberByLoginName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2 and upper(login_name) =:loginName
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+			<bean id="Member.findMemberById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2 and id =:id
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+			<bean id="Member.findMemberByLoginMobile" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2 and login_mobile =:loginMobile
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Member.findThirdMemberByUidAndSource" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER 
+		       			 where lifecycle !=2 
+		       			 	and third_party_identify =:thirdPartyIdentify
+		       			 	and source =:source 
+		       			 	and type =:type
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Member.findMemberEffectiveMemberIdByGroupId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据分类id 查询分类下面正在启用的会员</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		
+				SELECT * FROM T_MEM_MEMBER WHERE id IN(
+						SELECT member_id FROM t_mem_member_group_relation WHERE  
+						group_id IN (
+						  #foreach($groupId in $groupIds)
+						  $groupId,
+						  #end
+						  '-1'
+						)  
+					  )
+				and LIFECYCLE='1'
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Member.findEffectMemberIdListByGroupIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据分组ID列表查询有效的会员ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		
+				SELECT id 
+				FROM T_MEM_MEMBER 
+				WHERE id IN(
+						SELECT member_id FROM t_mem_member_group_relation WHERE  
+						group_id IN (
+						  #foreach($groupId in $groupIds)
+						  $groupId,
+						  #end
+						  '-1'
+						)  
+					  )
+				and LIFECYCLE != 2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Member.findAllEffectMemberIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效会员ID列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						id
+					FROM
+						t_mem_member
+					WHERE
+						lifecycle != 2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Member.findSimpleMemberComboListByIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表，查询会员的简单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						id, login_name AS name
+					FROM
+						t_mem_member
+					WHERE
+						lifecycle != 2
+					AND id IN (
+					#foreach($id in $ids)
+						$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="Member.findMemberIdsByComsumeeAmtPromotionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 生日当月消费净额3000元及以上生日礼遇在会员生日当月只可享1次会员ID列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT DISTINCT mem.id as id from
+					(
+						select 
+							a.*,
+							pm.promotion_no
+						from t_mem_member a INNER JOIN
+										t_mem_personal_data b on a."id" = b."id"
+										INNER JOIN t_so_salesorder as ss on a.id = ss.member_id
+										LEFT JOIN t_so_orderpromotion pm on ss.id = pm.order_id
+						WHERE extract(MONTH from now()) = extract(MONTH from b.birthday)
+					) as mem INNER JOIN
+					(
+						select ss.member_id,
+											SUM(ss.total) as total
+											from 
+											t_so_salesorder as ss INNER JOIN t_so_orderline as so
+											on ss.id = so.order_id and ss.shop_id =:shopId
+											where (ss.logistics_status != 9 and ss.logistics_status != 10)
+						GROUP BY ss.Member_id
+					) as tt on mem.id = tt.member_id and tt.total >:amt and (mem.promotion_no is NULL or mem.promotion_no !=:prmId)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

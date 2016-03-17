@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/jqplot/jquery.jqplot.min.css" />
+<style>
+.jqstooltip, .jqstooltip div {
+    box-sizing: content-box;
+}
+</style>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<!-- jqplot -->
+<script type="text/javascript" src="../scripts/jquery/jqplot/jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqplot/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqplot/plugins/jqplot.barRenderer.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqplot/plugins/jqplot.json2.min.js"></script>
+
+<!-- flot -->
+<script type="text/javascript" src="../scripts/jquery/flot/jquery.flot.min.js"></script>
+
+<!-- sparkline -->
+<script type="text/javascript" src="../scripts/jquery/sparkline/jquery.sparkline.min.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+Salesrev = {
+    factors: [500,300,100,20,20,10,20,80,80,300,800,600,500,400,600,300,500,500,600,900,1200,1000,800,600],
+    range: 20,
+    axis: [],
+    val:[],
+    cd: null,
+    _getVal: function(t){
+        return Math.round(Math.random()* this.factors[t]);
+    },
+    load: function(){
+        this.axis = [], this.val = [];
+        var d = new Date();
+        this.cd = d;
+        d.setTime(d.getTime()-3600000*this.range);
+        for(var i=0; i<this.range; i++){
+            this.axis.push(d.getDay() + "-" + d.getHours());
+            this.val.push(this._getVal(d.getHours()));
+            d.setTime(d.getTime()+3600000);
+        }
+    },
+    push: function(){
+        this.cd.setTime(this.cd.getTime()+3600000);
+        this.axis.shift();
+        this.axis.push(this.cd.getDay() + "-" + this.cd.getHours());
+        this.val.shift();
+        this.val.push(this._getVal(this.cd.getHours()));
+    },
+
+    value: function(){
+        var data=[];
+        for(var i=0; i< this.val.length; i++)
+            data.push(this.val[i]);
+        return data;
+    },
+
+    getdata: function(){
+        var data = [];
+        for(var i=0; i< this.val.length; i++)
+            data.push([i+1, this.val[i]]);
+        return data;
+    }
+}
+
+$j(document).ready(function(){
+	$j("#recentOrders").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#recentOrders").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+	
+	
+	$j("#recentKeywords").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#recentKeywords").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+	
+	$j("#recentPopKeywords").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#recentPopKeywords").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+	
+	
+	$j("#hotproduct").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#hotproduct").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+	
+	$j("#moreproduct").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#moreproduct").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+	
+	$j("#newmemeber").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#newmemeber").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+	
+	$j("#oldmemeber").loxiasimpletable({
+	cols:[{name:"cust",label:"客户",width:"50%"},{name:"qty",label:"件数",width:"20%"},{name:"amt",label:"金额",width:"30%", align:"right"}]
+	});
+	$j("#oldmemeber").loxiasimpletable("refresh",[{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"},
+	{cust:"小小",qty:1,amt:"￥100.00"}]);
+    for(var i=2; i<=5; i++){
+        Salesrev.load();
+
+        $j("#chart"+i).sparkline(Salesrev.value(), {
+            type: 'bar',
+            width: 160,
+            height: 40,
+            barColor: i%2 == 0? '#db8973':'#72a5e4',
+            barWidth: 6
+        });
+    }
+
+    Salesrev.load();
+    var plot = $j.plot("#chart1", [ Salesrev.getdata() ], {
+        series: {
+            shadowSize: 0,
+            lines: {show:true, fill: true},
+            points: {show:true}
+        },
+        yaxis: {
+            min: 0,
+            max: 1200
+        },
+        xaxis: {
+            //show: false
+        }
+    });
+
+    function update() {
+        Salesrev.push();
+        plot.setData([Salesrev.getdata()]);
+
+        // Since the axes don't change, we don't need to call plot.setupGrid()
+        plot.draw();
+        setTimeout(update, 2000);
+    }
+
+    update();
+    //jqplot
+//    Salesrev.load();
+//    var plot = $j.jqplot('chart1',[Salesrev.val], {
+//        seriesDefaults:{
+//            renderer:$j.jqplot.BarRenderer
+//        },
+//        axes: {
+//            xaxis: {
+//                renderer: $j.jqplot.CategoryAxisRenderer,
+//                ticks: Salesrev.axis
+//            },
+//            yaxis: {
+//                min: 0,
+//                max: 1200
+//            }
+//        }
+//    });
+
+//    setInterval(function(){
+//        Salesrev.push();
+//        plot.axes.xaxis.ticks = Salesrev.axis;
+//        for ( var i = 0; i < plot.series[0].data.length; i++) {
+//            try {
+//                plot.series[0].data[i][1] = Salesrev.val[i];
+//            } catch (e) {
+//            }
+//        }
+//        plot.replot({
+//            resetAxes : false
+//        });
+//    },5000);
+
+});
+</script>
+<script type="text/javascript" src="../scripts/main.js"></script>
+</head>
+
+<body>
+<div class="dashboard">
+	 <!--dashboard-left-->
+	 <div class="dashboard-left">
+          <div class="ui-title1">
+          	   <img src="../images/wmi/blacks/32x32/cur_yen.png">累计订单金额
+          </div>
+          <div class="dash-center">￥100.00</div>
+
+          <div class="ui-title1"><img src="../images/wmi/blacks/32x32/cur_yen.png">平均订单金额</div>
+          <div class="dash-center">￥100.00 </div>
+     	  
+
+          <div class="ui-title1"><img src="../images/wmi/blacks/32x32/notepad_2.png">最近3个订单</div>
+          <div id="recentOrders" class="border-grey"></div>
+          
+          <div class="ui-title1"><img src="../images/wmi/blacks/32x32/text_letter_t.png">最近3个搜索关键字</div>
+          <div id="recentKeywords" class="border-grey"></div>
+              
+          <div class="ui-title1"><img src="../images/wmi/blacks/32x32/text_letter_t.png">最热门3个搜索关键字</div>
+          <div id="recentPopKeywords" class="border-grey"></div>
+     	  
+     </div>
+     <!--dashboard-left-end-->
+     
+     <!--dashboard-right-->
+
+     <div class="dashboard-right">
+          <!--ui-tag-change-->
+          <div class="ui-tag-change">
+               <ul class="tag-change-ul">
+                   <li>订单</li>
+                   <li>金额</li>
+               </ul>
+              
+               <div class="tag-change-content">
+                    <div class="tag-change-in block center">
+                        <div id="chart1" style="height:300px; width: 100%;"></div>
+                         <dl class="price-cate-num">
+                             <dd>
+                                 <p><div id="chart2" style="height:50px; width: 100%;"></div></p>
+                                 利润
+                             </dd>
+
+                             <dd>
+                                 <p><div id="chart3" style="height:50px; width: 100%;"></div></p>
+                                 利润
+                             </dd>
+
+                             <dd>
+                                 <p><div id="chart4" style="height:50px; width: 100%;"></div></p>
+                                 利润
+                             </dd>
+
+                             <dd>
+                                 <p><div id="chart5" style="height:50px; width: 100%;"></div></p>
+                                 利润
+                             </dd>
+                         </dl>
+                    </div>
+                   
+                    <div class="tag-change-in center font20">
+                         ￥1234.00
+                    </div>
+               </div>
+          </div>
+          <!--ui-tag-change-end-->
+          
+          <!--ui-tag-change-->
+          <div class="ui-tag-change">
+                  <ul class="tag-change-ul">
+                      <li>畅销商品</li>
+                      <li>最多查看商品</li>
+                      <li>新客户</li>
+                      <li>客户</li>
+                  </ul>
+                  
+                  <div class="tag-change-content">
+                       <div id="hotproduct" class="tag-change-in border-grey"></div>
+                      
+                       <div id="moreproduct" class="tag-change-in border-grey"></div>
+                      
+                       <div id="newmemeber" class="tag-change-in border-grey"></div>
+                      
+                       <div id="oldmemeber" class="tag-change-in border-grey"></div>
+          		</div>
+          </div>
+          <!--ui-tag-change-end-->
+      </div>
+      <!--dashboard-right-end-->
+</div>
+</body>
+</html>

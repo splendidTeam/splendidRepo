@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE></TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../css/main.css" type="text/css">
+	<link rel="stylesheet" href="../css/demo.css" type="text/css">
+
+	<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+	<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+	<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+	<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+	<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+	<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+	<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+	<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+	<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+	<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+	
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+	<SCRIPT type="text/javascript">
+	var $j = jQuery.noConflict();
+		
+	var key;
+	var log, className = "dark";
+	var lastValue = "", nodeList = [], fontCss = {};
+	var setting = {
+			
+			check: {
+				enable: false
+			},
+			view: {
+				showIcon:false,
+				fontCss: getFontCss
+			},
+			edit: {
+				enable: false,
+				showRenameBtn: false
+			},
+			data: {
+				keep: {
+					parent:false,
+					leaf:false
+				},
+				key: {
+					title: "name"
+				},
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: onClick,
+				beforeRemove: beforeRemove,
+				onRemove: onRemove,
+			}
+		};
+
+		var zNodes =[
+		           	{id:19, pId:0, name: "ROOT",open:true},
+            		{id:20, pId:19, name: "电脑",open:true},
+            		{id:21, pId:20, name: "电脑整机",open:false},
+            	{id:22, pId:21, name: "笔记本",open:false},
+            	{id:23, pId:21, name: "平板电脑配件",open:false},
+            	{id:24, pId:21, name: "笔记本配件",open:false},
+            	{id:25, pId:20, name: "电脑外设",open:false},
+                {id:26, pId:20, name: "网络产品",open:false},
+            	{id:27, pId:25, name: "键盘",open:false},
+            	{id:28, pId:25, name: "摄像头",open:false},
+            	{id:29, pId:25, name: "线缆",open:false},
+            	{id:30, pId:25, name: "耳机",open:false},
+            	{id:31, pId:26, name: "网络设备",open:false},
+            	{id:32, pId:26, name: "路由器",open:false},
+            	{id:33, pId:26, name: "网卡",open:false},
+            	{id:34, pId:26, name: "网络存储",open:false},
+            	{id:35, pId:19, name: "家电",open:true},
+            	{id:36, pId:19, name: "汽车",open:true},
+            	{id:37, pId:35, name: "厨房电器",open:false},
+            	{id:38, pId:35, name: "个人护理",open:false},
+            	{id:39, pId:35, name: "生活电器",open:false},
+            	{id:40, pId:35, name: "视听影音",open:false},
+            	{id:46, pId:37, name: "榨汁机",open:false},
+            	{id:47, pId:37, name: "搅拌机",open:false},
+            	{id:48, pId:37, name: "空炸机",open:false},
+            	{id:49, pId:37, name: "咖啡机",open:false},
+            	{id:50, pId:37, name: "电饭煲",open:false},
+            	{id:51, pId:37, name: "电压力煲",open:false},
+            	{id:52, pId:37, name: "其他",open:false},
+            	{id:53, pId:38, name: "个人护理",open:false},
+            	{id:54, pId:38, name: "剃须刀",open:false}
+            		,
+            	{id:55, pId:38, name: "电动牙刷",open:false}
+            		,
+            	{id:56, pId:38, name: "电吹风",open:false}
+            		,
+            	{id:57, pId:38, name: "脱/剃毛器",open:false}
+            		,
+            	{id:58, pId:39, name: "生活电器",open:false}
+            		,
+            	{id:59, pId:39, name: "吸尘器",open:false}
+            		,
+            	{id:60, pId:39, name: "电熨斗",open:false}
+            		,
+            	{id:61, pId:39, name: "挂烫机",open:false}
+            		,
+            	{id:62, pId:39, name: "空气净化器",open:false}
+            		,
+            	{id:63, pId:39, name: "其他",open:false}
+            		,
+            	{id:64, pId:40, name: "视听数码",open:false}
+            		,
+            	{id:65, pId:40, name: "液晶电视",open:false}
+            		,
+            	{id:66, pId:40, name: "音响",open:false}
+            		,
+            	{id:67, pId:40, name: "iphone等苹果音乐底座",open:false}
+            		,
+            	{id:68, pId:40, name: "数码配件",open:false}
+            		,
+            	{id:69, pId:36, name: "汽车用品",open:false}
+            		,
+            	{id:70, pId:36, name: "汽车美容",open:false}
+            		,
+            	{id:71, pId:69, name: "汽车用品",open:false}
+            		,
+            	{id:72, pId:69, name: "车用香水",open:false}
+            		,
+            	{id:73, pId:69, name: "车用头枕",open:false}
+            		,
+            	{id:74, pId:69, name: "车用腰枕",open:false}
+            		,
+            	{id:75, pId:69, name: "小套饰",open:false}
+            		,
+            	{id:76, pId:69, name: "方向盘套",open:false}
+            		,
+            	{id:77, pId:69, name: "汽车座垫",open:false}
+            		,
+            	{id:78, pId:69, name: "儿童安全座椅",open:false}
+            		,
+            	{id:79, pId:69, name: "通用座套",open:false}
+            		,
+            	{id:80, pId:69, name: "其他",open:false}
+            		,
+            	{id:82, pId:70, name: "其他",open:false}
+
+		];
+		
+		
+		
+		function beforeRemove(treeId, treeNode,e) {
+			className = (className === "dark" ? "":"dark");	
+			if(confirm("确认删除 节点 -- " + treeNode.name + " 吗？"))
+	   		{
+	    		removeNode(treeNode,null);
+	   		}
+		}
+		
+		
+		function onRemove(e, treeId, treeNode) {
+		}
+		function onClick(event, treeId, treeNode)  {
+			 //alert(treeNode.id + ", " + treeNode.name);
+				$j("#tree_fid").val(treeNode.name);
+				$j("#tree_state").val(treeNode.state);
+				$j("#tree_sort").val(treeNode.sort);
+				$j("#tree_fid").attr("treeId",treeId);
+				$j("#tree_fid").data("treeNode",treeNode);
+				$j("#tree_fid").data("event",event);
+		}
+		function focusKey(e) {
+			if (key.hasClass("empty")) {
+				key.removeClass("empty");
+			}
+		}
+		function blurKey(e) {
+			if (key.get(0).value === "") {
+				key.addClass("empty");
+			}
+		}
+		
+		
+		function searchNode(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			var value = $j.trim(key.get(0).value);
+				
+				if (key.hasClass("empty")) {
+					value = "";
+				}
+				if (lastValue === value) return;
+				lastValue = value;
+				if (value === "") return;
+				updateNodes(false);
+				
+			nodeList = zTree.getNodesByParamFuzzy("name", value);
+
+			if (nodeList.length > 0) {
+			$j.each(nodeList, function(i, node){      
+         		 zTree.expandNode(node.getParentNode(),true, true, true);
+　　			}); 
+			}
+			updateNodes(true);
+			$j("#key").focus();
+		}
+		function updateNodes(highlight) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			for( var i=0, l=nodeList.length; i<l; i++) {
+				nodeList[i].highlight = highlight;
+				zTree.updateNode(nodeList[i]);
+			}
+		}
+		function getFontCss(treeId, treeNode) {
+			return (!!treeNode.highlight) ? {color:"#333","background-color":"yellow"} : {color:"#333", "font-weight":"normal","background-color":""};		
+		}
+	
+
+		$j(document).ready(function(){
+            loxia.init({
+                debug : true,
+                region : 'zh-CN'
+            });
+            nps.init();
+
+			$j.fn.zTree.init($j("#tree"), setting, zNodes);
+			key = $j("#key");
+			key.bind("focus", focusKey)
+			.bind("blur", blurKey)
+			.bind("propertychange", searchNode)
+			.bind("input", searchNode);
+			$j("#addParent").bind("click", {isParent:true}, addRoot);
+			$j("#addLeaf").bind("click", {isParent:false}, add);
+			
+			
+			
+
+			
+			//保存分类修改
+			$j(".button.orange.persist").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+				var sortNode ;
+				if (nodes.length>0) {
+					nodes[0].name = $j("#tree_fid").val();
+					nodes[0].state = $j("#tree_state").val();
+					if(nodes[0].sort == $j("#tree_sort").val()){
+						sortNode = 0;
+					}else{
+						nodes[0].sort = $j("#tree_sort").val()
+						sortNode = 1;
+					}
+					zTree.updateNode(nodes[0]);
+					if(sortNode==1){
+						var nlist ;
+						if(nodes[0].getParentNode()==null){
+							nlist = zTree.getNodesByParam("root", "true", null);
+						}else{
+							nlist = nodes[0].getParentNode().children;
+						}
+						for( var i=0; i<nlist.length; i++) {
+							if(parseInt(nodes[0].sort)<parseInt(nlist[i].sort)){
+								zTree.moveNode(nlist[i],nodes[0] , "prev");
+								break;
+							}
+							if(i==nlist.length-1){
+								zTree.moveNode(nlist[i],nodes[0], "next");
+							}
+						}	
+					}
+				}
+				//$j(".curSelectedNode span:eq(1)").html($j("#tree_fid").val());
+			});
+			
+			//删除所选的分类
+			$j(".button.orange.delete").click(function(){
+				var treeObj = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = treeObj.getSelectedNodes();
+				if(nodes.length == 0){
+					nps.info(nps.i18n("USER_FORM_CHECK_ERROR"),"请先选择要删除的分类");
+				}else{
+					nps.confirm("确定删除","确定要删除选中的分类吗？",function(){
+						if (nodes && nodes.length>0  && nodes[0].id!=0) {
+							treeObj.removeNode(nodes[0]);
+						}
+					});
+				}
+				
+			});
+
+
+		});
+		
+		
+		var newCount = 1;
+		function addRoot(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode&& treeNode.getParentNode()!=null) {
+				treeNode=treeNode.getParentNode();
+				treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:false, name:$j("#add_name").val()});
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:false, name:$j("#add_name").val()});
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+		
+		function add(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode) {
+				treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:isParent, name:$j("#add_name").val()});
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:isParent, name:$j("#add_name").val()});
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+	
+		
+	</SCRIPT>
+</HEAD>
+
+<BODY>
+<div class="content-box width-percent100">
+    <div class="ui-title1"><img src="../images/wmi/blacks/32x32/tag.png">商品分类管理</div>
+    <div class="ui-block ui-block-fleft w240">
+        <div class="ui-block-content ui-block-content-lb">
+            <div class="tree-control">
+                <input type="text" id="key" loxiatype="input" placeholder="输入关键字快速定位" />
+            </div>
+            <ul id="tree" class="ztree"></ul>
+
+        </div>
+    </div>
+    
+    <div class="ui-block ml240" style="padding-left: 10px;">
+        <div class="ui-block-title1">编辑分类</div>
+        <div class="ui-block-content border-grey" style="margin-bottom: 10px;">
+            <div class="ui-block-line">
+                <label>商品分类编码</label>
+                <div>
+                    <input type="text" id="tree_sort" loxiatype="input" mandatory="true"/>
+                </div>
+            </div>
+            <div class="ui-block-line">
+                <label>商品分类名称</label>
+                <div>
+                    <input type="text" id="tree_fid" loxiatype="input" mandatory="true"/>
+                </div>
+            </div>
+            <div class="button-line1">
+            <a href="javascript:void(0);" class="func-button persist" title="保存"><span>保存</span></a>
+            <a href="javascript:void(0);" class="func-button delete" title="删除"><span>删除</span></a>
+            </div>
+        </div>
+        <div class="ui-block-title1">添加新分类</div>
+        <div class="ui-block-content border-grey">
+            <div class="ui-block-line">
+                <label>商品分类编码</label>
+                <div>
+                    <input type="text" loxiatype="input" mandatory="true" placeholder="分类编码"/>
+                </div>
+            </div>
+            <div class="ui-block-line">
+                <label>商品分类名称</label>
+                <div>
+                    <input type="text" id="add_name" loxiatype="input" mandatory="true" placeholder="分类名称"/>
+                </div>
+            </div>
+            <div class="button-line1">
+                <a id="addParent" href="javascript:void(0);" class="func-button insert" title="插入同级分类"><span>插入同级分类</span></a>
+                <a id="addLeaf" href="javascript:void(0);" class="func-button insertLeaf" title="添加子分类"><span>添加子分类</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+  
+</HTML>

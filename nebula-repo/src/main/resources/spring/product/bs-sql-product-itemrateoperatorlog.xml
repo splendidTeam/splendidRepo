@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemRateOperatorLog.findAllItemRateOperatorLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRateOperatorLog.findItemRateOperatorLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemRateOperatorLog.findItemRateOperatorLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($rateId)
+		       					and RATE_ID=:rateId
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($note)
+		       					and NOTE=:note
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME >= :operatorTimeStart
+		       				#end
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME <= :operatorTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRateOperatorLog.findItemRateOperatorLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($rateId)
+		       					and RATE_ID=:rateId
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($note)
+		       					and NOTE=:note
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME >= :operatorTimeStart
+		       				#end
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME <= :operatorTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemRateOperatorLog.enableOrDisableItemRateOperatorLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_RATE_OPERATOR_LOG
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemRateOperatorLog.removeItemRateOperatorLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_RATE_OPERATOR_LOG
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemRateOperatorLog.findAllEffectItemRateOperatorLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ItemRateOperatorLog.findEffectItemRateOperatorLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG where lifecycle=1
+		       		
+					
+		       			
+		       				#if($rateId)
+		       					and RATE_ID=:rateId
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($note)
+		       					and NOTE=:note
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME >= :operatorTimeStart
+		       				#end
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME <= :operatorTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRateOperatorLog.findEffectItemRateOperatorLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE_OPERATOR_LOG where lifecycle=1
+		       		
+					
+		       			
+		       				#if($rateId)
+		       					and RATE_ID=:rateId
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($note)
+		       					and NOTE=:note
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME >= :operatorTimeStart
+		       				#end
+		       				#if($operatorTime)
+		       					and OPERATOR_TIME <= :operatorTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

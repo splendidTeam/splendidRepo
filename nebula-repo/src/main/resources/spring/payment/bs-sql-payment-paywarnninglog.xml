@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PayWarnningLog.findAllPayWarnningLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PayWarnningLog.findPayWarnningLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PayWarnningLog.findPayWarnningLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog where 
+		       			    1 = 1
+		       			    
+		       				#if($orderCode)
+		       					and ORDERCODE=:orderCode
+		       				#end
+
+		       			
+		       				#if($thirPayNo)
+		       					and THIRPAYNO=:thirPayNo
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($paystate_shop)
+		       					and PAYSTATE_SHOP=:paystate_shop
+		       				#end
+
+		       			
+		       				#if($paystate_payment)
+		       					and PAYSTATE_PAYMENT=:paystate_payment
+		       				#end
+
+		       			
+		       				#if($isSupportQuery)
+		       					and ISSUPPORTQUERY=:isSupportQuery
+		       				#end
+
+		       			
+		       				#if($result)
+		       					and RESULT=:result
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PayWarnningLog.findPayWarnningLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($orderCode)
+		       					and ORDERCODE=:orderCode
+		       				#end
+
+		       			
+		       				#if($thirPayNo)
+		       					and THIRPAYNO=:thirPayNo
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($paystate_shop)
+		       					and PAYSTATE_SHOP=:paystate_shop
+		       				#end
+
+		       			
+		       				#if($paystate_payment)
+		       					and PAYSTATE_PAYMENT=:paystate_payment
+		       				#end
+
+		       			
+		       				#if($isSupportQuery)
+		       					and ISSUPPORTQUERY=:isSupportQuery
+		       				#end
+
+		       			
+		       				#if($result)
+		       					and RESULT=:result
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PayWarnningLog.enableOrDisablePayWarnningLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_so_payWarnningLog
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayWarnningLog.removePayWarnningLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_so_payWarnningLog
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayWarnningLog.findAllEffectPayWarnningLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="PayWarnningLog.findEffectPayWarnningLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog where lifecycle=1
+		       		
+					
+		       			
+		       				#if($orderCode)
+		       					and ORDERCODE=:orderCode
+		       				#end
+
+		       			
+		       				#if($thirPayNo)
+		       					and THIRPAYNO=:thirPayNo
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($paystate_shop)
+		       					and PAYSTATE_SHOP=:paystate_shop
+		       				#end
+
+		       			
+		       				#if($paystate_payment)
+		       					and PAYSTATE_PAYMENT=:paystate_payment
+		       				#end
+
+		       			
+		       				#if($isSupportQuery)
+		       					and ISSUPPORTQUERY=:isSupportQuery
+		       				#end
+
+		       			
+		       				#if($result)
+		       					and RESULT=:result
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PayWarnningLog.findEffectPayWarnningLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_so_payWarnningLog where lifecycle=1
+		       		
+					
+		       			
+		       				#if($orderCode)
+		       					and ORDERCODE=:orderCode
+		       				#end
+
+		       			
+		       				#if($thirPayNo)
+		       					and THIRPAYNO=:thirPayNo
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($paystate_shop)
+		       					and PAYSTATE_SHOP=:paystate_shop
+		       				#end
+
+		       			
+		       				#if($paystate_payment)
+		       					and PAYSTATE_PAYMENT=:paystate_payment
+		       				#end
+
+		       			
+		       				#if($isSupportQuery)
+		       					and ISSUPPORTQUERY=:isSupportQuery
+		       				#end
+
+		       			
+		       				#if($result)
+		       					and RESULT=:result
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

@@ -1,0 +1,854 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Item.findItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询Item</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE id= :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Item.findItemCommandByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据code查询ItemCommand</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.lifecycle as lifecycle,
+						tpifo.title as title,
+						tpifo.style as style,
+						tpifo.description as description
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid
+						
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.LIFECYCLE!=2
+						and tpit.code=:itemCode
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>商品管理</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.* from (
+						select 
+							tpi.id as id,
+							tpi.code as code,
+							tpi.create_time as createTime,
+							tpi.list_time as listTime,
+							tpi.modify_time as modifyTime,
+							tpi.version,tpid.name as industryName, 
+							'' as categoryName,
+							tpi.lifecycle as lifecycle,
+							tpifo.title as title,
+							tpifo.active_begin_time as activeBeginTime,
+							tpifo.type,
+							coalesce(image.imageCount,0) as imageCount
+						from t_pd_item tpi left join (select item_id, count(*) as imageCount from t_pd_item_image GROUP BY item_id) image on tpi.id = image.item_id,
+						    t_pd_iteminfo tpifo,
+							t_pd_industry tpid 
+							#if($categoryId)
+								,t_pd_item_category tpic 
+							#end
+						where tpi.id=tpifo.item_id 
+							and tpid.id=tpi.industry_id
+							and tpi.shop_id =:shopId
+							and tpi.LIFECYCLE!=2
+							
+							#if($code)
+		       					and tpi.code like :code
+		       				#end
+							
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpi.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpi.industry_id=:industryId
+		       				#end
+							
+							#if($createStartDate)
+		       					and tpi.create_time >= :createStartDate
+		       				#end
+		       				
+		       				#if($createEndDate)
+		       					and tpi.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpi.list_time >= :listStartDate
+		       				#end
+		       				
+		       				#if($listEndDate)
+		       					and tpi.list_time <= :listEndDate
+		       				#end
+		       				
+		       				#if($modifyTimeStart)
+		       					and tpi.modify_time >= :modifyTimeStart
+		       				#end
+		       				
+		       				#if($modifyTimeEnd)
+		       					and tpi.modify_time <= :modifyTimeEnd
+		       				#end
+
+		       				#if($type == 1)
+		       					and (tpifo.type = 1 or tpifo.type is null)
+		       				#end
+
+		       				#if($type == 0)
+		       					and tpifo.type = 0
+		       				#end
+
+		       				#if($categoryId)
+		       					and tpi.id = tpic.item_id 
+		       					and tpic.category_id = :categoryId
+		       				#end
+		       		) tpit where 1=1
+		       		#if($imgCount == 1)
+		       			and tpit.imageCount > 0 
+		       		#end
+		       		#if($imgCount == 0)
+		       			and tpit.imageCount = 0 
+		       		#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+
+	
+	
+	<bean id="Item.findEffectItemInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>商品管理</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code as code, 
+						tpi.list_time as listTime,
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.item_id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.style as style
+					from t_pd_item tpi, t_pd_iteminfo tpii
+					#if($categoryCode)
+						, t_pd_item_category tpic, t_pd_category tpc
+					#end
+					where tpi.id=tpii.item_id  
+					and tpi.LIFECYCLE!=2
+					#if($code)
+						and tpi.code like :code
+					#end
+					#if($title)
+						and tpii.title like :title
+					#end
+					#if($categoryCode)
+						and tpic.item_id = tpi.id
+						and tpic.category_id = tpc.id
+						and tpc.code = :categoryCode
+					#end
+						
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="Item.enableOrDisableItemByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用或禁用店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+				#if($state == 1)
+					update t_pd_item
+		       		set lifecycle=:state
+		       		#if($updateListTimeFlag == 'false')
+		       			,list_time=(CASE WHEN list_time is NULL THEN now() ELSE list_time END)
+		       		#else
+		       			,list_time = now()
+		       		#end
+		       		 where 
+		       		id in (
+		       		#foreach($id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+				#else
+					update t_pd_item
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach($id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+    	<bean id="Item.removeItemByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>(逻辑删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_item
+		       		set lifecycle=2
+		       		where id in (
+		       			#foreach( $id in $ids )
+    					$id,
+						#end
+						-1
+		       		) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="Item.findItemListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId数组查询Item</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE id IN(
+					#foreach($id in $itemIds)
+					$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="Item.findItemListByIdsWithLimitCount" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId数组查询Item</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE id IN(
+					#foreach($id in $itemIds)
+					$id,
+					#end
+					-1
+					) limit :limitCount
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemListByShopIdAndIndustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据industryId,shopId数组查询Item</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE industry_id = :industryId and shop_id =:shopId and lifecycle!=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemListByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shopId查询Item</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE shop_id =:shopId and lifecycle!=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.updateItemIsAddCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemIds,更新是否加入分类状态为state</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_item 
+		       		set isaddcategory=:state
+		       		where 
+		       		id in (
+		       		#foreach($id in $itemIds)
+					$id,
+					#end
+					-1
+					)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.updateItemIsAddTag" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemIds,更新是否加入标签状态为state</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_item 
+		       		set isaddtag=:state
+		       		where 
+		       		id in (
+		       		#foreach($id in $itemIds)
+					$id,
+					#end
+					-1
+					)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.validateItemCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询是否有相同的code</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select count(*) as CNT from t_pd_item where code = :code and shop_id =:shopId and lifecycle!=2
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemBaseInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品Id查询商品基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code as code, 
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					where tpi.id = :itemId
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemBaseInfoLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品Id查询商品基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code as code, 
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpiil.title as title,
+						tpiil.sub_title as subTitle,
+						tpiil.sketch as sketch,
+						tpiil.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpiil.seoDescription as seoDescription,
+						tpiil.seoKeywords as seoKeywords,
+						tpiil.seoTitle as seoTitle,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					left join t_pd_iteminfo_lang tpiil on tpiil.item_info_id = tpii.id 
+					where tpi.id = :itemId and tpiil.lang = :lang
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemBaseInfoByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品code查询商品基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code as code, 
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					where tpi.code = :code and tpi.lifecycle!=2
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemBaseInfoByCodeLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品code查询商品基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code as code, 
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpiil.title as title,
+						tpiil.sub_title as subTitle,
+						tpiil.sketch as sketch,
+						tpiil.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpiil.seoDescription as seoDescription,
+						tpiil.seoKeywords as seoKeywords,
+						tpiil.seoTitle as seoTitle,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					left join t_pd_iteminfo_lang tpiil on tpiil.item_info_id = tpii.id 
+					where tpi.code = :code and tpiil.lang = :lang
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemByShopIDItemID" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过店铺Id和商品Id查询商品基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code as code, 
+						tpi.list_time as listTime,
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.item_id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					where tpi.shop_id =:shopId and tpi.id = :itemId and tpi.lifecycle!=2 
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemListByCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品Code查询商品集合</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_pd_item where lifecycle != 2
+					#if($shopId)
+						and shop_id = :shopId
+					#end 
+					and code in (
+						#foreach($itemCode in $itemCodes)
+							'$itemCode',
+						#end
+						'-1')
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemCommandListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId集合查询ItemCommand集合</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpi.code as code, 
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpi.id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi ,t_pd_iteminfo tpii
+					where tpi.id = tpii.item_id 
+						and tpi.id in(
+							#foreach($id in $itemIds)
+								$id,
+							#end
+							-1
+						)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemCommandByStyle" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId集合查询ItemCommand集合</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpi.code as code, 
+						tpi.list_time as listTime,
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.item_id as id, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.style as style,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					where tpii.style = :style and tpi.lifecycle!=2
+					order by tpi.create_time 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Item.findItemCommandByStyleI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId集合查询ItemCommand集合</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpi.code as code, 
+						tpi.list_time as listTime,
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.item_id as id, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.style as style,
+						tpii.active_begin_time as activeBeginTime
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					left join t_pd_iteminfo_lang tpiil on tpiil.item_info_id = tpii.id 
+					where tpii.style = :style and tpi.lifecycle!=2
+					and tpiil.lang =:lang 
+					order by tpi.create_time 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Item.findItemCommandById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询ItemCommand</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpi.code as code, 
+						tpi.list_time as listTime,
+						tpi.industry_id as industryId,
+						tpi.pic_url as picUrl,
+						tpi.isaddcategory as isaddcategory,
+						tpi.isaddtag as isaddtag,
+						tpi.lifecycle as lifecycle,
+						tpii.item_id as id, 
+						tpii.item_id as itemId, 
+						tpii.language as language,
+						tpii.title as title,
+						tpii.sub_title as subTitle,
+						tpii.sketch as sketch,
+						tpii.description as description,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpii.type as type,
+						tpii.seoDescription as seoDescription,
+						tpii.seoKeywords as seoKeywords,
+						tpii.seoTitle as seoTitle,
+						tpii.style as style
+					from t_pd_item tpi 
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
+					where tpi.id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findAllOnSalesItemList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取有效的Item列表 lifecycle =1</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tpi.*
+					from t_pd_item tpi, t_pd_iteminfo tpii 
+					where tpi.id = tpii.item_id and tpi.lifecycle != 2
+					order by id 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findAllDeletedItemList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取无效的Item列表 lifecycle !=1</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * from t_pd_item where lifecycle != 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findEffectiveItemList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取有效的Item列表 lifecycle !=2</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * from t_pd_item where lifecycle != 2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemCommandByCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemCodes查询item </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tpi.code,
+						tpi.id as id,
+						tpii.title as title,
+						tpii.sale_price as salePrice,
+						tpii.list_price as listPrice,
+						tpi.list_time as listTime
+					from t_pd_item tpi, t_pd_iteminfo tpii
+					where tpi.id = tpii.item_id and tpi.lifecycle != 2
+					and tpi.code in (
+						#foreach($itemCode in $itemCodes)
+							'$itemCode',
+						#end
+						'-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findInventoryByItemList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemCodes查询item 库存 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select f.item_id,sum(b.available_qty) leftInvt
+				from t_pd_sku f ,t_pd_item h,t_pd_sku_inventory b
+				where  f.out_id = b.extention_code and h.shop_id = $shopId and f.lifecycle = 1 and f.item_id = h.id
+					and f.item_id in (#foreach($itemId in $itemIds)
+											'$itemId',
+									   #end
+									  -1)
+				group by f.item_id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemCommandByQueryMapAndItemCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description> </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select
+						item.id as id,
+						item.code as code,
+						item.shop_id as shopId,
+						item.industry_id as industryId,
+						item.create_time as createTime,
+						item.lifecycle as lifecycle,
+						item.list_time as listTime,
+						itemInfo.description as description,
+						itemInfo.list_price as listPrice,
+						itemInfo.sale_price as salePrice,
+						itemInfo.sub_Title as subTitle,
+						itemInfo.style,
+						itemInfo.title,
+						itemInfo.seoTitle,
+						itemInfo.seoDescription,
+						itemInfo.seoKeywords,
+						itemInfo.type,
+						itemInfo.sketch
+					from t_pd_item item left join t_pd_iteminfo itemInfo on itemInfo.item_id = item.id
+					where item.lifecycle != 2
+					
+					#if($shopId)
+						and item.shop_id = :shopId
+					#end
+					
+					#if($industryId)
+						and item.industry_id = :industryId
+					#end
+					
+					and item.code in (
+						#foreach($itemCode in $itemCodeList)
+							'$itemCode',
+						#end
+						'-1')
+					
+					order by item.create_time
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemCommandByQueryMapAndItemCodesI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description> </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select
+						item.id as id,
+						itemInfoLang.item_info_id as itemInfoId,
+						itemInfoLang.lang as lang,
+						itemInfoLang.description,
+						itemInfoLang.seodescription,
+						itemInfoLang.seokeywords,
+						itemInfoLang.seotitle,
+						itemInfoLang.sketch,
+						itemInfoLang.sub_title as subTitle,
+						itemInfoLang.title,
+						item.code
+					from t_pd_item item 
+						left join t_pd_iteminfo itemInfo on itemInfo.item_id = item.id
+						left join t_pd_iteminfo_lang itemInfoLang on itemInfo.id = itemInfoLang.item_info_id
+					where item.lifecycle != 2 and itemInfoLang.lang = :langKey
+					#if($shopId)
+						and item.shop_id = :shopId
+					#end
+					
+					#if($industryId)
+						and item.industry_id = :industryId
+					#end
+					
+					and item.code in (
+						#foreach($itemCode in $itemCodeList)
+							'$itemCode',
+						#end
+						'-1')
+					order by item.create_time
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

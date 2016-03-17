@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="User.findByUserName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过登录名称获取用户</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_user where user_name=:userName and lifecycle=1 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="User.findUserListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过ids查询用户列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_user 
+					where id in (
+		       			#foreach( $id in $ids )
+    					$id,
+						#end
+						-1
+		       		)  
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="User.findUserListByUserNams" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 通过多个用户名称查询用户列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_user 
+					where user_name in (
+		       			#foreach( $un in $userNames )
+    					'$un',
+						#end
+						'-1'
+		       		)  
+		       		and lifecycle=1 
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="User.validByUserName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>验证登录名称</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_user where user_name=:userName and lifecycle=1 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="User.findById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id获取用户</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_user where id=:id 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="User.findUserList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页获取用户列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       		 us.id as id,
+		       		 us.user_name as userName,
+		       		 us.mobile as mobile,
+		       		 us.email as email,
+		       		 us.realname as realName,
+		       		 us.create_time as createTime,
+		       		  us.lifecycle as lifecycle,
+		       		 org.id as orgId,
+		       		 org.name as orgName
+		       		 from t_au_user as us
+		       		 left join t_au_organization as org
+		       		  on org.id=us.ORG_ID 
+		       		 where 1=1 
+		       		 #if($lifecycle)
+		       			and	us.lifecycle = :lifecycle
+		       		#end
+		       		#if($userName)
+		       			and	lower(us.user_name) like lower(:userName)
+		       		#end
+		       		#if($mobile)
+		       			and us.mobile like :mobile
+		       		#end
+		       		#if($email)
+		       			and us.email like :email
+		       		#end
+		       		#if($realName)
+		       			and	lower(us.realname) like lower(:realName)
+		       		#end
+		       		
+		       		#if($orgId)
+		       			and	us.ORG_ID=:orgId
+		       		#end
+		       		#if($startDate)
+		       			and	us.create_time>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	us.create_time<=:endDate
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="User.enableOrDisableUser" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 启用或禁用用户</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_au_user
+		       		set lifecycle=:state
+		       		where id in (
+		       			#foreach( $id in $ids )
+    					$id,
+						#end
+						-1
+		       		) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="User.updateLatestAccessTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新登录时间</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_au_user
+		       		set latest_access_time=now(), latest_update_time=now()
+		       		where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		
+	<bean id="User.modifyPwd" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新密码</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_au_user
+		       		set password=:newPwd, latest_update_time=now()
+		       		where id = :userId and password=:oldPwd
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+		
+</beans>

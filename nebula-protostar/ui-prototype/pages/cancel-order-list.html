@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("id", data)+"'/>";
+}
+
+function drawOrder(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('order-details.html','_blank',null,[0,0]);\">"+loxia.getObject("orderNo", data)+"</a>";
+}
+
+
+
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"orderDate asc", firstPage: true, lastPage: false,
+		items: [
+					{orderNo:"SO20131121000001",memberName:"张三",cancelReason:"重复下单",telephone:"18600000000",orderStatus:"新建",message:"帮忙取消",optionName:"administator",orderDate:"2013/11/21"},
+					{orderNo:"SO20131121000002",memberName:"李四",cancelReason:"质量问题",telephone:"18988888888",orderStatus:"完成",message:"帮忙取消",optionName:"administator",orderDate:"2013/11/20"},
+					{orderNo:"SO20131121000003",memberName:"赵七",cancelReason:"不想购买了",telephone:"13788888888",orderStatus:"新建",message:"帮忙取消",optionName:"administator",orderDate:"2013/11/19"},
+					{orderNo:"SO20131121000004",memberName:"王八",cancelReason:"其他",telephone:"13100000000",orderStatus:"完成",message:"帮忙取消",optionName:"administator",orderDate:"2013/11/18"}
+				]
+		});
+
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+    $j("#table1").on("reload", function(){
+    	$j("td.col-1 a",this).click(function(){
+    		loxia.openPage('order-details.html','aaa',null,[0,0]);
+    	});
+    	
+    	
+    });
+    $j.ui.loxiasimpletable().typepainter.trackingStatus= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span>发货准备中</span>";
+        	}
+        	else if(data==2){
+        		return "<span>在途</span>";
+        	}
+			else if(data==3){
+				return "<span>交易完成</span>";
+        	}
+            
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+    $j.ui.loxiasimpletable().typepainter.faStatus= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span>未付款</span>";
+        	}
+        	else if(data==2){
+        		return "<span>已付款</span>";
+        	}
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+			/* {label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"}, */
+			{name:"orderNo",label:"订单号",width:"20%",sort:"orderNo",template:"drawOrder"},
+			{name:"memberName",label:"会员名称",width:"15%"},
+			{name:"cancelReason",label:"取消原因",width:"15%"},
+			{name:"telephone",label:"联系人电话",width:"10%"},
+			{name:"orderStatus",label:"状态",width:"8%",sort:"orderStatus"},
+			{name:"message",label:"留言",width:"10%"},
+			{name:"optionName",label:"处理人",width:"10%"},
+			{name:"orderDate",label:"订单日期",width:"12%",sort:"orderDate"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"orderDate desc", firstPage: true, lastPage: false,
+			items: [
+					{orderNo:"SO20131121000001",memberName:"张三",cancelReason:"重复下单",telephone:"18600000000",orderStatus:"新建",message:"帮忙取消",optionName:"administator",orderDate:"2013-11-21"},
+					{orderNo:"SO20131121000002",memberName:"李四",cancelReason:"质量问题",telephone:"18988888888",orderStatus:"完成",message:"帮忙取消",optionName:"administator",orderDate:"2013-11-20"},
+					{orderNo:"SO20131121000003",memberName:"赵七",cancelReason:"不想购买了",telephone:"13788888888",orderStatus:"新建",message:"帮忙取消",optionName:"administator",orderDate:"2013-11-19"},
+					{orderNo:"SO20131121000004",memberName:"王八",cancelReason:"其他",telephone:"13100000000",orderStatus:"完成",message:"帮忙取消",optionName:"administator",orderDate:"2013-11-18"}
+				]
+			}
+	});
+
+	refreshData();
+});
+
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/users.png">申请取消订单列表
+    </div>
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+        <table>
+            <tr>
+                <td><label>订单号</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="订单编码"></input></span>
+                </td>
+                <td><label>申请状态</label></td>
+                <td>
+                      <span>
+						<select  loxiaType="select" >
+							<option value="0">新建</option>
+	                        <option value="1">完成</option>
+	                    </select>
+					</span>
+                </td>
+                <td><label>会员名称</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="会员名"></input></span>
+                </td>
+        	</tr>
+			<tr>
+				<td><label>联系人电话</label></td>
+	            <td>
+	                  <span><input type="text" loxiaType="input" mandatory="false" placeholder="13800000000"></input></span>
+	            </td>
+	            <td><label>创建时间</label></td>
+	            <td>
+	               <span><input type="text" id="startTime" name="startTime"  value="" loxiaType="date" mandatory="false" /></span>
+	            </td>
+	            <td><label>——</label></td>
+	            <td>
+	                <span><input type="text" id="endTime" name="endTime"  value="" loxiaType="date" mandatory="false"/></span>
+	            </td>
+	            
+	        </tr>
+        </table>
+        <div class="button-line1">
+        	<a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+    <div class="ui-block">
+   	 	<div class="border-grey" id="table1" caption="申请取消订单列表"></div>
+    </div>
+</div>
+
+
+</body>
+</html>

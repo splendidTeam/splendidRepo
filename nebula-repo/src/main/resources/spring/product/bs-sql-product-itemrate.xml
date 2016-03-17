@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemRate.findAllItemRateList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRate.findRateCommandById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select t.id, t.item_id as itemId ,t.member_id as  memberId , 
+		       		t.score as score  from T_PD_ITEM_RATE t
+		       	    where t.lifecycle !=2 and t.id= :rateId
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	 
+	<bean id="ItemRate.findItemRateListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRate.findItemRateListById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE where 
+		       		id=:id
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRate.replyRate" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					#if($isReply==1)
+		       			update T_PD_ITEM_RATE
+			       		set reply=:reply,
+			       		    replier_id=:operatorId,
+			       		    last_reply_time = now()
+			       		 where 
+			       		id=:id
+		       		#else
+			       		update T_PD_ITEM_RATE
+			       		set reply=:reply,
+			       		    replier_id=:operatorId,
+			       		    reply_time = now()
+			       		 where 
+			       		id=:id
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	
+	
+	<bean id="ItemRate.findItemRateListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($score)
+		       					and SCORE=:score
+		       				#end
+
+		       			
+		       				#if($content)
+		       					and CONTENT=:content
+		       				#end
+
+		       			
+		       				#if($reply)
+		       					and REPLY=:reply
+		       				#end
+
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($replierId)
+		       					and REPLIER_ID=:replierId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($passTime)
+		       					and PASS_TIME >= :passTimeStart
+		       				#end
+		       				#if($passTime)
+		       					and PASS_TIME <= :passTimeEnd
+		       				#end
+
+		       			
+		       				#if($disableTime)
+		       					and DISABLE_TIME >= :disableTimeStart
+		       				#end
+		       				#if($disableTime)
+		       					and DISABLE_TIME <= :disableTimeEnd
+		       				#end
+
+		       			
+		       				#if($replyTime)
+		       					and REPLY_TIME >= :replyTimeStart
+		       				#end
+		       				#if($replyTime)
+		       					and REPLY_TIME <= :replyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lastReplyTime)
+		       					and LAST_REPLY_TIME >= :lastReplyTimeStart
+		       				#end
+		       				#if($lastReplyTime)
+		       					and LAST_REPLY_TIME <= :lastReplyTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemRate.findItemRateListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($score)
+		       					and SCORE=:score
+		       				#end
+
+		       			
+		       				#if($content)
+		       					and CONTENT=:content
+		       				#end
+
+		       			
+		       				#if($reply)
+		       					and REPLY=:reply
+		       				#end
+
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($replierId)
+		       					and REPLIER_ID=:replierId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($passTime)
+		       					and PASS_TIME >= :passTimeStart
+		       				#end
+		       				#if($passTime)
+		       					and PASS_TIME <= :passTimeEnd
+		       				#end
+
+		       			
+		       				#if($disableTime)
+		       					and DISABLE_TIME >= :disableTimeStart
+		       				#end
+		       				#if($disableTime)
+		       					and DISABLE_TIME <= :disableTimeEnd
+		       				#end
+
+		       			
+		       				#if($replyTime)
+		       					and REPLY_TIME >= :replyTimeStart
+		       				#end
+		       				#if($replyTime)
+		       					and REPLY_TIME <= :replyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lastReplyTime)
+		       					and LAST_REPLY_TIME >= :lastReplyTimeStart
+		       				#end
+		       				#if($lastReplyTime)
+		       					and LAST_REPLY_TIME <= :lastReplyTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemRate.enableOrDisableItemRateByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				    #if($state==1)
+     					update T_PD_ITEM_RATE
+			       		set lifecycle=:state,
+			       		    operator_id=:operatorId,
+			       		    pass_time=now()
+			       		 where 
+			       		id in (
+			       		#foreach( $id in $ids )
+	    					$id,
+						 #end
+			       		 -1)
+     				#else
+	     				update T_PD_ITEM_RATE
+			       		set lifecycle=:state,
+			       		    operator_id=:operatorId,
+			       		    disable_time=now()
+			       		 where 
+			       		id in (
+			       		#foreach( $id in $ids )
+	    					$id,
+						 #end
+			       		 -1)
+     				 #end
+     				
+		       		
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemRate.removeItemRateByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_RATE
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemRate.findAllEffectItemRateList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ItemRate.findEffectItemRateListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_RATE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($score)
+		       					and SCORE=:score
+		       				#end
+
+		       			
+		       				#if($content)
+		       					and CONTENT=:content
+		       				#end
+
+		       			
+		       				#if($reply)
+		       					and REPLY=:reply
+		       				#end
+
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($operatorId)
+		       					and OPERATOR_ID=:operatorId
+		       				#end
+
+		       			
+		       				#if($replierId)
+		       					and REPLIER_ID=:replierId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($passTime)
+		       					and PASS_TIME >= :passTimeStart
+		       				#end
+		       				#if($passTime)
+		       					and PASS_TIME <= :passTimeEnd
+		       				#end
+
+		       			
+		       				#if($disableTime)
+		       					and DISABLE_TIME >= :disableTimeStart
+		       				#end
+		       				#if($disableTime)
+		       					and DISABLE_TIME <= :disableTimeEnd
+		       				#end
+
+		       			
+		       				#if($replyTime)
+		       					and REPLY_TIME >= :replyTimeStart
+		       				#end
+		       				#if($replyTime)
+		       					and REPLY_TIME <= :replyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lastReplyTime)
+		       					and LAST_REPLY_TIME >= :lastReplyTimeStart
+		       				#end
+		       				#if($lastReplyTime)
+		       					and LAST_REPLY_TIME <= :lastReplyTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="ItemRate.findeStatusNndOrderListQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据会员id查询交易完成的商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+						select 
+						      ss.id as orderId,sol.item_id as itemId,ss.create_time as createTime,ss.member_id as  memberId ,
+						      sol.item_pic as itemPic ,sol.evaluation_status AS evaluationStatus,
+						      sol.item_name as itemName ,sol.item_pic as itempic ,sol."id" as soLineId ,
+						      ss.code AS code,ir.id as rateId ,ir.reply as reply ,ir.lifecycle
+						from  
+						     t_so_salesorder as ss 
+						     LEFT JOIN t_so_orderline as sol 
+						     on	ss.id = sol.order_id 
+						     LEFT JOIN  T_PD_ITEM_RATE as ir ON ir.ORDER_LINE_ID=  sol.id 
+						where  ss.logistics_status=15 
+						
+						and ss.member_id =:memberId
+						
+						AND 1=1 
+						#if($evaluationStatus)
+		       					and sol.evaluation_status= :evaluationStatus
+		       			#end
+		       			#if($beginTime)
+						  and ss.create_time >=:beginTime
+					    #end
+					    #if($endTime)
+						  and ss.create_time <=:endTime
+					    #end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemRate.findEffectItemRateListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select  
+		       		   a.id id,
+		       		   a.score score,
+		       		   a.content as content,
+		       		   a.reply reply,
+		       		   a.member_id memberId,
+		       		   b.login_name loginName,
+		       		   d.code itemCode,
+		       		   e.title itemName,
+		       		   a.lifecycle lifecycle,
+		       		   a.operator_id operatorId,
+		       		   c.realname operatorRealName,
+		       		   a.replier_id replierId,
+		       		   f.realname replierRealName,
+		       		   a.create_time createTime,
+		       		   a.pass_time passTime,
+		       		   a.disable_time disableTime,
+		       		   a.reply_time replyTime,
+		       		   a.last_reply_time lastReplyTime
+
+		       		from T_PD_ITEM_RATE a
+		       		            LEFT JOIN T_MEM_MEMBER b on a.MEMBER_ID = b.id
+								LEFT JOIN T_AU_USER c on a.OPERATOR_ID =c.id
+								LEFT JOIN T_PD_ITEM d on a.ITEM_ID =d.id
+								LEFT JOIN T_PD_ITEMINFO e on a.ITEM_ID = e.ITEM_ID
+								LEFT JOIN T_AU_USER f on  a.REPLIER_ID = f.id
+		       		
+		       		where 
+		       		         1=1 
+		       		
+		       	        	#if($lifecycle)
+		       					and a.LIFECYCLE=:lifecycle
+		       				#end
+		       				
+		       				#if($code)
+		       					and d.CODE like :code
+		       				#end
+		       				
+		       				#if($title)
+		       					and e.TITLE like :title
+		       				#end
+
+		       				#if($score)
+		       					and a.SCORE=:score
+		       				#end
+		       			
+		       				#if($memberLoginName)
+		       					and b.LOGIN_NAME=:memberLoginName
+		       				#end
+		       					
+		       				#if($operatorRealName)
+		       					and c.REALNAME like :operatorRealName
+		       				#end
+
+		       				#if($minScore)
+		       					and a.SCORE >= :minScore
+		       				#end
+		       				#if($maxScore)
+		       					and a.SCORE <= :maxScore
+		       				#end
+
+		       			
+		       				#if($createDateStart)
+		       					and a.CREATE_TIME >= :createDateStart
+		       				#end
+		       				#if($createDateEnd)
+		       					and a.CREATE_TIME <= :createDateEnd
+		       				#end
+
+		       			
+		       				#if($passDateStart)
+		       					and a.PASS_TIME >= :passDateStart
+		       				#end
+		       				#if($passDateEnd)
+		       					and a.PASS_TIME <= :passDateEnd
+		       				#end
+
+		       			
+		       				#if($isReply==1)
+		       					and a.REPLY_TIME is not null
+		       				#end
+		       				
+		       				#if($isReply==2)
+		       					and a.REPLY_TIME is null
+		       				#end
+		       				order by a.create_time asc,a.pass_time desc, a.last_reply_time desc
+		       				
+		       			
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemRate.findItemRateListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					     tmm.login_name as loginName,
+					     ti.id as itemId,
+					     ti.code as itemCode,
+						 tpir.id as id,
+						 tpir.order_line_id as orderLineId,
+						 tpir.score as score,
+						 tpir.content as content,
+						 tpir.reply as reply,
+						 tpir.member_id as memberId,
+						 tpir.lifecycle as lifecycle,
+						 tpir.operator_id as operatorId,
+						 tpir.replier_id as replierId,
+						 tpir.create_time as createTime,
+						 tpir.pass_time as passTime,
+						 tpir.disable_time as disableTime,
+						 tpir.reply_time as replyTime,
+						 tpir.last_reply_time as lastReplyTime 
+					from T_PD_ITEM_RATE tpir 
+					LEFT JOIN t_mem_member tmm on tmm.id = tpir.member_id
+					LEFT JOIN t_pd_item ti on tpir.item_id = ti.id
+					where tpir.lifecycle = 1 and tpir.item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	
+	<bean id="ItemRate.findItemRateListByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页根据用户ID获取有效的ItemRate列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT 
+					 tmm.login_name as loginName,
+						 tpi.title as itemName,	
+						 tpir.id as id,
+						 tpir.item_id as itemId,
+						 ti.code as itemCode,
+						 tpir.score as score,
+						 tpir.content as content,
+						 tpir.reply as reply,
+						 tpir.member_id as memberId,
+						 tpir.lifecycle as lifecycle,
+						 tpir.operator_id as operatorId,
+						 tpir.replier_id as replierId,
+						 tpir.create_time as createTime,
+						 tpir.pass_time as passTime,
+						 tpir.disable_time as disableTime,
+						 tpir.reply_time as replyTime,
+						 tpir.last_reply_time as lastReplyTime
+					 FROM t_pd_item_rate tpir
+					LEFT JOIN  t_pd_item ti
+					on  tpir.item_id=ti.id
+					LEFT JOIN t_mem_member tmm
+					on tpir.member_id = tmm.id
+					LEFT join t_pd_iteminfo tpi  
+					on  ti.id	=tpi.item_id
+					where tpir.lifecycle != 0
+					and tpir.member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	 
+</beans>

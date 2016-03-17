@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="SalesActivityImprovedEntity.findAllSalesActivity" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_act_activity_improved t where t.effective=true and t.end_time>=:currentDate
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ActivityGiftEntity.findGiftEntityByActivityId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据活动id查询赠品</description>
+        <constructor-arg>
+            <value><![CDATA[
+				select * from t_act_activity_gift t where t.activity_id=:activityId
+			 ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+    
+	<bean id="ActivityGiftEntity.findAllGiftEntity" class="loxia.dao.support.DynamicQueryHolder">
+        <description>查询所有赠品</description>
+        <constructor-arg>
+            <value><![CDATA[
+				select * from t_act_activity_gift
+			 ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+	
+    <bean id="ActivityScopeExpandEntity.findAllByExpandId" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据expandId查询</description>
+        <constructor-arg>
+            <value><![CDATA[
+				select * from t_act_activity_scope_expand t where t.expand_id=:expandId
+			 ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+    <bean id="SalesActivityScopeEntity.findSalesActivityScopeById" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select a.* from t_act_common_activity_sku_scope a where a.id = :id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+    <bean id="SalesActivityTriggerPointEntity.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select * from t_act_activity_trigger_point
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+    <bean id="SalesActivityBindingEntity.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select * from t_act_activity_binding where end_date>=now()
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SalesActivityBindingEntity.findByType" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select * from t_act_activity_binding where end_date>=now() and type = :type
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SalesActivityLimitTimeDiscountEntity.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select * from t_act_activity_limit_time_dicount where end_date>=now()
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

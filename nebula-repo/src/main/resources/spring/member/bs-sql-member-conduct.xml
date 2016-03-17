@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MemberConduct.findMemberConductCommandById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select id,
+		       		login_count as loginCount,register_time as registerTime,
+		       		pay_time as payTime,register_ip as registerIp,cumulative_con_amount as cumulativeConAmount,
+		       		login_ip as loginIp
+		       		from T_MEM_CONDUCT where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="MemberConduct.findMemberConductById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from T_MEM_CONDUCT where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

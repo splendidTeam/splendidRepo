@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemImage.updateItemImageById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过Id修改itemImage信息</description>
+		<constructor-arg>
+			<value>
+	            <![CDATA[ 
+	                  UPDATE t_pd_item_image 
+	                  SET 
+		                  modify_time = NOW(), 
+		                  pic_url = :picUrl, 
+		                  position = :position, 
+		                  description = :description,
+		                  type = :type 
+	                  WHERE id = :id 
+	            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemImage.findItemImageByItemPropAndItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemProperties和商品Id查询itemImage集合(type为3的图片信息也可以查询出来)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT id, item_id, pic_url, position, property_id, description, item_properties, property_value_id, type FROM t_pd_item_image 
+					WHERE  item_id = :itemId
+					#if($itemProperties)
+						and item_properties = :itemProperties
+						
+					#end
+					#if($propertyValueId)
+						and property_value_id = :proeprtyValueId 
+					#end
+					#if($type)
+						and (type = :type )  
+					#end
+					ORDER BY position
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemImage.removeAllByItemPropAndItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过属性Id和商品Id删除所有的ItemImage</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					DELETE FROM t_pd_item_image WHERE item_id = :itemId
+					#if($itemProperties)
+       					and item_properties = :itemProperties
+       				#end
+					#if($propertyValueId)
+						and property_value_id = :propertyValueId
+					#end
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+
+	<bean id="ItemImage.removeItemImageByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品Id删除所有的ItemImage</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					DELETE FROM t_pd_item_image 
+					WHERE id in (
+					#foreach($id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+
+	<bean id="ItemImage.removeItemImageByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品Id集合删除商品图片</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					DELETE FROM t_pd_item_image 
+					WHERE item_id in (
+					#foreach($itemId in $itemIds )
+    					$itemId,
+					 #end
+		       		 -1)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+
+	<bean id="ItemImage.findItemImageByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品id集合查询商品图片</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select * from t_pd_item_image 
+					where item_id in(
+						#foreach($itemId in $itemIds)
+							$itemId,
+						#end
+						-1
+					)
+					and (type = :type )
+					order by item_id, position
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	<bean id="ItemImage.findItemImageByItemIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品id集合查询商品图片</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+						select  image.id as id,  image.type as type,  image.version as version,
+					 image.create_time as create_time,  image.modify_time as modify_time,  image.item_id as item_id,
+					 image_lang.pic_url as pic_url, image.position as position,  image.property_id as property_id,
+					 image_lang.description as description, image.property_value_id as property_value_id,  image.item_properties as item_properties
+					 from t_pd_item_image image,t_pd_item_image_lang image_lang 
+					where item_id in(
+						#foreach($itemId in $itemIds)
+							$itemId,
+						#end
+						-1
+					)
+					and image_lang.lang =:lang 
+					and image.id = image_lang.item_image_id 
+					and (type = :type )
+					
+					order by item_id, position
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+
+	<bean id="ItemImage.findItemImgNormsByItemIdItemProp" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemProperties和itemId查询商品的规格图片</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select * from t_pd_item_image 
+					where item_id = :itemId and type = :type 
+					#if($itemProperties)
+						and item_properties = :itemProperties
+					#end
+					order by position
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	<bean id="ItemImage.findItemImgNormsByItemIdItemPropI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemProperties和itemId查询商品的规格图片</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select  image.id as id,  image.type as type,  image.version as version,
+					 image.create_time as create_time,  image.modify_time as modify_time,  image.item_id as item_id,
+					 image_lang.pic_url as pic_url, image.position as position,  image.property_id as property_id,
+					 image_lang.description as description, image.property_value_id as property_value_id,  image.item_properties as item_properties
+					 from t_pd_item_image image,t_pd_item_image_lang image_lang 
+					 where image_lang.lang =:lang and image.id = image_lang.item_image_id 
+					and image.item_id = :itemId and image.type = :type 
+					#if($itemProperties)
+						and image.item_properties = :itemProperties 
+					#end
+					order by image.position
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	<bean id="ItemImage.findItemImageLangList" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT * 
+                   FROM t_pd_item_image_lang 
+                   WHERE item_image_id in (
+                    #foreach($id in $ids)
+                    $id,
+                    #end
+                    -1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemImage.updateItemImageLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   update  t_pd_item_image_lang set pic_url=:url  ,description = :desc 
+                   where lang=:lang  and item_image_id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemImage.findItemImageLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select *from t_pd_item_image_lang 
+                   where item_image_id =:id 
+                   and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemImage.removeItemImageLangByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   delete  from t_pd_item_image_lang 
+                   where item_image_id in (
+                    #foreach($id in $ids)
+                    $id,
+                    #end
+                    -1
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+</beans>

@@ -1,0 +1,1139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SalesOrder.findOrderByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单号查询订单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					#if($sdkQueryType == 1)
+						select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptContent,
+						o.REMARK,
+						o.CREATE_TIME as createTime,
+						o.TRANS_CODE as transCode,
+					    o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+						sc.NAME,
+						sc.ORDER_ID,
+						sc.COUNTRY,
+						sc.PROVINCE,
+						sc.CITY,
+						sc.AREA,
+						sc.TOWN,
+						sc.COUNTRY_ID as countryId,
+						sc.PROVINCE_ID as provinceId,
+						sc.CITY_ID as cityId,
+						sc.AREA_ID as areaId,
+						sc.TOWN_ID as townId,
+						sc.ADDRESS,
+						sc.MOBILE,
+						sc.TEL,
+						sc.EMAIL,
+						sc.POSTCODE,
+						sc.APPOINT_TIME_QUANTUM as appointTimeQuantum,
+						sc.APPOINT_TIME as appointTime,
+						sc.APPOINT_TYPE as appointType,
+						sop.ORDER_LINE_ID as orderLineId,
+						sop.ACTIVITY_ID as activityId,
+						sop.PROMOTION_NO as promotionNo,
+						sop.PROMOTION_TYPE as promotionType,
+						sop.DISCOUNT_AMOUNT as discountAmount,
+						sop.COUPON,
+						sop.DESCRIBE
+						from 
+						t_so_salesorder as o 
+						LEFT JOIN t_so_consignee as sc 
+						on	o.id = sc.order_id
+						LEFT JOIN t_so_orderpromotion as sop ON sop.order_id=  o.id  
+						where o.CODE = :code 
+					#else
+						select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.REMARK,
+						o.CREATE_TIME as createTime
+						from t_so_salesorder as o 
+						where  o.CODE = :code
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+		<bean id="SalesOrder.findOrderById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询订单 第一个sql用于oms同步使用 第二个普通使用</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					#if($sdkQueryType == 1)
+						 select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptContent,
+						o.REMARK,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime,
+						o.logistics_provider_code as logisticsProviderCode,
+                        o.logistics_provider_name as logisticsProviderName,  
+						
+						sc.NAME,
+						sc.COUNTRY,
+						sc.PROVINCE,
+						sc.CITY,
+						sc.AREA,
+						sc.TOWN,
+						sc.COUNTRY_ID as countryId,
+						sc.PROVINCE_ID as provinceId,
+						sc.CITY_ID as cityId,
+						sc.AREA_ID as areaId,
+						sc.TOWN_ID as townId,
+						sc.ADDRESS,
+						sc.MOBILE,
+						sc.TEL,
+						sc.EMAIL,
+						sc.POSTCODE,
+						sc.APPOINT_TIME_QUANTUM as appointTimeQuantum,
+						sc.APPOINT_TIME as appointTime,
+						sc.APPOINT_TYPE as appointType,
+						sc.MODIFY_TIME as consigneeModifyTime
+						from t_so_salesorder as o LEFT JOIN
+						     t_so_consignee as sc ON sc.ORDER_ID = o.ID 
+							
+						where  o.id = :id
+					#else
+					select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptContent,
+						o.REMARK,
+						o.CREATE_TIME as createTime,
+						o.logistics_provider_code as logisticsProviderCode,
+                        o.logistics_provider_name as logisticsProviderName
+                        
+						from t_so_salesorder as o 
+						where  o.id = :id
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="SalesOrder.findOrders" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询订单列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					#if($sdkQueryType == 1)
+				 	
+					select 
+					o.ID,
+					o.ORDER_TYPE as orderType,
+					o.APPOINT_SHIP_DATE as appointShipDate,
+					o.PAY_TYPE as payType,
+					o.CODE,
+					o.OMS_CODE as omsCode,
+					o.MEMBER_ID as memberId,
+					o.MEMBER_NAME as memberName,
+					o.GUEST_IDENTIFY as guestIdentify,
+					o.QUANTITY ,
+					o.TOTAL ,
+					o.DISCOUNT,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.SOURCE,
+					o.IP,
+					o.PAYABLE_FREIGHT as payableFreight,
+					o.ACTUAL_FREIGHT  as actualFreight,
+					o.RECEIPT_CODE as receiptCode,
+					o.RECEIPT_TYPE as receiptType,
+					o.RECEIPT_TITLE as receiptTitle,
+					o.RECEIPT_CONTENT as receiptContent,
+					o.REMARK,
+					o.MODIFY_TIME as modifyTime,
+					o.CREATE_TIME as createTime,
+					o.TRANS_CODE as transCode,
+					o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+					sc.NAME,
+					sc.COUNTRY,
+					sc.PROVINCE,
+					sc.CITY,
+					sc.AREA,
+					sc.TOWN,
+                    sc.COUNTRY_ID as countryId,
+					sc.PROVINCE_ID as provinceId,
+					sc.CITY_ID as cityId,
+					sc.AREA_ID as areaId,
+					sc.TOWN_ID as townId,
+					sc.ADDRESS,
+					sc.MOBILE,
+					sc.TEL,
+					sc.EMAIL,
+					sc.POSTCODE,
+					sc.APPOINT_TIME_QUANTUM as appointTimeQuantum,
+					sc.APPOINT_TIME as appointTime,
+					sc.APPOINT_TYPE as appointType,
+					sc.MODIFY_TIME as consigneeModifyTime
+					from t_so_salesorder as o LEFT JOIN
+					     t_so_consignee as sc ON sc.ORDER_ID = o.ID 
+					   
+					where 1=1
+					#if($code)
+						and o.CODE like :code
+					#end
+					#if($omsCode)
+						and o.OMS_CODE like :omsCode
+					#end
+					#if($logisticsStatus)
+						and o.LOGISTICS_STATUS = :logisticsStatus
+					#end
+					#if($financialStatus)
+						and o.FINANCIAL_STATUS = :financialStatus
+					#end
+					#if($source)
+						and o.SOURCE = :source
+					#end
+					#if($startDate)
+		       			and	o.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	o.CREATE_TIME<=:endDate
+		       		#end
+		       		#if($memberName)
+		       			and o.MEMBER_NAME like :memberName
+		       		#end
+		       		#if($name)
+		       			and sc.NAME like :name
+		       		#end
+				 	#if($memberId)
+						and o.MEMBER_ID = :memberId
+					#end
+				    #if($logisticsStatusList)
+					and o.LOGISTICS_STATUS 
+					in (
+		       		#foreach( $ls in $logisticsStatusList )
+    					$ls,
+				    #end
+				     -1)
+					#end
+					#if($financialStatusList)
+						and o.FINANCIAL_STATUS 
+						in (
+			       		#foreach( $fs in $financialStatusList )
+	    					$fs,
+					    #end
+					     -1)
+					#end
+					#if($keywords)
+						and (exists (select 1 from t_so_orderline sol where sol.order_id=o.id and sol.item_name like :keywords)
+						or o.CODE like :keywords)
+					#end
+				 	#else
+				 	select 
+					o.ID,
+					o.ORDER_TYPE as orderType,
+					o.APPOINT_SHIP_DATE as appointShipDate,
+					o.PAY_TYPE as payType,
+					o.CODE,
+					o.OMS_CODE as omsCode,
+					o.MEMBER_ID as memberId,
+					o.MEMBER_NAME as memberName,
+					o.GUEST_IDENTIFY as guestIdentify,
+					o.QUANTITY ,
+					o.TOTAL ,
+					o.DISCOUNT,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.SOURCE,
+					o.IP,
+					o.PAYABLE_FREIGHT as payableFreight,
+					o.ACTUAL_FREIGHT  as actualFreight,
+					o.RECEIPT_CODE as receiptCode,
+					o.RECEIPT_TYPE as receiptType,
+					o.RECEIPT_TITLE as receiptTitle,
+					o.RECEIPT_CONTENT as receiptCotent,
+					o.REMARK,
+					o.MODIFY_TIME as modifyTime,
+					o.CREATE_TIME as createTime
+					
+					from t_so_salesorder as o
+					where 1 = 1 
+
+					#if($code)
+						and o.CODE = :code
+					#end
+					#if($omsCode)
+						and o.OMS_CODE = :omsCode
+					#end
+					#if($logisticsStatus)
+						and o.LOGISTICS_STATUS = :logisticsStatus
+					#end
+					#if($financialStatus)
+						and o.FINANCIAL_STATUS = :financialStatus
+					#end
+					#if($source)
+						and o.SOURCE = :source
+					#end
+					#if($startDate)
+		       			and	o.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	o.CREATE_TIME<=:endDate
+		       		#end
+		       		#if($memberName)
+		       			and o.MEMBER_NAME like :memberName
+		       		#end
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<bean id="SalesOrder.findOrdersWithOutPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询订单列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					#if($sdkQueryType == 1)
+				 	
+					select 
+					o.ID,
+					o.ORDER_TYPE as orderType,
+					o.APPOINT_SHIP_DATE as appointShipDate,
+					o.PAY_TYPE as payType,
+					o.CODE,
+					o.OMS_CODE as omsCode,
+					o.MEMBER_ID as memberId,
+					o.MEMBER_NAME as memberName,
+					o.GUEST_IDENTIFY as guestIdentify,
+					o.QUANTITY ,
+					o.TOTAL ,
+					o.DISCOUNT,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.SOURCE,
+					o.IP,
+					o.PAYABLE_FREIGHT as payableFreight,
+					o.ACTUAL_FREIGHT  as actualFreight,
+					o.RECEIPT_CODE as receiptCode,
+					o.RECEIPT_TYPE as receiptType,
+					o.RECEIPT_TITLE as receiptTitle,
+					o.RECEIPT_CONTENT as receiptContent,
+					o.REMARK,
+					o.MODIFY_TIME as modifyTime,
+					o.CREATE_TIME as createTime,
+					o.TRANS_CODE as transCode,
+					o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
+					sc.NAME,
+					sc.COUNTRY,
+					sc.PROVINCE,
+					sc.CITY,
+					sc.AREA,
+					sc.TOWN,
+					sc.COUNTRY_ID as countryId,
+					sc.PROVINCE_ID as provinceId,
+					sc.CITY_ID as cityId,
+					sc.AREA_ID as areaId,
+					sc.TOWN_ID as townId,
+					sc.ADDRESS,
+					sc.MOBILE,
+					sc.TEL,
+					sc.EMAIL,
+					sc.POSTCODE,
+					sc.APPOINT_TIME_QUANTUM as appointTimeQuantum,
+					sc.APPOINT_TIME as appointTime,
+					sc.APPOINT_TYPE as appointType,
+					sc.MODIFY_TIME as consigneeModifyTime
+					from t_so_salesorder as o LEFT JOIN
+					     t_so_consignee as sc ON sc.ORDER_ID = o.ID 
+					   
+					where 1=1
+					#if($code)
+						and o.CODE like :code
+					#end
+					#if($omsCode)
+						and o.OMS_CODE like :omsCode
+					#end
+					#if($logisticsStatus)
+						and o.LOGISTICS_STATUS = :logisticsStatus
+					#end
+					#if($financialStatus)
+						and o.FINANCIAL_STATUS = :financialStatus
+					#end
+					#if($source)
+						and o.SOURCE = :source
+					#end
+					#if($startDate)
+		       			and	o.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	o.CREATE_TIME<=:endDate
+		       		#end
+		       		#if($memberName)
+		       			and o.MEMBER_NAME like :memberName
+		       		#end
+		       		#if($name)
+		       			and sc.NAME like :name
+		       		#end
+				 	#if($memberId)
+						and o.MEMBER_ID = :memberId
+					#end
+				    #if($logisticsStatusList)
+					and o.LOGISTICS_STATUS 
+					in (
+		       		#foreach( $ls in $logisticsStatusList )
+    					$ls,
+				    #end
+				     -1)
+					#end
+					#if($logisticsStatusNotInList)
+					and o.LOGISTICS_STATUS not 
+					in (
+		       		#foreach( $ls in $logisticsStatusNotInList )
+    					$ls,
+				    #end
+				     -1)
+					#end
+					#if($financialStatusList)
+						and o.FINANCIAL_STATUS 
+						in (
+			       		#foreach( $fs in $financialStatusList )
+	    					$fs,
+					    #end
+					     -1)
+					#end
+					#if($keywords)
+						and (exists (select 1 from t_so_orderline sol where sol.order_id=o.id and sol.item_name like :keywords)
+						or o.CODE like :keywords)
+					#end
+				 	#else
+				 	select 
+					o.ID,
+					o.ORDER_TYPE as orderType,
+					o.APPOINT_SHIP_DATE as appointShipDate,
+					o.PAY_TYPE as payType,
+					o.CODE,
+					o.OMS_CODE as omsCode,
+					o.MEMBER_ID as memberId,
+					o.MEMBER_NAME as memberName,
+					o.GUEST_IDENTIFY as guestIdentify,
+					o.QUANTITY ,
+					o.TOTAL ,
+					o.DISCOUNT,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.SOURCE,
+					o.IP,
+					o.PAYABLE_FREIGHT as payableFreight,
+					o.ACTUAL_FREIGHT  as actualFreight,
+					o.RECEIPT_CODE as receiptCode,
+					o.RECEIPT_TYPE as receiptType,
+					o.RECEIPT_TITLE as receiptTitle,
+					o.RECEIPT_CONTENT as receiptCotent,
+					o.REMARK,
+					o.MODIFY_TIME as modifyTime,
+					o.CREATE_TIME as createTime
+					
+					from t_so_salesorder as o
+					where 1 = 1 
+
+					#if($code)
+						and o.CODE = :code
+					#end
+					#if($omsCode)
+						and o.OMS_CODE = :omsCode
+					#end
+					#if($logisticsStatus)
+						and o.LOGISTICS_STATUS = :logisticsStatus
+					#end
+					#if($financialStatus)
+						and o.FINANCIAL_STATUS = :financialStatus
+					#end
+					#if($source)
+						and o.SOURCE = :source
+					#end
+					#if($startDate)
+		       			and	o.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	o.CREATE_TIME<=:endDate
+		       		#end
+		       		#if($memberName)
+		       			and o.MEMBER_NAME like :memberName
+		       		#end
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SalesOrder.updateOrderLogisticsStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 更改订单物流状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_salesorder
+		       		set LOGISTICS_STATUS = :state,MODIFY_TIME= :modifyTime
+		       		where
+		       		CODE = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SalesOrder.updateOrderFinancialStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 更改订单财务状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_salesorder
+		       		set FINANCIAL_STATUS = :state,MODIFY_TIME= :modifyTime
+		       		where
+		       		CODE = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findItemSkuListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 查询商品及sku信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select b.code as code,a.max as maxPrice,a.min as minPrice,a.item_id as itemId,b.title as title ,c.qty as availableQty 
+					from 
+						(select max(a.price),min(a.price),a.item_id 
+							from  t_pd_sku a  group by a.item_id) a,
+						(select a.code code,b.title title, a.id item_id 
+							from t_pd_item a, t_pd_iteminfo b 
+							where a.id = b.item_id) b,
+						(select a.item_id ,sum(b.available_qty) qty  
+							from t_pd_sku a ,t_pd_sku_inventory b 
+							where  a.out_id = b.extention_code group by a.item_id ) c
+					where a.item_id= b.item_id  and a.item_id=c.item_id
+					
+					#if($code)
+						and b.code =:code
+					#end
+					
+					#if($minPrice)
+						and a.min <=:minPrice
+					#end
+					
+					#if($maxPrice)
+						and a.max >=:maxPrice
+					#end
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+
+		<bean id="SalesOrder.findNotEvaultionOrderLineQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询未评价的订单行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+						select 
+						ss.id as orderId,sol.item_id as itemId,sol.item_name as itemName,
+						sol.item_pic as itemPic 
+						from 
+						t_so_salesorder as ss 
+						,t_so_orderline as sol
+						where 
+						ss.id = sol.order_id and sol.evaluation_status=0
+						and ss.member_id =:memberId
+						#if($orderId)
+						and sol.order_id =:orderId 
+						#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SalesOrder.findCanceledOrderList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据会员ID查询已申请的取消订单列表</description>
+		<constructor-arg>
+			<value>
+			<![CDATA[  
+				select 
+					sc.order_code as orderCode, sc."id", sc.status, ss.total
+				from 
+					t_so_cancelorderapp sc
+				join 
+					t_so_salesorder ss 
+				on sc.order_code = ss.code
+				where 
+				sc.member_id = :memberId
+				order by sc.create_time desc
+			]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SalesOrder.findReturnedOrderList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据会员ID查询已申请的退换货列表</description>
+		<constructor-arg>
+			<value>
+			<![CDATA[  
+				select 
+					sr.id,
+					sr.order_code as orderCode,
+					sr.order_line_id as orderLineId,
+					sr.member_id as memberId,
+					sr."count",
+					sr.service_type as serviceType,
+					sr."describe",
+					sr.feedback,
+					sr.is_receipt as isReceipt,
+					sr.pic,
+					sr.name,
+					sr.address,
+					sr.mobile,
+					sr.status,
+					sr.handle_id as handleId,
+					sr.handle_name as handleName,
+					sr.create_time as createTime,
+					sr.modify_time as modifyTime,
+					sr."version",
+					sr.member_name as memberName
+				from 
+					t_so_returnorderapp sr
+				join 
+					t_so_salesorder ss 
+				on sr.order_code = ss.code
+				where 
+				sr.member_id = :memberId
+				order by sr.create_time desc
+			]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="SalesOrder.findOrderByLineId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单行ID查询订单</description>
+		<constructor-arg>
+			<value>
+			<![CDATA[  
+				select 
+					o.ID,
+					o.ORDER_TYPE as orderType,
+					o.APPOINT_SHIP_DATE as appointShipDate,
+					o.PAY_TYPE as payType,
+					o.CODE,
+					o.OMS_CODE as omsCode,
+					o.MEMBER_ID as memberId,
+					o.MEMBER_NAME as memberName,
+					o.GUEST_IDENTIFY as guestIdentify,
+					o.QUANTITY,
+					o.TOTAL ,
+					o.DISCOUNT,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.SOURCE,
+					o.IP,
+					o.PAYABLE_FREIGHT as payableFreight,
+					o.ACTUAL_FREIGHT as actualFreight,
+					o.RECEIPT_CODE as receiptCode,
+					o.RECEIPT_TYPE as receiptType,
+					o.RECEIPT_TITLE as receiptTitle,
+					o.RECEIPT_CONTENT as receiptContent,
+					o.REMARK,
+					o.CREATE_TIME as createTime,
+					sc.NAME,
+					sc.ORDER_ID,
+					sc.COUNTRY,
+					sc.PROVINCE,
+					sc.CITY,
+					sc.AREA,
+					sc.TOWN,
+					sc.COUNTRY_ID as countryId,
+					sc.PROVINCE_ID as provinceId,
+					sc.CITY_ID as cityId,
+					sc.AREA_ID as areaId,
+					sc.TOWN_ID as townId,
+					sc.ADDRESS,
+					sc.MOBILE,
+					sc.TEL,
+					sc.EMAIL,
+					sc.POSTCODE,
+					sc.APPOINT_TIME_QUANTUM as appointTimeQuantum,
+					sc.APPOINT_TIME as appointTime,
+					sc.APPOINT_TYPE as appointType,
+					sop.ORDER_LINE_ID as orderLineId,
+					sop.ACTIVITY_ID as activityId,
+					sop.PROMOTION_NO as promotionNo,
+					sop.PROMOTION_TYPE as promotionType,
+					sop.DISCOUNT_AMOUNT as discountAmount,
+					sop.COUPON,
+					sop.DESCRIBE
+				from 
+					t_so_salesorder as o 
+				JOIN t_so_orderline l ON o.id = l.order_id
+				LEFT JOIN t_so_consignee as sc on	o.id = sc.order_id
+				LEFT JOIN t_so_orderpromotion as sop ON sop.order_id=  o.id  
+				where 
+					sop.ORDER_LINE_ID is NULL and l.id = :lineId
+			]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.updateOrderFinancialStatusById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id修改订单的财务状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_salesorder
+		       		set FINANCIAL_STATUS = :financialStatus
+		       		where id in (
+		       			#foreach( $id in $orderIds )
+    					$id,
+						#end
+						-1
+		       		) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findCountOfOrder" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找条数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select COUNT(*) AS COUNT from t_so_salesorder o
+					where 1=1
+					 #if($status)
+						and o.LOGISTICS_STATUS 
+						in (
+			       		#foreach( $ls in $status )
+	    					$ls,
+					    #end
+				     -1)
+					#end
+					#if($memberId)
+						and o.MEMBER_ID = :memberId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findCountOfOrderByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找某个店铺的订单数量条数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select COUNT(*) AS COUNT from t_so_salesorder o where o.shop_id = :shopId and (o.logistics_status != 9 and o.logistics_status != 10)  
+					#if($memberId)
+						and o.MEMBER_ID = :memberId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findItemCountOfOrderByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找某个店铺的订单的商品数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select SUM(o.QUANTITY) AS COUNT from t_so_salesorder o where o.shop_id = :shopId and (o.logistics_status != 9 and o.logistics_status != 10)  
+					#if($memberId)
+						and o.MEMBER_ID = :memberId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="SalesOrder.findNoPayOrders" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询末付款订单列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.REMARK,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime,
+						tsc.name as name,
+						tsc.city as city,
+						tsc.address as address,
+						tsc.area as area,
+						tsc.country as county,
+						tsc.province as province,
+						tsc.TOWN,
+						tsc.COUNTRY_ID as countryId,
+						tsc.PROVINCE_ID as provinceId,
+						tsc.CITY_ID as cityId,
+						tsc.AREA_ID as areaId,
+						tsc.TOWN_ID as townId,
+						tsc.mobile as mobile
+					from t_so_salesorder as o
+					left join t_so_consignee tsc on tsc.order_id = o.id
+					where o.FINANCIAL_STATUS != 3
+						and o.payment != 1
+						and o.LOGISTICS_STATUS = 1
+						and o.MEMBER_ID = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findCodeSeq" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询code的序列号</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT nextval('SEQ_T_SAL_SALESORDER_CODE') as CODESEQ
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="SalesOrder.findOrderSerialNO" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询流水的序列号</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT nextval('SEQ_T_SAL_SALESORDER_SERIALNO') as SERIALNO
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SalesOrder.findToBeCancelOrders" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询符合取消条件的订单（非COD，未付款，时间大于多少）</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.REMARK,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime
+					from t_so_salesorder as o
+					WHERE (o.FINANCIAL_STATUS = 1
+						and o.payment != 1
+						and o.LOGISTICS_STATUS not in(9,10)
+						#if($startDate)
+			       			and	o.CREATE_TIME>=:startDate
+			       		#end
+			       		#if($endDate)
+			       			and	o.CREATE_TIME<=:endDate
+			       		#end
+			       		)
+			       		OR o.FINANCIAL_STATUS = 4
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SalesOrder.findOrderByCodeList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单code查询订单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.REMARK,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime
+					from t_so_salesorder as o
+					where o.code in 
+					      (
+					      #foreach($code in $codeList)
+					          '$code',
+					      #end
+					      '-1'
+					      )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findOrderByExntentionListAndOrderCreateTime" class="loxia.dao.support.DynamicQueryHolder">
+	    <description>根据订单code查询订单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.REMARK,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime
+					from t_so_salesorder as o
+					where o.create_time >= :startTime
+					     and exists(
+					            select 1 from t_so_orderline line
+					            where line.order_id = o.id
+					                  and  line.extention_code in (
+									         #foreach($code in $extentionList)
+									             '$code',
+									         #end
+									         '-1'
+									        )
+					     ) 
+					        
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findOrderByExntentionListAndOrderStatus" class="loxia.dao.support.DynamicQueryHolder">
+	    <description>根据订单状态和extentionList查找对应的订单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.REMARK,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime
+					from t_so_salesorder as o
+					where o.LOGISTICS_STATUS in (
+					         #foreach($status in $orderStatus)
+					             $status,
+					         #end
+					         -1
+					     )
+					     and exists(
+					            select 1 from t_so_orderline line
+					            where line.order_id = o.id
+				                      and  line.extention_code in (
+								         #foreach($code in $extentionList)
+								             '$code',
+								         #end
+								         '-1'
+								        )
+					     ) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="SalesOrder.updateLogisticsInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单code更新物流信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_so_salesorder
+		       		set 
+		       		    LOGISTICS_PROVIDER_NAME=:logisticsProviderName,LOGISTICS_PROVIDER_CODE= :logisticsProviderCode,
+		       		    TRANS_CODE = :transCode,modify_time = :modifyTime
+		       		    #if($actualFreight)
+		       		      ,actual_freight = :actualFreight
+		       		    #end
+		       		where
+		       		CODE = :orderCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

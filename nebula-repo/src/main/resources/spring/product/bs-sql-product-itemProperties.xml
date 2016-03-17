@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemProperties.findItemPropertiesByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM T_PD_ITEM_PROPERTIES WHERE ITEM_ID= :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemProperties.findItemPropertiesByItemIdI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT ip.id as id,ip.create_time as create_time , ip.item_id as item_id,
+					 ip.modify_time as modify_time,ip.picurl as picurl,
+					 ip.property_id as property_id ,ip.propertyvalue_id as  propertyvalue_id, ip.version as version,
+					 ipl.property_value as property_value  
+					 FROM T_PD_ITEM_PROPERTIES as ip,t_pd_item_properties_lang as ipl  
+					 WHERE ITEM_ID = :itemId and ip.id =ipl.item_properties_id and  lang = :lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+    <bean id="ItemProperties.deleteItemPropertiesByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID删除所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM T_PD_ITEM_PROPERTIES WHERE  item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.findItemPropertieListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemIds查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM T_PD_ITEM_PROPERTIES WHERE item_id in(
+						#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.findItemPropertieListByItemIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过语言标识和商品ID集合查询商品属性(国际化方法)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT 
+						itemProperties.id,
+						itemProperties.item_id as itemId,
+						itemProperties.property_id as propertyId,
+						itemPropertiesLang.property_value as propertyValue,
+						itemProperties.propertyValue_id as propertyValueId,
+						itemProperties.modify_time as modifyTime
+					FROM T_PD_ITEM_PROPERTIES itemProperties
+					left join t_pd_item_properties_lang itemPropertiesLang on itemProperties.id = itemPropertiesLang.item_properties_id
+					WHERE 
+					itemPropertiesLang.lang = :langKey
+					and item_id in(
+						#foreach( $id in $itemIds )
+							$id,
+						#end
+					 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.findItemPropertiesByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT tpip.* FROM t_pd_item_properties tpip
+					LEFT JOIN t_pd_property tpp ON tpip.property_id = tpp.id
+					WHERE
+						tpip.id IN (
+				       		#foreach( $id in $ids )
+		    					$id,
+							 #end
+				       		 -1)
+					ORDER BY
+						tpp.sort_no
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.findItemPropertiesByIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id和语言查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT
+						IP.ID AS ID,
+						IP.CREATE_TIME AS CREATE_TIME,
+						IP.ITEM_ID AS ITEM_ID,
+						IP.MODIFY_TIME AS MODIFY_TIME,
+						IP.PICURL AS PICURL,
+						IP.PROPERTY_ID AS PROPERTY_ID,
+						IP.PROPERTYVALUE_ID AS PROPERTYVALUE_ID,
+						IP.VERSION AS VERSION,
+						IPL.PROPERTY_VALUE AS PROPERTY_VALUE
+					FROM
+						T_PD_ITEM_PROPERTIES AS IP
+					LEFT JOIN T_PD_PROPERTY AS P ON P.ID = IP.PROPERTY_ID
+					INNER JOIN T_PD_ITEM_PROPERTIES_LANG AS IPL ON IP.ID = IPL.ITEM_PROPERTIES_ID
+					WHERE
+						IP.ID IN (
+							#foreach ($id IN $ids) 
+								$id,
+							#end 
+								-1
+						)
+					AND IPL.LANG = :lang
+					ORDER BY P.SORT_NO
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.findItemPropertiesByItemIdAndPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID和属性ID查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM T_PD_ITEM_PROPERTIES 
+					WHERE item_id = :itemId AND property_id = :propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 根据商品ID和属性值ID查询 -->
+	<bean id="ItemProperties.findItemPropertiesByItemIdAndPropertyValueId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID和属性值ID查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * 
+					from t_pd_item_properties 
+					where 
+						item_id 			=	:itemId 
+					and propertyValue_id	=	:propertyValueId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.findItemPropertiesByItemIdAndPropertyIdForList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID和属性ID查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM T_PD_ITEM_PROPERTIES 
+					WHERE item_id = :itemId AND property_id = :propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.findItemPropertiesByItemCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpip.id as id,
+						tpip.item_id as itemId, 
+						tpip.property_value as propertyValue,
+						tppv.value as  proValue,
+						tpcp.editing_type as type
+					from t_pd_item_properties tpip 
+					left join t_pd_item tpi on tpip.item_id = tpi.id
+					left join t_pd_property tpp on tpp.id = tpip.property_id
+					left join t_pd_common_property tpcp on tpp.common_property_id = tpcp.id 
+					left join t_pd_property_value tppv on tppv.id = tpip.propertyvalue_id
+					where tpcp.is_color_prop = true and tpi.code in (
+						#foreach($itemCode in $itemCodes)
+							'$itemCode',
+						#end
+						'-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.findPropertyValueByPropertyNameAndItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT item_id as itemId,property_value as propertyValue
+					FROM t_pd_item_properties
+					WHERE property_id IN (SELECT id
+							FROM t_pd_property
+							WHERE name = :propertyName)
+						AND item_id IN (
+							#foreach($itemId in $itemIds)
+								'$itemId',
+							#end
+						'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.findPropertyValueByPropertyNameAndItemIdsI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select item_id as itemid,ipl.property_value as propertyvalue
+					from t_pd_item_properties ip,t_pd_item_properties_lang ipl 
+					where property_id in (select id
+							from t_pd_property
+							where name = :propertyName)
+						and item_id in (
+							#foreach($itemid in $itemIds)
+								'$itemid',
+							#end
+						'-1')
+						and ipl.item_properties_id = ip.id
+						and ipl.lang = :lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.deleteItemPropertiesByItemIdAndPropId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM t_pd_item_properties
+					WHERE property_id = :propId
+						 AND item_id = :itemId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.removeItemPropByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id集合删除ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				DELETE FROM t_pd_item_properties
+				WHERE id IN (
+				            #foreach($id in $ids)
+								'$id',
+							#end
+						'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.updatePropertyValueById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID更新属性值和属性值ID</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					UPDATE t_pd_item_properties
+					SET propertyvalue_id = :valueId, property_value = :value
+					WHERE id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.updatePropertiesLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改商品属性国际化</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_item_properties_lang
+					set property_value = :value 
+					where item_properties_id = :itemPropertiesId 
+					and lang = :lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.findItemPropertiesLangByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select * from t_pd_item_properties_lang  
+                   where item_properties_id in(
+                   	#foreach($id in $ids)
+                   		$id,
+                   	#end
+                   	-1
+                   ) 
+                   and lang in(
+                   	#foreach($lang in $langs)
+                   		'$lang',
+                   	#end
+                   	'-1'
+                   ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	  <bean id="ItemProperties.deleteItemPropertiesLangByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID删除所有ItemProperties</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					delete from t_pd_item_properties_lang where  item_properties_id in(
+                   	#foreach($id in $ids)
+                   		$id,
+                   	#end
+                   	-1
+                   ) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="ItemProperties.findItemPropertiesByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品编码集合,店铺ID和行业ID查询商品属性</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						item.id as itemId,
+						item.code as itemCode,
+						itemProperties.id as id,
+						property.id as propertyId,
+						commonProperty.editing_type as type,
+						property.name as propertyName,
+						(case when itemProperties.propertyvalue_id is not null then propertyValue.value
+							else itemProperties.property_value end) as propertyValue
+					from t_pd_item_properties itemProperties 
+					left join t_pd_property property on itemProperties.property_id = property.id
+					left join t_pd_common_property commonProperty on property.common_property_id = commonProperty.id
+					left join t_pd_property_value propertyValue on itemProperties.propertyvalue_id = propertyValue.id
+					left join t_pd_item item on itemProperties.item_id = item.id 
+					where item.shop_id = :shopId 
+					and item.industry_id = :industryId
+					and item.lifecycle != 2
+					and property.id in(
+							#foreach($propertyId in $propertyIdList)
+								$propertyId,
+							#end
+							-1)
+					and item.code in(
+						#foreach($itemCode in $itemCodeList)
+							'$itemCode',
+						#end
+						'-1')
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ItemProperties.findItemPropertiesByQueryMapI18n" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品编码集合,店铺ID和行业ID查询商品属性(国际化)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select
+						item.id as itemId,
+						item.code as itemCode,
+						itemProperties.id as id,
+						property.id as propertyId,
+						property.editing_type as type,
+						property.name as propertyName,
+						(case when itemProperties.property_value is not null then itemProperties.property_value
+							else propertyValue.value end) as propertyValue
+					from (
+						select 
+							tmpItemProperties.id,
+							tmpItemProperties.create_time,
+							tmpItemProperties.item_id,
+							tmpItemProperties.modify_time,
+							tmpItemProperties.property_id,
+							tmpItemProperties.propertyvalue_id,
+							itemPropertiesLang.property_value,
+							itemPropertiesLang.lang
+						from t_pd_item_properties tmpItemProperties
+						left join t_pd_item_properties_lang itemPropertiesLang on tmpItemProperties.id = itemPropertiesLang.item_properties_id
+						where itemPropertiesLang.lang = :langKey
+					) itemProperties 
+					left join (
+						select 
+							tmpProperty.id,
+							commonProperty.create_time,
+							commonProperty.editing_type,
+							tmpProperty.group_name,
+							tmpProperty.industry_id,
+							commonProperty.is_color_prop,
+							commonProperty.is_salep_rop,
+							commonProperty.modify_time,
+							propertyLang.name,
+							tmpProperty.required,
+							tmpProperty.searchable,
+							tmpProperty.sort_no,
+							tmpProperty.is_common_industry,
+							propertyLang.lang
+						from t_pd_property tmpProperty
+						left join t_pd_common_property commonProperty on tmpProperty.common_property_id = commonProperty.id 
+						left join t_pd_property_lang propertyLang on tmpProperty.id = propertyLang.property_id
+						where tmpProperty.lifecycle !=2 and propertyLang.lang = :langKey
+					) property on itemProperties.property_id = property.id
+					left join (
+						select 
+							tmpPropertyValue.id,
+							tmpPropertyValue.create_time,
+							tmpPropertyValue.modify_time,
+							tmpPropertyValue.property_id,
+							tmpPropertyValue.sort_no,
+							propertyValueLang.value,
+							propertyValueLang.lang
+						from t_pd_property_value tmpPropertyValue
+						left join t_pd_property_value_lang propertyValueLang on tmpPropertyValue.id = propertyValueLang.property_value_id
+						where propertyValueLang.lang = :langKey
+					) propertyValue on itemProperties.propertyvalue_id = propertyValue.id
+					left join t_pd_item item on itemProperties.item_id = item.id
+					where item.shop_id = :shopId
+					and item.industry_id = :industryId
+					and item.lifecycle != 2
+					and property.id in(
+							#foreach($propertyId in $propertyIdList)
+								$propertyId,
+							#end
+							-1)
+					and item.code in(
+						#foreach($itemCode in $itemCodeList)
+							'$itemCode',
+						#end
+						'-1')
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemProperties.deleteItemPropertiesByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品属性的ID集合,删除商品属性</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					delete from t_pd_item_properties 
+					where id in (
+						#foreach($id in $ids)
+							$id,
+						#end
+						-1)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

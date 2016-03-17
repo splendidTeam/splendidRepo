@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ColumnComponent.findAllColumnComponentList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnComponent.findColumnComponentListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnComponent.findColumnComponentListByModuleIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where 
+		       		module_id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>		
+
+	<bean id="ColumnComponent.findColumnComponentCommandListByModuleIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						id as id,
+						target_id as targetId,
+						title,
+						url,
+						description,
+						img,
+						sort_no as sortNo,
+						ext,
+						module_id,
+						img_width as imgWidth,
+						img_height as imgHeight
+					from T_COL_COLUMN_COMPONENT where 
+		       		module_id in (
+			       		#foreach( $id in $ids )
+	    					$id,
+						#end
+			       		-1
+			       	) 
+		       		order by module_id, sort_no
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>		
+	
+	
+	<bean id="ColumnComponent.findColumnComponentListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID=:targetId
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($ext)
+		       					and EXT=:ext
+		       				#end
+
+		       			
+		       				#if($moduleId)
+		       					and MODULE_ID=:moduleId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnComponent.findColumnComponentListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID=:targetId
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($ext)
+		       					and EXT=:ext
+		       				#end
+
+		       			
+		       				#if($moduleId)
+		       					and MODULE_ID=:moduleId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ColumnComponent.enableOrDisableColumnComponentByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_COL_COLUMN_COMPONENT
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnComponent.findAllEffectColumnComponentList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ColumnComponent.findEffectColumnComponentListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where 1=1
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID=:targetId
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($ext)
+		       					and EXT=:ext
+		       				#end
+
+		       			
+		       				#if($moduleId)
+		       					and MODULE_ID=:moduleId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnComponent.findEffectColumnComponentListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT where lifecycle=1
+		       		
+					
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID=:targetId
+		       				#end
+
+		       			
+		       				#if($title)
+		       					and TITLE=:title
+		       				#end
+
+		       			
+		       				#if($url)
+		       					and URL=:url
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and DESCRIPTION=:description
+		       				#end
+
+		       			
+		       				#if($img)
+		       					and IMG=:img
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($ext)
+		       					and EXT=:ext
+		       				#end
+
+		       			
+		       				#if($moduleId)
+		       					and MODULE_ID=:moduleId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnComponent.findColumnCompListByModuleId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_COMPONENT 
+		       		where module_id = :moduleId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="ColumnComponent.findColumnComponentByPageCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tccg.code as pageCode,
+						tccm.code as moduleCode,
+						tccc.id as id,
+						tccc.description as description,
+						tccc.ext as ext,
+						tccc.img as img,
+						tccc.module_id as moduleId,
+						tccc.target_id as targetId,
+						tccc.title as title,
+						tccc.url as url,
+						tccm.type as type,
+						tccm.publish_time as publishTime,
+						tccc.img_width as imgWidth,
+						tccc.img_height as imgHeight,
+						tccc.sort_no as sortNo
+					from t_col_column_component tccc
+					left join t_col_column_module tccm on tccc.module_id = tccm.id 
+					left join t_col_column_page tccg on tccg.id = tccm.page_id
+					where tccg.code = :pageCode order by tccc.sort_no
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnComponent.removeColumnComponentByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from  T_COL_COLUMN_COMPONENT
+		       		where id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					#end
+		       		-1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ColumnComponent.updateComlumCompById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_col_column_component 
+		       		set description = :description, 
+		       			ext = :ext, 
+		       			img = :img, 
+		       			sort_no = :sortNo, 
+		       			target_id = :targetId, 
+		       			title = :title, 
+		       			url = :url,
+		       			img_width = :imgWidth,
+		       			img_height = :imgHeight  
+		       		where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

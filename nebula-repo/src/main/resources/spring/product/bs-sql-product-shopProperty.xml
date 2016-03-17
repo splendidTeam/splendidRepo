@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ShopProperty.addShopProperty" class="loxia.dao.support.DynamicQueryHolder">
+		<description>添加一个店铺、行业、属性的关系</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				INSERT INTO t_pd_shopproperty(id, industry_id, shop_id, property_id)
+                VALUES (nextval('S_T_PD_SHOPPROPERTY'), :industryId, :shopId,:propertyId)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ShopProperty.removeShopProperty" class="loxia.dao.support.DynamicQueryHolder">
+		<description>添加一个店铺、行业、属性的关系</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				DELETE FROM t_pd_shopproperty WHERE industry_id =:industryId  AND shop_id =:shopId AND property_id IN(
+				 #foreach($id in $propertyIds)
+				 $id,
+				 #end
+				 '-1'
+				) 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ShopProperty.findShopPropertyByshopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shopId查找该店铺已经有的关联行业</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * from t_pd_shopproperty where shop_id= :shopId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

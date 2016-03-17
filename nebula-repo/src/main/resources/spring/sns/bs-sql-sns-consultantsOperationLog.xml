@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<!--  
+	<bean id="ShoppingCartLine.findShopCartLineByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shoppingCartId查询购物车行的信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					ss.ID,
+					ss.SKU_ID as skuId,
+					ss.QUANTITY,
+					ss.EXTENTION_CODE as extentionCode,
+					ss.MEMBER_ID as memberId,
+					ss.CREATE_TIME as createTime,
+					ss.SETTLEMENT_STATE as settlementState
+					from t_sc_shoppingcartline as ss
+					where 
+					 ss.MEMBER_ID = :memberId 
+					 #if($settlementState)
+		       			and ss.SETTLEMENT_STATE = :settlementState
+		       		 #end
+					  order by createTime
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	-->
+</beans>

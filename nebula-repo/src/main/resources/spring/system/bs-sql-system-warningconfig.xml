@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="WarningConfig.findAllWarningConfigList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="WarningConfig.findWarningConfigListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="WarningConfig.findWarningConfigListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($name)
+		       					and NAME like :name
+		       				#end
+
+		       				#if($warningDesc)
+		       					and warning_desc=:warningDesc
+		       				#end
+		       			
+		       				#if($timeParam)
+		       					and TIMEPARAM like :timeParam
+		       				#end
+		       			
+		       				#if($receivers)
+		       					and RECEIVERS=:receivers
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       			
+		       				#if($templateCode)
+		       					and TEMPLATE_CODE=:templateCode
+		       				#end
+
+		       				#if($level)
+		       					and LEVEL=:level
+		       				#end
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="WarningConfig.findWarningConfigListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG where 
+		       		
+		       				lifecycle !=2
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($name)
+		       					and NAME like :name
+		       				#end
+		       			
+		       				#if($warningDesc)
+		       					and warning_desc=:warningDesc
+		       				#end
+		       			
+		       				#if($timeParam)
+		       					and TIMEPARAM like :timeParam
+		       				#end
+		       			
+		       				#if($receivers)
+		       					and RECEIVERS=:receivers
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       			
+		       				#if($templateCode)
+		       					and TEMPLATE_CODE=:templateCode
+		       				#end
+
+		       				#if($level)
+		       					and LEVEL=:level
+		       				#end
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="WarningConfig.enableOrDisableWarningConfigByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_WARNING_CONFIG
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="WarningConfig.removeWarningConfigByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_WARNING_CONFIG
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="WarningConfig.findAllEffectWarningConfigList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="WarningConfig.findEffectWarningConfigListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG where lifecycle=1
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($name)
+		       					and NAME like :name
+		       				#end
+		       			
+		       				#if($warningDesc)
+		       					and warning_desc=:warningDesc
+		       				#end
+		       			
+		       				#if($timeParam)
+		       					and TIMEPARAM like :timeParam
+		       				#end
+		       			
+		       				#if($receivers)
+		       					and RECEIVERS=:receivers
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       				#if($templateCode)
+		       					and TEMPLATE_CODE=:templateCode
+		       				#end
+		       			
+		       				#if($level)
+		       					and LEVEL=:level
+		       				#end
+
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="WarningConfig.findEffectWarningConfigListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_WARNING_CONFIG where lifecycle=1
+		       		
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($name)
+		       					and NAME like :name
+		       				#end
+		       			
+		       				#if($warningDesc)
+		       					and warning_desc=:warningDesc
+		       				#end
+
+		       				#if($timeParam)
+		       					and TIMEPARAM=:timeParam
+		       				#end
+		       			
+		       				#if($receivers)
+		       					and RECEIVERS=:receivers
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       			
+		       				#if($templateCode)
+		       					and TEMPLATE_CODE=:templateCode
+		       				#end
+
+		       				#if($level)
+		       					and LEVEL=:level
+		       				#end
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

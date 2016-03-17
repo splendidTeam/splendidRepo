@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+   <bean id="PromotionCoupon.findAllCouponList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询信息完整的优惠卷类型</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT	
+					id AS id,
+					active_mark AS activeMark,
+					coupon_name AS couponName,
+					type AS type,
+					create_id AS createId,
+					create_time AS createTime,
+					discount AS discount,
+					LIMIT_TIMES as limitTimes
+				FROM t_prm_promotioncoupon
+				WHERE active_mark = 1
+				ORDER BY create_time
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="PromotionCoupon.findPromotionCouponCommandById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询优惠券</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT	
+					id AS id,
+					active_mark AS activeMark,
+					coupon_name AS couponName,
+					type AS type,
+					create_id AS createId,
+					create_time AS createTime,
+					discount AS discount,
+					LIMIT_TIMES as limitTimes
+				FROM t_prm_promotioncoupon
+				WHERE id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	 <bean id="PromotionCoupon.queryCouponListByConditionallyWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件查询优惠券-何波</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT	
+					id AS id,
+					active_mark AS activeMark,
+					coupon_name AS couponName,
+					type AS type,
+					create_id AS createId,
+					create_time AS createTime,
+					discount AS discount,
+					LIMIT_TIMES as limitTimes
+				FROM t_prm_promotioncoupon
+				WHERE active_mark != 2
+				#if($couponName)
+					AND coupon_name like :couponName 
+				#end
+				#if($type)
+					AND type = :type 
+				#end
+				#if($activeMark)
+					AND active_mark = :activeMark 
+				#end
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

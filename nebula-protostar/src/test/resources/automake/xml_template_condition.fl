@@ -1,0 +1,20 @@
+					<#list propertyList as item>
+		       			
+		       			<#if item.fieldType=='Date' >
+		       				#if($${item.fieldName})
+		       					and ${item.columnName} >= :${item.fieldName}Start
+		       				#end
+		       				#if($${item.fieldName})
+		       					and ${item.columnName} <= :${item.fieldName}End
+		       				#end
+		       			<#else>
+		       				#if($${item.fieldName})
+		       					and ${item.columnName}=:${item.fieldName}
+		       				#end
+		       				<#if item.fieldName?lower_case?index_of("name")!=-1 >
+		       				#if($${item.fieldName}ForLike)
+		       					and ${item.columnName} like :${item.fieldName}ForLike
+		       				#end
+		       				</#if>
+		       			</#if>
+		       		</#list>

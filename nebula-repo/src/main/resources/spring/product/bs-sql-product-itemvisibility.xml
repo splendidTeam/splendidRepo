@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemVisibility.findAllItemVisibilityList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemVisibility.findItemVisibilityListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemVisibility.findItemVisibilityListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility where 
+		       				1=1
+		       				#if($memFilterId)
+		       					and MEM_FILTER_ID=:memFilterId
+		       				#end
+
+		       				#if($itemFilterId)
+		       					and ITEM_FILTER_ID=:itemFilterId
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemVisibility.findItemVisibilityListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT  v.id ,v.mem_filter_id memFilterId , v.item_filter_id itemFilterId ,memtag.name memFilterName,pdtag.name itemFilterName 
+		       		 from t_pd_item_visibility v LEFT JOIN t_pd_tag_rule  pdtag on v.item_filter_id=pdtag.id
+					LEFT JOIN t_mem_tag_rule memtag  on v.mem_filter_id = memtag.id where 
+		       			pdtag.lifecycle = 1
+		       			and memtag.lifecycle = 1
+	       				#if($memFilterName)
+	       					and memtag.name like :memFilterName
+	       				#end
+	       			
+	       				#if($itemFilterName)
+	       					and pdtag.name like :itemFilterName
+	       				#end
+		       			ORDER BY v.id desc 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemVisibility.removeItemVisibilityByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_pd_item_visibility 
+		       		where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemVisibility.findAllEffectItemVisibilityList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ItemVisibility.findEffectItemVisibilityListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility where 1=1
+		       			
+		       				#if($memFilterId)
+		       					and MEM_FILTER_ID=:memFilterId
+		       				#end
+
+		       				#if($itemFilterId)
+		       					and ITEM_FILTER_ID=:itemFilterId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemVisibility.findEffectItemVisibilityListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility where 1=1
+		       		
+		       				#if($memFilterId)
+		       					and MEM_FILTER_ID=:memFilterId
+		       				#end
+		       			
+		       				#if($itemFilterId)
+		       					and ITEM_FILTER_ID=:itemFilterId
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="ItemVisibility.findItemVisibilityCommand" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT  v.id ,v.mem_filter_id memFilterId , v.item_filter_id itemFilterId ,memtag.name memFilterName,pdtag.name itemFilterName 
+		       		 from t_pd_item_visibility v LEFT JOIN t_pd_tag_rule  pdtag on v.item_filter_id=pdtag.id
+					LEFT JOIN t_mem_tag_rule memtag  on v.mem_filter_id = memtag.id where 
+		       			pdtag.lifecycle = 1
+		       			and memtag.lifecycle = 1
+	       				#if($memFilterName)
+	       					and memtag.name like :memFilterName
+	       				#end
+	       			
+	       				#if($itemFilterName)
+	       					and pdtag.name like :itemFilterName
+	       				#end
+			       		
+			       		#if($id)
+			       			and  v.id =:id
+			       		#end
+			       		
+			       		#if($memFilterId)
+			       			and  v.mem_filter_id =:memFilterId
+			       		#end
+			       		
+			       		#if($itemFilterId)
+			       			and  v.item_filter_id =:itemFilterId
+			       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemVisibility.findItemVisibilityListByItemFilterIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_item_visibility where 
+		       		item_filter_id in (
+		       		#foreach( $id in $itemFilterIds )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

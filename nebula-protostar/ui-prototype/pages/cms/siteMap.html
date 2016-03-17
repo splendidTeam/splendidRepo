@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE></TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/main.css" type="text/css">
+	<link rel="stylesheet" href="../../css/demo.css" type="text/css">
+
+	<script type="text/javascript" src="../../scripts/jquery/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="../../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+	
+<script type="text/javascript" src="../../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+	<SCRIPT type="text/javascript">
+	var $j = jQuery.noConflict();
+		<!--
+		
+		
+		var tempSetting = {
+				check: {
+					enable: true,
+					chkStyle: "radio",
+					radioType: "all"
+				},
+				view: {
+					dblClickExpand: false,
+					showIcon:false
+				},
+				data: {
+					simpleData: {
+						enable: true
+					}
+				},
+				callback: {
+					onClick: onClickTemp,
+					onCheck: onCheckTemp,
+				}
+			};
+
+		var tempzNodes =[
+			{ id:0, name:"ROOT",state:"0",sort:1, open:true,root:"true"},
+				{ id:1, pId:0, name:"列表页",state:"0",sort:1, open:true,root:"true"},
+				{ id:11, pId:1, name:"商品列表页",state:"1",sort:1},
+				{ id:12, pId:1, name:"搜索列表页",state:"0",sort:2},
+				{ id:2, pId:0, name:"详情页",state:"0",sort:2, open:true,root:"true"},
+				{ id:21, pId:2, name:"商品详情页",state:"1",sort:1},
+				{ id:22, pId:2, name:"订单详情页",state:"0",sort:2},
+				
+				{ id:3, pId:0, name:"购物页",state:"0",sort:3, open:true,root:"true"},
+				{ id:31, pId:3, name:"购物车页",state:"1",sort:1},
+				{ id:32, pId:3, name:"下订单页",state:"0",sort:2},
+				{ id:33, pId:3, name:"支付页",state:"0",sort:3}
+		 ];
+		
+		var setting = {
+			
+			check: {
+				enable: false
+			},
+			view: {
+				showIcon:false,
+				fontCss: getFontCss
+			},
+			edit: {
+				enable: false,
+				showRenameBtn: false
+			},
+			data: {
+				keep: {
+					parent:false,
+					leaf:false
+				},
+				key: {
+					title: "name"
+				},
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				onClick: onClick,
+				beforeRemove: beforeRemove,
+				onRemove: onRemove,
+				onNodeCreated: onNodeCreated
+			}
+		};
+
+		var zNodes =[
+			{ id:0, name:"ROOT",state:"0",sort:1, open:true,root:"true"},
+			{ id:1, pId:0, name:"首页",state:"0",sort:1, open:true,root:"true"},
+			{ id:2, pId:0, name:"商品页面",state:"0",sort:2, open:true,root:"true"},
+			{ id:21, pId:2, name:"商品1（禁用）",state:"1",sort:1, open:true},
+			{ id:211, pId:21, name:"区域1",state:"1",sort:1, open:true},
+			{ id:2111, pId:211, name:"组件1",state:"1",sort:1},
+			{ id:2112, pId:211, name:"组件2",state:"1",sort:1},
+			{ id:212, pId:21, name:"区域2",state:"1",sort:1},
+			{ id:22, pId:2, name:"商品2（已发布）",state:"0",sort:2},
+			{ id:23, pId:2, name:"商品3（新建）",state:"0",sort:3},
+			{ id:3, pId:0, name:"分类列表页",state:"0",sort:3, open:true,root:"true"},
+			{ id:31, pId:3, name:"男装",state:"1",sort:1},
+			{ id:32, pId:3, name:"女装",state:"0",sort:2},
+			{ id:33, pId:3, name:"童装",state:"0",sort:3}
+		];
+		var log, className = "dark";
+		
+		
+		function beforeRemove(treeId, treeNode,e) {
+			className = (className === "dark" ? "":"dark");	
+			if(confirm("确认删除 节点 -- " + treeNode.name + " 吗？"))
+   		{
+    	removeNode(treeNode,null);
+   		}
+		}
+		
+		
+		
+		
+		function onRemove(e, treeId, treeNode) {
+		}
+		function onClick(event, treeId, treeNode)  {
+			 //alert(treeNode.id + ", " + treeNode.name);
+				$j("#tree_fid").val(treeNode.name);
+				$j("#tree_state").val(treeNode.state);
+				$j("#tree_sort").val(treeNode.sort);
+				$j("#tree_fid").attr("treeId",treeId);
+				$j("#tree_fid").data("treeNode",treeNode);
+				$j("#tree_fid").data("event",event);
+				if(treeNode.id==0){
+					$j(".percent70-content-right").css("display","none");
+				}else{
+					$j(".percent70-content-right").css("display","block");
+				}
+		}
+		function onNodeCreated(e, treeId, treeNode) {
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var node = zTree.getNodeByParam("id", treeId, null);
+				zTree.moveNode(treeNode,  node  , "prev");
+		}
+		
+		
+		
+		function focusKey(e) {
+			if (key.hasClass("empty")) {
+				key.removeClass("empty");
+			}
+		}
+		function blurKey(e) {
+			if (key.get(0).value === "") {
+				key.addClass("empty");
+			}
+		}
+		var lastValue = "", nodeList = [], fontCss = {};
+		
+		function searchNode(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			var value = $j.trim(key.get(0).value);
+				
+				if (key.hasClass("empty")) {
+					value = "";
+				}
+				if (lastValue === value) return;
+				lastValue = value;
+				if (value === "") return;
+				updateNodes(false);
+				
+			//找 id=value的node,可用于自定义查找条件
+			//nodeList = zTree.getNodesByParam("id", value);
+				
+			nodeList = zTree.getNodesByParamFuzzy("name", value);
+
+			if (nodeList.length > 0) {
+			$j.each(nodeList, function(i, node){      
+         		 zTree.expandNode(node.getParentNode(),true, true, true);
+　　			}); 
+			}
+			updateNodes(true);
+			$j("#key").focus();
+		}
+		function updateNodes(highlight) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree");
+			for( var i=0, l=nodeList.length; i<l; i++) {
+				nodeList[i].highlight = highlight;
+				zTree.updateNode(nodeList[i]);
+			}
+		}
+		function getFontCss(treeId, treeNode) {
+			return (!!treeNode.highlight) ? {color:"#333","background-color":"yellow"} : {color:"#333", "font-weight":"normal","background-color":""};		
+		}
+	
+		
+		
+		function onBodyDown(event) {
+			if (!( event.target.id == "temp" || event.target.id == "tempContent" || $j(event.target).parents("#tempContent").length>0)) {
+				hideMenu();
+			}
+		}
+
+		function onClickTemp(e, treeId, treeNode) {
+			var zTree = $j.fn.zTree.getZTreeObj("tempDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return false;
+		}
+
+		function onCheckTemp(e, treeId, treeNode) {
+			var zTree = $j.fn.zTree.getZTreeObj("tempDemo"),
+			nodes = zTree.getCheckedNodes(true),
+			v = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].name + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			var cityObj = $j("#temp");
+			cityObj.attr("value", v);
+			hideMenu();
+		}
+		function hideMenu() {
+			$j("#tempContent").fadeOut("fast");
+			$j("body").unbind("mousedown", onBodyDown);
+		}
+		
+		var key;
+		$j(document).ready(function(){
+			
+			loxia.init({debug: true, region: 'zh-CN'});
+		    nps.init();
+			
+			$j.fn.zTree.init($j("#tree"), setting, zNodes);
+			key = $j("#key");
+			key.bind("focus", focusKey)
+			.bind("blur", blurKey)
+			.bind("propertychange", searchNode)
+			.bind("input", searchNode);
+			$j("#addParent").bind("click", {isParent:true}, addRoot);
+			$j("#addLeaf").bind("click", {isParent:false}, add);
+			
+			
+			$j.fn.zTree.init($j("#tempDemo"), tempSetting, tempzNodes);
+			
+			 $j("#temp").click(function() {
+					var cityObj = $j(this);
+					var cityOffset = $j(this).offset();
+					$j("#tempContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
+
+					$j("body").bind("mousedown", onBodyDown);
+				});
+			
+			//修改节点名称
+			$j("#save_father_Name").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+				var sortNode ;
+				if (nodes.length>0) {
+					nodes[0].name = $j("#tree_fid").val();
+					nodes[0].state = $j("#tree_state").val();
+					if(nodes[0].sort == $j("#tree_sort").val()){
+						sortNode = 0;
+					}else{
+						nodes[0].sort = $j("#tree_sort").val()
+						sortNode = 1;
+					}
+					zTree.updateNode(nodes[0]);
+					if(sortNode==1){
+						var nlist ;
+						if(nodes[0].getParentNode()==null){
+							nlist = zTree.getNodesByParam("root", "true", null);
+						}else{
+							nlist = nodes[0].getParentNode().children;
+						}
+						for( var i=0; i<nlist.length; i++) {
+							if(parseInt(nodes[0].sort)<parseInt(nlist[i].sort)){
+								zTree.moveNode(nlist[i],nodes[0] , "prev");
+								break;
+							}
+							if(i==nlist.length-1){
+								zTree.moveNode(nlist[i],nodes[0], "next");
+							}
+						}	
+					}
+				}
+				//$j(".curSelectedNode span:eq(1)").html($j("#tree_fid").val());
+			});	
+
+			//上移
+			$j("#up_element").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+
+				if (nodes.length > 0) {
+					var node = nodes[0].getPreNode();
+				}
+				if(node!=null){
+					zTree.moveNode(node,nodes[0] , "prev");
+					var up_value = nodes[0].sort
+					var down_value  = node.sort
+					node.sort = up_value;
+					nodes[0].sort = down_value;
+					zTree.updateNode(nodes[0]);
+					zTree.updateNode(node);
+					$j("#tree_sort").val(down_value);
+				} 
+			});	
+
+			//下移
+			$j("#down_element").click(function(){
+				var zTree = $j.fn.zTree.getZTreeObj("tree");
+				var nodes = zTree.getSelectedNodes();
+
+				if (nodes.length > 0) {
+					var node = nodes[0].getNextNode();
+				}
+				if(node!=null){
+					zTree.moveNode(node,nodes[0] , "next");
+					var up_value = nodes[0].sort
+					var down_value  = node.sort
+					node.sort = up_value;
+					nodes[0].sort = down_value;
+					zTree.updateNode(nodes[0]);
+					zTree.updateNode(node);
+					$j("#tree_sort").val(down_value);
+				} 
+			});				
+			
+			//删除节点
+			$j("#remove_element").click(function(){
+				 	//beforeRemove($j("#tree_fid").attr("treeId"),$j("#tree_fid").data("treeNode"),$j("#tree_fid").data("event"));
+				 	var treeObj = $j.fn.zTree.getZTreeObj("tree");
+					var nodes = treeObj.getSelectedNodes();
+					if (nodes && nodes.length>0  && nodes[0].id!=0 && !nodes[0].isParent) {
+						treeObj.removeNode(nodes[0]);
+					}
+			});	
+		});
+		
+		var newCount = 1;
+		function addRoot(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode&& treeNode.getParentNode()!=null) {
+				treeNode=treeNode.getParentNode();
+				var new_id = treeNode.id *10  +  treeNode.children.length+1;
+				treeNode = zTree.addNodes(treeNode, {id:new_id, pId:treeNode.id, isParent:false, name:$j("#add_name").val()});
+				onNodeCreated(e,new_id,nodes[0]);
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:false, name:$j("#add_name").val()});
+				
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+
+		//添加子节点
+		function add(e) {
+			var zTree = $j.fn.zTree.getZTreeObj("tree"),
+			isParent = e.data.isParent,
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+			if (treeNode) {
+				treeNode = zTree.addNodes(treeNode, {id:(100 + newCount), pId:treeNode.id, isParent:isParent, name:$j("#add_name").val()});
+				
+				
+			} else {
+				treeNode = zTree.addNodes(null, {id:(100 + newCount), pId:0, isParent:isParent, name:$j("#add_name").val()});
+			}
+			if (treeNode) {
+				zTree.editName(treeNode[0]);
+			} else {
+				alert("叶子节点被锁定，无法增加子节点");
+			}
+		};
+		//-->
+	</SCRIPT>
+</HEAD>
+
+<BODY>
+	
+		
+		
+	
+		
+		
+		
+		 <div class="ui-block p10">       
+            <div class="ui-title1">页面维护</div>
+            
+        </div>
+        
+    	<div class="percent30-content-left  border-right-dashed">
+             <div class="">
+			 	<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名称：</label><input type="text" id="key" placeholder="输入关键字快速定位"/><br/>
+			 	<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;状态：</label><span><select id="tree_state"><option value="1">新建</option><option value="0">已发布</option><option value="0">禁用</option></select></span><br/>
+				<label>&nbsp;&nbsp;&nbsp;有效期：</label><span><input type="text" loxiaType="date" style="width:100px"/>-<input type="text" loxiaType="date" style="width:100px"/></span><br/>
+				<label>创建时间：</label><span><input type="text" loxiaType="date" style="width:100px"/>-<input type="text" loxiaType="date" style="width:100px"/></span><br/>
+				<a href="#" class="func-button"><label class="ficon-true"></label><span>搜索</span></a> <br/>
+					
+             </div>
+            
+             	<ul id="tree" class="ztree"></ul>
+          
+        </div>
+        
+          <div class="percent70-content-right">
+        	 <div class="type-content" style="width:500px;">
+                  您当前选中的页面
+                  <div class="ui-block-line ui-block-line-37">
+			         <label>名称：</label>
+			         <div class="wl-right">
+			              <input type="text" loxiaType="input" value="" mandatory="true"/>
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>url：</label>
+			         <div class="wl-right">
+			              <input type="text" loxiaType="input" value="" mandatory="true"/>
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>模板选择：</label>
+			         <div class="wl-right">
+			             <input id="temp" loxiaType="input"/>
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>描述：</label>
+			         <div class="wl-right">
+			              <input type="text" loxiaType="input" value="" mandatory="true"/>
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>状态：</label>
+			         <div class="wl-right">
+			              
+						<select id="tree_state" loxiaType="select">
+							<option value="1">新建</option>
+							<option value="0">已发布</option>
+							<option value="0">禁用</option>
+							<option value="0">卸载</option>
+						</select>
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>有效期：</label>
+			         <div class="wl-right">
+			             <input type="text" loxiaType="date"/>-<input loxiaType="date" type="text" />
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>创建时间：</label>
+			         <div class="wl-right">
+			             <input type="text" loxiaType="date"/>-<input loxiaType="date" type="text" />
+			         </div>
+			   	  </div>
+
+			   	  
+
+
+                  
+                  <div class="type-content-line">
+                  	<input type="button" class="button" id="addLeaf" value="新建"/>
+                  	<input type="button" class="button" id="save_father_Name" value="编辑"/>
+                       <input type="button" class="button" id="save_father_Name" value="保存"/> <input type="button" class="button" id="remove_element" value="删除"/>
+                       <input type="button" class="button" id="save_father_Name" value="预览"/> <input type="button" class="button" id="remove_element" value="发布"/>
+                  		<input type="button" class="button" id="save_father_Name" value="卸载"/> 
+                  		<input type="button" class="button" id="save_father_Name" value="复制"/> 
+                  </div>
+             </div>
+             <br/>
+             <div class="type-content" style="width:500px;">
+                  页面动态属性
+                  <div class="ui-block-line ui-block-line-37">
+			         <label>属性1：</label>
+			         <div class="wl-right">
+			              <input type="text" loxiaType="input" value="" mandatory="false"/>
+			         </div>
+			   	  </div>
+			   	  <div class="ui-block-line ui-block-line-37">
+			         <label>属性2：</label>
+			         <div class="wl-right">
+			              <input type="text" loxiaType="input" value="" mandatory="false"/>
+			         </div>
+			   	  </div>
+
+                  <div class="type-content-line">
+                       <input type="button" class="button" id="save_father_Name" value="保存"/>
+                  </div>
+             </div>
+             
+        </div>
+        
+      
+        
+        <div id="tempContent" class="menuContent" style="display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
+			<ul id="tempDemo" class="ztree" style="margin-top:0; width:180px; height: 100%;"></ul>
+		</div>
+        
+
+  
+</HTML>

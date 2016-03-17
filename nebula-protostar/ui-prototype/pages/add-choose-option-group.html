@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+	<script type="text/javascript">
+	$j(document).ready(function(){
+		loxia.init({debug: true, region: 'zh-CN'});
+	    nps.init();
+		$j(".button.saveoptgp").on("click",function(){
+			nps.submitForm('csOptGpForm',{mode:'sync'})
+	    });
+
+	});
+	</script>
+
+</head>
+<body>
+
+<div class="content-box">
+	<form name="csOptGpForm" action="/aaaa" method="post">
+	    <div class="ui-title1"><img src="../images/wmi/blacks/32x32/compass.png">通用选项管理
+		    <input type="button" value="返回" class="button" onclick="location.href='choose-option-group.html'" title="返回"/>
+	        <input type="button" value="保存" class="button orange saveoptgp" title="保存"/>
+		</div>
+		<div class="ui-block">
+	    	<div class="ui-block-title1">新增分组及选项</div>
+	    	<div class="ui-block-content border-grey" style="margin-bottom: 10px;">
+	            <div class="ui-block-line">
+					<label>分组编码</label>
+					<div >
+						<input name="groupCode" type="text" loxiaType="input" value="" mandatory="true" placeholder="分组编码"/>
+					</div>
+	    		</div>
+	    
+			    <div class="ui-block-line">
+			        <label>分组描述</label>
+			        <div >
+						<input name="groupDesc" type="text" loxiaType="input" value="" mandatory="true" placeholder="分组描述"/>
+			        </div>
+			    </div>
+	
+
+			    <div class="ui-block-title1" style="background:#fff;color:#000;">分组所属选项信息</div>
+			    <div id="edittable" loxiaType="edittable" >
+				<table operation="add,delete" append="1" width="2000" class="inform-person">
+					<thead>
+						<tr>
+							<th width="5%"><input type="checkbox"/></th>
+							<th width="35%">选项名</th>
+							<th width="30%">选项值</th>
+							<th width="30%">排序号</th>
+						</tr>
+					</thead>
+				    
+				    <tbody>
+				    </tbody>
+				    
+					<tbody>
+						<tr>
+							<td width="5%"><input type="checkbox"/></td>
+							<td width="15%"><input type="text" loxiaType="input" id="input3" name="name(#)" style="width:95%" mandatory="true" placeholder="选项名称"/></td>
+							<td width="15%"><input name="optionValue" type="text" loxiaType="input" value="" mandatory="true" placeholder="选项值"/></td>
+							<td width="15%"><input name="sortNo" type="text" loxiaType="number" value="" mandatory="true" placeholder="排序号"/></td>
+						</tr>
+						
+					</tbody>
+				    
+					<tfoot>
+						<tr>
+							<td colspan="2" >&nbsp;</td><td>&nbsp;</td>
+						</tr>
+					</tfoot>
+				</table>
+				</div>
+
+
+	    	</div>
+		</div>
+	</form>
+    
+    <div class="button-line">
+        <input type="button" value="保存" class="button orange saveoptgp" title="保存"/>
+        <input type="button" value="返回" class="button return" onclick="location.href='choose-option-group.html'" title="返回"/>
+        
+    </div>
+</div>
+</body>
+</html>

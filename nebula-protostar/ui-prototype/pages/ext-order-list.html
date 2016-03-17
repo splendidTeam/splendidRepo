@@ -1,0 +1,247 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("id", data)+"'/>";
+}
+
+function drawSkuIcon(data, args, idx){
+	return "<img src='../images/main/portrait.gif' width=60 height=60 title='默认商品'>";
+}
+
+function drawPropIcon(data, args, idx){
+	return "<img src='../images/main/portrait.gif' width=60 height=60 title='默认图片'>";
+}
+
+
+function drawOrder(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('order-details.html','aaa',null,[0,0]);\">"+loxia.getObject("orderCode", data)+"</a>";
+}
+
+function drawMemberInfo(data, args, idx){
+	return "<label>"+
+				"<div>收件人 : 小王</div>"+
+					"</br>"+
+				"<div>地址 : 上海市闸北</div>"+
+					"</br>"+
+				"<div>电话号码 : 13162342550</div>"+
+			"</label>";
+}
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime asc", firstPage: true, lastPage: false,
+		items: [
+					{orderCode:"866248688",name:"张三",serviceType:"1",describe:"破损.......",isReceipt:"1",status:"1",createtime:"2013-03-05",handleName:"小王"},
+					{orderCode:"866248688",name:"张三",serviceType:"2",describe:"破损.......",isReceipt:"2",status:"2",createtime:"2013-03-05",handleName:"小王"},
+					{orderCode:"866248688",name:"张三",serviceType:"1",describe:"破损.......",isReceipt:"1",status:"3",createtime:"2013-03-05",handleName:"小王"},
+					{orderCode:"866248688",name:"张三",serviceType:"2",describe:"破损.......",isReceipt:"2",status:"1",createtime:"2013-03-05",handleName:"小王"}
+				]
+		});
+
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+    $j("#table1").on("reload", function(){
+    	$j("td.col-1 a",this).click(function(){
+    		loxia.openPage('order-details.html','aaa',null,[0,0]);
+    	});
+    	
+    	
+    });
+    
+    $j.ui.loxiasimpletable().typepainter.serviceType= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span>退货</span>";
+        	}
+        	else if(data==2){
+        		return "<span>换货</span>";
+        	}
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+    
+    $j.ui.loxiasimpletable().typepainter.extStatus= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span>新建</span>";
+        	}
+        	else if(data==2){
+        		return "<span>审核通过</span>";
+        	}
+			else if(data==3){
+				return "<span>处理完成</span>";
+        	}
+            
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+    $j.ui.loxiasimpletable().typepainter.isInvoiceState= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span class='ui-pyesno ui-pyesno-no' title='无'></span>";
+        	}
+        	else if(data==2){
+        		return "<span class='ui-pyesno ui-pyesno-yes' title='有'></span>";
+        	}
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+			/* {label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"}, */
+			{name:"orderCode",label:"订单号",width:"10%",sort:"orderCode",template:"drawOrder"},
+			{name:"itemPic",label:"商品主图",width:"10%",template:"drawSkuIcon"},
+			{name:"name",label:"收货人",width:"10%"},
+			{name:"serviceType",label:"服务类型",width:"5%",type:"serviceType"},
+			{name:"status",label:"申请状态",width:"7%",type:"extStatus"},
+			{name:"isReceipt",label:"有无发票",width:"5%",type:"isInvoiceState"},
+			{name:"pic",label:"问题图片",width:"10%",template:"drawPropIcon"},
+			{name:"describe",label:"问题描述",width:"8%"},
+			{name:"memberInfo",label:"联系人信息",width:"15%",template:"drawMemberInfo"},
+			{name:"createtime",label:"创建时间",width:"10%",sort:"createtime"},
+			{name:"handleName",label:"处理人",width:"10%"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime desc", firstPage: true, lastPage: false,
+			items: [
+					{orderCode:"866248688",name:"张三",serviceType:"1",describe:"破损.......",isReceipt:"1",status:"1",createtime:"2013-03-05",handleName:"小王"},
+					{orderCode:"866248688",name:"张三",serviceType:"2",describe:"破损.......",isReceipt:"2",status:"2",createtime:"2013-03-05",handleName:"小王"},
+					{orderCode:"866248688",name:"张三",serviceType:"1",describe:"破损.......",isReceipt:"1",status:"3",createtime:"2013-03-05",handleName:"小王"},
+					{orderCode:"866248688",name:"张三",serviceType:"2",describe:"破损.......",isReceipt:"2",status:"1",createtime:"2013-03-05",handleName:"小王"}
+				]
+			}
+	});
+
+	refreshData();
+});
+
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/users.png">申请退换货列表
+    </div>
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+        <table>
+            <tr>
+            	
+                <td><label>订单号</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="订单编码"></input></span>
+                </td>
+                <td><label>收货人</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="收货人姓名"></input></span>
+                </td>
+                <td><label>处理人</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="售后员姓名"></input></span>
+                </td>
+        	</tr>
+        	<tr>
+                <td><label>申请状态</label></td>
+	            <td>
+	               <span>
+						<select  loxiaType="select" >
+							<option value="0">不限</option>
+	                        <option value="1">新建</option>
+	                        <option value="2">审核通过</option>
+	                        <option value="3">处理完成</option>
+	                    </select>
+					</span>
+	            </td>
+                <td><label>服务类型</label></td>
+	            <td>
+	               <span>
+						<select  loxiaType="select" >
+							<option value="0">不限</option>
+	                        <option value="1">退货</option>
+	                        <option value="2">换货</option>
+	                    </select>
+					</span>
+	            </td>
+                <td><label>有无发票</label></td>
+                <td>
+                <span>
+					<select loxiaType="select"  >
+						<option value="0">不限</option>
+                        <option value="1">有</option>
+                        <option value="2">无</option>
+                    </select>
+				</span>
+                </td>
+        	</tr>
+			<tr>
+	            <td><label>创建时间</label></td>
+	            <td>
+	               <span><input type="text" id="startTime" name="startTime"  value="" loxiaType="date" mandatory="false" /></span>
+	            </td>
+	            <td><label>——</label></td>
+	            <td>
+	                <span><input type="text" id="endTime" name="endTime"  value="" loxiaType="date" mandatory="false"/></span>
+	            </td>
+	        </tr>
+        </table>
+        <div class="button-line1">
+        	<a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+    <div class="ui-block">
+   	 	<div class="border-grey" id="table1" caption="申请退换货列表"></div>
+    </div>
+</div>
+
+
+</body>
+</html>

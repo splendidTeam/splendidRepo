@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PromotionPriorityAdjustGroup.findAllPromotionPriorityAdjustGroupList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PromotionPriorityAdjustGroup.findPromotionPriorityAdjustGroupListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PromotionPriorityAdjustGroup.findPromotionPriorityAdjustGroupListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($adjustId)
+		       					and ADJUSTID=:adjustId
+		       				#end
+
+		       			
+		       				#if($promotionId)
+		       					and PROMOTIONID=:promotionId
+		       				#end
+
+		       			
+		       				#if($groupName)
+		       					and GROUP_NAME=:groupName
+		       				#end
+		       				#if($groupNameForLike)
+		       					and GROUP_NAME like :groupNameForLike
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PromotionPriorityAdjustGroup.findPromotionPriorityAdjustGroupListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($adjustId)
+		       					and ADJUSTID=:adjustId
+		       				#end
+
+		       			
+		       				#if($promotionId)
+		       					and PROMOTIONID=:promotionId
+		       				#end
+
+		       			
+		       				#if($groupName)
+		       					and GROUP_NAME=:groupName
+		       				#end
+		       				#if($groupNameForLike)
+		       					and GROUP_NAME like :groupNameForLike
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PromotionPriorityAdjustGroup.enableOrDisablePromotionPriorityAdjustGroupByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_prm_priorityadjustgroup
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionPriorityAdjustGroup.removePromotionPriorityAdjustGroupByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_prm_priorityadjustgroup
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionPriorityAdjustGroup.removePromotionPriorityAdjustGroupByAdjustIdsAndGroupName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_prm_priorityadjustgroup where adjustid=:adjustId and group_name=:groupName
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<bean id="PromotionPriorityAdjustGroup.findAllEffectPromotionPriorityAdjustGroupList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="PromotionPriorityAdjustGroup.findEffectPromotionPriorityAdjustGroupListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where lifecycle=1
+		       		
+					
+		       			
+		       				#if($adjustId)
+		       					and ADJUSTID=:adjustId
+		       				#end
+
+		       			
+		       				#if($promotionId)
+		       					and PROMOTIONID=:promotionId
+		       				#end
+
+		       			
+		       				#if($groupName)
+		       					and GROUP_NAME=:groupName
+		       				#end
+		       				#if($groupNameForLike)
+		       					and GROUP_NAME like :groupNameForLike
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PromotionPriorityAdjustGroup.findEffectPromotionPriorityAdjustGroupListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where lifecycle=1
+		       		
+					
+		       			
+		       				#if($adjustId)
+		       					and ADJUSTID=:adjustId
+		       				#end
+
+		       			
+		       				#if($promotionId)
+		       					and PROMOTIONID=:promotionId
+		       				#end
+
+		       			
+		       				#if($groupName)
+		       					and GROUP_NAME=:groupName
+		       				#end
+		       				#if($groupNameForLike)
+		       					and GROUP_NAME like :groupNameForLike
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="PromotionPriorityAdjustGroup.findPromotionPriorityAdjustGroupListByAdjustId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where ADJUSTID = :adjustId order by group_name
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="PromotionPriorityAdjustGroup.findPromotionPriorityAdjustGroupListByGroupName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_priorityadjustgroup where group_name = :groupName
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

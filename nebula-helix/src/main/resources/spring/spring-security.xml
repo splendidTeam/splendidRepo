@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" 
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+	<!-- 与web.xml中配置的csrfFilter对应 -->
+	<!-- CSRF protection. Here we only include the CsrfFilter instead of all 
+		of Spring Security. See http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#csrf 
+		for more information on Spring Security's CSRF protection -->
+	<beans:bean id="requireCsrfProtectionMatcher" class="com.baozun.nebula.sdk.utils.CsrfUrlWhiteList" />
+	
+	<beans:bean id="csrfFilter" class="org.springframework.security.web.csrf.CsrfFilter">
+		<beans:constructor-arg>
+			<beans:bean
+				class="org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository" />
+		</beans:constructor-arg>
+		<beans:property name="requireCsrfProtectionMatcher" ref="requireCsrfProtectionMatcher" />
+	</beans:bean>
+	
+	<!-- 用于SecurityFilter生成SecurityWrapperMultipartRequest -->
+	<beans:bean id="multipartResolver" name="multipartResolver"
+		class="com.baozun.nebula.security.SecurityCommonsMultipartResolver">
+		<beans:property name="maxUploadSize" value="100000000" />
+	</beans:bean>
+	
+	<!-- XSS参数过滤白名单 -->
+	<beans:bean class="com.baozun.nebula.security.SecurityConfig" >
+		<beans:property name="ignoreParameters">
+			<beans:set>
+				<beans:value>_csrf</beans:value>
+				<!-- TODO:需要统一过滤json内容 -->
+				<beans:value>skuInfos</beans:value>
+			</beans:set>
+		</beans:property>
+	</beans:bean>
+	
+	<!-- 用于数据库字段加解密 -->
+	<beans:bean id="piiEncryptionModule" class=" com.baozun.nebula.security.crypto.PIIEncryptionModule">
+		<beans:constructor-arg index="0" value="#{meta['pii.key']}"></beans:constructor-arg>
+		<beans:constructor-arg index="1" value="#{meta['pii.ivParameter']}"></beans:constructor-arg>
+	</beans:bean>
+	
+	
+</beans:beans>  

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:loxia="http://loxia.benjamin.cn/schema/core"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://loxia.benjamin.cn/schema/core http://loxia.benjamin.cn/schema/core/loxia-spring-ext.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd	
+		">
+		
+
+	<!--memcached client -->
+	<bean id="memcachedClient" class="net.spy.memcached.spring.MemcachedClientFactoryBean">
+		<property name="servers" value="#{mem['memcachedClient.servers']}" />
+		<property name="protocol" value="#{mem['memcachedClient.protocol']}" />
+		<property name="transcoder">
+			<bean class="net.spy.memcached.transcoders.SerializingTranscoder">
+				<property name="compressionThreshold" value="#{mem['memcachedClient.transcoder.compressionThreshold']}" />
+			</bean>
+		</property>
+		<property name="opTimeout" value="#{mem['memcachedClient.opTimeout']}" />
+		<property name="timeoutExceptionThreshold" value="#{mem['memcachedClient.timeoutExceptionThreshold']}" />
+		<property name="hashAlg">
+			<value type="net.spy.memcached.DefaultHashAlgorithm">KETAMA_HASH</value>
+		</property>
+		<property name="locatorType" value="#{mem['memcachedClient.locatorType']}" />
+		<property name="failureMode" value="#{mem['memcachedClient.failureMode']}" />
+		<property name="useNagleAlgorithm" value="#{mem['memcachedClient.useNagleAlgorithm']}" />
+	</bean>
+
+	<bean id="transcoder" class="loxia.support.cache.SerializingStringSetTranscoder">
+		<property name="compressionThreshold" value="#{mem['transcoder.compressionThreshold']}" />
+	</bean>
+
+	<bean id="cacheAspect" class="loxia.support.cache.CacheAspect" />
+</beans>

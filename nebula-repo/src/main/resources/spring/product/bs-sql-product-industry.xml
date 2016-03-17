@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Industry.findAllIndustryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.findIndustryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry 
+		       			 where ID=:id
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.findIndustryListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		,
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="Industry.findIndustryListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($parentId)
+		       					and PARENT_ID=:parentId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.findIndustryListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($parentId)
+		       					and PARENT_ID=:parentId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="Industry.enableOrDisableIndustryByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_industry
+		       		set lifecycle=:state
+		       		 where id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)	 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Industry.removeIndustryByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_industry
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Industry.removeIndustryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_industry
+		       		set lifecycle=2
+		       		 where 
+		       		id = :id	       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.updateIndustryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改一个行业 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+		       		UPDATE t_pd_industry  SET NAME= :name , MODIFY_TIME=now() , lifecycle= :lifecycle WHERE ID= :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Industry.findAllEffectIndustryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="Industry.findEffectIndustryListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry where lifecycle=1
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($parentId)
+		       					and PARENT_ID=:parentId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.findEffectIndustryListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_industry where lifecycle=1
+		       		
+					
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+
+		       			
+		       				#if($parentId)
+		       					and PARENT_ID=:parentId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.findIndustryListByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询某一店铺下的所有行业</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				SELECT * FROM t_pd_industry d WHERE d.id IN (
+				SELECT industry_id FROM t_pd_shopproperty WHERE shop_id = :shopId
+				UNION 
+				SELECT d.parent_id FROM t_pd_industry d WHERE d.id IN (SELECT industry_id FROM t_pd_shopproperty WHERE shop_id = :shopId)
+				) AND lifecycle !=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Industry.findIndustryCount" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更具名称和parentId查询行业条数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				SELECT count(*) CNT FROM t_pd_industry where name= :name and parent_Id= :parentId and lifecycle !=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Industry.findIndustryListByNames" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据行业名称去查询行业信息(lifecycle = 1)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT * FROM t_pd_industry 
+					where lifecycle = 1 and name in (
+						#foreach($name in $industryNames)
+							'$name',
+						#end
+						-1
+					)
+                ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Industry.findIndustryListByCommonPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品属性扩展表(CommonProperty)的id查询使用了该属性的所有行业信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select distinct a.* from  t_pd_industry a LEFT JOIN t_pd_property b 
+					on a.id=b.industry_id where b.common_property_id=:commonPropertyId 
+					and b.lifecycle!=2
+                ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

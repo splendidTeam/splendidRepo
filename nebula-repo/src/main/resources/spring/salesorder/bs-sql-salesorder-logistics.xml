@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Logistics.findLogisticsByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询物流追踪信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					l.ID,
+					l.ORDER_ID as orderId,
+					l.IS_FINISH as isFinish,
+					l.TRACKING_DESCRIPTION as trackingDescription, 
+					l.MODIFY_TIME as modiftTime
+					from t_so_logistics as l
+					where l.ORDER_ID = :orderId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Logistics.findLogisticsListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询物流追踪信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					l.ID,
+					l.ORDER_ID as orderId,
+					l.IS_FINISH as isFinish,
+					l.TRACKING_DESCRIPTION as trackingDescription, 
+					l.MODIFY_TIME as modiftTime
+					from t_so_logistics as l
+					where 1=1
+					#if($startModifyDate)
+						and l.MODIFY_TIME >= :startModifyDate
+					#end
+					#if($endModifyDate)
+						and l.MODIFY_TIME <= :endModifyDate
+					#end
+					#if($startDate)
+						and l.CREATE_TIME >= :startDate
+					#end
+					#if($endDate)
+						and l.CREATE_TIME <= :endDate
+					#end
+					#if($notFinish)
+						and (l.IS_FINISH = false or l.IS_FINISH is Null)
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

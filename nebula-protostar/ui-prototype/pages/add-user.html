@@ -1,0 +1,514 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/user-role.js"></script>
+<style type="text/css">
+.wl-right-auto2
+{
+
+
+border:1px solid #ccc;
+overflow-y:scroll;
+
+}
+.wl-right-auto2  input[type="checkbox"]
+{
+clear:both;
+}
+
+.wl-right-auto2  input[type="radio"]
+{
+clear:both;
+}
+.wl-right-auto2  p
+{
+width:80%;
+}
+</style>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j.extend(loxia.regional['zh-CN'],{
+    "PWD_NOT_MATCH":"密码输入不一致",
+    "EMAIL_NOT_VALID":"邮箱不符合规则",
+    "MOBILE_NOT_VALID":"手机不符合规则",
+    "ORG_NOT_SELECT":"请选择所属组织",
+    "NPS_NOTSEL_ROLE":"请选择角色",
+    "NPS_NOTSEL_ORG":"请选择组织",
+    "NPS_ROLE_EXISTS":"角色重复"
+    
+    
+});
+
+
+function userFormValidate(form){
+   
+    console.log("xxx");
+    if($j("input[name='pwd']").val() != $j("input[name='pwd1']").val()){
+    	 return nps.i18n("PWD_NOT_MATCH");
+        
+    }
+
+    var emailreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+   
+    if(!emailreg.test($j("input[name='email']").val()))
+     {
+                 
+         return nps.i18n("EMAIL_NOT_VALID");
+                
+     }
+
+    var mobilereg=/^((13[0-9]{1})|(15[0-9]{1}))+\d{8}$/;
+    if(!mobilereg.test($j("input[name='mobile']").val()))
+    {
+                
+        return nps.i18n("MOBILE_NOT_VALID");
+               
+    }
+
+    var selVal=$j("input[name='rad_user_org']:checked").val();
+   
+    if(selVal== undefined ||selVal==''){
+    	 return nps.i18n("ORG_NOT_SELECT");
+      }
+    
+    return loxia.SUCCESS;  
+}
+
+
+function refreshRoleSel(){
+	$j(".ui-tag-change").each(function(){
+		$j(this).find("li").eq(0).addClass("selected");
+		$j(this).find(".tag-change-content").find(".tag-change-in").eq(0).show();
+		$j(this).find("li").on("click",function(){
+			var thisindex=$j(".ui-tag-change ul li").index($j(this));
+			$j(this).addClass("selected").siblings("li").removeClass("selected");
+			$j(".tag-change-in").eq(thisindex).css("display","block").siblings(".tag-change-in").css("display","none");
+		});
+	});
+}
+
+function drawDeleteButton(data, args, idx){
+	return "<a href='javascript:void(0);' val='"+loxia.getObject("urId", data)+"' class='func-button delete'>删除</a>";
+}
+
+function drawEditButton(data, args, idx){
+
+	var orgTypeId=loxia.getObject("orgTypeId", data);
+	if(orgTypeId==2){
+		return "<a href='javascript:void(0);' val='"+loxia.getObject("urId", data)+"' class='func-button edit'>修改</a>";
+	}
+	else{
+		return "<a href='javascript:void(0);' val='"+loxia.getObject("urId", data)+"' class='func-button' style='color:#000000;' title='系统类型不能删除,可以删除'>无法修改</a>";
+	}
+}
+
+function drawOrgList(data, args, idx){
+	return "<div id='orgListValue_"+loxia.getObject("urId", data)+"' >"+loxia.getObject("orgs", data)+"</div>";
+}
+
+//获取所属组织
+function querySelOrg(){
+
+	return $j("#orgSelect").val();
+}
+
+function chooseFilterOrgType(sel, obj){
+
+	var val=sel.split("-")[0];
+
+	selOrgType(val);
+    return loxia.SUCCESS;
+}
+
+
+function chooseFilterRole(val, obj){
+    
+    return loxia.SUCCESS;
+}
+
+
+
+function chooseFilterOrg(val, obj){
+
+	orgTypeSelInit();
+    return loxia.SUCCESS;
+}
+
+//选中组织类型以后同时联动修改：
+//角色列表，组织列表
+function selOrgType(val){
+	var roleHtml='';
+	var orghtml='';
+    
+	if(val == '1'){
+
+		for(var o in sysRoleList){
+			roleHtml+='<option value="'+sysRoleList[o].id+'-'+sysRoleList[o].name+'">'+sysRoleList[o].name+'</option>';
+		}
+
+		for(var o in sysOrgList){
+			orghtml+='<div class="children-store"><input checked="checked" type="checkbox" name="userOrgAdd" value="'+sysOrgList[o].id+'" nvalue="'+sysOrgList[o].name+'">'+sysOrgList[o].name+'</div>';
+		}
+        
+    }else {
+    	for(var o in shopRoleList){
+    		roleHtml+='<option value="'+shopRoleList[o].id+'-'+shopRoleList[o].name+'">'+shopRoleList[o].name+'</option>';
+		}
+
+    	for(var o in shopOrgList){
+    		console.log(querySelOrg());
+        	if(querySelOrg()=='1'||parseInt(val)==shopOrgList[o].id){
+        		console.log("进入了");	
+				orghtml+='<div style="line-height:25px;"><input  type="checkbox" name="userOrgAdd" value="'+shopOrgList[o].id+'" nvalue="'+shopOrgList[o].name+'">'+shopOrgList[o].name+'</div>';
+        	}
+		}
+       
+    }
+    $j("#roleSelect").html(roleHtml);
+    $j("#addUserRoleDiv").html(orghtml);
+}
+
+//通过用户所属组织来决定用户可选的组织类型
+function orgTypeSelInit(){
+
+    if(querySelOrg()=='1'){
+        var html='<option value="1-系统">系统</option> <option value="2-店铺">店铺</option>';
+		$j("#orgTypeSelect").html(html);
+		 selOrgType('1');
+    }
+    else{
+
+    	var html='<option value="2-店铺">店铺</option>';
+		$j("#orgTypeSelect").html(html);
+		 selOrgType(querySelOrg());
+    }
+
+    
+}
+
+//初始化数据(店铺类型的组织)
+var shopOrgList=[{"id":2,"name":"店铺2"},{"id":3,"name":"店铺3"},{"id":4,"name":"店铺4"},{"id":5,"name":"店铺5"},{"id":6,"name":"店铺6"},{"id":7,"name":"店铺7"},{"id":8,"name":"店铺8"}];
+
+//初始化数据(系统类型的组织)
+var sysOrgList=[{"id":1,"name":"系统"}];
+
+//初始化数据(系统类型的角色)
+var sysRoleList=[{"id":1,"name":"系统角色1"}];
+
+//初始化数据(系统类型的角色)
+var shopRoleList=[{"id":2,"name":"角色2"},{"id":3,"name":"角色3"},{"id":4,"name":"角色4"},{"id":5,"name":"角色5"},{"id":6,"name":"角色6"}];
+
+//初始化数据,用户当前的角色组织对应关系，如没有设为new Array()
+var urData=[{"urId":1,"orgTypeId":1,"roleId":1,"orgIds":[1],"orgType":"系统","role":"系统角色1","orgs":"系统"},
+          {"urId":2,"orgTypeId":2,"roleId":2,"orgIds":[2,3],"orgType":"店铺","role":"角色2","orgs":"店铺2,店铺3"},
+          {"urId":3,"orgTypeId":2,"roleId":3,"orgIds":[4,3],"orgType":"店铺","role":"角色3","orgs":"店铺4,店铺3"},
+          {"urId":4,"orgTypeId":2,"roleId":4,"orgIds":[4,5],"orgType":"店铺","role":"角色4","orgs":"店铺4,店铺5"},
+
+]
+
+
+function refreshUserRole(){
+
+	 $j("#userRoleTable").loxiasimpletable("refresh",userRoleList.findAll());
+
+
+}
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+
+    //初始化用户角色关系
+    userRoleList.init(urData);
+
+   
+	var curUrId=urData.length;
+
+    orgTypeSelInit();
+    //添加用户角色关系
+    $j(".func-button.addrole").click(function(){
+        	var ortTypeSel=$j("#orgTypeSelect").val();
+        	var roleSel=$j("#roleSelect").val();
+			var orgTypeId=ortTypeSel.split("-")[0];
+			var orgTypeName=ortTypeSel.split("-")[1];
+			var roleId=roleSel.split("-")[0];
+			var roleName=roleSel.split("-")[1];
+			
+			var orgList=new Array();
+			var orgNameList=new Array();
+			 $j("input[name='userOrgAdd']:checked").each(function(i,n){
+				 orgList[i]=$j(this).val();
+				 orgNameList[i]=$j(this).attr("nvalue");
+			 });
+			console.log(roleId);
+			if(roleId==''){
+
+				nps.info(loxia.getLocaleMsg("NPS_FORM_CHECK_ERROR"),loxia.getLocaleMsg("NPS_NOTSEL_ROLE"));
+				return ;
+			}
+			if(orgList.length==0){
+				
+				nps.info(loxia.getLocaleMsg("NPS_FORM_CHECK_ERROR"),loxia.getLocaleMsg("NPS_NOTSEL_ORG"));
+				return ;
+			}
+			 
+			var object=userRoleList.findByRoleId(parseInt(roleId));
+			if(object!=null){
+				
+				nps.info(loxia.getLocaleMsg("NPS_FORM_CHECK_ERROR"),loxia.getLocaleMsg("NPS_ROLE_EXISTS"));
+				return ;
+			}
+			alert("服务端发送新增请求");
+			//addElement的urId 需要服务端返回后再加上
+			userRoleList.addElement(curUrId++,parseInt(orgTypeId),parseInt(roleId),orgList,orgTypeName,roleName,orgNameList)
+			
+			
+			refreshUserRole();
+     });
+
+    $j("#userRoleTable").loxiasimpletable({
+    	cols:[{name:"role",label:"角色",width:"20%"},
+    	      {name:"orgType",label:"组织类型",width:"12%"},
+    	      {name:"orgs",label:"组织",width:"40%", align:"left",template:"drawOrgList"},
+    	      {label:"修改",width:"10%", align:"left",template:"drawEditButton"},
+    	      {label:"删除",width:"10%", align:"left",template:"drawDeleteButton"}]
+    	});
+
+    
+	 //修改角色对应组织
+	 $j("#userRoleTable").on("click",".func-button.edit",function(){
+		 var urId=$j(this).attr("val");
+		 var urObject=userRoleList.findByUrId(parseInt(urId));
+
+		 var html='<div style="overflow-y:scroll;border:1px solid;height:100px;">';
+		 var orgNameArray=urObject.orgs.split(",");
+
+		 //重新绘制编辑框中的checkbox
+		 for(var j=0;j<shopOrgList.length;j++){
+
+			 var eleHtml='';
+			 //遍历已选中的数据
+		 	 for(var i=0;i<urObject.orgIds.length;i++){
+
+				if(shopOrgList[j].id== urObject.orgIds[i]){
+		 			eleHtml+='<div style="line-height:25px;"><input checked="checked" type="checkbox" name="userOrg_'+urObject.urId+'" value="'+urObject.orgIds[i]+'" nvalue="'+orgNameArray[i]+'">'+orgNameArray[i]+'</div>';
+					break;
+				}
+  			
+		 	  }
+		 	  if(eleHtml==''){
+
+		 		 eleHtml+='<div style="line-height:25px;"><input type="checkbox" name="userOrg_'+urObject.urId+'" value="'+shopOrgList[j].id+'" nvalue="'+shopOrgList[j].name+'">'+shopOrgList[j].name+'</div>';
+			 }
+
+		 	html+=eleHtml;
+		 }
+			html+='</div>';
+			html+='<div><a class="func-button orgok" href="javascript:void(0)" val='+urId+'>确定</a>&nbsp;<a class="func-button orgcancel" href="javascript:void(0)" val='+urId+'>取消</a></div>';
+			$j("#orgListValue_"+urId).html(html);
+
+			//确定修改
+			 $j(".func-button.orgok").on("click",function(){
+				 var urId=$j(this).attr("val");
+				 var urObject=userRoleList.findByUrId(parseInt(urId));
+				 //遍历选中的角色组织对应关系
+				 var orgIds=new Array();
+				 var orgNames=new Array();
+				 $j("input[name='userOrg_"+urId+"']:checked").each(function(i,n){
+					 orgIds[i]=$j(this).val();
+					 orgNames[i]=$j(this).attr("nvalue");
+				 });
+
+				 alert("发送修改请求到服务端");
+				 
+				 userRoleList.modifyElement(urId,urObject.orgTypeId,urObject.roleId,orgIds,orgNames)
+
+				 $j("#orgListValue_"+urId).html(orgNames.join(","));
+				 
+			 });
+			 //取消修改
+			 $j(".func-button.orgcancel").on("click",function(){
+				 var urId=$j(this).attr("val");
+				 var urObject=userRoleList.findByUrId(parseInt(urId));
+				 $j("#orgListValue_"+urId).html(urObject.orgs);
+			 });
+					
+	 });
+
+
+
+	//删除角色对应组织
+	$j("#userRoleTable").on("click",".func-button.delete",function(){
+		 var urId=$j(this).attr("val");
+		alert("发送删除请求");
+		userRoleList.deleteElement(parseInt(urId));
+		refreshUserRole();
+	 }); 
+    
+    refreshUserRole();
+    
+    $j(".button.orange.save").on("click",function(){
+    	
+    	nps.submitForm('userForm',{mode:'async'})
+    })
+    
+     $j(".button.return").on("click",function(){
+    	
+    	 location.href='list-user.html'
+    })
+
+    
+});
+
+
+
+//对象相关
+
+
+</script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+    
+   <form name="userForm" action="" method="post">
+	<div class="ui-title1">
+	<img src="../images/wmi/blacks/32x32/user.png">
+	用户管理
+	</div>
+	<div class="ui-block">
+    <div class="ui-block-title1">添加/修改用户</div>
+    
+    <div class="ui-block-content border-grey">
+            
+    <div class="ui-block-line">
+          <label>登录名</label>
+          <div>
+              <input type="text" loxiaType="input" mandatory="true" placeholder="用户登录名">
+          </div>
+     </div>
+    
+    <div class="ui-block-line">
+         <label>密码</label>
+         <div >
+              <input name="pwd" type="password" loxiaType="input" value="" mandatory="true" placeholder="用户密码"/>
+         </div>
+    </div>
+    
+    <div class="ui-block-line">
+         <label>确认密码</label>
+         <div>
+              <input name="pwd1" type="password" loxiaType="input" value="" mandatory="true" placeholder="用户密码"/>
+         </div>
+    </div>
+    
+     <div class="ui-block-line">
+         <label>邮箱</label>
+         <div>
+              <input name="email" type="text" loxiaType="input" value="" mandatory="true" placeholder="aaa@aa.com"/>
+         </div>
+    </div>
+    
+    <div class="ui-block-line">
+         <label>真实姓名</label>
+         <div>
+              <input  type="text" loxiaType="input" value="" mandatory="true" placeholder="张三"/>
+         </div>
+    </div>
+    
+    <div class="ui-block-line">
+         <label>手机</label>
+         <div>
+              <input type="text" name="mobile" loxiaType="input" value="" mandatory="false" placeholder="13xxxxxxxxx"/>
+         </div>
+    </div>
+    
+
+    
+    <div class="ui-block-line">
+         <label title="">所属组织</label>
+         <div >    
+    			<select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+    				<option value="1">系统</option>
+    				
+    				<option value="2">店铺2</option>
+    				<option value="3">店铺3</option>
+    				<option value="4">店铺4</option>
+    				<option value="5">店铺5</option>
+    				<option value="6">店铺6</option>
+    				<option value="7">店铺7</option>
+    				<option value="8">店铺8</option>
+    			</select>
+    			
+    			&nbsp;<span style="line-height:25px;color:#ff0000;">(*此处可以灵活选择组织只是为了演示效果,功能做好此处不能修改)</span>
+         </div>
+    </div>
+    
+     <div class="ui-block-line ">
+         <label title="">管理角色</label>
+            
+    			<div id="userRoleTable" class="border-grey " style="width:92%;clear:both;">
+    			</div>
+    			
+         
+    </div>
+    
+    <div class="ui-block-line ">
+         <label title="">新增角色</label>
+         
+    			<div id="userRoleTable" style="padding:5px;" class="border-grey ">
+    				<span>组织类型 </span>
+    				
+    				<span><select loxiaType="select"  checkmaster="chooseFilterOrgType" style="width:20%;" id="orgTypeSelect"><option value="1-系统">系统</option> <option value="2-店铺">店铺</option> </select></span>
+    				
+    				<span>角色 </span>
+    				<span><select loxiaType="select" checkmaster="chooseFilterRole"  style="width:20%;" id="roleSelect"><option value="">请先选择组织类型</option> </select></span>
+    				<br/>
+    				<span>组织 </span>
+    				<div id="addUserRoleDiv" class="border-grey " style="overflow-y:scroll;height:100px;margin:10px;width:48%;"></div>
+    				
+    				<span><a href="javascript:void(0)" class="func-button addrole">新增角色</a> </span>
+    			</div>
+    			
+         
+    </div>
+    </div>
+
+	</div>
+   </form>
+    
+    <div class="button-line">
+         <input type="button" value="保存" class="button orange save" title="保存"/>
+
+         <input type="button" value="返回" class="button return" title="返回"/>
+         
+    </div>
+</div>
+
+
+</body>
+</html>

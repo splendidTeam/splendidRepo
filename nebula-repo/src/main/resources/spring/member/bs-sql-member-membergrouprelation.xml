@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MemberGroupRelation.findAllMemberGroupRelationList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroupRelation.findMemberByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过多种id查询用户组织角色关系列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from
+		       		  	T_MEM_MEMBER_GROUP_RELATION 
+		       		  	where 1=1 
+		       		  		#if($Id)
+		       					and id=:Id
+		       				#end
+		       				#if($orgaId)
+		       					and member_id=:memberId
+		       				#end
+		       				#if($roleId)
+		       					and group_id=:groupId
+		       				#end
+		       		  		
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroupRelation.findMemberGroupRelationListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberGroupRelation.findMemberGroupRelationListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($groupId)
+		       					and GROUP_ID=:groupId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroupRelation.findMemberGroupRelationListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($groupId)
+		       					and GROUP_ID=:groupId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberGroupRelation.enableOrDisableMemberGroupRelationByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER_GROUP_RELATION
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroupRelation.removeMemberGroupRelationByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER_GROUP_RELATION
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroupRelation.findAllEffectMemberGroupRelationList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="MemberGroupRelation.findEffectMemberGroupRelationListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION where lifecycle=1
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($groupId)
+		       					and GROUP_ID=:groupId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroupRelation.findEffectMemberGroupRelationListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_MEMBER_GROUP_RELATION where lifecycle=1
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($groupId)
+		       					and GROUP_ID=:groupId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroupRelation.findMemberGroupRelationByMemberIdAndGroupId"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出所有 会员id 在memberIds和 分组groupid 在groupIds中的MemberGroupRelation
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+					SELECT * FROM t_mem_member_group_relation WHERE 
+					group_id IN (
+					  #foreach($groupId in $groupIds)
+					  $groupId,
+					  #end
+					  '-1'
+					) AND member_id IN (
+					  #foreach($memberId in $memberIds)
+					  $memberId,
+					  #end
+					  '-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroupRelation.bindMemberGroup" class="loxia.dao.support.DynamicQueryHolder">
+		<description>将一个会员关联到一个会员分组下</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				INSERT INTO t_mem_member_group_relation(id, group_id,member_id)
+                VALUES (nextval('S_T_MEM_MEMBER_GROUP'), :groupId ,:memberId);
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroupRelation.unBindMemberGroup" class="loxia.dao.support.DynamicQueryHolder">
+		<description>把一个或者多个会员从一个分组下解除关联(关系表物理删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM t_mem_member_group_relation WHERE group_id = :groupId 
+					    AND member_id IN (
+					    #foreach( $memberId in $memberIds )
+    					$memberId,
+						#end
+						'-1'
+					    )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroupRelation.findMemberGroupRelationListByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据会员ID查找所有分组条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * FROM t_mem_member_group_relation WHERE  member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	
+</beans>

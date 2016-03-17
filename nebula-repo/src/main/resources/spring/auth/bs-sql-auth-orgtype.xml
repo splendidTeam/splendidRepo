@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+	
+	<bean id="OrgType.findAllList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取所有机构类型</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_au_org_type where lifecycle=1 order by id desc
+		       			
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="OrgType.findOptionCommand" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取选项列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select id as value,name as label from t_au_org_type where lifecycle=1
+		       			
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		
+</beans>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+	
+	
+	<bean id="UserRole.findRoleByUserIdAndOranId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户id,组织机构id查询角色列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select role.* 
+		       			from t_au_role as role
+		       		  	left join t_au_user_role as uor
+		       		  	on uor.role_id=role.id
+		       		  	where role.lifecycle=1 
+		       		  		and uor.user_id=:userId 
+		       		  		and uor.org_id=:orgaId
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="UserRole.findRoleByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过多种id查询用户组织角色关系列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from
+		       		  	t_au_user_role 
+		       		  	where 1=1 
+		       		  		#if($userId)
+		       					and user_id=:userId
+		       				#end
+		       				#if($orgaId)
+		       					and org_id=:orgaId
+		       				#end
+		       				#if($roleId)
+		       					and role_id=:roleId
+		       				#end
+		       		  		
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="UserRole.findUserRoleByUserId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户id查询有效的用户组织角色列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from
+						t_au_user_role user_role
+						where user_id=:userId
+						and exists(select 1 from t_au_role role where role.lifecycle=1 and role.id=user_role.role_id) and 
+						exists(select 1 from t_au_organization organization where organization.lifecycle=1 and organization.id=user_role.org_id)
+						and exists(select 1 from t_au_user  where t_au_user.lifecycle=1 and t_au_user.id=user_role.user_id)
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="UserRole.findOrganizationByUserId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户id获取已挂权限的机构列表(去重distinct,在用户组织角色表中)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		
+						select * from t_au_organization as orga
+       						where orga.id in
+       							(	select DISTINCT org_id 
+       								from t_au_user_role as uor 
+       								where uor.user_id=:userId
+       							 )
+		       		  			
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="UserRole.insertByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过三个id添加关联</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				  
+		       		insert into t_au_user_role(id,org_id,user_id,role_id) values (nextval('S_T_AU_USER_ROLE'),:orgaId,:userId,:roleId)
+		       		
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="UserRole.removeByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户及角色id批量删除</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				  
+		       		delete from
+		       		  	t_au_user_role 
+		       		  	where 1=1 
+		       		  		#if($userId)
+		       					and user_id=:userId
+		       				#end
+		       				#if($orgaId)
+		       					and org_id=:orgaId
+		       				#end
+		       				#if($roleId)
+		       					and role_id=:roleId
+		       				#end
+		       		
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="UserRole.findUserAclByUserId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户id查询所有权限列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				  
+
+		       		
+		       		select distinct ap.acl,aur.org_id as orgId from t_au_user_role aur,t_au_role ar,t_au_role_privilege arp,t_au_privilege ap
+where aur.user_id=:userId and aur.role_id=ar.id and ar.id=arp.role_id  and arp.pri_id=ap.id
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

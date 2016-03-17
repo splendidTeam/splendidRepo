@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+<script type="text/javascript">
+
+var check="";
+
+var setting = {
+		check: {
+			enable: true,
+			chkboxType: {"Y":"", "N":""}
+		},
+		view: {
+			dblClickExpand: true,
+			showIcon:false
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		},
+		callback: {
+			beforeClick: beforeClick,
+			onCheck: onCheck
+		}
+	};
+
+	var zNodes =[
+{ id:0, name:"ROOT",state:"0",sort:1, open:true,root:"true",nocheck:true},
+		{ id:1, pId:0, name:"鞋", open:true,nocheck:true},
+		{ id:11, pId:1, name:"运动鞋"},
+		{ id:12, pId:1, name:"休闲鞋"},
+		{ id:2, pId:0, name:"服装", open:true,nocheck:true},
+		{ id:21, pId:2, name:"T恤"},
+		{ id:22, pId:2, name:"裤子"},
+		{ id:23, pId:2, name:"卫衣"},
+		{ id:3, pId:0, name:"配件", open:true,nocheck:true},
+		{ id:31, pId:3, name:"帽子"},
+		{ id:32, pId:3, name:"手套"},
+		{ id:33, pId:3, name:"袜子"}
+	 ];
+
+	function beforeClick(treeId, treeNode) {
+		var zTree = $j.fn.zTree.getZTreeObj("treeDemo");
+		zTree.checkNode(treeNode, !treeNode.checked, null, true);
+		return false;
+	}
+	
+	function onCheck(e, treeId, treeNode) {
+		var zTree = $j.fn.zTree.getZTreeObj("treeDemo"),
+		nodes = zTree.getCheckedNodes(true),
+		v = "";
+		for (var i=0, l=nodes.length; i<l; i++) {
+			v += nodes[i].id + ",";
+		}
+		if (v.length > 0 ) v = v.substring(0, v.length-1);
+		check = v;
+	}
+
+	
+
+	$j(document).ready(function(){
+		loxia.init({debug: true, region: 'zh-CN'});
+	    nps.init();
+		$j.fn.zTree.init($j("#treeDemo"), setting, zNodes);	
+		$j(".button.orange.saveshop").on("click",function(){
+			nps.submitForm('userForm',{mode:'async'})
+	    });
+		$j(".button.back").on("click",function(){
+			location.href='shop.html';
+	    });
+		$j(".button.saveprop").on("click",function(){
+			location.href='shop-industry3.html';
+	    });
+		
+	});
+
+</script>
+</head>
+<body>
+
+<div class="content-box width-percent100">
+   
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/cube.png">店铺管理</div>
+    <div class="ui-block">
+        <div class="ui-block-content ui-block-content-lb" style="padding-bottom: 10px;">
+            <table>
+                <tr>
+                    <td><label>店铺编码</label></td>
+                    <td><span>xxxxxx</span></td>
+                    <td><label>店铺名称</label></td>
+                    <td><span>Nike官方旗舰店</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	<div class="ui-tag-change">
+       <ul class="tag-change-ul">
+           <li >修改店铺</li>
+           <li ><a href="shop-industry3.html">设置店铺属性</a></li>
+       </ul>
+              
+       <div class="tag-change-content">
+
+            <div class="tag-change-in" >
+
+                 <form name="userForm" action="" method="post">
+                    <div class="ui-block">
+                        <div class="ui-block-title1">修改店铺</div>
+                        <div class="ui-block-content">
+                            <div class="ui-block-line">
+                                <label>店铺名称</label>
+                                <div>
+                                    <input type="text" loxiaType="input" value="" mandatory="true" placeholder="店铺名称"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-block-line">
+                                <label>店铺编码</label>
+                                <div>
+                                    <input name="pwd" type="password" loxiaType="input" value="" mandatory="true" placeholder="店铺编码"/>
+                                </div>
+                            </div>
+
+                            <div class="ui-block-line">
+                                <label>描述</label>
+                                <div>
+                                    <textarea cols="50" size="30" style="border:2px solid #EEE">test</textarea>
+                                </div>
+                            </div>
+
+                            <div class="ui-block-line">
+                                <label>状态</label>
+                                <div>
+                                    <select id="statusSelect" loxiaType="select" >
+
+                                        <option value="3">有效</option>
+                                        <option value="4">无效</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="ui-block-line">
+                                <label>关联行业</label>
+                                <div>
+                                    <ul id="treeDemo" class="ztree" style="margin-top:0; width:180px; height: 100%;"></ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+
+                    <div class="button-line">
+                        <input type="button" value="保存" title="保存" class="button orange saveshop"/>
+                        <input type="button" value="返回" title="返回" class="button back"/>
+                        <input type="button" value="修改店铺属性" title="修改店铺属性" class="button saveprop"/>
+                    </div>
+            </div>
+           <div class="tag-change-in"></div>
+       </div>
+    </div>
+	
+
+	
+	
+</div>
+</body>
+</html>

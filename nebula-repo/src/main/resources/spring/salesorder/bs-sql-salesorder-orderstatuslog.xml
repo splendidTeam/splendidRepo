@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="OrderStatusLog.findOrderStatusLogByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询订单历史日志信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					o.ID,
+					o.ORDER_ID,
+					o.BEFORE_STATUS,
+					o.AFTER_STATUS,
+					o.OPERATOR_ID,
+					o.OPERATOR_NAME,
+					o.CREATE_TIME
+					from t_so_orderstatuslog as o
+					where o.ORDER_ID = :orderId
+					order by o.CREATE_TIME 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	<bean id="OrderStatusLog.findOrderStatusLogById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询订单历史日志信息 用于oms</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT 
+						o.ID as id,
+						o.ORDER_ID as orderId,
+	                    s.code as orderCode,
+						o.BEFORE_STATUS as beforeStatus,
+						o.AFTER_STATUS as afterStatus,
+						o.OPERATOR_ID as operatorId,
+						o.OPERATOR_NAME as operatorName,
+						o.CREATE_TIME as createTime
+					FROM t_so_orderstatuslog as o
+			        LEFT JOIN t_so_salesorder as s
+			        ON s.id = o.order_id
+					where o.ID = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+
+</beans>

@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ColumnModule.findAllColumnModuleList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnModule.findColumnModuleListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ColumnModule.findColumnModuleListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where 
+		       				1=1
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+
+		       				#if($pageCode)
+		       					and PAGE_ID=(select id from T_COL_COLUMN_PAGE where CODE = :pageCode)
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnModule.findColumnModuleCommandListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where 
+		       				1=1
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnModule.findColumnModuleListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ColumnModule.enableOrDisableColumnModuleByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_COL_COLUMN_MODULE
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnModule.removeColumnModuleByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_COL_COLUMN_MODULE
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnModule.findAllEffectColumnModuleList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ColumnModule.findEffectColumnModuleListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnModule.findEffectColumnModuleListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_MODULE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($publishTime)
+		       					and PUBLISH_TIME >= :publishTimeStart
+		       				#end
+		       				#if($publishTime)
+		       					and PUBLISH_TIME <= :publishTimeEnd
+		       				#end
+
+		       			
+		       				#if($pageId)
+		       					and PAGE_ID=:pageId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnModule.findColumnModuleByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过code查询ColumnModule</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tccm.* 
+					from T_COL_COLUMN_MODULE tccm
+					left join t_col_column_page tccg on  tccg.id = tccm.page_id
+					where tccm.code = :code and tccg.code = :pageCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ColumnModule.findColumnModuleCommandByPageCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过code查询ColumnModule</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tccm.* 
+					from T_COL_COLUMN_MODULE tccm
+					left join t_col_column_page tccg on  tccg.id = tccm.page_id
+					where tccg.code = :pageCode order by tccm.id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnModule.findColumnModuleByPageCodeAndModuleCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过pagecode和moduleCode查询ColumnModule</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT *
+					FROM t_col_column_module
+					WHERE code = :moduleCode
+						AND page_id IN (SELECT id
+							FROM t_col_column_page
+							WHERE code = :pageCode)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>		
+	
+	<bean id="ColumnModule.updateColModPubTimById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改发布时间</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_col_column_module set publish_time = :publishTime where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

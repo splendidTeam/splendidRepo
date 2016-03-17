@@ -1,0 +1,683 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PromotionCouponCode.findPromotionCouponCodeCommandByCouponCode"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据优惠券券码查询优惠券</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT	
+						cc.id AS id,
+						cc.coupon_id AS couponId,
+						cc.shop_id AS shopId,
+						cc.coupon_code AS couponCode,
+						c.coupon_name AS couponName,
+						c.discount AS discount,
+						c.type AS couponType,
+						cc.start_time AS startTime,
+						cc.end_time AS endTime,
+						cc.isused AS isused,
+						cc.create_id AS createId,
+						cc.create_time AS createTime,
+						cc.active_mark AS activeMark,
+						cc.limit_times AS limitTimes
+					FROM t_prm_promotioncouponcode cc
+					JOIN t_prm_promotioncoupon c ON cc.coupon_id = c.id
+					WHERE 
+						c.active_mark = 1 AND
+						cc.active_mark = 1 AND
+						cc.coupon_code = :code
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<bean id="PromotionCouponCode.findPromotionCouponCodeListByidlist"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询不在范围的优惠code</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				   select	
+				code.id as id,
+				code.active_mark as activeMark,
+				code.coupon_code as couponCode,
+				code.coupon_id as couponId,
+				coupon.coupon_name as couponName,
+				code.create_id as  create_id,
+				code.create_time as createTime,
+				code.end_time as endTime,
+				code.isused as isused,
+				code.shop_id as shopId,
+				code.start_time as startTime,
+				code.version as version,
+				code.limit_times as limitTimes
+				FROM T_PRM_PROMOTIONCOUPONCODE  code
+				INNER JOIN t_prm_promotioncoupon  coupon on  code.coupon_id=coupon."id"
+		        WHERE 	code.ACTIVE_MARK = 1 AND  code.ISUSED = 0 and code.limit_times>0 AND 
+                (code.start_time<=now()  and  code.end_time>=now() ) and 
+				  code.COUPON_ID=:coupontype
+		       	   #if($couponid)
+		       	    and code.id not in(
+		       	       #foreach($id in $couponid)
+					         $id,
+					   #end
+					   -1
+		       	    )	
+				  #end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="PromotionCouponCode.findPromotionCouponCodeListBymemberidlist"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据用户ID查询优惠券</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+                cop.id as id,
+				cod.active_mark as activeMark,
+				cod.coupon_code as couponCode,
+				cod.coupon_id as couponId,
+				cpn.coupon_name as couponName,
+				cod.create_id as  create_id,
+				cod.create_time as createTime,
+				cod.end_time as endTime,
+				cod.isused as isused,
+				cod.shop_id as shopId,
+				cod.start_time as startTime,
+				cod.version as version,
+				cod.limit_times as limitTimes
+				from   T_SYS_COUPON_LOG  cop INNER JOIN t_prm_promotioncouponcode cod on cop.promotioncouponcodeid=cod.id
+				INNER JOIN t_prm_promotioncoupon cpn on cop.promotioncouponid=cpn.id
+				where  cop.memberid=:memberid and cod.active_mark=1 and  cod.isused=0 and  cod.limit_times>0 
+				and (cod.start_time<=now()  and  cod.end_time>=now() ) 
+				ORDER BY cod.start_time desc 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+
+    
+    
+    
+    <bean id="PromotionCouponCode.findPromotionCouponCodeListpersonalcenterlist"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>个人中心查询优惠券</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+                cop.id as id,
+				cod.active_mark as activeMark,
+				cod.coupon_code as couponCode,
+				cod.coupon_id as couponId,
+				cpn.coupon_name as couponName,
+				cpn.type as couponType,
+				cpn.discount as couponDiscount,
+				cod.create_id as  create_id,
+				cod.create_time as createTime,
+				cod.end_time as endTime,
+				cod.isused as isused,
+				cod.shop_id as shopId,
+				cod.start_time as startTime,
+				cod.version as version,
+				cod.limit_times as limitTimes
+				from   T_SYS_COUPON_LOG  cop INNER JOIN t_prm_promotioncouponcode cod on cop.promotioncouponcodeid=cod.id
+				INNER JOIN t_prm_promotioncoupon cpn on cop.promotioncouponid=cpn.id
+				where  cop.memberid=:memberid
+				#if($usable)
+					and cod.active_mark=1 and  cod.limit_times>0 
+				    and (cod.start_time<=now()  and  cod.end_time>=now() ) 
+				#end
+				#if($alreadyuse)
+					and cod.limit_times<=0 
+				#end
+				#if($alreaddue)
+					 and cod.end_time<now()
+				#end
+				ORDER BY cod.start_time desc 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+    
+
+	<bean
+		id="PromotionCouponCode.findPromotionCouponCodeCommandListByCouponCodeList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据优惠券券码列表查询优惠券列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT	
+						cc.id AS id,
+						cc.coupon_id AS couponId,
+						cc.shop_id AS shopId,
+						cc.coupon_code AS couponCode,
+						c.coupon_name AS couponName,
+						c.discount AS discount,
+						c.type AS couponType,
+						cc.start_time AS startTime,
+						cc.end_time AS endTime,
+						cc.isused AS isused,
+						cc.create_id AS createId,
+						cc.create_time AS createTime,
+						cc.active_mark AS activeMark,
+						cc.limit_times AS limitTimes
+					FROM t_prm_promotioncouponcode cc
+					JOIN t_prm_promotioncoupon c ON cc.coupon_id = c.id
+					WHERE 
+						c.active_mark = 1 AND
+						#if($couponTypeId)
+							c.id = :couponTypeId AND
+						#end
+						cc.active_mark = 1 AND
+						#if($shopId)
+							cc.shop_id = :shopId AND
+						#end
+						#if($queryTime)
+						    :queryTime between cc.start_time and cc.end_time AND
+						#end
+						cc.isused = 0 AND
+						cc.coupon_code in (
+			       		#foreach( $code in $codes )
+	    					'$code',
+						#end
+			       		'')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean
+		id="PromotionCouponCode.findAndCheckPromotionCouponCodeCommandListByCodes"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据优惠券券码列表查询优惠券列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT	
+						cc.id AS id,
+						cc.coupon_id AS couponId,
+						cc.shop_id AS shopId,
+						cc.coupon_code AS couponCode,
+						c.coupon_name AS couponName,
+						c.discount AS discount,
+						c.type AS couponType,
+						cc.start_time AS startTime,
+						cc.end_time AS endTime,
+						cc.isused AS isused,
+						cc.create_id AS createId,
+						cc.create_time AS createTime,
+						cc.active_mark AS activeMark,
+						cc.limit_times AS limitTimes
+					FROM t_prm_promotioncouponcode cc
+					JOIN t_prm_promotioncoupon c ON cc.coupon_id = c.id
+					WHERE 
+						c.active_mark = 1 AND
+						cc.active_mark = 1 AND
+						#if($queryTime)
+						    :queryTime between cc.start_time and cc.end_time AND
+						#end
+						cc.coupon_code in (
+			       		#foreach( $code in $codes )
+	    					'$code',
+						#end
+			       		'')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionCouponCode.findAllPromotionCouponCodeList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_promotioncouponcode 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.findPromotionCouponCodeListByIds"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_promotioncouponcode where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.findPromotionCouponCodeBycoupon"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		  select * from t_prm_promotioncouponcode t
+
+                        where t.active_mark = 1 AND t.limit_times > 0 and now() > t.start_time and  now() < t.end_time
+
+                        #if($couponCode)
+                           and t.coupon_code =:couponCode
+                        #end
+                      
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.findPromotionCouponCodeListByQueryMap"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_promotioncouponcode where 
+		       			1=1
+		       				#if($couponCode)
+		       					and COUPON_CODE=:couponCode
+		       				#end
+
+		       			
+		       				#if($couponName)
+		       					and COUPON_NAME=:couponName
+		       				#end
+		       				#if($couponNameForLike)
+		       					and COUPON_NAME like :couponNameForLike
+		       				#end
+
+		       			
+		       				#if($couponType)
+		       					and COUPON_TYPE=:couponType
+		       				#end
+
+		       			
+		       				#if($discount)
+		       					and DISCOUNT=:discount
+		       				#end
+
+		       			
+		       				#if($startTime)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTime)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+
+		       			
+		       				#if($endTime)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTime)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
+
+		       			
+		       				#if($createId)
+		       					and CREATE_ID=:createId
+		       				#end
+
+		       			
+		       				#if($isused)
+		       					and ISUSED=:isused
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($activeMark)
+		       					and ACTIVE_MARK=:activeMark
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.querycouponcodeListByQueryMapWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件查询信息完整的优惠卷</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            SELECT	
+				cc.id AS id,
+				cc.coupon_id AS couponId,
+				cc.shop_id AS shopId,
+				cc.coupon_code AS couponCode,
+				c.coupon_name AS couponName,
+				c.discount AS discount,
+				c.type AS couponType,
+				cc.start_time AS startTime,
+				cc.end_time AS endTime,
+				cc.isused AS isused,
+				cc.create_id AS createId,
+				cc.create_time AS createTime,
+				cc.active_mark AS activeMark,
+				u.realname AS createName,
+				cc.limit_times AS limitTimes
+			FROM t_prm_promotioncouponcode cc
+			JOIN t_prm_promotioncoupon c ON cc.coupon_id = c.id
+            JOIN t_au_user u ON u.id = cc.create_id
+            where cc.active_mark = 1
+                    AND cc.shop_id = :shopId
+				#if($couponCode)
+					AND cc.coupon_code LIKE :couponCode
+				#end
+				#if($startTime)
+					AND cc.start_time >= :startTime
+				#end
+				#if($endTime)
+					AND cc.end_time <= :endTime
+				#end
+				#if($activeMark)
+					AND au.active_mark = :activeMark
+				#end
+				#if($couponType)
+					AND cc.coupon_id = :couponType
+				#end
+				#if($isused == 1)
+					AND cc.isused = 1
+				#end
+				#if($isused == 0)
+					AND cc.isused = 0 AND cc.end_time >= now()
+				#end
+				#if($isused == -1)
+					AND cc.isused = 0 AND cc.end_time < now()
+				#end
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.useOrUnusePromotionCouponCodeByCouponCodes"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_prm_promotioncouponcode
+		       		set limit_times = limit_times+1
+		       		 where 
+		       		coupon_code in (
+		       		#foreach( $couponCode in $couponCodes )
+    				'$couponCode',
+					 #end
+		       		 '-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.comsumePromotionCouponCodeByCouponCodes"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_prm_promotioncouponcode
+
+					set limit_times = limit_times-1
+					Where active_mark = 1 AND limit_times > 0 AND
+
+					start_time <= now() and now() <= end_time AND
+					coupon_code in (
+		       		#foreach( $couponCode in $couponCodes )
+    				'$couponCode',
+					 #end
+		       		 '-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionCouponCode.enableOrDisableCouponCodeById"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询信息完整的优惠卷类型</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	
+			update t_prm_promotioncouponcode
+		       		set ACTIVE_MARK=:activeMark
+		       		 where 
+		       		id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionCouponCode.removePromotionCouponCodeByIds"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_prm_promotioncouponcode
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.findAllEffectPromotionCouponCodeList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_promotioncouponcode where ACTIVE_MARK=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionCouponCode.findEffectPromotionCouponCodeListByQueryMap"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_promotioncouponcode where 1=1
+		       				#if($couponCode)
+		       					and COUPON_CODE=:couponCode
+		       				#end
+
+		       			
+		       				#if($couponName)
+		       					and COUPON_NAME=:couponName
+		       				#end
+		       				#if($couponNameForLike)
+		       					and COUPON_NAME like :couponNameForLike
+		       				#end
+
+		       			
+		       				#if($couponType)
+		       					and COUPON_TYPE=:couponType
+		       				#end
+
+		       			
+		       				#if($discount)
+		       					and DISCOUNT=:discount
+		       				#end
+
+		       			
+		       				#if($startTime)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTime)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+
+		       			
+		       				#if($endTime)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTime)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
+
+		       			
+		       				#if($createId)
+		       					and CREATE_ID=:createId
+		       				#end
+
+		       			
+		       				#if($isused)
+		       					and ISUSED=:isused
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($activeMark)
+		       					and ACTIVE_MARK=:activeMark
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean
+		id="PromotionCouponCode.findEffectPromotionCouponCodeListByQueryMapWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_prm_promotioncouponcode where 1=1
+		       				#if($couponCode)
+		       					and COUPON_CODE=:couponCode
+		       				#end
+
+		       			
+		       				#if($couponName)
+		       					and COUPON_NAME=:couponName
+		       				#end
+		       				#if($couponNameForLike)
+		       					and COUPON_NAME like :couponNameForLike
+		       				#end
+
+		       			
+		       				#if($couponType)
+		       					and COUPON_TYPE=:couponType
+		       				#end
+
+		       			
+		       				#if($discount)
+		       					and DISCOUNT=:discount
+		       				#end
+
+		       			
+		       				#if($startTime)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTime)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+
+		       			
+		       				#if($endTime)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTime)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
+
+		       			
+		       				#if($createId)
+		       					and CREATE_ID=:createId
+		       				#end
+
+		       			
+		       				#if($isused)
+		       					and ISUSED=:isused
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($activeMark)
+		       					and ACTIVE_MARK=:activeMark
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionCouponCode.findCouponInfoByCouponCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				SELECT t1.*, t2.shopName FROM 
+				(SELECT cc.coupon_id AS couponId, cc.coupon_code AS couponCode, cc.start_time AS startTime, cc.end_time AS endTime, 
+				cc.isused AS isUsed, cc.shop_id AS shopId, c.coupon_name AS couponName, c.discount, c."type" 
+				FROM t_prm_promotioncouponcode AS cc INNER JOIN t_prm_promotioncoupon c 
+				ON cc.coupon_id = c."id" AND cc.active_mark = 1 AND c.active_mark = 1 AND cc.isused = 0 
+				AND cc.start_time <= now() AND cc.end_time > now() AND cc.coupon_code = :couponCode) AS t1,
+				(SELECT s."id" AS shopId, o."name" AS shopName FROM t_au_organization o LEFT JOIN t_ma_shop s ON s.org_id = o."id") AS t2 
+				WHERE t1.shopId = t2.shopId
+                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PromotionCouponCode.findTimesUsedByCouponCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT limit_times AS limitTimes from t_prm_promotioncouponcode where coupon_code = :couponCode
+                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+</beans>

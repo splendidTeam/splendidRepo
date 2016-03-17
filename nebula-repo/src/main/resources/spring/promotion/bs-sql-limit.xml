@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    
+   <bean id="LimitHead.findLimitCommandConditionallyWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件，分页查询限购列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT
+					h.id AS id,
+					h.shop_id AS shopId,
+					h.name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.update_time AS updateTime,
+					h.update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.id AS audienceId,
+					au.combo_id AS memberComboId,
+					au.combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.combo_name AS memberComboText,
+					au.combo_expression AS memberComboExpression,
+					sc.id AS scopeId,
+					sc.combo_id AS productComboId,
+					sc.combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.combo_name AS productComboText,
+					sc.combo_expression AS productComboExpression,
+					con.id AS conditionId,
+					con.text AS conditionText,
+					con.expression AS conditionExpression
+				FROM t_sc_limit_head h
+				INNER JOIN t_sc_limit_audience au ON au.limit_id = h.id
+				INNER JOIN t_sc_limit_scope sc ON sc.limit_id = h.id
+				INNER JOIN t_sc_limit_condition con ON con.limit_id = h.id
+				INNER JOIN t_mem_tag_rule mc ON mc.id = au.combo_id
+				INNER JOIN t_pd_tag_rule pc ON pc.id = sc.combo_id
+				INNER JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE	1 = 1
+				#if($name)
+				AND h.name LIKE :name
+				#end
+				#if($startTime) 
+				AND :startTime  between h.start_time and h.end_time
+				#end
+				#if($endTime) 
+				AND :endTime between h.start_time and h.end_time
+				#end
+				#if($memberComboType)
+				AND au.combo_type = :memberComboType
+				#end
+				
+				#if($lifecycle == 0)
+   					and h.lifecycle = 0 and h.end_time >= now() 
+   				#end
+   				#if($lifecycle == 1)
+   					and h.lifecycle = 1
+   					and h.start_time > now()
+   				#end
+   				#if($lifecycle == 2)
+   					and (h.lifecycle = 1 or h.lifecycle = 2)
+   					and now() between h.start_time and h.end_time
+   				#end
+   				#if($lifecycle == 3)
+   					and (h.lifecycle = 3 or h.end_time < now())
+   				#end
+				AND h.shop_id = :shopId
+				
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	   <bean id="LimitHead.findEditLimitCommandConditionallyWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据条件，分页查询限购列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT
+					h.id AS id,
+					h.shop_id AS shopId,
+					h.name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.update_time AS updateTime,
+					h.update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.id AS audienceId,
+					au.combo_id AS memberComboId,
+					au.combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.combo_name AS memberComboText,
+					au.combo_expression AS memberComboExpression,
+					sc.id AS scopeId,
+					sc.combo_id AS productComboId,
+					sc.combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.combo_name AS productComboText,
+					sc.combo_expression AS productComboExpression,
+					con.id AS conditionId,
+					con.text AS conditionText,
+					con.expression AS conditionExpression
+				FROM t_sc_limit_head h
+				LEFT JOIN t_sc_limit_audience au ON au.limit_id = h.id
+				LEFT JOIN t_sc_limit_scope sc ON sc.limit_id = h.id
+				LEFT JOIN t_sc_limit_condition con ON con.limit_id = h.id
+				LEFT JOIN t_mem_tag_rule mc ON mc.id = au.combo_id
+				LEFT JOIN t_pd_tag_rule pc ON pc.id = sc.combo_id
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE	1 = 1
+				#if($name)
+				AND h.name LIKE :name
+				#end
+				#if($startTime) 
+				AND :startTime  between h.start_time and h.end_time
+				#end
+				#if($endTime) 
+				AND :endTime between h.start_time and h.end_time
+				#end
+				#if($memberComboType)
+				AND au.combo_type = :memberComboType
+				#end
+				
+				#if($lifecycle == 0)
+   					and h.lifecycle = 0 and h.end_time >= now() 
+   				#end
+   				#if($lifecycle == 1)
+   					and h.lifecycle = 1
+   					and h.start_time > now()
+   				#end
+   				#if($lifecycle == 2)
+   					and (h.lifecycle = 1 or h.lifecycle = 2)
+   					and now() between h.start_time and h.end_time
+   				#end
+   				#if($lifecycle == 3)
+   					and (h.lifecycle = 3 or h.end_time < now())
+   				#end
+				AND h.shop_id = :shopId
+				
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="LimitHead.findLimitCommandById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询限购VO</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				SELECT
+					h.id AS id,
+					h.shop_id AS shopId,
+					h.name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.update_time AS updateTime,
+					h.update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.id AS audienceId,
+					au.combo_id AS memberComboId,
+					au.combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.combo_name AS memberComboText,
+					au.combo_expression AS memberComboExpression,
+					sc.id AS scopeId,
+					sc.combo_id AS productComboId,
+					sc.combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.combo_name AS productComboText,
+					sc.combo_expression AS productComboExpression,
+					con.id AS conditionId,
+					con.text AS conditionText,
+					con.expression AS conditionExpression
+				FROM t_sc_limit_head h
+				LEFT JOIN t_sc_limit_audience au ON au.limit_id = h.id
+				LEFT JOIN t_sc_limit_scope sc ON sc.limit_id = h.id
+				LEFT JOIN t_sc_limit_condition con ON con.limit_id = h.id
+				LEFT JOIN t_mem_tag_rule mc ON mc.id = au.combo_id
+				LEFT JOIN t_pd_tag_rule pc ON pc.id = sc.combo_id
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE
+					h.id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="LimitHead.deleteLimitConditionByLimitId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据限购ID删除限购条件</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+				DELETE
+				FROM
+					t_sc_limit_condition
+				WHERE
+					limit_id = (
+						SELECT
+							id
+						FROM
+							t_sc_limit_head
+						WHERE
+							id = :id
+					)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="LimitHead.findActiveLimitListByTimeScope" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询与该限购时间上冲突的已启用的限购列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT
+					h.id AS id,
+					h.shop_id AS shopId,
+					h.name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.update_time AS updateTime,
+					h.update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.id AS audienceId,
+					au.combo_id AS memberComboId,
+					au.combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.combo_name AS memberComboText,
+					au.combo_expression AS memberComboExpression,
+					sc.id AS scopeId,
+					sc.combo_id AS productComboId,
+					sc.combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.combo_name AS productComboText,
+					sc.combo_expression AS productComboExpression,
+					con.id AS conditionId,
+					con.text AS conditionText,
+					con.expression AS conditionExpression
+				FROM t_sc_limit_head h
+				JOIN t_sc_limit_audience au ON au.limit_id = h.id
+				JOIN t_sc_limit_scope sc ON sc.limit_id = h.id
+				JOIN t_sc_limit_condition con ON con.limit_id = h.id
+				JOIN t_mem_tag_rule mc ON mc.id = au.combo_id
+				JOIN t_pd_tag_rule pc ON pc.id = sc.combo_id
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE
+					h.lifecycle = 1 
+				AND h.shop_id = :shopId
+				AND h.id != :id
+				AND h.end_time >= now()
+				AND	(
+						(SELECT start_time FROM t_sc_limit_head WHERE id = :id) BETWEEN h.start_time AND h.end_time
+					OR 
+						(SELECT end_time FROM t_sc_limit_head WHERE id = :id) BETWEEN h.start_time AND h.end_time
+				)
+				ORDER BY h.start_time, h.end_time
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="LimitHead.findActiveOrEffectiveLimitCommandList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询已启用或已生效的限购列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	SELECT
+					h.id AS id,
+					h.shop_id AS shopId,
+					h.name AS name,
+					h.default_priority AS defaultPriority,
+					h.lifecycle AS lifecycle,
+					h.start_time AS startTime,
+					h.end_time AS endTime,
+					h.create_time AS createTime,
+					h.create_id AS createId,
+					u1.realname AS createName,
+					h.update_time AS updateTime,
+					h.update_id AS updateId,
+					u2.realname AS updateName,
+					h.publish_time AS publishTime,
+					h.publish_id AS publishId,
+					u3.realname AS publishName,
+					h.cancel_time AS cancelTime,
+					h.cancel_id AS cancelId,
+					u4.realname AS cancelName,
+					au.id AS audienceId,
+					au.combo_id AS memberComboId,
+					au.combo_type AS memberComboType,	
+					mc.name AS memberComboName,
+					au.combo_name AS memberComboText,
+					au.combo_expression AS memberComboExpression,
+					sc.id AS scopeId,
+					sc.combo_id AS productComboId,
+					sc.combo_type AS productComboType,
+					pc.name AS productComboName,
+					sc.combo_name AS productComboText,
+					sc.combo_expression AS productComboExpression,
+					con.id AS conditionId,
+					con.text AS conditionText,
+					con.expression AS conditionExpression
+				FROM t_sc_limit_head h
+				JOIN t_sc_limit_audience au ON au.limit_id = h.id
+				JOIN t_sc_limit_scope sc ON sc.limit_id = h.id
+				JOIN t_sc_limit_condition con ON con.limit_id = h.id
+				JOIN t_mem_tag_rule mc ON mc.id = au.combo_id
+				JOIN t_pd_tag_rule pc ON pc.id = sc.combo_id
+				LEFT JOIN t_au_user u1 ON u1.id = h.create_id
+				LEFT JOIN t_au_user u2 ON u2.id = h.update_id
+				LEFT JOIN t_au_user u3 ON u3.id = h.publish_id
+				LEFT JOIN t_au_user u4 ON u4.id = h.cancel_id
+				WHERE
+					h.lifecycle = 1 
+				AND h.end_time >= :now
+				ORDER BY h.default_priority ASC, h.publish_time DESC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="LimitHead.updateLimitLifecycle" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新限购生命周期</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	UPDATE t_sc_limit_head
+            	SET lifecycle = :lifecycle
+            	WHERE id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+   <bean id="LimitHead.activateLimit" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用限购</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+            	UPDATE t_sc_limit_head
+            	SET lifecycle = 1, publish_id = :userId, publish_time = now()
+            	WHERE id = :id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="Consultants.resolveConsultant" class="loxia.dao.support.DynamicQueryHolder">
+		<description>回答问题</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				update t_sns_consultants
+				set lifecycle = :lifecycle, resolvenote = :resolvenote, resolveid = :resolveid, resolvetime= now()
+				#if($publishmark==1)
+		       		, publishmark = :publishmark , publishid = :resolveid, publishtime = now() 
+		       	#end
+				where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Consultants.updateConsultant" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改答案</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				update t_sns_consultants
+				set resolvenote = :resolvenote, lastupdateid = :lastupdateid, lastupdatetime= now()
+				#if($publishmark==1)
+		       		, publishmark = :publishmark , publishid = :lastupdateid, publishtime = now() 
+		       	#end
+		       	#if($publishmark==0)
+		       		, publishmark = :publishmark , unpublishid = :lastupdateid, unpublishtime = now()
+		       	#end
+				where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Consultants.publishConsultant" class="loxia.dao.support.DynamicQueryHolder">
+		<description>设为公开答案</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				update t_sns_consultants
+				set publishmark = :publishmark , publishid = :publishid, publishtime = now() 
+				where id = :id
+	                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Consultants.unpublishConsultant" class="loxia.dao.support.DynamicQueryHolder">
+		<description>取消设为公开答案</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				update t_sns_consultants
+				set publishmark = :publishmark , unpublishid = :unpublishid, unpublishtime = now() 
+				where id = :id
+	                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="Consultants.findConsultants" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找咨询列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				select  
+				a.id as id,
+				a.itemid as itemId,
+				e.title itemName,
+				a.consultype as  consultype,
+				a.content as content,
+				a.memberid as memberId,
+				b.login_name as memberName,
+				a.createtime as createTime,
+				a.lifecycle as lifeCycle,
+				a.publishmark as publishMark,
+				a.responseid as responseId,
+				a.responsetime as responseTime,
+				a.resolvenote as resolveNote,
+				a.resolveid as resolveId,				
+				c.realname as resolveName,
+				a.lastupdateid as lastUpdateId,
+				f.realname as lastUpdateName,
+				a.lastupdatetime as lastUpdateTime,
+				a.publishid as publishId,
+				a.publishtime as publishTime,
+				a.unpublishid as unPublishId,
+				a.unpublishtime as unPublishTime,
+				a.resolvetime as resolveTime,
+				d.code as itemCode,
+				d.pic_url as picUrl
+			
+			from t_sns_consultants a
+
+			LEFT JOIN T_MEM_MEMBER b on 	a.memberid = b.id
+			LEFT JOIN T_AU_USER c on a.resolveid =c.id
+			LEFT JOIN T_PD_ITEMINFO e on a.itemid = e.item_id
+			LEFT JOIN T_PD_ITEM d on d.id = e.item_id
+			LEFT JOIN T_AU_USER f on  a.lastupdateid = f.id
+			where 1=1
+			
+				#if($code)
+					   and d.CODE like :code
+				   #end
+			
+				   #if($title)
+					   and e.TITLE like :title
+				   #end
+			
+				#if($lifecycle)
+					and a.lifecycle = :lifecycle
+				#end
+			
+				#if($lifecycle==3)
+					and a.resolveid = c.id
+				#end
+			
+				#if($publishmark)
+					and a.publishmark = :publishmark
+				#end
+			
+				#if($createDateStart)
+					and a.createtime >= :createDateStart
+				#end
+				#if($createDateEnd)
+					and a.createtime <= :createDateEnd
+				#end
+				#if($resolvetimeStart)
+					and a.resolvetime >= :resolvetimeStart
+				#end
+				#if($resolvetimeEnd)
+					and a.resolvetime <= :resolvetimeEnd
+				#end
+				#if($memberId)
+					and a.memberid = :memberId
+				#end
+			
+	                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Consultants.findConsultantsNoPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找咨询列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				select  
+				a.id as id,
+				a.itemid as itemId,
+				e.title itemName,
+				a.consultype as  consultype,
+				a.content as content,
+				a.memberid as memberId,
+				b.login_name as memberName,
+				a.createtime as createTime,
+				a.lifecycle as lifeCycle,
+				a.publishmark as publishMark,
+				a.responseid as responseId,
+				a.responsetime as responseTime,
+				a.resolvenote as resolveNote,
+				a.resolveid as resolveId,				
+				c.realname as resolveName,
+				a.lastupdateid as lastUpdateId,
+				f.realname as lastUpdateName,
+				a.lastupdatetime as lastUpdateTime,
+				a.publishid as publishId,
+				a.publishtime as publishTime,
+				a.unpublishid as unPublishId,
+				a.unpublishtime as unPublishTime,
+				a.resolvetime as resolveTime,
+				d.code as itemCode,
+				d.pic_url as picUrl
+			
+			from t_sns_consultants a
+
+			LEFT JOIN T_MEM_MEMBER b on 	a.memberid = b.id
+			LEFT JOIN T_AU_USER c on a.resolveid =c.id
+			LEFT JOIN T_PD_ITEMINFO e on a.itemid = e.item_id
+			LEFT JOIN T_PD_ITEM d on d.id = e.item_id
+			LEFT JOIN T_AU_USER f on  a.lastupdateid = f.id
+			where 1=1
+			
+				#if($code)
+					   and d.CODE like :code
+				   #end
+			
+				   #if($title)
+					   and e.TITLE like :title
+				   #end
+			
+				#if($lifecycle)
+					and a.lifecycle = :lifecycle
+				#end
+			
+				#if($lifecycle==3)
+					and a.resolveid = c.id
+				#end
+			
+				#if($publishmark)
+					and a.publishmark = :publishmark
+				#end
+			
+				#if($createDateStart)
+					and a.createtime >= :createDateStart
+				#end
+				#if($createDateEnd)
+					and a.createtime <= :createDateEnd
+				#end
+				#if($resolvetimeStart)
+					and a.resolvetime >= :resolvetimeStart
+				#end
+				#if($resolvetimeEnd)
+					and a.resolvetime <= :resolvetimeEnd
+				#end
+				#if($memberId)
+					and a.memberid = :memberId
+				#end
+			
+	                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Consultants.findById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找咨询列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				
+				select  
+				a.id as id,
+				a.itemid as itemId,
+				e.title itemName,
+				a.consultype as  consultype,
+				a.content as content,
+				a.memberid as memberId,
+				b.login_name as memberName,
+				a.createtime as createTime,
+				a.lifecycle as lifeCycle,
+				a.publishmark as publishMark,
+				a.responseid as responseId,
+				a.responsetime as responseTime,
+				a.resolvenote as resolveNote,
+				a.resolveid as resolveId,				
+				c.realname as resolveName,
+				a.lastupdateid as lastUpdateId,
+				f.realname as lastUpdateName,
+				a.lastupdatetime as lastUpdateTime,
+				a.publishid as publishId,
+				a.publishtime as publishTime,
+				a.unpublishid as unPublishId,
+				a.unpublishtime as unPublishTime,
+				a.resolvetime as resolveTime,
+				d.code as itemCode
+			
+			from t_sns_consultants a
+
+			LEFT JOIN T_MEM_MEMBER b on 	a.memberid = b.id
+			LEFT JOIN T_AU_USER c on a.resolveid =c.id
+			LEFT JOIN T_PD_ITEMINFO e on a.itemid = e.item_id
+			LEFT JOIN T_PD_ITEM d on d.id = e.item_id
+			LEFT JOIN T_AU_USER f on  a.lastupdateid = f.id
+			where a.id = :id
+
+			
+	                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Consultants.findConsultantsListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品Id查询对商品咨询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tsc.id as id,
+						tsc.itemid as itemId,
+						tsc.consultype as consultype,
+						tsc.content as content,
+						tsc.memberid as memberId,
+						tmm.login_name as memberName,
+						tsc.createtime as createTime,
+						tsc.resolvenote as resolveNote
+					from t_sns_consultants tsc 
+					LEFT JOIN t_mem_member tmm on tmm.id = tsc.memberid
+					where tsc.publishmark = 1 and tsc.lifeCycle = 3 
+					and tsc.itemid = :itemId				
+	                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

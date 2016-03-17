@@ -1,0 +1,326 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+		
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+		
+
+
+<script type="text/javascript">
+
+
+
+function editGroup(data, args, idx){
+	return "<a href='javascript:void(0);' class='func-button deleteGroup'>删除</a>";
+}
+
+function groupNameTemplate(data, args, idx){
+	return "<a href='javascript:void(0);' class='func-button showmember'>"+loxia.getObject("groupname",data)+"</a>";
+}
+
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("name", data)+"'/>";
+}
+
+
+function drawName(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('member-details.html','aaa',null,[0,1]);\">"+loxia.getObject("name", data)+"</a>";
+}
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"date asc", firstPage: true, lastPage: false,
+		items: [
+					{name:"张三",nickname:"昵称1",regsource:"QQ登录", type:"类型1", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"QQ登录", type:"类型2", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"QQ登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"QQ登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型",point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"aaatt",nickname:"昵称",regsource:"新浪登录", type:"类型", point:"0",lifecycle:"分组1",createtime:"2013-03-05", recentlytime:"2013-03-05"}
+				]
+		});
+
+
+	$j("#table2").loxiasimpletable("refresh",[
+					{groupname:"分组1"},
+					{groupname:"分组"},
+					{groupname:"分组"},
+					{groupname:"分组3"},
+					{groupname:"分组4"},
+					{groupname:"分组5"},
+					{groupname:"分组6"},
+					{groupname:"分组7"}
+				]);
+    
+
+
+}
+
+
+
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+		{label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"},
+		{name:"name",label:"会员名",width:"15%",template:"drawName"},
+		{name:"nickname",label:"昵称",width:"10%"},
+		{name:"regsource",label:"来源",width:"15%"},
+		{name:"type",label:"类型",width:"15%"},
+
+		{name:"lifecycle",label:"已加入分组",width:"15%"},
+		{name:"createtime",label:"创建时间",width:"15%"},
+		{name:"recentlytime",label:"最近登录时间",width:"15%"},
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"date desc", firstPage: true, lastPage: false,
+			items: [
+					
+					{name:"张三",nickname:"昵称1",regsource:"淘宝登录", type:"类型1",point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称",regsource:"淘宝登录", type:"类型2", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称3",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称4",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称5",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称6",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"李四",nickname:"昵称7",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"王五",nickname:"昵称8",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"},
+					{name:"王五",nickname:"昵称9",regsource:"淘宝登录", type:"类型", point:"0",lifecycle:"已绑定",createtime:"2013-03-05", recentlytime:"2013-03-05"}
+					
+			]
+			}
+	});
+
+
+	$j("#table2").loxiasimpletable({	
+		cols:
+		[
+		{label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"},
+		{name:"groupname",label:"名称",width:"70%",template:"groupNameTemplate"},
+		{label:"操作",width:"30%", template:"editGroup"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"date desc", firstPage: true, lastPage: false,
+			items: [
+					{groupname:"1分组1"},
+					{groupname:"1分组"},
+					{groupname:"1分组"},
+					{groupname:"44444"},
+					{groupname:"1分组4"},
+					{groupname:"1分组5"},
+					{groupname:"1分组6"},
+					{groupname:"1分组7"},
+					{groupname:"1分组8"},
+					{groupname:"1分组9"}		
+			]
+			}
+	});
+	
+	
+    $j("#table2").on("click",".func-button.showmember",function(){
+    	$j("#table1 .ui-loxia-table-title").html($j(this).text()+"会员列表");
+    	
+    })
+    
+     $j("#table2").on("click",".func-button.deleteGroup",function(){
+    	nps.confirm("确认删除","确定要删除选定的分组么？", function(){
+           
+    		nps.info("操作提示","删除成功")
+            refreshData();
+        });
+    });
+
+
+	refreshData();
+	
+});
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1">
+		<img src="../images/wmi/blacks/32x32/users.png">
+		会员关联分组
+	  
+        <input type="button" value="脱离分组" class="button orange bind" title="脱离分组"/>
+		<input type="button" value="加入分组" class="button orange unbing" title="加入分组"/>
+    
+    </div>
+    
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+     <table >
+        <tr>
+            <td><label>会员名</label></td>
+            <td>
+                <span id="searchkeytext"><input type="text" loxiaType="input" mandatory="false" placeholder="会员登录名"> </input></span>
+            </td>
+            
+             <td><label>注册时间段</label></td>
+            <td>
+                <span id="searchkeytext"> <input type="text" id="startTime" name="startTime" loxiaType="date" mandatory="false" /></span>
+            </td>
+            
+             <td ><label>——</label></td>
+            <td>
+             <span id="searchkeytext"> <input type="text" id="endTime" name="endTime" loxiaType="date" mandatory="false"/></span>
+            </td>
+            
+        </tr>   
+         
+         <tr>
+            
+           <td><label>来源</label></td>
+            <td>
+                <span id="searchkeytext">
+					<select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" >	
+						<option value="">不限</option>			
+						<option value="2">注册</option>
+						<option value="3">QQ登录</option>
+						<option value="4">新浪登录</option>
+					</select>
+				</span>
+            </td>
+         
+           
+            
+             <td><label>类型</label></td>
+            <td>
+                <span id="searchkeytext">
+                <select id="orgSelect" loxiaType="select" >		
+                		<option value="">不限</option>				
+						<option value="1">自注册</option>
+						<option value="2">自有帐号</option>
+						<option value="3">第三方会员</option>
+					</select>
+               </span>
+            </td>
+            
+			<td><label>是否绑定</label></td>
+            <td>
+                <span id="searchkeytext">
+					<select id="orgSelect" loxiaType="select"  >
+						<option value="">不限</option>					
+						<option value="1">未绑定</option>
+						<option value="2">已绑定</option>
+					</select>
+				</span>
+            </td>
+
+            
+         </tr>   
+        
+         
+    </table>
+     <div class="button-line1">
+        <a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+
+
+   
+
+		<div class="ui-block ui-block-fleft w240">
+		  <div class="ui-block-content ui-block-content-lb">
+		    
+		    <table >
+		        <tr>
+		            <td>
+		                <span ><input type="text"  loxiaType="input" mandatory="false" style="width: 180px;" placeHolder="请输入新增或搜索的分组名称"></input></span>
+		            </td>  
+		            
+		        </tr>
+		    </table>
+		    <div class="button-line1">
+		    	 <a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+		         <a href="#" class="func-button" id="add_group" title="新增"><span>新增</span></a> 
+		    </div>
+		    
+		    	<div class="clear-line height10"></div>
+		   
+		   	 	
+		   	 	
+		
+		    </div>
+		    <div class="ui-block "> 
+		    	
+		   		<div class="table-border0 border-grey" id="table2" caption="会员分组列表"></div>
+		   		
+		   		<div class="button-line1">
+		    	 <a href="#" class="func-button" title="搜索"><span>批量删除</span></a>
+		    	</div> 
+		   	</div>  
+		   	
+		   	 
+			
+		</div>
+
+		<div class="ui-block ml240">
+		    <div class="ui-block-content" style="padding-top:0;padding-right:0;">
+			
+			    <div class="ui-block">
+			    	
+			   	 	<div class="table-border0 border-grey" id="table1" caption="会员列表"></div>   
+			    </div>
+		
+		    </div>
+	   	</div>
+ 
+ 
+     <div class="button-line">
+
+        <input type="button" value="加入分组" class="button orange bind" title="加入分组"/>
+		<input type="button" value="脱离分组" class="button orange unbind" title="脱离分组"/>
+
+         
+    </div>
+ 
+
+</div>
+
+
+
+</body>
+</html>

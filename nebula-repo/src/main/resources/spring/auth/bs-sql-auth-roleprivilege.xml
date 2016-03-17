@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="RolePrivilege.findAllRolePrivilege" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有角色可以访问的url列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+		       		select distinct a.role_id as roleId,b.id as privilegeId ,d.url from t_au_role_privilege a,  t_au_privilege b, t_au_role c,T_AU_PRIVILEGE_URL d   where a.pri_id=b.id  and b.lifecycle=1 and c.lifecycle=1
+					and d.PRI_ID=b.id 
+		       	]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="RolePrivilege.deleteByRoleId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据roleId插入删除</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					delete from t_au_role_privilege where role_id=:roleId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="RolePrivilege.deleteByPridAndRoleIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>删除多个角色所拥有的某一个功能</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					delete from t_au_role_privilege where role_id in (
+		       			#foreach( $roleId in $roleIds )
+    					$roleId,
+						#end
+						-1
+		       		) and pri_id =:prid
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+		
+</beans>

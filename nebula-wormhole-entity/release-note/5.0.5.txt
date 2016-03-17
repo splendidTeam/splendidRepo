@@ -1,0 +1,2 @@
+2016-01-05:
+	OrderPaymentV5增加一个codPaymentType，用于传递COD的具体支付方式，1表示“现金支付”， 2表示“POS机刷卡”，可以为空

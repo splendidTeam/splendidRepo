@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="OrderLine.findOrderDetailList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderId查询订单行信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.EXTENTION_CODE as extentionCode,
+					so.ITEM_ID as itemId,
+					so.COUNT,
+					so.MSRP,
+					so.SALE_PRICE as salePrice,
+					so.SUBTOTAL,
+					so.DISCOUNT,
+					so.ITEM_NAME as itemName,
+					so.ITEM_PIC as itemPic,
+					so.SALE_PROPERTY as saleProperty,
+					so.TYPE,
+					so.GROUP_ID as groupId,
+					so.EVALUATION_STATUS as evaluationStatus,
+					so.SNAPSHOT
+					from 
+					t_so_orderline as so 
+					where 
+					 so.ORDER_ID = :orderId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findOrderDetailListByOrderIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单ids查询订单行信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.EXTENTION_CODE as extentionCode,
+					so.ITEM_ID as itemId,
+					so.COUNT,
+					so.MSRP,
+					so.SALE_PRICE as salePrice,
+					so.SUBTOTAL,
+					so.DISCOUNT,
+					so.ITEM_NAME as itemName,
+					so.ITEM_PIC as itemPic,
+					so.SALE_PROPERTY as saleProperty,
+					so.TYPE,
+					so.GROUP_ID as groupId,
+					so.EVALUATION_STATUS as evaluationStatus,
+					so.SNAPSHOT,
+					tpi.code as productCode
+					
+					from t_so_orderline as so 
+					left join t_pd_item tpi on tpi.id = so.item_id
+					where  so.ORDER_ID in(  
+						 #foreach( $id in $orderIds)
+	    					$id,
+						 #end
+		       		 	-1)
+		       		 	order by so.GROUP_ID,so.TYPE desc;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="OrderLine.findOrderDetailListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单行ids查询订单行信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.EXTENTION_CODE as extentionCode,
+					so.ITEM_ID as itemId,
+					so.COUNT,
+					so.MSRP,
+					so.SALE_PRICE as salePrice,
+					so.SUBTOTAL,
+					so.DISCOUNT,
+					so.ITEM_NAME as itemName,
+					so.ITEM_PIC as itemPic,
+					so.SALE_PROPERTY as saleProperty,
+					so.TYPE,
+					so.GROUP_ID as groupId,
+					so.EVALUATION_STATUS as evaluationStatus,
+					so.SNAPSHOT
+					from t_so_orderline as so
+					where
+					 	so.ID in(  
+						 #foreach( $id in $ids )
+	    					$id,
+						 #end
+		       		 	-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="OrderLine.updateOrderLineEvaulationStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新订单行的评价状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_so_orderline
+		       		set EVALUATION_STATUS=1
+		       		where
+		       		item_id =:skuId and order_id =:orderId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.updateOrderLineEvaulationStatusByOrderLineid"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单行id更新订单行的评价状态</description>
+		<constructor-arg>
+			<value>
+			<![CDATA[  
+				update t_so_orderline
+	       		set EVALUATION_STATUS=1
+	       		where
+	       		item_id =:skuId and id =:orderId
+                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findOrderLinesByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderId查询订单行信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.EXTENTION_CODE as extentionCode,
+					so.ITEM_ID as itemId,
+					so.SKU_ID as skuId,
+					so.COUNT,
+					so.MSRP,
+					so.SALE_PRICE as salePrice,
+					so.SUBTOTAL,
+					so.DISCOUNT,
+					so.ITEM_NAME as itemName,
+					so.ITEM_PIC as itemPic,
+					so.SALE_PROPERTY as saleProperty,
+					so.TYPE,
+					so.GROUP_ID as groupId,
+					so.EVALUATION_STATUS as evaluationStatus,
+					so.SNAPSHOT
+					from 
+					t_so_orderline as so 
+					where 
+					 so.ORDER_ID = :orderId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="OrderLine.findOrderLineCompletionByItemIdOrUserId"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>检查商品交易是否可以评价(付款订单已付款，货到付款订单以下单)根据用户名和商品itemId
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[   
+					 select 
+							ss.id as orderId,sol.item_id as itemId,ss.create_time as createTime,ss.member_id as  memberId ,
+							sol.item_pic as itemPic ,sol.evaluation_status AS evaluationStatus,
+							sol.item_name as itemName ,sol.item_pic as itempic ,sol."id" as soLineId ,
+							ss.code AS code
+						from   t_so_salesorder as ss 
+						LEFT JOIN t_so_orderline as sol 
+						on	ss.id = sol.order_id 
+						where (ss.financial_status !=1 OR ss.payment=1)
+							and ss.member_id = :memberId
+							and sol.item_id= :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findAllOrderLines" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有订单详细信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.EXTENTION_CODE as extentionCode,
+					so.ITEM_ID as itemId,
+					so.COUNT,
+					so.MSRP,
+					so.SALE_PRICE as salePrice,
+					so.SUBTOTAL,
+					so.DISCOUNT,
+					so.ITEM_NAME as itemName,
+					so.ITEM_PIC as itemPic,
+					so.SALE_PROPERTY as saleProperty,
+					so.TYPE,
+					so.GROUP_ID as groupId,
+					so.EVALUATION_STATUS as evaluationStatus,
+					so.SNAPSHOT
+					from 
+					t_so_orderline as so 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findOrderLinesCountBySkuId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询sku下订单购买总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+					SUM(so.COUNT) as count
+					from 
+					t_so_orderline as so,t_so_salesorder as ss where so.sku_id = :skuId and ss.shop_id = :shopId and ss.id = so.order_id 
+					and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+                	#if($memberId)
+						and ss.member_id = :memberId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findOrderLinesCountByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询item下订单购买总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+					SUM(so.COUNT) as count
+					from 
+					t_so_orderline as so,t_so_salesorder as ss where so.item_id = :itemId and ss.shop_id = :shopId and ss.id = so.order_id 
+					and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+                	#if($memberId)
+						and ss.member_id = :memberId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findOrderLinesCountByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询item下订单购买行总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select 
+					COUNT(so.COUNT) as count
+					from 
+					t_so_orderline as so,t_so_salesorder as ss where so.item_id in(
+					#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1) 
+		       		  and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		#if($memberId)
+						and ss.member_id = :memberId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findOrderLinesCountByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据categoryId查询下单的购买行总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select count(1) as count from (
+					select 
+					distinct(so.item_id)
+					from 
+					t_so_orderline as so,t_so_salesorder as ss where so.item_id in 
+					(SELECT DISTINCT item_id FROM t_pd_item_category where category_id = :categoryId)
+					and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+					#if($memberId)
+						and ss.member_id = :memberId
+					#end
+				) t_so
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderCountByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据历史订单itemId查询订单次数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select COUNT(1)
+				from 
+				(select DISTINCT so.order_id,so.item_id from t_so_orderline as so,t_so_salesorder as ss where so.item_id 
+				in(  
+					#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1) and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+				) as t_so 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderCountByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据历史订单categoryId查询订单次数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select COUNT(1)
+				from 
+				(select DISTINCT so.order_id,so.item_id from t_so_orderline as so,t_so_salesorder as ss where so.item_id in 
+					(SELECT DISTINCT item_id FROM t_pd_item_category where category_id = :categoryId) and ss.shop_id = :shopId and ss.id = so.order_id 
+					and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+					#if($memberId)
+							and ss.member_id = :memberId
+				 	#end 
+				) as t_so 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="OrderLine.findHistoryOrderItemQtyByCategoryAndItemIds"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据历史订单category和itemId查询订单次数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select COUNT(1)
+				from 
+				(select DISTINCT so.order_id,so.item_id from t_so_orderline as so where so.item_id in 
+					(SELECT DISTINCT item_id FROM t_pd_item_category where category_id in(  
+					#foreach( $id in $categoryIds)
+	    					$id,
+						 #end
+		       		 	-1)
+		       		) or so.item_id in (#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1)
+				) as t_so
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderSumItemQtyByCategoryAndItemIds"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询t_so_orderline下订单购买商品总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select SUM(so.COUNT) as count from t_so_orderline as so,t_so_salesorder as ss where so.item_id in 
+					(SELECT DISTINCT item_id FROM t_pd_item_category where category_id in(  
+					#foreach( $id in $categoryIds)
+	    					$id,
+						 #end
+		       		 	-1)
+		       		 or so.item_id in (#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1)) and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="OrderLine.findHistoryOrderSumItemQtyByCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询t_so_orderline下订单购买商品总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select SUM(so.COUNT) as count from t_so_orderline as so,t_so_salesorder as ss where so.item_id in 
+					(SELECT DISTINCT item_id FROM t_pd_item_category where category_id in(  
+					#foreach( $id in $categoryIds)
+	    					$id,
+						 #end
+		       		 	-1)
+		       		 	-1) and ss.shop_id = :shopId and ss.id = so.order_id  and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="OrderLine.findHistoryOrderLinesByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemIds查询历史下单的购买行总数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select DISTINCT(so.item_id) as item_id from t_so_orderline as so,t_so_salesorder as ss where so.item_id in (#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1) and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="OrderLine.findHistoryOrderCountItemQtyByCategoryAndItemIds"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据category和item查询下订单次数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select COUNT(1) from t_so_orderline as so,t_so_salesorder as ss where (so.item_id in 
+					(SELECT DISTINCT item_id FROM t_pd_item_category where category_id in(  
+					#foreach( $id in $categoryIds)
+	    					$id,
+						 #end
+		       		 	-1)
+		       		) or so.item_id in (#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1)) and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderCountItemQtyByCategory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据category查询下订单次数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select COUNT(1) from t_so_orderline as so,t_so_salesorder as ss where so.item_id in 
+					SELECT DISTINCT item_id FROM t_pd_item_category where category_id in(  
+					#foreach( $id in $categoryIds)
+	    					$id,
+						 #end
+		       		 	-1)
+		       		and ss.shop_id = :shopId and ss.id = so.order_id  
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderCountItemQtyByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据item查询下订单次数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select count(code) from t_so_salesorder ss where id in (
+					select so.order_id from t_so_orderline so 
+					where so.item_id in 
+						(#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1)
+				) and ss.shop_id = :shopId and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       	#if($memberId)
+					and ss.member_id = :memberId
+				#end	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="OrderLine.findOrderLineByExtentionCodesAndOrderStatus"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode和订单状态获取订单行</description>
+		<constructor-arg>
+			<value>
+					<![CDATA[  
+					    select line.*
+					    from t_so_orderline line
+					         join t_so_salesorder s_order on line.order_id = s_order.id
+					    where line.extention_code in
+					          (
+					          #foreach($code in $extentionList)
+					              $code,
+					          #end
+					          '-1'
+					          )
+					          and 
+					          s_order.logistics_status in
+					          (
+					          #foreach($status in $orderStatus)
+					              $status,
+					          #end
+					          '-1'
+					          )
+	                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="OrderLine.findOrderLinesByOrderCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode和订单状态获取订单行</description>
+		<constructor-arg>
+			<value>
+					<![CDATA[  
+					    select line.*
+					    from t_so_orderline line
+					         join t_so_salesorder s_order on line.order_id = s_order.id
+					    where s_order.code in
+					          (
+					          #foreach($code in $orderCodeList)
+					              $code,
+					          #end
+					          '-1'
+					          )
+	                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderLinesCountByNotItmeIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有历史订单行商品数量的集合，不包括参数传来的商品ids项</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select COUNT(so.COUNT) as count from t_so_orderline as so,t_so_salesorder as ss where so.item_id not in (#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1) and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderLine.findHistoryOrderCountItemByNotItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有历史订单行数量的集合，不包括参数传来的商品ids项</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+				select COUNT(1) from t_so_orderline as so,t_so_salesorder as ss where so.item_id not in (#foreach( $id in $itemIds)
+	    					$id,
+						 #end
+		       		 	-1) and ss.shop_id = :shopId and ss.id = so.order_id and (ss.logistics_status != 9 and ss.logistics_status != 10) 
+		       		 	#if($memberId)
+							and ss.member_id = :memberId
+						#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

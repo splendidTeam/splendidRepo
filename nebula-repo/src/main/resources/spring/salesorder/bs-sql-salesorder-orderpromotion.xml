@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="OrderPromotion.findOrderProInfoByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderId查询订单促销信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.ORDER_LINE_ID as orderLineId,
+					so.ACTIVITY_ID as activityId,
+					so.PROMOTION_NO as promotionNo,
+					so.PROMOTION_TYPE as promotionType,
+					so.DISCOUNT_AMOUNT as discountAmount,
+					so.COUPON,
+					so.DESCRIBE,
+					so.VERSION,
+					so.BASEORDER as baseOrder,
+					so.IS_SHIPDISCOUNT as isShipDiscount
+					from t_so_orderpromotion as so
+					where 
+					 so.ORDER_ID = :orderId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="OrderPromotion.findOrderProInfosByOrderLineIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderLineIds查询订单行的促销信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.ORDER_LINE_ID as orderLineId,
+					so.ACTIVITY_ID as activityId,
+					so.PROMOTION_NO as promotionNo,
+					so.PROMOTION_TYPE as promotionType,
+					so.DISCOUNT_AMOUNT as discountAmount,
+					so.COUPON,
+					so.DESCRIBE,
+					so.VERSION
+					from t_so_orderpromotion as so
+					where 
+					 so.ORDER_LINE_ID in (
+		       		#foreach( $orderLineId in $orderLineIds )
+    					$orderLineId,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="OrderPromotion.findOrderProsInfoByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据orderId查询订单促销信息列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					so.ID,
+					so.ORDER_ID as orderId,
+					so.ORDER_LINE_ID as orderLineId,
+					so.ACTIVITY_ID as activityId,
+					so.PROMOTION_NO as promotionNo,
+					so.PROMOTION_TYPE as promotionType,
+					so.DISCOUNT_AMOUNT as discountAmount,
+					so.COUPON,
+					so.DESCRIBE,
+					so.VERSION
+					from t_so_orderpromotion as so
+					where 
+					 so.ORDER_ID = :orderId and so.coupon IS NOT NULL
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

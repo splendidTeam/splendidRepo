@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+		{label:"活动名称",width:"15%",name:"name"},
+		{label:"开始时间",width:"12%",name:"startTime"},
+		{label:"结束时间",width:"12%",name:"endTime"},
+		{label:"受益人群",width:"10%",name:"memberType"},
+		{label:"生效",width:"5%",name:"available",template:"drawAvailable"},
+		{label:"限购",width:"5%",name:"limit",template:"drawLimit"},
+		{label:"优惠项",width:"10%",name:"type"},
+		{label:"更新时间",width:"12",name:"updateTime"},
+		{label:"更新人员",width:"10%",name:"updateUserName"},
+		{label:"操作",width:"5%", template:"edit"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime desc", firstPage: true, lastPage: false,
+			items: [
+				{name:"五一大促",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"全体",available:true,limit:false,type:"立减",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+				{name:"三八有礼（女鞋）",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"VIP",available:false,limit:false,type:"折扣",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+				{name:"情人节Coupon",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"高级会员",available:true,limit:false,type:"优惠券",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+				{name:"年终大促",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"全体",available:false,limit:false,type:"免运费",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+				{name:"女子训练鞋礼品赠（护腕）",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"注册会员",available:false,limit:true,type:"赠品",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"}
+			]
+		}
+	});
+
+	refreshData();
+});
+
+function edit(data, args, idx){
+	return "<a href='javascript:void(0);' class='func-button' onclick='gotoEditPage()'>编辑</a>";
+}
+
+function drawAvailable(data, args, idx){
+	return "<input type='checkbox' disabled='disabled' " + (loxia.getObject("available", data) ? "checked='checked'" : "") + "/>";
+}
+
+function drawLimit(data, args, idx){
+	return "<input type='checkbox' disabled='disabled' " + (loxia.getObject("limit", data) ? "checked='checked'" : "") + "/>";
+}
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime asc", firstPage: true, lastPage: false,
+		items: [
+					{name:"五一大促",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"全体",available:true,limit:false,type:"立减",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+					{name:"三八有礼（女鞋）",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"VIP",available:false,limit:false,type:"折扣",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+					{name:"情人节Coupon",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"高级会员",available:true,limit:false,type:"优惠券",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+					{name:"年终大促",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"全体",available:false,limit:false,type:"免运费",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"},
+					{name:"女子训练鞋礼品赠（护腕）",startTime:"2014-01-27 17:28:33",endTime:"2015-01-27 17:28:33",memberType:"注册会员",available:false,limit:true,type:"赠品",updateTime:"2015-01-27 17:28:33",updateUserName:"Admin"}
+				]
+		});
+
+}
+
+function gotoEditPage() {
+	window.location = "promotion-edit.html";
+}
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/users.png">促销管理</div>
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+        <table>
+            <tr>
+                <td><label>促销名称</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="促销名称"></input></span>
+                </td>
+                <td><label>有效期</label></td>
+            	<td>
+	               <span><input type="text" id="startTime" name="startTime"  value="" loxiaType="date" mandatory="false" /></span>
+	            </td>
+	            <td class="time-line20"><label>——</label></td>
+	            <td>
+	                <span><input type="text" id="endTime" name="endTime"  value="" loxiaType="date" mandatory="false"/></span>
+	            </td>
+            </tr>
+            
+            <tr>
+                <td><label>活动受益人群</label></td>
+                <td>
+                <span>
+					<select loxiaType="select"  >
+                        <option value="">不限</option>
+                        <option value="1">全体</option>
+                        <option value="2">注册会员</option>
+                        <option value="3">高级会员</option>
+                        <option value="4">VIP</option>
+                    </select>
+				</span>
+                </td>
+                <td><label for="chk_available">生效</label></td>
+                <td>
+	                <span>
+						<input type="checkbox" id="chk_available" />
+					</span>
+                </td>
+                <td><label for="chk_limit">限购</label></td>
+                <td>
+	                <span>
+						<input type="checkbox" id="chk_limit" />
+					</span>
+                </td>
+       		</tr>
+        </table>
+        <div class="button-line1">
+        <a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+    <div class="ui-block">
+   	 	<div class="border-grey" id="table1" caption="活动列表"></div>
+    </div>
+	
+</div>
+
+
+</body>
+</html>

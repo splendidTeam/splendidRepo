@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ChooseOption.findAllChooseOptionList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION order by GROUP_CODE, SORT_NO 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ChooseOption.findChooseOptionValue" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select group_code,option_label, option_value from t_sys_choose_option
+		       			 where 
+                     lifecycle !=2
+                     and
+                     group_code in (
+		       		#foreach($code in $groupCode)
+    					'$code',
+					 #end
+		       		'-1')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ChooseOption.findChooseOptionListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end,
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ChooseOption.findChooseOptionListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where 1=1
+		       		
+		       				#if($groupCode)
+		       					and GROUP_CODE=:groupCode
+		       				#end
+		       			
+		       				#if($groupDesc)
+		       					and GROUP_DESC=:groupDesc
+		       				#end
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+		       			
+		       				#if($optionValue)
+		       					and OPTION_VALUE=:optionValue
+		       				#end
+		       			
+		       				#if($optionLabel)
+		       					and OPTION_LABEL=:optionLabel
+		       				#end
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+		       				
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ChooseOption.findChooseOptionListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION 
+				    where  group_code =:groupCode
+
+				    #if($optionLabel)
+		       	    	and option_label like :optionLabel
+		            #end
+		        
+		            #if($lifecycle)
+		       	  		and lifecycle= :lifecycle
+		       	    #end
+							
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ChooseOption.enableOrDisableOptionByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_CHOOSE_OPTION
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ChooseOption.findChooseOptionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id获取chooseOption</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where id=:id 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+	<bean id="ChooseOption.findAllEffectChooseOptionList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ChooseOption.findEffectChooseOptionListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where lifecycle=1
+		       		
+					
+		       			
+		       				#if($groupCode)
+		       					and GROUP_CODE=:groupCode
+		       				#end
+
+		       			
+		       				#if($groupDesc)
+		       					and GROUP_DESC=:groupDesc
+		       				#end
+
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+
+		       			
+		       				#if($optionValue)
+		       					and OPTION_VALUE=:optionValue
+		       				#end
+
+		       			
+		       				#if($optionLabel)
+		       					and OPTION_LABEL=:optionLabel
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ChooseOption.findEffectChooseOptionListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where lifecycle=1
+		       		
+					
+		       			
+		       				#if($groupCode)
+		       					and GROUP_CODE=:groupCode
+		       				#end
+
+		       			
+		       				#if($groupDesc)
+		       					and GROUP_DESC=:groupDesc
+		       				#end
+
+		       			
+		       				#if($language)
+		       					and LANGUAGE=:language
+		       				#end
+
+		       			
+		       				#if($optionValue)
+		       					and OPTION_VALUE=:optionValue
+		       				#end
+
+		       			
+		       				#if($optionLabel)
+		       					and OPTION_LABEL=:optionLabel
+		       				#end
+
+		       			
+		       				#if($sortNo)
+		       					and SORT_NO=:sortNo
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="ChooseOption.findOptionGroupList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页获取选项列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						t.id as id,
+						t.group_code as groupCode, 
+						t.group_desc as groupDesc, 
+						t.lifecycle as lifecycle, 
+						t.option_label as optionLabel, 
+						t.option_value as optionValue, 
+						t.sort_no as sortNo,
+						t.version as version, 
+						t.label_lang as labelLang, 
+						t.is_system  as isSystem
+						from (select row_number() over(partition by t1.group_code) as rowid,t1.* from T_SYS_CHOOSE_OPTION t1) t 
+						where t.rowid=1 and t.lifecycle!=2
+						
+	       				#if($groupCode)
+	       					and lower(t.GROUP_CODE) like lower(:groupCode)
+	       				#end
+
+	       				#if($groupDesc)
+	       					and t.GROUP_DESC like :groupDesc
+	       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ChooseOption.validateOptionGroupCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION where group_code =:groupCode ORDER BY id limit 1 OFFSET 0
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
+	<bean id="ChooseOption.validateOptionValue" class="loxia.dao.support.DynamicQueryHolder">
+		<description>验证修改页面</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION 
+		       		where 
+		       		group_code =:groupCode
+		       		and 
+		       		option_value=:optionValue
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ChooseOption.findOptionListByGroupCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过分组名查询分组信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_CHOOSE_OPTION 
+		       		where 
+		       		group_code =:groupCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
+</beans>

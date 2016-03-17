@@ -1,0 +1,1322 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.baozun.nebula</groupId>
+	<artifactId>nebula</artifactId>
+	<version>5.3.0</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>nebula-repo</module>
+		<module>nebula-utilities</module>
+		<module>nebula-protostar</module>
+		<module>nebula-helix</module>
+		<module>nebula-collapsar</module>
+		<module>nebula-wormhole</module>
+		<module>nebula-wormhole-entity</module>
+	</modules>
+
+	<properties>
+		<version.nebula>5.3.0</version.nebula>
+		<!-- 让整个项目统一字符集编码 -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- **********************begin maven-compiler-plugin config******************************************* -->
+		<maven-compiler-plugin.source>1.7</maven-compiler-plugin.source>
+		<maven-compiler-plugin.target>1.7</maven-compiler-plugin.target>
+		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
+		<!-- **********************end maven-compiler-plugin config******************************************* -->
+
+		<!--*********************begin plugins version************************************ -->
+		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
+		<v.maven-compiler-plugin>3.3</v.maven-compiler-plugin>
+		<v.maven-dependency-plugin>2.10</v.maven-dependency-plugin>
+		<v.maven-install-plugin>2.5.2</v.maven-install-plugin>
+		<v.maven-jar-plugin>2.6</v.maven-jar-plugin>
+		<v.maven-javadoc-plugin>2.10.3</v.maven-javadoc-plugin>
+		<v.maven-site-plugin>3.4</v.maven-site-plugin>
+		<v.maven-assembly-plugin>2.5.5</v.maven-assembly-plugin>
+		<v.maven-source-plugin>2.4</v.maven-source-plugin>
+		<v.maven-surefire-plugin>2.17</v.maven-surefire-plugin>
+		<v.maven-release-plugin>2.5.2</v.maven-release-plugin>
+		<v.maven-resources-plugin>2.7</v.maven-resources-plugin>
+		<v.maven-war-plugin>2.6</v.maven-war-plugin>
+		<v.tomcat7-maven-plugin>2.0</v.tomcat7-maven-plugin>
+		<tomcat7.path>/</tomcat7.path>
+
+		<v.yuicompressor-maven-plugin>1.5.1</v.yuicompressor-maven-plugin>
+		<v.native2ascii-maven-plugin>1.0-beta-1</v.native2ascii-maven-plugin>
+
+		<version.jasypt>1.9.2</version.jasypt>
+		<version.gson>2.2.4</version.gson>
+		<version.logback>1.0.3</version.logback>
+		
+		<version.slf4j>1.7.5</version.slf4j>
+		<!-- **********************end plugins version******************************************* -->
+
+		<!-- **********************begin native2ascii config******************************************* -->
+		<native2ascii-maven-plugin.pattern>**/*.properties</native2ascii-maven-plugin.pattern>
+		<native2ascii-maven-plugin.encoding>${project.build.sourceEncoding}</native2ascii-maven-plugin.encoding>
+		<!-- **********************end native2ascii config******************************************* -->
+
+		<!-- **********************begin maven-javadoc-plugin config******************************************* -->
+		<!-- 用来编译生成文档 -->
+		<maven-javadoc-plugin.encoding>${project.build.sourceEncoding}</maven-javadoc-plugin.encoding>
+		<maven-javadoc-plugin.docencoding>${project.build.sourceEncoding}</maven-javadoc-plugin.docencoding>
+		<!-- 用来显示页面 META 部分 content="text/html; charset=GBK" -->
+		<maven-javadoc-plugin.charset>${project.build.sourceEncoding}</maven-javadoc-plugin.charset>
+		<!-- 用于读取javadoc 内部使用的 配置文件, 比如 描述文字为 描述,英文环境为description -->
+		<maven-javadoc-plugin.locale>en_US</maven-javadoc-plugin.locale>
+		<maven-javadoc-plugin.outputDirectory>file://${user.home}/javadoc/${project.version}</maven-javadoc-plugin.outputDirectory>
+		<maven-javadoc-plugin.reportOutputDirectory>${user.home}/javadoc/${project.version}</maven-javadoc-plugin.reportOutputDirectory>
+		<maven-javadoc-plugin.destDir>${project.name}</maven-javadoc-plugin.destDir>
+		<maven-javadoc-plugin.javadocVersion>1.8</maven-javadoc-plugin.javadocVersion>
+		<maven-javadoc-plugin.javadocDirectory>${env._FEILONGTAGLIB}/Apache
+			Maven/javadoc/springframework</maven-javadoc-plugin.javadocDirectory>
+		<maven-javadoc-plugin.stylesheetfile>${maven-javadoc-plugin.javadocDirectory}/stylesheet.css</maven-javadoc-plugin.stylesheetfile>
+
+
+
+		<version.esapi>2.0GA</version.esapi>
+		<version.solr-solrj>3.6.2</version.solr-solrj>
+
+		<version.velocity>1.7</version.velocity>
+		<version.loxia>2.5.2</version.loxia>
+		<version.jedis>2.2.1</version.jedis>
+		<version.commons-pool>1.6</version.commons-pool>
+		<version.commons-lang>2.6</version.commons-lang>
+		<version.commons-lang3>3.4</version.commons-lang3>
+		<version.commons-collections>3.2.2</version.commons-collections>
+		<version.commons-collections4>4.1</version.commons-collections4>
+		<version.commons-beanutils>1.9.2</version.commons-beanutils>
+		<version.commons-fileupload>1.2.2</version.commons-fileupload>
+		<version.commons-codec>1.5</version.commons-codec>
+
+		<version.pinyin4j>2.5.0</version.pinyin4j>
+		<version.hibernate>3.5.1-Final</version.hibernate>
+		<version.javamail>1.4</version.javamail>
+		<version.spring>3.2.16.RELEASE</version.spring>
+		<version.spring.security>3.2.9.RELEASE</version.spring.security>
+		<version.spring-mobile-device>1.1.4.RELEASE</version.spring-mobile-device>
+		<version.jsoup>1.7.3</version.jsoup>
+		<version.zookeeper>3.4.5</version.zookeeper>
+		<version.quartz>1.5.2</version.quartz>
+		<version.jasypt>1.9.2</version.jasypt>
+		<version.hibernate-validator>4.3.0.Final</version.hibernate-validator>
+		<version.validation-api>1.0.0.GA</version.validation-api>
+		<version.servlet-api>2.5</version.servlet-api>
+		<version.jsp-api>2.1</version.jsp-api>
+		<version.jstl>1.2</version.jstl>
+		<version.fastjson>1.1.23</version.fastjson>
+		<version.json-lib>2.4</version.json-lib>
+		<version.jackson>1.8.5</version.jackson>
+		<version.dom4j>1.6.1</version.dom4j>
+		<version.janino>2.5.10</version.janino>
+
+		<version.c3p0>0.9.1.2</version.c3p0>
+		<version.postgresql>9.1-901.jdbc3</version.postgresql>
+
+		<!-- for test -->
+		<version.junit>4.10</version.junit>
+		<version.testng>5.8</version.testng>
+		<version.easymock>2.5.2</version.easymock>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<!-- junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<classifier>jdk15</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+		</dependency>
+
+		<!-- redis -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+		</dependency>
+
+		<!-- commons-lang -->
+		<dependency>
+			<artifactId>commons-lang</artifactId>
+			<groupId>commons-lang</groupId>
+		</dependency>
+
+		<!-- commons-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+		<!-- commons-collections -->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
+		<!-- commons-collections4 Requires Java 5.0+ -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.pinyin4j</groupId>
+			<artifactId>pinyin4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>loxia2</groupId>
+			<artifactId>loxia2-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>loxia2</groupId>
+			<artifactId>loxia2-support</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>loxia2</groupId>
+			<artifactId>loxia2-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+		</dependency>
+		<!--********************** spring************************* -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.mobile</groupId>
+			<artifactId>spring-mobile-device</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+		</dependency>
+
+		<!-- servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- commons-beanutils -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.owasp.esapi</groupId>
+			<artifactId>esapi</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<classifier>jdk15</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+
+
+		<!-- quartz -->
+
+		<dependency>
+			<groupId>quartz</groupId>
+			<artifactId>quartz</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+		</dependency>
+
+		<!-- 配置文件加密 -->
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt-spring31</artifactId>
+		</dependency>
+
+		<!--******** logback and slf4j ******** -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-access</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+
+		<!--jul桥接 用来输出 Java Logging Framework (JUL) -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+		</dependency>
+
+		<!-- jcl桥接，用来输出 第三方Jakarta Commons Logging (JCL) -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!--*********************dependencyManagement****************************** -->
+	<dependencyManagement>
+		<dependencies>
+			<!-- nebula-utilities -->
+			<dependency>
+				<groupId>com.baozun.nebula</groupId>
+				<artifactId>nebula-utilities</artifactId>
+				<version>${version.nebula}</version>
+			</dependency>
+			<!-- velocity -->
+			<dependency>
+				<groupId>org.apache.velocity</groupId>
+				<artifactId>velocity</artifactId>
+				<version>${version.velocity}</version>
+			</dependency>
+			<!-- loxia -->
+			<dependency>
+				<groupId>loxia2</groupId>
+				<artifactId>loxia2-support</artifactId>
+				<version>${version.loxia}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>slf4j-log4j12</artifactId>
+						<groupId>org.slf4j</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>slf4j-api</artifactId>
+						<groupId>org.slf4j</groupId>
+					</exclusion>
+					<exclusion>
+						<groupId>spy</groupId>
+						<artifactId>spymemcached</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>loxia2</groupId>
+				<artifactId>loxia2-core</artifactId>
+				<version>${version.loxia}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.hibernate</groupId>
+						<artifactId>hibernate-entitymanager</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>velocity</groupId>
+						<artifactId>velocity-dep</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-aspects</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-jdbc</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-orm</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-aop</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-tx</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context-support</artifactId>
+					</exclusion>
+
+					<exclusion>
+						<artifactId>slf4j-log4j12</artifactId>
+						<groupId>org.slf4j</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>loxia2</groupId>
+				<artifactId>loxia2-api</artifactId>
+				<version>${version.loxia}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-jdbc</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<!-- redis -->
+			<dependency>
+				<groupId>redis.clients</groupId>
+				<artifactId>jedis</artifactId>
+				<version>${version.jedis}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${version.commons-codec}</version>
+			</dependency>
+			<!-- commons-pool -->
+			<dependency>
+				<groupId>commons-pool</groupId>
+				<artifactId>commons-pool</artifactId>
+				<version>${version.commons-pool}</version>
+			</dependency>
+
+			<!-- commons-lang -->
+			<dependency>
+				<artifactId>commons-lang</artifactId>
+				<groupId>commons-lang</groupId>
+				<version>${version.commons-lang}</version>
+			</dependency>
+
+			<!-- commons-lang3 -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${version.commons-lang3}</version>
+			</dependency>
+
+			<!-- commons-collections -->
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${version.commons-collections}</version>
+			</dependency>
+
+			<!-- commons-collections4 Requires Java 5.0+ -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-collections4</artifactId>
+				<version>${version.commons-collections4}</version>
+			</dependency>
+			<!-- commons-beanutils -->
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${version.commons-beanutils}</version>
+			</dependency>
+			<!-- 上传使用 -->
+			<dependency>
+				<groupId>commons-fileupload</groupId>
+				<artifactId>commons-fileupload</artifactId>
+				<version>${version.commons-fileupload}</version>
+			</dependency>
+			<!-- pinyin4j -->
+			<dependency>
+				<groupId>net.sourceforge.pinyin4j</groupId>
+				<artifactId>pinyin4j</artifactId>
+				<version>${version.pinyin4j}</version>
+			</dependency>
+			<!-- gson -->
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${version.gson}</version>
+			</dependency>
+			<!-- hibernate start -->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>${version.hibernate}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-annotations</artifactId>
+				<version>${version.hibernate}</version>
+			</dependency>
+			<!-- hibernate end -->
+			<!-- mail -->
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${version.javamail}</version>
+			</dependency>
+			<!--********************** spring start************************* -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-orm</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-expression</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${version.spring}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${version.spring}</version>
+			</dependency>
+			<!--********************** spring end************************* -->
+			<!-- spring security start -->
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-core</artifactId>
+				<version>${version.spring.security}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-expression</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-web</artifactId>
+				<version>${version.spring.security}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-tx</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-expression</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-config</artifactId>
+				<version>${version.spring.security}</version>
+			</dependency>
+			<!-- spring security end -->
+			<!-- spring-mobile-device -->
+			<dependency>
+				<groupId>org.springframework.mobile</groupId>
+				<artifactId>spring-mobile-device</artifactId>
+				<version>${version.spring-mobile-device}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>janino</groupId>
+				<artifactId>janino</artifactId>
+				<version>${version.janino}</version>
+			</dependency>
+			<!-- junit -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${version.junit}</version>
+				<scope>test</scope>
+			</dependency>
+			<!-- testng -->
+			<dependency>
+				<groupId>org.testng</groupId>
+				<artifactId>testng</artifactId>
+				<version>${version.testng}</version>
+				<classifier>jdk15</classifier>
+				<scope>test</scope>
+			</dependency>
+			<!-- easymock -->
+			<dependency>
+				<groupId>org.easymock</groupId>
+				<artifactId>easymock</artifactId>
+				<version>${version.easymock}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>${version.jsoup}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<version>${version.zookeeper}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jdmk</groupId>
+						<artifactId>jmxtools</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jmx</groupId>
+						<artifactId>jmxri</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- servlet-api -->
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>${version.servlet-api}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- jstl -->
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>${version.jstl}</version>
+			</dependency>
+
+			<!-- jsp-api -->
+			<dependency>
+				<groupId>javax.servlet.jsp</groupId>
+				<artifactId>jsp-api</artifactId>
+				<version>${version.jsp-api}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.owasp.esapi</groupId>
+				<artifactId>esapi</artifactId>
+				<version>${version.esapi}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-beanutils</groupId>
+						<artifactId>commons-beanutils-core</artifactId>
+					</exclusion>
+
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>fastjson</artifactId>
+				<version>${version.fastjson}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.sf.json-lib</groupId>
+				<artifactId>json-lib</artifactId>
+				<version>${version.json-lib}</version>
+				<classifier>jdk15</classifier>
+				<exclusions>
+					<exclusion>
+						<artifactId>commons-logging</artifactId>
+						<groupId>commons-logging</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.codehaus.jackson</groupId>
+				<artifactId>jackson-mapper-asl</artifactId>
+				<version>${version.jackson}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-solrj</artifactId>
+				<version>${version.solr-solrj}</version>
+			</dependency>
+
+
+
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>${version.hibernate-validator}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+				<version>${version.validation-api}</version>
+			</dependency>
+
+
+			<!-- quartz -->
+
+			<dependency>
+				<groupId>quartz</groupId>
+				<artifactId>quartz</artifactId>
+				<version>${version.quartz}</version>
+			</dependency>
+
+			<!-- 配置文件加密 -->
+			<dependency>
+				<groupId>org.jasypt</groupId>
+				<artifactId>jasypt</artifactId>
+				<version>${version.jasypt}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jasypt</groupId>
+				<artifactId>jasypt-spring31</artifactId>
+				<version>${version.jasypt}</version>
+			</dependency>
+
+			<!--******** logback and slf4j ******** -->
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-core</artifactId>
+				<version>${version.logback}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${version.logback}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-access</artifactId>
+				<version>${version.logback}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${version.slf4j}</version>
+			</dependency>
+
+			<!--jul桥接 用来输出 Java Logging Framework (JUL) -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>${version.slf4j}</version>
+			</dependency>
+
+			<!-- jcl桥接，用来输出 第三方Jakarta Commons Logging (JCL) -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${version.slf4j}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>c3p0</groupId>
+				<artifactId>c3p0</artifactId>
+				<version>${version.c3p0}</version>
+			</dependency>
+			<dependency>
+				<groupId>postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>${version.postgresql}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dom4j</groupId>
+				<artifactId>dom4j</artifactId>
+				<version>${version.dom4j}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+	<!--********************************build****************************************** -->
+	<build>
+		<plugins>
+			<!-- js、css文件压缩混淆插件，一般情况下frontend和mobile需要压缩js和css，其它module是否压缩视需求而定 -->
+			<plugin>
+				<!-- YUI Compressor Maven压缩插件 -->
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>${v.yuicompressor-maven-plugin}</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+
+					<!-- 读取js,css文件采用UTF-8编码 -->
+					<encoding>UTF-8</encoding>
+					<!-- 不显示js可能的错误 -->
+					<jswarn>false</jswarn>
+					<!-- 若存在已压缩的文件，会先对比源文件是否有改动。有改动便压缩，无改动就不压缩 -->
+					<force>false</force>
+					<!-- 在指定的列号后插入新行 -->
+					<linebreakpos>-1</linebreakpos>
+					<!-- 压缩之前先执行聚合文件操作 -->
+					<preProcessAggregates>true</preProcessAggregates>
+
+					<failOnWarning>false</failOnWarning>
+
+					<!-- 不添加后缀 -->
+					<nosuffix>true</nosuffix>
+
+					<!-- 压缩js和css文件 -->
+					<includes>
+						<include>**/*.js</include>
+						<include>**/*.css</include>
+					</includes>
+
+					<!-- 以下目录和文件不会被压缩 -->
+					<excludeResources>true</excludeResources>
+
+					<!-- 排除本来就压缩的js文件， 比如 jquery-1.7.2.min.js jquery.flexslider-min.js 之类的文件 -->
+					<excludes>
+						<exclude>**/*.min.js</exclude>
+						<exclude>**/*-min.js</exclude>
+					</excludes>
+
+				</configuration>
+			</plugin>
+
+			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径， 
+				因此可以通过warSourceExcludes配置排除复制,的文件或路径， **by feilong 2015-07-01 -->
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warSourceExcludes>%regex[^.+(?:(?&lt;!(?:-|\.)min)\.js)]</warSourceExcludes>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${v.maven-site-plugin}</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${v.maven-assembly-plugin}</version>
+			</plugin>
+
+			<!-- 国际化插件 -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>native2ascii-maven-plugin</artifactId>
+				<version>${v.native2ascii-maven-plugin}</version>
+
+				<configuration>
+					<encoding>${native2ascii-maven-plugin.encoding}</encoding>
+					<includes>
+						<include>classes\${native2ascii-maven-plugin.pattern}</include>
+						<include>test-classes\${native2ascii-maven-plugin.pattern}</include>
+					</includes>
+					<workDir>${project.build.directory}</workDir>
+					<tempDir>${project.build.directory}</tempDir>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>native2ascii</id>
+						<!-- 默认是 phase process-classes -->
+						<!-- <phase>compile</phase> -->
+						<goals>
+							<goal>native2ascii</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- maven-resources-plugin插件 -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${v.maven-resources-plugin}</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<includeEmptyDirs>true</includeEmptyDirs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-resources</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<detail>true</detail>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-testResources</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>testResources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- maven-compiler-plugin -->
+			<plugin>
+				<!-- true or false，是否此插件配置将会应用于poms，那些继承于此的项目 -->
+				<inherited>true</inherited>
+
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${v.maven-compiler-plugin}</version>
+				<configuration>
+					<!-- 指定高版本的源码和编译后的字节码文件 -->
+					<source>${maven-compiler-plugin.source}</source>
+					<target>${maven-compiler-plugin.target}</target>
+					<encoding>${maven-compiler-plugin.encoding}</encoding>
+					<!-- <verbose>true</verbose> -->
+					<detail>true</detail>
+				</configuration>
+			</plugin>
+
+			<!-- maven-jar-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${v.maven-jar-plugin}</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- maven-source-plugin -->
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${v.maven-source-plugin}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- maven-javadoc-plugin -->
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${v.maven-javadoc-plugin}</version>
+				<configuration>
+					<verbose>true</verbose>
+					<destDir>${maven-javadoc-plugin.destDir}</destDir>
+
+					<outputDirectory>${maven-javadoc-plugin.outputDirectory}</outputDirectory>
+					<reportOutputDirectory>${maven-javadoc-plugin.reportOutputDirectory}</reportOutputDirectory>
+
+					<!-- If no custom stylesheet is specified in the <stylesheetfile/> parameter, 
+						the <stylesheet/> parameter will indicate which stylesheet will be used -->
+					<!-- <stylesheet>${maven-javadoc-plugin.stylesheet}</stylesheet> -->
+
+					<!-- <stylesheetfile>${maven-javadoc-plugin.stylesheetfile}</stylesheetfile> -->
+
+					<overview>src/main/java/overview.html</overview>
+
+					<!-- -->
+					<docfilessubdirs>true</docfilessubdirs>
+					<!-- <javadocDirectory>${maven-javadoc-plugin.javadocDirectory}</javadocDirectory> -->
+					<javadocVersion>${maven-javadoc-plugin.javadocVersion}</javadocVersion>
+
+					<!-- Specifies the title to be placed in the HTML title tag.  -->
+					<windowtitle>${project.name} ${project.version} API create by
+						feilong</windowtitle>
+
+					<!-- Specifies whether or not the author text is included in the generated 
+						Javadocs.  -->
+					<author>true</author>
+					<!-- Includes the version text in the generated docs.  -->
+					<version>true</version>
+
+					<failOnError>false</failOnError>
+
+					<locale>${maven-javadoc-plugin.locale}</locale>
+
+					<charset>${maven-javadoc-plugin.charset}</charset>
+					<docencoding>${maven-javadoc-plugin.docencoding}</docencoding>
+					<encoding>${maven-javadoc-plugin.encoding}</encoding>
+
+					<header>${project.name} ${project.version} API</header>
+					<footer>${project.name} ${project.version} API</footer>
+
+					<bottom>
+						<![CDATA[Copyright &copy; {inceptionYear}-{currentYear} by baozun]]>
+					</bottom>
+
+					<groups>
+						<group>
+							<title>Date package 日期</title>
+							<packages>com.baozun.nebulaplus.date</packages>
+						</group>
+
+						<group>
+							<title>IO package</title>
+							<packages>com.baozun.nebulaplus.io</packages>
+						</group>
+
+						<group>
+							<title>net package</title>
+							<packages>com.baozun.nebulaplus.net</packages>
+						</group>
+
+						<group>
+							<title>util package</title>
+							<packages>com.baozun.nebulaplus.util</packages>
+						</group>
+					</groups>
+				</configuration>
+			</plugin>
+
+			<!-- maven-surefire-plugin -->
+			<plugin>
+				<inherited>true</inherited>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${v.maven-surefire-plugin}</version>
+				<configuration>
+					<!-- 跳过测试 -->
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<!-- maven-clean-plugin插件 -->
+			<plugin>
+				<inherited>true</inherited>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>${v.maven-clean-plugin}</version>
+				<executions>
+					<execution>
+						<id>default-clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- maven-install-plugin插件 -->
+			<plugin>
+				<inherited>true</inherited>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${v.maven-install-plugin}</version>
+				<executions>
+					<execution>
+						<id>default-install</id>
+						<phase>install</phase>
+						<goals>
+							<goal>install</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- maven-release-plugin -->
+			<plugin>
+				<inherited>true</inherited>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${v.maven-release-plugin}</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
+
+			<!-- maven-dependency-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${v.maven-dependency-plugin}</version>
+			</plugin>
+		</plugins>
+
+		<!-- pluginManagement -->
+		<pluginManagement>
+			<plugins>
+
+				<plugin>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>${v.maven-war-plugin}</version>
+				</plugin>
+
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.7,)</versionRange>
+										<goals>
+											<goal>run</goal>
+											<goal>help</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>native2ascii-maven-plugin</artifactId>
+										<versionRange>[1.0-beta-1,)</versionRange>
+										<goals>
+											<goal>native2ascii</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>${v.tomcat7-maven-plugin}</version>
+					<configuration>
+						<path>${tomcat7.path}</path>
+						<uriEncoding>utf-8</uriEncoding>
+						<ignorePackaging>true</ignorePackaging>
+						<systemProperties>
+							<spring.profiles.active>dev</spring.profiles.active>
+						</systemProperties>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<configuration>
+						<downloadSources>true</downloadSources>
+						<downloadJavadocs>true</downloadJavadocs>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${v.maven-dependency-plugin}</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<!-- 指定这个项目的组织机构信息 -->
+	<organization>
+		<name>baozun</name>
+		<url>http://www.baozun.com/</url>
+	</organization>
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>nexus-releases</name>
+			<url>http://10.8.12.100/nexus/content/repositories/releases/</url>
+		</repository>
+
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>nexus-snapshots</name>
+			<url>http://10.8.12.100/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>

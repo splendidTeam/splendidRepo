@@ -1,0 +1,183 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+<script type="text/javascript">
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+	nps.init();
+
+	$j(".button.orange.addprop").on("click",function(){
+		nps.submitForm('userForm',{mode:'async'})
+    });
+});
+
+
+</script>
+</head>
+<body>
+<div class="content-box width-percent100">
+    
+   <form name="userForm" action="" method="post">
+       <div class="ui-title1"><img src="../images/wmi/blacks/32x32/cube.png">店铺管理</div>
+       <div class="ui-block">
+           <div class="ui-block-content ui-block-content-lb" style="padding-bottom: 10px;">
+               <table>
+                   <tr>
+                       <td><label>店铺编码</label></td>
+                       <td><span>xxxxxx</span></td>
+                       <td><label>店铺名称</label></td>
+                       <td><span>Nike官方旗舰店</span></td>
+                   </tr>
+                   <tr>
+                       <td><label>行业编码</label></td>
+                       <td><span>xxxxxx</span></td>
+                       <td><label>行业名称</label></td>
+                       <td><span>休闲鞋</span></td>
+                   </tr>
+               </table>
+           </div>
+           
+           <div class="ui-block">
+           
+           
+           <div class="ui-block-title1">添加属性</div>
+           <div class="ui-block-content border-grey">
+           
+               <div class="ui-block-line">
+                   <label>属性名称　</label>
+                   <div>
+                       <input type="text" loxiaType="input" value="" mandatory="true" size="50" placeHolder="属性名称"/>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>编辑类型　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">单行输入</option>
+                           <option value="3">可输入单选</option>
+                           <option value="4">单选</option>
+                           <option value="5">多选</option>
+                       </select>
+                   </div>
+               </div>
+
+
+               <div class="ui-block-line">
+                   <label>值类型　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">文本</option>
+                           <option value="3">数值</option>
+                           <option value="4">日期</option>
+                           <option value="5">日期时间</option>
+                       </select>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>是否销售属性　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">是</option>
+                           <option value="3">否</option>
+                       </select>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>是否颜色属性　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">是</option>
+                           <option value="3">否</option>
+                       </select>
+                   </div>
+               </div>
+               <div class="ui-block-line">
+                   <label>是否必输　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">是</option>
+                           <option value="3">否</option>
+                       </select>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>是否用于检索　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">是</option>
+                           <option value="3">否</option>
+                       </select>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>是否配图　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">是</option>
+                           <option value="3">否</option>
+                       </select>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>排列顺序　</label>
+                   <div>
+                       <input name="email" type="text" value="11" loxiaType="input" value="" mandatory="true"/>
+                   </div>
+               </div>
+
+               <div class="ui-block-line">
+                   <label>状态　</label>
+                   <div>
+                       <select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" style="width:30%;float:left;">
+                           <option value="2">有效</option>
+                           <option value="3">无效</option>
+                       </select>
+                   </div>
+               </div>
+           </div>
+           </div>
+       </div>
+
+       <div class="button-line">
+           <input type="button" value="保存" title="保存" class="button orange addprop"/>
+           <input type="button" value="返回" title="返回" class="button" onclick="location.href='shop-industry3.html'"/>
+          
+       </div>
+   </form>
+    
+
+</div>
+</body>
+</html>

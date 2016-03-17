@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="EmailIntercepter.findAllEmailIntercepterList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailIntercepter.findEmailIntercepterListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="EmailIntercepter.findEmailIntercepterListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER where 
+		       			1=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($uniqueContent)
+		       					and UNIQUE_CONTENT=:uniqueContent
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($count)
+		       					and COUNT=:count
+		       				#end
+				       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailIntercepter.findEmailIntercepterListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($uniqueContent)
+		       					and UNIQUE_CONTENT=:uniqueContent
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($count)
+		       					and COUNT=:count
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="EmailIntercepter.enableOrDisableEmailIntercepterByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_EMAIL_INTERCEPTER
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EmailIntercepter.removeEmailIntercepterByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_EMAIL_INTERCEPTER
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EmailIntercepter.findAllEffectEmailIntercepterList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="EmailIntercepter.findEffectEmailIntercepterListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER where lifecycle=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($uniqueContent)
+		       					and UNIQUE_CONTENT=:uniqueContent
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($count)
+		       					and COUNT=:count
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="EmailIntercepter.findEffectEmailIntercepterListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_EMAIL_INTERCEPTER where lifecycle=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($uniqueContent)
+		       					and UNIQUE_CONTENT=:uniqueContent
+		       				#end
+
+		       			
+		       				#if($receiverEmail)
+		       					and RECEIVER_EMAIL=:receiverEmail
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($count)
+		       					and COUNT=:count
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

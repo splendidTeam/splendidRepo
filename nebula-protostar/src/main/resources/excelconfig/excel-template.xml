@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sheets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="exceltemplate-1.0.xsd">
+	
+	<!--************************************************** 导入 **************************************************-->
+	
+	<!-- 商品基本信息导入 -->
+	<sheet name="itemUpload">
+		<block start="A5" end="I5">
+		    <cell position="A5" dataName="shopId" type="long"/>
+			<cell position="B5" dataName="industryId" type="long"/>
+		</block>
+		<block start="A8" end="M8" dataName="impItemCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpItemCommand" >
+			<cell position="A8" dataName="title" mandatory="true"  type="string" />
+			<cell position="B8" dataName="code" mandatory="true" type="string"/>
+			<cell position="C8" dataName="description" mandatory="false" type="string" />
+			<cell position="D8" dataName="sketch" mandatory="false" type="string"/>
+			<cell position="E8" dataName="listPrice" mandatory="false" type="bigdecimal"/>
+			<cell position="F8" dataName="salePrice" mandatory="true"  type="bigdecimal"/>
+			<cell position="G8" dataName="seoKeyWords" mandatory="false" type="string"/>
+			<cell position="H8" dataName="seoTitle" mandatory="false" type="string" />
+			<cell position="I8" dataName="seoDesc" mandatory="false" type="string"/>
+			<cell position="J8" dataName="categoryCodes" mandatory="false" type="string"/>
+			<cell position="K8" dataName="itemStyle" mandatory="false" type="string" />
+			<cell position="L8" dataName="subTitle" mandatory="false" type="string" />
+			<cell position="M8" dataName="itemType" mandatory="true" type="string" />
+		</block>
+	</sheet>
+	<sheet name="skuUpload">
+		<block start="A5" end="B5">
+		    <cell position="A5" dataName="shopId"  type="long"/>
+			<cell position="B5" dataName="industryId" type="long"/>
+		</block>
+		<block start="A8" end="B8" dataName="impSkuCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpSkuCommand">
+			<cell position="A8" dataName="code" mandatory="true"  type="string"/>
+			<cell position="B8" dataName="upc" mandatory="true" type="string"/>
+		</block>
+	</sheet>
+	
+	
+	<sheet name="itemImport">
+		<block start="A5" end="C5">
+			<cell position="A5" dataName="shopId" type="long"/>
+			<cell position="B5" dataName="industryId" type="long"/>
+			<cell position="C5" dataName="defaultLang" type="string"/>
+		</block>
+		<block start="A9" end="A9" dataName="impItemCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpItemCommand" >
+			<cell position="A9" dataName="code" mandatory="true" type="string"/>
+		</block>
+	</sheet>
+	
+	
+	<!-- 优惠券导入 -->
+	<sheet name="couponImport">
+		<block start="A4" end="A4" dataName="codeList" loop="true" loopClass="com.baozun.nebula.command.promotion.PromotionCouponCodeCommand">
+		    <cell position="A4" dataName="couponCode" />
+		    <cell position="B4" dataName="startTime" />
+		    <cell position="C4" dataName="endTime" />
+		</block>
+	</sheet>
+	
+	<!-- 运费表导入 -->
+	<sheet name="shippingUpload">	
+		<block start="A4" end="J4" dataName="impShippingFeeCommand" loop="true" loopClass="com.baozun.nebula.freight.command.ImpShippingFeeCommand" >
+			<cell position="A4" dataName="distributionModeName" mandatory="true"  type="string" />
+			<cell position="B4" dataName="province" mandatory="true" type="string"/>
+			<cell position="C4" dataName="city" mandatory="false" type="string"/>
+			<cell position="D4" dataName="area" mandatory="false" type="string"/>
+			<cell position="E4" dataName="town" mandatory="false" type="string"/>
+			<cell position="F4" dataName="firstPartUnit" mandatory="false" type="string" />
+			<cell position="G4" dataName="firstPartPrice" mandatory="false" type="string"/>
+			<cell position="H4" dataName="subsequentPartUnit" mandatory="false" type="string"/>
+			<cell position="I4" dataName="subsequentPartPrice" mandatory="false"  type="string"/>
+		</block>
+	</sheet>
+	
+	<!-- 支持区域导入 -->
+	<sheet name="supportedAreaUpload">
+		<block start="A4" end="E4" dataName="impSupportedAreaList" loop="true" loopClass="com.baozun.nebula.freight.command.ImpSupportedAreaCommand">
+		    <cell position="A4" dataName="province" mandatory="true"  type="string"/>
+		    <cell position="B4" dataName="city" mandatory="false" type="string"/>
+			<cell position="C4" dataName="county" mandatory="false" type="string"/>
+			<cell position="D4" dataName="town" mandatory="false" type="string"/>
+			<cell position="E4" dataName="type" mandatory="true" type="string"/>
+		    
+		</block>
+	</sheet>
+	
+	<!--************************************************** 导出 **************************************************-->
+	
+	<!-- 咨询列表导出 -->
+	<sheet name="consultantExport">
+		<block start="A4" end="I4" dataName="consultantList" loop="true" loopClass="com.baozun.nebula.command.product.ConsultantCommand">
+			<cell position="A4" dataName="itemCode" />
+			<cell position="B4" dataName="itemName" />
+			<cell position="C4" dataName="memberName" />
+			<cell position="D4" dataName="content" />
+			<cell position="E4" dataName="createTime" />
+			<cell position="F4" dataName="resolveNote" />
+			<cell position="G4" dataName="resolveTime" />
+			<cell position="H4" dataName="resolveName" />
+			<cell position="I4" dataName="publishMark" /> 
+		</block>
+	</sheet>
+	
+	<!-- 运费表导出 -->
+	<sheet name="shippingExport">
+		<block start="A1" end="I1" dataName="expTemplateName" loop="true" loopClass="com.baozun.nebula.freight.command.ExpShippingFeeCommand">
+		    <cell position="A1" dataName="templateName"/>
+		</block>
+		<block start="A3" end="I3" dataName="expShippingName" loop="true" loopClass="com.baozun.nebula.freight.command.ExpShippingFeeCommand">
+		    <cell position="A3" dataName="distributionModeName"/>
+			<cell position="B3" dataName="province" />
+			<cell position="C3" dataName="city" />
+			<cell position="D3" dataName="area"/>
+			<cell position="E3" dataName="town" />
+			<cell position="F3" dataName="firstPartUnit" />
+			<cell position="G3" dataName="firstPartPrice" />
+			<cell position="H3" dataName="subsequentPartUnit" />
+			<cell position="I3" dataName="subsequentPartPrice" />
+		</block>
+		<block start="A4" end="I4" dataName="expShippingList" loop="true" loopClass="com.baozun.nebula.freight.command.ExpShippingFeeCommand">
+			<cell position="A4" dataName="distributionModeName"/>
+			<cell position="B4" dataName="province" />
+			<cell position="C4" dataName="city" />
+			<cell position="D4" dataName="area"/>
+			<cell position="E4" dataName="town" />
+			<cell position="F4" dataName="firstPartUnit" />
+			<cell position="G4" dataName="firstPartPrice" />
+			<cell position="H4" dataName="subsequentPartUnit" />
+			<cell position="I4" dataName="subsequentPartPrice" />
+		</block>
+	</sheet>
+	
+	<!-- 支持区域导出 -->
+	<sheet name="supportedAreaExport">
+		<block start="A1" end="E1" dataName="expDistributionName" loop="true" loopClass="com.baozun.nebula.freight.command.ExpSupportedAreaCommand">
+		    <cell position="A1" dataName="distributionName"/>
+		</block>
+		<block start="A4" end="E4" dataName="expSupportedAreaList" loop="true" loopClass="com.baozun.nebula.freight.command.ExpSupportedAreaCommand">
+		    <cell position="A4" dataName="province" />
+		    <cell position="B4" dataName="city" />
+			<cell position="C4" dataName="county" />
+			<cell position="D4" dataName="town" />
+			<cell position="E4" dataName="type" />
+		</block>
+	</sheet>
+	
+	<!-- 商品国际化信息导入  -->
+	<sheet name="itemInfoI18n">
+		<block start="A3" end="H3" dataName="itemInfoI18n" loop="true" loopClass="com.baozun.nebula.command.product.ItemInfoExcelCommand">
+			<cell position="A3" dataName="code"  mandatory="true" />
+			<cell position="B3" dataName="title"  mandatory="true" />
+			<cell position="C3" dataName="description" />
+			<cell position="D3" dataName="sketch" />
+			<cell position="E3" dataName="seoKeywords" />
+			<cell position="F3" dataName="seoTitle" />
+			<cell position="G3" dataName="seoDescription" />
+			<cell position="H3" dataName="subTitle" />
+		</block>
+	</sheet>
+	
+	<!-- 商品国际化信息导入  -->
+	<sheet name="itemImportI18n">
+		<block start="A5" end="A5" dataName="impItemCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpItemCommand">
+			<cell position="A5" dataName="code"  mandatory="true" />
+		</block>
+	</sheet>
+	
+</sheets>

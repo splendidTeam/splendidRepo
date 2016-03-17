@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+<script type="text/javascript">
+
+function status(val){
+	if(val==0) return "无效";
+	else return "有效";
+}
+
+function formatIsSystem(val){
+	if(val) return "是";
+	else return "否";
+}
+function edit(data, args, idx){ 
+	var str="";
+	 str+="<a href='javascript:void(0);' class='func-button setoption'>设置选项</a>";
+	
+	return str; 
+}
+
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+	
+	$j("#table1").loxiasimpletable({
+		page:true,
+		cols:
+		[
+			{name:"groupCode",label:"分组编码"},
+			{name:"groupDesc",label:"分组描述"},
+			{label:"操作", template:"edit"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, firstPage: true, lastPage: false,
+			items: [
+			        {groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"}]
+			}
+	});
+	
+    $j("#table1").on("click",".func-button.setoption", function(){
+        window.location.href="choose-option.html";
+    });
+	$j(".button.addchoosegp").on("click", function(){
+        window.location.href="add-choose-option-group.html";
+    });
+	refreshData();
+});
+
+function refreshData(){
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, firstPage: true, lastPage: false,
+		items:[
+		{groupCode:"IS_AVAILABLE1",groupDesc:"是否有效1"},
+		{groupCode:"IS_AVAILABLE2",groupDesc:"是否有效2"},
+		{groupCode:"IS_AVAILABLE3",groupDesc:"是否有效3"},
+		{groupCode:"IS_AVAILABLE4",groupDesc:"是否有效4"},
+		{groupCode:"IS_AVAILABLE5",groupDesc:"是否有效5"},
+		{groupCode:"IS_AVAILABLE6",groupDesc:"是否有效6"}]
+	});
+
+
+}
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/compass.png">通用选项管理
+	         <input type="button" value="新增分组及选项" class="button orange addchoosegp" title="新增分组及选项"/>
+    </div>
+
+	<div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+		    <table>
+		        <tr>
+		            <td><label>分组编码</label></td>
+		            <td>
+		                <span id="searchkeytext"><input type="text" loxiaType="input" mandatory="false" placeholder="分组编码"></input></span>
+		            </td>
+		
+		      		 <td><label>分组描述</label></td>
+		            <td>
+		                <span id="searchkeytext"><input type="text" loxiaType="input" mandatory="false" placeholder="分组描述"></input></span>
+		            </td>
+		        </tr>
+		    </table>
+		    <div class="button-line1">
+		        <a href="javascript:void(0);" class="func-button"><span>搜索</span></a>
+		    </div>
+    	</div>
+	</div>
+	
+	<div class="ui-block">
+		 <div class="border-grey" id="table1" caption="通用选项分组列表"></div>
+	</div>
+	<div class="button-line">
+        <input type="button" value="新增分组及选项" class="button orange addchoosegp" title="新增分组及选项"/>
+    </div>
+
+</div>
+</body>
+</html>

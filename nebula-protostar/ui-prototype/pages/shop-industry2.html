@@ -1,0 +1,379 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" type="text/css" href="../css/demo.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+
+
+<script type="text/javascript">
+
+//行业及选中属性
+var industryProperti=[
+          			{industryId:1,name:"运动鞋",createtime:"2013-03-05",status:1,selPros:[1,2],pros:[1,2],proNames:['尺寸','颜色']},
+        			{industryId:2,name:"休闲鞋",createtime:"2013-03-05",status:1,selPros:[1],pros:[1,2],proNames:['尺寸','颜色']},
+        			{industryId:3,name:"T恤",createtime:"2013-03-05",status:1,selPros:[2],pros:[1,2],proNames:['尺寸','颜色']},
+        			{industryId:4,name:"裤子",createtime:"2013-03-05",status:1,selPros:[1],pros:[1,2],proNames:['尺寸','颜色']},
+        			{industryId:5,name:"卫衣",createtime:"2013-03-05",status:1,selPros:[2],pros:[1,2],proNames:['尺寸','颜色']},
+        			{industryId:11,name:"笔记本",createtime:"2013-03-05",status:1,selPros:[2],pros:[1,2],proNames:['尺寸','颜色']}
+        			];
+
+
+        			
+function formatGender(val){
+	if(val == 0) return "正常";
+	else return "禁用";
+}
+
+function chooseFilterIndustry(sel, obj){
+	var html='';
+	
+	if(parseInt(sel)<10){
+		
+		html+='<div class="children-store"><input type="checkbox" name="property" value="1" nvalue="尺寸"></input>尺寸</div>';
+		html+='<div class="children-store"><input type="checkbox" name="property" value="2" nvalue="颜色"></input>颜色</div>';
+	
+	}
+	else{
+		html+='<div class="children-store"><input type="checkbox" name="property" value="3" nvalue="版本"></input>版本</div>';
+	
+	}
+
+	$j("#addPropertyDiv").html(html);
+}
+
+function editUser(data, args, idx){
+	 var html="<a href='javascript:void(0);' val='"+loxia.getObject("industryId", data)+"' class='func-button modify'>关联属性管理</a>";
+
+	 html+='&nbsp;<a href="javascript:void(0);" val="'+loxia.getObject("industryId", data)+'" class="func-button remove">删除</a>'
+	 return html;
+}
+
+
+function refreshData(){
+	$j("#table1").loxiasimpletable("refresh",
+			industryProperti
+	);
+
+    $j(".button.adduser").click(function(){
+        window.location.href="add-user.html";
+    });
+
+    $j(".func-button.delete").on("click",function(){
+        nps.confirm("确认删除","确定要删除选定的用户么？", function(){
+            alert("Deleted");
+            refreshData();
+        });
+    });
+}
+
+var check=""
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+	
+	$j("#table1").loxiasimpletable({
+		cols:
+		[
+			{name:"name",label:"行业名称",width:"15%"},
+			{name:"createtime",label:"创建时间",width:"10%"},
+		
+			{label:"操作",width:"10%", template:"editUser"}
+		]
+	});
+
+	$j("#table1").on("click",".func-button.modify",function(){
+		
+		var curId=$j(this).attr("val");
+		var obj=null;
+		
+		for(var o in industryProperti){
+
+			if(industryProperti[o].industryId==parseInt(curId)){
+				obj=industryProperti[o];
+			}
+			
+		}
+
+		var html='';
+
+		for(var o in obj.pros){
+
+			var chtml=''
+			for(var j in obj.selPros){
+				if(obj.selPros[j]==obj.pros[o]){
+					chtml='<div class="children-store"><input type="checkbox" name="modifyProperty" checked value="'+obj.pros[o]+'"></input>'+obj.proNames[o]+'</div>';
+				}
+			}
+
+			if(chtml==''){
+				chtml='<div class="children-store"><input type="checkbox" name="modifyProperty" value="'+obj.pros[o]+'"></input>'+obj.proNames[o]+'</div>';
+			}
+
+			html+=chtml;
+		}	
+		
+		$j("#modifyPropertyDiv").html(html);
+		$j("#industryTitle").html("【"+obj.name+"】行业自定义属性修改");
+	});
+
+	//删除
+	$j("#table1").on("click",".func-button.remove",function(){
+		var curId=$j(this).attr("val");
+
+		nps.confirm("操作提示","确认删除?", function(){
+
+			for(var o in industryProperti){
+
+				if(industryProperti[o].industryId==parseInt(curId)){
+					industryProperti.splice(o,1);
+					refreshData();
+					return ;
+				}
+				
+			}
+		});
+		
+		
+	});	
+
+	refreshData();
+	
+			var setting = {
+			check: {
+				enable: true,
+				chkboxType: {"Y":"", "N":""}
+			},
+			view: {
+				dblClickExpand: true,
+				showIcon:false
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			},
+			callback: {
+				beforeClick: beforeClick,
+				onCheck: onCheck
+			}
+		};
+
+		var zNodes =[
+			{ id:1, pId:0, name:"鞋", open:true,nocheck:true},
+			{ id:11, pId:1, name:"运动鞋"},
+			{ id:12, pId:1, name:"休闲鞋"},
+			{ id:2, pId:0, name:"服装", open:true,nocheck:true},
+			{ id:21, pId:2, name:"T恤"},
+			{ id:22, pId:2, name:"裤子"},
+			{ id:23, pId:2, name:"卫衣"},
+			{ id:3, pId:0, name:"配件", open:true,nocheck:true},
+			{ id:31, pId:3, name:"帽子"},
+			{ id:32, pId:3, name:"手套"},
+			{ id:33, pId:3, name:"袜子"}
+		 ];
+
+		function beforeClick(treeId, treeNode) {
+			var zTree = $j.fn.zTree.getZTreeObj("treeDemo");
+			zTree.checkNode(treeNode, !treeNode.checked, null, true);
+			return false;
+		}
+		
+		function onCheck(e, treeId, treeNode) {
+			var zTree = $j.fn.zTree.getZTreeObj("treeDemo"),
+			nodes = zTree.getCheckedNodes(true),
+			v = "";
+			for (var i=0, l=nodes.length; i<l; i++) {
+				v += nodes[i].id + ",";
+			}
+			if (v.length > 0 ) v = v.substring(0, v.length-1);
+			check = v;
+		}
+
+		function showMenu() {
+			var cityObj = $j(this);
+			var cityOffset = $j(this).offset();
+			$j("#menuContent").slideDown("fast");
+
+			$j("body").bind("mousedown", onBodyDown);
+		}
+		function hideMenu() {
+			$j("#menuContent").fadeOut("fast");
+			$j("body").unbind("mousedown", onBodyDown);
+		}
+
+		
+		function onBodyDown(event) {
+			if (!(event.target.id == "menuBtn" || event.target.id == "citySel" || event.target.id == "menuContent" || $j(event.target).parents("#menuContent").length>0)) {
+				hideMenu();
+			}
+		}
+		
+		$j.fn.zTree.init($j("#treeDemo"), setting, zNodes);
+		
+		$j(".button.orange.add").click(function(){
+			var proSelArray=new Array();
+			var proArray=new Array();
+			var proNameArray=new Array();
+			$j("input[name='addProperty']").each(function(i,n){
+				proArray[i]=$j(this).val();
+				proNameArray[i]=$j(this).attr("nvalue");
+			 });
+
+			$j("input[name='addProperty']:checked").each(function(i,n){
+				proSelArray[i]=$j(this).val();
+				
+			 });
+
+			var curIndustry=$j("#industry").val();
+
+			var industryArray=curIndustry.split("-");
+			
+			industryProperti[industryProperti.length]={industryId:parseInt(industryArray[0]),name:industryArray[1],createtime:"2013-03-05",status:1,selPros:proSelArray,pros:proArray,proNames:proNameArray};
+
+			   refreshData();
+		});
+});
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1">【nike官方旗舰店】自定义行业属性设置
+     
+    </div>
+
+    <table class="ui-block-content" style="display:none;">
+        <tr>
+            <td><label>行业名称：</label></td>
+            <td>
+                <span id="searchkeytext"><input type="text" loxiaType="input" mandatory="false"></input></span>
+               
+            </td>
+            <td>
+             <a href="#" class="func-button"><label class="ficon-true"></label><span>搜索</span></a> 
+            </td>
+        </tr>
+    </table>
+    
+	<div class="percent30-content-left" style="width:70%">
+
+    <div class="ui-block">
+    	<div class="ui-block-title1">自定义行业属性列表</div>
+
+   	 	<div class="border-grey ui-loxia-simple-table" id="table1"></div>   
+    </div>
+	</div>
+	 <div class="percent70-content-right"  style="width:30%">
+        	<div id="menuContent" class="menuContent border-grey" style="z-index:1000;background-color:#fff;">
+					<div class="ui-block-title1" id="industryTitle">【运动鞋】行业自定义属性修改</div>
+					
+					<div style="border:1px solid #1d5773;float:left;height:150px;width:100%;">
+						<div id="modifyPropertyDiv" style="border:1px solid #ccc;float:left;overflow-y:scroll;height:120px;width:100%;">
+							<div class="children-store">
+								<input type="checkbox" ></input>尺寸
+							</div>
+							<div class="children-store">
+								<input type="checkbox" ></input>颜色
+							</div>
+						</div>
+						<div style="line-height:30px;margin-left:150px;">
+							<a href="" class="func-button ok">确定</a>
+							<a href="" class="func-button cancel">取消</a>
+						</div>
+					</div>
+			</div>
+		</div>
+      
+
+
+
+	<div class="percent30-content-left" style="width:70%">
+
+		    <div class="ui-block" >
+		    	<div class="ui-block-title1">新增自定义行业属性</div>
+		    	<div style="margin-top:10px;margin-left:10px;">
+		    		<label>行业:</label>
+		    	<select loxiaType="select" id="industry" style="margin-left:55px;" >
+					
+					<OPTGROUP label="鞋">
+						<option value="1-运动鞋">--运动鞋</option>
+						<option value="2-休闲鞋">--休闲鞋</option>
+					</OPTGROUP>
+					
+					<OPTGROUP label="服装">
+						<option value="3-T恤">--T恤</option>
+						<option value="4-裤子">--裤子</option>
+						<option value="5-卫衣">--卫衣</option>
+					</OPTGROUP>
+					
+					<OPTGROUP label="电脑">
+						<OPTGROUP label="----整机">
+							<option value="11-笔记本">----笔记本</option>
+							<option value="12-上网本">----上网本</option>
+						</OPTGROUP>
+						
+						<OPTGROUP label="----网络产品">
+							<option value="13-路由器">----路由器</option>
+							<option value="14-网卡">----网卡</option>
+						</OPTGROUP>
+					</OPTGROUP>
+					
+				</select>
+		    	</div>
+		    	</br>
+				<div style="float:left;margin-left:10px;">
+					<div>
+					<label>待选自定义属性:</label>
+					</div>
+					
+					<div id="addPropertyDiv" style="margin-top:10px;border:1px solid #ccc;float:left;overflow-y:scroll;height:100px;width:300px;">
+						<div class="children-store">
+							<input type="checkbox" name="addProperty" value="1" nvalue="尺寸"></input>尺寸
+						</div>
+						<div class="children-store">
+							<input type="checkbox" name="addProperty" value="2" nvalue="颜色"></input>颜色
+						</div>
+						
+					</div>
+				</div>
+				
+				<div  class="button-line" style="text-align:left;">
+					 <input type="button" value="新增" class="button orange add"/>
+				</div>
+				
+		   	 	<div id="addIndusry"></div>   
+		    </div>
+	</div>
+</div>
+</body>
+</html>

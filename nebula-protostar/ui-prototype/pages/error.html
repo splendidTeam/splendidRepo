@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+function error_display(self){
+	if($j(self).hasClass("mini-button")){
+		$j(self).removeClass("mini-button");
+		$j(".error-detail").css("display","none");
+		setTimeout(function(){$j(".error-page").css({"padding-top":((parseInt($j(window).height())-parseInt($j(".error-page").height()))/2)-50,"display":"block"});},1);
+	}
+	else{
+		$j(self).addClass("mini-button");
+		$j(".error-detail").css("display","block");
+		setTimeout(function(){$j(".error-page").css({"padding-top":((parseInt($j(window).height())-parseInt($j(".error-page").height()))/2)-50,"display":"block"});},1);
+	}
+	
+	
+}
+</script>
+</head>
+
+<body>
+<div class="error-page" cellpadding="0" cellspacing="0">
+	 <h1>404</h1>
+     <p>
+     	您所查看的页面不存在或无法浏览，错误原因。
+        <input type="button" class="ui-button add-button" onClick="error_display(this);" value="查看信息"/>
+        <input type="button" class="ui-button mail-button" value="发送信息"/>
+     </p>
+     
+     <div class="error-detail">
+     	<input type="button" class="ui-button copy-button" value="复制信息"/>
+        <div class="clear-line height1"></div>
+     	1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息<br/>
+        1.错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息错误信息
+     </div>
+</div>
+<script type="text/javascript">
+$j(window).load(function(){
+	$j(".error-page").css({"padding-top":((parseInt($j(window).height())-parseInt($j(".error-page").height()))/2)-50,"display":"block"});
+	$j(window).resize(function(){
+		$j(".error-page").css({"padding-top":((parseInt($j(window).height())-parseInt($j(".error-page").height()))/2)-50,"display":"block"});
+	});
+});
+</script>
+</body>
+</html>

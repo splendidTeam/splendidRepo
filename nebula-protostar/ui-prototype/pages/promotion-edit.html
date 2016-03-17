@@ -1,0 +1,784 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" href="../css/demo.css" type="text/css">
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+<style type="text/css">
+.wl-right-auto2
+{
+
+
+border:1px solid #ccc;
+overflow-y:scroll;
+
+}
+.wl-right-auto2  input[type="checkbox"]
+{
+clear:both;
+}
+
+.wl-right-auto2  input[type="radio"]
+{
+clear:both;
+}
+.wl-right-auto2  p
+{
+width:80%;
+}
+
+.extension {
+line-height: 28px; height: 21px;float:left;margin-right: 10px;
+}
+
+.ui-loxia-simple-table table tr th{
+	height: 30px;
+}
+
+.ui-loxia-simple-table table tr th div{
+	height: 30px;
+	line-height: 30px;
+}
+
+.padding-left-100{
+	padding-left: 100px;
+}
+
+.ui-block .input-mode{
+	background-color: #F8F8F8;
+	display: none;
+}
+
+.ui-loxia-simple-table thead td{
+	font-weight: bold;
+	background: none repeat scroll 0 0 #2D3033;
+    color: #FFFFFF;
+    padding: 0 0 0 10px;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+#selectable .ui-selecting { background: #6600FF; }
+#selectable .ui-selected { background: #0066CC; color: white; }
+#selectable { list-style-type: none; margin: 0; padding: 0; width: 450px; }
+#selectable li { padding: 1px; float: left; width: 100px; height: 40px; font-size: 16px; text-align: center; line-height: 38px; cursor: pointer;}
+</style>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+/************************************** 全局变量 **************************************/
+//促销信息
+var NAME 			= 	"五一大促";
+var START_TIME		=	"2014-05-01 00:00:00";
+var END_TIME		=	"2014-05-03 00:00:00";
+var IS_LIMIT 		= 	true;
+var LIMIT_RULE1 	= 	"历史总数";
+var LIMIT_RULE2 	= 	"每商品";
+var LIMIT_QUANTITY 	= 	2;
+var CORNER_MARK 	= 	"减";
+var BENEFICIARY		=	"全体";
+
+/************************************** ready **************************************/
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+    $j(":button.edit").click(function(){$j(":button.edit").hide();})
+    
+	//‘活动头部设置’ 修改按钮
+	$j(".promotion-header :button.edit").click(function(){
+		
+		
+		$j(this).hide();
+		$j(".promotion-header .text-mode").hide();
+		$j(".promotion-header .input-mode").show();
+	});
+	
+	//‘活动头部设置’ 保存按钮
+	$j(".promotion-header :button.save").click(function(){
+		NAME = $j.trim($j(".promotion-header .pro-name :text").val());
+		START_TIME = $j(".promotion-header .pro-startTime :text").val();
+		END_TIME = $j(".promotion-header .pro-endTime :text").val();
+		IS_LIMIT = $j(".promotion-header .pro-isLimit :checkbox").prop("checked");
+		LIMIT_RULE1 = $j(".promotion-header .pro-rule1 select").val();
+		LIMIT_RULE2 = $j(".promotion-header .pro-rule2 select").val();
+		LIMIT_QUANTITY = $j(".promotion-header .pro-quantity :text").val();
+		CORNER_MARK = $j(".promotion-header .pro-mark select").val();
+		
+		$j(".promotion-header .text-mode .pro-name").text(NAME);
+		$j(".promotion-header .text-mode .pro-startTime").text(START_TIME);
+		$j(".promotion-header .text-mode .pro-endTime").text(END_TIME);
+		$j(".promotion-header .text-mode .pro-isLimit").text(IS_LIMIT ? "限购" : "不限购");
+		$j(".promotion-header .text-mode .pro-rule1").text(LIMIT_RULE1);
+		$j(".promotion-header .text-mode .pro-rule2").text(LIMIT_RULE2);
+		$j(".promotion-header .text-mode .pro-quantity").text(LIMIT_QUANTITY);
+		$j(".promotion-header .text-mode .pro-mark").text("减");
+		
+		$j(".promotion-header :button.edit").show();
+		$j(".promotion-header .text-mode").show();
+		$j(".promotion-header .input-mode").hide();
+		
+		$j("html").animate({scrollTop:$j(".promotion-beneficiary").offset().top}, 'slow')	//滑动到 ‘活动范围设置’
+		$j(".promotion-beneficiary :button.edit").click();
+	});
+
+	//‘受益人群设置’ 修改按钮
+	$j(".promotion-beneficiary :button.edit").click(function(){
+		$j(this).hide();
+		$j(".promotion-beneficiary .text-mode").hide();
+		$j(".promotion-beneficiary .input-mode").show();
+	});
+	
+	//‘受益人群设置’ 保存按钮
+	$j(".promotion-beneficiary :button.save").click(function(){
+		BENEFICIARY = $j(".promotion-beneficiary .pro-beneficiary select").val();
+		
+		$j(".promotion-beneficiary .text-mode .pro-beneficiary").text(BENEFICIARY);
+		
+		$j(".promotion-beneficiary :button.edit").show();
+		$j(".promotion-beneficiary .text-mode").show();
+		$j(".promotion-beneficiary .input-mode").hide();
+		
+		$j("html").animate({scrollTop:$j(".promotion-scope").offset().top}, 'slow')	//滑动到 ‘活动范围设置’
+		
+		$j(".promotion-scope :button.edit").click();
+	});
+	
+	//‘活动范围设置’ 修改按钮
+	$j(".promotion-scope :button.edit").click(function(){
+		$j(".promotion-scope .ui-block-content").css("background-color", "#F8F8F8");	//高亮显示被选区
+		$j(".promotion-scope .text-mode").hide();	
+		$j(".promotion-scope .input-mode").show();	
+		$j(".promotion-scope thead td.input-mode").css("background-color", "#2D3033");	
+		$j(this).hide();
+		
+		$j(".promotion-scope :button.save").parent().show();
+	});
+	
+	//‘活动范围设置’ 保存按钮
+	$j(".promotion-scope :button.save").click(function(){
+		$j(".promotion-scope .ui-block-content").css("background-color", "#FFFFFF");	//取消高亮显示被选区
+		$j(this).parent().hide();
+		$j(".promotion-scope :button.edit").show();
+		$j(".promotion-scope .input-mode").hide();	
+		$j(".promotion-scope .text-mode").show();	
+		
+		$j("html").animate({scrollTop:$j(".promotion-condition").offset().top}, 'slow')	//滑动到 ‘活动范围设置’
+		$j(".promotion-condition :button.edit").click();
+	});
+
+	//‘活动条件设置’ 修改按钮
+	$j(".promotion-condition :button.edit").click(function(){
+		$j(".promotion-condition .input-mode").show();	
+		$j(this).hide();
+	});
+	
+	//‘活动条件设置’ 保存按钮
+	$j(".promotion-condition :button.save").click(function(){
+		$j(".promotion-condition .input-mode").hide();	
+		$j(".promotion-condition :button.edit").show();
+		
+		$j("html").animate({scrollTop:$j(".promotion-discount").offset().top}, 'slow')	//滑动到 ‘活动范围设置’
+		$j(".promotion-discount :button.edit").click();
+	});
+
+	//‘活动优惠设置’ 修改按钮
+	$j(".promotion-discount :button.edit").click(function(){
+		$j(".promotion-discount .input-mode").show();	
+		$j(this).hide();
+	});
+	
+	//‘活动优惠设置’ 保存按钮
+	$j(".promotion-discount :button.save").click(function(){
+		
+		$j(".promotion-discount .input-mode").hide();	
+		$j(".promotion-discount :button.edit").show();
+		
+		$j(":button.edit").show();
+	});
+	
+	//表格中的删除按钮-点击事件
+	$j(".btn-delete").live("click", function(){
+		var node = $j(this).parents("tr");
+		node.nextAll().each(function(index, dom){
+			var cls = $j(dom).attr("class");
+			$j(dom).removeClass(cls).addClass(cls == "odd" ? "even" : "odd");
+		});
+		node.remove();
+	});
+
+	//表格中的添加按钮-点击事件
+	$j(".btn-add").live("click", function(){
+		var node = $j(this).parents("tr").prev().clone();
+		var cls = node.attr("class");
+		node.removeClass(cls).addClass(cls == "odd" ? "even" : "odd");
+		node.insertBefore($j(this).parents("tr"));
+		$j(this).parents("tr").removeClass().addClass(cls);
+	});
+	
+	$j(":radio[name='condition-type']").click(function(){
+		$j(".promotion-condition .ui-loxia-simple-table").hide();
+		$j("#" + $j(this).attr("data") + "-table").show();
+	});
+	
+	$j("#selectable").selectable({
+		selected : function(event, ui){
+			$j("#discount-money-div").hide();
+			$j("#discount-quantity-div").hide();
+			$j("#discount-freight-div").hide();
+			$j("#discount-" + $j(ui.selected).attr("data") + "-div").show();
+		}
+	});
+});
+
+//点击‘编辑’按钮时，检查是否还有其他步骤正在被编辑
+function checkIsEditing(){
+	var rs = true;
+	if(IS_EDITING) {
+		if(confirm("您有尚未保存的步骤，是否保存？")) {
+			$j(":button.save:visible").click();
+		} else {
+			rs = false;
+		}
+	}
+	return rs;
+}
+
+</script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body><h1 class="a-1">fff</h1><h1 class="a-2">fff</h1>
+	<div class="content-box width-percent100">
+
+		<form name="itemForm" action="" method="post" enctype="multipart/form-data">
+			<div class="ui-title1">
+				<img src="../images/wmi/blacks/32x32/cube.png">活动设置
+			</div>
+			<div class="ui-block">
+				<div id="second" style="display: block">
+					<div class="ui-block">
+						<div class="ui-block-content ui-block-content-lb"
+							style="padding-bottom: 10px;">
+							<table>
+								<tr>
+									<td><label>已选活动</label></td>
+									<td><span>xxxxxx</span></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!------------------------------------- 活动头部设置 开始 ------------------------------------->
+				<div class="ui-block promotion-header">
+					<div class="ui-block-title1" style="background: #fff; color: #000;">
+						活动头部设置 
+						<input type="button" value="修改" class="button orange edit" onclick="" title="修改" />
+					</div>
+
+					<!------------------------------------- 活动头部文本模式 开始 ------------------------------------->
+					<div class="ui-block-content border-grey text-mode">
+						<div class="ui-block-line ">
+							<label>促销名称：</label>
+							<div class="text pro-name">五一大促</div>
+						</div>
+						<div class="ui-block-line ">
+							<label>有效期：</label>
+							<div class="text">从 
+								<span class="pro-startTime">2014-05-01 00:00:00</span> 
+								到 
+								<span class="pro-endTime">2014-05-03 00:00:00</span> 
+								止
+							</div>
+						</div>
+						<div class="ui-block-line ">
+							<label>限购规则：</label> 
+							<div class="text">
+								<span class="pro-isLimit">限购</span>
+								<span class="pro-rule1">历史总数</span>
+								<span class="pro-rule2">每商品</span>
+								数值：<span class="pro-quantity">2</span>
+							</div>
+						</div>
+						<div class="ui-block-line ">
+							<label>活动角标：</label> 
+							<div class="text pro-mark">减</div>
+						</div>
+					</div>
+					<!------------------------------------- 活动头部文本模式 结束 ------------------------------------->
+					
+					<!------------------------------------- 活动头部输入模式 开始 ------------------------------------->
+					<div class="ui-block-content border-grey input-mode">
+						<div class="ui-block-line ">
+							<label>促销名称：</label>
+							<div class="text pro-name"><input loxiaType="input" value="五一大促" /></div>
+						</div>
+						<div class="ui-block-line ">
+							<label>有效期：</label>
+							<div class="text">从 
+								<span class="pro-startTime"><input loxiaType="date" showtime="true" value="2014-05-01 00:00:00" /></span> 
+								到 
+								<span class="pro-endTime"><input loxiaType="date" showtime="true" value="2014-05-03 00:00:00" /></span> 
+								止
+							</div>
+						</div>
+						<div class="ui-block-line ">
+							<label>限购规则：</label> 
+							<div class="text">
+								<span class="pro-isLimit"><input type="checkbox" checked="checked" />限购</span>
+								<span class="pro-rule1">
+									<select loxiaType="select">
+										<option value="历史总数">历史总数</option>
+										<option value="订单">订单</option>
+									</select>
+								</span>
+								<span class="pro-rule2">
+									<select loxiaType="select">
+										<option value="所有商品">所有商品</option>
+										<option value="每商品">每商品</option>
+									</select>
+								</span>
+								数值：<span class="pro-quantity"><input loxiaType="number" value="2" style="width: 25px;" /></span>
+							</div>
+						</div>
+						<div class="ui-block-line ">
+							<label>活动角标：</label> 
+							<div class="text pro-mark">
+								<select loxiaType="select">
+									<option value="全体">全体</option>
+									<option value="会员分组">会员分组</option>
+									<option value="会员标签">会员标签</option>
+								</select>
+							</div>
+						</div>
+						<div class="ui-block-line padding-left-100">
+							<input type="button" value="保存" class="button orange save" onclick="" title="保存" />
+						</div>
+					</div>
+					<!------------------------------------- 活动头部输入模式 结束 ------------------------------------->
+				</div>
+				<div style="margin-top: 10px"></div>
+				<!------------------------------------- 活动头部设置 结束 ------------------------------------->
+
+				<!------------------------------------- 受益人群设置 开始 ------------------------------------->
+				<div class="ui-block promotion-beneficiary">
+					<div class="ui-block-title1" style="background: #fff; color: #000;">
+						受益人群设置 
+						<input type="button" value="修改" class="button orange edit" onclick="" title="修改" />
+					</div>
+
+					<!------------------------------------- 受益人群文本模式 开始 ------------------------------------->
+					<div class="ui-block-content border-grey text-mode">
+						<div class="ui-block-line ">
+							<label>受益人群：</label>
+							<div class="text pro-beneficiary">全体</div>
+						</div>
+					</div>
+					<!------------------------------------- 受益人群文本模式 结束 ------------------------------------->
+					
+					<!------------------------------------- 受益人群输入模式 开始 ------------------------------------->
+					<div class="ui-block-content border-grey input-mode">
+						<div class="ui-block-line ">
+							<label><input type="radio" name="pro-beneficiary" checked="checked" />系统人群选择</label>
+							<label><input type="radio" name="pro-beneficiary" />新建人群选择</label>
+						</div>
+						<div class="ui-block-line ">
+							<label>受益人群：</label>
+							<div class="pro-beneficiary">
+								<select loxiaType="select">
+									<option value="全体">全体</option>
+									<option value="会员标签">会员标签</option>
+								</select>
+							</div>
+						</div>
+						<div class="ui-block-line padding-left-100">
+							<input type="button" value="保存" class="button orange save" onclick="" title="保存" />
+						</div>
+					</div>
+					<!------------------------------------- 受益人群输入模式 结束 ------------------------------------->
+				</div>
+				<div style="margin-top: 10px"></div>
+				<!------------------------------------- 受益人群设置 结束 ------------------------------------->
+				
+				<!------------------------------------- 活动范围设置 开始 ------------------------------------->
+				<div class="ui-block promotion-scope">
+					<div class="ui-block-title1" style="background: #fff; color: #000;">
+						活动范围设置 
+						<input type="button" value="修改" class="button orange edit" onclick="" title="修改" />
+					</div>
+
+					<div class="ui-block-content border-grey" style="float: left">
+						<div class="text-mode">
+							<label>任选</label> 
+						</div>
+						<div class="input-mode" style="border: 1px #CCCCCC solid; width: 150px; margin-top: 10px; line-height: 20px;">
+							<label style="margin-right: 30px">
+								<input type="radio" name="type" checked="checked" />任选
+							</label> 
+							<label>
+								<input type="radio" name="type" />固定捆绑
+							</label>
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="main-table" style="float: left; width: 60%">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="30%"><div>商品范围</div></th>
+										<th class="col-1" width="10%">价格</th>
+										<th class="col-2" width="50%">限购</th>
+										<td class="col-3 input-mode" width="10%">操作</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td class="col-0 "><span title="女子">女子</span></td>
+										<td class="col-1 "><span title="100">100</span></td>
+										<td class="col-2 text-mode"><span title="每商品在历史总数大于3000">每商品在历史总数大于3000</span></td>
+										<td class="col-2 input-mode"><span title="每商品在历史总数大于3000">
+											<input type="checkbox" />覆盖限购 
+											<select loxiaType="select" style="width: 90px;">
+												<option value="历史总数">历史总数</option>
+												<option value="订单">订单</option>
+											</select>
+											<select loxiaType="select" style="width: 90px;">
+												<option value="所有商品">所有商品</option>
+												<option value="每商品">每商品</option>
+											</select>
+											数值
+											<input loxiaType="number" value="2" style="width: 25px;" />
+										</span></td>
+										<td class="col-3 input-mode"><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>
+									<tr class="even">
+										<td class="col-0 "><span title="男子>鞋类">男子>鞋类</span></td>
+										<td class="col-1 "><span title="100">100</span></td>
+										<td class="col-2 text-mode"><span title="每商品在历史总数大于3000">每商品在历史总数大于3000</span></td>
+										<td class="col-2 input-mode"><span title="每商品在历史总数大于3000">
+											<input type="checkbox" />覆盖限购 
+											<select loxiaType="select" style="width: 90px;">
+												<option value="历史总数">历史总数</option>
+												<option value="订单">订单</option>
+											</select>
+											<select loxiaType="select" style="width: 90px;">
+												<option value="所有商品">所有商品</option>
+												<option value="每商品">每商品</option>
+											</select>
+											数值
+											<input loxiaType="number" value="2" style="width: 25px;" />
+										</span></td>
+										<td class="col-3 input-mode"><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>
+									<tr class="odd">
+										<td class="col-0 "><span title="NIKE FREE TR FIT 4 女子训练鞋">NIKE FREE TR FIT 4 女子训练鞋</span></td>
+										<td class="col-1 "><span title="249">249</span></td>
+										<td class="col-2 text-mode"><span title="每商品在历史总数大于3000">每商品在历史总数大于3000</span></td>
+										<td class="col-2 input-mode"><span title="每商品在历史总数大于3000">
+											<input type="checkbox" />覆盖限购 
+											<select loxiaType="select" style="width: 90px;">
+												<option value="历史总数">历史总数</option>
+												<option value="订单">订单</option>
+											</select>
+											<select loxiaType="select" style="width: 90px;">
+												<option value="所有商品">所有商品</option>
+												<option value="每商品">每商品</option>
+											</select>
+											数值
+											<input loxiaType="number" value="2" style="width: 25px;" />
+										</span></td>
+										<td class="col-3 input-mode"><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>
+									<tr class="even">
+										<td class="col-0 "><span title="NIKE STUDIO WRAP 2 女子训练鞋">NIKE STUDIO WRAP 2 女子训练鞋</span></td>
+										<td class="col-1 "><span title="239">239</span></td>
+										<td class="col-2 text-mode"><span title="每商品在历史总数大于3000">每商品在历史总数大于3000</span></td>
+										<td class="col-2 input-mode"><span title="每商品在历史总数大于3000">
+											<input type="checkbox" />覆盖限购 
+											<select loxiaType="select" style="width: 90px;">
+												<option value="历史总数">历史总数</option>
+												<option value="订单">订单</option>
+											</select>
+											<select loxiaType="select" style="width: 90px;">
+												<option value="所有商品">所有商品</option>
+												<option value="每商品">每商品</option>
+											</select>
+											数值
+											<input loxiaType="number" value="2" style="width: 25px;" />
+										</span></td>
+										<td class="col-3 input-mode"><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>
+									<tr class="odd">
+										<td class="col-0"></td>
+										<td class="col-1"></td>
+										<td class="col-2"></td>
+										<td class="col-3 input-mode"><a class="btn-add" href="javascript:void(0)">+</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="deputy-table" style="float: left; width: 40%">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="60%">
+											<div>例外商品范围</div>
+										</th>
+										<th class="col-1" width="30%">
+											<div>价格</div>
+										</th>
+										<td class="col-2 input-mode" width="10%">
+											<div>操作</div>
+										</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td class="col-0 "><span title="NIKE STUDIO WRAP 3 女子训练鞋">NIKE STUDIO WRAP 3 女子训练鞋</span></td>
+										<td class="col-1 "><span title="689">689</span></td>
+										<td class="col-2 input-mode"><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>
+									<tr class="even">
+										<td class="col-0"></td>
+										<td class="col-1"></td>
+										<td class="col-2 input-mode"><a class="btn-add" href="javascript:void(0)">+</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="ui-block-line" style="padding-left: 100px; display: none;">
+							<input type="button" value="保存" class="button orange save" onclick="" title="保存" />
+						</div>
+					</div>
+				</div>
+				<div style="margin-top: 10px; clear: both"></div>
+				<!------------------------------------- 活动范围设置 结束 ------------------------------------->
+
+				<!------------------------------------- 活动条件设置 开始 ------------------------------------->
+				<div class="ui-block promotion-condition">
+					<div class="ui-block-title1" style="background: #fff; color: #000;">
+						活动条件设置 (最多5条)
+						<input type="button" value="修改" class="button orange edit" onclick="" title="修改" />
+					</div>
+					
+					<div class="ui-block-content border-grey input-mode">
+						<div style="border: 1px #CCCCCC solid; width: 350px; margin-top: 10px; line-height: 20px;">
+							<label style="margin-right: 30px">
+								<input type="radio" name="condition-type" checked="checked" data="money" />金额
+							</label> 
+							<label style="margin-right: 30px">
+								<input type="radio" name="condition-type" data="quantity" />件款数
+							</label> 
+							<label style="margin-right: 30px">
+								<input type="radio" name="condition-type" data="chosen" />选件
+							</label>
+							<label>
+								<input type="radio" name="condition-type" />固定捆绑
+							</label> 
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="money-table" style="width: 30%">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="60%">金额条件设置</th>
+										<th class="col-1" width="25%">金额</th>
+										<th class="col-3" width="15%">操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td>满</td>
+										<td>500</td>
+										<td><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>								
+									<tr class="even">
+										<td>满</td>
+										<td>1000</td>
+										<td><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>								
+									<tr class="odd">
+										<td></td>
+										<td></td>
+										<td><a class="btn-add" href="javascript:void(0)">+</a></td>
+									</tr>								
+								</tbody>
+							</table>
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="quantity-table" style="width: 50%; display: none; ">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="40%">件数条件设置</th>
+										<th class="col-1" width="45%">数量</th>
+										<th class="col-3" width="15%">操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td>满</td>
+										<td>
+											<input type="radio" name="piece-or-style-1" checked="checked" />件数
+											<input type="radio" name="piece-or-style-1" />款
+											<input loxiaType="number" value="1" style="width: 30px;" />
+										</td>
+										<td><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>								
+									<tr class="even">
+										<td>满</td>
+										<td>
+											<input type="radio" name="piece-or-style-2" checked="checked" />件数
+											<input type="radio" name="piece-or-style-2" />款
+											<input loxiaType="number" value="1" style="width: 30px;" />
+										</td>
+										<td><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>								
+									<tr class="odd">
+										<td></td>
+										<td></td>
+										<td><a class="btn-add" href="javascript:void(0)">+</a></td>
+									</tr>								
+								</tbody>
+							</table>
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="chosen-table" style="width: 50%; display: none;">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="50%">选择商品条件设置</th>
+										<th class="col-1" width="15%">价格</th>
+										<th class="col-2" width="20%">限制件数</th>
+										<th class="col-3" width="15%">操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td>NIKE SWOOSH 运动护腕</td>
+										<td>39</td>
+										<td>
+											<input loxiaType="number" value="1" style="width: 50px;" />
+										</td>
+										<td><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>								
+									<tr class="even">
+										<td>NIKE 运动水壶</td>
+										<td>149</td>
+										<td>
+											<input loxiaType="number" value="1" style="width: 50px;" />
+										</td>
+										<td><a class="btn-delete" href="javascript:void(0)">-</a></td>
+									</tr>								
+									<tr class="odd">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td><a class="btn-add" href="javascript:void(0)">+</a></td>
+									</tr>								
+								</tbody>
+							</table>
+						</div>
+						<div class="ui-block-line" style="padding-left: 100px;">
+							<input type="button" value="保存" class="button orange save" onclick="" title="保存" />
+						</div>
+					</div>
+				</div>
+				<div style="margin-top: 10px"></div>
+				<!------------------------------------- 活动条件设置 结束 ------------------------------------->
+				
+				<!------------------------------------- 活动优惠设置 开始 ------------------------------------->
+				<div class="ui-block promotion-discount">
+					<div class="ui-block-title1" style="background: #fff; color: #000;">
+						活动优惠设置 
+						<input type="button" value="修改" class="button orange edit" onclick="" title="修改" />
+					</div>
+					<div class="ui-block-content border-grey input-mode" style="float: left;">
+						<ul id="selectable">
+							<li class="ui-state-default ui-selected" data="money">金额</li>
+							<li class="ui-state-default" data="quantity">件款数</li>
+							<li class="ui-state-default" data="freight">免运费</li>
+						</ul>
+						<div class="ui-block-line ">
+							<input type="radio" name="discount-type" checked="checked" />减
+							<input type="radio" name="discount-type" />折
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="discount-money-div" style="width: 50%; ">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="40%">金额条件设置</th>
+										<th class="col-1" width="20%">金额</th>
+										<th class="col-3" width="40%">优惠</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td>满</td>
+										<td>500</td>
+										<td><input loxiaType="number" value="95" />元/折</td>
+									</tr>								
+									<tr class="even">
+										<td>满</td>
+										<td>1000</td>
+										<td><input loxiaType="number" value="90" />元/折</td>
+									</tr>								
+								</tbody>
+							</table>
+						</div>
+						<div class="border-grey ui-loxia-simple-table" id="discount-quantity-div" style="width: 50%; display: none;">
+							<table>
+								<thead>
+									<tr>
+										<th class="col-0" width="40%">件款条件设置</th>
+										<th class="col-1" width="20%">件款数量</th>
+										<th class="col-3" width="40%">优惠</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td>满</td>
+										<td>2款</td>
+										<td><input loxiaType="number" value="30" />元/折</td>
+									</tr>								
+									<tr class="even">
+										<td>满</td>
+										<td>3款</td>
+										<td><input loxiaType="number" value="40" />元/折</td>
+									</tr>								
+								</tbody>
+							</table>
+						</div>
+						<div class="ui-block-line" id="discount-freight-div" style="display: none;">
+							免运费：<input loxiaType="number" value="12" />元
+						</div>
+						<div class="ui-block-line" style="padding-left: 100px;">
+							<input type="button" value="保存" class="button orange save" onclick="" title="保存" />
+						</div>
+					</div>
+				</div>
+				<div style="margin-top: 10px"></div>
+				<!------------------------------------- 活动优惠设置 结束 ------------------------------------->
+			</div>
+		</form>
+	</div>
+	
+</body>
+</html>

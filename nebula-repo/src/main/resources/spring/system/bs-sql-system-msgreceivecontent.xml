@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MsgReceiveContent.findAllMsgReceiveContentList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_RECEIVE_CONTENT 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MsgReceiveContent.findMsgReceiveContentListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_RECEIVE_CONTENT where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MsgReceiveContent.findMsgReceiveContentListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_RECEIVE_CONTENT 
+		       		where 1=1	
+	       				#if($ifIdentify)
+	       					and IF_IDENTIFY=:ifIdentify
+	       				#end
+	       			
+	       				#if($sendTime)
+	       					and SEND_TIME >= :sendTimeStart
+	       				#end
+	       				#if($sendTime)
+	       					and SEND_TIME <= :sendTimeEnd
+	       				#end
+	       			
+	       				#if($msgId)
+	       					and MSG_ID=:msgId
+	       				#end
+	       			
+	       				#if($msgBody)
+	       					and MSG_BODY=:msgBody
+	       				#end
+	       			
+	       				#if($isProccessed == true)
+	       					and IS_PROCCESSED=:isProccessed
+	       				#end
+
+	       				#if($isProccessed == false)
+	       					and IS_PROCCESSED=:isProccessed
+	       				#end
+	       				
+	       				order by id 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MsgReceiveContent.findMsgReceiveContentListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_MSG_RECEIVE_CONTENT where 
+		       		
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($ifIdentify)
+		       					and IF_IDENTIFY=:ifIdentify
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($msgId)
+		       					and MSG_ID=:msgId
+		       				#end
+
+		       			
+		       				#if($msgBody)
+		       					and MSG_BODY=:msgBody
+		       				#end
+
+		       			
+		       				#if($isProccessed)
+		       					and IS_PROCCESSED=:isProccessed
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="MsgReceiveContent.updateMsgRecContIsProByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SYS_MSG_RECEIVE_CONTENT set IS_PROCCESSED = true 
+		       		where id in (
+						#foreach($id in $ids)
+							$id,
+						#end
+						-1		       		
+		       		)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

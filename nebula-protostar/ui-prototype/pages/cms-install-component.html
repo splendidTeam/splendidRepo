@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" href="../css/demo.css" type="text/css">
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+<style type="text/css">
+.marg-top {
+	margin-top: 20px;
+}
+
+.template-class {
+	margin-top: 20px;
+	border: 1px solid #dedede;
+	width: 300px;
+	height: 140px;
+	padding-top: 50px;
+	text-align: center;
+	vertical-align: middle;
+	padding-bottom: 24px;
+}
+
+
+input {
+	vertical-align: middle;
+	margin: 0;
+	padding: 0
+}
+
+.txt {
+	height: 22px;
+	border: 1px solid #cdcdcd;
+	width: 180px;
+}
+
+.btn {
+	background-color: #FFF;
+	border: 1px solid #CDCDCD;
+	height: 24px;
+	width: 70px;
+}
+
+.file {
+	top: 0;
+	right: 80px;
+	height: 24px;
+	filter: alpha(opacity :   0);
+	opacity: 0;
+	width: 15px
+}
+</style>
+<script type="text/javascript">
+	function previewFile() {
+		//得到file对象  
+		var file = document.getElementById("componentFile");
+		//弹出选择文件的对话框  
+		file.click();
+		//弹出file的值  
+		document.getElementById('componentFilePath').value = file.value;
+
+	}
+</script>
+</head>
+<body>
+		<div class="content-box width-percent100">
+
+		<div class="ui-title1">
+			<img src="../images/wmi/blacks/32x32/users.png">模版安装
+		</div>
+		<div class="ui-tag-change">
+			<div class="tag-change-content">
+				<div>
+					<form name="userForm" action="/cms/createArea.json" method="post"
+						enctype="multipart/form-data">
+						<div class="ui-block">
+							<div class="ui-block-title1">模版安装</div>
+							<div align="center">
+								<div class="marg-top">
+									<div>
+									<input
+											type="file" name="componentFile" id="componentFile"
+											class="file" size="28"
+											onchange='document.getElementById("componentFilePath").value=this.value' />
+										<input type='text' name='componentFilePath'
+											id='componentFilePath' class='txt' /> <input type='button'
+											class='btn' onclick='previewFile()' value='浏览...' /> 
+									</div>
+								</div>
+
+								<div class="marg-top">
+									<input type="button" value="安装" class="button orange save"
+										style="width: 120px;" title="安装" />
+								</div>
+								<div class="template-class">
+								安装模版
+								</div>
+							</div>
+						</div>
+						<div class="button-line"></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

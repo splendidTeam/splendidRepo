@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="NavigationLang.findNavigationLangByNameAndNavids" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据名称、导航id、语种查询记录</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   SELECT 
+                   		count(*) as count 
+                   FROM 
+                   		t_base_navigation_lang 
+                   WHERE name= :name
+                   		 and lang=:lang
+                   		 and navigation_id in(
+                   				#foreach($id in $nIds)
+                   					$id,
+                   				#end
+                   				-1
+                   			)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="NavigationLang.findNavigationLangByNavidAndLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select * from 
+                   		t_base_navigation_lang 
+                   where navigation_id =:navigationId 
+                   		 and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="NavigationLang.updateNavigationLangByNavigationIdAndLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   update
+                   		t_base_navigation_lang
+                   set name =:name 
+                   where navigation_id =:navigationId 
+                   		 and lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="NavigationLang.findNavigationLangListByNavidAndLangs" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select * from 
+                   		t_base_navigation_lang 
+                   where navigation_id =:navigationId 
+                   		 and lang in (
+                   		 	#foreach($lang in $langs)
+                   					'$lang',
+                   				#end
+                   				'-1'
+                   			)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="NavigationLang.deleteNavigationLangByNavigationIds" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   delete from
+                   		t_base_navigation_lang
+                   where navigation_id in (
+                   		 	#foreach($id in $navigationIds)
+                   					$id,
+                   				#end
+                   				-1
+                   			)
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

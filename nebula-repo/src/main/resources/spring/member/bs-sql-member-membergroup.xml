@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MemberGroup.findAllMemberGroupList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select a.id as id,a.name as name from T_MEM_GROUP a
+		       			 where lifecycle =1
+		       			 
+		       			
+                   
+		       			
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroup.findMemberGroupListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_GROUP where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberGroup.findMemberGroupListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_GROUP mgr where 
+		       			lifecycle !=2
+		       		
+					
+		       				
+		       				#if($type)
+		       					and mgr.TYPE=:type
+		       				#end
+		       				
+		       				#if($code)
+		       					and mgr.CODE=:code
+		       				#end
+
+		       			
+		       				#if($groupName)
+		       					and mgr.NAME like :groupName
+		       				#end
+		       				#if($nameForLike)
+		       					and mgr.NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and mgr.description=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and mgr.CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and mgr.CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and mgr.MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and mgr.MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($creator)
+		       					and mgr.creator=:creator
+		       				#end
+
+		       			
+		       				#if($modifier)
+		       					and mgr.modifier=:modifier
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and mgr.LIFECYCLE=:lifecycle
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroup.findMemberGroupListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_GROUP where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and description=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($creator)
+		       					and creator=:creator
+		       				#end
+
+		       			
+		       				#if($modifier)
+		       					and modifier=:modifier
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberGroup.enableOrDisableMemberGroupByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_GROUP
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroup.removeMemberGroupByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_GROUP
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberGroup.findAllEffectMemberGroupList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_GROUP where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="MemberGroup.findEffectMemberGroupListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_GROUP mgr where lifecycle=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and mgr.CODE=:code
+		       				#end
+
+		       			
+		       				#if($groupName)
+		       					and mgr.NAME like :groupName
+		       				#end
+		       				#if($nameForLike)
+		       					and mgr.NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and mgr.description=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and mgr.CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and mgr.CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and mgr.MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and mgr.MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($creator)
+		       					and mgr.creator=:creator
+		       				#end
+
+		       			
+		       				#if($modifier)
+		       					and mgr.modifier=:modifier
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and mgr.LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroup.findEffectMemberGroupListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_GROUP where lifecycle=1
+		       		
+					
+		       			
+		       				#if($code)
+		       					and CODE=:code
+		       				#end
+
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       			
+		       				#if($description)
+		       					and description=:description
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($creator)
+		       					and creator=:creator
+		       				#end
+
+		       			
+		       				#if($modifier)
+		       					and modifier=:modifier
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberGroup.validateGroupName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>验证分组名称</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_mem_group where name=:groupName and lifecycle=1 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="MemberGroup.findSimpleMemberComboListByIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表，查询会员分组的简单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						id, name
+					FROM
+						t_mem_group
+					WHERE
+						lifecycle = 1
+					AND id IN (
+					#foreach($id in $ids)
+						$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

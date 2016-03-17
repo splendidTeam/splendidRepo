@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Organization.findAllList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取全部组织机构</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_organization where lifecycle=1 
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Organization.findByParent" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过parent获取组织机构</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_organization where lifecycle=1 and PARENT_ID=:parent
+
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Organization.findByOrgaTypeId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过机构类型获取组织机构</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_organization where lifecycle=1 and ORG_TYPE_ID=:orgaTypeId
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Organization.findByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过机构名称模糊查询组织机构</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_organization where lifecycle=1 and name=:name
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Organization.findByUserId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户id获取组织机构(机构与用户关联后再筛选查询)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select orga.* 
+						from t_au_organization as orga 
+						left join t_au_user as us 
+						on us.orga_id=orga.id
+						where orga.lifecycle=1 
+						and us.id=:userId
+		       			
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Organization.findOrgbyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过用户id获取组织机构(机构与用户关联后再筛选查询)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_au_organization where id in (select org_id from t_ma_shop where id =:id)
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="Organization.validateShopCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询是否有相同的组织名称</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select count(*) as CNT from t_au_organization where code = :code and lifecycle!=2;
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Organization.findOrganizationByOrgIdAndorgs" class="loxia.dao.support.DynamicQueryHolder">
+		<description>验证组织与角色是否一致</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_au_organization 
+					where org_type_id = :orgTypeId
+					and id in(
+					#foreach($id in $orgList)
+    					$id,
+					 #end
+		       		 -1)
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

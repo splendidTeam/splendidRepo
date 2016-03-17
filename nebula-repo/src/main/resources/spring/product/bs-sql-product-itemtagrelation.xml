@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemTagRelation.findAllItemTagRelationList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select a.id as itemId,c.name as tagName from t_pd_item a,t_pd_item_tag_relation b,t_pd_itemtag c
+					where a.id=b.item_id and b.tag_id=c.id
+					and a.lifecycle!=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemTagRelation.findAllItemTagRelationListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select a.id as itemId,c.name as tagName from t_pd_item a,t_pd_item_tag_relation b,t_pd_itemtag c
+					where a.id=b.item_id and b.tag_id=c.id
+					and a.lifecycle!=2
+		       		and a.id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemTagRelation.findAllItemCategoryListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select a.id as itemId,c.name as tagName from t_pd_item a,t_pd_item_tag_relation b,t_pd_itemtag c
+					where a.id=b.item_id and b.tag_id=c.id
+					and a.lifecycle!=2
+		       		 and a.id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemTagRelation.findItemTagRelationListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_TAG_RELATION where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemTagRelation.findItemTagRelationListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_TAG_RELATION where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($tagId)
+		       					and TAG_ID=:tagId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemTagRelation.findItemTagRelationListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_TAG_RELATION where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($tagId)
+		       					and TAG_ID=:tagId
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemTagRelation.enableOrDisableItemTagRelationByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_TAG_RELATION
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.removeItemTagRelationByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_TAG_RELATION
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.findAllEffectItemTagRelationList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_TAG_RELATION where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ItemTagRelation.findEffectItemTagRelationListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_TAG_RELATION where lifecycle=1
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($tagId)
+		       					and TAG_ID=:tagId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemTagRelation.findEffectItemTagRelationListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_TAG_RELATION where lifecycle=1
+		       		
+					
+		       			
+		       				#if($itemId)
+		       					and ITEM_ID=:itemId
+		       				#end
+
+		       			
+		       				#if($tagId)
+		       					and TAG_ID=:tagId
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemTagRelation.findItemListEmptyTagByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>已标签商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,'' as tagName, 
+						tpit.lifecycle as lifecycle,
+						tpifo.title as title
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+							#if($tagId)
+								,t_pd_item_tag_relation tpitr 
+							#end
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.isaddtag=1
+						and tpit.shop_id =:shopId
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+		       				
+		       				#if($modifyTimeStart)
+		       					and tpit.modify_time >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTimeEnd)
+		       					and tpit.modify_time <= :modifyTimeEnd
+		       				#end
+		       				
+		       				#if($tagId)
+		       					and tpit.id = tpitr.item_id 
+		       					and tpitr.tag_id = :tagId
+		       				#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.findItemListNoTagByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>未标签商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,'' as tagName, 
+						tpit.lifecycle as lifecycle,
+						tpifo.title as title
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+							#if($tagId)
+								,t_pd_item_tag_relation tpitr 
+							#end
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.isaddtag=0
+						and tpit.shop_id =:shopId
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+		       				
+		       				#if($modifyTimeStart)
+		       					and tpit.modify_time >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTimeEnd)
+		       					and tpit.modify_time <= :modifyTimeEnd
+		       				#end
+		       				
+		       				#if($tagId)
+		       					and tpit.id = tpitr.item_id 
+		       					and tpitr.tag_id = :tagId
+		       				#end
+						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.findItemTagRelationByItemIdAndCategoryId"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出所有 商品id 在itemIds和 标签id 在tagIds中的ItemTagRelation
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				
+					SELECT * FROM t_pd_item_tag_relation WHERE 
+					tag_id IN (
+					  #foreach($tagId in $tagIds)
+					  $tagId,
+					  #end
+					  '-1'
+					) AND item_id IN (
+					  #foreach($itemId in $itemIds)
+					  $itemId,
+					  #end
+					  '-1'
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.bindItemTag" class="loxia.dao.support.DynamicQueryHolder">
+		<description>将一个商品关联到一个商品标签下</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				INSERT INTO t_pd_item_tag_relation(id,item_id,tag_id)
+                VALUES (nextval('S_T_PD_ITEM_TAG_RELATION'), :itemId, :tagId);
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.unBindItemTag" class="loxia.dao.support.DynamicQueryHolder">
+		<description>把一个或者多个商品从一个标签下解除关联</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					DELETE FROM t_pd_item_tag_relation WHERE tag_id = :tagId 
+					    AND item_id IN (
+					    #foreach( $id in $itemIds )
+    					$id,
+						#end
+						'-1'
+					    )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemTagRelation.findItemTagRelationListByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID查找所有标签条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * FROM t_pd_item_tag_relation WHERE  item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="ItemTagRelation.findItemTagRelationListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品itemIds查找所有标签条目</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * FROM t_pd_item_tag_relation WHERE  item_id IN (
+					    #foreach( $id in $itemIds )
+    					$id,
+						#end
+						'-1'
+					    )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+</beans>

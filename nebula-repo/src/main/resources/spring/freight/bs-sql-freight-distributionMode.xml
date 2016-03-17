@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="DistributionMode.getAllDistributionMode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>得到所有的获取所有的 物流方式</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * FROM t_sf_distribution_mode  ORDER BY id asc;
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="DistributionMode.updateDistributionMode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改物流方式信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_sf_distribution_mode set name = :name where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="DistributionMode.findDistributionModeById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_sf_distribution_mode 
+		       			 where id =:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="DistributionMode.getDistributionModeListByTemplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>得到所有的获取所有的 物流方式</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       	
+					select * from t_sf_distribution_mode 
+						where id in (
+							select t.distribution_mode_id from t_sf_temeplate_distribution_mode t 
+								where t.shipping_tmp_id = :templateId)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="DistributionMode.findDistributionModeByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * FROM t_sf_distribution_mode
+						WHERE name = :name
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="DistributionMode.getAllDistributionModeList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * FROM t_sf_distribution_mode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

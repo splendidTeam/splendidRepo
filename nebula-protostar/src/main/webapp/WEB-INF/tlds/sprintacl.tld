@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd" version="2.1">
+
+	<tlib-version>1.0</tlib-version>
+	<short-name>acl</short-name>
+	<uri>http://www.baozun.cn/acl</uri>
+	<description>宝尊自定义权限访问控制</description>
+
+	<tag>
+		<name>check</name>
+		<tag-class>com.baozun.nebula.web.taglib.SpringAclTag</tag-class>
+		<body-content>JSP</body-content>
+		<description>检查权限</description>
+		
+		<attribute>
+			<name>aclElement</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<description>acl</description>
+		</attribute>
+		
+		
+	</tag>
+</taglib>

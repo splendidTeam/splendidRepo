@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+<script type="text/javascript">
+
+function status(val){
+	if(val==0) return "无效";
+	else return "有效";
+}
+
+function formatIsSystem(val){
+	if(val) return "是";
+	else return "否";
+}
+function edit(data, args, idx){ 
+	var str="";
+	 str+="<a href='javascript:void(0);' class='func-button modify'>修改</a>";
+	if(data['lifecycle']==1){
+		str+="<a href='javascript:void(0);' class='func-button'>禁用</a>";
+	}else{
+		str+="<a href='javascript:void(0);' class='func-button'>启用</a>";
+	}
+	return str; 
+}
+
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+	
+	$j("#table1").loxiasimpletable({
+		page:false,
+		cols:
+		[
+			{name:"optionLabel",label:"选项名称"},
+			{name:"optionValue",label:"选项值"},
+			{name:"lifecycle",label:"状态",template:"status"},
+			{name:"isSystem",label:"是否系统选项",template:"formatIsSystem"},
+			{label:"操作", template:"edit"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, firstPage: true, lastPage: false,
+			items: [
+			        {groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+					{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"}]
+			}
+	});
+	refreshData();
+});
+
+function refreshData(){
+	$j("#table1").loxiasimpletable("refresh",
+		[
+		{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+		{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+		{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+		{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+		{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"},
+		{groupCode:"IS_AVAILABLE",groupDesc:"是否有效",optionLabel:"有效",optionValue:"1",labelLang:"zh-CN",lifecycle:1,isSystem:"true"}]
+	);
+
+    $j(".func-button.modify").on("click", function(){
+        window.location.href="update-choose-option.html";
+    });
+	$j(".button.addshop").on("click", function(){
+        window.location.href="add-choose-option2.html";
+    });
+    $j(".button.return").on("click", function(){
+        window.location.href="choose-option-group.html";
+    });
+    
+    $j(".func-button.group-click").on("click",function(){
+    	$j(".func-button.group-click").each(function(){
+    		$j(this).css("color","#069");
+    	});
+      	
+       var text=$j(this).text();
+       $j(this).css("color","red");
+       $j(".ui-block-title1").html(text+"分组通用选项列表");
+    });
+    
+    $j(".button.orange.addgroupandoption").on("click", function(){
+        window.location.href="add-choose-option-group2.html";
+    });
+    
+}
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1">通用选项维护
+			
+	         <input type="button" value="新增选项" class="button orange addshop"/>
+	          <input type="button" value="新增分组及选项" class="button orange addgroupandoption"/>
+    </div>
+    
+    	<div class="ui-block" style="font-size:14px;margin-top:10px;">
+    
+		选项分组筛选：<span style="margin-right:10px;"><a href="javascript:void(0)" style="color:#f00;" class="func-button group-click" val="IS_AVAILABLE">是否有效</a></span>
+				 <span style="margin-right:10px;"><a href="javascript:void(0)" class="func-button group-click" val="EDITING_TYPE">编辑类型</a></span>
+				 <span style="margin-right:10px;"><a href="javascript:void(0)" class="func-button group-click" val="VALUE_TYPE">值类型</a></span>
+				 <span style="margin-right:10px;"><a href="javascript:void(0)" class="func-button group-more" val="">更多</a></span>
+    	</div>
+	
+    <table class="ui-block-content">
+        <tr>
+			<td><label>选项名称：</label></td>
+            <td>
+                <span id="searchkeytext"><input type="text" loxiaType="input" mandatory="false"></input></span>
+            </td>
+
+			<td><label>状态：</label></td>
+            <td>
+                <span id="searchkeytext">
+					<select id="orgSelect" loxiaType="select" checkmaster="chooseFilterOrg" >				
+						<option value="2">不限</option>
+						<option value="1">有效</option>
+						<option value="0">无效</option>
+					</select>
+				</span>
+            </td>
+            <td>
+             <a href="#" class="func-button"><label class="ficon-true"></label><span>搜索</span></a> 
+            </td>
+        </tr>
+    </table>
+    
+
+    <div class="ui-block">
+    
+    	<div class="ui-block-title1">是否有效分组通用选项列表</div>
+   	 	<div class="table-border0" id="table1"></div>   
+    </div>
+    
+    
+	<div class="button-line">
+		<input type="button" value="新增分组及选项" class="button orange addgroupandoption"/>
+         <input type="button" value="新增选项" class="button orange addshop"/>
+         
+    </div>
+
+</div>
+</body>
+</html>

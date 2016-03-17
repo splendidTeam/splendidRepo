@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+		<bean id="Consignee.findConsigneeOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询收货信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					sc.ID,
+					sc.ORDER_ID as orderId,
+					sc.NAME,
+					sc.COUNTRY,
+					sc.PROVINCE,
+					sc.CITY,
+					sc.AREA,
+					sc.ADDRESS,
+					sc.MOBILE,
+					sc.TEL,
+					sc.EMAIL,
+					sc.POSTCODE,
+					sc.APPOINT_TIME_QUANTUM as appointTimeQuantum ,
+					sc.APPOINT_TIME as appointTime,
+					sc.APPOINT_TYPE as appointType,
+					sc.VERSION 
+					from t_so_consignee as sc
+					where 
+					 sc.ORDER_ID = :orderId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Consignee.findConsigneesByOrderIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单orderIds查询收货信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					sc.ID,
+					sc.ORDER_ID as orderId,
+					sc.NAME,
+					sc.COUNTRY,
+					sc.PROVINCE,
+					sc.CITY,
+					sc.AREA,
+					sc.ADDRESS,
+					sc.MOBILE,
+					sc.TEL,
+					sc.EMAIL,
+					sc.POSTCODE,
+					sc.APPOINT_TIME_QUANTUM as appointTimeQuantum ,
+					sc.APPOINT_TIME as appointTime,
+					sc.APPOINT_TYPE as appointType,
+					sc.VERSION 
+					from t_so_consignee as sc
+					where 
+					 sc.ORDER_ID  in (
+		       		#foreach( $id in $orderIds )
+    					$id,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

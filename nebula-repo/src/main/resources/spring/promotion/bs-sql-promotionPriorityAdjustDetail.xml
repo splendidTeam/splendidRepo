@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PromotionPriorityAdjustDetail.findPriorityAdjustDetailByAdjustId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据adjustid查询优先级详情</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[  
+				SELECT * from t_prm_priorityadjustdetail  
+				WHERE 1=1
+				#if($adjustId)
+					AND  adjustid = $adjustId
+				#end 
+				 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>  
+	<bean id="PromotionPriorityAdjustDetail.deletePromotionPriorityAdjustDetailByAdjustid" class="loxia.dao.support.DynamicQueryHolder">
+		<description>删除当前adjustid所属优先级详情条目</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[  
+           	 DELETE FROM t_prm_priorityadjustdetail
+           	 WHERE adjustid =:adjustid 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	<bean id="PromotionPriorityAdjustDetail.findPromotionPriorityAdjustDetailByAdjustid" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据当前adjustid优先级详情表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[   
+				SELECT * FROM t_prm_priorityadjustdetail pa WHERE
+				 adjustid= :adjustid
+				 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PromotionPriorityAdjustDetail.findPriorityDetailListByPriorityId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据优先级ID查询详细列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[  
+            	SELECT 
+					d.id,
+					d.priority,
+					d.exclusivemark As exclusiveMark,
+					h.promotion_id AS promotionId,
+					h.promotion_name AS promotionName,
+					h.start_time AS promotionStartTime,
+					h.end_time AS promotionEndTime,
+					au.mem_combo_name AS audienceName,
+					sc.product_combo_name AS scopeName,
+					h.lifecycle AS promotionLifecycle,
+					h.promotion_logo_type AS logoType,
+					h.last_update_time AS promotionUpdateTime,
+			          gp.group_name AS groupName,
+			          gp.groupType AS groupType
+							FROM t_prm_priorityadjustdetail d
+							JOIN t_prm_promotionhead h ON d.promotionid = h.promotion_id
+							JOIN t_prm_promotionaudiences au ON au.promotion_id = h.promotion_id
+							JOIN t_prm_promotionscope sc ON sc.promotion_id = h.promotion_id
+			        LEFT JOIN t_prm_priorityadjustgroup gp ON gp.adjustid = d.adjustid AND gp.promotionid = d.promotionid
+			        WHERE
+					d.adjustid = :priorityId
+				    ORDER BY d.priority ASC 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PromotionPriorityAdjustDetail.findPriorityDetailListByShopIdCurrentTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ShopID，和CurrentTime获取优先级调整列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[   
+				SELECT 
+					d.id,
+					d.adjustid,
+					d.exclusivemark as exclusiveMark,
+					d.priority,
+					d.promotionid,
+					d.version,
+					gp.group_name as groupname,
+					gp.grouptype as groupType
+					FROM t_prm_priorityadjustdetail d
+					JOIN t_prm_priorityadjust pp ON d.adjustid = pp.adjustid
+					LEFT JOIN t_prm_priorityadjustgroup gp ON gp.adjustid = d.adjustid AND gp.promotionid = d.promotionid
+					WHERE pp.shop_id in 
+					(#foreach( $id in $shopIds)
+			   					$id,
+							 #end
+			       		 	-1) and pp.activemark = 1
+					ORDER BY pp.SHOP_ID,d.priority ASC
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

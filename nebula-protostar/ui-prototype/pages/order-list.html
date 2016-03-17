@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("id", data)+"'/>";
+}
+
+function drawOrder(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('order-details.html','aaa',null,[0,0]);\">"+loxia.getObject("code", data)+"</a>";
+}
+
+
+
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime asc", firstPage: true, lastPage: false,
+		items: [
+					{code:"866248688",omsCode:"abcdefg",realName:"张三",transferFee:"20.00",total:"2500.00",discount:"0.8",quantity:"50",source:"商城",paymentType:"在线支付",logisticsStatus:"1",financialStatus:"1",createTime:"2013-03-05",remark:"派送改顺丰..."},
+					{code:"866248688",omsCode:"abcdefg",realName:"李四",transferFee:"20.00",total:"999.00",discount:"0.8",quantity:"2",source:"商城",paymentType:"货到付款",logisticsStatus:"2",financialStatus:"2",createTime:"2013-03-05",remark:"sss"},
+					{code:"866248688",omsCode:"abcdefg",realName:"xiaox",transferFee:"20.00",total:"500.00",discount:"0.8",quantity:"30",source:"第三方",paymentType:"上门自提",logisticsStatus:"3",financialStatus:"1",createTime:"2013-03-05",remark:"aa"},
+					{code:"866248688",omsCode:"abcdefg",realName:"xxx",transferFee:"20.00",total:"8888.00",discount:"0.8",quantity:"1",source:"第三方",paymentType:"在线支付",logisticsStatus:"1",financialStatus:"1",createTime:"2013-03-05",remark:"sdf"}
+				]
+		});
+
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    
+    $j("#table1").on("reload", function(){
+    	$j("td.col-1 a",this).click(function(){
+    		loxia.openPage('order-details.html','aaa',null,[0,0]);
+    	});
+    	
+    	
+    });
+    $j.ui.loxiasimpletable().typepainter.logisticsStatus= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span>发货准备中</span>";
+        	}
+        	else if(data==2){
+        		return "<span>在途</span>";
+        	}
+			else if(data==3){
+				return "<span>交易完成</span>";
+        	}
+            
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+    $j.ui.loxiasimpletable().typepainter.financialStatus= {
+        getContent: function(data){
+        	if(data==1){
+        		return "<span>未付款</span>";
+        	}
+        	else if(data==2){
+        		return "<span>已付款</span>";
+        	}
+        },
+        registerEvent: function(context){
+            //do nothing
+        }
+    };
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		
+		cols:
+		[
+			/* {label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"}, */
+			{name:"code",label:"订单号",width:"10%",sort:"code",template:"drawOrder"},
+			{name:"omsCode",label:"OMS订单号",width:"10%"},
+			{name:"realName",label:"收货人",width:"8%"},
+			{name:"source",label:"来源",width:"5%"},
+			{name:"paymentType",label:"支付方式",width:"8%"},
+			{name:"logisticsStatus",label:"物流状态",width:"8%",type:"logisticsStatus"},
+			{name:"financialStatus",label:"财务状态",width:"6%",type:"financialStatus"},
+			{name:"quantity",label:"总数量",width:"4%"},
+			{name:"transferFee",label:"运费",width:"4%"},
+			{name:"discount",label:"折扣",width:"4%"},
+			{name:"total",label:"总价",width:"5%"},
+			{name:"createTime",label:"创建时间",width:"10%",sort:"createTime"},
+			{name:"remark",label:"备注",width:"18%"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"createTime desc", firstPage: true, lastPage: false,
+			items: [
+					{code:"866248688",omsCode:"abcdefg",realName:"张三",transferFee:"20.00",total:"2500.00",discount:"0.8",quantity:"50",source:"商城",paymentType:"在线支付",logisticsStatus:"1",financialStatus:"1",createTime:"2013-03-05",remark:"派送改顺丰..."},
+					{code:"866248688",omsCode:"abcdefg",realName:"李四",transferFee:"20.00",total:"999.00",discount:"0.8",quantity:"1",source:"商城",paymentType:"货到付款",logisticsStatus:"2",financialStatus:"2",createTime:"2013-03-05",remark:"sss"},
+					{code:"866248688",omsCode:"abcdefg",realName:"xiaox",transferFee:"20.00",total:"500.00",discount:"0.8",quantity:"5",source:"第三方",paymentType:"上门自提",logisticsStatus:"3",financialStatus:"1",createTime:"2013-03-05",remark:"aa"},
+					{code:"866248688",omsCode:"abcdefg",realName:"xxx",transferFee:"20.00",total:"8888.00",discount:"0.8",quantity:"2",source:"第三方",paymentType:"在线支付",logisticsStatus:"1",financialStatus:"1",createTime:"2013-03-05",remark:"sdf"}
+				]
+			}
+	});
+
+	refreshData();
+});
+
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/users.png">订单列表
+    </div>
+    <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+        <table>
+            <tr>
+                <td><label>订单号</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="订单编码"></input></span>
+                </td>
+                <td><label>OMS订单号</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="OMS订单号"></input></span>
+                </td>
+                <td><label>收货人</label></td>
+                <td>
+                    <span><input type="text" loxiaType="input" mandatory="false" placeholder="收货人姓名"></input></span>
+                </td>
+        	</tr>
+        	<tr>
+                <td><label>物流状态</label></td>
+	            <td>
+	               <span>
+						<select  loxiaType="select" >
+							<option value="0">不限</option>
+	                        <option value="1">发货准备中</option>
+	                        <option value="2">在途</option>
+	                        <option value="3">交易完成</option>
+	                    </select>
+					</span>
+	            </td>
+                <td><label>财务状态</label></td>
+	            <td>
+	               <span>
+						<select  loxiaType="select" >
+							<option value="0">不限</option>
+	                        <option value="1">未付款</option>
+	                        <option value="2">已付款</option>
+	                    </select>
+					</span>
+	            </td>
+                <td><label>来源</label></td>
+                <td>
+                <span>
+					<select loxiaType="select"  >
+                        <option value="1">商城订单</option>
+                        <option value="2">第三方</option>
+                    </select>
+				</span>
+                </td>
+        	</tr>
+			<tr>
+	            <td><label>创建时间</label></td>
+	            <td>
+	               <span><input type="text" id="startTime" name="startTime"  value="" loxiaType="date" mandatory="false" /></span>
+	            </td>
+	            <td><label>——</label></td>
+	            <td>
+	                <span><input type="text" id="endTime" name="endTime"  value="" loxiaType="date" mandatory="false"/></span>
+	            </td>
+	        </tr>
+        </table>
+        <div class="button-line1">
+        	<a href="#" class="func-button" title="搜索"><span>搜索</span></a>
+        </div>
+    </div>
+    </div>
+    <div class="ui-block">
+   	 	<div class="border-grey" id="table1" caption="订单列表"></div>
+    </div>
+</div>
+
+
+</body>
+</html>

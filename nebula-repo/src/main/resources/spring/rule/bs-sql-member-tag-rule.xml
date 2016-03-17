@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MemberTagRule.findMemberTagRuleListConditionallyWithPage"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE
+						1 = 1
+					#if($name)
+						AND mr.name LIKE :name
+					#end
+					#if($type)
+						AND mr.type = :type
+					#end
+					#if($lifecycle)
+						AND mr.lifecycle = :lifecycle
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findByGroupName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据名称查询筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE mr.name = :name
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findMemberTagRuleById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据ID查询筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE mr.id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findAllAvailableMemberTagRuleCommandList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE mr.lifecycle = 1
+					ORDER BY mr.type ASC, mr.create_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findAvailableAtomicMemberTagRuleList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询有效的原子筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE mr.lifecycle = 1 AND mr.type != 4
+					ORDER BY mr.create_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findCustomMemberGroupListByType" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据类型查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE mr.lifecycle = 1 
+					AND mr.type = :type
+					ORDER BY mr.create_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.updateLifecycleById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新生命周期</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					UPDATE t_mem_tag_rule			
+					SET lifecycle = :lifecycle
+					WHERE id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findSimpleMemberComboListByIdList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表，查询会员组合的简单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						id, name
+					FROM t_mem_tag_rule
+					WHERE lifecycle = 1 
+					AND id IN (
+					#foreach($id in $ids)
+						$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="MemberTagRule.findEffectMemberTagRuleListByIdList"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id列表，查询会员筛选器</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+						mr.id,
+						mr.type,
+						mr.name,
+						mr.expression,
+						mr.text,
+						mr.lifecycle,
+						mr.create_id AS createId,
+						mr.create_time AS createTime,
+						u.realname AS createName
+					FROM t_mem_tag_rule mr
+					LEFT JOIN t_au_user u ON u.id = mr.create_id
+					WHERE mr.lifecycle = 1 
+					AND mr.id IN (
+					#foreach($id in $idList)
+						$id,
+					#end
+					-1
+					)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

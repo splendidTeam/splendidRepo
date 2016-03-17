@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ProductShippingTemeplate.findUsedCountByTemeplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询运费模板Id 已经关联了多少商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select count(0) as total
+		       		from T_SF_PRODUCT_SHIPPING_TEMEPLATE
+		       		where SHIPPING_TMP_ID = :temeplateId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ProductShippingTemeplate.removeAllShippingFeeConfigsByTemeplateId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据运费模板删除改运费模板id对应的所有商品运费模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete
+		       		from T_SF_PRODUCT_SHIPPING_TEMEPLATE
+		       		where SHIPPING_TMP_ID = :temeplateId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ProductShippingTemeplate.findProductShippingTemeplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据运费模板id和商品id 查询商品运费模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from T_SF_PRODUCT_SHIPPING_TEMEPLATE
+		       		where SHIPPING_TMP_ID = :temeplateId
+		       		and ITEM_ID = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ProductShippingTemeplate.updateProductShippingTemeplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改商品运费模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SF_PRODUCT_SHIPPING_TEMEPLATE
+		       		set SHIPPING_TMP_ID = :temeplateId
+		       		where ITEM_ID = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ProductShippingTemeplate.findProductShippingTemeplateByItemIdCityId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查找运费模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT c.* 
+		       		from T_SF_PRODUCT_SHIPPING_TEMEPLATE as a, t_sf_shipping_config as c
+					where a.item_id = :itemId   and c.shipping_provider_id = :shippingProviderId and c.shipping_temeplate_id = a.shipping_tmp_id and c.dest_city=:destId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ProductShippingTemeplate.findProductShippingTemeplateByItemIdProvienceId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId查找运费模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT c.* 
+		       		from T_SF_PRODUCT_SHIPPING_TEMEPLATE as a, t_sf_shipping_config as c
+					where a.item_id = :itemId   and c.shipping_provider_id = :shippingProviderId and c.shipping_temeplate_id = a.shipping_tmp_id and c.dest_province=:destId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ProductShippingTemeplate.removeItemShippingTemeplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId删除运费模板</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		DELETE from t_sf_product_shipping_temeplate where item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

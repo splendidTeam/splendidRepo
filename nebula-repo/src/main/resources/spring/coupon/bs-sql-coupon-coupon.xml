@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Coupon.findById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from t_act_card 
+		       		where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Coupon.findByCardNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from t_act_card 
+		       		where card_no = :cardNo
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Coupon.findByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from t_act_card 
+		       		where member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+
+	<bean id="Coupon.findByMemberIdAndActCardId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from t_act_card 
+		       		where id = :actCardId
+		       			  and member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Coupon.findByMemberIdAndCardNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from t_act_card 
+		       		where card_no = :cardNo
+		       			  and member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Coupon.findCouponCommandList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		      	select  ac.id as cardId,
+		       				ac.card_no as cardNo,
+		       				ac.card_pwd as cardPassword,
+		       				ac.used_time as usedTime,   	
+		       				ac.member_id as memberId,	
+		       				ac.create_time as createTime,		
+		       				b.id as cardTypeId,
+		       				b.begin_time as beginTime,
+		       				b.end_time as endTime,
+		       				b.factor as factor,
+		       				b.factor_type as factorType,
+		       				b.name as name,
+		       				b.usenum as useNum
+		       		from t_act_card ac , t_act_card_type b
+                    where
+               			  b.id=ac.card_type_id
+		       		#if($memberId)
+		       			and ac.member_id =:memberId 
+		       		#end
+		       		#if($actCardId)
+		       			and ac.id =:actCardId
+		       		#end
+		       		#if($cardNo)
+		       			and ac.card_no =:cardNo 
+		       		#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Coupon.updateCouponByMemberIdAndCardNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update  t_act_card set used_time = :usedTime 
+		       		where card_no = :cardNo
+		       			  and member_id = :memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+
+
+	<bean id="Coupon.findCouponCommandByMemberIdAndCardNo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+       		      	select  ac.id as cardId,
+       				ac.card_no as cardNo,
+       				ac.card_pwd as cardPassword,
+       				ac.used_time as usedTime,   	
+       				ac.member_id as memberId,	
+       				ac.create_time as createTime,		
+       				b.id as cardTypeId,
+       				b.begin_time as beginTime,
+       				b.end_time as endTime,
+       				b.factor as factor,
+       				b.factor_type as factorType,
+       				b.name as name,
+       				b.usenum as useNum
+		       		from t_act_card ac , t_act_card_type b
+                    where
+               			  b.id=ac.card_type_id
+		       		#if($memberId)
+		       			and ac.member_id =:memberId 
+		       		#end
+		       		#if($cardNo)
+		       			and ac.card_no =:cardNo 
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

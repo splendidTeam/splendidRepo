@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemCategory.findItemSortByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>排序商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpic.id as id, tpit.code as code, tpit.pic_url as picUrl, tpifo.title as name, tpic.sort_no as sortNo, tpc.name as categoryName
+					from t_pd_item tpit, t_pd_iteminfo tpifo, t_pd_item_category tpic, t_pd_category tpc
+					where tpit.id = tpifo.item_id 
+						and tpit.isaddcategory = 1
+						and tpit.id = tpic.item_id
+						and tpic.category_id = tpc.id
+						#if($sorted)
+							and tpic.sort_no is not null
+						#else
+							and tpic.sort_no is null
+						#end
+						
+						#if($code)
+							and tpit.code like :code
+						#end
+						#if($title)
+							and tpifo.title like :title
+						#end
+						#if($idList)
+							and tpc.id in (-1
+								#foreach($cateId in $idList)
+									,$cateId
+								#end
+							)
+						#end
+					order by tpic.sort_no asc
+						
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemCategory.findItemAbove" class="loxia.dao.support.DynamicQueryHolder">
+		<description>找到某排序商品之前的商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select *
+					from t_pd_item_category tpic
+					where 
+						tpic.sort_no < :sortNo
+						#if($idList)
+							and tpic.category_id in (-1
+								#foreach($cateId in $idList)
+									,$cateId
+								#end
+							)
+						#end
+					order by tpic.sort_no desc
+					limit 1
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemCategory.findItemUnder" class="loxia.dao.support.DynamicQueryHolder">
+		<description>找到某排序商品之后的商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select *
+					from t_pd_item_category tpic
+					where 
+						tpic.sort_no > :sortNo
+						#if($idList)
+							and tpic.category_id in (-1
+								#foreach($cateId in $idList)
+									,$cateId
+								#end
+							)
+						#end
+					order by tpic.sort_no asc
+					limit 1
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemCategory.findItemBottom" class="loxia.dao.support.DynamicQueryHolder">
+		<description>找到排序商品的最末位</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select *
+					from t_pd_item_category tpic
+					where 
+						tpic.sort_no is not null
+						#if($categoryId)
+							and tpic.category_id = :categoryId
+						#end
+					order by tpic.sort_no desc
+					limit 1
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

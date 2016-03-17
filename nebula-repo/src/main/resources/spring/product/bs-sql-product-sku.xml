@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Sku.findSkuByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemid查询Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku WHERE item_id= :itemId and lifecycle != 0
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.findSkuByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemids查询Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku  WHERE lifecycle != 0 and item_id in(
+						#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.findEffectSkuByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemids查询Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku  WHERE lifecycle = 1 and item_id in(
+						#foreach( $id in $itemIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.deleteSkuByItemCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemCodes删除Sku 用于商品上传使用 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku
+					set lifecycle = 0
+					WHERE item_id in(
+						    select id from t_pd_item where code in(
+							#foreach( $itemCode in $itemCodes )
+		    					'$itemCode',
+							 #end
+				       		 '-1'))
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.findEffectSkuTopOneByItemIdsWithinLimit" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemids查询Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+				select f.* from t_pd_sku f ,t_pd_item h
+				,(select a.item_id
+											from t_pd_sku a ,t_pd_sku_inventory b 
+											where  a.out_id = b.extention_code
+						and a.item_id in (
+											#foreach( $id in $itemIds )
+						    					$id,
+											 #end
+											-1)
+				 					group by a.item_id HAVING sum(b.available_qty) >= :limitCount LIMIT :displayLimitCount) e
+				where h.shop_id = :shopId and f.lifecycle = 1 and f.item_id = h.id and f.item_id = e.item_id LIMIT :displayLimitCount
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.findSkuByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode查询Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku WHERE lifecycle = 1 and out_id= :extentionCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findSkuByExtentionCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据extentionCode集合查询Sku集合(lifecycle=1)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku 
+					WHERE lifecycle = 1 
+					and out_id in (
+					#foreach( $outId in $extentionCodes )
+	   					'$outId',
+					 #end
+		       		 '-1') 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.deleteSkuByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemid删除Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					delete FROM t_pd_sku WHERE item_id= :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.deleteSkuBySkuIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据skuIds删除Sku(逻辑删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku
+					set lifecycle = 0
+					where id in(
+						#foreach( $id in $skuIds )
+	    					$id,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.removeSkuByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品id集合删除Sku(逻辑删除)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku
+					set lifecycle = 0
+					where item_id in(
+						#foreach( $itemId in $itemIds )
+	    					$itemId,
+						 #end
+			       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findSkuById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询Sku</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku WHERE id= :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findInventory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过sku的itemProperties属性获取库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpsi.available_qty as availableQty,
+						tps.out_id as extentionCode,
+						tps.id as id,
+						tps.sale_price as salePrice,
+						tps.list_price as listPrice
+					from t_pd_sku tps 
+					left join t_pd_sku_inventory tpsi on tps.out_id = tpsi.extention_code 
+					where tps.item_id = :itemId 
+					and tps.lifecycle != 0
+					#if($itemProperties)
+       					and tps.properties = :itemProperties
+       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findInventoryByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过sku的itemProperties属性获取库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpsi.available_qty as availableQty,
+						tps.out_id as extentionCode,
+						tps.properties as properties,
+						tps.id as id,
+						tps.sale_price as salePrice,
+						tps.list_price as listPrice,
+						tps.lifecycle as state
+					from t_pd_sku tps 
+					left join t_pd_sku_inventory tpsi on tps.out_id = tpsi.extention_code 
+					where tps.item_id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.findEffectiveSkuInvByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemId获取lifescyle为有效的sku的库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select 
+						tpsi.available_qty as availableQty,
+						tps.out_id as extentionCode,
+						tps.properties as properties,
+						tps.id as id,
+						tps.sale_price as salePrice,
+						tps.list_price as listPrice,
+						tps.lifecycle as state
+					from t_pd_sku tps 
+					left join t_pd_sku_inventory tpsi on tps.out_id = tpsi.extention_code 
+					where tps.item_id = :itemId and tps.lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.syncSkuPriceByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>同步商品价格(sku级别)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku set sale_price = :salesPrice, modify_time = now()
+					#if($listPrice)
+						, list_price = :listPrice
+					#end
+					where out_id = :extentionCode and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.updateSkuPriceByItemCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>同步sku价格(item级别)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku set sale_price = :salesPrice, modify_time = now()
+					#if($listPrice)
+						, list_price = :listPrice
+					#end 
+					where item_id = (select id from t_pd_item where code = :itemCode and lifecycle != 2) 
+					and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Sku.findAllOnSalesSkuList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取有效的Item列表 lifecycle =1</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tps.*
+					from t_pd_sku tps , t_pd_itemInfo tpii, t_pd_item tpi
+					where tpi.id = tpii.item_id and tpi.id = tps.item_id
+					and tpi.lifecycle != 2 and tps.lifecycle != 2 order by tps.id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findOnSalesItemListWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页获取有效的sku列表 lifecycle =1</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						tps.*
+					from t_pd_sku tps , t_pd_itemInfo tpii, t_pd_item tpi
+					where tpi.id = tpii.item_id and tpi.id = tps.item_id
+					and tpi.lifecycle != 2 and tps.lifecycle != 0
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findInventoryById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据skuId查询库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT inv.available_qty as availableQty,inv.extention_code as extentionCode
+					FROM t_pd_sku_inventory inv
+					JOIN t_pd_sku sku ON sku.out_id = inv.extention_code
+					WHERE sku.id = :skuId AND sku.lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Sku.findSkuWithParaMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_pd_sku
+					where 1 = 1
+					#if($itemId)
+						and item_id = :itemId
+					#end
+					
+					#if($itemProperties)
+						and properties = :itemProperties
+					#end
+					
+					#if($lifecycle)
+						and lifecycle = :lifecycle
+					#end
+					
+					#if($outId)
+						and out_id = :outId
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

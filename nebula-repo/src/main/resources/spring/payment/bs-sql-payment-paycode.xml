@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+		<bean id="PayCode.findPayCodeBySubOrdinate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据支付流水号查询支付订单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+					p.id,
+					p.pay_money,
+					p.pay_numerical,
+					p.pay_type,
+					p.modify_time,
+					p.pay_success_status,
+					p.sub_ordinate,
+					p.create_time,
+					p.version
+					FROM t_so_paycode AS p
+					WHERE p.sub_ordinate = :subOrdinate
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayCode.updatePayCodeBySubOrdinate" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 根据支付订单号更新支付信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_paycode
+		       		set pay_type = :payType
+		       		where
+		       		sub_ordinate = :subinateCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayCode.findPayCodeByCodeAndPayTypeAndPayStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据支付订单号、支付类型、是否支付成功查询支付订单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+					p.id,
+					p.pay_money,
+					p.pay_numerical,
+					p.pay_type,
+					p.modify_time,
+					p.pay_success_status,
+					p.sub_ordinate,
+					p.create_time,
+					p.version
+					FROM t_so_paycode AS p
+					WHERE p.sub_ordinate = :subinateCode and p.pay_type = :payType and p.pay_success_status = :paySuccessStatus
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayCode.updatePayCodePayStatus" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 根据支付订单号更新支付状态</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_so_paycode
+		       		set modify_time = :modifyTime,pay_success_status = :paySuccessStatus
+		       		where
+		       		sub_ordinate = :subinateCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="PayCode.findPayCodeByCodeAndPayType" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据支付订单号、支付类型、是否支付成功查询支付订单信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT
+					p.id,
+					p.pay_money,
+					p.pay_numerical,
+					p.pay_type,
+					p.modify_time,
+					p.pay_success_status,
+					p.sub_ordinate,
+					p.create_time,
+					p.version
+					FROM t_so_paycode AS p
+					WHERE p.sub_ordinate = :subinateCode and p.pay_type = :payType
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+</beans>

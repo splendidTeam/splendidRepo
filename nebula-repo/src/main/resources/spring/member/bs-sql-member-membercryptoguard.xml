@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="MemberCryptoguard.findAllMemberCryptoguardList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberCryptoguard.findMemberCryptoguardListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberCryptoguard.findMemberCryptoguardListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($question)
+		       					and QUESTION=:question
+		       				#end
+
+		       			
+		       				#if($answer)
+		       					and ANSWER=:answer
+		       				#end
+
+		       			
+		       				#if($sort)
+		       					and SORT=:sort
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberCryptoguard.findMemberCryptoguardListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($question)
+		       					and QUESTION=:question
+		       				#end
+
+		       			
+		       				#if($answer)
+		       					and ANSWER=:answer
+		       				#end
+
+		       			
+		       				#if($sort)
+		       					and SORT=:sort
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="MemberCryptoguard.enableOrDisableMemberCryptoguardByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_CRYPTOGUARD
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberCryptoguard.removeMemberCryptoguardByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_CRYPTOGUARD
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="MemberCryptoguard.removeMemberCryptoguardByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_CRYPTOGUARD
+		       		set lifecycle=2
+		       		 where MEMBER_ID=:memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberCryptoguard.findAllEffectMemberCryptoguardList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="MemberCryptoguard.findEffectMemberCryptoguardListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD where lifecycle=1
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($question)
+		       					and QUESTION=:question
+		       				#end
+
+		       			
+		       				#if($answer)
+		       					and ANSWER=:answer
+		       				#end
+
+		       			
+		       				#if($sort)
+		       					and SORT=:sort
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="MemberCryptoguard.findEffectMemberCryptoguardListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CRYPTOGUARD where lifecycle=1
+		       		
+					
+		       			
+		       				#if($memberId)
+		       					and MEMBER_ID=:memberId
+		       				#end
+
+		       			
+		       				#if($question)
+		       					and QUESTION=:question
+		       				#end
+
+		       			
+		       				#if($answer)
+		       					and ANSWER=:answer
+		       				#end
+
+		       			
+		       				#if($sort)
+		       					and SORT=:sort
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="MemberCryptoguard.findByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过id用户获取密保问题</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select *
+					from t_mem_cryptoguard
+					where
+					   lifecycle=1 and
+						member_id = :memberId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberCryptoguard.findByQa" class="loxia.dao.support.DynamicQueryHolder">
+		<description>验证密保问题</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select *
+					from t_mem_cryptoguard
+					where
+						question = :q and answer = :a
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

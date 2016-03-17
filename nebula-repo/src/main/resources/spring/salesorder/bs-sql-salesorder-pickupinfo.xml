@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PickupInfo.findAllPickupInfoList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PickupInfo.findPickupInfoListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PickupInfo.findPickupInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+
+		       			
+		       				#if($district)
+		       					and DISTRICT=:district
+		       				#end
+
+		       			
+		       				#if($town)
+		       					and TOWN=:town
+		       				#end
+
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($zipCode)
+		       					and ZIPCODE=:zipCode
+		       				#end
+
+		       			
+		       				#if($contact)
+		       					and CONTACT=:contact
+		       				#end
+
+		       			
+		       				#if($contactPhone)
+		       					and CONTACT_PHONE=:contactPhone
+		       				#end
+
+		       			
+		       				#if($contactMobile)
+		       					and CONTACT_MOBILE=:contactMobile
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($bsOrdercode)
+		       					and BS_ORDER_CODE=:bsOrdercode
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PickupInfo.findPickupInfoListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+
+		       			
+		       				#if($district)
+		       					and DISTRICT=:district
+		       				#end
+
+		       			
+		       				#if($town)
+		       					and TOWN=:town
+		       				#end
+
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($zipCode)
+		       					and ZIPCODE=:zipCode
+		       				#end
+
+		       			
+		       				#if($contact)
+		       					and CONTACT=:contact
+		       				#end
+
+		       			
+		       				#if($contactPhone)
+		       					and CONTACT_PHONE=:contactPhone
+		       				#end
+
+		       			
+		       				#if($contactMobile)
+		       					and CONTACT_MOBILE=:contactMobile
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($bsOrdercode)
+		       					and BS_ORDER_CODE=:bsOrdercode
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PickupInfo.enableOrDisablePickupInfoByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SO_PICKUPINFO
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PickupInfo.removePickupInfoByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SO_PICKUPINFO
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PickupInfo.findAllEffectPickupInfoList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="PickupInfo.findEffectPickupInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO where lifecycle=1
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+
+		       			
+		       				#if($district)
+		       					and DISTRICT=:district
+		       				#end
+
+		       			
+		       				#if($town)
+		       					and TOWN=:town
+		       				#end
+
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($zipCode)
+		       					and ZIPCODE=:zipCode
+		       				#end
+
+		       			
+		       				#if($contact)
+		       					and CONTACT=:contact
+		       				#end
+
+		       			
+		       				#if($contactPhone)
+		       					and CONTACT_PHONE=:contactPhone
+		       				#end
+
+		       			
+		       				#if($contactMobile)
+		       					and CONTACT_MOBILE=:contactMobile
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($bsOrdercode)
+		       					and BS_ORDER_CODE=:bsOrdercode
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PickupInfo.findEffectPickupInfoListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PICKUPINFO where lifecycle=1
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($country)
+		       					and COUNTRY=:country
+		       				#end
+
+		       			
+		       				#if($province)
+		       					and PROVINCE=:province
+		       				#end
+
+		       			
+		       				#if($city)
+		       					and CITY=:city
+		       				#end
+
+		       			
+		       				#if($district)
+		       					and DISTRICT=:district
+		       				#end
+
+		       			
+		       				#if($town)
+		       					and TOWN=:town
+		       				#end
+
+		       			
+		       				#if($address)
+		       					and ADDRESS=:address
+		       				#end
+
+		       			
+		       				#if($zipCode)
+		       					and ZIPCODE=:zipCode
+		       				#end
+
+		       			
+		       				#if($contact)
+		       					and CONTACT=:contact
+		       				#end
+
+		       			
+		       				#if($contactPhone)
+		       					and CONTACT_PHONE=:contactPhone
+		       				#end
+
+		       			
+		       				#if($contactMobile)
+		       					and CONTACT_MOBILE=:contactMobile
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($bsOrdercode)
+		       					and BS_ORDER_CODE=:bsOrdercode
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

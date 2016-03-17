@@ -1,0 +1,1 @@
+SalesOrderV5中增加一个remark字段，用于保存一些各商城扩展字段

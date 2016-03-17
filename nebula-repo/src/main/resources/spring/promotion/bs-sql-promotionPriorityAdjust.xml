@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PromotionPriorityAdjust.findPriorityAdjustList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询促销</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[  
+				SELECT pa.adjustid as id,pa.activeMark, pa.adjustName , pa.startTime,pa.endTime, 
+				CASE pa.lastUpdateId  WHEN NULL THEN u.realname ELSE u.realname END,
+				pa.lastUpdateTime,pa.lastUpdateId, pa.shop_id
+				from t_prm_priorityadjust pa 
+				JOIN t_au_user u
+				ON pa.lastupdateid  =u.id
+				where pa.shop_id = :shopId
+				#if($adjustName)
+					AND pa.adjustName LIKE :adjustName
+				#end 
+   				#if($status)
+   					and pa.activeMark = :status
+   				#end
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>  
+
+	<bean id="PromotionPriorityAdjust.findEffectivePriorityList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有非禁用的优先级列表</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[  
+				SELECT pa.adjustid as id,pa.activeMark, pa.adjustName , pa.startTime,pa.endTime, 
+				CASE pa.lastUpdateId  WHEN NULL THEN u.realname ELSE u.realname END,
+				pa.lastUpdateTime,pa.lastUpdateId, pa.shop_id
+				from t_prm_priorityadjust pa 
+				JOIN t_au_user u
+				ON pa.lastupdateid  =u.id
+				where pa.shop_id = :shopId
+   				AND pa.activeMark =1
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>  
+	<bean id="PromotionPriorityAdjust.findPriorityAdjustByStartTimeAndEndTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据开始和结束时间查询优先级</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[   
+				SELECT * FROM t_prm_priorityadjust pj WHERE
+				 pj.starttime=:startTime
+				AND pj.endtime=:endTime
+				 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	<bean id="PromotionPriorityAdjust.enableOrUnablePriorityById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用禁用优先级</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[   
+                update t_prm_priorityadjust set lastupdateid=:userId,activemark =:activeMark where adjustid=:id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	<bean id="PromotionPriorityAdjust.findPriorityAdjustByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用禁用优先级</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[   
+                SELECT * FROM t_prm_priorityadjust pj WHERE
+				 pj.adjustname=:name
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+	
+	
+	
+</beans>

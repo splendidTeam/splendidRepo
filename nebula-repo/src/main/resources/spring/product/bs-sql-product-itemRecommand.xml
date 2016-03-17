@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="RecommandItem.findRecItemByTypeAndParam" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT *
+					FROM t_pd_rec_item
+					WHERE type = :type
+						AND param = :param
+						AND lifecycle = 1
+					ORDER BY sort ASC
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RecommandItem.findRecommandItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tpri.*,  
+						tpii.title,
+						tpi.code
+					from t_pd_rec_item tpri 
+					left join t_pd_item tpi on tpi.id = tpri.item_id
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id
+					where tpri.id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="RecommandItem.findRecItemByTypeAndParams" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT *
+					FROM t_pd_rec_item
+					WHERE type = :type
+						AND param in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+						AND lifecycle = 1
+					ORDER BY sort ASC
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RecommandItem.findRecommandItemListByParaMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tpri.id as id,
+						tpri.item_id as itemId,
+						tpri.param as param,
+						tpri.type as type, 
+						tpii.title,
+						tpi.code
+					from t_pd_rec_item tpri 
+					left join t_pd_item tpi on tpi.id = tpri.item_id
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id
+					where 1 = 1
+					#if($code)
+						and lower(tpi.code) like lower(:code) 
+					#end
+
+					#if($type)
+						and tpri.type = :type
+					#end
+
+					#if($param)
+						and tpri.param = :param
+					#end
+					order by sort 
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RecommandItem.findRecommandItemListByParaMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tpri.id as id,
+						tpri.item_id as itemId,
+						tpri.param as param,
+						tpri.type as type, 
+						tpii.title,
+						tpi.code
+					from t_pd_rec_item tpri 
+					left join t_pd_item tpi on tpi.id = tpri.item_id
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id
+					where 1 = 1
+					#if($code)
+						and lower(tpi.code) like lower(:code) 
+					#end
+
+					#if($type)
+						and tpri.type = :type
+					#end
+
+					#if($param)
+						and tpri.param = :param
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RecommandItem.removeRecommandItemByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过推荐id集合删除推荐信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete from t_pd_rec_item 
+		       		where id in (
+		       			#foreach($id in $ids)
+		       				$id,
+		       			#end
+		       			-1
+		       		)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="RecommandItem.enabledReceommandItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>启用推荐</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_rec_item set lifecycle = 1 where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RecommandItem.disenabledReceommandItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>禁用推荐</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_rec_item set lifecycle = 0 where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RecommandItem.updateRecommandItemById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改推荐</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update t_pd_rec_item set
+			       		param = :param, 
+			       		type=:type, 
+			       		opeartor_id = :userId, 
+			       		item_id = :itemId, 
+			       		modify_time = now(),
+			       		sort = :sort 
+		       		where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="RecommandItem.findRecommandItemListByCodeList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据编号列表查询推荐商品列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						tpri.*,  
+						tpii.title,
+						tpi.code
+					from t_pd_rec_item tpri 
+					left join t_pd_item tpi on tpi.id = tpri.item_id
+					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id
+					where tpi.code in (
+		       			#foreach($code in $codeList)
+		       				'$code',
+		       			#end
+		       			''
+		       		)
+                 ]]>
+			</value>
+		</constructor-arg>
+	
+	</bean>
+</beans>

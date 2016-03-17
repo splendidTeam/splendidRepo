@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- <bean id="ActivityCardEntity.findActivityCardByCardNo" class="loxia.dao.support.DynamicQueryHolder">
+        <description>根据cardNo查询</description>
+        <constructor-arg>
+            <value><![CDATA[
+				select * from t_act_card t where t.card_no=:cardNo
+			 ]]>
+            </value>
+        </constructor-arg>
+    </bean>
+    <bean id="ActivityCardEntity.updateActivityCardUsed" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					UPDATE t_act_card SET used_time=now()
+                    WHERE card_no = :cardNo	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean> -->
+	<bean id="LimitaryImprovedEntity.findAllLimitCondition" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_limitary_improved 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	 <bean id="LimitaryTriggerPointEntity.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select * from t_limitary_trigger_point
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	 <bean id="LimitaryImprovedEntity.findAllLimitConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select a.* from t_limitary_improved a where a.id = :id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EffectImprovedEntity.findAllEffectCondition" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_effect_improved 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	 <bean id="EffectImprovedEntity.findAllEffectConditionById" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select a.* from t_effect_improved a where a.id = :id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EffectTriggerPointEntity.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+	 				select * from t_effect_trigger_point
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

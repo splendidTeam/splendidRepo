@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ColumnPublishedHistory.findAllColumnPublishedHistoryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnPublishedHistory.findColumnPublishedHistoryListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ColumnPublishedHistory.findColumnPublishedHistoryListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($pageCode)
+		       					and PAGE_CODE=:pageCode
+		       				#end
+
+		       			
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+
+		       			
+		       				#if($value)
+		       					and VALUE=:value
+		       				#end
+
+		       			
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME >= :publishedTimeStart
+		       				#end
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME <= :publishedTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnPublishedHistory.findColumnPublishedHistoryListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($pageCode)
+		       					and PAGE_CODE=:pageCode
+		       				#end
+
+		       			
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+
+		       			
+		       				#if($value)
+		       					and VALUE=:value
+		       				#end
+
+		       			
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME >= :publishedTimeStart
+		       				#end
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME <= :publishedTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ColumnPublishedHistory.enableOrDisableColumnPublishedHistoryByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_COL_COLUMN_PUBLISHED_HISTORY
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnPublishedHistory.removeColumnPublishedHistoryByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_COL_COLUMN_PUBLISHED_HISTORY
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ColumnPublishedHistory.findAllEffectColumnPublishedHistoryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ColumnPublishedHistory.findEffectColumnPublishedHistoryListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY where lifecycle=1
+		       		
+					
+		       			
+		       				#if($pageCode)
+		       					and PAGE_CODE=:pageCode
+		       				#end
+
+		       			
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+
+		       			
+		       				#if($value)
+		       					and VALUE=:value
+		       				#end
+
+		       			
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME >= :publishedTimeStart
+		       				#end
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME <= :publishedTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ColumnPublishedHistory.findEffectColumnPublishedHistoryListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_COL_COLUMN_PUBLISHED_HISTORY where lifecycle=1
+		       		
+					
+		       			
+		       				#if($pageCode)
+		       					and PAGE_CODE=:pageCode
+		       				#end
+
+		       			
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+
+		       			
+		       				#if($value)
+		       					and VALUE=:value
+		       				#end
+
+		       			
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME >= :publishedTimeStart
+		       				#end
+		       				#if($publishedTime)
+		       					and PUBLISHED_TIME <= :publishedTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

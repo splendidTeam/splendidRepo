@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PresellItem.findpropertvaluenameByitempropertyIds"
+		class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemId获取该商品具有的属性值(如白色,32G,联通版),以属性排序号和属性值排序号升序
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT  a.id itempropertyId,b.value propertyvalueName FROM t_pd_item_properties a 
+					LEFT JOIN t_pd_property_value b on a.propertyvalue_id= b.id 
+					LEFT JOIN t_pd_property c on c.id=a.property_id 
+					where a.item_id=:itemId and c.lifecycle!=2 ORDER BY c.sort_no asc,b.sort_no asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PresellItem.findPresaleInfoByitemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据itemCode获取该商品的预售基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select * from t_sto_presell_item where itemId=:itemId and lifecycle!=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:loxia="http://loxia.benjamin.cn/schema/core" xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.5.0.xsd
+		">
+      
+ 
+    <bean id="jmsConnectionFactory_pro" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<constructor-arg index="0" value="#{mq['mq.username']}"/>
+		<constructor-arg index="1" value="#{mq['mq.password']}"/>
+		<constructor-arg index="2" value="#{mq['mq.brokerUrl']}"/>
+	</bean>  
+    
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory">
+            <!-- lets wrap in a pool to avoid creating a connection per send -->
+            <bean class="org.springframework.jms.connection.CachingConnectionFactory">
+                <property name="targetConnectionFactory" ref="jmsConnectionFactory_pro"/>
+                <property name="sessionCacheSize" value="20"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="mqMessageService" class="com.baozun.nebula.wormhole.scm.MessageCommonManagerImpl"/>
+	
+
+	<bean name="QUEUE_P1_1" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_P1_1']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_P1_2" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_P1_2']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_I1_1" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_I1_1']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_I1_2" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_I1_2']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_O1_1" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_O1_1']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_L1_1" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_L1_1']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_SCM2SHOP_RESPE" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_SCM2SHOP_RESPE']}]]> </value></constructor-arg>
+	</bean>
+	<bean name="QUEUE_SHOP2SCM_RESPE" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg><value> <![CDATA[#{mq['QUEUE_SHOP2SCM_RESPE']}]]> </value></constructor-arg>
+	</bean>
+
+
+ 
+     <!-- QUEUE_P1_1  -->
+	<bean id="queueListener_QUEUE_P1_1" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFromScm"/>
+        <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/>
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_P1_1" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_P1_1"/>
+        <property name="messageListener" ref="queueListener_QUEUE_P1_1"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+	<!-- QUEUE_P1_2  -->
+	<bean id="queueListener_QUEUE_P1_2" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFromScm"/>
+        <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/>
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_P1_2" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_P1_2"/>
+        <property name="messageListener" ref="queueListener_QUEUE_P1_2"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+
+    
+    <!-- QUEUE_I1_1  -->
+	<bean id="queueListener_QUEUE_I1_1" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFromScm"/>
+        <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/>
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_I1_1" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_I1_1"/>
+        <property name="messageListener" ref="queueListener_QUEUE_I1_1"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+    <!-- QUEUE_I1_2  -->
+	<bean id="queueListener_QUEUE_I1_2" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFromScm"/>
+        <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/>
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_I1_2" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_I1_2"/>
+        <property name="messageListener" ref="queueListener_QUEUE_I1_2"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+    <!-- QUEUE_O1_1  -->
+	<bean id="queueListener_QUEUE_O1_1" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFromScm"/>
+        <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/>
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_O1_1" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_O1_1"/>
+        <property name="messageListener" ref="queueListener_QUEUE_O1_1"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+    <!-- QUEUE_L1_1  -->
+	<bean id="queueListener_QUEUE_L1_1" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFromScm"/>
+        <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/>
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_L1_1" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_L1_1"/>
+        <property name="messageListener" ref="queueListener_QUEUE_L1_1"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+    
+    <!-- QUEUE_SCM2SHOP_RESPE  -->
+	<bean id="queueListener_QUEUE_SCM2SHOP_RESPE" class="org.springframework.jms.listener.adapter.MessageListenerAdapter">
+        <constructor-arg ref="mqMessageService"/>
+        <property name="defaultListenerMethod" value="receiveFeedback"/>
+<!--         <property name="defaultResponseDestination" ref="QUEUE_SHOP2SCM_RESPE"/> -->
+    </bean>
+    
+    <bean id="queueListenerContainer_QUEUE_SCM2SHOP_RESPE" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory_pro"/>
+        <property name="destination" ref="QUEUE_SCM2SHOP_RESPE"/>
+        <property name="messageListener" ref="queueListener_QUEUE_SCM2SHOP_RESPE"/>
+        <property name="sessionTransacted" value="true"/>
+    </bean>
+
+   
+</beans>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Navigation.findAllNavigationList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有导航</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * 
+		       		from t_base_navigation 
+		       		where lifecycle != 2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Navigation.findAvailableNavigationList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有有效导航</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * 
+		       		from t_base_navigation 
+		       		where lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="Navigation.findNavigationListByParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据父ID查询导航列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * 
+		       		from t_base_navigation 
+		       		where parent_id = :pid
+		       		and lifecycle != 2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Navigation.findEnableNavigationListByNameAndParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据父ID、名称查询有效导航列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * 
+		       		from t_base_navigation 
+		       		where parent_id = :pid
+		       			  and name =:name
+		       			  and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Navigation.removeNavigationById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id删除导航</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_base_navigation
+					set lifecycle = 2
+					where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Navigation.findNavigationByCategoryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据category id查找导航菜单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_base_navigation where param = :cid and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Navigation.findEffectNavigationById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查找有效导航菜单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_base_navigation where id = :id and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Navigation.findEffectNavigationByName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查找有效导航菜单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_base_navigation where name = :name and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

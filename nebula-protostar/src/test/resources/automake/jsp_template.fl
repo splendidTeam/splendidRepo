@@ -1,0 +1,54 @@
+<%@include file="/pages/commons/common.jsp" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title><spring:message code="user.list.label.title" /></title>
+<%@include file="/pages/commons/common-css.jsp" %>
+<%@include file="/pages/commons/common-javascript.jsp" %>
+<script type="text/javascript" src="${r'${base}'}/scripts/search-filter.js"></script>
+<script type="text/javascript" src="${r'${base}'}/scripts/main.js"></script>
+<script type="text/javascript" src="${r'${base}'}/scripts/${packagName}/${entityName}.js"></script>
+</head>
+<body>
+<div class="content-box width-percent100">
+	<div class="ui-title1"><img src="${r'${base}'}/images/wmi/blacks/32x32/calc.png">${entityName}
+	 <input type="button" value="<spring:message code="product.property.button.delete"/>"	class="button delete batch" title="<spring:message code="product.property.button.delete"/>"/>
+	 <input type="button" value="<spring:message code="btn.add" />" class="button orange add${entityName}" title="<spring:message code="btn.add" />"/>
+	</div>
+
+	<form id="searchForm">
+	  <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+    <table >
+        <tr>
+			<#list propertyList as item>
+       			<td><label>${item.fieldName}</label></td>
+				<td>
+					<#if item.fieldType=='Integer' ||item.fieldType=='int' ||item.fieldType=='Long'||item.fieldType=='long' >
+					<input name="q_int_${item.fieldName}" type="text" loxiaType="number" ></input>
+					<#else>
+					<#if item.fieldType=='Date'>
+					<input name="q_date_${item.fieldName}" type="text" loxiaType="date" ></input>
+					<#else>
+					<input name="q_string_${item.fieldName}" type="text" loxiaType="input" ></input>
+					</#if>
+					</#if>
+				</td>
+		    </#list>
+        </tr> 
+    </table>
+    	<div class="button-line1">
+    		<a href="javascript:void(0);" class="func-button reset" title="<spring:message code ='user.list.filter.btn'/>">重置</a>
+        	<a href="javascript:void(0);" class="func-button search" title="<spring:message code ='user.list.filter.btn'/>"><spring:message code ='user.list.filter.btn'/></a>
+        </div>
+    </div>
+    </div>
+    </form> 
+    
+    <div class="ui-block">
+   	 	<div class="table-border0 border-grey" id="tableList" caption="${entityName}列表"></div>   
+    </div>
+</div>
+</body>
+</html>

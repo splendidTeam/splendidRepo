@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+
+
+
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+
+
+function editUser(data, args, idx){
+	return "<a href='javascript:void(0);' class='func-button modify'>修改</a><a href='javascript:void(0);' class='func-button delete'>删除</a>";
+}
+
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("name", data)+"'/>";
+}
+
+function drawName(data, args, idx){
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('add-user.html','aaa',null,[0,1]);\">"+loxia.getObject("name", data)+"</a>";
+}
+
+
+function refreshData(){
+
+	$j("#table1").loxiasimpletable("refresh",
+			{
+		currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:null, firstPage: true, lastPage: false,
+		items: []
+		}
+	);
+
+
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+	
+	$j("#table1").loxiasimpletable({
+		page: true,
+		nodatamessage:'<span>'+nps.i18n("NO_DATA")+'</span>',
+		cols:
+		[
+		{label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"},
+		{name:"name",label:"登录名",width:"15%",template:"drawName",sort: "name"},
+		{name:"realname",label:"真实姓名",width:"10%"},
+		{name:"email",label:"邮箱",width:"15%"},
+		{name:"dept",label:"所属组织机构",width:"10%"},
+		{name:"date",label:"创建时间",width:"15%" ,sort: ["date asc","date desc"]},
+		{name:"mobile",label:"手机",width:"10%",align:"right"},
+		{name:"lifecycle",label:"状态",width:"5%",type:"yesno"},
+
+		{label:"操作",width:"10%", template:"editUser"}
+		],
+		dataurl : {
+			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:null, firstPage: true, lastPage: false,
+			
+			}
+		
+	});
+	
+	$j(".button.delete").on("click",function(){
+		nps.confirm("确认删除","确定要删除选定的用户么？", function(){
+	        alert("Deleted");
+	        refreshData();
+	    });
+    })
+	
+    $j(".button.adduser").click(function(){
+        window.location.href="add-user.html";
+    });
+
+    $j("#table1").on("click",".func-button.modify",function(){
+        window.location.href="add-user.html";
+    });
+
+    $j("#table1").on("click",".func-button.delete",function(){
+        nps.confirm("确认删除","确定要删除选定的用户么？", function(){
+            alert("Deleted");
+            refreshData();
+        });
+    });
+
+	refreshData();
+	
+});
+
+
+
+</script>
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+	<div class="ui-title1">
+		<img src="../images/wmi/blacks/32x32/user.png">
+		用户管理
+		  <input type="button" value="批量删除" class="button delete" title="批量删除"/>
+        <input type="button" value="新增" class="button orange adduser" title="新增"/>
+    </div>
+
+ <div class="ui-block">
+    <div class="ui-block-content ui-block-content-lb">
+    <table >
+        <tr>
+            <td><label>综合条件</label></td>
+            <td><select loxiaType="select" id="searchType" >
+                <option value="0">用户名</option>
+                <option value="1">真实姓名</option>
+              
+            </select></td>
+            <td>
+            	<label>关键字</label>
+            </td>
+            <td>
+                <input type="text" loxiaType="input" mandatory="false" placeHolder="用户名或真实姓名"></input>
+
+            </td>
+             <td><label>所属组织</label></td>
+            <td><select loxiaType="select" id="org" >
+                <option value="1">系统</option>
+                <option value="2">组织1</option>
+                <option value="3">组织2</option>
+              
+            </select></td>
+
+        </tr>
+        <tr>	
+        	 <td><label>创建时间</label></td>
+            <td><input type="text" id="startDate" loxiaType="date" mandatory="false" ></input></td>
+            
+             <td><label>——</label></td>
+            <td><input type="text" id="endDate" loxiaType="date" mandatory="false" ></input></td>
+        	 <td><label>状态</label></td>
+            <td><select loxiaType="select" id="lifecycle" >
+                <option value="">不限</option>
+                <option value="1">有效</option>
+                <option value="0">无效</option>
+              
+            </select></td>
+        
+        </tr>
+    </table>
+    
+    <div class="button-line1">
+        <a href="javascript:void(0);" class="func-button search" title="搜索">搜索</a>
+        </div>
+    </div>
+    </div>
+    
+    <div class="ui-block">
+    
+   	 	<div class="table-border0 border-grey" id="table1" caption="用户列表"></div>   
+    </div>
+    
+    
+	
+    <div class="button-line">
+
+
+        <input type="button" value="新增" class="button orange adduser" title="新增"/>
+         <input type="button" value="批量删除" class="button delete" title="批量删除"/>
+
+
+         
+    </div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" media="screen" href="../themes/redmond/jquery-ui-custom.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="../themes/ui.jqgrid.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="../themes/ui.multiselect.css" />
+
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+<script src="../scripts/jquery/jqueryui/jquery-ui-custom.min.js" type="text/javascript"></script>
+<script src="../scripts/jquery.layout.js" type="text/javascript"></script>
+<script src="../scripts/grid.locale-en.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $.jgrid.no_legacy_api = true;
+    $.jgrid.useJSON = true;
+</script>
+<script src="../scripts/ui.multiselect.js" type="text/javascript"></script>
+<script src="../scripts/jquery.jqGrid.js" type="text/javascript"></script>
+<script src="../scripts/jquery.tablednd.js" type="text/javascript"></script>
+<script src="../scripts/jquery.contextmenu.js" type="text/javascript"></script>
+</head>
+
+<body>
+<table id="list47"></table>
+<div id="plist47"></div>
+</body>
+
+
+<script type="text/javascript">
+	var mydata = [ 
+	{id:"1",invdate:"2010-05-24",name:"test",note:"note",tax:"10.00",total:"2111.00"} , 
+	{id:"2",invdate:"2010-05-25",name:"test2",note:"note2",tax:"20.00",total:"320.00"}, 
+	{id:"3",invdate:"2007-09-01",name:"test3",note:"note3",tax:"30.00",total:"430.00"}, 
+	{id:"4",invdate:"2007-10-04",name:"test",note:"note",tax:"10.00",total:"210.00"}, 
+	{id:"5",invdate:"2007-10-05",name:"test2",note:"note2",tax:"20.00",total:"320.00"}, 
+	{id:"6",invdate:"2007-09-06",name:"test3",note:"note3",tax:"30.00",total:"430.00"}, 
+	{id:"7",invdate:"2007-10-04",name:"test",note:"note",tax:"10.00",total:"210.00"}
+	 ]; 
+	 
+	jQuery("#list47").jqGrid({ data: mydata, datatype: "local", height: 150, rowNum: 10, rowList: [10,20,30], colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'], colModel:[ 
+		{name:'id',index:'id', width:60, sorttype:"int"}, 
+		{name:'invdate',index:'invdate', width:90, sorttype:"date", formatter:"date"}, 
+		{name:'name',index:'name', width:100},
+		{name:'amount',index:'amount', width:80, align:"right",sorttype:"float", formatter:"number"}, 
+		{name:'tax',index:'tax', width:80, align:"right",sorttype:"float"}, 
+		{name:'total',index:'total', width:80,align:"right",sorttype:"float"}, 
+		{name:'note',index:'note', width:150, sortable:false} 
+	], 
+	/*pager: "#plist47",*/ viewrecords: true, caption: "Manipulating Array Data" }
+	);
+</script>
+</html>

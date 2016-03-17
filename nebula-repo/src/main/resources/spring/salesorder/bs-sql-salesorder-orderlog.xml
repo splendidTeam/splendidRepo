@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	 <bean id="OrderLog.findOrderLogByOrderId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id查询订单状态日志信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					o.ID,
+					o.ORDER_ID,
+					o.CONTENT,
+					o.OPERATOR_ID,
+					o.OPERATOR_NAME,
+					o.CREATE_TIME
+					from t_so_orderlog as o
+					where o.ORDER_ID = :orderId
+					order by o.CREATE_TIME 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+ 
+
+</beans>

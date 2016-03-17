@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="${entityName}.findAll${entityName}List" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} 
+		       		<#if lifecycle !="" && hasDeleteLifecycle>
+		       			 where ${lifecycle} !=2
+		       		</#if>
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="${entityName}.find${entityName}ListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="${entityName}.find${entityName}ListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} where 
+					<#if lifecycle !="" && hasDeleteLifecycle>
+		       			${lifecycle} !=2
+		       		<#else>
+		       			1=1	
+		       		</#if>
+		       		
+		       		<#include "xml_template_condition.fl">
+				       		<#if lifecycle !="">
+				       		#if($${lifecycle})
+				       			and ${lifecycle} =:${lifecycle}
+				       		#end
+				       		</#if>
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="${entityName}.find${entityName}ListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} where 
+		       		
+		       		<#if lifecycle !="" && hasDeleteLifecycle>
+		       			${lifecycle} !=2
+		       		<#else>
+		       			1=1	
+		       		</#if>
+		       		
+		       		<#include "xml_template_condition.fl">
+				       		<#if lifecycle !="">
+				       		#if($${lifecycle})
+				       			and ${lifecycle} =:${lifecycle}
+				       		#end
+				       		</#if>
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<#if lifecycle !="">
+	
+	<bean id="${entityName}.enableOrDisable${entityName}ByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update ${tableName}
+		       		set ${lifecycle}=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="${entityName}.remove${entityName}ByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update ${tableName}
+		       		set ${lifecycle}=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="${entityName}.findAllEffect${entityName}List" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} where ${lifecycle}=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="${entityName}.findEffect${entityName}ListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} where ${lifecycle}=1
+		       		
+		       		<#include "xml_template_condition.fl">
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="${entityName}.findEffect${entityName}ListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from ${tableName} where ${lifecycle}=1
+		       		
+		       		<#include "xml_template_condition.fl">
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	</#if>	
+</beans>

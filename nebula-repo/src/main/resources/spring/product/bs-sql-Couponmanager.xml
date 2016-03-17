@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="CouponSendUserLog.findCouponSendUserLog" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询已发送的优惠券</description>
+		<constructor-arg>
+			<value>
+			 <![CDATA[ 
+				 select * from   t_sys_coupon_log  where promotioncouponid=:promotioncouponid
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="CouponSendUserLog.saveCouponSendUserLog" class="loxia.dao.support.DynamicQueryHolder">
+		<description>添加发送记录</description>
+		<constructor-arg>
+			<value>
+			 <![CDATA[ 
+				 INSERT INTO t_sys_coupon_log (id,createtime,memberid,promotioncouponcode,promotioncouponcodeid,promotioncouponid,promotioncouponname) 
+				 VALUES (nextval('S_T_SYS_COUPON_LOG'),now(), :memberid, :promotioncouponcode, :promotioncouponcodeid, :promotioncouponid, :promotioncouponname);
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="InstationSendMessageRef.findTempletBymemberid" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询用户的自己站内信息</description>
+		<constructor-arg>
+			<value>
+			 <![CDATA[ 
+				 select tmp.message as message,tmp.title as title
+                 from T_SYS_INSTATION_SEND_MESSAGE sendlog INNER JOIN T_SYS_INSTATION_MESSAGE_TEMPLATE tmp 
+                 ON sendlog.messagetemplateid=tmp.id and sendlog.memberid=:memberid
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>
+
+
+

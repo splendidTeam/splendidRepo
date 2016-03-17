@@ -1,0 +1,646 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" href="../css/demo.css" type="text/css">
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+	
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+
+
+<script type="text/javascript" src="../scripts/user-role.js"></script>
+<style type="text/css">
+.wl-right-auto2
+{
+
+
+border:1px solid #ccc;
+overflow-y:scroll;
+
+}
+.wl-right-auto2  input[type="checkbox"]
+{
+clear:both;
+}
+
+.wl-right-auto2  input[type="radio"]
+{
+clear:both;
+}
+.wl-right-auto2  p
+{
+width:80%;
+}
+
+.extension {
+line-height: 28px; height: 21px;float:left;margin-right: 10px;
+}
+</style>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j.extend(loxia.regional['zh-CN'],{
+    "PWD_NOT_MATCH":"密码输入不一致",
+    "EMAIL_NOT_VALID":"邮箱不符合规则",
+    "MOBILE_NOT_VALID":"手机不符合规则",
+    "ORG_NOT_SELECT":"请选择所属组织",
+    "NPS_NOTSEL_ROLE":"请选择角色",
+    "NPS_NOTSEL_ORG":"请选择组织",
+    "NPS_ROLE_EXISTS":"角色重复"
+    
+    
+});
+
+var setting = {
+		check: {
+			enable: true
+		},
+		view: {
+			dblClickExpand: true,
+			showIcon:false
+		},
+		data: { 
+			simpleData: {
+				enable: true
+			}  
+		},
+		callback: {
+			onClick: onClick,
+			beforeRemove: beforeRemove,
+			onRemove: onRemove,
+			onCheck: onCheck,
+		}
+	};
+
+	var zNodes =[
+		
+		{id:19, pId:0, name: "ROOT",open:true},
+		{id:20, pId:19, name: "电脑",open:true},
+		{id:21, pId:20, name: "电脑整机",open:false},
+    	{id:22, pId:21, name: "笔记本",open:false},
+    	{id:23, pId:21, name: "平板电脑配件",open:false},
+    	{id:24, pId:21, name: "笔记本配件",open:false},
+    	{id:25, pId:20, name: "电脑外设",open:false},
+        {id:26, pId:20, name: "网络产品",open:false},
+    	{id:27, pId:25, name: "键盘",open:false},
+    	{id:28, pId:25, name: "摄像头",open:false},
+    	{id:29, pId:25, name: "线缆",open:false},
+    	{id:30, pId:25, name: "耳机",open:false},
+    	{id:31, pId:26, name: "网络设备",open:false},
+    	{id:32, pId:26, name: "路由器",open:false},
+    	{id:33, pId:26, name: "网卡",open:false},
+    	{id:34, pId:26, name: "网络存储",open:false},
+    	{id:35, pId:19, name: "家电",open:true},
+    	{id:36, pId:19, name: "汽车",open:true},
+    	{id:37, pId:35, name: "厨房电器",open:false},
+    	{id:38, pId:35, name: "个人护理",open:false},
+    	{id:39, pId:35, name: "生活电器",open:false},
+    	{id:40, pId:35, name: "视听影音",open:false},
+    	{id:46, pId:37, name: "榨汁机",open:false},
+    	{id:47, pId:37, name: "搅拌机",open:false},
+    	{id:48, pId:37, name: "空炸机",open:false},
+    	{id:49, pId:37, name: "咖啡机",open:false},
+    	{id:50, pId:37, name: "电饭煲",open:false},
+    	{id:51, pId:37, name: "电压力煲",open:false},
+    	{id:52, pId:37, name: "其他",open:false},
+    	{id:53, pId:38, name: "个人护理",open:false},
+    	{id:54, pId:38, name: "剃须刀",open:false},
+    	{id:55, pId:38, name: "电动牙刷",open:false},
+    	{id:56, pId:38, name: "电吹风",open:false},
+    	{id:57, pId:38, name: "脱/剃毛器",open:false}
+	];
+
+function onCheck(event, treeId, treeNode){
+	
+}
+function onClick(event, treeId, treeNode){
+	var treeObj = $j.fn.zTree.getZTreeObj("industrytreeDemo");
+	var nodes = treeObj.transformToArray(treeObj.getNodes());
+	for(var i = 0;i<nodes.length;i++){
+		if(!nodes[i].isParent){
+			nodes[i].checked = false;
+			treeObj.refresh();
+		}
+	}
+		treeNode.checked = true;
+		treeObj.refresh();
+		onCheck(event, treeId, treeNode);
+}
+function beforeRemove(event, treeId, treeNode){
+	
+}
+function onRemove(event, treeId, treeNode){
+	
+}
+
+
+var categorySetting = {
+		check: {
+			enable: true,
+			chkStyle: "radio",
+			radioType: "all"
+		},
+		view: {
+			dblClickExpand: false,
+			showIcon:false
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		},
+		callback: {
+			onClick: onClick1,
+			onCheck: onCheck1,
+		}
+	};
+
+var categoryzNodes =[
+				{id:19, pId:0, name: "ROOT",open:true},
+        		{id:20, pId:19, name: "电脑",open:true},
+        		{id:21, pId:20, name: "电脑整机",open:false},
+            	{id:22, pId:21, name: "笔记本",open:false},
+            	{id:23, pId:21, name: "平板电脑配件",open:false},
+            	{id:24, pId:21, name: "笔记本配件",open:false},
+            	{id:25, pId:20, name: "电脑外设",open:false},
+                {id:26, pId:20, name: "网络产品",open:false},
+            	{id:27, pId:25, name: "键盘",open:false},
+            	{id:28, pId:25, name: "摄像头",open:false},
+            	{id:29, pId:25, name: "线缆",open:false},
+            	{id:30, pId:25, name: "耳机",open:false},
+            	{id:31, pId:26, name: "网络设备",open:false},
+            	{id:32, pId:26, name: "路由器",open:false},
+            	{id:33, pId:26, name: "网卡",open:false},
+            	{id:34, pId:26, name: "网络存储",open:false},
+            	{id:35, pId:19, name: "家电",open:true},
+            	{id:36, pId:19, name: "汽车",open:true},
+            	{id:37, pId:35, name: "厨房电器",open:false},
+            	{id:38, pId:35, name: "个人护理",open:false},
+            	{id:39, pId:35, name: "生活电器",open:false},
+            	{id:40, pId:35, name: "视听影音",open:false},
+            	{id:46, pId:37, name: "榨汁机",open:false},
+            	{id:47, pId:37, name: "搅拌机",open:false},
+            	{id:48, pId:37, name: "空炸机",open:false},
+            	{id:49, pId:37, name: "咖啡机",open:false},
+            	{id:50, pId:37, name: "电饭煲",open:false},
+            	{id:51, pId:37, name: "电压力煲",open:false},
+            	{id:52, pId:37, name: "其他",open:false},
+            	{id:53, pId:38, name: "个人护理",open:false},
+            	{id:54, pId:38, name: "剃须刀",open:false},
+            	{id:55, pId:38, name: "电动牙刷",open:false},
+            	{id:56, pId:38, name: "电吹风",open:false},
+            	{id:57, pId:38, name: "脱/剃毛器",open:false}
+        
+ ];
+
+//**********************category input  start********************
+function onClick1(e, treeId, treeNode) {
+	var zTree = $j.fn.zTree.getZTreeObj("treeDemo");
+	zTree.checkNode(treeNode, !treeNode.checked, null, true);
+	return false;
+}
+
+function onCheck1(e, treeId, treeNode) {
+	var zTree = $j.fn.zTree.getZTreeObj("treeDemo"),
+	nodes = zTree.getCheckedNodes(true),
+	v = "",
+	categoryHtml = "",
+	categoryIds = "";
+	for (var i=0, l=nodes.length; i<l; i++) {
+		v += nodes[i].name + ",";
+		categoryHtml = "<div class="+nodes[i].id +">"+nodes[i].name + 
+		"<a href='javascript:void(0);' id="+nodes[i].id+" style='float:right;margin-right: 760px;text-decoration: underline;color:#F8A721' onclick='delCategroy(this.id)'>删除此分类</a><br/></div>";
+		categoryIds  += nodes[i].id +",";
+	}
+	if (v.length > 0 ) v = v.substring(0, v.length-1);
+	//取到category的id
+	if (categoryIds.length > 0 ){ 
+		categoryIds = categoryIds.substring(0, categoryIds.length-1);
+	}
+	
+	var cityObj = $j("#category");
+	//cityObj.attr("value", v);
+	hideMenu();
+	
+	$j("#chooseCategory").append(categoryHtml);
+}
+function hideMenu() {
+	$j("#menuContent").fadeOut("fast");
+	$j("body").unbind("mousedown", onBodyDown);
+}
+function onBodyDown(event) {
+	if (!(event.target.id == "menuBtn" || event.target.id == "industry" || event.target.id == "menuContent" || $j(event.target).parents("#menuContent").length>0)) {
+		hideMenu();
+	}
+}
+//**********************category input  end ********************
+function delCategroy(id){
+	$j("."+id+"").remove();
+}
+
+
+
+
+
+
+
+function produceExtension(){
+	$j("#exten").css("display","block");
+	var colorArray = new Array();
+	var sizeArray = new Array();
+	//取到所有颜色
+	$j("input[id='color']").each(function(index){
+		//alert(index+" s");
+		if($j(this).attr("checked")){
+			colorArray.push($j(this).attr("value"));
+		}
+			//alert($j(this).attr("value"));
+	});
+	
+	$j("input[id='size']").each(function(index){
+		if($j(this).attr("checked")){
+			sizeArray.push($j(this).attr("value"));
+		}
+	});
+
+	var html = "";
+	if(colorArray.length == 0 || sizeArray.length == 0){
+		html = "您需要选择所有的属性，才能组合成完整的规格信息!";
+	}else{
+		html = "<tr><td style='width:100px'>颜色</td><td style='width:100px'>尺寸</td><td style='width:100px'>价格</td><td style='width:100px'>数量</td><td style='width:100px'>商家编码</td></tr>";
+		$j.each(colorArray,function(key,cval){
+			html += "<tr><td style='width:100px'>"+cval+"</td>";
+			
+			$j.each(sizeArray,function(key,sval){
+				html += "<td style='width:100px'>"+sval+"</td><td style='width:100px'><input type='text' loxiaType='input' value='' mandatory='true'/></td><td style='width:100px'><input type='text' loxiaType='input' value='' mandatory='true'/></td><td style='width:100px'><input type='text' loxiaType='input' value='' mandatory='true'/></td></tr>";
+				if(sizeArray.length > 1){
+					if(key != sizeArray.length-1){
+						html += "<tr><td style='width:100px'>"+cval+"</td>";
+					}
+				}	
+		    });
+		});
+	}
+	//html = html.substring(0,html.lastIndexOf("<tr>"));
+	$j("#extensionTable").html(html);
+	
+	 return loxia.SUCCESS; 
+}
+
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+
+    $j.fn.zTree.init($j("#industrytreeDemo"), setting, zNodes);
+    
+	var treeObj = $j.fn.zTree.getZTreeObj("industrytreeDemo");
+	//1.将所有的节点转换为简单 Array 格式
+	var nodes = treeObj.transformToArray(treeObj.getNodes());
+	for(var i = 0;i<nodes.length;i++){
+		//2.如果此节点为父节点 或者 为ROOT节点 ，则让此节点没有radio选框
+		if(nodes[i].isParent || nodes[i].id == 0){
+			nodes[i].nocheck = true;
+		}
+		treeObj.refresh();
+	}
+	
+	$j(".button.return").on("click",function(){
+		window.location.href="item-list.html";
+		
+	});
+
+	//下一步
+	$j(".button.orange.next").on("click",function(){
+		var ztree = $j.fn.zTree.getZTreeObj("industrytreeDemo"),
+			industryNames="",
+			industryIds="";
+		var nodes_ = ztree.getCheckedNodes(true);
+		if(nodes_.length == 0){
+			nps.info("错误提示：","请选择商品所在行业!");
+		}else{
+			//取到选择的行业名称
+			for (var i=0, l=nodes_.length; i<l; i++) {
+				industryNames += nodes_[i].name +"<br/>";
+				industryIds += nodes_[i].id + ",";
+			}
+			if (industryIds.length > 0 ){ 
+				industryIds = industryIds.substring(0, industryIds.length-1);
+			}
+
+			$j("#chooseIndustry").html(industryNames);
+			$j("#first").css("display","none");
+			$j("#second").css("display","block");
+			$j("#third").css("display","block");
+		}
+		
+	});
+
+    //上一步
+    $j(".button.back").on("click",function(){
+    	$j("#first").css("display","block");
+		$j("#second").css("display","none");
+		$j("#third").css("display","none");
+    });
+
+
+    
+	//商品分类下拉树
+	$j.fn.zTree.init($j("#treeDemo"), categorySetting, categoryzNodes);
+	//让商品分类下拉树只有叶子节点可选
+	var _treeObj = $j.fn.zTree.getZTreeObj("treeDemo");
+	//1.将所有的节点转换为简单 Array 格式
+	var _nodes = _treeObj.transformToArray(_treeObj.getNodes());
+	for(var i = 0;i<_nodes.length;i++){
+		//2.如果此节点为父节点 或者 为ROOT节点 ，则让此节点没有radio选框
+		if(_nodes[i].isParent || _nodes[i].id == 0){
+			_nodes[i].nocheck = true;
+		}
+		_treeObj.refresh();
+	}
+    $j("#category").click(function() {
+		var cityObj = $j(this);
+		var cityOffset = $j(this).offset();
+		$j("#menuContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
+
+		$j("body").bind("mousedown", onBodyDown);
+	});
+
+    $j("#category").on("change",function(){
+		//var categoryTree = $j.fn.zTree.getZTreeObj("treeDemo");
+		//var node = categoryTree.getCheckedNodes();
+		//alert("sdfsdf");
+	});
+
+
+    //图片预览
+	$j("input[name='img1']").on("change",function(){
+		
+		//alert($j("input[name='img1']").files.item(0).getAsDataURL());
+		//alert($j("input[name='img1']").files.item(0).getAsDataURL());
+		//alert(document.getElementByTabName("img1").value);
+	});
+    //图片预览
+	$j(".func-button.extension").on("click",function(){
+		produceExtension();
+	});
+
+	
+	
+});
+
+</script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body>
+
+<div class="content-box width-percent100">
+    
+   <form name="itemForm" action="" method="post" enctype="multipart/form-data">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/cube.png">商品管理</div>
+	<div class="ui-block">
+	
+	<div id="first">
+	<div class="ui-block border-grey">
+	   <div class="ui-block-title1">选择商品所在行业</div>
+	    <div class="ui-block ui-block-fleft w240">
+        <div class="ui-block-content ui-block-content-lb">
+            <div class="tree-control">
+                <input type="text" id="key" loxiatype="input" placeholder="输入关键字快速定位" />
+            </div>
+            <ul id="industrytreeDemo" class="ztree"></ul>
+
+        </div>
+    </div>
+	  <div class="button-line">
+         <input type="button" value="下一步" class="button orange next" onclick=""  title="下一步"/>
+         <input type="button" value="返回" class="button return" onclick=""  title="返回"/>
+         
+      </div>
+	</div>
+	</div>
+	
+
+
+	
+	<div id="second" style="display: none">
+	
+		<div class="ui-block">
+	        <div class="ui-block-content ui-block-content-lb" style="padding-bottom: 10px;">
+	            <table>
+	                <tr>
+	                    <td><label>已选行业</label></td>
+	                    <td><span >xxxxxx</span></td>
+	                    
+	                </tr>
+	            </table>
+	        </div>
+	    </div>
+	
+	
+	<div class="ui-block ">
+		
+	
+		 <div class="ui-block-title1">添加商品</div>
+	   <div class="ui-block-title1" style="background:#fff;color:#000;">基本信息</div>
+	
+	   <div class="ui-block-content border-grey">
+	   <div class="ui-block-line ">
+         <label >商品编码</label>
+          <div >
+              <input type="text" loxiaType="input" value="" mandatory="true" placeholder="商品编码"/>
+         </div>
+	   </div>
+	   <div class="ui-block-line ">
+         <label >商品名称</label>
+          <div >
+              <input type="text" loxiaType="input" value="" mandatory="true" placeholder="商品名称"/>
+         </div>
+	   </div>
+	   
+	   <div class="ui-block-line ">
+         <label >商品分类</label>
+          <div >
+              <input type="text" id="category" loxiaType="button" value="点击选择分类"  />
+         </div>
+	   </div>
+	   <div class="ui-block-line ">
+         <label></label>
+          <div  id="chooseCategory">
+         </div>
+	   </div>
+	   	</div>
+	   	<div style="margin-top: 10px"></div>
+	   
+	    <div class="ui-block-title1" style="background:#fff;color:#000;">属性信息</div>
+	    
+	    <div class="ui-block-content border-grey">
+
+	    
+	     <div class="ui-block-line ">
+	     <label style="">颜色</label>
+
+         
+     	 <div class="priDiv">
+	          	<span class="children-store"><input type="checkbox" id="color" value="红色"/>红色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="橙色"/>橙色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="黄色"/>黄色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="绿色"/>绿色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="青色"/>青色</span>
+	            <span class="children-store"><input type="checkbox" id="color" value="蓝色"/>蓝色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="紫色"/>紫色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="酒红色"/>酒红色</span> 
+        </div>
+
+	    </div>
+	    
+	    <div class="ui-block-line ">
+        <label style="">尺寸</label>
+        
+     	 <div class="priDiv">
+	          	 <span class="children-store"><input type="checkbox" id="size" value="XXS" />XXS</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="XS"/>XS</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="S"/>S</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="M"/>M </span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="ML"/>ML</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="L"/>L</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="XL"/>XL</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="XXL"/>XXL</span> 
+        </div>
+         
+	    </div>
+	    
+	 
+	   
+	   
+         <div id="exten" class="ui-block-line  " style="display:none;">
+          <div  id="extension">
+             <table id="extensionTable" class="border-grey" style="padding:5px;">
+               
+              </table>
+         	</div>
+         </div>
+	  
+	   
+	   
+	    <div class="ui-block-line ">
+	    	<label></label>
+           <div>
+             
+              
+              	<a href="javascript:void(0)" class="func-button extension" style="height:30px;"><span>编码设置 </span></a>
+             
+         </div>
+	   </div>
+	   
+	   
+	   
+	   
+	   
+	   
+	   <div class="ui-block-line ">
+         <label style="">材质</label>
+          <div >
+             
+              <input loxiaType="input" value="" mandatory="true" placeholder="材质"/>
+         </div>
+	   </div>
+	   
+	  	<div class="ui-block-line ">
+        <label style="">商品描述</label>
+          
+           <div   >
+              <textarea loxiaType="input" mandatory="" selectonfocus="true" style="width: 500px; height: 50px;">此处添加商品描述</textarea>
+         
+          </div>
+          
+	    </div>
+	    
+	  </div>
+	   <div style="margin-top: 10px"></div>
+	   <div class="ui-block-title1" style="background:#fff;color:#000;">商品图片信息</div>
+	   
+	   <div class="ui-block-content border-grey">
+	   <div class="ui-block-line ">
+	    
+          <div ></div>
+	   </div>
+	   <div class="ui-block-line ">
+         <label >主图</label>
+          <div >
+              <input name="img1" type="file" id="img1"  />
+              
+         </div>
+	   </div>
+	   <div class="ui-block-line ">
+         <label >背面图</label>
+          <div >
+              <input type="file" />
+         </div>
+	   </div>
+	   <div class="ui-block-line ">
+         <label >做工细节图</label>
+          <div >
+              <input type="file" />
+         </div>
+	   </div>
+	   <div class="ui-block-line ">
+         <label >款式细节图</label>
+          <div >
+              <input type="file" />
+         </div>
+	   </div>
+	    <div class="ui-block-line ">
+          <div >
+              <img id="img1" src="" width="100" height="100" style="margin-left: 20px;"> <img id="img2" src=""  width="100" height="100" style="margin-left: 20px;"> 
+              <img id="img3" src="" width="100" height="100" style="margin-left: 20px;"> <img id="img4" src=""  width="100" height="100" style="margin-left: 20px;">
+         </div>
+	   </div>
+	    
+		    
+    
+
+	</div>
+	</div>
+	
+	 <div class="button-line">
+	         <input type="button" value="保存" class="button orange" onclick="nps.submitForm('itemForm',{mode:'async'})"  title="保存"/>
+	         <input type="button" value="上一步" class="button back"  title="上一步" />
+	     
+	</div>
+	
+	<div style="margin-top: 20px"></div>
+	
+
+	</div>
+   </form>
+    
+    
+</div>
+
+<div id="menuContent" class="menuContent" style="display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:180px; height: 100%;"></ul>
+</div>
+
+</body>
+</html>

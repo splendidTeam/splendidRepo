@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<bean id="Privilege.findAllEffectiveList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取所有有效的权限列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_privilege where lifecycle=1 
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="Privilege.findEffectiveListByRoleId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据roleId获取所有有效的权限</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT p.* FROM t_au_privilege p,t_au_role_privilege rp where p.id=rp.pri_id and rp.role_id=:roleId and p.lifecycle=1
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Privilege.findAllEffectivePrivilegeUrl" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取所有有效的权限url</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select apu.url as url,ap.acl as acl from  T_AU_PRIVILEGE_URL apu,t_au_privilege ap where apu.pri_id=ap.id
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="Privilege.findPrivilegeListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_privilege where 
+		       				1=1	
+		       				#if($name)
+		       					and name=:name
+		       				#end
+		       				
+		       				#if($acl)
+		       					and acl=:acl
+		       				#end
+		       			
+		       				#if($orgTypeId)
+		       					and org_type_id=:orgTypeId
+		       				#end
+		       				
+		       				#if($description)
+		       					and description=:description
+		       				#end
+		       				
+		       				#if($description)
+		       					and group_name=:groupName
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Privilege.findPrivilegeCommandPageByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_privilege  where 
+		       				1 = 1	
+		       				#if($name)
+		       					and name like :name
+		       				#end
+		       				
+		       				#if($acl)
+		       					and acl like :acl
+		       				#end
+		       			
+		       				#if($orgTypeId)
+		       					and org_type_id=:orgTypeId
+		       				#end
+		       				
+		       				#if($groupName)
+		       					and group_name like :groupName
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and lifecycle=:lifecycle
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="Privilege.removePrivilegeByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		 delete  from t_au_privilege 
+		       		 where id  in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1) 
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Privilege.enableOrDisableById" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		 update  t_au_privilege  set lifecycle = :state
+		       		 where id = :id
+		       		 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemSortScore.findAllItemSortScoreList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemSortScore.findItemSortScoreListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemSortScore.findItemSortScoreListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE where 
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($categoryId)
+		       					and CATEGORY_ID=:categoryId
+		       				#end
+
+		       			
+		       				#if($propertyId)
+		       					and PROPERTY_ID=:propertyId
+		       				#end
+
+		       			
+		       				#if($operator)
+		       					and OPERATOR=:operator
+		       				#end
+
+		       			
+		       				#if($param)
+		       					and PARAM=:param
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemSortScore.findItemSortScoreListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($categoryId)
+		       					and CATEGORY_ID=:categoryId
+		       				#end
+
+		       			
+		       				#if($propertyId)
+		       					and PROPERTY_ID=:propertyId
+		       				#end
+
+		       			
+		       				#if($operator)
+		       					and OPERATOR=:operator
+		       				#end
+
+		       			
+		       				#if($param)
+		       					and PARAM=:param
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ItemSortScore.enableOrDisableItemSortScoreByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_SORT_SCORE
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemSortScore.removeItemSortScoreByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_PD_ITEM_SORT_SCORE
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="ItemSortScore.findAllEffectItemSortScoreList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="ItemSortScore.findEffectItemSortScoreListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE where lifecycle=1
+		       		
+					
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($categoryId)
+		       					and CATEGORY_ID=:categoryId
+		       				#end
+
+		       			
+		       				#if($propertyId)
+		       					and PROPERTY_ID=:propertyId
+		       				#end
+
+		       			
+		       				#if($operator)
+		       					and OPERATOR=:operator
+		       				#end
+
+		       			
+		       				#if($param)
+		       					and PARAM=:param
+		       				#end
+
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ItemSortScore.findEffectItemSortScoreListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_PD_ITEM_SORT_SCORE where lifecycle != 2
+		       			
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+		       			
+		       				#if($categoryId)
+		       					and CATEGORY_ID=:categoryId
+		       				#end
+		       			
+		       				#if($propertyId)
+		       					and PROPERTY_ID=:propertyId
+		       				#end
+		       			
+		       				#if($operator)
+		       					and OPERATOR=:operator
+		       				#end
+		       			
+		       				#if($param)
+		       					and PARAM=:param
+		       				#end
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

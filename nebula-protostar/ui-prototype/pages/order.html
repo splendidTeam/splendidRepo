@@ -1,0 +1,702 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css"/>
+<link rel="stylesheet" href="../css/demo.css" type="text/css">
+<script type="text/javascript" src="../scripts/jquery/jquery-1.9.1.js"></script>
+
+
+<script type="text/javascript" src="../scripts/jquery/jquery-migrate-1.2.0.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-1.10.2.custom.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery-ui-timepicker-addon.js"></script>
+
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiacore-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiainput-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiaselect-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxiatable-2.js"></script>
+<script type="text/javascript" src="../scripts/loxia2/jquery.loxia.locale-zh-CN.js"></script>
+<script type="text/javascript" src="../scripts/jquery/jqueryui/jquery.ui.datepicker-zh-CN.js"></script>
+
+<script type="text/javascript" src="../scripts/nebula/jquery.nebula.protostar-1.js"></script>
+	
+<script type="text/javascript" src="../scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+
+
+
+<script type="text/javascript" src="../scripts/user-role.js"></script>
+<style type="text/css">
+em {margin-right:5px; color:#f60; font-family:sans-serif;}
+.review-tbody {border-bottom:1px dashed #ddd; padding:10px 0;}
+.sbox-wrap {padding:0 44px;}
+#order-cart {width:1000px;}
+#order-cart .order-review {width:1000px; padding-top:5px;}
+#order-cart .review-thead {width:100%;}
+#order-cart .review-thead td {height:25px; border-left:1px solid #fff; color:#666; line-height:25px; text-align:center; background-color:#eeeeee;}
+#order-cart .fore1 {width:344px;}
+#order-cart .fore100 {width:100px;}
+#order-cart .fore120 {width:120px;}
+
+#order-cart .review-tbody {border-bottom:1px dashed #ddd; padding:10px 0;}
+#order-cart .order-table {width:1000px;}
+#order-cart .order-table td {padding-left:1px;}
+
+#order-cart .p-goods {overflow:hidden; zoom:1;}
+#order-cart .p-goods {width:344px;}
+#order-cart .p-img {width:50px; height:50px; margin-right:5px; border:1px solid #ddd; padding:0; float:left; overflow:hidden;}
+#order-cart .p-detail {width:286px; float:left; line-height:16px;}
+#order-cart .p-name {width:285px; height:32px; overflow:hidden; zoom:1;}
+#order-cart .p-name a, #order-cart .p-name a:visited, #order-cart .p-name a:hover {color:#005ea7;}
+#order-cart .p-more, #order-cart .p-extra {color:#999; line-height:20px;}
+
+#order-cart .p-size {width:99px; height:22px; overflow:hidden; zoom:1;}
+#order-cart .p-name a, #order-cart .p-name a:visited, #order-cart .p-name a:hover {color:#005ea7;}
+#order-cart .p-color{line-height:20px;}
+
+#order-cart .order-table .p-price {width:99px; padding-right:10px; text-align:right;}
+#order-cart .order-table .p-price strong {color:#333;}
+#order-cart .order-table .kucun {width:99px; padding-right:10px; text-align:center;}
+#order-cart .order-table .operate {width:99px; padding-right:10px; text-align:center;}
+
+.order-summary {padding-top:10px; padding-left:700px;overflow:hidden; zoom:1;}
+.order-summary .statistic {width:400px;}
+.order-summary .statistic .list {height:24px; line-height:24px; overflow:hidden; zoom:1;}
+.order-summary .statistic span {width:180px; margin-right:20px; float:left; text-align:right;}
+.order-summary .statistic em {color:#e4393c;}
+.order-summary .statistic .price{color:#333333;float:left;width:100px;text-align:right;}
+
+.total {padding-right:18px; line-height:50px; font-size:14px; font-weight:700;}
+.total strong {color:#e4393c; font-size:20px;vertical-align:bottom;font-weight:normal;}
+
+.p-quantity {
+	line-height: 52px
+}
+.p-quantity .quantity-form {
+	width: 76px;
+	height: 42px;
+	margin: 0 auto;
+	padding-top: 16px;
+	overflow: hidden;
+	text-align: left
+}
+ .p-quantity a {
+	width: 13px;
+	height: 13px;
+	margin-top: 3px;
+	float: left;
+	display: block;
+	overflow: hidden;
+	line-height: 13px;
+	background:#fff;
+	border:1px solid #ccc;
+	text-align:center;
+}
+.p-quantity a:hover{text-decoration:none;color:#333;border:1px solid #999;}
+.p-quantity .quantity-form input {
+	float: left;
+	border:1px solid #ccc;
+}
+.p-quantity a.decrement {
+	margin-right: 5px;
+	
+}
+.p-quantity a.increment {
+	float: right;
+	
+}
+ .p-quantity a.disabled {
+	background-position: 0 -26px
+}
+.quantity-text {
+	width: 34px;
+	height: 18px;
+	border: 1px solid #ddd;
+	border-top-color: #aaa;
+	border-left-color: #aaa;
+	padding-top: 2px;
+	overflow: hidden;
+	text-align: center;
+	background-color: #fff
+}
+
+</style>
+<script type="text/javascript">
+var $j = jQuery.noConflict();
+
+$j.extend(loxia.regional['zh-CN'],{
+    "PWD_NOT_MATCH":"密码输入不一致"
+    
+    
+});
+function drawCheckbox(data, args, idx){
+	return "<input type='checkbox' name='id' value='" + loxia.getObject("name", data)+"'/>";
+}
+function drawSizeSelect(data, args, idx){
+	return "<select loxiatype='select'><option value='0'>28px</option><option value='1'>28.5px</option><option value='2'>29px</option></select>";
+}
+function drawProp(data, args, idx){
+	return  '<div>'+
+    '<label style="">颜色：</label>'+
+	    '<input  type="radio" name="color" value="x" />红色'+
+	    '<input  type="radio" name="color" value="xl" />蓝色'+
+     '</div>'+
+  
+	  '<div>'+
+	  '<label>尺寸：</label>'+
+	      '<input  type="radio" name="size" value="x" />x'+
+	      '<input  type="radio" name="size" value="xl" />xl'+
+	  '</div>';
+}
+
+function formatDate(val){
+	if(val==null||val==''){
+		return "&nbsp;";
+	}
+	else{
+		var date=new Date(val);
+		return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+	}
+}
+
+function drawEditShop(data, args, idx){
+	var result="";
+	var state=loxia.getObject("lifecycle", data);
+	result+="<a href='javascript:void(0);' class='func-button modify' val='"+loxia.getObject("shopid", data)+"'>修改</a>";
+	result+="<a href='javascript:void(0);' val='"+loxia.getObject("organizationid", data)+"' class='func-button enable'>禁用</a>";
+	result+="<a href='javascript:void(0);' class='func-button remove' val='"+loxia.getObject("organizationid", data)+"'>删除</a>";
+	
+	return result;
+}
+$j(document).ready(function(){
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
+    $j("#orderInfoBody").on("click","#editAddress",function(){
+		$j("#editAddressArea").show();
+	});
+    
+    $j("#orderInfoBody").on("click",".saveConsigneeInfo",function(){
+		$j("#editAddressArea").hide();
+	});
+    
+    
+    /**
+ 	 * 修改商品属性
+ 	 */
+     $j("#orderInfoBody").on("click","#editSizeOrColor",function(){
+		   //open
+		   $j("#editSizeOrColor-dialog").dialogff({type:'open',close:'in',width:'500px',height:'300px'});
+	   });
+     $j("#orderInfoBody").on("click",".cancel2",function(){
+	    	$j("#editSizeOrColor-dialo").dialogff({
+				type : 'close'
+			});
+		 });
+	     $j("#orderInfoBody").on("click",".ok2",function(){
+	    	$j("#editSizeOrColor-dialog").dialogff({
+				type : 'close'
+			});
+		 });
+		
+    
+ 	/**
+ 	 * 添加商品
+ 	 */
+ 	   $j("#orderInfoBody").on("click","#edit_sku",function(){
+ 		   //open
+		   $j("#editOrderSku-dialog").dialogff({type:'open',close:'in',width:'1000px',height:'450px'});
+	   });
+ 	  /**
+ 	    * 关闭
+ 	    */
+ 	    $j("#orderInfoBody").on("click",".cancel",function(){
+ 	    	$j("#editOrderSku-dialog").dialogff({
+ 				type : 'close'
+ 			});
+ 		 });
+ 	     $j("#orderInfoBody").on("click",".ok",function(){
+	    	$j("#editOrderSku-dialog").dialogff({
+				type : 'close'
+			});
+		 });
+ 		
+ 	     
+ 	     //增加 减少
+ 	     $j("#orderInfoBody").on("click","#decrement",function(){
+ 	    	var changeQuantityVal =$j("#changeQuantity").val();
+ 	    	$j("#changeQuantity").val(--changeQuantityVal);
+ 		 });
+ 	     $j("#orderInfoBody").on("click","#increment",function(){
+ 	    	var changeQuantityVal =$j("#changeQuantity").val();
+ 	    	$j("#changeQuantity").val(++changeQuantityVal);
+		 });
+ 	     
+ 	    $j("#orderInfoBody").on("click","#decrement1",function(){
+ 	    	var changeQuantityVal =$j("#changeQuantity1").val();
+ 	    	$j("#changeQuantity1").val(--changeQuantityVal);
+ 		 });
+ 	     $j("#orderInfoBody").on("click","#increment1",function(){
+ 	    	var changeQuantityVal =$j("#changeQuantity1").val();
+ 	    	$j("#changeQuantity1").val(++changeQuantityVal);
+		 });
+ 		$j("#table1").loxiasimpletable({
+ 			page: true,
+ 			
+ 			cols:
+ 			[
+ 			{label:"<input type='checkbox'/>",witdh:"5%", template:"drawCheckbox"},
+ 			{name:"code",label:"商品编码",width:"10%"},
+ 			{name:"name",label:"商品名称",width:"20%" },
+ 			{name:"price",label:"价格",width:"10%"},
+ 			{name:"lifecycle",label:"是否有货",width:"10%",type:"yesno"},
+ 			{name:"skuCount",label:"库存",width:"10%"},
+ 			{name:"prop",label:"销售属性",width:"35%",template:"drawProp"},
+ 			],
+ 			dataurl : {
+ 				currentPage:10, totalPages: 10, count: 99, size: 10, sortStr:"hot desc", firstPage: false, lastPage: true,
+ 				items: [
+ 				{ code:1, name:"外套",price:"200.00", lifecycle:1,skuCount: "10"},
+ 				{ code:1, name:"外套",price:"200.00", lifecycle:1,skuCount: "10"},
+ 				]
+ 				}
+ 		});
+ 		$j("#table1").loxiasimpletable("refresh",{
+ 			currentPage:1, totalPages: 10, count: 99, size: 10, sortStr:"hot asc", firstPage: true, lastPage: false,
+ 			items: [
+                { code:1, name:"外套",price:"200.00", lifecycle:1,skuCount: "10"},
+             	{ code:1, name:"外套",price:"200.00", lifecycle:1,skuCount: "10"},
+ 			]
+ 			});
+
+
+	
+});
+
+</script>
+
+
+<script type="text/javascript" src="../scripts/main.js"></script>
+
+</head>
+
+<body id="orderInfoBody">
+
+<div class="content-box width-percent100">
+    
+   <form name="itemForm" action="" method="post" enctype="multipart/form-data">
+	<div class="ui-title1"><img src="../images/wmi/blacks/32x32/cube.png">填写并核对订单信息</div>
+	<div class="ui-block">
+
+	<div id="second" style="display:block">
+	
+		<div class="ui-block">
+	        <div class="ui-block-content ui-block-content-lb" style="padding-bottom: 10px;">
+	            <table>
+	                <tr>
+	                    <td><label>填写并核对订单信息</label></td>
+	                    <td><span ></span></td>
+	                    
+	                </tr>
+	            </table>
+	        </div>
+	    </div>
+	
+	
+	<div class="ui-block ">
+		
+	
+		 <div class="ui-block-title1">填写并核对订单信息</div>
+	   <div class="ui-block-title1" style="background:#fff;color:#000;">收货人信息</div>
+	   <!--  收货人信息 开始-->
+	   <div class="ui-block-content border-grey">
+		  <div class="sbox-wrap">
+			   <div class="ui-block-line " id="editAddressArea">  
+		          <label >　<em>*</em>收货人：</label>
+		          <div >
+		              <input type="text" loxiaType="input" value="" mandatory="true" placeholder=""/>
+		          </div>
+		          
+		          <label ><em>*</em>所在地区：</label>
+		          <div >
+		              <select class="ui-loxia-default ui-corner-all" aria-disabled="false">
+						<option value="1">上海*</option>
+					  </select>
+					  <select class="ui-loxia-default ui-corner-all" aria-disabled="false">
+						<option value="1">闸北区*</option>
+					  </select>
+					  <select class="ui-loxia-default ui-corner-all" aria-disabled="false">
+						<option value="1">内环以内</option>
+						<option value="2">内环中环之间</option>
+						<option value="3">中环外环之间</option>
+					  </select>　　
+		          </div>
+		          
+		          <label ><em>*</em>详细地址：</label>
+		          <div >
+		                              上海闸北区中环外环之间<input type="text" loxiaType="input" value="" mandatory="true" placeholder=""/>
+		          </div>
+		          
+		          
+		          <label ><em>*</em>手机号码：</label>
+		          <div >
+		             <input type="text" loxiaType="input" value="" mandatory="true" placeholder=""/>或   固定电话：
+		             <input type="text" loxiaType="input" value="" mandatory="true" placeholder=""/>
+		          </div>
+		          
+		          <label >　　　邮箱：</label>
+		          <div >
+		              <input type="text" loxiaType="input" value="" mandatory="true" placeholder=""/>  用来接收订单提醒邮件，便于您及时了解订单状态
+		          </div>
+			   </div>
+		   </div>
+		   
+	       
+	   
+	   	</div>
+	   	<!--  收货人信息 结束-->
+	   	
+	   	<div style="margin-top: 10px"></div>
+	    <!--  支付及配送方式 开始-->
+	    <div class="ui-block-title1" style="background:#fff;color:#000;">支付及配送方式</div>
+	    
+	    <div class="ui-block-content border-grey">
+
+	    
+	     <div class="ui-block-line ">
+	        <label style="">支付方式</label>
+	     </div>
+	     <div class="sbox-wrap">
+	         <div class="ui-block-line ">
+		        <input type="radio" name="pay" value="pay" checked="checked" />货到付款
+	                    　　　　　送货上门后再收款，支持现金、POS机刷卡、支票支付 查看服务及配送范围
+		     </div>
+		     <div class="ui-block-line ">
+		        <input type="radio" name="pay" value="pay" checked="checked" />延迟付款
+	                    　　　　　不当场付钱，线下方式付款
+		     </div>
+		     
+		     
+		 </div>
+	     
+	     <div class="ui-block-line ">
+	        <label style="">配送方式</label>
+	     </div>
+	     <div class="sbox-wrap">
+		      <div class="ui-block-line ">
+		        <input type="radio" name="delivery" value="address1" checked="checked" />ｘｘ快递
+	                    　　　　　由ｘｘ公司负责配送，速度很快，还接受上门刷卡付款服务
+		      </div>
+	     </div>
+	     
+	       
+	    
+	    <div class="sbox-wrap">
+	    <br>
+	         <label style="">送货时间</label>
+	         <div class="ui-block-line ">
+	            <input type="radio" name="deliveryTime" value="address1" checked="checked" />　只工作日送货
+		     </div>
+		     
+		     <div class="ui-block-line ">
+		        <input type="radio" name="deliveryTime" value="address1"  />　工作日、双休日与假日均可送货
+		     </div>
+		     
+		     <div class="ui-block-line ">
+		        <input type="radio" name="deliveryTime" value="address1"  />　只双休日、假日送货
+		     </div>
+		     
+		     <div class="ui-block-line ">
+	          <label style="">是否送货前确认</label>
+	         </div>
+	         
+	          <div class="ui-block-line ">
+		        <input type="radio" name="deliveryConfirm" value="address1" checked="checked" />是
+		        <input type="radio" name="deliveryConfirm" value="address1"  />否
+		     </div>
+		     
+	    </div>
+	    
+	  </div>
+	  <!--  支付及配送方式 结束-->
+	  
+	   <div style="margin-top: 10px"></div>
+	 <!--  发票信息 开始-->
+	   <div class="ui-block-title1" style="background:#fff;color:#000;">发票信息</div>
+	   
+	   <div class="ui-block-content border-grey">
+	   
+	    <div class="ui-block-line ">
+	        <label style="">类型和抬头</label>
+	     </div>
+	   <div class="sbox-wrap"> 
+		     <div class="ui-block-line ">
+		        <label style="">发票类型：</label>
+		          <input type="radio" name="invoiceType" value="address1" checked="checked" />普通发票  
+		          <input type="radio" name="invoiceType" value="address1"  />增值税发票
+		     </div>
+		     <div class="ui-block-line ">
+		        <label style="">发票抬头：</label>
+		          <input type="radio" name="invoiceTitle" value="address1" checked="checked" />个人 
+		          <input type="radio" name="invoiceTitle" value="address1"  />单位 <input type="text" loxiaType="input" value="" mandatory="true" placeholder=""/>
+		     </div>
+	   </div>
+	     <div class="ui-block-line ">
+	        <label style="">发票内容</label>
+	     </div>
+	     <div class="sbox-wrap">
+	      <div class="ui-block-line ">
+	          <input type="radio" name="invoiceContent" value="address1" checked="checked" />明细 
+	          <input type="radio" name="invoiceContent" value="address1"  />办公用品
+	          <input type="radio" name="invoiceContent" value="address1"  />电脑配件 
+	          <input type="radio" name="invoiceContent" value="address1"  />耗材
+	       </div>
+	     </div>
+
+	</div>
+	 <!--  发票信息 结束-->
+	 
+	   <div style="margin-top: 10px"></div>
+	 <!--  商品清单 开始-->
+	   <div class="ui-block-title1" style="background:#fff;color:#000;">商品清单</div>
+
+	   <div class="ui-block-content border-grey">
+
+	   
+	   
+	      <div id="order-cart">
+	      
+				<div class="order-review">
+					   <!--商品清单展示-->
+					<span id="span-skulist">
+						<table class="review-thead">
+							<tbody>
+								<tr>
+								<td class="fore1">商品</td>
+								<td class="fore120">商品信息</td>
+								<td class="fore100">价格</td>
+								<td class="fore100">折扣</td>
+								<td class="fore120">数量</td>
+								<td class="fore100">库存状态</td>
+								<td class="fore100">操作</td>
+							    </tr>
+							</tbody>
+						</table>
+						
+						<!--**********商品清单内容列表开始************-->
+						<div class="review-body">
+
+						
+						<!---单品开始--->
+				
+						<div class="review-tbody">
+								<table class="order-table">
+									<tbody>
+									  <tr>
+									    <td class="fore1">
+										   <div class="p-goods">
+											  <div class="p-img"><a href="http://item.jd.com/1001144991.html" target="_blank"><img alt="" src="http://img10.360buyimg.com/n5/g14/M06/00/07/rBEhV1KB-0YIAAAAAACQNEF_U84AAFifwAfK0QAAJBM536.jpg"></a></div>
+												 <div class="p-detail">
+													<div class="p-name">
+														<a href="http://item.jd.com/1001144991.html" target="_blank">
+															威古氏偏光镜太阳镜男款驾驶镜眼镜墨镜男
+													    </a>
+													</div>
+													<div class="p-more">商品编号：1001144991</div>
+												 </div>
+											   </div>
+										  </td>
+										  <td class="fore120"> 
+											  <div class="p-size">
+													3025 <a id="editSizeOrColor" href="javascript:void(0)"  class="func-button ml5">修改</a>
+											  </div>
+											  <div class="p-color">枪框黑灰色片</div>
+										  </td>
+										  <td class="fore100 p-price"><strong>￥139.00</strong></td>
+										  <!-- <td class="p-promotion">￥9.00 </td> -->
+										  <td class="fore100 p-price">￥9.00 </td>
+										  
+										  <td class="fore120"> 
+										            <div class="cell p-quantity" for-stock="for-stock-1001144992">
+										                <div class="quantity-form" data-bind="">
+										                    <a href="javascript:void(0);" class="decrement" clstag="clickcart|keycount|xincart|diminish1" id="decrement">-</a>
+										                    <input type="text" loxiaType="number"  class="quantity-text" value="10" id="changeQuantity">
+										                    <a href="javascript:void(0);" class="increment" clstag="clickcart|keycount|xincart|add1" id="increment">+</a>
+										                </div>
+										            </div>
+
+                                          </td>
+										  <td class="fore100 kucun" skuid="1001144991">有货</td>
+										   <td class="fore100 operate" > 
+										      <a id="delete_sku" href="javascript:void(0)"  class="func-button ml5">删除</a>
+										   </td>
+									   </tr>
+									 
+									 </tbody>
+						        </table>
+						</div>
+							   
+						 <!---单品结束--->		
+							      			
+						</div>
+						<!--**********商品清单内容列表结束************-->
+						
+                        </span>		
+                         <!--商品清单展示结束-->
+                        
+                        
+                        
+              
+		                                  
+						<div class="order-summary">
+							<div class="statistic fr">
+		                                          <div class="list"><span><em id="span-skuNum">2</em> 件商品，总商品金额：</span><em class="price" id="warePriceId" v="1977.00">￥1977.00</em></div>
+		                                          <div class="list"><span>返现：</span><em class="price" id="cachBackId" v="0.00"> -￥18.00</em></div>
+		                                          <div class="list" id="showFreightPrice" style="padding-left:140px;">
+		                                          		<span id="freightSpan" style="width:40px;">运费：</span> 
+		                                          		<em class="price" id="freightPriceId"> ￥0.00</em>
+		                                          </div>
+								                   <div class="list" id="showCouponPrice" style="display:none;">
+		                                              <span>优惠券：</span><em class="price" id="couponPriceId">-￥0.00</em>
+		                                          </div>
+				                                  <div class="list">
+				                                       <span>应付总额：</span><em id="sumPayPriceId" class="price"> ￥1977.00</em>
+				                                  </div>			
+								</div>
+		
+						</div><!--@end div.order-summary-->
+					</div>
+				</div>
+				 <a id="edit_sku" href="javascript:void(0)"  class="func-button ml5">添加商品</a>
+	   
+	   
+	   
+	   
+
+
+    	</div>
+	 <!--  商品清单 结束-->
+	 
+	 
+	 
+	</div>
+	
+	 <div class="button-line">
+	         <span class="total">应付总额：<strong id="payPriceId">￥1977.00</strong>元</span>
+	         <input type="button" value="提交订单" class="button orange" onclick="nps.submitForm('itemForm',{mode:'async'})"  title="提交订单"/>
+	     
+	</div>
+	
+	<div style="margin-top: 20px"></div>
+	
+
+	</div>
+   </form>
+    
+    
+</div>
+
+<div id="menuContent" class="menuContent" style="display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
+	<ul id="treeDemo" class="ztree" style="margin-top:0; width:180px; height: 100%;"></ul>
+</div>
+
+<!-- dialog -->
+<div id="editSizeOrColor-dialog" class="proto-dialog">
+	<h5>搜索商品</h5>
+	
+	  
+	 <div class="proto-dialog-content">		
+	 
+
+	     <div class="ui-block-line ">
+	     <label style="">颜色</label>
+
+          
+     	 <div class="priDiv">
+	          	<span class="children-store"><input type="checkbox" id="color" value="红色">红色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="橙色">橙色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="黄色">黄色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="绿色">绿色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="青色">青色</span>
+	            <span class="children-store"><input type="checkbox" id="color" value="蓝色">蓝色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="紫色">紫色</span> 
+	            <span class="children-store"><input type="checkbox" id="color" value="酒红色">酒红色</span> 
+        </div>
+         
+	    </div>
+	    
+	    <div class="ui-block-line ">
+        <label>尺寸</label>
+     	 <div class="priDiv">
+	          	 <span class="children-store"><input type="checkbox" id="size" value="XXS">XXS</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="XS">XS</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="S">S</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="M">M </span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="ML">ML</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="L">L</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="XL">XL</span> 
+	             <span class="children-store"><input type="checkbox" id="size" value="XXL">XXL</span> 
+        </div>
+	    </div>
+
+                	  
+	 </div>
+ 
+	 <div class="proto-dialog-button-line">
+	 	  <input type="button" value="确定" class="button orange ok2"/>
+	 	  <input type="button" value="取消" class="button orange cancel2"/>
+	 </div>
+</div>
+<div id="editOrderSku-dialog" class="proto-dialog">
+	<h5>搜索商品</h5>
+	
+	  
+	 <div class="proto-dialog-content">		
+	 
+	 
+	 
+	              <form id="searchForm">
+						    <div class="ui-block">
+						            <div class="ui-block-content ui-block-content-lb">
+						                <table>
+						                <tr>
+						                        <td><label>商品编码</label></td>
+						                        <td><input loxiatype="input" placeholder=""/></td>
+						                       
+						                         <td><label>品牌</label></td>
+						                        <td><input loxiatype="input" placeholder=""/></td>
+						                    </tr>
+						                    <tr>
+						                        <td><label>价格</label></td>
+						                        <td> <input loxiatype="input" placeholder=""/>
+						                        </td>
+						                        <td align="center"><label>——</label></td>
+						                         <td><input loxiatype="input" placeholder=""/>
+						                        </td>
+						                        
+						                    </tr>
+						                </table>
+						                <div class="button-line1">
+						                <a href="javascript:void(0);"
+						                   class="func-button search"><span>搜索</span></a>
+						                   
+						                </div>
+						            </div>
+						 
+						   	 		
+						    		</div>
+						    </form>
+						    <div class="ui-block">
+						    <div id="table1" class="border-grey" caption="商品列表" ></div>   
+						    </div> 	
+	 	  
+	 	 
+	 	  
+	 </div>
+ 
+	 <div class="proto-dialog-button-line">
+	 	  <input type="button" value="确定" class="button orange ok"/>
+	 	  <input type="button" value="取消" class="button orange cancel"/>
+	 </div>
+</div>
+</body>
+</html>

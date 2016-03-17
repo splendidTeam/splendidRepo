@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ShippingTemeplate.updateShippingTemeplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改模板基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SF_SHIPPING_TEMEPALTE
+		       		set NAME = :name,
+		       			CALCULATION_TYPE = :calculationType,
+		       			ISDEFAULT = :isDefault,
+		       			default_fee = :defaultFee
+		       		where id = :id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ShippingTemeplate.findShippingTemeplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找模板基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from T_SF_SHIPPING_TEMEPALTE
+		       		where TYPE = :type
+		       		#if($shopId)
+		       					and SHOP_ID=:shopId
+		       		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ShippingTemeplate.findShippingTemeplateList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页显示店铺模板基本信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from T_SF_SHIPPING_TEMEPALTE
+		       		where SHOP_ID= :shopId
+	       		  #if($name)
+		       		and	name LIKE :name
+		       	#end
+		       			
+		       	#if($calculationtype)
+		       		and	calculation_type =:calculationtype
+		       	#end
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="ShippingTemeplate.findAllShippingTemeplate" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有的运费模板信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select *
+		       		from T_SF_SHIPPING_TEMEPALTE order by id asc;
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="ShippingTemeplate.updateShippingTemeplateByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SF_SHIPPING_TEMEPALTE set ISDEFAULT =false 
+		       			 where 1=1
+		       			#if($shopId)
+	       		     		and SHOP_ID= :shopId
+	       		  		#end  
+	       		  		and ISDEFAULT=true
+	       		  		
+		       			
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+		<bean id="ShippingTemeplate.updateShippingTemeplateById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SF_SHIPPING_TEMEPALTE set ISDEFAULT =:isDefault 
+		       			 where 
+		       			 ID =:id
+		       			 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+</beans>

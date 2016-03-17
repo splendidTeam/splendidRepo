@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="PayInfoLog.findAllPayInfoLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PayInfoLog.findPayInfoLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PayInfoLog.findPayInfoLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG where 
+		       			1 = 1
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($payInfoId)
+		       					and PAY_INFO_ID=:payInfoId
+		       				#end
+
+		       			
+		       				#if($payNumerical)
+		       					and PAY_NUMERICAL=:payNumerical
+		       				#end
+
+		       			
+		       				#if($payMoney)
+		       					and PAY_MONEY=:payMoney
+		       				#end
+
+		       			
+		       				#if($payType)
+		       					and PAY_TYPE=:payType
+		       				#end
+
+		       			
+		       				#if($payInfo)
+		       					and PAY_INFO=:payInfo
+		       				#end
+
+		       			
+		       				#if($thirdPayNo)
+		       					and THIRD_PAY_NO=:thirdPayNo
+		       				#end
+
+		       			
+		       				#if($thirdPayAccount)
+		       					and THIRD_PAY_ACCOUNT=:thirdPayAccount
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($paySuccessStatusStr ==1)
+		       					and PAY_SUCCESS_STATUS=true
+		       				#end
+		       				
+		       				#if($paySuccessStatusStr ==2)
+		       					and PAY_SUCCESS_STATUS=false
+		       				#end
+
+		       			
+		       				#if($subOrdinate)
+		       					and SUB_ORDINATE=:subOrdinate
+		       				#end
+
+		       			
+		       				#if($paymentPeople)
+		       					and PAYMENT_PEOPLE=:paymentPeople
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($callCloseStatus)
+		       					and CALL_CLOSE_STATUS=:callCloseStatus
+		       				#end
+
+		       			
+		       				#if($picUrl)
+		       					and picUrl=:picUrl
+		       				#end
+
+		       			
+		       				#if($bankCode)
+		       					and bankCode=:bankCode
+		       				#end
+		       				
+		       				order by CREATE_TIME desc
+				       		
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PayInfoLog.findPayInfoLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG where 
+		       		
+		       			lifecycle !=2
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($payInfoId)
+		       					and PAY_INFO_ID=:payInfoId
+		       				#end
+
+		       			
+		       				#if($payNumerical)
+		       					and PAY_NUMERICAL=:payNumerical
+		       				#end
+
+		       			
+		       				#if($payMoney)
+		       					and PAY_MONEY=:payMoney
+		       				#end
+
+		       			
+		       				#if($payType)
+		       					and PAY_TYPE=:payType
+		       				#end
+
+		       			
+		       				#if($payInfo)
+		       					and PAY_INFO=:payInfo
+		       				#end
+
+		       			
+		       				#if($thirdPayNo)
+		       					and THIRD_PAY_NO=:thirdPayNo
+		       				#end
+
+		       			
+		       				#if($thirdPayAccount)
+		       					and THIRD_PAY_ACCOUNT=:thirdPayAccount
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($paySuccessStatus)
+		       					and PAY_SUCCESS_STATUS=:paySuccessStatus
+		       				#end
+
+		       			
+		       				#if($subOrdinate)
+		       					and SUB_ORDINATE=:subOrdinate
+		       				#end
+
+		       			
+		       				#if($paymentPeople)
+		       					and PAYMENT_PEOPLE=:paymentPeople
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($callCloseStatus)
+		       					and CALL_CLOSE_STATUS=:callCloseStatus
+		       				#end
+
+		       			
+		       				#if($picUrl)
+		       					and picUrl=:picUrl
+		       				#end
+
+		       			
+		       				#if($bankCode)
+		       					and bankCode=:bankCode
+		       				#end
+				       		#if($lifecycle)
+				       			and lifecycle =:lifecycle
+				       		#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="PayInfoLog.enableOrDisablePayInfoLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SO_PAYINFO_LOG
+		       		set lifecycle=:state
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayInfoLog.removePayInfoLogByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_SO_PAYINFO_LOG
+		       		set lifecycle=2
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PayInfoLog.findAllEffectPayInfoLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG where lifecycle=1
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="PayInfoLog.findEffectPayInfoLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG where 1=1
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($payInfoId)
+		       					and PAY_INFO_ID=:payInfoId
+		       				#end
+
+		       			
+		       				#if($payNumerical)
+		       					and PAY_NUMERICAL=:payNumerical
+		       				#end
+
+		       			
+		       				#if($payMoney)
+		       					and PAY_MONEY=:payMoney
+		       				#end
+
+		       			
+		       				#if($payType)
+		       					and PAY_TYPE=:payType
+		       				#end
+
+		       			
+		       				#if($payInfo)
+		       					and PAY_INFO=:payInfo
+		       				#end
+
+		       			
+		       				#if($thirdPayNo)
+		       					and THIRD_PAY_NO=:thirdPayNo
+		       				#end
+
+		       			
+		       				#if($thirdPayAccount)
+		       					and THIRD_PAY_ACCOUNT=:thirdPayAccount
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($paySuccessStatus)
+		       					and PAY_SUCCESS_STATUS=:paySuccessStatus
+		       				#end
+
+		       			
+		       				#if($subOrdinate)
+		       					and SUB_ORDINATE=:subOrdinate
+		       				#end
+
+		       			
+		       				#if($paymentPeople)
+		       					and PAYMENT_PEOPLE=:paymentPeople
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($callCloseStatus)
+		       					and CALL_CLOSE_STATUS=:callCloseStatus
+		       				#end
+
+		       			
+		       				#if($picUrl)
+		       					and picUrl=:picUrl
+		       				#end
+
+		       			
+		       				#if($bankCode)
+		       					and bankCode=:bankCode
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="PayInfoLog.findEffectPayInfoLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SO_PAYINFO_LOG where 1=1
+		       		
+					
+		       			
+		       				#if($orderId)
+		       					and ORDER_ID=:orderId
+		       				#end
+
+		       			
+		       				#if($payInfoId)
+		       					and PAY_INFO_ID=:payInfoId
+		       				#end
+
+		       			
+		       				#if($payNumerical)
+		       					and PAY_NUMERICAL=:payNumerical
+		       				#end
+
+		       			
+		       				#if($payMoney)
+		       					and PAY_MONEY=:payMoney
+		       				#end
+
+		       			
+		       				#if($payType)
+		       					and PAY_TYPE=:payType
+		       				#end
+
+		       			
+		       				#if($payInfo)
+		       					and PAY_INFO=:payInfo
+		       				#end
+
+		       			
+		       				#if($thirdPayNo)
+		       					and THIRD_PAY_NO=:thirdPayNo
+		       				#end
+
+		       			
+		       				#if($thirdPayAccount)
+		       					and THIRD_PAY_ACCOUNT=:thirdPayAccount
+		       				#end
+
+		       			
+		       				#if($modifyTime)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTime)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+
+		       			
+		       				#if($version)
+		       					and VERSION >= :versionStart
+		       				#end
+		       				#if($version)
+		       					and VERSION <= :versionEnd
+		       				#end
+
+		       			
+		       				#if($paySuccessStatus)
+		       					and PAY_SUCCESS_STATUS=:paySuccessStatus
+		       				#end
+
+		       			
+		       				#if($subOrdinate)
+		       					and SUB_ORDINATE=:subOrdinate
+		       				#end
+
+		       			
+		       				#if($paymentPeople)
+		       					and PAYMENT_PEOPLE=:paymentPeople
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($callCloseStatus)
+		       					and CALL_CLOSE_STATUS=:callCloseStatus
+		       				#end
+
+		       			
+		       				#if($picUrl)
+		       					and picUrl=:picUrl
+		       				#end
+
+		       			
+		       				#if($bankCode)
+		       					and bankCode=:bankCode
+		       				#end
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>
