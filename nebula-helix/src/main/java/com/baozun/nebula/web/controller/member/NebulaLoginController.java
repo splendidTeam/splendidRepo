@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.sdk.command.UserDetails;
+import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
