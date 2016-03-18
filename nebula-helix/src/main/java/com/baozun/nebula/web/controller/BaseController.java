@@ -19,15 +19,16 @@ package com.baozun.nebula.web.controller;
 import javax.annotation.Resource;
 
 import org.springframework.context.ApplicationContext;
+
 /**
  * BaseController
  * 
  * @author songdianchao
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author feilong
  */
-public class BaseController{
-	
-	@Resource
-	protected ApplicationContext	context;
+public abstract class BaseController{
+
+    @Resource
+    protected ApplicationContext context;
 
 }
