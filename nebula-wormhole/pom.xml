@@ -42,13 +42,6 @@
 		</dependency>
 
 
-		<!-- servlet-api -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- jsp-api -->
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>

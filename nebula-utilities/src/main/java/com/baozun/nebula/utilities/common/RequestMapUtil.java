@@ -6,15 +6,13 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class RequestMapUtil {
+public class RequestMapUtil{
 
-	@SuppressWarnings("unchecked")
-	public static void requestConvert(HttpServletRequest request,
-			Map<String, String> responseMap) {
-		Map<Object,Object> parameterMap = request.getParameterMap();
-		for (Object key : parameterMap.keySet()) {
-			responseMap.put(key.toString(), Arrays.toString((String[])parameterMap.get(key)).replace("[", "").replace("]", ""));
-		}
-	}
+    public static void requestConvert(HttpServletRequest request,Map<String, String> responseMap){
+        Map<String, String[]> map = request.getParameterMap();
+        for (Object key : map.keySet()){
+            responseMap.put(key.toString(), Arrays.toString((String[]) map.get(key)).replace("[", "").replace("]", ""));
+        }
+    }
 
 }

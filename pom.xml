@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.baozun.nebula</groupId>
 	<artifactId>nebula</artifactId>
@@ -32,7 +31,6 @@
 		<v.maven-dependency-plugin>2.10</v.maven-dependency-plugin>
 		<v.maven-install-plugin>2.5.2</v.maven-install-plugin>
 		<v.maven-jar-plugin>2.6</v.maven-jar-plugin>
-		<v.maven-javadoc-plugin>2.10.3</v.maven-javadoc-plugin>
 		<v.maven-site-plugin>3.4</v.maven-site-plugin>
 		<v.maven-assembly-plugin>2.5.5</v.maven-assembly-plugin>
 		<v.maven-source-plugin>2.4</v.maven-source-plugin>
@@ -47,9 +45,8 @@
 		<v.native2ascii-maven-plugin>1.0-beta-1</v.native2ascii-maven-plugin>
 
 		<version.jasypt>1.9.2</version.jasypt>
-		<version.gson>2.2.4</version.gson>
 		<version.logback>1.0.3</version.logback>
-		
+
 		<version.slf4j>1.7.5</version.slf4j>
 		<!-- **********************end plugins version******************************************* -->
 
@@ -57,24 +54,6 @@
 		<native2ascii-maven-plugin.pattern>**/*.properties</native2ascii-maven-plugin.pattern>
 		<native2ascii-maven-plugin.encoding>${project.build.sourceEncoding}</native2ascii-maven-plugin.encoding>
 		<!-- **********************end native2ascii config******************************************* -->
-
-		<!-- **********************begin maven-javadoc-plugin config******************************************* -->
-		<!-- 用来编译生成文档 -->
-		<maven-javadoc-plugin.encoding>${project.build.sourceEncoding}</maven-javadoc-plugin.encoding>
-		<maven-javadoc-plugin.docencoding>${project.build.sourceEncoding}</maven-javadoc-plugin.docencoding>
-		<!-- 用来显示页面 META 部分 content="text/html; charset=GBK" -->
-		<maven-javadoc-plugin.charset>${project.build.sourceEncoding}</maven-javadoc-plugin.charset>
-		<!-- 用于读取javadoc 内部使用的 配置文件, 比如 描述文字为 描述,英文环境为description -->
-		<maven-javadoc-plugin.locale>en_US</maven-javadoc-plugin.locale>
-		<maven-javadoc-plugin.outputDirectory>file://${user.home}/javadoc/${project.version}</maven-javadoc-plugin.outputDirectory>
-		<maven-javadoc-plugin.reportOutputDirectory>${user.home}/javadoc/${project.version}</maven-javadoc-plugin.reportOutputDirectory>
-		<maven-javadoc-plugin.destDir>${project.name}</maven-javadoc-plugin.destDir>
-		<maven-javadoc-plugin.javadocVersion>1.8</maven-javadoc-plugin.javadocVersion>
-		<maven-javadoc-plugin.javadocDirectory>${env._FEILONGTAGLIB}/Apache
-			Maven/javadoc/springframework</maven-javadoc-plugin.javadocDirectory>
-		<maven-javadoc-plugin.stylesheetfile>${maven-javadoc-plugin.javadocDirectory}/stylesheet.css</maven-javadoc-plugin.stylesheetfile>
-
-
 
 		<version.esapi>2.0GA</version.esapi>
 		<version.solr-solrj>3.6.2</version.solr-solrj>
@@ -103,12 +82,17 @@
 		<version.jasypt>1.9.2</version.jasypt>
 		<version.hibernate-validator>4.3.0.Final</version.hibernate-validator>
 		<version.validation-api>1.0.0.GA</version.validation-api>
-		<version.servlet-api>2.5</version.servlet-api>
-		<version.jsp-api>2.1</version.jsp-api>
+
+		<version.servlet-api>3.0.1</version.servlet-api>
+		<version.jsp-api>2.2</version.jsp-api>
+
 		<version.jstl>1.2</version.jstl>
+
 		<version.fastjson>1.1.23</version.fastjson>
 		<version.json-lib>2.4</version.json-lib>
 		<version.jackson>1.8.5</version.jackson>
+		<version.gson>2.2.4</version.gson>
+
 		<version.dom4j>1.6.1</version.dom4j>
 		<version.janino>2.5.10</version.janino>
 
@@ -297,7 +281,7 @@
 		<!-- servlet-api -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 
@@ -746,7 +730,7 @@
 			<!-- servlet-api -->
 			<dependency>
 				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
+				<artifactId>javax.servlet-api</artifactId>
 				<version>${version.servlet-api}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -955,7 +939,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径， 
+			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径，
 				因此可以通过warSourceExcludes配置排除复制,的文件或路径， **by feilong 2015-07-01 -->
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -1080,80 +1064,6 @@
 				</executions>
 			</plugin>
 
-			<!-- maven-javadoc-plugin -->
-			<plugin>
-				<inherited>true</inherited>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${v.maven-javadoc-plugin}</version>
-				<configuration>
-					<verbose>true</verbose>
-					<destDir>${maven-javadoc-plugin.destDir}</destDir>
-
-					<outputDirectory>${maven-javadoc-plugin.outputDirectory}</outputDirectory>
-					<reportOutputDirectory>${maven-javadoc-plugin.reportOutputDirectory}</reportOutputDirectory>
-
-					<!-- If no custom stylesheet is specified in the <stylesheetfile/> parameter, 
-						the <stylesheet/> parameter will indicate which stylesheet will be used -->
-					<!-- <stylesheet>${maven-javadoc-plugin.stylesheet}</stylesheet> -->
-
-					<!-- <stylesheetfile>${maven-javadoc-plugin.stylesheetfile}</stylesheetfile> -->
-
-					<overview>src/main/java/overview.html</overview>
-
-					<!-- -->
-					<docfilessubdirs>true</docfilessubdirs>
-					<!-- <javadocDirectory>${maven-javadoc-plugin.javadocDirectory}</javadocDirectory> -->
-					<javadocVersion>${maven-javadoc-plugin.javadocVersion}</javadocVersion>
-
-					<!-- Specifies the title to be placed in the HTML title tag.  -->
-					<windowtitle>${project.name} ${project.version} API create by
-						feilong</windowtitle>
-
-					<!-- Specifies whether or not the author text is included in the generated 
-						Javadocs.  -->
-					<author>true</author>
-					<!-- Includes the version text in the generated docs.  -->
-					<version>true</version>
-
-					<failOnError>false</failOnError>
-
-					<locale>${maven-javadoc-plugin.locale}</locale>
-
-					<charset>${maven-javadoc-plugin.charset}</charset>
-					<docencoding>${maven-javadoc-plugin.docencoding}</docencoding>
-					<encoding>${maven-javadoc-plugin.encoding}</encoding>
-
-					<header>${project.name} ${project.version} API</header>
-					<footer>${project.name} ${project.version} API</footer>
-
-					<bottom>
-						<![CDATA[Copyright &copy; {inceptionYear}-{currentYear} by baozun]]>
-					</bottom>
-
-					<groups>
-						<group>
-							<title>Date package 日期</title>
-							<packages>com.baozun.nebulaplus.date</packages>
-						</group>
-
-						<group>
-							<title>IO package</title>
-							<packages>com.baozun.nebulaplus.io</packages>
-						</group>
-
-						<group>
-							<title>net package</title>
-							<packages>com.baozun.nebulaplus.net</packages>
-						</group>
-
-						<group>
-							<title>util package</title>
-							<packages>com.baozun.nebulaplus.util</packages>
-						</group>
-					</groups>
-				</configuration>
-			</plugin>
 
 			<!-- maven-surefire-plugin -->
 			<plugin>
@@ -1226,7 +1136,7 @@
 					<version>${v.maven-war-plugin}</version>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
