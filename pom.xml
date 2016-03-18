@@ -27,7 +27,7 @@
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
-		<v.maven-compiler-plugin>3.3</v.maven-compiler-plugin>
+		<v.maven-compiler-plugin>3.5.1</v.maven-compiler-plugin>
 		<v.maven-dependency-plugin>2.10</v.maven-dependency-plugin>
 		<v.maven-install-plugin>2.5.2</v.maven-install-plugin>
 		<v.maven-jar-plugin>2.6</v.maven-jar-plugin>
