@@ -25,6 +25,8 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
+		<version.feilong-platform>1.5.0-SNAPSHOT</version.feilong-platform>
+
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
 		<v.maven-compiler-plugin>3.5.1</v.maven-compiler-plugin>
@@ -106,6 +108,21 @@
 	</properties>
 
 	<dependencies>
+
+		<!--feilong-core -->
+		<dependency>
+			<groupId>com.feilong.platform</groupId>
+			<artifactId>feilong-core</artifactId>
+			<version>${version.feilong-platform}</version>
+		</dependency>
+
+		<!--feilong-servlet -->
+		<dependency>
+			<groupId>com.feilong.platform</groupId>
+			<artifactId>feilong-servlet</artifactId>
+			<version>${version.feilong-platform}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
@@ -1229,4 +1246,17 @@
 			<url>http://10.8.12.100/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>feilong-platform-repository</id>
+			<name>feilong platform repository</name>
+			<url>https://raw.github.com/venusdrogon/feilong-platform/repository</url>
+			<releases>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>
