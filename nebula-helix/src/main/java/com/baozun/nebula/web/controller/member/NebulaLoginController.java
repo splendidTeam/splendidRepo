@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.baozun.nebula.sdk.command.UserDetails;
+import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
@@ -16,7 +16,7 @@ import com.baozun.nebula.web.controller.member.form.LoginForm;
 public class NebulaLoginController extends NebulaBaseLoginController{
 
 	//去登录页面，"/member/login" GET
-	public String showLogin(@LoginMember UserDetails userDetails,HttpServletRequest request,Model model){
+	public String showLogin(@LoginMember MemberDetails memberDetails,HttpServletRequest request,Model model){
 		//1.校验是否已经登录
 		
 		//1.1如果已登录 去首页或个人中心

@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.member.command;
+package com.baozun.nebula.command.member;
 
 public class TirdPartyMemberCommand {
 

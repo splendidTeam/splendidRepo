@@ -3,7 +3,7 @@ package com.baozun.nebula.web.controller.member;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.web.controller.member.command.TirdPartyMemberCommand;
+import com.baozun.nebula.command.member.TirdPartyMemberCommand;
 
 public abstract class NebulaThirdPartyLoginController extends NebulaBaseLoginController{
 	
