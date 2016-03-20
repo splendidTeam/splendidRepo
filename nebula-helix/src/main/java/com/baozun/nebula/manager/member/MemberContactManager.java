@@ -13,21 +13,25 @@ public interface MemberContactManager extends BaseManager{
 
 	/**
 	 * 分页查询联系人地址信息
+	 * 这个方法没有考虑会员Id是必须填入的值，因此不推荐使用，请直接使用SdkMemberManager中的findContactsByMemberId
 	 * @param page
 	 * @param sorts
 	 * @param searchParam
 	 * @return
 	 */
+	@Deprecated
 	public Pagination<ContactCommand> findContactCommandByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam);
 	
 	/**
 	 * 
 	 * 查询收货人地址列表
+	 * 这个方法没有考虑会员Id是必须填入的值，因此不推荐使用，请直接使用SdkMemberManager中的findContactsByMemberId
 	 * @param page
 	 * @param sorts
 	 * @param searchParam
 	 * @return
 	 */
+	@Deprecated
 	public Pagination<ContactCommand> findContactList(Page page,Sort[] sorts,Map<String, Object> searchParam);
 	
 	/**

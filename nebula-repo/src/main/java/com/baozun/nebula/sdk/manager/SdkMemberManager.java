@@ -117,6 +117,16 @@ public interface SdkMemberManager extends BaseManager{
 	public List<ContactCommand> findAllContactListByMemberId(Long memberId);
 	
 	/**
+	 * 根据会员Id查询收货地址列表，支持分页和排序
+	 * 
+	 * @param page
+	 * @param sorts
+	 * @param memberId
+	 * @return
+	 */
+	public Pagination<ContactCommand> findContactsByMemberId(Page page, Sort[] sorts, Long memberId);
+	
+	/**
 	 * 查询该会员的所有收藏列表
 	 * @param page
 	 * @param sorts
@@ -328,11 +338,13 @@ public interface SdkMemberManager extends BaseManager{
 	
 	/**
 	 * 分页查询联系人地址信息
+	 * 从源码上看，目前这个方法和下面的方法 findContactList 的实现和参数都是完全一样的，因此可以删除一个
 	 * @param page
 	 * @param sorts
 	 * @param searchParam
 	 * @return
 	 */
+	@Deprecated
 	public Pagination<ContactCommand> findContactCommandByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam);
 	
 	/**

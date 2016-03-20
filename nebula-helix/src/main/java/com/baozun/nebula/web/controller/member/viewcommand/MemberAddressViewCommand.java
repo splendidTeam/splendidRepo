@@ -14,25 +14,16 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.member.converter;
+package com.baozun.nebula.web.controller.member.viewcommand;
 
-import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.web.controller.BaseConverter;
-import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
+import com.baozun.nebula.web.controller.BaseViewCommand;
 
-public class MemberViewCommandConverter extends BaseConverter<MemberViewCommand> {
+public class MemberAddressViewCommand extends BaseViewCommand {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2122116108014878879L;
-	
-	public MemberViewCommand convert(Object data){
-		if(data == null) return null;
-		MemberCommand memberCommand = (MemberCommand) data;
-		//TODO 
-		//完成转换
-		return null;
-	}
+	private static final long serialVersionUID = -4733156500102613882L;
 
+	//增加地址相关信息，请注意区划信息默认5级都在里面
 }

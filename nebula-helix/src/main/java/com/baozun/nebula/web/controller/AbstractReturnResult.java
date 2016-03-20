@@ -39,6 +39,11 @@ public abstract class AbstractReturnResult implements NebulaReturnResult, Serial
 	 * 对应返回信息
 	 */
 	private DefaultResultMessage resultMessage;
+	
+	/**
+	 * 对应返回的数据对象
+	 */
+	private Object returnObject;
 
 	public boolean isResult() {
 		return result;
@@ -63,5 +68,12 @@ public abstract class AbstractReturnResult implements NebulaReturnResult, Serial
 	public void setResultMessage(DefaultResultMessage resultMessage) {
 		this.resultMessage = resultMessage;
 	}
-	
+
+	public Object getReturnObject() {
+		return returnObject;
+	}
+
+	public void setReturnObject(Object returnObject) {
+		this.returnObject = returnObject;
+	}
 }

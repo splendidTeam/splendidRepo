@@ -101,7 +101,7 @@ public class NebulaMemberProfileController extends BaseController {
 		MemberCommand memberCommand = memberManager.findMemberById(memberDetails.getMemberId());
 		
 		model.addAttribute(MODEL_KEY_MEMBER_PROFILE,
-				memberViewCommandConverter.convertFromMemberCommand(memberCommand));
+				memberViewCommandConverter.convert(memberCommand));
 		
 		return VIEW_MEMBER_PROFILE;
 	}

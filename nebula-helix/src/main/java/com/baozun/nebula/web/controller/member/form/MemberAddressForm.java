@@ -14,25 +14,15 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.member.converter;
+package com.baozun.nebula.web.controller.member.form;
 
-import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.web.controller.BaseConverter;
-import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
+import com.baozun.nebula.web.controller.BaseForm;
 
-public class MemberViewCommandConverter extends BaseConverter<MemberViewCommand> {
+public class MemberAddressForm extends BaseForm {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2122116108014878879L;
-	
-	public MemberViewCommand convert(Object data){
-		if(data == null) return null;
-		MemberCommand memberCommand = (MemberCommand) data;
-		//TODO 
-		//完成转换
-		return null;
-	}
+	private static final long serialVersionUID = -4534711242178149888L;
 
 }

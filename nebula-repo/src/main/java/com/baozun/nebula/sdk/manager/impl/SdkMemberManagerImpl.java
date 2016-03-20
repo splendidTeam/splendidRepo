@@ -14,6 +14,8 @@ import java.util.Set;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
+import loxia.utils.PropListCopyable;
+import loxia.utils.PropertyUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -277,6 +279,24 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 			return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
 		return null;
 	}
+	
+	/**
+	 * 重写联系人信息中的区划的国际化信息
+	 * @param contactCommand
+	 */
+	private void rewriteIntlDistrictInfo(ContactCommand contactCommand){
+		if(contactCommand == null) return;
+		Address country = AddressUtil.getAddressById(contactCommand.getCountryId());
+		Address province = AddressUtil.getAddressById(contactCommand.getProvinceId());
+		Address city = AddressUtil.getAddressById(contactCommand.getCityId());
+		Address area = AddressUtil.getAddressById(contactCommand.getAreaId());
+		Address town = AddressUtil.getAddressById(contactCommand.getTownId());
+		contactCommand.setCountry(country == null ? "" : country.getName());
+		contactCommand.setProvince(province == null ? "" : province.getName());
+		contactCommand.setCity(city == null ? "" : city.getName());
+		contactCommand.setArea(area == null ? "" : area.getName());
+		contactCommand.setTown(town == null ? "" : town.getName());
+	}
 
 	@Override
 	@Transactional(readOnly=true)
@@ -288,19 +308,34 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(),
 					contact);
 			// 用id获取中文名称
-			Address country = AddressUtil.getAddressById(contactCommand.getCountryId());
-			Address province = AddressUtil.getAddressById(contactCommand.getProvinceId());
-			Address city = AddressUtil.getAddressById(contactCommand.getCityId());
-			Address area = AddressUtil.getAddressById(contactCommand.getAreaId());
-			Address town = AddressUtil.getAddressById(contactCommand.getTownId());
-			contactCommand.setCountry(country == null ? "" : country.getName());
-			contactCommand.setProvince(province == null ? "" : province.getName());
-			contactCommand.setCity(city == null ? "" : city.getName());
-			contactCommand.setArea(area == null ? "" : area.getName());
-			contactCommand.setTown(town == null ? "" : town.getName());
+			rewriteIntlDistrictInfo(contactCommand);			
 			contactCommands.add(contactCommand);
 		}
 		return contactCommands;
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Pagination<ContactCommand> findContactsByMemberId(Page page, Sort[] sorts, Long memberId){
+		Pagination<Contact> contacts = contactDao.findContactsByMemberId(page, sorts, memberId);
+		Pagination<ContactCommand> resultContacts = new Pagination<ContactCommand>();
+		try {
+			PropertyUtil.copyProperties(contacts, resultContacts, 
+					new PropListCopyable("count","currentPage","totalPages","start","size","sortStr"));
+		} catch (Exception e) {
+			//should not occur
+			e.printStackTrace();
+		}
+		resultContacts.setItems(new ArrayList<ContactCommand>());
+		for(Contact contact : contacts.getItems()){
+			decryptContact(contact);
+			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(),
+					contact);
+			// 用id获取中文名称
+			rewriteIntlDistrictInfo(contactCommand);
+			resultContacts.getItems().add(contactCommand);			
+		}
+		return resultContacts;
 	}
 
 	@Override
@@ -504,33 +539,15 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	private ContactCommand convertContactToContactCommand(Contact con) {
 		ContactCommand command = new ContactCommand();
-
-		command.setId(con.getId());
-		command.setName(con.getName());
-		command.setAddress(con.getAddress());
-		command.setAreaId(con.getAreaId());
-		command.setCityId(con.getCityId());
-		command.setCountryId(con.getCountryId());
-		command.setIsDefault(con.getIsDefault());
-		command.setMobile(con.getMobile());
-		command.setPostcode(con.getPostcode());
-		command.setProvinceId(con.getProvinceId());
-		command.setTelphone(con.getTelphone());
-		command.setTownId(con.getTownId());
-		command.setMemberId(con.getMemberId());
-		Address country = AddressUtil.getAddressById(con.getCountryId());
-		Address province = AddressUtil.getAddressById(con.getProvinceId());
-		Address city = AddressUtil.getAddressById(con.getCityId());
-		Address area = AddressUtil.getAddressById(con.getAreaId());
-		Address town = AddressUtil.getAddressById(con.getTownId());
-		command.setCountry(country == null ? "" : country.getName());
-		command.setProvince(province == null ? "" : province.getName());
-		command.setCity(city == null ? "" : city.getName());
-		command.setArea(area == null ? "" : area.getName());
-		command.setTown(town == null ? "" : town.getName());
+		
+		ConvertUtils.convertTwoObject(command, con);
+		rewriteIntlDistrictInfo(command);
+		
 		return command;
 	}
 
+	//TODO 这个方法的地址转换需要检查逻辑是否正确。从我个人理解来看，数据转换为展现的时候要转，但是存储的时候也转是否有必要和合适
+	//是为了匹配历史不用ID而直接用名字时的兼容性么？
 	private Contact convertContactCommandToContact(ContactCommand command, Contact con) {
 		// con.setId(command.getId());
 		con.setName(command.getName());

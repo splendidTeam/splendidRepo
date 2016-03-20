@@ -16,20 +16,20 @@
  */
 package com.baozun.nebula.web.controller.member.converter;
 
-import com.baozun.nebula.sdk.command.member.MemberCommand;
+import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
-import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
+import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
 
-public class MemberViewCommandConverter extends BaseConverter<MemberViewCommand> {
+public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddressViewCommand>{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2122116108014878879L;
+	private static final long serialVersionUID = -7415881959809156733L;
 	
-	public MemberViewCommand convert(Object data){
+	public MemberAddressViewCommand convert(Object data){
 		if(data == null) return null;
-		MemberCommand memberCommand = (MemberCommand) data;
+		ContactCommand contactCommand = (ContactCommand) data;
 		//TODO 
 		//完成转换
 		return null;

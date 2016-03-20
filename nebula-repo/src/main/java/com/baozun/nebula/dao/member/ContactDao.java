@@ -23,6 +23,17 @@ public interface ContactDao extends GenericEntityDao<Contact,Long>{
 	List<Contact> findAllContactListByMemberId(@QueryParam("memberId") Long memberId);
 	
 	/**
+	 * 根据会员ID获取地址列表，可分页可排序
+	 * 
+	 * @param page
+	 * @param sorts
+	 * @param memberId
+	 * @return
+	 */
+	@NativeQuery(model = Contact.class, value="findAllContactListByMemberId")
+	Pagination<Contact> findContactsByMemberId(Page page,Sort[] sorts, @QueryParam("memberId") Long memberId);
+	
+	/**
 	 * 查询单个收货人地址
 	 * @param id
 	 * @return
