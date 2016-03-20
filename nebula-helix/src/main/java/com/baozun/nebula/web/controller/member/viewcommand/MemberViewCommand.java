@@ -14,21 +14,16 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller;
+package com.baozun.nebula.web.controller.member.viewcommand;
 
-import javax.annotation.Resource;
+import com.baozun.nebula.web.controller.BaseViewCommand;
 
-import org.springframework.context.ApplicationContext;
+public class MemberViewCommand extends BaseViewCommand {
 
-/**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
- */
-public abstract class BaseController {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2707929308427092090L;
 
-	@Resource
-	protected ApplicationContext context;
-
+	//抄袭MemberPersonalData到这里，并删除保留字段
 }

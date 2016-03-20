@@ -3,6 +3,13 @@ package com.baozun.nebula.command;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 目前MemberManager中使用的是sdk中的MemberCommand。
+ * 如果有用这个的，需要考虑使用场景，属于ViewCommand的切换到ViewCommand，属于Model的切换到Command
+ * @author liuliu
+ *
+ */
+@Deprecated
 public class MemberCommand implements Command {
 
 	/**

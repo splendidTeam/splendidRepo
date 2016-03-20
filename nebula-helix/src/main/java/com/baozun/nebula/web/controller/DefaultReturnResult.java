@@ -16,19 +16,25 @@
  */
 package com.baozun.nebula.web.controller;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.springframework.context.ApplicationContext;
+public class DefaultReturnResult extends AbstractReturnResult {
 
-/**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
- */
-public abstract class BaseController {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5265655012973414164L;
+	
+	public static final DefaultReturnResult SUCCESS = new DefaultReturnResult();
 
-	@Resource
-	protected ApplicationContext context;
+	private List<DefaultReturnResult> extraResultMessages = new ArrayList<DefaultReturnResult>();
 
+	public List<DefaultReturnResult> getExtraResultMessages() {
+		return extraResultMessages;
+	}
+
+	public void setExtraResultMessages(List<DefaultReturnResult> extraResultMessages) {
+		this.extraResultMessages = extraResultMessages;
+	}
 }

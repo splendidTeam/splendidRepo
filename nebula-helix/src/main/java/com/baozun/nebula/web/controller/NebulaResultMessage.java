@@ -16,19 +16,11 @@
  */
 package com.baozun.nebula.web.controller;
 
-import javax.annotation.Resource;
-
-import org.springframework.context.ApplicationContext;
-
 /**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
+ * 返回对象中的说明结果接口
+ * @author liuliu
+ *
  */
-public abstract class BaseController {
-
-	@Resource
-	protected ApplicationContext context;
+public interface NebulaResultMessage {
 
 }

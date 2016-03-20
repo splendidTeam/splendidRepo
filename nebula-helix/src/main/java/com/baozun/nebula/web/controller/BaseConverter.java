@@ -16,19 +16,13 @@
  */
 package com.baozun.nebula.web.controller;
 
-import javax.annotation.Resource;
+import java.io.Serializable;
 
-import org.springframework.context.ApplicationContext;
+public abstract class BaseConverter<T extends BaseViewCommand> implements Serializable{
 
-/**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
- */
-public abstract class BaseController {
-
-	@Resource
-	protected ApplicationContext context;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2549552226190173876L;
 
 }

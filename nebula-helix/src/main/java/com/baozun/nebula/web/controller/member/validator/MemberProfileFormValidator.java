@@ -14,21 +14,31 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller;
+package com.baozun.nebula.web.controller.member.validator;
 
-import javax.annotation.Resource;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
-import org.springframework.context.ApplicationContext;
+import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
 
 /**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
+ * MemberProfileForm的校验器
+ * @author liuliu
+ *
  */
-public abstract class BaseController {
+public class MemberProfileFormValidator implements Validator{
 
-	@Resource
-	protected ApplicationContext context;
+	@Override
+	public boolean supports(Class<?> clazz) {
+		return MemberProfileForm.class.isAssignableFrom(clazz);
+	}
+
+	@Override
+	public void validate(Object target, Errors errors) {
+		//重点检查Email，手机号码，密码一致性等
+		
+		// TODO Auto-generated method stub
+		
+	}
 
 }

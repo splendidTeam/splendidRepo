@@ -14,21 +14,23 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller;
+package com.baozun.nebula.web.controller.member.converter;
 
-import javax.annotation.Resource;
+import com.baozun.nebula.sdk.command.member.MemberCommand;
+import com.baozun.nebula.web.controller.BaseConverter;
+import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
 
-import org.springframework.context.ApplicationContext;
+public class MemberViewCommandConverter extends BaseConverter<MemberViewCommand> {
 
-/**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
- */
-public abstract class BaseController {
-
-	@Resource
-	protected ApplicationContext context;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2122116108014878879L;
+	
+	public MemberViewCommand convertFromMemberCommand(MemberCommand memberCommand){
+		//TODO 
+		//完成转换
+		return null;
+	}
 
 }

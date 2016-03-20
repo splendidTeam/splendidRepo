@@ -14,21 +14,17 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller;
+package com.baozun.nebula.web.controller.member.form;
 
-import javax.annotation.Resource;
+import com.baozun.nebula.web.controller.BaseForm;
 
-import org.springframework.context.ApplicationContext;
+public class MemberProfileForm extends BaseForm {
 
-/**
- * BaseController
- * 
- * @author songdianchao
- * @author feilong
- */
-public abstract class BaseController {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 869373758998326938L;
 
-	@Resource
-	protected ApplicationContext context;
-
+	//抄袭MemberPersonalData到这里，并删除保留字段
+	//注意密码字段需要两个
 }
