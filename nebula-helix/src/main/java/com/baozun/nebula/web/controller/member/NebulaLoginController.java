@@ -16,9 +16,6 @@
  */
 package com.baozun.nebula.web.controller.member;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,13 +26,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.event.LoginSuccessEvent;
-import com.baozun.nebula.event.RegisterSuccessEvent;
-import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.PasswordNotMatchException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -45,7 +39,6 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
-import com.baozun.nebula.web.controller.member.form.RegisterForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.baozun.nebula.web.controller.member.validator.RegisterFormValidator;
 import com.feilong.core.util.Validator;
@@ -57,7 +50,7 @@ import com.feilong.servlet.http.CookieUtil;
  * @author D.C
  *
  */
-public class NebulaLoginController extends NebulaBaseLoginController {
+public class NebulaLoginController extends NebulaAbstractLoginController {
 
 	/* Remember me cookie key */
 	public static final String COOKIE_KEY_REMEMBER_ME = "rmb";
@@ -108,7 +101,7 @@ public class NebulaLoginController extends NebulaBaseLoginController {
 		// 记住我，处理流程
 		rememberMeProcess(request, model);
 		// 密码前端JS加密准备工作
-		prepare4SensitiveDataEncryptedByJs(request, model);
+		init4SensitiveDataEncryptedByJs(request, model);
 
 		return VIEW_MEMBER_LOGIN;
 	}
@@ -247,7 +240,7 @@ public class NebulaLoginController extends NebulaBaseLoginController {
 	}
 
 	/**
-	 * 认证成功，未激活用户也认为是认证成功
+	 * 认证成功，未激活用户也认为是认证成功，如果需要特殊处理未激活用户请重写此方法
 	 * 
 	 * @param memberDetails
 	 * @param request
@@ -255,53 +248,11 @@ public class NebulaLoginController extends NebulaBaseLoginController {
 	 */
 	protected NebulaReturnResult onAuthenticationSuccess(MemberDetails memberDetails, HttpServletRequest request,
 			HttpServletResponse response) {
-		// 未激活
-		if (!memberDetails.isActived()) {
-			return onLoginSuccess4InactivatedMember(memberDetails, request, response);
-		} else {
-			return onLoginSuccess4ActivedMember(memberDetails, request, response);
-		}
-	}
-
-	/**
-	 * 激活的用户登录成功
-	 * 
-	 * @param memberDetails
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected NebulaReturnResult onLoginSuccess4ActivedMember(MemberDetails memberDetails, HttpServletRequest request,
-			HttpServletResponse response) {
 		super.resetSession(request);
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_CONTEXT, memberDetails);
 		// 触发登录成功事件，用于异步处理其他的业务
 		eventPublisher.publish(new LoginSuccessEvent(memberDetails, getClientContext(request, response)));
 		return DefaultReturnResult.SUCCESS;
-	}
-
-	/**
-	 * 获取用户环境上下文，如ip agent等信息，默认是空实现
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected Map<String, String> getClientContext(HttpServletRequest request, HttpServletResponse response) {
-		return new HashMap<String, String>();
-	}
-
-	/**
-	 * 未激活的用户登录成功, 默认不区分激活不激活的用户，区分时请重构
-	 * 
-	 * @param memberDetails
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected NebulaReturnResult onLoginSuccess4InactivatedMember(MemberDetails memberDetails,
-			HttpServletRequest request, HttpServletResponse response) {
-		return this.onLoginSuccess4ActivedMember(memberDetails, request, response);
 	}
 
 	/**
@@ -313,73 +264,6 @@ public class NebulaLoginController extends NebulaBaseLoginController {
 	protected boolean isActivedMember(MemberCommand member) {
 		// TODO 判断逻辑
 		return false;
-	}
-
-	/**
-	 * 注册页面，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/register", method = RequestMethod.GET)
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	public String showRegister(Model model, HttpServletRequest request) {
-		prepare4SensitiveDataEncryptedByJs(request, model);
-		return VIEW_MEMBER_REGISTER;
-	}
-
-	/**
-	 * 注册处理，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/register.json", method =
-	 *                       RequestMethod.POST)
-	 * @param registerForm
-	 * @param bindingResult
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	// TODO 验证码
-	public NebulaReturnResult register(@ModelAttribute RegisterForm registerForm, BindingResult bindingResult,
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-
-		// 数据校验
-		registerFormValidator.validate(registerForm, bindingResult);
-		if (bindingResult.hasErrors()) {
-			// TODO出错处理
-			return null;
-		}
-
-		// 密码解密，密码传输通过RSA做了加密，此处需要解密
-		registerForm.setPassword(decryptSensitiveDataEncryptedByJs(registerForm.getPassword(), request));
-		// 用户注册
-		try {
-			Member member = memberManager.register(registerForm.toMemberFrontendCommand());
-			//TODO member convert to memberCommand, 激活状态处理
-			MemberCommand memberCommand = null;
-			
-			return onRegisterSuccess(constructMemberDetails(memberCommand), request, response);
-		} catch (BusinessException e) {
-			// TODO 异常处理
-			return null;
-		}
-	}
-	/**
-	 * 用户注册成功切入点
-	 * @param memberDetails
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected NebulaReturnResult onRegisterSuccess(MemberDetails memberDetails, HttpServletRequest request,
-			HttpServletResponse response) {
-		if(isAutoLoginAfterRegister()) {
-			this.onAuthenticationSuccess(memberDetails, request, response);
-		}
-		
-		eventPublisher.publish(new RegisterSuccessEvent(memberDetails, getClientContext(request, response)));
-		return DefaultReturnResult.SUCCESS;
 	}
 
 	/**

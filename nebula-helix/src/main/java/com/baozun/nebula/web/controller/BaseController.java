@@ -16,8 +16,12 @@
  */
 package com.baozun.nebula.web.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.ui.Model;
@@ -44,7 +48,7 @@ public abstract class BaseController {
 	 * @param request
 	 * @param model
 	 */
-	protected void prepare4SensitiveDataEncryptedByJs(HttpServletRequest request, Model model) {
+	protected void init4SensitiveDataEncryptedByJs(HttpServletRequest request, Model model) {
 	}
 
 	/**
@@ -61,5 +65,16 @@ public abstract class BaseController {
 		} catch (Exception e) {
 		} // 解密出错原样使用
 		return result;
+	}
+	
+	/**
+	 * 获取用户环境上下文，如ip agent等信息，默认是空实现
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	protected Map<String, String> getClientContext(HttpServletRequest request, HttpServletResponse response) {
+		return new HashMap<String, String>();
 	}
 }

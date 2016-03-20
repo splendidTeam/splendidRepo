@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.baozun.nebula.web.controller.BaseController;
 
-public abstract class NebulaBaseLoginController extends BaseController {
+public abstract class NebulaAbstractLoginController extends BaseController {
 
 	/**
 	 * 重置会话

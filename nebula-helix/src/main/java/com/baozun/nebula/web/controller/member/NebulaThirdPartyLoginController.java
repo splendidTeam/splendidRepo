@@ -4,8 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.command.member.TirdPartyMemberCommand;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.baozun.nebula.web.controller.NebulaReturnResult;
 
-public abstract class NebulaThirdPartyLoginController extends NebulaBaseLoginController{
+public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLoginController{
 	
 	
 	/** 
@@ -41,5 +43,33 @@ public abstract class NebulaThirdPartyLoginController extends NebulaBaseLoginCon
 //		resetSessionMember(request, userDetails);
 		
 		return "store.member.info";
+	}
+	/**
+	 * 是否需要绑定
+	 * @return
+	 */
+	protected boolean isNeedBinding() {
+		return false;
+	}
+	/**
+	 * 绑定页面
+	 * @return
+	 */
+	protected String showBinding() {
+		return null;
+	}
+	/**
+	 * 绑定动作
+	 * @return
+	 */
+	protected NebulaReturnResult binding() {
+		return DefaultReturnResult.SUCCESS;
+	}
+	/**
+	 * 绑定成功
+	 * @return
+	 */
+	protected NebulaReturnResult onBindingSuccess() {
+		return DefaultReturnResult.SUCCESS;
 	}
 }
