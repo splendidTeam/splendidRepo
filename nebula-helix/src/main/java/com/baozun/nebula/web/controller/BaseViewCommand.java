@@ -17,12 +17,21 @@
 package com.baozun.nebula.web.controller;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BaseViewCommand implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3993085606710273959L;
+	/**
+	 * 自定义数据
+	 */
+	private Map<String, Object> extraData = new HashMap<String, Object>(0);
+	public Map<String, Object> getExtraData() {
+		return extraData;
+	}
+	public void addExtraData(String key, Object value) {
+		this.getExtraData().put(key, value);
+	}
+	
 
 }
