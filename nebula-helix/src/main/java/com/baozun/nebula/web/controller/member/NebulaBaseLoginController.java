@@ -1,28 +1,20 @@
 package com.baozun.nebula.web.controller.member;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.web.controller.BaseController;
 
-public class NebulaBaseLoginController extends BaseController{
+public abstract class NebulaBaseLoginController extends BaseController {
 
 	/**
-	 * 重置会话信息
+	 * 重置会话
+	 * 
 	 * @param request
 	 * @param details
 	 */
-	protected void resetSessionMember(HttpServletRequest request,UserDetails userDetails){
-		//
-	}
-	
-	/**
-	 * 同步购物车
-	 * @param request
-	 * @param details
-	 */
-	protected void syncShoppingCart(HttpServletRequest request,HttpServletResponse response,UserDetails userDetails) {
-		//
+	protected void resetSession(HttpServletRequest request) {
+		// TODO copy old session value
+		request.getSession().invalidate();
+		// TODO add old session value to new session
 	}
 }

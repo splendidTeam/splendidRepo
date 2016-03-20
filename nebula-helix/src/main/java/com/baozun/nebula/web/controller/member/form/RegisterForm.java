@@ -17,6 +17,8 @@ public class RegisterForm {
 	private String name;
 	
 	private String nickName;
+	
+	private String password;
 	/**
 	 * 是否愿意接收推送信息 可选值：1.接受，2.不接受
 	 */
@@ -89,6 +91,14 @@ public class RegisterForm {
 	public MemberFrontendCommand toMemberFrontendCommand(){
 		//数据转换
 		return new MemberFrontendCommand();
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	
 }

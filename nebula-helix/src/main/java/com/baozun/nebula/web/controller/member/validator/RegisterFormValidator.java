@@ -3,18 +3,18 @@ package com.baozun.nebula.web.controller.member.validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import com.baozun.nebula.web.controller.member.form.LoginForm;
+import com.baozun.nebula.web.controller.member.form.RegisterForm;
 
 
-public class LoginFormValidator implements Validator{
+public class RegisterFormValidator implements Validator{
 
-	public LoginFormValidator() {
+	public RegisterFormValidator() {
 		super();
 	}
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return LoginForm.class.isAssignableFrom(clazz);
+		return RegisterForm.class.isAssignableFrom(clazz);
 	}
 
 	@Override

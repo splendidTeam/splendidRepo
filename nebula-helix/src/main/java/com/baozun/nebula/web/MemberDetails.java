@@ -23,12 +23,11 @@ import java.util.Set;
 import com.baozun.nebula.model.member.MemberGroup;
 
 /**
- * 会员登录后，存储在session中的用户结构
- * 登录后，在session中存储此对象，退出后，则删除此对象
+ * 会员登录成功后，存储在session中的用户结构
  * 
- * @author songdianchao
+ * @author D.C
  */
-public class MemberDetails implements Serializable{
+public class MemberDetails implements Serializable {
 
 	/**
 	 * 
@@ -38,50 +37,54 @@ public class MemberDetails implements Serializable{
 	/**
 	 * 登录名
 	 */
-	private String							loginName;
-	
+	private String loginName;
+
 	/**
 	 * 登录邮箱
 	 */
-	private String 							loginEmail;
-	
+	private String loginEmail;
+
 	/**
 	 * 登录手机
 	 */
-	private String 							loginMobile;
-	
-	/**
-	 * 用户昵称
-	 */
-	private String							nickName;
+	private String loginMobile;
 
 	/**
-	 * 用的真实名
+	 * 昵称
 	 */
-	private String							realName;
+	private String nickName;
 
 	/**
-	 * 当前会员id
+	 * 真实姓名
 	 */
-	private Long							memberId;
+	private String realName;
 
-	/** 
+	/**
+	 * 会员id
+	 */
+	private Long memberId;
+
+	/**
 	 * 会员所属分组
 	 */
-	private List<MemberGroup>						groups;
-	
+	private List<MemberGroup> groups;
+
 	/**
 	 * 分组标签
 	 */
-	private Set<String>						memComboList;
-	
-	
+	private Set<String> memComboList;
+	/**
+	 * 激活状态
+	 */
+	private Boolean actived = false;
+
+
 	public MemberDetails() {
 		super();
 	}
 
 	public MemberDetails(String loginName, String loginEmail, String loginMobile, Long memberId, String nickName,
-			List<MemberGroup> groups,Set<String> memComboList){
+			List<MemberGroup> groups, Set<String> memComboList) {
 		super();
 		this.loginName = loginName;
 		this.loginEmail = loginEmail;
@@ -90,23 +93,22 @@ public class MemberDetails implements Serializable{
 		this.nickName = nickName;
 		this.groups = groups;
 		this.memComboList = memComboList;
-	}
-	
-	public MemberDetails(String loginName, String loginEmail, String loginMobile, Long memberId, String nickName,
-			List<MemberGroup> groups,Set<String> memComboList,String realName){
-		super();
-		this.loginName = loginName;
-		this.loginEmail = loginEmail;
-		this.loginMobile = loginMobile;
-		this.memberId = memberId;
-		this.nickName = nickName;
-		this.groups = groups;
-		this.memComboList = memComboList;
-		this.realName=realName;
 	}
 
-	public MemberDetails(String loginName, String loginEmail, String loginMobile, Long memberId, String nickName
-			){
+	public MemberDetails(String loginName, String loginEmail, String loginMobile, Long memberId, String nickName,
+			List<MemberGroup> groups, Set<String> memComboList, String realName) {
+		super();
+		this.loginName = loginName;
+		this.loginEmail = loginEmail;
+		this.loginMobile = loginMobile;
+		this.memberId = memberId;
+		this.nickName = nickName;
+		this.groups = groups;
+		this.memComboList = memComboList;
+		this.realName = realName;
+	}
+
+	public MemberDetails(String loginName, String loginEmail, String loginMobile, Long memberId, String nickName) {
 		super();
 		this.loginName = loginName;
 		this.loginEmail = loginEmail;
@@ -119,61 +121,49 @@ public class MemberDetails implements Serializable{
 		return loginName;
 	}
 
-
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
-
 
 	public String getLoginEmail() {
 		return loginEmail;
 	}
 
-
 	public void setLoginEmail(String loginEmail) {
 		this.loginEmail = loginEmail;
 	}
-
 
 	public String getLoginMobile() {
 		return loginMobile;
 	}
 
-
 	public void setLoginMobile(String loginMobile) {
 		this.loginMobile = loginMobile;
 	}
-
 
 	public String getNickName() {
 		return nickName;
 	}
 
-
 	public void setNickName(String nickName) {
 		this.nickName = nickName;
 	}
-
 
 	public String getRealName() {
 		return realName;
 	}
 
-
 	public void setRealName(String realName) {
 		this.realName = realName;
 	}
-
 
 	public Long getMemberId() {
 		return memberId;
 	}
 
-
 	public void setMemberId(Long memberId) {
 		this.memberId = memberId;
 	}
-	
 
 	public List<MemberGroup> getGroups() {
 		return groups;
@@ -191,5 +181,11 @@ public class MemberDetails implements Serializable{
 		this.memComboList = memComboList;
 	}
 	
-	
+	public Boolean isActived() {
+		return actived;
+	}
+
+	public void setActived(Boolean actived) {
+		this.actived = actived;
+	}
 }
