@@ -41,13 +41,14 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.converter.MemberAddressViewCommandConverter;
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
 import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
+import com.baozun.nebula.web.controller.member.form.PageForm;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
 public class NebulaMemberAddressController extends BaseController {
-	
+
 	/**
 	 * log 定义
 	 */
@@ -55,30 +56,31 @@ public class NebulaMemberAddressController extends BaseController {
 
 	/* Model 对应的键值定义 */
 	public static final String MODEL_KEY_MEMBER_ADDRESS_LIST = "memberAddressList";
-	
-	/* View 的默认定义*/
+
+	/* View 的默认定义 */
 	public static final String VIEW_MEMBER_ADDRESS_LIST = "member.address.list";
 
-	
 	/**
 	 * 会员业务管理类
 	 */
 	@Autowired
 	private MemberManager memberManager;
-	
+
 	/**
 	 * 
 	 */
 	@Autowired
 	private SdkMemberManager sdkMemberManager;
-	
+
 	@Autowired
 	@Qualifier("memberAddressViewCommandConverter")
 	private MemberAddressViewCommandConverter memberAddressViewCommandConverter;
-	
+
 	/**
 	 * 显示会员地址信息，默认推荐配置如下
-	 * @RequestMapping(value = "/member/address/list", method = RequestMethod.GET)
+	 * 
+	 * @RequestMapping(value = "/member/address/list", method =
+	 *                       RequestMethod.GET)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -87,30 +89,32 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	public String showMemberAddress(@LoginMember MemberDetails memberDetails, 
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){		
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+	public String showMemberAddress(@LoginMember MemberDetails memberDetails, @ModelAttribute("page") PageForm pageForm,
+			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
+
 		log.info("[MEM_VIEW_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
-		//获取会员地址信息
-		//TODO
-		//这里需要加入默认的页面列表分页机制，然后替换下面两个默认新增的Page和Sort参数
-		//方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
-		//因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
-		
-		Pagination<ContactCommand> contacts = 
-				sdkMemberManager.findContactsByMemberId(new Page(), new Sort[]{}, memberDetails.getMemberId());
-		
-		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST,
-				memberAddressViewCommandConverter.convert(contacts));
-		
+		// 获取会员地址信息
+		// TODO
+		// 这里需要加入默认的页面列表分页机制，然后替换下面两个默认新增的Page和Sort参数
+		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
+		// 因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
+
+		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(
+				memberAddressViewCommandConverter.convertPage(pageForm),
+				memberAddressViewCommandConverter.convertSort(pageForm), memberDetails.getMemberId());
+
+		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST, memberAddressViewCommandConverter.convert(contacts));
+
 		return VIEW_MEMBER_ADDRESS_LIST;
 	}
-	
+
 	/**
 	 * 列举会员地址信息数据，默认推荐配置如下
-	 * @RequestMapping(value = "/member/address/list-data", method = RequestMethod.GET)
+	 * 
+	 * @RequestMapping(value = "/member/address/list-data", method =
+	 *                       RequestMethod.GET)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -118,28 +122,30 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @param httpResponse
 	 * @param model
 	 */
-	public void listMemberAddress(@LoginMember MemberDetails memberDetails, 
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+	public void listMemberAddress(@LoginMember MemberDetails memberDetails, @ModelAttribute("page") PageForm pageForm,
+			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
+
 		log.info("[MEM_LIST_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
-		//获取会员地址信息
-		//TODO
-		//这里需要加入默认的页面列表分页机制，然后替换下面两个默认新增的Page和Sort参数，或者对于列举来说是使用默认值或者无分页
-		//方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
-		//因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
-		
-		Pagination<ContactCommand> contacts = 
-				sdkMemberManager.findContactsByMemberId(new Page(), new Sort[]{}, memberDetails.getMemberId());
-		
-		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST,
-				memberAddressViewCommandConverter.convert(contacts));
+		// 获取会员地址信息
+		// TODO
+		// 这里需要加入默认的页面列表分页机制，然后替换下面两个默认新增的Page和Sort参数，或者对于列举来说是使用默认值或者无分页
+		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
+		// 因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
+
+		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(
+				memberAddressViewCommandConverter.convertPage(pageForm),
+				memberAddressViewCommandConverter.convertSort(pageForm), memberDetails.getMemberId());
+
+		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST, memberAddressViewCommandConverter.convert(contacts));
 	}
-	
+
 	/**
 	 * 新增收货地址，默认推荐配置如下
-	 * @RequestMapping(value = "/member/address/add", method = RequestMethod.POST)
+	 * 
+	 * @RequestMapping(value = "/member/address/add", method =
+	 *                       RequestMethod.POST)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -149,23 +155,26 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult addMemberAddress(@LoginMember MemberDetails memberDetails, 
-			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm,
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+	public NebulaReturnResult addMemberAddress(@LoginMember MemberDetails memberDetails,
+			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
-		//log.info("[MEM_EDIT_ADDRESS] {} [{}] \"{}\"", memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
-		//可以参考NebulaMemberProfileController中的过程，构造校验过程
-		//业务方法使用 SdkMemberManager 中的 createOrUpdateContact
+
+		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
+		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
+		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
+		// 业务方法使用 SdkMemberManager 中的 createOrUpdateContact
 		NebulaReturnResult returnResult = new DefaultReturnResult();
-		//这里将编辑好的Address作为返回值放入返回对象的returnObject中
+		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中
 		return returnResult;
 	}
-	
+
 	/**
 	 * 设置默认地址，默认推荐配置如下
-	 * @RequestMapping(value = "/member/address/setdefault", method = RequestMethod.GET)
+	 * 
+	 * @RequestMapping(value = "/member/address/setdefault", method =
+	 *                       RequestMethod.GET)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -175,21 +184,24 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult setDefaultAddress(@LoginMember MemberDetails memberDetails, 
-			@ModelAttribute("addressId") Long addressId,
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+	public NebulaReturnResult setDefaultAddress(@LoginMember MemberDetails memberDetails,
+			@ModelAttribute("addressId") Long addressId, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
-		//log.info("[MEM_SET_ADDRESS_DEFAULT] {} [{}] \"{}\"", memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
-		//可以参考NebulaMemberProfileController中的过程，构造校验过程
-		//业务方法使用 SdkMemberManager 中的 updateContactIsDefault
+
+		// log.info("[MEM_SET_ADDRESS_DEFAULT] {} [{}] \"{}\"",
+		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
+		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
+		// 业务方法使用 SdkMemberManager 中的 updateContactIsDefault
 		return DefaultReturnResult.SUCCESS;
 	}
-	
+
 	/**
 	 * 删除地址，默认推荐配置如下
-	 * @RequestMapping(value = "/member/address/remove", method = RequestMethod.GET)
+	 * 
+	 * @RequestMapping(value = "/member/address/remove", method =
+	 *                       RequestMethod.GET)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -199,21 +211,24 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult deleteMemberAddress(@LoginMember MemberDetails memberDetails, 
-			@ModelAttribute("addressId") Long addressId,
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+	public NebulaReturnResult deleteMemberAddress(@LoginMember MemberDetails memberDetails,
+			@ModelAttribute("addressId") Long addressId, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
-		//log.info("[MEM_REMOVE_ADDRESS] {} [{}] \"{}\"", memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
-		//可以参考NebulaMemberProfileController中的过程，构造校验过程
-		//业务方法使用 SdkMemberManager 中的 removeContactById
+
+		// log.info("[MEM_REMOVE_ADDRESS] {} [{}] \"{}\"",
+		// memberDetails.getLoginName(), new Date(), 待删除的地址Id);
+		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
+		// 业务方法使用 SdkMemberManager 中的 removeContactById
 		return DefaultReturnResult.SUCCESS;
 	}
-	
+
 	/**
 	 * 查找当前所需编辑地址信息，默认推荐配置如下
-	 * @RequestMapping(value = "/member/address/find", method = RequestMethod.POST)
+	 * 
+	 * @RequestMapping(value = "/member/address/find", method =
+	 *                       RequestMethod.POST)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -223,17 +238,19 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult findMemberAddress(@LoginMember MemberDetails memberDetails, 
-			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm,
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
-		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
-		//log.info("[MEM_EDIT_ADDRESS] {} [{}] \"{}\"", memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
-		//可以参考NebulaMemberProfileController中的过程，构造校验过程
-		//业务方法使用 SdkMemberManager 中的 findMemberAddress
+	public NebulaReturnResult findMemberAddress(@LoginMember MemberDetails memberDetails,
+			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
+		assert memberDetails != null : "Please Check NeedLogin Annotation"; 
+
+		// log.info("[MEM_FIND_ADDRESS] {} [{}] \"{}\"",
+		// memberDetails.getLoginName(), new Date(), 待获得的地址Id);
+		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
+		// 业务方法使用 SdkMemberManager 中的 findMemberAddressByMemberAddressId
+		// 地址信息查询需要会员ID与地址ID同时查询
 		NebulaReturnResult returnResult = new DefaultReturnResult();
-		//这里将找到的Address作为返回值放入返回对象的returnObject中
+		// 这里将找到的Address作为返回值放入返回对象的returnObject中
 		return returnResult;
 	}
 }

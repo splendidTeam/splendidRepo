@@ -20,18 +20,44 @@ import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
 
-public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddressViewCommand>{
+import loxia.dao.Page;
+import loxia.dao.Sort;
+
+public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddressViewCommand> {
+
+	/**
+	 * 地址簿默认行数 
+	 */
+	public static final int MEMBERADDRESSDEFAULTSIZE = 5;
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7415881959809156733L;
-	
-	public MemberAddressViewCommand convert(Object data){
-		if(data == null) return null;
+
+	public MemberAddressViewCommand convert(Object data) {
+		if (data == null)
+			return null;
 		ContactCommand contactCommand = (ContactCommand) data;
-		//TODO 
-		//完成转换
+		// TODO
+		// 完成转换
+		return null;
+	}
+
+	public Page convertPage(Object data) {
+		if (data == null)
+			return null;
+		Page page = (Page) data;
+		// TODO
+		// 完成转换
+		return null;
+	}
+
+	public Sort[] convertSort(Object data) {
+		if (data == null)
+			return null;
+		// TODO
+		// 完成转换
 		return null;
 	}
 
