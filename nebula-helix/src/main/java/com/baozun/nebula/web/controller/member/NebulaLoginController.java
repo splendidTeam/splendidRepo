@@ -61,7 +61,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	public static final String VIEW_MEMBER_REGISTER = "member.register";
 
 	/* Login 登录ID */
-	public static final String PROPERTY_KEY_MEMBER_LOGIN_ID = "member.login.id";
+	public static final String MODEL_KEY_MEMBER_LOGIN_ID = "loginId";
 
 	/**
 	 * 会员登录Form的校验器
@@ -192,7 +192,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 */
 	protected void rememberMeProcess(HttpServletRequest request, Model model) {
 		if (isSupportRemberMe() && !Validator.isNullOrEmpty(CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME))) {
-			model.addAttribute(PROPERTY_KEY_MEMBER_LOGIN_ID,
+			model.addAttribute(MODEL_KEY_MEMBER_LOGIN_ID,
 					remberMeValueDecrypt(CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME).getValue()));
 		}
 	}
