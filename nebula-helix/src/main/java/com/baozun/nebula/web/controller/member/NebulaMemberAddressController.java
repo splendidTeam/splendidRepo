@@ -210,4 +210,30 @@ public class NebulaMemberAddressController extends BaseController {
 		//业务方法使用 SdkMemberManager 中的 removeContactById
 		return DefaultReturnResult.SUCCESS;
 	}
+	
+	/**
+	 * 查找当前所需编辑地址信息，默认推荐配置如下
+	 * @RequestMapping(value = "/member/address/find", method = RequestMethod.POST)
+	 * @NeedLogin
+	 * 
+	 * @param memberDetails
+	 * @param memberAddressForm
+	 * @param httpRequest
+	 * @param httpResponse
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult findMemberAddress(@LoginMember MemberDetails memberDetails, 
+			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm,
+			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){
+		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+		assert memberDetails != null : "Please Check NeedLogin Annotation";
+		
+		//log.info("[MEM_EDIT_ADDRESS] {} [{}] \"{}\"", memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
+		//可以参考NebulaMemberProfileController中的过程，构造校验过程
+		//业务方法使用 SdkMemberManager 中的 findMemberAddress
+		NebulaReturnResult returnResult = new DefaultReturnResult();
+		//这里将找到的Address作为返回值放入返回对象的returnObject中
+		return returnResult;
+	}
 }
