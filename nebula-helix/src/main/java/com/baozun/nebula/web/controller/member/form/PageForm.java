@@ -70,7 +70,7 @@ public class PageForm extends BaseForm {
 	}
 
 	/**
-	 * @param sort
+	 * @param sort 
 	 *            the sort to set
 	 */
 	public void setSort(String sort) {

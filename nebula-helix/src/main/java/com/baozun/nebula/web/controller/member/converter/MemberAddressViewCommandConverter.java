@@ -26,7 +26,7 @@ import loxia.dao.Sort;
 public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddressViewCommand> {
 
 	/**
-	 * 地址簿默认行数
+	 * 地址簿默认行数 
 	 */
 	public static final int MEMBERADDRESSDEFAULTSIZE = 5;
 

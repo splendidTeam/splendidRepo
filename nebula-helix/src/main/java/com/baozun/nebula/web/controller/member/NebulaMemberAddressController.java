@@ -242,7 +242,7 @@ public class NebulaMemberAddressController extends BaseController {
 			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
-		assert memberDetails != null : "Please Check NeedLogin Annotation";
+		assert memberDetails != null : "Please Check NeedLogin Annotation"; 
 
 		// log.info("[MEM_FIND_ADDRESS] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待获得的地址Id);
