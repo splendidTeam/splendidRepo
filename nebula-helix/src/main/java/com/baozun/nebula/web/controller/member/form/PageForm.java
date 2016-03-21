@@ -6,7 +6,7 @@ package com.baozun.nebula.web.controller.member.form;
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
- * @author Dean.Lu
+ * @author Dean.Lu 
  * @data 2016年3月21日 上午11:07:25
  *
  */
