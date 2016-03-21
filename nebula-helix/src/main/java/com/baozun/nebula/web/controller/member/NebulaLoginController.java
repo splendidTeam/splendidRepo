@@ -266,15 +266,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 		return false;
 	}
 
-	/**
-	 * 注册成功后是否需要自动登录
-	 * 
-	 * @return
-	 */
-	protected boolean isAutoLoginAfterRegister() {
-		return false;
-	}
-
 	// 去忘记密码页面，"/member/forgetPassword"
 	public String showForgetPassword(Model model) {
 		return "store.member.fortgetPassword";

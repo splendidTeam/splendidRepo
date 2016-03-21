@@ -56,6 +56,7 @@ public class NebulaRegisterController extends NebulaLoginController {
 	 */
 	@Autowired
 	private MemberManager memberManager;
+
 	/**
 	 * 注册页面，默认推荐配置如下
 	 * 
@@ -118,10 +119,19 @@ public class NebulaRegisterController extends NebulaLoginController {
 	protected NebulaReturnResult onRegisterSuccess(MemberDetails memberDetails, HttpServletRequest request,
 			HttpServletResponse response) {
 		if (isAutoLoginAfterRegister()) {
-			this.onAuthenticationSuccess(memberDetails, request, response);
+			super.onAuthenticationSuccess(memberDetails, request, response);
 		}
 
 		eventPublisher.publish(new RegisterSuccessEvent(memberDetails, getClientContext(request, response)));
 		return DefaultReturnResult.SUCCESS;
+	}
+
+	/**
+	 * 注册成功后是否需要自动登录
+	 * 
+	 * @return
+	 */
+	protected boolean isAutoLoginAfterRegister() {
+		return false;
 	}
 }

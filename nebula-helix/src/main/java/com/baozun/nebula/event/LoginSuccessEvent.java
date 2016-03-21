@@ -28,8 +28,8 @@ import com.baozun.nebula.web.MemberDetails;
 public class LoginSuccessEvent extends ApplicationEvent{
 	/*上下文，ip agent等信息*/
 	private Map<String, String> clientContext;
-	public LoginSuccessEvent(MemberDetails source, Map<String, String> clientContext) {
-		super(source);
+	public LoginSuccessEvent(MemberDetails memberDetails, Map<String, String> clientContext) {
+		super(memberDetails);
 		this.setClientContext(clientContext);
 	}
 
