@@ -18,7 +18,7 @@ package com.baozun.nebula.web.controller;
 
 /**
  * 控制器直接返回的数据对象
- * @author liuliu
+ * @author Benjamin.Liu
  *
  */
 public interface NebulaReturnResult {

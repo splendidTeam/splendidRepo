@@ -29,24 +29,32 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.ContactCommand;
-import com.baozun.nebula.manager.member.MemberContactManager;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.member.converter.MemberAddressViewCommandConverter;
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
-import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
-import com.baozun.nebula.web.controller.member.form.PageForm;
 
-import loxia.dao.Page;
 import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
+/**
+ * 会员地址簿相关的控制器，里面主要控制如下操作：
+ * showMemberAddress ：显示地址簿列表
+ * listMemberAddress ：列举地址数据
+ * addMemberAddress： 新增地址
+ * deleteMemberAddress：删除地址
+ * setDefaultAddress：设置默认地址
+ * 
+ * 并没有提供查看地址明细方法，因为假定在显示地址簿时就已获取所有相关信息，不用再读取一遍。如果商城需要，自己重载。
+ * 
+ * @author Benjamin.Liu
+ *
+ */
 public class NebulaMemberAddressController extends BaseController {
 
 	/**
@@ -97,13 +105,12 @@ public class NebulaMemberAddressController extends BaseController {
 		log.info("[MEM_VIEW_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		// 获取会员地址信息
 		// TODO
-		// 这里需要加入默认的页面列表分页机制，然后替换下面两个默认新增的Page和Sort参数
 		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
 		// 因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
-
+		
+		// TODO 疑问：pageForm是否需要判断空？
 		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(
-				memberAddressViewCommandConverter.convertPage(pageForm),
-				memberAddressViewCommandConverter.convertSort(pageForm), memberDetails.getMemberId());
+				pageForm.getPage(), pageForm.getSorts(),memberDetails.getMemberId());
 
 		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST, memberAddressViewCommandConverter.convert(contacts));
 
@@ -130,13 +137,11 @@ public class NebulaMemberAddressController extends BaseController {
 		log.info("[MEM_LIST_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		// 获取会员地址信息
 		// TODO
-		// 这里需要加入默认的页面列表分页机制，然后替换下面两个默认新增的Page和Sort参数，或者对于列举来说是使用默认值或者无分页
 		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
 		// 因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
 
 		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(
-				memberAddressViewCommandConverter.convertPage(pageForm),
-				memberAddressViewCommandConverter.convertSort(pageForm), memberDetails.getMemberId());
+				pageForm.getPage(),pageForm.getSorts(), memberDetails.getMemberId());
 
 		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST, memberAddressViewCommandConverter.convert(contacts));
 	}
@@ -222,35 +227,5 @@ public class NebulaMemberAddressController extends BaseController {
 		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
 		// 业务方法使用 SdkMemberManager 中的 removeContactById
 		return DefaultReturnResult.SUCCESS;
-	}
-
-	/**
-	 * 查找当前所需编辑地址信息，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/address/find", method =
-	 *                       RequestMethod.POST)
-	 * @NeedLogin
-	 * 
-	 * @param memberDetails
-	 * @param memberAddressForm
-	 * @param httpRequest
-	 * @param httpResponse
-	 * @param model
-	 * @return
-	 */
-	public NebulaReturnResult findMemberAddress(@LoginMember MemberDetails memberDetails,
-			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, HttpServletRequest httpRequest,
-			HttpServletResponse httpResponse, Model model) {
-		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
-		assert memberDetails != null : "Please Check NeedLogin Annotation"; 
-
-		// log.info("[MEM_FIND_ADDRESS] {} [{}] \"{}\"",
-		// memberDetails.getLoginName(), new Date(), 待获得的地址Id);
-		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
-		// 业务方法使用 SdkMemberManager 中的 findMemberAddressByMemberAddressId
-		// 地址信息查询需要会员ID与地址ID同时查询
-		NebulaReturnResult returnResult = new DefaultReturnResult();
-		// 这里将找到的Address作为返回值放入返回对象的returnObject中
-		return returnResult;
 	}
 }

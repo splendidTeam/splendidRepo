@@ -18,8 +18,15 @@ package com.baozun.nebula.web.controller.member.converter;
 
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
+import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
 
+/**
+ * 会员Profile信息的视图模型转换器
+ * 
+ * @author Benjamin.Liu
+ *
+ */
 public class MemberViewCommandConverter extends BaseConverter<MemberViewCommand> {
 
 	/**
@@ -29,9 +36,15 @@ public class MemberViewCommandConverter extends BaseConverter<MemberViewCommand>
 	
 	public MemberViewCommand convert(Object data){
 		if(data == null) return null;
-		MemberCommand memberCommand = (MemberCommand) data;
-		//TODO 
-		//完成转换
+		
+		if(data instanceof MemberCommand){
+			MemberCommand memberCommand = (MemberCommand) data;
+			//TODO 
+			//完成转换
+		}else{
+			throw new UnsupportDataTypeException(data.getClass() + " cannot convert to " + MemberViewCommand.class + "yet.");
+		}
+		
 		return null;
 	}
 

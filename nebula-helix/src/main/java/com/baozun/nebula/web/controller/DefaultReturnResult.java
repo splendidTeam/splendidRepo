@@ -19,6 +19,12 @@ package com.baozun.nebula.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 默认返回数据结果类
+ * 
+ * @author Benjamin.Liu
+ *
+ */
 public class DefaultReturnResult extends AbstractReturnResult {
 
 	/**
@@ -26,8 +32,14 @@ public class DefaultReturnResult extends AbstractReturnResult {
 	 */
 	private static final long serialVersionUID = -5265655012973414164L;
 	
+	/**
+	 * 默认返回成功类
+	 */
 	public static final DefaultReturnResult SUCCESS = new DefaultReturnResult();
 
+	/**
+	 * 额外的返回信息，当前端需要返回多个信息时使用
+	 */
 	private List<DefaultReturnResult> extraResultMessages = new ArrayList<DefaultReturnResult>();
 
 	public List<DefaultReturnResult> getExtraResultMessages() {

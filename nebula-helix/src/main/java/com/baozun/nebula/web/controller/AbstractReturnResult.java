@@ -18,6 +18,12 @@ package com.baozun.nebula.web.controller;
 
 import java.io.Serializable;
 
+/**
+ * 返回值的基础抽象实现，用于直接返回数据时使用。
+ * 
+ * @author Benjamin.Liu
+ *
+ */
 public abstract class AbstractReturnResult implements NebulaReturnResult, Serializable {
 
 	/**
@@ -31,17 +37,17 @@ public abstract class AbstractReturnResult implements NebulaReturnResult, Serial
 	private boolean result = true;	
 	
 	/**
-	 * 返回状态码
+	 * 返回状态码（可选值）
 	 */
 	private String statusCode;
 	
 	/**
-	 * 对应返回信息
+	 * 对应返回信息（可选值）
 	 */
 	private DefaultResultMessage resultMessage;
 	
 	/**
-	 * 对应返回的数据对象
+	 * 对应返回的数据对象（可选值）
 	 */
 	private Object returnObject;
 

@@ -18,7 +18,7 @@ package com.baozun.nebula.web.controller;
 
 /**
  * 返回对象中的说明结果接口
- * @author liuliu
+ * @author Benjamin.Liu
  *
  */
 public interface NebulaResultMessage {

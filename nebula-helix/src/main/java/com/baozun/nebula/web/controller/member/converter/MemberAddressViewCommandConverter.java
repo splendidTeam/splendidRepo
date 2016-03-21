@@ -18,11 +18,15 @@ package com.baozun.nebula.web.controller.member.converter;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
+import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
 
-import loxia.dao.Page;
-import loxia.dao.Sort;
-
+/**
+ * 地址视图模型的转换器
+ * 
+ * @author Benjamin.Liu
+ *
+ */
 public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddressViewCommand> {
 
 	/**
@@ -36,29 +40,16 @@ public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddre
 	private static final long serialVersionUID = -7415881959809156733L;
 
 	public MemberAddressViewCommand convert(Object data) {
-		if (data == null)
+		if(data == null)
 			return null;
-		ContactCommand contactCommand = (ContactCommand) data;
-		// TODO
-		// 完成转换
+		if(data instanceof ContactCommand){
+			ContactCommand contactCommand = (ContactCommand) data;
+			// TODO
+			// 完成转换
+		}else{
+			throw new UnsupportDataTypeException(data.getClass() + " cannot convert to " + ContactCommand.class + "yet.");
+		}
+		
 		return null;
 	}
-
-	public Page convertPage(Object data) {
-		if (data == null)
-			return null;
-		Page page = (Page) data;
-		// TODO
-		// 完成转换
-		return null;
-	}
-
-	public Sort[] convertSort(Object data) {
-		if (data == null)
-			return null;
-		// TODO
-		// 完成转换
-		return null;
-	}
-
 }

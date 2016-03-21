@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * 默认说明，可用于输出信息
- * @author liuliu
+ * @author Benjamin.Liu
  *
  */
 public class DefaultResultMessage implements NebulaResultMessage, Serializable{

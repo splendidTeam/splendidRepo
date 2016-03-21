@@ -16,30 +16,39 @@
  */
 package com.baozun.nebula.web.controller;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * 视图层模型的基类
+ * 数据转换类型不支持异常，用于在ViewCommand的转换过程中出现类型不匹配时抛出。
  * 
  * @author Benjamin.Liu
  *
  */
-public class BaseViewCommand implements Serializable {
-	
-	private static final long serialVersionUID = -3993085606710273959L;
-	
-	/**
-	 * 自定义数据，未来某些简单或者过于定制的数据扩展可以直接在这里处理。
-	 */
-	private Map<String, Object> extraData = new HashMap<String, Object>(0);
-	public Map<String, Object> getExtraData() {
-		return extraData;
-	}
-	public void addExtraData(String key, Object value) {
-		this.getExtraData().put(key, value);
-	}
-	
+public class UnsupportDataTypeException extends RuntimeException {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6032343993575469611L;
+
+	public UnsupportDataTypeException() {
+		super();
+	}
+
+	public UnsupportDataTypeException(String message, Throwable cause, boolean enableSuppression,
+			boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public UnsupportDataTypeException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public UnsupportDataTypeException(String message) {
+		super(message);
+	}
+
+	public UnsupportDataTypeException(Throwable cause) {
+		super(cause);
+	}
+
+	
 }
