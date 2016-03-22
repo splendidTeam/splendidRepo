@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Deprecated
 public @interface NoClientCache{
- 
+
     boolean value() default true;
 
 }
