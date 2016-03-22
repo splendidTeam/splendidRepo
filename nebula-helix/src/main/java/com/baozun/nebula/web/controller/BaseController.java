@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceResolver;
 import org.springframework.mobile.device.LiteDeviceResolver;
 import org.springframework.ui.Model;
 
@@ -43,6 +44,8 @@ public abstract class BaseController{
 
     @Resource
     protected EventPublisher     eventPublisher;
+    
+    private static final DeviceResolver deviceResolver = new LiteDeviceResolver();
     
 
     // TODO未实现
@@ -99,7 +102,7 @@ public abstract class BaseController{
      * @see org.springframework.mobile.device.LiteDeviceResolver
      */
     protected Device getDevice(HttpServletRequest request){
-        return new LiteDeviceResolver().resolveDevice(request);
+        return deviceResolver.resolveDevice(request);
     }
 
 }
