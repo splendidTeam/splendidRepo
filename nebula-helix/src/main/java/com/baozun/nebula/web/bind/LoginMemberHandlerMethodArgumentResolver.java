@@ -14,6 +14,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.util.WebUtils;
 
+import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.lang.reflect.FieldUtil;
 import com.feilong.core.tools.jsonlib.JsonUtil;
@@ -36,6 +38,15 @@ import com.feilong.core.util.Validator;
  * <h3>配置示例:</h3>
  * 
  * <blockquote>
+ * 默认配置:
+ * 
+ * <pre>
+ * {@code
+ *             <bean class="com.baozun.nebula.web.bind.LoginMemberHandlerMethodArgumentResolver"/>
+ * }
+ * </pre>
+ * 
+ * 完整配置:
  * 
  * <pre>
  * {@code
@@ -65,13 +76,13 @@ import com.feilong.core.util.Validator;
 public class LoginMemberHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver{
 
     /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginMemberHandlerMethodArgumentResolver.class);
+    private static final Logger LOGGER             = LoggerFactory.getLogger(LoginMemberHandlerMethodArgumentResolver.class);
 
     /** 在session中保存的标识用户session对象的key. */
-    private String              sessionKey;
+    private String              sessionKey         = SessionKeyConstants.MEMBER_CONTEXT;
 
     /** session 里面存放的 用户对象类型. */
-    private Class<?>            sessionMemberClass;
+    private Class<?>            sessionMemberClass = MemberDetails.class;
 
     /** 对象的主键名称. */
     private String              sessionMemberIdName;
