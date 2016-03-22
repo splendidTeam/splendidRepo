@@ -77,7 +77,6 @@
 		<version.javamail>1.4</version.javamail>
 		<version.spring>3.2.16.RELEASE</version.spring>
 		<version.spring.security>3.2.9.RELEASE</version.spring.security>
-		<version.spring-mobile-device>1.1.4.RELEASE</version.spring-mobile-device>
 		<version.jsoup>1.7.3</version.jsoup>
 		<version.zookeeper>3.4.5</version.zookeeper>
 		<version.quartz>1.5.2</version.quartz>
@@ -278,11 +277,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.mobile</groupId>
-			<artifactId>spring-mobile-device</artifactId>
 		</dependency>
 
 		<dependency>
@@ -683,12 +677,6 @@
 				<version>${version.spring.security}</version>
 			</dependency>
 			<!-- spring security end -->
-			<!-- spring-mobile-device -->
-			<dependency>
-				<groupId>org.springframework.mobile</groupId>
-				<artifactId>spring-mobile-device</artifactId>
-				<version>${version.spring-mobile-device}</version>
-			</dependency>
 
 			<dependency>
 				<groupId>janino</groupId>
