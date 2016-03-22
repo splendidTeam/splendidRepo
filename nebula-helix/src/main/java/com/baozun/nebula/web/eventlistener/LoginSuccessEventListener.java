@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.event;
+package com.baozun.nebula.web.eventlistener;
 
 import java.util.Date;
 import java.util.Map;
@@ -24,19 +24,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
 
 /**
- * 注册成功监听器
+ * 登录成功监听器
  * 
  * @author D.C
  */
-public class RegisterSuccessEventListener implements ApplicationListener<LoginSuccessEvent> {
-	private static final Logger LOG = LoggerFactory.getLogger(RegisterSuccessEventListener.class);
+public class LoginSuccessEventListener implements ApplicationListener<LoginSuccessEvent> {
+	private static final Logger LOG = LoggerFactory.getLogger(LoginSuccessEventListener.class);
 
 	@Override
 	public void onApplicationEvent(LoginSuccessEvent event) {
 		MemberDetails memberDetails = (MemberDetails)event.getSource();
-		LOG.info("[MEM_REGISTER_SUCCESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
+		LOG.info("[MEM_LOGIN_SUCCESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		this.handler(memberDetails, event.getClientContext());
 	}
 	/**
@@ -45,6 +46,6 @@ public class RegisterSuccessEventListener implements ApplicationListener<LoginSu
 	 * @param context
 	 */
 	protected void handler(MemberDetails source, Map<String, String> context) {
-		//TODO 发送注册邮件等
+		//TODO 比如记录登录日志，处理购物车
 	}
 }

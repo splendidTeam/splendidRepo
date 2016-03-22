@@ -25,7 +25,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.baozun.nebula.event.LoginSuccessEvent;
 import com.baozun.nebula.exception.PasswordNotMatchException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
@@ -36,6 +35,7 @@ import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
