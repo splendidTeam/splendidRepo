@@ -58,28 +58,6 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>janino</groupId>
-			<artifactId>janino</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>catalina</artifactId>
-			<version>6.0.37</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>coyote</artifactId>
-			<version>6.0.37</version>
-			<scope>provided</scope>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.springframework.mobile</groupId>
