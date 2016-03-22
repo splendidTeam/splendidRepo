@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.LiteDeviceResolver;
 import org.springframework.ui.Model;
 
 import com.baozun.nebula.event.EventPublisher;
@@ -32,49 +34,72 @@ import com.baozun.nebula.event.EventPublisher;
  * BaseController
  * 
  * @author D.C
+ * @author feilong
  */
-public abstract class BaseController {
+public abstract class BaseController{
 
-	@Resource
-	protected ApplicationContext context;
-	@Resource
-	protected EventPublisher eventPublisher;
+    @Resource
+    protected ApplicationContext context;
 
-	// TODO未实现
-	/**
-	 * 使用RSA非对称加解密 默认使用全局的public key，使用servlet初始化，此处保持空实现 如果安全上要求每个用户使用不同public
-	 * key时需要商城重写
-	 * 
-	 * @param request
-	 * @param model
-	 */
-	protected void init4SensitiveDataEncryptedByJs(HttpServletRequest request, Model model) {
-	}
+    @Resource
+    protected EventPublisher     eventPublisher;
+    
 
-	/**
-	 * 敏感数据解密过程
-	 * 
-	 * @param sensitiveData
-	 * @return
-	 */
-	protected String decryptSensitiveDataEncryptedByJs(String sensitiveData, HttpServletRequest request) {
-		String result = sensitiveData;
-		// TODO 解密动作
-		try {
+    // TODO未实现
+    /**
+     * 使用RSA非对称加解密 默认使用全局的public key，使用servlet初始化，此处保持空实现 如果安全上要求每个用户使用不同public
+     * key时需要商城重写
+     * 
+     * @param request
+     * @param model
+     */
+    protected void init4SensitiveDataEncryptedByJs(HttpServletRequest request,Model model){
+    }
 
-		} catch (Exception e) {
-		} // 解密出错原样使用
-		return result;
-	}
-	
-	/**
-	 * 获取用户环境上下文，如ip agent等信息，默认是空实现
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected Map<String, String> getClientContext(HttpServletRequest request, HttpServletResponse response) {
-		return new HashMap<String, String>();
-	}
+    /**
+     * 敏感数据解密过程
+     * 
+     * @param sensitiveData
+     * @return
+     */
+    protected String decryptSensitiveDataEncryptedByJs(String sensitiveData,HttpServletRequest request){
+        String result = sensitiveData;
+        // TODO 解密动作
+        try{
+
+        }catch (Exception e){} // 解密出错原样使用
+        return result;
+    }
+
+    /**
+     * 获取用户环境上下文，如ip agent等信息，默认是空实现
+     * 
+     * @param request
+     * @param response
+     * @return
+     */
+    protected Map<String, String> getClientContext(HttpServletRequest request,HttpServletResponse response){
+        return new HashMap<String, String>();
+    }
+
+    /**
+     * 基于spring mobile 解析获得 {@link Device},以便区分 {@link Device#isMobile()},{@link Device#isNormal()},{@link Device#isTablet()}.
+     * 
+     * <p>
+     * 目前 spring mobile的默认实现是 {@link LiteDeviceResolver},参见
+     * {@link org.springframework.mobile.device.DeviceResolverHandlerInterceptor#DeviceResolverHandlerInterceptor()}
+     * </p>
+     * 
+     * @param request
+     *            request
+     * @return {@link Device}
+     * @since 5.3.0
+     * @see Device
+     * @see org.springframework.mobile.device.DeviceResolverHandlerInterceptor#DeviceResolverHandlerInterceptor()
+     * @see org.springframework.mobile.device.LiteDeviceResolver
+     */
+    protected Device getDevice(HttpServletRequest request){
+        return new LiteDeviceResolver().resolveDevice(request);
+    }
+
 }
