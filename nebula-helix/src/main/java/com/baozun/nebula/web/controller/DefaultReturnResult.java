@@ -40,13 +40,13 @@ public class DefaultReturnResult extends AbstractReturnResult {
 	/**
 	 * 额外的返回信息，当前端需要返回多个信息时使用
 	 */
-	private List<DefaultReturnResult> extraResultMessages = new ArrayList<DefaultReturnResult>();
+	private List<DefaultResultMessage> extraResultMessages = new ArrayList<DefaultResultMessage>();
 
-	public List<DefaultReturnResult> getExtraResultMessages() {
+	public List<DefaultResultMessage> getExtraResultMessages() {
 		return extraResultMessages;
 	}
 
-	public void setExtraResultMessages(List<DefaultReturnResult> extraResultMessages) {
+	public void setExtraResultMessages(List<DefaultResultMessage> extraResultMessages) {
 		this.extraResultMessages = extraResultMessages;
 	}
 }
