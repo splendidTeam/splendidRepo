@@ -16,13 +16,19 @@
  */
 package com.baozun.nebula.web.controller.member;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.exception.BusinessException;
@@ -31,6 +37,7 @@ import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
+import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
@@ -46,6 +53,8 @@ import com.feilong.core.util.Validator;
  * @time 2016年3月20日 下午6:25:09
  */
 public class NebulaRegisterController extends NebulaLoginController{
+
+	private static final Logger		LOGGER					= LoggerFactory.getLogger(NebulaRegisterController.class);
 
 	/* Register Page 的默认定义 */
 	public static final String		VIEW_MEMBER_REGISTER	= "member.register";
@@ -101,10 +110,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 			HttpServletResponse response,
 			Model model){
 
-		// ① 数据校验
+		// TODO 方案确认 。。。。。。。。。。 数据校验
+		registerFormValidator.setDevice(this.getDevice(request));
 		registerFormValidator.validate(registerForm, bindingResult);
 		if (bindingResult.hasErrors()){
-			// TODO出错处理
+			List<ObjectError> allErrors = bindingResult.getAllErrors();
+			for (ObjectError objectError : allErrors){
+				LOGGER.info("{}", objectError);
+			}
 			return null;
 		}
 
@@ -112,7 +125,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 		registerForm.setPassword(decryptSensitiveDataEncryptedByJs(registerForm.getPassword(), request));
 		// 用户注册
 		try{
-			Member member = memberManager.register(registerForm.toMemberFrontendCommand());
+			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
+			// 检查验证码 ，email，mobile等是否合法
+			// checkCoreData(memberFrontendCommand); 返回值待定
+			
+			//此方法要修改。
+			Member member = memberManager.register(memberFrontendCommand);
 
 			// TODO member convert to memberCommand, 激活状态处理
 			MemberCommand memberCommand = null;
@@ -149,4 +167,5 @@ public class NebulaRegisterController extends NebulaLoginController{
 	protected boolean isAutoLoginAfterRegister(){
 		return false;
 	}
+
 }

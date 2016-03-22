@@ -22,10 +22,10 @@ public class RegisterForm extends BaseForm{
 	private String				password;
 
 	/** 再次输入密码 */
-	private String				passwordAgain;
+	private String				repassword;
 
 	/** 验证码 */
-	private String				captcha;
+	private String				randomCode;
 
 	private String				sex;
 
@@ -41,36 +41,6 @@ public class RegisterForm extends BaseForm{
 	 * 是否愿意接收推送信息 可选值：1.接受，2.不接受
 	 */
 	private String				receiveMessage;
-
-	/**
-	 * @return the passwordAgain
-	 */
-	public String getPasswordAgain(){
-		return passwordAgain;
-	}
-
-	/**
-	 * @param passwordAgain
-	 *            the passwordAgain to set
-	 */
-	public void setPasswordAgain(String passwordAgain){
-		this.passwordAgain = passwordAgain;
-	}
-
-	/**
-	 * @return the captcha
-	 */
-	public String getCaptcha(){
-		return captcha;
-	}
-
-	/**
-	 * @param captcha
-	 *            the captcha to set
-	 */
-	public void setCaptcha(String captcha){
-		this.captcha = captcha;
-	}
 
 	public String getMobile(){
 		return mobile;
@@ -147,6 +117,36 @@ public class RegisterForm extends BaseForm{
 
 	public void setPassword(String password){
 		this.password = password;
+	}
+
+	/**
+	 * @return the repassword
+	 */
+	public String getRepassword(){
+		return repassword;
+	}
+
+	/**
+	 * @param repassword
+	 *            the repassword to set
+	 */
+	public void setRepassword(String repassword){
+		this.repassword = repassword;
+	}
+
+	/**
+	 * @return the randomCode
+	 */
+	public String getRandomCode(){
+		return randomCode;
+	}
+
+	/**
+	 * @param randomCode
+	 *            the randomCode to set
+	 */
+	public void setRandomCode(String randomCode){
+		this.randomCode = randomCode;
 	}
 
 }

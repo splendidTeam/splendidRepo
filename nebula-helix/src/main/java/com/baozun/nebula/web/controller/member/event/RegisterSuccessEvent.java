@@ -23,26 +23,28 @@ import org.springframework.context.ApplicationEvent;
 import com.baozun.nebula.web.MemberDetails;
 
 /**
- *  用户注册成功事件
+ * 用户注册成功事件
+ * 
  * @author D.C
  */
-public class RegisterSuccessEvent extends ApplicationEvent {
-	/*上下文，ip agent等信息*/
-	private Map<String, String> clientContext;
-	
-	public RegisterSuccessEvent(MemberDetails source, Map<String, String> clientContext) {
+public class RegisterSuccessEvent extends ApplicationEvent{
+
+	private static final long	serialVersionUID	= -3227325006512626684L;
+
+	/* 上下文，ip agent等信息 */
+	private Map<String, String>	clientContext;
+
+	public RegisterSuccessEvent(MemberDetails source, Map<String, String> clientContext){
 		super(source);
 		this.setClientContext(clientContext);
 	}
 
-	public Map<String, String> getClientContext() {
+	public Map<String, String> getClientContext(){
 		return clientContext;
 	}
 
-	public void setClientContext(Map<String, String> clientContext) {
+	public void setClientContext(Map<String, String> clientContext){
 		this.clientContext = clientContext;
 	}
-
-	private static final long serialVersionUID = -3227325006512626684L;
 
 }
