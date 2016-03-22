@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.event;
+package com.baozun.nebula.web.controller.member.event;
 
 import java.util.Map;
 

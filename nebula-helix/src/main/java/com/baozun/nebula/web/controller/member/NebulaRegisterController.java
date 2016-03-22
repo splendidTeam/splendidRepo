@@ -25,7 +25,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.baozun.nebula.event.RegisterSuccessEvent;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.Member;
@@ -34,6 +33,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
 import com.baozun.nebula.web.controller.member.validator.RegisterFormValidator;
 import com.feilong.core.util.Validator;
