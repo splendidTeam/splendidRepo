@@ -18,6 +18,15 @@ public class RegisterForm extends BaseForm{
 
 	private String				email;
 
+	/** 密码 */
+	private String				password;
+
+	/** 再次输入密码 */
+	private String				passwordAgain;
+
+	/** 验证码 */
+	private String				captcha;
+
 	private String				sex;
 
 	private String				age;
@@ -28,12 +37,40 @@ public class RegisterForm extends BaseForm{
 
 	private String				nickName;
 
-	private String				password;
-
 	/**
 	 * 是否愿意接收推送信息 可选值：1.接受，2.不接受
 	 */
 	private String				receiveMessage;
+
+	/**
+	 * @return the passwordAgain
+	 */
+	public String getPasswordAgain(){
+		return passwordAgain;
+	}
+
+	/**
+	 * @param passwordAgain
+	 *            the passwordAgain to set
+	 */
+	public void setPasswordAgain(String passwordAgain){
+		this.passwordAgain = passwordAgain;
+	}
+
+	/**
+	 * @return the captcha
+	 */
+	public String getCaptcha(){
+		return captcha;
+	}
+
+	/**
+	 * @param captcha
+	 *            the captcha to set
+	 */
+	public void setCaptcha(String captcha){
+		this.captcha = captcha;
+	}
 
 	public String getMobile(){
 		return mobile;
