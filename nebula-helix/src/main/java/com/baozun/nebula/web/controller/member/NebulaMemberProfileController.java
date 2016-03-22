@@ -43,7 +43,7 @@ import com.baozun.nebula.web.controller.member.validator.MemberProfileFormValida
 
 /**
  * 会员信息相关控制器，含显示会员信息和修改会员信息。
- * @author liuliu
+ * @author Benjamin.Liu
  *
  */
 public class NebulaMemberProfileController extends BaseController {
@@ -51,7 +51,7 @@ public class NebulaMemberProfileController extends BaseController {
 	/**
 	 * log 定义
 	 */
-	private static final Logger log = LoggerFactory.getLogger(NebulaMemberProfileController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaMemberProfileController.class);
 
 	/* Model 对应的键值定义 */
 	public static final String MODEL_KEY_MEMBER_PROFILE = "memberDetail";
@@ -96,7 +96,7 @@ public class NebulaMemberProfileController extends BaseController {
 		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 		
-		log.info("[MEM_VIEW_PROFILE] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
+		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		//获取会员信息
 		MemberCommand memberCommand = memberManager.findMemberById(memberDetails.getMemberId());
 		
@@ -141,13 +141,13 @@ public class NebulaMemberProfileController extends BaseController {
 		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 				
-		log.info("[MEM_EDIT_PROFILE] {} [{}] \"Start\"", memberDetails.getLoginName(), new Date());
+		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Start\"", memberDetails.getLoginName(), new Date());
 		
-		log.debug("Start to check input profile");
+		LOG.debug("Start to check input profile");
 		
 		//TODO 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
 		//memberProfileFormValidator.validate(memberProfileForm, bindingResult);
-		log.debug("input profile is validated");
+		LOG.debug("input profile is validated");
 		
 		//获取会员信息
 		MemberCommand memberCommand = memberManager.findMemberById(memberDetails.getMemberId());
@@ -163,14 +163,14 @@ public class NebulaMemberProfileController extends BaseController {
 		if(isPasswordChange){
 			//TODO 保存重设密码
 			postProcessForPasswordChange();
-			log.info("[MEM_EDIT_PROFILE] {} [{}] \"[PASSWORD_CHANGED]\"", memberDetails.getLoginName(), new Date());
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[PASSWORD_CHANGED]\"", memberDetails.getLoginName(), new Date());
 		}
 		if(isEmailChange){
 			postProcessForEmailChange();
-			log.info("[MEM_EDIT_PROFILE] {} [{}] \"[EMAIL_CHANGED]\"", memberDetails.getLoginName(), new Date());
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[EMAIL_CHANGED]\"", memberDetails.getLoginName(), new Date());
 		}
 		
-		log.info("[MEM_EDIT_PROFILE] {} [{}] \"Finished\"", memberDetails.getLoginName(), new Date());
+		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Finished\"", memberDetails.getLoginName(), new Date());
 		
 		return DefaultReturnResult.SUCCESS;
 	}

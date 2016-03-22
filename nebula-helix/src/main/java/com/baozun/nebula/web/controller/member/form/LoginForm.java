@@ -1,13 +1,20 @@
 package com.baozun.nebula.web.controller.member.form;
 
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.baozun.nebula.web.controller.BaseForm;
 
 /**
  * 登录表单
  * @author jeally
  * @version 2016年3月17日
  */
-public class LoginForm {
+public class LoginForm extends BaseForm{
+
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4546580076732683893L;
 
 	/**
 	 * 登录名

@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceResolver;
 import org.springframework.mobile.device.LiteDeviceResolver;
 import org.springframework.ui.Model;
 
@@ -39,11 +40,12 @@ import com.baozun.nebula.event.EventPublisher;
 public abstract class BaseController{
 
     @Resource
-    protected ApplicationContext context;
+    protected ApplicationContext        context;
 
     @Resource
-    protected EventPublisher     eventPublisher;
-    
+    protected EventPublisher            eventPublisher;
+
+    private static final DeviceResolver DEVICE_RESOLVER = new LiteDeviceResolver();
 
     // TODO未实现
     /**
@@ -86,6 +88,12 @@ public abstract class BaseController{
      * 基于spring mobile 解析获得 {@link Device},以便区分 {@link Device#isMobile()},{@link Device#isNormal()},{@link Device#isTablet()}.
      * 
      * <p>
+     * 以往的实现方式是通过配置 {@link DeviceResolverHandlerInterceptor}或者 {@link DeviceResolverRequestFilter}或者
+     * {@link DeviceHandlerMethodArgumentResolver},<br>
+     * 目前的实现方式是:按需加载,当有需要的时候调用该方法
+     * </p>
+     * 
+     * <p>
      * 目前 spring mobile的默认实现是 {@link LiteDeviceResolver},参见
      * {@link org.springframework.mobile.device.DeviceResolverHandlerInterceptor#DeviceResolverHandlerInterceptor()}
      * </p>
@@ -99,7 +107,7 @@ public abstract class BaseController{
      * @see org.springframework.mobile.device.LiteDeviceResolver
      */
     protected Device getDevice(HttpServletRequest request){
-        return new LiteDeviceResolver().resolveDevice(request);
+        return DEVICE_RESOLVER.resolveDevice(request);
     }
 
 }

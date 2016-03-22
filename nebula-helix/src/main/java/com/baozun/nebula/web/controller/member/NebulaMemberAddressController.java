@@ -60,7 +60,7 @@ public class NebulaMemberAddressController extends BaseController {
 	/**
 	 * log 定义
 	 */
-	private static final Logger log = LoggerFactory.getLogger(NebulaMemberAddressController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaMemberAddressController.class);
 
 	/* Model 对应的键值定义 */
 	public static final String MODEL_KEY_MEMBER_ADDRESS_LIST = "memberAddressList";
@@ -102,7 +102,7 @@ public class NebulaMemberAddressController extends BaseController {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
-		log.info("[MEM_VIEW_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
+		LOG.info("[MEM_VIEW_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		// 获取会员地址信息
 		// TODO
 		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
@@ -134,7 +134,7 @@ public class NebulaMemberAddressController extends BaseController {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
-		log.info("[MEM_LIST_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
+		LOG.info("[MEM_LIST_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		// 获取会员地址信息
 		// TODO
 		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
