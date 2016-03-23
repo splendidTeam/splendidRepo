@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.baozun.nebula</groupId>
 	<artifactId>nebula</artifactId>
@@ -10,7 +11,7 @@
 		<module>nebula-protostar</module>
 		<module>nebula-helix</module>
 		<module>nebula-collapsar</module>
-		<module>nebula-wormhole</module>
+		<module>nebula-wormhole</module> 
 		<module>nebula-wormhole-entity</module>
 	</modules>
 
@@ -104,6 +105,7 @@
 		<version.junit>4.10</version.junit>
 		<version.testng>6.9.10</version.testng>
 		<version.easymock>2.5.2</version.easymock>
+
 	</properties>
 
 	<dependencies>
@@ -196,6 +198,7 @@
 			<groupId>loxia2</groupId>
 			<artifactId>loxia2-core</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>loxia2</groupId>
 			<artifactId>loxia2-support</artifactId>
@@ -393,6 +396,11 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>janino</groupId>
+			<artifactId>janino</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -942,7 +950,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径，
+			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径， 
 				因此可以通过warSourceExcludes配置排除复制,的文件或路径， **by feilong 2015-07-01 -->
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -1139,7 +1147,7 @@
 					<version>${v.maven-war-plugin}</version>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
