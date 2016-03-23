@@ -102,7 +102,7 @@
 
 		<!-- for test -->
 		<version.junit>4.10</version.junit>
-		<version.testng>5.8</version.testng>
+		<version.testng>6.9.10</version.testng>
 		<version.easymock>2.5.2</version.easymock>
 	</properties>
 
@@ -135,7 +135,6 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<classifier>jdk15</classifier>
 		</dependency>
 
 		<dependency>
@@ -695,7 +694,6 @@
 				<groupId>org.testng</groupId>
 				<artifactId>testng</artifactId>
 				<version>${version.testng}</version>
-				<classifier>jdk15</classifier>
 				<scope>test</scope>
 			</dependency>
 			<!-- easymock -->
