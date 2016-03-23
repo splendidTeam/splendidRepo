@@ -9,22 +9,20 @@ import com.baozun.nebula.sdk.manager.impl.SdkCmsModuleInstanceManagerImpl;
 public class ModuleTag extends TagSupport {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String code;
-	
+
 	@Override
 	public int doStartTag() throws JspException {
 		JspWriter out = this.pageContext.getOut();
-		try{
+		try {
 			String data = SdkCmsModuleInstanceManagerImpl.moduleMap.get(code);
 			out.println(data);
-		}
-		catch(Exception e){
-			e.printStackTrace();
+		} catch (Exception e) {
 		}
 		return SKIP_BODY;
 	}
-	
+
 	@Override
 	public int doEndTag() throws JspException {
 		return EVAL_PAGE;
@@ -38,6 +36,4 @@ public class ModuleTag extends TagSupport {
 		this.code = code;
 	}
 
-
-	
 }
