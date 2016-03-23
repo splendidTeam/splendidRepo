@@ -1,36 +1,34 @@
 package com.baozun.nebula.sdk.command.member;
 
-import java.util.Date;
-
 import com.baozun.nebula.command.Command;
 
-public class MemberCommand  implements Command{
+public class MemberCommand implements Command {
 
 	/**
 	 * 
 	 */
-	private static final long	serialVersionUID	= 3285230772055781744L;
+	private static final long serialVersionUID = 3285230772055781744L;
 
 	/**
 	 * id
 	 */
 	private Long id;
-	
+
 	/**
 	 * 登录名
 	 */
 	private String loginName;
-	
+
 	/**
 	 * 登录邮箱
 	 */
 	private String loginEmail;
-	
+
 	/**
 	 * 登录手机
 	 */
 	private String loginMobile;
-	
+
 	/**
 	 * 密码
 	 */
@@ -38,70 +36,56 @@ public class MemberCommand  implements Command{
 	/**
 	 * BrandStore迁移的密码
 	 */
-	private String	oldPassword;
+	private String oldPassword;
 	/**
 	 * 第三方标识
 	 */
 	private String thirdPartyIdentify;
-	
+
 	/**
-	 * 来源：
-	 * 	自注册
-	 * 	微博登录
-	 * 	QQ登录
-	 *  等。
-	 * value在ChooseOption中配置
+	 * 来源： 自注册 微博登录 QQ登录 等。 value在ChooseOption中配置
 	 */
 	private Integer source;
-	
+
 	/**
-	 * 类型:
-	 * 	自有会员
-	 * 	自注册会员
-	 * 	第三方会员
-	 * 	等。
-	 * value在ChooseOption中配置
+	 * 类型: 自有会员 自注册会员 第三方会员 等。 value在ChooseOption中配置
 	 */
 	private Integer type;
-	
+
 	/**
-	 * 是否已绑定分类:1表示已加入
-	 * 		0表示未加入
+	 * 是否已绑定分类:1表示已加入 0表示未加入
 	 */
-	private Integer				isaddgroup;
+	private Integer isaddgroup;
 
 	/**
 	 * 性别 ：0表示男 1表示女
 	 */
-	private Integer 			sex;
-	
+	private Integer sex;
+
 	/**
 	 * 生日
 	 */
-	private String 				birthday;
+	private String birthday;
 
-	
-	private String 		repassword;
-	
+	private String repassword;
+
 	/**
 	 * 生命周期
 	 */
-	private Integer lifecycle ;
-	
+	private Integer lifecycle;
+
 	/**
 	 * 真实姓名
 	 */
-	private String	realName;
-	
-	
+	private String realName;
+
 	/**
-	 * 1 接收
-	 * 0 不接收
+	 * 1 接收 0 不接收
 	 */
 	private Integer receiveMail;
-	
+
 	private String newPassword;
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -237,5 +221,5 @@ public class MemberCommand  implements Command{
 	public void setOldPassword(String oldPassword) {
 		this.oldPassword = oldPassword;
 	}
-	
+
 }
