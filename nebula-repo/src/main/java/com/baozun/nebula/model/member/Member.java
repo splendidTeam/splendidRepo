@@ -36,13 +36,11 @@ import com.baozun.nebula.model.BaseModel;
  * 会员标识信息
  * 
  * @author Justin
- * 
  */
 @Entity
-@Table(name = "T_MEM_MEMBER", uniqueConstraints = { @UniqueConstraint(columnNames = { "LOGIN_NAME", "LOGIN_EMAIL",
-		"LOGIN_MOBILE" }) })
+@Table(name = "T_MEM_MEMBER",uniqueConstraints = { @UniqueConstraint(columnNames = { "LOGIN_NAME", "LOGIN_EMAIL", "LOGIN_MOBILE" }) })
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class Member extends BaseModel {
+public class Member extends BaseModel{
 
 	/**
 	 */
@@ -68,6 +66,9 @@ public class Member extends BaseModel {
 
 	/** 支付宝登录 **/
 	public static int			MEMBER_SOURCE_ALIPAY			= 4;
+
+	/** 来自微信 */
+	public static int			MEMBER_SOURCE_WECHAT			= 5;
 
 	/**
 	 * id
@@ -148,95 +149,95 @@ public class Member extends BaseModel {
 
 	@Id
 	@Column(name = "ID")
-	@SequenceGenerator(name = "SEQ_T_MEM_IDENTIFY", sequenceName = "S_T_MEM_IDENTIFY", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_T_MEM_IDENTIFY")
-	public Long getId() {
+	@SequenceGenerator(name = "SEQ_T_MEM_IDENTIFY",sequenceName = "S_T_MEM_IDENTIFY",allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_MEM_IDENTIFY")
+	public Long getId(){
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Long id){
 		this.id = id;
 	}
 
-	@Column(name = "LOGIN_NAME", length = 255)
-	public String getLoginName() {
+	@Column(name = "LOGIN_NAME",length = 255)
+	public String getLoginName(){
 		return loginName;
 	}
 
-	public void setLoginName(String loginName) {
+	public void setLoginName(String loginName){
 		this.loginName = loginName;
 	}
 
-	@Column(name = "LOGIN_EMAIL", length = 255)
-	public String getLoginEmail() {
+	@Column(name = "LOGIN_EMAIL",length = 255)
+	public String getLoginEmail(){
 		return loginEmail;
 	}
 
-	public void setLoginEmail(String loginEmail) {
+	public void setLoginEmail(String loginEmail){
 		this.loginEmail = loginEmail;
 	}
 
-	@Column(name = "LOGIN_MOBILE", length = 255)
-	public String getLoginMobile() {
+	@Column(name = "LOGIN_MOBILE",length = 255)
+	public String getLoginMobile(){
 		return loginMobile;
 	}
 
-	public void setLoginMobile(String loginMobile) {
+	public void setLoginMobile(String loginMobile){
 		this.loginMobile = loginMobile;
 	}
 
-	@Column(name = "PASSWORD", length = 255)
-	public String getPassword() {
+	@Column(name = "PASSWORD",length = 255)
+	public String getPassword(){
 		return password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(String password){
 		this.password = password;
 	}
 
-	@Column(name = "THIRD_PARTY_IDENTIFY", length = 512)
-	public String getThirdPartyIdentify() {
+	@Column(name = "THIRD_PARTY_IDENTIFY",length = 512)
+	public String getThirdPartyIdentify(){
 		return thirdPartyIdentify;
 	}
 
-	public void setThirdPartyIdentify(String thirdPartyIdentify) {
+	public void setThirdPartyIdentify(String thirdPartyIdentify){
 		this.thirdPartyIdentify = thirdPartyIdentify;
 	}
 
 	@Column(name = "SOURCE")
-	public Integer getSource() {
+	public Integer getSource(){
 		return source;
 	}
 
-	public void setSource(Integer source) {
+	public void setSource(Integer source){
 		this.source = source;
 	}
 
 	@Column(name = "LIFECYCLE")
-	public Integer getLifecycle() {
+	public Integer getLifecycle(){
 		return lifecycle;
 	}
 
-	public void setLifecycle(Integer lifecycle) {
+	public void setLifecycle(Integer lifecycle){
 		this.lifecycle = lifecycle;
 	}
 
 	@Column(name = "TYPE")
-	public Integer getType() {
+	public Integer getType(){
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(Integer type){
 		this.type = type;
 	}
 
 	@Version
 	@Column(name = "VERSION")
-	public Date getVersion() {
+	public Date getVersion(){
 		return version;
 	}
 
-	public void setVersion(Date version) {
+	public void setVersion(Date version){
 		this.version = version;
 	}
 
@@ -278,19 +279,20 @@ public class Member extends BaseModel {
 	// }
 
 	@Column(name = "RECEIVE_MAIL")
-	public Integer getReceiveMail() {
+	public Integer getReceiveMail(){
 		return receiveMail;
 	}
 
-	public void setReceiveMail(Integer receiveMail) {
+	public void setReceiveMail(Integer receiveMail){
 		this.receiveMail = receiveMail;
 	}
-	@Column(name = "OLDPASSWORD", length = 255)
-	public String getOldPassword() {
+
+	@Column(name = "OLDPASSWORD",length = 255)
+	public String getOldPassword(){
 		return oldPassword;
 	}
 
-	public void setOldPassword(String oldPassword) {
+	public void setOldPassword(String oldPassword){
 		this.oldPassword = oldPassword;
 	}
 
