@@ -40,6 +40,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.converter.MemberViewCommandConverter;
 import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
 import com.baozun.nebula.web.controller.member.validator.MemberProfileFormValidator;
+import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
 
 /**
  * 会员信息相关控制器，含显示会员信息和修改会员信息。
@@ -91,18 +92,28 @@ public class NebulaMemberProfileController extends BaseController {
 	 * @param model
 	 * @return
 	 */
-	public String showMemberProfile(@LoginMember MemberDetails memberDetails, 
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse, Model model){		
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+	public String showMemberProfile(@LoginMember MemberDetails memberDetails,
+			HttpServletRequest httpRequest, HttpServletResponse httpResponse,
+			Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-		
-		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
-		//获取会员信息
-		MemberCommand memberCommand = memberManager.findMemberById(memberDetails.getMemberId());
-		
-		model.addAttribute(MODEL_KEY_MEMBER_PROFILE,
-				memberViewCommandConverter.convert(memberCommand));
-		
+		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"show LoginName\"",
+				memberDetails.getLoginName(), new Date());
+
+		// 获取会员信息
+		MemberCommand memberCommand = memberManager
+				.findMemberById(memberDetails.getMemberId());
+
+		// 将MemberCommand对象数据全部转入MemberViewCommand中
+		MemberViewCommand memberViewCommand = memberViewCommandConverter
+				.convert(memberCommand);
+
+		LOG.info(
+				"[MEM_VIEW_PROFILE] {} [{}] \"copy MemberCommand Properties to MemberViewCommand\"",
+				memberViewCommand.getLoginName(), new Date());
+
+		model.addAttribute(MODEL_KEY_MEMBER_PROFILE, memberViewCommand);
+
 		return VIEW_MEMBER_PROFILE;
 	}
 	
@@ -116,9 +127,10 @@ public class NebulaMemberProfileController extends BaseController {
 	 * @param httpResponse
 	 * @return
 	 */
-	public NebulaReturnResult updatePortrait(@LoginMember MemberDetails memberDetails, 
-			HttpServletRequest httpRequest, HttpServletResponse httpResponse){
-		//TODO 更新用户头像，需要一个通用的异步图片处理标准
+	public NebulaReturnResult updatePortrait(
+			@LoginMember MemberDetails memberDetails,
+			HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+		// TODO 更新用户头像，需要一个通用的异步图片处理标准
 		return DefaultReturnResult.SUCCESS;
 	}
 	
@@ -134,52 +146,112 @@ public class NebulaMemberProfileController extends BaseController {
 	 * @param bindingResult
 	 * @return
 	 */
-	public NebulaReturnResult editMemberProfile(@LoginMember MemberDetails memberDetails, 
+	public NebulaReturnResult editMemberProfile(
+			@LoginMember MemberDetails memberDetails,
 			@ModelAttribute("memberProfile") MemberProfileForm memberProfileForm,
 			HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-			BindingResult bindingResult){
-		//因为有NeedLogin控制，进来的一定是已经登录的有效用户
+			BindingResult bindingResult) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-				
-		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Start\"", memberDetails.getLoginName(), new Date());
-		
+
+		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Start\"",
+				memberDetails.getLoginName(), new Date());
+
 		LOG.debug("Start to check input profile");
-		
-		//TODO 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
-		//memberProfileFormValidator.validate(memberProfileForm, bindingResult);
+
+		// TODO 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
+		memberProfileFormValidator.validate(memberProfileForm, bindingResult);
+		if (bindingResult.hasErrors()) {
+			LOG.info(
+					"[MEM_EDIT_PROFILE] {} [{}] \"Validator memberProfileForm has Error\"",
+					memberDetails.getLoginName(), new Date());
+			return null;
+		}
 		LOG.debug("input profile is validated");
-		
-		//获取会员信息
-		MemberCommand memberCommand = memberManager.findMemberById(memberDetails.getMemberId());
-		MemberPersonalData memberProfile = memberManager.findMemberPersonData(memberDetails.getMemberId());
-		
-		//TODO 这里需要通过Form和会员信息来判断这些关键信息是否变化
+
+		// 获取会员信息
+		MemberCommand memberCommand = memberManager
+				.findMemberById(memberDetails.getMemberId());
+		MemberPersonalData memberProfile = memberManager
+				.findMemberPersonData(memberDetails.getMemberId());
+
+		memberProfile = memberProfileForm
+				.convertMemberProfileFormToMemberPersonalData(memberProfile);
+
+		// TODO 这里需要通过Form和会员信息来判断这些关键信息是否变化
 		boolean isPasswordChange = false;
-		boolean isEmailChange = false;		
-		//TODO 这里会把需要修改的值都设置到 memberProfile 中，请确保所有值都成功存储
-		
+		boolean isEmailChange = false;
+		boolean isMobileChange = false;
+
+		if (!memberCommand.getPassword()
+				.equals(memberProfileForm.getPassword())) {
+			isPasswordChange = true;
+			memberManager.updatePasswd(memberDetails.getMemberId(),
+					memberCommand.getPassword(),
+					memberProfileForm.getPassword(),
+					memberProfileForm.getRepassword());
+		}
+
+		if (!memberCommand.getLoginEmail().equals(
+				memberProfileForm.getLoginEmail())) {
+			isEmailChange = true;
+			if (memberCommand.getLoginEmail().equals(
+					memberCommand.getLoginName())) {
+				memberProfileForm.setMemberLoginName(memberCommand,
+						memberProfileForm.getLoginEmail());
+			}
+			memberCommand = memberProfileForm
+					.setMemberLoginEmail(memberCommand);
+		}
+
+		if (!memberCommand.getLoginMobile().equals(
+				memberProfileForm.getLoginMobile())) {
+			isMobileChange = true;
+			if (memberCommand.getLoginMobile().equals(
+					memberCommand.getLoginName())) {
+				memberProfileForm.setMemberLoginName(memberCommand,
+						memberProfileForm.getLoginMobile());
+			}
+			memberCommand = memberProfileForm
+					.setMemberLoginMobile(memberCommand);
+		}
+
+		// TODO 这里会把需要修改的值都设置到 memberProfile 中，请确保所有值都成功存储
 		memberManager.savePersonData(memberProfile);
-		
-		if(isPasswordChange){
-			//TODO 保存重设密码
+		memberManager.saveMember(memberCommand);
+
+		if (isPasswordChange) {
+			// TODO 保存重设密码
 			postProcessForPasswordChange();
-			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[PASSWORD_CHANGED]\"", memberDetails.getLoginName(), new Date());
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[PASSWORD_CHANGED]\"",
+					memberDetails.getLoginName(), new Date());
 		}
-		if(isEmailChange){
+		if (isEmailChange) {
 			postProcessForEmailChange();
-			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[EMAIL_CHANGED]\"", memberDetails.getLoginName(), new Date());
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[EMAIL_CHANGED]\"",
+					memberDetails.getLoginName(), new Date());
 		}
-		
-		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Finished\"", memberDetails.getLoginName(), new Date());
-		
+		if (isMobileChange) {
+			postProcessForMobileChange();
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[MOBILE_CHANGED]\"",
+					memberDetails.getLoginName(), new Date());
+		}
+
+		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Finished\"",
+				memberDetails.getLoginName(), new Date());
+
 		return DefaultReturnResult.SUCCESS;
 	}
-	
-	protected void postProcessForPasswordChange(){
-		
+
+	protected void postProcessForPasswordChange() {
+
 	}
-	
-	protected void postProcessForEmailChange(){
-		//如果Email同时是登录名，可能需要考虑重新检查Email可用性，Email不可用之前账号会被禁用
+
+	protected void postProcessForEmailChange() {
+		// 如果Email同时是登录名，可能需要考虑重新检查Email可用性，Email不可用之前账号会被禁用
+	}
+
+	protected void postProcessForMobileChange() {
+
 	}
 }
