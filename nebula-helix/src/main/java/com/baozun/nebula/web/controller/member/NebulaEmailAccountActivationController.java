@@ -19,7 +19,6 @@ package com.baozun.nebula.web.controller.member;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,14 +43,12 @@ import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.Validator;
-import com.baozun.nebula.utils.CookieUtil;
 import com.baozun.nebula.utils.EmailUtil;
 import com.baozun.nebula.utils.ShopDateUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.constants.CommonUrlConstants;
 import com.baozun.nebula.web.constants.Constants;
-import com.baozun.nebula.web.constants.CookieKeyConstants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.member.converter.MemberAddressViewCommandConverter;
@@ -216,7 +213,6 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			// 同步购物车、保存用户信息信息 TODO
 			// 设置cookie中的购物车 TODO
 			// 同步購物車數據後，刪除cookie TODO
-			CookieUtil.deleteCookie(httpRequest, httpResponse, new Cookie(CookieKeyConstants.GUEST_COOKIE_GC,null));
 			// 记录登录状态 TODO
 			
 			String returnUrl = CommonUrlConstants.DEFAULT_REDIRECT_URL;
