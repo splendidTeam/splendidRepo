@@ -33,7 +33,7 @@ public class DefaultResultMessage implements NebulaResultMessage, Serializable{
 	private static final long serialVersionUID = -4707572914064240028L;
 	
 	/**
-	 * 输出的信息或输出的信息Key，如果用于输出给到普通用户看到，则应该使用Key模式
+	 * 输出的信息或输出的信息Key，如果使用Key模式，代表国际化的动作将由页面脚本完成
 	 */
 	private String message;
 	
