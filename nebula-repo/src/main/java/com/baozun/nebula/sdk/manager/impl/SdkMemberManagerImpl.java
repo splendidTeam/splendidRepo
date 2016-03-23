@@ -835,6 +835,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		return consultantsDao.save(consultants);
 	}
 
+	@Deprecated
 	@Override
 	public Member register(Member sourceMember){
 		sourceMember.setLifecycle(BaseModel.LIFECYCLE_ENABLE);// 有效
@@ -855,7 +856,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		// pwd处理为密文
 		String encodePassword = EncryptUtil.getInstance().hash(member.getPassword(), member.getLoginName());
 		member.setPassword(encodePassword);
-		
+
 		member = memberDao.save(member);
 		return member;
 	}
