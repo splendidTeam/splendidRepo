@@ -20,6 +20,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -31,13 +33,14 @@ import com.baozun.nebula.utilities.common.encryptor.Encryptor;
 
 /**
  * 常用加解密，hash，digest
- * @author liuliu
+ * @author Benjamin.Liu
  *
  */
 public class EncryptUtil {
-	private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);	
+	private static final Logger LOG = LoggerFactory.getLogger(EncryptUtil.class);	
 	
 	public static final String ENCRYPTOR_PREFIX = "encryptor.";
+	public static final String ENCRYPTORS = "encryptors";
 	
 	public static final int DEFAULT_ITERATIONS = 1024;
 	
@@ -49,7 +52,7 @@ public class EncryptUtil {
 	
 	private static EncryptUtil instance = null;
 	
-	
+	private Map<String, Encryptor> encryptors = new HashMap<String, Encryptor>();
 	private Encryptor encryptor = null;
 	private Base64Convertor base64Convertor = new Base64Convertor();
 	private ThreadLocal<MessageDigest> hasherContext = new ThreadLocal<MessageDigest>();
@@ -57,19 +60,21 @@ public class EncryptUtil {
 	
 	private EncryptUtil(){
 		//init encryptor
+		String[] encryptorArray = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ENCRYPTORS).split(",");
+		for(String strEnc: encryptorArray){
+			String encryptClassKey = ENCRYPTOR_PREFIX + strEnc;
+			String encryptClass = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(encryptClassKey);
+			assert encryptClass != null : "Cannot find Class Definition for Encryptor:" + strEnc;
+			try {
+				Encryptor e = (Encryptor)Class.forName(encryptClass).newInstance();
+				encryptors.put(strEnc, e);
+			} catch (Exception e) {
+				LOG.error("Encryptor initialization fail. {} can not be initialized with Error {}", encryptClassKey, e.getClass());
+			}
+		}
 		String encryptMethod = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ConfigurationUtil.ENCRYPT_ALGORITHM_KEY);
-		String encryptClassKey = ENCRYPTOR_PREFIX + (encryptMethod == null? DEFAULT_ENCRYPT_ALGORITHM : encryptMethod);
-		String encryptClass = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(encryptClassKey);
-		if(encryptClass == null){
-			logger.error("Encryptor initialization fail. No registration found for {}" +
-					" so no further encrypt/decrypt operation can be success.", encryptClassKey);
-		}
-		try {
-			encryptor = (Encryptor)Class.forName(encryptClass).newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("Encryptor initialization fail. {} can not be initialized.", encryptClassKey);
-		}
+		encryptMethod = encryptMethod == null? DEFAULT_ENCRYPT_ALGORITHM : encryptMethod;
+		encryptor = encryptors.get(encryptMethod);
 		
 	}
 	
@@ -79,10 +84,23 @@ public class EncryptUtil {
 		return instance;
 	}
 	
+	/**
+	 * 取得Hash值
+	 * @param plainText
+	 * @param salt
+	 * @return
+	 */
 	public String hash(String plainText, String salt){
 		return hash(plainText, salt, DEFAULT_ITERATIONS);
 	}
 	
+	/**
+	 * 取得Hash值
+	 * @param plainText
+	 * @param salt
+	 * @param iterations
+	 * @return
+	 */
 	public String hash(String plainText, String salt, int iterations){
 		byte[] bytes = hashNative(plainText, salt, iterations);
 		if(bytes == null) return null;
@@ -94,9 +112,9 @@ public class EncryptUtil {
 		try {
 			return MessageDigest.getInstance(hashAlgorithm == null? DEFAULT_HASH_ALGORITHM : hashAlgorithm);
 		} catch (NoSuchAlgorithmException e) {
-			logger.error("No algorithm found for digest with name {}", 
+			LOG.error("No algorithm found for digest with name {}", 
 					hashAlgorithm == null? DEFAULT_HASH_ALGORITHM : hashAlgorithm);
-			logger.error("Digester for Hash initialzation fail, so no further hash operation can be success");
+			LOG.error("Digester for Hash initialzation fail, so no further hash operation can be success");
 		}
 		return null;
 	}
@@ -106,9 +124,9 @@ public class EncryptUtil {
 		try {
 			return MessageDigest.getInstance(digestAlgorithm == null? DEFAULT_DIGEST_ALGORITHM : digestAlgorithm);
 		} catch (NoSuchAlgorithmException e) {
-			logger.error("No algorithm found for digest with name {}", 
+			LOG.error("No algorithm found for digest with name {}", 
 					digestAlgorithm == null? DEFAULT_DIGEST_ALGORITHM : digestAlgorithm);
-			logger.error("Digester initialzation fail, so no further digest operation can be success");
+			LOG.error("Digester initialzation fail, so no further digest operation can be success");
 		}
 		return null;
 	}
@@ -134,33 +152,78 @@ public class EncryptUtil {
 			}
 			return bytes;
 		} catch (UnsupportedEncodingException e) {
-			logger.error("Get Bytes for digest data error with UTF-8");
+			LOG.error("Get Bytes for digest data error with UTF-8");
 			throw new RuntimeException("Get Bytes for digest data error with UTF-8");
 		}
 	}
 	
+	/**
+	 * 获得缺省的加解密器，默认是对称加密
+	 * @return
+	 */
+	public Encryptor getEncryptor() {
+		return encryptor;
+	}
+	
+	/**
+	 * 获得加解密器
+	 * @param encType
+	 * @return
+	 */
+	public Encryptor getEncryptor(String encType){
+		return encryptors.get(encType);
+	}
+
+	/**
+	 * 加密，加密字符串是经过BASE64转码的
+	 * @param plainText
+	 * @param encType
+	 * @return
+	 * @throws EncryptionException
+	 */
+	public String encrypt(String plainText, String encType) throws EncryptionException{
+		Encryptor e = encryptors.get(encType);
+		if(e == null)
+			throw new EncryptionException("No proper Encryptor found for " + encType);
+		return e.encrypt(plainText);
+	}
+	
+	/**
+	 * 解密，默认加密字符串是经过BASE64转码的
+	 * @param cipherText
+	 * @param encType
+	 * @return
+	 * @throws EncryptionException
+	 */
+	public String decrypt(String cipherText, String encType) throws EncryptionException{
+		Encryptor e = encryptors.get(encType);
+		if(e == null)
+			throw new EncryptionException("No proper Encryptor found for " + encType);
+		return e.decrypt(cipherText);
+	}
+	
+	/**
+	 * 使用默认加解密器加密，加密字符串是经过BASE64转码的
+	 * @param plainText
+	 * @return
+	 * @throws EncryptionException
+	 */
 	public String encrypt(String plainText) throws EncryptionException{
 		if(encryptor == null)
-			throw new RuntimeException("Encryptor does not initiate properly.");
+			throw new EncryptionException("Encryptor does not initiate properly.");
 		return encryptor.encrypt(plainText);
 	}
 	
+	/**
+	 * 使用默认加解密器解密，默认加密字符串是经过BASE64转码的
+	 * @param cipherText
+	 * @return
+	 * @throws EncryptionException
+	 */
 	public String decrypt(String cipherText) throws EncryptionException{
 		if(encryptor == null)
-			throw new RuntimeException("Encryptor does not initiate properly.");
+			throw new EncryptionException("Encryptor does not initiate properly.");
 		return encryptor.decrypt(cipherText);
-	}
-	
-	public String encrypt(String plainText,String masterkey) throws EncryptionException{
-		if(encryptor == null)
-			throw new RuntimeException("Encryptor does not initiate properly.");
-		return encryptor.encrypt(plainText,masterkey);
-	}
-	
-	public String decrypt(String cipherText,String masterkey) throws EncryptionException{
-		if(encryptor == null)
-			throw new RuntimeException("Encryptor does not initiate properly.");
-		return encryptor.decrypt(cipherText,masterkey);
 	}
 	
 	public String sign(String data){
@@ -184,7 +247,7 @@ public class EncryptUtil {
 			digester.reset();
 			return StringUtil.bytes2String(digester.digest(data.getBytes(ConfigurationUtil.DEFAULT_ENCODING)));
 		} catch (UnsupportedEncodingException e) {
-			logger.error("Get Bytes for digest data error with UTF-8");
+			LOG.error("Get Bytes for digest data error with UTF-8");
 			throw new RuntimeException("Get Bytes for digest data error with UTF-8");
 		}
 	}
@@ -201,6 +264,11 @@ public class EncryptUtil {
 		}
 	}
 	
+	/**
+	 * BASE64转码
+	 * @param source
+	 * @return
+	 */
 	public String base64Encode(String source){
 		
 		if(StringUtils.isBlank(source))
@@ -209,6 +277,11 @@ public class EncryptUtil {
 			return base64Convertor.format(source.getBytes());
 	}
 	
+	/**
+	 * BASE64解码
+	 * @param source
+	 * @return
+	 */
 	public String base64Decode(String source){
 		
 		if(StringUtils.isBlank(source))
