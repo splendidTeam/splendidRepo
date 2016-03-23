@@ -7,11 +7,11 @@
 	<modules>
 		<module>nebula-repo</module>
 		<module>nebula-utilities</module>
-		<module>nebula-protostar</module>
+		<!-- <module>nebula-protostar</module> -->
 		<module>nebula-helix</module>
-		<module>nebula-collapsar</module>
-		<module>nebula-wormhole</module>
-		<module>nebula-wormhole-entity</module>
+		<!-- <module>nebula-collapsar</module> -->
+		<!-- <module>nebula-wormhole</module> -->
+		<!-- <module>nebula-wormhole-entity</module> -->
 	</modules>
 
 	<properties>
@@ -198,6 +198,7 @@
 			<groupId>loxia2</groupId>
 			<artifactId>loxia2-core</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>loxia2</groupId>
 			<artifactId>loxia2-support</artifactId>
