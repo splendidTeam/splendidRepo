@@ -25,5 +25,29 @@ public class EmailConstants {
      * 邮件注册验证模板
      */
     public static final String EMAIL_REGISTER_VALIDATE="EMAIL_REGISTER_VALIDATE";
+    
+	/**郵件發送次數*/
+	public static final Integer SEND_EMAIL_NUMBER = 5;
+	
+	/** 发送邮件时间间隔（分鐘） */
+	public static final Integer NEBULA_SEND_EMAIL_AGAIN_TIME_SPAN = 2;
+	
+	/**註冊緩存key拼接字符*/
+	public static final String NEBULA_MEMBER_REGISTER = "_register";
+	
+	/**激活邮件发送时间 key拼接字符*/
+	public static final String SEND_ACTIVE_EMAIL_EXPIRED_TIME = "send_active_email_expired_time";
+	
+	/**
+	 * 邮箱已激活
+	 */
+	public static final String EMAIL_ACTIVE_YES = "Y";
+	/**
+	 * 邮箱未激活
+	 */
+	public static final String EMAIL_ACTIVE_NO = "N";
+
+	
+
 
 }
