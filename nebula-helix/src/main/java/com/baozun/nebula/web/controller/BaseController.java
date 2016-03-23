@@ -23,7 +23,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DeviceResolver;
 import org.springframework.mobile.device.LiteDeviceResolver;
@@ -44,8 +47,31 @@ public abstract class BaseController{
 
     @Resource
     protected EventPublisher            eventPublisher;
+    
+    @Autowired
+	private MessageSource				messageSource;
 
     private static final DeviceResolver DEVICE_RESOLVER = new LiteDeviceResolver();
+    
+    /**
+     * 获取i18n信息
+     * @param key
+     * @return
+     */
+    protected String getMessage(String key){
+    	return getMessage(key, new Object[]{});
+    }
+    
+    /**
+     * 获取i18n信息
+     * @param key
+     * @param params
+     * @return
+     */
+    protected String getMessage(String key, Object[] params){
+    	return messageSource.getMessage(key, params, LocaleContextHolder.getLocale());
+    }
+    
 
     // TODO未实现
     /**

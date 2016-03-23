@@ -28,5 +28,26 @@ public interface HelixConstants {
 	 * 网站域名
 	 */
 	public static final String SITE_DOMAIN_NAME = "site.domain.name";
+	
+	/**
+	 * 网站登录地址
+	 */
+	public static final String SITE_LOGIN_URL = "site.login.url";
+	
+	/**
+	 * 网站请求协议头改写位置
+	 */
+	public static final String SITE_WEBHEADER_REQUEST_PROTOCOL = "site.webheader.request.protocol";
 
+	/**
+	 * Https混合模式下会话安全签名盐值
+	 */
+	public static final String SECURITY_HTTPS_SECURESESSION_SALT = "security.https.securesession.salt";
+	
+	/**
+	 * 网站用户信息检查失败后的跳转地址
+	 */
+	public static final String SECURITY_SESSION_CHECK_FAILURE_URL = "security.session.check.failure.url";
+	
+	
 }

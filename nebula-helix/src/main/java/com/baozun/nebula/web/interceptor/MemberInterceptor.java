@@ -19,8 +19,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utils.CookieUtil;
-import com.baozun.nebula.utils.cookie.HttpUtilities;
 import com.baozun.nebula.utils.http.HttpsLoginUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.NeedLogin;
@@ -29,6 +27,7 @@ import com.baozun.nebula.web.constants.CookieKeyConstants;
 import com.baozun.nebula.web.constants.ImgConstants;
 import com.baozun.nebula.web.constants.MemberCookieLoginTypeConstatns;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.feilong.servlet.http.CookieUtil;
 
 public class MemberInterceptor extends HandlerInterceptorAdapter implements
         ServletContextAware {
@@ -124,7 +123,7 @@ public class MemberInterceptor extends HandlerInterceptorAdapter implements
              
             //登录状态不会为，并且是会员登录状态，则删除cookie
             if(memberLoginCk!=null&&memberLoginCk.getValue().equals(CookieKeyConstants.MEMBER_LOGIN_STATUS)){
-            	CookieUtil.deleteCookie(request, response, CookieKeyConstants.MEMBER_COOKIE_LOGIN_STATUS);
+            	CookieUtil.deleteCookie(CookieKeyConstants.MEMBER_COOKIE_LOGIN_STATUS, response);
             }		 
             		 
              //非ajax的请求
@@ -146,7 +145,7 @@ public class MemberInterceptor extends HandlerInterceptorAdapter implements
     		
     		if(scheme!=null&&scheme.endsWith("https")){  //当前为https访问模式
     			
-    			String sign=HttpUtilities.getCookieValue(CookieKeyConstants.HTTPS_SIGN, request);
+    			String sign=CookieUtil.getCookieValue(request, CookieKeyConstants.HTTPS_SIGN);
     			
     			Properties properties=ProfileConfigUtil.findPro("config/metainfo.properties");
     			
@@ -158,7 +157,7 @@ public class MemberInterceptor extends HandlerInterceptorAdapter implements
     				return true;
     			}
     			else{					//签名是错误的，则删除签名，并返回未登录状态
-    				HttpUtilities.removeCookie(CookieKeyConstants.HTTPS_SIGN, request, response);
+    				CookieUtil.deleteCookie(CookieKeyConstants.HTTPS_SIGN, response);
     				
     				 if (request.getHeader("X-Requested-With") == null) {
     	                	
