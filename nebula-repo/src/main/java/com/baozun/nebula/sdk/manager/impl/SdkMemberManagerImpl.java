@@ -74,7 +74,7 @@ import com.baozun.nebula.utilities.library.address.AddressUtil;
 
 @Transactional
 @Service("sdkMemberService")
-public class SdkMemberManagerImpl implements SdkMemberManager {
+public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	final Logger					log	= LoggerFactory.getLogger(this.getClass());
 
@@ -107,6 +107,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	@Autowired
 	private MemberGroupRelationDao	memberGroupRelationDao;
+
 	@Autowired
 	private SdkOrderLineDao			sdkOrderLineDao;
 
@@ -122,61 +123,167 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	@Autowired
 	private SdkSecretManager		sdkSecretManager;
 
-	private void encrypt(MemberPersonalData mpd) {
+	private void encrypt(MemberPersonalData mpd){
 
-		sdkSecretManager.encrypt(mpd, new String[] { "nickname", "localRealName", "intelRealName", "bloodType",
-				"marriage", "country", "province", "city", "area", "town", "address", "credentialsNo", "email",
-				"mobile", "qq", "weibo", "weixin", "edu", "industy", "position", "salary", "workingLife", "company",
-				"interest", "postCode" });
+		sdkSecretManager.encrypt(mpd, new String[] {
+				"nickname",
+				"localRealName",
+				"intelRealName",
+				"bloodType",
+				"marriage",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"credentialsNo",
+				"email",
+				"mobile",
+				"qq",
+				"weibo",
+				"weixin",
+				"edu",
+				"industy",
+				"position",
+				"salary",
+				"workingLife",
+				"company",
+				"interest",
+				"postCode" });
 	}
 
-	private void decrypt(MemberPersonalData mpd) {
+	private void decrypt(MemberPersonalData mpd){
 
-		sdkSecretManager.decrypt(mpd, new String[] { "nickname", "localRealName", "intelRealName", "bloodType",
-				"marriage", "country", "province", "city", "area", "town", "address", "credentialsNo", "email",
-				"mobile", "qq", "weibo", "weixin", "edu", "industy", "position", "salary", "workingLife", "company",
-				"interest", "postCode" });
+		sdkSecretManager.decrypt(mpd, new String[] {
+				"nickname",
+				"localRealName",
+				"intelRealName",
+				"bloodType",
+				"marriage",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"credentialsNo",
+				"email",
+				"mobile",
+				"qq",
+				"weibo",
+				"weixin",
+				"edu",
+				"industy",
+				"position",
+				"salary",
+				"workingLife",
+				"company",
+				"interest",
+				"postCode" });
 	}
 
-	private void encrypt(MemberPersonalDataCommand mpdc) {
+	private void encrypt(MemberPersonalDataCommand mpdc){
 
-		sdkSecretManager.encrypt(mpdc, new String[] { "nickname", "localRealName", "intelRealName", "bloodType",
-				"marriage", "country", "province", "city", "area", "address", "credentialsNo", "postCode" });
+		sdkSecretManager.encrypt(mpdc, new String[] {
+				"nickname",
+				"localRealName",
+				"intelRealName",
+				"bloodType",
+				"marriage",
+				"country",
+				"province",
+				"city",
+				"area",
+				"address",
+				"credentialsNo",
+				"postCode" });
 	}
 
-	private void decrypt(MemberPersonalDataCommand mpdc) {
+	private void decrypt(MemberPersonalDataCommand mpdc){
 
-		sdkSecretManager.decrypt(mpdc, new String[] { "nickname", "localRealName", "intelRealName", "bloodType",
-				"marriage", "country", "province", "city", "area", "address", "credentialsNo", "postCode" });
+		sdkSecretManager.decrypt(mpdc, new String[] {
+				"nickname",
+				"localRealName",
+				"intelRealName",
+				"bloodType",
+				"marriage",
+				"country",
+				"province",
+				"city",
+				"area",
+				"address",
+				"credentialsNo",
+				"postCode" });
 	}
 
-	private void encryptContact(ContactCommand contact) {
+	private void encryptContact(ContactCommand contact){
 
-		sdkSecretManager.encrypt(contact, new String[] { "name", "country", "province", "city", "area", "town",
-				"address", "postcode", "telphone", "mobile", "email" });
+		sdkSecretManager.encrypt(contact, new String[] {
+				"name",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"telphone",
+				"mobile",
+				"email" });
 	}
 
-	private void decryptContact(ContactCommand contact) {
+	private void decryptContact(ContactCommand contact){
 
-		sdkSecretManager.decrypt(contact, new String[] { "name", "country", "province", "city", "area", "town",
-				"address", "postcode", "telphone", "mobile", "email" });
+		sdkSecretManager.decrypt(contact, new String[] {
+				"name",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"telphone",
+				"mobile",
+				"email" });
 	}
 
-	private void encryptContact(Contact contact) {
+	private void encryptContact(Contact contact){
 
-		sdkSecretManager.encrypt(contact, new String[] { "name", "country", "province", "city", "area", "town",
-				"address", "postcode", "telphone", "mobile", "email" });
+		sdkSecretManager.encrypt(contact, new String[] {
+				"name",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"telphone",
+				"mobile",
+				"email" });
 	}
 
-	private void decryptContact(Contact contact) {
+	private void decryptContact(Contact contact){
 
-		sdkSecretManager.decrypt(contact, new String[] { "name", "country", "province", "city", "area", "town",
-				"address", "postcode", "telphone", "mobile", "email" });
+		sdkSecretManager.decrypt(contact, new String[] {
+				"name",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"telphone",
+				"mobile",
+				"email" });
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberCommand findMemberById(Long id) {
+	@Transactional(readOnly = true)
+	public MemberCommand findMemberById(Long id){
 		Member member = memberDao.findMemberById(id);
 		if (null != member)
 			return convertMemberToMemberCommand(member);
@@ -184,26 +291,26 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public MemberCommand saveMember(MemberCommand memberCommand) {
+	public MemberCommand saveMember(MemberCommand memberCommand){
 		Member member = null;
-		if (memberCommand.getId() == null || memberCommand.getId() == 0) {
+		if (memberCommand.getId() == null || memberCommand.getId() == 0){
 			// 保存
 			member = new Member();
-		} else {
+		}else{
 			// 更新
 			member = memberDao.findMemberById(memberCommand.getId());
 		}
 		member = convertMemberCommandToMember(memberCommand, member);
 		member = memberDao.save(member);
-		if (null != member) {
+		if (null != member){
 			return convertMemberToMemberCommand(member);
 		}
 		return null;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberCommand findMemberByLoginName(String loginName) {
+	@Transactional(readOnly = true)
+	public MemberCommand findMemberByLoginName(String loginName){
 		Member member = null;
 		if (StringUtils.isNotBlank(loginName))
 			member = memberDao.findMemberByLoginName(loginName.toUpperCase());
@@ -213,8 +320,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberCommand findMemberByLoginEmail(String loginName) {
+	@Transactional(readOnly = true)
+	public MemberCommand findMemberByLoginEmail(String loginName){
 		Member member = null;
 		if (StringUtils.isNotBlank(loginName))
 			member = memberDao.findMemberByLoginEmail(loginName.toUpperCase());
@@ -224,8 +331,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberCommand findMemberByLoginNameAndPasswd(String loginName, String password) {
+	@Transactional(readOnly = true)
+	public MemberCommand findMemberByLoginNameAndPasswd(String loginName,String password){
 		Member member = memberDao.findMemberByLoginNameAndPasswd(loginName, password);
 		if (null != member)
 			return convertMemberToMemberCommand(member);
@@ -233,8 +340,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<CouponCommand> findCouponCommandList(Page page, Sort[] sorts, Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<CouponCommand> findCouponCommandList(Page page,Sort[] sorts,Map<String, Object> searchParam){
 		return couponDao.findCouponCommandList(page, sorts, searchParam);
 	}
 
@@ -242,8 +349,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	 * @deprecated {@link com.baozun.nebula.sdk.manager.SdkMemberManager#findContactById(Long, Long)}
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public ContactCommand findContactById(Long contactId) {
+	@Transactional(readOnly = true)
+	public ContactCommand findContactById(Long contactId){
 		Contact contact = contactDao.findContactById(contactId);
 		decryptContact(contact);
 		if (null != contact)
@@ -253,7 +360,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ContactCommand findContactById(Long contactId, Long memberId) {
+	public ContactCommand findContactById(Long contactId,Long memberId){
 		Contact contact = contactDao.findContactByCantactIdAndMemberId(contactId, memberId);
 		decryptContact(contact);
 		if (null != contact)
@@ -262,13 +369,13 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public ContactCommand saveContactCommand(ContactCommand contactCommand) {
+	public ContactCommand saveContactCommand(ContactCommand contactCommand){
 		encryptContact(contactCommand);
 		Contact contact = null;
-		if (contactCommand.getId() == null || contactCommand.getId() == 0) {
+		if (contactCommand.getId() == null || contactCommand.getId() == 0){
 			// 保存
 			contact = new Contact();
-		} else {
+		}else{
 			// 更新
 			contact = contactDao.getByPrimaryKey(contactCommand.getId());
 		}
@@ -279,13 +386,15 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 			return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
 		return null;
 	}
-	
+
 	/**
 	 * 重写联系人信息中的区划的国际化信息
+	 * 
 	 * @param contactCommand
 	 */
 	private void rewriteIntlDistrictInfo(ContactCommand contactCommand){
-		if(contactCommand == null) return;
+		if (contactCommand == null)
+			return;
 		Address country = AddressUtil.getAddressById(contactCommand.getCountryId());
 		Address province = AddressUtil.getAddressById(contactCommand.getProvinceId());
 		Address city = AddressUtil.getAddressById(contactCommand.getCityId());
@@ -299,82 +408,83 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public List<ContactCommand> findAllContactListByMemberId(Long memberId) {
+	@Transactional(readOnly = true)
+	public List<ContactCommand> findAllContactListByMemberId(Long memberId){
 		List<Contact> contacts = contactDao.findAllContactListByMemberId(memberId);
 		List<ContactCommand> contactCommands = new ArrayList<ContactCommand>();
-		for (Contact contact : contacts) {
+		for (Contact contact : contacts){
 			decryptContact(contact);
-			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(),
-					contact);
+			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
 			// 用id获取中文名称
-			rewriteIntlDistrictInfo(contactCommand);			
+			rewriteIntlDistrictInfo(contactCommand);
 			contactCommands.add(contactCommand);
 		}
 		return contactCommands;
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
-	public Pagination<ContactCommand> findContactsByMemberId(Page page, Sort[] sorts, Long memberId){
+	public Pagination<ContactCommand> findContactsByMemberId(Page page,Sort[] sorts,Long memberId){
 		Pagination<Contact> contacts = contactDao.findContactsByMemberId(page, sorts, memberId);
 		Pagination<ContactCommand> resultContacts = new Pagination<ContactCommand>();
-		try {
-			PropertyUtil.copyProperties(contacts, resultContacts, 
-					new PropListCopyable("count","currentPage","totalPages","start","size","sortStr"));
-		} catch (Exception e) {
-			//should not occur
+		try{
+			PropertyUtil.copyProperties(contacts, resultContacts, new PropListCopyable(
+					"count",
+					"currentPage",
+					"totalPages",
+					"start",
+					"size",
+					"sortStr"));
+		}catch (Exception e){
+			// should not occur
 			e.printStackTrace();
 		}
 		resultContacts.setItems(new ArrayList<ContactCommand>());
-		for(Contact contact : contacts.getItems()){
+		for (Contact contact : contacts.getItems()){
 			decryptContact(contact);
-			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(),
-					contact);
+			ContactCommand contactCommand = (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
 			// 用id获取中文名称
 			rewriteIntlDistrictInfo(contactCommand);
-			resultContacts.getItems().add(contactCommand);			
+			resultContacts.getItems().add(contactCommand);
 		}
 		return resultContacts;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<MemberFavoritesCommand> memberFavoritesList(Page page, Sort[] sorts,
-			Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<MemberFavoritesCommand> memberFavoritesList(Page page,Sort[] sorts,Map<String, Object> searchParam){
 		return memberFavoritesDao.memberFavoritesList(page, sorts, searchParam);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberFavoritesCommand findMemberFavoritesByMemberIdAndItemId(Long itemId, Long memberId, Long skuId) {
+	@Transactional(readOnly = true)
+	public MemberFavoritesCommand findMemberFavoritesByMemberIdAndItemId(Long itemId,Long memberId,Long skuId){
 		Map<String, Long> paramMap = new HashMap<String, Long>();
 		paramMap.put("itemId", itemId);
 		paramMap.put("memberId", memberId);
-		if (null != skuId) {
+		if (null != skuId){
 			paramMap.put("skuId", skuId);
 		}
 		MemberFavorites memberFavorites = memberFavoritesDao.findMemberFavoritesByMemberIdAndItemId(paramMap);
 		if (null != memberFavorites)
-			return (MemberFavoritesCommand) ConvertUtils
-					.convertTwoObject(new MemberFavoritesCommand(), memberFavorites);
+			return (MemberFavoritesCommand) ConvertUtils.convertTwoObject(new MemberFavoritesCommand(), memberFavorites);
 		return null;
 	}
 
 	@Override
-	public void deleteMemberFavorites(MemberFavoritesCommand memberFavoritesCommand) {
+	public void deleteMemberFavorites(MemberFavoritesCommand memberFavoritesCommand){
 		Map<String, Long> paramMap = new HashMap<String, Long>();
 		paramMap.put("itemId", memberFavoritesCommand.getItemId());
 		paramMap.put("memberId", memberFavoritesCommand.getMemberId());
 		Long skuId = memberFavoritesCommand.getSkuId();
-		if (null != skuId) {
+		if (null != skuId){
 			paramMap.put("skuId", skuId);
 		}
 		MemberFavorites memberFavorites = memberFavoritesDao.findMemberFavoritesByMemberIdAndItemId(paramMap);
 		memberFavoritesDao.delete(memberFavorites);
 	}
 
-	private MemberCommand convertMemberToMemberCommand(Member member) {
+	private MemberCommand convertMemberToMemberCommand(Member member){
 		MemberCommand memberCommand = new MemberCommand();
 
 		memberCommand.setLoginName(member.getLoginName());
@@ -395,7 +505,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 		return memberCommand;
 	}
 
-	private Member convertMemberCommandToMember(MemberCommand memberCommand, Member member) {
+	private Member convertMemberCommandToMember(MemberCommand memberCommand,Member member){
 		member.setLoginName(memberCommand.getLoginName());
 		member.setPassword(memberCommand.getPassword());
 		member.setLoginEmail(memberCommand.getLoginEmail());
@@ -414,7 +524,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public MemberConductCommand saveMemberConduct(MemberConductCommand memberConductCommand) {
+	public MemberConductCommand saveMemberConduct(MemberConductCommand memberConductCommand){
 		MemberConduct conduct = memberConductDao.findMemberConductById(memberConductCommand.getId());
 		if (null == conduct)
 			conduct = new MemberConduct();
@@ -426,31 +536,28 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public MemberPersonalDataCommand saveMemberPersonDataCommand(MemberPersonalDataCommand memberPersonalDataCommand) {
+	public MemberPersonalDataCommand saveMemberPersonDataCommand(MemberPersonalDataCommand memberPersonalDataCommand){
 		encrypt(memberPersonalDataCommand);
-		MemberPersonalData memberPersonalData = memberPersonalDataDao
-				.getByPrimaryKey(memberPersonalDataCommand.getId());
-		if (null == memberPersonalData) {
+		MemberPersonalData memberPersonalData = memberPersonalDataDao.getByPrimaryKey(memberPersonalDataCommand.getId());
+		if (null == memberPersonalData){
 			memberPersonalData = new MemberPersonalData();
 		}
-		memberPersonalData = (MemberPersonalData) ConvertUtils.convertTwoObject(memberPersonalData,
-				memberPersonalDataCommand);
+		memberPersonalData = (MemberPersonalData) ConvertUtils.convertTwoObject(memberPersonalData, memberPersonalDataCommand);
 		memberPersonalData = memberPersonalDataDao.save(memberPersonalData);
 		if (null != memberPersonalData)
-			return (MemberPersonalDataCommand) ConvertUtils.convertTwoObject(new MemberPersonalDataCommand(),
-					memberPersonalData);
+			return (MemberPersonalDataCommand) ConvertUtils.convertTwoObject(new MemberPersonalDataCommand(), memberPersonalData);
 		return null;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberConductCommand findMemberConductCommandById(Long id) {
+	@Transactional(readOnly = true)
+	public MemberConductCommand findMemberConductCommandById(Long id){
 		return memberConductDao.findMemberConductCommandById(id);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberPersonalDataCommand findMemberPersonDataCommandById(Long id) {
+	@Transactional(readOnly = true)
+	public MemberPersonalDataCommand findMemberPersonDataCommandById(Long id){
 		MemberPersonalDataCommand mpdc = memberPersonalDataDao.findById(id);
 
 		decrypt(mpdc);
@@ -458,24 +565,23 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public Integer updateContactIsDefault(Long memberId, Long contactId, boolean isDefault) {
+	public Integer updateContactIsDefault(Long memberId,Long contactId,boolean isDefault){
 		contactDao.updateContactByMemberId(memberId, Contact.NOTDEFAULT);
 		return contactDao.updateContactByContactId(contactId, isDefault, memberId);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public CouponCommand findByMemberIdAndCardNo(Long memberId, String couponNo) {
+	@Transactional(readOnly = true)
+	public CouponCommand findByMemberIdAndCardNo(Long memberId,String couponNo){
 		return couponDao.findCouponCommandByMemberIdAndCardNo(memberId, couponNo);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<ContactCommand> findContactCommandByQueryMapWithPage(Page page, Sort[] sorts,
-			Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<ContactCommand> findContactCommandByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam){
 		Pagination<ContactCommand> contactPage = contactDao.findContactByQueryMapWithPage(page, sorts, searchParam);
 
-		for (ContactCommand cc : contactPage.getItems()) {
+		for (ContactCommand cc : contactPage.getItems()){
 			decryptContact(cc);
 		}
 
@@ -484,17 +590,15 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findContactList(loxia. dao.Page, loxia.dao.Sort[],
-	 * java.util.Map)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findContactList(loxia. dao.Page, loxia.dao.Sort[], java.util.Map)
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<ContactCommand> findContactList(Page page, Sort[] sorts, Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<ContactCommand> findContactList(Page page,Sort[] sorts,Map<String, Object> searchParam){
 
 		Pagination<ContactCommand> contactPage = contactDao.findContactByQueryMapWithPage(page, sorts, searchParam);
 
-		for (ContactCommand cc : contactPage.getItems()) {
+		for (ContactCommand cc : contactPage.getItems()){
 			decryptContact(cc);
 		}
 
@@ -503,52 +607,50 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createOrUpdateContact(
-	 * com.baozun.nebula.command.ContactCommand)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createOrUpdateContact( com.baozun.nebula.command.ContactCommand)
 	 */
 	@Override
-	public ContactCommand createOrUpdateContact(ContactCommand command) {
+	public ContactCommand createOrUpdateContact(ContactCommand command){
 
 		Contact con = null;
-		if (command.getId() == null || command.getId() == 0) {
+		if (command.getId() == null || command.getId() == 0){
 			// 保存
 			con = new Contact();
 			con = convertContactCommandToContact(command, con);
 			encryptContact(con);
-			if (command.getIsDefault()) {// 设置其他为非默认
+			if (command.getIsDefault()){// 设置其他为非默认
 				contactDao.updateContactByMemberId(command.getMemberId(), Contact.NOTDEFAULT);
 			}
 			con = contactDao.save(con);
 
-		} else {
+		}else{
 			// 更新
 			con = contactDao.getByPrimaryKey(command.getId());
 			con = convertContactCommandToContact(command, con);
 			encryptContact(con);
-			if (command.getIsDefault()) {// 设置其他为非默认
+			if (command.getIsDefault()){// 设置其他为非默认
 				contactDao.updateContactByMemberId(command.getMemberId(), Contact.NOTDEFAULT);
 			}
 
 		}
-		if (null != con) {
+		if (null != con){
 			return convertContactToContactCommand(con);
 		}
 		return null;
 	}
 
-	private ContactCommand convertContactToContactCommand(Contact con) {
+	private ContactCommand convertContactToContactCommand(Contact con){
 		ContactCommand command = new ContactCommand();
-		
+
 		ConvertUtils.convertTwoObject(command, con);
 		rewriteIntlDistrictInfo(command);
-		
+
 		return command;
 	}
 
-	//TODO 这个方法的地址转换需要检查逻辑是否正确。从我个人理解来看，数据转换为展现的时候要转，但是存储的时候也转是否有必要和合适
-	//是为了匹配历史不用ID而直接用名字时的兼容性么？
-	private Contact convertContactCommandToContact(ContactCommand command, Contact con) {
+	// TODO 这个方法的地址转换需要检查逻辑是否正确。从我个人理解来看，数据转换为展现的时候要转，但是存储的时候也转是否有必要和合适
+	// 是为了匹配历史不用ID而直接用名字时的兼容性么？
+	private Contact convertContactCommandToContact(ContactCommand command,Contact con){
 		// con.setId(command.getId());
 		con.setName(command.getName());
 		con.setAddress(command.getAddress());
@@ -578,30 +680,27 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#removeContactById(java .lang.Long, java.lang.Long)
 	 */
 	@Override
-	public Integer removeContactById(Long contactId, Long memberId) {
+	public Integer removeContactById(Long contactId,Long memberId){
 		return contactDao.removeContactById(contactId, memberId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findFavoritesList(loxia .dao.Page, loxia.dao.Sort[],
-	 * java.util.Map)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findFavoritesList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<MemberFavoritesCommand> findFavoritesList(Page page, Sort[] sorts, Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<MemberFavoritesCommand> findFavoritesList(Page page,Sort[] sorts,Map<String, Object> searchParam){
 
 		Pagination<MemberFavoritesCommand> favoritesPage = memberFavoritesDao.findFavoritesList(page, sorts, searchParam);
-		if (favoritesPage != null && favoritesPage.getItems() != null) {
-			for (MemberFavoritesCommand favortiesCommand : favoritesPage.getItems()) {
-				if(favortiesCommand != null && favortiesCommand.getSkuId() != null){
+		if (favoritesPage != null && favoritesPage.getItems() != null){
+			for (MemberFavoritesCommand favortiesCommand : favoritesPage.getItems()){
+				if (favortiesCommand != null && favortiesCommand.getSkuId() != null){
 					List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(favortiesCommand.getProperties());
-					if (null != skuPros && !skuPros.isEmpty()) {
+					if (null != skuPros && !skuPros.isEmpty()){
 						favortiesCommand.setSkuPropertys(skuPros);
 					}
 				}
@@ -613,12 +712,11 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createFavorites(java.lang .Long, java.lang.Long,
-	 * java.lang.String, java.lang.String)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createFavorites(java.lang .Long, java.lang.Long, java.lang.String,
+	 * java.lang.String)
 	 */
 	@Override
-	public MemberFavoritesCommand createFavorites(Long memberId, Long itemId, Long skuId) {
+	public MemberFavoritesCommand createFavorites(Long memberId,Long itemId,Long skuId){
 		MemberFavorites meberFavorites = new MemberFavorites();
 		meberFavorites.setItemId(itemId);
 		meberFavorites.setSkuId(skuId);
@@ -627,37 +725,32 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 		meberFavorites.setVersion(new Date());
 		MemberFavorites newMeberFavorites = memberFavoritesDao.save(meberFavorites);
 		MemberFavoritesCommand memberFavoritesCommand = new MemberFavoritesCommand();
-		memberFavoritesCommand = (MemberFavoritesCommand) ConvertUtils.convertTwoObject(memberFavoritesCommand,
-				newMeberFavorites);
+		memberFavoritesCommand = (MemberFavoritesCommand) ConvertUtils.convertTwoObject(memberFavoritesCommand, newMeberFavorites);
 		return memberFavoritesCommand;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#removeFavoritesByIds(java .util.List, java.lang.Long)
 	 */
 	@Override
-	public Integer removeFavoritesByIds(List<Long> itemIds, List<Long> skuIds, Long memberId) {
+	public Integer removeFavoritesByIds(List<Long> itemIds,List<Long> skuIds,Long memberId){
 		// TODO Auto-generated method stub
 		return memberFavoritesDao.removeFavoritesByIds(itemIds, skuIds, memberId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateList(loxia .dao.Page, loxia.dao.Sort[],
-	 * java.util.Map)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<ItemRateCommand> findItemRateList(Page page, Sort[] sorts, Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<ItemRateCommand> findItemRateList(Page page,Sort[] sorts,Map<String, Object> searchParam){
 		Pagination<ItemRateCommand> ItemRateCommandList = new Pagination<ItemRateCommand>();
 		List<ItemRateCommand> itemRateList = new ArrayList<ItemRateCommand>();
-		Pagination<ItemRateListCommand> itemteList = itemRateDao.findeStatusNndOrderListQueryMapWithPage(page, sorts,
-				searchParam);
-		if (itemteList != null && itemteList.getItems().size() > 0) {
-			for (ItemRateListCommand itemRate : itemteList.getItems()) {
+		Pagination<ItemRateListCommand> itemteList = itemRateDao.findeStatusNndOrderListQueryMapWithPage(page, sorts, searchParam);
+		if (itemteList != null && itemteList.getItems().size() > 0){
+			for (ItemRateListCommand itemRate : itemteList.getItems()){
 				ItemRateCommand itemRateCommand = new ItemRateCommand();
 				OrderLineCommand orderLine = new OrderLineCommand();
 				RateCommand rateCommand = new RateCommand();
@@ -690,12 +783,11 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findItemRateById(java. lang.Long)
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public RateCommand findItemRateById(Long rateId) {
+	@Transactional(readOnly = true)
+	public RateCommand findItemRateById(Long rateId){
 		ItemRate newItemRate = itemRateDao.getByPrimaryKey(rateId);
 		RateCommand newItemRateCommand = new RateCommand();
 		if (null != newItemRate)
@@ -706,11 +798,10 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createRate(com.baozun. nebula.command.RateCommand)
 	 */
 	@Override
-	public ItemRate createRate(RateCommand itemRateCommand) {
+	public ItemRate createRate(RateCommand itemRateCommand){
 		ItemRate newItemRate = new ItemRate();
 		newItemRate.setId(itemRateCommand.getId());
 		newItemRate.setItemId(itemRateCommand.getItemId());
@@ -727,29 +818,25 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findConsultantsList(loxia .dao.Page, loxia.dao.Sort[],
-	 * java.util.Map)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#findConsultantsList(loxia .dao.Page, loxia.dao.Sort[], java.util.Map)
 	 */
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<ConsultantCommand> findConsultantsList(Page page, Sort[] sorts, Map<String, Object> searchParam) {
+	@Transactional(readOnly = true)
+	public Pagination<ConsultantCommand> findConsultantsList(Page page,Sort[] sorts,Map<String, Object> searchParam){
 		return consultantsDao.findConsultants(page, sorts, searchParam);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createConsultants(com.
-	 * baozun.nebula.command.product.ItemConsultantCommand)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createConsultants(com. baozun.nebula.command.product.ItemConsultantCommand)
 	 */
 	@Override
-	public Consultants createConsultants(Consultants consultants) {
+	public Consultants createConsultants(Consultants consultants){
 		return consultantsDao.save(consultants);
 	}
 
 	@Override
-	public Member register(Member sourceMember) {
+	public Member register(Member sourceMember){
 		sourceMember.setLifecycle(BaseModel.LIFECYCLE_ENABLE);// 有效
 		// sourceMember.setIsaddgroup(0);//未加入组
 		String encodePassword = EncryptUtil.getInstance().hash(sourceMember.getPassword(), sourceMember.getLoginName());
@@ -759,73 +846,87 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 		return member;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#rewriteRegister(com.baozun.nebula.model.member.Member)
+	 */
 	@Override
-	@Transactional(readOnly=true)
-	public boolean validUserName(String username) {
+	public Member rewriteRegister(Member member){
+		// pwd处理为密文
+		String encodePassword = EncryptUtil.getInstance().hash(member.getPassword(), member.getLoginName());
+		member.setPassword(encodePassword);
+		
+		member = memberDao.save(member);
+		return member;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean validUserName(String username){
 		boolean flag = false;
 		Member member = memberDao.findMemberByLoginName(username);
-		if (null == member) {
+		if (null == member){
 			flag = true;
 		}
 		return flag;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public boolean validEmail(String email) {
+	@Transactional(readOnly = true)
+	public boolean validEmail(String email){
 		boolean flag = false;
 		Member member = memberDao.findMemberByLoginEmail(email);
-		if (null == member) {
+		if (null == member){
 			flag = true;
 		}
 		return flag;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public boolean validMobile(String mobile) {
+	@Transactional(readOnly = true)
+	public boolean validMobile(String mobile){
 		boolean flag = false;
 		Member member = memberDao.findMemberByLoginMobile(mobile);
-		if (null == member) {
+		if (null == member){
 			flag = true;
 		}
 		return flag;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public List<MemberCryptoguard> findCryptoguardList(Long memberId) {
+	@Transactional(readOnly = true)
+	public List<MemberCryptoguard> findCryptoguardList(Long memberId){
 		return memberCryptoguardDao.findByMemberId(memberId);
 	}
 
 	@Override
-	public String sendPassResetCodeByEmail(Long memberId) {
+	public String sendPassResetCodeByEmail(Long memberId){
 		String genericRandomCode = genericRandomCode();
 		log.info(genericRandomCode);
 		return genericRandomCode;
 	}
 
 	@Override
-	public String sendPassResetCodeBySms(Long memberId) {
+	public String sendPassResetCodeBySms(Long memberId){
 		String genericRandomCode = genericRandomCode();
 		log.info(genericRandomCode);
 		return genericRandomCode;
 	}
 
-	private String genericRandomCode() {
+	private String genericRandomCode(){
 		Random random = new Random();
 		String result = "";
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++){
 			result += String.valueOf(random.nextInt(10));
 		}
 		return result;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public boolean checkCryptoguard(List<MemberCryptoguard> cryptoguardList) {
+	@Transactional(readOnly = true)
+	public boolean checkCryptoguard(List<MemberCryptoguard> cryptoguardList){
 		boolean result = true;
-		for (MemberCryptoguard c : cryptoguardList) {
+		for (MemberCryptoguard c : cryptoguardList){
 			MemberCryptoguard newCry = memberCryptoguardDao.findByQa(c.getQuestion(), c.getAnswer());
 			result = result && (newCry != null);
 		}
@@ -833,14 +934,14 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public boolean checkEmailUrl(String code, Long memberId) {
+	public boolean checkEmailUrl(String code,Long memberId){
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberPersonalData findMemberPersonData(Long memberId) {
+	@Transactional(readOnly = true)
+	public MemberPersonalData findMemberPersonData(Long memberId){
 		MemberPersonalData mpd = memberPersonalDataDao.findByMemberId(memberId);
 
 		decrypt(mpd);
@@ -850,7 +951,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public boolean resetPasswd(Long memberId, String newPwd) {
+	public boolean resetPasswd(Long memberId,String newPwd){
 		Integer res = memberDao.updatePasswd(memberId, newPwd);
 		if (res > 0)
 			return true;
@@ -858,18 +959,18 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public boolean updatePasswd(Long memberId, String pwd, String newPwd, String reNewPwd) {
+	public boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd){
 		Member member = memberDao.findMemberById(memberId);
 
 		String encodePassword = EncryptUtil.getInstance().hash(pwd, member.getLoginName());
 		String encodeNewPassword = EncryptUtil.getInstance().hash(newPwd, member.getLoginName());
-		if (!encodePassword.equals(member.getPassword())) {
+		if (!encodePassword.equals(member.getPassword())){
 			throw new BusinessException(Constants.OLDPASSWORD_ISWRONG_ERROR);
 		}
-		if (pwd.equals(newPwd)) {
+		if (pwd.equals(newPwd)){
 			throw new BusinessException(Constants.OLDPASSWORD_ASSAMEAS_NEWPASSWORD_ERROR);
 		}
-		if (!newPwd.equals(reNewPwd)) {
+		if (!newPwd.equals(reNewPwd)){
 			throw new BusinessException(Constants.RENEWPASSWORD_NOTSAMEAS_NEWPASSWORD_ERROR);
 		}
 		Integer res = memberDao.updatePasswd(memberId, encodeNewPassword);
@@ -879,30 +980,30 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	public void saveCryptoguard(MemberCryptoguard memberCryptoguard) {
+	public void saveCryptoguard(MemberCryptoguard memberCryptoguard){
 		memberCryptoguardDao.save(memberCryptoguard);
 
 	}
 
 	@Override
-	public void removeCryptoguardByMemberId(Long memberId) {
+	public void removeCryptoguardByMemberId(Long memberId){
 		memberCryptoguardDao.removeMemberCryptoguardByMemberId(memberId);
 
 	}
 
 	@Override
-	public MemberPersonalData savePersonData(MemberPersonalData personData) {
+	public MemberPersonalData savePersonData(MemberPersonalData personData){
 
 		encrypt(personData);
 
 		MemberPersonalData oldMemberPersonalData = memberPersonalDataDao.getByPrimaryKey(personData.getId());
 		MemberPersonalData memberPersonalData = null;
-		if (oldMemberPersonalData != null) {
+		if (oldMemberPersonalData != null){
 			Date ver = oldMemberPersonalData.getVersion();
 			personData.setVersion(ver);
 			oldMemberPersonalData = personData;
 			memberPersonalData = memberPersonalDataDao.save(oldMemberPersonalData);
-		} else {
+		}else{
 			memberPersonalData = memberPersonalDataDao.save(personData);
 		}
 
@@ -910,8 +1011,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public boolean checkNickname(String nickname) {
+	@Transactional(readOnly = true)
+	public boolean checkNickname(String nickname){
 		MemberPersonalData memberPersonalData = memberPersonalDataDao.findByNickname(nickname);
 		if (memberPersonalData == null)
 			return false;
@@ -919,41 +1020,41 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public void sendBindEmailUrl(Long memberId, String email, String path) {
+	@Transactional(readOnly = true)
+	public void sendBindEmailUrl(Long memberId,String email,String path){
 		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
 		Member member = memberDao.findMemberById(memberId);
 		MemberConductCommand conduct = findMemberConductCommandById(member.getId());
 		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType())
-				.append(member.getSource()).append(conduct.getRegisterTime());
+		emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType()).append(member.getSource())
+				.append(conduct.getRegisterTime());
 		String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
 		StringBuffer activeEmailUrl = new StringBuffer();
 
-		try {
+		try{
 			StringBuffer encryptParams = new StringBuffer();
-			encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum)
-					.append("&sendTime=").append(new Date().getTime()).append("&email=").append(email);
+			encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum).append("&sendTime=")
+					.append(new Date().getTime()).append("&email=").append(email);
 			String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
 			activeEmailUrl.append(path).append("?registerComfirm=").append(URLEncoder.encode(encrypt, "UTF-8"));
 
-		} catch (Exception e) {
+		}catch (Exception e){
 			e.printStackTrace();
 		}
 		log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
 	}
 
 	@Override
-	public boolean bindEmail(Long memberId, String checkSum, String email) {
+	public boolean bindEmail(Long memberId,String checkSum,String email){
 		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
 		Member member = memberDao.findMemberById(memberId);
 		MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(memberId);
 		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType())
-				.append(member.getSource()).append(conduct.getRegisterTime());
+		emailContent.append(member.getId()).append(member.getId()).append(email).append(member.getType()).append(member.getSource())
+				.append(conduct.getRegisterTime());
 		String encodeChckSum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
 
-		if (!encodeChckSum.equals(checkSum)) {
+		if (!encodeChckSum.equals(checkSum)){
 			throw new BusinessException(Constants.VALIDEMAIL_ERROR);
 		}
 		Member mem = memberDao.getByPrimaryKey(memberId);
@@ -963,24 +1064,24 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 		MemberPersonalData personData = memberPersonalDataDao.getByPrimaryKey(memberId);
 		personData.setEmail(email);
 		MemberPersonalData personDataRes = memberPersonalDataDao.save(personData);
-		if (personDataRes == null || memRes == null) {
+		if (personDataRes == null || memRes == null){
 			throw new BusinessException(Constants.BINDEMAIL_ERROR);
 		}
 		return true;
 	}
 
 	@Override
-	public String sendBindMobileCode(String mobile, Long memberId) {
+	public String sendBindMobileCode(String mobile,Long memberId){
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean bindMobile(String mobile, Long memberId) {
+	public boolean bindMobile(String mobile,Long memberId){
 		Member member = memberDao.getByPrimaryKey(memberId);
 		member.setLoginMobile(mobile);
 		Member res = memberDao.save(member);
-		if (res == null) {
+		if (res == null){
 			return false;
 		}
 		return true;
@@ -992,7 +1093,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	 * @return
 	 */
 	@SuppressWarnings("unused")
-	private String getUsername() {
+	private String getUsername(){
 		StringBuffer sb = new StringBuffer();
 		sb.append("bz").append(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())).append(getRandomNumber());
 		return sb.toString();
@@ -1003,13 +1104,13 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	 * 
 	 * @return Set<Integer>
 	 */
-	private static Set<Integer> getRandomNumber() {
+	private static Set<Integer> getRandomNumber(){
 		// 使用SET以此保证写入的数据不重复
 		Set<Integer> set = new HashSet<Integer>();
 		// 随机数
 		Random random = new Random();
 
-		while (set.size() < 4) {
+		while (set.size() < 4){
 			// nextInt返回一个伪随机数，它是取自此随机数生成器序列的、在 0（包括）
 			// 和指定值（不包括）之间均匀分布的 int 值。
 			set.add(random.nextInt(10));
@@ -1018,25 +1119,25 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberFavorites findMemberFavoritesByIdAndMemberId(Long id, Long memberId) {
+	@Transactional(readOnly = true)
+	public MemberFavorites findMemberFavoritesByIdAndMemberId(Long id,Long memberId){
 		// TODO Auto-generated method stub
 		return memberFavoritesDao.findMemberFavoritesByIdAndMemberId(id, memberId);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Member findMember(String loginName) {
+	@Transactional(readOnly = true)
+	public Member findMember(String loginName){
 		Member member = null;
-		if (StringUtils.isNotBlank(loginName)) {
+		if (StringUtils.isNotBlank(loginName)){
 			String name = loginName.toUpperCase();
 			// 先检查loginName
 			member = memberDao.findMemberByLoginName(name);
-			if (null == member) {
+			if (null == member){
 				// 如果loginName没有对应的用户，则检查该loginName是否符合手机号码或邮箱,查看是否有对应的用户
-				if (RegulareExpUtils.isMobileNO(loginName)) {
+				if (RegulareExpUtils.isMobileNO(loginName)){
 					member = memberDao.findMemberByLoginMobile(loginName);
-				} else if (RegulareExpUtils.isSureEmail(loginName)) {
+				}else if (RegulareExpUtils.isSureEmail(loginName)){
 					member = memberDao.findMemberByLoginEmail(name);
 				}
 			}
@@ -1045,8 +1146,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberPersonalData findMemberPersonDataByMobile(String mobile) {
+	@Transactional(readOnly = true)
+	public MemberPersonalData findMemberPersonDataByMobile(String mobile){
 
 		MemberPersonalData mpd = memberPersonalDataDao.findMemberPersonDataByMobile(mobile);
 
@@ -1056,101 +1157,99 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public void sendActiveByEmail(Long memberId, String path) {
+	@Transactional(readOnly = true)
+	public void sendActiveByEmail(Long memberId,String path){
 		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
 		Member member = memberDao.findMemberById(memberId);
 		MemberPersonalData personData = memberPersonalDataDao.findByMemberId(memberId);
 		decrypt(personData);
 		MemberConductCommand conduct = findMemberConductCommandById(member.getId());
 		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail())
-				.append(member.getType()).append(member.getSource()).append(conduct.getRegisterTime());
+		emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail()).append(member.getType())
+				.append(member.getSource()).append(conduct.getRegisterTime());
 		String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
 		StringBuffer activeEmailUrl = new StringBuffer();
 
-		try {
+		try{
 			StringBuffer encryptParams = new StringBuffer();
-			encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum)
-					.append("&sendTime=").append(new Date().getTime());
+			encryptParams.append("member_id=").append(member.getId()).append("&checksum=").append(checksum).append("&sendTime=")
+					.append(new Date().getTime());
 			String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
-			activeEmailUrl.append(path).append("?registerComfirm=")
-					.append(URLEncoder.encode(encrypt, Constants.CHARSET));
+			activeEmailUrl.append(path).append("?registerComfirm=").append(URLEncoder.encode(encrypt, Constants.CHARSET));
 
-		} catch (Exception e) {
+		}catch (Exception e){
 			e.printStackTrace();
 		}
 		log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
 	}
 
 	@Override
-	public void validEmailActiveUrl(Long memberId, String checkSum) {
+	public void validEmailActiveUrl(Long memberId,String checkSum){
 		String SEND_MAIL_KEY = ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key");
 		Member member = memberDao.findMemberById(memberId);
 		MemberPersonalData personData = memberPersonalDataDao.findByMemberId(memberId);
 		decrypt(personData);
 		MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(memberId);
 		StringBuffer emailContent = new StringBuffer();
-		emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail())
-				.append(member.getType()).append(member.getSource()).append(conduct.getRegisterTime());
+		emailContent.append(member.getId()).append(member.getId()).append(personData.getEmail()).append(member.getType())
+				.append(member.getSource()).append(conduct.getRegisterTime());
 		String encodeChckSum = EncryptUtil.getInstance().hash(emailContent.toString(), SEND_MAIL_KEY);
-		if (!encodeChckSum.equals(checkSum)) {
+		if (!encodeChckSum.equals(checkSum)){
 			throw new BusinessException(Constants.VALIDEMAIL_ERROR);
 		}
 		member.setLoginEmail(personData.getEmail());
 		Member res = memberDao.save(member);
-		if (res == null) {
+		if (res == null){
 			throw new BusinessException(Constants.BINDEMAIL_ERROR);
 		}
 
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Member findThirdMemberByThirdIdAndSource(String thirdPartyIdentify, Integer source) {
-		Member member = memberDao.findThirdMemberByUidAndSource(thirdPartyIdentify, source,
-				Member.MEMBER_TYPE_THIRD_PARTY_MEMBER);
+	@Transactional(readOnly = true)
+	public Member findThirdMemberByThirdIdAndSource(String thirdPartyIdentify,Integer source){
+		Member member = memberDao.findThirdMemberByUidAndSource(thirdPartyIdentify, source, Member.MEMBER_TYPE_THIRD_PARTY_MEMBER);
 		if (null != member)
 			return member;
 		return null;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public List<MemberGroupRelation> findMemberGroupRelationListByMemberId(Long memberId) {
+	@Transactional(readOnly = true)
+	public List<MemberGroupRelation> findMemberGroupRelationListByMemberId(Long memberId){
 		return memberGroupRelationDao.findMemberGroupRelationListByMemberId(memberId);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public List<MemberGroup> findMemberGroupListByIds(List<Long> ids) {
+	@Transactional(readOnly = true)
+	public List<MemberGroup> findMemberGroupListByIds(List<Long> ids){
 
 		return memberGroupDao.findMemberGroupListByIds(ids);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public List<OrderLineCommand> findOrderLineCompletionByItemIdOrUserId(Long memberId, Long itemId) {
+	@Transactional(readOnly = true)
+	public List<OrderLineCommand> findOrderLineCompletionByItemIdOrUserId(Long memberId,Long itemId){
 
 		return sdkOrderLineDao.findOrderLineCompletionByItemIdOrUserId(memberId, itemId);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Pagination<RateCommand> findItemRateListByMemberId(Page page, Sort[] sorts, Long memberId) {
+	@Transactional(readOnly = true)
+	public Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId){
 		Pagination<RateCommand> itemRateCommand = itemRateDao.findItemRateListByMemberId(page, sorts, memberId);
 		return itemRateCommand;
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public Set<String> getMemComboIdsByGroupIdMemberId(List<Long> groupIds, Long memberId) {
+	@Transactional(readOnly = true)
+	public Set<String> getMemComboIdsByGroupIdMemberId(List<Long> groupIds,Long memberId){
 		return sdkEngineManager.getCrowdScopeListByMemberAndGroup(memberId, groupIds);
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public MemberCommand findMemberByLoginMobile(String loginMobile) {
+	@Transactional(readOnly = true)
+	public MemberCommand findMemberByLoginMobile(String loginMobile){
 		// TODO Auto-generated method stub
 		Member member = memberDao.findMemberByLoginMobile(loginMobile);
 
@@ -1159,4 +1258,5 @@ public class SdkMemberManagerImpl implements SdkMemberManager {
 
 		return null;
 	}
+
 }
