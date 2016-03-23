@@ -135,7 +135,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 		// 数据校验
 		loginFormValidator.validate(loginForm, bindingResult);
 		if (bindingResult.hasErrors()) {
-			// TODO 出错处理
+			// TODO出错处理
 			return null;
 		}
 
@@ -284,9 +284,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	public String showForgetPassword(Model model) {
 		return VIEW_MEMBER_FORTGET_PASSWORD;
 	}
-	
+
 	/**
-	 * 忘记密码, 默认推荐配置如下
+	 * 发送验证码, 默认推荐配置如下
 	 * @RequestMapping(value = "/member/forgetPassword.json", method = RequestMethod.POST)
 	 * @param forgetPasswordForm
 	 * @param bindingResult
@@ -302,32 +302,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 			return null;
 		}
 
-		// 2.验证验证码
-		
-
-		return null;
-	}
-	
-	/**
-	 * 发送验证码, 默认推荐配置如下
-	 * @RequestMapping(value = "/member/sendVerifyCode.json", method = RequestMethod.POST)
-	 * @param forgetPasswordForm
-	 * @param bindingResult
-	 * @param model
-	 * @return
-	 */
-	public NebulaReturnResult sendVerifyCode(@ModelAttribute ForgetPasswordForm forgetPasswordForm,
-			BindingResult bindingResult, HttpServletRequest request,HttpServletResponse response, Model model) {
-		// 1.数据校验 validator
-		forgetPasswordFormValidator.validate(forgetPasswordForm, bindingResult);
-		if(bindingResult.hasErrors()){
-			//TODO 
-			return null;
-		}
-
-		//2.校验用户是否存在，校验当日发送验证码的次数等等
-		
-		//3.发送验证码
+		// 2.判断是手机还是邮箱，分别调用发送验证码逻辑
 		
 
 		return null;

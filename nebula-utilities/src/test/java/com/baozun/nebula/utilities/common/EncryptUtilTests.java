@@ -44,6 +44,16 @@ public class EncryptUtilTests {
 	}
 	
 	@Test
+	public void testEncryptionWithRSA() throws Exception{
+		String plainText="Base64是一种基于64个可打印字符来表示二进制数据的表示方法。";
+		String cipherText = EncryptUtil.getInstance().encrypt(plainText,"RSA");
+		System.out.println("Cipher:" + cipherText);
+		String decipherText = EncryptUtil.getInstance().decrypt(cipherText,"RSA");
+		System.out.println("Decipher:" + decipherText);
+		assert plainText.equals(decipherText) : "Encrypt is not correct";
+	}
+	
+	@Test
 	public void testDigest() throws Exception{
 		String digest = EncryptUtil.getInstance().digest("Base64是一种基于64个可打印字符来表示二进制数据的表示方法。");
 		assert digest != null : "Failure";
