@@ -21,31 +21,44 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 
+import com.baozun.nebula.sdk.manager.EmailTemplateManager;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
+import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
 
 /**
  * 注册成功监听器
  * 
+ * @author Viktor Huang
  * @author D.C
  */
-public class RegisterSuccessEventListener implements ApplicationListener<LoginSuccessEvent> {
-	private static final Logger LOG = LoggerFactory.getLogger(RegisterSuccessEventListener.class);
+public class RegisterSuccessEventListener implements ApplicationListener<RegisterSuccessEvent>{
+
+	private static final Logger		LOG	= LoggerFactory.getLogger(RegisterSuccessEventListener.class);
+
+	@Autowired
+	private EmailTemplateManager	emailTemplateManager;
 
 	@Override
-	public void onApplicationEvent(LoginSuccessEvent event) {
-		MemberDetails memberDetails = (MemberDetails)event.getSource();
+	public void onApplicationEvent(RegisterSuccessEvent event){
+
+		MemberDetails memberDetails = (MemberDetails) event.getSource();
+
 		LOG.info("[MEM_REGISTER_SUCCESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		this.handler(memberDetails, event.getClientContext());
 	}
+
 	/**
 	 * 可扩展的处理器
+	 * 
 	 * @param source
 	 * @param context
 	 */
-	protected void handler(MemberDetails source, Map<String, String> context) {
-		//TODO 发送注册邮件等
+	protected void handler(MemberDetails source,Map<String, String> context){
+		// TODO 会员分组处理
+		// TODO 激活邮件
+		// emailTemplateManager.sendEmail(event.getReceiverEmail(), event.getCode(), event.getDataMap());
 	}
 }

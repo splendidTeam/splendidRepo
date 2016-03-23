@@ -7,6 +7,7 @@ import org.springframework.validation.Validator;
 
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
 
+@Deprecated
 public class RegisterFormValidator implements Validator{
 
 	/** A model for the user agent or device that submitted the current request. */
