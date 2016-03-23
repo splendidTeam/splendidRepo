@@ -18,6 +18,15 @@ public class RegisterForm extends BaseForm{
 
 	private String				email;
 
+	/** 密码 */
+	private String				password;
+
+	/** 再次输入密码 */
+	private String				repassword;
+
+	/** 验证码 */
+	private String				randomCode;
+
 	private String				sex;
 
 	private String				age;
@@ -27,8 +36,6 @@ public class RegisterForm extends BaseForm{
 	private String				name;
 
 	private String				nickName;
-
-	private String				password;
 
 	/**
 	 * 是否愿意接收推送信息 可选值：1.接受，2.不接受
@@ -110,6 +117,36 @@ public class RegisterForm extends BaseForm{
 
 	public void setPassword(String password){
 		this.password = password;
+	}
+
+	/**
+	 * @return the repassword
+	 */
+	public String getRepassword(){
+		return repassword;
+	}
+
+	/**
+	 * @param repassword
+	 *            the repassword to set
+	 */
+	public void setRepassword(String repassword){
+		this.repassword = repassword;
+	}
+
+	/**
+	 * @return the randomCode
+	 */
+	public String getRandomCode(){
+		return randomCode;
+	}
+
+	/**
+	 * @param randomCode
+	 *            the randomCode to set
+	 */
+	public void setRandomCode(String randomCode){
+		this.randomCode = randomCode;
 	}
 
 }

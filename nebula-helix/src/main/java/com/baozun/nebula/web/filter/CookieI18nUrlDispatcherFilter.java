@@ -16,7 +16,7 @@ import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utils.CookieUtil;
+import com.feilong.servlet.http.CookieUtil;
 
 
 /**
@@ -44,7 +44,7 @@ public class CookieI18nUrlDispatcherFilter extends AbstractI18nUrlDispatcherFilt
 			String newLocale = getNewLocale(request);
 			if(Validator.isNotNullOrEmpty(newLocale) && sdkI18nLangManager.isExistLang(newLocale)) {
 				//把新的语言设置到cookie中
-				CookieUtil.setCookie(request, response, getCookieName(), newLocale);
+				CookieUtil.addCookie(getCookieName(), newLocale, response);
 				return newLocale;
 			}
 			
