@@ -17,34 +17,43 @@ package com.baozun.nebula.web.controller.member;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.model.member.Contact;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseControllerTest;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.member.converter.MemberAddressViewCommandConverter;
+import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
+import com.baozun.nebula.web.controller.member.validator.MemberAddressFormValidator;
 
 import loxia.dao.Pagination;
 
 /**
  * NebulaMemberAddressControllerTest.
  * 
- * <h3>什么是Mock:</h3>
- * <blockquote>
+ * <h3>什么是Mock:</h3> <blockquote>
  * <p>
  * 用于把次要对象和主要对象分离开，用Mock对象替换次要对象，以保证完成主要测试对象的测试工作;
- * Mock的定义包含了测试逻辑和流程，如输入，调用次数，返回值等;
- * Mock对象一般不复用，都遵循”just enough”原则
+ * Mock的定义包含了测试逻辑和流程，如输入，调用次数，返回值等; Mock对象一般不复用，都遵循”just enough”原则
  * </p>
  * </blockquote>
  * 
- * <h3>Record-Replay-Verify:</h3>
- * <blockquote>
+ * <h3>Record-Replay-Verify:</h3> <blockquote>
  * <table border="1" cellspacing="0" cellpadding="4">
  * <tr style="background-color:#ccccff">
  * <th align="left">字段</th>
@@ -116,7 +125,8 @@ assertNotNull(user);
  * 
  * 
  * <p>
- * record-replay-verify 模型非常好的满足了大多数测试场景的需要：<b> 先指定测试的期望，然后执行测试，再验证期望是否被满足。</b> <br>
+ * record-replay-verify 模型非常好的满足了大多数测试场景的需要：<b> 先指定测试的期望，然后执行测试，再验证期望是否被满足。</b>
+ * <br>
  * 这个模型简单直接，易于实现，也容易被开发人员理解和接受，因此被各个mock框架广泛使用。
  * </p>
  * </blockquote>
@@ -125,52 +135,158 @@ assertNotNull(user);
  * @version 5.3.0 2016年3月21日 下午4:50:31
  * @since 5.3.0
  */
-public class NebulaMemberAddressControllerTest extends BaseControllerTest{
+public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 
-    /** The nebula member address controller. */
-    private NebulaMemberAddressController     nebulaMemberAddressController;
+	/** The nebula member address controller. */
+	private NebulaMemberAddressController nebulaMemberAddressController;
 
-    /** The member address view command converter. */
-    private MemberAddressViewCommandConverter memberAddressViewCommandConverter;
+	/** The member address view command converter. */
+	private MemberAddressViewCommandConverter memberAddressViewCommandConverter;
+	
+	private MemberAddressFormValidator memberAddressFormValidator;
 
-    /** The sdk member manager. */
-    private SdkMemberManager                  sdkMemberManager;
+	/** The sdk member manager. */
+	private SdkMemberManager sdkMemberManager;
 
-    /**
-     * Inits the.
-     */
-    @Before
-    public void init(){
-        nebulaMemberAddressController = new NebulaMemberAddressController();
-        memberAddressViewCommandConverter = new MemberAddressViewCommandConverter();
+	/**
+	 * Inits the.
+	 */
+	@Before
+	public void init() {
+		nebulaMemberAddressController = new NebulaMemberAddressController();
+		memberAddressViewCommandConverter = new MemberAddressViewCommandConverter();
+		memberAddressFormValidator = new MemberAddressFormValidator();
 
-        sdkMemberManager = EasyMock.createMock("sdkMemberManager", SdkMemberManager.class);
+		sdkMemberManager = EasyMock.createMock("sdkMemberManager", SdkMemberManager.class);
 
-        ReflectionTestUtils.setField(nebulaMemberAddressController, "sdkMemberManager", sdkMemberManager);
-        ReflectionTestUtils.setField(nebulaMemberAddressController, "memberAddressViewCommandConverter", memberAddressViewCommandConverter);
-    }
+		ReflectionTestUtils.setField(nebulaMemberAddressController, "sdkMemberManager", sdkMemberManager);
+		ReflectionTestUtils.setField(nebulaMemberAddressController, "memberAddressViewCommandConverter",
+				memberAddressViewCommandConverter);
+		ReflectionTestUtils.setField(nebulaMemberAddressController, "memberAddressFormValidator",
+				memberAddressFormValidator);
+		
+	}
 
-    /**
-     * Test show member address.
-     */
-    @Test
-    public void testShowMemberAddress(){
+	/**
+	 * Test show member address.
+	 */
+	@Test
+	public void testShowMemberAddress() {
+		// Record
+		EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L))
+				.andReturn(new Pagination<ContactCommand>());
 
-        //Record
-        EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L)).andReturn(new Pagination<ContactCommand>());
+		// Replay
+		control.replay();
 
-        //Replay
-        control.replay();
+		PageForm pageForm = new PageForm();
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);
+		// 验证结果
+		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
+				nebulaMemberAddressController.showMemberAddress(memberDetails, pageForm, request, response, model));
 
-        PageForm pageForm = new PageForm();
-        MemberDetails memberDetails = new MemberDetails();
+		// 验证交互行为
+		control.verify();
+	}
+	
+	/**
+	 * Test setDefaultAddress.
+	 */
+	@Test
+	public void testSetDefaultAddress() {
+		// Record
+		ContactCommand command = new ContactCommand();
+		command.setId(1L);
+		EasyMock.expect(sdkMemberManager.findContactById(1L, 1L))
+				.andReturn(command);
+		EasyMock.expect(sdkMemberManager.updateContactIsDefault(1L, 1L,true))
+		.andReturn(new Integer(0));
 
-        //验证结果
-        assertEquals(
-                        NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
-                        nebulaMemberAddressController.showMemberAddress(memberDetails, pageForm, request, response, model));
+		// Replay
+		EasyMock.replay(sdkMemberManager);
+		PageForm pageForm = new PageForm();
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);
+ 
+		Long addressId = 1L;
+		// 验证结果
+		assertEquals(DefaultReturnResult.SUCCESS,nebulaMemberAddressController.setDefaultAddress(memberDetails,addressId, request,response, model));
 
-        //验证交互行为
-        control.verify();
-    }
+		// 验证交互行为
+		EasyMock.verify(sdkMemberManager);
+	}
+	
+	/**
+	 * Test updateMemberAddress.
+	 */
+	@Test
+	public void testUpdateMemberAddress() {
+		// Record
+		ContactCommand command = new ContactCommand();
+		command.setId(1L);
+		EasyMock.expect(sdkMemberManager.findContactById(1L, 1L))
+				.andReturn(command);
+		
+		EasyMock.expect(sdkMemberManager.saveContactCommand(command))
+		.andReturn(command);
+		
+		
+		MemberAddressForm memberAddressForm = new MemberAddressForm();
+		memberAddressForm.setProvince(1L);
+		memberAddressForm.setCity(1L);
+		memberAddressForm.setArea(1L);
+		memberAddressForm.setTown(1L);
+		memberAddressForm.setAddress("上海市浦东新区川杨新苑三期");
+		memberAddressForm.setPhone("13023230767");
+		memberAddressForm.setConsignee("wanghengheng");
+		memberAddressForm.setPostcode("200000");
+		BindingResult bindingResult = null;
+		EasyMock.expectLastCall();
+		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
+		
+		// Replay
+		EasyMock.replay(sdkMemberManager);
+
+		PageForm pageForm = new PageForm();
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);	
+		
+ 		// 验证结果
+		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
+				nebulaMemberAddressController.updateMemberAddress(memberDetails,
+						memberAddressForm, bindingResult, request,
+						response , model));
+
+		// 验证交互行为		
+		EasyMock.verify(sdkMemberManager);
+	}
+	
+	/**
+	 * Test deleteMemberAddress.
+	 */
+	@Test
+	public void testDeleteMemberAddress() {
+		// Record
+		ContactCommand command = new ContactCommand();
+		command.setId(1L);
+		EasyMock.expect(sdkMemberManager.findContactById(1L, 1L))
+				.andReturn(command);
+		EasyMock.expect(sdkMemberManager.removeContactById(1L, 1L))
+				.andReturn(new Integer(1));
+
+		// Replay
+		EasyMock.replay(sdkMemberManager);
+
+		PageForm pageForm = new PageForm();
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);
+		Long addressId = 1L;
+		// 验证结果
+		assertEquals(DefaultReturnResult.SUCCESS,
+				nebulaMemberAddressController.deleteMemberAddress(memberDetails,addressId, request, response, model	));
+
+		// 验证交互行为
+		EasyMock.verify(sdkMemberManager);
+	}
 }

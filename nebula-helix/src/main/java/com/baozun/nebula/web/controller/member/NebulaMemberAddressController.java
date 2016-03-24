@@ -26,10 +26,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.model.member.Contact;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -39,16 +41,17 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.member.converter.MemberAddressViewCommandConverter;
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
+import com.baozun.nebula.web.controller.member.validator.MemberAddressFormValidator;
 
 import loxia.dao.Pagination;
 
 /**
  * 会员地址簿相关的控制器，里面主要控制如下操作：
  * showMemberAddress ：显示地址簿列表
- * listMemberAddress ：列举地址数据
  * addMemberAddress： 新增地址
  * deleteMemberAddress：删除地址
  * setDefaultAddress：设置默认地址
+ * updateMemberAddress:更细地址
  * 
  * 并没有提供查看地址明细方法，因为假定在显示地址簿时就已获取所有相关信息，不用再读取一遍。如果商城需要，自己重载。
  * 
@@ -64,6 +67,8 @@ public class NebulaMemberAddressController extends BaseController {
 
 	/* Model 对应的键值定义 */
 	public static final String MODEL_KEY_MEMBER_ADDRESS_LIST = "memberAddressList";
+	
+	public static final String MODEL_KEY_MEMBER_ADDRESS = "memberAddress";
 
 	/* View 的默认定义 */
 	public static final String VIEW_MEMBER_ADDRESS_LIST = "member.address.list";
@@ -73,7 +78,7 @@ public class NebulaMemberAddressController extends BaseController {
 	 */
 	@Autowired
 	private MemberManager memberManager;
-
+	
 	/**
 	 * 
 	 */
@@ -83,6 +88,13 @@ public class NebulaMemberAddressController extends BaseController {
 	@Autowired
 	@Qualifier("memberAddressViewCommandConverter")
 	private MemberAddressViewCommandConverter memberAddressViewCommandConverter;
+	
+	/**
+	 * 地址信息Form的校验器
+	 */
+	@Autowired
+	@Qualifier("memberAddressFormValidator")
+	private MemberAddressFormValidator memberAddressFormValidator;
 
 	/**
 	 * 显示会员地址信息，默认推荐配置如下
@@ -161,18 +173,78 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @return
 	 */
 	public NebulaReturnResult addMemberAddress(@LoginMember MemberDetails memberDetails,
-			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, HttpServletRequest httpRequest,
+			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, BindingResult bindingResult, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
 		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
+		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"待新增地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
+		
+		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
+		//校验过程
+		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
+		if(bindingResult.hasErrors()){
+			return null;
+		}	
+		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
+		//Form转contact
+		ContactCommand contact = memberAddressForm.convertMemberAddressFormToContactCommand();
+		contact.setMemberId(memberDetails.getMemberId());
 		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
 		// 业务方法使用 SdkMemberManager 中的 createOrUpdateContact
-		NebulaReturnResult returnResult = new DefaultReturnResult();
-		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中
-		return returnResult;
+		ContactCommand contactCommand = sdkMemberManager.saveContactCommand(contact);
+		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中		
+		model.addAttribute("MODEL_KEY_MEMBER_ADDRESS",memberAddressViewCommandConverter.convert(contactCommand));
+		return DefaultReturnResult.SUCCESS;		
+	}
+	
+	/**
+	 * 更新收货地址
+	 * @NeedLogin
+	 * 
+	 * @param memberDetails
+	 * @param memberAddressForm
+	 * @param bindingResult
+	 * @param httpRequest
+	 * @param httpResponse
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult updateMemberAddress(@LoginMember MemberDetails memberDetails,
+			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, BindingResult bindingResult, HttpServletRequest httpRequest,
+			HttpServletResponse httpResponse, Model model) {
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
+		assert memberDetails != null : "Please Check NeedLogin Annotation";
+
+		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
+		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
+		LOG.info("[MEM_UPDATE_ADDRESS] {} [{}] \"待更新地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
+		
+		//校验过程
+		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
+		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
+		if(bindingResult.hasErrors()){
+			return null;
+		}
+		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
+		//查询出原来的地址对象
+		ContactCommand command=sdkMemberManager.findContactById(memberAddressForm.getId(),memberDetails.getMemberId());
+		if(null != command) {
+			return null;
+		}
+		//Form转contact
+		ContactCommand contact = memberAddressForm.convertMemberAddressFormToContactCommand(command);
+		//另外字段添加
+		contact.setMemberId(memberDetails.getMemberId());
+		contact.setId(memberAddressForm.getId());		
+		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
+		// 业务方法使用 SdkMemberManager 中的 createOrUpdateContact
+		ContactCommand contactCommand = sdkMemberManager.saveContactCommand(contact);
+		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中		
+		model.addAttribute("MODEL_KEY_MEMBER_ADDRESS",memberAddressViewCommandConverter.convert(contactCommand));
+		return DefaultReturnResult.SUCCESS;		
 	}
 
 	/**
@@ -197,8 +269,17 @@ public class NebulaMemberAddressController extends BaseController {
 
 		// log.info("[MEM_SET_ADDRESS_DEFAULT] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
+		LOG.info("[MEM_DEFAULT_ADDRESS] {} [{}] \"待修改的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
 		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
+		//校验addressId有效
+		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --start");
+		ContactCommand contact=sdkMemberManager.findContactById(addressId,memberDetails.getMemberId());
+		if(null == contact) {
+			return null;
+		}
+		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --end");
 		// 业务方法使用 SdkMemberManager 中的 updateContactIsDefault
+		sdkMemberManager.updateContactIsDefault(memberDetails.getMemberId(),addressId,Contact.ISDEFAULT);
 		return DefaultReturnResult.SUCCESS;
 	}
 
@@ -224,8 +305,17 @@ public class NebulaMemberAddressController extends BaseController {
 
 		// log.info("[MEM_REMOVE_ADDRESS] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待删除的地址Id);
+		LOG.info("[MEM_DELETE_ADDRESS] {} [{}] \"待删除的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
+		//校验addressId有效
+		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --start");
+		ContactCommand contact=sdkMemberManager.findContactById(addressId,memberDetails.getMemberId());
+		if(null == contact) {
+			return null;
+		}
+		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
 		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
 		// 业务方法使用 SdkMemberManager 中的 removeContactById
+		sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
 		return DefaultReturnResult.SUCCESS;
 	}
 }
