@@ -19,17 +19,16 @@ package com.baozun.nebula.dao.member;
 import java.util.List;
 import java.util.Map;
 
+import com.baozun.nebula.command.MemberPersonalDataCommand;
+import com.baozun.nebula.model.member.MemberPersonalData;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
+import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-import loxia.dao.Page;
-
-import com.baozun.nebula.command.MemberPersonalDataCommand;
-import com.baozun.nebula.model.auth.User;
-import com.baozun.nebula.model.member.MemberPersonalData;
 
 /**
  * MemberPersonalDataDao
@@ -150,5 +149,25 @@ public interface MemberPersonalDataDao extends GenericEntityDao<MemberPersonalDa
 	@NativeQuery(model = MemberPersonalData.class)
 	MemberPersonalData findByNickname(@QueryParam("nickname") String nickname);
 	
+	
+	/**
+	 * 通过用户id获取用户个人信息
+	 * MemberPersonalData
+	 * @author 冯明雷
+	 * @time 2016-3-23下午3:12:58
+	 */
+	@NativeQuery(model = MemberPersonalData.class)
+	MemberPersonalData findMemberPersonalDataByMemberId(@QueryParam("memberId") Long memberId);	
+	
+	
+	/**
+	 * 记住密码<br>
+     * 更新T_MEM_PERSONAL_DATA 中short4字段
+	 * Integer
+	 * @author 冯明雷
+	 * @time 2016-3-23下午3:13:08
+	 */
+    @NativeUpdate
+    Integer rememberPwd(@QueryParam("memberId")Long memberId, @QueryParam("short4")String short4);
 	
 }

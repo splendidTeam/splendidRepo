@@ -2,14 +2,10 @@ package com.baozun.nebula.manager.member;
 
 import java.util.List;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.RateCommand;
-import com.baozun.nebula.exception.LoginException;
 import com.baozun.nebula.exception.PasswordNotMatchException;
+import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
 import com.baozun.nebula.manager.BaseManager;
@@ -19,6 +15,10 @@ import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 public interface MemberManager extends BaseManager{
 
@@ -119,8 +119,8 @@ public interface MemberManager extends BaseManager{
 	 * @param loginPwd
 	 * @return
 	 */
-	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
-			PasswordNotMatchException;
+	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd)
+			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;
 
 	/**
 	 * 包含用户名、手机、邮箱
@@ -234,4 +234,11 @@ public interface MemberManager extends BaseManager{
 	 * @author 何波 @Description: 绑定用户邮箱 @param memberId void @throws
 	 */
 	void bindMemberEmail(Long memberId,String email);
+	
+	/**
+	 * 同步购物车信息
+	 * @author 冯明雷
+	 * @time 2016-3-23下午4:19:35
+	 */
+	void synchronousShoppingCart(Long memberId, List<ShoppingCartLineCommand> shoppingLines)throws SynchronousShoppingCartException;
 }

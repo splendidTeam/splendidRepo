@@ -1001,6 +1001,38 @@
                  ]]>
 			</value>
 		</constructor-arg>
-	</bean>	
+	</bean>
+	
+	<bean id="MemberPersonalData.findMemberPersonalDataByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			*
+		       		from
+		       			T_MEM_PERSONAL_DATA
+		       		where 
+		       		    id=:memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="MemberPersonalData.rememberPwd" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update 
+		       			t_mem_personal_data
+		       		set
+		       			short4 = :short4 
+		       		where
+		       			id = :memberId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 	
 </beans>
