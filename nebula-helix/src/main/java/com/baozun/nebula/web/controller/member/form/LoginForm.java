@@ -35,6 +35,16 @@ public class LoginForm extends BaseForm{
 	 * 密码
 	 */
 	private String 				password;
+	
+	/**
+	 * 是否记住用户名
+	 */
+	private Boolean             isRemberMeLoginName=false;
+	
+	/**
+	 * 是否记住密码
+	 */
+	private Boolean             isRemberMePwd=false;
 
 	public String getLoginName() {
 		return loginName;
@@ -68,13 +78,32 @@ public class LoginForm extends BaseForm{
 		this.password = password;
 	}
 	
-	/**
+	public Boolean getIsRemberMeLoginName() {
+        return isRemberMeLoginName;
+    }
+
+    public void setIsRemberMeLoginName(Boolean isRemberMeLoginName) {
+        this.isRemberMeLoginName = isRemberMeLoginName;
+    }
+
+    public Boolean getIsRemberMePwd() {
+        return isRemberMePwd;
+    }
+
+    public void setIsRemberMePwd(Boolean isRemberMePwd) {
+        this.isRemberMePwd = isRemberMePwd;
+    }
+
+    /**
 	 * 转换成server需要的command
 	 * @return
 	 */
 	public MemberFrontendCommand toMemberFrontendCommand(){
 		MemberFrontendCommand memberCommand=new MemberFrontendCommand();
 		memberCommand.setLoginEmail(this.loginEmail);
+		memberCommand.setLoginMobile(this.loginMobile);
+		memberCommand.setLoginName(this.loginName);
+		memberCommand.setPassword(this.password);
 		//.....
 		return memberCommand;
 	}

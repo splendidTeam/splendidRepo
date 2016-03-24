@@ -8,10 +8,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +28,6 @@ import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.exception.ErrorCodesFoo;
-import com.baozun.nebula.exception.LoginException;
 import com.baozun.nebula.exception.PasswordNotMatchException;
 import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
@@ -56,6 +51,10 @@ import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 @Transactional
 @Service("membManager")
@@ -299,8 +298,8 @@ public class MemberManagerImpl implements MemberManager{
 	}
 
 	@Override
-	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
-			PasswordNotMatchException{
+	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd)
+			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException {
 		MemberCommand member = null;
 		if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
 			member = sdkMemberManager.findMemberByLoginMobile(memberCommand.getLoginName());
@@ -313,15 +312,19 @@ public class MemberManagerImpl implements MemberManager{
 		if (null == member){
 			throw new UserNotExistsException();
 		}
-		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
+		
+		//没有记住密码的时候才需要验证输入的密码是否相同
+		if(!isHaveReMemberPwd){
+			String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
+			if (!encodePassword.equals(member.getPassword())) {
+				throw new PasswordNotMatchException();
+			}
+		}
 
 		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())){
 			throw new UserExpiredException();
 		}
-
-		if (!encodePassword.equals(member.getPassword())){
-			throw new PasswordNotMatchException();
-		}
+		
 		// 保存用户行为信息
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
@@ -459,6 +462,11 @@ public class MemberManagerImpl implements MemberManager{
 		if (res == null){
 			throw new BusinessException(Constants.BINDEMAIL_ERROR);
 		}
+	}
+	
+	@Override
+	public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines)throws SynchronousShoppingCartException{
+		sdkShoppingCartManager.synchronousShoppingCart(memberId, shoppingLines);
 	}
 
 }

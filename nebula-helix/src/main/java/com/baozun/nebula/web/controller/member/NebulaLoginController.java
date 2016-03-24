@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2016 Jumbomart All Rights Reserved.
  *
@@ -16,26 +17,42 @@
  */
 package com.baozun.nebula.web.controller.member;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baozun.nebula.exception.PasswordNotMatchException;
+import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
+import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.CookieShoppingCartLine;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.utilities.common.EncryptUtil;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
@@ -48,49 +65,68 @@ import com.feilong.servlet.http.CookieUtil;
  * 用户登录
  * 
  * @author D.C
- *
  */
-public class NebulaLoginController extends NebulaAbstractLoginController {
+public class NebulaLoginController extends NebulaAbstractLoginController{
 
-	/* Remember me cookie key */
-	public static final String COOKIE_KEY_REMEMBER_ME = "rmb";
+	/**
+	 * log定义
+	 */
+	private static final Logger			LOG								= LoggerFactory.getLogger(NebulaLoginController.class);
+
+	/* Remember me user cookie key */
+	public static final String			COOKIE_KEY_REMEMBER_ME_USER		= "rmbu";
+
+	/* Remember me pwd cookie key */
+	public static final String			COOKIE_KEY_REMEMBER_ME_PWD		= "rmbp";
 
 	/* Login Page 的默认定义 */
-	public static final String VIEW_MEMBER_LOGIN = "member.login";
+	public static final String			VIEW_MEMBER_LOGIN				= "member.login";
+
 	/* Register Page 的默认定义 */
-	public static final String VIEW_MEMBER_REGISTER = "member.register";
-	/* Fortget Password Page 的默认定义*/
-	public static final String VIEW_MEMBER_FORTGET_PASSWORD	=	"member.forget.password";
+	public static final String			VIEW_MEMBER_REGISTER			= "member.register";
+
+	/* Fortget Password Page 的默认定义 */
+	public static final String			VIEW_MEMBER_FORTGET_PASSWORD	= "member.forget.password";
 
 	/* Login 登录ID */
-	public static final String MODEL_KEY_MEMBER_LOGIN_ID = "loginId";
+	public static final String			MODEL_KEY_MEMBER_LOGIN_ID		= "loginId";
+
+	/* Login 登录密码 */
+	public static final String			MODEL_KEY_MEMBER_LOGIN_PWD		= "loginPwd";
+
+	private static final String			REMEMBER_PWD					= "********";
+
+	private static final String			DEFAULT_PWD						= "zf1sr1Ys";
 
 	/**
 	 * 会员登录Form的校验器
 	 */
 	@Autowired
 	@Qualifier("loginFormValidator")
-	private LoginFormValidator loginFormValidator;
+	private LoginFormValidator			loginFormValidator;
 
 	/**
 	 * 会员注册Form的校验器
 	 */
 	@Autowired
 	@Qualifier("registerFormValidator")
-	private RegisterFormValidator registerFormValidator;
-	
+	private RegisterFormValidator		registerFormValidator;
+
 	/**
 	 * 忘记密码Form的校验器
 	 */
 	@Autowired
 	@Qualifier("forgetPasswordFormValidator")
-	private ForgetPasswordFormValidator forgetPasswordFormValidator;
+	private ForgetPasswordFormValidator	forgetPasswordFormValidator;
 
 	/**
 	 * 会员业务管理类
 	 */
 	@Autowired
-	private MemberManager memberManager;
+	private MemberManager				memberManager;
+
+	@Autowired
+	private MemberExtraManager			memberExtraManager;
 
 	/**
 	 * 登录页面，默认推荐配置如下
@@ -99,27 +135,28 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param memberDetails
 	 *            用户未登录的情况下进入该页面该值将为空，主要用于已登录用户的页面跳转处理
 	 * @param httpRequest
+	 * @param httpResponse
 	 * @param model
-	 * @return
 	 */
-	public String showLogin(@LoginMember MemberDetails memberDetails, HttpServletRequest request,HttpServletResponse response, Model model) {
-		// 登录用户
+	public String showLogin(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
+		// 如果用户已经登录，默认返回
 		if (!Validator.isNullOrEmpty(memberDetails)) {
+			LOG.info("[The member have logged in,login name: ] {} [{}]", memberDetails.getLoginName(), new Date());
 			return getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
-		// 记住我，处理流程
-		rememberMeProcess(request, model);
+
+		// 记住我的用户名和密码的处理流程
+		rememberMeProcess(request, response, model);
+
 		// 密码前端JS加密准备工作
 		init4SensitiveDataEncryptedByJs(request, model);
-
 		return VIEW_MEMBER_LOGIN;
 	}
 
 	/**
 	 * 登录处理，默认推荐配置如下
 	 * 
-	 * @RequestMapping(value = "/member/login.json", method =
-	 *                       RequestMethod.POST)
+	 * @RequestMapping(value = "/member/login.json", method = RequestMethod.POST)
 	 * @param memberDetails
 	 *            用户未登录的情况下进入该页面该值将为空，主要用于已登录用户的页面跳转处理
 	 * @param loginForm
@@ -129,42 +166,192 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param model
 	 * @return
 	 */
-	// TODO 验证码
-	public NebulaReturnResult login(@ModelAttribute LoginForm loginForm, BindingResult bindingResult,
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-		// 数据校验
-		loginFormValidator.validate(loginForm, bindingResult);
-		if (bindingResult.hasErrors()) {
-			// TODO出错处理
-			return null;
+	public NebulaReturnResult login(
+			@ModelAttribute LoginForm loginForm,
+			BindingResult bindingResult,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model){
+		DefaultReturnResult returnResult = new DefaultReturnResult();
+		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+
+		String pwd = loginForm.getPassword();
+		if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
+			// 随便一个符合密码规范的，让下面的验证通过
+			loginForm.setPassword(getDefaultPwd());
 		}
 
-		// 密码解密，密码传输通过RSA做了加密，此处需要解密
-		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
+		// ****************************************************************** 数据校验
+		loginFormValidator.validate(loginForm, bindingResult);
+		if (bindingResult.hasErrors()) {
+			returnResult.setResult(false);
+			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+			returnResult.setResultMessage(defaultResultMessage);
+			return returnResult;
+		}
 
-		try {
+		// ***************************************************************解密用户名和密码
+		// 是否已经记住了密码,默认没有
+		boolean isHaveReMemberPwd = false;
+		// 解密用户名
+		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
+
+		// 记住用户名和密码
+		if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
+			isHaveReMemberPwd = isHaveReMemberPwd(loginForm, request, response, model);
+			loginForm.setPassword("");
+		}else{
+			// 不记住密码的，直接解密密码，进行验证
+			// 密码解密，密码传输通过RSA做了加密，此处需要解密
+			loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
+		}
+
+		// **********************************************************登录
+		try{
 			// 登录判断，登录失败会抛出异常，通过捕获处理
-			MemberCommand member = memberManager.login(loginForm.toMemberFrontendCommand());
+			MemberCommand member = memberManager.login(loginForm.toMemberFrontendCommand(), isHaveReMemberPwd);
+			Long memberId = member.getId();
+
+			// 合并购物车
+			// 同步Cookie中的购物车信息到数据库
+			synchronousShoppingCart(memberId, request, response, model);
+
+			// 清除记住的用户名和密码
+			CookieUtil.deleteCookie(MODEL_KEY_MEMBER_LOGIN_ID, response);
+			CookieUtil.deleteCookie(MODEL_KEY_MEMBER_LOGIN_PWD, response);
+
+			// 设置记住用户名密码
+			if (loginForm.getIsRemberMeLoginName()) {
+				// 设置cookie值
+				CookieUtil.addCookie(MODEL_KEY_MEMBER_LOGIN_ID,EncryptUtil.getInstance().encrypt(loginForm.getLoginName()),30 * 24 * 60 * 60,response);
+				if (loginForm.getIsRemberMePwd()) {
+					String timestamp = String.valueOf(new Date().getTime());
+					memberExtraManager.rememberPwd(memberId, timestamp);
+
+					String checkNum = EncryptUtil.getInstance().hash(loginForm.getLoginName() + timestamp,ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key"));
+					CookieUtil.addCookie(MODEL_KEY_MEMBER_LOGIN_PWD,EncryptUtil.getInstance().encrypt(checkNum),30 * 24 * 60 * 60,response);
+				}
+			}
 
 			// 认证成功处理
 			return super.onAuthenticationSuccess(constructMemberDetails(member), request, response);
-
-		} catch (UserNotExistsException | UserExpiredException | PasswordNotMatchException e) { // 登录失败
+		}catch (UserNotExistsException e){
+			LOG.error(e.getMessage());
+			// TODO 登录用户不存在
+		}catch (UserExpiredException e){
+			LOG.error(e.getMessage());
+			// TODO 登录用户生命周期不对
+		}catch (PasswordNotMatchException e){
+			LOG.error(e.getMessage());
+			// TODO 登录密码错误
+		}catch (SynchronousShoppingCartException e){
+			LOG.error(e.getMessage());
+			// TODO 同步购物车失败
+		}catch (Exception e){
+			LOG.error(e.getMessage());
 			// TODO 登录失败处理
-			return null;
 		}
+
+		return null;
+	}
+
+	/**
+	 * 验证是否已经记住了密码 boolean
+	 * 
+	 * @author 冯明雷
+	 * @time 2016-3-23下午3:51:07
+	 */
+	protected boolean isHaveReMemberPwd(LoginForm loginForm,HttpServletRequest request,HttpServletResponse response,Model model){
+		// cookie中保存的密码的key
+		Cookie pwdKeyCookie = CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME_PWD);
+		// cookie保存的用户名
+		Cookie loginNameCookie = CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME_USER);
+
+		// cookie中保存的用户名和密码不能为空
+		if (Validator.isNotNullOrEmpty(loginNameCookie) && Validator.isNotNullOrEmpty(pwdKeyCookie)) {
+			String loginName = loginForm.getLoginName();
+			try{
+				if (loginNameCookie.getValue().equals(EncryptUtil.getInstance().encrypt(loginName))) {
+					// 根据用户名查询该用户修改密码的最后时间，用来判断记住的密码是否过期，和解密cookie中保存的密码的key
+					MemberPersonalData memberPersonalData = memberExtraManager.findMemPersonalDataByLoginName(loginName);
+					if (memberPersonalData != null) {
+						String short4 = memberPersonalData.getShort4();
+						String checkNum = EncryptUtil.getInstance().encrypt(
+								EncryptUtil.getInstance().hash(
+										loginName + short4,
+										ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key")));
+						// 如果验证通过，去根据用户名查询密码
+						return pwdKeyCookie.getValue().equals(checkNum);
+					}
+				}
+			}catch (Exception e){
+				LOG.error(e.getMessage());
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 返回一个默认密码防止校验出错 String
+	 * 
+	 * @author 冯明雷
+	 * @time 2016-3-23上午11:21:47
+	 */
+	protected String getDefaultPwd(){
+		return DEFAULT_PWD;
+	}
+
+	/**
+	 * 同步购物车
+	 * 
+	 * @return void
+	 * @param memberId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @throws SynchronousShoppingCartException
+	 * @author 冯明雷
+	 * @time 2016-3-23下午5:07:59
+	 */
+	protected void synchronousShoppingCart(Long memberId,HttpServletRequest request,HttpServletResponse response,Model model)
+			throws SynchronousShoppingCartException{
+		List<ShoppingCartLineCommand> shoppingLines = new ArrayList<ShoppingCartLineCommand>();
+
+		// 获取游客购物车
+		Cookie cookie = CookieUtil.getCookie(request, Constants.GUEST_COOKIE_GC);
+		if (Validator.isNotNullOrEmpty(cookie)) {
+			String value = decryptSensitiveDataEncryptedByJs(cookie.getValue(), request);
+			List<CookieShoppingCartLine> cookieShoppingCartLines = JSON
+					.parseObject(value, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
+
+			if (Validator.isNotNullOrEmpty(cookieShoppingCartLines)) {
+				for (CookieShoppingCartLine cookieLine : cookieShoppingCartLines){
+					ShoppingCartLineCommand cartLine = new ShoppingCartLineCommand();
+					cartLine.setQuantity(cookieLine.getQuantity());
+					cartLine.setCreateTime(cookieLine.getCreateTime());
+					cartLine.setSettlementState(cookieLine.getSettlementState());
+					cartLine.setExtentionCode(cookieLine.getExtentionCode());
+					cartLine.setSkuId(cookieLine.getSkuId());
+					cartLine.setPromotionId(cookieLine.getPromotionId());
+					cartLine.setGift(cookieLine.getIsGift());
+					cartLine.setLineGroup(cookieLine.getLineGroup());
+					cartLine.setShopId(cookieLine.getShopId());
+					shoppingLines.add(cartLine);
+				}
+			}
+		}
+		memberManager.synchronousShoppingCart(memberId, shoppingLines);
 	}
 
 	/**
 	 * 登出，默认推荐配置如下
 	 * 
-	 * @RequestMapping(value = "/member/loginOut.json", method =
-	 *                       RequestMethod.GET)
+	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.GET)
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	public NebulaReturnResult logout(HttpServletRequest request, HttpServletResponse response) {
+	public NebulaReturnResult logout(HttpServletRequest request,HttpServletResponse response,Model model){
 		request.getSession().invalidate();
 		onLogoutSuccess(request, response);
 		return DefaultReturnResult.SUCCESS;
@@ -176,7 +363,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param request
 	 * @param response
 	 */
-	protected void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response) {
+	protected void onLogoutSuccess(HttpServletRequest request,HttpServletResponse response){
 
 	}
 
@@ -188,8 +375,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param model
 	 * @return 默认返回登录页
 	 */
-	protected String getShowPage4LoginedUserViewLoginPage(MemberDetails memberDetails, HttpServletRequest request,
-			Model model) {
+	protected String getShowPage4LoginedUserViewLoginPage(MemberDetails memberDetails,HttpServletRequest request,Model model){
 		return VIEW_MEMBER_LOGIN;
 	}
 
@@ -199,10 +385,23 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param request
 	 * @param model
 	 */
-	protected void rememberMeProcess(HttpServletRequest request, Model model) {
-		if (isSupportRemberMe() && !Validator.isNullOrEmpty(CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME))) {
-			model.addAttribute(MODEL_KEY_MEMBER_LOGIN_ID,
-					remberMeValueDecrypt(CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME).getValue()));
+	protected void rememberMeProcess(HttpServletRequest request,HttpServletResponse response,Model model){
+		boolean isSupportRemberMeUser = isSupportRemberMeUser();
+
+		// 是否记住密码，如果是记住密码，默认就记住用户名
+		if (isSupportRemberMePwd()) {
+			isSupportRemberMeUser = true;
+			Cookie pwd = CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME_PWD);
+			if (Validator.isNotNullOrEmpty(pwd)) {
+				model.addAttribute(MODEL_KEY_MEMBER_LOGIN_PWD, REMEMBER_PWD);
+			}
+		}
+
+		if (isSupportRemberMeUser) {
+			Cookie userName = CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME_USER);
+			if (Validator.isNotNullOrEmpty(userName)) {
+				model.addAttribute(MODEL_KEY_MEMBER_LOGIN_ID, remberMeValueDecrypt(userName.getValue(), request));
+			}
 		}
 	}
 
@@ -212,8 +411,8 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param value
 	 * @return 默认原值返回
 	 */
-	protected String remberMeValueDecrypt(String value) {
-		return value;
+	protected String remberMeValueDecrypt(String value,HttpServletRequest request){
+		return decryptSensitiveDataEncryptedByJs(value, request);
 	}
 
 	/**
@@ -222,16 +421,25 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param value
 	 * @return 默认原值返回
 	 */
-	protected String remberMeValueEncrypt(String value) {
+	protected String remberMeValueEncrypt(String value){
 		return value;
 	}
 
 	/**
-	 * 是否支持remember me，各商城可重写
+	 * 是否支持remember me 用户名，各商城可重写
 	 * 
 	 * @return 默认关闭
 	 */
-	protected boolean isSupportRemberMe() {
+	protected boolean isSupportRemberMeUser(){
+		return Boolean.FALSE.booleanValue();
+	}
+
+	/**
+	 * 是否支持remember me 密码，(如果记住密码默认记住用户名)各商城可重写
+	 * 
+	 * @return 默认关闭
+	 */
+	protected boolean isSupportRemberMePwd(){
 		return Boolean.FALSE.booleanValue();
 	}
 
@@ -241,7 +449,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param member
 	 * @return
 	 */
-	protected MemberDetails constructMemberDetails(MemberCommand member) {
+	protected MemberDetails constructMemberDetails(MemberCommand member){
 		MemberDetails memberDetails = new MemberDetails();
 		// TODO property填充
 		memberDetails.setActived(this.isActivedMember(member));
@@ -254,54 +462,57 @@ public class NebulaLoginController extends NebulaAbstractLoginController {
 	 * @param member
 	 * @return
 	 */
-	protected boolean isActivedMember(MemberCommand member) {
+	protected boolean isActivedMember(MemberCommand member){
 		// TODO 判断逻辑
 		return false;
 	}
 
 	/**
 	 * 忘记密码页面, 默认推荐配置如下
+	 * 
 	 * @RequestMapping(value = "/member/forgetPassword", method = RequestMethod.GET)
 	 * @param model
 	 * @return
 	 */
-	public String showForgetPassword(Model model) {
+	public String showForgetPassword(Model model){
 		return VIEW_MEMBER_FORTGET_PASSWORD;
 	}
 
 	/**
 	 * 发送验证码, 默认推荐配置如下
+	 * 
 	 * @RequestMapping(value = "/member/forgetPassword.json", method = RequestMethod.POST)
 	 * @param forgetPasswordForm
 	 * @param bindingResult
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult forgetPassword(@ModelAttribute ForgetPasswordForm forgetPasswordForm,
-			BindingResult bindingResult, HttpServletRequest request,HttpServletResponse response, Model model) {
+	public NebulaReturnResult forgetPassword(
+			@ModelAttribute ForgetPasswordForm forgetPasswordForm,
+			BindingResult bindingResult,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model){
 		// 1.数据校验 validator
 		forgetPasswordFormValidator.validate(forgetPasswordForm, bindingResult);
-		if(bindingResult.hasErrors()){
-			//TODO 
+		if (bindingResult.hasErrors()) {
+			// TODO
 			return null;
 		}
 
 		// 2.判断是手机还是邮箱，分别调用发送验证码逻辑
-		
 
 		return null;
 	}
-	
-	
 
 	/**
-	 * 
 	 * 登出, 默认推荐配置如下
+	 * 
 	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
 	 * @param request
 	 * @return
 	 */
-	public NebulaReturnResult active(HttpServletRequest request,HttpServletResponse response, Model model) {
+	public NebulaReturnResult active(HttpServletRequest request,HttpServletResponse response,Model model){
 		// 1.清空session
 		resetSession(request);
 
