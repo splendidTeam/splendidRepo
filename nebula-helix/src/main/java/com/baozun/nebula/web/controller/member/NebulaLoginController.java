@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2016 Jumbomart All Rights Reserved.
  *
@@ -49,15 +50,14 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.feilong.core.util.Validator;
 import com.feilong.servlet.http.CookieUtil;
+
 
 /**
  * 用户登录
@@ -218,7 +218,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			}
 
 			// 认证成功处理
-			return onAuthenticationSuccess(constructMemberDetails(member), request, response);
+			return super.onAuthenticationSuccess(constructMemberDetails(member), request, response);
 		}catch (UserNotExistsException e){
 			LOG.error(e.getMessage());
 			// TODO 登录用户不存在
@@ -446,24 +446,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 认证成功，未激活用户也认为是认证成功，如果需要特殊处理未激活用户请重写此方法
-	 * 
-	 * @param memberDetails
-	 * @param request
-	 * @param response
-	 */
-	protected NebulaReturnResult onAuthenticationSuccess(
-			MemberDetails memberDetails,
-			HttpServletRequest request,
-			HttpServletResponse response){
-		super.resetSession(request);
-		request.getSession().setAttribute(SessionKeyConstants.MEMBER_CONTEXT, memberDetails);
-		// 触发登录成功事件，用于异步处理其他的业务
-		eventPublisher.publish(new LoginSuccessEvent(memberDetails, getClientContext(request, response)));
-		return DefaultReturnResult.SUCCESS;
-	}
-
-	/**
 	 * 用户是否激活
 	 * 
 	 * @param member
@@ -472,17 +454,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	protected boolean isActivedMember(MemberCommand member){
 		// TODO 判断逻辑
 		return false;
-	}
-
-	/**
-	 * 忘记密码页面, 默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/forgetPassword", method = RequestMethod.GET)
-	 * @param model
-	 * @return
-	 */
-	public String showForgetPassword(Model model){
-		return VIEW_MEMBER_FORTGET_PASSWORD;
 	}
 	
 	/**
