@@ -55,7 +55,7 @@ import loxia.dao.Pagination;
  * 
  * 并没有提供查看地址明细方法，因为假定在显示地址簿时就已获取所有相关信息，不用再读取一遍。如果商城需要，自己重载。
  * 
- * @author Benjamin.Liu
+ * @author hengheng.wang
  *
  */
 public class NebulaMemberAddressController extends BaseController {
