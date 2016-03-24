@@ -57,23 +57,15 @@ public class RegisterForm extends BaseForm{
 	 * @return
 	 */
 	public MemberFrontendCommand toMemberFrontendCommand(){
-		// 数据转换
-		return new MemberFrontendCommand();
-	}
-
-	/**
-	 * RegisterForm 对象装换为 MemberFrontendCommand
-	 * 
-	 * @return
-	 */
-	public MemberFrontendCommand toMemberFrontendCommand(RegisterForm registerForm){
 		MemberFrontendCommand memberFrontendCommand = new MemberFrontendCommand();
+		// 数据转换
 		try{
-			BeanUtils.copyProperties(memberFrontendCommand, registerForm);
+			BeanUtils.copyProperties(memberFrontendCommand, this);
 		}catch (Exception e){
 			LOGGER.error("", e);
 		}
-		return memberFrontendCommand;
+
+		return new MemberFrontendCommand();
 	}
 
 	public String getSex(){
