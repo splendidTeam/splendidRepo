@@ -20,16 +20,6 @@ public class LoginForm extends BaseForm{
 	 * 登录名
 	 */
 	private String				loginName;
-
-	/**
-	 * 登录邮箱
-	 */
-	private String				loginEmail;
-
-	/**
-	 * 登录手机
-	 */
-	private String				loginMobile;
 	
 	/**
 	 * 密码
@@ -52,22 +42,6 @@ public class LoginForm extends BaseForm{
 
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
-	}
-
-	public String getLoginEmail() {
-		return loginEmail;
-	}
-
-	public void setLoginEmail(String loginEmail) {
-		this.loginEmail = loginEmail;
-	}
-
-	public String getLoginMobile() {
-		return loginMobile;
-	}
-
-	public void setLoginMobile(String loginMobile) {
-		this.loginMobile = loginMobile;
 	}
 
 	public String getPassword() {
@@ -100,8 +74,6 @@ public class LoginForm extends BaseForm{
 	 */
 	public MemberFrontendCommand toMemberFrontendCommand(){
 		MemberFrontendCommand memberCommand=new MemberFrontendCommand();
-		memberCommand.setLoginEmail(this.loginEmail);
-		memberCommand.setLoginMobile(this.loginMobile);
 		memberCommand.setLoginName(this.loginName);
 		memberCommand.setPassword(this.password);
 		//.....

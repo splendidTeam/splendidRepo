@@ -80,12 +80,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/* Login Page 的默认定义 */
 	public static final String			VIEW_MEMBER_LOGIN				= "member.login";
 
-	/* Register Page 的默认定义 */
-	public static final String			VIEW_MEMBER_REGISTER			= "member.register";
-
-	/* Fortget Password Page 的默认定义 */
-	public static final String			VIEW_MEMBER_FORTGET_PASSWORD	= "member.forget.password";
-
 	/* Login 登录ID */
 	public static final String			MODEL_KEY_MEMBER_LOGIN_ID		= "loginId";
 
@@ -124,7 +118,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	public String showLogin(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
 		// 如果用户已经登录，默认返回
-		if (!Validator.isNullOrEmpty(memberDetails)) {
+		if (Validator.isNotNullOrEmpty(memberDetails)) {
 			LOG.info("[The member have logged in,login name: ] {} [{}]", memberDetails.getLoginName(), new Date());
 			return getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
@@ -221,6 +215,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			return super.onAuthenticationSuccess(constructMemberDetails(member), request, response);
 		}catch (UserNotExistsException e){
 			LOG.error(e.getMessage());
+			
 			// TODO 登录用户不存在
 		}catch (UserExpiredException e){
 			LOG.error(e.getMessage());

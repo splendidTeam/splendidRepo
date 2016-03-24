@@ -3,6 +3,8 @@
  */
 package com.baozun.nebula.web.controller.member;
 
+import static org.junit.Assert.assertEquals;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,8 +13,10 @@ import org.springframework.validation.BindingResult;
 
 import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.BaseControllerTest;
-import com.baozun.nebula.web.controller.member.form.RegisterForm;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 
 /**
@@ -32,17 +36,16 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 	private MemberExtraManager		memberExtraManager;
 
-	private RegisterForm			registerForm;
-
 	private BindingResult			bindingResult;
 
 	@Before
 	public void setUp(){
-		registerForm = new RegisterForm();
-
 		nebulaLoginController = new NebulaLoginController();
+		loginFormValidator =new LoginFormValidator();
+		
 		memberManager = EasyMock.createMock("memberManager", MemberManager.class);
 		bindingResult = EasyMock.createMock("bindingResult", BindingResult.class);
+		memberExtraManager = EasyMock.createMock("memberExtraManager", MemberExtraManager.class);
 
 		ReflectionTestUtils.setField(nebulaLoginController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaLoginController, "loginFormValidator", loginFormValidator);
@@ -51,18 +54,20 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 	@Test
 	public void testShowLogin(){
-	
+		control.replay();
+		MemberDetails memberDetails = null;
+		//验证结果
+		assertEquals(NebulaLoginController.VIEW_MEMBER_LOGIN,nebulaLoginController.showLogin(memberDetails, request, response, model));
+		control.verify();
 	}
 
 	@Test
 	public void testLogin(){
-		// Record
-		// EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L)).andReturn(new Pagination<ContactCommand>());
-
 		// Replay
 		control.replay();
-
+		LoginForm loginForm=new LoginForm();
 		
+		assertEquals(DefaultReturnResult.SUCCESS,nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 
 		// 验证交互行为
 		control.verify();
