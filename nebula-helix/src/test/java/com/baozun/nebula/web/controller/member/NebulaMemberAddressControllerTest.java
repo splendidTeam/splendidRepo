@@ -17,23 +17,14 @@ package com.baozun.nebula.web.controller.member;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.ContactCommand;
-import com.baozun.nebula.model.member.Contact;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -241,9 +232,11 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setPhone("13023230767");
 		memberAddressForm.setConsignee("wanghengheng");
 		memberAddressForm.setPostcode("200000");
-		BindingResult bindingResult = null;
-		EasyMock.expectLastCall();
+
+
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
+		
+	      EasyMock.expectLastCall();
 		
 		// Replay
 		EasyMock.replay(sdkMemberManager);
