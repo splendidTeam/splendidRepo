@@ -38,26 +38,26 @@ public class ContactManagerTest {
 	public void testSdkCreateOrUpdateContact() {
 		ContactCommand con = new ContactCommand();
 //		con.setId(2L);
-		con.setName("ZHANGSAN");
-		con.setAddress("JFADLG;L");
-		con.setAreaId(2L);
-		con.setCityId(2L);
-		con.setCountryId(2L);
-		//con.setIfDefault(0);
-		con.setMobile("54213659");
-		con.setPostcode("165326");
-		con.setProvinceId(2L);
-		con.setTelphone("15234563");
-		con.setTownId(2L);
-		con.setMemberId(1L);
-		try {
-			sdkMemberManager.createOrUpdateContact(con);
-			log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@{}",
-					"++++++++++++++++++++++++++++sucess");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		con.setName("ZHANGSAN");
+//		con.setAddress("JFADLG;L");
+//		con.setAreaId(2L);
+//		con.setCityId(2L);
+//		con.setCountryId(2L);
+//		//con.setIfDefault(0);
+//		con.setMobile("54213659");
+//		con.setPostcode("165326");
+//		con.setProvinceId(2L);
+//		con.setTelphone("15234563");
+//		con.setTownId(2L);
+//		con.setMemberId(1L);
+//		try {
+//			sdkMemberManager.createOrUpdateContact(con);
+//			log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@{}",
+//					"++++++++++++++++++++++++++++sucess");
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	@Test

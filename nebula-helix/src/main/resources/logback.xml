@@ -9,7 +9,7 @@
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>DEBUG</level>
+			<level>WARN</level>
 		</filter>
 
 		<!-- 注意 logback 的括号需要转义 -->
@@ -54,28 +54,28 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.baozun" level="DEBUG" />
+	<logger name="com.baozun" level="WARN" />
 
-	<logger name="org.springframework" level="DEBUG" />
-	<logger name="org.hibernate.SQL" level="DEBUG" />
-	<logger name="org.hibernate" level="DEBUG" />
+	<logger name="org.springframework" level="WARN" />
+	<logger name="org.hibernate.SQL" level="WARN" />
+	<logger name="org.hibernate" level="WARN" />
 
-	<logger name="org.apache" level="DEBUG" />
+	<logger name="org.apache" level="WARN" />
 
 	<!-- **************************loxia****************************************** -->
-	<logger name="loxia" level="DEBUG" />
+	<logger name="loxia" level="WARN" />
 
-	<logger name="loxia.dao.support.BaseRowMapper" level="info" />
-	<logger name="loxia.dao.ReadWriteDataSource" level="info" />
-	<logger name="loxia.aspect.QueryAspect" level="info" />
-	<logger name="loxia.support.json" level="info" />
-	<logger name="loxia.support.cache.CacheAspect" level="info" />
-	<logger name="loxia.aspect.ReadWriteDataSourceAspect" level="info" />
-	<logger name="loxia.service.VelocityTemplateService" level="info" />
+	<logger name="loxia.dao.support.BaseRowMapper" level="WARN" />
+	<logger name="loxia.dao.ReadWriteDataSource" level="WARN" />
+	<logger name="loxia.aspect.QueryAspect" level="WARN" />
+	<logger name="loxia.support.json" level="WARN" />
+	<logger name="loxia.support.cache.CacheAspect" level="WARN" />
+	<logger name="loxia.aspect.ReadWriteDataSourceAspect" level="WARN" />
+	<logger name="loxia.service.VelocityTemplateService" level="WARN" />
 
 	<!-- ****************************common***************************************** -->
-	<logger name="com.mchange.v2" level="info" />
-	<logger name="org.apache.commons" level="info" />
+	<logger name="com.mchange.v2" level="WARN" />
+	<logger name="org.apache.commons" level="WARN" />
 	<logger name="org.apache.tiles.definition.dao.ResolvingLocaleUrlDefinitionDAO" level="warn" />
 	<logger name="httpclient.wire" level="warn" />
 	<logger name="org.springframework.jdbc.core.JdbcTemplate" level="warn" />
