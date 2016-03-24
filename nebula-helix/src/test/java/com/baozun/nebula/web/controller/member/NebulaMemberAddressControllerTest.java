@@ -21,7 +21,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.validation.BindingResult;
+
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
@@ -247,10 +247,10 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setPhone("13023230767");
 		memberAddressForm.setConsignee("wanghengheng");
 		memberAddressForm.setPostcode("200000");
-		
-		BindingResult bindingResult = null;
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		EasyMock.expectLastCall();
+		
+	      EasyMock.expectLastCall();
 		
 		// Replay
 		EasyMock.replay(sdkMemberManager);
