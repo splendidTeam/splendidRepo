@@ -14,11 +14,11 @@
 	
 	<import resource="spring/spring-dao.xml" />
 	<import resource="spring/spring-manager.xml" />
-<!-- 	<import resource="spring/spring-message.xml" /> -->
-<!-- 	<import resource="spring/spring-mail.xml" /> -->
-<!-- 	<import resource="spring/spring-security.xml" /> -->
-<!-- 	<import resource="spring/spring-solr.xml" />
-	<import resource="spring/spring-redis.xml" /> -->
+	<import resource="spring/spring-message.xml" />
+	<import resource="spring/spring-mail.xml" />
+	<import resource="spring/spring-security.xml" />
+	<import resource="spring/spring-solr.xml" />
+	<import resource="spring/spring-redis.xml" />
 	<import resource="spring/spring-zk.xml" />
 	
 	<!-- 配置文件加密工具 start -->
@@ -35,6 +35,12 @@
 		<property name="config" ref="environmentVariablesConfiguration" />
 	</bean>
 	<!-- 配置文件加密工具 end -->
+	
+	<beans profile="dev">
+		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/dev/metainfo.properties"/>
+		<encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/dev/solr.properties"/>
+		<encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/dev/redis.properties"/>
+	</beans>
 	
 	<beans profile="dev">
 		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/dev/metainfo.properties"/>

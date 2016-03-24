@@ -11,7 +11,6 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://loxia.benjamin.cn/schema/core http://loxia.benjamin.cn/schema/core/loxia-spring-ext.xsd
 		">
-	<util:properties id="meta" location="classpath:config/metainfo.properties"></util:properties>
 
 	<loxia:dao-config base-package="com.baozun.**.dao" />
 	<bean id="sessionFactory"
