@@ -109,7 +109,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (!Validator.isNullOrEmpty(memberDetails)){
 			return super.getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
-		// TODO 此处加入这个是否有必要？
+		// TODO 
 		init4SensitiveDataEncryptedByJs(request, model);
 		return VIEW_MEMBER_REGISTER;
 	}
