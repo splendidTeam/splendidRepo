@@ -49,7 +49,7 @@ public abstract class BaseController{
     protected EventPublisher            eventPublisher;
     
     @Autowired
-	private MessageSource				messageSource; 
+	private MessageSource				messageSource;
 
     private static final DeviceResolver DEVICE_RESOLVER = new LiteDeviceResolver();
     
