@@ -16,10 +16,10 @@
  */
 package com.baozun.nebula.manager.member;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,14 +37,16 @@ import com.baozun.nebula.dao.member.MemberConductDao;
 import com.baozun.nebula.dao.member.MemberDao;
 import com.baozun.nebula.event.EmailEvent;
 import com.baozun.nebula.event.EventPublisher;
+import com.baozun.nebula.model.email.EmailCheck;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.model.member.MemberPersonalData;
+import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.utils.Validator;
-
-import loxia.utils.DateUtil;
 
 
 /**
@@ -76,33 +78,14 @@ public abstract class MemberEmailManagerImpl implements MemberEmailManager{
 	@Autowired
 	private MemberConductDao memberConductDao;
 	
-	
-	
 
 	@Override
-	public Object sendActiveEmail(Long memberId, HttpServletRequest request) {
-		//获取发送邮件间隔时间
-		Integer timeSpan = EmailConstants.NEBULA_SEND_EMAIL_AGAIN_TIME_SPAN;
-		Integer expiredSeconds = timeSpan * 60;
-		
-		//获取上一次发送时间
-		Date expiredTime = null;
-		if (request.getSession().getAttribute(EmailConstants.SEND_ACTIVE_EMAIL_EXPIRED_TIME) != null) { 
-			 expiredTime = (Date)request.getSession().getAttribute(EmailConstants.SEND_ACTIVE_EMAIL_EXPIRED_TIME); 
-		} 
-		
-		// 还未到再次发送时间，不进行发送 
-		Date now = Calendar.getInstance().getTime(); 
-		if (expiredTime != null && now.compareTo(expiredTime) < 0) { 
-			 expiredSeconds = Long.valueOf((expiredTime.getTime() - now.getTime()) /1000).intValue();
-			 return expiredSeconds;
-		}
-		
+	@Transactional(readOnly = true)
+	public void sendActiveEmail(Long memberId, HttpServletRequest request) {
 		//获取用户信息
 		Member member = memberDao.findMemberById(memberId);
 		//获取用户登录注册信息
 		MemberConductCommand conduct = memberConductDao.findMemberConductCommandById(member.getId());
-		
 		//拼接内容
 		StringBuffer emailContent = new StringBuffer();
 		emailContent.append(member.getId())
@@ -112,7 +95,7 @@ public abstract class MemberEmailManagerImpl implements MemberEmailManager{
 					.append(conduct.getRegisterTime());
 		//加密字符串
 		String checksum = EncryptUtil.getInstance().hash(emailContent.toString(), sendMailKey);
-		
+		//拼接链接字符串并加密
 		StringBuffer activeEmailUrl = new StringBuffer();
 		try {
 			StringBuffer encryptParams = new StringBuffer();
@@ -122,15 +105,15 @@ public abstract class MemberEmailManagerImpl implements MemberEmailManager{
 						 .append(checksum).append("&sendTime=")
 						 .append(new Date().getTime());
 			String encrypt = EncryptUtil.getInstance().encrypt(encryptParams.toString());
-			
 			String path = getRegEmailValidPath(request);
 			activeEmailUrl.append(path).append("?registerComfirm=").append(EncryptUtil.getInstance().base64Encode(encrypt));
-
 		} catch (Exception e) {
 			log.error("sendErr-----------------------: ",e);
 		}
+		
 		log.info("activeEmailUrl-----------------------: " + activeEmailUrl);
 
+		//组装参数
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		String lang = LangUtil.getCurrentLang();
 		lang = lang == null ? "zh_HK" : lang;
@@ -138,10 +121,6 @@ public abstract class MemberEmailManagerImpl implements MemberEmailManager{
 		dataMap.put("activeEmailUrl", activeEmailUrl);
 		// 发送
 		commonSendEmail(this,EmailConstants.EMAIL_REGISTER_VALIDATE,member.getLoginEmail(), dataMap);
-		
-		expiredTime = DateUtil.addMinutes(now, timeSpan);
-		request.getSession().setAttribute(EmailConstants.SEND_ACTIVE_EMAIL_EXPIRED_TIME, expiredTime);
-		return expiredSeconds;
 	}
 	
 	@Override
@@ -157,6 +136,7 @@ public abstract class MemberEmailManagerImpl implements MemberEmailManager{
 	
 
 	@Override
+	@Transactional(readOnly = true)
 	public void sendRegsiterSuccessEmail(String email, MemberPersonalData personalData) {
 		log.info("send register successfully email start ");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
@@ -168,6 +148,7 @@ public abstract class MemberEmailManagerImpl implements MemberEmailManager{
 		commonSendEmail(this,EmailConstants.EMAIL_REGISTER_VALIDATE,email, dataMap);
 		log.info("send register successfully email end ");
 	}
+	
 	
 	/**
 	 * 通用接口
