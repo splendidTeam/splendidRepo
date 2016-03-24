@@ -8,10 +8,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +27,7 @@ import com.baozun.nebula.event.EmailEvent;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
-import com.baozun.nebula.exception.LoginException;
+import com.baozun.nebula.exception.ErrorCodesFoo;
 import com.baozun.nebula.exception.PasswordNotMatchException;
 import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
@@ -56,88 +52,92 @@ import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
 @Transactional
 @Service("membManager")
-public class MemberManagerImpl implements MemberManager {
+public class MemberManagerImpl implements MemberManager{
 
-	private static final Logger log = LoggerFactory.getLogger(MemberManagerImpl.class);
-
-	@Autowired
-	private SdkMemberManager sdkMemberManager;
+	private static final Logger		LOGGER		= LoggerFactory.getLogger(MemberManagerImpl.class);
 
 	@Autowired
-	private SdkShoppingCartManager sdkShoppingCartManager;
+	private SdkMemberManager		sdkMemberManager;
 
 	@Autowired
-	private SdkItemManager sdkItemManager;
+	private SdkShoppingCartManager	sdkShoppingCartManager;
 
 	@Autowired
-	private EmailCheckManager emailCheckManager;
+	private SdkItemManager			sdkItemManager;
 
 	@Autowired
-	private MemberPersonalDataDao memberPersonalDataDao;
+	private EmailCheckManager		emailCheckManager;
 
 	@Autowired
-	private EventPublisher eventPublisher;
+	private MemberPersonalDataDao	memberPersonalDataDao;
 
 	@Autowired
-	private MemberDao memberDao;
+	private EventPublisher			eventPublisher;
+
+	@Autowired
+	private MemberDao				memberDao;
 
 	@Value("#{meta['page.base']}")
-	private String pageUrlBase = "";
+	private String					pageUrlBase	= "";
 
 	@Override
-	public MemberPersonalData findMemberPersonData(Long memberId) {
+	public MemberPersonalData findMemberPersonData(Long memberId){
 		return sdkMemberManager.findMemberPersonData(memberId);
 	}
 
 	@Override
-	public boolean updatePasswd(Long memberId, String pwd, String newPwd, String reNewPwd) {
+	public boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd){
 		return sdkMemberManager.updatePasswd(memberId, pwd, newPwd, reNewPwd);
 	}
 
 	@Override
-	public void saveCryptoguard(List<MemberCryptoguard> memberCryptoguardList) {
-		if (memberCryptoguardList != null) {
+	public void saveCryptoguard(List<MemberCryptoguard> memberCryptoguardList){
+		if (memberCryptoguardList != null){
 			Long memberId = memberCryptoguardList.get(0).getMemberId();
 			List<MemberCryptoguard> res = sdkMemberManager.findCryptoguardList(memberId);
 			if (res != null)
 				sdkMemberManager.removeCryptoguardByMemberId(memberId);
-			for (MemberCryptoguard memberCryptoguard : memberCryptoguardList) {
+			for (MemberCryptoguard memberCryptoguard : memberCryptoguardList){
 				sdkMemberManager.saveCryptoguard(memberCryptoguard);
 			}
 		}
 	}
 
 	@Override
-	public List<MemberCryptoguard> findCryptoguardList(Long memberId) {
+	public List<MemberCryptoguard> findCryptoguardList(Long memberId){
 		return sdkMemberManager.findCryptoguardList(memberId);
 	}
 
 	@Override
-	public MemberPersonalData savePersonData(MemberPersonalData personData) {
+	public MemberPersonalData savePersonData(MemberPersonalData personData){
 
-		if (personData.getCountryId() != null) {
+		if (personData.getCountryId() != null){
 			Address address = AddressUtil.getAddressById(personData.getCountryId());
 			personData.setCountry(address.getName());
 		}
 
-		if (personData.getProvinceId() != null) {
+		if (personData.getProvinceId() != null){
 			Address address = AddressUtil.getAddressById(personData.getProvinceId());
 			personData.setProvince(address.getName());
 		}
 
-		if (personData.getCityId() != null) {
+		if (personData.getCityId() != null){
 			Address address = AddressUtil.getAddressById(personData.getCityId());
 			personData.setCity(address.getName());
 		}
 
-		if (personData.getAreaId() != null) {
+		if (personData.getAreaId() != null){
 			Address address = AddressUtil.getAddressById(personData.getAreaId());
 			personData.setArea(address.getName());
 		}
 
-		if (personData.getTownId() != null) {
+		if (personData.getTownId() != null){
 			Address address = AddressUtil.getAddressById(personData.getTownId());
 			personData.setTown(address.getName());
 		}
@@ -147,38 +147,38 @@ public class MemberManagerImpl implements MemberManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public boolean checkNickname(String nickname) {
+	public boolean checkNickname(String nickname){
 		return sdkMemberManager.checkNickname(nickname);
 	}
 
 	@Override
-	public void sendBindEmailUrl(Long memberId, String email, String path) {
+	public void sendBindEmailUrl(Long memberId,String email,String path){
 		sdkMemberManager.sendBindEmailUrl(memberId, email, path);
 	}
 
 	@Override
-	public boolean bindEmail(Long memberId, String cryptCode, String email) {
+	public boolean bindEmail(Long memberId,String cryptCode,String email){
 		return sdkMemberManager.bindEmail(memberId, cryptCode, email);
 	}
 
 	@Override
-	public String sendBindMobileCode(String mobile, Long memberId) {
+	public String sendBindMobileCode(String mobile,Long memberId){
 		return sdkMemberManager.sendBindMobileCode(mobile, memberId);
 	}
 
 	@Override
-	public boolean bindMobile(String mobile, Long memberId) {
+	public boolean bindMobile(String mobile,Long memberId){
 		return sdkMemberManager.bindMobile(mobile, memberId);
 	}
 
-	private void saveLoginMemberConduct(MemberConductCommand codunctCommand, Long memberId) {
+	private void saveLoginMemberConduct(MemberConductCommand codunctCommand,Long memberId){
 		MemberConductCommand condCommand = sdkMemberManager.findMemberConductCommandById(memberId);
 		Integer count = 0;
-		if (null != condCommand) {
+		if (null != condCommand){
 			if (null == condCommand.getLoginCount())
 				condCommand.setLoginCount(count);
 			count = condCommand.getLoginCount() + 1;
-		} else {
+		}else{
 			condCommand = new MemberConductCommand();
 			count = count + 1;
 		}
@@ -190,19 +190,19 @@ public class MemberManagerImpl implements MemberManager {
 
 	@Transactional(readOnly = true)
 	@Override
-	public Member findMember(String loginName) {
+	public Member findMember(String loginName){
 		return sdkMemberManager.findMember(loginName);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public MemberCommand findMemberByUsername(String username) {
+	public MemberCommand findMemberByUsername(String username){
 		return sdkMemberManager.findMemberByLoginName(username);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public MemberPersonalData findMemberPersonDataByMobile(String mobile) {
+	public MemberPersonalData findMemberPersonDataByMobile(String mobile){
 		return sdkMemberManager.findMemberPersonDataByMobile(mobile);
 	}
 
@@ -215,23 +215,23 @@ public class MemberManagerImpl implements MemberManager {
 	 */
 	@Transactional(readOnly = true)
 	@Override
-	public MemberCommand findMemberById(Long memberId) {
+	public MemberCommand findMemberById(Long memberId){
 		MemberCommand member = sdkMemberManager.findMemberById(memberId);
 		return member;
 	}
 
 	@Override
-	public MemberCommand saveMember(MemberCommand memberCommand) {
+	public MemberCommand saveMember(MemberCommand memberCommand){
 		return sdkMemberManager.saveMember(memberCommand);
 	}
 
 	@Override
-	public void sendActiveByEmail(Long memberId, String path) {
+	public void sendActiveByEmail(Long memberId,String path){
 		// sdkMemberManager.sendActiveByEmail(memberId,path);
 		setEncryptedMsg(memberId, path);
 	}
 
-	private void setEncryptedMsg(Long memberId, String path) {
+	private void setEncryptedMsg(Long memberId,String path){
 		Properties properties = ProfileConfigUtil.findPro("config/email.properties");
 		String key = properties.getProperty("param.register.key");
 		String action = properties.getProperty("param.register.action");
@@ -261,7 +261,7 @@ public class MemberManagerImpl implements MemberManager {
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		dataMap.put("pageUrlBase", pageUrlBase);
 		String url = path + "?" + t_q_s;
-		log.info("激活邮件url:{}", url);
+		LOGGER.info("激活邮件url:{}", url);
 		dataMap.put("link", "<a href='" + url + "'>" + url + "</a>");
 		// 发送邮件
 		EmailEvent emailEvent = new EmailEvent(this, email, EmailConstants.EMAIL_REGISTER_VALIDATE, dataMap);
@@ -270,26 +270,25 @@ public class MemberManagerImpl implements MemberManager {
 
 	@Transactional(readOnly = true)
 	@Override
-	public Pagination<RateCommand> findItemRateListByMemberId(Page page, Sort[] sorts, Long memberId) {
+	public Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId){
 		Pagination<RateCommand> ratePage = sdkMemberManager.findItemRateListByMemberId(page, sorts, memberId);
 
 		List<Long> itemIds = new ArrayList<Long>();
-		if (ratePage != null) {
+		if (ratePage != null){
 			List<RateCommand> reateList = ratePage.getItems();
-			for (RateCommand rate : reateList) {
+			for (RateCommand rate : reateList){
 				itemIds.add(rate.getItemId());
 
 			}
 
 			Map<Long, List<ItemImage>> map = new HashMap<Long, List<ItemImage>>();
-			List<ItemImageCommand> itemImageCommandList = sdkItemManager.findItemImagesByItemIds(itemIds,
-					ItemImage.IMG_TYPE_LIST);
-			for (ItemImageCommand itemImageCommand : itemImageCommandList) {
+			List<ItemImageCommand> itemImageCommandList = sdkItemManager.findItemImagesByItemIds(itemIds, ItemImage.IMG_TYPE_LIST);
+			for (ItemImageCommand itemImageCommand : itemImageCommandList){
 				map.put(itemImageCommand.getItemId(), itemImageCommand.getItemIamgeList());
 
 			}
 
-			for (RateCommand rate : reateList) {
+			for (RateCommand rate : reateList){
 				rate.setItemPicUrlList(map.get(rate.getItemId()));
 			}
 			ratePage.setItems(reateList);
@@ -299,96 +298,147 @@ public class MemberManagerImpl implements MemberManager {
 	}
 
 	@Override
-	public MemberCommand login(MemberFrontendCommand memberCommand)
+	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd)
 			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException {
 		MemberCommand member = null;
-		if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())) {
+		if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
 			member = sdkMemberManager.findMemberByLoginMobile(memberCommand.getLoginName());
-		} else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())) {
+		}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
 			member = sdkMemberManager.findMemberByLoginEmail(memberCommand.getLoginName());
-		} else {
+		}else{
 			member = sdkMemberManager.findMemberByLoginName(memberCommand.getLoginName());
 		}
 
-		if (null == member) {
+		if (null == member){
 			throw new UserNotExistsException();
 		}
-		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
+		
+		//没有记住密码的时候才需要验证输入的密码是否相同
+		if(!isHaveReMemberPwd){
+			String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
+			if (!encodePassword.equals(member.getPassword())) {
+				throw new PasswordNotMatchException();
+			}
+		}
 
-		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())) {
+		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())){
 			throw new UserExpiredException();
 		}
-
-		if (!encodePassword.equals(member.getPassword())) {
-			throw new PasswordNotMatchException();
-		}
+		
 		// 保存用户行为信息
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
 	}
 
+	@Deprecated
 	@Override
-	public Member register(MemberFrontendCommand memberCommand) {
+	public Member register(MemberFrontendCommand memberCommand){
 		// 保存会员信息
 		Member member = sdkMemberManager.register((Member) ConvertUtils.convertTwoObject(new Member(), memberCommand));
-		if (null == member) {
-			log.info("member is null");
+		if (null == member){
+			LOGGER.info("member is null");
 			throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
 		}
 		MemberPersonalData personData = new MemberPersonalData();
 		personData.setId(member.getId());
-		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER) {
-			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())) {
+		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
+			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
 				personData.setMobile(memberCommand.getLoginName());
-			} else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())) {
+			}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
 				personData.setEmail(memberCommand.getLoginName());
 			}
 		}
 		// loginMobile不为null,则写入persondata
-		if (StringUtils.isNotBlank(memberCommand.getLoginMobile())) {
+		if (StringUtils.isNotBlank(memberCommand.getLoginMobile())){
 			personData.setMobile(memberCommand.getLoginMobile());
 		}
 
 		// loginEmail不为null,则写入persondata
-		if (StringUtils.isNotBlank(memberCommand.getLoginEmail())) {
+		if (StringUtils.isNotBlank(memberCommand.getLoginEmail())){
 			personData.setEmail(memberCommand.getLoginEmail());
 		}
 		// 保存会员个人资料信息
 		personData = sdkMemberManager.savePersonData(personData);
-		if (null == personData) {
-			log.info("personData is null");
+		if (null == personData){
+			LOGGER.info("personData is null");
 			throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
 		}
 		// 保存用户行为信息
 		memberCommand.getMemberConductCommand().setId(member.getId());
-		MemberConductCommand conductCommand = sdkMemberManager
-				.saveMemberConduct(memberCommand.getMemberConductCommand());
-		if (null == conductCommand) {
-			log.info("conductCommand is null");
+		MemberConductCommand conductCommand = sdkMemberManager.saveMemberConduct(memberCommand.getMemberConductCommand());
+		if (null == conductCommand){
+			LOGGER.info("conductCommand is null");
 			throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
 		}
 
 		return member;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.manager.member.MemberManager#rewriteRegister(com.baozun.nebula.web.command.MemberFrontendCommand)
+	 */
 	@Override
-	public void validEmailActiveUrl(Long memberId, String checkSum) {
+	public Member rewriteRegister(MemberFrontendCommand memberCommand){
+		// 保存会员信息
+		Member targetMember = (Member) ConvertUtils.convertTwoObject(new Member(), memberCommand);
+		Member member = sdkMemberManager.rewriteRegister(targetMember);
+		if (null == member){
+			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'Member' occurs error during registration!\"", new Date());
+			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
+		}
+
+		MemberPersonalData personData = new MemberPersonalData();
+		personData.setId(member.getId());
+		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
+			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
+				personData.setMobile(memberCommand.getLoginName());
+			}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
+				personData.setEmail(memberCommand.getLoginName());
+			}
+		}
+		// loginMobile不为null,则写入persondata
+		if (StringUtils.isNotBlank(memberCommand.getLoginMobile())){
+			personData.setMobile(memberCommand.getLoginMobile());
+		}
+
+		// loginEmail不为null,则写入persondata
+		if (StringUtils.isNotBlank(memberCommand.getLoginEmail())){
+			personData.setEmail(memberCommand.getLoginEmail());
+		}
+		// 保存会员个人资料信息
+		personData = sdkMemberManager.savePersonData(personData);
+		if (null == personData){
+			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'MemberPersonalData' occurs error during registration!\"", new Date());
+			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
+		}
+		// 保存用户行为信息
+		memberCommand.getMemberConductCommand().setId(member.getId());
+		MemberConductCommand conductCommand = sdkMemberManager.saveMemberConduct(memberCommand.getMemberConductCommand());
+		if (null == conductCommand){
+			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'MemberConductCommand' occurs error during registration!\"", new Date());
+			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
+		}
+		return member;
+	}
+
+	@Override
+	public void validEmailActiveUrl(Long memberId,String checkSum){
 		sdkMemberManager.validEmailActiveUrl(memberId, checkSum);
 	}
 
 	@Override
-	public boolean bindMobileAndSynShopppingCart(String mobile, Long memberId) {
+	public boolean bindMobileAndSynShopppingCart(String mobile,Long memberId){
 		return sdkMemberManager.bindMobile(mobile, memberId);
 	}
 
 	@Override
-	public void bindAfterOper(Long memberId, List<ShoppingCartLineCommand> shoppingLines,
-			MemberConductCommand codunctCommand) {
+	public void bindAfterOper(Long memberId,List<ShoppingCartLineCommand> shoppingLines,MemberConductCommand codunctCommand){
 		// 绑定成功，则同步购物车数据
-		try {
+		try{
 			sdkShoppingCartManager.synchronousShoppingCart(memberId, shoppingLines);
-		} catch (Exception e) {
-			log.info("bindMobileAndSynShopppingCart: " + e);
+		}catch (Exception e){
+			LOGGER.info("bindMobileAndSynShopppingCart: " + e);
 			e.printStackTrace();
 			throw new BusinessException(ErrorCodes.SYNCHR_SHOPCART_FAILURE);
 		}
@@ -397,7 +447,7 @@ public class MemberManagerImpl implements MemberManager {
 	}
 
 	@Override
-	public boolean validEmailActiveUrl(String t, String q, String s) {
+	public boolean validEmailActiveUrl(String t,String q,String s){
 		Properties properties = ProfileConfigUtil.findPro("config/email.properties");
 		String key = properties.getProperty("param.register.key");
 		String action = properties.getProperty("param.register.action");
@@ -405,12 +455,18 @@ public class MemberManagerImpl implements MemberManager {
 	}
 
 	@Override
-	public void bindMemberEmail(Long memberId, String email) {
+	public void bindMemberEmail(Long memberId,String email){
 		Member member = memberDao.findMemberById(memberId);
 		member.setLoginEmail(email);
 		Member res = memberDao.save(member);
-		if (res == null) {
+		if (res == null){
 			throw new BusinessException(Constants.BINDEMAIL_ERROR);
 		}
 	}
+	
+	@Override
+	public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines)throws SynchronousShoppingCartException{
+		sdkShoppingCartManager.synchronousShoppingCart(memberId, shoppingLines);
+	}
+
 }

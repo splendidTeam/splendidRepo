@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.member.form;
 
+import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseForm;
 
 public class MemberAddressForm extends BaseForm {
@@ -284,4 +285,47 @@ public class MemberAddressForm extends BaseForm {
 		this.isDefault = isDefault;
 	}
 
+	/**
+	 * 将memberAddressForm转成ContactCommand
+	 * @param memberAddressForm
+	 * @return
+	 */
+	public ContactCommand convertMemberAddressFormToContactCommand() {
+		ContactCommand contactCommand = new ContactCommand();
+		contactCommand.setIsDefault(false);
+		contactCommand.setAreaId(this.area);
+		contactCommand.setCityId(this.getCity());		
+		contactCommand.setTownId(this.getTown());	
+		contactCommand.setProvinceId(this.getProvince());	
+		contactCommand.setPostcode(this.getPostcode());
+		contactCommand.setAddress(this.getAddress());
+		contactCommand.setName(this.getConsignee());
+		contactCommand.setMobile(this.getPhone());
+		contactCommand.setTelphone(this.getTelphone());
+		return contactCommand;
+	}
+
+	/**
+	 * 更新地址信息
+	 * @param command
+	 * @return
+	 */
+	public ContactCommand convertMemberAddressFormToContactCommand(ContactCommand command) {
+		command.setAreaId(this.area);		
+		command.setCityId(this.getCity());		
+		command.setTownId(this.getTown());	
+		command.setProvinceId(this.getProvince());	
+		command.setPostcode(this.getPostcode());
+		command.setAddress(this.getAddress());
+		command.setName(this.getConsignee());
+		command.setIsDefault(command.getIsDefault());
+		if(null != this.getPhone() || "".equals(this.getPhone())){
+			command.setMobile(this.getPhone());
+		}
+		if(null != this.getTelphone() || "".equals(this.getTelphone())){
+			command.setTelphone(this.getTelphone());
+		}		
+		return command;
+	}
+	
 }

@@ -1,5 +1,9 @@
 package com.baozun.nebula.web.controller.member.form;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseForm;
 
@@ -14,9 +18,13 @@ public class RegisterForm extends BaseForm{
 
 	private static final long	serialVersionUID	= 1265756122959961908L;
 
-	private String				mobile;
+	private static final Logger	LOGGER				= LoggerFactory.getLogger(RegisterForm.class);
 
-	private String				email;
+	private String				loginMobile;
+
+	private String				loginEmail;
+
+	private String				loginName;
 
 	/** 密码 */
 	private String				password;
@@ -27,13 +35,14 @@ public class RegisterForm extends BaseForm{
 	/** 验证码 */
 	private String				randomCode;
 
+	/** 是否接收AD邮件:1 接收 0 不接收 */
+	private int					receiveMail;
+
 	private String				sex;
 
 	private String				age;
 
 	private String				birthday;
-
-	private String				name;
 
 	private String				nickName;
 
@@ -42,20 +51,21 @@ public class RegisterForm extends BaseForm{
 	 */
 	private String				receiveMessage;
 
-	public String getMobile(){
-		return mobile;
-	}
+	/**
+	 * RegisterForm 对象装换为 MemberFrontendCommand
+	 * 
+	 * @return
+	 */
+	public MemberFrontendCommand toMemberFrontendCommand(){
+		MemberFrontendCommand memberFrontendCommand = new MemberFrontendCommand();
+		// 数据转换
+		try{
+			BeanUtils.copyProperties(memberFrontendCommand, this);
+		}catch (Exception e){
+			LOGGER.error("", e);
+		}
 
-	public void setMobile(String mobile){
-		this.mobile = mobile;
-	}
-
-	public String getEmail(){
-		return email;
-	}
-
-	public void setEmail(String email){
-		this.email = email;
+		return new MemberFrontendCommand();
 	}
 
 	public String getSex(){
@@ -82,14 +92,6 @@ public class RegisterForm extends BaseForm{
 		this.birthday = birthday;
 	}
 
-	public String getName(){
-		return name;
-	}
-
-	public void setName(String name){
-		this.name = name;
-	}
-
 	public String getNickName(){
 		return nickName;
 	}
@@ -104,11 +106,6 @@ public class RegisterForm extends BaseForm{
 
 	public void setReceiveMessage(String receiveMessage){
 		this.receiveMessage = receiveMessage;
-	}
-
-	public MemberFrontendCommand toMemberFrontendCommand(){
-		// 数据转换
-		return new MemberFrontendCommand();
 	}
 
 	public String getPassword(){
@@ -147,6 +144,66 @@ public class RegisterForm extends BaseForm{
 	 */
 	public void setRandomCode(String randomCode){
 		this.randomCode = randomCode;
+	}
+
+	/**
+	 * @return the loginMobile
+	 */
+	public String getLoginMobile(){
+		return loginMobile;
+	}
+
+	/**
+	 * @param loginMobile
+	 *            the loginMobile to set
+	 */
+	public void setLoginMobile(String loginMobile){
+		this.loginMobile = loginMobile;
+	}
+
+	/**
+	 * @return the loginEmail
+	 */
+	public String getLoginEmail(){
+		return loginEmail;
+	}
+
+	/**
+	 * @param loginEmail
+	 *            the loginEmail to set
+	 */
+	public void setLoginEmail(String loginEmail){
+		this.loginEmail = loginEmail;
+	}
+
+	/**
+	 * @return the loginName
+	 */
+	public String getLoginName(){
+		return loginName;
+	}
+
+	/**
+	 * @param loginName
+	 *            the loginName to set
+	 */
+	public void setLoginName(String loginName){
+		this.loginName = loginName;
+	}
+
+	/**
+	 * @return the receiveMail
+	 */
+	public int getReceiveMail(){
+		return receiveMail;
+	}
+
+	/**
+	 * @param receiveMail
+	 *            the receiveMail to set
+	 */
+	public void setReceiveMail(int receiveMail){
+		this.receiveMail = receiveMail;
 	}
 
 }

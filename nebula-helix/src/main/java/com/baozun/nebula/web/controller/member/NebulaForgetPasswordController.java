@@ -10,16 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
-import com.baozun.nebula.web.controller.member.form.ResetPasswordForm;
 
 /**
  * <pre>
@@ -68,6 +66,9 @@ public class NebulaForgetPasswordController extends BaseController {
 
     @Autowired
     private SdkMemberManager sdkMemberManager;
+    
+    @Autowired
+	private MemberManager memberManager;
 
     /**
      * 跳转到忘记密码的页面
@@ -130,7 +131,7 @@ public class NebulaForgetPasswordController extends BaseController {
 
 	MemberCommand memberCommand = null;
 
-	// 1,检测邮箱是否存在
+	// 1,检测邮箱是否存在（此处表示邮箱输入框里是有值的）
 	if (email.indexOf('@') > -1) {
 
 	    // 通过邮箱查询用户是否存在
@@ -139,8 +140,9 @@ public class NebulaForgetPasswordController extends BaseController {
 
 	    // 1.2 对应邮箱的用户不存在：在输入邮箱的时候提示邮箱不存在
 	    if (Validator.isNullOrEmpty(memberCommand)) {
-		model.addAttribute("loginEmail_error", "该账号不存在");
-		return "";
+		request.setAttribute("loginEmail_error", "该账号不存在");
+		/* 返回FAILED给前台，前台通过js判断，如果为failed，则提示错误信息（ajax请求） */
+		return "FAILED";
 
 	    } else {
 		// 1.1 邮箱用户存在：则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
@@ -187,7 +189,7 @@ public class NebulaForgetPasswordController extends BaseController {
 	    HttpServletResponse response,
 	    Model model,
 	    @RequestParam("mobile") String mobile,
-	    @ModelAttribute("forgetPasswordForm") ForgetPasswordForm ForgetPasswordForm,
+	    @ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm,
 	    BindingResult bindingResult) {
 
 	MemberCommand memberCommand = null;
@@ -201,7 +203,7 @@ public class NebulaForgetPasswordController extends BaseController {
 	// 1.2 对应手机的用户不存在：在输入手机的时候提示手机不存在
 	if (Validator.isNullOrEmpty(memberCommand)) {
 	    model.addAttribute("loginMobile_error", "该账号不存在");
-	    return "";
+	    return "FAILED";
 
 	} else {
 	    // 1.1 手机用户存在：则调用发送短信的方法，发送相应的修改密码的验证码到手机中
@@ -217,7 +219,7 @@ public class NebulaForgetPasswordController extends BaseController {
 	// 2,检测输入的验证码是否和发送的验证码相同
 	// 获取到发送过去的验证码(假设获取到发送的验证码为123)
 	String sendCode = "123";
-	if (sendCode.equals(ForgetPasswordForm.getSecurityCode())) {
+	if (sendCode.equals(forgetPasswordForm.getSecurityCode())) {
 	    // 2.1 相同：则跳转到重置密码页面
 	    return "store.login.resetpassword";
 
@@ -243,32 +245,61 @@ public class NebulaForgetPasswordController extends BaseController {
     /**
      * 重置密码
      * 
+     * @RequestMapping(value = "/member/resetpassword.htm", method =
+     *                       RequestMethod.POST)
      * 
      */
-    @RequestMapping(value = "/member/resetpassword.htm", method = RequestMethod.GET)
+
     public String resetPassword(
 	    HttpServletRequest request,
 	    HttpServletResponse response,
 	    Model model,
-	    @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm,
+	    @ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm,
 	    BindingResult bindingResult) {
 
 	// 获取到页面表单数据，进行比较后，调用service的方法，将原来的密码覆盖掉
-	String newPassword = resetPasswordForm.getNewPassword();
-	String confirmPassword = resetPasswordForm.getConfirmPassword();
+	String newPassword = forgetPasswordForm.getNewPassword();
+	String confirmPassword = forgetPasswordForm.getConfirmPassword();
+	/* 判断密码是否为空 */
 	if (newPassword != null && confirmPassword != null
 		&& StringUtils.isNotEmpty(newPassword)
 		&& StringUtils.isNotEmpty(confirmPassword)) {
-
+	    /* 不为空 */
+	    /* 初始化id */
+	    Long memberId = 0l;
 	    if (newPassword.equals(confirmPassword)) {
-		// sdkMemberManager.findMemberByLoginEmail(loginEmail);
-		// 调用service层的方法，用新密码替换掉对应原来的密码
-		// sdkMemberManager.resetPasswd(memberId, newPassword);
+		/*
+		 * 两次输入的密码相等，则判断是邮箱验证还是手机验证，
+		 * 若是手机验证方式，则通过登录手机号查询登录的用户信息（获取到用户id）；
+		 * 若是邮箱验证方式，则通过登录邮箱获取用户信息（获取到用户id）
+		 */
+		if (forgetPasswordForm.getType() == 2) {
+		    MemberCommand memberCommand = sdkMemberManager
+			    .findMemberByLoginEmail(forgetPasswordForm
+				    .getEmail());
+		    memberId = memberCommand.getId();
+
+		} else if (forgetPasswordForm.getType() == 1) {
+
+		    MemberCommand memberCommand = sdkMemberManager
+			    .findMemberByLoginMobile(forgetPasswordForm
+				    .getMobile());
+		    memberId = memberCommand.getId();
+		}
+
+		// 调用service层的方法，用新密码替换掉对应原来的密码（newpassword需要加密处理，处理方式待定）
+		boolean resetPassword = sdkMemberManager.resetPasswd(memberId,
+			newPassword);
+
+		if (resetPassword) {
+		    /* 修改密码成功，跳转至修改成功页面 */
+		    return "resetpassword.success";
+		}
+		/* 修改密码失败，（可以提示修改密码失败，几秒后跳转至重置密码页面）可重新跳转至重置密码页面 */
+		return "store.login.resetpassword";
 	    }
-
 	}
-
-	return "";
+	/* 重置密码时，输入的密码为空，则重新跳转至重置密码页面 */
+	return "store.login.resetpassword";
     }
-
 }

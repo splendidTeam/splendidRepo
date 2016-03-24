@@ -19,7 +19,7 @@ public interface MemberEmailManager extends BaseManager {
 	 * 发送激活邮件
 	 * 
 	 */
-	public Object sendActiveEmail(Long memberId, HttpServletRequest request);
+	public void sendActiveEmail(Long memberId, HttpServletRequest request);
 	
 	/**
 	 * 判断会员邮箱是否激活
@@ -34,4 +34,6 @@ public interface MemberEmailManager extends BaseManager {
 	 * 
 	 */
 	public void sendRegsiterSuccessEmail(String email,MemberPersonalData personalData);
+	
+
 }

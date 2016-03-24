@@ -16,6 +16,28 @@ public class ForgetPasswordForm extends BaseForm {
     /* 验证码 */
     private String SecurityCode;
 
+    /* 新密码 */
+    private String newPassword;
+
+    /* 确认密码 */
+    private String confirmPassword;
+
+    public String getConfirmPassword() {
+	return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+	this.confirmPassword = confirmPassword;
+    }
+
+    public String getNewPassword() {
+	return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+	this.newPassword = newPassword;
+    }
+
     public String getSecurityCode() {
 	return SecurityCode;
     }

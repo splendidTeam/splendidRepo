@@ -12,8 +12,11 @@ public class ThirdPartyMember implements Serializable {
 	private String userName;
 	
 	private String nickName;
+	/**
+	 * 头像
+	 */
+	private String avatar;
 	
-
 	private String errorCode;
 	
 	private String errorDescription;
@@ -57,6 +60,14 @@ public class ThirdPartyMember implements Serializable {
 
 	public void setErrorDescription(String errorDescription) {
 		this.errorDescription = errorDescription;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 	
 	

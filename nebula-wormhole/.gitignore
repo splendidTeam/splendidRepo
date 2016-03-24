@@ -3,4 +3,5 @@
 /.classpath
 /.project
 /.settings/
-/target/
+/velocity.log
+
