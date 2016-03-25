@@ -32,16 +32,16 @@ import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
  */
 public class MemberProfileFormValidator implements Validator {
 
-	public static final int TYPE_REGISTER = 1;
-	public static final int TYPE_LOGIN = 2;
+	// public static final int TYPE_REGISTER = 1;
+	// public static final int TYPE_LOGIN = 2;
 
-	private int type = TYPE_REGISTER;
+	// private int type = TYPE_REGISTER;
 
 	public MemberProfileFormValidator() {
 	}
 
 	public MemberProfileFormValidator(int type) {
-		this.type = type;
+		// this.type = type;
 	}
 
 	@Override
@@ -56,47 +56,43 @@ public class MemberProfileFormValidator implements Validator {
 		// TODO Auto-generated method stub
 		if (target instanceof MemberProfileForm) {
 			MemberProfileForm command = (MemberProfileForm) target;
+			
+			//验证邮箱，手机，密码，确认密码是否为空
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email","field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile","field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password","field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "passwordAgain","field.required");
 
-			if (type == TYPE_REGISTER) {
+			if (!errors.hasFieldErrors("password")
+					&& !errors.hasFieldErrors("passwordAgain")) {
+				if (!command.getPassword().equals(command.getRepassword())) {
+					errors.rejectValue("passwordAgain",
+							"passwordAgain.error");
+				}
+				if (null != command.getOldPassword()
+						&& command.getOldPassword().equals(
+								command.getPassword())) {
+					errors.rejectValue("passwordAgain", "oldPasswordSame.error");
+				}
+			}
 
-				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email",
-						"field.required");
-				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile",
-						"field.required");
-				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password",
-						"field.required");
-				ValidationUtils.rejectIfEmptyOrWhitespace(errors,
-						"passwordAgain", "field.required");
+			if (!errors.hasFieldErrors("email")) {
+				Pattern p1 = Pattern
+						.compile("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$");
+				if (!"".equals(command.getLoginEmail().trim())
+						&& !p1.matcher(command.getLoginEmail().trim())
+								.matches()) {
+					errors.rejectValue("email", "member.email.error");
+				}
+			}
 
-				if (!errors.hasFieldErrors("password")
-						&& !errors.hasFieldErrors("passwordAgain")) {
-					if (!command.getPassword().equals(command.getRepassword())) {
-						errors.rejectValue("passwordAgain",
-								"register.passwordAgain.error");
-					}
+			if (!errors.hasFieldErrors("mobile")) {
+				Pattern p1 = Pattern.compile("^(1[3-9]{1}[0-9]{1})\\d{8}$");
+				if (!"".equals(command.getLoginMobile().trim())
+						&& !p1.matcher(command.getLoginMobile().trim())
+								.matches()) {
+					errors.rejectValue("mobile", "member.mobile.error");
 				}
-				if (!errors.hasFieldErrors("email")) {
-					Pattern p1 = Pattern
-							.compile("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$");
-					if (!"".equals(command.getLoginEmail().trim())
-							&& !p1.matcher(command.getLoginEmail().trim())
-									.matches()) {
-						errors.rejectValue("email", "member.email.error");
-					}
-				}
-				if (!errors.hasFieldErrors("mobile")) {
-					Pattern p1 = Pattern.compile("^(1[3-9]{1}[0-9]{1})\\d{8}$");
-					if (!"".equals(command.getLoginMobile().trim())
-							&& !p1.matcher(command.getLoginMobile().trim())
-									.matches()) {
-						errors.rejectValue("mobile", "member.mobile.error");
-					}
-				}
-			} else {
-				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "loginName",
-						"field.required");
-				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password",
-						"field.required");
 			}
 		}
 	}
