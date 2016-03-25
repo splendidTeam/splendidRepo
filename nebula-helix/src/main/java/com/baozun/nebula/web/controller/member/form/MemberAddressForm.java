@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.member.form;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseForm;
 
@@ -319,10 +321,10 @@ public class MemberAddressForm extends BaseForm {
 		command.setAddress(this.getAddress());
 		command.setName(this.getConsignee());
 		command.setIsDefault(command.getIsDefault());
-		if(null != this.getPhone() || "".equals(this.getPhone())){
+		if(StringUtils.isNotBlank(this.getPhone())){
 			command.setMobile(this.getPhone());
 		}
-		if(null != this.getTelphone() || "".equals(this.getTelphone())){
+		if(StringUtils.isNotBlank(this.getTelphone())){
 			command.setTelphone(this.getTelphone());
 		}		
 		return command;

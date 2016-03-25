@@ -45,6 +45,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
@@ -109,7 +110,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (!Validator.isNullOrEmpty(memberDetails)){
 			return super.getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
-		// TODO 
+		// TODO
 		init4SensitiveDataEncryptedByJs(request, model);
 		return VIEW_MEMBER_REGISTER;
 	}
@@ -181,14 +182,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (!RegulareExpUtils.isMobileNO(mobile)){
 			// 手机号不合法
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1004");
 			return defaultReturnResult;
 		}
 		boolean ableSendMessageToMobile = isAbleSendMessageToMobile(request, mobile);
 		if (!ableSendMessageToMobile){
 			// 不能连续发送短信
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1005");
 			return defaultReturnResult;
 		}
 		// TODO 发送短信
@@ -223,9 +222,13 @@ public class NebulaRegisterController extends NebulaLoginController{
 			registerFormNormalValidator.validate(registerForm, bindingResult);
 		}
 		if (bindingResult.hasErrors()){
-			// TODO 方式修改
+			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+
 			defaultReturnResult.setResult(false);
 			defaultReturnResult.setStatusCode("1004");
+			defaultReturnResult.setResultMessage(defaultResultMessage);
+
 			return defaultReturnResult;
 		}
 
@@ -234,7 +237,9 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		try{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
-			/** 检查验证码 ，email，mobile等是否合法 */
+			/** 检查验证码 */
+			checkCaptcha(request, memberFrontendCommand.getRandomCode());
+			/** 检查email，mobile等是否合法 */
 			defaultReturnResult = (DefaultReturnResult) checkCoreData(memberFrontendCommand, request, response);
 			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
@@ -260,6 +265,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 			defaultReturnResult.setStatusCode("1005");
 			return defaultReturnResult;
 		}
+	}
+
+	/**
+	 * @param request
+	 * @param randomCode
+	 */
+	protected void checkCaptcha(HttpServletRequest request,String randomCode){
+		
 	}
 
 	/**
