@@ -119,7 +119,20 @@ public interface MemberManager extends BaseManager{
 	 * @param loginPwd
 	 * @return
 	 */
-	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd)
+	public MemberCommand login(MemberFrontendCommand memberCommand)
+			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;
+	
+	/**
+	 * 不需要密码的登录方法，(记住密码使用)
+	 * @return MemberCommand
+	 * @param memberCommand
+	 * @throws UserNotExistsException
+	 * @throws UserExpiredException
+	 * @throws PasswordNotMatchException 
+	 * @author 冯明雷
+	 * @time 2016年3月25日下午3:27:49
+	 */
+	MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand)
 			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;
 
 	/**

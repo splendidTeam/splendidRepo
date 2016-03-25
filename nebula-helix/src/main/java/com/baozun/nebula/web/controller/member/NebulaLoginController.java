@@ -48,6 +48,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
@@ -57,7 +58,6 @@ import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.feilong.core.util.Validator;
 import com.feilong.servlet.http.CookieUtil;
-
 
 /**
  * 用户登录
@@ -69,42 +69,42 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/**
 	 * log定义
 	 */
-	private static final Logger			LOG								= LoggerFactory.getLogger(NebulaLoginController.class);
+	private static final Logger	LOG							= LoggerFactory.getLogger(NebulaLoginController.class);
 
 	/* Remember me user cookie key */
-	public static final String			COOKIE_KEY_REMEMBER_ME_USER		= "rmbu";
+	public static final String	COOKIE_KEY_REMEMBER_ME_USER	= "rmbu";
 
 	/* Remember me pwd cookie key */
-	public static final String			COOKIE_KEY_REMEMBER_ME_PWD		= "rmbp";
+	public static final String	COOKIE_KEY_REMEMBER_ME_PWD	= "rmbp";
 
 	/* Login Page 的默认定义 */
-	public static final String			VIEW_MEMBER_LOGIN				= "member.login";
+	public static final String	VIEW_MEMBER_LOGIN			= "member.login";
 
 	/* Login 登录ID */
-	public static final String			MODEL_KEY_MEMBER_LOGIN_ID		= "loginId";
+	public static final String	MODEL_KEY_MEMBER_LOGIN_ID	= "loginId";
 
 	/* Login 登录密码 */
-	public static final String			MODEL_KEY_MEMBER_LOGIN_PWD		= "loginPwd";
+	public static final String	MODEL_KEY_MEMBER_LOGIN_PWD	= "loginPwd";
 
-	private static final String			REMEMBER_PWD					= "********";
+	private static final String	REMEMBER_PWD				= "********";
 
-	private static final String			DEFAULT_PWD						= "zf1sr1Ys";
+	private static final String	DEFAULT_PWD					= "zf1sr1Ys";
 
 	/**
 	 * 会员登录Form的校验器
 	 */
 	@Autowired
 	@Qualifier("loginFormValidator")
-	private LoginFormValidator			loginFormValidator;
-	
+	private LoginFormValidator	loginFormValidator;
+
 	/**
 	 * 会员业务管理类
 	 */
 	@Autowired
-	private MemberManager				memberManager;
+	private MemberManager		memberManager;
 
 	@Autowired
-	private MemberExtraManager			memberExtraManager;
+	private MemberExtraManager	memberExtraManager;
 
 	/**
 	 * 登录页面，默认推荐配置如下
@@ -154,16 +154,16 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
 		String pwd = loginForm.getPassword();
-		if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
-			// 随便一个符合密码规范的，让下面的验证通过
-			loginForm.setPassword(getDefaultPwd());
-		}
+		// if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
+		// // 随便一个符合密码规范的，让下面的验证通过
+		// loginForm.setPassword(getDefaultPwd());
+		// }
 
 		// ****************************************************************** 数据校验
 		loginFormValidator.validate(loginForm, bindingResult);
 		if (bindingResult.hasErrors()) {
 			returnResult.setResult(false);
-			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+			defaultResultMessage.setMessage(bindingResult.getAllErrors().get(0).getCode());
 			returnResult.setResultMessage(defaultResultMessage);
 			return returnResult;
 		}
@@ -171,13 +171,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// ***************************************************************解密用户名和密码
 		// 是否已经记住了密码,默认没有
 		boolean isHaveReMemberPwd = false;
-		// 解密用户名
-		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
 
 		// 记住用户名和密码
 		if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
 			isHaveReMemberPwd = isHaveReMemberPwd(loginForm, request, response, model);
-			loginForm.setPassword("");
 		}else{
 			// 不记住密码的，直接解密密码，进行验证
 			// 密码解密，密码传输通过RSA做了加密，此处需要解密
@@ -187,51 +184,87 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// **********************************************************登录
 		try{
 			// 登录判断，登录失败会抛出异常，通过捕获处理
-			MemberCommand member = memberManager.login(loginForm.toMemberFrontendCommand(), isHaveReMemberPwd);
+			MemberCommand member =null;
+			
+			if(isHaveReMemberPwd){
+				//如果记住了密码，登录时不验证密码
+				member=memberManager.loginWithOutPwd(loginForm.toMemberFrontendCommand());
+			}else{
+				member=memberManager.login(loginForm.toMemberFrontendCommand());
+			}
+					
 			Long memberId = member.getId();
 
 			// 合并购物车
 			// 同步Cookie中的购物车信息到数据库
 			synchronousShoppingCart(memberId, request, response, model);
 
-			// 清除记住的用户名和密码
-			CookieUtil.deleteCookie(MODEL_KEY_MEMBER_LOGIN_ID, response);
-			CookieUtil.deleteCookie(MODEL_KEY_MEMBER_LOGIN_PWD, response);
-
 			// 设置记住用户名密码
-			if (loginForm.getIsRemberMeLoginName()) {
-				// 设置cookie值
-				CookieUtil.addCookie(MODEL_KEY_MEMBER_LOGIN_ID,EncryptUtil.getInstance().encrypt(loginForm.getLoginName()),30 * 24 * 60 * 60,response);
-				if (loginForm.getIsRemberMePwd()) {
-					String timestamp = String.valueOf(new Date().getTime());
-					memberExtraManager.rememberPwd(memberId, timestamp);
-
-					String checkNum = EncryptUtil.getInstance().hash(loginForm.getLoginName() + timestamp,ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key"));
-					CookieUtil.addCookie(MODEL_KEY_MEMBER_LOGIN_PWD,EncryptUtil.getInstance().encrypt(checkNum),30 * 24 * 60 * 60,response);
-				}
-			}
+			doRememberMeProcess(loginForm, memberId, request, response, model);
 
 			// 认证成功处理
 			return super.onAuthenticationSuccess(constructMemberDetails(member), request, response);
 		}catch (UserNotExistsException e){
+			// 登录用户不存在
 			LOG.error(e.getMessage());
-			
-			// TODO 登录用户不存在
+			returnResult.setResult(false);
+			defaultResultMessage.setMessage("loginerror.userNotExists");
+			returnResult.setResultMessage(defaultResultMessage);
 		}catch (UserExpiredException e){
+			// 登录用户生命周期不对
 			LOG.error(e.getMessage());
-			// TODO 登录用户生命周期不对
+			returnResult.setResult(false);
+			defaultResultMessage.setMessage("loginerror.UserExpiredException");
+			returnResult.setResultMessage(defaultResultMessage);
 		}catch (PasswordNotMatchException e){
+			// 登录密码错误
 			LOG.error(e.getMessage());
-			// TODO 登录密码错误
+			returnResult.setResult(false);
+			defaultResultMessage.setMessage("loginerror.passwordError");
+			returnResult.setResultMessage(defaultResultMessage);
 		}catch (SynchronousShoppingCartException e){
-			LOG.error(e.getMessage());
-			// TODO 同步购物车失败
+			// 同步购物车失败
+			LOG.error(e.getMessage());			
+			returnResult.setResult(false);
+			defaultResultMessage.setMessage("loginerror.synShoppingCartError");
+			returnResult.setResultMessage(defaultResultMessage);
 		}catch (Exception e){
+			// 登录失败处理
 			LOG.error(e.getMessage());
-			// TODO 登录失败处理
+			returnResult.setResult(false);
+			defaultResultMessage.setMessage("loginerror.systemError");
+			returnResult.setResultMessage(defaultResultMessage);
 		}
 
-		return null;
+		return returnResult;
+	}
+
+	/**
+	 * 登出，默认推荐配置如下(POST方法)
+	 * 
+	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.GET)
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public NebulaReturnResult logoutWithPost(HttpServletRequest request,HttpServletResponse response,Model model){
+		request.getSession().invalidate();
+		onLogoutSuccess(request, response);
+		return DefaultReturnResult.SUCCESS;
+	}
+
+	/**
+	 * 登出, 默认推荐配置如下(GET方法)
+	 * 
+	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
+	 * @param request
+	 * @return
+	 */
+	public NebulaReturnResult logoutWithGet(HttpServletRequest request,HttpServletResponse response,Model model){
+		// 1.清空session
+		resetSession(request);
+		onLogoutSuccess(request, response);
+		return DefaultReturnResult.SUCCESS;
 	}
 
 	/**
@@ -255,10 +288,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 					MemberPersonalData memberPersonalData = memberExtraManager.findMemPersonalDataByLoginName(loginName);
 					if (memberPersonalData != null) {
 						String short4 = memberPersonalData.getShort4();
-						String checkNum = EncryptUtil.getInstance().encrypt(
-								EncryptUtil.getInstance().hash(
-										loginName + short4,
-										ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("send.mail.key")));
+						String checkNum = EncryptUtil.getInstance().encrypt(EncryptUtil.getInstance().hash(loginName + short4,remberMePwdKey()));
 						// 如果验证通过，去根据用户名查询密码
 						return pwdKeyCookie.getValue().equals(checkNum);
 					}
@@ -323,20 +353,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 登出，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.GET)
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	public NebulaReturnResult logout(HttpServletRequest request,HttpServletResponse response,Model model){
-		request.getSession().invalidate();
-		onLogoutSuccess(request, response);
-		return DefaultReturnResult.SUCCESS;
-	}
-
-	/**
 	 * 登出成功
 	 * 
 	 * @param request
@@ -385,6 +401,45 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
+	 * 记住用户名和密码(加密后保存到cookie中)
+	 * 
+	 * @return void
+	 * @param loginForm
+	 *            页面传过来的参数，这个方法用到的属性是：isRemberMeLoginName是否记住用户名；isRemberMePwd:是否记住密码(默认不记住)
+	 * @param memberId
+	 *            登录用户的id
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @author 冯明雷
+	 * @throws EncryptionException
+	 * @time 2016年3月25日下午1:58:43
+	 */
+	protected void doRememberMeProcess(
+			LoginForm loginForm,
+			Long memberId,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws EncryptionException{
+		// 先清除记住的用户名和密码
+		CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_USER, response);
+		CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_PWD, response);
+
+		if (loginForm.getIsRemberMeLoginName()) {
+			// 设置cookie值
+			CookieUtil.addCookie(COOKIE_KEY_REMEMBER_ME_USER,EncryptUtil.getInstance().encrypt(loginForm.getLoginName()),remberMeValidityPeriod(),response);
+
+			if (loginForm.getIsRemberMePwd()) {
+				String timestamp = String.valueOf(new Date().getTime());
+				memberExtraManager.rememberPwd(memberId, timestamp);
+				String checkNum = EncryptUtil.getInstance().hash(loginForm.getLoginName() + timestamp, remberMePwdKey());
+				CookieUtil.addCookie(COOKIE_KEY_REMEMBER_ME_PWD, EncryptUtil.getInstance().encrypt(checkNum), remberMeValidityPeriod(), response);
+			}
+		}
+
+	}
+
+	/**
 	 * remember me 值的解密处理
 	 * 
 	 * @param value
@@ -429,14 +484,14 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return
 	 */
 	protected MemberDetails constructMemberDetails(MemberCommand member){
-		MemberDetails memberDetails = new MemberDetails();		
+		MemberDetails memberDetails = new MemberDetails();
 		memberDetails.setActived(this.isActivedMember(member));
 		memberDetails.setLoginName(member.getLoginName());
 		memberDetails.setLoginMobile(member.getLoginMobile());
 		memberDetails.setLoginEmail(member.getLoginEmail());
 		memberDetails.setNickName(member.getLoginName());
 		memberDetails.setMemberId(member.getId());
-		memberDetails.setRealName(member.getRealName());		
+		memberDetails.setRealName(member.getRealName());
 		return memberDetails;
 	}
 
@@ -452,16 +507,24 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 	
 	/**
-	 * 登出, 默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
-	 * @param request
-	 * @return
+	 * 获取记住密码加密使用的key
+	 * @return String
+	 * @author 冯明雷
+	 * @time 2016年3月25日下午3:20:55
 	 */
-	public NebulaReturnResult active(HttpServletRequest request,HttpServletResponse response,Model model){
-		// 1.清空session
-		resetSession(request);
-
-		return DefaultReturnResult.SUCCESS;
+	protected String remberMePwdKey(){
+		return ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("rember.pwd.key");
 	}
+	
+	/**
+	 * 记住我的用户名、密码cookie有效期(默认30天)
+	 * @return int
+	 * @return 
+	 * @author 冯明雷
+	 * @time 2016年3月25日下午3:24:35
+	 */
+	protected int remberMeValidityPeriod(){
+		return 30*24*60*60;
+	}
+
 }
