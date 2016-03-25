@@ -9,6 +9,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 
 import com.baozun.nebula.manager.member.MemberExtraManager;
@@ -36,15 +37,12 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 	private MemberExtraManager		memberExtraManager;
 
-	private BindingResult			bindingResult;
-
 	@Before
 	public void setUp(){
 		nebulaLoginController = new NebulaLoginController();
-		loginFormValidator =new LoginFormValidator();
-		
+		loginFormValidator = new LoginFormValidator();
+
 		memberManager = EasyMock.createMock("memberManager", MemberManager.class);
-		bindingResult = EasyMock.createMock("bindingResult", BindingResult.class);
 		memberExtraManager = EasyMock.createMock("memberExtraManager", MemberExtraManager.class);
 
 		ReflectionTestUtils.setField(nebulaLoginController, "memberManager", memberManager);
@@ -56,8 +54,8 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 	public void testShowLogin(){
 		control.replay();
 		MemberDetails memberDetails = null;
-		//验证结果
-		assertEquals(NebulaLoginController.VIEW_MEMBER_LOGIN,nebulaLoginController.showLogin(memberDetails, request, response, model));
+		// 验证结果
+		assertEquals(NebulaLoginController.VIEW_MEMBER_LOGIN, nebulaLoginController.showLogin(memberDetails, request, response, model));
 		control.verify();
 	}
 
@@ -65,9 +63,14 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 	public void testLogin(){
 		// Replay
 		control.replay();
-		LoginForm loginForm=new LoginForm();
+		LoginForm loginForm = new LoginForm();
 		
-		assertEquals(DefaultReturnResult.SUCCESS,nebulaLoginController.login(loginForm, bindingResult, request, response, model));
+		loginForm.setLoginName("minglei");
+		loginForm.setPassword("123456");
+
+		BindingResult bindingResult = new BindException(loginForm, "loginForm");
+
+		assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 
 		// 验证交互行为
 		control.verify();
