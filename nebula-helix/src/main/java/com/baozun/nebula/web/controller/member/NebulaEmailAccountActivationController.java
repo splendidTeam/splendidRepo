@@ -57,7 +57,7 @@ import loxia.utils.DateUtil;
 /**
  * 邮箱账户激活相关的控制器，里面主要控制如下操作：
  * sendRegEmail ：发送激活邮件
- * validEmailActiveUrl :验证激活
+ * 
  * 
  * @author yufei.kong 2016.3.22
  *
