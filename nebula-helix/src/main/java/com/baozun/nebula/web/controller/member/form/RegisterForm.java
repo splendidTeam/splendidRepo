@@ -4,6 +4,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.command.MemberPersonalDataCommand;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseForm;
 
@@ -38,11 +39,33 @@ public class RegisterForm extends BaseForm{
 	/** 是否接收AD邮件:1 接收 0 不接收 */
 	private int					receiveMail;
 
-	private String				sex;
-
-	private String				age;
+	/**
+	 * 性别 1为男,2为女[‘1&2’以MemberPersonalData中的注释为准]
+	 */
+	private int					sex;
 
 	private String				birthday;
+
+	/*******************************************/
+	/** 省 */
+	private String				province;
+
+	/** 市 */
+	private String				city;
+
+	/** 区 */
+	private String				area;
+
+	/** 省 id */
+	private Long				provinceId;
+
+	/** 市id */
+	private Long				cityId;
+
+	/** 区 id */
+	private Long				areaId;
+
+	/*******************************************/
 
 	private String				nickName;
 
@@ -51,6 +74,8 @@ public class RegisterForm extends BaseForm{
 	 */
 	private String				receiveMessage;
 
+	private String				age;
+
 	/**
 	 * RegisterForm 对象装换为 MemberFrontendCommand
 	 * 
@@ -58,22 +83,19 @@ public class RegisterForm extends BaseForm{
 	 */
 	public MemberFrontendCommand toMemberFrontendCommand(){
 		MemberFrontendCommand memberFrontendCommand = new MemberFrontendCommand();
+		MemberPersonalDataCommand memberPersonalDataCommand = new MemberPersonalDataCommand();
 		// 数据转换
 		try{
 			BeanUtils.copyProperties(memberFrontendCommand, this);
+			BeanUtils.copyProperties(memberPersonalDataCommand, this);
+
+			memberFrontendCommand.setMemberPersonalDataCommand(memberPersonalDataCommand);
+
 		}catch (Exception e){
 			LOGGER.error("", e);
 		}
 
 		return new MemberFrontendCommand();
-	}
-
-	public String getSex(){
-		return sex;
-	}
-
-	public void setSex(String sex){
-		this.sex = sex;
 	}
 
 	public String getAge(){
@@ -204,6 +226,111 @@ public class RegisterForm extends BaseForm{
 	 */
 	public void setReceiveMail(int receiveMail){
 		this.receiveMail = receiveMail;
+	}
+
+	/**
+	 * @return the province
+	 */
+	public String getProvince(){
+		return province;
+	}
+
+	/**
+	 * @param province
+	 *            the province to set
+	 */
+	public void setProvince(String province){
+		this.province = province;
+	}
+
+	/**
+	 * @return the city
+	 */
+	public String getCity(){
+		return city;
+	}
+
+	/**
+	 * @param city
+	 *            the city to set
+	 */
+	public void setCity(String city){
+		this.city = city;
+	}
+
+	/**
+	 * @return the area
+	 */
+	public String getArea(){
+		return area;
+	}
+
+	/**
+	 * @param area
+	 *            the area to set
+	 */
+	public void setArea(String area){
+		this.area = area;
+	}
+
+	/**
+	 * @return the provinceId
+	 */
+	public Long getProvinceId(){
+		return provinceId;
+	}
+
+	/**
+	 * @param provinceId
+	 *            the provinceId to set
+	 */
+	public void setProvinceId(Long provinceId){
+		this.provinceId = provinceId;
+	}
+
+	/**
+	 * @return the cityId
+	 */
+	public Long getCityId(){
+		return cityId;
+	}
+
+	/**
+	 * @param cityId
+	 *            the cityId to set
+	 */
+	public void setCityId(Long cityId){
+		this.cityId = cityId;
+	}
+
+	/**
+	 * @return the areaId
+	 */
+	public Long getAreaId(){
+		return areaId;
+	}
+
+	/**
+	 * @param areaId
+	 *            the areaId to set
+	 */
+	public void setAreaId(Long areaId){
+		this.areaId = areaId;
+	}
+
+	/**
+	 * @return the sex
+	 */
+	public int getSex(){
+		return sex;
+	}
+
+	/**
+	 * @param sex
+	 *            the sex to set
+	 */
+	public void setSex(int sex){
+		this.sex = sex;
 	}
 
 }
