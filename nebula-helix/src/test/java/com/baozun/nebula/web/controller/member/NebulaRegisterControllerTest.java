@@ -8,12 +8,16 @@ import static org.junit.Assert.assertEquals;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DevicePlatform;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindingResult;
 
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.utils.RegulareExpUtils;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -46,13 +50,22 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 
 	private MemberCommand				memberCommand;
 
+	private RegulareExpUtils			regulareExpUtils;
+
+	private String						loginEmail	= "yi.huang@baozun.cn";
+
+	private String						LoginMobile	= "151618580940";
+
 	@Before
 	public void setUp(){
 		registerForm = new RegisterForm();
+
+		registerForm.setLoginEmail(loginEmail);
+
 		memberCommand = new MemberCommand();
 		memberCommand.setId(11L);
 		memberCommand = null;
-		
+
 		nebulaRegisterController = new NebulaRegisterController();
 
 		registerFormNormalValidator = new RegisterFormNormalValidator();
@@ -61,11 +74,14 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 
 		memberManager = control.createMock("memberManager", MemberManager.class);
 		sdkMemberManager = control.createMock("sdkMemberManager", SdkMemberManager.class);
-		bindingResult = control.createMock("bindingResult", BindingResult.class);
+
+		regulareExpUtils = control.createMock("regulareExpUtils", RegulareExpUtils.class);
+
+		bindingResult = mockBindingResult(registerForm);
 
 		ReflectionTestUtils.setField(nebulaRegisterController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaRegisterController, "sdkMemberManager", sdkMemberManager);
-		
+
 		ReflectionTestUtils.setField(nebulaRegisterController, "registerFormNormalValidator", registerFormNormalValidator);
 		ReflectionTestUtils.setField(nebulaRegisterController, "registerFormMobileValidator", registerFormMobileValidator);
 	}
@@ -87,11 +103,10 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 	@Test
 	public void testCheckLoginEmailAvailable(){
 
-		String loginEmail = "yi.huang@baozun.cn";
 		EasyMock.expect(sdkMemberManager.findMemberByLoginEmail(loginEmail)).andReturn(memberCommand);
 
-//		EasyMock.replay(sdkMemberManager);
-		
+		// EasyMock.replay(sdkMemberManager);
+
 		control.replay();
 
 		assertEquals(DefaultReturnResult.SUCCESS, nebulaRegisterController.checkLoginEmailAvailable(loginEmail));
@@ -102,27 +117,29 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 	@Test
 	public void testCheckLoginMobileAvailable(){
 
+		EasyMock.expect(sdkMemberManager.findMemberByLoginMobile(LoginMobile)).andReturn(memberCommand);
+
+		control.replay();
+
+		assertEquals(DefaultReturnResult.SUCCESS, nebulaRegisterController.checkLoginMobileAvailable(LoginMobile));
+
+		control.verify();
+
 	}
 
 	@Test
 	public void testSendRegisterMobileMessage(){
+		// TODO mock static method
+		// EasyMock.expect(RegulareExpUtils.isMobileNO(LoginMobile)).andReturn(true);
+		control.replay();
 
+		assertEquals(DefaultReturnResult.SUCCESS, nebulaRegisterController.sendRegisterMobileMessage(request, response, model, LoginMobile));
+
+		control.verify();
 	}
 
 	@Test
 	public void testRegister(){
-		// Record
-//		 EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L)).andReturn(new Pagination<ContactCommand>());
-		// Replay
-		control.replay();
-
-		PageForm pageForm = new PageForm();
-		// MemberDetails memberDetails = new MemberDetails();
-
-		// 验证结果
-		assertEquals(null, nebulaRegisterController.register(registerForm, bindingResult, request, response, model));
-
-		// 验证交互行为
-		control.verify();
+		// TODO mock suplerclass protected method
 	}
 }
