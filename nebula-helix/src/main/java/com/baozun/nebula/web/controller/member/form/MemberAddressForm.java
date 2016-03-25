@@ -292,10 +292,10 @@ public class MemberAddressForm extends BaseForm {
 	 * @param memberAddressForm
 	 * @return
 	 */
-	public ContactCommand convertMemberAddressFormToContactCommand() {
+	public ContactCommand toContactCommand() {
 		ContactCommand contactCommand = new ContactCommand();
 		contactCommand.setIsDefault(false);
-		contactCommand.setAreaId(this.area);
+		contactCommand.setAreaId(this.getArea());
 		contactCommand.setCityId(this.getCity());		
 		contactCommand.setTownId(this.getTown());	
 		contactCommand.setProvinceId(this.getProvince());	
@@ -312,8 +312,8 @@ public class MemberAddressForm extends BaseForm {
 	 * @param command
 	 * @return
 	 */
-	public ContactCommand convertMemberAddressFormToContactCommand(ContactCommand command) {
-		command.setAreaId(this.area);		
+	public ContactCommand toContactCommand(ContactCommand command) {
+		command.setAreaId(this.getArea());		
 		command.setCityId(this.getCity());		
 		command.setTownId(this.getTown());	
 		command.setProvinceId(this.getProvince());	

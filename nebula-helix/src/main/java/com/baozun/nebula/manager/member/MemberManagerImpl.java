@@ -298,9 +298,41 @@ public class MemberManagerImpl implements MemberManager{
 	}
 
 	@Override
-	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd) throws UserNotExistsException,
+	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,
 			UserExpiredException,PasswordNotMatchException{
 		MemberCommand member = null;
+		member = validateMember(memberCommand);
+		
+		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
+		if (!encodePassword.equals(member.getPassword())){
+			throw new PasswordNotMatchException();
+		}
+
+		// 保存用户行为信息
+		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
+		return member;
+	}
+	
+	@Override
+	public MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand) throws UserNotExistsException,
+			UserExpiredException,PasswordNotMatchException{
+		MemberCommand member = validateMember(memberCommand);
+		// 保存用户行为信息
+		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
+		return member;
+	}
+
+	/**
+	 * 共用的验证用户方法，只验证用户是否存在和用户的生命周期是否有效
+	 * @return MemberCommand
+	 * @param memberCommand
+	 * @throws UserNotExistsException
+	 * @throws UserExpiredException 
+	 * @author 冯明雷
+	 * @time 2016年3月25日下午3:31:48
+	 */
+	private MemberCommand validateMember(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException{
+		MemberCommand member;
 		if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
 			member = sdkMemberManager.findMemberByLoginMobile(memberCommand.getLoginName());
 		}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
@@ -311,24 +343,14 @@ public class MemberManagerImpl implements MemberManager{
 
 		if (null == member){
 			throw new UserNotExistsException();
-		}
-
-		// 没有记住密码的时候才需要验证输入的密码是否相同
-		if (!isHaveReMemberPwd){
-			String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
-			if (!encodePassword.equals(member.getPassword())){
-				throw new PasswordNotMatchException();
-			}
-		}
+		}		
 
 		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())){
 			throw new UserExpiredException();
 		}
-
-		// 保存用户行为信息
-		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
 	}
+	
 
 	@Deprecated
 	@Override

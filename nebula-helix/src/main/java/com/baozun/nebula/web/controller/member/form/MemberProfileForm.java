@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.member.form;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.baozun.nebula.model.member.MemberPersonalData;
@@ -232,14 +234,21 @@ public class MemberProfileForm extends BaseForm {
 		this.newPassword = newPassword;
 	}
 
-	public MemberPersonalData convertMemberProfileFormToMemberPersonalData(
+	public MemberPersonalData toMemberPersonalData(
 			MemberPersonalData memberPersonalData) {
-		memberPersonalData.setVersion(new Date());
-		memberPersonalData.setBirthday(new Date(this.birthday));
-		memberPersonalData.setEmail(this.loginEmail);
-		memberPersonalData.setMobile(this.loginMobile);
-		memberPersonalData.setNickname(this.loginName);
-		memberPersonalData.setSex(this.sex);
+		if (null != memberPersonalData) {
+			memberPersonalData.setVersion(new Date());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				memberPersonalData.setBirthday(sdf.parse(this.birthday));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			memberPersonalData.setEmail(this.loginEmail);
+			memberPersonalData.setMobile(this.loginMobile);
+			memberPersonalData.setNickname(this.loginName);
+			memberPersonalData.setSex(this.sex);
+		}
 		return memberPersonalData;
 	}
 

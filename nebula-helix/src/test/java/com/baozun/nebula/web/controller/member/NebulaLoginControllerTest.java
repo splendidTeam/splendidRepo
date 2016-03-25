@@ -9,7 +9,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 
 import com.baozun.nebula.manager.member.MemberExtraManager;
@@ -69,7 +68,6 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 		loginForm.setPassword("123456");
 
 		BindingResult bindingResult =mockBindingResult(loginForm);
-		//new BindException(loginForm, "loginForm");
 
 		assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 
