@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.model.member;
 
+
 import java.util.Date;
 
 import javax.persistence.Column;
