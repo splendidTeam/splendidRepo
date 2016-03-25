@@ -182,14 +182,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (!RegulareExpUtils.isMobileNO(mobile)){
 			// 手机号不合法
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1004");
 			return defaultReturnResult;
 		}
 		boolean ableSendMessageToMobile = isAbleSendMessageToMobile(request, mobile);
 		if (!ableSendMessageToMobile){
 			// 不能连续发送短信
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1005");
 			return defaultReturnResult;
 		}
 		// TODO 发送短信
@@ -226,11 +224,11 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (bindingResult.hasErrors()){
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
-			
+
 			defaultReturnResult.setResult(false);
 			defaultReturnResult.setStatusCode("1004");
 			defaultReturnResult.setResultMessage(defaultResultMessage);
-			
+
 			return defaultReturnResult;
 		}
 
@@ -239,7 +237,9 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		try{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
-			/** 检查验证码 ，email，mobile等是否合法 */
+			/** 检查验证码 */
+			checkCaptcha(request, memberFrontendCommand.getRandomCode());
+			/** 检查email，mobile等是否合法 */
 			defaultReturnResult = (DefaultReturnResult) checkCoreData(memberFrontendCommand, request, response);
 			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
@@ -265,6 +265,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 			defaultReturnResult.setStatusCode("1005");
 			return defaultReturnResult;
 		}
+	}
+
+	/**
+	 * @param request
+	 * @param randomCode
+	 */
+	protected void checkCaptcha(HttpServletRequest request,String randomCode){
+		
 	}
 
 	/**
