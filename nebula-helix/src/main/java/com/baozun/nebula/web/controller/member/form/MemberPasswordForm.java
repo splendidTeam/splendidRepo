@@ -6,12 +6,18 @@ public class MemberPasswordForm extends BaseForm {
 
     private static final long serialVersionUID = 1L;
 
+    /* 用户id */
     private long memberId;
-    private String confirmPassword;
-    private String newPassword;
-    private String oldPassword;
+    /* 用户手机 */
     private String mobile;
+    /* 用户邮箱 */
     private String email;
+    /* 旧密码 */
+    private String oldPassword;
+    /* 新密码 */
+    private String newPassword;
+    /* 确认密码 */
+    private String confirmPassword;
 
     public long getMemberId() {
 	return memberId;
