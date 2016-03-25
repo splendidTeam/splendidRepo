@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
@@ -122,7 +123,7 @@ assertNotNull(user);
  * </p>
  * </blockquote>
  *
- * @author feilong
+ * @author hengheng.wang
  * @version 5.3.0 2016年3月21日 下午4:50:31
  * @since 5.3.0
  */
@@ -164,15 +165,28 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	@Test
 	public void testShowMemberAddress() {
 		// Record
-		EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L))
+		
+		PageForm pageForm = new PageForm();
+		pageForm.setCurrentPage(0);
+		pageForm.setSize(10);
+		
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);
+		
+		EasyMock.expect(sdkMemberManager.findContactsByMemberId(pageForm.getPage(), pageForm.getSorts(), memberDetails.getMemberId()))
 				.andReturn(new Pagination<ContactCommand>());
 
 		// Replay
 		control.replay();
 
-		PageForm pageForm = new PageForm();
-		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setMemberId(1L);
+//		PageForm pageForm2 = new PageForm();
+//		pageForm.setCurrentPage(0);
+//		pageForm.setSize(10);
+//		
+//		MemberDetails memberDetails2 = new MemberDetails();
+//		memberDetails.setMemberId(1L);	
+//		//nebulaMemberAddressController.showMemberAddress(memberDetails2, pageForm2, request, response, model);
+//		System.out.println("dsdsd");
 		// 验证结果
 		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
 				nebulaMemberAddressController.showMemberAddress(memberDetails, pageForm, request, response, model));
@@ -232,12 +246,9 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setPhone("13023230767");
 		memberAddressForm.setConsignee("wanghengheng");
 		memberAddressForm.setPostcode("200000");
+		memberAddressFormValidator.validate(memberAddressForm, mockBindingResult(memberAddressForm));
+		EasyMock.expectLastCall();
 
-
-		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
-		
-	      EasyMock.expectLastCall();
-		
 		// Replay
 		EasyMock.replay(sdkMemberManager);
 
@@ -248,7 +259,7 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
  		// 验证结果
 		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
 				nebulaMemberAddressController.updateMemberAddress(memberDetails,
-						memberAddressForm, bindingResult, request,
+						memberAddressForm, mockBindingResult(memberAddressForm), request,
 						response , model));
 
 		// 验证交互行为		
