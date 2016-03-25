@@ -165,7 +165,6 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	@Test
 	public void testShowMemberAddress() {
 		// Record
-		Pagination<ContactCommand> pagination =  new Pagination<ContactCommand>();
 		
 		PageForm pageForm = new PageForm();
 		pageForm.setCurrentPage(0);
@@ -175,25 +174,25 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberDetails.setMemberId(1L);
 		
 		EasyMock.expect(sdkMemberManager.findContactsByMemberId(pageForm.getPage(), pageForm.getSorts(), memberDetails.getMemberId()))
-				.andReturn(pagination);
+				.andReturn(new Pagination<ContactCommand>());
 
 		// Replay
-		EasyMock.replay(sdkMemberManager);
+		control.replay();
 
-		PageForm pageForm2 = new PageForm();
-		pageForm.setCurrentPage(0);
-		pageForm.setSize(10);
-		
-		MemberDetails memberDetails2 = new MemberDetails();
-		memberDetails.setMemberId(1L);	
-		nebulaMemberAddressController.showMemberAddress(memberDetails2, pageForm2, request, response, model);
-		System.out.println("dsdsd");
+//		PageForm pageForm2 = new PageForm();
+//		pageForm.setCurrentPage(0);
+//		pageForm.setSize(10);
+//		
+//		MemberDetails memberDetails2 = new MemberDetails();
+//		memberDetails.setMemberId(1L);	
+//		//nebulaMemberAddressController.showMemberAddress(memberDetails2, pageForm2, request, response, model);
+//		System.out.println("dsdsd");
 		// 验证结果
 		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
-				nebulaMemberAddressController.showMemberAddress(memberDetails2, pageForm2, request, response, model));
+				nebulaMemberAddressController.showMemberAddress(memberDetails, pageForm, request, response, model));
 
 		// 验证交互行为
-		EasyMock.verify(sdkMemberManager);
+		control.verify();
 	}
 	
 	/**
@@ -249,9 +248,7 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setPostcode("200000");
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		EasyMock.expectLastCall();
-		
-	      EasyMock.expectLastCall();
-		
+
 		// Replay
 		EasyMock.replay(sdkMemberManager);
 

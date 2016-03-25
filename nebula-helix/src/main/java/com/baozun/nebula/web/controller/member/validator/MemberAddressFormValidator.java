@@ -24,10 +24,7 @@ public class MemberAddressFormValidator implements Validator{
 	}
 
 	@Override
-	public void validate(Object target, Errors errors) {
-		if(null != errors){
-			return;
-		}
+	public void validate(Object target, Errors errors) {		
 		MemberAddressForm memberAddressForm = (MemberAddressForm) target;
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "province", "field.required");
 		
