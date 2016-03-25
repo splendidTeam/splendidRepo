@@ -56,6 +56,7 @@ public class MemberViewCommandConverter extends
 								"isaddgroup", "sex", "birthday", "repassword",
 								"lifecycle", "realName", "receiveMail",
 								"newPassword"));
+				return memberViewCommand;
 			} catch (Exception e) {
 				// TODO should not occur
 				e.printStackTrace();

@@ -56,7 +56,7 @@ public class MemberProfileFormValidator implements Validator {
 		// TODO Auto-generated method stub
 		if (target instanceof MemberProfileForm) {
 			MemberProfileForm command = (MemberProfileForm) target;
-			
+
 			//验证邮箱，手机，密码，确认密码是否为空
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email","field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile","field.required");
@@ -66,12 +66,9 @@ public class MemberProfileFormValidator implements Validator {
 			if (!errors.hasFieldErrors("password")
 					&& !errors.hasFieldErrors("passwordAgain")) {
 				if (!command.getPassword().equals(command.getRepassword())) {
-					errors.rejectValue("passwordAgain",
-							"passwordAgain.error");
+					errors.rejectValue("passwordAgain", "passwordAgain.error");
 				}
-				if (null != command.getOldPassword()
-						&& command.getOldPassword().equals(
-								command.getPassword())) {
+				if (command.getOldPassword().equals(command.getPassword())) {
 					errors.rejectValue("passwordAgain", "oldPasswordSame.error");
 				}
 			}
