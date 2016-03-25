@@ -41,7 +41,7 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 	@Before
 	public void setUp(){
 		registerForm = new RegisterForm();
-//		registerForm.setEmail("viktorhuangchn@163.com");
+		// registerForm.setEmail("viktorhuangchn@163.com");
 
 		nebulaRegisterController = new NebulaRegisterController();
 		registerFormValidator = new RegisterFormValidator();
@@ -77,7 +77,7 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 	@Test
 	public void testRegister(){
 		// Record
-//		 EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L)).andReturn(new Pagination<ContactCommand>());
+//		EasyMock.expect(sdkMemberManager.findContactsByMemberId(null, null, 1L)).andReturn(new Pagination<ContactCommand>());
 
 		// Replay
 		control.replay();

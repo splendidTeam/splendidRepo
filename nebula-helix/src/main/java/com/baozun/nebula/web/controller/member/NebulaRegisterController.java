@@ -45,6 +45,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
@@ -109,7 +110,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (!Validator.isNullOrEmpty(memberDetails)){
 			return super.getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
-		// TODO 
+		// TODO
 		init4SensitiveDataEncryptedByJs(request, model);
 		return VIEW_MEMBER_REGISTER;
 	}
@@ -223,9 +224,13 @@ public class NebulaRegisterController extends NebulaLoginController{
 			registerFormNormalValidator.validate(registerForm, bindingResult);
 		}
 		if (bindingResult.hasErrors()){
-			// TODO 方式修改
+			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+			
 			defaultReturnResult.setResult(false);
 			defaultReturnResult.setStatusCode("1004");
+			defaultReturnResult.setResultMessage(defaultResultMessage);
+			
 			return defaultReturnResult;
 		}
 
