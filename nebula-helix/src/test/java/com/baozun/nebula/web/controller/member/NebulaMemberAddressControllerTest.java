@@ -246,7 +246,7 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setPhone("13023230767");
 		memberAddressForm.setConsignee("wanghengheng");
 		memberAddressForm.setPostcode("200000");
-		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
+		memberAddressFormValidator.validate(memberAddressForm, mockBindingResult(memberAddressForm));
 		EasyMock.expectLastCall();
 
 		// Replay
@@ -259,7 +259,7 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
  		// 验证结果
 		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
 				nebulaMemberAddressController.updateMemberAddress(memberDetails,
-						memberAddressForm, bindingResult, request,
+						memberAddressForm, mockBindingResult(memberAddressForm), request,
 						response , model));
 
 		// 验证交互行为		

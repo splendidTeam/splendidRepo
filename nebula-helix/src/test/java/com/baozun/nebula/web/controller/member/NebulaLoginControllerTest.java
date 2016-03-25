@@ -68,7 +68,8 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 		loginForm.setLoginName("minglei");
 		loginForm.setPassword("123456");
 
-		BindingResult bindingResult = new BindException(loginForm, "loginForm");
+		BindingResult bindingResult =mockBindingResult(loginForm);
+		//new BindException(loginForm, "loginForm");
 
 		assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 
