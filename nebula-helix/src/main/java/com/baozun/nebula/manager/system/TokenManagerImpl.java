@@ -43,8 +43,8 @@ public class TokenManagerImpl implements TokenManager {
 		Token token = cacheManager.getObject(generateKey(businessCode, human));
 		if (!Validator.isNullOrEmpty(token)) {
 			if (code.equals(token.getCode())) {
+				cacheManager.remove(generateKey(businessCode, human));
 				if ((token.getCreated() + token.getLiveTime()) >= System.currentTimeMillis()) {
-					cacheManager.remove(generateKey(businessCode, human));
 					return VerifyResult.SUCESS;
 				} else {
 					return VerifyResult.EXPIRED;
