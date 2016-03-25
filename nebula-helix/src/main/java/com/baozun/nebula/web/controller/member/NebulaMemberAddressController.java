@@ -17,10 +17,12 @@
 package com.baozun.nebula.web.controller.member;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,6 +186,7 @@ public class NebulaMemberAddressController extends BaseController {
 		
 		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		//校验过程
+		validateAddress(memberAddressForm);	
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
 			return null;
@@ -198,6 +201,14 @@ public class NebulaMemberAddressController extends BaseController {
 		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中		
 		model.addAttribute("MODEL_KEY_MEMBER_ADDRESS",memberAddressViewCommandConverter.convert(contactCommand));
 		return DefaultReturnResult.SUCCESS;		
+	}
+	
+	/**
+	 * 地址中手机和电话二选一
+	 * @return
+	 */
+	protected boolean validateAddress(MemberAddressForm  memberAddressForm){
+		return StringUtils.isNotBlank(memberAddressForm.getTelphone()) || StringUtils.isNotBlank(memberAddressForm.getTelphone());
 	}
 	
 	/**
@@ -223,6 +234,7 @@ public class NebulaMemberAddressController extends BaseController {
 		LOG.info("[MEM_UPDATE_ADDRESS] {} [{}] \"待更新地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
 		
 		//校验过程
+		validateAddress(memberAddressForm);
 		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
