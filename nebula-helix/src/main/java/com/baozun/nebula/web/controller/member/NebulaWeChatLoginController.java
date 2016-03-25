@@ -16,8 +16,6 @@ import com.baozun.nebula.utils.Validator;
 
 public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController{
 	
-	
-	
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaWeChatLoginController.class);
 
 	/**

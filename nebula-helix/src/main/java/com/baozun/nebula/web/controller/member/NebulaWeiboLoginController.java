@@ -16,8 +16,6 @@ import com.baozun.nebula.utils.Validator;
 
 public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	
-	
-	
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaWeiboLoginController.class);
 
 	/**
@@ -49,7 +47,7 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	public String showTirdParty() {
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
 		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("WeChat generate login url {}",loginUrl);
+		LOG.info("Weibo generate login url {}",loginUrl);
 		return loginUrl;
 	}
 
