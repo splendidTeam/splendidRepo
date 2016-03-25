@@ -33,7 +33,9 @@ import com.baozun.nebula.web.controller.member.converter.MemberAddressViewComman
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
 import com.baozun.nebula.web.controller.member.validator.MemberAddressFormValidator;
 
+import loxia.dao.Page;
 import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * NebulaMemberAddressControllerTest.
@@ -173,26 +175,18 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		MemberDetails memberDetails = new MemberDetails();
 		memberDetails.setMemberId(1L);
 		
-		EasyMock.expect(sdkMemberManager.findContactsByMemberId(pageForm.getPage(), pageForm.getSorts(), memberDetails.getMemberId()))
+		EasyMock.expect(sdkMemberManager.findContactsByMemberId(EasyMock.isA(Page.class), pageForm.getSorts(), memberDetails.getMemberId()))
 				.andReturn(new Pagination<ContactCommand>());
 
 		// Replay
-		control.replay();
+		EasyMock.replay(sdkMemberManager);
 
-//		PageForm pageForm2 = new PageForm();
-//		pageForm.setCurrentPage(0);
-//		pageForm.setSize(10);
-//		
-//		MemberDetails memberDetails2 = new MemberDetails();
-//		memberDetails.setMemberId(1L);	
-//		//nebulaMemberAddressController.showMemberAddress(memberDetails2, pageForm2, request, response, model);
-//		System.out.println("dsdsd");
 		// 验证结果
 		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
 				nebulaMemberAddressController.showMemberAddress(memberDetails, pageForm, request, response, model));
 
 		// 验证交互行为
-		control.verify();
+		EasyMock.verify(sdkMemberManager);
 	}
 	
 	/**
@@ -246,6 +240,7 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setPhone("13023230767");
 		memberAddressForm.setConsignee("wanghengheng");
 		memberAddressForm.setPostcode("200000");
+		
 		memberAddressFormValidator.validate(memberAddressForm, mockBindingResult(memberAddressForm));
 		EasyMock.expectLastCall();
 

@@ -1,6 +1,5 @@
 package com.baozun.nebula.web.controller.member.validator;
 
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.Errors;
@@ -8,6 +7,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
+import com.feilong.core.util.RegexUtil;
 
 
 /**
@@ -40,24 +40,20 @@ public class MemberAddressFormValidator implements Validator {
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");			
 			// 通用性检验
 			if (StringUtils.isNotBlank(memberAddressForm.getPhone())) {
-				Pattern p1 = Pattern.compile("^(1[3-9]{1}[0-9]{1})\\d{8}$");
-				if (!p1.matcher(memberAddressForm.getPhone().trim()).matches()) {
+				if (!RegexUtil.matches("^(1[3-9]{1}[0-9]{1})\\d{8}$",memberAddressForm.getPhone().trim())) {
 					errors.rejectValue("phone", "memberaddress.phone.error");
 				}				
 			}
-			if (StringUtils.isNotBlank(memberAddressForm.getTelphone())) {				
-				Pattern p2 = Pattern.compile("^\\d+$");
-				if (!p2.matcher(memberAddressForm.getTelphone().trim()).matches()) {
-					errors.rejectValue("telephone", "memberaddress.telephone.error");
-				}
+			if (StringUtils.isNotBlank(memberAddressForm.getTelphone())) {	
+				if (!RegexUtil.matches("^\\d+$",memberAddressForm.getTelphone().trim())) {
+					errors.rejectValue("phone", "memberaddress.telephone.error");
+				}	
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getPostcode())) {
-				Pattern p1 = Pattern.compile("^[0-9][0-9]{5}$");
-				if (!p1.matcher(memberAddressForm.getPostcode().trim()).matches()) {
+				if (!RegexUtil.matches("^[0-9][0-9]{5}$",memberAddressForm.getPostcode().trim())) {
 					errors.rejectValue("postcode", "memberaddress.postcode.error");
-				}
+				}				
 			}
 		}
 	}
-
 }
