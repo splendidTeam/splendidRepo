@@ -123,9 +123,10 @@ public class Member extends BaseModel{
 	private Date				version;
 
 	/**
-	 * 是否已绑定分类:1表示已加入 0表示未加入
+	 * 分组ID，用于处理会员间绑定关系
+	 * add by D.C 20160325
 	 */
-	// private Integer isaddgroup;
+	private Long groupId;
 
 	/**
 	 * 性别 ：0表示男 1表示女
@@ -241,15 +242,6 @@ public class Member extends BaseModel{
 		this.version = version;
 	}
 
-	// @Column(name = "ISADDGROUP")
-	// public Integer getIsaddgroup(){
-	// return isaddgroup;
-	// }
-	//
-	//
-	// public void setIsaddgroup(Integer isaddgroup){
-	// this.isaddgroup = isaddgroup;
-	// }
 
 	// @Column(name = "SEX")
 	// public Integer getSex() {
@@ -294,6 +286,14 @@ public class Member extends BaseModel{
 
 	public void setOldPassword(String oldPassword){
 		this.oldPassword = oldPassword;
+	}
+	@Column(name = "GROUP_ID")
+	public Long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
 	}
 
 }
