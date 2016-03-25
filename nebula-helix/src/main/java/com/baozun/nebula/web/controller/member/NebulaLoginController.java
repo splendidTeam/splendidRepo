@@ -53,13 +53,11 @@ import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
-import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormValidator;
 import com.feilong.core.util.Validator;
 import com.feilong.servlet.http.CookieUtil;
+
 
 /**
  * 用户登录
@@ -82,12 +80,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/* Login Page 的默认定义 */
 	public static final String			VIEW_MEMBER_LOGIN				= "member.login";
 
-	/* Register Page 的默认定义 */
-	public static final String			VIEW_MEMBER_REGISTER			= "member.register";
-
-	/* Fortget Password Page 的默认定义 */
-	public static final String			VIEW_MEMBER_FORTGET_PASSWORD	= "member.forget.password";
-
 	/* Login 登录ID */
 	public static final String			MODEL_KEY_MEMBER_LOGIN_ID		= "loginId";
 
@@ -104,21 +96,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	@Autowired
 	@Qualifier("loginFormValidator")
 	private LoginFormValidator			loginFormValidator;
-
-	/**
-	 * 会员注册Form的校验器
-	 */
-	@Autowired
-	@Qualifier("registerFormValidator")
-	private RegisterFormValidator		registerFormValidator;
-
-	/**
-	 * 忘记密码Form的校验器
-	 */
-	@Autowired
-	@Qualifier("forgetPasswordFormValidator")
-	private ForgetPasswordFormValidator	forgetPasswordFormValidator;
-
+	
 	/**
 	 * 会员业务管理类
 	 */
@@ -140,7 +118,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	public String showLogin(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
 		// 如果用户已经登录，默认返回
-		if (!Validator.isNullOrEmpty(memberDetails)) {
+		if (Validator.isNotNullOrEmpty(memberDetails)) {
 			LOG.info("[The member have logged in,login name: ] {} [{}]", memberDetails.getLoginName(), new Date());
 			return getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
@@ -164,7 +142,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @return
+	 * @return NebulaReturnResult
 	 */
 	public NebulaReturnResult login(
 			@ModelAttribute LoginForm loginForm,
@@ -237,6 +215,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			return super.onAuthenticationSuccess(constructMemberDetails(member), request, response);
 		}catch (UserNotExistsException e){
 			LOG.error(e.getMessage());
+			
 			// TODO 登录用户不存在
 		}catch (UserExpiredException e){
 			LOG.error(e.getMessage());
@@ -450,9 +429,14 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return
 	 */
 	protected MemberDetails constructMemberDetails(MemberCommand member){
-		MemberDetails memberDetails = new MemberDetails();
-		// TODO property填充
+		MemberDetails memberDetails = new MemberDetails();		
 		memberDetails.setActived(this.isActivedMember(member));
+		memberDetails.setLoginName(member.getLoginName());
+		memberDetails.setLoginMobile(member.getLoginMobile());
+		memberDetails.setLoginEmail(member.getLoginEmail());
+		memberDetails.setNickName(member.getLoginName());
+		memberDetails.setMemberId(member.getId());
+		memberDetails.setRealName(member.getRealName());		
 		return memberDetails;
 	}
 
@@ -466,45 +450,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// TODO 判断逻辑
 		return false;
 	}
-
-	/**
-	 * 忘记密码页面, 默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/forgetPassword", method = RequestMethod.GET)
-	 * @param model
-	 * @return
-	 */
-	public String showForgetPassword(Model model){
-		return VIEW_MEMBER_FORTGET_PASSWORD;
-	}
-
-	/**
-	 * 发送验证码, 默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/forgetPassword.json", method = RequestMethod.POST)
-	 * @param forgetPasswordForm
-	 * @param bindingResult
-	 * @param model
-	 * @return
-	 */
-	public NebulaReturnResult forgetPassword(
-			@ModelAttribute ForgetPasswordForm forgetPasswordForm,
-			BindingResult bindingResult,
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Model model){
-		// 1.数据校验 validator
-		forgetPasswordFormValidator.validate(forgetPasswordForm, bindingResult);
-		if (bindingResult.hasErrors()) {
-			// TODO
-			return null;
-		}
-
-		// 2.判断是手机还是邮箱，分别调用发送验证码逻辑
-
-		return null;
-	}
-
+	
 	/**
 	 * 登出, 默认推荐配置如下
 	 * 
@@ -516,6 +462,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// 1.清空session
 		resetSession(request);
 
-		return null;
+		return DefaultReturnResult.SUCCESS;
 	}
 }

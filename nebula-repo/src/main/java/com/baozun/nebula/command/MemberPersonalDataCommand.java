@@ -4,440 +4,609 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class MemberPersonalDataCommand implements Command{
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1221341154541433431L;
-	private Long id	;
-	private Long memberId; 
-	private String loginName;
-	private Integer lifecycle;
-	private String loginEmail;
-	private String loginMobile;
-	private Integer source;
-	private Integer type;
-	
-	private String userPic;	
-	private String nickname	;	
-	private String localRealName;	
-	private String intelRealName;
-	private Integer sex;
-	private String bloodType;
-	private Date birthday;
-	private String marriage;
-	private String country;
-	private String province;
-	private String city;
-	private String district;
+	private static final long	serialVersionUID	= 1221341154541433431L;
+
+	private Long				id;
+
+	private Long				memberId;
+
+	private String				loginName;
+
+	private Integer				lifecycle;
+
+	private String				loginEmail;
+
+	private String				loginMobile;
+
+	private Integer				source;
+
+	private Integer				type;
+
+	private String				userPic;
+
+	private String				nickname;
+
+	private String				localRealName;
+
+	private String				intelRealName;
+
+	private Integer				sex;
+
+	private String				bloodType;
+
+	private Date				birthday;
+
+	private String				marriage;
+
+	private String				country;
+
+	private String				province;
+
+	private String				city;
+
+	private String				district;
+
 	/**
 	 * 县(区)
 	 */
-	private String area;
-	/**
-	 * 国家id 
-	 */
-	private Long 				countryId;
-	
-	/** 省 id*/
-	private Long				provinceId;
-	
-	/** 市id */
-	private Long			    cityId;
-	
-	/** 区 id*/
-	private Long			    areaId;
+	private String				area;
 
-	private String address;
-	private Integer credentialsType;
-	private String credentialsNo;
-	private String typeName;
-	private String sexName;
-	private String credentialsTypeName;
-	private String lifeCycleName;
-	private String postCode;
-	public String getLifeCycleName() {
+	/**
+	 * 国家id
+	 */
+	private Long				countryId;
+
+	/** 省 id */
+	private Long				provinceId;
+
+	/** 市id */
+	private Long				cityId;
+
+	/** 区 id */
+	private Long				areaId;
+
+	private String				address;
+
+	private Integer				credentialsType;
+
+	private String				credentialsNo;
+
+	private String				typeName;
+
+	private String				sexName;
+
+	private String				credentialsTypeName;
+
+	private String				lifeCycleName;
+
+	private String				postCode;
+
+	private String				company;
+
+	private String				interest;
+
+	private String				short1;
+
+	private String				short2;
+
+	private String				short3;
+
+	private Integer				long1;
+
+	private Integer				long2;
+
+	private Integer				long3;
+
+	private Integer				loginCount;
+
+	private Date				registerTime;
+
+	private Date				loginTime;
+
+	private Date				payTime;
+
+	private String				registerIp;
+
+	private String				loginIp;
+
+	private BigDecimal			cumulativeConAmount;
+
+	public String getLifeCycleName(){
 		return lifeCycleName;
 	}
-	public void setLifeCycleName(String lifeCycleName) {
+
+	public void setLifeCycleName(String lifeCycleName){
 		this.lifeCycleName = lifeCycleName;
 	}
-	public String getCredentialsTypeName() {
+
+	public String getCredentialsTypeName(){
 		return credentialsTypeName;
 	}
-	public void setCredentialsTypeName(String credentialsTypeName) {
+
+	public void setCredentialsTypeName(String credentialsTypeName){
 		this.credentialsTypeName = credentialsTypeName;
 	}
-	public String getSexName() {
+
+	public String getSexName(){
 		return sexName;
 	}
-	public void setSexName(String sexName) {
+
+	public void setSexName(String sexName){
 		this.sexName = sexName;
 	}
-	public String getTypeName() {
+
+	public String getTypeName(){
 		return typeName;
 	}
-	public void setTypeName(String typeName) {
+
+	public void setTypeName(String typeName){
 		this.typeName = typeName;
 	}
-	public String getSourceName() {
+
+	public String getSourceName(){
 		return sourceName;
 	}
-	public void setSourceName(String sourceName) {
+
+	public void setSourceName(String sourceName){
 		this.sourceName = sourceName;
 	}
-	private String sourceName;
-	public String getCredentialsNo() {
+
+	private String	sourceName;
+
+	public String getCredentialsNo(){
 		return credentialsNo;
 	}
-	public void setCredentialsNo(String credentialsNo) {
+
+	public void setCredentialsNo(String credentialsNo){
 		this.credentialsNo = credentialsNo;
 	}
-	public String getPostCode() {
+
+	public String getPostCode(){
 		return postCode;
 	}
-	public void setPostCode(String postCode) {
+
+	public void setPostCode(String postCode){
 		this.postCode = postCode;
 	}
-	private String email;
-	private String mobile;
-	private String QQ;
-	private String weibo;
-	private String weixin;
-	private String edu;
-	private String industy;
-	private String position;
-	private String salary;
-	private String workingLife;
-	public String getLoginName() {
+
+	private String	email;
+
+	private String	mobile;
+
+	private String	QQ;
+
+	private String	weibo;
+
+	private String	weixin;
+
+	private String	edu;
+
+	private String	industy;
+
+	private String	position;
+
+	private String	salary;
+
+	private String	workingLife;
+
+	public String getLoginName(){
 		return loginName;
 	}
-	public void setLoginName(String loginName) {
+
+	public void setLoginName(String loginName){
 		this.loginName = loginName;
 	}
-	public Integer getLifecycle() {
+
+	public Integer getLifecycle(){
 		return lifecycle;
 	}
-	public void setLifecycle(Integer lifecycle) {
+
+	public void setLifecycle(Integer lifecycle){
 		this.lifecycle = lifecycle;
 	}
-	public String getLoginEmail() {
+
+	public String getLoginEmail(){
 		return loginEmail;
 	}
-	public void setLoginEmail(String loginEmail) {
+
+	public void setLoginEmail(String loginEmail){
 		this.loginEmail = loginEmail;
 	}
-	public String getLoginMobile() {
+
+	public String getLoginMobile(){
 		return loginMobile;
 	}
-	public void setLoginMobile(String loginMobile) {
+
+	public void setLoginMobile(String loginMobile){
 		this.loginMobile = loginMobile;
 	}
-	public Integer getSource() {
+
+	public Integer getSource(){
 		return source;
 	}
-	public void setSource(Integer source) {
+
+	public void setSource(Integer source){
 		this.source = source;
 	}
-	public Integer getType() {
+
+	public Integer getType(){
 		return type;
 	}
-	public void setType(Integer type) {
+
+	public void setType(Integer type){
 		this.type = type;
 	}
-	public Long getId() {
+
+	public Long getId(){
 		return id;
 	}
-	public void setId(Long id) {
+
+	public void setId(Long id){
 		this.id = id;
 	}
-	public Long getMemberId() {
+
+	public Long getMemberId(){
 		return memberId;
 	}
-	public void setMemberId(Long memberId) {
+
+	public void setMemberId(Long memberId){
 		this.memberId = memberId;
 	}
-	public String getUserPic() {
+
+	public String getUserPic(){
 		return userPic;
 	}
-	public void setUserPic(String userPic) {
+
+	public void setUserPic(String userPic){
 		this.userPic = userPic;
 	}
-	public String getNickname() {
+
+	public String getNickname(){
 		return nickname;
 	}
-	public void setNickname(String nickname) {
+
+	public void setNickname(String nickname){
 		this.nickname = nickname;
 	}
-	public String getLocalRealName() {
+
+	public String getLocalRealName(){
 		return localRealName;
 	}
-	public void setLocalRealName(String localRealName) {
+
+	public void setLocalRealName(String localRealName){
 		this.localRealName = localRealName;
 	}
-	public String getIntelRealName() {
+
+	public String getIntelRealName(){
 		return intelRealName;
 	}
-	public void setIntelRealName(String intelRealName) {
+
+	public void setIntelRealName(String intelRealName){
 		this.intelRealName = intelRealName;
 	}
-	public Integer getSex() {
+
+	public Integer getSex(){
 		return sex;
 	}
-	public void setSex(Integer sex) {
+
+	public void setSex(Integer sex){
 		this.sex = sex;
 	}
-	public String getBloodType() {
+
+	public String getBloodType(){
 		return bloodType;
 	}
-	public void setBloodType(String bloodType) {
+
+	public void setBloodType(String bloodType){
 		this.bloodType = bloodType;
 	}
-	public Date getBirthday() {
+
+	public Date getBirthday(){
 		return birthday;
 	}
-	public void setBirthday(Date birthday) {
+
+	public void setBirthday(Date birthday){
 		this.birthday = birthday;
 	}
-	public String getMarriage() {
+
+	public String getMarriage(){
 		return marriage;
 	}
-	public void setMarriage(String marriage) {
+
+	public void setMarriage(String marriage){
 		this.marriage = marriage;
 	}
-	public String getCountry() {
+
+	public String getCountry(){
 		return country;
 	}
-	public void setCountry(String country) {
+
+	public void setCountry(String country){
 		this.country = country;
 	}
-	public String getProvince() {
+
+	public String getProvince(){
 		return province;
 	}
-	public void setProvince(String province) {
+
+	public void setProvince(String province){
 		this.province = province;
 	}
-	public String getCity() {
+
+	public String getCity(){
 		return city;
 	}
-	public void setCity(String city) {
+
+	public void setCity(String city){
 		this.city = city;
 	}
-	
-	public String getDistrict() {
+
+	public String getDistrict(){
 		return district;
 	}
-	public void setDistrict(String district) {
+
+	public void setDistrict(String district){
 		this.district = district;
 	}
-	public String getAddress() {
+
+	public String getAddress(){
 		return address;
 	}
-	public void setAddress(String address) {
+
+	public void setAddress(String address){
 		this.address = address;
 	}
-	public Integer getCredentialsType() {
+
+	public Integer getCredentialsType(){
 		return credentialsType;
 	}
-	public void setCredentialsType(Integer credentialsType) {
+
+	public void setCredentialsType(Integer credentialsType){
 		this.credentialsType = credentialsType;
 	}
-	public String getEmail() {
+
+	public String getEmail(){
 		return email;
 	}
-	public void setEmail(String email) {
+
+	public void setEmail(String email){
 		this.email = email;
 	}
-	public String getMobile() {
+
+	public String getMobile(){
 		return mobile;
 	}
-	public void setMobile(String mobile) {
+
+	public void setMobile(String mobile){
 		this.mobile = mobile;
 	}
-	public String getQQ() {
+
+	public String getQQ(){
 		return QQ;
 	}
-	public void setQQ(String qQ) {
+
+	public void setQQ(String qQ){
 		QQ = qQ;
 	}
-	public String getWeibo() {
+
+	public String getWeibo(){
 		return weibo;
 	}
-	public void setWeibo(String weibo) {
+
+	public void setWeibo(String weibo){
 		this.weibo = weibo;
 	}
-	public String getWeixin() {
+
+	public String getWeixin(){
 		return weixin;
 	}
-	public void setWeixin(String weixin) {
+
+	public void setWeixin(String weixin){
 		this.weixin = weixin;
 	}
-	public String getEdu() {
+
+	public String getEdu(){
 		return edu;
 	}
-	public void setEdu(String edu) {
+
+	public void setEdu(String edu){
 		this.edu = edu;
 	}
-	public String getIndusty() {
+
+	public String getIndusty(){
 		return industy;
 	}
-	public void setIndusty(String industy) {
+
+	public void setIndusty(String industy){
 		this.industy = industy;
 	}
-	public String getPosition() {
+
+	public String getPosition(){
 		return position;
 	}
-	public void setPosition(String position) {
+
+	public void setPosition(String position){
 		this.position = position;
 	}
-	public String getSalary() {
+
+	public String getSalary(){
 		return salary;
 	}
-	public void setSalary(String salary) {
+
+	public void setSalary(String salary){
 		this.salary = salary;
 	}
-	public String getWorkingLife() {
+
+	public String getWorkingLife(){
 		return workingLife;
 	}
-	public void setWorkingLife(String workingLife) {
+
+	public void setWorkingLife(String workingLife){
 		this.workingLife = workingLife;
 	}
-	public String getCompany() {
+
+	public String getCompany(){
 		return company;
 	}
-	public void setCompany(String company) {
+
+	public void setCompany(String company){
 		this.company = company;
 	}
-	public String getInterest() {
+
+	public String getInterest(){
 		return interest;
 	}
-	public void setInterest(String interest) {
+
+	public void setInterest(String interest){
 		this.interest = interest;
 	}
-	public String getShort1() {
+
+	public String getShort1(){
 		return short1;
 	}
-	public void setShort1(String short1) {
+
+	public void setShort1(String short1){
 		this.short1 = short1;
 	}
-	public String getShort2() {
+
+	public String getShort2(){
 		return short2;
 	}
-	public void setShort2(String short2) {
+
+	public void setShort2(String short2){
 		this.short2 = short2;
 	}
-	public String getShort3() {
+
+	public String getShort3(){
 		return short3;
 	}
-	public void setShort3(String short3) {
+
+	public void setShort3(String short3){
 		this.short3 = short3;
 	}
-	public Integer getLong1() {
+
+	public Integer getLong1(){
 		return long1;
 	}
-	public void setLong1(Integer long1) {
+
+	public void setLong1(Integer long1){
 		this.long1 = long1;
 	}
-	public Integer getLong2() {
+
+	public Integer getLong2(){
 		return long2;
 	}
-	public void setLong2(Integer long2) {
+
+	public void setLong2(Integer long2){
 		this.long2 = long2;
 	}
-	public Integer getLong3() {
+
+	public Integer getLong3(){
 		return long3;
 	}
-	public void setLong3(Integer long3) {
+
+	public void setLong3(Integer long3){
 		this.long3 = long3;
 	}
-	public Integer getLoginCount() {
+
+	public Integer getLoginCount(){
 		return loginCount;
 	}
-	public void setLoginCount(Integer loginCount) {
+
+	public void setLoginCount(Integer loginCount){
 		this.loginCount = loginCount;
 	}
-	public Date getRegisterTime() {
+
+	public Date getRegisterTime(){
 		return registerTime;
 	}
-	public void setRegisterTime(Date registerTime) {
+
+	public void setRegisterTime(Date registerTime){
 		this.registerTime = registerTime;
 	}
-	public Date getLoginTime() {
+
+	public Date getLoginTime(){
 		return loginTime;
 	}
-	public void setLoginTime(Date loginTime) {
+
+	public void setLoginTime(Date loginTime){
 		this.loginTime = loginTime;
 	}
-	public Date getPayTime() {
+
+	public Date getPayTime(){
 		return payTime;
 	}
-	public void setPayTime(Date payTime) {
+
+	public void setPayTime(Date payTime){
 		this.payTime = payTime;
 	}
-	public String getRegisterIp() {
+
+	public String getRegisterIp(){
 		return registerIp;
 	}
-	public void setRegisterIp(String registerIp) {
+
+	public void setRegisterIp(String registerIp){
 		this.registerIp = registerIp;
 	}
-	public String getLoginIp() {
+
+	public String getLoginIp(){
 		return loginIp;
 	}
-	public void setLoginIp(String loginIp) {
+
+	public void setLoginIp(String loginIp){
 		this.loginIp = loginIp;
 	}
-	public BigDecimal getCumulativeConAmount() {
+
+	public BigDecimal getCumulativeConAmount(){
 		return cumulativeConAmount;
 	}
-	public void setCumulativeConAmount(BigDecimal cumulativeConAmount) {
+
+	public void setCumulativeConAmount(BigDecimal cumulativeConAmount){
 		this.cumulativeConAmount = cumulativeConAmount;
 	}
-	
-	public Long getCountryId() {
+
+	public Long getCountryId(){
 		return countryId;
 	}
-	public void setCountryId(Long countryId) {
+
+	public void setCountryId(Long countryId){
 		this.countryId = countryId;
 	}
-	public Long getProvinceId() {
+
+	public Long getProvinceId(){
 		return provinceId;
 	}
-	public void setProvinceId(Long provinceId) {
+
+	public void setProvinceId(Long provinceId){
 		this.provinceId = provinceId;
 	}
-	public Long getCityId() {
+
+	public Long getCityId(){
 		return cityId;
 	}
-	public void setCityId(Long cityId) {
+
+	public void setCityId(Long cityId){
 		this.cityId = cityId;
 	}
-	public String getArea() {
+
+	public String getArea(){
 		return area;
 	}
-	public void setArea(String area) {
+
+	public void setArea(String area){
 		this.area = area;
 	}
-	public Long getAreaId() {
+
+	public Long getAreaId(){
 		return areaId;
 	}
-	public void setAreaId(Long areaId) {
+
+	public void setAreaId(Long areaId){
 		this.areaId = areaId;
 	}
-	private String company;
-	private String interest;
-	private String short1;
-	private String short2;
-	private String short3;
-	private Integer long1;
-	private Integer long2;
-	private Integer long3;
-	private Integer loginCount;
-	private Date registerTime;
-	private Date loginTime;
-	private Date payTime;
-	private String registerIp;
-	private String loginIp;
-	private BigDecimal cumulativeConAmount;
-
-
 
 }

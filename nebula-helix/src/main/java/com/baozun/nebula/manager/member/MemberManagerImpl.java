@@ -298,8 +298,8 @@ public class MemberManagerImpl implements MemberManager{
 	}
 
 	@Override
-	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd)
-			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException {
+	public MemberCommand login(MemberFrontendCommand memberCommand,boolean isHaveReMemberPwd) throws UserNotExistsException,
+			UserExpiredException,PasswordNotMatchException{
 		MemberCommand member = null;
 		if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
 			member = sdkMemberManager.findMemberByLoginMobile(memberCommand.getLoginName());
@@ -312,11 +312,11 @@ public class MemberManagerImpl implements MemberManager{
 		if (null == member){
 			throw new UserNotExistsException();
 		}
-		
-		//没有记住密码的时候才需要验证输入的密码是否相同
-		if(!isHaveReMemberPwd){
+
+		// 没有记住密码的时候才需要验证输入的密码是否相同
+		if (!isHaveReMemberPwd){
 			String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
-			if (!encodePassword.equals(member.getPassword())) {
+			if (!encodePassword.equals(member.getPassword())){
 				throw new PasswordNotMatchException();
 			}
 		}
@@ -324,7 +324,7 @@ public class MemberManagerImpl implements MemberManager{
 		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())){
 			throw new UserExpiredException();
 		}
-		
+
 		// 保存用户行为信息
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
@@ -389,6 +389,8 @@ public class MemberManagerImpl implements MemberManager{
 		}
 
 		MemberPersonalData personData = new MemberPersonalData();
+		personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
+		
 		personData.setId(member.getId());
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
 			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
@@ -463,9 +465,9 @@ public class MemberManagerImpl implements MemberManager{
 			throw new BusinessException(Constants.BINDEMAIL_ERROR);
 		}
 	}
-	
+
 	@Override
-	public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines)throws SynchronousShoppingCartException{
+	public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines) throws SynchronousShoppingCartException{
 		sdkShoppingCartManager.synchronousShoppingCart(memberId, shoppingLines);
 	}
 

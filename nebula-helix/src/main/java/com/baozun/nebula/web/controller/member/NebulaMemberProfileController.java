@@ -16,7 +16,9 @@
  */
 package com.baozun.nebula.web.controller.member;
 
+import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +30,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
@@ -35,56 +40,66 @@ import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.converter.MemberViewCommandConverter;
 import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
 import com.baozun.nebula.web.controller.member.validator.MemberProfileFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
+import com.feilong.core.util.ResourceBundleUtil;
 
 /**
  * 会员信息相关控制器，含显示会员信息和修改会员信息。
+ * 
  * @author Benjamin.Liu
- *
+ * 
  */
 public class NebulaMemberProfileController extends BaseController {
-	
+
 	/**
 	 * log 定义
 	 */
-	private static final Logger LOG = LoggerFactory.getLogger(NebulaMemberProfileController.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(NebulaMemberProfileController.class);
 
 	/* Model 对应的键值定义 */
 	public static final String MODEL_KEY_MEMBER_PROFILE = "memberDetail";
-	
-	/* View 的默认定义*/
+
+	/* View 的默认定义 */
 	public static final String VIEW_MEMBER_PROFILE = "member.profile";
 	
+	/* 配置用户头像上传配置文件路径 */
+	protected String CONFIG = "";
+	
+	/* 读取配置文件中配置的用户头像路径 */
+	protected String MEMBER_HEAD_IMAGE = ResourceBundleUtil.getValue(CONFIG, "default.memberHeadImage.path");
+
 	/**
 	 * 会员业务管理类
 	 */
 	@Autowired
 	private MemberManager memberManager;
-	
+
 	/**
 	 * 会员信息Form的校验器
 	 */
 	@Autowired
 	@Qualifier("memberProfileFormValidator")
 	private MemberProfileFormValidator memberProfileFormValidator;
-	
+
 	/**
 	 * 会员信息转换器
 	 */
 	@Autowired
 	@Qualifier("memberViewCommandConverter")
 	private MemberViewCommandConverter memberViewCommandConverter;
-	
+
 	/**
 	 * 显示用户信息，默认推荐配置如下
+	 * 
 	 * @RequestMapping(value = "/member/profile", method = RequestMethod.GET)
-	 * @NeedLogin
-	 * 可以通过重载方法在获取用户信息后增加额外操作，或读取额外信息
+	 * @NeedLogin 可以通过重载方法在获取用户信息后增加额外操作，或读取额外信息
 	 * 
 	 * @param memberDetails
 	 * @param httpRequest
@@ -116,10 +131,11 @@ public class NebulaMemberProfileController extends BaseController {
 
 		return VIEW_MEMBER_PROFILE;
 	}
-	
+
 	/**
 	 * 更新用户头像，默认推荐配置如下
-	 * @RequestMapping(value = "", method = RequestMethod.POST)
+	 * 
+	 * @RequestMapping(value = "/upload/memberPortrait", method = RequestMethod.POST)
 	 * @NeedLogin
 	 * 
 	 * @param memberDetails
@@ -130,12 +146,56 @@ public class NebulaMemberProfileController extends BaseController {
 	public NebulaReturnResult updatePortrait(
 			@LoginMember MemberDetails memberDetails,
 			HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+		
+		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
+		assert memberDetails != null : "Please Check NeedLogin Annotation";
+		
 		// TODO 更新用户头像，需要一个通用的异步图片处理标准
-		return DefaultReturnResult.SUCCESS;
+		httpResponse.setContentType("text/html;charset=UTF-8");
+		String imageZipPath = MEMBER_HEAD_IMAGE;
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) httpRequest;
+		List<MultipartFile> commonsMultipartFileList = multipartRequest.getFiles("Filedata");
+		
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+		
+		//文件如果是空或者大小为0反馈失败
+		if (commonsMultipartFileList == null|| commonsMultipartFileList.size() == 0) {
+			defaultReturnResult.setResult(false);
+			defaultResultMessage.setMessage("memberPortrait.isEmpty");
+			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
+		}
+		
+		//上传图片
+		for (MultipartFile multipartFile : commonsMultipartFileList) {
+			CommonsMultipartFile commonsMultipartFile = (CommonsMultipartFile) multipartFile;
+			String fileName = commonsMultipartFile.getOriginalFilename();
+			String ranStr = memberDetails.getLoginName() + System.currentTimeMillis();
+			if (!commonsMultipartFile.isEmpty()) {
+				File imageDir = new File(imageZipPath);
+				if (!imageDir.exists()) {
+					imageDir.mkdirs();
+				}
+				File targetFile = new File(imageZipPath + ranStr);
+				try {
+					commonsMultipartFile.transferTo(targetFile);
+				} catch (Exception e) {
+					LOG.error(e.getMessage());
+					defaultReturnResult.setResult(false);
+					defaultResultMessage.setMessage("updatePortrait.error");
+					defaultReturnResult.setResultMessage(defaultResultMessage);
+					return defaultReturnResult;
+				}
+			}
+		}
+		
+		return defaultReturnResult;
 	}
-	
+
 	/**
 	 * 编辑用户信息，默认推荐配置如下
+	 * 
 	 * @RequestMapping(value = "/member/profile/edit", method = RequestMethod.POST)
 	 * @NeedLogin
 	 * 
@@ -157,17 +217,29 @@ public class NebulaMemberProfileController extends BaseController {
 		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Start\"",
 				memberDetails.getLoginName(), new Date());
 
-		LOG.debug("Start to check input profile");
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
+		LOG.debug("Start Validation input profile");
 		// TODO 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
 		memberProfileFormValidator.validate(memberProfileForm, bindingResult);
 		if (bindingResult.hasErrors()) {
 			LOG.info(
 					"[MEM_EDIT_PROFILE] {} [{}] \"Validator memberProfileForm has Error\"",
 					memberDetails.getLoginName(), new Date());
-			return null;
+			defaultReturnResult.setResult(false);
+			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
 		}
 		LOG.debug("input profile is validated");
+
+		memberProfileForm.setPassword(decryptSensitiveDataEncryptedByJs(
+				memberProfileForm.getPassword(), httpRequest));
+		memberProfileForm.setRepassword(decryptSensitiveDataEncryptedByJs(
+				memberProfileForm.getRepassword(), httpRequest));
+		memberProfileForm.setOldPassword(decryptSensitiveDataEncryptedByJs(
+				memberProfileForm.getOldPassword(), httpRequest));
 
 		// 获取会员信息
 		MemberCommand memberCommand = memberManager
@@ -185,6 +257,7 @@ public class NebulaMemberProfileController extends BaseController {
 
 		if (!memberCommand.getPassword()
 				.equals(memberProfileForm.getPassword())) {
+			LOG.debug("memberProfile update Passwd.");
 			isPasswordChange = true;
 			memberManager.updatePasswd(memberDetails.getMemberId(),
 					memberCommand.getPassword(),
@@ -194,6 +267,7 @@ public class NebulaMemberProfileController extends BaseController {
 
 		if (!memberCommand.getLoginEmail().equals(
 				memberProfileForm.getLoginEmail())) {
+			LOG.debug("memberProfile update Email.");
 			isEmailChange = true;
 			if (memberCommand.getLoginEmail().equals(
 					memberCommand.getLoginName())) {
@@ -206,6 +280,7 @@ public class NebulaMemberProfileController extends BaseController {
 
 		if (!memberCommand.getLoginMobile().equals(
 				memberProfileForm.getLoginMobile())) {
+			LOG.debug("memberProfile update Mobile.");
 			isMobileChange = true;
 			if (memberCommand.getLoginMobile().equals(
 					memberCommand.getLoginName())) {
@@ -216,42 +291,61 @@ public class NebulaMemberProfileController extends BaseController {
 					.setMemberLoginMobile(memberCommand);
 		}
 
-		// TODO 这里会把需要修改的值都设置到 memberProfile 中，请确保所有值都成功存储
-		memberManager.savePersonData(memberProfile);
-		memberManager.saveMember(memberCommand);
-
 		if (isPasswordChange) {
 			// TODO 保存重设密码
-			postProcessForPasswordChange();
+			isPasswordChange = postProcessForPasswordChange();
 			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[PASSWORD_CHANGED]\"",
 					memberDetails.getLoginName(), new Date());
 		}
 		if (isEmailChange) {
-			postProcessForEmailChange();
+			isEmailChange = postProcessForEmailChange();
 			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[EMAIL_CHANGED]\"",
 					memberDetails.getLoginName(), new Date());
 		}
 		if (isMobileChange) {
-			postProcessForMobileChange();
+			isEmailChange = postProcessForMobileChange();
 			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[MOBILE_CHANGED]\"",
 					memberDetails.getLoginName(), new Date());
 		}
 
+		// TODO 这里会把需要修改的值都设置到 memberProfile 中，请确保所有值都成功存储
+		memberManager.savePersonData(memberProfile);
+		if (isPasswordChange && isEmailChange && isMobileChange) {
+			memberManager.saveMember(memberCommand);
+		}
 		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Finished\"",
 				memberDetails.getLoginName(), new Date());
-
-		return DefaultReturnResult.SUCCESS;
+		return defaultReturnResult;
 	}
 
-	protected void postProcessForPasswordChange() {
-
+	/**
+	 * 如果isPasswordChange,预留各个商城对于修改密码不同的验证业务的预留扩展点<br>
+	 * 默认返回true,如果返回false之后就不会保存memberCommand<br>
+	 * 
+	 * @return
+	 */
+	protected boolean postProcessForPasswordChange() {
+		return true;
 	}
 
-	protected void postProcessForEmailChange() {
-		// 如果Email同时是登录名，可能需要考虑重新检查Email可用性，Email不可用之前账号会被禁用
+	/**
+	 * 如果isEmailChange,预留各个商城对于修改邮箱不同的验证业务的预留扩展点，如发送验证邮箱之类<br>
+	 * 默认返回true,如果返回false之后就不会保存memberCommand<br>
+	 * 
+	 * @return
+	 */
+	protected boolean postProcessForEmailChange() {
+		return true;
 	}
 
-	protected void postProcessForMobileChange() {
-
+	/**
+	 * 如果isMobileChange,预留各个商城对于修改Mobile不同的验证业务的预留扩展点，如发送验证码之类<br>
+	 * 默认返回true,如果返回false之后就不会保存memberCommand<br>
+	 * 
+	 * @return
+	 */
+	protected boolean postProcessForMobileChange() {
+		return true;
 	}
+
 }
