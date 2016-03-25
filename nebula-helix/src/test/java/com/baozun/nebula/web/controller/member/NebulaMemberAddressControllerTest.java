@@ -175,7 +175,9 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		MemberDetails memberDetails = new MemberDetails();
 		memberDetails.setMemberId(1L);
 		
-		EasyMock.expect(sdkMemberManager.findContactsByMemberId(EasyMock.isA(Page.class), pageForm.getSorts(), memberDetails.getMemberId()))
+		EasyMock.expect(sdkMemberManager.findContactsByMemberId(EasyMock.anyObject(Page.class), 
+		               (Sort[]) EasyMock.anyObject(),
+		               EasyMock.eq(memberDetails.getMemberId())   ))
 				.andReturn(new Pagination<ContactCommand>());
 
 		// Replay
