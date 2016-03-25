@@ -2,40 +2,72 @@ package com.baozun.nebula.web.controller.member.form;
 
 import com.baozun.nebula.web.controller.BaseForm;
 
-public class ForgetPasswordForm extends BaseForm{
+public class ForgetPasswordForm extends BaseForm {
 
-	private static final long serialVersionUID = -2376678079825089890L;
-	
-	/* 验证方式  可选值 1.mobile  2.email*/
-	private Integer type;
+    private static final long serialVersionUID = -2376678079825089890L;
 
-	private String mobile;
-	
-	private String email;
+    /* 验证方式 可选值 1.mobile 2.email */
+    private Integer type;
 
-	public Integer getType() {
-		return type;
-	}
+    private String mobile;
 
-	public void setType(Integer type) {
-		this.type = type;
-	}
+    private String email;
 
-	public String getMobile() {
-		return mobile;
-	}
+    /* 验证码 */
+    private String SecurityCode;
 
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
+    /* 新密码 */
+    private String newPassword;
 
-	public String getEmail() {
-		return email;
-	}
+    /* 确认密码 */
+    private String confirmPassword;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	
+    public String getConfirmPassword() {
+	return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+	this.confirmPassword = confirmPassword;
+    }
+
+    public String getNewPassword() {
+	return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+	this.newPassword = newPassword;
+    }
+
+    public String getSecurityCode() {
+	return SecurityCode;
+    }
+
+    public void setSecurityCode(String securityCode) {
+	SecurityCode = securityCode;
+    }
+
+    public Integer getType() {
+	return type;
+    }
+
+    public void setType(Integer type) {
+	this.type = type;
+    }
+
+    public String getMobile() {
+	return mobile;
+    }
+
+    public void setMobile(String mobile) {
+	this.mobile = mobile;
+    }
+
+    public String getEmail() {
+	return email;
+    }
+
+    public void setEmail(String email) {
+	this.email = email;
+    }
+
 }
