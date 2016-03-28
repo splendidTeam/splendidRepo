@@ -167,21 +167,4 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		//登录成功后处理
 		super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
 	}
-	
-	/***
-	 * 构建登录用户信息
-	 * @param member
-	 * @return
-	 */
-	protected MemberDetails constructMemberDetails(MemberCommand member){
-		MemberDetails memberDetails = new MemberDetails();		
-		memberDetails.setLoginName(member.getLoginName());
-		memberDetails.setLoginMobile(member.getLoginMobile());
-		memberDetails.setLoginEmail(member.getLoginEmail());
-		memberDetails.setNickName(member.getLoginName());
-		memberDetails.setMemberId(member.getId());
-		memberDetails.setRealName(member.getRealName());		
-		return memberDetails;
-	}
-	
 }

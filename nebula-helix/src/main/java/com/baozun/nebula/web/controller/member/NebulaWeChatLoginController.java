@@ -66,7 +66,9 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 		
 		//校验授权
 		ThirdPartyMember number = adaptor.returnMember(request);
-		if(Validator.isNotNullOrEmpty(number.getErrorCode())){
+		
+		//判断微信用户登录信息是否成功获取
+		if(number.getErrorCode() == null || number.getErrorCode().trim().length()==0){
 			LOG.error("thirdParty source "+ ThirdPartyMemberFactory.TYPE_WECHAT + " login failure, errorCode is " + number.getErrorCode());
 			return null;
 		}
