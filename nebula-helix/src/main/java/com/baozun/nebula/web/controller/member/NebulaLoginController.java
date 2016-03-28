@@ -56,7 +56,7 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.feilong.core.util.Validator;
+import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
 
 /**

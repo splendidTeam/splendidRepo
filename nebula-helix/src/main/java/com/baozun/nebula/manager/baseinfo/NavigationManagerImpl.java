@@ -23,8 +23,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import loxia.dao.Sort;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -38,7 +36,6 @@ import com.baozun.nebula.command.baseinfo.NavigationCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
-import com.baozun.nebula.constants.CacheConstants;
 import com.baozun.nebula.constants.MetaInfoConstants;
 import com.baozun.nebula.dao.baseinfo.NavigationDao;
 import com.baozun.nebula.dao.baseinfo.NavigationLangDao;
@@ -52,6 +49,8 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
 import com.baozun.nebula.utils.Validator;
 
+import loxia.dao.Sort;
+
 /**
  * 
  * @author - 项硕
@@ -60,8 +59,9 @@ import com.baozun.nebula.utils.Validator;
 @Service("navigationManager")
 public class NavigationManagerImpl implements NavigationManager{
 
-	@SuppressWarnings("unused")
-	private static final Logger	log	= LoggerFactory.getLogger(NavigationManagerImpl.class);
+	public static final String CACHE_KEY_NAVIGATION_LIST = "CACHE_KEY_NAVIGATION_LIST";
+	
+	private static final Logger	LOG	= LoggerFactory.getLogger(NavigationManagerImpl.class);
 	
 	//URL正则表达式
 	private static final String REG_URL = "^(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?$";
@@ -123,7 +123,7 @@ public class NavigationManagerImpl implements NavigationManager{
 	@Transactional(readOnly = true)
 	public List<NavigationCommand> findStoreNavigation() {
 		List<NavigationCommand> result = null;
-		cacheKeyNavigationList = Validator.isNullOrEmpty(cacheKeyNavigationList) ? CacheConstants.CACHE_KEY_NAVIGATION_LIST : cacheKeyNavigationList;
+		cacheKeyNavigationList = Validator.isNullOrEmpty(cacheKeyNavigationList) ? CACHE_KEY_NAVIGATION_LIST : cacheKeyNavigationList;
 		// ①走cache
 		try {
 			result = cacheManager
@@ -132,7 +132,7 @@ public class NavigationManagerImpl implements NavigationManager{
 				return result;
 			}
 		} catch (Exception e) {
-			log.warn(String.format("从Redis缓存中取值异常(kye = %s)",
+			LOG.warn(String.format("从Redis缓存中取值异常(kye = %s)",
 					cacheKeyNavigationList), e);
 		}
 
@@ -140,7 +140,7 @@ public class NavigationManagerImpl implements NavigationManager{
 		String rootNavIdStr = sdkMataInfoManager
 				.findValue(MetaInfoConstants.MATA_KEY_NAVIGATION_ROOT_ID);
 		if (Validator.isNullOrEmpty(rootNavIdStr)) {
-			log.warn(String.format("配置参数“%s”的值为空",
+			LOG.warn(String.format("配置参数“%s”的值为空",
 					MetaInfoConstants.MATA_KEY_NAVIGATION_ROOT_ID));
 			return null;
 		}
@@ -150,7 +150,7 @@ public class NavigationManagerImpl implements NavigationManager{
 		List<Navigation> navigationlist = navigationDao
 				.findAvailableNavigationList(sorts);
 		if (Validator.isNullOrEmpty(navigationlist)) {
-			log.warn("导航数据为空");
+			LOG.warn("导航数据为空");
 			return null;
 		}
 
@@ -163,7 +163,7 @@ public class NavigationManagerImpl implements NavigationManager{
 			cacheManager.setObject(cacheKeyNavigationList,
 					result, TimeInterval.SECONDS_PER_HOUR);
 		} catch (Exception e) {
-			log.warn(String.format("设置Redis缓存异常(kye = %s)",
+			LOG.warn(String.format("设置Redis缓存异常(kye = %s)",
 					cacheKeyNavigationList), e);
 		}
 

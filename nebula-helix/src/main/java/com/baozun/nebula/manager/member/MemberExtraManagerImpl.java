@@ -9,7 +9,7 @@ import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.utils.RegulareExpUtils;
-import com.feilong.core.util.Validator;
+import com.feilong.core.Validator;
 
 @Transactional
 @Service("memberExtraManager")
