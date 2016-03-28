@@ -40,7 +40,6 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	@Autowired
 	private SdkMemberManager skdMemeberManager;
 	
-	
 	/** 
 	 * 构建去第三方登录url
 	 * @return
@@ -184,4 +183,5 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		memberDetails.setRealName(member.getRealName());		
 		return memberDetails;
 	}
+	
 }

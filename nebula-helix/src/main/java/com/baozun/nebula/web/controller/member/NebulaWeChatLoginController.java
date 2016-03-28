@@ -44,7 +44,6 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 		if(tirdPartyMember == null){
 			return VIEW_MEMBER_LOGIN_FAIL;
 		}
-		
 		//2.第三方登录
 		return thirdParyLogin(tirdPartyMember,request, response,model);
 	}

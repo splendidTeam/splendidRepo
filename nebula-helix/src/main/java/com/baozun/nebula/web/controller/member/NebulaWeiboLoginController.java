@@ -53,6 +53,7 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	public String showTirdParty() {
 		//获取微博参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
+		
 		//微博登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("Weibo generate login url {}",loginUrl);
