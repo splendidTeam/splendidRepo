@@ -5,15 +5,16 @@ package com.baozun.nebula.web.controller.member;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindingResult;
 
+import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
@@ -48,6 +49,10 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 	private LoginForm				loginForm;
 	
 	private HttpSession				session;
+	
+	private EventPublisher 			eventPublisher;
+	 
+	private ApplicationEvent		applicationEvent; 
 
 	@Before
 	public void setUp(){
@@ -63,7 +68,9 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 		nebulaLoginController = new NebulaLoginController();
 		loginFormValidator = new LoginFormValidator();
-
+		
+		
+		eventPublisher = control.createMock(EventPublisher.class); 
 		memberManager =  control.createMock("memberManager", MemberManager.class);
 		memberExtraManager = control.createMock("memberExtraManager", MemberExtraManager.class);
 		session = control.createMock("HttpSession", HttpSession.class);
@@ -71,14 +78,17 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 		ReflectionTestUtils.setField(nebulaLoginController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaLoginController, "memberExtraManager", memberExtraManager);
 		ReflectionTestUtils.setField(nebulaLoginController, "loginFormValidator", loginFormValidator);
+		ReflectionTestUtils.setField(nebulaLoginController, "eventPublisher", eventPublisher);
 	}
 
 	@Test
 	public void testLogin(){
 		try{
-			EasyMock.expect(memberManager.login(EasyMock.isA(MemberFrontendCommand.class))).andReturn(memberCommand);
+			EasyMock.expect(memberManager.login(EasyMock.isA(MemberFrontendCommand.class))).andReturn(memberCommand);			
+			EasyMock.expect(request.getSession()).andReturn(session).anyTimes();			
 			
-			EasyMock.expect(request.getSession()).andReturn(session);
+			eventPublisher.publish(EasyMock.isA(ApplicationEvent.class));
+			EasyMock.expectLastCall();			
 			control.replay();
 			assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 			control.verify();
