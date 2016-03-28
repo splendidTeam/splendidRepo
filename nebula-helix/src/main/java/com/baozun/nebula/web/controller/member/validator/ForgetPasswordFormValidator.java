@@ -37,6 +37,7 @@ public class ForgetPasswordFormValidator implements Validator {
 	if (type == EMAIL) {
 	    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email",
 		    "field.required");
+
 	    // 验证邮箱规格
 	    if (!errors.hasFieldErrors("email")) {
 		Pattern p1 = Pattern
