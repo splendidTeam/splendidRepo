@@ -39,13 +39,12 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 	private MemberExtraManager		memberExtraManager;
 
 	private MemberCommand			member;
-	
+
 	@Before
 	public void setUp(){
 		member = new MemberCommand();
 		member.setId(11L);
-		
-		
+
 		nebulaLoginController = new NebulaLoginController();
 		loginFormValidator = new LoginFormValidator();
 
@@ -54,38 +53,37 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 		ReflectionTestUtils.setField(nebulaLoginController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaLoginController, "memberExtraManager", memberExtraManager);
-		ReflectionTestUtils.setField(nebulaLoginController, "loginFormValidator", loginFormValidator);		
+		ReflectionTestUtils.setField(nebulaLoginController, "loginFormValidator", loginFormValidator);
 	}
 
-	
 	@Test
 	public void testLogin(){
 		try{
 			LoginForm loginForm = new LoginForm();
-			
-			//初始化登录参数
+
+			// 初始化登录参数
 			loginForm.setLoginName("minglei");
 			loginForm.setPassword("123456");
 			loginForm.setIsRemberMeLoginName(true);
+
+			BindingResult bindingResult = mockBindingResult(loginForm);
 			
-			BindingResult bindingResult =mockBindingResult(loginForm);			
-			
-			
-			EasyMock.expect(memberManager.login(new MemberFrontendCommand())).andReturn(member);			
-			
+			EasyMock.expect(loginForm.toMemberFrontendCommand()).andReturn(new MemberFrontendCommand());
+
+			EasyMock.expect(memberManager.login(new MemberFrontendCommand())).andReturn(member);
+
 			control.replay();
 
 			assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 
-			control.verify();		
-			
+			control.verify();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
 	@Test
 	public void testShowLogin(){
 		control.replay();
