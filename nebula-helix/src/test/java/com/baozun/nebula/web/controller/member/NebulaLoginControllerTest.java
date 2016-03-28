@@ -5,30 +5,21 @@ package com.baozun.nebula.web.controller.member;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindingResult;
 
-import com.baozun.nebula.command.ContactCommand;
-import com.baozun.nebula.exception.PasswordNotMatchException;
-import com.baozun.nebula.exception.UserExpiredException;
-import com.baozun.nebula.exception.UserNotExistsException;
 import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-
-import loxia.dao.Pagination;
 
 /**
  * 登录controller测试类
@@ -69,7 +60,7 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 	
 	@Test
 	public void testLogin(){
-		try{			
+		try{
 			LoginForm loginForm = new LoginForm();
 			
 			//初始化登录参数
@@ -86,9 +77,7 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 			assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
 
-			control.verify();
-			
-			
+			control.verify();		
 			
 		}catch (Exception e){
 			e.printStackTrace();
