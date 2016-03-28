@@ -34,6 +34,9 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	/* 第三方帐号登录成功跳转页面的默认定义*/
 	public static final String VIEW_MEMBER_LOGIN_SUCC	=	"member.succ";
 	
+	/* 第三方帐号登录失败跳转页面的默认定义*/
+	public static final String VIEW_MEMBER_LOGIN_FAIL	=	"member.fail";	
+	
 	@Autowired
 	private SdkMemberManager skdMemeberManager;
 	
@@ -106,7 +109,6 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * @return
 	 */
 	protected String showBinding(HttpServletRequest request,HttpServletResponse response,Model model) {
-		//TODO 
 		return VIEW_MEMBER_BINDING;
 	}
 	/**
@@ -114,7 +116,6 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * @return
 	 */
 	protected NebulaReturnResult binding() {
-		//TODO 
 		return DefaultReturnResult.SUCCESS;
 	}
 	
@@ -163,7 +164,8 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 */
 	protected void doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
 		//同步购物车 暂时省略
-		MemberCommand memberCommand = skdMemeberManager.findMemberById(member.getId());
+		MemberCommand memberCommand = skdMemeberManager.findMemberById(member.getGroupId());
+		//登录成功后处理
 		super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
 	}
 	

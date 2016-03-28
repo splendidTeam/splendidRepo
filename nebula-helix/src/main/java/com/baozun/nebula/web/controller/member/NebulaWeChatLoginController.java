@@ -13,7 +13,11 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 import com.baozun.nebula.utils.Validator;
-
+/**
+ * 微信登录controller
+ * @author 黄大辉
+ * @version 1.0
+ */
 public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController{
 	
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaWeChatLoginController.class);
@@ -37,6 +41,9 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	public String weChatLoginCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
 		//1.校验授权
 		TirdPartyMemberCommand tirdPartyMember=this.checkOauth(request);
+		if(tirdPartyMember == null){
+			return VIEW_MEMBER_LOGIN_FAIL;
+		}
 		
 		//2.第三方登录
 		return thirdParyLogin(tirdPartyMember,request, response,model);
@@ -44,7 +51,10 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	
 	@Override
 	public String showTirdParty() {
+		//获取微博参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
+		
+		//微信登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("WeChat generate login url {}",loginUrl);
 		return loginUrl;
@@ -52,15 +62,17 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
-		
+		//获取微信参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
-		//1.校验授权
+		
+		//校验授权
 		ThirdPartyMember number = adaptor.returnMember(request);
 		if(Validator.isNotNullOrEmpty(number.getErrorCode())){
 			LOG.error("thirdParty source "+ ThirdPartyMemberFactory.TYPE_WECHAT + " login failure, errorCode is " + number.getErrorCode());
 			return null;
 		}
-		//2.组装信息
+		
+		//组装信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
