@@ -149,10 +149,11 @@ public class NebulaMemberAddressController extends BaseController {
 	public NebulaReturnResult addMemberAddress(@LoginMember MemberDetails memberDetails,
 			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, BindingResult bindingResult, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		
 		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
 		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"待新增地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
@@ -203,9 +204,10 @@ public class NebulaMemberAddressController extends BaseController {
 	public NebulaReturnResult updateMemberAddress(@LoginMember MemberDetails memberDetails,
 			@ModelAttribute("memberAddress") MemberAddressForm memberAddressForm, BindingResult bindingResult, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
+
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
 		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
@@ -261,9 +263,10 @@ public class NebulaMemberAddressController extends BaseController {
 	public NebulaReturnResult setDefaultAddress(@LoginMember MemberDetails memberDetails,
 			@ModelAttribute("addressId") Long addressId, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
+
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
 		// log.info("[MEM_SET_ADDRESS_DEFAULT] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
@@ -301,9 +304,10 @@ public class NebulaMemberAddressController extends BaseController {
 	public NebulaReturnResult deleteMemberAddress(@LoginMember MemberDetails memberDetails,
 			@ModelAttribute("addressId") Long addressId, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
+
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
 		// log.info("[MEM_REMOVE_ADDRESS] {} [{}] \"{}\"",
 		// memberDetails.getLoginName(), new Date(), 待删除的地址Id);
