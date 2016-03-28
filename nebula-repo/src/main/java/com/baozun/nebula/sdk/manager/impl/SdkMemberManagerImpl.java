@@ -217,6 +217,22 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 				"postCode" });
 	}
 
+	private void encrypt(MemberCommand memberCommand) {
+
+		sdkSecretManager.encrypt(memberCommand, new String[] { 
+				"loginEmail",
+				"loginMobile", 
+				"realName" });
+	}
+
+	private void decrypt(MemberCommand memberCommand) {
+
+		sdkSecretManager.decrypt(memberCommand, new String[] { 
+				"loginEmail",
+				"loginMobile", 
+				"realName" });
+	}
+
 	private void encryptContact(ContactCommand contact){
 
 		sdkSecretManager.encrypt(contact, new String[] {
@@ -283,59 +299,86 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberById(Long id){
+	public MemberCommand findMemberById(Long id) {
 		Member member = memberDao.findMemberById(id);
-		if (null != member)
-			return convertMemberToMemberCommand(member);
-		return null;
+		MemberCommand memberCommand = null;
+		if (null != member) {
+			memberCommand = convertMemberToMemberCommand(member);
+			// 敏感信息加密存储完后，解密传输至Controller
+			decrypt(memberCommand);
+			return memberCommand;
+		}
+		return memberCommand;
 	}
 
 	@Override
-	public MemberCommand saveMember(MemberCommand memberCommand){
+	public MemberCommand saveMember(MemberCommand memberCommand) {
 		Member member = null;
-		if (memberCommand.getId() == null || memberCommand.getId() == 0){
+		if (memberCommand.getId() == null || memberCommand.getId() == 0) {
 			// 保存
 			member = new Member();
-		}else{
+		} else {
 			// 更新
 			member = memberDao.findMemberById(memberCommand.getId());
 		}
+		// 敏感信息加密存储
+		encrypt(memberCommand);
 		member = convertMemberCommandToMember(memberCommand, member);
 		member = memberDao.save(member);
-		if (null != member){
-			return convertMemberToMemberCommand(member);
+		if (null != member) {
+			memberCommand = convertMemberToMemberCommand(member);
+			// 敏感信息加密存储完后，解密传输至Controller
+			decrypt(memberCommand);
+			return memberCommand;
 		}
 		return null;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginName(String loginName){
+	public MemberCommand findMemberByLoginName(String loginName) {
 		Member member = null;
+		MemberCommand memberCommand = null;
 		if (StringUtils.isNotBlank(loginName))
 			member = memberDao.findMemberByLoginName(loginName.toUpperCase());
-		if (null != member)
-			return convertMemberToMemberCommand(member);
+		if (null != member) {
+			memberCommand = convertMemberToMemberCommand(member);
+			// 敏感信息加密存储完后，解密传输至Controller
+			decrypt(memberCommand);
+			return memberCommand;
+		}
 		return null;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginEmail(String loginName){
+	public MemberCommand findMemberByLoginEmail(String loginName) {
 		Member member = null;
+		MemberCommand memberCommand = null;
 		if (StringUtils.isNotBlank(loginName))
 			member = memberDao.findMemberByLoginEmail(loginName.toUpperCase());
-		if (null != member)
-			return convertMemberToMemberCommand(member);
+		if (null != member){
+			memberCommand = convertMemberToMemberCommand(member);
+			// 敏感信息加密存储完后，解密传输至Controller
+			decrypt(memberCommand);
+			return memberCommand;
+		}
 		return null;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginNameAndPasswd(String loginName,String password){
-		Member member = memberDao.findMemberByLoginNameAndPasswd(loginName, password);
-		if (null != member)
-			return convertMemberToMemberCommand(member);
+	public MemberCommand findMemberByLoginNameAndPasswd(String loginName,
+			String password) {
+		Member member = memberDao.findMemberByLoginNameAndPasswd(loginName,
+				password);
+		MemberCommand memberCommand = null;
+		if (null != member){
+			memberCommand = convertMemberToMemberCommand(member);
+			// 敏感信息加密存储完后，解密传输至Controller
+			decrypt(memberCommand);
+			return memberCommand;
+		}
 		return null;
 	}
 
@@ -382,8 +425,10 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		contactCommand.setModifyTime(new Date());
 		contact = (Contact) ConvertUtils.convertTwoObject(contact, contactCommand);
 		contact = contactDao.save(contact);
-		if (null != contact)
+		if (null != contact){
+			decryptContact(contact);
 			return (ContactCommand) ConvertUtils.convertTwoObject(new ContactCommand(), contact);
+		}
 		return null;
 	}
 
@@ -530,8 +575,9 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			conduct = new MemberConduct();
 		conduct = (MemberConduct) ConvertUtils.convertTwoObject(conduct, memberConductCommand);
 		conduct = memberConductDao.save(conduct);
-		if (null != conduct)
+		if (null != conduct){
 			return (MemberConductCommand) ConvertUtils.convertTwoObject(new MemberConductCommand(), conduct);
+		}
 		return null;
 	}
 
@@ -634,6 +680,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 		}
 		if (null != con){
+			decryptContact(con);
 			return convertContactToContactCommand(con);
 		}
 		return null;
@@ -1007,7 +1054,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		}else{
 			memberPersonalData = memberPersonalDataDao.save(personData);
 		}
-
+		decrypt(memberPersonalData);
 		return memberPersonalData;
 	}
 
