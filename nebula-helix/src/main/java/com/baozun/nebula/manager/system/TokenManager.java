@@ -32,7 +32,7 @@ public interface TokenManager {
 	 */
 	void saveToken(String businessCode, String human, int liveTime, String token);
 	/**
-	 * 
+	 * 验证
 	 * @param businessCode 业务编码
 	 * @param human  人的识别码
 	 * @param token 验证码

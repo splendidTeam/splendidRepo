@@ -60,9 +60,10 @@ import com.feilong.core.util.Validator;
 import com.feilong.servlet.http.CookieUtil;
 
 /**
- * 用户登录
- * 
- * @author D.C
+ * 登录相关方法controller
+ * @author 冯明雷
+ * @version 1.0
+ * @time 2016年3月28日  上午10:26:57
  */
 public class NebulaLoginController extends NebulaAbstractLoginController{
 
@@ -192,7 +193,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			}else{
 				member=memberManager.login(loginForm.toMemberFrontendCommand());
 			}
-					
+
 			Long memberId = member.getId();
 
 			// 合并购物车
@@ -240,27 +241,14 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 登出，默认推荐配置如下(POST方法)
+	 * 登出，默认推荐配置如下
 	 * 
-	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	public NebulaReturnResult logoutWithPost(HttpServletRequest request,HttpServletResponse response,Model model){
-		request.getSession().invalidate();
-		onLogoutSuccess(request, response);
-		return DefaultReturnResult.SUCCESS;
-	}
-
-	/**
-	 * 登出, 默认推荐配置如下(GET方法)
-	 * 
-	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
-	 * @param request
-	 * @return
-	 */
-	public NebulaReturnResult logoutWithGet(HttpServletRequest request,HttpServletResponse response,Model model){
+	public NebulaReturnResult logout(HttpServletRequest request,HttpServletResponse response,Model model){
 		// 1.清空session
 		resetSession(request);
 		onLogoutSuccess(request, response);
@@ -330,8 +318,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		Cookie cookie = CookieUtil.getCookie(request, Constants.GUEST_COOKIE_GC);
 		if (Validator.isNotNullOrEmpty(cookie)) {
 			String value = decryptSensitiveDataEncryptedByJs(cookie.getValue(), request);
-			List<CookieShoppingCartLine> cookieShoppingCartLines = JSON
-					.parseObject(value, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
+			List<CookieShoppingCartLine> cookieShoppingCartLines = JSON.parseObject(value, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
 
 			if (Validator.isNotNullOrEmpty(cookieShoppingCartLines)) {
 				for (CookieShoppingCartLine cookieLine : cookieShoppingCartLines){

@@ -167,6 +167,8 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	@Test
 	public void testShowMemberAddress() {
 		// Record
+		Pagination<ContactCommand> pagination = new Pagination<ContactCommand>();
+		pagination.setCount(10);
 		
 		PageForm pageForm = new PageForm();
 		pageForm.setCurrentPage(0);
@@ -178,7 +180,7 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		EasyMock.expect(sdkMemberManager.findContactsByMemberId(EasyMock.anyObject(Page.class), 
 		               (Sort[]) EasyMock.anyObject(),
 		               EasyMock.eq(memberDetails.getMemberId())   ))
-				.andReturn(new Pagination<ContactCommand>());
+				.andReturn(pagination);
 
 		// Replay
 		EasyMock.replay(sdkMemberManager);
@@ -223,6 +225,8 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	 */
 	@Test
 	public void testUpdateMemberAddress() {
+		String a = null ;
+		assert a != null : "Please Check NeedLogin Annotation";
 		// Record
 		ContactCommand command = new ContactCommand();
 		command.setId(1L);
