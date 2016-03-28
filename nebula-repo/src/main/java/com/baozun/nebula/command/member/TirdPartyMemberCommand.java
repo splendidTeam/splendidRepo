@@ -16,6 +16,8 @@ public class TirdPartyMemberCommand {
 	private String age;
 	
 	private String sex;
+	
+	private Integer source;
 
 	public String getOpenId() {
 		return openId;
@@ -63,6 +65,14 @@ public class TirdPartyMemberCommand {
 
 	public void setSex(String sex) {
 		this.sex = sex;
+	}
+
+	public Integer getSource() {
+		return source;
+	}
+
+	public void setSource(Integer source) {
+		this.source = source;
 	}
 	
 	

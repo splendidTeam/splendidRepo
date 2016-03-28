@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.member.converter;
 
+import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
@@ -44,12 +45,11 @@ public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddre
 			return null;
 		if(data instanceof ContactCommand){
 			ContactCommand contactCommand = (ContactCommand) data;
-			// TODO
-			// 完成转换
+			// 一些预留转换没做
+			return (MemberAddressViewCommand) ConvertUtils.convertTwoObject(new MemberAddressViewCommand(), contactCommand);
 		}else{
 			throw new UnsupportDataTypeException(data.getClass() + " cannot convert to " + ContactCommand.class + "yet.");
 		}
 		
-		return null;
 	}
 }

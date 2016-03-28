@@ -130,6 +130,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		MemberCommand findMemberByLoginEmail = sdkMemberManager.findMemberByLoginEmail(email);
 		if (Validator.isNotNullOrEmpty(findMemberByLoginEmail)){
 			// eamil不可用
+			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
 			defaultReturnResult.setStatusCode("1004");
 			return defaultReturnResult;
@@ -153,6 +154,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		MemberCommand findMemberByLoginMobile = sdkMemberManager.findMemberByLoginMobile(mobile);
 		if (Validator.isNotNullOrEmpty(findMemberByLoginMobile)){
 			// mobile不可用
+			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
 			defaultReturnResult.setStatusCode("1005");
 			return defaultReturnResult;
@@ -181,12 +183,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		if (!RegulareExpUtils.isMobileNO(mobile)){
 			// 手机号不合法
+			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
 			return defaultReturnResult;
 		}
 		boolean ableSendMessageToMobile = isAbleSendMessageToMobile(request, mobile);
 		if (!ableSendMessageToMobile){
 			// 不能连续发送短信
+			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
 			return defaultReturnResult;
 		}
@@ -211,11 +215,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 			BindingResult bindingResult,
 			HttpServletRequest request,
 			HttpServletResponse response,
-			Model model){
+			Model model,
+			Device device){
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		/** 数据校验 */
-		Device device = getDevice(request);
+		// Device device = getDevice(request);
 		if (device.isMobile()){
 			registerFormMobileValidator.validate(registerForm, bindingResult);
 		}else{
@@ -239,11 +244,13 @@ public class NebulaRegisterController extends NebulaLoginController{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
 			/** 检查验证码 */
 			checkCaptcha(request, memberFrontendCommand.getRandomCode());
+
 			/** 检查email，mobile等是否合法 */
-			defaultReturnResult = (DefaultReturnResult) checkCoreData(memberFrontendCommand, request, response);
+			defaultReturnResult = (DefaultReturnResult) checkRegisterData(memberFrontendCommand, request, response);
 			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
 			}
+
 			/** 设置注册会员附加信息 */
 			setupMemberReference(memberFrontendCommand, request);
 
@@ -268,11 +275,15 @@ public class NebulaRegisterController extends NebulaLoginController{
 	}
 
 	/**
+	 * 检查验证码是否正确
+	 * 
 	 * @param request
 	 * @param randomCode
+	 *            验证码
 	 */
 	protected void checkCaptcha(HttpServletRequest request,String randomCode){
-		
+		// TODO 验证码
+
 	}
 
 	/**
@@ -299,7 +310,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	}
 
 	/**
-	 * 检查验证码 ，email，mobile等是否合法,重复问题
+	 * 检查email，mobile等是否合法,重复问题
 	 * 
 	 * @param mfc
 	 *            MemberFrontendCommand
@@ -307,11 +318,9 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * @param response
 	 * @return
 	 */
-	protected NebulaReturnResult checkCoreData(MemberFrontendCommand mfc,HttpServletRequest request,HttpServletResponse response){
+	protected NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc,HttpServletRequest request,HttpServletResponse response){
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		Map<String, String> returnObject = new HashMap<String, String>();
-		// TODO 验证码
-		String randomCode = mfc.getRandomCode();
 
 		// 验证email
 		String loginEmail = mfc.getLoginEmail();

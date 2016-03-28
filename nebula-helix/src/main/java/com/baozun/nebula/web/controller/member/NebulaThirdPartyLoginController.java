@@ -3,9 +3,16 @@ package com.baozun.nebula.web.controller.member;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
 import com.baozun.nebula.command.member.TirdPartyMemberCommand;
+import com.baozun.nebula.model.member.Member;
+import com.baozun.nebula.sdk.command.member.MemberCommand;
+import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 
@@ -16,11 +23,20 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
  */
 public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLoginController{
 	
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaThirdPartyLoginController.class);
+	
 	/* 用户补全信息页面的默认定义*/
 	public static final String VIEW_MEMBER_COMPLETEINFO	=	"member.completeInfo";
 	
 	/* 第三方帐号绑定页面的默认定义*/
 	public static final String VIEW_MEMBER_BINDING	=	"member.binding";
+	
+	/* 第三方帐号登录成功跳转页面的默认定义*/
+	public static final String VIEW_MEMBER_LOGIN_SUCC	=	"member.succ";
+	
+	@Autowired
+	private SdkMemberManager skdMemeberManager;
+	
 	
 	/** 
 	 * 构建去第三方登录url
@@ -41,24 +57,29 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 */
 	protected String thirdParyLogin(TirdPartyMemberCommand tirdPartyMember,HttpServletRequest request,HttpServletResponse response,Model model){
 		
+		Member member = skdMemeberManager.findThirdMemberByThirdIdAndSource(tirdPartyMember.getOpenId(),tirdPartyMember.getSource());
+		
 		//是否需要完善信息 默认需要
 		if(isNeedCompleteInfo()){
 			//TODO 逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
-			return showCompleteInfo(request, response, model);
+			if(member==null){
+				return showCompleteInfo(request, response, model);
+			}
 		}
 		//是否需要绑定用户 默认不需要
 		if(isNeedBinding()){
-			return showBinding(request, response, model);
+			if(member==null){
+				LOG.info("openId:{} begin bind",tirdPartyMember.getOpenId());
+				member  = generateThirdPartyMember(tirdPartyMember);
+				model.addAttribute("member_id", member.getId());
+				return showBinding(request, response, model);
+			}
 		}
-		
 		//第三方登录
-		//TODO 业务方法
-		
-		//登录成功后的认证
-//		super.onAuthenticationSuccess(memberDetails, request, response);
+		doLogin(request, response, model,member);
 		
 		//这里应该跟正常登录逻辑保持一致，返回指定的URL
-		return "";
+		return VIEW_MEMBER_LOGIN_SUCC;
 	}
 	/**
 	 * 是否需要绑定
@@ -121,4 +142,44 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		return null;
 	}
 
+	/**
+	 * 保存第三方用户信息
+	 * @param tirdPartyMember
+	 */
+	protected Member generateThirdPartyMember(TirdPartyMemberCommand tirdPartyMember){
+		Member member = new Member();
+		member.setThirdPartyIdentify(tirdPartyMember.getOpenId());
+		member.setSource(tirdPartyMember.getSource());
+		skdMemeberManager.rewriteRegister(member);
+		return member;
+	}
+	
+	/***
+	 * 验证成功后登录动作
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @param member
+	 */
+	protected void doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
+		//同步购物车 暂时省略
+		MemberCommand memberCommand = skdMemeberManager.findMemberById(member.getId());
+		super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
+	}
+	
+	/***
+	 * 构建登录用户信息
+	 * @param member
+	 * @return
+	 */
+	protected MemberDetails constructMemberDetails(MemberCommand member){
+		MemberDetails memberDetails = new MemberDetails();		
+		memberDetails.setLoginName(member.getLoginName());
+		memberDetails.setLoginMobile(member.getLoginMobile());
+		memberDetails.setLoginEmail(member.getLoginEmail());
+		memberDetails.setNickName(member.getLoginName());
+		memberDetails.setMemberId(member.getId());
+		memberDetails.setRealName(member.getRealName());		
+		return memberDetails;
+	}
 }
