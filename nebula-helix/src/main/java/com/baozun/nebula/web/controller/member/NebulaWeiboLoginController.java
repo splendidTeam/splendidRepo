@@ -79,7 +79,7 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_SINA);
-		return new TirdPartyMemberCommand();
+		return numberCommand;
 	}
 	
 }

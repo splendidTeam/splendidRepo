@@ -12,7 +12,6 @@ import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
-import com.baozun.nebula.utils.Validator;
 /**
  * 微信登录controller
  * @author 黄大辉
@@ -78,7 +77,7 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_WECHAT);
-		return new TirdPartyMemberCommand();
+		return numberCommand;
 	}
 	
 }
