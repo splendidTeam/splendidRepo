@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +22,9 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.MemberPasswordForm;
 import com.baozun.nebula.web.controller.member.validator.MemberPasswordFormValidator;
 
@@ -50,6 +54,9 @@ public class NebulaModifyPasswordController extends BaseController {
     private static final Logger LOGGER = LoggerFactory
 	    .getLogger(NebulaModifyPasswordController.class);
 
+    /* 修改密码的页面定义 */
+    public static final String VIEW_MODIFY_PASSWORD = "member.editPassword";
+
     @Autowired
     private SdkMemberManager sdkMemberManager;
 
@@ -59,22 +66,28 @@ public class NebulaModifyPasswordController extends BaseController {
     @Autowired
     private MemberExtraManager memberExtraManager;
 
+    @Autowired
+    @Qualifier("memberPasswordFormValidator")
+    private MemberPasswordFormValidator memberPasswordFormValidator;
+
     /**
-     * 去修改密码页面
+     * 去修改密码页面(此步骤的操作需要在登录状态下)
      * 
+     * @NeedLogin
      * @RequestMapping(value = "/member/editPassword.htm", method =
      *                       RequestMethod.GET)
      * 
      */
     public String showEditPassword() {
-	return "myaccount.editPassword";
+	return VIEW_MODIFY_PASSWORD;
     }
 
     /**
      * 修改密码
      * 
+     * @NeedLogin
      * @RequestMapping(value = "/member/editPassword.json", method =
-     *                       RequestMethod.GET)
+     *                       RequestMethod.POST)
      * 
      * @param memberDetails
      * @param memberPasswordForm
@@ -84,47 +97,61 @@ public class NebulaModifyPasswordController extends BaseController {
      * @param response
      * @return
      */
-
-    public String editPassword(
+    public NebulaReturnResult editPassword(
 	    @LoginMember MemberDetails memberDetails,
 	    @ModelAttribute("memberPasswordForm") MemberPasswordForm memberPasswordForm,
 	    BindingResult result, Model model, HttpServletRequest request,
 	    HttpServletResponse response) {
 
+	DefaultReturnResult returnResult = new DefaultReturnResult();
+	DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+
+	// 获取当前登录用户的id
 	Long memberId = memberDetails.getMemberId();
+	LOGGER.info("[The member try to modify password,memberId: ] {} [{}]",
+		memberId, new Date());
 
 	// 校验页面数据
-	new MemberPasswordFormValidator().validate(memberPasswordForm, result);
+	memberPasswordFormValidator.validate(memberPasswordForm, result);
 	if (result.hasErrors()) {
-	    model.addAttribute("hasError", true);
-	    model.addAttribute("loginName", memberDetails.getLoginName());
-	    return "json";
+	    returnResult.setResult(false);
+	    returnResult.setResultMessage(defaultResultMessage);
+
+	    return returnResult;
 	}
 
 	// 验证旧密码是否正确（需要解密）
-
 	String oldPassword = decryptSensitiveDataEncryptedByJs(
 		memberPasswordForm.getOldPassword(), request);
 	boolean flag = this.checkOldPassword(memberId, oldPassword);
+
 	if (flag) {
+	    // 若旧密码正确（确认用户未发生变化）
 	    memberPasswordForm.setMemberId(memberId);
+	    // 修改密码
 	    boolean updatePasswd = memberManager.updatePasswd(memberId,
 		    oldPassword, memberPasswordForm.getNewPassword(),
 		    memberPasswordForm.getConfirmPassword());
+
 	    // 如果修改成功
 	    if (updatePasswd) {
-		model.addAttribute("flag", "1");
-		model.addAttribute("loginName", memberDetails.getLoginName());
+		LOGGER.info(
+			"[The member have modified password success,memberId: ] {} [{}]",
+			memberId, new Date());
+		// 重置记住密码的数据
 		String short4 = new Date().getTime() + "";
 		memberExtraManager.rememberPwd(memberId, short4);
+
+		returnResult.setResult(true);
 	    }
 	} else {
 	    // 旧密码错误
-	    result.rejectValue("oldPassword", "member.oldPassword.error");
-	    model.addAttribute("hasError", true);
-	    model.addAttribute("flag", "2");
+	    returnResult.setResult(false);
+	    LOGGER.info(
+		    "[The member try to modify password but failed ,memberId: ] {} [{}]",
+		    memberId, new Date());
 	}
-	return "json";
+	return returnResult;
     }
 
     /**
@@ -143,6 +170,7 @@ public class NebulaModifyPasswordController extends BaseController {
 	String codePassword = EncryptUtil.getInstance().hash(oldPassword,
 		memberCommand.getLoginName());
 
+	// 确认数据库里查询到的密码的存在性
 	if (password != null && StringUtils.isNotEmpty(password)) {
 	    if (password.equals(codePassword)) {
 		return true;
@@ -150,5 +178,4 @@ public class NebulaModifyPasswordController extends BaseController {
 	}
 	return false;
     }
-
 }

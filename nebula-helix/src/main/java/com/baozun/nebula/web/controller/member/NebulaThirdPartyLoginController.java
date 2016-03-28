@@ -12,7 +12,6 @@ import com.baozun.nebula.command.member.TirdPartyMemberCommand;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 
@@ -58,28 +57,30 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * @return
 	 */
 	protected String thirdParyLogin(TirdPartyMemberCommand tirdPartyMember,HttpServletRequest request,HttpServletResponse response,Model model){
-		
+		//查询是否存在该用户登录信息
 		Member member = skdMemeberManager.findThirdMemberByThirdIdAndSource(tirdPartyMember.getOpenId(),tirdPartyMember.getSource());
 		
-		//是否需要完善信息 默认需要
-		if(isNeedCompleteInfo()){
-			//TODO 逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
-			if(member==null){
-				return showCompleteInfo(request, response, model);
-			}
+		//首次登录时，创建用户
+		if (member == null) {
+			member = generateThirdPartyMember(tirdPartyMember);
 		}
-		//是否需要绑定用户 默认不需要
-		if(isNeedBinding()){
-			if(member==null){
-				LOG.info("openId:{} begin bind",tirdPartyMember.getOpenId());
-				member  = generateThirdPartyMember(tirdPartyMember);
-				model.addAttribute("member_id", member.getId());
-				return showBinding(request, response, model);
-			}
-		}
-		//第三方登录
-		doLogin(request, response, model,member);
 		
+		// 是否需要完善信息 默认需要
+		if (isNeedCompleteInfo()) {
+			
+			//逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
+			return showCompleteInfo(request, response, model);
+		}
+		
+		// 是否需要绑定用户 默认不需要
+		if (isNeedBinding()) {
+			LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
+			model.addAttribute("member_id", member.getId());
+			return showBinding(request, response, model);
+		}
+	
+		// 第三方登录
+		doLogin(request, response, model, member);
 		//这里应该跟正常登录逻辑保持一致，返回指定的URL
 		return VIEW_MEMBER_LOGIN_SUCC;
 	}
@@ -167,21 +168,4 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		//登录成功后处理
 		super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
 	}
-	
-	/***
-	 * 构建登录用户信息
-	 * @param member
-	 * @return
-	 */
-	protected MemberDetails constructMemberDetails(MemberCommand member){
-		MemberDetails memberDetails = new MemberDetails();		
-		memberDetails.setLoginName(member.getLoginName());
-		memberDetails.setLoginMobile(member.getLoginMobile());
-		memberDetails.setLoginEmail(member.getLoginEmail());
-		memberDetails.setNickName(member.getLoginName());
-		memberDetails.setMemberId(member.getId());
-		memberDetails.setRealName(member.getRealName());		
-		return memberDetails;
-	}
-	
 }
