@@ -192,7 +192,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			}else{
 				member=memberManager.login(loginForm.toMemberFrontendCommand());
 			}
-					
+
 			Long memberId = member.getId();
 
 			// 合并购物车
@@ -330,8 +330,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		Cookie cookie = CookieUtil.getCookie(request, Constants.GUEST_COOKIE_GC);
 		if (Validator.isNotNullOrEmpty(cookie)) {
 			String value = decryptSensitiveDataEncryptedByJs(cookie.getValue(), request);
-			List<CookieShoppingCartLine> cookieShoppingCartLines = JSON
-					.parseObject(value, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
+			List<CookieShoppingCartLine> cookieShoppingCartLines = JSON.parseObject(value, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
 
 			if (Validator.isNotNullOrEmpty(cookieShoppingCartLines)) {
 				for (CookieShoppingCartLine cookieLine : cookieShoppingCartLines){
