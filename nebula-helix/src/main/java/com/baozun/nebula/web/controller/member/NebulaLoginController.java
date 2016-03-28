@@ -241,29 +241,18 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 登出，默认推荐配置如下(POST方法)
+	 * 登出，默认推荐配置如下
 	 * 
 	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	public NebulaReturnResult logoutWithPost(HttpServletRequest request,HttpServletResponse response,Model model){
+	public NebulaReturnResult logout(HttpServletRequest request,HttpServletResponse response,Model model){
 		// 1.清空session
 		resetSession(request);
 		onLogoutSuccess(request, response);
 		return DefaultReturnResult.SUCCESS;
-	}
-
-	/**
-	 * 登出, 默认推荐配置如下(GET方法)
-	 * 
-	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.GET)
-	 * @param request
-	 * @return
-	 */
-	public NebulaReturnResult logoutWithGet(HttpServletRequest request,HttpServletResponse response,Model model){
-		return logoutWithPost(request, response, model);
 	}
 
 	/**
