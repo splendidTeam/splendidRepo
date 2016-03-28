@@ -9,6 +9,7 @@ import com.baozun.nebula.command.MessageCommand;
 import com.baozun.nebula.manager.sms.validator.MessageCommandValidator;
 
 /**
+ * 短信的发送Manager
  * @author shouqun.li
  * 2016年3月24日 上午10:35:35
  */
@@ -28,7 +29,8 @@ public class SmsManagerImpl implements SmsManager {
 		String pwd = ProfileConfigUtil.findPro("config/sms.properties").getProperty("sms.pwd");
 		LOG.info("send sms interface url : "+url);*/
 		if(MessageCommandValidator.validator(messageCommand)){
-			
+			System.out.println("短信发送中。。。。。。");
+			System.out.println("短信发送成功。。。。。。");
 			/*String message = messageCommand.getContent();
 			if(message.indexOf("&")>=0) {
 				message=message.replace("&","&amp;");

@@ -1,10 +1,10 @@
 package com.baozun.nebula.manager.sms;
 
 import com.baozun.nebula.command.MessageCommand;
-import com.baozun.nebula.exception.MobileException;
 import com.baozun.nebula.manager.BaseManager;
 
 /**
+ * 短信发送的manager
  * @author shouqun.li
  * @version 2016年3月24日 上午10:35:44
  */
