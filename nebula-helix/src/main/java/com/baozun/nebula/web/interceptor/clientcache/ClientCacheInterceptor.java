@@ -27,8 +27,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.baozun.nebula.web.interceptor.AbstractHandlerInterceptorAdapter;
+import com.feilong.servlet.http.HttpHeaders;
 import com.feilong.servlet.http.ResponseUtil;
-import com.feilong.servlet.http.entity.HttpHeaders;
 
 /**
  * 用来拦截所有 标识有 {@link ClientCache}的 请求方法.

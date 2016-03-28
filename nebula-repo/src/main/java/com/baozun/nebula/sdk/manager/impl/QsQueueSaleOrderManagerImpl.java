@@ -45,7 +45,7 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.QsQueueSaleOrderManager;
 import com.baozun.nebula.security.crypto.PIIEncryptionModule;
 import com.baozun.nebula.utilities.common.Validator;
-import com.feilong.core.tools.jsonlib.JsonUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 import net.sf.json.JSONObject;
 

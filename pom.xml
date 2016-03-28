@@ -26,7 +26,7 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
-		<version.feilong-platform>1.5.0-SNAPSHOT</version.feilong-platform>
+		<version.feilong-platform>1.5.2</version.feilong-platform>
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
