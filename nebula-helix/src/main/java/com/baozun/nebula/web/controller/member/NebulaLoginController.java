@@ -72,6 +72,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 
 	/* Login Page 的默认定义 */
 	public static final String	VIEW_MEMBER_LOGIN			= "member.login";
+	
+	/* 登录成功的默认定义 */
+	public static final String	VIEW_MEMBER_LOGIN_SUCCESS	= "member.login.success";
 
 	/* Login 登录ID */
 	public static final String	MODEL_KEY_MEMBER_LOGIN_ID	= "loginId";
@@ -80,8 +83,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	public static final String	MODEL_KEY_MEMBER_LOGIN_PWD	= "loginPwd";
 
 	private static final String	REMEMBER_PWD				= "********";
-
-	private static final String	DEFAULT_PWD					= "zf1sr1Ys";
 
 	/**
 	 * 会员登录Form的校验器
@@ -110,17 +111,20 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @param model
 	 */
 	public String showLogin(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
-		// 如果用户已经登录，默认返回
-		if (Validator.isNotNullOrEmpty(memberDetails)) {
-			LOG.info("[The member have logged in,login name: ] {} [{}]", memberDetails.getLoginName(), new Date());
-			return getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
-		}
-
 		// 记住我的用户名和密码的处理流程
 		rememberMeProcess(request, response, model);
 
 		// 密码前端JS加密准备工作
 		init4SensitiveDataEncryptedByJs(request, model);
+		
+		
+		// 如果用户已经登录，默认返回
+		if (Validator.isNotNullOrEmpty(memberDetails)) {
+			LOG.info("[USER_ALREADY_LOGIN] {} [{}] \"User alerady login and will jump profile page\"", memberDetails.getLoginName(), new Date());			
+			return getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);			
+		}
+		
+		
 		return VIEW_MEMBER_LOGIN;
 	}
 
@@ -147,10 +151,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
 		String pwd = loginForm.getPassword();
-		// if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
-		// // 随便一个符合密码规范的，让下面的验证通过
-		// loginForm.setPassword(getDefaultPwd());
-		// }
 
 		// ****************************************************************** 数据校验
 		loginFormValidator.validate(loginForm, bindingResult);
@@ -166,7 +166,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		boolean isHaveReMemberPwd = false;
 
 		// 记住用户名和密码
-		if (REMEMBER_PWD.equals(pwd) && isSupportRemberMePwd()) {
+		if (REMEMBER_PWD.equals(pwd) && isSupportAutoLogin()) {
 			isHaveReMemberPwd = isHaveReMemberPwd(loginForm, request, response, model);
 		}else{
 			// 不记住密码的，直接解密密码，进行验证
@@ -270,16 +270,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		}
 		return false;
 	}
-
-	/**
-	 * 返回一个默认密码防止校验出错 String
-	 * 
-	 * @author 冯明雷
-	 * @time 2016-3-23上午11:21:47
-	 */
-	protected String getDefaultPwd(){
-		return DEFAULT_PWD;
-	}
 	
 
 	/**
@@ -298,10 +288,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @param memberDetails
 	 * @param request
 	 * @param model
-	 * @return 默认返回登录页
+	 * @return 默认返回登录成功页
 	 */
 	protected String getShowPage4LoginedUserViewLoginPage(MemberDetails memberDetails,HttpServletRequest request,Model model){
-		return VIEW_MEMBER_LOGIN;
+		return VIEW_MEMBER_LOGIN_SUCCESS;
 	}
 
 	/**
@@ -311,18 +301,18 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @param model
 	 */
 	protected void rememberMeProcess(HttpServletRequest request,HttpServletResponse response,Model model){
-		boolean isSupportRemberMeUser = isSupportRemberMeUser();
+		boolean isSupportRemeberMe = isSupportRemeberMe();
 
 		// 是否记住密码，如果是记住密码，默认就记住用户名
-		if (isSupportRemberMePwd()) {
-			isSupportRemberMeUser = true;
+		if (isSupportAutoLogin()) {
+			isSupportRemeberMe = true;
 			Cookie pwd = CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME_PWD);
 			if (Validator.isNotNullOrEmpty(pwd)) {
 				model.addAttribute(MODEL_KEY_MEMBER_LOGIN_PWD, REMEMBER_PWD);
 			}
 		}
 
-		if (isSupportRemberMeUser) {
+		if (isSupportRemeberMe) {
 			Cookie userName = CookieUtil.getCookie(request, COOKIE_KEY_REMEMBER_ME_USER);
 			if (Validator.isNotNullOrEmpty(userName)) {
 				model.addAttribute(MODEL_KEY_MEMBER_LOGIN_ID, remberMeValueDecrypt(userName.getValue(), request));
@@ -394,7 +384,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * 
 	 * @return 默认关闭
 	 */
-	protected boolean isSupportRemberMeUser(){
+	protected boolean isSupportRemeberMe(){
 		return Boolean.FALSE.booleanValue();
 	}
 
@@ -403,7 +393,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * 
 	 * @return 默认关闭
 	 */
-	protected boolean isSupportRemberMePwd(){
+	protected boolean isSupportAutoLogin(){
 		return Boolean.FALSE.booleanValue();
 	}
 
