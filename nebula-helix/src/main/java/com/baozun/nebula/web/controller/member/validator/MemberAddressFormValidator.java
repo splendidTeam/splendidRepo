@@ -47,7 +47,7 @@ public class MemberAddressFormValidator implements Validator {
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getTelphone())) {	
 				if (!RegexUtil.matches(RegexPattern.TELEPHONE,memberAddressForm.getTelphone().trim())) {
-					errors.rejectValue("phone", "memberaddress.telephone.error");
+					errors.rejectValue("telephone", "memberaddress.telephone.error");
 				}	
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getPostcode())) {

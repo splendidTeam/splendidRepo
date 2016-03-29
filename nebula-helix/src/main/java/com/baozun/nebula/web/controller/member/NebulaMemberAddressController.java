@@ -164,7 +164,7 @@ public class NebulaMemberAddressController extends BaseController {
 		if(bindingResult.hasErrors()){
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage("校验对象memberAddressForm字段报错");
+			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 		}	
 		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
@@ -219,7 +219,7 @@ public class NebulaMemberAddressController extends BaseController {
 		if(bindingResult.hasErrors()){
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage("校验对象memberAddressForm字段报错");
+			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 		}
 		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
@@ -228,7 +228,7 @@ public class NebulaMemberAddressController extends BaseController {
 		if(null != command) {
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage("没有找到相应的地址信息");
+			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 		}
 		//Form转contact
@@ -277,7 +277,7 @@ public class NebulaMemberAddressController extends BaseController {
 		if(null == contact) {
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage("没有找到相应的地址信息");
+			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 		}
 		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --end");
@@ -317,7 +317,7 @@ public class NebulaMemberAddressController extends BaseController {
 		if(null == contact) {
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage("没有找到相应的地址信息");
+			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 		}
 		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
