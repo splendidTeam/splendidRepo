@@ -37,11 +37,11 @@ public class MaskTag extends TagSupport {
 	 */
 	private char maskStr = '*';
 	/**
-	 * 左侧不马赛克长度
+	 * 左侧不需要马赛克长度
 	 */
 	private int leftUnmaskLength = 0;
 	/**
-	 * 右侧不马赛克长度
+	 * 右侧不需要马赛克长度
 	 */
 	private int rightUnmaskLength = 0;
 
