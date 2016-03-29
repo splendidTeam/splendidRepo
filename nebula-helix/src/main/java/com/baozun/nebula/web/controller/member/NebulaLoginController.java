@@ -56,7 +56,7 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.feilong.core.util.Validator;
+import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
 
 /**
@@ -184,17 +184,18 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 
 		// **********************************************************登录
 		try{
+			
 			// 登录判断，登录失败会抛出异常，通过捕获处理
-			MemberCommand member =null;
+			MemberCommand memberCommand =null;
 			
 			if(isHaveReMemberPwd){
 				//如果记住了密码，登录时不验证密码
-				member=memberManager.loginWithOutPwd(loginForm.toMemberFrontendCommand());
+				memberCommand=memberManager.loginWithOutPwd(loginForm.toMemberFrontendCommand());
 			}else{
-				member=memberManager.login(loginForm.toMemberFrontendCommand());
+				memberCommand=memberManager.login(loginForm.toMemberFrontendCommand());
 			}
 
-			Long memberId = member.getId();
+			Long memberId = memberCommand.getId();
 
 			// 合并购物车
 			// 同步Cookie中的购物车信息到数据库
@@ -204,7 +205,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			doRememberMeProcess(loginForm, memberId, request, response, model);
 
 			// 认证成功处理
-			return super.onAuthenticationSuccess(constructMemberDetails(member), request, response);
+			return super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
 		}catch (UserNotExistsException e){
 			// 登录用户不存在
 			LOG.error(e.getMessage());
@@ -464,34 +465,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		return Boolean.FALSE.booleanValue();
 	}
 
-	/**
-	 * 构造MemberDetails
-	 * 
-	 * @param member
-	 * @return
-	 */
-	protected MemberDetails constructMemberDetails(MemberCommand member){
-		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setActived(this.isActivedMember(member));
-		memberDetails.setLoginName(member.getLoginName());
-		memberDetails.setLoginMobile(member.getLoginMobile());
-		memberDetails.setLoginEmail(member.getLoginEmail());
-		memberDetails.setNickName(member.getLoginName());
-		memberDetails.setMemberId(member.getId());
-		memberDetails.setRealName(member.getRealName());
-		return memberDetails;
-	}
-
-	/**
-	 * 用户是否激活
-	 * 
-	 * @param member
-	 * @return
-	 */
-	protected boolean isActivedMember(MemberCommand member){
-		// TODO 判断逻辑
-		return false;
-	}
 	
 	/**
 	 * 获取记住密码加密使用的key

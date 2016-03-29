@@ -12,7 +12,9 @@ import java.util.Map;
 /**
  * isNullOrEmpty(Object value),判断元素是否为空
  * 
+ * @deprecated pls use {@link com.feilong.core.Validator}
  */
+@Deprecated
 public final class Validator{
 
 	/** Don't let anyone instantiate this class. */

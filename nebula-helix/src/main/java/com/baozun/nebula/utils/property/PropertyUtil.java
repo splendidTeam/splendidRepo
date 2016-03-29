@@ -11,7 +11,9 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 /**
  * @author xianze.zhang
  *@creattime 2013-7-8
+ *@deprecated pls use {@link com.feilong.core.bean.PropertyUtil}
  */
+@Deprecated
 public class PropertyUtil{
 	private static PropertyUtilsBean propertyUtils = new PropertyUtilsBean();
 	/**

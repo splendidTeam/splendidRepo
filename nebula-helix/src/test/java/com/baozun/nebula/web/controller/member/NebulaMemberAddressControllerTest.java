@@ -225,8 +225,6 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	 */
 	@Test
 	public void testUpdateMemberAddress() {
-		String a = null ;
-		assert a != null : "Please Check NeedLogin Annotation";
 		// Record
 		ContactCommand command = new ContactCommand();
 		command.setId(1L);

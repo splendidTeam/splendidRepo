@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.baozun.nebula</groupId>
 		<artifactId>nebula</artifactId>
-		<version>5.3.0</version>
+		<version>5.3.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>nebula-protostar</artifactId>
 	<version>${version.nebula}</version>

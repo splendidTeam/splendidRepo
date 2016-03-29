@@ -52,7 +52,7 @@ import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
 import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValidator;
 import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
-import com.feilong.core.util.Validator;
+import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 
 /**

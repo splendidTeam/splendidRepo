@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
  * @version 1.0 Sep 2, 2010 8:35:28 PM
  * @version 1.1 2012-9-23 21:34 api更新,isNullOrEmpty 替换isNull(deprecated)
  * @since 1.0
+ * @deprecated pls use {@link com.feilong.core.Validator}
  */
+@Deprecated
 public final class Validator{
 
 	private final static Logger	log	= LoggerFactory.getLogger(Validator.class);

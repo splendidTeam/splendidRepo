@@ -119,11 +119,10 @@ public class NebulaMemberAddressController extends BaseController {
 
 		LOG.info("[MEM_VIEW_ADDRESS] {} [{}] \"\"", memberDetails.getLoginName(), new Date());
 		// 获取会员地址信息
-		// TODO
 		// 方法调用从MemberContactManager中拿了出来，直接使用了SdkMemberManager中新增的方法
 		// 因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
 		
-		// TODO 疑问：pageForm是否需要判断空？
+		// 疑问：pageForm是否需要判断空？
 		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(
 				pageForm.getPage(), pageForm.getSorts(),memberDetails.getMemberId());
 

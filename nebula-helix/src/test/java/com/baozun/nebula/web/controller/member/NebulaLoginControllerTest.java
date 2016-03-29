@@ -5,12 +5,16 @@ package com.baozun.nebula.web.controller.member;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.servlet.http.HttpSession;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindingResult;
 
+import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
@@ -38,46 +42,56 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 	private MemberExtraManager		memberExtraManager;
 
-	private MemberCommand			member;
+	private MemberCommand			memberCommand;
+
+	private BindingResult			bindingResult;
+
+	private LoginForm				loginForm;
+	
+	private HttpSession				session;
+	
+	private EventPublisher 			eventPublisher;
+	 
+	private ApplicationEvent		applicationEvent; 
 
 	@Before
 	public void setUp(){
-		member = new MemberCommand();
-		member.setId(11L);
+		memberCommand = new MemberCommand();
+		memberCommand.setId(1L);
+
+		// 初始化登录参数
+		loginForm = new LoginForm();
+		loginForm.setLoginName("minglei");
+		loginForm.setPassword("123456");
+		loginForm.setIsRemberMeLoginName(true);
+		bindingResult = mockBindingResult(loginForm);
 
 		nebulaLoginController = new NebulaLoginController();
 		loginFormValidator = new LoginFormValidator();
-
-		memberManager = control.createMock("memberManager", MemberManager.class);
+		
+		
+		eventPublisher = control.createMock(EventPublisher.class); 
+		memberManager =  control.createMock("memberManager", MemberManager.class);
 		memberExtraManager = control.createMock("memberExtraManager", MemberExtraManager.class);
+		session = control.createMock("HttpSession", HttpSession.class);
 
 		ReflectionTestUtils.setField(nebulaLoginController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaLoginController, "memberExtraManager", memberExtraManager);
 		ReflectionTestUtils.setField(nebulaLoginController, "loginFormValidator", loginFormValidator);
+		ReflectionTestUtils.setField(nebulaLoginController, "eventPublisher", eventPublisher);
 	}
 
 	@Test
 	public void testLogin(){
 		try{
-			LoginForm loginForm = new LoginForm();
-
-			// 初始化登录参数
-			loginForm.setLoginName("minglei");
-			loginForm.setPassword("123456");
-			loginForm.setIsRemberMeLoginName(true);
-
-			BindingResult bindingResult = mockBindingResult(loginForm);
+			EasyMock.expect(memberManager.login(EasyMock.isA(MemberFrontendCommand.class))).andReturn(memberCommand);			
+			EasyMock.expect(request.getSession()).andReturn(session).anyTimes();			
 			
-			EasyMock.expect(loginForm.toMemberFrontendCommand()).andReturn(new MemberFrontendCommand());
-
-			EasyMock.expect(memberManager.login(new MemberFrontendCommand())).andReturn(member);
-
+			eventPublisher.publish(EasyMock.isA(ApplicationEvent.class));
+			EasyMock.expectLastCall();			
 			control.replay();
-
 			assertEquals(DefaultReturnResult.SUCCESS, nebulaLoginController.login(loginForm, bindingResult, request, response, model));
-
 			control.verify();
-
 		}catch (Exception e){
 			e.printStackTrace();
 		}
@@ -86,8 +100,8 @@ public class NebulaLoginControllerTest extends BaseControllerTest{
 
 	@Test
 	public void testShowLogin(){
-		control.replay();
 		MemberDetails memberDetails = null;
+		control.replay();
 		// 验证结果
 		assertEquals(NebulaLoginController.VIEW_MEMBER_LOGIN, nebulaLoginController.showLogin(memberDetails, request, response, model));
 		control.verify();

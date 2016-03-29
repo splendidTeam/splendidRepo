@@ -16,6 +16,12 @@
  */
 package com.baozun.nebula.utilities.common;
 
-public class DateUtil {
+/**
+ * 
+ *
+ * @deprecated original file is blank~~,if you need date method,pls use {@link com.feilong.core.date.DateUtil}
+ */
+@Deprecated
+public class DateUtil{
 
 }
