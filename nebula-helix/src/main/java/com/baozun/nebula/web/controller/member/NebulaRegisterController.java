@@ -243,7 +243,10 @@ public class NebulaRegisterController extends NebulaLoginController{
 		try{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
 			/** 检查验证码 */
-			checkCaptcha(request, memberFrontendCommand.getRandomCode());
+			defaultReturnResult = (DefaultReturnResult) checkCaptcha(request, memberFrontendCommand.getRandomCode());
+			if (!defaultReturnResult.isResult()){
+				return defaultReturnResult;
+			}
 
 			/** 检查email，mobile等是否合法 */
 			defaultReturnResult = (DefaultReturnResult) checkRegisterData(memberFrontendCommand, request, response);
@@ -281,9 +284,11 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * @param randomCode
 	 *            验证码
 	 */
-	protected void checkCaptcha(HttpServletRequest request,String randomCode){
+	protected NebulaReturnResult checkCaptcha(HttpServletRequest request,String randomCode){
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		// TODO 验证码
 
+		return defaultReturnResult;
 	}
 
 	/**
