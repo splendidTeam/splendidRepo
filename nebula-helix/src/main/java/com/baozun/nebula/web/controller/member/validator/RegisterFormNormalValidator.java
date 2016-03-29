@@ -10,6 +10,8 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
+import com.feilong.core.RegexPattern;
+import com.feilong.core.util.RegexUtil;
 
 /**
  * PC || Tablet 注册的表单数据验证
@@ -37,12 +39,17 @@ public class RegisterFormNormalValidator implements Validator{
 		RegisterForm form = (RegisterForm) target;
 
 		// pc端注册：邮箱，密码，验证码必需
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "required.registerform.email");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "required.registerform.password");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword", "required.registerform.repassword");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "randomCode", "required.registerform.randomCode");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "loginEmail", "field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword", "field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "randomCode", "field.required");
 
-		
+		if (!errors.hasFieldErrors("loginEmail")){
+			if (!RegexUtil.matches(RegexPattern.EMAIL, form.getLoginEmail())){
+				errors.rejectValue("loginEmail", "member.email.error");
+			}
+		}
+
 		if (!errors.hasFieldErrors("password") && !errors.hasFieldErrors("repassword")){
 			// if (form.getPassword().indexOf(" ") > -1){
 			// errors.rejectValue("password", "register.password.spaces");
@@ -51,7 +58,7 @@ public class RegisterFormNormalValidator implements Validator{
 			// errors.rejectValue("repassword", "register.repassword.spaces");
 			// }
 			if (!form.getPassword().equals(form.getRepassword())){
-				errors.rejectValue("repassword", "register.repassword.error");
+				errors.rejectValue("repassword", "passwordAgain.error");
 			}
 		}
 	}

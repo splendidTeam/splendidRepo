@@ -208,13 +208,12 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 
 		// Replay
 		EasyMock.replay(sdkMemberManager);
-		PageForm pageForm = new PageForm();
 		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setMemberId(1L);
- 
+		memberDetails.setMemberId(1L); 
 		Long addressId = 1L;
 		// 验证结果
-		assertEquals(DefaultReturnResult.SUCCESS,nebulaMemberAddressController.setDefaultAddress(memberDetails,addressId, request,response, model));
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		assertEquals(defaultReturnResult,nebulaMemberAddressController.setDefaultAddress(memberDetails,addressId, request,response, model));
 
 		// 验证交互行为
 		EasyMock.verify(sdkMemberManager);
@@ -226,14 +225,50 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	@Test
 	public void testUpdateMemberAddress() {
 		// Record
-		ContactCommand command = new ContactCommand();
-		command.setId(1L);
-		EasyMock.expect(sdkMemberManager.findContactById(1L, 1L))
-				.andReturn(command);
+		MemberAddressForm memberAddressForm = new MemberAddressForm();
+		memberAddressForm.setProvince(1L);
+		memberAddressForm.setCity(1L);
+		memberAddressForm.setArea(1L);
+		memberAddressForm.setTown(1L);
+		memberAddressForm.setAddress("上海市浦东新区川杨新苑三期");
+		memberAddressForm.setPhone("13023230767");
+		memberAddressForm.setConsignee("wanghengheng");
+		memberAddressForm.setPostcode("200000");
+		memberAddressForm.setId(1L);
 		
-		EasyMock.expect(sdkMemberManager.saveContactCommand(command))
-		.andReturn(command);
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);	
 		
+		ContactCommand contact = new ContactCommand();
+		contact.setMemberId(memberDetails.getMemberId());
+		contact.setId(memberAddressForm.getId());	
+		
+		EasyMock.expect(sdkMemberManager.findContactById(EasyMock.anyLong(), EasyMock.anyLong())).andReturn(contact);
+		
+		EasyMock.expect(sdkMemberManager.saveContactCommand(EasyMock.anyObject(ContactCommand.class)))
+		.andReturn(contact);
+
+		memberAddressFormValidator.validate(memberAddressForm, mockBindingResult(memberAddressForm));
+		EasyMock.expectLastCall();
+
+		// Replay
+		EasyMock.replay(sdkMemberManager);	
+		
+ 		// 验证结果
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		assertEquals(defaultReturnResult,nebulaMemberAddressController.updateMemberAddress(memberDetails,memberAddressForm, mockBindingResult(memberAddressForm), request,
+						response , model));
+
+		// 验证交互行为		
+		EasyMock.verify(sdkMemberManager);
+	}
+	
+	/**
+	 * Test addMemberAddress.
+	 */
+	@Test
+	public void testAddMemberAddress() {
+		// Record
 		
 		MemberAddressForm memberAddressForm = new MemberAddressForm();
 		memberAddressForm.setProvince(1L);
@@ -245,25 +280,31 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		memberAddressForm.setConsignee("wanghengheng");
 		memberAddressForm.setPostcode("200000");
 		
+		MemberDetails memberDetails = new MemberDetails();
+		memberDetails.setMemberId(1L);	
+		
+		ContactCommand contact = memberAddressForm.toContactCommand();
+		contact.setMemberId(memberDetails.getMemberId());
+		
+		EasyMock.expect(sdkMemberManager.saveContactCommand(EasyMock.anyObject(ContactCommand.class)))
+		.andReturn(contact);
+		
 		memberAddressFormValidator.validate(memberAddressForm, mockBindingResult(memberAddressForm));
 		EasyMock.expectLastCall();
 
 		// Replay
-		EasyMock.replay(sdkMemberManager);
-
-		PageForm pageForm = new PageForm();
-		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setMemberId(1L);	
+		EasyMock.replay(sdkMemberManager);	
 		
  		// 验证结果
-		assertEquals(NebulaMemberAddressController.VIEW_MEMBER_ADDRESS_LIST,
-				nebulaMemberAddressController.updateMemberAddress(memberDetails,
-						memberAddressForm, mockBindingResult(memberAddressForm), request,
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		
+		assertEquals(defaultReturnResult,nebulaMemberAddressController.addMemberAddress(memberDetails,memberAddressForm, mockBindingResult(memberAddressForm), request,
 						response , model));
 
 		// 验证交互行为		
 		EasyMock.verify(sdkMemberManager);
 	}
+	
 	
 	/**
 	 * Test deleteMemberAddress.
@@ -281,12 +322,12 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		// Replay
 		EasyMock.replay(sdkMemberManager);
 
-		PageForm pageForm = new PageForm();
 		MemberDetails memberDetails = new MemberDetails();
 		memberDetails.setMemberId(1L);
 		Long addressId = 1L;
 		// 验证结果
-		assertEquals(DefaultReturnResult.SUCCESS,
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		assertEquals(defaultReturnResult,
 				nebulaMemberAddressController.deleteMemberAddress(memberDetails,addressId, request, response, model	));
 
 		// 验证交互行为

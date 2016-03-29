@@ -38,7 +38,10 @@ public class MemberAddressFormValidator implements Validator {
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "area", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "town", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "field.required");				
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");			
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");	
+			
+			validateAddress(memberAddressForm);	
+			
 			// 通用性检验
 			if (StringUtils.isNotBlank(memberAddressForm.getPhone())) {
 				if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,memberAddressForm.getPhone().trim())) {
@@ -47,7 +50,7 @@ public class MemberAddressFormValidator implements Validator {
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getTelphone())) {	
 				if (!RegexUtil.matches(RegexPattern.TELEPHONE,memberAddressForm.getTelphone().trim())) {
-					errors.rejectValue("phone", "memberaddress.telephone.error");
+					errors.rejectValue("telephone", "memberaddress.telephone.error");
 				}	
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getPostcode())) {
@@ -56,5 +59,13 @@ public class MemberAddressFormValidator implements Validator {
 				}	
 			}
 		}
+	}
+	
+	/**
+	 * 地址中手机和电话二选一
+	 * @return
+	 */
+	protected boolean validateAddress(MemberAddressForm  memberAddressForm){
+		return StringUtils.isNotBlank(memberAddressForm.getPhone()) || StringUtils.isNotBlank(memberAddressForm.getTelphone());
 	}
 }
