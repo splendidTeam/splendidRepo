@@ -59,6 +59,7 @@ public class RSAEncryptor implements Encryptor {
 	
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
+	private String strPublicKey;
 	
 	public RSAEncryptor(){
 		String privateKeyPlace = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey");	
@@ -74,7 +75,8 @@ public class RSAEncryptor implements Encryptor {
 		try {
 			privateKey = privateKeyIsPKCS8 ? toRSAPrivateKeyPKCS8(getInputStream(privateKeyPlace)):
 						toRSAPrivateKey(getInputStream(privateKeyPlace));
-			publicKey = toRSAPublicKey(getInputStream(publicKeyPlace));
+			strPublicKey = loadKeyFromInputStream(getInputStream(publicKeyPlace));
+			publicKey = toRSAPublicKey(strPublicKey);
 		} catch (Exception e) {
 			
 		}
@@ -243,5 +245,9 @@ public class RSAEncryptor implements Encryptor {
         } catch (Exception e) {  
             throw new EncryptionException("Extract PrivateKey Error",e);  
         }
+	}
+
+	public String getStrPublicKey() {
+		return strPublicKey;
 	}
 }
