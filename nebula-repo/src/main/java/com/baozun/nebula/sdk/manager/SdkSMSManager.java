@@ -16,7 +16,6 @@ public interface SdkSMSManager extends BaseManager{
 	 * @throws Exception 
 	 */
 	SendResult send(SMSCommand messageCommand);
-	
 	enum SendResult {
 		SUCESS, FAILURE, ERROR, INVALIDATE_PARAM;
 	}
