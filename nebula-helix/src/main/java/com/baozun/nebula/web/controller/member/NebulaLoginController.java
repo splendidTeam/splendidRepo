@@ -17,6 +17,7 @@
  */
 package com.baozun.nebula.web.controller.member;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.servlet.http.Cookie;
@@ -29,8 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.baozun.nebula.exception.LoginException;
 import com.baozun.nebula.exception.PasswordNotMatchException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
@@ -143,6 +146,67 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Model model){
+		/*
+		//校验输入数据
+		loginFormValidator.validate(loginForm, bindingResult);
+		//如果校验失败，返回错误
+		if (bindingResult.hasErrors()) {
+			//因为目前都还是密文，所以可以直接Debug输出
+			LOG.debug("loginForm validation error. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());
+			return getResultFromBindingResult(bindingResult);
+		}
+		//处理Form中数据的加解密
+		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
+		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
+		//此后使用 loginForm.toMemberCommand 就可以获得业务层模型了
+		
+		MemberCommand memberCommand = null;
+		//判断AutoLogin的设定，RemeberMe不用考虑，因为页面已经自动回写用户名到Form中了
+		if(isAutoLogin()){
+			//这里需要检查AutoLogin，检查的方法是检查解密后的Password和之前提供的随机Hash是否一致
+			if(validateAutoLogin(loginForm, request)){
+				//AutoLogin
+				LOG.info("[MEM_AUTO_LOGIN ] {} [{}] \"\"", loginForm.getLoginName(), new Date());
+				memberCommand = memberManager.findMemberByUsername(loginForm.getLoginName());
+			}else{
+				LOG.info("[MEM_AUTO_LOGIN_FAILED ] {} [{}] \"Will check password later\"", loginForm.getLoginName(), new Date());
+			}
+		}
+		//开始进行普通用户登录校验
+		if(memberCommand == null){
+			LOG.debug("Check Login information for user {}", loginForm.getLoginName());
+			try {
+				memberCommand=memberManager.login(loginForm.toMemberFrontendCommand());
+			} catch (LoginException e) {
+				LOG.info("[MEM_LOGIN_FAILURE] {} [{}] \"{}\"", 
+						loginForm.getLoginName(), new Date(), e.getClass().getSimpleName());
+			}
+		}
+		if(memberCommand != null){
+			//登录成功的处理
+			LOG.debug("{} login success", memberCommand.getLoginName());
+			//处理RemeberMe和AutoLogin(这两个东西需要分开来，因此是两个不同的Cookie Key)
+			//这里处理的逻辑需要注意以下几点：
+			//1. 如果RemeberMe被设置，那么需要重新设置RemeberMe的用户名，有效期需要配置
+			//2. 如果AutoLogin被设置，那么需要重新设置AutoLogin的用户名，有效期需要配置
+			doRememberMeProcess(loginForm, memberId, request, response, model);
+			return super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
+		}else{
+			//登录失败的处理
+			LOG.debug("{} login failure", memberCommand.getLoginName());
+			DefaultReturnResult returnResult = new DefaultReturnResult();
+			returnResult.setResult(false);
+			DefaultResultMessage message = new DefaultResultMessage();
+			message.setMessage("login.failure");
+			returnResult.setResultMessage(message);
+			return returnResult;
+		}
+		
+		
+		*/
+		////////////////////////////////////////////////////////////////////////////////
+		
+		
 		DefaultReturnResult returnResult = new DefaultReturnResult();
 		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
