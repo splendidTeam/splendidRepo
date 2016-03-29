@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +24,25 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mobile.device.Device;
+import org.springframework.mobile.device.DeviceHandlerMethodArgumentResolver;
 import org.springframework.mobile.device.DeviceResolver;
+import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
+import org.springframework.mobile.device.DeviceResolverRequestFilter;
 import org.springframework.mobile.device.LiteDeviceResolver;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 
 import com.baozun.nebula.event.EventPublisher;
+import com.baozun.nebula.utilities.common.EncryptUtil;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 
 /**
  * BaseController
@@ -41,6 +51,8 @@ import com.baozun.nebula.event.EventPublisher;
  * @author feilong
  */
 public abstract class BaseController{
+	
+	private static final Logger	LOG	= LoggerFactory.getLogger(BaseController.class);
 
     @Resource
     protected ApplicationContext        context;
@@ -72,6 +84,27 @@ public abstract class BaseController{
     	return messageSource.getMessage(key, params, LocaleContextHolder.getLocale());
     }
     
+    /**
+     * 根据BindingResult获得返回数据对象
+     * @param bindingResult
+     * @return
+     */
+    protected NebulaReturnResult getResultFromBindingResult(BindingResult bindingResult){
+    	DefaultReturnResult returnResult = new DefaultReturnResult();
+    	if(bindingResult.hasErrors()){
+    		returnResult.setResult(false);
+			for(ObjectError error : bindingResult.getAllErrors()){
+				DefaultResultMessage message = new DefaultResultMessage();
+				message.setMessage(error.getCode());
+				if(error.getArguments() != null)
+					message.setParams(Arrays.asList(error.getArguments()));
+				returnResult.getExtraResultMessages().add(message);
+			}
+			returnResult.setResultMessage(returnResult.getExtraResultMessages().get(0));
+    	}
+    	return returnResult;
+    }
+    
 
     // TODO未实现
     /**
@@ -85,18 +118,18 @@ public abstract class BaseController{
     }
 
     /**
-     * 敏感数据解密过程
+     * 敏感数据解密，默认使用全局RSA解密
      * 
      * @param sensitiveData
      * @return
      */
     protected String decryptSensitiveDataEncryptedByJs(String sensitiveData,HttpServletRequest request){
-        String result = sensitiveData;
-        // TODO 解密动作
-        try{
-
-        }catch (Exception e){} // 解密出错原样使用
-        return result;
+        try {
+			return EncryptUtil.getInstance().getEncryptor("RSA").decrypt(sensitiveData);
+		} catch (EncryptionException e1) {
+			LOG.warn("[DECRYPTION_ERROR] [{}]", sensitiveData);
+			return sensitiveData;
+		}
     }
 
     /**

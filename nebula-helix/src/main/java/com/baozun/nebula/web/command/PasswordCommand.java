@@ -1,6 +1,13 @@
 package com.baozun.nebula.web.command;
 
-
+/**
+ * 返回提示.
+ * 
+ * @author D.C
+ * @version 2010-6-24 上午03:14:56
+ * @deprecated 在新的nebula 2016直接弃用
+ */
+@Deprecated
 public class PasswordCommand{
 
 	/** 原密码*/
