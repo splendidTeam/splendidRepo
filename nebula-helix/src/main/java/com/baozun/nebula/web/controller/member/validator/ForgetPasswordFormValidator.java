@@ -6,6 +6,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 
 public class ForgetPasswordFormValidator implements Validator {
@@ -40,10 +41,7 @@ public class ForgetPasswordFormValidator implements Validator {
 
 	    // 验证邮箱规格
 	    if (!errors.hasFieldErrors("email")) {
-		Pattern p1 = Pattern
-			.compile("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$");
-		if (!"".equals(command.getEmail().trim())
-			&& !p1.matcher(command.getEmail().trim()).matches()) {
+		if (!RegulareExpUtils.isSureEmail(command.getEmail())) {
 		    errors.rejectValue("email", "member.email.error");
 		}
 	    }
@@ -55,7 +53,7 @@ public class ForgetPasswordFormValidator implements Validator {
 	    // 验证手机号是否符合规则
 	    if (!errors.hasFieldErrors("mobile")) {
 		Pattern p1 = Pattern.compile("^(1[3-9]{1}[0-9]{1})\\d{8}$");
-		if (!"".equals(command.getMobile().trim())
+		if (RegulareExpUtils.isMobileNO(command.getMobile()))
 			&& !p1.matcher(command.getMobile().trim()).matches()) {
 		    errors.rejectValue("mobile", "member.mobile.error");
 		}

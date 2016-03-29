@@ -17,25 +17,25 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
  * @author 黄大辉
  * @version 1.0
  */
-public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController{
+public class NebulaAlipayLoginController extends NebulaThirdPartyLoginController{
 	
-	private static final Logger LOG = LoggerFactory.getLogger(NebulaWeChatLoginController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaAlipayLoginController.class);
 
 	/**
-	 * 去微信联合登陆页，默认推荐配置如下
-	 * @RequestMapping(value = "/member/showWeChatLogin", method =  RequestMethod.POST)
+	 * 去支付宝联合登陆页，默认推荐配置如下
+	 * @RequestMapping(value = "/member/showAlipayLogin", method =  RequestMethod.POST)
 	 */
-	public String showWeChatLogin(){
+	public String showAlipayLogin(){
 		return "redirect:"+this.showTirdParty();
 	}
 	
 	/**
 	 * 联合登录回调地址，默认推荐配置如下
-	 * @RequestMapping(value = "/member/weChatCallBack", method =  RequestMethod.POST)
+	 * @RequestMapping(value = "/member/alipayBack", method =  RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 */
-	public String weChatLoginCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
+	public String alipayCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
 		
 		//	校验授权
 		TirdPartyMemberCommand tirdPartyMember=this.checkOauth(request);
@@ -50,27 +50,27 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	@Override
 	public String showTirdParty() {
 		
-		//	获取微博参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
+		//	获取系统支付宝参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
 		
-		//	微信登录地址
+		//	支付宝登录地址
 		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("WeChat generate login url {}",loginUrl);
+		LOG.info("alipay generate login url {}",loginUrl);
 		return loginUrl;
 	}
 
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
 		
-		//	获取微信参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
+		//	获取系统支付宝参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
 		
 		//	校验授权
 		ThirdPartyMember number = adaptor.returnMember(request);
 		
-		//	判断微信用户登录信息是否成功获取
+		//	判断支付宝用户登录信息是否成功获取
 		if(number.getErrorCode() == null || number.getErrorCode().trim().length()==0){
-			LOG.error("thirdParty source "+ ThirdPartyMemberFactory.TYPE_WECHAT + " login failure, errorCode is " + number.getErrorCode());
+			LOG.error("thirdParty source "+ ThirdPartyMemberFactory.TYPE_ALIPAY + " login failure, errorCode is " + number.getErrorCode());
 			return null;
 		}
 		
@@ -78,7 +78,7 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
-		numberCommand.setSource(Member.MEMBER_SOURCE_WECHAT);
+		numberCommand.setSource(Member.MEMBER_SOURCE_ALIPAY);
 		return numberCommand;
 	}
 	

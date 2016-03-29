@@ -12,7 +12,6 @@ import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
-import com.baozun.nebula.utils.Validator;
 /**
  * 微博登录controller
  * @author 黄大辉
@@ -25,7 +24,6 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	/**
 	 * 去微博联合登陆页，默认推荐配置如下
 	 * @RequestMapping(value = "/member/showWeiboLogin", method =  RequestMethod.POST)
-	 * @return
 	 */
 	public String showWeiboLogin(){
 		return "redirect:"+this.showTirdParty();
@@ -36,25 +34,26 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	 * @RequestMapping(value = "/member/weiboLoginCallBack", method =  RequestMethod.POST)
 	 * @param request
 	 * @param response
-	 * @return
 	 */
 	public String weiboLoginCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
-		//校验授权
+		
+		//	校验授权
 		TirdPartyMemberCommand tirdPartyMember=this.checkOauth(request);
 		if(tirdPartyMember == null){
 			 return VIEW_MEMBER_LOGIN_FAIL;
 		}
-		//第三方登录
+		
+		//	第三方登录
 		return thirdParyLogin(tirdPartyMember,request, response,model);
 	}
 	
-	
 	@Override
 	public String showTirdParty() {
-		//获取微博参数
+		
+		//	获取微博参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
 		
-		//微博登录地址
+		//	微博登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("Weibo generate login url {}",loginUrl);
 		return loginUrl;
@@ -62,13 +61,13 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
-		//获取微博参数
+		//	获取微博参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
 		
-		//校验授权
+		//	校验授权
 		ThirdPartyMember number = adaptor.returnMember(request);
 		
-		//判断微博用户登录信息是否成功获取
+		//	判断微博用户登录信息是否成功获取
 		if(number.getErrorCode() == null || number.getErrorCode().trim().length()==0){
 			LOG.error("thirdParty source "+ ThirdPartyMemberFactory.TYPE_WEIBO + " login failure, errorCode is " + number.getErrorCode());
 			return null;
