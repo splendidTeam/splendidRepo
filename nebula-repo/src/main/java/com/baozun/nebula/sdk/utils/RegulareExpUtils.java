@@ -5,7 +5,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-
+/**
+ * 
+ * @deprecated pls use {@link com.feilong.core.RegexUtil} {@link com.feilong.core.RegexPattern} 
+ */
+@Deprecated
 public class RegulareExpUtils {
 
 	public static final String EMAIL_REG = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$";

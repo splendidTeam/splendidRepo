@@ -158,14 +158,14 @@ public class NebulaMemberAddressController extends BaseController {
 		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"待新增地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
 		
 		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
-		//校验过程
-		validateAddress(memberAddressForm);	
+		//校验过程		
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
 		}	
 		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
 		//Form转contact
@@ -180,13 +180,7 @@ public class NebulaMemberAddressController extends BaseController {
 		return defaultReturnResult;		
 	}
 	
-	/**
-	 * 地址中手机和电话二选一
-	 * @return
-	 */
-	protected boolean validateAddress(MemberAddressForm  memberAddressForm){
-		return StringUtils.isNotBlank(memberAddressForm.getTelphone()) || StringUtils.isNotBlank(memberAddressForm.getTelphone());
-	}
+	
 	
 	/**
 	 * 更新收货地址
@@ -213,7 +207,6 @@ public class NebulaMemberAddressController extends BaseController {
 		LOG.info("[MEM_UPDATE_ADDRESS] {} [{}] \"待更新地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
 		
 		//校验过程
-		validateAddress(memberAddressForm);
 		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -221,15 +214,17 @@ public class NebulaMemberAddressController extends BaseController {
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
 		}
 		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
 		//查询出原来的地址对象
 		ContactCommand command=sdkMemberManager.findContactById(memberAddressForm.getId(),memberDetails.getMemberId());
-		if(null != command) {
+		if(null == command) {
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
 		}
 		//Form转contact
 		ContactCommand contact = memberAddressForm.toContactCommand(command);
@@ -279,6 +274,7 @@ public class NebulaMemberAddressController extends BaseController {
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
 		}
 		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --end");
 		// 业务方法使用 SdkMemberManager 中的 updateContactIsDefault
@@ -319,11 +315,21 @@ public class NebulaMemberAddressController extends BaseController {
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
 		}
 		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
 		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
 		// 业务方法使用 SdkMemberManager 中的 removeContactById
-		sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
-		return defaultReturnResult;
+		Integer result = sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
+		if(1 == result) {
+			return defaultReturnResult;
+		}else if(0 == result){
+			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+			defaultReturnResult.setResult(false);
+			defaultResultMessage.setMessage(getMessage("memberaddress.sqlerror"));
+			defaultReturnResult.setResultMessage(defaultResultMessage);
+			return defaultReturnResult;
+		}
+		return null;		
 	}
 }
