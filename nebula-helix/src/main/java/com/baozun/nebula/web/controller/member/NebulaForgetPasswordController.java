@@ -23,7 +23,6 @@ import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.SecurityCodeUtil;
 import com.baozun.nebula.web.controller.BaseController;
@@ -32,6 +31,8 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
+import com.feilong.core.RegexPattern;
+import com.feilong.core.util.RegexUtil;
 
 /**
  * @author Wanrong.Wang
@@ -122,7 +123,7 @@ public class NebulaForgetPasswordController extends BaseController {
 		LOG.info("忘记密码的用户email为--=" + email);
 
 		//	验证邮箱格式
-		if (!RegulareExpUtils.isSureEmail(email)) {
+		if (!RegexUtil.matches(RegexPattern.EMAIL, email)) {
 			returnResult.setResult(false);
 			returnResult.setResultMessage(defaultResultMessage);
 			return returnResult;
@@ -139,9 +140,10 @@ public class NebulaForgetPasswordController extends BaseController {
 		} else {
 			//  邮箱用户存在：则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
 			String code = SecurityCodeUtil.createSecurityCode(MessageConstants.SECURITY_CODE_ORIGINAL_STRING,MessageConstants.SECURITY_CODE_LENGTH);
-
 			tokenManager.saveToken(null, email, MAX_EXIST_TIME, code);
-			memberEmailManager.sendEmailValidateCode(code, email);// 发送验证码结束
+			
+			//	发送验证码
+			memberEmailManager.sendEmailValidateCode(code, email);
 		}
 		returnResult.setResult(true);
 		return returnResult;
@@ -173,7 +175,7 @@ public class NebulaForgetPasswordController extends BaseController {
 		LOG.info("忘记密码的用户mobile为--=" + mobile);
 
 		//	验证手机格式
-		if (!RegulareExpUtils.isMobileNO(mobile)) {
+		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,mobile)) {
 			returnResult.setResult(false);
 			returnResult.setResultMessage(defaultResultMessage);
 			return returnResult;
