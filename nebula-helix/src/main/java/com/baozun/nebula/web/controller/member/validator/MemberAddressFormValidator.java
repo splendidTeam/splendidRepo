@@ -7,7 +7,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
-import com.feilong.core.util.RegexPattern;
+import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
 
 
