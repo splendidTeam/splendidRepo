@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.baozun.nebula</groupId>
 		<artifactId>nebula</artifactId>
-		<version>5.3.0</version>
+		<version>5.3.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>nebula-protostar</artifactId>
 	<version>${version.nebula}</version>
@@ -135,30 +135,24 @@
 			</activation>
 			<properties>
 				<env>dev</env>
-				<webpath>target/protostar/WEB-INF/web.xml</webpath>
-				<compliepath>target/classes</compliepath>
 			</properties>
 		</profile>
 		<profile>
 			<id>test</id>
 			<properties>
 				<env>test</env>
-				<webpath>target/protostar/WEB-INF/web.xml</webpath>
-				<compliepath>target/classes</compliepath>
 			</properties>
 		</profile>
 		<profile>
 			<id>pro</id>
 			<properties>
 				<env>pro</env>
-				<webpath>nebula-protostar/branches/5.1.15b-SNAPSHOT/target/protostar/WEB-INF/web.xml</webpath>
-				<compliepath>nebula-protostar/branches/5.1.15b-SNAPSHOT/target/classes</compliepath>
 			</properties>
 		</profile>
 	</profiles>
 
 	<build>
-		<finalName>protostar</finalName>
+		<finalName>nebula-protostar</finalName>
 		<plugins>
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -172,7 +166,7 @@
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${webpath}</file>
+							<file>${project.build.directory}/${project.artifactId}/WEB-INF/web.xml</file>
 							<token>&lt;param-value&gt;dev&lt;/param-value&gt;</token>
 							<value>&lt;param-value&gt;${env}&lt;/param-value&gt;</value>
 							<regexFlags>
@@ -188,8 +182,8 @@
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${compliepath}/ckfinder/ckfinder-config.xml</file>
-							<tokenValueMap>${compliepath}/config/${env}/metainfo.properties</tokenValueMap>
+							<file>${project.build.directory}/classes/ckfinder/ckfinder-config.xml</file>
+							<tokenValueMap>${project.build.directory}/classes/config/${env}/metainfo.properties</tokenValueMap>
 						</configuration>
 					</execution>
 				</executions>

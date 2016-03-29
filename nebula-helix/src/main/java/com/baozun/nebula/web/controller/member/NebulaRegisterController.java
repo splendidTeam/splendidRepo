@@ -35,8 +35,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.MemberConductCommand;
+import com.baozun.nebula.command.MessageCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.manager.sms.SmsManager;
+import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
@@ -96,6 +99,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 	@Autowired
 	private SdkMemberManager			sdkMemberManager;
 
+	@Autowired
+	private SmsManager					smsManager;
+
+	@Autowired
+	private TokenManager				tokenManager;
+
 	/**
 	 * 注册页面，默认推荐配置如下
 	 * 
@@ -110,7 +119,6 @@ public class NebulaRegisterController extends NebulaLoginController{
 		if (!Validator.isNullOrEmpty(memberDetails)){
 			return super.getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
-		// TODO
 		init4SensitiveDataEncryptedByJs(request, model);
 		return VIEW_MEMBER_REGISTER;
 	}
@@ -132,7 +140,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			// eamil不可用
 			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1004");
+			defaultReturnResult.setStatusCode("register.loginemail.unavailable");
 			return defaultReturnResult;
 		}
 
@@ -156,7 +164,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			// mobile不可用
 			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1005");
+			defaultReturnResult.setStatusCode("register.loginmobile.unavailable");
 			return defaultReturnResult;
 		}
 
@@ -166,6 +174,8 @@ public class NebulaRegisterController extends NebulaLoginController{
 	/**
 	 * 注册时发送短信验证码
 	 * 
+	 * @ResponseBody
+	 * @RequestMapping(value = "/member/sendRegisterMobileMessage.json",method = RequestMethod.GET)
 	 * @param request
 	 * @param response
 	 * @param model
@@ -179,23 +189,31 @@ public class NebulaRegisterController extends NebulaLoginController{
 			Model model,
 			@RequestParam(value = "mobile",required = true) String mobile){
 
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
 
 		if (!RegulareExpUtils.isMobileNO(mobile)){
 			// 手机号不合法
-			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
+			defaultReturnResult.setStatusCode("register.mobile.illegal");
 			return defaultReturnResult;
 		}
+		// 判断是否可以给指定的mobile发生短信
 		boolean ableSendMessageToMobile = isAbleSendMessageToMobile(request, mobile);
 		if (!ableSendMessageToMobile){
 			// 不能连续发送短信
-			defaultReturnResult = new DefaultReturnResult();
 			defaultReturnResult.setResult(false);
+			defaultReturnResult.setStatusCode("register.sendMsg.over.counts");
 			return defaultReturnResult;
 		}
-		// TODO 发送短信
 
+		boolean sendMsgResult = sendRegisterMessage(request, mobile);
+		if (!sendMsgResult){
+			defaultReturnResult.setResult(false);
+			defaultReturnResult.setStatusCode("register.sendMsg.error");
+			return defaultReturnResult;
+		}
+
+		defaultReturnResult.setResult(true);
 		return defaultReturnResult;
 	}
 
@@ -231,7 +249,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
 
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1004");
+			defaultReturnResult.setStatusCode("reigster.validator.errors");
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 
 			return defaultReturnResult;
@@ -243,7 +261,10 @@ public class NebulaRegisterController extends NebulaLoginController{
 		try{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
 			/** 检查验证码 */
-			checkCaptcha(request, memberFrontendCommand.getRandomCode());
+			defaultReturnResult = (DefaultReturnResult) checkCaptcha(request, memberFrontendCommand.getRandomCode());
+			if (!defaultReturnResult.isResult()){
+				return defaultReturnResult;
+			}
 
 			/** 检查email，mobile等是否合法 */
 			defaultReturnResult = (DefaultReturnResult) checkRegisterData(memberFrontendCommand, request, response);
@@ -269,7 +290,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		}catch (BusinessException e){
 			LOGGER.error("", e);
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("1005");
+			defaultReturnResult.setStatusCode("register.failed");
 			return defaultReturnResult;
 		}
 	}
@@ -281,9 +302,11 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * @param randomCode
 	 *            验证码
 	 */
-	protected void checkCaptcha(HttpServletRequest request,String randomCode){
-		// TODO 验证码
+	protected NebulaReturnResult checkCaptcha(HttpServletRequest request,String randomCode){
+		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		// 验证码
 
+		return defaultReturnResult;
 	}
 
 	/**
@@ -328,7 +351,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			MemberCommand findMemberByLoginEmail = sdkMemberManager.findMemberByLoginEmail(loginEmail);
 			if (Validator.isNotNullOrEmpty(findMemberByLoginEmail)){
 				defaultReturnResult.setResult(false);
-				returnObject.put("loginEmail", "error.loginemail.notavailable");
+				returnObject.put("loginEmail", "register.loginemail.unavailable");
 			}
 		}
 		// 验证mobile
@@ -337,7 +360,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			MemberCommand findMemberByLoginMobile = sdkMemberManager.findMemberByLoginMobile(loginMobile);
 			if (Validator.isNotNullOrEmpty(findMemberByLoginMobile)){
 				defaultReturnResult.setResult(false);
-				returnObject.put("loginMobile", "error.loginmobile.notavailable");
+				returnObject.put("loginMobile", "register.loginmobile.unavailable");
 			}
 		}
 
@@ -347,7 +370,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			MemberCommand findMemberByLoginName = sdkMemberManager.findMemberByLoginName(loginName);
 			if (Validator.isNotNullOrEmpty(findMemberByLoginName)){
 				defaultReturnResult.setResult(false);
-				returnObject.put("loginName", "error.loginname.notavailable");
+				returnObject.put("loginName", "register.loginname.unavailable");
 			}
 		}
 		defaultReturnResult.setReturnObject(returnObject);
@@ -392,11 +415,36 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * 
 	 * @param request
 	 * @param mobile
-	 *            要发生短信的手机
+	 *            要发送短信的手机
 	 * @return
 	 */
 	protected boolean isAbleSendMessageToMobile(HttpServletRequest request,String mobile){
 		return true;
+	}
+
+	/**
+	 * 发送短信
+	 * 
+	 * @param request
+	 * @param mobile
+	 *            要发送短信的手机
+	 * @return
+	 */
+	protected boolean sendRegisterMessage(HttpServletRequest request,String mobile){
+
+		MessageCommand messageCommand = new MessageCommand();
+		messageCommand.setMobile(mobile);
+		messageCommand.setContent("11111111111111111111111");
+		// 发送短信
+		try{
+			boolean sendMessage = smsManager.sendMessage(messageCommand);
+			// tokenManager.saveToken(businessCode, human, liveTime, token);
+			return sendMessage;
+		}catch (Exception e){
+			LOGGER.error("{}", e);
+			return false;
+		}
+
 	}
 
 }

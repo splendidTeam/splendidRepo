@@ -7,6 +7,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
+import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
 
 
@@ -37,23 +38,34 @@ public class MemberAddressFormValidator implements Validator {
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "area", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "town", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "field.required");				
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");			
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");	
+			
+			validateAddress(memberAddressForm);	
+			
 			// 通用性检验
 			if (StringUtils.isNotBlank(memberAddressForm.getPhone())) {
-				if (!RegexUtil.matches("^(1[3-9]{1}[0-9]{1})\\d{8}$",memberAddressForm.getPhone().trim())) {
+				if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,memberAddressForm.getPhone().trim())) {
 					errors.rejectValue("phone", "memberaddress.phone.error");
-				}				
+				}					
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getTelphone())) {	
-				if (!RegexUtil.matches("^\\d+$",memberAddressForm.getTelphone().trim())) {
-					errors.rejectValue("phone", "memberaddress.telephone.error");
+				if (!RegexUtil.matches(RegexPattern.TELEPHONE,memberAddressForm.getTelphone().trim())) {
+					errors.rejectValue("telephone", "memberaddress.telephone.error");
 				}	
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getPostcode())) {
-				if (!RegexUtil.matches("^[0-9][0-9]{5}$",memberAddressForm.getPostcode().trim())) {
+				if (!RegexUtil.matches(RegexPattern.ZIPCODE,memberAddressForm.getPostcode().trim())) {
 					errors.rejectValue("postcode", "memberaddress.postcode.error");
-				}				
+				}	
 			}
 		}
+	}
+	
+	/**
+	 * 地址中手机和电话二选一
+	 * @return
+	 */
+	protected boolean validateAddress(MemberAddressForm  memberAddressForm){
+		return StringUtils.isNotBlank(memberAddressForm.getPhone()) || StringUtils.isNotBlank(memberAddressForm.getTelphone());
 	}
 }

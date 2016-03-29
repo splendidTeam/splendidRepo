@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.baozun.nebula</groupId>
 		<artifactId>nebula</artifactId>
-		<version>5.3.0</version>
+		<version>5.3.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>nebula-wormhole</artifactId>
 	<version>${version.nebula}</version>
@@ -108,26 +108,23 @@
 			</activation>
 			<properties>
 				<env>dev</env>
-				<webpath>target/wormhole/WEB-INF/web.xml</webpath>
 			</properties>
 		</profile>
 		<profile>
 			<id>test</id>
 			<properties>
 				<env>test</env>
-				<webpath>nebula-wormhole/trunk/target/wormhole/WEB-INF/web.xml</webpath>
 			</properties>
 		</profile>
 		<profile>
 			<id>pro</id>
 			<properties>
 				<env>pro</env>
-				<webpath>nebula-wormhole/trunk/target/wormhole/WEB-INF/web.xml</webpath>
 			</properties>
 		</profile>
 	</profiles>
 	<build>
-		<finalName>wormhole</finalName>
+		<finalName>nebula-wormhole</finalName>
 		<plugins>
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
@@ -142,8 +139,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- <file>src/main/webapp/WEB-INF/web.xml</file> -->
-					<file>${webpath}</file>
+					<file>${project.build.directory}/${project.artifactId}/WEB-INF/web.xml</file>
 					<token>&lt;param-value&gt;dev&lt;/param-value&gt;</token>
 					<value>&lt;param-value&gt;${env}&lt;/param-value&gt;</value>
 					<regexFlags>

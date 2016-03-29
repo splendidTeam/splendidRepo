@@ -10,6 +10,7 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
+import com.feilong.servlet.http.SessionUtil;
 
 public abstract class NebulaAbstractLoginController extends BaseController {
 	
@@ -20,9 +21,7 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 	 * @param details
 	 */
 	protected void resetSession(HttpServletRequest request) {
-		// TODO copy old session value
-		request.getSession().invalidate();
-		// TODO add old session value to new session
+		SessionUtil.replaceSession(request);
 	}
 	
 	/**
