@@ -14,15 +14,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.baozun.nebula.command.MessageCommand;
+import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constants.MessageConstants;
 import com.baozun.nebula.manager.member.MemberEmailManager;
 import com.baozun.nebula.manager.member.MemberExtraManager;
-import com.baozun.nebula.manager.sms.SmsManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.SecurityCodeUtil;
 import com.baozun.nebula.web.controller.BaseController;
@@ -61,7 +61,7 @@ public class NebulaForgetPasswordController extends BaseController {
     private MemberEmailManager memberEmailManager;
 
     @Autowired
-    private SmsManager smsManager;
+    private SdkSMSManager smsManager;
 
     @Autowired
     private TokenManager tokenManager;
@@ -198,12 +198,12 @@ public class NebulaForgetPasswordController extends BaseController {
 			tokenManager.saveToken(null, mobile, MAX_EXIST_TIME, code);
 
 			//  调用发送短信验证码的方式发送短信验证码
-			MessageCommand messageCommand = new MessageCommand();
-			messageCommand.setSecurityCode(code);
+			SMSCommand messageCommand = new SMSCommand();
+			messageCommand.addVar("securityCode", code);
 			messageCommand.setMobile(mobile);
 
 			//	发送验证码结束
-			smsManager.sendMessage(messageCommand);
+			smsManager.send(messageCommand);
 		}
 		returnResult.setResult(true);
 		return returnResult;

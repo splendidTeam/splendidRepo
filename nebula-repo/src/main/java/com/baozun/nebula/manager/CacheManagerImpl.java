@@ -768,5 +768,4 @@ public class CacheManagerImpl implements CacheManager{
 		list = cacheItemDao.findAllCacheItem(new BeanPropertyRowMapper<CacheItemCommand>(CacheItemCommand.class), paraMap);
 		return list;
 	}
-
 }
