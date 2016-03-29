@@ -14,10 +14,10 @@ import com.baozun.nebula.utilities.common.StringUtil;
 public class MessageCommandValidator{
 	public static boolean validator(MessageCommand messageCommand) throws MobileException{
 		if(StringUtil.isNull(messageCommand.getMobile())){
-			throw new MobileException("手机号码为空！");
+			throw new MobileException("the mobile number is null !");
 		}
 		if(StringUtil.isNull(messageCommand.getContent())){
-			throw new MobileException("短信内容为空！");
+			throw new MobileException("the message content is null ！");
 		}
 		return true;
 	}

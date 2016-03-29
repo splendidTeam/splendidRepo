@@ -57,37 +57,38 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * @return
 	 */
 	protected String thirdParyLogin(TirdPartyMemberCommand tirdPartyMember,HttpServletRequest request,HttpServletResponse response,Model model){
-		//查询是否存在该用户登录信息
+	
+		//	查询是否存在该用户登录信息
 		Member member = skdMemeberManager.findThirdMemberByThirdIdAndSource(tirdPartyMember.getOpenId(),tirdPartyMember.getSource());
 		
-		//首次登录
+		//	首次登录
 		if (member == null) {
-			//创建用户
+			//	创建用户
 			member = generateThirdPartyMember(tirdPartyMember);
 		}
-		// 是否需要完善信息 默认需要
-		if (isNeedCompleteInfo(tirdPartyMember)) {
-			// 逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
+		//	是否需要完善信息 默认需要
+		if (isNeedCompleteInfo(member)) {
+			//	逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
 			return showCompleteInfo(request, response, model);
 		}
-		// 是否需要绑定用户 默认不需要
-		if (isNeedBinding(tirdPartyMember)) {
+		//	是否需要绑定用户 默认不需要
+		if (isNeedBinding(member)) {
 			LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
 			model.addAttribute("member_id", member.getId());
 			return showBinding(request, response, model);
 		}
 	
-		// 第三方登录
+		//	第三方登录
 		doLogin(request, response, model, member);
 		
-		//这里应该跟正常登录逻辑保持一致，返回指定的URL
+		//	这里应该跟正常登录逻辑保持一致，返回指定的URL
 		return VIEW_MEMBER_LOGIN_SUCC;
 	}
 	/**
 	 * 是否需要绑定
 	 * @return
 	 */
-	protected boolean isNeedBinding(TirdPartyMemberCommand command) {
+	protected boolean isNeedBinding(Member member) {
 		return false;
 	}
 	
@@ -95,7 +96,7 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * 是否需要补全用户信息
 	 * @return
 	 */
-	protected boolean isNeedCompleteInfo(TirdPartyMemberCommand command) {
+	protected boolean isNeedCompleteInfo(Member member) {
 		return true;
 	}
 	
@@ -147,6 +148,7 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * @param tirdPartyMember
 	 */
 	protected Member generateThirdPartyMember(TirdPartyMemberCommand tirdPartyMember){
+	
 		Member member = new Member();
 		member.setThirdPartyIdentify(tirdPartyMember.getOpenId());
 		member.setSource(tirdPartyMember.getSource());
@@ -162,9 +164,11 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * @param member
 	 */
 	protected void doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
-		//同步购物车 暂时省略
+		
+		//	同步购物车 暂时省略
 		MemberCommand memberCommand = skdMemeberManager.findMemberById(member.getGroupId());
-		//登录成功后处理
+		
+		//	登录成功后处理
 		super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response);
 	}
 }

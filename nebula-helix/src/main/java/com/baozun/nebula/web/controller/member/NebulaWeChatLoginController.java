@@ -15,7 +15,6 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 /**
  * 微信登录controller
  * @author 黄大辉
- * @version 1.0
  */
 public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController{
 	
@@ -24,7 +23,6 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	/**
 	 * 去微信联合登陆页，默认推荐配置如下
 	 * @RequestMapping(value = "/member/showWeChatLogin", method =  RequestMethod.POST)
-	 * @return
 	 */
 	public String showWeChatLogin(){
 		return "redirect:"+this.showTirdParty();
@@ -35,24 +33,26 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	 * @RequestMapping(value = "/member/weChatCallBack", method =  RequestMethod.POST)
 	 * @param request
 	 * @param response
-	 * @return
 	 */
 	public String weChatLoginCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
-		//1.校验授权
+		
+		//	校验授权
 		TirdPartyMemberCommand tirdPartyMember=this.checkOauth(request);
 		if(tirdPartyMember == null){
 			return VIEW_MEMBER_LOGIN_FAIL;
 		}
-		//2.第三方登录
+		
+		//	第三方登录
 		return thirdParyLogin(tirdPartyMember,request, response,model);
 	}
 	
 	@Override
 	public String showTirdParty() {
-		//获取微博参数
+		
+		//	获取系统微信参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
 		
-		//微信登录地址
+		//	微信登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("WeChat generate login url {}",loginUrl);
 		return loginUrl;
@@ -60,19 +60,20 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
-		//获取微信参数
+		
+		//	获取系统微信参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
 		
-		//校验授权
+		//	校验授权
 		ThirdPartyMember number = adaptor.returnMember(request);
 		
-		//判断微信用户登录信息是否成功获取
+		//	判断微信用户登录信息是否成功获取
 		if(number.getErrorCode() == null || number.getErrorCode().trim().length()==0){
 			LOG.error("thirdParty source "+ ThirdPartyMemberFactory.TYPE_WECHAT + " login failure, errorCode is " + number.getErrorCode());
 			return null;
 		}
 		
-		//组装信息
+		//	组装微信用户信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
