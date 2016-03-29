@@ -60,27 +60,28 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		//查询是否存在该用户登录信息
 		Member member = skdMemeberManager.findThirdMemberByThirdIdAndSource(tirdPartyMember.getOpenId(),tirdPartyMember.getSource());
 		
-		//首次登录时，创建用户
+		//首次登录
 		if (member == null) {
+			//创建用户
 			member = generateThirdPartyMember(tirdPartyMember);
-		}
-		
-		// 是否需要完善信息 默认需要
-		if (isNeedCompleteInfo()) {
 			
-			//逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
-			return showCompleteInfo(request, response, model);
-		}
-		
-		// 是否需要绑定用户 默认不需要
-		if (isNeedBinding()) {
-			LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
-			model.addAttribute("member_id", member.getId());
-			return showBinding(request, response, model);
+			// 是否需要完善信息 默认需要
+			if (isNeedCompleteInfo()) {
+				//逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
+				return showCompleteInfo(request, response, model);
+			}
+			
+			// 是否需要绑定用户 默认不需要
+			if (isNeedBinding()) {
+				LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
+				model.addAttribute("member_id", member.getId());
+				return showBinding(request, response, model);
+			}
 		}
 	
 		// 第三方登录
 		doLogin(request, response, model, member);
+		
 		//这里应该跟正常登录逻辑保持一致，返回指定的URL
 		return VIEW_MEMBER_LOGIN_SUCC;
 	}
