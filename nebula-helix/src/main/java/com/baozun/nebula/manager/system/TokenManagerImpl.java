@@ -19,6 +19,7 @@ package com.baozun.nebula.manager.system;
 import java.io.Serializable;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.manager.CacheManager;
 import com.feilong.core.Validator;
@@ -27,6 +28,7 @@ import com.feilong.core.Validator;
  * @author D.C
  * @time 2016年3月24日 下午4:04:47
  */
+@Service("tokenManager")
 public class TokenManagerImpl implements TokenManager {
 
 	@Autowired
