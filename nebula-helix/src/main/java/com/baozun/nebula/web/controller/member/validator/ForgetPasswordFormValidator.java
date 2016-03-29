@@ -4,7 +4,6 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
@@ -44,7 +43,6 @@ public class ForgetPasswordFormValidator implements Validator {
 					errors.rejectValue("email", "member.email.error");
 				}
 			}
-
 		} else {
 			// 手机验证方式，则手机不能为空
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile", "field.required");
@@ -64,7 +62,8 @@ public class ForgetPasswordFormValidator implements Validator {
 		// 验证两次密码的一致性
 		if (!errors.hasFieldErrors("newPassword") && !errors.hasFieldErrors("confirmPassword")) {
 			if (!command.getNewPassword().equals(command.getConfirmPassword())) {
-				errors.rejectValue("confirmPassword", "register.confirmPassword.error");// 提示两次输入的密码不一致
+				// 提示两次输入的密码不一致
+				errors.rejectValue("confirmPassword", "register.confirmPassword.error");
 			}
 		}
 	}
