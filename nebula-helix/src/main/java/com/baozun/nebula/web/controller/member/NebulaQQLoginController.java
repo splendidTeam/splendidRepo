@@ -49,7 +49,7 @@ public class NebulaQQLoginController extends NebulaThirdPartyLoginController{
 	@Override
 	public String showTirdParty() {
 		
-		//	获取QQ参数
+		//	获取系统QQ参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_QQ);
 		
 		//	QQ登录地址
@@ -61,7 +61,7 @@ public class NebulaQQLoginController extends NebulaThirdPartyLoginController{
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
 		
-		//	获取QQ参数
+		//	获取系统QQ参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_QQ);
 		
 		//	校验授权
@@ -73,7 +73,7 @@ public class NebulaQQLoginController extends NebulaThirdPartyLoginController{
 			return null;
 		}
 		
-		//	组装用户信息
+		//	组装QQ用户信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());

@@ -73,7 +73,7 @@ public class NebulaAlipayLoginController extends NebulaThirdPartyLoginController
 			return null;
 		}
 		
-		//	组装用户信息
+		//	组装支付宝用户信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
