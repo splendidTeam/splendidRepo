@@ -15,7 +15,6 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 /**
  * 微信登录controller
  * @author 黄大辉
- * @version 1.0
  */
 public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController{
 	
@@ -50,7 +49,7 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	@Override
 	public String showTirdParty() {
 		
-		//	获取微博参数
+		//	获取系统微信参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
 		
 		//	微信登录地址
@@ -62,7 +61,7 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
 		
-		//	获取微信参数
+		//	获取系统微信参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
 		
 		//	校验授权
@@ -74,7 +73,7 @@ public class NebulaWeChatLoginController extends NebulaThirdPartyLoginController
 			return null;
 		}
 		
-		//	组装信息
+		//	组装微信用户信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());

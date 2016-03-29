@@ -15,7 +15,6 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 /**
  * 微博登录controller
  * @author 黄大辉
- * @version 1.0
  */
 public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	
@@ -50,7 +49,7 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 	@Override
 	public String showTirdParty() {
 		
-		//	获取微博参数
+		//	获取系统微博参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
 		
 		//	微博登录地址
@@ -61,7 +60,8 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 
 	@Override
 	public TirdPartyMemberCommand checkOauth(HttpServletRequest request) {
-		//	获取微博参数
+		
+		//	获取系统微博参数
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
 		
 		//	校验授权
@@ -73,7 +73,7 @@ public class NebulaWeiboLoginController extends NebulaThirdPartyLoginController{
 			return null;
 		}
 		
-		//组装信息
+		//	组装微博用户信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
