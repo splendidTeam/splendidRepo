@@ -4,6 +4,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
