@@ -13,9 +13,8 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 /**
- * 微信登录controller
+ * 支付宝登录controller
  * @author 黄大辉
- * @version 1.0
  */
 public class NebulaAlipayLoginController extends NebulaThirdPartyLoginController{
 	
@@ -74,7 +73,7 @@ public class NebulaAlipayLoginController extends NebulaThirdPartyLoginController
 			return null;
 		}
 		
-		//	组装信息
+		//	组装用户信息
 		TirdPartyMemberCommand numberCommand = new TirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
