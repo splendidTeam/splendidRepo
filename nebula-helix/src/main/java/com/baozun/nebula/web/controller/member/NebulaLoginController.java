@@ -17,9 +17,7 @@
  */
 package com.baozun.nebula.web.controller.member;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -33,19 +31,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.baozun.nebula.exception.PasswordNotMatchException;
-import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
 import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.CookieShoppingCartLine;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
@@ -197,10 +189,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 
 			Long memberId = memberCommand.getId();
 
-			// 合并购物车
-			// 同步Cookie中的购物车信息到数据库
-			synchronousShoppingCart(memberId, request, response, model);
-
 			// 设置记住用户名密码
 			doRememberMeProcess(loginForm, memberId, request, response, model);
 
@@ -223,12 +211,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			LOG.error(e.getMessage());
 			returnResult.setResult(false);
 			defaultResultMessage.setMessage("loginerror.passwordError");
-			returnResult.setResultMessage(defaultResultMessage);
-		}catch (SynchronousShoppingCartException e){
-			// 同步购物车失败
-			LOG.error(e.getMessage());			
-			returnResult.setResult(false);
-			defaultResultMessage.setMessage("loginerror.synShoppingCartError");
 			returnResult.setResultMessage(defaultResultMessage);
 		}catch (Exception e){
 			// 登录失败处理
@@ -298,47 +280,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	protected String getDefaultPwd(){
 		return DEFAULT_PWD;
 	}
-
-	/**
-	 * 同步购物车
-	 * 
-	 * @return void
-	 * @param memberId
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @throws SynchronousShoppingCartException
-	 * @author 冯明雷
-	 * @time 2016-3-23下午5:07:59
-	 */
-	protected void synchronousShoppingCart(Long memberId,HttpServletRequest request,HttpServletResponse response,Model model)
-			throws SynchronousShoppingCartException{
-		List<ShoppingCartLineCommand> shoppingLines = new ArrayList<ShoppingCartLineCommand>();
-
-		// 获取游客购物车
-		Cookie cookie = CookieUtil.getCookie(request, Constants.GUEST_COOKIE_GC);
-		if (Validator.isNotNullOrEmpty(cookie)) {
-			String value = decryptSensitiveDataEncryptedByJs(cookie.getValue(), request);
-			List<CookieShoppingCartLine> cookieShoppingCartLines = JSON.parseObject(value, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
-
-			if (Validator.isNotNullOrEmpty(cookieShoppingCartLines)) {
-				for (CookieShoppingCartLine cookieLine : cookieShoppingCartLines){
-					ShoppingCartLineCommand cartLine = new ShoppingCartLineCommand();
-					cartLine.setQuantity(cookieLine.getQuantity());
-					cartLine.setCreateTime(cookieLine.getCreateTime());
-					cartLine.setSettlementState(cookieLine.getSettlementState());
-					cartLine.setExtentionCode(cookieLine.getExtentionCode());
-					cartLine.setSkuId(cookieLine.getSkuId());
-					cartLine.setPromotionId(cookieLine.getPromotionId());
-					cartLine.setGift(cookieLine.getIsGift());
-					cartLine.setLineGroup(cookieLine.getLineGroup());
-					cartLine.setShopId(cookieLine.getShopId());
-					shoppingLines.add(cartLine);
-				}
-			}
-		}
-		memberManager.synchronousShoppingCart(memberId, shoppingLines);
-	}
+	
 
 	/**
 	 * 登出成功
