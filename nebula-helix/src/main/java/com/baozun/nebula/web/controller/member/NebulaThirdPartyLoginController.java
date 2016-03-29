@@ -64,19 +64,17 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		if (member == null) {
 			//创建用户
 			member = generateThirdPartyMember(tirdPartyMember);
-			
-			// 是否需要完善信息 默认需要
-			if (isNeedCompleteInfo()) {
-				//逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
-				return showCompleteInfo(request, response, model);
-			}
-			
-			// 是否需要绑定用户 默认不需要
-			if (isNeedBinding()) {
-				LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
-				model.addAttribute("member_id", member.getId());
-				return showBinding(request, response, model);
-			}
+		}
+		// 是否需要完善信息 默认需要
+		if (isNeedCompleteInfo(tirdPartyMember)) {
+			// 逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面
+			return showCompleteInfo(request, response, model);
+		}
+		// 是否需要绑定用户 默认不需要
+		if (isNeedBinding(tirdPartyMember)) {
+			LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
+			model.addAttribute("member_id", member.getId());
+			return showBinding(request, response, model);
 		}
 	
 		// 第三方登录
@@ -89,7 +87,7 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * 是否需要绑定
 	 * @return
 	 */
-	protected boolean isNeedBinding() {
+	protected boolean isNeedBinding(TirdPartyMemberCommand command) {
 		return false;
 	}
 	
@@ -97,7 +95,7 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	 * 是否需要补全用户信息
 	 * @return
 	 */
-	protected boolean isNeedCompleteInfo() {
+	protected boolean isNeedCompleteInfo(TirdPartyMemberCommand command) {
 		return true;
 	}
 	
