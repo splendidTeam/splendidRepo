@@ -51,6 +51,8 @@ import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.feilong.core.RegexPattern;
+import com.feilong.core.util.RegexUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -298,11 +300,11 @@ public class MemberManagerImpl implements MemberManager{
 	}
 
 	@Override
-	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,
-			UserExpiredException,PasswordNotMatchException{
+	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
+			PasswordNotMatchException{
 		MemberCommand member = null;
 		member = validateMember(memberCommand);
-		
+
 		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
 		if (!encodePassword.equals(member.getPassword())){
 			throw new PasswordNotMatchException();
@@ -312,10 +314,10 @@ public class MemberManagerImpl implements MemberManager{
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
 	}
-	
+
 	@Override
-	public MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand) throws UserNotExistsException,
-			UserExpiredException,PasswordNotMatchException{
+	public MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
+			PasswordNotMatchException{
 		MemberCommand member = validateMember(memberCommand);
 		// 保存用户行为信息
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
@@ -324,10 +326,11 @@ public class MemberManagerImpl implements MemberManager{
 
 	/**
 	 * 共用的验证用户方法，只验证用户是否存在和用户的生命周期是否有效
+	 * 
 	 * @return MemberCommand
 	 * @param memberCommand
 	 * @throws UserNotExistsException
-	 * @throws UserExpiredException 
+	 * @throws UserExpiredException
 	 * @author 冯明雷
 	 * @time 2016年3月25日下午3:31:48
 	 */
@@ -343,14 +346,13 @@ public class MemberManagerImpl implements MemberManager{
 
 		if (null == member){
 			throw new UserNotExistsException();
-		}		
+		}
 
 		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())){
 			throw new UserExpiredException();
 		}
 		return member;
 	}
-	
 
 	@Deprecated
 	@Override
@@ -412,12 +414,12 @@ public class MemberManagerImpl implements MemberManager{
 
 		MemberPersonalData personData = new MemberPersonalData();
 		personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
-		
+
 		personData.setId(member.getId());
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
-			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
+			if (RegexUtil.matches(RegexPattern.MOBILEPHONE, memberCommand.getLoginName())){
 				personData.setMobile(memberCommand.getLoginName());
-			}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
+			}else if (RegexUtil.matches(RegexPattern.EMAIL, memberCommand.getLoginName())){
 				personData.setEmail(memberCommand.getLoginName());
 			}
 		}
