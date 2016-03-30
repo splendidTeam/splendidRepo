@@ -36,6 +36,9 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 	/* 第三方帐号登录失败跳转页面的默认定义*/
 	public static final String VIEW_MEMBER_LOGIN_FAIL	=	"member.fail";	
 	
+	/* model key 第三方登录者的member id */
+	public static final String	THIRD_PARTY_MEMBER_ID	= "memberId";
+	
 	@Autowired
 	private SdkMemberManager skdMemeberManager;
 	
@@ -74,7 +77,7 @@ public abstract class NebulaThirdPartyLoginController extends NebulaAbstractLogi
 		//	是否需要绑定用户 默认不需要
 		if (isNeedBinding(member)) {
 			LOG.info("openId:{} begin bind", tirdPartyMember.getOpenId());
-			model.addAttribute("member_id", member.getId());
+			model.addAttribute(THIRD_PARTY_MEMBER_ID, member.getId());
 			return showBinding(request, response, model);
 		}
 	
