@@ -238,25 +238,15 @@ public class NebulaRegisterController extends NebulaLoginController{
 			BindingResult bindingResult,
 			HttpServletRequest request,
 			HttpServletResponse response,
-			Model model,
-			Device device){
+			Model model){
 
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
 		/** 数据校验 */
-		// Device device = getDevice(request);
-		if (device.isMobile()){
-			registerFormMobileValidator.validate(registerForm, bindingResult);
-		}else{
-			registerFormNormalValidator.validate(registerForm, bindingResult);
-		}
-		if (bindingResult.hasErrors()){
-			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
-			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
+		Device device = getDevice(request);
+		defaultReturnResult = (DefaultReturnResult) registerFormValidate(device, registerForm, bindingResult);
 
-			defaultReturnResult.setResult(false);
+		if (!defaultReturnResult.isResult()){
 			defaultReturnResult.setStatusCode("reigster.validator.errors");
-			defaultReturnResult.setResultMessage(defaultResultMessage);
-
 			return defaultReturnResult;
 		}
 
@@ -298,6 +288,29 @@ public class NebulaRegisterController extends NebulaLoginController{
 			defaultReturnResult.setStatusCode("register.failed");
 			return defaultReturnResult;
 		}
+	}
+
+	/**
+	 * 数据注册表单校验
+	 * 
+	 * @param device
+	 *            终端
+	 * @param registerForm
+	 *            注册表单
+	 * @param bindingResult
+	 *            验证结果
+	 * @return
+	 */
+	protected NebulaReturnResult registerFormValidate(Device device,RegisterForm registerForm,BindingResult bindingResult){
+		if (device.isMobile()){
+			registerFormMobileValidator.validate(registerForm, bindingResult);
+		}else{
+			registerFormNormalValidator.validate(registerForm, bindingResult);
+		}
+
+		NebulaReturnResult resultFromBindingResult = getResultFromBindingResult(bindingResult);
+
+		return resultFromBindingResult;
 	}
 
 	/**
