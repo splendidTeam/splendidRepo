@@ -407,15 +407,17 @@ public class MemberManagerImpl implements MemberManager{
 		// 保存会员信息
 		Member targetMember = (Member) ConvertUtils.convertTwoObject(new Member(), memberCommand);
 		Member member = sdkMemberManager.rewriteRegister(targetMember);
-		if (null == member){
-			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'Member' occurs error during registration!\"", new Date());
-			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
-		}
+		Long memberId = member.getId();
+		// 注册的时候 会员的GroupId默认为会员的ID
+		sdkMemberManager.updateMemberGroupIdById(memberId, memberId);
+
+		LOGGER.info("[save Member entity suc!] [{}] ID:{} \"\"", new Date(), memberId);
 
 		MemberPersonalData personData = new MemberPersonalData();
 		personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
 
-		personData.setId(member.getId());
+		personData.setId(memberId);
+
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
 			if (RegexUtil.matches(RegexPattern.MOBILEPHONE, memberCommand.getLoginName())){
 				personData.setMobile(memberCommand.getLoginName());
@@ -433,18 +435,16 @@ public class MemberManagerImpl implements MemberManager{
 			personData.setEmail(memberCommand.getLoginEmail());
 		}
 		// 保存会员个人资料信息
-		personData = sdkMemberManager.savePersonData(personData);
-		if (null == personData){
-			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'MemberPersonalData' occurs error during registration!\"", new Date());
-			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
-		}
+		sdkMemberManager.savePersonData(personData);
+
+		LOGGER.info("[save MemberPersonalData entity suc!] [{}] ID:{} \"\"", new Date(), memberId);
+
 		// 保存用户行为信息
-		memberCommand.getMemberConductCommand().setId(member.getId());
-		MemberConductCommand conductCommand = sdkMemberManager.saveMemberConduct(memberCommand.getMemberConductCommand());
-		if (null == conductCommand){
-			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'MemberConductCommand' occurs error during registration!\"", new Date());
-			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
-		}
+		memberCommand.getMemberConductCommand().setId(memberId);
+		MemberConductCommand memberConduct = sdkMemberManager.saveMemberConduct(memberCommand.getMemberConductCommand());
+
+		LOGGER.info("[save MemberConduct entity suc!] [{}] conduct_id:{} \"\"", new Date(), memberConduct.getId());
+
 		return member;
 	}
 
