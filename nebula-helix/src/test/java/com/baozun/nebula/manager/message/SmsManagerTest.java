@@ -62,6 +62,7 @@ public class SmsManagerTest extends BaseControllerTest{
 		EasyMock.expect(smsTemplateDao.findEffectSMSTemplateListByQueryMap(paramMap)).andReturn(smsTemplate);
 		EasyMock.expect(velocityManager.parseVMContent(template.getBody(), smsCommand.getVars())).andReturn(content);
 		EasyMock.expectLastCall();
+		
 		control.replay();
 		assertEquals(SendResult.SUCESS, smsManager.send(smsCommand));
 		control.verify();
