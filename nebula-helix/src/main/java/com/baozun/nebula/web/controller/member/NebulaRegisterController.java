@@ -35,10 +35,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.MemberConductCommand;
-import com.baozun.nebula.command.MessageCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.manager.sms.SmsManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
@@ -108,9 +106,6 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 	@Autowired
 	private SdkMemberManager			sdkMemberManager;
-
-	@Autowired
-	private SmsManager					smsManager;
 
 	@Autowired
 	private TokenManager				tokenManager;
@@ -442,22 +437,15 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected boolean sendRegisterMessage(HttpServletRequest request,String mobile){
 
-		MessageCommand messageCommand = new MessageCommand();
-		messageCommand.setMobile(mobile);
-		long createRandomWithLength = RandomUtil.createRandomWithLength(SEND_MOBILE_MSG_LENGTH);
-		String randomCode = String.valueOf(createRandomWithLength);
-		messageCommand.setContent(randomCode);
-		// 发送短信
-		try{
-			boolean sendMessage = smsManager.sendMessage(messageCommand);
-			// request.getSession().setAttribute(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, randomCode);
-			tokenManager.saveToken(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, mobile, SEND_MOBILE_MSG_LIVETIME, randomCode);
-			return sendMessage;
-		}catch (Exception e){
-			LOGGER.error("{}", e);
-			return false;
-		}
-
+		/*
+		 * MessageCommand messageCommand = new MessageCommand(); messageCommand.setMobile(mobile); long createRandomWithLength =
+		 * RandomUtil.createRandomWithLength(SEND_MOBILE_MSG_LENGTH); String randomCode = String.valueOf(createRandomWithLength);
+		 * messageCommand.setContent(randomCode); // 发送短信 try{ boolean sendMessage = smsManager.sendMessage(messageCommand); //
+		 * request.getSession().setAttribute(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, randomCode);
+		 * tokenManager.saveToken(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, mobile, SEND_MOBILE_MSG_LIVETIME, randomCode); return
+		 * sendMessage; }catch (Exception e){ LOGGER.error("{}", e); return false; }
+		 */
+		return false;
 	}
 
 }
