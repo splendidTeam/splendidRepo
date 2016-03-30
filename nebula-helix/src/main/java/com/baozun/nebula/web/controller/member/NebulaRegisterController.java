@@ -35,12 +35,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.MemberConductCommand;
+import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkSMSManager;
+import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
@@ -52,10 +55,7 @@ import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
 import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValidator;
 import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
-import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
-import com.feilong.core.util.RandomUtil;
-import com.feilong.core.util.RegexUtil;
 import com.feilong.servlet.http.RequestUtil;
 
 /**
@@ -73,14 +73,6 @@ public class NebulaRegisterController extends NebulaLoginController{
 	public static final String			VIEW_MEMBER_REGISTER				= "member.register";
 
 	public static final String			VIEW_MEMBER_REGISTER_ACTIVE_EMAIL	= "member.registerActiveEmail";
-
-	public static final String			VIEW_MEMBER_CENTER					= "member.center";
-
-	/** 发送手机验证码短信长度 */
-	public static Integer				SEND_MOBILE_MSG_LENGTH				= 5;
-
-	/** 发送手机验证码有效期 */
-	public static Integer				SEND_MOBILE_MSG_LIVETIME			= 2 * 60;
 
 	/**
 	 * PC || Tablet <br/>
@@ -108,6 +100,9 @@ public class NebulaRegisterController extends NebulaLoginController{
 	private SdkMemberManager			sdkMemberManager;
 
 	@Autowired
+	private SdkSMSManager				smsManager;
+
+	@Autowired
 	private TokenManager				tokenManager;
 
 	/**
@@ -122,7 +117,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	public String showRegister(@LoginMember MemberDetails memberDetails,Model model,HttpServletRequest request){
 		// ① 判断用户是否登陆
 		if (!Validator.isNullOrEmpty(memberDetails)){
-			return VIEW_MEMBER_CENTER;
+			return super.getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
 		init4SensitiveDataEncryptedByJs(request, model);
 		return VIEW_MEMBER_REGISTER;
@@ -196,7 +191,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
 
-		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, mobile)){
+		if (!RegulareExpUtils.isMobileNO(mobile)){
 			// 手机号不合法
 			defaultReturnResult.setResult(false);
 			defaultReturnResult.setStatusCode("register.mobile.illegal");
@@ -437,15 +432,19 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected boolean sendRegisterMessage(HttpServletRequest request,String mobile){
 
-		/*
-		 * MessageCommand messageCommand = new MessageCommand(); messageCommand.setMobile(mobile); long createRandomWithLength =
-		 * RandomUtil.createRandomWithLength(SEND_MOBILE_MSG_LENGTH); String randomCode = String.valueOf(createRandomWithLength);
-		 * messageCommand.setContent(randomCode); // 发送短信 try{ boolean sendMessage = smsManager.sendMessage(messageCommand); //
-		 * request.getSession().setAttribute(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, randomCode);
-		 * tokenManager.saveToken(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, mobile, SEND_MOBILE_MSG_LIVETIME, randomCode); return
-		 * sendMessage; }catch (Exception e){ LOGGER.error("{}", e); return false; }
-		 */
-		return false;
+		SMSCommand messageCommand = new SMSCommand();
+		messageCommand.setMobile(mobile);
+		// messageCommand.setContent("11111111111111111111111");
+		// 发送短信
+		try{
+			// boolean sendMessage = smsManager.sendMessage(messageCommand);
+			// tokenManager.saveToken(businessCode, human, liveTime, token);
+			return false;
+		}catch (Exception e){
+			LOGGER.error("{}", e);
+			return false;
+		}
+
 	}
 
 }
