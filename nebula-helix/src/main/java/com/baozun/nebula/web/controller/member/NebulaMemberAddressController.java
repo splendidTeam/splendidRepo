@@ -153,26 +153,19 @@ public class NebulaMemberAddressController extends BaseController {
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		
-		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
-		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
 		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"待新增地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
 		
 		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		//校验过程		
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
-			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
-			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
-			defaultReturnResult.setResultMessage(defaultResultMessage);
-			return defaultReturnResult;
+			NebulaReturnResult nebulaReturnResult = getResultFromBindingResult(bindingResult);
+			return nebulaReturnResult;
 		}	
 		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
 		//Form转contact
 		ContactCommand contact = memberAddressForm.toContactCommand();
 		contact.setMemberId(memberDetails.getMemberId());
-		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
-		// 业务方法使用 SdkMemberManager 中的 createOrUpdateContact
 		ContactCommand contactCommand = sdkMemberManager.saveContactCommand(contact);
 		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中	
 		MemberAddressViewCommand memberAddressViewCommand = memberAddressViewCommandConverter.convert(contactCommand);
@@ -202,19 +195,14 @@ public class NebulaMemberAddressController extends BaseController {
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
-		// log.info("[MEM_ADD_ADDRESS] {} [{}] \"{}\"",
-		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
 		LOG.info("[MEM_UPDATE_ADDRESS] {} [{}] \"待更新地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
 		
 		//校验过程
 		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
-			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
-			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
-			defaultReturnResult.setResultMessage(defaultResultMessage);
-			return defaultReturnResult;
+			NebulaReturnResult nebulaReturnResult = getResultFromBindingResult(bindingResult);
+			return nebulaReturnResult;
 		}
 		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
 		//查询出原来的地址对象
@@ -231,8 +219,6 @@ public class NebulaMemberAddressController extends BaseController {
 		//另外字段添加
 		contact.setMemberId(memberDetails.getMemberId());
 		contact.setId(memberAddressForm.getId());		
-		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
-		// 业务方法使用 SdkMemberManager 中的 createOrUpdateContact
 		ContactCommand contactCommand = sdkMemberManager.saveContactCommand(contact);
 		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中
 		MemberAddressViewCommand memberAddressViewCommand = memberAddressViewCommandConverter.convert(contactCommand);
@@ -262,10 +248,7 @@ public class NebulaMemberAddressController extends BaseController {
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
-		// log.info("[MEM_SET_ADDRESS_DEFAULT] {} [{}] \"{}\"",
-		// memberDetails.getLoginName(), new Date(), 待编辑的地址Id);
 		LOG.info("[MEM_DEFAULT_ADDRESS] {} [{}] \"待修改的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
-		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
 		//校验addressId有效
 		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --start");
 		ContactCommand contact=sdkMemberManager.findContactById(addressId,memberDetails.getMemberId());
@@ -277,7 +260,6 @@ public class NebulaMemberAddressController extends BaseController {
 			return defaultReturnResult;
 		}
 		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --end");
-		// 业务方法使用 SdkMemberManager 中的 updateContactIsDefault
 		sdkMemberManager.updateContactIsDefault(memberDetails.getMemberId(),addressId,Contact.ISDEFAULT);
 		return defaultReturnResult;
 	}
@@ -304,8 +286,6 @@ public class NebulaMemberAddressController extends BaseController {
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
-		// log.info("[MEM_REMOVE_ADDRESS] {} [{}] \"{}\"",
-		// memberDetails.getLoginName(), new Date(), 待删除的地址Id);
 		LOG.info("[MEM_DELETE_ADDRESS] {} [{}] \"待删除的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
 		//校验addressId有效
 		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --start");
@@ -318,8 +298,6 @@ public class NebulaMemberAddressController extends BaseController {
 			return defaultReturnResult;
 		}
 		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
-		// 可以参考NebulaMemberProfileController中的过程，构造校验过程
-		// 业务方法使用 SdkMemberManager 中的 removeContactById
 		Integer result = sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
 		if(1 == result) {
 			return defaultReturnResult;
