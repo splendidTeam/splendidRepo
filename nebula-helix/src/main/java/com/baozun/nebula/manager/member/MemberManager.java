@@ -119,22 +119,9 @@ public interface MemberManager extends BaseManager{
 	 * @param loginPwd
 	 * @return
 	 */
-	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
-			PasswordNotMatchException;
+	public MemberCommand login(MemberFrontendCommand memberCommand)
+			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;	
 
-	/**
-	 * 不需要密码的登录方法，(记住密码使用)
-	 * 
-	 * @return MemberCommand
-	 * @param memberCommand
-	 * @throws UserNotExistsException
-	 * @throws UserExpiredException
-	 * @throws PasswordNotMatchException
-	 * @author 冯明雷
-	 * @time 2016年3月25日下午3:27:49
-	 */
-	MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
-			PasswordNotMatchException;
 
 	/**
 	 * 包含用户名、手机、邮箱
@@ -143,6 +130,16 @@ public interface MemberManager extends BaseManager{
 	 * @return
 	 */
 	public Member findMember(String loginName);
+	
+	
+	/**
+	 * 根据用户名查询MemberCommand(用户名包含登录名、登录邮箱、登录手机)
+	 * @return Member
+	 * @param loginName
+	 * @author 冯明雷
+	 * @time 2016年3月30日上午10:42:13
+	 */
+	public MemberCommand findMemberCommandByLoginName(String loginName);
 
 	/**
 	 * 会员注册
@@ -154,8 +151,7 @@ public interface MemberManager extends BaseManager{
 
 	/**
 	 * 会员注册 <br/>
-	 * 保存 Member & MemberPersonalData & MemberConductCommand <br/>
-	 * 此处要注意Member.groupId的逻辑，注册的时候 会员的GroupId默认为会员的ID（主要给第三方联合登录绑定会员使用）
+	 * 保存 Member & MemberPersonalData & MemberConductCommand
 	 * 
 	 * @param memberCommand
 	 * @return
@@ -249,12 +245,11 @@ public interface MemberManager extends BaseManager{
 	 * @author 何波 @Description: 绑定用户邮箱 @param memberId void @throws
 	 */
 	void bindMemberEmail(Long memberId,String email);
-
+	
 	/**
 	 * 同步购物车信息
-	 * 
 	 * @author 冯明雷
 	 * @time 2016-3-23下午4:19:35
 	 */
-	void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines) throws SynchronousShoppingCartException;
+	void synchronousShoppingCart(Long memberId, List<ShoppingCartLineCommand> shoppingLines)throws SynchronousShoppingCartException;
 }

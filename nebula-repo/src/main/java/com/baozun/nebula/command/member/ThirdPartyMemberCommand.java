@@ -1,22 +1,45 @@
 package com.baozun.nebula.command.member;
 
-public class TirdPartyMemberCommand {
+/**
+ * 第三方登录成功后，基于第三方返回信息构造的会员对象
+ * @author Benjamin.Liu
+ *
+ */
+public class ThirdPartyMemberCommand {
 
 	/**
-	 * 第三方用户唯一表示
+	 * 第三方用户唯一标识
 	 * */
 	private String openId;
 	
+	/**
+	 * Email
+	 */
 	private String email;
 	
+	/**
+	 * 手机
+	 */
 	private String mobile;
 	
+	/**
+	 * 昵称
+	 */
 	private String nickName;
 	
+	/**
+	 * 年龄
+	 */
 	private String age;
 	
+	/**
+	 * 性别
+	 */
 	private String sex;
 	
+	/**
+	 * 会员来源，请参考Member中的相关常量定义
+	 */
 	private Integer source;
 
 	public String getOpenId() {
