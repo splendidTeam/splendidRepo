@@ -64,7 +64,10 @@ public abstract class BaseController{
     @Autowired
 	private MessageSource				messageSource;
 
-    private static final DeviceResolver DEVICE_RESOLVER = new LiteDeviceResolver();
+    private static final DeviceResolver DEVICE_RESOLVER 		= new LiteDeviceResolver();
+    
+    //RSA加密全局的PublicKey
+    private static final String			SENSITIVE_PUBLIC_KEY	="sensitivePublicKey";
     
     /**
      * 获取i18n信息
@@ -117,7 +120,7 @@ public abstract class BaseController{
      */
     protected void init4SensitiveDataEncryptedByJs(HttpServletRequest request,Model model){
     	//默认的js使用的公钥
-    	model.addAttribute("init4SensitivePublicKey", new RSAEncryptor().getStrPublicKey());
+    	model.addAttribute(SENSITIVE_PUBLIC_KEY, new RSAEncryptor().getStrPublicKey());
     }
 
     /**
