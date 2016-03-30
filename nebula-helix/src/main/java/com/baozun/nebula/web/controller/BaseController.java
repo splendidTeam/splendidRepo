@@ -43,6 +43,7 @@ import org.springframework.validation.ObjectError;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
+import com.baozun.nebula.utilities.common.encryptor.RSAEncryptor;
 
 /**
  * BaseController
@@ -105,16 +106,18 @@ public abstract class BaseController{
     	return returnResult;
     }
     
-
-    // TODO未实现
+   
     /**
-     * 使用RSA非对称加解密 默认使用全局的public key，使用servlet初始化，此处保持空实现 如果安全上要求每个用户使用不同public
+     * 使用RSA非对称加解密 默认使用全局的public key，使用servlet初始化， 如果安全上要求每个用户使用不同public
      * key时需要商城重写
-     * 
      * @param request
-     * @param model
+     * @param model 
+     * @author 冯明雷
+     * @time 2016年3月30日下午4:43:47
      */
     protected void init4SensitiveDataEncryptedByJs(HttpServletRequest request,Model model){
+    	//默认的js使用的公钥
+    	model.addAttribute("init4SensitivePublicKey", new RSAEncryptor().getStrPublicKey());
     }
 
     /**
