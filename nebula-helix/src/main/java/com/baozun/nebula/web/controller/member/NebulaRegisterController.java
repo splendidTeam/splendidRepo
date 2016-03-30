@@ -45,7 +45,6 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
-import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
@@ -54,7 +53,6 @@ import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValid
 import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
-import com.feilong.core.util.RandomUtil;
 import com.feilong.core.util.RegexUtil;
 import com.feilong.servlet.http.RequestUtil;
 
