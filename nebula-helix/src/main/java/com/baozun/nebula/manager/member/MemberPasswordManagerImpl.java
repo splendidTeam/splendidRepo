@@ -4,16 +4,15 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baozun.nebula.command.MessageCommand;
-import com.baozun.nebula.constants.MessageConstants;
-import com.baozun.nebula.manager.sms.SmsManager;
+import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
-import com.baozun.nebula.utils.SecurityCodeUtil;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
+import com.feilong.core.util.RandomUtil;
 
 public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
@@ -27,7 +26,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	private MemberEmailManager	memberEmailManager;
 
 	@Autowired
-	private SmsManager			smsManager;
+	private SdkSMSManager		smsManager;
 
 	@Autowired
 	private TokenManager		tokenManager;
@@ -53,9 +52,11 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		// 对应邮箱的用户不存在
 		if (memberCommand != null){
 			// 邮箱用户存在：则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
-			String code = SecurityCodeUtil.createSecurityCode(
-					MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
-					MessageConstants.SECURITY_CODE_LENGTH);
+
+			String code = RandomUtil.createRandomFromString("待定", 4);
+			// String code = SecurityCodeUtil.createSecurityCode(
+			// MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
+			// MessageConstants.SECURITY_CODE_LENGTH);
 			tokenManager.saveToken(null, email, MAX_EXIST_TIME, code);
 
 			// 发送验证码
@@ -72,19 +73,22 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		// 对应手机号的用户不存在
 		if (memberCommand != null){
 			// 手机用户存在：则调用发送手机验证码的方法，发送相应的验证码到邮箱中
-			String code = SecurityCodeUtil.createSecurityCode(
-					MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
-					MessageConstants.SECURITY_CODE_LENGTH);
+			String code = RandomUtil.createRandomFromString("待定", 4);
+			// String code = SecurityCodeUtil.createSecurityCode(
+			// MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
+			// MessageConstants.SECURITY_CODE_LENGTH);
 
 			// 保存验证码到redis中，并且设置验证码的生存时间
 			tokenManager.saveToken(null, mobile, MAX_EXIST_TIME, code);
 
 			// 调用发送短信验证码的方式发送短信验证码
-			MessageCommand messageCommand = new MessageCommand();
-			messageCommand.setSecurityCode(code);
-			messageCommand.setMobile(mobile);
+			SMSCommand smsCommand = new SMSCommand();
+			smsCommand.addVar("securityCode", code);
+			smsCommand.setMobile(mobile);
+
 			// 发送验证码结束
-			smsManager.sendMessage(messageCommand);
+			smsManager.send(smsCommand);
+
 			flag = true;
 		}
 		return flag;

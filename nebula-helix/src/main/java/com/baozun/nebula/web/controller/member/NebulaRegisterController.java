@@ -35,14 +35,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.MemberConductCommand;
-import com.baozun.nebula.command.MessageCommand;
+import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.manager.sms.SmsManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -100,7 +100,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	private SdkMemberManager			sdkMemberManager;
 
 	@Autowired
-	private SmsManager					smsManager;
+	private SdkSMSManager					smsManager;
 
 	@Autowired
 	private TokenManager				tokenManager;
@@ -432,14 +432,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected boolean sendRegisterMessage(HttpServletRequest request,String mobile){
 
-		MessageCommand messageCommand = new MessageCommand();
+		SMSCommand messageCommand = new SMSCommand();
 		messageCommand.setMobile(mobile);
-		messageCommand.setContent("11111111111111111111111");
+		//messageCommand.setContent("11111111111111111111111");
 		// 发送短信
 		try{
-			boolean sendMessage = smsManager.sendMessage(messageCommand);
+		//	boolean sendMessage = smsManager.sendMessage(messageCommand);
 			// tokenManager.saveToken(businessCode, human, liveTime, token);
-			return sendMessage;
+			return false;
 		}catch (Exception e){
 			LOGGER.error("{}", e);
 			return false;

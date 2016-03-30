@@ -30,7 +30,6 @@ import com.feilong.core.util.RegexUtil;
  * @Date 2016/03/22
  * @Controller
  */
-@SuppressWarnings("unused")
 public class NebulaForgetPasswordController extends BaseController{
 
 	private static final Logger			LOG							= LoggerFactory.getLogger(NebulaForgetPasswordController.class);
