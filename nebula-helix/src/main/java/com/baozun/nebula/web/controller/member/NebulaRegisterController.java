@@ -100,7 +100,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	private SdkMemberManager			sdkMemberManager;
 
 	@Autowired
-	private SdkSMSManager					smsManager;
+	private SdkSMSManager				smsManager;
 
 	@Autowired
 	private TokenManager				tokenManager;
@@ -434,10 +434,10 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		SMSCommand messageCommand = new SMSCommand();
 		messageCommand.setMobile(mobile);
-		//messageCommand.setContent("11111111111111111111111");
+		// messageCommand.setContent("11111111111111111111111");
 		// 发送短信
 		try{
-		//	boolean sendMessage = smsManager.sendMessage(messageCommand);
+			// boolean sendMessage = smsManager.sendMessage(messageCommand);
 			// tokenManager.saveToken(businessCode, human, liveTime, token);
 			return false;
 		}catch (Exception e){
