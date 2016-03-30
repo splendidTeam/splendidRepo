@@ -37,8 +37,8 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.utilities.common.EncryptUtil;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
+import com.baozun.nebula.web.HelixConfig;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
@@ -73,14 +73,14 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/* Login Page 的默认定义 */
 	public static final String	VIEW_MEMBER_LOGIN				= "member.login";
 
-	/* 登录成功的默认定义 */
-	public static final String	VIEW_MEMBER_LOGIN_SUCCESS		= "member.login.success";
-
 	/* Login 登录ID */
 	public static final String	MODEL_KEY_MEMBER_LOGIN_ID		= "loginId";
 
 	/* Login 登录密码 */
 	public static final String	MODEL_KEY_MEMBER_LOGIN_PWD		= "loginPwd";
+	
+	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
+	private int					remberMeValidityPeriod;
 
 	/**
 	 * 会员登录Form的校验器
@@ -256,8 +256,8 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 						MemberPersonalData memberPersonalData = memberExtraManager.findMemPersonalDataByLoginName(loginName);
 						if (memberPersonalData != null) {
 							String short4 = memberPersonalData.getShort4();
-							String checkNum = EncryptUtil.getInstance().encrypt(EncryptUtil.getInstance().hash(loginName + short4, remberMePwdKey()));
 							
+							String checkNum = EncryptUtil.getInstance().encrypt(EncryptUtil.getInstance().hash(loginName + short4, HelixConfig.getInstance().get("remberme.pwd.salt")));
 							// 如果验证通过，去根据用户名查询密码
 							return pwdKey.equals(checkNum);
 						}
@@ -283,15 +283,15 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 处理已登录用户访问登录页面
+	 * 处理已登录用户访问登录页面(商城可以重写)
 	 * 
 	 * @param memberDetails
 	 * @param request
 	 * @param model
-	 * @return 默认返回登录成功页
+	 * @return 默认返回登录页
 	 */
-	protected String getShowPage4LoginedUserViewLoginPage(MemberDetails memberDetails,HttpServletRequest request,Model model){
-		return VIEW_MEMBER_LOGIN_SUCCESS;
+	protected String getShowPage4LoginedUserViewLoginPage(MemberDetails memberDetails,HttpServletRequest request,Model model){		
+		return VIEW_MEMBER_LOGIN;
 	}
 
 	/**
@@ -396,14 +396,14 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		if (loginForm.getIsRemberMeLoginName()) {
 			try{
 				// 设置登录名的cookie值
-				CookieUtil.addCookie(COOKIE_KEY_REMEMBER_ME_USER,remberMeValueEncrypt(loginForm.getLoginName()),remberMeValidityPeriod(),response);
+				CookieUtil.addCookie(COOKIE_KEY_REMEMBER_ME_USER,remberMeValueEncrypt(loginForm.getLoginName()),getRemberMeValidityPeriod(),response);
 
 				//设置密码对应的key的cookie的值,获取当前时间的毫秒数加上登录名和一个配置的key进行加密存储
 				if (loginForm.getIsRemberMePwd()) {
 					String timestamp = String.valueOf(new Date().getTime());
 					memberExtraManager.rememberPwd(memberId, timestamp);
-					String checkNum = EncryptUtil.getInstance().hash(loginForm.getLoginName() + timestamp, remberMePwdKey());
-					CookieUtil.addCookie(COOKIE_KEY_AUTO_LOGIN,remberMeValueEncrypt(checkNum),remberMeValidityPeriod(),response);
+					String checkNum = EncryptUtil.getInstance().hash(loginForm.getLoginName() + timestamp, HelixConfig.getInstance().get("remberme.pwd.salt"));
+					CookieUtil.addCookie(COOKIE_KEY_AUTO_LOGIN,remberMeValueEncrypt(checkNum),getRemberMeValidityPeriod(),response);
 					
 					LOG.info("[REMEMBER_ME_PROCESS_SUCCESS] {} [{}]", loginForm.getLoginName(), new Date());
 				}
@@ -444,28 +444,26 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	protected boolean isSupportAutoLogin(){
 		return Boolean.FALSE.booleanValue();
 	}
-
-	/**
-	 * 获取记住密码加密使用的key
-	 * 
-	 * @return String
-	 * @author 冯明雷
-	 * @time 2016年3月25日下午3:20:55
+	
+	
+	/**   
+	 * get remberMeValidityPeriod  
+	 * @return remberMeValidityPeriod  
 	 */
-	protected String remberMePwdKey(){
-		return ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("rember.pwd.key");
+	public int getRemberMeValidityPeriod(){
+		if(Validator.isNullOrEmpty(remberMeValidityPeriod)){
+			return 30 * 24 * 60 * 60;
+		}		
+		return remberMeValidityPeriod;
 	}
 
+	
 	/**
-	 * 记住我的用户名、密码cookie有效期(默认30天)
-	 * 
-	 * @return int
-	 * @return
-	 * @author 冯明雷
-	 * @time 2016年3月25日下午3:24:35
+	 * set remberMeValidityPeriod 
+	 * @param remberMeValidityPeriod
 	 */
-	protected int remberMeValidityPeriod(){
-		return 30 * 24 * 60 * 60;
+	public void setRemberMeValidityPeriod(int remberMeValidityPeriod){
+		this.remberMeValidityPeriod = remberMeValidityPeriod;
 	}
 
 }
