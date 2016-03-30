@@ -303,7 +303,7 @@ public class MemberManagerImpl implements MemberManager{
 	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,
 			UserExpiredException,PasswordNotMatchException{
 		MemberCommand member = findMemberCommandByLoginName(memberCommand.getLoginName());
-		
+
 		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
 		if (!encodePassword.equals(member.getPassword())){
 			throw new PasswordNotMatchException();
@@ -312,8 +312,7 @@ public class MemberManagerImpl implements MemberManager{
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
 	}
-	
-	
+
 	@Override
 	public MemberCommand findMemberCommandByLoginName(String loginName){
 		MemberCommand member;
@@ -326,10 +325,8 @@ public class MemberManagerImpl implements MemberManager{
 		}		
 		return member;	
 	}
-
 	
 	
-
 	@Deprecated
 	@Override
 	public Member register(MemberFrontendCommand memberCommand){
@@ -390,12 +387,12 @@ public class MemberManagerImpl implements MemberManager{
 
 		MemberPersonalData personData = new MemberPersonalData();
 		personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
-		
+
 		personData.setId(member.getId());
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
-			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
+			if (RegexUtil.matches(RegexPattern.MOBILEPHONE, memberCommand.getLoginName())){
 				personData.setMobile(memberCommand.getLoginName());
-			}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
+			}else if (RegexUtil.matches(RegexPattern.EMAIL, memberCommand.getLoginName())){
 				personData.setEmail(memberCommand.getLoginName());
 			}
 		}

@@ -25,7 +25,7 @@ import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewComm
 /**
  * 地址视图模型的转换器
  * 
- * @author Benjamin.Liu
+ * @author hengheng.wang
  *
  */
 public class MemberAddressViewCommandConverter extends BaseConverter<MemberAddressViewCommand> {

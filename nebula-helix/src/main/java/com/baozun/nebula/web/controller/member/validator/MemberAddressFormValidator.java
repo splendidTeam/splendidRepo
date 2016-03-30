@@ -33,6 +33,7 @@ public class MemberAddressFormValidator implements Validator {
 		if (target instanceof MemberAddressForm) {
 			MemberAddressForm memberAddressForm = (MemberAddressForm) target;
 
+			//验证必填字段
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "province", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "area", "field.required");
@@ -40,6 +41,7 @@ public class MemberAddressFormValidator implements Validator {
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "field.required");				
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");	
 			
+			//验证手机号码和电话号码
 			validateAddress(memberAddressForm);	
 			
 			// 通用性检验

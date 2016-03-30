@@ -10,7 +10,9 @@ import java.util.Map;
  * 
  * @author 金鑫 2010-4-5 下午11:00:54
  * @since 1.0
+ * @deprecated pls use {@link com.feilong.core.lang.ObjectUtil}
  */
+@Deprecated
 public final class ObjectUtil{
 
 	/** Don't let anyone instantiate this class. */
