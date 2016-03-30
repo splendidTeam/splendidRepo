@@ -9,8 +9,8 @@ import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constants.MessageConstants;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.sdk.manager.impl.SdkSMSManagerImpl;
-import com.baozun.nebula.utils.SecurityCodeUtil;
 import com.baozun.nebula.web.controller.BaseControllerTest;
+import com.feilong.core.util.RandomUtil;
 
 /**
  * 短信验证码manager的Test
@@ -30,7 +30,7 @@ public class SmsManagerTest extends BaseControllerTest{
 		SMSCommand messageCommand = new SMSCommand();
 		messageCommand.setMobile("18271265526");
 		/*生成验证码*/
-		String code = SecurityCodeUtil.createSecurityCode(MessageConstants.SECURITY_CODE_ORIGINAL_STRING, MessageConstants.SECURITY_CODE_LENGTH);
+		String code = RandomUtil.createRandomFromString(MessageConstants.SECURITY_CODE_ORIGINAL_STRING, MessageConstants.SECURITY_CODE_LENGTH);
 		System.out.println(code);
 		//ProfileConfigUtil.setMode("dev");
 		//这个sign是必须的（可能是短信供应商那边有设置），每个商城的sign不一样。若没有sign，程序这边显示的短信发送成功，用户实际上是没有收到的。
