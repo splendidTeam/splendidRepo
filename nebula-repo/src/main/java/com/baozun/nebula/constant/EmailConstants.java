@@ -35,19 +35,25 @@ public class EmailConstants {
 	/**註冊緩存key拼接字符*/
 	public static final String NEBULA_MEMBER_REGISTER = "_register";
 	
-	/**注册邮件发送时间 key字符*/
-	public static final String EMAIL_SEND_TIME_KEY = "email_send_time_key";
+	/**最大发送数 cache key*/
+	public static final String NEBULA_EMAIL_SENDMAXNUMBER_KEY="nebula_email_sendMaxNumber_key";
 	
-	/**激活邮件发送时间 key拼接字符*/
-	public static final String SEND_ACTIVE_EMAIL_EXPIRED_TIME = "send_active_email_expired_time";
+	/**发送时间间隔 cache key*/
+	public static final String NEBULA_EMAIL_INTERVALTIME_KEY="nebula_email_intervalTime_key";
 	
-	/**
-	 * 邮箱已激活
-	 */
+	/**最大发送次数验证错误码*/
+	public static final String NEBULA_EMAIL_SENDMAXNUMBER_ERRORCODE = "sendMaxNumberError";
+	
+	/**发送时间间隔验证错误码*/
+	public static final String NEBULA_EMAIL_INTERVALTIME_ERRORCODE = "intervalTimeError";
+	
+	/**发送成功响应码*/
+	public static final String NEBULA_EMAIL_SEND_SUCCESSCODE = "sendSuccess";
+	
+	/** 邮箱已激活*/
 	public static final String EMAIL_ACTIVE_YES = "Y";
-	/**
-	 * 邮箱未激活
-	 */
+	
+	/** 邮箱未激活*/
 	public static final String EMAIL_ACTIVE_NO = "N";
 
 }

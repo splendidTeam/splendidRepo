@@ -16,7 +16,7 @@
  */
 package com.baozun.nebula.web.controller.member;
 
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,24 +35,22 @@ import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.EmailType;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodesFoo;
-import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.member.MemberEmailManager;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utils.EmailUtil;
 import com.baozun.nebula.utils.ShopDateUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.constants.CommonUrlConstants;
-import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.BaseController;
-
-import loxia.utils.DateUtil;
+import com.feilong.core.CharsetType;
+import com.feilong.core.Validator;
+import com.feilong.core.net.ParamUtil;
 
 /**
  * 邮箱账户激活相关的控制器，里面主要控制如下操作：
@@ -78,19 +76,18 @@ public class NebulaEmailAccountActivationController extends BaseController {
 	/* Login Page 的默认定义 */
 	public static final String VIEW_MEMBER_LOGIN = "member.login";
 
-	/* 用户相关业务类 注入 */
+	/* 用户sdk相关业务类 注入 */
 	@Autowired
 	private SdkMemberManager sdkMemberManager;
 	
+	/* 用户相关业务类 注入 */
 	@Autowired
 	private MemberManager memberManager;
 	
+	/* 用户邮件相关业务类 注入 */
 	@Autowired
 	private MemberEmailManager memberEmailManager;
 	
-	/* jedis缓存业务类 注入 */
-	@Autowired
-	CacheManager cacheManager;
 
 
 	/**
@@ -98,17 +95,16 @@ public class NebulaEmailAccountActivationController extends BaseController {
 	 * 
 	 * @RequestMapping(value = "/member/sendRegEmail", method =RequestMethod.GET)
 	 * 
-	 * 获取邮件源地址,便于直接从邮件中跳转到该邮箱,具体在项目实施中自行使用
-	 * model.addAttribute("sendEmail", e.getWebsite()); 
-	 * 
-	 * 激活邮件发送次数判断,初始设置次数999999 自行配置
-	 * model.addAttribute(Constants.RESULTCODE,"numberErr");
-	 * 
-	 * 邮件发送间隔时间判断,初始设置2分钟 自行配置 
-	 * model.addAttribute(Constants.RESULTCODE,"unEnoughTime");
-	 * 邮件发送间隔不足时,具体差异时间
-	 * model.addAttribute(EmailConstants.EMAIL_SEND_TIME_KEY,expiredSeconds);
-	 * 
+	 *1.由于可能出现不登录 也可以发送激活邮件的情况,memberDetails可能为空,所以需要验证
+	 *  当memberDetails为空时,获取注册成功之后存储于session中的email,通过email获取memberDetails
+	 *  
+	 *2.发送响应码为2个错误码 1个成功码
+	 *  sendMaxNumberError 发送最大次数错误
+	 *  intervalTimeError 发送时间间隔错误
+	 *  sendSuccess 发送成功
+	 *  
+	 *3.model.addAttribute("sendEmail", e.getWebsite());  将该邮箱的源地址传递到前台.便于直接跳转到该邮箱
+	 *  
 	 * @param memberDetails
 	 * @param httpRequest
 	 * @param httpResponse
@@ -128,14 +124,21 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			memberId = memberDetails.getMemberId();
 			email = memberDetails.getLoginEmail();
 		}else{
-			String loginEmailKey="";
-			String loginEmail = (String)httpRequest.getSession().getAttribute(loginEmailKey);
+			String loginEmail = (String)httpRequest.getSession().getAttribute(SessionKeyConstants.MEMBER_REG_EMAIL_URL);
 			MemberCommand member = sdkMemberManager.findMemberByLoginEmail(loginEmail);
 			memberId = member.getId();
 			email =  member.getLoginEmail();
 		}
 		LOG.info("valid or get loginEmail   end");
+		//调用方法,发送邮件
+		LOG.info("begin sendActiveEmail");
 		
+		//拼接发送地址
+		String path=getRegEmailValidPath(httpRequest);
+		//发送邮件获取响应码 
+		String resultCode=memberEmailManager.sendActiveEmail(memberId, path,email);
+		
+		//********************************************************************************
 		//获取跳转地址
 		EmailType e = EmailUtil.getEmailType(email);
 		if(Validator.isNotNullOrEmpty(e)) {
@@ -144,61 +147,25 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			model.addAttribute("sendEmail", "");
 		}
 		
-		
-		LOG.info("valid sendNumber start");
-		Integer sendNumber = 0;
-		// 激活次數判斷
-		if(Validator.isNotNullOrEmpty(cacheManager.getValue(email+EmailConstants.NEBULA_MEMBER_REGISTER))){
-			sendNumber = Integer.parseInt(cacheManager.getValue(email+EmailConstants.NEBULA_MEMBER_REGISTER));
-			if(sendNumber>EmailConstants.SEND_EMAIL_NUMBER){
-				LOG.info("cant't send email,sendNumber error");
-				model.addAttribute(Constants.RESULTCODE,"numberErr");
-				return VIEW_MEMBER_REGISTER_ACTIVE_EMAIL;
-			}
-		}
-		
-		LOG.info("valid sendNumber end");
-		
-		LOG.info("valid expiredTime start");
-		//获取发送邮件间隔时间
-		Integer timeSpan = EmailConstants.NEBULA_SEND_EMAIL_AGAIN_TIME_SPAN;
-		Integer expiredSeconds = timeSpan * 60;
-		
-		//获取上一次发送时间
-		Date expiredTime = null;
-		if (httpRequest.getSession().getAttribute(EmailConstants.SEND_ACTIVE_EMAIL_EXPIRED_TIME) != null) { 
-			 expiredTime = (Date)httpRequest.getSession().getAttribute(EmailConstants.SEND_ACTIVE_EMAIL_EXPIRED_TIME); 
-		} 
-		
-		// 还未到再次发送时间，不进行发送 
-		Date now = Calendar.getInstance().getTime(); 
-		if (expiredTime != null && now.compareTo(expiredTime) > 0) { 
-			 expiredSeconds = Long.valueOf((now.getTime() - expiredTime.getTime()) /1000).intValue();
-			 if(expiredSeconds < timeSpan * 60){
-				 model.addAttribute(Constants.RESULTCODE,"unEnoughTime");
-				 model.addAttribute(EmailConstants.EMAIL_SEND_TIME_KEY,expiredSeconds);
-				 LOG.info("cant't send email,expiredSeconds------------"+expiredSeconds);
-				 return VIEW_MEMBER_REGISTER_ACTIVE_EMAIL;
-			 }
-		}
-		
-		LOG.info("valid expiredTime end");
-		
-		//调用方法,发送邮件
-		LOG.info("begin sendActiveEmail");
-		memberEmailManager.sendActiveEmail(memberId, httpRequest);
-		// 發送一次加一次
-		sendNumber++;
-		
-		// 過期時間
-		Integer expireSeconds = EmailUtil.getEmailExpireSeconds();
-		cacheManager.setValue(email +EmailConstants.NEBULA_MEMBER_REGISTER, sendNumber.toString(), expireSeconds);
-		
-		//将发送时间存入session 
-		expiredTime = DateUtil.addMinutes(now, timeSpan);
-		httpRequest.getSession().setAttribute(EmailConstants.SEND_ACTIVE_EMAIL_EXPIRED_TIME, expiredTime);
+		model.addAttribute("resultCode", resultCode);
 		
 		return VIEW_MEMBER_REGISTER_ACTIVE_EMAIL;
+	}
+	
+	
+	/**
+	 * 拼接邮件链接
+	 * 
+	 * @param request
+	 * @return
+	 */
+	// http://wwww/www/
+	private String getRegEmailValidPath(HttpServletRequest request) {
+		String path = request.getContextPath();
+		String basePath = request.getScheme() + "://" + request.getServerName()
+				+ ":" + request.getServerPort() + path
+				+ "/m/validEmailActiveUrl";
+		return basePath;
 	}
 	
 	
@@ -225,6 +192,7 @@ public class NebulaEmailAccountActivationController extends BaseController {
 		try {
 			LOG.info("valid register Email start");
 			
+			//判断是否为空 如为空则跳转到 首页,不为空则解码
 			if (StringUtils.isBlank(registerComfirm)) {
 				return "redirect:/index";
 			} else {
@@ -233,20 +201,27 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			
 			//解密
 			String decrypt = EncryptUtil.getInstance().decrypt(registerComfirm);
-			
 			//获取链接中的参数
-			List<String> paramList = EmailUtil.getRequestParams(decrypt);
+			List<String> paramList =new ArrayList<String>(ParamUtil.toSingleValueMap(decrypt, CharsetType.UTF8).values());
 			
+			//判断参数列表是否为空  如果为空则返回首页
 			if (CollectionUtils.isEmpty(paramList)) {
 				return "redirect:/index";
 			}
+			
+			//获取参数列表中的第一个参数 为memberid
+			Long memberId=Long.valueOf(paramList.get(0));
 			//获取用户信息
-			MemberCommand member = memberManager.findMemberById(Long.valueOf(paramList.get(0)));
+			MemberCommand member = memberManager.findMemberById(memberId);
+			
 			if (Validator.isNullOrEmpty(member)) {
 				throw new BusinessException(ErrorCodesFoo.member_not_exist);
 			}
 			
-			Long memberId = member.getId();
+			
+			//下面的代码 要抽成一个方法 具体等讨论后 TODO
+			
+			
 			// 判斷帳號是否激活
 			if (memberEmailManager.isMemberEmailActive(memberId)) {
 				// 链接已激活
