@@ -4,6 +4,7 @@
 package com.baozun.nebula.manager.system;
 
 import com.baozun.nebula.command.SMSCommand;
+import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 
 /**
  * 短信校验码‘发送’和‘验证’的过程
@@ -39,7 +40,7 @@ public interface SMSManager{
 	 *            验证码的有效期（ 单位为秒）
 	 * @return
 	 */
-	boolean send(SMSCommand smsCommand,RandomType type,int length,int validity);
+	boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity);
 
 	/**
 	 * 验证手机短信验证码是否真确
@@ -50,9 +51,9 @@ public interface SMSManager{
 	 *            发给上面手机的，需要验证的验证码
 	 * @return
 	 */
-	boolean validate(String mobile,String captcha);
+	VerifyResult validate(String mobile,String captcha);
 
-	enum RandomType{
+	enum CaptchaType{
 		NUMBER, CHARACTER, MIXED
 	}
 }
