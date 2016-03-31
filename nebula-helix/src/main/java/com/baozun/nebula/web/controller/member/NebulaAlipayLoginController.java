@@ -19,7 +19,7 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
  * @author 黄大辉
  */
 public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaAlipayLoginController.class);
 
 	/**
@@ -28,7 +28,7 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 	 * @RequestMapping(value = "/member/showAlipayLogin", method = RequestMethod.POST)
 	 */
 	public String showAlipayLogin(){
-		return "redirect:"+this.constructOAuthLoginURL();
+		return "redirect:" + this.constructOAuthLoginURL();
 	}
 
 	/**
@@ -44,33 +44,35 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 	}
 
 	@Override
-	public String constructOAuthLoginURL() {
-		
-		//	获取系统支付宝参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
-		
-		//	支付宝登录地址
+	public String constructOAuthLoginURL(){
+
+		// 获取系统支付宝参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
+				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
+
+		// 支付宝登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("alipay generate login url {}", loginUrl);
 		return loginUrl;
 	}
 
 	@Override
-	public ThirdPartyMemberCommand checkOAuthLogin(HttpServletRequest request) {
-		
-		//	获取系统支付宝参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
-		
-		//	校验授权
+	public ThirdPartyMemberCommand checkOAuthLogin(HttpServletRequest request){
+
+		// 获取系统支付宝参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
+				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
+
+		// 校验授权
 		ThirdPartyMember number = adaptor.returnMember(request);
 
 		// 判断支付宝用户登录信息是否成功获取
 		if (number.getErrorCode() == null || number.getErrorCode().trim().length() == 0) {
-			LOG.error("thirdParty source " + ThirdPartyMemberFactory.TYPE_ALIPAY + " login failure, errorCode is " + number.getErrorCode());
+			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_ALIPAY, number.getErrorCode());
 			return null;
 		}
-		
-		//	组装支付宝用户信息
+
+		// 组装支付宝用户信息
 		ThirdPartyMemberCommand numberCommand = new ThirdPartyMemberCommand();
 		numberCommand.setOpenId(number.getUid());
 		numberCommand.setNickName(number.getNickName());
