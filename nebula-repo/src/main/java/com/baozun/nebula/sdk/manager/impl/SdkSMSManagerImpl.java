@@ -44,16 +44,16 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 	VelocityManager velocityManager;
 
 	@Override
-	public SendResult send(SMSCommand messageCommand){
+	public SendResult send(SMSCommand smsCommand){
 		Map<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("code", messageCommand.getTemplateCode());
+		paramMap.put("code", smsCommand.getTemplateCode());
 		//TODO cache & dao method
 		List<SMSTemplate> smsTemplateList = smsTemplateDao.findEffectSMSTemplateListByQueryMap(paramMap);
 		if (smsTemplateList != null && smsTemplateList.size() > 0) {
 			SMSTemplate et = smsTemplateList.get(0);
-			String content = velocityManager.parseVMContent(et.getBody(), messageCommand.getVars());
+			String content = velocityManager.parseVMContent(et.getBody(), smsCommand.getVars());
 			System.out.println("the message is being sended");
-			System.out.println("the mobileNumber is" + messageCommand.getMobile());
+			System.out.println("the mobileNumber is" + smsCommand.getMobile());
 			System.out.println("the message content is" + content);
 			System.out.println("the message is sended");
 			// 记录日志

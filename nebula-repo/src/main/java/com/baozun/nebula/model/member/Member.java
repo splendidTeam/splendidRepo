@@ -125,7 +125,7 @@ public class Member extends BaseModel{
 
 	/**
 	 * 分组ID，用于处理会员间绑定关系
-	 * add by D.C 20160325
+	 * by D.C 20160325
 	 */
 	private Long groupId;
 

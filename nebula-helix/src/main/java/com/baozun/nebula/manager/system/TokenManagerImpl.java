@@ -111,4 +111,9 @@ public class TokenManagerImpl implements TokenManager {
 
 	}
 
+	@Override
+	public VerifyResult verifyAccess(String businessCode, String human, RollingTimeWindow rollingTimeWindow) {
+		return null;
+	}
+
 }

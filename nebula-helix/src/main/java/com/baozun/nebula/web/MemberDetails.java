@@ -73,10 +73,11 @@ public class MemberDetails implements Serializable {
 	 * 分组标签
 	 */
 	private Set<String> memComboList;
+	
 	/**
-	 * 激活状态
+	 * 状态
 	 */
-	private Boolean actived = false;
+	private String status;
 
 
 	public MemberDetails() {
@@ -181,11 +182,29 @@ public class MemberDetails implements Serializable {
 		this.memComboList = memComboList;
 	}
 	
-	public Boolean isActived() {
-		return actived;
+	public String getStatus() {
+		return status;
 	}
 
-	public void setActived(Boolean actived) {
-		this.actived = actived;
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public enum Status {
+		INVALIDATE("invalidate"), VALIDATE("validate"), EMAIL_ACTIVE(""), EMAIL_INACTIVE(""), MOBILE_INACTIVE(""), WAITING_BIND(""), WAITING_PROFILE("");
+		
+		private String value;
+		
+		Status(String value) {
+			this.setValue(value);
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
 	}
 }
