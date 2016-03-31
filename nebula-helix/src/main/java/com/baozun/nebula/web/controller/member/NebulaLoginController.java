@@ -19,7 +19,6 @@ package com.baozun.nebula.web.controller.member;
 
 import java.util.Date;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,13 +31,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.exception.LoginException;
-import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
-import com.baozun.nebula.web.HelixConfig;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
@@ -49,6 +45,7 @@ import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberLoginViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
+import com.feilong.servlet.http.entity.CookieEntity;
 
 /**
  * 登录相关方法controller
@@ -68,19 +65,24 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	public static final String	COOKIE_KEY_REMEMBER_ME_USER		= "rmbu";
 
 	/* Remember me pwd cookie key */
-	public static final String	COOKIE_KEY_AUTO_LOGIN			= "ckal";
+	public static final String	COOKIE_KEY_AUTO_LOGIN			= "rmbc";
 
 	/* Login Page 的默认定义 */
 	public static final String	VIEW_MEMBER_LOGIN				= "member.login";
 
 	/* Login 登录ID */
-	public static final String	MODEL_KEY_MEMBER_LOGIN_ID		= "loginId";
+	public static final String	MODEL_KEY_MEMBER_LOGIN_ID		= "login";
 
 	/* Login 登录密码 */
-	public static final String	MODEL_KEY_MEMBER_LOGIN_PWD		= "loginPwd";
+	public static final String	MODEL_KEY_MEMBER_LOGIN_PWD		= "password";
+	
+	/**
+	 * 默认RemeberMe过期时间
+	 */
+	public static final int DEFAULT_REMEBERME_MAX_AGE = 30*24*60*60;
 	
 	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
-	private int					remberMeValidityPeriod;
+	private int					remberMeValidityPeriod = -1;
 
 	/**
 	 * 会员登录Form的校验器
@@ -94,9 +96,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	@Autowired
 	private MemberManager		memberManager;
-
-	@Autowired
-	private MemberExtraManager	memberExtraManager;
 
 	/**
 	 * 登录页面，默认推荐配置如下
@@ -171,11 +170,12 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		//判断AutoLogin的设定，RemeberMe不用考虑，因为页面已经自动回写用户名到Form中了
 		if(isSupportAutoLogin()){
 			//这里需要检查AutoLogin，检查的方法是检查解密后的Password和之前提供的随机Hash是否一致
-			if(validateAutoLogin(loginForm, request)){
+			memberCommand = memberManager.findMemberCommandByLoginName(loginForm.getLoginName());
+			if(memberCommand != null && validateAutoLogin(loginForm, memberCommand, request)){
 				 LOG.info("[MEM_AUTO_LOGIN ] {} [{}] \"\"", loginForm.getLoginName(), new Date());
-				 memberCommand = memberManager.findMemberCommandByLoginName(loginForm.getLoginName());
 			}else{
 				LOG.info("[MEM_AUTO_LOGIN_FAILED ] {} [{}] \"Will check password later\"", loginForm.getLoginName(), new Date()); 
+				memberCommand = null;
 			}
 		}
 		
@@ -195,11 +195,8 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			//登录成功的处理
 			LOG.debug("{} login success", memberCommand.getLoginName());
 			
-			//处理RemeberMe和AutoLogin(这两个东西需要分开来，因此是两个不同的Cookie Key) 
-			//这里处理的逻辑需要注意以下几点：			
-			//1. 如果RemeberMe被设置，那么需要重新设置RemeberMe的用户名，有效期需要配置 
-			//2.如果AutoLogin被设置，那么需要重新设置AutoLogin的用户名，有效期需要配置 
-			doRememberMeProcess(loginForm, memberCommand.getId(), request, response, model);
+			//处理RemeberMe和AutoLogin
+			doRememberMeProcess(loginForm, memberCommand, request, response, model);
 			
 			return super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response); 
 		}else{
@@ -231,42 +228,27 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/**
 	 * 验证是否自动登录
 	 * @return boolean
-	 * @param loginForm
+	 * @param memberCommand
 	 * @param request
-	 * @param response
-	 * @param model
 	 * @author 冯明雷
 	 * @time 2016年3月30日上午11:09:29
 	 */
-	protected boolean validateAutoLogin(LoginForm loginForm,HttpServletRequest request){
-		// cookie中保存的自动登录的key
-		String pwdKey =getRememberInfo(request, COOKIE_KEY_AUTO_LOGIN);
-		
+	protected boolean validateAutoLogin(LoginForm loginForm, MemberCommand memberCommand, HttpServletRequest request){
 		//cookie保存的用户名
-		String loginName =getRememberInfo(request, COOKIE_KEY_REMEMBER_ME_USER);
-
+		String loginName =getRememberedLogin(request);
+				
+		// cookie中保存的自动登录的key
+		String autoLoginPassword =getAutoLoginPassword(request);
+		
 		// cookie中保存的用户名和密码不能为空
-		if (Validator.isNotNullOrEmpty(pwdKey) && Validator.isNotNullOrEmpty(loginName)) {
+		if (Validator.isNotNullOrEmpty(loginName) && Validator.isNotNullOrEmpty(autoLoginPassword)) {
 			//页面传来的密码必须和默认密码相同
-			String defaultPwd=getDefaultPwd(pwdKey);
-			if(loginForm.getPassword().equals(defaultPwd)){
-				try{
-					if (loginName.equals(loginForm.getLoginName())) {
-						// 根据用户名查询该用户修改密码的最后时间，用来判断记住的密码是否过期，和解密cookie中保存的密码的key
-						MemberPersonalData memberPersonalData = memberExtraManager.findMemPersonalDataByLoginName(loginName);
-						if (memberPersonalData != null) {
-							String short4 = memberPersonalData.getShort4();
-							
-							String checkNum = EncryptUtil.getInstance().encrypt(EncryptUtil.getInstance().hash(loginName + short4, HelixConfig.getInstance().get("remberme.pwd.salt")));
-							// 如果验证通过，去根据用户名查询密码
-							return pwdKey.equals(checkNum);
-						}
-					}
-				}catch (Exception e){
-					LOG.info("[VALIDATE_AUTOLOGIN_FAIL] {} [{}] \"{}\"", loginForm.getLoginName(), new Date(), e.getClass().getSimpleName());
-				}
+			if(loginForm.getPassword().equals(autoLoginPassword) &&
+					loginName.equals(loginForm.getLoginName())){
+				LOG.debug("Auto login password is same with saved one, will check whether it is expired.");
+				return loginForm.getPassword().equals(generateAutoLoginPassword(memberCommand));
 			}else{
-				LOG.info("[VALIDATE_AUTOLOGIN_FAIL] {} [{}] \"The password is different from the default password and page\"", loginForm.getLoginName(), new Date());
+				LOG.debug("Auto Login Password is not valid from Input for {}", loginForm.getLoginName());
 			}
 		}
 		return false;
@@ -314,58 +296,108 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// 如果支持记住用户名
 		if (isSupportRemeberMe()) {
 			// 从cookie中获取解密后的loginName
-			String loginName = getRememberInfo(request, COOKIE_KEY_REMEMBER_ME_USER);
+			String loginName = getRememberedLogin(request);
 			if (Validator.isNotNullOrEmpty(loginName)) {
+				LOG.debug("RememberMe information is loaded: [User:{}]", loginName);
 				memberLoginViewCommand.setIsRememberMe(true);
 				memberLoginViewCommand.setLoginName(loginName);
 			}
-
-			if(isSupportAutoLogin()){
-				//从cooike中获取是否自动登录的key
-				String pwdKey = getRememberInfo(request, COOKIE_KEY_AUTO_LOGIN);
-				if (Validator.isNotNullOrEmpty(pwdKey)) {
+		}
+		
+		if(isSupportAutoLogin()){
+			assert isSupportRemeberMe() : "SupportAutoLogin can only be actived when SupportRemeberMe";
+			if(memberLoginViewCommand.getLoginName() != null){
+				LOG.debug("User Login Name exists. Try to get Auto Login password.");
+				String password = getAutoLoginPassword(request);
+				if (Validator.isNotNullOrEmpty(password)) {
 					memberLoginViewCommand.setIsAutoLogin(true);
-					String defaultPwd=getDefaultPwd(CookieUtil.getCookie(request,COOKIE_KEY_AUTO_LOGIN).getValue());
-					memberLoginViewCommand.setPassword(defaultPwd);
+					memberLoginViewCommand.setPassword(password);
 				}
+			}else{
+				LOG.debug("No Auto Login informaton exists.");
 			}
 		}
 
 	}
-
+	
 	/**
-	 * 从cookie中获取记住用户名的信息
-	 * 
-	 * @return String
+	 * 读取暂存用户名，默认方法是加密存放在Cookie中
 	 * @param request
-	 * @param key
-	 * @author 冯明雷
-	 * @time 2016年3月29日下午6:17:31
+	 * @return
 	 */
-	protected String getRememberInfo(HttpServletRequest request,String key){
-		Cookie cookie = CookieUtil.getCookie(request, key);
-		// 如果cookie不为空的话
-		if (Validator.isNotNullOrEmpty(cookie)) {
-			String value = cookie.getValue();
-			try{
-				value = EncryptUtil.getInstance().decrypt(value);
-				return value;
-			}catch (Exception e){
-				LOG.info("[COOKIE_VALUE_DECRYPT_FAIL] {} [{}] \"The cookie value decrypt fail.\"", value, new Date());
-			}
+	protected String getRememberedLogin(HttpServletRequest request){
+		try {
+			return getEncryptedInformationFromCookie(request, COOKIE_KEY_REMEMBER_ME_USER);
+		} catch (EncryptionException e) {
+			LOG.warn("Remeber Me information is not correct: {}", e.getOriginText());				
 		}
 		return null;
 	}
 	
 	/**
-	 * 获取默认用户名,根据从cookie中获取的pwk的值，取前八位当做默认密码
-	 * @return String
-	 * @param pwdKey
-	 * @author 冯明雷
-	 * @time 2016年3月30日上午9:45:21
+	 * 设置暂存用户名，默认方法是加密存放在Cookie中
+	 * @param response
+	 * @param loginName
 	 */
-	protected String getDefaultPwd(String pwdKey){
-		return pwdKey.substring(0, 7);
+	protected void setRememberedLogin(HttpServletResponse response, String loginName){
+		try {
+			setEncryptedInformationFromCookie(response, COOKIE_KEY_REMEMBER_ME_USER, loginName, getRemberMeValidityPeriod());
+		} catch (EncryptionException e) {
+			LOG.warn("Error when Settting Remeber Me information: {}", e);
+		}
+	}
+	
+	/**
+	 * 读取暂存自动登录密码，默认方法是加密存放在Cookie中
+	 * @param request
+	 * @return
+	 */
+	protected String getAutoLoginPassword(HttpServletRequest request){
+		try {
+			return getEncryptedInformationFromCookie(request, COOKIE_KEY_AUTO_LOGIN);
+		} catch (EncryptionException e) {
+			LOG.warn("AutoLogin Password information is not correct: {}", e.getOriginText());				
+		}
+		return null;
+	}
+	
+	/**
+	 * 设置暂存自动登录密码，默认方法是加密存放在Cookie中
+	 * @param response
+	 * @param memberCommand
+	 */
+	protected void setAutoLoginPassword(HttpServletResponse response, MemberCommand memberCommand){
+		try {
+			setEncryptedInformationFromCookie(response, COOKIE_KEY_AUTO_LOGIN, 
+					generateAutoLoginPassword(memberCommand), getRemberMeValidityPeriod());
+		} catch (EncryptionException e) {
+			LOG.warn("Error when Settting Remeber Me information: {}", e);
+		}
+	}
+	
+	/**
+	 * 生成自动登录密码，方法可以被重载
+	 * @param memberCommand
+	 * @return
+	 */
+	protected String generateAutoLoginPassword(MemberCommand memberCommand){
+		String pwd = EncryptUtil.getInstance().hash(memberCommand.getLoginName(), memberCommand.getPassword());
+		return pwd.substring(0,6);
+	}
+	
+	private String getEncryptedInformationFromCookie(HttpServletRequest request, String name) throws EncryptionException{
+		String encValue = CookieUtil.getCookieValue(request, name);
+		if(encValue != null){
+			return EncryptUtil.getInstance().decrypt(name);
+		}
+		return null;
+	}
+	
+	private void setEncryptedInformationFromCookie(HttpServletResponse response, 
+			String name, String value, int maxAge) throws EncryptionException{
+		CookieEntity cookie = new CookieEntity(name, EncryptUtil.getInstance().encrypt(value));
+		cookie.setMaxAge(maxAge);
+		CookieUtil.addCookie(cookie, response);
 	}
 
 	/**
@@ -374,8 +406,8 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return void
 	 * @param loginForm
 	 *            页面传过来的参数，这个方法用到的属性是：isRemberMeLoginName是否记住用户名；isRemberMePwd:是否记住密码(默认不记住)
-	 * @param memberId
-	 *            登录用户的id
+	 * @param memberCommand
+	 *            登录用户的信息
 	 * @param request
 	 * @param response
 	 * @param model
@@ -385,46 +417,40 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	protected void doRememberMeProcess(
 			LoginForm loginForm,
-			Long memberId,
+			MemberCommand memberCommand,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Model model){
-		// 先清除记住的用户名和密码
-		CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_USER, response);
-		CookieUtil.deleteCookie(COOKIE_KEY_AUTO_LOGIN, response);
-
-		if (loginForm.getIsRemberMeLoginName()) {
-			try{
-				// 设置登录名的cookie值
-				CookieUtil.addCookie(COOKIE_KEY_REMEMBER_ME_USER,remberMeValueEncrypt(loginForm.getLoginName()),getRemberMeValidityPeriod(),response);
-
-				//设置密码对应的key的cookie的值,获取当前时间的毫秒数加上登录名和一个配置的key进行加密存储
-				if (loginForm.getIsRemberMePwd()) {
-					String timestamp = String.valueOf(new Date().getTime());
-					memberExtraManager.rememberPwd(memberId, timestamp);
-					String checkNum = EncryptUtil.getInstance().hash(loginForm.getLoginName() + timestamp, HelixConfig.getInstance().get("remberme.pwd.salt"));
-					CookieUtil.addCookie(COOKIE_KEY_AUTO_LOGIN,remberMeValueEncrypt(checkNum),getRemberMeValidityPeriod(),response);
-					
-					LOG.info("[REMEMBER_ME_PROCESS_SUCCESS] {} [{}]", loginForm.getLoginName(), new Date());
-				}
-			}catch (Exception e){
-				LOG.info("[REMEMBER_ME_PROCESS_FAILURE] {} [{}] \"{}\"", loginForm.getLoginName(), new Date(), e.getClass().getSimpleName());
+		
+		if(loginForm.getIsRemberMePwd()){
+			if(isSupportAutoLogin()){
+				LOG.debug("Need update Both RemeberMe & AutoLogin information");
+				setRememberedLogin(response, loginForm.getLoginName());
+				setAutoLoginPassword(response, memberCommand);
+				LOG.info("[RMBER_ME_AUTOLOGIN_SET] {} [{}] \"\"", loginForm.getLoginName(), new Date());
+			}else{
+				LOG.warn("System don't support AutoLogin!");
+				CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_USER, response);
+				CookieUtil.deleteCookie(COOKIE_KEY_AUTO_LOGIN, response);
+			}			
+		} else if(loginForm.getIsRemberMeLoginName()){
+			if(isSupportRemeberMe()){
+				LOG.debug("Need update RemeberMe information");
+				setRememberedLogin(response, loginForm.getLoginName());
+				LOG.info("[RMBER_ME_SET] {} [{}] \"\"", loginForm.getLoginName(), new Date());
+			}else{
+				LOG.warn("System don't support RememberMe!");
+				CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_USER, response);
 			}
-			
+		} else{
+			LOG.debug("No Remember Me. Clear any possible remember me settings");
+			if(CookieUtil.getCookieValue(request, COOKIE_KEY_REMEMBER_ME_USER) != null){
+				//清除记住的用户名和密码
+				CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_USER, response);
+				CookieUtil.deleteCookie(COOKIE_KEY_AUTO_LOGIN, response);
+			}		
 		}
 
-	}
-	
-
-	/**
-	 * remember me 值的加密处理
-	 * 
-	 * @param value
-	 * @return 默认原值返回
-	 * @throws EncryptionException 
-	 */
-	protected String remberMeValueEncrypt(String value) throws EncryptionException{
-		return EncryptUtil.getInstance().encrypt(value);
 	}
 
 	/**
@@ -451,10 +477,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return remberMeValidityPeriod  
 	 */
 	public int getRemberMeValidityPeriod(){
-		if(Validator.isNullOrEmpty(remberMeValidityPeriod)){
-			return 30 * 24 * 60 * 60;
-		}		
-		return remberMeValidityPeriod;
+		return remberMeValidityPeriod >0 ? remberMeValidityPeriod : DEFAULT_REMEBERME_MAX_AGE;
 	}
 
 	
