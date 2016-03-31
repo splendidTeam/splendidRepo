@@ -150,7 +150,7 @@ public class NebulaMemberProfileController extends BaseController {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
-		// TODO 更新用户头像，需要一个通用的异步图片处理标准
+		// 更新用户头像，需要一个通用的异步图片处理标准
 		httpResponse.setContentType("text/html;charset=UTF-8");
 		String imageZipPath = MEMBER_HEAD_IMAGE;
 
@@ -217,7 +217,7 @@ public class NebulaMemberProfileController extends BaseController {
 		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
 		LOG.debug("Start Validation input profile");
-		// TODO 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
+		// 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
 		memberProfileFormValidator.validate(memberProfileForm, bindingResult);
 		if (bindingResult.hasErrors()) {
 			LOG.info(
@@ -245,7 +245,7 @@ public class NebulaMemberProfileController extends BaseController {
 
 		memberProfile = memberProfileForm.toMemberPersonalData(memberProfile);
 
-		// TODO 这里需要通过Form和会员信息来判断这些关键信息是否变化
+		// 这里需要通过Form和会员信息来判断这些关键信息是否变化
 		boolean isPasswordChange = false;
 		boolean isEmailChange = false;
 		boolean isMobileChange = false;
@@ -287,7 +287,7 @@ public class NebulaMemberProfileController extends BaseController {
 		}
 
 		if (isPasswordChange) {
-			// TODO 保存重设密码
+			// 保存重设密码
 			isPasswordChange = postProcessForPasswordChange();
 			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"[PASSWORD_CHANGED]\"",
 					memberDetails.getLoginName(), new Date());
@@ -303,7 +303,7 @@ public class NebulaMemberProfileController extends BaseController {
 					memberDetails.getLoginName(), new Date());
 		}
 
-		// TODO 这里会把需要修改的值都设置到 memberProfile 中，请确保所有值都成功存储
+		// 这里会把需要修改的值都设置到 memberProfile 中，请确保所有值都成功存储
 		memberProfile = memberManager.savePersonData(memberProfile);
 		if (isPasswordChange && isEmailChange && isMobileChange) {
 			memberCommand = memberManager.saveMember(memberCommand);
