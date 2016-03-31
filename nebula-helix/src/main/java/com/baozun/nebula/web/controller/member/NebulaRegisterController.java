@@ -448,14 +448,8 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected boolean sendRegisterMessage(HttpServletRequest request,String mobile){
 
-		/*
-		 * MessageCommand messageCommand = new MessageCommand(); messageCommand.setMobile(mobile); long createRandomWithLength =
-		 * RandomUtil.createRandomWithLength(SEND_MOBILE_MSG_LENGTH); String randomCode = String.valueOf(createRandomWithLength);
-		 * messageCommand.setContent(randomCode); // 发送短信 try{ boolean sendMessage = smsManager.sendMessage(messageCommand); //
-		 * request.getSession().setAttribute(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, randomCode);
-		 * tokenManager.saveToken(SessionKeyConstants.MEMBER_REGISTER_SMSCODE, mobile, SEND_MOBILE_MSG_LIVETIME, randomCode); return
-		 * sendMessage; }catch (Exception e){ LOGGER.error("{}", e); return false; }
-		 */
+		
+		
 		return false;
 	}
 
