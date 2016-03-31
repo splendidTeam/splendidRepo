@@ -217,20 +217,14 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 				"postCode" });
 	}
 
-	private void encrypt(MemberCommand memberCommand) {
+	private void encrypt(MemberCommand memberCommand){
 
-		sdkSecretManager.encrypt(memberCommand, new String[] { 
-				"loginEmail",
-				"loginMobile", 
-				"realName" });
+		sdkSecretManager.encrypt(memberCommand, new String[] { "loginEmail", "loginMobile", "realName" });
 	}
 
-	private void decrypt(MemberCommand memberCommand) {
+	private void decrypt(MemberCommand memberCommand){
 
-		sdkSecretManager.decrypt(memberCommand, new String[] { 
-				"loginEmail",
-				"loginMobile", 
-				"realName" });
+		sdkSecretManager.decrypt(memberCommand, new String[] { "loginEmail", "loginMobile", "realName" });
 	}
 
 	private void encryptContact(ContactCommand contact){
@@ -299,10 +293,10 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberById(Long id) {
+	public MemberCommand findMemberById(Long id){
 		Member member = memberDao.findMemberById(id);
 		MemberCommand memberCommand = null;
-		if (null != member) {
+		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
 			decrypt(memberCommand);
@@ -312,12 +306,12 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	}
 
 	@Override
-	public MemberCommand saveMember(MemberCommand memberCommand) {
+	public MemberCommand saveMember(MemberCommand memberCommand){
 		Member member = null;
-		if (memberCommand.getId() == null || memberCommand.getId() == 0) {
+		if (memberCommand.getId() == null || memberCommand.getId() == 0){
 			// 保存
 			member = new Member();
-		} else {
+		}else{
 			// 更新
 			member = memberDao.findMemberById(memberCommand.getId());
 		}
@@ -325,7 +319,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		encrypt(memberCommand);
 		member = convertMemberCommandToMember(memberCommand, member);
 		member = memberDao.save(member);
-		if (null != member) {
+		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
 			decrypt(memberCommand);
@@ -336,12 +330,12 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginName(String loginName) {
+	public MemberCommand findMemberByLoginName(String loginName){
 		Member member = null;
 		MemberCommand memberCommand = null;
 		if (StringUtils.isNotBlank(loginName))
 			member = memberDao.findMemberByLoginName(loginName.toUpperCase());
-		if (null != member) {
+		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
 			decrypt(memberCommand);
@@ -352,7 +346,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginEmail(String loginName) {
+	public MemberCommand findMemberByLoginEmail(String loginName){
 		Member member = null;
 		MemberCommand memberCommand = null;
 		if (StringUtils.isNotBlank(loginName))
@@ -368,10 +362,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginNameAndPasswd(String loginName,
-			String password) {
-		Member member = memberDao.findMemberByLoginNameAndPasswd(loginName,
-				password);
+	public MemberCommand findMemberByLoginNameAndPasswd(String loginName,String password){
+		Member member = memberDao.findMemberByLoginNameAndPasswd(loginName, password);
 		MemberCommand memberCommand = null;
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
@@ -1305,6 +1297,15 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			return convertMemberToMemberCommand(member);
 
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#updateMemberGroupIdById(java.lang.Long, java.lang.Long)
+	 */
+	@Override
+	public int updateMemberGroupIdById(Long memberId,Long groupId){
+		return memberDao.updateMemberGroupIdById(memberId, groupId);
 	}
 
 }

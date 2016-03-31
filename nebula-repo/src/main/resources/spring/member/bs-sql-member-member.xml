@@ -664,4 +664,14 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	<bean id="Member.updateMemberGroupIdById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据会员id更新他对应的groupId</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update T_MEM_MEMBER  set GROUP_ID=:groupId where id=:memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>
