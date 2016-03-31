@@ -24,7 +24,7 @@ package com.baozun.nebula.manager.system;
  * @version 2016年3月24日 下午3:33:50
  */
 public interface TokenManager {
-	/**
+	/** 
 	 * 保存验证码
 	 * @param businessCode 业务编码
 	 * @param human 人的识别码
@@ -49,11 +49,11 @@ public interface TokenManager {
 	 * Rolling Time Window, 用于控制用户在某个时间窗口内的访问次数，
 	 * 比如：发送短信业务，5分钟内可以发送2次，24小时内可以发送5次
 	 * 完成这种访问控制需要定义2个RollingTimeWindow(5,2),(24,5)对象，分两次调用verifyAccess来达成目标
-	 * 
+	 * 如果验证通过后需要将本次调用添加进去
 	 * 基于redis集合特性实现，key = businessCode + "_" +　human +　"_" + rollingTimeWindow.toString()
 	 * @param businessCode 业务编码
 	 * @param human  人的识别码
-	 * @param token 时间窗
+	 * @param rollingTimeWindow 时间窗
 	 * @return　验证结果
 	 */
 	VerifyResult verifyAccess(String businessCode, String human, RollingTimeWindow rollingTimeWindow);
