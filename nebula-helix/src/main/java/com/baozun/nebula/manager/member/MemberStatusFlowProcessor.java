@@ -14,38 +14,23 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.manager.system;
+package com.baozun.nebula.manager.member;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.baozun.nebula.web.MemberDetails;
 
 /**
- * 访问控制策略类
  * @author D.C
- * @version 2016年3月28日 下午2:05:58
+ * @time 2016年3月31日 上午11:00:22
  */
-public class RollingTimeWindow {
-	/**
-	 * Allowed operations per time window
-	 */ 
-	private Long limit;
-	/**
-	 * Rolling time window in seconds
-	 */
-	private Long window;
+public class MemberStatusFlowProcessor {
+	List<MemberStatusHandler> handlers = new ArrayList<MemberStatusHandler>();
 	
-	public Long getLimit() {
-		return limit;
+	void doProcess(MemberDetails memberDetails) {
+		for(MemberStatusHandler handler : handlers) {
+			handler.execute(memberDetails);
+		}
 	}
-	public void setLimit(Long limit) {
-		this.limit = limit;
-	}
-	public Long getWindow() {
-		return window;
-	}
-	public void setWindow(Long window) {
-		this.window = window;
-	}
-	@Override
-	public String toString() {
-		return "RollingTimeWindow [limit=" + limit + ", window=" + window + "]";
-	}
-	
 }

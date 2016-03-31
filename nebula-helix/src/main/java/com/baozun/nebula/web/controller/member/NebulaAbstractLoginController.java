@@ -48,7 +48,7 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 	 */
 	protected MemberDetails constructMemberDetails(MemberCommand member){
 		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setActived(this.isActivedMember(member));
+		//memberDetails.setActived(this.isActivedMember(member));
 		memberDetails.setLoginName(member.getLoginName());
 		memberDetails.setLoginMobile(member.getLoginMobile());
 		memberDetails.setLoginEmail(member.getLoginEmail());
