@@ -121,8 +121,7 @@ public class NebulaMemberProfileController extends BaseController {
 				.findMemberById(memberDetails.getMemberId());
 
 		// 将MemberCommand对象数据全部转入MemberViewCommand中
-		MemberViewCommand memberViewCommand = memberViewCommandConverter
-				.convert(memberCommand);
+		MemberViewCommand memberViewCommand = memberViewCommandConverter.convert(memberCommand);
 
 		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"copy MemberCommand Properties to MemberViewCommand\"",
 				memberViewCommand, new Date());
@@ -181,7 +180,7 @@ public class NebulaMemberProfileController extends BaseController {
 			} catch (Exception e) {
 				LOG.error(e.getMessage());
 				defaultReturnResult.setResult(false);
-				defaultResultMessage.setMessage("updatePortrait.error");
+				defaultResultMessage.setMessage(getMessage("updatePortrait.error"));
 				defaultReturnResult.setResultMessage(defaultResultMessage);
 				return defaultReturnResult;
 			}
