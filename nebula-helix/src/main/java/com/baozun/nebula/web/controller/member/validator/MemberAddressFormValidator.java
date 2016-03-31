@@ -39,15 +39,15 @@ public class MemberAddressFormValidator implements Validator {
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "area", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "town", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "field.required");				
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "consignee", "field.required");	
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "field.required");	
 			
 			//验证手机号码和电话号码
 			validateAddress(memberAddressForm);	
 			
 			// 通用性检验
-			if (StringUtils.isNotBlank(memberAddressForm.getPhone())) {
-				if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,memberAddressForm.getPhone().trim())) {
-					errors.rejectValue("phone", "memberaddress.phone.error");
+			if (StringUtils.isNotBlank(memberAddressForm.getMobile())) {
+				if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,memberAddressForm.getMobile().trim())) {
+					errors.rejectValue("mobile", "memberaddress.phone.error");
 				}					
 			}
 			if (StringUtils.isNotBlank(memberAddressForm.getTelphone())) {	
@@ -68,6 +68,6 @@ public class MemberAddressFormValidator implements Validator {
 	 * @return
 	 */
 	protected boolean validateAddress(MemberAddressForm  memberAddressForm){
-		return StringUtils.isNotBlank(memberAddressForm.getPhone()) || StringUtils.isNotBlank(memberAddressForm.getTelphone());
+		return StringUtils.isNotBlank(memberAddressForm.getMobile()) || StringUtils.isNotBlank(memberAddressForm.getTelphone());
 	}
 }
