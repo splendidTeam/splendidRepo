@@ -4,6 +4,7 @@
 package com.baozun.nebula.manager.system;
 
 import com.baozun.nebula.command.SMSCommand;
+import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 
 /**
@@ -12,7 +13,7 @@ import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
  * @author Viktor Huang
  * @date 2016年3月30日 上午11:29:51
  */
-public interface SMSManager{
+public interface SMSManager extends BaseManager{
 
 	/**
 	 * 发送验证码短信，captcha会根据validity保存在redis中

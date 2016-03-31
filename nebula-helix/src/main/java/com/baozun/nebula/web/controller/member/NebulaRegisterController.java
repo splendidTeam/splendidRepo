@@ -35,9 +35,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.MemberConductCommand;
+import com.baozun.nebula.command.SMSCommand;
+import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.manager.system.TokenManager;
+import com.baozun.nebula.manager.system.SMSManager;
+import com.baozun.nebula.manager.system.SMSManager.CaptchaType;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
@@ -106,7 +109,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	private SdkMemberManager			sdkMemberManager;
 
 	@Autowired
-	private TokenManager				tokenManager;
+	private SMSManager					smsManager;
 
 	/**
 	 * 注册页面，默认推荐配置如下
@@ -253,7 +256,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		try{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
-			/** 检查验证码 */
+			/** TODO 检查验证码 */
 			defaultReturnResult = (DefaultReturnResult) checkCaptcha(request, memberFrontendCommand.getRandomCode());
 			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
@@ -320,7 +323,8 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected NebulaReturnResult checkCaptcha(HttpServletRequest request,String randomCode){
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
-		// 验证码
+		// TODO 验证码
+		// smsManager.validate(mobile, randomCode)
 
 		return defaultReturnResult;
 	}
@@ -448,9 +452,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected boolean sendRegisterMessage(HttpServletRequest request,String mobile){
 
-		
-		
-		return false;
-	}
+		SMSCommand smsCommand = new SMSCommand();
+		smsCommand.setMobile(mobile);
+		smsCommand.setTemplateCode(SMSTemplateConstants.SMS_REGISTER_CAPTCHA);
 
+		boolean sendResult = smsManager.send(smsCommand, CaptchaType.MIXED, SEND_MOBILE_MSG_LENGTH, SEND_MOBILE_MSG_LIVETIME);
+
+		return sendResult;
+	}
 }
