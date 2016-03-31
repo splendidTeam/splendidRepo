@@ -2,18 +2,17 @@ package com.baozun.nebula.web.controller.member;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.servlet.http.HttpSession;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.BindingResult;
 
-import com.baozun.nebula.manager.member.MemberEmailManager;
-import com.baozun.nebula.manager.member.MemberExtraManager;
+import com.baozun.nebula.manager.member.MemberPasswordManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -25,32 +24,34 @@ import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValid
  * 
  * @author Wanrong.Wang
  */
-@SuppressWarnings("unused")
 public class NebulaForgetPasswordControllerTest extends BaseControllerTest{
 
 	private NebulaForgetPasswordController	nebulaForgetPasswordController;
 
 	private ForgetPasswordFormValidator		forgetPasswordFormValidator;
 
-	private MemberExtraManager				memberExtraManager;
-
-	private SdkMemberManager				sdkMemberManager;
-
 	private TokenManager					tokenManager;
 
+	private MemberPasswordManager			memberPasswordManager;
+
 	private MemberCommand					memberCommand;
+
+	private HttpSession						session;
 
 	private BindingResult					bindingResult;
 
 	private ForgetPasswordForm				forgetPasswordForm;
 
-	private String							email	= "wanrong.wang@baozun.com";
+	private String							email						= "wanrong.wang@baozun.com";
 
-	private String							mobile	= "18291809551";
+	private static final String				TOKEN						= "VALIDATED_USER_MESSAGE_KEY";
 
-	private MemberEmailManager				memberEmailManager;
+	/* 重置密码成功的页面定义 */
+	public static final String				VIEW_RESET_PASSWORD_SUCCESS	= "resetpassword.success";
 
-	private SdkSMSManager					smsManager;
+	public static final String				PASSWORD					= "password";
+
+	public static final String				CONFIRM_PASSWORD			= "confirmPassword";
 
 	@Before
 	public void setUp(){
@@ -60,54 +61,49 @@ public class NebulaForgetPasswordControllerTest extends BaseControllerTest{
 		forgetPasswordFormValidator = new ForgetPasswordFormValidator();
 
 		// 创建Mock对象
-		memberExtraManager = control.createMock("memberExtraManager", MemberExtraManager.class);
-		sdkMemberManager = control.createMock("sdkMemberManager", SdkMemberManager.class);
-		memberEmailManager = control.createMock("memberEmailManager", MemberEmailManager.class);
-		smsManager = control.createMock("smsManager", SdkSMSManager.class);
 		tokenManager = control.createMock("tokenManager", TokenManager.class);
-
+		memberPasswordManager = control.createMock("memberPasswordManager", MemberPasswordManager.class);
+		session = control.createMock("HttpSession", HttpSession.class);
 		// 此步骤相当于将创建好的对象都注入到对应的controller中去
-		ReflectionTestUtils.setField(nebulaForgetPasswordController, "sdkMemberManager", sdkMemberManager);
-		ReflectionTestUtils.setField(nebulaForgetPasswordController, "memberExtraManager", memberExtraManager);
-		ReflectionTestUtils.setField(nebulaForgetPasswordController, "forgetPasswordFormValidator", forgetPasswordFormValidator);
-		ReflectionTestUtils.setField(nebulaForgetPasswordController, "memberEmailManager", memberEmailManager);
-		ReflectionTestUtils.setField(nebulaForgetPasswordController, "smsManager", smsManager);
 		ReflectionTestUtils.setField(nebulaForgetPasswordController, "tokenManager", tokenManager);
+		ReflectionTestUtils.setField(nebulaForgetPasswordController, "memberPasswordManager", memberPasswordManager);
+		ReflectionTestUtils.setField(nebulaForgetPasswordController, "forgetPasswordFormValidator", forgetPasswordFormValidator);
 	}
 
 	/**
-	 * 测试邮箱发送验证码
+	 * 测试发送验证码
 	 */
 	@Test
-	public void testEmailSendValidateCode(){
+	public void testSendValidateCode(){
 		try{
 
 			memberCommand = new MemberCommand();
 			memberCommand.setLoginEmail(email);
-
 			// 初始化forgetPasswordForm参数
 			forgetPasswordForm = new ForgetPasswordForm();
 			forgetPasswordForm.setEmail(email);
-			// forgetPasswordForm.setType(2);
-			// forgetPasswordForm.setNewPassword("123");
-			// forgetPasswordForm.setConfirmPassword("123");
-			// bindingResult = mockBindingResult(forgetPasswordForm);
-
-			EasyMock.expect(sdkMemberManager.findMemberByLoginEmail(forgetPasswordForm.getEmail())).andReturn(memberCommand);
-
+			forgetPasswordForm.setType(2);
+			bindingResult = mockBindingResult(forgetPasswordForm);
+			DefaultReturnResult returnResult = new DefaultReturnResult();
+			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+			returnResult.setResult(true);
+			returnResult.setResultMessage(defaultResultMessage);
 			// 没有返回值的数据模拟
-			tokenManager.saveToken(null, email, 60, "code");
+
+			EasyMock.expect(memberPasswordManager.sendValidateCode(forgetPasswordForm)).andReturn(true);
+			EasyMock.expect(request.getSession()).andReturn(session);
+
+			session.setAttribute(TOKEN, forgetPasswordForm);
 			EasyMock.expectLastCall();
 
 			control.replay();
-
-			DefaultReturnResult returnResult = new DefaultReturnResult();
-			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
-			returnResult.setResultMessage(defaultResultMessage);
-			returnResult.setResult(true);
-			// assertEquals(
-			// DefaultReturnResult.SUCCESS,
-			// nebulaForgetPasswordController.emailSendValidateCode(request, response, model, forgetPasswordForm, bindingResult));
+			DefaultReturnResult sendValidateCode = (DefaultReturnResult) nebulaForgetPasswordController.sendValidateCode(
+					request,
+					response,
+					model,
+					forgetPasswordForm,
+					bindingResult);
+			assertEquals(true, (boolean) sendValidateCode.isResult());
 
 			control.verify();
 		}catch (Exception e){
@@ -116,31 +112,38 @@ public class NebulaForgetPasswordControllerTest extends BaseControllerTest{
 	}
 
 	/**
-	 * 测试手机发送验证码
+	 * 测试重置密码
 	 */
 	@Test
-	public void testmobileSendValidateCode(){
+	public void testResetPassword(){
 		try{
 
 			memberCommand = new MemberCommand();
-			memberCommand.setLoginMobile(mobile);
+			memberCommand.setLoginEmail(email);
 
 			// 初始化forgetPasswordForm参数
 			forgetPasswordForm = new ForgetPasswordForm();
-			forgetPasswordForm.setMobile(mobile);
+			forgetPasswordForm.setEmail(email);
+			forgetPasswordForm.setType(2);
 			bindingResult = mockBindingResult(forgetPasswordForm);
 
-			EasyMock.expect(sdkMemberManager.findMemberByLoginMobile(mobile)).andReturn(memberCommand);
-			control.replay();
-			// assertEquals(
-			// DefaultReturnResult.SUCCESS,
-			// nebulaForgetPasswordController.mobileSendValidateCode(request, response, model, forgetPasswordForm, bindingResult));
-			// control.verify();
+			// EasyMock.expect(sdkMemberManager.findMemberByLoginEmail(forgetPasswordForm.getEmail())).andReturn(memberCommand);
+			EasyMock.expect(memberPasswordManager.resetPassword(forgetPasswordForm, "123")).andReturn(true);
+			EasyMock.expect(request.getSession()).andReturn(session).anyTimes();
+			EasyMock.expect(session.getAttribute(TOKEN)).andReturn(forgetPasswordForm).anyTimes();
+			EasyMock.expect(request.getParameter(PASSWORD)).andReturn("123").anyTimes();
+			EasyMock.expect(request.getParameter(CONFIRM_PASSWORD)).andReturn("123").anyTimes();
 
+			control.replay();
+
+			assertEquals(
+					VIEW_RESET_PASSWORD_SUCCESS,
+					nebulaForgetPasswordController.resetPassword(request, response, model, forgetPasswordForm, bindingResult));
+
+			control.verify();
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-
 	}
 
 	/**

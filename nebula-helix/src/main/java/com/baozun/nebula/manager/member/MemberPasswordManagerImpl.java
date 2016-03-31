@@ -44,9 +44,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	@Autowired
 	private TokenManager		tokenManager;
 
-	@Autowired
-	private MemberExtraManager	memberExtraManager;
-
 	/**
 	 * 发送验证码的方法
 	 */
@@ -162,7 +159,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 重置密码
 			LOG.info("[The member try to reset password,memberId: ] {} [{}]", memberCommand.getId(), new Date());
 			resetPassword = sdkMemberManager.resetPasswd(memberCommand.getId(), codePassword);
-			memberExtraManager.rememberPwd(memberCommand.getId(), new Date().getTime() + "");
 		}
 		return resetPassword;
 	}
@@ -204,9 +200,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 如果修改成功
 			if (updatePasswd){
 				LOG.info("[The member have modified password success,memberId: ] {} [{}]", memberId, new Date());
-				// 重置记住密码的数据
-				String short4 = new Date().getTime() + "";
-				memberExtraManager.rememberPwd(memberId, short4);
 				flag = true;
 			}
 		}else{

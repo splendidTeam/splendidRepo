@@ -31,11 +31,11 @@ public class MemberPasswordFormValidator implements Validator{
 		RegexUtil.matches(RegexPattern.AN, newPassword);
 
 		// 还需要校验两次输入密码的一致性（service层最终进行修改密码的时候也进行了校验，不知道此处的校验还需要否？）
-		if (!errors.hasFieldErrors("newPassword") && !errors.hasFieldErrors("confirmPassword")){
-			if (!command.getNewPassword().equals(command.getConfirmPassword())){
-				errors.rejectValue("confirmPassword", "register.confirmPassword.error");// 提示两次输入的密码不一致
-			}
-		}
+		// if (!errors.hasFieldErrors("newPassword") && !errors.hasFieldErrors("confirmPassword")){
+		// if (!command.getNewPassword().equals(command.getConfirmPassword())){
+		// errors.rejectValue("confirmPassword", "register.confirmPassword.error");// 提示两次输入的密码不一致
+		// }
+		// }
 
 	}
 }
