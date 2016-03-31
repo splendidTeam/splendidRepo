@@ -588,4 +588,13 @@ public interface SdkMemberManager extends BaseManager{
 	public Pagination<RateCommand> findItemRateListByMemberId(Page page,Sort[] sorts,Long memberId);
 
 	public Set<String> getMemComboIdsByGroupIdMemberId(List<Long> groupIds,Long memberId);
+
+	/**
+	 * 根据会员id更新他对应的groupId
+	 * 
+	 * @param memberId
+	 * @param groupId
+	 * @return
+	 */
+	int updateMemberGroupIdById(Long memberId,Long groupId);
 }

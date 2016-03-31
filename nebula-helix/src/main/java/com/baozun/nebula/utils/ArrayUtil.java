@@ -13,7 +13,9 @@ import java.util.List;
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 2010-4-16 下午01:00:27
  * @since 1.0
+ * @deprecated pls use {@link com.feilong.core.lang.ArrayUtil}
  */
+@Deprecated
 public final class ArrayUtil{
 
 	/** Don't let anyone instantiate this class. */

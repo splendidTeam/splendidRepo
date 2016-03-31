@@ -37,6 +37,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import com.baozun.nebula.utilities.common.ConfigurationUtil;
 import com.baozun.nebula.utilities.common.ResourceUtil;
 import com.baozun.nebula.utilities.common.convertor.Base64Convertor;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException.EncOperation;
 
 /**
  * RSA 加解密器
@@ -59,6 +60,7 @@ public class RSAEncryptor implements Encryptor {
 	
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
+	private String strPublicKey;
 	
 	public RSAEncryptor(){
 		String privateKeyPlace = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey");	
@@ -74,7 +76,8 @@ public class RSAEncryptor implements Encryptor {
 		try {
 			privateKey = privateKeyIsPKCS8 ? toRSAPrivateKeyPKCS8(getInputStream(privateKeyPlace)):
 						toRSAPrivateKey(getInputStream(privateKeyPlace));
-			publicKey = toRSAPublicKey(getInputStream(publicKeyPlace));
+			strPublicKey = loadKeyFromInputStream(getInputStream(publicKeyPlace));
+			publicKey = toRSAPublicKey(strPublicKey);
 		} catch (Exception e) {
 			
 		}
@@ -134,7 +137,7 @@ public class RSAEncryptor implements Encryptor {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);  
             return cipher.doFinal(plainText.getBytes(ConfigurationUtil.DEFAULT_ENCODING)); 
         } catch (Exception e) {  
-            throw new EncryptionException("RSA Encryption Error", e);  
+            throw new EncryptionException(plainText, "RSA", EncOperation.ENCRYPT ,e);  
         } 
 	}
 	
@@ -146,7 +149,7 @@ public class RSAEncryptor implements Encryptor {
             byte[] output= cipher.doFinal(cipherBytes);  
             return new String(output, ConfigurationUtil.DEFAULT_ENCODING);
         } catch (Exception e) {  
-            throw new EncryptionException("RSA Decryption Error", e);  
+        	throw new EncryptionException(base64.format(cipherBytes), "RSA", EncOperation.DECRYPT ,e);  
         }  
 	}
 	
@@ -190,6 +193,7 @@ public class RSAEncryptor implements Encryptor {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private RSAPublicKey toRSAPublicKey(InputStream is) throws EncryptionException {
 		String strKey = loadKeyFromInputStream(is);
 		return toRSAPublicKey(strKey);
@@ -243,5 +247,9 @@ public class RSAEncryptor implements Encryptor {
         } catch (Exception e) {  
             throw new EncryptionException("Extract PrivateKey Error",e);  
         }
+	}
+
+	public String getStrPublicKey() {
+		return strPublicKey;
 	}
 }

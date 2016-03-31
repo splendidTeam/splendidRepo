@@ -120,20 +120,8 @@ public interface MemberManager extends BaseManager{
 	 * @return
 	 */
 	public MemberCommand login(MemberFrontendCommand memberCommand)
-			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;
-	
-	/**
-	 * 不需要密码的登录方法，(记住密码使用)
-	 * @return MemberCommand
-	 * @param memberCommand
-	 * @throws UserNotExistsException
-	 * @throws UserExpiredException
-	 * @throws PasswordNotMatchException 
-	 * @author 冯明雷
-	 * @time 2016年3月25日下午3:27:49
-	 */
-	MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand)
-			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;
+			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;	
+
 
 	/**
 	 * 包含用户名、手机、邮箱
@@ -142,6 +130,16 @@ public interface MemberManager extends BaseManager{
 	 * @return
 	 */
 	public Member findMember(String loginName);
+	
+	
+	/**
+	 * 根据用户名查询MemberCommand(用户名包含登录名、登录邮箱、登录手机)
+	 * @return Member
+	 * @param loginName
+	 * @author 冯明雷
+	 * @time 2016年3月30日上午10:42:13
+	 */
+	public MemberCommand findMemberCommandByLoginName(String loginName);
 
 	/**
 	 * 会员注册

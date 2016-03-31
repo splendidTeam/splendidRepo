@@ -51,6 +51,8 @@ import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.feilong.core.RegexPattern;
+import com.feilong.core.util.RegexUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -300,58 +302,31 @@ public class MemberManagerImpl implements MemberManager{
 	@Override
 	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,
 			UserExpiredException,PasswordNotMatchException{
-		MemberCommand member = null;
-		member = validateMember(memberCommand);
-		
+		MemberCommand member = findMemberCommandByLoginName(memberCommand.getLoginName());
+
 		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
 		if (!encodePassword.equals(member.getPassword())){
 			throw new PasswordNotMatchException();
 		}
-
 		// 保存用户行为信息
 		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
 		return member;
 	}
-	
+
 	@Override
-	public MemberCommand loginWithOutPwd(MemberFrontendCommand memberCommand) throws UserNotExistsException,
-			UserExpiredException,PasswordNotMatchException{
-		MemberCommand member = validateMember(memberCommand);
-		// 保存用户行为信息
-		saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
-		return member;
-	}
-
-	/**
-	 * 共用的验证用户方法，只验证用户是否存在和用户的生命周期是否有效
-	 * @return MemberCommand
-	 * @param memberCommand
-	 * @throws UserNotExistsException
-	 * @throws UserExpiredException 
-	 * @author 冯明雷
-	 * @time 2016年3月25日下午3:31:48
-	 */
-	private MemberCommand validateMember(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException{
+	public MemberCommand findMemberCommandByLoginName(String loginName){
 		MemberCommand member;
-		if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
-			member = sdkMemberManager.findMemberByLoginMobile(memberCommand.getLoginName());
-		}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
-			member = sdkMemberManager.findMemberByLoginEmail(memberCommand.getLoginName());
+		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,loginName)){
+			member = sdkMemberManager.findMemberByLoginMobile(loginName);
+		}else if (!RegexUtil.matches(RegexPattern.EMAIL,loginName)){
+			member = sdkMemberManager.findMemberByLoginEmail(loginName);
 		}else{
-			member = sdkMemberManager.findMemberByLoginName(memberCommand.getLoginName());
-		}
-
-		if (null == member){
-			throw new UserNotExistsException();
+			member = sdkMemberManager.findMemberByLoginName(loginName);
 		}		
-
-		if (!Member.LIFECYCLE_ENABLE.equals(member.getLifecycle())){
-			throw new UserExpiredException();
-		}
-		return member;
+		return member;	
 	}
 	
-
+	
 	@Deprecated
 	@Override
 	public Member register(MemberFrontendCommand memberCommand){
@@ -405,19 +380,21 @@ public class MemberManagerImpl implements MemberManager{
 		// 保存会员信息
 		Member targetMember = (Member) ConvertUtils.convertTwoObject(new Member(), memberCommand);
 		Member member = sdkMemberManager.rewriteRegister(targetMember);
-		if (null == member){
-			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'Member' occurs error during registration!\"", new Date());
-			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
-		}
+		Long memberId = member.getId();
+		// 注册的时候 会员的GroupId默认为会员的ID
+		sdkMemberManager.updateMemberGroupIdById(memberId, memberId);
+
+		LOGGER.info("[save Member entity suc!] [{}] ID:{} \"\"", new Date(), memberId);
 
 		MemberPersonalData personData = new MemberPersonalData();
 		personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
-		
-		personData.setId(member.getId());
+
+		personData.setId(memberId);
+
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
-			if (RegulareExpUtils.isMobileNO(memberCommand.getLoginName())){
+			if (RegexUtil.matches(RegexPattern.MOBILEPHONE, memberCommand.getLoginName())){
 				personData.setMobile(memberCommand.getLoginName());
-			}else if (RegulareExpUtils.isSureEmail(memberCommand.getLoginName())){
+			}else if (RegexUtil.matches(RegexPattern.EMAIL, memberCommand.getLoginName())){
 				personData.setEmail(memberCommand.getLoginName());
 			}
 		}
@@ -431,18 +408,16 @@ public class MemberManagerImpl implements MemberManager{
 			personData.setEmail(memberCommand.getLoginEmail());
 		}
 		// 保存会员个人资料信息
-		personData = sdkMemberManager.savePersonData(personData);
-		if (null == personData){
-			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'MemberPersonalData' occurs error during registration!\"", new Date());
-			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
-		}
+		sdkMemberManager.savePersonData(personData);
+
+		LOGGER.info("[save MemberPersonalData entity suc!] [{}] ID:{} \"\"", new Date(), memberId);
+
 		// 保存用户行为信息
-		memberCommand.getMemberConductCommand().setId(member.getId());
-		MemberConductCommand conductCommand = sdkMemberManager.saveMemberConduct(memberCommand.getMemberConductCommand());
-		if (null == conductCommand){
-			LOGGER.error("[MEM_REGISTER] [{}] \"Saving 'MemberConductCommand' occurs error during registration!\"", new Date());
-			throw new BusinessException(ErrorCodesFoo.SYSTEM_ERROR);
-		}
+		memberCommand.getMemberConductCommand().setId(memberId);
+		MemberConductCommand memberConduct = sdkMemberManager.saveMemberConduct(memberCommand.getMemberConductCommand());
+
+		LOGGER.info("[save MemberConduct entity suc!] [{}] conduct_id:{} \"\"", new Date(), memberConduct.getId());
+
 		return member;
 	}
 

@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import com.baozun.nebula.manager.CacheManager;
 import com.feilong.core.Validator;
 
+import redis.clients.jedis.Jedis;
+
 /**
  * @author D.C
  * @time 2016年3月24日 下午4:04:47
@@ -107,6 +109,11 @@ public class TokenManagerImpl implements TokenManager {
 		private long created;
 		private long liveTime;
 
+	}
+
+	@Override
+	public VerifyResult verifyAccess(String businessCode, String human, RollingTimeWindow rollingTimeWindow) {
+		return null;
 	}
 
 }

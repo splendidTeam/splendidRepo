@@ -22,24 +22,66 @@ public class EncryptionException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 3358193119637945864L;
+	
+	public static enum EncOperation {
+		ENCRYPT,DECRYPT
+	}
+	
+	/**
+	 * 待加密/解密的文本
+	 */
+	private String originText;
+	
+	/**
+	 * 加解密算法
+	 */
+	private String encType;
+	
+	private EncOperation encOperation;
 
 	public EncryptionException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public EncryptionException(String arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
 	}
 
 	public EncryptionException(Throwable arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
 	}
 
 	public EncryptionException(String arg0, Throwable arg1) {
 		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
+	}
+	
+	public EncryptionException(String originText, String encType, EncOperation encOperation, Throwable e){
+		super(e);
+		this.originText = originText;
+		this.encType = encType;
+		this.encOperation = encOperation;
 	}
 
+	public String getOriginText() {
+		return originText;
+	}
+
+	public void setOriginText(String originText) {
+		this.originText = originText;
+	}
+
+	public String getEncType() {
+		return encType;
+	}
+
+	public void setEncType(String encType) {
+		this.encType = encType;
+	}
+
+	public EncOperation getEncOperation() {
+		return encOperation;
+	}
+
+	public void setEncOperation(EncOperation encOperation) {
+		this.encOperation = encOperation;
+	}
 }

@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import com.baozun.nebula.utilities.common.ConfigurationUtil;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.convertor.Base64Convertor;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException.EncOperation;
 
 public class AESEncryptor implements Encryptor {
 
@@ -81,7 +82,7 @@ public class AESEncryptor implements Encryptor {
 
 			return cipher.doFinal(plainText.getBytes(ConfigurationUtil.DEFAULT_ENCODING));
 		} catch (Exception e) {
-			throw new EncryptionException("AES Encryption Error", e);
+			throw new EncryptionException(plainText, "AES", EncOperation.ENCRYPT ,e); 
 		} 
 	}
 
@@ -97,7 +98,7 @@ public class AESEncryptor implements Encryptor {
 			byte[] b = c.doFinal(cipher);
 			return new String(b, ConfigurationUtil.DEFAULT_ENCODING);
 		} catch (Exception e) {
-			throw new EncryptionException("AES Decryption Error", e);
+			throw new EncryptionException(base64.format(cipher), "AES", EncOperation.DECRYPT ,e); 
 		}
 	}
 
