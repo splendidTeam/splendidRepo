@@ -25,6 +25,19 @@ import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
 import com.feilong.core.util.RandomUtil;
 
+/**
+ * <pre>
+ * 类名：MemberPasswordManagerImpl
+ * 功能：用户密码相关操作的manager实现 
+ * 相关方法：  
+ *   发送验证码的方法
+ *  重置密码的方法
+ *   查询旧密码是否正确的方法
+ *   修改密码的方法
+ * </pre>
+ * 
+ * @author Wanrong.Wang 2016/04/01
+ */
 public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 	private static final Logger	LOG				= LoggerFactory.getLogger(MemberPasswordManagerImpl.class);
@@ -48,7 +61,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * 发送验证码的方法
 	 */
 	@Override
-	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm) throws Exception{
+	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm){
 		boolean flag = false;
 		if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.MOBILE){
 			// 是手机验证方式，则调用手机发送验证码的方法
@@ -67,7 +80,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean emailSendValidateCode(String email) throws Exception{
+	private boolean emailSendValidateCode(String email){
 
 		boolean flag = false;
 
@@ -78,9 +91,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 			// 生成验证码
 			String code = RandomUtil.createRandomFromString("待定", 4);
-			// String code = SecurityCodeUtil.createSecurityCode(
-			// MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
-			// MessageConstants.SECURITY_CODE_LENGTH);
 
 			// 保存发送的验证码到redis中
 			tokenManager.saveToken(null, email, MAX_EXIST_TIME, code);
@@ -101,7 +111,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean mobileSendValidateCode(String mobile) throws Exception{
+	private boolean mobileSendValidateCode(String mobile){
 
 		boolean flag = false;
 
@@ -113,9 +123,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 			// 生成验证码
 			String code = RandomUtil.createRandomFromString("待定", 4);
-			// String code = SecurityCodeUtil.createSecurityCode(
-			// MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
-			// MessageConstants.SECURITY_CODE_LENGTH);
 
 			// 保存验证码到redis中，并且设置验证码的生存时间
 			tokenManager.saveToken(null, mobile, MAX_EXIST_TIME, code);
