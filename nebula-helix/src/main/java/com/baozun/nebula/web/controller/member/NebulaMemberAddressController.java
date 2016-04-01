@@ -289,28 +289,24 @@ public class NebulaMemberAddressController extends BaseController {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
-		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+		//校验addressId有效，验证方法是直接删除对应会员的地址，如果删除成功说明地址Id有效，否则无效
+		LOG.debug("Try to delete address[{}] for member{}", addressId, memberDetails.getLoginName());
 		
-		LOG.info("[MEM_DELETE_ADDRESS] {} [{}] \"待删除的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
-		//校验addressId有效
-		LOG.debug("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --start");
-		ContactCommand contact=sdkMemberManager.findContactById(addressId,memberDetails.getMemberId());
-		
-		if(null == contact) {
-			LOG.info("[MEM_ADD_ADDRESS] 校验删除地址的id是否属于这个会员  --error");
-			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
-			defaultReturnResult.setResultMessage(defaultResultMessage);
-			return defaultReturnResult;
-		}
-		LOG.debug("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
 		Integer result = sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
-		if(1 > result) {
-			defaultReturnResult.setResult(false);
+		if(1 == result) {
+			LOG.debug("Delete address[{}] for member{} success", addressId, memberDetails.getLoginName());
+			LOG.info("[MEM_ADDRESS_DELETE] {} [{}] \"Address[{}] is deleted.\"", memberDetails.getLoginName(), new Date(), addressId);
+			return DefaultReturnResult.SUCCESS;
+		}else if(0 == result){
+			LOG.debug("Delete address[{}] for member{} failed. no record found", addressId, memberDetails.getLoginName());
+			DefaultReturnResult returnResult= new DefaultReturnResult();
+			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+			returnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
-			defaultReturnResult.setResultMessage(defaultResultMessage);
-		}
-		return defaultReturnResult;
+			returnResult.setResultMessage(defaultResultMessage);
+			return returnResult;
+		}else{
+			throw new RuntimeException("Should not happen");
+		}		
 	}
 }

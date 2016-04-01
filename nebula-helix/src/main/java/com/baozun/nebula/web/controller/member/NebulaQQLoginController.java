@@ -36,7 +36,7 @@ public class NebulaQQLoginController extends NebulaOAuthLoginController{
 		// QQ登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("qq generate login url {}", loginUrl);
-		return loginUrl;
+		return "redirect:"+loginUrl;
 	}
 
 	/**

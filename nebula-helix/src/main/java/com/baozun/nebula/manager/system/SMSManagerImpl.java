@@ -6,6 +6,8 @@ package com.baozun.nebula.manager.system;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
@@ -19,6 +21,8 @@ import com.feilong.core.util.RegexUtil;
  * @author Viktor Huang
  * @date 2016年3月30日 下午6:28:04
  */
+@Service("smsManager")
+@Transactional
 public class SMSManagerImpl implements SMSManager{
 
 	@SuppressWarnings("unused")

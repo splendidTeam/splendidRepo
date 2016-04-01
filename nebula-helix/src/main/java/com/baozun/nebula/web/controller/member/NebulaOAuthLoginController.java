@@ -14,9 +14,11 @@ import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.member.ThirdPartyMemberCommand;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.Member;
+import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.RequestUtil;
 
 /**
@@ -181,15 +183,9 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	 * @return
 	 */
 	protected MemberDetails getMemberDetails(Member member){
-
-		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setLoginName(member.getLoginName());
-		memberDetails.setLoginMobile(member.getLoginMobile());
-		memberDetails.setLoginEmail(member.getLoginEmail());
-		memberDetails.setNickName(member.getLoginName());
-		memberDetails.setMemberId(member.getId());
-
-		return memberDetails;
+		MemberCommand command = new MemberCommand();
+		PropertyUtil.copyProperties(command, member);
+		return constructMemberDetails(command);
 	}
 
 }

@@ -1,8 +1,13 @@
 package com.baozun.nebula.web.controller.member;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baozun.nebula.manager.member.MemberStatusFlowProcessor;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
@@ -14,6 +19,9 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.SessionUtil;
 
 public abstract class NebulaAbstractLoginController extends BaseController {
+	
+	@Autowired
+	private MemberStatusFlowProcessor memberStatusFlowProcessor;
 	
 	/**
 	 * 重置会话
@@ -38,29 +46,54 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_CONTEXT, memberDetails);
 		// 触发登录成功事件，用于异步处理其他的业务
 		eventPublisher.publish(new LoginSuccessEvent(memberDetails, getClientContext(request, response)));
-		return DefaultReturnResult.SUCCESS;
+		
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();		
+		//执行Processor
+		String url=memberStatusFlowProcessor.process(memberDetails);
+		
+		//返回链接
+		defaultReturnResult.setReturnObject(url);
+		
+		return defaultReturnResult;
 	}
+	
 	
 	/**
 	 * 构造MemberDetails
-	 * 
-	 * @param member
-	 * @return
+	 * @return MemberDetails
+	 * @param memberCommand
+	 * @author 冯明雷
+	 * @time 2016年4月1日下午5:07:04
 	 */
-	protected MemberDetails constructMemberDetails(MemberCommand member){
+	protected MemberDetails constructMemberDetails(MemberCommand memberCommand){
 		MemberDetails memberDetails = new MemberDetails();
-		PropertyUtil.copyProperties(memberDetails, member, "loginName","loginMobile","loginEmail","id","realName");
+		PropertyUtil.copyProperties(memberDetails, memberCommand);
+		//获取member status
+		memberDetails.setStatus(getPendingStatus(memberCommand));
+		
+		memberDetails.setMemberId(memberCommand.getId());
+		memberDetails.setNickName(memberCommand.getLoginName());
 		return memberDetails;
 	}
 	
+	
 	/**
-	 * 用户是否激活
-	 * 
-	 * @param member
-	 * @return
+	 * <h3>本方法需要商城去重写</h3>
+	 * 根据memberId查询MemberBehaviorStatus表中是否存在用户行为记录<br/>
+	 * 根据用户行为记录判断用户是否需要去激活，或者是绑定、完善信息等
+	 * @return List<String>
+	 * @param memberCommand
+	 * @author 冯明雷
+	 * @time 2016年4月1日下午5:10:28
 	 */
-	protected boolean isActivedMember(MemberCommand member){
-		// TODO 判断逻辑
-		return false;
-	}
+	protected List<String> getPendingStatus(MemberCommand memberCommand){
+		//通过memberId 以及 各商城关注点  查询MemberBehaviorStatus表记录
+		
+		//根据MemberBehaviorStatus表中的数据去判断是否需要激活、绑定、完善信息等
+		
+		return null;
+	}	
+	
 }
+
+
