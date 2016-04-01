@@ -37,7 +37,7 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 		// 微信登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("WeChat generate login url {}", loginUrl);
-		return loginUrl;
+		return "redirect:"+loginUrl;
 	}
 
 	/**
