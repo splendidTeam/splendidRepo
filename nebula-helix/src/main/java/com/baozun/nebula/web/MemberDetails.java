@@ -75,9 +75,27 @@ public class MemberDetails implements Serializable {
 	private Set<String> memComboList;
 	
 	/**
-	 * 状态
+	 * 用户行为状态
 	 */
 	private List<String> status;
+	
+	public enum Status {
+		INVALIDATE("invalidate"), VALIDATE("validate"), EMAIL_ACTIVE(""), EMAIL_INACTIVE(""), MOBILE_INACTIVE(""), WAITING_BIND(""), WAITING_PROFILE("");
+		
+		private String value;
+		
+		Status(String value) {
+			this.setValue(value);
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+	}
 
 
 	public MemberDetails() {
@@ -190,21 +208,4 @@ public class MemberDetails implements Serializable {
 		this.status = status;
 	}
 
-	public enum Status {
-		INVALIDATE("invalidate"), VALIDATE("validate"), EMAIL_ACTIVE(""), EMAIL_INACTIVE(""), MOBILE_INACTIVE(""), WAITING_BIND(""), WAITING_PROFILE("");
-		
-		private String value;
-		
-		Status(String value) {
-			this.setValue(value);
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-	}
 }

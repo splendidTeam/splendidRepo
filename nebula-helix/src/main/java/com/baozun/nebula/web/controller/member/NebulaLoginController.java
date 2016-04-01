@@ -37,6 +37,7 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
+import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -267,8 +268,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return
 	 */
 	public NebulaReturnResult loginOut(HttpServletRequest request,HttpServletResponse response,Model model){
-		// 1.清空session
-		resetSession(request);
+		// 1.清空session中保存的用户信息
+		request.getSession().removeAttribute(SessionKeyConstants.MEMBER_CONTEXT);
+		
 		onLogoutSuccess(request, response);
 		return DefaultReturnResult.SUCCESS;
 	}
