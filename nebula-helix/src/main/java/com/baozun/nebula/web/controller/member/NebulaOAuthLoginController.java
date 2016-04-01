@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.member;
+	package com.baozun.nebula.web.controller.member;
 
 import java.util.Date;
 
@@ -16,8 +16,11 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
+import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.RequestUtil;
 
@@ -56,17 +59,25 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 
 	/**
 	 * 构建去第三方登录url
-	 * 
+	 * type 第三方登录名：微信 ，微博，QQ  支付宝等
 	 * @return
 	 */
-	protected abstract String constructOAuthLoginURL();
+	protected String constructOAuthLoginURL(String type){
+		// 获取第三方登录系统参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(type);
+
+		// 第三方登录地址
+		String loginUrl = adaptor.generateLoginUrl();
+		LOG.info("WeChat generate login url {}", loginUrl);
+		return "redirect:" + loginUrl;
+	}
 
 	/**
 	 * 校验授权并组装信息。如果验证失败返回null，否则返回封装好的第三方用户信息
 	 * 
 	 * @return
 	 */
-	protected abstract ThirdPartyMemberCommand checkOAuthLogin(HttpServletRequest request);
+	public  abstract ThirdPartyMemberCommand checkOAuthLogin(HttpServletRequest request);
 
 	/**
 	 * 根据回调处理登录动作，需要在具体项目中指定回调地址，示例配置为
@@ -114,17 +125,16 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 			MemberFrontendCommand frontendCommand = generateThirdPartyMember(thirdPartyMember, request);
 			memberManager.rewriteRegister(frontendCommand);
 		}
-		/*
-		 * 这部分将交给成功登录后的处理器去操作 // 是否需要完善信息 默认需要 if (isNeedCompleteInfo(member)) { // 逻辑判断 是否已经完善过信息，如果完善信息直接登录，如果没有，应去完善信息页面 return
-		 * showCompleteInfo(request, response, model); } // 是否需要绑定用户 默认不需要 if (isNeedBinding(member)) { LOG.info("openId:{} begin bind",
-		 * thirdPartyMember.getOpenId()); model.addAttribute("member_id", member.getId()); return showBinding(request, response, model); }
-		 */
 
 		// 第三方登录
-		doLogin(request, response, model, member);
+		String url =  doLogin(request, response, model, member);
 
-		// 这里应该跟正常登录逻辑保持一致，返回指定的URL
-		return VIEW_MEMBER_LOGIN_SUCC;
+		//判断是否存在用户状态流转，空表示不存在，应该跳转到默认登录成功页，否则跳转到状态返回URL
+		if (url == null || url.trim().length() == 0) {
+			return VIEW_MEMBER_LOGIN_SUCC;
+		}else{
+			return url;
+		}
 	}
 
 	/**
@@ -167,13 +177,15 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	 * @param model
 	 * @param member
 	 */
-	protected void doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
+	protected String doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
 
 		// 同步购物车 暂时省略
 		MemberDetails memberDetails = getMemberDetails(member);
 
 		// 登录成功后处理
-		super.onAuthenticationSuccess(memberDetails, request, response);
+		DefaultReturnResult result = (DefaultReturnResult) super.onAuthenticationSuccess(memberDetails, request, response);
+
+		return result.getReturnObject().toString();
 	}
 
 	/**

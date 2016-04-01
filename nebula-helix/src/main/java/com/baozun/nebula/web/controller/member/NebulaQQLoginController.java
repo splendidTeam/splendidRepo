@@ -27,16 +27,8 @@ public class NebulaQQLoginController extends NebulaOAuthLoginController{
 	 * 
 	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	@Override
 	public String constructOAuthLoginURL(){
-
-		// 获取系统QQ参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_QQ);
-
-		// QQ登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("qq generate login url {}", loginUrl);
-		return "redirect:"+loginUrl;
+		return super.constructOAuthLoginURL(ThirdPartyMemberFactory.TYPE_QQ);
 	}
 
 	/**
@@ -58,19 +50,30 @@ public class NebulaQQLoginController extends NebulaOAuthLoginController{
 		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_QQ);
 
 		// 校验授权
-		ThirdPartyMember number = adaptor.returnMember(request);
+		ThirdPartyMember member = adaptor.returnMember(request);
 
 		// 判断QQ用户登录信息是否成功获取
-		if (number.getErrorCode() == null || number.getErrorCode().trim().length() == 0) {
-			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_QQ, number.getErrorCode());
+		if (member.getErrorCode() == null || member.getErrorCode().trim().length() == 0) {
+			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_QQ, member.getErrorCode());
 			return null;
 		}
 
 		// 组装QQ用户信息
 		ThirdPartyMemberCommand numberCommand = new ThirdPartyMemberCommand();
-		numberCommand.setOpenId(number.getUid());
-		numberCommand.setNickName(number.getNickName());
+		numberCommand.setOpenId(member.getUid());
+		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_QQ);
+		
+		// 头像
+		numberCommand.setAvatar(member.getAvatar());
+		
+		//性别  注意：获取不到时默认返回男
+		if("男".equals(member.getSex())){
+			numberCommand.setSex("1");
+		}else if("女".equals(member.getSex())){
+			numberCommand.setSex("2");
+		}
+		
 		return numberCommand;
 	}
 

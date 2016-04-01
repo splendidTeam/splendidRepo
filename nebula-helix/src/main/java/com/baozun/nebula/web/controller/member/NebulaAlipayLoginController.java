@@ -29,17 +29,8 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 	 * 
 	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	@Override
 	public String constructOAuthLoginURL(){
-
-		// 获取系统支付宝参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
-				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
-
-		// 支付宝登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("alipay generate login url {}", loginUrl);
-		return "redirect:"+loginUrl;
+		return super.constructOAuthLoginURL(ThirdPartyMemberFactory.TYPE_ALIPAY);
 	}
 
 	/**
@@ -62,19 +53,29 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_ALIPAY);
 
 		// 校验授权
-		ThirdPartyMember number = adaptor.returnMember(request);
+		ThirdPartyMember member = adaptor.returnMember(request);
 
 		// 判断支付宝用户登录信息是否成功获取
-		if (number.getErrorCode() == null || number.getErrorCode().trim().length() == 0) {
-			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_ALIPAY, number.getErrorCode());
+		if (member.getErrorCode() == null || member.getErrorCode().trim().length() == 0) {
+			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_ALIPAY, member.getErrorCode());
 			return null;
 		}
 
 		// 组装支付宝用户信息
 		ThirdPartyMemberCommand numberCommand = new ThirdPartyMemberCommand();
-		numberCommand.setOpenId(number.getUid());
-		numberCommand.setNickName(number.getNickName());
+		numberCommand.setOpenId(member.getUid());
+		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_ALIPAY);
+		
+		// 头像
+		numberCommand.setAvatar(member.getAvatar());
+		
+		//性别  M为男性，F为女性
+		if("M".equals(member.getSex())){
+			numberCommand.setSex("1");
+		}else if("F".equals(member.getSex())){
+			numberCommand.setSex("2");
+		}
 		return numberCommand;
 	}
 

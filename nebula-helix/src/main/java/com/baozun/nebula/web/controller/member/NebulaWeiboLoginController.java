@@ -27,17 +27,8 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 	 * 
 	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	@Override
 	public String constructOAuthLoginURL(){
-
-		// 获取系统微博参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
-				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
-
-		// 微博登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("Weibo generate login url {}", loginUrl);
-		return "redirect:"+loginUrl;
+		return super.constructOAuthLoginURL(ThirdPartyMemberFactory.TYPE_WEIBO);
 	}
 
 	/**
@@ -60,19 +51,29 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
 
 		// 校验授权
-		ThirdPartyMember number = adaptor.returnMember(request);
+		ThirdPartyMember member = adaptor.returnMember(request);
 
 		// 判断微博用户登录信息是否成功获取
-		if (number.getErrorCode() == null || number.getErrorCode().trim().length() == 0) {
-			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_WEIBO, number.getErrorCode());
+		if (member.getErrorCode() == null || member.getErrorCode().trim().length() == 0) {
+			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_WEIBO, member.getErrorCode());
 			return null;
 		}
 
 		// 组装微博用户信息
 		ThirdPartyMemberCommand numberCommand = new ThirdPartyMemberCommand();
-		numberCommand.setOpenId(number.getUid());
-		numberCommand.setNickName(number.getNickName());
+		numberCommand.setOpenId(member.getUid());
+		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_SINA);
+		
+		// 头像
+		numberCommand.setAvatar(member.getAvatar());
+		
+		// 性别，m：男、f：女、n：未知
+		if("m".equals(member.getSex())){
+			numberCommand.setSex("1");
+		}else if("f".equals(member.getSex())){
+			numberCommand.setSex("2");
+		}
 		return numberCommand;
 	}
 

@@ -7,17 +7,14 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.Validator;
-import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.AbstractThirdPartyMemberAdaptor;
+import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.exception.RequestInfoException;
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
@@ -128,7 +125,7 @@ public class QqThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impleme
 		Map<String, String> jsonMap = null;
 		try {
 			openIdMap = objectMapper.readValue(openidInfo.substring(openidInfo.indexOf('{'), openidInfo.indexOf('}') + 1), idReference);
-			if(Validator.isNotNullOrEmpty(openIdMap)){
+			if(!openIdMap.isEmpty()){
 				openid = openIdMap.get("openid");
 				userInfoMap.put("openid", openid);
 				userInfoMap.put("oauth_consumer_key", clientId);
@@ -145,13 +142,20 @@ public class QqThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impleme
 			throw new RequestInfoException("QQ login failure "+openidInfo,e);
 		}
 			
-		if(Validator.isNullOrEmpty(jsonMap) || !"0".equals((String)jsonMap.get("ret"))){
+		if(jsonMap.isEmpty() || !"0".equals((String)jsonMap.get("ret"))){
 			throw new RequestInfoException("QQ login failure with "+(String)jsonMap.get("msg"));
 		}
 		
 		member = new ThirdPartyMember();
 		member.setNickName((String) jsonMap.get("nickname"));
 		member.setUid(openid);
+		
+		// 头像
+		member.setAvatar(jsonMap.get("figureurl"));
+		
+		// 性别
+		member.setSex(jsonMap.get("gender"));
+
 		return member;
 	
 	}

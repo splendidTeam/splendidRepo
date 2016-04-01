@@ -117,7 +117,7 @@ public class WeChatThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 
 			Map<String, String> openIdMap = objectMapper.readValue(tokenInfo.substring(tokenInfo.indexOf('{'),tokenInfo.indexOf('}') + 1), idReference);
 
-			if (Validator.isNotNullOrEmpty(openIdMap)) {
+			if (!openIdMap.isEmpty()) {
 				if (Validator.isNotNullOrEmpty(openIdMap.get("errcode"))) {
 						member.setErrorCode(openIdMap.get("errcode"));
 						member.setErrorDescription(openIdMap.get("errmsg"));						
@@ -143,7 +143,7 @@ public class WeChatThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 			throw new RequestInfoException("WenXin login failure " + tokenInfo, e);
 		}
 		// 获取用户信息失败
-		if (Validator.isNullOrEmpty(jsonMap)) {
+		if (jsonMap.isEmpty()) {
 			throw new RequestInfoException("WenXin login failure with " +  jsonMap.get("errmsg"));
 		}
 		if (Validator.isNotNullOrEmpty(jsonMap.get("errcode"))) {
@@ -155,6 +155,13 @@ public class WeChatThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 		member = new ThirdPartyMember();
 		member.setNickName(jsonMap.get("nickname"));
 		member.setUid(jsonMap.get("openid"));
+		
+		// 头像
+		member.setAvatar(jsonMap.get("headimgurl"));
+		
+		// 性别
+		member.setSex(jsonMap.get("sex"));
+		
 		return member;
 
 	}

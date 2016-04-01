@@ -7,8 +7,6 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
@@ -16,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.Validator;
-import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.AbstractThirdPartyMemberAdaptor;
+import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.exception.RequestInfoException;
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
@@ -146,13 +144,15 @@ public class WeiboThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impl
 			throw new RequestInfoException((String) userjsonMap.get("error"));
 		}
 		
-		if(Validator.isNullOrEmpty(userjsonMap)){
+		if(userjsonMap.isEmpty()){
 			logger.error("Sina Weibo login failure.");
 			throw new RequestInfoException("Sina Weibo login failure.");
 		}
 		
 		member.setUid(uid);
 		member.setNickName((String) userjsonMap.get("screen_name"));
+		member.setAvatar((String) userjsonMap.get("profile_image_url"));
+		member.setSex(jsonMap.get("gender"));
 		return member;
 		
 	}

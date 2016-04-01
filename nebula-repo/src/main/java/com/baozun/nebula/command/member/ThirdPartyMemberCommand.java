@@ -41,6 +41,11 @@ public class ThirdPartyMemberCommand {
 	 * 会员来源，请参考Member中的相关常量定义
 	 */
 	private Integer source;
+	
+	/**
+	 * 头像
+	 */
+	private String avatar;
 
 	public String getOpenId() {
 		return openId;
@@ -96,6 +101,16 @@ public class ThirdPartyMemberCommand {
 
 	public void setSource(Integer source) {
 		this.source = source;
+	}
+
+	
+	public String getAvatar(){
+		return avatar;
+	}
+
+	
+	public void setAvatar(String avatar){
+		this.avatar = avatar;
 	}
 	
 	

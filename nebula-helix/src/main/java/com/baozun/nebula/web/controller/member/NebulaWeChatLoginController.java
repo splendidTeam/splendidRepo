@@ -27,17 +27,8 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 	 * 
 	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	@Override
 	public String constructOAuthLoginURL(){
-
-		// 获取系统微信参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
-				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
-
-		// 微信登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("WeChat generate login url {}", loginUrl);
-		return "redirect:"+loginUrl;
+		return super.constructOAuthLoginURL(ThirdPartyMemberFactory.TYPE_WECHAT);
 	}
 
 	/**
@@ -60,19 +51,29 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
 
 		// 校验授权
-		ThirdPartyMember number = adaptor.returnMember(request);
+		ThirdPartyMember member = adaptor.returnMember(request);
 
 		// 判断微信用户登录信息是否成功获取
-		if (number.getErrorCode() == null || number.getErrorCode().trim().length() == 0) {
-			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_WECHAT, number.getErrorCode());
+		if (member.getErrorCode() == null || member.getErrorCode().trim().length() == 0) {
+			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_WECHAT, member.getErrorCode());
 			return null;
 		}
 
 		// 组装微信用户信息
 		ThirdPartyMemberCommand numberCommand = new ThirdPartyMemberCommand();
-		numberCommand.setOpenId(number.getUid());
-		numberCommand.setNickName(number.getNickName());
+		numberCommand.setOpenId(member.getUid());
+		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_WECHAT);
+		
+		// 头像
+		numberCommand.setAvatar(member.getAvatar());
+		
+		//性别  普通用户性别，1为男性，2为女性
+		if("1".equals(member.getSex())){
+			numberCommand.setSex("1");
+		}else if("2".equals(member.getSex())){
+			numberCommand.setSex("2");
+		}
 		return numberCommand;
 	}
 
