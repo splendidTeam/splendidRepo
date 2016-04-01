@@ -21,7 +21,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,16 +152,17 @@ public class NebulaMemberAddressController extends BaseController {
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		
-		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"待新增地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
+		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"地址信息\"", memberDetails.getLoginName(), new Date());
 		
-		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
+		LOG.debug("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		//校验过程		
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
+			LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --error");
 			NebulaReturnResult nebulaReturnResult = getResultFromBindingResult(bindingResult);
 			return nebulaReturnResult;
 		}	
-		LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
+		LOG.debug("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
 		//Form转contact
 		ContactCommand contact = memberAddressForm.toContactCommand();
 		contact.setMemberId(memberDetails.getMemberId());
@@ -195,25 +195,29 @@ public class NebulaMemberAddressController extends BaseController {
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 
-		LOG.info("[MEM_UPDATE_ADDRESS] {} [{}] \"待更新地址信息的用户Id{}\"", memberDetails.getLoginName(), new Date(),memberDetails.getMemberId());
+		LOG.info("[MEM_UPDATE_ADDRESS] {} [{}] \"待更新地址信息的Id{}\"", memberDetails.getLoginName(), new Date(),memberAddressForm.getId());
 		
 		//校验过程
-		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
+		LOG.debug("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
+			LOG.info("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --error");
 			NebulaReturnResult nebulaReturnResult = getResultFromBindingResult(bindingResult);
 			return nebulaReturnResult;
 		}
-		LOG.info("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
+		LOG.debug("[MEM_UPDATE_ADDRESS] 校验对象memberAddressForm的必需字段  --end");
 		//查询出原来的地址对象
 		ContactCommand command=sdkMemberManager.findContactById(memberAddressForm.getId(),memberDetails.getMemberId());
+		LOG.debug("[MEM_DEFAULT_ADDRESS] 校验更新的地址是否属于这个会员  --start");
 		if(null == command) {
+			LOG.debug("[MEM_UPDATE_ADDRESS] 校验更新的地址是否属于这个会员  --error");
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 			return defaultReturnResult;
 		}
+		LOG.debug("[MEM_DEFAULT_ADDRESS] 校验更新的地址是否属于这个会员  --end");
 		//Form转contact
 		ContactCommand contact = memberAddressForm.toContactCommand(command);
 		//另外字段添加
@@ -250,16 +254,17 @@ public class NebulaMemberAddressController extends BaseController {
 
 		LOG.info("[MEM_DEFAULT_ADDRESS] {} [{}] \"待修改的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
 		//校验addressId有效
-		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --start");
+		LOG.debug("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --start");
 		ContactCommand contact=sdkMemberManager.findContactById(addressId,memberDetails.getMemberId());
 		if(null == contact) {
+			LOG.info("[MEM_ADD_ADDRESS] 校验设置默认地址的id是否属于这个会员  --error");
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 			return defaultReturnResult;
 		}
-		LOG.info("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --end");
+		LOG.debug("[MEM_DEFAULT_ADDRESS] 校验设置默认地址的id是否属于这个会员  --end");
 		sdkMemberManager.updateContactIsDefault(memberDetails.getMemberId(),addressId,Contact.ISDEFAULT);
 		return defaultReturnResult;
 	}
@@ -285,29 +290,27 @@ public class NebulaMemberAddressController extends BaseController {
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
-
+		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+		
 		LOG.info("[MEM_DELETE_ADDRESS] {} [{}] \"待删除的地址Id{}\"", memberDetails.getLoginName(), new Date(),addressId);
 		//校验addressId有效
-		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --start");
+		LOG.debug("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --start");
 		ContactCommand contact=sdkMemberManager.findContactById(addressId,memberDetails.getMemberId());
+		
 		if(null == contact) {
-			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+			LOG.info("[MEM_ADD_ADDRESS] 校验删除地址的id是否属于这个会员  --error");
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
 			return defaultReturnResult;
 		}
-		LOG.info("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
+		LOG.debug("[MEM_DELETE_ADDRESS] 校验删除地址的id是否属于这个会员  --end");
 		Integer result = sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
-		if(1 == result) {
-			return defaultReturnResult;
-		}else if(0 == result){
-			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
+		if(1 > result) {
 			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage(getMessage("memberaddress.sqlerror"));
+			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			defaultReturnResult.setResultMessage(defaultResultMessage);
-			return defaultReturnResult;
 		}
-		return null;		
+		return defaultReturnResult;
 	}
 }

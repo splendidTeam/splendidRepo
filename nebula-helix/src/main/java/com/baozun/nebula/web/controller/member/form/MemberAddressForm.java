@@ -16,7 +16,10 @@
  */
 package com.baozun.nebula.web.controller.member.form;
 
-import org.apache.commons.lang3.StringUtils;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.web.controller.BaseForm;
@@ -27,6 +30,8 @@ public class MemberAddressForm extends BaseForm {
 	 * 
 	 */
 	private static final long serialVersionUID = -4534711242178149888L;
+	
+	private static final Logger	LOGGER = LoggerFactory.getLogger(MemberAddressForm.class);
 
 	/**
 	 * ID
@@ -36,11 +41,11 @@ public class MemberAddressForm extends BaseForm {
 	/**
 	 * 联系人姓名
 	 */
-	private String consignee;
+	private String name;
 	/**
 	 * 联系手机
 	 */
-	private String phone;
+	private String mobile;
 
 	/**
 	 * 联系电话
@@ -55,22 +60,22 @@ public class MemberAddressForm extends BaseForm {
 	/**
 	 * 省
 	 */
-	private Long province;
-
+	private String province;
+	
 	/**
 	 * 市
 	 */
-	private Long city;
+	private String city;
 
 	/**
 	 * 区
 	 */
-	private Long area;
+	private String area;
 
 	/**
 	 * 镇
 	 */
-	private Long town;
+	private String town;
 
 	/**
 	 * 地址
@@ -93,6 +98,62 @@ public class MemberAddressForm extends BaseForm {
 	private boolean isDefault;
 
 	/**
+	 * @return the province
+	 */
+	public String getProvince() {
+		return province;
+	}
+
+	/**
+	 * @param province the province to set
+	 */
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	/**
+	 * @return the city
+	 */
+	public String getCity() {
+		return city;
+	}
+
+	/**
+	 * @param city the city to set
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * @return the area
+	 */
+	public String getArea() {
+		return area;
+	}
+
+	/**
+	 * @param area the area to set
+	 */
+	public void setArea(String area) {
+		this.area = area;
+	}
+
+	/**
+	 * @return the town
+	 */
+	public String getTown() {
+		return town;
+	}
+
+	/**
+	 * @param town the town to set
+	 */
+	public void setTown(String town) {
+		this.town = town;
+	}
+
+	/**
 	 * @return the id
 	 */
 	public Long getId() {
@@ -105,36 +166,6 @@ public class MemberAddressForm extends BaseForm {
 	 */
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	/**
-	 * @return the consignee
-	 */
-	public String getConsignee() {
-		return consignee;
-	}
-
-	/**
-	 * @param consignee
-	 *            the consignee to set
-	 */
-	public void setConsignee(String consignee) {
-		this.consignee = consignee;
-	}
-
-	/**
-	 * @return the phone
-	 */
-	public String getPhone() {
-		return phone;
-	}
-
-	/**
-	 * @param phone
-	 *            the phone to set
-	 */
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 
 	/**
@@ -165,66 +196,6 @@ public class MemberAddressForm extends BaseForm {
 	 */
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	/**
-	 * @return the province
-	 */
-	public Long getProvince() {
-		return province;
-	}
-
-	/**
-	 * @param province
-	 *            the province to set
-	 */
-	public void setProvince(Long province) {
-		this.province = province;
-	}
-
-	/**
-	 * @return the city
-	 */
-	public Long getCity() {
-		return city;
-	}
-
-	/**
-	 * @param city
-	 *            the city to set
-	 */
-	public void setCity(Long city) {
-		this.city = city;
-	}
-
-	/**
-	 * @return the area
-	 */
-	public Long getArea() {
-		return area;
-	}
-
-	/**
-	 * @param area
-	 *            the area to set
-	 */
-	public void setArea(Long area) {
-		this.area = area;
-	}
-
-	/**
-	 * @return the town
-	 */
-	public Long getTown() {
-		return town;
-	}
-
-	/**
-	 * @param town
-	 *            the town to set
-	 */
-	public void setTown(Long town) {
-		this.town = town;
 	}
 
 	/**
@@ -294,16 +265,7 @@ public class MemberAddressForm extends BaseForm {
 	 */
 	public ContactCommand toContactCommand() {
 		ContactCommand contactCommand = new ContactCommand();
-		contactCommand.setIsDefault(false);
-		contactCommand.setAreaId(this.getArea());
-		contactCommand.setCityId(this.getCity());		
-		contactCommand.setTownId(this.getTown());	
-		contactCommand.setProvinceId(this.getProvince());	
-		contactCommand.setPostcode(this.getPostcode());
-		contactCommand.setAddress(this.getAddress());
-		contactCommand.setName(this.getConsignee());
-		contactCommand.setMobile(this.getPhone());
-		contactCommand.setTelphone(this.getTelphone());
+		toContactCommand(contactCommand);
 		return contactCommand;
 	}
 
@@ -313,21 +275,40 @@ public class MemberAddressForm extends BaseForm {
 	 * @return
 	 */
 	public ContactCommand toContactCommand(ContactCommand command) {
-		command.setAreaId(this.getArea());		
-		command.setCityId(this.getCity());		
-		command.setTownId(this.getTown());	
-		command.setProvinceId(this.getProvince());	
-		command.setPostcode(this.getPostcode());
-		command.setAddress(this.getAddress());
-		command.setName(this.getConsignee());
-		command.setIsDefault(command.getIsDefault());
-		if(StringUtils.isNotBlank(this.getPhone())){
-			command.setMobile(this.getPhone());
+		try {
+			BeanUtils.copyProperties(command, this);
+		} catch (Exception e){
+			LOGGER.error("", e);
 		}
-		if(StringUtils.isNotBlank(this.getTelphone())){
-			command.setTelphone(this.getTelphone());
-		}		
 		return command;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the mobile
+	 */
+	public String getMobile() {
+		return mobile;
+	}
+
+	/**
+	 * @param mobile the mobile to set
+	 */
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
 	}
 	
 }

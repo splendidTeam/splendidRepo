@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.baozun.nebula.manager.member.MemberExtraManager;
 import com.baozun.nebula.manager.member.MemberPasswordManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
@@ -26,8 +25,10 @@ import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
 
 /**
+ * 忘记密码功能的实现： 通过手机或邮箱任意一种验证方式来重置密码，最终达到修改了数据库中对应用户下的密码的目的
+ * 
  * @author Wanrong.Wang
- * @Date 2016/03/22
+ * @Date 2016/03/31
  * @Controller
  */
 public class NebulaForgetPasswordController extends BaseController{
@@ -54,9 +55,6 @@ public class NebulaForgetPasswordController extends BaseController{
 	private TokenManager				tokenManager;
 
 	@Autowired
-	private MemberExtraManager			memberExtraManager;
-
-	@Autowired
 	private MemberPasswordManager		memberPasswordManager;
 
 	@Autowired
@@ -76,11 +74,14 @@ public class NebulaForgetPasswordController extends BaseController{
 	/**
 	 * 发送验证码
 	 * 
-	 * @param type
-	 * @return String
 	 * @RequestMapping(value="/member/sendValidateCode.json",method=RequestMethod.POST)
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @param forgetPasswordForm
+	 * @param bindingResult
+	 * @return 返回结果集NebulaReturnResult
 	 */
-
 	public NebulaReturnResult sendValidateCode(
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -118,6 +119,12 @@ public class NebulaForgetPasswordController extends BaseController{
 	 * 点击下一步时，对比验证码是否正确
 	 * 
 	 * @RequestMapping(value ="/member/checkValidateCode",method=RequestMethod .POST)
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @param forgetPasswordForm
+	 * @param bindingResult
+	 * @return String 返回需要跳转到的页面
 	 */
 	public String checkValidateCode(
 			HttpServletRequest request,
@@ -153,6 +160,12 @@ public class NebulaForgetPasswordController extends BaseController{
 	 * 重置密码 注意点：需要判断是否是同一用户的操作，防止越过验证层，直接到修改密码层操作，或者伪造数据
 	 * 
 	 * @RequestMapping(value = "/member/resetpassword", method =RequestMethod.POST)
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @param forgetPasswordForm
+	 * @param bindingResult
+	 * @return String 返回需要跳转到的页面
 	 */
 	@SuppressWarnings("static-access")
 	public String resetPassword(
@@ -195,6 +208,9 @@ public class NebulaForgetPasswordController extends BaseController{
 
 		// 验证通过，确认是同一用户操作。接下来获取到页面数据，进行比较后，调用service的方法，将原来的密码覆盖掉
 		// 前台传过来的密码解密后的密码
+		// 测试时使用
+		// String password = request.getParameter(PASSWORD);
+		// String confirmPassword = request.getParameter(CONFIRM_PASSWORD);
 		String password = decryptSensitiveDataEncryptedByJs(request.getParameter(PASSWORD), request);
 		String confirmPassword = decryptSensitiveDataEncryptedByJs(request.getParameter(CONFIRM_PASSWORD), request);
 		// 判断密码是否为空

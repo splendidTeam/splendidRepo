@@ -67,7 +67,7 @@ public class ContactCommand implements Command{
 	 * false 非默认地址
 	 * true 默认地址
 	 */
-	private Boolean 			isDefault;
+	private Boolean 			isDefault = false;
 	
 	private String 				email;
 	

@@ -47,12 +47,49 @@ import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
 import com.feilong.servlet.http.entity.CookieEntity;
 
+
 /**
  * 登录相关方法controller
  * 
+ * <ol>
+ * <li>{@link #showLogin(memberDetails,request,respons,model)} 进入登录页面</li>
+ * <li>{@link #login(loginForm,bindingResult,request,response,model)}登录方法</li>
+ * <li>{@link #loginOut(request,response,model)}退出登录方法</li>
+ * </ol>
+ * 
+ * <h3>showLogin方法,主要有以下几点:</h3>
+ * <blockquote>
+ * <ol>
+ * <li>设置回填的用户名和密码;</li>
+ * <li>将js加密使用的公钥传入页面;</li>
+ * <li>如果memberDetails不为null视为登录用户，默认还是可以进入登录页的，商城可以重写 {@link #getShowPage4LoginedUserViewLoginPage},来决定登录用户是否可以进入登录页</li>
+ * </ol>
+ * </blockquote>
+ * 
+ * <h3>login方法,主要有以下几点:</h3>
+ * <blockquote>
+ * <ol>
+ * <li>校验页面传来的参数，主要是非空校验;</li>
+ * <li>对页面传来的用户名、密码进行解密;</li>
+ * <li>判断是否支持自动登录，如果支持校验是否可以自动登录;</li>
+ * <li>如果不支持自动登录或自动登录校验失败，走正常的登录流程，校验用户名密码是否正确等;</li>
+ * <li>登录成功后处理是否记住用户名和密码;</li>
+ * <li>登录成功的后续操作，包括返回页面、重置session等</li>
+ * </ol>
+ * </blockquote>
+ * 
+ * <h3>loginOut方法,主要有以下几点:</h3>
+ * <blockquote>
+ * <ol>
+ * <li>清空session;</li>
+ * <li>登出成功的后续操作，商城可以重写 {@link #onLogoutSuccess}方法</li>
+ * </ol>
+ * </blockquote>
+ * 
+ * 
  * @author 冯明雷
  * @version 1.0
- * @time 2016年3月28日 上午10:26:57
+ * @time 2016年3月31日  下午2:37:59
  */
 public class NebulaLoginController extends NebulaAbstractLoginController{
 
@@ -79,10 +116,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/**
 	 * 默认RemeberMe过期时间
 	 */
-	public static final int DEFAULT_REMEBERME_MAX_AGE = 30*24*60*60;
+	public static final int 	DEFAULT_REMEBERME_MAX_AGE 		= 30*24*60*60;
 	
 	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
-	private int					remberMeValidityPeriod = -1;
+	private int					remberMeValidityPeriod 			= -1;
 
 	/**
 	 * 会员登录Form的校验器
@@ -96,15 +133,20 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	@Autowired
 	private MemberManager		memberManager;
+	
 
 	/**
-	 * 登录页面，默认推荐配置如下
-	 * 
+	 * 进入登录页面 	
+	 * <ol>
+	 * <li>判断是否记住用户名、密码，如果记住传递到页面进行回填</li>
+	 * <li>把js要用到的加密使用的公钥出入页面</li>
+	 * <li>根据memberDetails判断用户是否登录，确定是否进入登录页面</li>
+	 * </ol>
 	 * @RequestMapping(value = "/member/login", method = RequestMethod.GET)
 	 * @param memberDetails
 	 *            用户未登录的情况下进入该页面该值将为空，主要用于已登录用户的页面跳转处理
-	 * @param httpRequest
-	 * @param httpResponse
+	 * @param request
+	 * @param response
 	 * @param model
 	 */
 	public String showLogin(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
@@ -129,17 +171,21 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 登录处理，默认推荐配置如下
-	 * 
+	 * 登录处理
+	 * <ol>
+	 * <li>首先会进行数据的校验</li>
+	 * <li>校验成功后，判断是否支持自动登录，如果支持 去校验自动登录是否成功</li>
+	 * <li>如果不支持自动登录或自动登录校验不成功，走正常的登录流程，校验用户名和密码是否正确</li>
+	 * <li>登录成功后判断是否记住用户名密码，然后继续重置session等动作</li>
+	 * <li>登录失败或校验失败，返回错误信息的key，在js当中进行国际化</li>
+	 * </ol>
 	 * @RequestMapping(value = "/member/login.json", method = RequestMethod.POST)
-	 * @param memberDetails
-	 *            用户未登录的情况下进入该页面该值将为空，主要用于已登录用户的页面跳转处理
-	 * @param loginForm
-	 * @param bindingResult
+	 * @param loginForm 页面传来的参数，主要有用户名、密码、是否记住用户名、是否记住密码等
+	 * @param bindingResult validate的校验结果
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @return NebulaReturnResult
+	 * @return NebulaReturnResult 返回结果
 	 */
 	public NebulaReturnResult login(
 			@ModelAttribute LoginForm loginForm,
@@ -164,13 +210,14 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		
 		
 		//此后使用 loginForm.toMemberCommand 就可以获得业务层模型了
-		MemberCommand memberCommand = null;
-		
+		MemberCommand memberCommand = null;		
 		
 		//判断AutoLogin的设定，RemeberMe不用考虑，因为页面已经自动回写用户名到Form中了
 		if(isSupportAutoLogin()){
-			//这里需要检查AutoLogin，检查的方法是检查解密后的Password和之前提供的随机Hash是否一致
+			//根据用户名查询memberCommand,用来判断自动登录保存的密码hash值是否正确
 			memberCommand = memberManager.findMemberCommandByLoginName(loginForm.getLoginName());
+			
+			//这里需要检查AutoLogin，检查的方法是检查解密后的Password和之前提供的随机Hash是否一致
 			if(memberCommand != null && validateAutoLogin(loginForm, memberCommand, request)){
 				 LOG.info("[MEM_AUTO_LOGIN ] {} [{}] \"\"", loginForm.getLoginName(), new Date());
 			}else{
@@ -204,26 +251,27 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			LOG.debug("{} login failure", loginForm.getLoginName());
 			DefaultReturnResult returnResult = new DefaultReturnResult();
 			returnResult.setResult(false);
-			DefaultResultMessage message = new DefaultResultMessage(); message.setMessage("login.failure");
+			DefaultResultMessage message = new DefaultResultMessage();
+			message.setMessage("login.failure");
 			returnResult.setResultMessage(message);
 			return returnResult;
 		}
 	}
 
 	/**
-	 * 登出，默认推荐配置如下
+	 * 登出，主要是重置session
 	 * 
 	 * @RequestMapping(value = "/member/loginOut.json", method = RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @return
 	 */
-	public NebulaReturnResult logout(HttpServletRequest request,HttpServletResponse response,Model model){
+	public NebulaReturnResult loginOut(HttpServletRequest request,HttpServletResponse response,Model model){
 		// 1.清空session
 		resetSession(request);
 		onLogoutSuccess(request, response);
 		return DefaultReturnResult.SUCCESS;
-	}	
+	}
 
 	/**
 	 * 验证是否自动登录
@@ -243,8 +291,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// cookie中保存的用户名和密码不能为空
 		if (Validator.isNotNullOrEmpty(loginName) && Validator.isNotNullOrEmpty(autoLoginPassword)) {
 			//页面传来的密码必须和默认密码相同
-			if(loginForm.getPassword().equals(autoLoginPassword) &&
-					loginName.equals(loginForm.getLoginName())){
+			if(loginForm.getPassword().equals(autoLoginPassword) &&loginName.equals(loginForm.getLoginName())){
 				LOG.debug("Auto login password is same with saved one, will check whether it is expired.");
 				return loginForm.getPassword().equals(generateAutoLoginPassword(memberCommand));
 			}else{
@@ -277,8 +324,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	}
 
 	/**
-	 * 进入登录页面的时候记住用户名和密码的操作
-	 * 
+	 * 进入登录页面的时候记住用户名和密码的操作<br/>
+	 * 判断是否支持记住用户名，如果支持将cookie中存的用户名去除并解密传到页面<br/>
+	 * 判断是否支持自动登录，如果支持将cookie中存储的关于密码的hash值解密传到页面
 	 * @return void
 	 * @param memberLoginViewCommand
 	 * @param request
@@ -297,6 +345,8 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		if (isSupportRemeberMe()) {
 			// 从cookie中获取解密后的loginName
 			String loginName = getRememberedLogin(request);
+			
+			//如果loginName不为空
 			if (Validator.isNotNullOrEmpty(loginName)) {
 				LOG.debug("RememberMe information is loaded: [User:{}]", loginName);
 				memberLoginViewCommand.setIsRememberMe(true);
@@ -304,8 +354,12 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			}
 		}
 		
+		//如果支持自动登录或记住用户名
 		if(isSupportAutoLogin()){
+			//如果支持记自动登录的话，必须要支持记住用户名
 			assert isSupportRemeberMe() : "SupportAutoLogin can only be actived when SupportRemeberMe";
+			
+			//cookie中用户名不能为空，然后才会去获取cookie中的密码的hash
 			if(memberLoginViewCommand.getLoginName() != null){
 				LOG.debug("User Login Name exists. Try to get Auto Login password.");
 				String password = getAutoLoginPassword(request);
@@ -381,10 +435,26 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return
 	 */
 	protected String generateAutoLoginPassword(MemberCommand memberCommand){
+		//这里的memberCommand不能为空，在调用方法之前应该有判断
+		assert memberCommand!=null : "This memberCommand cannot be empty.";		
+		
 		String pwd = EncryptUtil.getInstance().hash(memberCommand.getLoginName(), memberCommand.getPassword());
+		
+		//如果用户名和密码hash之后的值为null，抛出一个RuntimeException
+		if(pwd==null)
+			throw new RuntimeException("generateAutoLoginPassword Encrypt hash fail.");
+		
 		return pwd.substring(0,6);
 	}
 	
+	/**
+	 * 根据name从cookie中取取值，并且解密
+	 * @return String
+	 * @param request
+	 * @param name
+	 * @throws EncryptionException 
+	 * @time 2016年3月31日下午2:34:58
+	 */
 	private String getEncryptedInformationFromCookie(HttpServletRequest request, String name) throws EncryptionException{
 		String encValue = CookieUtil.getCookieValue(request, name);
 		if(encValue != null){
@@ -393,6 +463,17 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		return null;
 	}
 	
+	
+	/**
+	 * 将value值加密存储在cookie中
+	 * @return void
+	 * @param response
+	 * @param name	存储的key
+	 * @param value  存储的值
+	 * @param maxAge  有效期
+	 * @throws EncryptionException 
+	 * @time 2016年3月31日下午2:35:42
+	 */
 	private void setEncryptedInformationFromCookie(HttpServletResponse response, 
 			String name, String value, int maxAge) throws EncryptionException{
 		CookieEntity cookie = new CookieEntity(name, EncryptUtil.getInstance().encrypt(value));
@@ -422,18 +503,25 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			HttpServletResponse response,
 			Model model){
 		
+		//是否记住了密码，如果记住密码默认记住用户名
 		if(loginForm.getIsRemberMePwd()){
+			//是否支持记住密码
 			if(isSupportAutoLogin()){
 				LOG.debug("Need update Both RemeberMe & AutoLogin information");
+				//是的话直接在cookie中保存，加密后的用户名和加密后的pwd的hash值
 				setRememberedLogin(response, loginForm.getLoginName());
 				setAutoLoginPassword(response, memberCommand);
 				LOG.info("[RMBER_ME_AUTOLOGIN_SET] {} [{}] \"\"", loginForm.getLoginName(), new Date());
 			}else{
+				//不支持的话，直接删除cookie中保存的用户名和密码
 				LOG.warn("System don't support AutoLogin!");
 				CookieUtil.deleteCookie(COOKIE_KEY_REMEMBER_ME_USER, response);
 				CookieUtil.deleteCookie(COOKIE_KEY_AUTO_LOGIN, response);
 			}			
 		} else if(loginForm.getIsRemberMeLoginName()){
+			//是否记住了用户名
+			
+			//是否支持记住用户名			
 			if(isSupportRemeberMe()){
 				LOG.debug("Need update RemeberMe information");
 				setRememberedLogin(response, loginForm.getLoginName());
