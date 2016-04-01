@@ -121,7 +121,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * @return
 	 */
 	public String showRegister(@LoginMember MemberDetails memberDetails,Model model,HttpServletRequest request){
-		// ① 判断用户是否登陆
+		// 判断用户是否登陆
 		if (!Validator.isNullOrEmpty(memberDetails)){
 			return VIEW_MEMBER_CENTER;
 		}
@@ -286,7 +286,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		}catch (BusinessException e){
 			LOGGER.error("", e);
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setStatusCode("register.failed");
+			defaultReturnResult.setStatusCode(getMessage("register.failed"));
 			return defaultReturnResult;
 		}
 	}
@@ -407,17 +407,15 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * @return
 	 */
 	protected NebulaReturnResult onRegisterSuccess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+
+		// eventPublisher.publish(new RegisterSuccessEvent(memberDetails, getClientContext(request, response)));
+
 		// 注册成功后是否需要自动登录
-		if (isAutoLoginAfterRegister()){
-			super.onAuthenticationSuccess(memberDetails, request, response);
-		}
+		// if (isAutoLoginAfterRegister()){
+		// defaultReturnResult = ;
+		// }
 
-		eventPublisher.publish(new RegisterSuccessEvent(memberDetails, getClientContext(request, response)));
-
-		defaultReturnResult.setReturnObject(VIEW_MEMBER_REGISTER_ACTIVE_EMAIL);
-
-		return defaultReturnResult;
+		return super.onAuthenticationSuccess(memberDetails, request, response);
 	}
 
 	/**
