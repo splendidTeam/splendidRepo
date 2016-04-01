@@ -25,7 +25,7 @@ public class NebulaWeiboLoginControllerTest extends BaseControllerTest{
 		control.replay();
 		String url="redirect:https://api.weibo.com/oauth2/authorize?response_type=code&redirect_uri=http://xn6774445.imwork.net/member/weibo-login-callback&client_id=1030399418";
 		//state随机生成，无法进行相等比较，临时比较长度
-		assertEquals(url.length(),controller.showWeiboLogin().length());
+		assertEquals(url.length(),controller.constructOAuthLoginURL().length());
 		control.verify();
 	}
 	

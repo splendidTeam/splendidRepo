@@ -92,16 +92,8 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		//根据MemberBehaviorStatus表中的数据去判断是否需要激活、绑定、完善信息等
 		
 		return null;
-	} 
+	}	
 	
-	/**
-	 * 用户是否激活
-	 * 
-	 * @param member
-	 * @return
-	 */
-	protected boolean isActivedMember(MemberCommand member){
-		// TODO 判断逻辑
-		return false;
-	}
 }
+
+

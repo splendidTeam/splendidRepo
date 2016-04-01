@@ -21,6 +21,8 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaAlipayLoginController.class);
+	
+
 
 	/**
 	 * 支付宝联合登陆页，默认推荐配置如下
@@ -37,7 +39,7 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 		// 支付宝登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("alipay generate login url {}", loginUrl);
-		return loginUrl;
+		return "redirect:"+loginUrl;
 	}
 
 	/**
