@@ -67,7 +67,7 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_ALIPAY);
 		
-		// 头像
+		// 头像  文档上没有像素说明，官方文档找到例子显示640×640 但明显被放大了，不清晰
 		numberCommand.setAvatar(member.getAvatar());
 		
 		//性别  M为男性，F为女性

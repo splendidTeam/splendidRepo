@@ -151,7 +151,7 @@ public class QqThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impleme
 		member.setUid(openid);
 		
 		// 头像
-		member.setAvatar(jsonMap.get("figureurl"));
+		member.setAvatar(jsonMap.get("figureurl_1"));
 		
 		// 性别
 		member.setSex(jsonMap.get("gender"));

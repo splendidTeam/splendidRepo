@@ -64,7 +64,7 @@ public class NebulaQQLoginController extends NebulaOAuthLoginController{
 		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_QQ);
 		
-		// 头像
+		// 头像  50×50
 		numberCommand.setAvatar(member.getAvatar());
 		
 		//性别  注意：获取不到时默认返回男
