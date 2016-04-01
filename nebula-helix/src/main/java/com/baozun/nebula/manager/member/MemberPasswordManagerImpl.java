@@ -22,9 +22,22 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
-import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
 import com.feilong.core.util.RandomUtil;
 
+/**
+ * <pre>
+ * 类名：MemberPasswordManagerImpl
+ * 功能：用户密码相关操作的manager实现 
+ * 相关方法：  
+ *  发送验证码的方法
+ *  重置密码的方法
+ *  查询旧密码是否正确的方法
+ *  修改密码的方法
+ * </pre>
+ * 
+ * @author Wanrong.Wang
+ * @Date 2016/04/01
+ */
 public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 	private static final Logger	LOG				= LoggerFactory.getLogger(MemberPasswordManagerImpl.class);
@@ -44,16 +57,18 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	@Autowired
 	private TokenManager		tokenManager;
 
+	public static final String	BUSINESS_CODE	= "FORGET_PASSWORD_BUSINESS";
+
 	/**
 	 * 发送验证码的方法
 	 */
 	@Override
 	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm){
 		boolean flag = false;
-		if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.MOBILE){
+		if (forgetPasswordForm.getType() == ForgetPasswordForm.MOBILE){
 			// 是手机验证方式，则调用手机发送验证码的方法
 			flag = this.mobileSendValidateCode(forgetPasswordForm.getMobile());
-		}else if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.EMAIL){
+		}else if (forgetPasswordForm.getType() == ForgetPasswordForm.EMAIL){
 			// 是邮箱验证方式，则调用邮箱发送验证码的方法
 			flag = this.emailSendValidateCode(forgetPasswordForm.getEmail());
 		}
@@ -78,12 +93,9 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 			// 生成验证码
 			String code = RandomUtil.createRandomFromString("待定", 4);
-			// String code = SecurityCodeUtil.createSecurityCode(
-			// MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
-			// MessageConstants.SECURITY_CODE_LENGTH);
 
 			// 保存发送的验证码到redis中
-			tokenManager.saveToken(null, email, MAX_EXIST_TIME, code);
+			tokenManager.saveToken(BUSINESS_CODE, email, MAX_EXIST_TIME, code);
 
 			// 则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
 			memberEmailManager.sendEmailValidateCode(code, email);
@@ -113,12 +125,9 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 			// 生成验证码
 			String code = RandomUtil.createRandomFromString("待定", 4);
-			// String code = SecurityCodeUtil.createSecurityCode(
-			// MessageConstants.SECURITY_CODE_ORIGINAL_STRING,
-			// MessageConstants.SECURITY_CODE_LENGTH);
 
 			// 保存验证码到redis中，并且设置验证码的生存时间
-			tokenManager.saveToken(null, mobile, MAX_EXIST_TIME, code);
+			tokenManager.saveToken(BUSINESS_CODE, mobile, MAX_EXIST_TIME, code);
 
 			// 调用发送手机验证码的方法，发送相应的验证码到邮箱中
 			SMSCommand smsCommand = new SMSCommand();
@@ -144,11 +153,11 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		/*
 		 * 两次输入的密码相等，则判断是邮箱验证还是手机验证， 若是手机验证方式，则通过登录手机号查询登录的用户信息（获取到用户id）； 若是邮箱验证方式，则通过登录邮箱获取用户信息（获取到用户id）
 		 */
-		if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.EMAIL){
+		if (forgetPasswordForm.getType() == ForgetPasswordForm.EMAIL){
 			// 邮箱验证方式，则通过邮箱查找对应用户是否存在
 			memberCommand = sdkMemberManager.findMemberByLoginEmail(forgetPasswordForm.getEmail());
 
-		}else if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.MOBILE){
+		}else if (forgetPasswordForm.getType() == ForgetPasswordForm.MOBILE){
 			// 手机验证方式，则通过手机号码查找对应的用户是否存在
 			memberCommand = sdkMemberManager.findMemberByLoginMobile(forgetPasswordForm.getMobile());
 		}

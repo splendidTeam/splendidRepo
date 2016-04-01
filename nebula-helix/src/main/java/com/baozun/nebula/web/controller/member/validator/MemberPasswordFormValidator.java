@@ -1,6 +1,14 @@
 package com.baozun.nebula.web.controller.member.validator;
 
 import org.springframework.validation.Errors;
+/**
+ * @author Wanrong.Wang
+ * @Date 2016/03/31
+ * 
+ * 类名：MemberPasswordFormValidator
+ * 修改密码页面数据的校验
+ * 
+ */
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
