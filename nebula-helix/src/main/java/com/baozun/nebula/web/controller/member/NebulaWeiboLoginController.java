@@ -37,7 +37,7 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 		// 微博登录地址
 		String loginUrl = adaptor.generateLoginUrl();
 		LOG.info("Weibo generate login url {}", loginUrl);
-		return loginUrl;
+		return "redirect:"+loginUrl;
 	}
 
 	/**

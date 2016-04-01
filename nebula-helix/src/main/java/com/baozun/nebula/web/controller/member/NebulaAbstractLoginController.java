@@ -38,6 +38,8 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_CONTEXT, memberDetails);
 		// 触发登录成功事件，用于异步处理其他的业务
 		eventPublisher.publish(new LoginSuccessEvent(memberDetails, getClientContext(request, response)));
+		
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
