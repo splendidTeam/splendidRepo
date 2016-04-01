@@ -345,4 +345,15 @@ public interface CacheManager{
 	 * 获取全部缓存项
 	 */
 	public List<CacheItemCommand> findAllCacheItem(RowMapper<CacheItemCommand> rowMapper,Map<String, Object> paraMap);
+	
+	/**
+	 * 移除有序集中，指定分数（score）区间内的所有成员。
+	 * @param key
+	 * @param start
+	 * @param end
+	 */
+	public void zremrangebyscore(String key,String start,String end);
+	
+	
+	
 }

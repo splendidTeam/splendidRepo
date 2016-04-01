@@ -77,7 +77,7 @@ public class MemberDetails implements Serializable {
 	/**
 	 * 状态
 	 */
-	private String status;
+	private List<String> status;
 
 
 	public MemberDetails() {
@@ -182,11 +182,11 @@ public class MemberDetails implements Serializable {
 		this.memComboList = memComboList;
 	}
 	
-	public String getStatus() {
+	public List<String> getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(List<String> status) {
 		this.status = status;
 	}
 

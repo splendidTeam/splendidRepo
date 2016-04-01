@@ -31,6 +31,21 @@ public class RollingTimeWindow {
 	 */
 	private Long window;
 	
+	
+	
+	public RollingTimeWindow(Long limit, Long window) {
+		super();
+		this.limit = limit;
+		this.window = window;
+	}
+	
+	
+	public RollingTimeWindow() {
+		super();
+	}
+
+
+
 	public Long getLimit() {
 		return limit;
 	}

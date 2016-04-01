@@ -48,7 +48,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * 发送验证码的方法
 	 */
 	@Override
-	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm) throws Exception{
+	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm){
 		boolean flag = false;
 		if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.MOBILE){
 			// 是手机验证方式，则调用手机发送验证码的方法
@@ -67,7 +67,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean emailSendValidateCode(String email) throws Exception{
+	private boolean emailSendValidateCode(String email){
 
 		boolean flag = false;
 
@@ -101,7 +101,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean mobileSendValidateCode(String mobile) throws Exception{
+	private boolean mobileSendValidateCode(String mobile){
 
 		boolean flag = false;
 

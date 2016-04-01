@@ -23,12 +23,20 @@ public class NebulaQQLoginController extends NebulaOAuthLoginController{
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaQQLoginController.class);
 
 	/**
-	 * 去QQ联合登陆页，默认推荐配置如下
+	 * QQ联合登陆页，默认推荐配置如下
 	 * 
-	 * @RequestMapping(value = "/member/showQQLogin", method = RequestMethod.POST)
+	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	public String showQQLogin(){
-		return "redirect:" + this.constructOAuthLoginURL();
+	@Override
+	public String constructOAuthLoginURL(){
+
+		// 获取系统QQ参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_QQ);
+
+		// QQ登录地址
+		String loginUrl = adaptor.generateLoginUrl();
+		LOG.info("qq generate login url {}", loginUrl);
+		return loginUrl;
 	}
 
 	/**
@@ -41,18 +49,6 @@ public class NebulaQQLoginController extends NebulaOAuthLoginController{
 	@Override
 	public String loginWithCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
 		return super.loginWithCallBack(request, response, model);
-	}
-
-	@Override
-	public String constructOAuthLoginURL(){
-
-		// 获取系统QQ参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance().getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_QQ);
-
-		// QQ登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("qq generate login url {}", loginUrl);
-		return loginUrl;
 	}
 
 	@Override

@@ -22,15 +22,66 @@ import java.util.List;
 import com.baozun.nebula.web.MemberDetails;
 
 /**
+ * 用户状态的流转处理流程器
  * @author D.C
  * @time 2016年3月31日 上午11:00:22
  */
 public class MemberStatusFlowProcessor {
-	List<MemberStatusHandler> handlers = new ArrayList<MemberStatusHandler>();
+
+	private List<StatusAction> statusActionList = new ArrayList<StatusAction>();
+
+	public List<StatusAction> getStatusActionList() {
+		return statusActionList;
+	}
+
+	public void setStatusActionList(List<StatusAction> statusActionList) {
+		this.statusActionList = statusActionList;
+	}
+
+	/**
+	 * 返回null时前端不做任何处理，非null时需要流转到对应的action
+	 * @param memberDetails
+	 * @return
+	 */
+	public String process(MemberDetails memberDetails) {
+		for (StatusAction statusAction : statusActionList) {
+			if (memberDetails.getStatus().contains(statusAction.getStatus())) {
+				return statusAction.getAction();
+			}
+		}
+		return null;
+	}
 	
-	void doProcess(MemberDetails memberDetails) {
-		for(MemberStatusHandler handler : handlers) {
-			handler.execute(memberDetails);
+	
+	/**
+	 * 状态流转映射
+	 * @author D.C
+	 * 上午11:13:49
+	 */
+	class StatusAction {
+		/**
+		 * 状态定义，需要和表中定义一致
+		 */
+		private String status;
+		/**
+		 * 某种状态的流转路径
+		 */
+		private String action;
+
+		public String getStatus() {
+			return status;
+		}
+
+		public void setStatus(String status) {
+			this.status = status;
+		}
+
+		public String getAction() {
+			return action;
+		}
+
+		public void setAction(String action) {
+			this.action = action;
 		}
 	}
 }
