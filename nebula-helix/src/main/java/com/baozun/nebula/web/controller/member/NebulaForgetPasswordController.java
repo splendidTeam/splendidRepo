@@ -18,7 +18,6 @@ import com.baozun.nebula.manager.member.MemberPasswordManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
@@ -29,37 +28,42 @@ import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValid
  * 
  * @author Wanrong.Wang
  * @Date 2016/03/31
- * @Controller
+ * @Controller NebulaForgetPasswordController
  */
-public class NebulaForgetPasswordController extends BaseController {
+public class NebulaForgetPasswordController extends BaseController{
 
-	private static final Logger LOG = LoggerFactory.getLogger(NebulaForgetPasswordController.class);
+	private static final Logger			LOG							= LoggerFactory.getLogger(NebulaForgetPasswordController.class);
 
 	/* 忘记密码的页面定义 */
-	public static final String VIEW_FORGET_PASSWORD = "store.login.forgetpassword";
+	public static final String			VIEW_FORGET_PASSWORD		= "store.login.forgetpassword";
 
 	/* 重置密码的页面定义 */
-	public static final String VIEW_RESET_PASSWORD = "store.login.resetpassword";
+	public static final String			VIEW_RESET_PASSWORD			= "store.login.resetpassword";
 
 	/* 重置密码成功的页面定义 */
-	public static final String VIEW_RESET_PASSWORD_SUCCESS = "resetpassword.success";
+	public static final String			VIEW_RESET_PASSWORD_SUCCESS	= "resetpassword.success";
 
-	public static final String PASSWORD = "password";
+	/* 页面传递过来的密码 */
+	public static final String			PASSWORD					= "password";
 
-	public static final String CONFIRM_PASSWORD = "confirmPassword";
+	/* 页面传递过来的确认密码 */
+	public static final String			CONFIRM_PASSWORD			= "confirmPassword";
 
 	/* 存储用户手机或邮箱信息的session的key */
-	private static final String TOKEN = "VALIDATED_USER_MESSAGE_KEY";
+	private static final String			TOKEN						= "VALIDATED_USER_MESSAGE_KEY";
+
+	/* redis中存储发送的验证码的业务码 */
+	public static final String			BUSINESS_CODE				= "FORGET_PASSWORD_BUSINESS";
 
 	@Autowired
-	private TokenManager tokenManager;
+	private TokenManager				tokenManager;
 
 	@Autowired
-	private MemberPasswordManager memberPasswordManager;
+	private MemberPasswordManager		memberPasswordManager;
 
 	@Autowired
 	@Qualifier("forgetPasswordFormValidator")
-	private ForgetPasswordFormValidator forgetPasswordFormValidator;
+	private ForgetPasswordFormValidator	forgetPasswordFormValidator;
 
 	/**
 	 * 跳转到忘记密码的页面
@@ -67,37 +71,37 @@ public class NebulaForgetPasswordController extends BaseController {
 	 * @return String
 	 * @RequestMapping(value = "/forgetpassword", method = RequestMethod.GET)
 	 */
-	public String showForgetPassword() {
+	public String showForgetPassword(){
 		return VIEW_FORGET_PASSWORD;
 	}
 
 	/**
 	 * 发送验证码
 	 * 
-	 * @RequestMapping(value="/member/sendValidateCode.json",
-	 * method= RequestMethod.POST) @param request
+	 * @RequestMapping(value="/member/sendValidateCode.json", method= RequestMethod.POST) @param request
 	 * @param response
 	 * @param model
 	 * @param forgetPasswordForm
 	 * @param bindingResult
 	 * @return 返回结果集NebulaReturnResult
 	 */
-	public NebulaReturnResult sendValidateCode(HttpServletRequest request, HttpServletResponse response, Model model,
-			@ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm, BindingResult bindingResult) {
+	public NebulaReturnResult sendValidateCode(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model,
+			@ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm,
+			BindingResult bindingResult){
 
 		DefaultReturnResult returnResult = new DefaultReturnResult();
 
 		// 校验页面的数据
 		forgetPasswordFormValidator.validate(forgetPasswordForm, bindingResult);
-		if (bindingResult.hasErrors()) {
+		if (bindingResult.hasErrors()){
 			return super.getResultFromBindingResult(bindingResult);
 		}
 
 		// 数据校验都成功后，调用发送验证码的方法
 		boolean result = memberPasswordManager.sendValidateCode(forgetPasswordForm);
-
-		// 在此处将用户的提交的信息存放到session中去，供后续修改密码时验证是否是同一个用户使用
-		request.getSession().setAttribute(TOKEN, forgetPasswordForm);
 
 		returnResult.setResult(result);
 
@@ -105,109 +109,100 @@ public class NebulaForgetPasswordController extends BaseController {
 	}
 
 	/**
-	 * 点击下一步时，对比验证码是否正确
+	 * 用户输入验证码后，就对比验证码是否正确（ajax请求，未点击下一步提交表单）
 	 * 
-	 * @RequestMapping(value ="/member/checkValidateCode",method=RequestMethod
-	 *                       .POST)
+	 * @RequestMapping(value ="/member/checkValidateCode.json",method=RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @param model
 	 * @param forgetPasswordForm
-	 * @param bindingResult
 	 * @return String 返回需要跳转到的页面
 	 */
-	public String checkValidateCode(HttpServletRequest request, HttpServletResponse response, Model model,
-			@ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm) {
+	public boolean checkValidateCode(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model,
+			@ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm){
 		boolean flag = false;
 		// 检测输入的验证码是否和发送的验证码相同
-		if (StringUtils.isNotBlank(forgetPasswordForm.getSecurityCode())) {
+		if (StringUtils.isNotBlank(forgetPasswordForm.getSecurityCode())){
 			// 需要区分是手机验证方式还是邮件验证方式（1为手机验证方式，2为邮件验证方式）
-			if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.MOBILE) {
-				flag = VerifyResult.SUCESS == tokenManager.verifyToken(null, forgetPasswordForm.getMobile(),
+			if (forgetPasswordForm.getType() == ForgetPasswordForm.MOBILE){
+				flag = VerifyResult.SUCESS == tokenManager.verifyToken(
+						BUSINESS_CODE,
+						forgetPasswordForm.getMobile(),
 						forgetPasswordForm.getSecurityCode());
-			} else {
-				flag = VerifyResult.SUCESS == tokenManager.verifyToken(null, forgetPasswordForm.getEmail(),
+			}else{
+				flag = VerifyResult.SUCESS == tokenManager.verifyToken(
+						BUSINESS_CODE,
+						forgetPasswordForm.getEmail(),
 						forgetPasswordForm.getSecurityCode());
 			}
-			if (flag) {
-				// 验证成功：则跳转到重置密码页面
-				
-				
-				return VIEW_RESET_PASSWORD;
+			if (flag){
+				// 验证成功
+				// 在此处将用户的提交的信息存放到session中去，供后续修改密码时验证是否是同一个用户使用
+				request.getSession().setAttribute(TOKEN, forgetPasswordForm);
+				return true;
 			}
 		}
-		// 验证失败：则重新跳转到忘记密码页面，要求重新进行验证
+		// 验证失败
+		return false;
+	}
+
+	/**
+	 * 点击下一步，进行页面跳转的判断（前端ajax请求可以使用此方法）
+	 * 
+	 * @RequestMapping(value = "/member/showResetPassword", method =RequestMethod.GET)
+	 */
+	public String showResetPassword(HttpServletRequest request){
+		// 从session中获取到之前验证过的用户的信息
+		ForgetPasswordForm forgetPasswordForm = (ForgetPasswordForm) request.getSession().getAttribute(TOKEN);
+		if (forgetPasswordForm != null){
+			// session中有值，则跳转到重置密码页面
+			return VIEW_RESET_PASSWORD;
+		}
+		// 若session中没有值，则重新跳转到验证页面
 		return VIEW_FORGET_PASSWORD;
 	}
 
 	/**
-	 * 重置密码 注意点：需要判断是否是同一用户的操作，防止越过验证层，直接到修改密码层操作，或者伪造数据
+	 * 点击重置密码按钮， 重置密码 注意点：需要判断是否是同一用户的操作，防止越过验证层，直接到修改密码层操作，或者伪造数据
 	 * 
-	 * @RequestMapping(value = "/member/resetpassword", method
-	 *                       =RequestMethod.POST)
+	 * @RequestMapping(value = "/member/resetpassword", method =RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @param forgetPasswordForm
-	 * @param bindingResult
 	 * @return String 返回需要跳转到的页面
 	 */
-	@SuppressWarnings("static-access")
-	public String resetPassword(HttpServletRequest request, HttpServletResponse response, Model model,
-			@ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm, BindingResult bindingResult) {
+	public String resetPassword(HttpServletRequest request,HttpServletResponse response,Model model){
 
-		boolean flag = false;
-		ForgetPasswordForm passwordForm = null;
 		// 从session中获取到之前验证过的用户的信息
-		passwordForm = (ForgetPasswordForm) request.getSession().getAttribute(TOKEN);
-
-		// 验证是否是同一用户操作，需要区分是手机验证方式还是邮箱验证方式
-		if (forgetPasswordForm.getType() == forgetPasswordFormValidator.MOBILE) {
-			// 从现有提交的数据中获取到的mobile值
-			String mobile2 = forgetPasswordForm.getMobile();
-			// 从session中取到的mobile值
-			String mobile = passwordForm.getMobile();
-			// 比较两个值是否相等
-			if (mobile2 == null || mobile == null || !(mobile.equals(mobile2))) {
-				// 说明不是同一个用户
-				// 修改密码失败，可以重新跳转至验证页面
-				return VIEW_FORGET_PASSWORD;
-			}
-		} else {
-			// 说明是邮箱验证方式
-			// 从现有提交的数据中获取到的email值
-			String email2 = forgetPasswordForm.getEmail();
-			// 从session中取到的email值
-			String email = passwordForm.getEmail();
-			// 比较两个值是否相等
-			if (email2 == null || email == null || !(email.equals(email2))) {
-				// 说明不是同一个用户
-				// 修改密码失败，可以重新跳转至验证页面
-				return VIEW_FORGET_PASSWORD;
-			}
+		ForgetPasswordForm forgetPasswordForm = (ForgetPasswordForm) request.getSession().getAttribute(TOKEN);
+		// 判断session是否有值
+		if (forgetPasswordForm == null){
+			// 说明session中没有值，则不是同一个用户操作，需要他重新跳转到验证页面，重新验证信息
+			// 修改密码失败，可以重新跳转至验证页面
+			return VIEW_FORGET_PASSWORD;
 		}
 
-		// 验证通过，确认是同一用户操作。接下来获取到页面数据，进行比较后，调用service的方法，将原来的密码覆盖掉
+		// session中有值，确认是同一用户操作，则进行修改密码的操作
 		// 前台传过来的密码解密后的密码
-		// 测试时使用
-		// String password = request.getParameter(PASSWORD);
-		// String confirmPassword = request.getParameter(CONFIRM_PASSWORD);
 		String password = decryptSensitiveDataEncryptedByJs(request.getParameter(PASSWORD), request);
 		String confirmPassword = decryptSensitiveDataEncryptedByJs(request.getParameter(CONFIRM_PASSWORD), request);
 		// 判断密码是否为空
-		if (StringUtils.isNotBlank(password) && StringUtils.isNotBlank(confirmPassword)
-				&& password.equals(confirmPassword)) {
+		if (StringUtils.isNotBlank(password) && StringUtils.isNotBlank(confirmPassword) && password.equals(confirmPassword)){
 			// 调用manager层的方法，重置密码
 			LOG.info("[The member try to reset password] {} [{}]", new Date());
-			flag = memberPasswordManager.resetPassword(forgetPasswordForm, password);
-			if (flag) {
+			boolean flag = memberPasswordManager.resetPassword(forgetPasswordForm, password);
+			if (flag){
 				LOG.info("[The member reset password success] {} [{}]", new Date());
+				request.getSession().removeAttribute(TOKEN);
 				return VIEW_RESET_PASSWORD_SUCCESS;
 			}
-			// 修改密码失败，（可以提示修改密码失败，几秒后跳转至重置密码页面）可重新跳转至重置密码页面
+			// 修改密码失败，（可以提示修改密码失败，几秒后跳转至重置密码页面）可重新跳转至验证页面
 			LOG.info("[The member reset password failed] {} [{}]", new Date());
 			return VIEW_RESET_PASSWORD;
-		} else {
+		}else{
 			// 重置密码时，输入的密码为空，则重新跳转至重置密码页面
 			LOG.info("[The member reset password failed] {} [{}]", new Date());
 			return VIEW_RESET_PASSWORD;

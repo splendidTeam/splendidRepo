@@ -136,9 +136,7 @@ public class NebulaForgetPasswordControllerTest extends BaseControllerTest{
 
 			control.replay();
 
-			assertEquals(
-					VIEW_RESET_PASSWORD_SUCCESS,
-					nebulaForgetPasswordController.resetPassword(request, response, model, forgetPasswordForm, bindingResult));
+			assertEquals(VIEW_RESET_PASSWORD_SUCCESS, nebulaForgetPasswordController.resetPassword(request, response, model));
 
 			control.verify();
 		}catch (Exception e){

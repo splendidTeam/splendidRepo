@@ -2,6 +2,9 @@ package com.baozun.nebula.web.controller.member.form;
 
 import com.baozun.nebula.web.controller.BaseForm;
 
+/**
+ * 忘记密码表单
+ */
 public class ForgetPasswordForm extends BaseForm{
 
 	private static final long	serialVersionUID	= -2376678079825089890L;
@@ -12,6 +15,10 @@ public class ForgetPasswordForm extends BaseForm{
 	private String				mobile;
 
 	private String				email;
+
+	public static final int		EMAIL				= 2;
+
+	public static final int		MOBILE				= 1;
 
 	/* 验证码 */
 	private String				SecurityCode;

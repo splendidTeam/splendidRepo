@@ -37,7 +37,7 @@ import com.baozun.nebula.web.controller.member.validator.MemberPasswordFormValid
  * </pre>
  * 
  * @author Wanrong.Wang 2016/03/31
- * @Controller
+ * @Controller NebulaModifyPasswordController
  */
 
 public class NebulaModifyPasswordController extends BaseController{

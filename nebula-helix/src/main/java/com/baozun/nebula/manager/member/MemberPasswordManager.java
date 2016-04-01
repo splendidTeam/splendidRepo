@@ -5,12 +5,12 @@ import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 /**
  * MemberPasswordManager接口
  * 
- * @author Wanrong.Wang 2016/03/30
+ * @author Wanrong.Wang
+ * @Date 2016/03/30
  */
 public interface MemberPasswordManager{
 
-
-
+	// 发送验证码
 	boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm);
 
 	// 重置密码
