@@ -23,6 +23,8 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
+import com.feilong.core.RegexPattern;
+import com.feilong.core.util.RegexUtil;
 
 /**
  * MemberProfileForm的校验器
@@ -74,20 +76,15 @@ public class MemberProfileFormValidator implements Validator {
 			}
 
 			if (!errors.hasFieldErrors("email")) {
-				Pattern p1 = Pattern
-						.compile("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$");
 				if (!"".equals(command.getLoginEmail().trim())
-						&& !p1.matcher(command.getLoginEmail().trim())
-								.matches()) {
+						&& !RegexUtil.matches(RegexPattern.EMAIL,command.getLoginEmail().trim())) {
 					errors.rejectValue("email", "member.email.error");
 				}
 			}
 
 			if (!errors.hasFieldErrors("mobile")) {
-				Pattern p1 = Pattern.compile("^(1[3-9]{1}[0-9]{1})\\d{8}$");
 				if (!"".equals(command.getLoginMobile().trim())
-						&& !p1.matcher(command.getLoginMobile().trim())
-								.matches()) {
+						&& !RegexUtil.matches(RegexPattern.MOBILEPHONE,command.getLoginMobile().trim())) {
 					errors.rejectValue("mobile", "member.mobile.error");
 				}
 			}

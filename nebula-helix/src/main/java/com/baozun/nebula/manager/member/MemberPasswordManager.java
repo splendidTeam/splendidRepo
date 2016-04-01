@@ -7,7 +7,7 @@ import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
  */
 public interface MemberPasswordManager{
 
-	boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm) throws Exception;
+	boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm);
 
 	boolean resetPassword(ForgetPasswordForm forgetPasswordForm,String password);
 

@@ -14,13 +14,7 @@ public class ForgetPasswordFormValidator implements Validator{
 
 	public static final int	MOBILE	= 1;
 
-	private int				type	= EMAIL;
-
 	public ForgetPasswordFormValidator(){}
-
-	public ForgetPasswordFormValidator(int type){
-		this.type = type;
-	}
 
 	@Override
 	public boolean supports(Class<?> clazz){
@@ -31,6 +25,9 @@ public class ForgetPasswordFormValidator implements Validator{
 	public void validate(Object target,Errors errors){
 
 		ForgetPasswordForm command = (ForgetPasswordForm) target;
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "type", "field.required");
+
+		Integer type = command.getType();
 
 		// 判断是手机验证方式还是邮箱验证方式
 		// 邮箱验证方式，则邮箱不能为空
@@ -53,18 +50,5 @@ public class ForgetPasswordFormValidator implements Validator{
 				}
 			}
 		}
-
-		// 校验数据不能为空
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "type", "field.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "SecurityCode", "field.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "newPassword", "field.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "field.required");
-		// 验证两次密码的一致性
-		// if (!errors.hasFieldErrors("newPassword") && !errors.hasFieldErrors("confirmPassword")) {
-		// if (!command.getNewPassword().equals(command.getConfirmPassword())) {
-		// // 提示两次输入的密码不一致
-		// errors.rejectValue("confirmPassword", "register.confirmPassword.error");
-		// }
-		// }
 	}
 }

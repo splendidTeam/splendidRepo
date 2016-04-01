@@ -44,14 +44,11 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	@Autowired
 	private TokenManager		tokenManager;
 
-	@Autowired
-	private MemberExtraManager	memberExtraManager;
-
 	/**
 	 * 发送验证码的方法
 	 */
 	@Override
-	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm) throws Exception{
+	public boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm){
 		boolean flag = false;
 		if (forgetPasswordForm.getType() == ForgetPasswordFormValidator.MOBILE){
 			// 是手机验证方式，则调用手机发送验证码的方法
@@ -70,7 +67,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean emailSendValidateCode(String email) throws Exception{
+	private boolean emailSendValidateCode(String email){
 
 		boolean flag = false;
 
@@ -104,7 +101,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean mobileSendValidateCode(String mobile) throws Exception{
+	private boolean mobileSendValidateCode(String mobile){
 
 		boolean flag = false;
 
@@ -162,7 +159,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 重置密码
 			LOG.info("[The member try to reset password,memberId: ] {} [{}]", memberCommand.getId(), new Date());
 			resetPassword = sdkMemberManager.resetPasswd(memberCommand.getId(), codePassword);
-			memberExtraManager.rememberPwd(memberCommand.getId(), new Date().getTime() + "");
 		}
 		return resetPassword;
 	}
@@ -204,9 +200,6 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 如果修改成功
 			if (updatePasswd){
 				LOG.info("[The member have modified password success,memberId: ] {} [{}]", memberId, new Date());
-				// 重置记住密码的数据
-				String short4 = new Date().getTime() + "";
-				memberExtraManager.rememberPwd(memberId, short4);
 				flag = true;
 			}
 		}else{

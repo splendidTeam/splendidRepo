@@ -768,4 +768,22 @@ public class CacheManagerImpl implements CacheManager{
 		list = cacheItemDao.findAllCacheItem(new BeanPropertyRowMapper<CacheItemCommand>(CacheItemCommand.class), paraMap);
 		return list;
 	}
+
+	@Override
+	public void zremrangebyscore(String key, String start, String end) {
+		if (!useCache())
+			return;
+		key = processKey(key);
+		Jedis jredis = null;
+		try{
+			jredis = getJedis();
+			jredis.zremrangeByScore(key, start, end);
+		}catch (Exception e){
+			jedisPool.returnBrokenResource(jredis);
+			throw new CacheException(e);
+		}finally{
+			returnResource(jredis);
+		}
+		return;
+	}
 }

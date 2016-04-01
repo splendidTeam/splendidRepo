@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.manager.member.MemberPasswordManager;
-import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -37,7 +36,7 @@ import com.baozun.nebula.web.controller.member.validator.MemberPasswordFormValid
  * 
  * </pre>
  * 
- * @author Wanrong.Wang
+ * @author Wanrong.Wang 2016/03/31
  * @Controller
  */
 
@@ -47,9 +46,6 @@ public class NebulaModifyPasswordController extends BaseController{
 
 	/* 修改密码的页面定义 */
 	public static final String			VIEW_MODIFY_PASSWORD	= "member.modifyPassword";
-
-	@Autowired
-	private SdkMemberManager			sdkMemberManager;
 
 	@Autowired
 	private MemberPasswordManager		memberPasswordManager;
@@ -69,10 +65,10 @@ public class NebulaModifyPasswordController extends BaseController{
 	}
 
 	/**
-	 * 修改密码 此controller为用户点击提交之后的操作（直接输入两次密码是否相同由前端js校验）
+	 * 修改密码
 	 * 
 	 * @NeedLogin
-	 * @RequestMapping(value = "/member/editPassword.json", method = RequestMethod.POST)
+	 * @RequestMapping(value = "/member/modifyPassword.json", method = RequestMethod.POST)
 	 * @param memberDetails
 	 * @param memberPasswordForm
 	 * @param result
@@ -98,6 +94,7 @@ public class NebulaModifyPasswordController extends BaseController{
 
 		// 校验页面数据
 		memberPasswordFormValidator.validate(memberPasswordForm, result);
+		LOG.info("开始校验页面数据");
 		if (result.hasErrors()){
 			returnResult.setResult(false);
 			returnResult.setResultMessage(defaultResultMessage);
@@ -105,11 +102,13 @@ public class NebulaModifyPasswordController extends BaseController{
 			return returnResult;
 		}
 
+		LOG.info("校验页面数据成功");
+
 		// 解密页面数据
 		String oldPassword = decryptSensitiveDataEncryptedByJs(memberPasswordForm.getOldPassword(), request);
 		String newPassword = decryptSensitiveDataEncryptedByJs(memberPasswordForm.getNewPassword(), request);
 		String confirmPassword = decryptSensitiveDataEncryptedByJs(memberPasswordForm.getConfirmPassword(), request);
-
+		LOG.info("即将调用service层的方法");
 		// 若页面数据校验通过，则调用service层的方法，进行修改密码操作
 		boolean flag = memberPasswordManager.modifyPassword(oldPassword, newPassword, confirmPassword, memberId);
 

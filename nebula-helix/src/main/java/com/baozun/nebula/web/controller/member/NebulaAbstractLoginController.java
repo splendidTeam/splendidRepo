@@ -10,6 +10,7 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
+import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.SessionUtil;
 
 public abstract class NebulaAbstractLoginController extends BaseController {
@@ -48,13 +49,7 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 	 */
 	protected MemberDetails constructMemberDetails(MemberCommand member){
 		MemberDetails memberDetails = new MemberDetails();
-		memberDetails.setActived(this.isActivedMember(member));
-		memberDetails.setLoginName(member.getLoginName());
-		memberDetails.setLoginMobile(member.getLoginMobile());
-		memberDetails.setLoginEmail(member.getLoginEmail());
-		memberDetails.setNickName(member.getLoginName());
-		memberDetails.setMemberId(member.getId());
-		memberDetails.setRealName(member.getRealName());
+		PropertyUtil.copyProperties(memberDetails, member, "loginName","loginMobile","loginEmail","id","realName");
 		return memberDetails;
 	}
 	

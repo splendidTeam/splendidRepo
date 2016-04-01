@@ -126,72 +126,6 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	}
 
 	/**
-	 * 是否需要绑定
-	 * 
-	 * @return
-	 */
-	// protected boolean isNeedBinding(Member member){
-	// return false;
-	// }
-
-	/**
-	 * 是否需要补全用户信息
-	 * 
-	 * @return
-	 */
-	// protected boolean isNeedCompleteInfo(Member member){
-	// return true;
-	// }
-
-	/**
-	 * 去绑定页面，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/binding", method = RequestMethod.GET)
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	// protected String showBinding(HttpServletRequest request,HttpServletResponse response,Model model){
-	// return VIEW_MEMBER_BINDING;
-	// }
-
-	/**
-	 * 绑定动作
-	 * 
-	 * @return
-	 */
-	// protected NebulaReturnResult binding(){
-	// return DefaultReturnResult.SUCCESS;
-	// }
-
-	/**
-	 * 去完善信息页面，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/completeInfo", method = RequestMethod.GET)
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	// protected String showCompleteInfo(HttpServletRequest request,HttpServletResponse response,Model model){
-	// return VIEW_MEMBER_COMPLETEINFO;
-	// }
-
-	/**
-	 * 完善用户信息，默认推荐配置如下
-	 * 
-	 * @RequestMapping(value = "/member/completeInfo.json", method = RequestMethod.POST)
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	// protected NebulaReturnResult completeInfo(HttpServletRequest request,HttpServletResponse response,Model model){
-	// return null;
-	// }
-
-	/**
 	 * 保存第三方用户信息，这里在后续继承类中需要补充可以拿到的所有相关信息，默认只拿了OpenId
 	 * 
 	 * @param thirdPartyMember
@@ -241,7 +175,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	}
 
 	/**
-	 * 构建登录会员信息, 目前缺少:激活状态
+	 * 构建登录会员信息
 	 * 
 	 * @param member
 	 * @return
