@@ -67,11 +67,17 @@ import com.feilong.servlet.http.RequestUtil;
  * <li>{@link #sendRegisterMobileMessage(HttpServletRequest, HttpServletResponse, Model, String)} 注册时发送短信验证码</li>
  * <li>{@link #register(RegisterForm, BindingResult, HttpServletRequest, HttpServletResponse, Model) } 注册</li>
  * </ol>
- * <h3>register方法 Tips:</h3> <blockquote>
+ * <h3>showRegister方法 Tips:</h3> <blockquote>
+ * <ol>
+ * <li>判断用户如果已经登录了，跳转到【membercenter】</li>
+ * <li>初始化 RSA非对称加密的key，商城端也可以实现{@link #init4SensitiveDataEncryptedByJs(HttpServletRequest, Model)} 完成自己的逻辑</li>
+ * </ol>
+ * </blockquote> <h3>register方法 Tips:</h3> <blockquote>
  * <ol>
  * <li>根据Device分别验证登录提交的表单，商城端可以自己实现 {@link #registerFormValidate(Device, RegisterForm, BindingResult) }来实现自定义</li>
  * <li>注册，持久化数据</li>
- * <li></li>
+ * <li>注册数据操作成功之后【注意此时注册流程不一样已经完成，还有可能需要激活邮件，完善profile等其他异步动作】；<br/>
+ * 商城端也可以自己实现{@link #onRegisterSuccess(MemberDetails, HttpServletRequest, HttpServletResponse)}</li>
  * </ol>
  * </blockquote>
  * 
@@ -81,20 +87,18 @@ import com.feilong.servlet.http.RequestUtil;
  */
 public class NebulaRegisterController extends NebulaLoginController{
 
-	private static final Logger			LOGGER								= LoggerFactory.getLogger(NebulaRegisterController.class);
+	private static final Logger			LOGGER						= LoggerFactory.getLogger(NebulaRegisterController.class);
 
 	/* Register Page 的默认定义 */
-	public static final String			VIEW_MEMBER_REGISTER				= "member.register";
+	public static final String			VIEW_MEMBER_REGISTER		= "member.register";
 
-	public static final String			VIEW_MEMBER_REGISTER_ACTIVE_EMAIL	= "member.registerActiveEmail";
-
-	public static final String			VIEW_MEMBER_CENTER					= "member.center";
+	public static final String			VIEW_MEMBER_CENTER			= "/member/center.htm";
 
 	/** 发送手机验证码短信长度 */
-	public static Integer				SEND_MOBILE_MSG_LENGTH				= 5;
+	public static Integer				SEND_MOBILE_MSG_LENGTH		= 5;
 
 	/** 发送手机验证码有效期 */
-	public static Integer				SEND_MOBILE_MSG_LIVETIME			= 2 * 60;
+	public static Integer				SEND_MOBILE_MSG_LIVETIME	= 2 * 60;
 
 	/**
 	 * PC || Tablet <br/>
@@ -136,7 +140,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	public String showRegister(@LoginMember MemberDetails memberDetails,Model model,HttpServletRequest request){
 		// 判断用户是否登陆
 		if (!Validator.isNullOrEmpty(memberDetails)){
-			return VIEW_MEMBER_CENTER;
+			return "redirect:" + VIEW_MEMBER_CENTER;
 		}
 		init4SensitiveDataEncryptedByJs(request, model);
 		return VIEW_MEMBER_REGISTER;
@@ -310,7 +314,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 			/**
 			 * 构造MemberDetails<br/>
-			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberCommand.status 
+			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberCommand.status
 			 */
 			MemberDetails memberDetails = constructMemberDetails(memberCommand);
 
@@ -452,7 +456,8 @@ public class NebulaRegisterController extends NebulaLoginController{
 		// defaultReturnResult = ;
 		// }
 		/***
-		 * 不管是否注册成功之后自动登录，都跑此方法<br/> 
+		 * 不管是否注册成功之后自动登录，都跑此方法<br/>
+		 * 方法中的【Processor】会过滤出注册需要完善的下一步动作，返回NebulaReturnResult中包含下一步动作的url
 		 */
 		return super.onAuthenticationSuccess(memberDetails, request, response);
 	}
@@ -493,6 +498,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		smsCommand.setMobile(mobile);
 		smsCommand.setTemplateCode(SMSTemplateConstants.SMS_REGISTER_CAPTCHA);
 
+		// 发送验证码短信，captcha会根据validity保存在redis中
 		boolean sendResult = smsManager.send(smsCommand, CaptchaType.MIXED, SEND_MOBILE_MSG_LENGTH, SEND_MOBILE_MSG_LIVETIME);
 
 		return sendResult;
