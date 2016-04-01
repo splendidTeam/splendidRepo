@@ -92,6 +92,7 @@ public  class CommonEmailManagerImpl implements CommonEmailManager{
 			RollingTimeWindow rollingTimeWindow=new RollingTimeWindow(Long.parseLong(maxSendNumber),Long.parseLong(emailCacheExpireTime));
 			VerifyResult resultcode= tokenManager.verifyAccess("validEmailMaxSendNum",email, rollingTimeWindow);
 			log.debug("validate result is"+resultcode);
+			//这个地方不对  要改 TODO
 			if(resultcode.equals(resultcode.LIMITED)){
 				return SendEmailResultCode.MAXSENDNUMBERERROR;
 			}
@@ -103,6 +104,7 @@ public  class CommonEmailManagerImpl implements CommonEmailManager{
 			RollingTimeWindow rollingTimeWindow=new RollingTimeWindow(Long.parseLong(intervalTime),Long.parseLong(emailCacheExpireTime));
 			VerifyResult resultcode= tokenManager.verifyAccess("validEmailIntervalTime",email, rollingTimeWindow);
 			log.debug("validate result is"+resultcode);
+			//这个地方不对  要改 TODO
 			if(resultcode.equals(resultcode.LIMITED)){
 				return SendEmailResultCode.INTERVALTIMEERROR;
 			}
