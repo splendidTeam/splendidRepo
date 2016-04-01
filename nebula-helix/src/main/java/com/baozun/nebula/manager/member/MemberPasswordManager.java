@@ -9,7 +9,8 @@ import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
  */
 public interface MemberPasswordManager{
 
-	// 发送验证码
+
+
 	boolean sendValidateCode(ForgetPasswordForm forgetPasswordForm);
 
 	// 重置密码

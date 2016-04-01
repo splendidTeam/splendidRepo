@@ -23,12 +23,21 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaWeiboLoginController.class);
 
 	/**
-	 * 去微博联合登陆页，默认推荐配置如下
+	 * 微博联合登陆页，默认推荐配置如下
 	 * 
-	 * @RequestMapping(value = "/member/showWeiboLogin", method = RequestMethod.POST)
+	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	public String showWeiboLogin(){
-		return "redirect:" + this.constructOAuthLoginURL();
+	@Override
+	public String constructOAuthLoginURL(){
+
+		// 获取系统微博参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
+				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
+
+		// 微博登录地址
+		String loginUrl = adaptor.generateLoginUrl();
+		LOG.info("Weibo generate login url {}", loginUrl);
+		return loginUrl;
 	}
 
 	/**
@@ -41,19 +50,6 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 	@Override
 	public String loginWithCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
 		return super.loginWithCallBack(request, response, model);
-	}
-
-	@Override
-	public String constructOAuthLoginURL(){
-
-		// 获取系统微博参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
-				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WEIBO);
-
-		// 微博登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("Weibo generate login url {}", loginUrl);
-		return loginUrl;
 	}
 
 	@Override

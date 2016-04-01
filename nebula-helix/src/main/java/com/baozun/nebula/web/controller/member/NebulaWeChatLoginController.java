@@ -23,12 +23,21 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaWeChatLoginController.class);
 
 	/**
-	 * 去微信联合登陆页，默认推荐配置如下
+	 * 微信联合登陆页，默认推荐配置如下
 	 * 
-	 * @RequestMapping(value = "/member/showWeChatLogin", method = RequestMethod.POST)
+	 * @RequestMapping(value = "/member/constructOAuthLoginURL", method = RequestMethod.POST)
 	 */
-	public String showWeChatLogin(){
-		return "redirect:" + this.constructOAuthLoginURL();
+	@Override
+	public String constructOAuthLoginURL(){
+
+		// 获取系统微信参数
+		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
+				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
+
+		// 微信登录地址
+		String loginUrl = adaptor.generateLoginUrl();
+		LOG.info("WeChat generate login url {}", loginUrl);
+		return loginUrl;
 	}
 
 	/**
@@ -41,19 +50,6 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 	@Override
 	public String loginWithCallBack(HttpServletRequest request,HttpServletResponse response,Model model){
 		return super.loginWithCallBack(request, response, model);
-	}
-
-	@Override
-	public String constructOAuthLoginURL(){
-
-		// 获取系统微信参数
-		ThirdPartyMemberAdaptor adaptor = ThirdPartyMemberFactory.getInstance()
-				.getThirdPartyMemberAdaptor(ThirdPartyMemberFactory.TYPE_WECHAT);
-
-		// 微信登录地址
-		String loginUrl = adaptor.generateLoginUrl();
-		LOG.info("WeChat generate login url {}", loginUrl);
-		return loginUrl;
 	}
 
 	@Override
