@@ -21,10 +21,12 @@ public class EmailConstants {
 	public static final String FORGET_PASSWORD="EMAIL_FORGET_PASSWORD";
     /** 取消失败预警*/
     public static final String SYS_CANCEL_ORDER_FAILURE ="EMAIL_SYS_CANCEL_ORDER_FAILURE" ;
-    /**
-     * 邮件注册验证模板
-     */
-    public static final String EMAIL_REGISTER_VALIDATE="EMAIL_REGISTER_VALIDATE";
+    
+    /**激活邮件模板 */
+    public static final String EMAIL_ACTIVE_TEMPLATE="EMAIL_ACTIVE_TEMPLATE";
+    
+    /**发送成功邮件模板 */
+    public static final String EMAIL_SENDSUCCESS_TEMPLATE="EMAIL_SENDSUCCESS_TEMPLATE";
     
 	/**郵件發送次數*/
 	public static final Integer SEND_EMAIL_NUMBER = 99999;

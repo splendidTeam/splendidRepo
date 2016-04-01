@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.MemberFavoritesCommand;
@@ -17,6 +13,7 @@ import com.baozun.nebula.command.coupon.CouponCommand;
 import com.baozun.nebula.command.product.ConsultantCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.member.Member;
+import com.baozun.nebula.model.member.MemberBehaviorStatus;
 import com.baozun.nebula.model.member.MemberCryptoguard;
 import com.baozun.nebula.model.member.MemberFavorites;
 import com.baozun.nebula.model.member.MemberGroup;
@@ -27,6 +24,10 @@ import com.baozun.nebula.model.sns.Consultants;
 import com.baozun.nebula.sdk.command.ItemRateCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 public interface SdkMemberManager extends BaseManager{
 
@@ -597,4 +598,24 @@ public interface SdkMemberManager extends BaseManager{
 	 * @return
 	 */
 	int updateMemberGroupIdById(Long memberId,Long groupId);
+	
+	
+	/**
+	 * 新增会员行为
+	 * @param memberBehaviorStatus
+	 * @author yufei.kong 2016年4月1日 18:29:55
+	 * @return
+	 */
+	public int saveMemberBehaviorStatus(MemberBehaviorStatus memberBehaviorStatus);
+	
+	/**
+	 * 通过类型和memberid获取MemberBehaviorStatus
+	 * @param type
+	 * @param memberId
+	 * @author yufei.kong 2016年4月1日 18:29:55
+	 * @return
+	 */
+	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type,Long memberId);
+	
+	
 }

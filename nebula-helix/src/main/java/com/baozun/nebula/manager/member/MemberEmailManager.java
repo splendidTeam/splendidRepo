@@ -1,7 +1,7 @@
 package com.baozun.nebula.manager.member;
 
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.model.member.MemberPersonalData;
+import com.baozun.nebula.manager.member.CommonEmailManager.SendEmailResultCode;
 
 /**
  * 会员邮件相关业务类
@@ -11,42 +11,32 @@ import com.baozun.nebula.model.member.MemberPersonalData;
  */
 public interface MemberEmailManager extends BaseManager {
 	
-	/**
-	 * 是否验证最大邮件发送数
-	 * @param email
-	 * @return
-	 */
-	public boolean validEmailSendMaxNum(String email); 
-	
-	
-	/**
-	 * 是否验证邮件发送时间间隔
-	 * @param email
-	 * @return
-	 */
-	public boolean validEmailSendIntervalTime(String email); 
-	
 	
 	/**
 	 * 发送激活邮件
 	 * @param memberId
-	 * @param path
+	 * @param path 拼接发送内容中的 前缀地址
+	 * @param email 接收邮箱
 	 */
-	public String sendActiveEmail(Long memberId, String path,String email);
+	public SendEmailResultCode sendActiveEmail(Long memberId, String path,String email);
 	
 	/**
-	 * 判断会员邮箱是否激活
-	 * 
+	 * 发送注册成功的邮件
+	 * @param email 接收地址
+	 * @param nickName用户昵称
+	 * @return
+	 */
+	public SendEmailResultCode sendRegsiterSuccessEmail(String email,String nickName);
+	
+	
+	/**
+	 * 激活用户
 	 * @param memberId
 	 * @return
 	 */
-	public boolean isMemberEmailActive(Long memberId);
+	public String activeMemberAccount(Long memberId);
 	
-	/**
-	 * 发送普通會員註冊成功邮件
-	 * 
-	 */
-	public void sendRegsiterSuccessEmail(String email,MemberPersonalData personalData);
+	
 	
     public void sendEmailValidateCode(String code, String email);
 }

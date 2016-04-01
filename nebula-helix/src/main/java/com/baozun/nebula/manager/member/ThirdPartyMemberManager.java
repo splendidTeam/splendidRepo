@@ -20,4 +20,18 @@ public interface ThirdPartyMemberManager extends BaseManager {
 	 * @return 如果为false则表示not first login，跳转到登录页,true is first login
 	 */
 	public Boolean validFirstLogin(ThirdPartyMember member, Integer source, String ip);
+	
+	/**
+	 * 第三方账户跟商城账户绑定
+	 * 1.验证2个memberid不能为空
+	 * 2.判断是否已经绑定
+	 * 3.执行绑定方法
+	 * 4.存储memberBehaviorStatus
+	 * 
+	 * @param thirdPartyMemberId
+	 * @param storeMemberId
+	 * @param type
+	 * @return
+	 */
+	public String bindThirdPartyLoginAccount(Long thirdPartyMemberId,Long storeMemberId,String type);
 }

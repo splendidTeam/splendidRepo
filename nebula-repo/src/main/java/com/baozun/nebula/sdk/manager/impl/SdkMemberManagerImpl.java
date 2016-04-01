@@ -49,6 +49,7 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.member.Contact;
 import com.baozun.nebula.model.member.Member;
+import com.baozun.nebula.model.member.MemberBehaviorStatus;
 import com.baozun.nebula.model.member.MemberConduct;
 import com.baozun.nebula.model.member.MemberCryptoguard;
 import com.baozun.nebula.model.member.MemberFavorites;
@@ -122,6 +123,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Autowired
 	private SdkSecretManager		sdkSecretManager;
+	
 
 	private void encrypt(MemberPersonalData mpd){
 
@@ -1306,6 +1308,18 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	@Override
 	public int updateMemberGroupIdById(Long memberId,Long groupId){
 		return memberDao.updateMemberGroupIdById(memberId, groupId);
+	}
+
+	@Override
+	public int saveMemberBehaviorStatus(MemberBehaviorStatus memberBehaviorStatus) {
+		//return memberDao.saveMemberBehaviorStatus(memberBehaviorStatus);
+		return 0;
+	}
+
+	@Override
+	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type, Long memberId) {
+		// TODO 等dao好了之后在做
+		return null;
 	}
 
 }

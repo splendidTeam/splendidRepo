@@ -17,7 +17,6 @@
 package com.baozun.nebula.web.controller.member;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,10 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.EmailType;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodesFoo;
+import com.baozun.nebula.manager.member.CommonEmailManager.SendEmailResultCode;
 import com.baozun.nebula.manager.member.MemberEmailManager;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
@@ -42,7 +41,6 @@ import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.EmailUtil;
-import com.baozun.nebula.utils.ShopDateUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.constants.CommonUrlConstants;
@@ -98,12 +96,7 @@ public class NebulaEmailAccountActivationController extends BaseController {
 	 *1.由于可能出现不登录 也可以发送激活邮件的情况,memberDetails可能为空,所以需要验证
 	 *  当memberDetails为空时,获取注册成功之后存储于session中的email,通过email获取memberDetails
 	 *  
-	 *2.发送响应码为2个错误码 1个成功码
-	 *  sendMaxNumberError 发送最大次数错误
-	 *  intervalTimeError 发送时间间隔错误
-	 *  sendSuccess 发送成功
-	 *  
-	 *3.model.addAttribute("sendEmail", e.getWebsite());  将该邮箱的源地址传递到前台.便于直接跳转到该邮箱
+	 *2.model.addAttribute("sendEmail", e.getWebsite());  将该邮箱的源地址传递到前台.便于直接跳转到该邮箱
 	 *  
 	 * @param memberDetails
 	 * @param httpRequest
@@ -136,7 +129,7 @@ public class NebulaEmailAccountActivationController extends BaseController {
 		//拼接发送地址
 		String path=getRegEmailValidPath(httpRequest);
 		//发送邮件获取响应码 
-		String resultCode=memberEmailManager.sendActiveEmail(memberId, path,email);
+		SendEmailResultCode resultCode=memberEmailManager.sendActiveEmail(memberId, path,email);
 		
 		//********************************************************************************
 		//获取跳转地址
@@ -218,31 +211,10 @@ public class NebulaEmailAccountActivationController extends BaseController {
 				throw new BusinessException(ErrorCodesFoo.member_not_exist);
 			}
 			
+			memberEmailManager.activeMemberAccount(memberId);
 			
-			//下面的代码 要抽成一个方法 具体等讨论后 TODO
-			
-			
-			// 判斷帳號是否激活
-			if (memberEmailManager.isMemberEmailActive(memberId)) {
-				// 链接已激活
-				model.addAttribute("result", "urlInvalid");
-				LOG.info("valid register Email invalid");
-				return VIEW_MEMEBER_ACTIVE_BACK;
-			}
-			boolean flag = ShopDateUtil.countTime(Long.valueOf(paramList.get(2)), new Date().getTime());
-			if (!flag) {
-				// 链接已经过期
-				model.addAttribute("result", "urlUnInvalid");
-				return VIEW_MEMEBER_ACTIVE_BACK;
-			}
-			
-			// 验证激活链接
-			memberManager.validEmailActiveUrl(memberId, paramList.get(1));
 			//修改数据库字段
 			MemberPersonalData personalData = sdkMemberManager.findMemberPersonData(memberId);
-			personalData.setShort2(EmailConstants.EMAIL_ACTIVE_YES);
-			sdkMemberManager.savePersonData(personalData);
-			
 			String returnUrl = CommonUrlConstants.DEFAULT_REDIRECT_URL;
 			if (httpRequest.getSession().getAttribute(SessionKeyConstants.MEMBER_IBACK_URL) != null) {
 				returnUrl = (String) httpRequest.getSession().getAttribute(SessionKeyConstants.MEMBER_IBACK_URL);
@@ -251,7 +223,7 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			model.addAttribute("returnUrl", returnUrl);
 			model.addAttribute("email", member.getLoginEmail());
 			model.addAttribute("result", "success");
-			memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData);
+			SendEmailResultCode resultCode=memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData.getNickname());
 			
 			LOG.info("valid register Email end");
 			

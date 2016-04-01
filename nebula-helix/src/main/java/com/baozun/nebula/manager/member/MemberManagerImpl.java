@@ -266,7 +266,7 @@ public class MemberManagerImpl implements MemberManager{
 		LOGGER.info("激活邮件url:{}", url);
 		dataMap.put("link", "<a href='" + url + "'>" + url + "</a>");
 		// 发送邮件
-		EmailEvent emailEvent = new EmailEvent(this, email, EmailConstants.EMAIL_REGISTER_VALIDATE, dataMap);
+		EmailEvent emailEvent = new EmailEvent(this, email, EmailConstants.EMAIL_ACTIVE_TEMPLATE, dataMap);
 		eventPublisher.publish(emailEvent);
 	}
 

@@ -151,13 +151,10 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
 	}
 	
 	private EmailSendLog generateMailLog(Long templateId,String receiverEmail){
-
 		EmailSendLog sendLog=new EmailSendLog();
-		
 		sendLog.setReceiverEmail(receiverEmail);
 		sendLog.setSendTime(new Date());
 		sendLog.setTemplateId(templateId);
-		
 		return sendLog;
 	}
 
