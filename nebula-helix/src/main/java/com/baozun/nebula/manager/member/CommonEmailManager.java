@@ -3,17 +3,22 @@ package com.baozun.nebula.manager.member;
 import java.util.Map;
 
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.model.member.MemberPersonalData;
+
 
 /**
- * 会员邮件相关业务类
+ * 通用邮件发送接口 实现以下方法
+ * <ol>
  * 
- * @author yufei.kong 2016.3.23
- *
+ * 	<li>发送邮件 {@link #sendEmail}</li>
+ * 
+ * </ol>
+ * @author yufei.kong 2016年4月5日 16:18:38
  */
 public interface CommonEmailManager extends BaseManager {
 	
 	/**
+	 * 返回结果枚举类
+	 * 
 	 * 成功-SUCESS 
 	 * 失败-FAILURE
 	 * 最大发送次数错误 -MAXSENDNUMBERERROR
@@ -36,7 +41,7 @@ public interface CommonEmailManager extends BaseManager {
 	 * @param dataMap 参数 需自己组装
 	 * @return
 	 */
-	public SendEmailResultCode sendEmail(String email, String emailTemplateCode,Map<String, Object> dataMap);
+	  SendEmailResultCode sendEmail(String email, String emailTemplateCode,Map<String, Object> dataMap);
 	
 	
 }

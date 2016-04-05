@@ -16,10 +16,13 @@
  */
 package com.baozun.nebula.manager.member;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +41,9 @@ import com.baozun.nebula.model.member.MemberBehaviorStatus;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
+import com.feilong.core.CharsetType;
 import com.feilong.core.Validator;
+import com.feilong.core.net.ParamUtil;
 
 
 /**
@@ -53,7 +58,6 @@ import com.feilong.core.Validator;
 public  class MemberEmailManagerImpl implements MemberEmailManager{
 	
 	private static final Logger log = LoggerFactory.getLogger(MemberManagerImpl.class);
-	
 	
 	@Autowired
 	private MemberDao memberDao;
@@ -74,6 +78,7 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 	@Override
 	@Transactional(readOnly = true)
 	public SendEmailResultCode sendActiveEmail(Long memberId, String path,String email) {
+		//判断是否为空,如为空则返回失败
 		if(Validator.isNullOrEmpty(memberId)){
 			return SendEmailResultCode.FAILURE;
 		}
@@ -89,10 +94,16 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 	}
 	
 	/**
-	 * 组装激活邮件的 内容 URL
-	 * @param memberId 
-	 * @param path 前缀地址
-	 * @return
+	 * 组装激活邮件URL内容
+	 * <ol>
+	 * 	<li>1.拼接加密内容</li>
+	 *  <li>2.加密字符串</li>
+	 *  <li>3.拼接最后的url</li>
+	 * </ol>
+	 * 
+	 * @param path url前缀地址
+	 * 
+	 * @author yufei.kong 2016年4月5日 16:18:38
 	 */
 	public String packageActiveEmailUrl(Long memberId,String path)  {
 		
@@ -177,6 +188,25 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 	public void sendEmailValidateCode(String code, String email) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<String> analysisTheUrl(String url) {
+		//解码
+		url = EncryptUtil.getInstance().base64Decode(url);
+		
+		String decrypt="";
+		try {
+			// 解密
+			decrypt = EncryptUtil.getInstance().decrypt(url);
+		} catch (EncryptionException e) {
+			e.printStackTrace();
+		}
+		
+		// 获取链接中的参数
+		List<String> paramList = new ArrayList<String>(ParamUtil.toSingleValueMap(decrypt, CharsetType.UTF8).values());
+
+		return paramList;
 	}
 	
 

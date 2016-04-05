@@ -58,7 +58,7 @@ import com.feilong.core.net.ParamUtil;
  * @author yufei.kong 2016.3.22
  *
  */
-public class NebulaEmailAccountActivationController extends BaseController {
+public class NebulaEmailAccountActivationController extends NebulaAbstractLoginController {
 
 	/**
 	 * log 定义
@@ -86,23 +86,22 @@ public class NebulaEmailAccountActivationController extends BaseController {
 	@Autowired
 	private MemberEmailManager memberEmailManager;
 	
-
-
+	
 	/**
 	 * 发送激活邮件,成功后跳转到提示用户激活页面,默认推荐配置如下
+	 * <ol>
+	 * <li>由于可能出现不登录 也可以发送激活邮件的情况,memberDetails可能为空,所以需要验证</li>
+	 * <li>当memberDetails为空时,获取注册成功之后存储于session中的email,通过email获取memberDetails</li>
+	 * <li>model.addAttribute("sendEmail", e.getWebsite());将该邮箱的源地址传递到前台.便于直接跳转到该邮箱</li>
+	 * <li>注册成功后,绑定第三方和商城账户,并保存行为数据,重新构建MemberDetails以及Status</li>
+	 * </ol>
 	 * 
 	 * @RequestMapping(value = "/member/sendRegEmail", method =RequestMethod.GET)
 	 * 
-	 *1.由于可能出现不登录 也可以发送激活邮件的情况,memberDetails可能为空,所以需要验证
-	 *  当memberDetails为空时,获取注册成功之后存储于session中的email,通过email获取memberDetails
-	 *  
-	 *2.model.addAttribute("sendEmail", e.getWebsite());  将该邮箱的源地址传递到前台.便于直接跳转到该邮箱
-	 *  
-	 * @param memberDetails
-	 * @param httpRequest
-	 * @param httpResponse
+	 * @param memberDetails 
+	 * @param request
+	 * @param response
 	 * @param model
-	 * @return
 	 */
 	public String sendRegEmail(@LoginMember MemberDetails memberDetails,
 							   HttpServletRequest httpRequest, 
@@ -123,11 +122,12 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			email =  member.getLoginEmail();
 		}
 		LOG.info("valid or get loginEmail   end");
-		//调用方法,发送邮件
-		LOG.info("begin sendActiveEmail");
 		
 		//拼接发送地址
 		String path=getRegEmailValidPath(httpRequest);
+		
+		//调用方法,发送邮件
+		LOG.info("begin sendActiveEmail");
 		//发送邮件获取响应码 
 		SendEmailResultCode resultCode=memberEmailManager.sendActiveEmail(memberId, path,email);
 		
@@ -184,18 +184,8 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			 						  Model model) {
 		try {
 			LOG.info("valid register Email start");
-			
-			//判断是否为空 如为空则跳转到 首页,不为空则解码
-			if (StringUtils.isBlank(registerComfirm)) {
-				return "redirect:/index";
-			} else {
-				registerComfirm = EncryptUtil.getInstance().base64Decode(registerComfirm);
-			}
-			
-			//解密
-			String decrypt = EncryptUtil.getInstance().decrypt(registerComfirm);
 			//获取链接中的参数
-			List<String> paramList =new ArrayList<String>(ParamUtil.toSingleValueMap(decrypt, CharsetType.UTF8).values());
+			List<String> paramList =memberEmailManager.analysisTheUrl(registerComfirm);
 			
 			//判断参数列表是否为空  如果为空则返回首页
 			if (CollectionUtils.isEmpty(paramList)) {
@@ -211,9 +201,9 @@ public class NebulaEmailAccountActivationController extends BaseController {
 				throw new BusinessException(ErrorCodesFoo.member_not_exist);
 			}
 			
+			//调用激活方法
 			memberEmailManager.activeMemberAccount(memberId);
 			
-			//修改数据库字段
 			MemberPersonalData personalData = sdkMemberManager.findMemberPersonData(memberId);
 			String returnUrl = CommonUrlConstants.DEFAULT_REDIRECT_URL;
 			if (httpRequest.getSession().getAttribute(SessionKeyConstants.MEMBER_IBACK_URL) != null) {
@@ -223,7 +213,11 @@ public class NebulaEmailAccountActivationController extends BaseController {
 			model.addAttribute("returnUrl", returnUrl);
 			model.addAttribute("email", member.getLoginEmail());
 			model.addAttribute("result", "success");
-			SendEmailResultCode resultCode=memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData.getNickname());
+			
+			//发送激活成功邮件
+			memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData.getNickname());
+			MemberDetails memberDetails=super.constructMemberDetails(member);
+			super.onAuthenticationSuccess(memberDetails, httpRequest, httpResponse);
 			
 			LOG.info("valid register Email end");
 			

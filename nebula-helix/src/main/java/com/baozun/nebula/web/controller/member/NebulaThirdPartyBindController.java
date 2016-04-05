@@ -59,40 +59,39 @@ import com.feilong.servlet.http.RequestUtil;
 
 
 /**
- * 登录相关方法controller
+ * 绑定第三方登录的Controller
  * 
  * <ol>
- * <li>{@link #showLogin(memberDetails,request,respons,model)} 进入登录页面</li>
- * <li>{@link #login(loginForm,bindingResult,request,response,model)}登录方法</li>
- * <li>{@link #loginOut(request,response,model)}退出登录方法</li>
+ * <li>{@link #showBind(request,respons,model)}进入绑定页面</li>
+ * <li>{@link #bindThirdPartyMemberWithStoreMember(String type,MemberDetails memberDetails,
+													LoginForm loginForm,BindingResult bindingResult,
+													HttpServletRequest request,HttpServletResponse response,Model model)}
+	       		已有商城账户的情况下绑定第三方账户											
+   </li>
+ * <li>{@link #bindThirdPartyMemberWithOutStoreMember(String type,MemberDetails memberDetails,RegisterForm registerForm,
+														BindingResult bindingResult,HttpServletRequest request,
+														HttpServletResponse response,Model model)}
+				没有商城账户的情况下绑定第三方账户				
+   </li>
  * </ol>
  * 
- * <h3>showLogin方法,主要有以下几点:</h3>
+ * <h3>bindThirdPartyMemberWithStoreMember方法,主要有以下几点:</h3>
  * <blockquote>
  * <ol>
- * <li>设置回填的用户名和密码;</li>
- * <li>将js加密使用的公钥传入页面;</li>
- * <li>如果memberDetails不为null视为登录用户，默认还是可以进入登录页的，商城可以重写 {@link #getShowPage4LoginedUserViewLoginPage},来决定登录用户是否可以进入登录页</li>
- * </ol>
- * </blockquote>
- * 
- * <h3>login方法,主要有以下几点:</h3>
- * <blockquote>
- * <ol>
- * <li>校验页面传来的参数，主要是非空校验;</li>
- * <li>对页面传来的用户名、密码进行解密;</li>
- * <li>判断是否支持自动登录，如果支持校验是否可以自动登录;</li>
- * <li>如果不支持自动登录或自动登录校验失败，走正常的登录流程，校验用户名密码是否正确等;</li>
- * <li>登录成功后处理是否记住用户名和密码;</li>
- * <li>登录成功的后续操作，包括返回页面、重置session等</li>
+ * <li>首先需要第三方用户登录</li>
+ * <li>其次会进行商城登录数据的校验</li>
+ * <li>校验用户名和密码是否正确</li>
+ * <li>校验成功后,绑定第三方和商城账户,并保存行为数据,重新构建MemberDetails以及Status</li>
+ * <li>登录失败或校验失败，返回错误信息,错误码详见ThirdPartyLoginBindConstants</li>
  * </ol>
  * </blockquote>
  * 
- * <h3>loginOut方法,主要有以下几点:</h3>
+ * <h3>bindThirdPartyMemberWithOutStoreMember方法,主要有以下几点:</h3>
  * <blockquote>
  * <ol>
- * <li>清空session;</li>
- * <li>登出成功的后续操作，商城可以重写 {@link #onLogoutSuccess}方法</li>
+ * <li>首先需要第三方用户登录</li>
+ * <li>其次会进行商城账户注册</li>
+ * <li>注册成功后,绑定第三方和商城账户,并保存行为数据,重新构建MemberDetails以及Status</li>
  * </ol>
  * </blockquote>
  * 
@@ -106,7 +105,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG								= LoggerFactory.getLogger(NebulaThirdPartyBindController.class);
+	private static final Logger	LOG	= LoggerFactory.getLogger(NebulaThirdPartyBindController.class);
 
 	/* bind Page 的默认定义 */
 	public static final String	VIEW_THIRDPARTY_MEMBER_BIND				= "member.thirdParty.bind";
@@ -124,21 +123,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	@Autowired
 	@Qualifier("loginFormValidator")
 	private LoginFormValidator	loginFormValidator;
-
-	/**
-	 * 会员业务管理类
-	 */
-	@Autowired
-	private MemberManager		memberManager;
 	
-	@Autowired
-	private SdkMemberManager	sdkMemberManager;
-	
-	/**
-	 * 第三方绑定业务类
-	 */
-	@Autowired
-	private ThirdPartyMemberManager thirdPartyMemberManager;
 	
 	/**
 	 * Mobile <br/>
@@ -155,6 +140,24 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	@Autowired
 	@Qualifier("registerFormNormalValidator")
 	private RegisterFormNormalValidator	registerFormNormalValidator;
+
+	/**
+	 * 会员业务管理类
+	 */
+	@Autowired
+	private MemberManager		memberManager;
+	
+	/**
+	 * sdk会员业务管理类
+	 */
+	@Autowired
+	private SdkMemberManager	sdkMemberManager;
+	
+	/**
+	 * 第三方绑定业务类
+	 */
+	@Autowired
+	private ThirdPartyMemberManager thirdPartyMemberManager;
 	
 
 	/**
