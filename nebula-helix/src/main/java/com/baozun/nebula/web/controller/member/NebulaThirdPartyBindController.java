@@ -296,9 +296,9 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
 
 		// 这个地方的方法应该抽取公用方法
-		NebulaRegisterController nc = new NebulaRegisterController();
+//		NebulaRegisterController nc = new NebulaRegisterController();
 		/** 检查email，mobile等是否合法 */
-		defaultReturnResult = (DefaultReturnResult) nc.checkRegisterData(memberFrontendCommand, request, response);
+		defaultReturnResult = (DefaultReturnResult) memberManager.checkRegisterData(memberFrontendCommand);
 
 		if (!defaultReturnResult.isResult()) {
 			return VIEW_THIRDPARTY_MEMBER_BIND_FAILURE;
