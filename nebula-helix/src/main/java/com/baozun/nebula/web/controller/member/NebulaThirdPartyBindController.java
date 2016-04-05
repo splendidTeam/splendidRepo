@@ -51,9 +51,9 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
+import com.baozun.nebula.web.controller.member.validator.BindRegisterFormMobileValidator;
+import com.baozun.nebula.web.controller.member.validator.BindRegisterFormNormalValidator;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValidator;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 
@@ -131,7 +131,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 */
 	@Autowired
 	@Qualifier("registerFormMobileValidator")
-	private RegisterFormMobileValidator	registerFormMobileValidator;
+	private BindRegisterFormMobileValidator	registerFormMobileValidator;
 	
 	/**
 	 * PC || Tablet <br/>
@@ -139,7 +139,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 */
 	@Autowired
 	@Qualifier("registerFormNormalValidator")
-	private RegisterFormNormalValidator	registerFormNormalValidator;
+	private BindRegisterFormNormalValidator	registerFormNormalValidator;
 
 	/**
 	 * 会员业务管理类
