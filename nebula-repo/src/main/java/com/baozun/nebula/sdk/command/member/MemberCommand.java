@@ -85,6 +85,12 @@ public class MemberCommand implements Command {
 	private Integer receiveMail;
 
 	private String newPassword;
+	
+	/**
+	 * 分组ID，用于处理会员间绑定关系 
+	 */
+	private Long groupId;
+	
 
 	public Long getId() {
 		return id;
@@ -200,6 +206,24 @@ public class MemberCommand implements Command {
 
 	public Integer getReceiveMail() {
 		return receiveMail;
+	}
+
+	
+	/**   
+	 * get groupId  
+	 * @return groupId  
+	 */
+	public Long getGroupId(){
+		return groupId;
+	}
+
+	
+	/**
+	 * set groupId 
+	 * @param groupId
+	 */
+	public void setGroupId(Long groupId){
+		this.groupId = groupId;
 	}
 
 	public void setReceiveMail(Integer receiveMail) {

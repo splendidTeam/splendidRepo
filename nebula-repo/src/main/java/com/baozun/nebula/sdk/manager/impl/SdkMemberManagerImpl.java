@@ -11,12 +11,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.utils.PropListCopyable;
-import loxia.utils.PropertyUtil;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +66,12 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+import loxia.utils.PropListCopyable;
+import loxia.utils.PropertyUtil;
 
 @Transactional
 @Service("sdkMemberService")
@@ -541,6 +541,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		memberCommand.setSource(member.getSource());
 		memberCommand.setReceiveMail(member.getReceiveMail());
 		memberCommand.setType(member.getType());
+		memberCommand.setGroupId(member.getGroupId());		
+		
 		return memberCommand;
 	}
 
@@ -1291,13 +1293,17 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	@Transactional(readOnly = true)
-	public MemberCommand findMemberByLoginMobile(String loginMobile){
-		// TODO Auto-generated method stub
-		Member member = memberDao.findMemberByLoginMobile(loginMobile);
-
-		if (null != member)
-			return convertMemberToMemberCommand(member);
-
+	public MemberCommand findMemberByLoginMobile(String loginMobile){		
+		Member member = null;
+		MemberCommand memberCommand = null;
+		if (StringUtils.isNotBlank(loginMobile))
+			member = memberDao.findMemberByLoginMobile(loginMobile);
+		if (null != member){
+			memberCommand = convertMemberToMemberCommand(member);
+			// 敏感信息加密存储完后，解密传输至Controller
+			decrypt(memberCommand);
+			return memberCommand;
+		}	
 		return null;
 	}
 
