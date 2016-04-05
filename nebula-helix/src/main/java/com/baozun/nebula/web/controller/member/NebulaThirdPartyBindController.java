@@ -51,9 +51,9 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
+import com.baozun.nebula.web.controller.member.validator.BindRegisterFormMobileValidator;
+import com.baozun.nebula.web.controller.member.validator.BindRegisterFormNormalValidator;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValidator;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 
@@ -131,7 +131,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 */
 	@Autowired
 	@Qualifier("registerFormMobileValidator")
-	private RegisterFormMobileValidator	registerFormMobileValidator;
+	private BindRegisterFormMobileValidator	registerFormMobileValidator;
 	
 	/**
 	 * PC || Tablet <br/>
@@ -139,7 +139,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 */
 	@Autowired
 	@Qualifier("registerFormNormalValidator")
-	private RegisterFormNormalValidator	registerFormNormalValidator;
+	private BindRegisterFormNormalValidator	registerFormNormalValidator;
 
 	/**
 	 * 会员业务管理类
@@ -353,52 +353,6 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
 
 		memberFrontendCommand.setMemberConductCommand(conductCommand);
-	}
-	
-	/**
-	 * 检查email，mobile等是否合法,重复问题
-	 * 
-	 * @param mfc
-	 *            MemberFrontendCommand
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc,HttpServletRequest request,HttpServletResponse response){
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
-		Map<String, String> returnObject = new HashMap<String, String>();
-
-		// 验证email
-		String loginEmail = mfc.getLoginEmail();
-		if (Validator.isNotNullOrEmpty(loginEmail)){
-			MemberCommand findMemberByLoginEmail = sdkMemberManager.findMemberByLoginEmail(loginEmail);
-			if (Validator.isNotNullOrEmpty(findMemberByLoginEmail)){
-				defaultReturnResult.setResult(false);
-				returnObject.put("loginEmail", "register.loginemail.unavailable");
-			}
-		}
-		// 验证mobile
-		String loginMobile = mfc.getLoginMobile();
-		if (Validator.isNotNullOrEmpty(loginMobile)){
-			MemberCommand findMemberByLoginMobile = sdkMemberManager.findMemberByLoginMobile(loginMobile);
-			if (Validator.isNotNullOrEmpty(findMemberByLoginMobile)){
-				defaultReturnResult.setResult(false);
-				returnObject.put("loginMobile", "register.loginmobile.unavailable");
-			}
-		}
-
-		// 验证 LoginName
-		String loginName = mfc.getLoginName();
-		if (Validator.isNotNullOrEmpty(loginName)){
-			MemberCommand findMemberByLoginName = sdkMemberManager.findMemberByLoginName(loginName);
-			if (Validator.isNotNullOrEmpty(findMemberByLoginName)){
-				defaultReturnResult.setResult(false);
-				returnObject.put("loginName", "register.loginname.unavailable");
-			}
-		}
-		defaultReturnResult.setReturnObject(returnObject);
-
-		return defaultReturnResult;
 	}
 	
 	
