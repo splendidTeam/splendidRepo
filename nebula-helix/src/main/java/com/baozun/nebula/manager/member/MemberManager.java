@@ -2,6 +2,9 @@ package com.baozun.nebula.manager.member;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.PasswordNotMatchException;
@@ -15,6 +18,7 @@ import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.baozun.nebula.web.controller.NebulaReturnResult;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -119,9 +123,8 @@ public interface MemberManager extends BaseManager{
 	 * @param loginPwd
 	 * @return
 	 */
-	public MemberCommand login(MemberFrontendCommand memberCommand)
-			throws UserNotExistsException, UserExpiredException, PasswordNotMatchException;	
-
+	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
+			PasswordNotMatchException;
 
 	/**
 	 * 包含用户名、手机、邮箱
@@ -130,10 +133,10 @@ public interface MemberManager extends BaseManager{
 	 * @return
 	 */
 	public Member findMember(String loginName);
-	
-	
+
 	/**
 	 * 根据用户名查询MemberCommand(用户名包含登录名、登录邮箱、登录手机)
+	 * 
 	 * @return Member
 	 * @param loginName
 	 * @author 冯明雷
@@ -245,11 +248,31 @@ public interface MemberManager extends BaseManager{
 	 * @author 何波 @Description: 绑定用户邮箱 @param memberId void @throws
 	 */
 	void bindMemberEmail(Long memberId,String email);
-	
+
 	/**
 	 * 同步购物车信息
+	 * 
 	 * @author 冯明雷
 	 * @time 2016-3-23下午4:19:35
 	 */
-	void synchronousShoppingCart(Long memberId, List<ShoppingCartLineCommand> shoppingLines)throws SynchronousShoppingCartException;
+	void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines) throws SynchronousShoppingCartException;
+
+	/**
+	 * 检查email，mobile等是否合法,重复问题
+	 * 
+	 * @param mfc
+	 *            MemberFrontendCommand
+	 * @return
+	 */
+	NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc);
+
+	/**
+	 * 设置注册会员附加信息<br/>
+	 * 首次生命状态,注册来源，会员类型,MemberConductCommand等
+	 * 
+	 * @param memberFrontendCommand
+	 * @param clientIp
+	 */
+	void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp);
+
 }
