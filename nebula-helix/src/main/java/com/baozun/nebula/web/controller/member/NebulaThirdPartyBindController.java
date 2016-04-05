@@ -51,9 +51,9 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
-import com.baozun.nebula.web.controller.member.validator.BindRegisterFormMobileValidator;
-import com.baozun.nebula.web.controller.member.validator.BindRegisterFormNormalValidator;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
+import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValidator;
+import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 
@@ -131,7 +131,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 */
 	@Autowired
 	@Qualifier("registerFormMobileValidator")
-	private BindRegisterFormMobileValidator	registerFormMobileValidator;
+	private RegisterFormMobileValidator	registerFormMobileValidator;
 	
 	/**
 	 * PC || Tablet <br/>
@@ -139,7 +139,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 */
 	@Autowired
 	@Qualifier("registerFormNormalValidator")
-	private BindRegisterFormNormalValidator	registerFormNormalValidator;
+	private RegisterFormNormalValidator	registerFormNormalValidator;
 
 	/**
 	 * 会员业务管理类
@@ -296,9 +296,9 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
 
 		// 这个地方的方法应该抽取公用方法
-		NebulaRegisterController nc = new NebulaRegisterController();
+//		NebulaRegisterController nc = new NebulaRegisterController();
 		/** 检查email，mobile等是否合法 */
-		defaultReturnResult = (DefaultReturnResult) nc.checkRegisterData(memberFrontendCommand, request, response);
+		defaultReturnResult = (DefaultReturnResult) memberManager.checkRegisterData(memberFrontendCommand);
 
 		if (!defaultReturnResult.isResult()) {
 			return VIEW_THIRDPARTY_MEMBER_BIND_FAILURE;
