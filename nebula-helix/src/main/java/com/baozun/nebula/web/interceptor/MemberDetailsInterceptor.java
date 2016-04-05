@@ -17,6 +17,8 @@
 package com.baozun.nebula.web.interceptor;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -32,11 +34,13 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
 
+import com.baozun.nebula.manager.member.MemberStatusFlowProcessor;
 import com.baozun.nebula.web.HelixConfig;
 import com.baozun.nebula.web.HelixConstants;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.NeedLogin;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.feilong.core.Validator;
 
 /**
  * 新版的用户信息拦截器，用于拦截需要登录的请求，并跳转
@@ -64,6 +68,9 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
 	@Autowired
 	@Qualifier("loginForwardHandler")
 	private LoginForwardHandler loginForwardHandler;
+	
+	@Autowired
+	private MemberStatusFlowProcessor memberStatusFlowProcessor;
 	
 	private ServletContext servletContext;
 	
@@ -141,6 +148,15 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
 			}
 			if(secureSessionSignatureHandler.CheckSignature(request, response)){
 				LOG.debug("Session is safe");
+				
+				//登录用户的状态流转
+				LOG.debug("do member status flow processor");
+				String action=memberStatusFlowProcessor.process(memberDetails);
+				if(Validator.isNotNullOrEmpty(action)){
+					LOG.info("[MEMBER_STATUS_FLOW_PROCESSOR]  memberId:{} ,status{} ,action{}",memberDetails.getMemberId(),memberDetails.getStatus().toArray(),action);
+					response.sendRedirect(request.getContextPath()+action);
+					return false;
+				}
 				return true;
 			}else{
 				LOG.info("Session Signature check is not passed.");

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baozun.nebula.web.MemberDetails;
+import com.feilong.core.Validator;
 
 /**
  * 用户状态的流转处理流程器
@@ -44,11 +45,14 @@ public class MemberStatusFlowProcessor {
 	 * @return
 	 */
 	public String process(MemberDetails memberDetails) {
-		for (StatusAction statusAction : statusActionList) {
-			if (memberDetails.getStatus().contains(statusAction.getStatus())) {
-				return statusAction.getAction();
+		if(Validator.isNotNullOrEmpty(memberDetails.getStatus())){
+			for (StatusAction statusAction : statusActionList) {
+				if (memberDetails.getStatus().contains(statusAction.getStatus())) {
+					return statusAction.getAction();
+				}
 			}
 		}
+		
 		return null;
 	}
 	
