@@ -1,6 +1,8 @@
 package com.baozun.nebula.manager.member;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -16,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.command.SMSCommand;
+import com.baozun.nebula.constant.EmailConstants;
+import com.baozun.nebula.manager.member.CommonEmailManager.SendEmailResultCode;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
@@ -49,7 +53,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	private SdkMemberManager	sdkMemberManager;
 
 	@Autowired
-	private MemberEmailManager	memberEmailManager;
+	private CommonEmailManager	commonEmailManager;
 
 	@Autowired
 	private SdkSMSManager		smsManager;
@@ -68,9 +72,38 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		if (forgetPasswordForm.getType() == ForgetPasswordForm.MOBILE){
 			// 是手机验证方式，则调用手机发送验证码的方法
 			flag = this.mobileSendValidateCode(forgetPasswordForm.getMobile());
-		}else if (forgetPasswordForm.getType() == ForgetPasswordForm.EMAIL){
+		}
+		if (forgetPasswordForm.getType() == ForgetPasswordForm.EMAIL){
 			// 是邮箱验证方式，则调用邮箱发送验证码的方法
 			flag = this.emailSendValidateCode(forgetPasswordForm.getEmail());
+		}
+		return flag;
+	}
+
+	/**
+	 * 发送邮箱链接的方式找回密码的方法
+	 * 
+	 * @param email
+	 * @return
+	 */
+	public boolean sendForgetPasswordValidateEmailURL(String url,ForgetPasswordForm forgetPasswordForm){
+
+		boolean flag = false;
+		// 通过邮箱查询用户是否存在
+		MemberCommand memberCommand = sdkMemberManager.findMemberByLoginEmail(forgetPasswordForm.getEmail());
+		// 对应邮箱的用户存在
+		if (memberCommand != null){
+			// 则调用发送邮件的方法，发送相应的链接到对应的邮箱中
+			Map<String, Object> dataMap = new HashMap<String, Object>();
+			dataMap.put("url", url);
+			SendEmailResultCode sendEmail = commonEmailManager.sendEmail(
+					forgetPasswordForm.getEmail(),
+					EmailConstants.FORGET_PASSWORD,
+					dataMap);
+			if (sendEmail == SendEmailResultCode.SUCESS){
+				// 发送成功，flag设置为true
+				flag = true;
+			}
 		}
 		return flag;
 	}
@@ -98,10 +131,13 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			tokenManager.saveToken(BUSINESS_CODE, email, MAX_EXIST_TIME, code);
 
 			// 则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
-			memberEmailManager.sendEmailValidateCode(code, email);
-
-			// 发送成功，flag设置为true
-			flag = true;
+			Map<String, Object> dataMap = new HashMap<String, Object>();
+			dataMap.put("code", code);
+			SendEmailResultCode sendEmail = commonEmailManager.sendEmail(email, EmailConstants.FORGET_PASSWORD, dataMap);
+			if (sendEmail == SendEmailResultCode.SUCESS){
+				// 发送成功，flag设置为true
+				flag = true;
+			}
 		}
 		return flag;
 	}
@@ -217,4 +253,5 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		}
 		return flag;
 	}
+
 }
