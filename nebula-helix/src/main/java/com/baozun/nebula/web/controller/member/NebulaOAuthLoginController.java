@@ -138,7 +138,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	}
 
 	/**
-	 * 保存第三方用户信息，这里在后续继承类中需要补充可以拿到的所有相关信息，默认只拿了OpenId
+	 * 保存第三方用户信息，这里在后续继承类中需要补充可以拿到的所有相关信息，默认只拿了OpenId,source,sex
 	 * 
 	 * @param thirdPartyMember
 	 */
@@ -157,6 +157,12 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 
 		// 类型：第三方会员
 		frontendCommand.setType(Member.MEMBER_TYPE_THIRD_PARTY_MEMBER);
+		
+		//性别
+		if(thirdPartyMember.getSex()!=null && thirdPartyMember.getSex().trim().length()!=0){
+			frontendCommand.setSex(Integer.parseInt(thirdPartyMember.getSex()));
+		}
+		
 
 		int loginCount = 0;
 		Date registerTime = new Date();

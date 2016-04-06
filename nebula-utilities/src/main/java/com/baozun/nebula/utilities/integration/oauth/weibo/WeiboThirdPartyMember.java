@@ -153,6 +153,13 @@ public class WeiboThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impl
 		member.setNickName((String) userjsonMap.get("screen_name"));
 		member.setAvatar((String) userjsonMap.get("profile_image_url"));
 		member.setSex(jsonMap.get("gender"));
+		
+		// 性别，m：男、f：女、n：未知
+		if("m".equals(jsonMap.get("gender"))){
+			member.setSex("1");
+		}else if("f".equals(jsonMap.get("gender"))){
+			member.setSex("2");
+		}
 		return member;
 		
 	}
