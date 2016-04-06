@@ -155,6 +155,15 @@
 		<finalName>nebula-protostar</finalName>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<!--注意增加这两行，在打包时相关的类会被独立打成jar -->
+					<attachClasses>true</attachClasses>
+					<classesClassifier>api</classesClassifier>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
 				<version>1.5.2</version>
