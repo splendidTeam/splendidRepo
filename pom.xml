@@ -901,54 +901,54 @@
 	<build>
 		<plugins>
 			<!-- js、css文件压缩混淆插件，一般情况下frontend和mobile需要压缩js和css，其它module是否压缩视需求而定 -->
-<!-- 			<plugin> -->
-<!-- 				YUI Compressor Maven压缩插件 -->
-<!-- 				<groupId>net.alchim31.maven</groupId> -->
-<!-- 				<artifactId>yuicompressor-maven-plugin</artifactId> -->
-<!-- 				<version>${v.yuicompressor-maven-plugin}</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<phase>prepare-package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>compress</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 				<configuration> -->
+			<plugin>
+				<!-- YUI Compressor Maven压缩插件 -->
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>${v.yuicompressor-maven-plugin}</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
 
-<!-- 					读取js,css文件采用UTF-8编码 -->
-<!-- 					<encoding>UTF-8</encoding> -->
-<!-- 					不显示js可能的错误 -->
-<!-- 					<jswarn>false</jswarn> -->
-<!-- 					若存在已压缩的文件，会先对比源文件是否有改动。有改动便压缩，无改动就不压缩 -->
-<!-- 					<force>false</force> -->
-<!-- 					在指定的列号后插入新行 -->
-<!-- 					<linebreakpos>-1</linebreakpos> -->
-<!-- 					压缩之前先执行聚合文件操作 -->
-<!-- 					<preProcessAggregates>true</preProcessAggregates> -->
+					<!-- 读取js,css文件采用UTF-8编码 -->
+					<encoding>UTF-8</encoding>
+					<!-- 不显示js可能的错误 -->
+					<jswarn>false</jswarn>
+					<!-- 若存在已压缩的文件，会先对比源文件是否有改动。有改动便压缩，无改动就不压缩 -->
+					<force>false</force>
+					<!-- 在指定的列号后插入新行 -->
+					<linebreakpos>-1</linebreakpos>
+					<!-- 压缩之前先执行聚合文件操作 -->
+					<preProcessAggregates>true</preProcessAggregates>
 
-<!-- 					<failOnWarning>false</failOnWarning> -->
+					<failOnWarning>false</failOnWarning>
 
-<!-- 					不添加后缀 -->
-<!-- 					<nosuffix>true</nosuffix> -->
+					<!-- 不添加后缀 -->
+					<nosuffix>true</nosuffix>
 
-<!-- 					压缩js和css文件 -->
-<!-- 					<includes> -->
-<!-- 						<include>**/*.js</include> -->
-<!-- 						<include>**/*.css</include> -->
-<!-- 					</includes> -->
+					<!-- 压缩js和css文件 -->
+					<includes>
+						<include>**/*.js</include>
+						<include>**/*.css</include>
+					</includes>
 
-<!-- 					以下目录和文件不会被压缩 -->
-<!-- 					<excludeResources>true</excludeResources> -->
+					<!-- 以下目录和文件不会被压缩 -->
+					<excludeResources>true</excludeResources>
 
-<!-- 					排除本来就压缩的js文件， 比如 jquery-1.7.2.min.js jquery.flexslider-min.js 之类的文件 -->
-<!-- 					<excludes> -->
-<!-- 						<exclude>**/*.min.js</exclude> -->
-<!-- 						<exclude>**/*-min.js</exclude> -->
-<!-- 					</excludes> -->
+					<!-- 排除本来就压缩的js文件， 比如 jquery-1.7.2.min.js jquery.flexslider-min.js 之类的文件 -->
+					<excludes>
+						<exclude>**/*.min.js</exclude>
+						<exclude>**/*-min.js</exclude>
+					</excludes>
 
-<!-- 				</configuration> -->
-<!-- 			</plugin> -->
+				</configuration>
+			</plugin>
 
 			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径， 
 				因此可以通过warSourceExcludes配置排除复制,的文件或路径， **by feilong 2015-07-01 -->
