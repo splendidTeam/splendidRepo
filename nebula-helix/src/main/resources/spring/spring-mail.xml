@@ -33,31 +33,4 @@
 		</property>
 	</bean>
 
-	<util:properties id="sendEmailRule"
-		location="classpath:config/sendEmailRule.properties"></util:properties>
-
-	<bean id="defaultsendEmailConfig" class="com.baozun.nebula.manager.member.entity.SendEmailConfig">
-		<!--通过value注解获取properties的value 获取是否开启时间间隔的验证开关 -->
-		<property name="isValidIntervalTime">
-			#{sendEmailRule['sendEmail.isValidate.intervalTime]}
-		</property>
-		<!-- 通过value注解获取properties的value 获取是否开启最大发送数的验证开关 -->
-		<property name="isValidMaxSendNumber">
-			#{sendEmailRule['sendEmail.isValidate.maxSendNumber']}
-		</property>
-		<!-- 通过value注解获取properties的value 获取有效期内的允许最大发送数 -->
-		<property name="maxSendNumber">
-			#{sendEmailRule['sendEmail.maxSendNumber]}
-		</property>
-		<!-- 通过value注解获取properties的value 获取有效期内的发送时间间隔 -->
-		<property name="intervalTime">
-			#{sendEmailRule['sendEmail.intervalTime']}
-		</property>
-		<!-- 通过value注解获取properties的value 获取缓存有效期 -->
-		<property name="emailCacheExpireTime">
-			#{sendEmailRule['sendEmail.expireTime']}
-		</property>
-	</bean>
- 
-
 </beans>
