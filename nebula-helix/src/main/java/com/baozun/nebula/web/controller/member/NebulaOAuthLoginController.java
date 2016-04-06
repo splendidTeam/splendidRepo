@@ -189,7 +189,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 		MemberDetails memberDetails = getMemberDetails(member);
 
 		// 登录成功后处理
-		DefaultReturnResult result = (DefaultReturnResult) super.onAuthenticationSuccess(memberDetails, request, response);
+		DefaultReturnResult result = (DefaultReturnResult) onAuthenticationSuccess(memberDetails, request, response);
 
 		return result.getReturnObject().toString();
 	}
