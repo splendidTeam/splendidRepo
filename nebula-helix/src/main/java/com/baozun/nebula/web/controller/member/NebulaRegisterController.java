@@ -391,7 +391,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		 * 不管是否注册成功之后自动登录，都跑此方法<br/>
 		 * 方法中的【Processor】会过滤出注册需要完善的下一步动作，返回NebulaReturnResult中包含下一步动作的url
 		 */
-		return super.onAuthenticationSuccess(memberDetails, request, response);
+		return onAuthenticationSuccess(memberDetails, request, response);
 	}
 
 	/**

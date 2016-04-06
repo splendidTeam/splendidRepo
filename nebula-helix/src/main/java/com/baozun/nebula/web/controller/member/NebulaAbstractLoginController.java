@@ -49,7 +49,7 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();		
 		//执行Processor
-		String url=memberStatusFlowProcessor.process(memberDetails);
+		String url=memberStatusFlowProcessor.process(memberDetails,request);
 		
 		//返回链接
 		defaultReturnResult.setReturnObject(url);
