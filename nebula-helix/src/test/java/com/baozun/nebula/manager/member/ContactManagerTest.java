@@ -88,7 +88,6 @@ public class ContactManagerTest {
 //		map.put("endDate", request.getAttribute("endDate"));
 		
 		Pagination<ContactCommand>args =contactManager.findContactCommandByQueryMapWithPage(page, sorts, map);
-		log.info("@@@@@@@@@@@@++++++++++++++++:::{},{}", JsonFormatUtil.format(args));
 	}
 	
 }

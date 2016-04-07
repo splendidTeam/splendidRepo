@@ -15,14 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import loxia.support.excel.ExcelKit;
-import loxia.support.excel.ExcelManipulatorFactory;
-import loxia.support.excel.ExcelReader;
-import loxia.support.excel.ReadStatus;
-import loxia.support.excel.definition.ExcelBlock;
-import loxia.support.excel.definition.ExcelCell;
-import loxia.support.excel.definition.ExcelSheet;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -71,9 +63,17 @@ import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
-import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utils.InputStreamCacher;
 import com.baozun.nebula.utils.JsonFormatUtil;
+import com.feilong.core.Validator;
+
+import loxia.support.excel.ExcelKit;
+import loxia.support.excel.ExcelManipulatorFactory;
+import loxia.support.excel.ExcelReader;
+import loxia.support.excel.ReadStatus;
+import loxia.support.excel.definition.ExcelBlock;
+import loxia.support.excel.definition.ExcelCell;
+import loxia.support.excel.definition.ExcelSheet;
 
 /**
  * 商品的导出和导入Manager实现类
