@@ -44,7 +44,7 @@ public class CsrfUrlWhiteList implements RequestMatcher,
 			// </util:list>
 			csrfUrlWhiteList = (List<String>) ac.getBean("csrfUrlWhiteList");
 		} catch (BeansException e) {
-			logger.info("bean 'csrfUrlWhiteList' not found", e);
+			logger.debug("bean 'csrfUrlWhiteList' not found", e);
 		}
 
 		List<RequestMatcher> requestMatchers = new ArrayList<RequestMatcher>();
