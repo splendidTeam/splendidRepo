@@ -65,11 +65,11 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 	 * @author 冯明雷
 	 * @time 2016年4月1日下午5:07:04
 	 */
-	protected MemberDetails constructMemberDetails(MemberCommand memberCommand){
+	protected MemberDetails constructMemberDetails(MemberCommand memberCommand,HttpServletRequest request){
 		MemberDetails memberDetails = new MemberDetails();
 		PropertyUtil.copyProperties(memberDetails, memberCommand);
 		//获取member status
-		memberDetails.setStatus(getPendingStatus(memberCommand));
+		memberDetails.setStatus(getPendingStatus(memberCommand,request));
 		
 		memberDetails.setMemberId(memberCommand.getId());
 		memberDetails.setNickName(memberCommand.getLoginName());
@@ -86,7 +86,7 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 	 * @author 冯明雷
 	 * @time 2016年4月1日下午5:10:28
 	 */
-	protected List<String> getPendingStatus(MemberCommand memberCommand){
+	protected List<String> getPendingStatus(MemberCommand memberCommand,HttpServletRequest request){
 		//通过memberId 以及 各商城关注点  查询MemberBehaviorStatus表记录
 		
 		//根据MemberBehaviorStatus表中的数据去判断是否需要激活、绑定、完善信息等
