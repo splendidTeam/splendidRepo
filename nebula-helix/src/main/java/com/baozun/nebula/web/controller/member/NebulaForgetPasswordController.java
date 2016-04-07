@@ -112,10 +112,12 @@ public class NebulaForgetPasswordController extends BaseController{
 			// 数据校验都成功后，调用发送链接的方法(发送的这个链接在点击之后正好跳转到重置密码的页面去)
 			String path = request.getContextPath();
 			String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path
-					+ "/member/showResetPassword";
+					+ "/member/showResetPassword" + "?TOKEN=" + TOKEN;
 			// 在此处将用户的提交的信息存放到session中去，供后续修改密码时验证是否是同一个用户使用
-			// TODO 如何将此处的session传递到发送至邮箱的链接中去呢？因为要通过点击链接来跳转到重置密码页面，而重置密码的页面需要判断session中是否有值，所以需要将此处session中的值给传递到对应的链接中去
+			// 如何将此处的session传递到发送至邮箱的链接中去呢？因为要通过点击链接来跳转到重置密码页面，而重置密码的页面需要判断session中是否有值，所以需要将此处session中的值给传递到对应的链接中去
+			// 解决方法：在此处正常将值放到session中，将session的key值作为参数放到链接中，传递到对应的邮箱中去。用户点击链接后，通过链接中的key值，获取到session中的值，从而正常进行重置密码的操作
 			try{
+				request.getSession().setAttribute(TOKEN, forgetPasswordForm);
 				// 将要发送的url加密处理
 				String url = EncryptUtil.getInstance().encrypt(basePath.toString());
 				request.getSession().setAttribute(TOKEN, forgetPasswordForm);
