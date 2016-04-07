@@ -1,4 +1,4 @@
-	package com.baozun.nebula.web.controller.member;
+package com.baozun.nebula.web.controller.member;
 
 import java.util.Date;
 
@@ -58,8 +58,8 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	private MemberManager		memberManager;
 
 	/**
-	 * 构建去第三方登录url
-	 * type 第三方登录名：微信 ，微博，QQ  支付宝等
+	 * 构建去第三方登录url type 第三方登录名：微信 ，微博，QQ 支付宝等
+	 * 
 	 * @return
 	 */
 	protected String constructOAuthLoginURL(String type){
@@ -77,7 +77,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	 * 
 	 * @return
 	 */
-	public  abstract ThirdPartyMemberCommand checkOAuthLogin(HttpServletRequest request);
+	public abstract ThirdPartyMemberCommand checkOAuthLogin(HttpServletRequest request);
 
 	/**
 	 * 根据回调处理登录动作，需要在具体项目中指定回调地址，示例配置为
@@ -127,18 +127,19 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 		}
 
 		// 第三方登录
-		String url =  doLogin(request, response, model, member);
+		String url = doLogin(request, response, model, member);
 
-		//判断是否存在用户状态流转，空表示不存在，应该跳转到默认登录成功页，否则跳转到状态返回URL
+		// 判断是否存在用户状态流转，空表示不存在，跳转到默认登录成功页
 		if (url == null || url.trim().length() == 0) {
 			return VIEW_MEMBER_LOGIN_SUCC;
 		}else{
-			return url;
+			//重定向到返回的URL 
+			return "redirect:" + url;
 		}
 	}
 
 	/**
-	 * 保存第三方用户信息，这里在后续继承类中需要补充可以拿到的所有相关信息，默认只拿了OpenId
+	 * 保存第三方用户信息，这里在后续继承类中需要补充可以拿到的所有相关信息，默认只拿了OpenId,source,sex
 	 * 
 	 * @param thirdPartyMember
 	 */
@@ -157,6 +158,11 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 
 		// 类型：第三方会员
 		frontendCommand.setType(Member.MEMBER_TYPE_THIRD_PARTY_MEMBER);
+
+		// 性别
+		if (thirdPartyMember.getSex() != null && thirdPartyMember.getSex().trim().length() != 0) {
+			frontendCommand.setSex(Integer.parseInt(thirdPartyMember.getSex()));
+		}
 
 		int loginCount = 0;
 		Date registerTime = new Date();
@@ -183,7 +189,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 		MemberDetails memberDetails = getMemberDetails(member);
 
 		// 登录成功后处理
-		DefaultReturnResult result = (DefaultReturnResult) super.onAuthenticationSuccess(memberDetails, request, response);
+		DefaultReturnResult result = (DefaultReturnResult) onAuthenticationSuccess(memberDetails, request, response);
 
 		return result.getReturnObject().toString();
 	}

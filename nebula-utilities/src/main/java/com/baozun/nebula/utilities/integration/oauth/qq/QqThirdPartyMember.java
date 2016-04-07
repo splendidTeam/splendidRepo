@@ -153,9 +153,12 @@ public class QqThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impleme
 		// 头像
 		member.setAvatar(jsonMap.get("figureurl_1"));
 		
-		// 性别
-		member.setSex(jsonMap.get("gender"));
-
+		//性别  注意：获取不到时默认返回男
+		if("男".equals(jsonMap.get("gender"))){
+			member.setSex("1");
+		}else if("女".equals(jsonMap.get("gender"))){
+			member.setSex("2");
+		}
 		return member;
 	
 	}

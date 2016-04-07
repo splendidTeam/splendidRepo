@@ -340,6 +340,22 @@ public interface CacheManager{
 	 * 计数器增加一个数量
 	 */
 	public Long Incr(String key,long value);
+	
+	/**
+	 * 计数器+1.
+	 * 
+	 * <p>If the key does not exist or contains a value of a wrong type,
+	 *  set the key to the value of "0" before to perform the increment operation</p>
+	 * 
+	 * <p>add by jim</p>
+	* @param key  key
+	* @param expireSeconds Set a timeout on the specified key.<br>
+	*  After the timeout the key will be automatically deleted by the server.<br>
+	*  A key with an associated timeout is said to be volatile in Redis terminology. 
+	* @return reply new value
+	* @since 5.0.0
+	 */
+	Long incr(String key,int expireSeconds);
 
 	/**
 	 * 获取全部缓存项

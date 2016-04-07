@@ -67,13 +67,8 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 		
 		// 头像  目前是640×640  ,官方文档有46×46，但返回数据并没有这种分辩率的
 		numberCommand.setAvatar(member.getAvatar());
-		
-		//性别  普通用户性别，1为男性，2为女性
-		if("1".equals(member.getSex())){
-			numberCommand.setSex("1");
-		}else if("2".equals(member.getSex())){
-			numberCommand.setSex("2");
-		}
+		numberCommand.setSex(member.getSex());
+
 		return numberCommand;
 	}
 

@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +53,12 @@ import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.feilong.core.RegexPattern;
+import com.feilong.core.Validator;
 import com.feilong.core.util.RegexUtil;
+import com.feilong.servlet.http.RequestUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -300,8 +306,8 @@ public class MemberManagerImpl implements MemberManager{
 	}
 
 	@Override
-	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,
-			UserExpiredException,PasswordNotMatchException{
+	public MemberCommand login(MemberFrontendCommand memberCommand) throws UserNotExistsException,UserExpiredException,
+			PasswordNotMatchException{
 		MemberCommand member = findMemberCommandByLoginName(memberCommand.getLoginName());
 
 		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
@@ -316,17 +322,16 @@ public class MemberManagerImpl implements MemberManager{
 	@Override
 	public MemberCommand findMemberCommandByLoginName(String loginName){
 		MemberCommand member;
-		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,loginName)){
+		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, loginName)){
 			member = sdkMemberManager.findMemberByLoginMobile(loginName);
-		}else if (!RegexUtil.matches(RegexPattern.EMAIL,loginName)){
+		}else if (!RegexUtil.matches(RegexPattern.EMAIL, loginName)){
 			member = sdkMemberManager.findMemberByLoginEmail(loginName);
 		}else{
 			member = sdkMemberManager.findMemberByLoginName(loginName);
-		}		
-		return member;	
+		}
+		return member;
 	}
-	
-	
+
 	@Deprecated
 	@Override
 	public Member register(MemberFrontendCommand memberCommand){
@@ -466,6 +471,73 @@ public class MemberManagerImpl implements MemberManager{
 	@Override
 	public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines) throws SynchronousShoppingCartException{
 		sdkShoppingCartManager.synchronousShoppingCart(memberId, shoppingLines);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.manager.member.MemberManager#checkRegisterData(com.baozun.nebula.web.command.MemberFrontendCommand,
+	 * javax.servlet.http.HttpServletRequest)
+	 */
+	@Override
+	public NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc){
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+		Map<String, String> returnObject = new HashMap<String, String>();
+
+		// 验证email
+		String loginEmail = mfc.getLoginEmail();
+		if (Validator.isNotNullOrEmpty(loginEmail)){
+			MemberCommand findMemberByLoginEmail = sdkMemberManager.findMemberByLoginEmail(loginEmail);
+			if (Validator.isNotNullOrEmpty(findMemberByLoginEmail)){
+				defaultReturnResult.setResult(false);
+				returnObject.put("loginEmail", "register.loginemail.unavailable");
+			}
+		}
+		// 验证mobile
+		String loginMobile = mfc.getLoginMobile();
+		if (Validator.isNotNullOrEmpty(loginMobile)){
+			MemberCommand findMemberByLoginMobile = sdkMemberManager.findMemberByLoginMobile(loginMobile);
+			if (Validator.isNotNullOrEmpty(findMemberByLoginMobile)){
+				defaultReturnResult.setResult(false);
+				returnObject.put("loginMobile", "register.loginmobile.unavailable");
+			}
+		}
+
+		// 验证 LoginName
+		String loginName = mfc.getLoginName();
+		if (Validator.isNotNullOrEmpty(loginName)){
+			MemberCommand findMemberByLoginName = sdkMemberManager.findMemberByLoginName(loginName);
+			if (Validator.isNotNullOrEmpty(findMemberByLoginName)){
+				defaultReturnResult.setResult(false);
+				returnObject.put("loginName", "register.loginname.unavailable");
+			}
+		}
+		defaultReturnResult.setResult(true);
+		defaultReturnResult.setReturnObject(returnObject);
+
+		return defaultReturnResult;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.manager.member.MemberManager#setupMemberReference(com.baozun.nebula.web.command.MemberFrontendCommand,
+	 * java.lang.String)
+	 */
+	@Override
+	public void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp){
+		// 生命周期：未激活状态
+		memberFrontendCommand.setLifecycle(Member.LIFECYCLE_UNACTIVE);
+		// 来源：自注册
+		memberFrontendCommand.setSource(Member.MEMBER_SOURCE_SINCE_REG_MEMBERS);
+		// 类型：自注册会员
+		memberFrontendCommand.setType(Member.MEMBER_TYPE_SINCE_REG_MEMBERS);
+
+		int loginCount = 0;
+		Date registerTime = new Date();
+
+		MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
+
+		memberFrontendCommand.setMemberConductCommand(conductCommand);
+
 	}
 
 }

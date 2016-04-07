@@ -298,13 +298,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 			}
 
 			/** 检查email，mobile等是否合法 */
-			defaultReturnResult = (DefaultReturnResult) checkRegisterData(memberFrontendCommand, request, response);
+			defaultReturnResult = (DefaultReturnResult) memberManager.checkRegisterData(memberFrontendCommand);
 			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
 			}
 
 			/** 设置注册会员附加信息 */
-			setupMemberReference(memberFrontendCommand, request);
+			String clientIp = RequestUtil.getClientIp(request);
+			memberManager.setupMemberReference(memberFrontendCommand, clientIp);
 
 			/** 用户注册 */
 			Member member = memberManager.rewriteRegister(memberFrontendCommand);
@@ -314,10 +315,11 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 			/**
 			 * 构造MemberDetails<br/>
-			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberCommand.status
+			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberDetails.status
 			 */
 			MemberDetails memberDetails = constructMemberDetails(memberCommand);
 
+			// 返回NebulaReturnResult中包含下一步动作的url
 			return onRegisterSuccess(memberDetails, request, response);
 
 		}catch (BusinessException e){
@@ -367,75 +369,6 @@ public class NebulaRegisterController extends NebulaLoginController{
 	}
 
 	/**
-	 * 设置注册会员附加信息<br/>
-	 * 首次生命状态,注册来源，会员类型,MemberConductCommand等
-	 * 
-	 * @param memberFrontendCommand
-	 */
-	protected void setupMemberReference(MemberFrontendCommand memberFrontendCommand,HttpServletRequest request){
-		// 生命周期：未激活状态
-		memberFrontendCommand.setLifecycle(Member.LIFECYCLE_UNACTIVE);
-		// 来源：自注册
-		memberFrontendCommand.setSource(Member.MEMBER_SOURCE_SINCE_REG_MEMBERS);
-		// 类型：自注册会员
-		memberFrontendCommand.setType(Member.MEMBER_TYPE_SINCE_REG_MEMBERS);
-
-		int loginCount = 0;
-		Date registerTime = new Date();
-		String clientIp = RequestUtil.getClientIp(request);
-
-		MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
-
-		memberFrontendCommand.setMemberConductCommand(conductCommand);
-	}
-
-	/**
-	 * 检查email，mobile等是否合法,重复问题
-	 * 
-	 * @param mfc
-	 *            MemberFrontendCommand
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	protected NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc,HttpServletRequest request,HttpServletResponse response){
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
-		Map<String, String> returnObject = new HashMap<String, String>();
-
-		// 验证email
-		String loginEmail = mfc.getLoginEmail();
-		if (Validator.isNotNullOrEmpty(loginEmail)){
-			MemberCommand findMemberByLoginEmail = sdkMemberManager.findMemberByLoginEmail(loginEmail);
-			if (Validator.isNotNullOrEmpty(findMemberByLoginEmail)){
-				defaultReturnResult.setResult(false);
-				returnObject.put("loginEmail", "register.loginemail.unavailable");
-			}
-		}
-		// 验证mobile
-		String loginMobile = mfc.getLoginMobile();
-		if (Validator.isNotNullOrEmpty(loginMobile)){
-			MemberCommand findMemberByLoginMobile = sdkMemberManager.findMemberByLoginMobile(loginMobile);
-			if (Validator.isNotNullOrEmpty(findMemberByLoginMobile)){
-				defaultReturnResult.setResult(false);
-				returnObject.put("loginMobile", "register.loginmobile.unavailable");
-			}
-		}
-
-		// 验证 LoginName
-		String loginName = mfc.getLoginName();
-		if (Validator.isNotNullOrEmpty(loginName)){
-			MemberCommand findMemberByLoginName = sdkMemberManager.findMemberByLoginName(loginName);
-			if (Validator.isNotNullOrEmpty(findMemberByLoginName)){
-				defaultReturnResult.setResult(false);
-				returnObject.put("loginName", "register.loginname.unavailable");
-			}
-		}
-		defaultReturnResult.setReturnObject(returnObject);
-
-		return defaultReturnResult;
-	}
-
-	/**
 	 * 用户注册成功切入点
 	 * 
 	 * @param memberDetails
@@ -459,7 +392,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		 * 不管是否注册成功之后自动登录，都跑此方法<br/>
 		 * 方法中的【Processor】会过滤出注册需要完善的下一步动作，返回NebulaReturnResult中包含下一步动作的url
 		 */
-		return super.onAuthenticationSuccess(memberDetails, request, response);
+		return onAuthenticationSuccess(memberDetails, request, response);
 	}
 
 	/**

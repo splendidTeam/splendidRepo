@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.baozun.nebula</groupId>
 	<artifactId>nebula</artifactId>
@@ -11,7 +10,7 @@
 		<module>nebula-protostar</module>
 		<module>nebula-helix</module>
 		<module>nebula-collapsar</module>
-		<module>nebula-wormhole</module> 
+		<module>nebula-wormhole</module>
 		<module>nebula-wormhole-entity</module>
 	</modules>
 
@@ -72,6 +71,7 @@
 		<version.commons-beanutils>1.9.2</version.commons-beanutils>
 		<version.commons-fileupload>1.2.2</version.commons-fileupload>
 		<version.commons-codec>1.5</version.commons-codec>
+		<version.commons-validator>1.5.0</version.commons-validator>
 
 		<version.pinyin4j>2.5.0</version.pinyin4j>
 		<version.hibernate>3.5.1-Final</version.hibernate>
@@ -305,6 +305,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.owasp.esapi</groupId>
 			<artifactId>esapi</artifactId>
 		</dependency>
@@ -514,6 +519,12 @@
 				<groupId>commons-pool</groupId>
 				<artifactId>commons-pool</artifactId>
 				<version>${version.commons-pool}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>${version.commons-validator}</version>
 			</dependency>
 
 			<!-- commons-lang -->
@@ -950,7 +961,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径， 
+			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径，
 				因此可以通过warSourceExcludes配置排除复制,的文件或路径， **by feilong 2015-07-01 -->
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -1147,7 +1158,7 @@
 					<version>${v.maven-war-plugin}</version>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>

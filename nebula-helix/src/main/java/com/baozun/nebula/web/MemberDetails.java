@@ -79,6 +79,12 @@ public class MemberDetails implements Serializable {
 	 */
 	private List<String> status;
 	
+	/**
+	 * 分组ID，用于处理会员间绑定关系。
+	 * 注意，此ID与上面groups无关
+	 */
+	private Long groupId;
+	
 	public enum Status {
 		INVALIDATE("invalidate"), VALIDATE("validate"), EMAIL_ACTIVE(""), EMAIL_INACTIVE(""), MOBILE_INACTIVE(""), WAITING_BIND(""), WAITING_PROFILE("");
 		
@@ -208,4 +214,13 @@ public class MemberDetails implements Serializable {
 		this.status = status;
 	}
 
+	public Long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
+	}
+
+	
 }

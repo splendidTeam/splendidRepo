@@ -760,6 +760,26 @@ public class CacheManagerImpl implements CacheManager{
 		}
 		return valueCurr;
 	}
+	
+	   @Override
+	    public Long incr(String key,int expireSeconds){
+	        if (!useCache()) {
+	            return -1L;}
+	        key = processKey(key);
+	        Jedis jredis = null;
+	        try{
+	            jredis = getJedis();
+	            //reply new value
+	            Long valueCurr = jredis.incr(key);
+	            jredis.expire(key, expireSeconds);
+	            return valueCurr;
+	        }catch (Exception e){
+	            jedisPool.returnBrokenResource(jredis);
+	            throw new CacheException(e);
+	        }finally{
+	            returnResource(jredis);
+	        }
+	    }
 
 	@Override
 	public List<CacheItemCommand> findAllCacheItem(RowMapper<CacheItemCommand> rowMapper,Map<String, Object> paraMap){

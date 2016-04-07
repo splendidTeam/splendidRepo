@@ -76,6 +76,11 @@ public class OrderLineV5 implements Serializable {
      * 保修时长(按月计)
      */
     private Integer warrantyMonths;
+    /**
+     * 商品主图
+     * Added by D.C 2016/4/6
+     */
+    private String itemPic;
     
     /**
      * 订单行所享受的促销活动
@@ -185,6 +190,14 @@ public class OrderLineV5 implements Serializable {
 
 	public void setWarrantyMonths(Integer warrantyMonths) {
 		this.warrantyMonths = warrantyMonths;
+	}
+
+	public String getItemPic() {
+		return itemPic;
+	}
+
+	public void setItemPic(String itemPic) {
+		this.itemPic = itemPic;
 	}
     
     

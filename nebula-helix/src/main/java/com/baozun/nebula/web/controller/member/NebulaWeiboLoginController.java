@@ -67,13 +67,8 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 		
 		// 头像  50×50
 		numberCommand.setAvatar(member.getAvatar());
-		
-		// 性别，m：男、f：女、n：未知
-		if("m".equals(member.getSex())){
-			numberCommand.setSex("1");
-		}else if("f".equals(member.getSex())){
-			numberCommand.setSex("2");
-		}
+		numberCommand.setSex(member.getSex());
+
 		return numberCommand;
 	}
 

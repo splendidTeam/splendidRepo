@@ -32,11 +32,13 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
 
+import com.baozun.nebula.manager.member.MemberStatusFlowProcessor;
 import com.baozun.nebula.web.HelixConfig;
 import com.baozun.nebula.web.HelixConstants;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.NeedLogin;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.feilong.core.Validator;
 
 /**
  * 新版的用户信息拦截器，用于拦截需要登录的请求，并跳转
@@ -64,6 +66,9 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
 	@Autowired
 	@Qualifier("loginForwardHandler")
 	private LoginForwardHandler loginForwardHandler;
+	
+	@Autowired
+	private MemberStatusFlowProcessor memberStatusFlowProcessor;
 	
 	private ServletContext servletContext;
 	
@@ -141,7 +146,9 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
 			}
 			if(secureSessionSignatureHandler.CheckSignature(request, response)){
 				LOG.debug("Session is safe");
-				return true;
+				
+				//登录用户的状态流转
+				return doMemberStatusFlowProcess(memberDetails, request, response);
 			}else{
 				LOG.info("Session Signature check is not passed.");
 				secureSessionSignatureHandler.deleteSignature(response);
@@ -180,6 +187,29 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
         } else {               	
             response.sendError(ajaxErrorCode);
         }
+	}
+	
+	/**
+	 * 执行会员状态流转器
+	 * @param memberDetails
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	protected boolean  doMemberStatusFlowProcess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response) throws IOException {
+		LOG.debug("do member status flow processor");
+		String action=memberStatusFlowProcessor.process(memberDetails,request);
+		if(Validator.isNotNullOrEmpty(action)){
+			LOG.info("[MEMBER_STATUS_FLOW_PROCESSOR]  memberId:{} ,status{} ,action{}",memberDetails.getMemberId(),memberDetails.getStatus().toArray(),action);
+			if(request.getHeader("X-Requested-With") == null){
+				response.sendRedirect(request.getContextPath()+action);
+			}else{
+				response.sendError(ajaxErrorCode);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	public int getAjaxErrorCode() {

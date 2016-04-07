@@ -55,11 +55,6 @@ public class CommonEmailManagerImpl implements CommonEmailManager {
 	@Autowired
 	private TokenManager tokenManager;
 
-	//注入默认邮件策略配置
-	@Autowired()
-	@Qualifier("defaultsendEmailConfig")
-	private SendEmailConfig defaultsendEmailConfig;
-
 	
 	/**
 	 * 发送邮件方法 要点如下
@@ -79,16 +74,16 @@ public class CommonEmailManagerImpl implements CommonEmailManager {
 	public SendEmailResultCode sendEmail(String email, String emailTemplateCode, Map<String, Object> dataMap,
 			SendEmailConfig sendEmailConfig) {
 
+		sendEmailConfig =new SendEmailConfig();
+		sendEmailConfig.setIsValidIntervalTime(false);
+		sendEmailConfig.setIsValidMaxSendNumber(false);
+		
 		// 判断邮箱是否为空 如为空则返回失败
 		if (Validator.isNullOrEmpty(email)) {
 			log.info("email can not be null");
 			return SendEmailResultCode.FAILURE;
 		}
 		
-		//判断是否为空,如为空则使用默认配置
-		if (Validator.isNullOrEmpty(sendEmailConfig)) {
-			sendEmailConfig = defaultsendEmailConfig;
-		}
 
 		// 判断是否开启最大次数验证 如开启 组装访问策略pojo
 		// RollingTimeWindow limit 为最大发送数 ,window为该窗口有效期

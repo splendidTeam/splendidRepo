@@ -19,7 +19,10 @@ package com.baozun.nebula.manager.member;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.web.MemberDetails;
+import com.feilong.core.Validator;
 
 /**
  * 用户状态的流转处理流程器
@@ -41,14 +44,21 @@ public class MemberStatusFlowProcessor {
 	/**
 	 * 返回null时前端不做任何处理，非null时需要流转到对应的action
 	 * @param memberDetails
+	 * @param request
 	 * @return
 	 */
-	public String process(MemberDetails memberDetails) {
-		for (StatusAction statusAction : statusActionList) {
-			if (memberDetails.getStatus().contains(statusAction.getStatus())) {
-				return statusAction.getAction();
+	public String process(MemberDetails memberDetails,HttpServletRequest request) {
+		if(Validator.isNotNullOrEmpty(memberDetails.getStatus())){
+			for (StatusAction statusAction : statusActionList) {
+				if (memberDetails.getStatus().contains(statusAction.getStatus())) {
+					if(statusAction.getWhiteList().contains(request.getRequestURI())){
+						return null;
+					}
+					return statusAction.getAction();
+				}
 			}
 		}
+		
 		return null;
 	}
 	
@@ -67,6 +77,10 @@ public class MemberStatusFlowProcessor {
 		 * 某种状态的流转路径
 		 */
 		private String action;
+		/**
+		 * 白名单，这里的url不会拦截
+		 */
+		private List<String> whiteList;
 
 		public String getStatus() {
 			return status;
@@ -83,5 +97,15 @@ public class MemberStatusFlowProcessor {
 		public void setAction(String action) {
 			this.action = action;
 		}
+
+		public List<String> getWhiteList() {
+			return whiteList;
+		}
+
+		public void setWhiteList(List<String> whiteList) {
+			this.whiteList = whiteList;
+		}
+		
+		
 	}
 }

@@ -117,8 +117,12 @@ public class AlipayThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 		// 头像
 		member.setAvatar(avatar);
 		
-		// 性别
-		member.setSex(sex);
+		//性别  M为男性，F为女性
+		if("M".equals(sex)){
+			member.setSex("1");
+		}else if("F".equals(sex)){
+			member.setSex("2");
+		}
 
 		return member;
 	}
