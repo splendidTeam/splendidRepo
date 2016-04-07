@@ -236,7 +236,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			LOG.debug("{} login success", memberCommand.getLoginName());
 			String resultCode=thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(),type);
 			model.addAttribute("resultCode", resultCode);
-			super.onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response); 
+			onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response); 
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
@@ -326,7 +326,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		LOG.debug("{} login success", memberCommand.getLoginName());
 		String resultCode = thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(), type);
 		model.addAttribute("resultCode", resultCode);
-		super.onAuthenticationSuccess(memberDetails, request, response);
+		onAuthenticationSuccess(memberDetails, request, response);
 
 		return VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS;
 	}

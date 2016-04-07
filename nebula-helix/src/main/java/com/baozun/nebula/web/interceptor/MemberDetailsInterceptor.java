@@ -17,8 +17,6 @@
 package com.baozun.nebula.web.interceptor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -150,14 +148,7 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
 				LOG.debug("Session is safe");
 				
 				//登录用户的状态流转
-				LOG.debug("do member status flow processor");
-				String action=memberStatusFlowProcessor.process(memberDetails);
-				if(Validator.isNotNullOrEmpty(action)){
-					LOG.info("[MEMBER_STATUS_FLOW_PROCESSOR]  memberId:{} ,status{} ,action{}",memberDetails.getMemberId(),memberDetails.getStatus().toArray(),action);
-					response.sendRedirect(request.getContextPath()+action);
-					return false;
-				}
-				return true;
+				return doMemberStatusFlowProcess(memberDetails, request, response);
 			}else{
 				LOG.info("Session Signature check is not passed.");
 				secureSessionSignatureHandler.deleteSignature(response);
@@ -196,6 +187,29 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
         } else {               	
             response.sendError(ajaxErrorCode);
         }
+	}
+	
+	/**
+	 * 执行会员状态流转器
+	 * @param memberDetails
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	protected boolean  doMemberStatusFlowProcess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response) throws IOException {
+		LOG.debug("do member status flow processor");
+		String action=memberStatusFlowProcessor.process(memberDetails,request);
+		if(Validator.isNotNullOrEmpty(action)){
+			LOG.info("[MEMBER_STATUS_FLOW_PROCESSOR]  memberId:{} ,status{} ,action{}",memberDetails.getMemberId(),memberDetails.getStatus().toArray(),action);
+			if(request.getHeader("X-Requested-With") == null){
+				response.sendRedirect(request.getContextPath()+action);
+			}else{
+				response.sendError(ajaxErrorCode);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	public int getAjaxErrorCode() {

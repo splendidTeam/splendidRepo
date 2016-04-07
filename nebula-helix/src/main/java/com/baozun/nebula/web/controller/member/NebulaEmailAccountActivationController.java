@@ -217,7 +217,7 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 			//发送激活成功邮件
 			memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData.getNickname());
 			MemberDetails memberDetails=super.constructMemberDetails(member);
-			super.onAuthenticationSuccess(memberDetails, httpRequest, httpResponse);
+			onAuthenticationSuccess(memberDetails, httpRequest, httpResponse);
 			
 			LOG.info("valid register Email end");
 			

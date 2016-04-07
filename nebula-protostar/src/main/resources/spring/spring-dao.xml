@@ -25,9 +25,6 @@
 				<value>classpath*:META-INF/*hql-*.xml</value>
 			</list>
 		</property>
-		<property name="entityInterceptor">
-			<bean class="com.baozun.nebula.dao.event.EntityInterceptor" />
-		</property>
 	</bean>
 
 	<!--dataSource -->

@@ -44,7 +44,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.QsQueueSaleOrderManager;
 import com.baozun.nebula.security.crypto.PIIEncryptionModule;
+import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.Validator;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 import net.sf.json.JSONObject;
@@ -66,10 +68,6 @@ public abstract class QsQueueSaleOrderManagerImpl implements QsQueueSaleOrderMan
 
 	@Autowired
 	private  CacheManager cacheManager;
-
-	@Autowired(required = false)
-	private  PIIEncryptionModule encryModule;
-	
 	
 	/***
 	 * 抽象方法
@@ -232,7 +230,12 @@ public abstract class QsQueueSaleOrderManagerImpl implements QsQueueSaleOrderMan
 	public String getUserQsRid(Long memberId, String upc) {
 		String prefix = memberId + upc;
 		String rid = Constants.QS_SALE_ORDER_RID;
-		return encryModule.encrypt(rid + prefix);
+		try {
+			return EncryptUtil.getInstance().getEncryptor("AES").encrypt(rid + prefix);
+		} catch (EncryptionException e1) {
+			LOGGER.warn("[DECRYPTION_ERROR] [{}]", e1);
+		}
+		return null;
 	}
 
 	/**
@@ -245,7 +248,13 @@ public abstract class QsQueueSaleOrderManagerImpl implements QsQueueSaleOrderMan
 	public String getUserQsQid(Long memberId, String upc) {
 		String prefix = memberId + upc;
 		String qid = Constants.QS_SALE_ORDER_QID;
-		return encryModule.encrypt(qid + prefix);
+		
+		try {
+			return EncryptUtil.getInstance().getEncryptor("AES").encrypt(qid + prefix);
+		} catch (EncryptionException e1) {
+			LOGGER.warn("[DECRYPTION_ERROR] [{}]", e1);
+		}
+		return null;
 	}
 	
 	/***
@@ -348,7 +357,7 @@ public abstract class QsQueueSaleOrderManagerImpl implements QsQueueSaleOrderMan
 	public Boolean dealQueueIsTimeOut(String qId,Long memberId) {
 		try{
 			if(Validator.isNotNullOrEmpty(memberId)&&Validator.isNotNullOrEmpty(qId)) {
-				String cacheKey = this.encryModule.decrypt(qId);
+				String cacheKey = EncryptUtil.getInstance().getEncryptor("AES").decrypt(qId);
 				String prefix = Constants.QS_SALE_ORDER_QID + memberId;
 				String upc = cacheKey.replace(prefix, "");
 				/**重新获取upc  判断rid对象是否失效**/

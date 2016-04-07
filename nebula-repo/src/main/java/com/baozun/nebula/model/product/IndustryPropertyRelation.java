@@ -24,13 +24,16 @@ public class IndustryPropertyRelation extends BaseModel{
 	 */
 	private static final long serialVersionUID = 7918575703095781475L;
 
-	private Long id;
+	private Long 	id;
 	
 	/**行业Id*/
-	private Long industryId;
+	private Long 	industryId;
 	
 	/**属性ID*/
-	private Long propertyId;
+	private Long 	propertyId;
+	
+	/**行业属性排序*/
+	private Integer	sortNo;
 
 	/**
 	 * Gets the pK.
@@ -65,6 +68,15 @@ public class IndustryPropertyRelation extends BaseModel{
 
 	public void setPropertyId(Long propertyId) {
 		this.propertyId = propertyId;
+	}
+	
+	@Column(name="SORT_NO")
+	public Integer getSortNo() {
+		return sortNo;
+	}
+
+	public void setSortNo(Integer sortNo) {
+		this.sortNo = sortNo;
 	}
 	
 }
