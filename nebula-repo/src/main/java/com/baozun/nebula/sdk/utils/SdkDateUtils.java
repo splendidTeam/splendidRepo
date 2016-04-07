@@ -3,7 +3,12 @@ package com.baozun.nebula.sdk.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+/**
+ * 
+ * @deprecated by D.C 2016/4/6
+ * pls use {@link com.feilong.core.text.DateFormatUtil} {@link com.feilong.core.DatePattern} 
+ */
+@Deprecated
 public class SdkDateUtils {
 	
 	public static Date parseStrToDate(String dateStr){
