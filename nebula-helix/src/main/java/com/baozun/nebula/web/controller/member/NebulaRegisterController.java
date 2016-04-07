@@ -315,10 +315,11 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 			/**
 			 * 构造MemberDetails<br/>
-			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberCommand.status
+			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberDetails.status
 			 */
 			MemberDetails memberDetails = constructMemberDetails(memberCommand);
 
+			// 返回NebulaReturnResult中包含下一步动作的url
 			return onRegisterSuccess(memberDetails, request, response);
 
 		}catch (BusinessException e){
