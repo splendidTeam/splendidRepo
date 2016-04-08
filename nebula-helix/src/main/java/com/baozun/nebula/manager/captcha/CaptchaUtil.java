@@ -428,7 +428,7 @@ public class CaptchaUtil{
 
         //验证码输入 是null or empty,那肯定表示验证失败
         if (Validator.isNullOrEmpty(userInputValue)){
-            if (LOGGER.isDebugEnabled()){
+            if (LOGGER.isWarnEnabled()){
                 LOGGER.warn("userInputValue isNullOrEmpty,captchaValidateEntity:{}", JsonUtil.format(captchaValidateEntity));
             }
             return false;
