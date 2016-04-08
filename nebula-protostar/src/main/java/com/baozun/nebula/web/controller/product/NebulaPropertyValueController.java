@@ -3,6 +3,7 @@
  */
 package com.baozun.nebula.web.controller.product;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,11 +15,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.manager.product.PropertyManager;
 import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
+import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 
 /**
@@ -38,7 +42,6 @@ import com.baozun.nebula.web.controller.BaseController;
 @Controller
 public class NebulaPropertyValueController extends BaseController{
 
-	@SuppressWarnings("unused")
 	private static final Logger	LOGGER	= LoggerFactory.getLogger(NebulaPropertyValueController.class);
 
 	@Autowired
@@ -64,9 +67,11 @@ public class NebulaPropertyValueController extends BaseController{
 		// request.getSession().setAttribute("propertyId", propertyId);
 
 		Property property = propertyManager.findPropertyById(propertyId);
+		model.addAttribute("property", property);
 		// 设置属性组分组只针对于属性类型为‘多选’类型
 		if (property.getEditingType().equals(Property.EDITING_TYPE_MULTI_SELECT)){
 			List<PropertyValueGroup> propertyValueGroupList = sdkPropertyManager.findProValueGroupByPropertyId(propertyId);
+			model.addAttribute("propertyValueGroupList", propertyValueGroupList);
 		}
 
 		// model.addAttribute("propertyName", property.getName());
@@ -87,21 +92,71 @@ public class NebulaPropertyValueController extends BaseController{
 	 * @param request
 	 * @param model
 	 * @param type
-	 *            操作类型（save || update）
+	 *            操作类型（0=new || 1=update）
 	 * @param groupId
 	 *            属性值组id
 	 * @param propertyId
 	 *            对应的属性
 	 * @return
 	 */
-	@RequestMapping(value = "/i18n/property/showAddGroup.htm")
+	@RequestMapping(value = "/i18n/property/showAddOrUpdateGroup.htm")
 	public String showAddOrUpdateGroup(
 			HttpServletRequest request,
 			Model model,
 			@RequestParam(value = "type",required = true) int type,
 			@RequestParam(value = "groupId",required = false) Long groupId,
 			@RequestParam(value = "propertyId",required = true) Long propertyId){
-		
-		return "/product/property/add-property-value-group";
+
+		if (type == 0){
+			// 新建
+			List<PropertyValue> propertyValueList = propertyManager.findPropertyValueList(propertyId);
+			// 没有与属性值组绑定的属性值
+			model.addAttribute("freeProValueList", propertyValueList);
+		}else{
+			// 已经加入到属性值组的PropertyValue
+			// model.addAttribute("boundProValueList", propertyValueList);
+			// 还没有加入到属性值组的PropertyValue
+			// model.addAttribute("freeProValueList", propertyValueList);
+			model.addAttribute("groupId", groupId);
+		}
+
+		return "/product/property/property-value-group";
 	}
+
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/saveOrUpdatePropertyValueGroup.json")
+	public BackWarnEntity saveOrUpdatePropertyValueGroup(
+			HttpServletRequest request,
+			Model model,
+			@RequestParam("propertyId") Long propertyId,
+			@RequestParam("groupId") Long groupId,
+			@RequestParam("groupName") String groupName,
+			@RequestParam("propertyValueIds") String propertyValueIds){
+		try{
+			// 保存PropertyValueGroup
+			PropertyValueGroup propertyValueGroup = sdkPropertyManager.savePropertyValueGroup(propertyId, groupId, groupName);
+			groupId = propertyValueGroup.getId();
+
+			// 处理【属性值】和【属性值组】的关联
+			String[] strIds = propertyValueIds.split(",");
+			List<Long> valueIds = new ArrayList<Long>();
+			if (strIds.length > 0){
+				for (int i = 0; i < strIds.length; i++){
+					Long valueId = Long.valueOf(strIds[i].toString());
+					valueIds.add(valueId);
+				}
+			}else{
+				valueIds.add(Long.valueOf(propertyValueIds.toString()));
+			}
+
+			sdkPropertyManager.bindPropertyValueAndProValueGroup(valueIds, groupId);
+			return SUCCESS;
+
+		}catch (Exception e){
+			LOGGER.error("", e);
+			return FAILTRUE;
+		}
+
+	}
+
 }

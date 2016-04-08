@@ -35,6 +35,7 @@ tbody input[type="text"]{
 		<div class="ui-title1">
 			<img src="${base}/images/wmi/blacks/32x32/wrench.png"><spring:message code="system.property.manager"/>
 		</div>
+		<input type="hidden" id="propertyId" value="${property.id}" />
 		<div class="ui-block ui-block-fleft" style="width: 400px;">
 			<div class="ui-block-content ui-block-content-lb">
   				<table >
@@ -43,7 +44,14 @@ tbody input[type="text"]{
 			            	<label><spring:message code='shop.property.group'/></label>
 			            </td>
 			            <td>
-			                <span ><opt:select id="type" name="q_long_type" loxiaType="select" expression="chooseOption.MEMBER_GROUPTYPE" nullOption="member.group.label.unlimit"/></input></span>
+			                <span >
+			                	<select  loxiaType="select"  mandatory="true" class="orgtype selectedGroupId" > 
+			                		<option value=""> ---请选择属性值组---</option>
+									<c:forEach items="${propertyValueGroupList}" var="group">
+										<option value="${group.id}">${group.name}</option>
+									</c:forEach>
+								</select>
+			                </span>
 			            </td>
 			            <td>
 			                <span ><a href="javascript:void(0);" class="func-button addPropertyValueGroup"   title="<spring:message code='btn.add'/>">

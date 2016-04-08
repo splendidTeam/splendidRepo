@@ -47,51 +47,28 @@ $j.extend(loxia.regional['zh-CN'],{
     "LABEL_PROPERTY_OPERATE":"操作",
     "LABEL_PROPERTY_GROUP":"所属分组"
 });
-//商品属性列表
-var propertyListUrl = base+'/property/propertyList.json';
-// 删除
-var removepropertyUrl = base+'/property/removeProperty.json';
-// 启用或禁用
-var enableOrDisablePropertyUrl = base+'/property/enableOrDisableproperty.json';
-
-//addPropertyValueGroup
-
-
-function addPropertyValueGroup(){
-	$j('.addPropertyValueGroup').click(function(data){
-		var propertyId = $j('#propertyId').val();
-		var selectedGroupId = $j('.selectedGroupId').find("option:selected").val();
-		console.log(propertyId, selectedGroupId);
-		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?propertyId="+propertyId +"&groupId="+selectedGroupId +"&type=0";
-	});
-}
-
-function updatePropertyValueGroup(){
-	
-	var selectedGroupId = $j('.selectedGroupId').find("option:selected").val();
-	
-	$j('.updatePropertyValueGroup').click(function(data){
-		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?groupId="+selectedGroupId +"&type=1";
-	});
-}
 
 
 $j(document).ready(function(){
 	
-	addPropertyValueGroup();
+	$j('.sumbmit').click(function(){
+		var groupId = $j('.groupId').val();
+		var groupName = $j('.groupName').val();
+		
+		
+		
+	});
 	
 	
 	
-
 	
+	$j('.boundPropertyValue checkbox').live('on',function(){
+		alert($j(this).text())
+	});
 	
-	
-	
-	
-
-	
-	
-	
+	$j('.freePropertyValue checkbox').live('on',function(){
+		alert($j(this).text())
+	});
 	
 	
 	

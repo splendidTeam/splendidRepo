@@ -23,4 +23,28 @@ public interface SdkPropertyManager extends BaseManager{
 	 * @return
 	 */
 	List<PropertyValueGroup> findProValueGroupByPropertyId(Long propertyId);
+
+	/**
+	 * 新建或者修改“属性值组”
+	 * 
+	 * @param propertyId
+	 *            此【属性值组】隶属的 【属性】 id
+	 * @param groupId
+	 *            属性值组Id
+	 * @param groupName
+	 *            属性值组名称
+	 * @return
+	 */
+	PropertyValueGroup savePropertyValueGroup(Long propertyId,Long groupId,String groupName);
+
+	/**
+	 * 给【属性值】和【属性值组】 建立绑定
+	 * 
+	 * @param proValueIds
+	 *            属性值 ids
+	 * @param propertyValueGroupId
+	 *            属性值组id
+	 * @return
+	 */
+	boolean bindPropertyValueAndProValueGroup(List<Long> proValueIds,Long propertyValueGroupId);
 }
