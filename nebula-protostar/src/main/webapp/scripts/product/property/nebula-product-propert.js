@@ -48,23 +48,13 @@ $j.extend(loxia.regional['zh-CN'],{
     "LABEL_PROPERTY_GROUP":"所属分组"
 });
 //商品属性列表
-var propertyListUrl = base+'/property/propertyList.json';
+var propertyListUrl = base+'/property/nebulaPropertyList.json';
 // 删除
-var removepropertyUrl = base+'/property/removeProperty.json';
+var removepropertyUrl = base+'/property/nebulaRemoveProperty.json';
 // 启用或禁用
-var enableOrDisablePropertyUrl = base+'/property/enableOrDisableproperty.json';
+var enableOrDisablePropertyUrl = base+'/property/belulaEnableOrDisableproperty.json';
 
-/**
- * 状态格式
- * @param val
- * @returns {String}
- */
-/*function formatGender(val) {
-	if (val == 0)
-		return nps.i18n("VALUE_NO_EFFECT");
-	else
-		return nps.i18n("VALUE_EFFECTIVE");
-}*/
+
 /**
  * 行业属性格式
  * @param val
@@ -240,7 +230,7 @@ var setting = {
 		nps.confirm(nps.i18n("PROPERT_OPERATOR_TIP"),nps.i18n("PROPERT_CONFIRM_DELETE_SEL_PROPERT"),function(){
 			var checkbox=$j("input[name='id']");
 			var data=""; 
-			  $j.each(checkbox, function(i,val){   
+			  $j.each(checkbox, function(i,val){
 				  if(val.checked){
 					  data=data+$j(this).val()+",";
 				  }
@@ -327,14 +317,14 @@ var setting = {
 	function propertyValue(data) {
 		var list = '';
 		if(data.editingType == 5 || data.editingType == 1){
-			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?industryId='+data.industryId+'&properyId='+data.id},
+			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?properyId='+data.id},
                     {label:nps.i18n("PROPERTY_CLICK_STOP"), type:"jsfunc", content:"disableProp"},
                     {label:nps.i18n("PROPERTY_CLICK_DELETE"), type:"jsfunc", content:"deleteProp"}];
 		}else{
-			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?industryId='+data.industryId+'&properyId='+data.id},
+			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?properyId='+data.id},
                     {label:nps.i18n("PROPERTY_CLICK_STOP"), type:"jsfunc", content:"disableProp"},
                     {label:nps.i18n("PROPERTY_CLICK_DELETE"), type:"jsfunc", content:"deleteProp"},
-                    {label:nps.i18n("PROPERTY_CLICK_SETVALUE"), type:"href", content:base+"/i18n/property/editPropertyValue.htm?propertyId="+data.id}];
+                    {label:nps.i18n("PROPERTY_CLICK_SETVALUE"), type:"href", content:base+"/i18n/property/propertyValueList.json?propertyId="+data.id}];
 		}
         if(data.lifecycle == 0){
             list[1].label = nps.i18n("PROPERTY_CLICK_START");
@@ -374,7 +364,7 @@ var setting = {
 		searchFilter.init({formId: 'searchForm', searchButtonClass: '.func-button.search'});
 		$j("#table1").loxiasimpletable({
 			page : true,
-			size : 15,
+			size : 100,
 			nodatamessage:'<span>'+nps.i18n("NO_DATA")+'</span>',
 			form:"searchForm",
 			cols : [ {
@@ -400,42 +390,27 @@ var setting = {
 			}, {
 				name : "isSaleProp",
 				label : nps.i18n("LABEL_PROPERTY_SALEPROP"),
-				width : "5%",
+				width : "9%",
 				type:"yesno"
 			}, {
 				name : "isColorProp",
 				label : nps.i18n("LABEL_PROPERTY_COLORPROP"),
-				width : "5%",
+				width : "9%",
 				type:"yesno"
 			}, {
 				name : "required",
 				label : nps.i18n("LABEL_PROPERTY_REQUIRED"),
-				width : "5%",
+				width : "9%",
 				type:"yesno"
 			}, {
 				name : "searchable",
 				label : nps.i18n("LABEL_PROPERTY_SEARCHABLE"),
-				width : "5%",
+				width : "9%",
 				type:"yesno"
-			},  {
-				name : "sortNo",
-				label : nps.i18n("LABEL_PROPERTY_SORTNO"),
-				sort: ["tpp.sort_no asc","tpp.sort_no desc"],
-				width : "5%"
-			}, {
-				name : "industryName",
-				label : nps.i18n("LABEL_PROPERTY_INDUSTRYNAME"),
-				sort: ["industryName asc","industryName desc"],
-				width : "10%"
-			}, {
-				name : "groupName",
-				label : nps.i18n("LABEL_PROPERTY_GROUP"),
-				sort: ["groupName asc","groupName desc"],
-				width : "10%"
 			}, {
 				name : "lifecycle",
 				label : nps.i18n("LABEL_PROPERTY_LIFECYCLE"),
-				width : "5%",
+				width : "9%",
 				type:"yesno"
 			}, {
 				label : nps.i18n("LABEL_PROPERTY_OPERATE"),
@@ -457,39 +432,39 @@ var setting = {
 			refreshData();
 		});
 		 
-		$j.fn.zTree.init($j("#treeDemo"), setting, zNodes);
+		//$j.fn.zTree.init($j("#treeDemo"), setting, zNodes);
 		
-		var treeObjIndustry = $j.fn.zTree.getZTreeObj("treeDemo");
-		var treeIndustryNodes = treeObjIndustry.transformToArray(treeObjIndustry.getNodes());
-		for(var i = 0;i<treeIndustryNodes.length;i++){
-			if(treeIndustryNodes[i].isParent){
-				treeIndustryNodes[i].nocheck = true;
-				treeObjIndustry.refresh();
-			}
-		}
-		
-		
-		var q_long_industryId = $j("input[name='q_long_industryId']").val().trim();
+//		var treeObjIndustry = $j.fn.zTree.getZTreeObj("treeDemo");
+//		var treeIndustryNodes = treeObjIndustry.transformToArray(treeObjIndustry.getNodes());
+//		for(var i = 0;i<treeIndustryNodes.length;i++){
+//			if(treeIndustryNodes[i].isParent){
+//				treeIndustryNodes[i].nocheck = true;
+//				treeObjIndustry.refresh();
+//			}
+//		}
 		
 		
-		if(q_long_industryId!=null&&q_long_industryId!=''){
-			
-			var industry_TreeObj=$j.fn.zTree.getZTreeObj("treeDemo");
-			
-			var industry_Nodes=industry_TreeObj.transformToArray(industry_TreeObj.getNodes());
-			
-			for(var i = 0 ; i < industry_Nodes.length ; i++){
-				if(industry_Nodes[i].id==q_long_industryId){
-					
-					industry_Nodes[i].checked = true;
-					
-					$j("#industryName").val(industry_Nodes[i].name);
-					
-					break;
-				}
-			}
-			industry_TreeObj.refresh();
-		}
+		//var q_long_industryId = $j("input[name='q_long_industryId']").val().trim();
+		
+		
+//		if(q_long_industryId!=null&&q_long_industryId!=''){
+//			
+//			var industry_TreeObj=$j.fn.zTree.getZTreeObj("treeDemo");
+//			
+//			var industry_Nodes=industry_TreeObj.transformToArray(industry_TreeObj.getNodes());
+//			
+//			for(var i = 0 ; i < industry_Nodes.length ; i++){
+//				if(industry_Nodes[i].id==q_long_industryId){
+//					
+//					industry_Nodes[i].checked = true;
+//					
+//					$j("#industryName").val(industry_Nodes[i].name);
+//					
+//					break;
+//				}
+//			}
+//			industry_TreeObj.refresh();
+//		}
 		
 		$j("#industryName").click(function() {
 			var cityObj = $j(this);
@@ -499,7 +474,7 @@ var setting = {
 			$j("body").bind("mousedown", onBodyDown);
 		});
 		$j(".button.orange.addpro").click(function() {
-			window.location.href=base+"/property/createProperty.htm";
+			window.location.href=base+"/property/nebulaCreateProperty.htm";
 		});
 		
 		$j(".button.delete").click(function() {

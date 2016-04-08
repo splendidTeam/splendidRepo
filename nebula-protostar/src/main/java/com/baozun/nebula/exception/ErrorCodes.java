@@ -133,11 +133,18 @@ public interface ErrorCodes {
 	/** 属性删除失败 */
 	public static final Integer	PRODUCT_PROPERTY_DELETION_FAIL				= 6025;
 	
+	
 	/** {0} 导航下,已存在名字 {1} 的导航 <code>{@value}</code>. */
 	public static final Integer	SYSTEM_NAVIGATION_PARENT_EXIST_NAME			= 6026;
 	
 	/** 父级导航 {0} 已不存在<code>{@value}</code>. */
 	public static final Integer	SYSTEM_NAVIGATION_PARENT_NO_EXISTS			= 6027;
+	
+	/** 属性被商品引用删除失败  */
+	public static final Integer	PRODUCT_PROPERTY_DELETION_QUOTE				= 6028;
+	/** 属性被商品引用禁用失败 */
+	public static final Integer	PRODUCT_PROPERTY_DISABLED_QUOTE				= 6029;
+	
 
 	// ****************** cms
 	// 3000区间*********************************************************************
