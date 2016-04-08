@@ -81,8 +81,26 @@ public class NebulaPropertyValueController extends BaseController{
 
 	}
 
+	/**
+	 * 渲染进入修改或者新增属性值组页面
+	 * 
+	 * @param request
+	 * @param model
+	 * @param type
+	 *            操作类型（save || update）
+	 * @param groupId
+	 *            属性值组id
+	 * @param propertyId
+	 *            对应的属性
+	 * @return
+	 */
 	@RequestMapping(value = "/i18n/property/showAddGroup.htm")
-	public String showAddGroup(HttpServletRequest request,Model model,@RequestParam(value = "propertyId",required = true) Long propertyId){
+	public String showAddOrUpdateGroup(
+			HttpServletRequest request,
+			Model model,
+			@RequestParam(value = "type",required = true) int type,
+			@RequestParam(value = "groupId",required = false) Long groupId,
+			@RequestParam(value = "propertyId",required = true) Long propertyId){
 		
 		return "/product/property/add-property-value-group";
 	}
