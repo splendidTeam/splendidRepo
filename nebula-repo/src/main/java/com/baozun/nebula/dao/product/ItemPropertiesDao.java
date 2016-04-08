@@ -207,4 +207,15 @@ public interface ItemPropertiesDao extends GenericEntityDao<ItemProperties, Long
 	 */
 	@NativeUpdate
 	Integer deleteItemPropertiesByIds(@QueryParam("ids") List<Long> ids);
+	
+	
+	/**
+	 * 根据属性id到itemProperties表中查询商品数量
+	 * @return Integer
+	 * @param id
+	 * @author 冯明雷
+	 * @time 2016年4月7日下午4:07:42
+	 */
+	@NativeQuery(alias = "num",clazzes = Integer.class)
+	Integer findItemCountByPropertyId(@QueryParam("propertyId")Long propertyId);
 }

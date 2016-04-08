@@ -271,7 +271,7 @@
 
 		       			
 		       				#if($editingType)
-		       					and tpcp.EDITINGTYPE=:editingType
+		       					and tpcp.editing_type=:editingType
 		       				#end
 
 		       			
@@ -1124,6 +1124,4 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
-	
 </beans>
