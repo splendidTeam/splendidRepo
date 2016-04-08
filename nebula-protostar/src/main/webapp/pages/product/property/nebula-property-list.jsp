@@ -31,7 +31,7 @@
 		<div class="ui-block">
 			<div class="ui-block-content ui-block-content-lb">
 		
-		<form action="/property/propertyList.json" id="searchForm">
+		<form action="/property/nebulaPropertyList.json" id="searchForm">
 		
 				<table>
 					<tr>

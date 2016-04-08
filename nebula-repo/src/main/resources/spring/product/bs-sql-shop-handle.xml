@@ -390,4 +390,38 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean id="Shop.findCountByPropertyName" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据属性名查询 属性数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  				
+					select
+						count(*) as count
+					from
+						t_pd_property
+					where
+						name = :propertyName
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Shop.findCountByPropertyNameAndLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据属性名和语言查询属性的数量</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  				
+					select
+						count(*) as count
+					from
+						t_pd_property_lang
+					where
+						name = :propertyName
+						and lang =:lang
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

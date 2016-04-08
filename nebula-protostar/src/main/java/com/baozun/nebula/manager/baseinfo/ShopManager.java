@@ -192,6 +192,16 @@ public interface ShopManager extends BaseManager{
 	 * @return
 	 */
 	boolean validatePropertyName(String name,Integer propertyId, String lang);
+	
+	/**
+	 * 根据属性名和语言验证(如果语言为空只验证属性名)
+	 * @return boolean
+	 * @param name
+	 * @param lang
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午4:03:11
+	 */
+	boolean validatePropertyName(String name,String lang);
 
 	/**
 	 * 查询是否有相同的组织名称

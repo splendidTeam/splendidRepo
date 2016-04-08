@@ -52,7 +52,7 @@ var propertyListUrl = base+'/property/nebulaPropertyList.json';
 // 删除
 var removepropertyUrl = base+'/property/nebulaRemoveProperty.json';
 // 启用或禁用
-var enableOrDisablePropertyUrl = base+'/property/belulaEnableOrDisableproperty.json';
+var enableOrDisablePropertyUrl = base+'/property/nebulaEnableOrDisableproperty.json';
 
 
 /**
@@ -317,11 +317,11 @@ var setting = {
 	function propertyValue(data) {
 		var list = '';
 		if(data.editingType == 5 || data.editingType == 1){
-			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?properyId='+data.id},
+			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/nebulaUpdateProperty.htm?properyId='+data.id},
                     {label:nps.i18n("PROPERTY_CLICK_STOP"), type:"jsfunc", content:"disableProp"},
                     {label:nps.i18n("PROPERTY_CLICK_DELETE"), type:"jsfunc", content:"deleteProp"}];
 		}else{
-			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?properyId='+data.id},
+			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/nebulaUpdateProperty.htm?properyId='+data.id},
                     {label:nps.i18n("PROPERTY_CLICK_STOP"), type:"jsfunc", content:"disableProp"},
                     {label:nps.i18n("PROPERTY_CLICK_DELETE"), type:"jsfunc", content:"deleteProp"},
                     {label:nps.i18n("PROPERTY_CLICK_SETVALUE"), type:"href", content:base+"/i18n/property/propertyValueList.json?propertyId="+data.id}];

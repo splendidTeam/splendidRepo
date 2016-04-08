@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +48,9 @@ import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.ShopProperty;
 import com.baozun.nebula.web.UserDetails;
+import com.feilong.core.Validator;
+
+import loxia.dao.Sort;
 
 /**
  * @author yi.huang
@@ -436,6 +437,19 @@ public class ShopManagerImpl implements ShopManager{
 	@Override
 	public List<Industry> findAllEnabledIndustryByShopId(Long shopId) {
 		return shopDao.findAllEnabledIndustryByShopId(shopId);
+	}
+	
+	
+	@Override
+	public boolean validatePropertyName(String name,String lang) {
+		Integer count=0;
+		if(Validator.isNotNullOrEmpty(lang)){
+			count=shopDao.findCountByPropertyNameAndLang(name, lang);
+		}else{
+			count=shopDao.findCountByPropertyName(name);
+		}
+		
+		return count == 0;
 	}
 
 }

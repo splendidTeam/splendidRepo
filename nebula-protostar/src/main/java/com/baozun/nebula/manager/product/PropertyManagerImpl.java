@@ -37,8 +37,7 @@ import com.baozun.nebula.model.product.PropertyLang;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.utilities.common.LangUtil;
-import com.baozun.nebula.utils.Validator;
-
+import com.feilong.core.Validator;
 /**
  * 属性管理
  * 
@@ -73,6 +72,12 @@ public class PropertyManagerImpl implements PropertyManager{
 	@Override
 	public Pagination<PropertyCommand> findPropertyListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
 		Pagination<PropertyCommand> result = propertyDao.findPropertyListByQueryMapWithPage(page, sorts, paraMap);
+		return result;
+	}
+	
+	@Override
+	public Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap){
+		Pagination<PropertyCommand> result = propertyDao.findPropertyPaginationByQueryMap(page, sorts, paraMap);
 		return result;
 	}
 
@@ -713,5 +718,96 @@ public class PropertyManagerImpl implements PropertyManager{
 		List<PropertyValueLang> propertyLangs = propertyValueDao.findPropertyValueLangByPvids(pvIds, MutlLang.i18nLangs());
 		
 		return propertyLangs;
+	}
+	
+	
+	@Override
+	public com.baozun.nebula.command.product.PropertyCommand nebulaCreateOrUpdateProperty(
+			com.baozun.nebula.command.product.PropertyCommand propertyCommand) {
+		Property property = null;
+		if (propertyCommand.getId() != null && propertyCommand.getId() != -1) {
+			property = findPropertyById(propertyCommand.getId());
+		}else{
+			property = new Property();
+			property.setCreateTime(new Date());
+		}
+		
+		property.setModifyTime(new Date());		
+		property.setEditingType(propertyCommand.getEditingType());
+		property.setIsColorProp(propertyCommand.getIsColorProp());
+		property.setIsSaleProp(propertyCommand.getIsSaleProp());
+		property.setHasThumb(propertyCommand.getHasThumb());
+		property.setRequired(propertyCommand.getRequired());
+		property.setSearchable(propertyCommand.getSearchable());		
+		property.setValueType(propertyCommand.getValueType());
+		if(Validator.isNotNullOrEmpty(propertyCommand.getSortNo())){
+			property.setSortNo(propertyCommand.getSortNo());
+		}		
+		property.setLifecycle(propertyCommand.getLifecycle());
+		
+		//国际化的判断
+		boolean i18n = LangProperty.getI18nOnOff();
+		if (i18n){
+			MutlLang pname = (MutlLang) propertyCommand.getName();
+			String[] values = pname.getValues();
+			String[] langs = pname.getLangs();
+			MutlLang gname = (MutlLang) propertyCommand.getGroupName();
+			String[] gnames = gname.getValues();
+			String name = pname.getDefaultValue();
+			String gpName = gname.getDefaultValue();
+			
+			property.setName(name);
+			property.setGroupName(gpName);
+			property = propertyDao.save(property);
+			
+			Long propertyId = property.getId();
+			for (int i = 0; i < values.length; i++){
+				String val = values[i];
+				String lang = langs[i];
+				String groupName = gnames[i];
+				// 新增
+				PropertyLang pl = propertyDao.findPropertyLang(propertyId, lang);
+				if (pl == null){
+					PropertyLang propertyLang = new PropertyLang();
+					propertyLang.setPropertyId(propertyId);
+					propertyLang.setLang(lang);
+					propertyLang.setName(val);
+					propertyLang.setGroupName(groupName);
+					propertyLangDao.save(propertyLang);
+				}else{
+					// 修改
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("name", val);
+					params.put("propertyId", propertyId);
+					params.put("lang", lang);
+					params.put("groupName", groupName);
+					propertyDao.updatePropertyLang(params);
+				}
+			}
+		}else{
+			SingleLang singleLang = (SingleLang) propertyCommand.getName();
+			property.setName(singleLang.getValue());
+
+			SingleLang gname = (SingleLang) propertyCommand.getGroupName();
+			property.setGroupName(gname.getValue());
+
+			property = propertyDao.save(property);
+		}
+
+		LangProperty.I18nPropertyCopyToSource(property, propertyCommand);
+		return propertyCommand;
+
+	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public Property findPropertyByPropertyId(Long propertyId){
+		return propertyDao.findPropertyByPropertyId(propertyId);
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public List<PropertyLang> findPropertyLongByPropertyId(Long propertyId){
+		return propertyDao.findPropertyLongByPropertyId(propertyId);
 	}
 }

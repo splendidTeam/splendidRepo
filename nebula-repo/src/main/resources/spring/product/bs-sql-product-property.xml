@@ -1124,4 +1124,133 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	
+	<bean id="Property.findPropertyPaginationByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+							select 
+								id as id,
+								create_time as createtime,
+								editing_type as editingType,
+								group_name as groupName,
+								hasthumb as hasthumb,
+								industry_id as industryid,
+								is_color_prop as iscolorprop,
+								is_salep_rop as issaleprop,
+								lifecycle as lifecycle,
+								modify_time as modifytime,
+								name as name,
+								required as required,
+								searchable as searchable,
+								sort_no as sortno,
+								value_type as valuetype,
+								version as version,
+								value_type as valuetype
+							from 
+								t_pd_property
+							where
+								lifecycle!=2
+								
+			       				#if($industryId)
+			       					and INDUSTRY_ID=:industryId
+			       				#end
+		       			
+			       				#if($name)
+			       					and NAME like :name
+			       				#end
+			       				#if($nameForLike)
+			       					and tpp.NAME like :nameForLike
+			       				#end
+
+			       				#if($sortNo)
+			       					and SORT_NO=:sortNo
+			       				#end
+
+			       				#if($createTime)
+			       					and CREATETIME >= :createTimeStart
+			       				#end
+			       				#if($createTime)
+			       					and CREATETIME <= :createTimeEnd
+			       				#end
+
+			       				#if($modifyTime)
+			       					and MODIFYTIME >= :modifyTimeStart
+			       				#end
+			       				#if($modifyTime)
+			       					and MODIFYTIME <= :modifyTimeEnd
+			       				#end
+		       			
+			       				#if($shopId)
+			       					and SHOPID=:shopId
+			       				#end
+		       			
+			       				#if($lifecycle)
+			       					and LIFECYCLE=:lifecycle
+			       				#end
+
+			       				#if($editingType)
+			       					and editing_type=:editingType
+			       				#end
+		       			
+			       				#if($valueType)
+			       					and VALUETYPE=:valueType
+			       				#end
+		       			
+			       				#if($isSaleProp)
+			       					and ISSALEP_ROP=:isSaleProp
+			       				#end
+			       			
+			       				#if($isColorProp)
+			       					and ISCOLOR_PROP=:isColorProp
+			       				#end
+			       			
+			       				#if($required)
+			       					and REQUIRED=:required
+			       				#end
+			       			
+			       				#if($searchable)
+			       					and SEARCHABLE=:searchable
+			       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="Property.findPropertyByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select
+                   		*
+                   from
+                   		t_pd_property
+                   where
+                   		id=:propertyId
+                   		and lifecycle!=2
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Property.findPropertyLongByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select
+                   		*
+                   from
+                   		t_pd_property_lang
+                   where
+                   		property_id=:propertyId
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
 </beans>

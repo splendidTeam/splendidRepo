@@ -39,15 +39,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.command.PropertyCommand;
+import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.product.CommonPropertyCommand;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
+import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.IndustryManager;
 import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.PropertyManager;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyLang;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.utils.query.bean.QueryBean;
@@ -70,11 +73,12 @@ public class NebulaPropertyController extends BaseController{
 	@Autowired
 	private PropertyManager		propertyManager;
 
-	@Autowired
-	private IndustryManager		industryManager;	
 	
 	@Autowired
 	private ItemManager			itemManager;
+	
+	@Autowired
+	private ShopManager			shopManager;
 	
 	
 	/**
@@ -127,15 +131,34 @@ public class NebulaPropertyController extends BaseController{
 		paraMap.put("isSystem", true);
 		Sort[] paraSorts = queryBean.getSorts();
 		if (null == paraSorts || paraSorts.length == 0){
-			Sort sort = new Sort("tpp.sort_no", "asc");
+			Sort sort = new Sort("sort_no", "asc");
 			paraSorts = new Sort[1];
 			paraSorts[0] = sort;
 			queryBean.setSorts(paraSorts);
 		}
 
-		Pagination<PropertyCommand> args = propertyManager.findPropertyListByQueryMapWithPage(queryBean.getPage(), paraSorts, paraMap);
+		Pagination<PropertyCommand> args = propertyManager.findPropertyPaginationByQueryMap(queryBean.getPage(), paraSorts, paraMap);
 		return args;
 	}
+	
+	
+	/**
+	 * 查询所有有效的属性
+	 * @return Object
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @author 冯明雷
+	 * @time 2016年4月8日上午11:00:13
+	 */
+	@RequestMapping("/property/nebulaFindPropertyList.json")
+	@ResponseBody
+	public Object nebulaFindPropertyList(Model model,HttpServletRequest request,HttpServletResponse response){
+		List<Property> list = propertyManager.findAllPropertys();
+		SUCCESS.setDescription(list);
+		return SUCCESS;
+	}
+	
 	
 	
 		
@@ -172,7 +195,7 @@ public class NebulaPropertyController extends BaseController{
 		}
 		
 		if(flag){
-			throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DELETION_FAIL);
+			throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_QUOTE);
 		}
 		
 		Integer result = propertyManager.removePropertyByIds(ids);
@@ -216,6 +239,73 @@ public class NebulaPropertyController extends BaseController{
 		return SUCCESS;
 	}
 	
+	
+	/**
+	 * 根据属性名和语言验证，如果语言为空只验证属性名
+	 * @return BackWarnEntity
+	 * @param name 属性名
+	 * @param lang 语言：可以为空，如果为空只验证属性名
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午4:08:26
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/shop/nebulaValidatePropertyName.json")
+	public BackWarnEntity validatePropertyName(@RequestParam("name") String name,@RequestParam(value="lang",required=false) String lang){
+		boolean result = shopManager.validatePropertyName(name, lang);
+		if (!result){
+			return FAILTRUE;
+		}
+
+		return SUCCESS;
+	}	
+	
+	
+	
+	/**
+	 * 新增或更改属性值
+	 * @return BackWarnEntity
+	 * @param model
+	 * @param property
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午2:08:36
+	 */
+	@RequestMapping("/i18n/property/nebulaSaveProperty.Json")
+	@ResponseBody
+	public BackWarnEntity savePropertyI18n(Model model,@I18nCommand com.baozun.nebula.command.product.PropertyCommand property){
+		com.baozun.nebula.command.product.PropertyCommand newProperty = propertyManager.nebulaCreateOrUpdateProperty(property);
+		if (newProperty == null){
+			throw new BusinessException(ErrorCodes.PROPERTY_SAVE_FAIL);
+		}
+		BackWarnEntity back = new BackWarnEntity();
+		back.setIsSuccess(true);
+		back.setDescription(newProperty);
+		return back;
+	}
+	
+	
+	
+	/**
+	 * 页面跳转
+	 * @return String
+	 * @param propertyId
+	 * @param model
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:22:23
+	 */
+	@RequestMapping("/property/nebulaUpdateProperty.htm")
+	public String updatePropery(@RequestParam(required = true,value = "properyId") Long propertyId,Model model){
+		Property property = propertyManager.findPropertyByPropertyId(propertyId);
+		model.addAttribute("property", property);
+		
+		boolean i18n = LangProperty.getI18nOnOff();
+		if (i18n){
+			//如果是国际化的要去查询属性国际化的名称等
+			List<PropertyLang> propertyLangs =propertyManager.findPropertyLongByPropertyId(propertyId);			
+			model.addAttribute("propertyLangs", propertyLangs);
+		}
+		
+		return "product/property/nebula-update-property";
+	}
 	
 	
 	
