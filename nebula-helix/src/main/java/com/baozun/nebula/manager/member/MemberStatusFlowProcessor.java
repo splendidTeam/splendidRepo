@@ -33,11 +33,6 @@ public class MemberStatusFlowProcessor {
 
 	private List<StatusAction> statusActionList = new ArrayList<StatusAction>();
 	
-	
-	public MemberStatusFlowProcessor() {
-		super();
-	}
-
 	public List<StatusAction> getStatusActionList() {
 		return statusActionList;
 	}
@@ -87,11 +82,6 @@ public class MemberStatusFlowProcessor {
 		 */
 		private List<String> whiteList;
 		
-
-		public StatusAction() {
-			super();
-		}
-
 		public String getStatus() {
 			return status;
 		}
