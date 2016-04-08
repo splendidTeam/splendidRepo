@@ -236,7 +236,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			LOG.debug("{} login success", memberCommand.getLoginName());
 			String resultCode=thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(),type);
 			model.addAttribute("resultCode", resultCode);
-			onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response); 
+			onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
@@ -317,7 +317,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		 * 构造MemberDetails<br/>
 		 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberCommand.status
 		 */
-		MemberDetails storeMemberDetails = constructMemberDetails(memberCommand);
+		MemberDetails storeMemberDetails = constructMemberDetails(memberCommand,request);
 
 		// 给发送激活邮件使用
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_REG_MEMBID, storeMemberDetails.getMemberId());

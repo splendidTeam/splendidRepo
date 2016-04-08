@@ -246,7 +246,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			//处理RemeberMe和AutoLogin
 			doRememberMeProcess(loginForm, memberCommand, request, response, model);
 			
-			return onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response); 
+			return onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
