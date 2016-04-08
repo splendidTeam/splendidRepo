@@ -334,7 +334,7 @@ var setting = {
 			list = [{label:nps.i18n("PROPERTY_CLICK_EDIT"), type:"href", content:base+'/property/updateProperty.htm?industryId='+data.industryId+'&properyId='+data.id},
                     {label:nps.i18n("PROPERTY_CLICK_STOP"), type:"jsfunc", content:"disableProp"},
                     {label:nps.i18n("PROPERTY_CLICK_DELETE"), type:"jsfunc", content:"deleteProp"},
-                    {label:nps.i18n("PROPERTY_CLICK_SETVALUE"), type:"href", content:base+"/i18n/property/propertyValueList.json?propertyId="+data.id}];
+                    {label:nps.i18n("PROPERTY_CLICK_SETVALUE"), type:"href", content:base+"/i18n/property/editPropertyValue.htm?propertyId="+data.id}];
 		}
         if(data.lifecycle == 0){
             list[1].label = nps.i18n("PROPERTY_CLICK_START");
