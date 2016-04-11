@@ -49,9 +49,11 @@ tbody input[type="text"]{
 		                <td><label><spring:message code="shop.property.group"/>:</label></td>
 		                <td>
 		                    <span id="searchkeytext">
-		                    	<input type="hidden" id="groupId" value="${groupId}" />
+		                    	<input type="hidden" id="groupId" value="${proValueGroup.id}" />
 		                    	<input type="hidden" id="propertyId" value="${propertyId}" />
-		                    	<input type="text" id="groupName" name="groupName" loxiaType="input" mandatory="false" placeholder="<spring:message code="shop.property.group"/>"></input>
+		                    	<input type="text" id="groupName" name="groupName" loxiaType="input" mandatory="false" 
+		                    		value="${proValueGroup.name}" placeholder="<spring:message code="shop.property.group"/>" 
+		                    	/>
 		                    </span>
 		                </td>
 		        	</tr>

@@ -24,6 +24,7 @@ import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
 
 /**
  * 商品属性值控制器 <br/>
@@ -113,11 +114,15 @@ public class NebulaPropertyValueController extends BaseController{
 			// 没有与属性值组绑定的属性值
 			model.addAttribute("freeProValueList", propertyValueList);
 		}else{
+
 			// 已经加入到属性值组的PropertyValue
-			// model.addAttribute("boundProValueList", propertyValueList);
+			List<PropertyValue> boundProValueList = sdkPropertyManager.findBoundGroupPropertyValue(groupId);
+			model.addAttribute("boundProValueList", boundProValueList);
 			// 还没有加入到属性值组的PropertyValue
-			// model.addAttribute("freeProValueList", propertyValueList);
-			model.addAttribute("groupId", groupId);
+			List<PropertyValue> freeProValueList = sdkPropertyManager.findFreeGroupPropertyValue(propertyId, groupId);
+			model.addAttribute("freeProValueList", freeProValueList);
+			PropertyValueGroup proValueGroup = sdkPropertyManager.findProValueGroupById(groupId);
+			model.addAttribute("proValueGroup", proValueGroup);
 		}
 		model.addAttribute("propertyId", propertyId);
 
@@ -137,17 +142,18 @@ public class NebulaPropertyValueController extends BaseController{
 			// 保存PropertyValueGroup
 			PropertyValueGroup propertyValueGroup = sdkPropertyManager.savePropertyValueGroup(propertyId, groupId, groupName);
 			groupId = propertyValueGroup.getId();
-
-			// 处理【属性值】和【属性值组】的关联
-			String[] strIds = propertyValueIds.split(",");
 			List<Long> valueIds = new ArrayList<Long>();
-			if (strIds.length > 0){
-				for (int i = 0; i < strIds.length; i++){
-					Long valueId = Long.valueOf(strIds[i].toString());
-					valueIds.add(valueId);
+			// 处理【属性值】和【属性值组】的关联
+			if (Validator.isNotNullOrEmpty(propertyValueIds)){
+				String[] strIds = propertyValueIds.split(",");
+				if (strIds.length > 0){
+					for (int i = 0; i < strIds.length; i++){
+						Long valueId = Long.valueOf(strIds[i].toString());
+						valueIds.add(valueId);
+					}
+				}else{
+					valueIds.add(Long.valueOf(propertyValueIds.toString()));
 				}
-			}else{
-				valueIds.add(Long.valueOf(propertyValueIds.toString()));
 			}
 
 			sdkPropertyManager.bindPropertyValueAndProValueGroup(valueIds, groupId);

@@ -26,6 +26,14 @@ public interface SdkPropertyManager extends BaseManager{
 	List<PropertyValueGroup> findProValueGroupByPropertyId(Long propertyId);
 
 	/**
+	 * 根据属性值组id查询他自己
+	 * 
+	 * @param groupId
+	 * @return
+	 */
+	PropertyValueGroup findProValueGroupById(Long groupId);
+
+	/**
 	 * 新建或者修改“属性值组”
 	 * 
 	 * @param propertyId

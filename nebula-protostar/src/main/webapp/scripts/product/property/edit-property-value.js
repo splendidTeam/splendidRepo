@@ -19,8 +19,9 @@ $j(document).ready(function(){
 	 * 修改属性值组
 	 */
 	$j('.updatePropertyValueGroup').click(function(data){
+		var propertyId = $j('#propertyId').val();
 		var selectedGroupId = $j('.selectedGroupId').find("option:selected").val();
-		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?groupId="+selectedGroupId +"&type=1";
+		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?propertyId="+propertyId +"&groupId="+selectedGroupId +"&type=1";
 	});
 	
 
