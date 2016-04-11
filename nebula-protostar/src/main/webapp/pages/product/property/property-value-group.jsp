@@ -49,8 +49,11 @@ tbody input[type="text"]{
 		                <td><label><spring:message code="shop.property.group"/>:</label></td>
 		                <td>
 		                    <span id="searchkeytext">
-		                    	<input type="hidden" id="groupId" value="${groupId}" />
-		                    	<input type="text" id="groupName" name="groupName" loxiaType="input" mandatory="false" placeholder="<spring:message code="shop.property.group"/>"></input>
+		                    	<input type="hidden" id="groupId" value="${proValueGroup.id}" />
+		                    	<input type="hidden" id="propertyId" value="${propertyId}" />
+		                    	<input type="text" id="groupName" name="groupName" loxiaType="input" mandatory="false" 
+		                    		value="${proValueGroup.name}" placeholder="<spring:message code="shop.property.group"/>" 
+		                    	/>
 		                    </span>
 		                </td>
 		        	</tr>
@@ -67,9 +70,8 @@ tbody input[type="text"]{
 	    <div class="ui-block-line " >
 	    	 <div class="priDiv boundPropertyValue" style="margin-left:0px;">
 	    	 	<c:forEach items="${boundProValueList}" var="propertyValue">
-		          	<span class="children-store"><input type="checkbox" value="${propertyValue.id}"/>${propertyValue.value }</span> 
+		          	<span class="children-store"><input type="checkbox" checked='checked' value="${propertyValue.id}"/>${propertyValue.value }</span> 
 	    	 	</c:forEach>
-	            <span class="children-store"><input type="checkbox" id="color" value="蓝色"/>蓝色</span> 
 	         </div>
 	    </div>
 	    

@@ -6,6 +6,7 @@ package com.baozun.nebula.sdk.manager.product;
 import java.util.List;
 
 import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
 
 /**
@@ -23,6 +24,14 @@ public interface SdkPropertyManager extends BaseManager{
 	 * @return
 	 */
 	List<PropertyValueGroup> findProValueGroupByPropertyId(Long propertyId);
+
+	/**
+	 * 根据属性值组id查询他自己
+	 * 
+	 * @param groupId
+	 * @return
+	 */
+	PropertyValueGroup findProValueGroupById(Long groupId);
 
 	/**
 	 * 新建或者修改“属性值组”
@@ -47,4 +56,25 @@ public interface SdkPropertyManager extends BaseManager{
 	 * @return
 	 */
 	boolean bindPropertyValueAndProValueGroup(List<Long> proValueIds,Long propertyValueGroupId);
+
+	/**
+	 * 查询已经加入到属性值组的PropertyValue
+	 * 
+	 * @param proValGroupId
+	 *            属性值组的Id
+	 * @return
+	 */
+	List<PropertyValue> findBoundGroupPropertyValue(Long proValGroupId);
+
+	/**
+	 * 查询还没有加入到属性值组的PropertyValue
+	 * 
+	 * @param propertyId
+	 *            对应那个属性
+	 * @param proValGroupId
+	 *            属性值组的Id
+	 * @return
+	 */
+	List<PropertyValue> findFreeGroupPropertyValue(Long propertyId,Long proValGroupId);
+
 }

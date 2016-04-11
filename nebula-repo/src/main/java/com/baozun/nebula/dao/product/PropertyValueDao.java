@@ -69,7 +69,7 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 
 	/**
 	 * 通过id查询属性值
-	 *
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -78,7 +78,7 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 
 	/**
 	 * 通过id和语言查询属性值
-	 *
+	 * 
 	 * @param id
 	 * @param lang
 	 * @return
@@ -136,27 +136,29 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	 * @return
 	 */
 	@NativeQuery(model = PropertyValue.class)
-	List<PropertyValue> findPropertyValueListByCommonPropertyId(@QueryParam("propertyId") Long propertyId,@QueryParam("commonPropertyId") Long commonPropertyId);
-	
+	List<PropertyValue> findPropertyValueListByCommonPropertyId(
+			@QueryParam("propertyId") Long propertyId,
+			@QueryParam("commonPropertyId") Long commonPropertyId);
+
 	/**
 	 * 根据commonPropertyId和属性值查询
 	 * 
 	 * @return
 	 */
 	@NativeQuery(model = PropertyValue.class)
-	List<PropertyValue> findPropertyValueByCommonPropertyIdAndValue(@QueryParam("commonPropertyId") Long commonPropertyId,@QueryParam("value") String value);
-	
-	
+	List<PropertyValue> findPropertyValueByCommonPropertyIdAndValue(
+			@QueryParam("commonPropertyId") Long commonPropertyId,
+			@QueryParam("value") String value);
+
 	@NativeQuery(model = PropertyValue.class)
 	List<PropertyValue> findPropertyValueByCommonPropertyIds(@QueryParam("commonProIds") List<Long> commonPropertyIds);
 
-	
 	/**
 	 * 根据itemcod查询propervalue id
 	 */
 	@NativeQuery(model = PropertyValue.class)
-	PropertyValue findpropervalueId(@QueryParam("mapvalue") Map<String,String> mapvalue,@QueryParam("valuecolor") String valuecolor);
-	
+	PropertyValue findpropervalueId(@QueryParam("mapvalue") Map<String, String> mapvalue,@QueryParam("valuecolor") String valuecolor);
+
 	/**
 	 * @param propertyIds
 	 * @return
@@ -165,4 +167,26 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	List<PropertyValue> findPropertyValueListByCommonPropertyIdAndPropertyId(
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("commonPropertyId") Long commonPropertyId);
+
+	/**
+	 * 查询已经加入到属性值组的PropertyValue
+	 * 
+	 * @param proValGroupId
+	 *            属性值组的Id
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	List<PropertyValue> findBoundGroupPropertyValue(@QueryParam("proValGroupId") Long proValGroupId);
+
+	/**
+	 * 查询还没有加入到属性值组的PropertyValue
+	 * 
+	 * @param propertyId
+	 *            对应那个属性
+	 * @param proValGroupId
+	 *            属性值组的Id
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	List<PropertyValue> findFreeGroupPropertyValue(@QueryParam("propertyId") Long propertyId,@QueryParam("proValGroupId") Long proValGroupId);
 }
