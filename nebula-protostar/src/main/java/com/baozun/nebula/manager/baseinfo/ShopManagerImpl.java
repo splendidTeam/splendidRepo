@@ -441,12 +441,12 @@ public class ShopManagerImpl implements ShopManager{
 	
 	
 	@Override
-	public boolean validatePropertyName(String name,String lang) {
+	public boolean validatePropertyName(Long propertyId,String name,String lang) {
 		Integer count=0;
 		if(Validator.isNotNullOrEmpty(lang)){
-			count=shopDao.findCountByPropertyNameAndLang(name, lang);
+			count=shopDao.findCountByPropertyNameAndLang(name, lang,propertyId);
 		}else{
-			count=shopDao.findCountByPropertyName(name);
+			count=shopDao.findCountByPropertyName(name,propertyId);
 		}
 		
 		return count == 0;

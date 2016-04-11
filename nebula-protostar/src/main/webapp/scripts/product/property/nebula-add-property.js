@@ -4,7 +4,7 @@ $j(document).ready(function(){
 	/**
 	 * 新增并且启用按钮
 	 */
-	$j(".button-line .button.orange.insert").click(function(){	
+	$j(".button-line .button.orange.insert").click(function(){
 		var name=$j("#name").val();		
 		if($j.trim(name)==""){
 			nps.error(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_COMMONPROPERTYNAME_EMPTYSTATUS"));
@@ -23,12 +23,13 @@ $j(document).ready(function(){
 				}
 			});
 			
-			
 			if(flag){
 				nps.error(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_COMMONPROPERTYNAME_EMPTYSTATUS"));
 				return;
 			}
 		}
+		
+		var propertyId=-1;
 		
 		var isColorProp = $j('#isColorProp').val();
 		if(isColorProp == 'true'){
@@ -41,12 +42,12 @@ $j(document).ready(function(){
 			}
 		}
 		
-		if(name!=""){	
+		if(name!=""){
 			var originalName =null;
 			var defualt = "";
 			var json={};
 			if(i18nOnOff){
-				var multlangs = '{"property.id":"-1"';
+				var multlangs = '{"property.id":'+propertyId;
 		    	multlangs += ',"property.editingType":"' +  $j("#editingType").attr("value")+'"';
 		    	multlangs += ',"property.isSaleProp":"' + $j("#isSaleProp").attr("value")+'"';
 		    	multlangs += ',"property.valueType":"' + $j("#valueType").attr("value")+'"';
@@ -63,7 +64,7 @@ $j(document).ready(function(){
 		    		if (null == val || "" == val) {
 		    			validate = true;
 		  		    }
-					if(!validatePropertyNameMutlLang(val,lang)){
+					if(!validatePropertyNameMutlLang(propertyId,val,lang)){
 						exit = true;
 					}
 		    		if(defaultlang==lang){
@@ -102,12 +103,12 @@ $j(document).ready(function(){
 				
 				defualt = name;
 				
-				if(!validatePropertyName(name)){
+				if(!validatePropertyName(propertyId,name)){
 					nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_EXIST"));
 					return false;
 				}
 				json={
-					    "property.id": -1,
+					    "property.id": propertyId,
 					    "property.name.value" : name,
 				        "property.name.lang" : "zh_cn",
 					    "property.editingType": $j("#editingType").attr("value"),
@@ -127,7 +128,7 @@ $j(document).ready(function(){
   			if(backWarnEntity.isSuccess){
   				var property = backWarnEntity.description;
   				
-  				var editingType=$j("#editingType").attr("value")  				
+  				var editingType=$j("#editingType").attr("value");
   				if(editingType==1||editingType==5){
   					window.location.href=base+"/property/nebulaPropertyList.htm";
   				}else{
@@ -136,7 +137,7 @@ $j(document).ready(function(){
   			}
 		}else{
 			nps.error(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_NAME"));
-		}	
+		}
 	});
 	
 });

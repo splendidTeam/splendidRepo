@@ -402,6 +402,7 @@
 						t_pd_property
 					where
 						name = :propertyName
+						and id <> :propertyId
                  ]]>
 			</value>
 		</constructor-arg>
@@ -419,6 +420,7 @@
 					where
 						name = :propertyName
 						and lang =:lang
+						and property_id <> :propertyId
                  ]]>
 			</value>
 		</constructor-arg>

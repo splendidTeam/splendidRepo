@@ -24,10 +24,10 @@
     <div class="ui-block" style="padding-left: 10px;">
 	   <div class="width-percent100">
     		<form name="userForm" action="" method="post">
-    			 <input name="propertyId" type="hidden" value="${property.id }" id="propertyId"/>
+    			<input name="propertyId" type="hidden" value="${property.id }" id="propertyId"/>
+    			<input name="lifecycle" type="hidden" value="${property.lifecycle }" id="lifecycle"/>
 				<div class="ui-block-title1"><spring:message code="shop.property.modify"/></div>
 				<div class="ui-block-content border-grey" style="margin-bottom: 10px;">
-				
 			        <c:if test="${i18nOnOff == true}">
 				    	<c:forEach items="${propertyLangs}" var="i18nLang">
 						    <div class="ui-block-line">
@@ -57,7 +57,7 @@
 				    <div class="ui-block-line">
 				         <label><spring:message code="shop.property.edit.type"/></label>
 				         <div class="wl-right">
-				          <opt:select name="editingType" id="editingType"  expression="chooseOption.EDITING_TYPE" defaultValue="1" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
+				          <opt:select name="editingType" id="editingType"  expression="chooseOption.EDITING_TYPE" defaultValue="${property.editingType }" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
 						</div>
 				    </div>
 					
@@ -65,110 +65,74 @@
 				    <div class="ui-block-line">
 				         <label><spring:message code="shop.property.valuetype"/></label>
 				         <div class="wl-right">
-				            <opt:select name="valueType" id="valueType" expression="chooseOption.VALUE_TYPE" defaultValue="1" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
+				            <opt:select name="valueType" id="valueType" expression="chooseOption.VALUE_TYPE" defaultValue="${property.valueType }" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
 				         </div>
 				    </div>
 				    
 				    <div class="ui-block-line">
 				         <label><spring:message code="shop.property.issale"/></label>
 				         <div class="wl-right">
-				         	    		<opt:select name="isSaleProp"  id="isSaleProp"  expression="chooseOption.TRUE_OR_FALSE" defaultValue="false" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
+				         	    		<opt:select name="isSaleProp"  id="isSaleProp"  expression="chooseOption.TRUE_OR_FALSE" defaultValue="${property.isSaleProp }" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
 				         </div>
 				    </div>
 					
 					<div class="ui-block-line">
 				         <label><spring:message code="shop.property.iscolor"/></label>
 				         <div class="wl-right">		
-				    			<opt:select name="isColorProp" id="isColorProp" expression="chooseOption.TRUE_OR_FALSE" defaultValue="false" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
+				    			<opt:select name="isColorProp" id="isColorProp" expression="chooseOption.TRUE_OR_FALSE" defaultValue="${property.isColorProp }" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
 				    			</select>
 				         </div>
 				    </div>
-				    <br/>
-				    <div class="ui-block-line">
-						<label><spring:message code="shop.property.otherIndustrys"/></label>
-						<div class="wl-right" style="margin-top: 5px;">
-								         	<b id="Industrys"></b>
-						</div>
-					</div>
-					<br/><br/>
-					<b style="font-size: 15px;">扩展描述</b>:
-					<br/><br/>
-					 <c:if test="${i18nOnOff == true}">
-			    	<c:forEach items="${i18nLangs}" var="i18nLang">
-				    <div class="ui-block-line">
-				         <label><spring:message code="shop.property.name"/></label>
-				         <div class="wl-right">
-				              <input name="name" type="text" loxiaType="input" id="proname" class="mutl-lang-name" value="" lang="${i18nLang.key}" mandatory="true" size="50"/>
-					          <span>${i18nLang.value}</span>
-				         </div>
-				    </div>
-				    </c:forEach>
-				    </c:if>
-				    <c:if test="${i18nOnOff == false}">
-					     <div class="ui-block-line">
-					         <label><spring:message code="shop.property.showname"/></label>
-					         <div class="wl-right">
-					              <input name="name" type="text" loxiaType="input" id="proname" value="" mandatory="true" size="50" placeholder="<spring:message code="shop.property.name"/>"/>
-<!-- 					              <input type="button" value="选择" class="choosebuuton"/> -->
-					         </div>
-					    </div>
-					  </c:if>
+					
 					<div class="ui-block-line">
 				         <label><spring:message code="shop.property.isoutput.necessary"/></label>
 				         <div class="wl-right">
-				            <opt:select name="required" id="required" expression="chooseOption.TRUE_OR_FALSE" defaultValue="false" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
+				            <opt:select name="required" id="required" expression="chooseOption.TRUE_OR_FALSE" defaultValue="${property.required }" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
 				         </div>
 				    </div>
 					
 					<div class="ui-block-line">
 				         <label><spring:message code="shop.property.issearch"/></label>
 				         <div class="wl-right">
-				           <opt:select name="searchable" id="searchable" expression="chooseOption.TRUE_OR_FALSE" defaultValue="true" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
+				           <opt:select name="searchable" id="searchable" expression="chooseOption.TRUE_OR_FALSE" defaultValue="${property.searchable }" otherProperties="loxiaType=\"select\" style=\"width:30%;float:left;\" "/>
 			
 				         </div>
 				    </div>
 					
 				    <c:if test="${i18nOnOff == true}">
-			    	<c:forEach items="${i18nLangs}" var="i18nLang">
-					<div class="ui-block-line">
-				         <label><spring:message code="shop.property.groupname" /></label>
-				         <div class="wl-right">
-				             <input name="groupName"  type="text" class="mutl-lang-groupName" lang="${i18nLang.key}" loxiaType="input" value=""  size="50" placeholder="<spring:message code="shop.property.lable.groupname" />"/>
-				         	 <span>${i18nLang.value}</span>
-				         </div>
-				    </div>
-				    </c:forEach>
+				    	<c:forEach items="${propertyLangs}" var="i18nLang">
+						    <div class="ui-block-line">
+						         <label><spring:message code="shop.property.groupname"/></label>
+						         <div class="wl-right">
+						            <input name="groupName" placeholder="<spring:message code="shop.property.groupname"/>" type="text" loxiaType="input" id="groupName" class="mutl-lang-groupName" value="${i18nLang.groupName }" lang="${i18nLang.lang}" mandatory="true" size="50"/>
+							     	<span><c:forEach items="${i18nLangs}" var="lang"><c:if test="${i18nLang.lang eq lang.key }">${lang.value}</c:if></c:forEach></span>
+						         </div>
+						    </div>
+					    </c:forEach>
 				    </c:if>
-				    
-				     <c:if test="${i18nOnOff == false}">
+				    <c:if test="${i18nOnOff == false}">
 					    <div class="ui-block-line">
 					         <label><spring:message code="shop.property.groupname" /></label>
 					         <div class="wl-right">
-					             <input name="groupName" id="groupName" type="text" loxiaType="input" value=""  size="50" placeholder="<spring:message code="shop.property.lable.groupname" />"/>
+					             <input name="groupName" id="groupName" type="text" loxiaType="input" value="${property.groupName }"  size="50" placeholder="<spring:message code="shop.property.lable.groupname" />"/>
 					         </div>
 					    </div>
-					    </c:if>
-					    	
-							<div id="categoryMenuContent" class="menuContent"
-												style="display: none; background-color: #f0f6e4; border: 1px solid #617775; padding: 3px;">
-												<ul id="categoryDemo" class="ztree"
-													style="margin-top: 0; width: 180px; height: 100%;"></ul>
-							</div>
+				    </c:if>
 			    </div>
 	    	</form>
 	   </div>
     </div>
 
 	
-	    <div class="button-line">
-	        <input type="button" value="<spring:message code="system.property.update"/>" class="button orange add" style="display:none" title="<spring:message code="system.property.update"/>"/>
-	        <input type="button" value="<spring:message code="system.property.insert"/>" class="button orange add" style="display:none" title="<spring:message code="system.property.insert"/>"/>
-	       	<input type="button" value="<spring:message code="shop.update.update"/>" class="button orange add" style="display:none" title="<spring:message code="shop.update.update"/>"/>
-	        <input type="button" value="<spring:message code="btn.disable"/>" class="button orange add" style="display:none" title="<spring:message code="btn.disable"/>"/>
-	          
-	        <input type="button" value="<spring:message code="btn.return"/>" class="button return_button" title="<spring:message code="btn.return"/>"/>
-	        <input type="button" value="<spring:message code="system.property.setvalue"/>" class="button" id="propertyValue_button" title="<spring:message code="system.property.setvalue"/>"/>
-	    </div>
+    <div class="button-line">
+        <input type="button" value="<spring:message code="system.property.update"/>" class="button orange add" <c:if test="${property.lifecycle == 1}">style="display:none"</c:if> title="<spring:message code="system.property.update"/>"/>
+       	<input type="button" value="<spring:message code="shop.update.update"/>" class="button orange add" <c:if test="${property.lifecycle != 1}">style="display:none"</c:if> title="<spring:message code="shop.update.update"/>"/>
+        <input type="button" value="<spring:message code="btn.disable"/>" class="button orange add" <c:if test="${property.lifecycle != 1}">style="display:none;"</c:if> title="<spring:message code="btn.disable"/>"/>
+        <input type="button" value="<spring:message code="btn.return"/>" class="button return_button" title="<spring:message code="btn.return"/>"/>
+        <c:if test="${property.editingType ==2 || property.editingType ==3 || property.editingType ==4}">
+        	<input type="button" value="<spring:message code="system.property.setvalue"/>" class="button" id="propertyValue_button" title="<spring:message code="system.property.setvalue"/>"/>
+        </c:if>
+    </div>
     
 </div>
 </div>

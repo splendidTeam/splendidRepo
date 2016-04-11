@@ -216,17 +216,17 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	
 	
 	/**
-	 * 根据属性名查询属性的数量
+	 * 根据属性名查询属性的数量,并排除当前属性id
 	 * @return Integer
 	 * @param propertyName
 	 * @author 冯明雷
 	 * @time 2016年4月8日下午4:11:23
 	 */
 	@NativeQuery(clazzes = Integer.class, alias = "COUNT")
-	Integer findCountByPropertyName(@QueryParam("propertyName") String propertyName);
+	Integer findCountByPropertyName(@QueryParam("propertyName") String propertyName,@QueryParam("propertyId") Long propertyId);
 
 	/**
-	 * 根据属性名和语言查询属性的数量
+	 * 根据属性名和语言查询属性的数量,并排除当前属性id
 	 * @return Integer
 	 * @param propertyName
 	 * @param lang
@@ -234,7 +234,7 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	 * @time 2016年4月8日下午4:11:48
 	 */
 	@NativeQuery(clazzes = Integer.class, alias = "COUNT")
-	Integer findCountByPropertyNameAndLang(@QueryParam("propertyName") String propertyName,@QueryParam("lang")String lang);
+	Integer findCountByPropertyNameAndLang(@QueryParam("propertyName") String propertyName,@QueryParam("lang")String lang,@QueryParam("propertyId") Long propertyId);
 	
 	
 	

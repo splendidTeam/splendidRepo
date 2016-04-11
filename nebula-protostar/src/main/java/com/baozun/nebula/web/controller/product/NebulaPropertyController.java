@@ -16,7 +16,6 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,41 +23,32 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.command.PropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
-import com.baozun.nebula.command.product.CommonPropertyCommand;
-import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
-import com.baozun.nebula.manager.product.IndustryManager;
 import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.PropertyManager;
-import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyLang;
-import com.baozun.nebula.model.product.PropertyValue;
-import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.utils.query.bean.QueryBean;
-import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.I18nCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 商品属性controller
@@ -195,7 +185,7 @@ public class NebulaPropertyController extends BaseController{
 		}
 		
 		if(flag){
-			throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_QUOTE);
+			throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DELETION_QUOTE);
 		}
 		
 		Integer result = propertyManager.removePropertyByIds(ids);
@@ -241,7 +231,7 @@ public class NebulaPropertyController extends BaseController{
 	
 	
 	/**
-	 * 根据属性名和语言验证，如果语言为空只验证属性名
+	 * 根据属性名和语言、属性id验证，如果语言为空只验证属性名并排除当前的属性id
 	 * @return BackWarnEntity
 	 * @param name 属性名
 	 * @param lang 语言：可以为空，如果为空只验证属性名
@@ -250,13 +240,16 @@ public class NebulaPropertyController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/shop/nebulaValidatePropertyName.json")
-	public BackWarnEntity validatePropertyName(@RequestParam("name") String name,@RequestParam(value="lang",required=false) String lang){
-		boolean result = shopManager.validatePropertyName(name, lang);
+	public BackWarnEntity validatePropertyName(
+			@RequestParam(required=true,value="propertyId") Long propertyId,
+			@RequestParam(required=true,value="name") String name,
+			@RequestParam(required=false,value="lang") String lang){
+		boolean result = shopManager.validatePropertyName(propertyId,name, lang);
 		if (!result){
 			return FAILTRUE;
 		}
-
 		return SUCCESS;
+		
 	}	
 	
 	
@@ -303,11 +296,7 @@ public class NebulaPropertyController extends BaseController{
 			List<PropertyLang> propertyLangs =propertyManager.findPropertyLongByPropertyId(propertyId);			
 			model.addAttribute("propertyLangs", propertyLangs);
 		}
-		
 		return "product/property/nebula-update-property";
 	}
-	
-	
-	
 	
 }

@@ -726,13 +726,13 @@ public class PropertyManagerImpl implements PropertyManager{
 			com.baozun.nebula.command.product.PropertyCommand propertyCommand) {
 		Property property = null;
 		if (propertyCommand.getId() != null && propertyCommand.getId() != -1) {
-			property = findPropertyById(propertyCommand.getId());
+			property = propertyDao.findPropertyByPropertyId(propertyCommand.getId());
 		}else{
 			property = new Property();
 			property.setCreateTime(new Date());
 		}
 		
-		property.setModifyTime(new Date());		
+		property.setModifyTime(new Date());
 		property.setEditingType(propertyCommand.getEditingType());
 		property.setIsColorProp(propertyCommand.getIsColorProp());
 		property.setIsSaleProp(propertyCommand.getIsSaleProp());
