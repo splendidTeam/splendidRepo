@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.product.PropertyValueGroupDao;
 import com.baozun.nebula.dao.product.PropertyValueGroupRelationDao;
+import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.model.product.PropertyValueGroupRelation;
 import com.feilong.core.Validator;
@@ -53,7 +54,7 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 	public PropertyValueGroup savePropertyValueGroup(Long propertyId,Long groupId,String groupName){
 		PropertyValueGroup group = new PropertyValueGroup();
 
-		if (Validator.isNullOrEmpty(groupId)){
+		if (Validator.isNotNullOrEmpty(groupId)){
 			group.setId(groupId);
 			group.setVersion(new Date());
 		}else{
@@ -87,5 +88,23 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 		}
 		
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findBoundGroupPropertyValue(java.lang.Long)
+	 */
+	@Override
+	public List<PropertyValue> findBoundGroupPropertyValue(Long proValGroupId){
+		
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findFreeGroupPropertyValue(java.lang.Long, java.lang.Long)
+	 */
+	@Override
+	public List<PropertyValue> findFreeGroupPropertyValue(Long propertyId,Long proValGroupId){
+		
+		return null;
 	}
 }

@@ -119,6 +119,7 @@ public class NebulaPropertyValueController extends BaseController{
 			// model.addAttribute("freeProValueList", propertyValueList);
 			model.addAttribute("groupId", groupId);
 		}
+		model.addAttribute("propertyId", propertyId);
 
 		return "/product/property/property-value-group";
 	}
