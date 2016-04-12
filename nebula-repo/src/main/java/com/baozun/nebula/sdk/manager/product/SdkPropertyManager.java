@@ -83,7 +83,7 @@ public interface SdkPropertyManager extends BaseManager{
 	List<PropertyValue> findFreeGroupPropertyValue(Long propertyId,Long proValGroupId);
 
 	/**
-	 * 分页查询属性值（i18n）【propertyId 和 proValueGroupId 必须有一个不为空】
+	 * 分页查询属性值（i18n）
 	 * 
 	 * @param page
 	 * @param sorts
@@ -98,11 +98,11 @@ public interface SdkPropertyManager extends BaseManager{
 	/**
 	 * 添加或修改属性值
 	 * 
-	 * @param propertyId
-	 *            属性id
+	 * @param groupId
+	 *            属性值组id
 	 * @param propertyValues
 	 *            属性值对象
 	 * @return
 	 */
-	void addOrUpdatePropertyValue(Long propertyId,PropertyValueCommand propertyValues);
+	void addOrUpdatePropertyValue(Long groupId,PropertyValueCommand propertyValues);
 }

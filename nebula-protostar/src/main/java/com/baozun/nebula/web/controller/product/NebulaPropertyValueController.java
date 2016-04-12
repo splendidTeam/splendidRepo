@@ -103,8 +103,8 @@ public class NebulaPropertyValueController extends BaseController{
 	 * @param model
 	 * @param request
 	 * @param response
-	 * @param propertyId
-	 *            属性id
+	 * @param groupId
+	 *            属性值组id
 	 * @param propertyValues
 	 *            属性值
 	 * @return
@@ -115,11 +115,11 @@ public class NebulaPropertyValueController extends BaseController{
 			Model model,
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@RequestParam("propertyId") Long propertyId,
+			@RequestParam(value = "groupId",required = false) Long groupId,
 			@I18nCommand PropertyValueCommand propertyValues){
 
 		try{
-			sdkPropertyManager.addOrUpdatePropertyValue(propertyId, propertyValues);
+			sdkPropertyManager.addOrUpdatePropertyValue(groupId, propertyValues);
 		}catch (Exception e){
 			LOGGER.error("", e);
 			return FAILTRUE;
@@ -127,12 +127,23 @@ public class NebulaPropertyValueController extends BaseController{
 		return SUCCESS;
 	}
 
-	// @ResponseBody
-	// @RequestMapping(value = "/member/memberFavoritesList.json")
-	public Pagination<PropertyValueCommand> memberFavoritesJson(
+	/**
+	 * 分页查询属性值（i18n）
+	 * 
+	 * @param model
+	 * @param propertyId
+	 *            属性id
+	 * @param proValueGroupId
+	 *            属性值组id
+	 * @param queryBean
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/findPropertyValueByPage.json")
+	public Pagination<PropertyValueCommand> findPropertyValueByPage(
 			Model model,
-			@RequestParam(value = "propertyId") Long propertyId,
-			@RequestParam(value = "proValueGroupId") Long proValueGroupId,
+			@RequestParam(value = "propertyId",required = true) Long propertyId,
+			@RequestParam(value = "proValueGroupId",required = false) Long proValueGroupId,
 			@QueryBeanParam QueryBean queryBean){
 
 		Pagination<PropertyValueCommand> result = sdkPropertyManager.findPropertyValueByPage(

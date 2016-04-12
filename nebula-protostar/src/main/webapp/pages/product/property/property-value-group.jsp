@@ -37,7 +37,7 @@ tbody input[type="text"]{
 
 <div class="content-box width-percent100">
 	<div class="ui-title1">
-		<img src="${base}/images/wmi/blacks/32x32/wrench.png"><spring:message code="system.property.manager"/>
+		<img src="${base}/images/wmi/blacks/32x32/wrench.png"><spring:message code="system.property.manager"/>--【${property.name }】
         <input type="button" value="<spring:message code='btn.return'/>" class="button return"  title="<spring:message code='btn.return'/>" />
 		<input type="button" value="<spring:message code='btn.save'/>" class="button orange submit" title="<spring:message code='btn.save'/>"/>
     </div>

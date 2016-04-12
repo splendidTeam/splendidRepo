@@ -3,6 +3,7 @@
  */
 package com.baozun.nebula.sdk.manager.product;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
+import com.baozun.nebula.command.i18n.SingleLang;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.dao.product.PropertyDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
@@ -148,9 +151,84 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 	 * java.lang.Long, java.lang.Long)
 	 */
 	@Override
-	public Pagination<PropertyValueCommand> findPropertyValueByPage(Page page,Sort[] sorts,Long propertyId,Long proValueGroupId){
+	public Pagination<PropertyValueCommand> findPropertyValueByPage(Page page,Sort[] sorts,Long propertyId,Long proValGroupId){
 
-		return null;
+		Pagination<PropertyValue> propertyValues = propertyValueDao.findPropertyValueWithPage(page, sorts, propertyId, proValGroupId);
+
+		// List<PropertyValue> pvs = propertyValueDao.findPropertyValueListById(propertyId);
+
+		if (Validator.isNullOrEmpty(propertyValues)){
+			return null;
+		}
+		List<PropertyValue> proValues = propertyValues.getItems();
+
+		List<PropertyValueCommand> proValCommands = new ArrayList<PropertyValueCommand>();
+		List<Long> pvIds = new ArrayList<Long>();
+
+		// 将PropertyValue转换为PropertyValueCommand
+		for (PropertyValue propertyValue : proValues){
+			PropertyValueCommand pvc = new PropertyValueCommand();
+			LangProperty.I18nPropertyCopyToSource(propertyValue, pvc);
+
+			Long pvId = propertyValue.getId();
+			pvIds.add(pvId);
+
+			proValCommands.add(pvc);
+		}
+
+		/**
+		 * 查询属性值对应的国际化
+		 */
+		List<PropertyValueLang> propertyLangs = propertyValueDao.findPropertyValueLangByPvids(pvIds, MutlLang.i18nLangs());
+		
+		if (Validator.isNullOrEmpty(propertyLangs)){
+
+//			return proValCommands;
+
+		}
+		//Map[key：属性值id]
+		Map<Long, List<PropertyValueLang>> map = new HashMap<Long, List<PropertyValueLang>>();
+		for (PropertyValueLang propertyLang : propertyLangs){
+			Long pid = propertyLang.getPropertyValueId();
+			if (map.containsKey(pid)){
+				map.get(pid).add(propertyLang);
+			}else{
+				List<PropertyValueLang> pls = new ArrayList<PropertyValueLang>();
+				pls.add(propertyLang);
+				map.put(pid, pls);
+			}
+		}
+		
+		for (int i = 0; i < proValCommands.size(); i++){
+			PropertyValueCommand pvc = proValCommands.get(i);
+			
+			Long pvId = pvc.getId();
+			List<PropertyValueLang> pls = map.get(pvId);
+			if (Validator.isNullOrEmpty(pls)){
+				continue;
+			}
+			// 名称
+			String[] values = new String[MutlLang.i18nSize()];
+			String[] langs = new String[MutlLang.i18nSize()];
+			for (int j = 0; j < pls.size(); j++){
+				PropertyValueLang propertyLang = pls.get(j);
+				values[j] = propertyLang.getValue();
+				langs[j] = propertyLang.getLang();
+			}
+			MutlLang mutlLang = new MutlLang();
+			mutlLang.setValues(values);
+			mutlLang.setLangs(langs);
+			pvc.setValue(mutlLang);
+		}
+		
+		Pagination<PropertyValueCommand>  result = new Pagination<PropertyValueCommand>(proValCommands, propertyValues.getCount());
+		result.setCurrentPage(propertyValues.getCurrentPage());
+		result.setSize(propertyValues.getSize());
+		result.setSortStr(propertyValues.getSortStr());
+		result.setTotalPages(propertyValues.getTotalPages());
+		result.setStart(propertyValues.getStart());
+		
+		return result;
 	}
 
 	/*
@@ -159,8 +237,9 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 	 * com.baozun.nebula.command.product.PropertyValueCommand)
 	 */
 	@Override
-	public void addOrUpdatePropertyValue(Long propertyId,PropertyValueCommand propertyValues){
+	public void addOrUpdatePropertyValue(Long groupId,PropertyValueCommand propertyValues){
 
+		Long propertyId = propertyValues.getPropertyId();
 		Property property = propertyDao.getByPrimaryKey(propertyId);
 		if (Validator.isNullOrEmpty(property)){
 			return;
@@ -210,24 +289,37 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 			 */
 			Calendar calendar = Calendar.getInstance();
 			Date date = calendar.getTime();
-			
+			Integer no = propertyValueDao.findMaxSortNoByPropertyId(propertyId);
+
+			sortNo = Validator.isNotNullOrEmpty(no) ? no + 1 : 1;
+
 			PropertyValue pv = new PropertyValue();
 			pv.setValue(valueLang.getDefaultValue());
+			pv.setSortNo(sortNo);
 			pv.setModifyTime(date);
 			pv.setCreateTime(date);
 			pv.setPropertyId(propertyId);
 			pv = propertyValueDao.save(pv);
 
-			Long pvid = pv.getId();
+			propertyValueId = pv.getId();
 			for (int j = 0; j < values.length; j++){
 				String val = values[j];
 				String lang = langs[j];
+
 				PropertyValueLang pvl = new PropertyValueLang();
-				pvl.setPropertyValueId(pvid);
+				pvl.setPropertyValueId(propertyValueId);
 				pvl.setLang(lang);
 				pvl.setValue(val);
 				propertyValueLangDao.save(pvl);
 			}
 		}
+
+		if (Validator.isNotNullOrEmpty(groupId)){
+			PropertyValueGroupRelation relation = new PropertyValueGroupRelation();
+			relation.setProValueId(propertyValueId);
+			relation.setProValGroupId(groupId);
+			propertyValueGroupRelationDao.save(relation);
+		}
+
 	}
 }

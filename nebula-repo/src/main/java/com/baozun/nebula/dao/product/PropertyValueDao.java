@@ -23,9 +23,13 @@ import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
+import com.baozun.nebula.model.system.InstationMessageTemplate;
 
 /**
  * @author wenxiu.ke
@@ -189,4 +193,33 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	 */
 	@NativeQuery(model = PropertyValue.class)
 	List<PropertyValue> findFreeGroupPropertyValue(@QueryParam("propertyId") Long propertyId,@QueryParam("proValGroupId") Long proValGroupId);
+
+	/**
+	 * 根据属性id查询属性值排序的最大值
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@NativeQuery(alias = "CNT",clazzes = Integer.class)
+	Integer findMaxSortNoByPropertyId(@QueryParam("propertyId") Long propertyId);
+
+	/**
+	 * 分页查询属性值
+	 * 
+	 * @param page
+	 * @param sorts
+	 * @param propertyId
+	 *            属性id
+	 * @param proValueGroupId
+	 *            属性值组id
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	Pagination<PropertyValue> findPropertyValueWithPage(
+			Page page,
+			Sort[] sorts,
+			@QueryParam("propertyId") Long propertyId,
+			@QueryParam("proValGroupId") Long proValGroupId);
+
 }
