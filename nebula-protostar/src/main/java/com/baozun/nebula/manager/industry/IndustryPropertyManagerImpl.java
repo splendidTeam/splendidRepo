@@ -86,7 +86,7 @@ public class IndustryPropertyManagerImpl implements IndustryPropertyManager{
 				}
 			}
 			for (int i = 0; i < propertyCommandList.size(); i++){
-				com.baozun.nebula.command.product.PropertyCommand propertyCommand = propertyCommandList.get(i);
+				PropertyCommand propertyCommand = propertyCommandList.get(i);
 				Long pid = propertyCommand.getId();
 				List<PropertyLang> pls = map.get(pid);
 				if (Validator.isNullOrEmpty(pls)){
@@ -120,7 +120,7 @@ public class IndustryPropertyManagerImpl implements IndustryPropertyManager{
 		}else{
 			for (int i = 0; i < propertyCommandList.size(); i++){
 				Property property = PropertyList.get(i);
-				com.baozun.nebula.command.product.PropertyCommand propertyCommand = propertyCommandList.get(i);
+				PropertyCommand propertyCommand = propertyCommandList.get(i);
 				// 名称
 				SingleLang singleLang = new SingleLang();
 				singleLang.setValue(property.getName());

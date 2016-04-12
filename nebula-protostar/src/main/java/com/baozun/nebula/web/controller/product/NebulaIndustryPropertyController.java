@@ -39,6 +39,11 @@ public class NebulaIndustryPropertyController extends BaseController{
 	@Autowired
 	private IndustryPropertyManager industryPropertyManager;
 	
+	/**
+	 * 读取行业信息，并返回到行业属性关联页面
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping("/industry/industry-property.htm")
 	public String showIndustryProperty(Model model){
 		List<Industry> list = industryManager.findAllIndustryList();
@@ -153,6 +158,9 @@ public class NebulaIndustryPropertyController extends BaseController{
 			try {
 				boolean flag = industryPropertyManager.updateIndustryPropertySort(industryId, str);
 				result.setIsSuccess(flag);
+				if(flag == false){
+					result.setErrorCode(2);
+				}
 				return result;
 			} catch (Exception e) {
 				LOG.error("dberror:update industryPropertySort error");

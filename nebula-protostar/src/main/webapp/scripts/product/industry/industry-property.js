@@ -31,7 +31,9 @@ $j.extend(loxia.regional['zh-CN'],{
 	"SYSTEM_PROPERTY_COMMONPROPERTYNAME_REPEAT":"通用属性名称已存在!",
 	"SYSTEM_PROPERTY_COMMONPROPERTYNAME_EMPTYSTATUS":"通用属性名称不能为空!",
 	"SYSTEM_PROPERTY_ISEXIT_INITEM":"有商品已关联此属性！",
-	"SYSTEM_PROPERTY_DELETE_ERROR":"删除属性失败！"
+	"SYSTEM_PROPERTY_DELETE_ERROR":"删除属性失败！",
+	"SYSTEM_INDUSTRY_PROPERTY_RELATION_ERROR":"行业属性关联失败",
+	"SYSTEM_PROPERTY_SORT_FAIL":"更新排序失败"
 });
 
 var setting = {
@@ -107,9 +109,14 @@ $j(document).ready(function(){
 				var json ={"ids":str,"industryId":industryId};
 				var backWarnEntity = loxia.syncXhr(base+'/industry/updateIndustryPropertySortBylist.json',json,{type: "GET"});
 				if(backWarnEntity.isSuccess){
-					nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_SORT_SUCCRSS"));	
+					nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_SORT_SUCCRSS"));
+					
 				}else{
-					nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_ERROR"));
+					if(backWarnEntity.errorCode == 2){
+						nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_SORT_FAIL"));
+					}else{
+						nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_ERROR"));
+					}
 				}
 			}
 		}
@@ -135,9 +142,10 @@ function getProperty(){
 			$j("#industryPropertyDiv").html(name+nps.i18n("SYSTEM_PROPERTY_INDUSTY_LIST"));
 			jsonArray2 = backWarnEntity.description.selected;
 			var jsonArray1 = backWarnEntity.description.enableSelect;
-			
 			showIndustyProperty(jsonArray2);
 			showEnableSelectProperty(jsonArray1);
+  		 }else{
+  			nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_ERROR"));
   		 }
 	}else{
 		  nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_SELECT_INDUSTRY"));
@@ -210,7 +218,7 @@ function showEnableSelectProperty(array2){
 	  		if(backWarnEntity.isSuccess){
 	  			getProperty();
 	  		}else{
-	  			nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_PROPERTY_SELECT_INDUSTRY"));
+	  			nps.info(nps.i18n("SYSTEM_PROPERTY_MESSAGE"),nps.i18n("SYSTEM_INDUSTRY_PROPERTY_RELATION_ERROR"));
 	  		}
 		}
 	});

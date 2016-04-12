@@ -12,7 +12,7 @@
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
 <script type="text/javascript" src="${base}/scripts/dragarraylist.js"></script>
 <script type="text/javascript" src="${base}/scripts/product/property/common-property.js"></script>
-<script type="text/javascript" src="${base}/scripts/product/industry/industry-property.js?v=25"></script>
+<script type="text/javascript" src="${base}/scripts/product/industry/industry-property.js?v=30"></script>
 <script src="${base}/scripts/layer/layer.js"></script>
 <SCRIPT type="text/javascript">	
 //<spring:message code="industry.list.expand"/>ROOT
