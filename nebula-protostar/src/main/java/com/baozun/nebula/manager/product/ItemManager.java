@@ -79,7 +79,7 @@ public interface ItemManager extends BaseManager {
 	 * @param industryUd
 	 * @return
 	 */
-	List<DynamicPropertyCommand> findDynamicPropertisNew(Long shopId,
+	List<DynamicPropertyCommand> findDynamicPropertisWidthoutCommonProperty(Long shopId,
 			Long industryId);
 	/**
 	 * 保存商品

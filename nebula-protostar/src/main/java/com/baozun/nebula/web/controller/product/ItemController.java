@@ -238,8 +238,6 @@ public class ItemController extends BaseController{
 		model.addAttribute("pdValidCode", pdValidCode);
 		model.addAttribute("categoryList", categoryList);
 		model.addAttribute("isStyleEnable", isEnableStyle());
-		//测试
-		model.addAttribute("now", System.currentTimeMillis());
 		return "/product/item/add-item";
 	}
 
@@ -374,7 +372,7 @@ public class ItemController extends BaseController{
 			shopId = shopCommand.getShopid();
 		}
 		// 根据行业Id和店铺Id查找对应属性和属性值
-		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisNew(shopId, industryId);
+		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisWidthoutCommonProperty(shopId, industryId);
 		return dynamicPropertyCommandList;
 	}
 
@@ -1753,8 +1751,6 @@ public class ItemController extends BaseController{
 		model.addAttribute("itemCodeValidMsg", itemCodeValidMsg);
 		String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
 		model.addAttribute("pdValidCode", pdValidCode);
-		//测试
-		model.addAttribute("now", System.currentTimeMillis());
 		return "/product/item/update-item";
 	}
 

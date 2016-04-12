@@ -352,8 +352,8 @@ public class ItemManagerImpl implements ItemManager{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<DynamicPropertyCommand> findDynamicPropertisNew(Long shopId,Long industryId){
-		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopIdNew(industryId, shopId, null);
+	public List<DynamicPropertyCommand> findDynamicPropertisWidthoutCommonProperty(Long shopId,Long industryId){
+		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopIdWidthoutCommonProperty(industryId, shopId, null);
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = new ArrayList<DynamicPropertyCommand>();
 		List<PropertyValue> propertyValueList;
 		Long propertyId;

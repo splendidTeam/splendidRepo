@@ -13,7 +13,7 @@
 <script type="text/javascript">	
 var itemCodeValidMsg = "${itemCodeValidMsg}";
 </script>
-<script type="text/javascript" src="${base}/scripts/product/item/add-item.js?v=${now}"></script>
+<script type="text/javascript" src="${base}/scripts/product/item/add-item.js"></script>
 <SCRIPT type="text/javascript">
 var pdValidCode = "${pdValidCode}";
 var zNodes =

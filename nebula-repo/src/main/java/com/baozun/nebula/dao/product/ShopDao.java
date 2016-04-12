@@ -72,7 +72,7 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	 * @return
 	 */
 	@NativeQuery(model = Property.class)
-	List<Property> findPropertyListByIndustryIdAndShopIdNew(@QueryParam("industryId") Long industryId, @QueryParam("shopId") Long shopId, Sort[] sorts);
+	List<Property> findPropertyListByIndustryIdAndShopIdWidthoutCommonProperty(@QueryParam("industryId") Long industryId, @QueryParam("shopId") Long shopId, Sort[] sorts);
 	
 	@NativeQuery(model = Property.class)
 	List<Property> findPropertyListByIndustryIdAndShopIdI18n(@QueryParam("industryId") Long industryId, 

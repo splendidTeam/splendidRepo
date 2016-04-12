@@ -14,7 +14,7 @@
 var itemCodeValidMsg = "${itemCodeValidMsg}";
 
 </script>
-<script type="text/javascript" src="${base}/scripts/product/item/update-item.js?v=${now}"></script>
+<script type="text/javascript" src="${base}/scripts/product/item/update-item.js"></script>
 <SCRIPT type="text/javascript">	
 var pdValidCode = "${pdValidCode}";
 var categoryzNodes  = [
