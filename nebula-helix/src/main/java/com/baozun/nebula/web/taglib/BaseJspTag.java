@@ -90,5 +90,5 @@ public abstract class BaseJspTag extends BaseTag{
 	
 	public void setStyle(String style){
 		this.style = style;
-	}
+	} 
 }
