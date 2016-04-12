@@ -230,34 +230,12 @@ public class ItemLangManagerImpl implements ItemLangManager {
 			for (SkuPropertyMUtlLangCommand spc : skuPropertyCommandArray) {
 				Long skuId = spc.getId();
 				String extentionCode = spc.getCode();
-
-				/*
-				 * 检察sku表中是否存在, itemId, out_id,
-				 * item_properties与提交的都一致,且lifecycle=0的信息 1, 存在: 修改lifecycle=1
-				 * 2, 不存在: 新增一条记录
-				 */
 				String skuItemProperties = getSkuItemProperties(spc, savedItemProperties);
-				Map<String, Object> paraMap = new HashMap<String, Object>();
-				paraMap.put("itemId", itemId);
-				paraMap.put("itemProperties", skuItemProperties);
-				paraMap.put("outId", extentionCode);
-				paraMap.put("lifecycle", Sku.LIFECYCLE_DISABLE);
-				List<Sku> savedSkuList = skuDao.findSkuWithParaMap(paraMap);
 
-				if (null != savedSkuList && !savedSkuList.isEmpty()) {
-					for (Sku sku : savedSkuList) {
-						sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
-						skuDao.save(sku);
-						break;
-					}
-				} else if (skuId == null) {// 新增
-					Sku skunew = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
-					returnList.add(skunew);
-				} else {// 修改
-
+				Sku savedSku = null;
+				if (skuId != null) {// 修改
 					/* 如果修改了extention_code , 将该sku的lifecycle设置为0, 并新增一条数据 */
 					Sku dbSku = skuDao.findSkuById(skuId);
-					Sku savedSku = null;
 					if (extentionCode.equals(dbSku.getOutid())) {
 						Sku skuToBeUpdate = skuDao.getByPrimaryKey(skuId);
 						skuToBeUpdate.setListPrice(spc.getListPrice());
@@ -270,9 +248,33 @@ public class ItemLangManagerImpl implements ItemLangManager {
 
 						savedSku = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
 					}
+				} else {
+					/*
+					 * 检察sku表中是否存在, itemId, out_id,
+					 * item_properties与提交的都一致,且lifecycle=0的信息 1, 存在:
+					 * 修改lifecycle=1 2, 不存在: 新增一条记录
+					 */
 
-					returnList.add(savedSku);
+					Map<String, Object> paraMap = new HashMap<String, Object>();
+					paraMap.put("itemId", itemId);
+					paraMap.put("itemProperties", skuItemProperties);
+					paraMap.put("outId", extentionCode);
+					paraMap.put("lifecycle", Sku.LIFECYCLE_DISABLE);
+					List<Sku> savedSkuList = skuDao.findSkuWithParaMap(paraMap);
+
+					if (null != savedSkuList && !savedSkuList.isEmpty()) {
+						for (Sku sku : savedSkuList) {
+							sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
+							sku.setListPrice(spc.getListPrice());
+							sku.setSalePrice(spc.getSalePrice());
+							savedSku = skuDao.save(sku);
+							break;
+						}
+					} else if (skuId == null) {// 新增
+						savedSku = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
+					}
 				}
+				returnList.add(savedSku);
 			}
 			// 获得要删除的skuId集合
 			List<Long> skuToBeDelList = new ArrayList<Long>();
