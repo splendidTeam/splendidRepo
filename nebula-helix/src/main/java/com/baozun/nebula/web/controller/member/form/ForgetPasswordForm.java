@@ -16,6 +16,8 @@ public class ForgetPasswordForm extends BaseForm{
 
 	private String				email;
 
+	public static final int		EMAIL_URL			= 3;
+
 	public static final int		EMAIL				= 2;
 
 	public static final int		MOBILE				= 1;

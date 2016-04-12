@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 Nov 9, 2012 5:16:58 PM
+ * 切换成新的安全处理机制 since 5.3.1
  */
+@Deprecated
 public class ESAPIContextListener implements ServletContextListener{
 
 	private static final Logger	log	= LoggerFactory.getLogger(ESAPIContextListener.class);

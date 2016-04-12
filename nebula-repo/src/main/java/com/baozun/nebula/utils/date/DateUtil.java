@@ -6,7 +6,8 @@ import java.util.Date;
 /**
  * @author xianze.zhang
  *@creattime 2013-1-3
- */
+*/
+@Deprecated
 public class DateUtil {
 	/**
 	 * 验证当前时间是否在开始时间和结束时间内

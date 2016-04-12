@@ -32,7 +32,7 @@ import com.feilong.core.Validator;
 public class MemberStatusFlowProcessor {
 
 	private List<StatusAction> statusActionList = new ArrayList<StatusAction>();
-
+	
 	public List<StatusAction> getStatusActionList() {
 		return statusActionList;
 	}
@@ -81,7 +81,7 @@ public class MemberStatusFlowProcessor {
 		 * 白名单，这里的url不会拦截
 		 */
 		private List<String> whiteList;
-
+		
 		public String getStatus() {
 			return status;
 		}

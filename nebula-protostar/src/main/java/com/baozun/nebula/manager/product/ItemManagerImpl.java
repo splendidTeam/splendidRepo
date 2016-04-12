@@ -5967,4 +5967,11 @@ public class ItemManagerImpl implements ItemManager {
 	public List<ItemCommand> findItemCommandByQueryMapAndItemCodesI18n(Map<String, Object> paramMap, List<String> itemCodeList, String langKey) {
 		return itemDao.findItemCommandByQueryMapAndItemCodesI18n(paramMap, itemCodeList, langKey);
 	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public Integer findItemCountByPropertyId(Long propertyId){
+		Integer count=itemPropertiesDao.findItemCountByPropertyId(propertyId);
+		return count == null ? 0 : count;  
+	}
 }

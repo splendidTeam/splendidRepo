@@ -19,6 +19,11 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
+import com.baozun.nebula.command.PropertyCommand;
+import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyLang;
+import com.baozun.nebula.model.product.PropertyValue;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -26,11 +31,6 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.command.PropertyCommand;
-import com.baozun.nebula.model.product.Property;
-import com.baozun.nebula.model.product.PropertyLang;
-import com.baozun.nebula.model.product.PropertyValue;
 
 /**
  * 商品属性Dao
@@ -79,6 +79,19 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyCommand.class)
 	Pagination<PropertyCommand> findPropertyListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+	
+	
+	/**
+	 * 根据条件分页查询属性
+	 * @return Pagination<PropertyCommand>
+	 * @param page
+	 * @param sorts
+	 * @param paraMap
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午4:55:41
+	 */
+	@NativeQuery(model = PropertyCommand.class)
+	Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 
 	/**
 	 * 通过ids批量启用或禁用Property 设置lifecycle =0 或 1
@@ -237,4 +250,25 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 			@QueryParam("industryId") Long industryId,
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("commonPropertyId") Long commonPropertyId);
+	
+	/**
+	 * 根据propertyId查询Property表
+	 * @return Property
+	 * @param propertyId
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:39:20
+	 */
+	@NativeQuery(model = Property.class)
+	Property findPropertyByPropertyId(@QueryParam("propertyId") Long propertyId);
+	
+	
+	/**
+	 * 根据propertyId查询Property国际化数据
+	 * @return List<PropertyValueLang>
+	 * @param propertyId
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:46:01
+	 */
+	@NativeQuery(model = PropertyLang.class)
+	List<PropertyLang> findPropertyLongByPropertyId(@QueryParam("propertyId") Long propertyId);
 }

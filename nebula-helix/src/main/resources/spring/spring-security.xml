@@ -37,12 +37,4 @@
 			</beans:set>
 		</beans:property>
 	</beans:bean>
-	
-	<!-- 用于数据库字段加解密 -->
-	<beans:bean id="piiEncryptionModule" class=" com.baozun.nebula.security.crypto.PIIEncryptionModule">
-		<beans:constructor-arg index="0" value="#{meta['pii.key']}"></beans:constructor-arg>
-		<beans:constructor-arg index="1" value="#{meta['pii.ivParameter']}"></beans:constructor-arg>
-	</beans:bean>
-	
-	
 </beans:beans>  

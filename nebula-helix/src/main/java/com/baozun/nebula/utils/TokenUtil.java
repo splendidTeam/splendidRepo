@@ -13,6 +13,7 @@ import com.baozun.nebula.exception.BusinessException;
  * @author songdianchao
  * 
  */
+@Deprecated
 public class TokenUtil {
 	public static final String TOKEN = "_http";
 	public static final String PARAM_TOKEN = "_t";

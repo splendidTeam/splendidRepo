@@ -25,10 +25,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
@@ -42,6 +38,10 @@ import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * item 操作接口
@@ -367,4 +367,14 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	List<ItemCommand> findItemCommandByQueryMapAndItemCodesI18n(Map<String, Object> paraMap, List<String> itemCodeList, String langKey);
+	
+	
+	/**
+	 * 根据属性id到itemProperties表中查询商品数量
+	 * @return Integer
+	 * @param id
+	 * @author 冯明雷
+	 * @time 2016年4月7日下午4:07:42
+	 */
+	Integer findItemCountByPropertyId(Long propertyId);
 }

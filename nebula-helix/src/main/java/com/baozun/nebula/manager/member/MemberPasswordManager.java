@@ -22,4 +22,7 @@ public interface MemberPasswordManager{
 	// 修改密码
 	boolean modifyPassword(String oldPassword,String newPassword,String confirmPassword,Long memberId);
 
+	// 发送修改密码的链接
+	boolean sendForgetPasswordValidateEmailURL(String basePath,ForgetPasswordForm forgetPasswordForm);
+
 }

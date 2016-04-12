@@ -16,10 +16,6 @@
  */
 package com.baozun.nebula.web.controller.member;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,7 +30,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.exception.BusinessException;
@@ -317,7 +312,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			 * 构造MemberDetails<br/>
 			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberDetails.status
 			 */
-			MemberDetails memberDetails = constructMemberDetails(memberCommand);
+			MemberDetails memberDetails = constructMemberDetails(memberCommand,request);
 
 			// 返回NebulaReturnResult中包含下一步动作的url
 			return onRegisterSuccess(memberDetails, request, response);
