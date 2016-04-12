@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValid
  * @Date 2016/03/31
  * @Controller NebulaForgetPasswordController
  */
+@Controller
 public class NebulaForgetPasswordController extends BaseController{
 
 	private static final Logger			LOG							= LoggerFactory.getLogger(NebulaForgetPasswordController.class);
@@ -72,7 +74,7 @@ public class NebulaForgetPasswordController extends BaseController{
 	 * 跳转到忘记密码的页面
 	 * 
 	 * @return String
-	 * @RequestMapping(value = "/forgetpassword", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/member/forgetpassword", method = RequestMethod.GET)
 	 */
 	public String showForgetPassword(){
 		return VIEW_FORGET_PASSWORD;
@@ -133,21 +135,24 @@ public class NebulaForgetPasswordController extends BaseController{
 	}
 
 	/**
-	 * 用户输入验证码后，就对比验证码是否正确（ajax请求，未点击下一步提交表单）
+	 * 用户输入验证码后，就对比验证码是否正确（ajax请求）
 	 * 
 	 * @RequestMapping(value ="/member/checkValidateCode.json",method=RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @param model
 	 * @param forgetPasswordForm
-	 * @return String 返回需要跳转到的页面
+	 * @return NebulaReturnResult
 	 */
-	public boolean checkValidateCode(
+	public NebulaReturnResult checkValidateCode(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Model model,
 			@ModelAttribute("forgetPasswordForm") ForgetPasswordForm forgetPasswordForm){
+
 		boolean flag = false;
+		DefaultReturnResult returnResult = new DefaultReturnResult();
+		returnResult.setResult(flag);
 		// 检测输入的验证码是否和发送的验证码相同
 		if (StringUtils.isNotBlank(forgetPasswordForm.getSecurityCode())){
 			// 需要区分是手机验证方式还是邮件验证方式（1为手机验证方式，2为邮件验证方式）
@@ -156,7 +161,7 @@ public class NebulaForgetPasswordController extends BaseController{
 						BUSINESS_CODE,
 						forgetPasswordForm.getMobile(),
 						forgetPasswordForm.getSecurityCode());
-			}else{
+			}else if (forgetPasswordForm.getType() == ForgetPasswordForm.EMAIL){
 				flag = VerifyResult.SUCESS == tokenManager.verifyToken(
 						BUSINESS_CODE,
 						forgetPasswordForm.getEmail(),
@@ -166,11 +171,12 @@ public class NebulaForgetPasswordController extends BaseController{
 				// 验证成功
 				// 在此处将用户的提交的信息存放到session中去，供后续修改密码时验证是否是同一个用户使用
 				request.getSession().setAttribute(TOKEN, forgetPasswordForm);
-				return true;
+				returnResult.setResult(flag);
+				return returnResult;
 			}
 		}
 		// 验证失败
-		return false;
+		return returnResult;
 	}
 
 	/**
