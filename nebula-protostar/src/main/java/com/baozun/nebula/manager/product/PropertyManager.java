@@ -38,6 +38,17 @@ public interface PropertyManager extends BaseManager{
 	Pagination<PropertyCommand> findPropertyListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap);
 
 	/**
+	 * 根据条件分页查询属性
+	 * @return Pagination<PropertyCommand>
+	 * @param page
+	 * @param sorts
+	 * @param paraMap
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午4:55:41
+	 */
+	Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap);
+	
+	/**
 	 * 通过ids批量启用或禁用Property 设置lifecycle =0 或 1
 	 * 
 	 * @param ids

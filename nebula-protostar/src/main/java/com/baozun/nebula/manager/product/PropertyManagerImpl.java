@@ -76,6 +76,11 @@ public class PropertyManagerImpl implements PropertyManager{
 		Pagination<PropertyCommand> result = propertyDao.findPropertyListByQueryMapWithPage(page, sorts, paraMap);
 		return result;
 	}
+	@Override
+	public Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap){
+		Pagination<PropertyCommand> result = propertyDao.findPropertyPaginationByQueryMap(page, sorts, paraMap);
+		return result;
+	}
 
 	@Override
 	public Integer enableOrDisablePropertyByIds(List<Long> ids,Integer state){
