@@ -426,4 +426,22 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Shop.findPropertyListByIndustryIdAndShopIdWidthoutCommonProperty" class="loxia.dao.support.DynamicQueryHolder">
+		<description> 根据行业id和店铺id查询 属性[不关联表t_pd_common_property]</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT p.id,p.create_time,p.editing_type,p.hasthumb,p.industry_id,p.is_color_prop,p.is_salep_rop,
+		       		p.lifecycle,p.modify_time,p.name,p.required,p.searchable,
+					p.sort_no,p.value_type ,p.version,p.is_common_industry 
+					FROM t_pd_property p 
+					inner join t_pd_industry_property_relation ipr on   ipr.property_id=p.id
+					LEFT JOIN t_pd_shopproperty s ON p.id = s.property_id
+					WHERE  p.lifecycle != 2 and s.shop_id =:shopId AND ipr.industry_id =:industryId
+					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

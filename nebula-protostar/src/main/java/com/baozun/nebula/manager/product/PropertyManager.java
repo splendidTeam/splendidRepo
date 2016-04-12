@@ -1,3 +1,4 @@
+
 package com.baozun.nebula.manager.product;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyLang;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
+import com.baozun.nebula.web.command.DynamicPropertyCommand;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -34,7 +36,7 @@ public interface PropertyManager extends BaseManager{
 	 * @return
 	 */
 	Pagination<PropertyCommand> findPropertyListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap);
-	
+
 	/**
 	 * 根据条件分页查询属性
 	 * @return Pagination<PropertyCommand>
@@ -45,7 +47,7 @@ public interface PropertyManager extends BaseManager{
 	 * @time 2016年4月8日下午4:55:41
 	 */
 	Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap);
-
+	
 	/**
 	 * 通过ids批量启用或禁用Property 设置lifecycle =0 或 1
 	 * 
@@ -202,6 +204,14 @@ public interface PropertyManager extends BaseManager{
 	boolean validatecommonPropertyName(String commonPropertyName);
 
 	List<PropertyValueLang> findPropertyValueCommandById(Long id);
+	
+	/**
+	 * 通过属性值分组ID找到相对的属性值列表
+	 * @param proGroupId
+	 * @return
+	 */
+	DynamicPropertyCommand  findByProGroupIdAndPropertyId(Long proGroupId,Long propertyId);
+
 	
 	/**
 	 * 根据propertyId查询Property表(只查询Property表中数据并且生命周期不为2)

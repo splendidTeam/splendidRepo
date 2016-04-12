@@ -29,7 +29,6 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
-import com.baozun.nebula.model.system.InstationMessageTemplate;
 
 /**
  * @author wenxiu.ke
@@ -164,6 +163,15 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	PropertyValue findpropervalueId(@QueryParam("mapvalue") Map<String, String> mapvalue,@QueryParam("valuecolor") String valuecolor);
 
 	/**
+	 * 通过属性值分组ID找到相对的属性值列表
+	 * 
+	 * @param proGroupId
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	List<PropertyValue> findByProGroupId(@QueryParam("proGroupId") Long proGroupId);
+
+	/**
 	 * @param propertyIds
 	 * @return
 	 */
@@ -221,5 +229,4 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 			Sort[] sorts,
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("proValGroupId") Long proValGroupId);
-
 }

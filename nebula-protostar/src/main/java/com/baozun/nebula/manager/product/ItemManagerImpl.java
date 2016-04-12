@@ -42,18 +42,6 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.support.excel.ExcelKit;
-import loxia.support.excel.ExcelManipulatorFactory;
-import loxia.support.excel.ExcelReader;
-import loxia.support.excel.ExcelUtil;
-import loxia.support.excel.ReadStatus;
-import loxia.support.excel.definition.ExcelBlock;
-import loxia.support.excel.definition.ExcelCell;
-import loxia.support.excel.definition.ExcelSheet;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -101,12 +89,14 @@ import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemImageDao;
 import com.baozun.nebula.dao.product.ItemImageLangDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
+import com.baozun.nebula.dao.product.ItemProValGroupRelationDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemPropertiesLangDao;
 import com.baozun.nebula.dao.product.ItemReferenceDao;
 import com.baozun.nebula.dao.product.ItemTagRelationDao;
 import com.baozun.nebula.dao.product.PropertyDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
+import com.baozun.nebula.dao.product.PropertyValueGroupDao;
 import com.baozun.nebula.dao.product.SearchConditionDao;
 import com.baozun.nebula.dao.product.SearchConditionItemDao;
 import com.baozun.nebula.dao.product.ShopDao;
@@ -126,11 +116,13 @@ import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemImageLang;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemInfoLang;
+import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
 import com.baozun.nebula.model.product.ItemReference;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
+import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.model.product.SearchConditionItem;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.system.ChooseOption;
@@ -147,153 +139,183 @@ import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+import loxia.support.excel.ExcelKit;
+import loxia.support.excel.ExcelManipulatorFactory;
+import loxia.support.excel.ExcelReader;
+import loxia.support.excel.ExcelUtil;
+import loxia.support.excel.ReadStatus;
+import loxia.support.excel.definition.ExcelBlock;
+import loxia.support.excel.definition.ExcelCell;
+import loxia.support.excel.definition.ExcelSheet;
+
 /**
  * @author yi.huang
  * @date 2013-7-1 下午04:11:23
  */
 @Transactional
 @Service("itemManager")
-public class ItemManagerImpl implements ItemManager {
+public class ItemManagerImpl implements ItemManager{
 
-	private static final Logger log = LoggerFactory.getLogger(ItemManagerImpl.class);
-
-	@Autowired
-	private ItemDao itemDao;
+	private static final Logger			log											= LoggerFactory.getLogger(ItemManagerImpl.class);
 
 	@Autowired
-	private ShopDao shopDao;
+	private ItemDao						itemDao;
 
 	@Autowired
-	private SkuDao skuDao;
+	private ShopDao						shopDao;
 
 	@Autowired
-	private CategoryDao categoryDao;
+	private SkuDao						skuDao;
 
 	@Autowired
-	private ItemCategoryDao itemCategoryDao;
+	private CategoryDao					categoryDao;
 
 	@Autowired
-	private ItemInfoDao itemInfoDao;
+	private ItemCategoryDao				itemCategoryDao;
 
 	@Autowired
-	private PropertyValueDao propertyValueDao;
+	private ItemInfoDao					itemInfoDao;
 
 	@Autowired
-	private ItemPropertiesDao itemPropertiesDao;
+	private PropertyValueDao			propertyValueDao;
 
 	@Autowired
-	private ItemCategoryManager itemCategoryManager;
+	private ItemPropertiesDao			itemPropertiesDao;
 
 	@Autowired
-	private ItemTagRelationDao itemTagRelationDao;
+	private ItemCategoryManager			itemCategoryManager;
 
 	@Autowired
-	private ItemImageDao itemImageDao;
+	private ItemTagRelationDao			itemTagRelationDao;
 
 	@Autowired
-	private PropertyManager propertyManager;
+	private ItemImageDao				itemImageDao;
 
 	@Autowired
-	private ItemSolrManager itemSolrManager;
+	private PropertyManager				propertyManager;
 
 	@Autowired
-	private ItemReferenceDao itemReferenceDao;
+	private ItemSolrManager				itemSolrManager;
 
 	@Autowired
-	private ShopManager shopManager;
+	private ItemReferenceDao			itemReferenceDao;
 
 	@Autowired
-	private IndustryManager industryManager;
+	private ShopManager					shopManager;
 
 	@Autowired
-	private PropertyDao propertyDao;
+	private IndustryManager				industryManager;
 
 	@Autowired
-	private SearchConditionDao searchConditionDao;
+	private SearchConditionItemDao		searchConditionItemDao;
 
 	@Autowired
-	private SearchConditionItemDao searchConditionItemDao;
+	private UploadManager				uploadManager;
 
 	@Autowired
-	private UploadManager uploadManager;
-	
-	@Autowired
-	private CategoryManager categoryManager;
+	private CategoryManager				categoryManager;
 
 	@Autowired
-	private ChooseOptionManager chooseOptionManager;
+	private ChooseOptionManager			chooseOptionManager;
 
 	@Autowired
-	private ExcelManipulatorFactory excelFactory;
+	private ExcelManipulatorFactory		excelFactory;
 
 	@Autowired
-	private SdkMataInfoManager sdkMataInfoManager;
+	private SdkMataInfoManager			sdkMataInfoManager;
+
 	@Autowired
-	private ItemImageLangDao itemImageLangDao;
-	
+	private ItemImageLangDao			itemImageLangDao;
+
+	@Autowired
+	private ItemProValGroupRelationDao	itemProValGroupRelationDao;
+
 	@Autowired(required = false)
-	private ItemExtendManager itemExtendManager;
+	private ItemExtendManager			itemExtendManager;
 
-	private ByteArrayOutputStream byteArrayOutputStream = null;
-	private static final String DEFAULT_PATH = "excel";
-	private static final Integer HSSFSHEET_1 = 0;
-	private static final Integer HSSFSHEET_2 = 1;
-	private static final Integer TITLE_ROW_INDEX = 5;
-	private static final Integer DESC_ROW_INDEX = 6;
+	private ByteArrayOutputStream		byteArrayOutputStream						= null;
+
+	private static final String			DEFAULT_PATH								= "excel";
+
+	private static final Integer		HSSFSHEET_1									= 0;
+
+	private static final Integer		HSSFSHEET_2									= 1;
+
+	private static final Integer		TITLE_ROW_INDEX								= 5;
+
+	private static final Integer		DESC_ROW_INDEX								= 6;
+
 	/** 商品图片类型 */
-	private static final String ITEM_IMG_TYPE = "IMAGE_TYPE";
+	private static final String			ITEM_IMG_TYPE								= "IMAGE_TYPE";
+
 	/** 商品图片尺寸 */
-	private static final String ITEM_IMG_ROLE = "THUMBNAIL_CONFIG";
+	private static final String			ITEM_IMG_ROLE								= "THUMBNAIL_CONFIG";
+
 	/**
 	 * 第一个sheet是从8行 第12列开始（不包含） 属性Id从第5行开始
 	 */
-	private static final Integer ITEMCOMM_SHEETDEFINITION_STARTCOL = 12;
-	private static final Integer ITEMCOMM_SHEETDEFINITION_STARTROW = 7;
-	private static final Integer ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW = 4;
-	private static final Integer ZERO = 0;
+	private static final Integer		ITEMCOMM_SHEETDEFINITION_STARTCOL			= 12;
+
+	private static final Integer		ITEMCOMM_SHEETDEFINITION_STARTROW			= 7;
+
+	private static final Integer		ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW	= 4;
+
+	private static final Integer		ZERO										= 0;
+
 	/**
 	 * 第一个sheet是从8行 第2列开始（不包含） 属性Id从第5行开始
 	 */
-	private static final Integer SKUCOMM_SHEETDEFINITION_STARTCOL = 1;
-	private static final Integer SKUCOMM_SHEETDEFINITION_STARTROW = 7;
-	private static final Integer SKUCOMM_SHEETDEFINITION_PROPID_STARTROW = 4;
-	private static final String SKUCOMM_SC_DES = "筛选条件名称";
-	private static final String SKUCOMM_SC_REQ = "字符串(非必填)";
+	private static final Integer		SKUCOMM_SHEETDEFINITION_STARTCOL			= 1;
 
-	//用于属性多个
-	private static final String DOUBLE_SLASH_SEPARATOR = "\\|\\|";
-	//分类 筛选条件
-	private static final String BACK_SLANT_SEPARATOR = "/";
+	private static final Integer		SKUCOMM_SHEETDEFINITION_STARTROW			= 7;
+
+	private static final Integer		SKUCOMM_SHEETDEFINITION_PROPID_STARTROW		= 4;
+
+	private static final String			SKUCOMM_SC_DES								= "筛选条件名称";
+
+	private static final String			SKUCOMM_SC_REQ								= "字符串(非必填)";
+
+	// 用于属性多个
+	private static final String			DOUBLE_SLASH_SEPARATOR						= "\\|\\|";
+
+	// 分类 筛选条件
+	private static final String			BACK_SLANT_SEPARATOR						= "/";
 
 	/** windows, mac系统查看缩略图所产生的缓存文件, 在导入商品图片是过滤掉这个文件 **/
-	private final static String CACHE_FILE_NAME = "Thumbs.db";
+	private final static String			CACHE_FILE_NAME								= "Thumbs.db";
+
 	/** 上传文件的类型:1, 增量导入; 0, 全量导入 */
-	private static final String UPLOAD_TYPE = "0";
-	
-	 /** 属性列表值最大长度 */
-    public static final int MAX_PROP_VALUE = 15;
-    public static final String VALUES_SHEET = "Sheet3";
-    
-    @Autowired
-    private  SdkI18nLangManager sdkI18nLangManager;
-    
-    @Autowired
-    private ItemLangManager itemLangManager;
-    
-    @Autowired
-	private ItemPropertiesLangDao itemPropertiesLangDao;
+	private static final String			UPLOAD_TYPE									= "0";
+
+	/** 属性列表值最大长度 */
+	public static final int				MAX_PROP_VALUE								= 15;
+
+	public static final String			VALUES_SHEET								= "Sheet3";
+
+	@Autowired
+	private SdkI18nLangManager			sdkI18nLangManager;
+
+	@Autowired
+	private ItemLangManager				itemLangManager;
+
+	@Autowired
+	private ItemPropertiesLangDao		itemPropertiesLangDao;
+
+	@Autowired
+	private PropertyValueGroupDao		propertyValueGroupDao;
+
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#findItemListByItemIds(java
-	 * .lang.Long[])
+	 * @see com.baozun.nebula.manager.product.ItemManager#findItemListByItemIds(java .lang.Long[])
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<Item> findItemListByItemIds(Long[] itemIds) {
+	public List<Item> findItemListByItemIds(Long[] itemIds){
 		List<Long> itemId = new ArrayList<Long>();
-		for (Long id : itemIds) {
+		for (Long id : itemIds){
 			itemId.add(id);
 		}
 		return itemDao.findItemListByIds(itemId);
@@ -301,25 +323,50 @@ public class ItemManagerImpl implements ItemManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#findDynamicPropertis(Long
-	 * shopId,Long industryId)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findDynamicPropertis(Long shopId,Long industryId)
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<DynamicPropertyCommand> findDynamicPropertis(Long shopId, Long industryId) {
+	public List<DynamicPropertyCommand> findDynamicPropertis(Long shopId,Long industryId){
 		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industryId, shopId, null);
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = new ArrayList<DynamicPropertyCommand>();
 		List<PropertyValue> propertyValueList;
 		Long propertyId;
-		for (Property property : propertyList) {
+		for (Property property : propertyList){
 			propertyId = property.getId();
 			propertyValueList = propertyValueDao.findPropertyValueListById(propertyId);
 
 			DynamicPropertyCommand dynamicPropertyCommand = new DynamicPropertyCommand();
 			dynamicPropertyCommand.setProperty(property);
 			dynamicPropertyCommand.setPropertyValueList(propertyValueList);
+
+			List<PropertyValueGroup> propertyValueGroupList = propertyValueGroupDao.findByPropertyId(propertyId);
+			dynamicPropertyCommand.setPropertyValueGroupList(propertyValueGroupList);
+
+			dynamicPropertyCommandList.add(dynamicPropertyCommand);
+		}
+		return dynamicPropertyCommandList;
+
+	}
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<DynamicPropertyCommand> findDynamicPropertisWidthoutCommonProperty(Long shopId,Long industryId){
+		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopIdWidthoutCommonProperty(industryId, shopId, null);
+		List<DynamicPropertyCommand> dynamicPropertyCommandList = new ArrayList<DynamicPropertyCommand>();
+		List<PropertyValue> propertyValueList;
+		Long propertyId;
+		for (Property property : propertyList){
+			propertyId = property.getId();
+			propertyValueList = propertyValueDao.findPropertyValueListById(propertyId);
+
+			DynamicPropertyCommand dynamicPropertyCommand = new DynamicPropertyCommand();
+			dynamicPropertyCommand.setProperty(property);
+			dynamicPropertyCommand.setPropertyValueList(propertyValueList);
+
+			List<PropertyValueGroup> propertyValueGroupList = propertyValueGroupDao.findByPropertyId(propertyId);
+			dynamicPropertyCommand.setPropertyValueGroupList(propertyValueGroupList);
 
 			dynamicPropertyCommandList.add(dynamicPropertyCommand);
 		}
@@ -328,24 +375,27 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public Item createOrUpdateItem(ItemCommand itemCommand, Long[] propertyValueIds, // 动态属性
+	public Item createOrUpdateItem(
+			ItemCommand itemCommand,
+			Long[] propertyValueIds, // 动态属性
 			Long[] categoriesIds,// 商品分类Id
 			ItemProperties[] iProperties,// 普通商品属性
-			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
-	) throws Exception {
-		
-		//分类校验
-		//categoriesIds not empty 
-		//1. categoriesIds包含defaultCategoryId 
-		//2.defaultCategoryId不为空
-		//3.defaultCategoryId对应分类存在
-		if(Validator.isNotNullOrEmpty(categoriesIds)){
-			
-			if(Validator.isNotNullOrEmpty(itemCommand.getDefCategroyId())){
-				List<Long> tempCateList =Arrays.asList(categoriesIds);
-				if(tempCateList.contains(itemCommand.getDefCategroyId())){
-					Category tempCategory =categoryDao.findEnableCategoryById(itemCommand.getDefCategroyId());
-					if(tempCategory ==null){
+			SkuPropertyCommand[] skuPropertyCommand,// sku 的信息，包含每个sku对应的价格
+			List<ItemProValGroupRelation> groupRelation// 商品属性分组
+	) throws Exception{
+
+		// 分类校验
+		// categoriesIds not empty
+		// 1. categoriesIds包含defaultCategoryId
+		// 2.defaultCategoryId不为空
+		// 3.defaultCategoryId对应分类存在
+		if (Validator.isNotNullOrEmpty(categoriesIds)) {
+
+			if (Validator.isNotNullOrEmpty(itemCommand.getDefCategroyId())) {
+				List<Long> tempCateList = Arrays.asList(categoriesIds);
+				if (tempCateList.contains(itemCommand.getDefCategroyId())) {
+					Category tempCategory = categoryDao.findEnableCategoryById(itemCommand.getDefCategroyId());
+					if (tempCategory == null) {
 						throw new BusinessException(ErrorCodes.ITEM_UPDATE_DEFCATE_NOT_EXISTS);
 					}
 				}else{
@@ -356,8 +406,8 @@ public class ItemManagerImpl implements ItemManager {
 			}
 		}
 
-		//boolean isUpdateSolr =false;
-		
+		// boolean isUpdateSolr =false;
+
 		Item item = null;
 		if (itemCommand.getId() != null) {// 更新
 			item = itemDao.getByPrimaryKey(itemCommand.getId());
@@ -365,14 +415,14 @@ public class ItemManagerImpl implements ItemManager {
 			item.setCode(itemCommand.getCode());
 			if (categoriesIds != null && categoriesIds.length > 0) {
 				item.setIsaddcategory(1);
-			} else {
+			}else{
 				item.setIsaddcategory(0);
 			}
 			item = itemDao.save(item);
-			/*if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
-				isUpdateSolr =true;
-			}*/
-		} else {// 新增
+			/*
+			 * if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){ isUpdateSolr =true; }
+			 */
+		}else{// 新增
 
 			if (itemCommand.getId() == null) {
 				Integer count = validateItemCode(itemCommand.getCode(), itemCommand.getShopId());
@@ -391,7 +441,7 @@ public class ItemManagerImpl implements ItemManager {
 
 			if (categoriesIds != null && categoriesIds.length > 0) {
 				item.setIsaddcategory(1);
-			} else {
+			}else{
 				item.setIsaddcategory(0);
 			}
 			item.setIsAddTag(0);
@@ -399,7 +449,15 @@ public class ItemManagerImpl implements ItemManager {
 		}
 
 		// 商品所有的属性值集合
-		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand);
+		List<ItemProperties> savedItemProperties = this
+				.createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand);
+
+		// 商品属性值分组
+		if (groupRelation.size() > 0) {
+			for (ItemProValGroupRelation relation : groupRelation){
+				itemProValGroupRelationDao.save(relation);
+			}
+		}
 
 		// 保存Sku
 		this.createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand, savedItemProperties);
@@ -408,12 +466,12 @@ public class ItemManagerImpl implements ItemManager {
 		this.createOrUpdateItemInfo(itemCommand, item.getId());
 
 		if (categoriesIds != null && categoriesIds.length > 0) {
-			//Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
+			// Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
 			Long defaultId = itemCommand.getDefCategroyId();
 
 			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
 			int index = 0;
-			for (Long id : categoriesIds) {
+			for (Long id : categoriesIds){
 				if (!defaultId.equals(id)) {
 					categoryIdArray[index] = id;
 					index++;
@@ -426,11 +484,11 @@ public class ItemManagerImpl implements ItemManager {
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand, item.getId(), defaultId);
 
-		} else {
+		}else{
 			List<ItemCategory> ctgList = itemCategoryManager.findItemCategoryListByItemId(item.getId());
 			Long[] itemIds = new Long[1];
 			itemIds[0] = item.getId();
-			for (ItemCategory ic : ctgList) {
+			for (ItemCategory ic : ctgList){
 				List<Long> itemIdList = new ArrayList<Long>();
 				itemIdList.add(item.getId());
 				itemCategoryManager.unBindItemCategory(itemIds, ic.getCategoryId());
@@ -438,20 +496,18 @@ public class ItemManagerImpl implements ItemManager {
 			}
 		}
 		// 执行扩展点
-		if(null != itemExtendManager) {
+		if (null != itemExtendManager) {
 			itemExtendManager.extendAfterCreateOrUpdateItem(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand);
 		}
-		/*//刷新索引
-		if(isUpdateSolr){
-			List<Long> itemIdsForSolr =new ArrayList<Long>();
-			itemIdsForSolr.add(item.getId());
-			itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
-		}*/
+		/*
+		 * //刷新索引 if(isUpdateSolr){ List<Long> itemIdsForSolr =new ArrayList<Long>(); itemIdsForSolr.add(item.getId());
+		 * itemSolrManager.saveOrUpdateItem(itemIdsForSolr); }
+		 */
 		return item;
 	}
 
 	// 得到默认分类，目前是最小的
-	private Long getDefaultCategoryId(Long[] categoriesIds) {
+	private Long getDefaultCategoryId(Long[] categoriesIds){
 		Arrays.sort(categoriesIds);
 
 		return categoriesIds[0];
@@ -459,15 +515,21 @@ public class ItemManagerImpl implements ItemManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#createOrUpdateItem(ItemCommand
-	 * itemCommand,Long shopId,Long[] categoriesIds,Long[]
+	 * @see com.baozun.nebula.manager.product.ItemManager#createOrUpdateItem(ItemCommand itemCommand,Long shopId,Long[] categoriesIds,Long[]
 	 * propertyValueIds,String[] codes,ItemProperties[] iProperties)
 	 */
 	@Override
-	public Item createOrUpdateItem(ItemCommand itemCommand, Long shopId, Long[] categoriesIds, Long[] propertyValueIds, String[] codes, BigDecimal[] salePrices, BigDecimal[] listPrices, ItemProperties[] iProperties, String changePropertyJson,
-			Long defaultCategoryId) throws Exception {
+	public Item createOrUpdateItem(
+			ItemCommand itemCommand,
+			Long shopId,
+			Long[] categoriesIds,
+			Long[] propertyValueIds,
+			String[] codes,
+			BigDecimal[] salePrices,
+			BigDecimal[] listPrices,
+			ItemProperties[] iProperties,
+			String changePropertyJson,
+			Long defaultCategoryId) throws Exception{
 		Item item = null;
 		if (itemCommand.getId() != null) {
 			item = itemDao.getByPrimaryKey(itemCommand.getId());
@@ -475,11 +537,11 @@ public class ItemManagerImpl implements ItemManager {
 			item.setCode(itemCommand.getCode());
 			if (categoriesIds != null && categoriesIds.length > 0) {
 				item.setIsaddcategory(1);
-			} else {
+			}else{
 				item.setIsaddcategory(0);
 			}
 			item = itemDao.save(item);
-		} else {
+		}else{
 			item = new Item();
 			item.setCode(itemCommand.getCode());
 			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
@@ -489,7 +551,7 @@ public class ItemManagerImpl implements ItemManager {
 			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
 			if (categoriesIds != null && categoriesIds.length > 0) {
 				item.setIsaddcategory(1);
-			} else {
+			}else{
 				item.setIsaddcategory(0);
 			}
 			item.setIsAddTag(0);
@@ -497,7 +559,8 @@ public class ItemManagerImpl implements ItemManager {
 		}
 
 		// 保存商品属性值
-		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds, item.getId(), iProperties);
+		List<ItemProperties> savedItemProperties = this
+				.createOrUpdateItemProperties(itemCommand, propertyValueIds, item.getId(), iProperties);
 
 		// 保存Sku
 		this.createOrUpdateSku(itemCommand, item.getId(), codes, salePrices, listPrices, savedItemProperties);
@@ -521,40 +584,36 @@ public class ItemManagerImpl implements ItemManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#validateItemCode(String
-	 * code,Long shopId)
+	 * @see com.baozun.nebula.manager.product.ItemManager#validateItemCode(String code,Long shopId)
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Integer validateItemCode(String code, Long shopId) {
+	public Integer validateItemCode(String code,Long shopId){
 		return itemDao.validateItemCode(code, shopId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.baozun.nebula.manager.product.ItemManager#findItemById(Long id)
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Item findItemById(Long id) {
+	public Item findItemById(Long id){
 		Item item = itemDao.findItemById(id);
 		return item;
 	}
 
-	public Integer updateItemIsAddCategory(List<Long> ids, Integer state) {
+	public Integer updateItemIsAddCategory(List<Long> ids,Integer state){
 		return itemDao.updateItemIsAddCategory(ids, state);
 	}
 
-	public Integer updateItemIsAddTag(List<Long> ids, Integer state) {
+	public Integer updateItemIsAddTag(List<Long> ids,Integer state){
 		return itemDao.updateItemIsAddTag(ids, state);
 	}
 
 	// 获取店铺所有的商品信息
 	@Transactional(readOnly = true)
-	public Pagination<ItemCommand> findItemListByQueryMap(Page page, Sort[] sorts, Map<String, Object> paraMap, Long shopId) {
+	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId){
 
 		Pagination<ItemCommand> ItemList = itemDao.findItemListByQueryMap(page, sorts, paraMap, shopId);
 
@@ -567,24 +626,24 @@ public class ItemManagerImpl implements ItemManager {
 		List<ItemCommand> items = ItemList.getItems();
 
 		List<String> categoryNameList = null;
-		
+
 		List<String> categoryCodeList = null;
 
 		List<String> tagNameList = null;
-		
-		List<Long> itemIds =new ArrayList<Long>();
-		for (int i = 0; i < items.size(); i++) {
+
+		List<Long> itemIds = new ArrayList<Long>();
+		for (int i = 0; i < items.size(); i++){
 			categoryNameList = new ArrayList<String>();
 			categoryCodeList = new ArrayList<String>();
 			tagNameList = new ArrayList<String>();
-			for (int j = 0; j < itemCategory.size(); j++) {
+			for (int j = 0; j < itemCategory.size(); j++){
 				if (items.get(i).getId().equals(itemCategory.get(j).getItemId())) {
 					categoryNameList.add(itemCategory.get(j).getCategoryName());
 					categoryCodeList.add(itemCategory.get(j).getCategoryCode());
 				}
 			}
 
-			for (int j = 0; j < itemTagList.size(); j++) {
+			for (int j = 0; j < itemTagList.size(); j++){
 				if (items.get(i).getId().equals(itemTagList.get(j).getItemId())) {
 					tagNameList.add(itemTagList.get(j).getTagName());
 				}
@@ -592,23 +651,23 @@ public class ItemManagerImpl implements ItemManager {
 			items.get(i).setTagNames(tagNameList);
 
 			items.get(i).setCategoryNames(categoryNameList);
-			
+
 			items.get(i).setCategoryCodes(categoryCodeList);
-			
+
 			itemIds.add(items.get(i).getId());
 
 		}
-		
-		//默认分类设置
-		
-		List<ItemCategoryCommand> itemCategoryList =itemCategoryDao.findDefaultCategoryByItemIds(itemIds);
-		
-		Map<Long,String> itemCategoryMap =new HashMap<Long, String>();
-		for (ItemCategoryCommand itemCategoryCommand : itemCategoryList) {
+
+		// 默认分类设置
+
+		List<ItemCategoryCommand> itemCategoryList = itemCategoryDao.findDefaultCategoryByItemIds(itemIds);
+
+		Map<Long, String> itemCategoryMap = new HashMap<Long, String>();
+		for (ItemCategoryCommand itemCategoryCommand : itemCategoryList){
 			itemCategoryMap.put(itemCategoryCommand.getItemId(), itemCategoryCommand.getCategoryName());
 		}
-		for (int i = 0; i < items.size(); i++) {
-			
+		for (int i = 0; i < items.size(); i++){
+
 			items.get(i).setDefCategory(itemCategoryMap.get(items.get(i).getId()));
 		}
 
@@ -618,25 +677,25 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public Pagination<ItemCommand> findEffectItemInfoListByQueryMap(Page page, Sort[] sorts, Map<String, Object> paraMap) {
+	public Pagination<ItemCommand> findEffectItemInfoListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap){
 		Pagination<ItemCommand> itemInfoPage = itemDao.findEffectItemInfoListByQueryMap(page, sorts, paraMap);
 		return itemInfoPage;
 	}
 
 	@Override
-	public Integer enableOrDisableItemByIds(List<Long> ids, Integer state) {
+	public Integer enableOrDisableItemByIds(List<Long> ids,Integer state){
 		String updateListTimeFlag = sdkMataInfoManager.findValue(MataInfo.UPDATE_ITEM_LISTTIME);
-		Integer result = itemDao.enableOrDisableItemByIds(ids, state,updateListTimeFlag);
+		Integer result = itemDao.enableOrDisableItemByIds(ids, state, updateListTimeFlag);
 		boolean solrFlag = false;
 		if (state == 1) {
 			// 刷新索引
 			boolean i18n = LangProperty.getI18nOnOff();
-			if(i18n){
+			if (i18n) {
 				solrFlag = itemSolrManager.saveOrUpdateItemI18n(ids);
 			}else{
 				solrFlag = itemSolrManager.saveOrUpdateItem(ids);
 			}
-		} else {
+		}else{
 			// 删除索引
 			solrFlag = itemSolrManager.deleteItem(ids);
 		}
@@ -649,10 +708,10 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public void removeItemByIds(List<Long> ids) {
+	public void removeItemByIds(List<Long> ids){
 		// 下架的商品是不存在solr中, 如果商品是上架商品,才删除solr中的索引
 		List<Item> itemList = itemDao.findItemListByIds(ids);
-		for (Item item : itemList) {
+		for (Item item : itemList){
 			Integer lifecycle = item.getLifecycle();
 			if (Item.LIFECYCLE_ENABLE.equals(lifecycle)) {
 				// 删除索引
@@ -670,7 +729,11 @@ public class ItemManagerImpl implements ItemManager {
 
 	}
 
-	private List<Sku> createOrUpdateSku(ItemCommand itemCommand, Long itemId, SkuPropertyCommand[] skuPropertyCommandArray, List<ItemProperties> savedItemProperties) {
+	private List<Sku> createOrUpdateSku(
+			ItemCommand itemCommand,
+			Long itemId,
+			SkuPropertyCommand[] skuPropertyCommandArray,
+			List<ItemProperties> savedItemProperties){
 
 		List<Sku> returnList = new ArrayList<Sku>();
 		if (itemCommand.getId() != null) {
@@ -679,21 +742,17 @@ public class ItemManagerImpl implements ItemManager {
 			// skuPropertyCommandArray, savedItemProperties);
 
 			/**
-			 * 提交到server的时候，根据传过来的 skuId 和 库里已经有的列表进行比对 如果新增，那么新增的skuId 为null。
-			 * 根据传过来的 PropertyId 和 propertyValue 拿到已经保存的ItemProperties. 新增Sku
-			 * 如果是修改，就是根据skuId 修改。此时不涉及 itemProperties 的修改。 只会修改skuCode， 销售价，吊牌价
-			 * 如果库里列表中的skuId在提交过来的SkuId 不存在，那么就删除
+			 * 提交到server的时候，根据传过来的 skuId 和 库里已经有的列表进行比对 如果新增，那么新增的skuId 为null。 根据传过来的 PropertyId 和 propertyValue 拿到已经保存的ItemProperties.
+			 * 新增Sku 如果是修改，就是根据skuId 修改。此时不涉及 itemProperties 的修改。 只会修改skuCode， 销售价，吊牌价 如果库里列表中的skuId在提交过来的SkuId 不存在，那么就删除
 			 */
 			List<Sku> skuListInDb = skuDao.findSkuByItemId(itemId);
 
-			for (SkuPropertyCommand spc : skuPropertyCommandArray) {
+			for (SkuPropertyCommand spc : skuPropertyCommandArray){
 				Long skuId = spc.getId();
 				String extentionCode = spc.getCode();
 
 				/*
-				 * 检察sku表中是否存在, itemId, out_id,
-				 * item_properties与提交的都一致,且lifecycle=0的信息 1, 存在: 修改lifecycle=1
-				 * 2, 不存在: 新增一条记录
+				 * 检察sku表中是否存在, itemId, out_id, item_properties与提交的都一致,且lifecycle=0的信息 1, 存在: 修改lifecycle=1 2, 不存在: 新增一条记录
 				 */
 				String skuItemProperties = getSkuItemProperties(spc, savedItemProperties);
 				Map<String, Object> paraMap = new HashMap<String, Object>();
@@ -704,15 +763,15 @@ public class ItemManagerImpl implements ItemManager {
 				List<Sku> savedSkuList = skuDao.findSkuWithParaMap(paraMap);
 
 				if (null != savedSkuList && !savedSkuList.isEmpty()) {
-					for (Sku sku : savedSkuList) {
+					for (Sku sku : savedSkuList){
 						sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
 						skuDao.save(sku);
 						break;
 					}
-				} else if (skuId == null) {// 新增
+				}else if (skuId == null) {// 新增
 					Sku skunew = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
 					returnList.add(skunew);
-				} else {// 修改
+				}else{// 修改
 
 					/* 如果修改了extention_code , 将该sku的lifecycle设置为0, 并新增一条数据 */
 					Sku dbSku = skuDao.findSkuById(skuId);
@@ -723,7 +782,7 @@ public class ItemManagerImpl implements ItemManager {
 						skuToBeUpdate.setOutid(spc.getCode());
 						skuToBeUpdate.setSalePrice(spc.getSalePrice());
 						savedSku = skuDao.save(skuToBeUpdate);
-					} else {
+					}else{
 						dbSku.setLifecycle(Sku.LIFECYCLE_DISABLE);
 						skuDao.save(dbSku);
 
@@ -737,9 +796,9 @@ public class ItemManagerImpl implements ItemManager {
 
 			// 获得要删除的skuId集合
 			List<Long> skuToBeDelList = new ArrayList<Long>();
-			for (Sku skuInDb : skuListInDb) {
+			for (Sku skuInDb : skuListInDb){
 				boolean delFlag = true;
-				for (Sku curSku : returnList) {
+				for (Sku curSku : returnList){
 					if (skuInDb.getId().equals(curSku.getId())) {
 						delFlag = false;
 						break;
@@ -832,7 +891,7 @@ public class ItemManagerImpl implements ItemManager {
 			// }
 			// }
 
-		} else {
+		}else{
 			returnList = saveSkus(itemCommand, itemId, skuPropertyCommandArray, savedItemProperties);
 		}
 
@@ -846,12 +905,12 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param savedItemProperties
 	 * @return
 	 */
-	private String getSkuItemProperties(SkuPropertyCommand spc, List<ItemProperties> savedItemProperties) {
+	private String getSkuItemProperties(SkuPropertyCommand spc,List<ItemProperties> savedItemProperties){
 		List<ItemPropertyCommand> ipCmdList = spc.getPropertyList();
 		List<Long> ipIds = new ArrayList<Long>();
 		if (ipCmdList != null) {
-			for (ItemPropertyCommand ipCmd : ipCmdList) {
-				for (ItemProperties ip : savedItemProperties) {
+			for (ItemPropertyCommand ipCmd : ipCmdList){
+				for (ItemProperties ip : savedItemProperties){
 
 					if (ip.getPropertyId().equals(ipCmd.getpId())) {
 						if (ipCmd.getId() != null && ip.getPropertyValueId() != null) {// 如果是多选
@@ -859,7 +918,7 @@ public class ItemManagerImpl implements ItemManager {
 								ipIds.add(ip.getId());
 							}
 
-						} else {// 如果是自定义多选
+						}else{// 如果是自定义多选
 							if (ipCmd.getValue() != null) {
 								if (ipCmd.getValue().equals(ip.getPropertyValue()) && ip.getPropertyId().equals(ipCmd.getpId())) {
 									ipIds.add(ip.getId());
@@ -888,7 +947,7 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param itemId
 	 * @return
 	 */
-	private Sku createSkuBySkuPropertyCommand(String skuItemProperties, SkuPropertyCommand spc, Long itemId) {
+	private Sku createSkuBySkuPropertyCommand(String skuItemProperties,SkuPropertyCommand spc,Long itemId){
 		Sku sku = new Sku();
 		sku.setItemId(itemId);
 		sku.setCreateTime(new Date());
@@ -911,10 +970,14 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param savedItemProperties
 	 * @return
 	 */
-	private List<Sku> saveSkus(ItemCommand itemCommand, Long itemId, SkuPropertyCommand[] skuPropertyCommandArray, List<ItemProperties> savedItemProperties) {
+	private List<Sku> saveSkus(
+			ItemCommand itemCommand,
+			Long itemId,
+			SkuPropertyCommand[] skuPropertyCommandArray,
+			List<ItemProperties> savedItemProperties){
 		List<Sku> returnList = new ArrayList<Sku>();
 		if (skuPropertyCommandArray != null && skuPropertyCommandArray.length > 0) {
-			for (SkuPropertyCommand spc : skuPropertyCommandArray) {
+			for (SkuPropertyCommand spc : skuPropertyCommandArray){
 				String skuItemProperties = getSkuItemProperties(spc, savedItemProperties);
 				Sku skunew = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
 				returnList.add(skunew);
@@ -933,15 +996,20 @@ public class ItemManagerImpl implements ItemManager {
 	 * @return
 	 * @throws Exception
 	 */
-	private List<Sku> createOrUpdateSku(ItemCommand itemCommand, Long itemId, String[] codes, BigDecimal[] salePrices, BigDecimal[] listPrices, List<ItemProperties> savedItemProperties) throws Exception {
+	private List<Sku> createOrUpdateSku(
+			ItemCommand itemCommand,
+			Long itemId,
+			String[] codes,
+			BigDecimal[] salePrices,
+			BigDecimal[] listPrices,
+			List<ItemProperties> savedItemProperties) throws Exception{
 
 		List<Sku> skuList = null;
 		List<Sku> returnList = new ArrayList<Sku>();
 		String str = itemCommand.getJsonSku().replaceAll("\'", "\"");
 
 		ObjectMapper om = new ObjectMapper();
-		TypeReference<List<Sku>> valueTypeRef = new TypeReference<List<Sku>>() {
-		};
+		TypeReference<List<Sku>> valueTypeRef = new TypeReference<List<Sku>>(){};
 
 		if (!"".equals(str)) {
 			skuList = om.readValue(str, valueTypeRef);
@@ -952,7 +1020,7 @@ public class ItemManagerImpl implements ItemManager {
 			int delcount = skuDao.deleteSkuByItemId(itemCommand.getId());
 			int j = 0;
 			if (skuList != null && skuList.size() > 0) {
-				for (Sku sku : skuList) {
+				for (Sku sku : skuList){
 					sku.setItemId(itemId);
 					sku.setCreateTime(new Date());
 					sku.setOutid(codes[j]);
@@ -964,8 +1032,7 @@ public class ItemManagerImpl implements ItemManager {
 					// "\""));
 					String propertiesName = sku.getPropertiesName().replace("/", "\"");
 
-					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>() {
-					};
+					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>(){};
 
 					List<ItemPropertyCommand> ipCmdList = null;
 					if (!"".equals(propertiesName)) {
@@ -974,15 +1041,15 @@ public class ItemManagerImpl implements ItemManager {
 					List<Long> ipIds = new ArrayList<Long>();
 					if (ipCmdList != null) {
 
-						for (ItemPropertyCommand ipCmd : ipCmdList) {
-							for (ItemProperties ip : savedItemProperties) {
+						for (ItemPropertyCommand ipCmd : ipCmdList){
+							for (ItemProperties ip : savedItemProperties){
 
 								if (ipCmd.getId() != null && ip.getPropertyValueId() != null) {// 如果是多选
 									if (ipCmd.getId().equals(ip.getPropertyValueId().toString())) {
 										ipIds.add(ip.getId());
 									}
 
-								} else {// 如果是自定义多选
+								}else{// 如果是自定义多选
 									if (ipCmd.getValue().equals(ip.getPropertyValue())) {
 										ipIds.add(ip.getId());
 									}
@@ -1003,10 +1070,10 @@ public class ItemManagerImpl implements ItemManager {
 				}
 			}
 
-		} else {
+		}else{
 			int j = 0;
 			if (skuList != null && skuList.size() > 0) {
-				for (Sku sku : skuList) {
+				for (Sku sku : skuList){
 					sku.setItemId(itemId);
 					sku.setCreateTime(new Date());
 					sku.setOutid(codes[j]);
@@ -1018,8 +1085,7 @@ public class ItemManagerImpl implements ItemManager {
 					// "\""));
 					String propertiesName = sku.getPropertiesName().replace("/", "\"");
 
-					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>() {
-					};
+					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>(){};
 
 					List<ItemPropertyCommand> ipCmdList = null;
 					if (!"".equals(propertiesName)) {
@@ -1028,15 +1094,15 @@ public class ItemManagerImpl implements ItemManager {
 					List<Long> ipIds = new ArrayList<Long>();
 					if (ipCmdList != null) {
 
-						for (ItemPropertyCommand ipCmd : ipCmdList) {
-							for (ItemProperties ip : savedItemProperties) {
+						for (ItemPropertyCommand ipCmd : ipCmdList){
+							for (ItemProperties ip : savedItemProperties){
 
 								if (ipCmd.getId() != null && ip.getPropertyValueId() != null) {// 如果是多选
 									if (ipCmd.getId().equals(ip.getPropertyValueId().toString())) {
 										ipIds.add(ip.getId());
 									}
 
-								} else {// 如果是自定义多选
+								}else{// 如果是自定义多选
 									if (ipCmd.getValue().equals(ip.getPropertyValue())) {
 										ipIds.add(ip.getId());
 									}
@@ -1068,7 +1134,7 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param itemId
 	 * @return
 	 */
-	private ItemInfo createOrUpdateItemInfo(ItemCommand itemCommand, Long itemId) {
+	private ItemInfo createOrUpdateItemInfo(ItemCommand itemCommand,Long itemId){
 		ItemInfo itemInfo = null;
 		if (itemCommand.getId() != null) {
 			itemInfo = itemInfoDao.findItemInfoByItemId(itemCommand.getId());
@@ -1086,7 +1152,7 @@ public class ItemManagerImpl implements ItemManager {
 			itemInfo.setStyle(itemCommand.getStyle());
 			itemInfo.setType(itemCommand.getType());
 			itemInfo = itemInfoDao.save(itemInfo);
-		} else {
+		}else{
 			itemInfo = new ItemInfo();
 			itemInfo.setItemId(itemId);
 			itemInfo.setTitle(itemCommand.getTitle());
@@ -1117,11 +1183,15 @@ public class ItemManagerImpl implements ItemManager {
 	 * @return
 	 * @throws Exception
 	 */
-	private List<ItemProperties> createOrUpdateItemProperties(ItemCommand itemCommand, Long[] propertyValueIds, Long itemId, ItemProperties[] iProperties) throws Exception {
+	private List<ItemProperties> createOrUpdateItemProperties(
+			ItemCommand itemCommand,
+			Long[] propertyValueIds,
+			Long itemId,
+			ItemProperties[] iProperties) throws Exception{
 		List<ItemProperties> itemPropertyList = new ArrayList<ItemProperties>();
 
 		List<Long> list = new ArrayList<Long>();
-		for (Long pvs : propertyValueIds) {
+		for (Long pvs : propertyValueIds){
 			list.add(pvs);
 		}
 		List<PropertyValue> propertyValueList = propertyValueDao.findPropertyValueListByIds(list);
@@ -1135,32 +1205,30 @@ public class ItemManagerImpl implements ItemManager {
 			// str = str.replace("/", "");
 
 			ObjectMapper om = new ObjectMapper();
-			TypeReference<List<Sku>> valueTypeRef = new TypeReference<List<Sku>>() {
-			};
+			TypeReference<List<Sku>> valueTypeRef = new TypeReference<List<Sku>>(){};
 
 			if (!"".equals(str)) {
 				skuList = om.readValue(str, valueTypeRef);
 			}
 			if (skuList != null && skuList.size() > 0) {
-				for (Sku sku : skuList) {
+				for (Sku sku : skuList){
 					String propertiesName = sku.getPropertiesName().replace("/", "\"");
 
-					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>() {
-					};
+					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>(){};
 
 					List<ItemPropertyCommand> ipCmdList = null;
 					if (!"".equals(propertiesName)) {
 						ipCmdList = om.readValue(propertiesName, cmdRef);
-						for (ItemPropertyCommand ip : ipCmdList) {
+						for (ItemPropertyCommand ip : ipCmdList){
 
 							if (ip.getId() != null && !ip.getId().equals("undefined")) { // 多选
 
-								for (PropertyValue pv : propertyValueList) {
+								for (PropertyValue pv : propertyValueList){
 									Long vid = Long.parseLong(ip.getId());
 									if (vid.equals(pv.getId())) {
 										boolean existFlag = false;
 
-										for (ItemProperties svItemProperties : itemPropertyList) {
+										for (ItemProperties svItemProperties : itemPropertyList){
 											if (vid.equals(svItemProperties.getPropertyValueId())) {
 												existFlag = true;
 												break;
@@ -1180,11 +1248,11 @@ public class ItemManagerImpl implements ItemManager {
 									}
 								}
 
-							} else {// 自定义多选
+							}else{// 自定义多选
 								String itemPropertyValue = ip.getValue();
 
 								boolean existFlag = false;
-								for (ItemProperties svItemProperties : itemPropertyList) {
+								for (ItemProperties svItemProperties : itemPropertyList){
 									if (itemPropertyValue.equals(svItemProperties.getPropertyValue())) {
 										existFlag = true;
 										break;
@@ -1209,14 +1277,14 @@ public class ItemManagerImpl implements ItemManager {
 			}
 
 			// 保存普通属性
-			for (int j = 0; j < iProperties.length; j++) {
+			for (int j = 0; j < iProperties.length; j++){
 				ItemProperties itemProperties = iProperties[j];
 				ItemProperties itemProperties2 = null;
 				String propertyValueStr = itemProperties.getPropertyValue();
 				if (propertyValueStr.indexOf("||") != -1) {
 					String[] propertyValues = propertyValueStr.split("\\|\\|");
 					if (propertyValues != null && propertyValues.length > 0) {
-						for (String propertyValue : propertyValues) {
+						for (String propertyValue : propertyValues){
 							itemProperties2 = new ItemProperties();
 							itemProperties2.setPropertyValue(propertyValue);
 							itemProperties2.setPropertyId(itemProperties.getPropertyId());
@@ -1227,7 +1295,7 @@ public class ItemManagerImpl implements ItemManager {
 							itemPropertyList.add(itemProperties);
 						}
 					}
-				} else {
+				}else{
 					itemProperties.setItemId(itemCommand.getId());
 					itemProperties.setCreateTime(new Date());
 					itemProperties = itemPropertiesDao.save(itemProperties);
@@ -1258,7 +1326,7 @@ public class ItemManagerImpl implements ItemManager {
 			// itemProperties=itemPropertiesDao.save(itemProperties);
 			// itemPropertyList.add(itemProperties);
 			// }
-		} else {// 新增
+		}else{// 新增
 
 			// 先保存销售属性， 从sku字符串中拿到销售属性。 销售属性目前有两种 ，一种是 多选，另外一种是自定义多选
 
@@ -1266,32 +1334,30 @@ public class ItemManagerImpl implements ItemManager {
 			String str = itemCommand.getJsonSku().replaceAll("\'", "\"");
 
 			ObjectMapper om = new ObjectMapper();
-			TypeReference<List<Sku>> valueTypeRef = new TypeReference<List<Sku>>() {
-			};
+			TypeReference<List<Sku>> valueTypeRef = new TypeReference<List<Sku>>(){};
 
 			if (!"".equals(str)) {
 				skuList = om.readValue(str, valueTypeRef);
 			}
 			if (skuList != null && skuList.size() > 0) {
-				for (Sku sku : skuList) {
+				for (Sku sku : skuList){
 					String propertiesName = sku.getPropertiesName().replace("/", "\"");
 
-					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>() {
-					};
+					TypeReference<List<ItemPropertyCommand>> cmdRef = new TypeReference<List<ItemPropertyCommand>>(){};
 
 					List<ItemPropertyCommand> ipCmdList = null;
 					if (!"".equals(propertiesName)) {
 						ipCmdList = om.readValue(propertiesName, cmdRef);
-						for (ItemPropertyCommand ip : ipCmdList) {
+						for (ItemPropertyCommand ip : ipCmdList){
 
 							if (ip.getId() != null && !ip.getId().equals("undefined")) { // 多选
 
-								for (PropertyValue pv : propertyValueList) {
+								for (PropertyValue pv : propertyValueList){
 									Long vid = Long.parseLong(ip.getId());
 									if (vid.equals(pv.getId())) {
 										boolean existFlag = false;
 
-										for (ItemProperties svItemProperties : itemPropertyList) {
+										for (ItemProperties svItemProperties : itemPropertyList){
 											if (vid.equals(svItemProperties.getPropertyValueId())) {
 												existFlag = true;
 												break;
@@ -1311,11 +1377,11 @@ public class ItemManagerImpl implements ItemManager {
 									}
 								}
 
-							} else {// 自定义多选
+							}else{// 自定义多选
 								String itemPropertyValue = ip.getValue();
 
 								boolean existFlag = false;
-								for (ItemProperties svItemProperties : itemPropertyList) {
+								for (ItemProperties svItemProperties : itemPropertyList){
 									if (itemPropertyValue.equals(svItemProperties.getPropertyValue())) {
 										existFlag = true;
 										break;
@@ -1358,14 +1424,14 @@ public class ItemManagerImpl implements ItemManager {
 			// }
 
 			// 保存普通属性
-			for (int j = 0; j < iProperties.length; j++) {
+			for (int j = 0; j < iProperties.length; j++){
 				ItemProperties itemProperties = iProperties[j];
 				ItemProperties itemProperties2 = null;
 				String propertyValueStr = itemProperties.getPropertyValue();
 				if (propertyValueStr.indexOf("#") != -1) {
 					String[] propertyValues = propertyValueStr.split("\\|\\|");
 					if (propertyValues != null && propertyValues.length > 0) {
-						for (String propertyValue : propertyValues) {
+						for (String propertyValue : propertyValues){
 							itemProperties2 = new ItemProperties();
 							itemProperties2.setPropertyValue(propertyValue);
 							itemProperties2.setPropertyId(itemProperties.getPropertyId());
@@ -1376,7 +1442,7 @@ public class ItemManagerImpl implements ItemManager {
 							itemPropertyList.add(itemProperties);
 						}
 					}
-				} else {
+				}else{
 					itemProperties.setItemId(itemCommand.getId());
 					itemProperties.setCreateTime(new Date());
 					itemProperties = itemPropertiesDao.save(itemProperties);
@@ -1399,11 +1465,16 @@ public class ItemManagerImpl implements ItemManager {
 	 * @return
 	 * @throws Exception
 	 */
-	private List<ItemProperties> createOrUpdateItemProperties(ItemCommand itemCommand, Long[] propertyValueIds, ItemProperties[] iProperties, Long itemId, SkuPropertyCommand[] skuPropertyCommandArray) throws Exception {
+	private List<ItemProperties> createOrUpdateItemProperties(
+			ItemCommand itemCommand,
+			Long[] propertyValueIds,
+			ItemProperties[] iProperties,
+			Long itemId,
+			SkuPropertyCommand[] skuPropertyCommandArray) throws Exception{
 		List<ItemProperties> itemPropertyList = new ArrayList<ItemProperties>();
 
 		List<Long> list = new ArrayList<Long>();
-		for (Long pvs : propertyValueIds) {
+		for (Long pvs : propertyValueIds){
 			list.add(pvs);
 		}
 		List<PropertyValue> propertyValueList = propertyValueDao.findPropertyValueListByIds(list);
@@ -1411,29 +1482,28 @@ public class ItemManagerImpl implements ItemManager {
 		if (itemCommand.getId() != null) {// 修改
 
 			/**
-			 * 销售属性 ItemProperties的修改 根据传过来的 propertyValueIds 和
-			 * propertyValueInputs 组合成 itemProperties (已经在
-			 * skuPropertyCommandArray 中) 在properties 表中查找 这个itemProperties
-			 * 如果没有，就新增 。 对比删除 。不涉及修改
+			 * 销售属性 ItemProperties的修改 根据传过来的 propertyValueIds 和 propertyValueInputs 组合成 itemProperties (已经在 skuPropertyCommandArray 中)
+			 * 在properties 表中查找 这个itemProperties 如果没有，就新增 。 对比删除 。不涉及修改
 			 */
 			List<ItemProperties> ipListInDb = itemPropertiesDao.findItemPropertiesByItemId(itemCommand.getId());
 
 			// skuPropertyCommandArray 中的数据是否在 数据库中 。 循环结束后，
 			// skuPropertyCommandArray对应的 itemProperties 都在
 			// itemPropertyList中
-			for (SkuPropertyCommand cmd : skuPropertyCommandArray) {
+			for (SkuPropertyCommand cmd : skuPropertyCommandArray){
 				List<ItemPropertyCommand> ipcList = cmd.getPropertyList();
-				for (ItemPropertyCommand ipc : ipcList) {
+				for (ItemPropertyCommand ipc : ipcList){
 
 					// 相等的条件： propertyId 相等， 并且 (pvId相等 或者pvValue相等)
 
 					boolean existFlag = false;
 
 					// 看表单传过来的值 是否在 数据库中。 如果存在，那么就放入 itemPropertyList
-					for (ItemProperties ip : ipListInDb) {
+					for (ItemProperties ip : ipListInDb){
 
 						if (ip.getPropertyValueId() != null) {
-							if (ip.getPropertyId().equals(ipc.getpId()) && (null != ipc.getId()) && ((ip.getPropertyValueId().equals(Long.parseLong(ipc.getId()))))) {
+							if (ip.getPropertyId().equals(ipc.getpId()) && (null != ipc.getId())
+									&& ((ip.getPropertyValueId().equals(Long.parseLong(ipc.getId()))))) {
 								existFlag = true;
 
 								// 此处添加的时候 要注意判断是否存在该属性 此处可能导致 大循环结束 属性值重复
@@ -1458,10 +1528,11 @@ public class ItemManagerImpl implements ItemManager {
 					}
 
 					// 看表单传过来的值是否已经在 itemPropertyList 中了
-					for (ItemProperties ip : itemPropertyList) {
+					for (ItemProperties ip : itemPropertyList){
 
 						if (ip.getPropertyValueId() != null) {
-							if (ip.getPropertyId().equals(ipc.getpId()) && ((ip.getPropertyValueId().equals(Long.parseLong(ipc.getId()))))) {
+							if (ip.getPropertyId().equals(ipc.getpId())
+									&& ((ip.getPropertyValueId().equals(Long.parseLong(ipc.getId()))))) {
 								existFlag = true;
 								// itemPropertyList.add(ip);
 								break;
@@ -1501,9 +1572,9 @@ public class ItemManagerImpl implements ItemManager {
 			List<ItemProperties> ipToDelList = new ArrayList<ItemProperties>();
 
 			// 数据库中原有的 数据 没有在 新的itemProperties 则删掉 （普通属性也被删掉）
-			for (ItemProperties ipInDb : ipListInDb) {
+			for (ItemProperties ipInDb : ipListInDb){
 				boolean delFlag = true;
-				for (ItemProperties ip : itemPropertyList) {
+				for (ItemProperties ip : itemPropertyList){
 					if (ipInDb.getId().equals(ip.getId())) {
 						delFlag = false;
 						break;
@@ -1520,14 +1591,14 @@ public class ItemManagerImpl implements ItemManager {
 			// itemPropertiesDao.deleteAll(ipToDelList);
 
 			// 保存普通属性
-			for (int j = 0; j < iProperties.length; j++) {
+			for (int j = 0; j < iProperties.length; j++){
 				ItemProperties itemProperties = iProperties[j];
 				ItemProperties itemProperties2 = null;
 				String propertyValueStr = itemProperties.getPropertyValue();
 				if (propertyValueStr.indexOf("||") != -1) {
 					String[] propertyValues = propertyValueStr.split("\\|\\|");
 					if (propertyValues != null && propertyValues.length > 0) {
-						for (String propertyValue : propertyValues) {
+						for (String propertyValue : propertyValues){
 							itemProperties2 = new ItemProperties();
 							itemProperties2.setPropertyValue(propertyValue);
 							itemProperties2.setPropertyId(itemProperties.getPropertyId());
@@ -1538,7 +1609,7 @@ public class ItemManagerImpl implements ItemManager {
 							itemPropertyList.add(itemProperties);
 						}
 					}
-				} else {
+				}else{
 					itemProperties.setItemId(itemId);
 					itemProperties.setCreateTime(new Date());
 					itemProperties = itemPropertiesDao.save(itemProperties);
@@ -1546,7 +1617,7 @@ public class ItemManagerImpl implements ItemManager {
 				}
 			}
 
-			// 普通属性 删掉重新加载 
+			// 普通属性 删掉重新加载
 
 			// itemPropertiesDao.deleteItemPropertiesByItemId(itemCommand.getId());
 
@@ -1555,7 +1626,7 @@ public class ItemManagerImpl implements ItemManager {
 			// saveItemProperties(itemId, skuPropertyCommandArray,
 			// itemPropertyList, propertyValueList, iProperties);
 
-		} else {// 新增
+		}else{// 新增
 			saveItemProperties(itemId, skuPropertyCommandArray, itemPropertyList, propertyValueList, iProperties);
 
 		}
@@ -1563,9 +1634,9 @@ public class ItemManagerImpl implements ItemManager {
 		return itemPropertyList;
 	}
 
-	private boolean isItemPrpertiesExistInList(ItemProperties ip, List<ItemProperties> ipList) {
+	private boolean isItemPrpertiesExistInList(ItemProperties ip,List<ItemProperties> ipList){
 
-		for (ItemProperties i : ipList) {
+		for (ItemProperties i : ipList){
 
 			if (ip.getPropertyValueId() != null) {
 				if (ip.getPropertyId().equals(i.getPropertyId()) && ip.getPropertyValueId().equals(i.getPropertyValueId())) {
@@ -1582,23 +1653,28 @@ public class ItemManagerImpl implements ItemManager {
 		return false;
 	}
 
-	private void saveItemProperties(Long itemId, SkuPropertyCommand[] skuPropertyCommandArray, List<ItemProperties> itemPropertyList, List<PropertyValue> propertyValueList, ItemProperties[] iProperties) {
+	private void saveItemProperties(
+			Long itemId,
+			SkuPropertyCommand[] skuPropertyCommandArray,
+			List<ItemProperties> itemPropertyList,
+			List<PropertyValue> propertyValueList,
+			ItemProperties[] iProperties){
 		// 先保存销售属性， 从skuPropertyCommand中拿到销售属性。 销售属性目前有两种 ，一种是 多选，另外一种是自定义多选
 
 		if (skuPropertyCommandArray != null) {
 
-			for (SkuPropertyCommand skuPropertyCommand : skuPropertyCommandArray) {
+			for (SkuPropertyCommand skuPropertyCommand : skuPropertyCommandArray){
 				List<ItemPropertyCommand> ipcList = skuPropertyCommand.getPropertyList();
 
-				for (ItemPropertyCommand ip : ipcList) {
+				for (ItemPropertyCommand ip : ipcList){
 					if (ip.getId() != null && !ip.getId().equals("undefined")) { // 多选
 
-						for (PropertyValue pv : propertyValueList) {
+						for (PropertyValue pv : propertyValueList){
 							Long vid = Long.parseLong(ip.getId());
 							if (vid.equals(pv.getId())) {
 								boolean existFlag = false;
 
-								for (ItemProperties svItemProperties : itemPropertyList) {
+								for (ItemProperties svItemProperties : itemPropertyList){
 									if (vid.equals(svItemProperties.getPropertyValueId())) {
 										existFlag = true;
 										break;
@@ -1618,11 +1694,11 @@ public class ItemManagerImpl implements ItemManager {
 							}
 						}
 
-					} else {// 自定义多选
+					}else{// 自定义多选
 						String itemPropertyValue = ip.getValue();
 
 						boolean existFlag = false;
-						for (ItemProperties svItemProperties : itemPropertyList) {
+						for (ItemProperties svItemProperties : itemPropertyList){
 							if (itemPropertyValue.equals(svItemProperties.getPropertyValue())) {
 								existFlag = true;
 								break;
@@ -1644,15 +1720,15 @@ public class ItemManagerImpl implements ItemManager {
 			}
 		}
 
-		// 保存普通属性  着重检查 可能有错
-		for (int j = 0; j < iProperties.length; j++) {
+		// 保存普通属性 着重检查 可能有错
+		for (int j = 0; j < iProperties.length; j++){
 			ItemProperties itemProperties = iProperties[j];
 			ItemProperties itemProperties2 = null;
 			String propertyValueStr = itemProperties.getPropertyValue();
 			if (propertyValueStr.indexOf("||") != -1) {
 				String[] propertyValues = propertyValueStr.split("\\|\\|");
 				if (propertyValues != null && propertyValues.length > 0) {
-					for (String propertyValue : propertyValues) {
+					for (String propertyValue : propertyValues){
 						itemProperties2 = new ItemProperties();
 						itemProperties2.setPropertyValue(propertyValue);
 						itemProperties2.setPropertyId(itemProperties.getPropertyId());
@@ -1663,7 +1739,7 @@ public class ItemManagerImpl implements ItemManager {
 						itemPropertyList.add(itemProperties);
 					}
 				}
-			} else {
+			}else{
 				itemProperties.setItemId(itemId);
 				itemProperties.setCreateTime(new Date());
 				itemProperties = itemPropertiesDao.save(itemProperties);
@@ -1674,47 +1750,39 @@ public class ItemManagerImpl implements ItemManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#findItemInfoByItemId(Long
-	 * itemId)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findItemInfoByItemId(Long itemId)
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public ItemInfo findItemInfoByItemId(Long itemId) {
+	public ItemInfo findItemInfoByItemId(Long itemId){
 		ItemInfo itemInfo = itemInfoDao.findItemInfoByItemId(itemId);
 		return itemInfo;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#findItemPropertiesListyByItemId
-	 * (Long itemId)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findItemPropertiesListyByItemId (Long itemId)
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<ItemProperties> findItemPropertiesListyByItemId(Long itemId) {
+	public List<ItemProperties> findItemPropertiesListyByItemId(Long itemId){
 		List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertiesByItemId(itemId);
 		return itemPropertiesList;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see com.baozun.nebula.manager.product.ItemManager#findSkuByItemId(Long
-	 * itemId)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findSkuByItemId(Long itemId)
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<Sku> findSkuByItemId(Long itemId) {
+	public List<Sku> findSkuByItemId(Long itemId){
 		List<Sku> skuList = skuDao.findSkuByItemId(itemId);
 		return skuList;
 	}
 
 	@Override
-	public void createOrUpdateItemImage(ItemImage[] itemImages, Long itemId, String baseImageUrl, boolean isImageTypeGroup) {
+	public void createOrUpdateItemImage(ItemImage[] itemImages,Long itemId,String baseImageUrl,boolean isImageTypeGroup){
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("itemId", itemId);
 
@@ -1722,26 +1790,26 @@ public class ItemManagerImpl implements ItemManager {
 		List<Long> deleteList = new ArrayList<Long>();
 
 		List<ItemImage> oldImageList = itemImageDao.findItemImageByItemPropAndItemId(paramMap);
-		
+
 		// 1: 遍历从jsp页面传递过来的itemImages数组, 如果
 		// Id为空,则表示该itemImage是新增;否则是修改或不处理的(页面上没有修改过的数据)itemImage,
 		// 并放入newMap(key:id,value:itemImage对象)中;
-		
+
 		Map<String, Integer> typeItemPropertiesMap = new HashMap<String, Integer>();
-		
-		for (ItemImage itemImage : itemImages) {
-			// 商品图片的排序: 通过type分组,	每组type中的图片的位置都是1,2,3...
-			if(!isImageTypeGroup){
+
+		for (ItemImage itemImage : itemImages){
+			// 商品图片的排序: 通过type分组, 每组type中的图片的位置都是1,2,3...
+			if (!isImageTypeGroup) {
 				Integer position = 1;
 				String type = itemImage.getType();
-				String itemProperties = itemImage.getItemProperties() == null?"":String.valueOf(itemImage.getItemProperties());
-				if(typeItemPropertiesMap.containsKey(type+itemProperties)){
-					position = typeItemPropertiesMap.get(type+itemProperties)+1;
+				String itemProperties = itemImage.getItemProperties() == null ? "" : String.valueOf(itemImage.getItemProperties());
+				if (typeItemPropertiesMap.containsKey(type + itemProperties)) {
+					position = typeItemPropertiesMap.get(type + itemProperties) + 1;
 				}
-				typeItemPropertiesMap.put(type+itemProperties, position);
+				typeItemPropertiesMap.put(type + itemProperties, position);
 				itemImage.setPosition(position);
 			}
-			
+
 			Long id = itemImage.getId();
 			String picUrl = replacePicUrl(itemImage.getPicUrl(), baseImageUrl);
 			if (null == id) {
@@ -1753,7 +1821,7 @@ public class ItemManagerImpl implements ItemManager {
 					itemImage.setPicUrl(picUrl);
 					itemImageDao.save(itemImage);
 				}
-			} else {
+			}else{
 				newMap.put(itemImage.getId(), itemImage);
 			}
 		}
@@ -1762,15 +1830,20 @@ public class ItemManagerImpl implements ItemManager {
 		// 3: 判断数据是否需要修改还是不处理: 通过itemImage中的description(描述),
 		// type(类型:列表页,内容页,两者都), position(位置),
 		// picUrl(图片路径)来判断该itemImage是否要修改
-		for (ItemImage oldImage : oldImageList) {
+		for (ItemImage oldImage : oldImageList){
 			Long oldId = oldImage.getId();
 			ItemImage newImage = newMap.get(oldId);
 			if (newImage == null) {
 				deleteList.add(oldId);
-			} else {
+			}else{
 				// 判断数据是否需要修改还是不处理的数据
 				if (!diffImage(oldImage, newImage, baseImageUrl)) {
-					itemImageDao.updateItemImageById(newImage.getType(), replacePicUrl(newImage.getPicUrl(), baseImageUrl), newImage.getPosition(), newImage.getDescription(), newImage.getId());
+					itemImageDao.updateItemImageById(
+							newImage.getType(),
+							replacePicUrl(newImage.getPicUrl(), baseImageUrl),
+							newImage.getPosition(),
+							newImage.getDescription(),
+							newImage.getId());
 				}
 			}
 		}
@@ -1788,7 +1861,7 @@ public class ItemManagerImpl implements ItemManager {
 	 * @return :Boolean
 	 * @date 2014-3-5 下午07:41:22
 	 */
-	private Boolean diffImage(ItemImage oldImage, ItemImage newImage, String baseImageUrl) {
+	private Boolean diffImage(ItemImage oldImage,ItemImage newImage,String baseImageUrl){
 		EqualsBuilder equalsBuilder = new EqualsBuilder();
 		equalsBuilder.append(oldImage.getDescription(), newImage.getDescription());
 		equalsBuilder.append(oldImage.getPicUrl(), replacePicUrl(newImage.getPicUrl(), baseImageUrl));
@@ -1796,12 +1869,13 @@ public class ItemManagerImpl implements ItemManager {
 		equalsBuilder.append(oldImage.getType(), newImage.getType());
 		return equalsBuilder.isEquals();
 	}
-	private Boolean diffImage(ItemImage oldImage, ItemImageLangCommand newImage, String baseImageUrl) {
+
+	private Boolean diffImage(ItemImage oldImage,ItemImageLangCommand newImage,String baseImageUrl){
 		EqualsBuilder equalsBuilder = new EqualsBuilder();
 		boolean i18n = LangProperty.getI18nOnOff();
-		if(i18n){
+		if (i18n) {
 			MutlLang newDesc = (MutlLang) newImage.getDescription();
-			equalsBuilder.append(oldImage.getDescription(),newDesc.getDefaultValue());
+			equalsBuilder.append(oldImage.getDescription(), newDesc.getDefaultValue());
 			MutlLang newUrl = (MutlLang) newImage.getPicUrl();
 			equalsBuilder.append(oldImage.getPicUrl(), replacePicUrl(newUrl.getDefaultValue(), baseImageUrl));
 		}else{
@@ -1823,16 +1897,16 @@ public class ItemManagerImpl implements ItemManager {
 	 * @return :String
 	 * @date 2014-3-5 下午05:00:20
 	 */
-	private String replacePicUrl(String picUrl, String baseImageUrl) {
+	private String replacePicUrl(String picUrl,String baseImageUrl){
 		if (StringUtils.isNotBlank(picUrl) && picUrl.toLowerCase().startsWith(baseImageUrl)) {
 			picUrl = picUrl.replace(baseImageUrl, "");
 		}
 		return picUrl;
 	}
 
-	private String[] replacePicUrl(String[] picUrls, String baseImageUrl) {
+	private String[] replacePicUrl(String[] picUrls,String baseImageUrl){
 		String[] arrs = new String[picUrls.length];
-		for (int j = 0; j < picUrls.length; j++) {
+		for (int j = 0; j < picUrls.length; j++){
 			String picUrl = picUrls[j];
 			if (StringUtils.isNotBlank(picUrl) && picUrl.toLowerCase().startsWith(baseImageUrl)) {
 				picUrl = picUrl.replace(baseImageUrl, "");
@@ -1843,7 +1917,7 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public List<ItemImage> findItemImageByItemPropAndItemId(String itemProperties, Long itemId, Long propertyValueId) {
+	public List<ItemImage> findItemImageByItemPropAndItemId(String itemProperties,Long itemId,Long propertyValueId){
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("itemId", itemId);
 		if (StringUtils.isNotBlank(itemProperties)) {
@@ -1853,7 +1927,7 @@ public class ItemManagerImpl implements ItemManager {
 		if (propertyValueId != null && StringUtils.isNotBlank(String.valueOf(propertyValueId))) {
 			// paramMap.put("propertyValueId", propertyValueId);
 			List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertiesByItemId(itemId);
-			for (ItemProperties itemProp : itemPropertiesList) {
+			for (ItemProperties itemProp : itemPropertiesList){
 				if (propertyValueId.equals(itemProp.getPropertyValueId())) {
 					paramMap.put("itemProperties", String.valueOf(itemProp.getId()));
 				}
@@ -1863,46 +1937,40 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public Integer updateItemInfoLSPIdByItemId(Long lastSelectPropertyId, Long itemId) {
+	public Integer updateItemInfoLSPIdByItemId(Long lastSelectPropertyId,Long itemId){
 		return itemInfoDao.updateItemInfoLSPIdByItemId(lastSelectPropertyId, itemId);
 	}
 
 	@Override
-	public Integer updateItemInfoLSPVIdByItemId(Long lastSelectPropertyValueId, Long itemId) {
+	public Integer updateItemInfoLSPVIdByItemId(Long lastSelectPropertyValueId,Long itemId){
 		return itemInfoDao.updateItemInfoLSPVIdByItemId(lastSelectPropertyValueId, itemId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#findSkuBySkuCode(java.lang
-	 * .String)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findSkuBySkuCode(java.lang .String)
 	 */
 	@Override
-	public Sku findSkuBySkuCode(String code) {
+	public Sku findSkuBySkuCode(String code){
 		Sku sku = skuDao.findSkuByExtentionCode(code);
 		return sku;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#validateUpdateSkuCode(java
-	 * .util.List)
+	 * @see com.baozun.nebula.manager.product.ItemManager#validateUpdateSkuCode(java .util.List)
 	 */
 	@Override
-	public List<String> validateUpdateSkuCode(List<SkuPropertyCommand> cmdList) {
+	public List<String> validateUpdateSkuCode(List<SkuPropertyCommand> cmdList){
 		List<String> result = new ArrayList<String>();
 
-		for (SkuPropertyCommand cmd : cmdList) {
+		for (SkuPropertyCommand cmd : cmdList){
 			if (cmd.getId() == null || cmd.getId() < 0) {// 修改时候新增的
 				Sku sku = skuDao.findSkuByExtentionCode(cmd.getCode());
 				if (sku != null) {// 根据填写的code，能从数据库中查出来。不合法
 					result.add(cmd.getCode());
 				}
-			} else {// 修改的
+			}else{// 修改的
 				Sku sku = skuDao.findSkuByExtentionCode(cmd.getCode());
 				if (sku != null) {// 该sku的code 查出有数据，并且id 不相等，不合法
 					if (!sku.getId().equals(cmd.getId())) {
@@ -1919,21 +1987,21 @@ public class ItemManagerImpl implements ItemManager {
 	 * import item start
 	 */
 	@Override
-	public List<Item> importItemFromFile(InputStream is, Long shopId) throws BusinessException {
-		
+	public List<Item> importItemFromFile(InputStream is,Long shopId) throws BusinessException{
+
 		BusinessException topE = null, currE = null;
 
 		/** 字节流存到内存方便多次读取 **/
 
 		InputStreamCacher cacher = null;
-		try {
+		try{
 			cacher = new InputStreamCacher(is);
-		} catch (Exception e) {
+		}catch (Exception e){
 			e.printStackTrace();
-		} finally {
-			try {
+		}finally{
+			try{
 				is.close();
-			} catch (IOException e) {
+			}catch (IOException e){
 				e.printStackTrace();
 			}
 		}
@@ -1949,7 +2017,6 @@ public class ItemManagerImpl implements ItemManager {
 
 		/***
 		 * 根据读取的数据 1：判断店铺是否一致 2：根据行业 查出该行业所对应的属性 3. 设置映射关系 4：根据属性对比excel属性是否一致
-		 * 
 		 */
 
 		/** 店铺ID检查 **/
@@ -1963,9 +2030,9 @@ public class ItemManagerImpl implements ItemManager {
 		// 查询这个开关配置（开关的作用是控制批量新建导入模板字段内容是否排序）
 		String pdUploadFieldSortFlag = sdkMataInfoManager.findValue(MataInfo.PD_UPLOAD_TEMPLATE_FIELD_SORT_BY_ID);
 		Sort[] sorts = null;
-		if("true".equalsIgnoreCase(pdUploadFieldSortFlag)){
+		if ("true".equalsIgnoreCase(pdUploadFieldSortFlag)) {
 			sorts = new Sort[1];
-			sorts[0] = new Sort("p.id","asc");	
+			sorts[0] = new Sort("p.id", "asc");
 		}
 		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industryId, shopId, sorts);
 		// 拆分成 销售属性List 非销售属性
@@ -1975,10 +2042,10 @@ public class ItemManagerImpl implements ItemManager {
 
 		Map<Long, Boolean> isReqMap = new HashMap<Long, Boolean>();
 		if (Validator.isNotNullOrEmpty(propertyList)) {
-			for (Property property : propertyList) {
+			for (Property property : propertyList){
 				if (property.getIsSaleProp()) {
 					salePropIdList.add(property.getId());
-				} else {
+				}else{
 					notSalePropIdList.add(property.getId());
 				}
 				isReqMap.put(property.getId(), property.getRequired());
@@ -1993,10 +2060,8 @@ public class ItemManagerImpl implements ItemManager {
 		skuCommSheetDefiniton(skuUpload, salePropIdList, isReqMap);
 
 		/****
-		 * 再次读取 重新赋值
-		 * 
-		 * *
-		 * ****/
+		 * 再次读取 重新赋值 *
+		 ****/
 		notSalePropIdMap = new LinkedHashMap<String, String>();
 		itemBeans = new HashMap<String, Object>();
 		itemBeans.put("propIds", notSalePropIdMap);
@@ -2008,9 +2073,7 @@ public class ItemManagerImpl implements ItemManager {
 		ReadStatus rs2 = skuUpload.readSheet(cacher.getInputStream(), 1, skuBeans);
 
 		/**
-		 * 
 		 * 检验属性列是否匹配
-		 * 
 		 */
 
 		propMatching(notSalePropIdMap, notSalePropIdList);
@@ -2019,20 +2082,18 @@ public class ItemManagerImpl implements ItemManager {
 
 		/*** 2：判断excel必填项 */
 		/*
-		 * topE = rsToE(rs, topE, currE);
-		 * 
-		 * topE = rsToE(rs2, topE, currE);
+		 * topE = rsToE(rs, topE, currE); topE = rsToE(rs2, topE, currE);
 		 */
 
 		if (rs.getStatus() != ReadStatus.STATUS_SUCCESS) {
 			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(rs, Locale.SIMPLIFIED_CHINESE);
-			for (String message : messageList) {
+			for (String message : messageList){
 				BusinessException e = new BusinessException(message);
 				if (topE == null) {
 					topE = e; // b-101 : Cell{}错误, new
 								// Object[]{ExcelUtil.getCell(1,2)}
 					currE = e;
-				} else {
+				}else{
 					currE.setLinkedException(e);
 					currE = e;
 				}
@@ -2042,13 +2103,13 @@ public class ItemManagerImpl implements ItemManager {
 
 		if (rs2.getStatus() != ReadStatus.STATUS_SUCCESS) {
 			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(rs2, Locale.SIMPLIFIED_CHINESE);
-			for (String message : messageList) {
+			for (String message : messageList){
 				BusinessException e = new BusinessException(message);
 				if (topE == null) {
 					topE = e; // b-101 : Cell{}错误, new
 								// Object[]{ExcelUtil.getCell(1,2)}
 					currE = e;
-				} else {
+				}else{
 					currE.setLinkedException(e);
 					currE = e;
 				}
@@ -2071,7 +2132,14 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param shopId
 	 * @param industryId
 	 */
-	public List<Item> dataValidateAndSave(List<Property> propertyList, Map<String, Object> itemBeans, Map<String, Object> skuBeans, Long shopId, Long industryId, List<Long> notSalePropIdList, List<Long> salePropIdList) {
+	public List<Item> dataValidateAndSave(
+			List<Property> propertyList,
+			Map<String, Object> itemBeans,
+			Map<String, Object> skuBeans,
+			Long shopId,
+			Long industryId,
+			List<Long> notSalePropIdList,
+			List<Long> salePropIdList){
 		BusinessException topE = null, currE = null;
 		int counter = 0;
 		List<Item> allItemList = itemDao.findEffectiveItemList();
@@ -2099,7 +2167,7 @@ public class ItemManagerImpl implements ItemManager {
 		Map<String, Boolean> itemStatusMap = new HashMap<String, Boolean>();
 
 		if (Validator.isNotNullOrEmpty(itemList)) {
-			for (Item item : itemList) {
+			for (Item item : itemList){
 				itemMap.put(item.getCode(), item.getId());
 				itemStatusMap.put(item.getCode(), false);
 			}
@@ -2111,7 +2179,7 @@ public class ItemManagerImpl implements ItemManager {
 		// 去除该店铺，该行业的商品
 		allItemList.removeAll(itemList);
 		if (Validator.isNotNullOrEmpty(allItemList)) {
-			for (Item item : allItemList) {
+			for (Item item : allItemList){
 				otherItemMap.put(item.getCode(), item.getId());
 			}
 
@@ -2134,13 +2202,13 @@ public class ItemManagerImpl implements ItemManager {
 		if (Validator.isNotNullOrEmpty(itemIds)) {
 			List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertieListByItemIds(itemIds);
 			if (Validator.isNotNullOrEmpty(itemPropertiesList)) {
-				for (ItemProperties itemProperties : itemPropertiesList) {
+				for (ItemProperties itemProperties : itemPropertiesList){
 					String key = itemProperties.getItemId() + "_" + itemProperties.getPropertyId();
 					itemPropMap.put(key, itemProperties.getId());
 					if (itemProperties.getPropertyValue() != null) {
 						key = itemProperties.getItemId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValue();
 						itemPropVMap.put(key, itemProperties.getId());
-					} else {
+					}else{
 						key = itemProperties.getItemId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
 						itemPropIdMap.put(key, itemProperties.getId());
 					}
@@ -2162,7 +2230,7 @@ public class ItemManagerImpl implements ItemManager {
 		int itemCosIndex = 0;
 		int itemRowIndex = 0;
 		int skuCosIndex = 0;
-		int skuCosIndex1 =0;
+		int skuCosIndex1 = 0;
 		int skuRowIndex = 0;
 		Iterator it = null;
 
@@ -2177,7 +2245,7 @@ public class ItemManagerImpl implements ItemManager {
 		// 数据字典 12
 		// key = categorycode
 		// value = categoryid
-//		Map<String, Long> categoryMap = getCategoryMap();
+		// Map<String, Long> categoryMap = getCategoryMap();
 		Map<String, Long> leafNodeCategoryMap = categoryManager.getLeafNodeCategoryMap();
 
 		// 数据字典13 判断upc是否重复
@@ -2191,46 +2259,50 @@ public class ItemManagerImpl implements ItemManager {
 
 		itemRowIndex = ITEMCOMM_SHEETDEFINITION_STARTROW;
 		if (Validator.isNotNullOrEmpty(impItemCommandList)) {
-			for (ImpItemCommand itemCommand : impItemCommandList) {
+			for (ImpItemCommand itemCommand : impItemCommandList){
 				itemCosIndex = ITEMCOMM_SHEETDEFINITION_STARTCOL;
 				// true 表示修改 false表示新增
 				if (itemMap.get(itemCommand.getCode()) == null) {
 					itemStatusMap.put(itemCommand.getCode(), false);
-				} else {
+				}else{
 					itemStatusMap.put(itemCommand.getCode(), true);
 				}
 				// 配置了正则并且不满足正则条件的情况下
-				if(Validator.isNotNullOrEmpty(pdValidCode)){
-					if(!Pattern.matches(pdValidCode, itemCommand.getCode())){
+				if (Validator.isNotNullOrEmpty(pdValidCode)) {
+					if (!Pattern.matches(pdValidCode, itemCommand.getCode())) {
 						if (++counter < 50) {
-							BusinessException e = new BusinessException(ErrorCodes.ITEM_CODE_VALID_ERROR, new Object[] { itemCommand.getCode(), pdValidCode});
+							BusinessException e = new BusinessException(
+									ErrorCodes.ITEM_CODE_VALID_ERROR,
+									new Object[] { itemCommand.getCode(), pdValidCode });
 
 							if (topE == null) {
 								topE = e; // b-101 : Cell{}错误, new
 											// Object[]{ExcelUtil.getCell(1,2)}
 								currE = e;
-							} else {
+							}else{
 								currE.setLinkedException(e);
 								currE = e;
 							}
-						} else {
+						}else{
 							throw topE;
 						}
 					}
 				}
 				if (otherItemMap.get(itemCommand.getCode()) != null) {
 					if (++counter < 50) {
-						BusinessException e = new BusinessException(ErrorCodes.ITEMCODE_REPEAT_ERROR, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 1) });
+						BusinessException e = new BusinessException(
+								ErrorCodes.ITEMCODE_REPEAT_ERROR,
+								new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 1) });
 
 						if (topE == null) {
 							topE = e; // b-101 : Cell{}错误, new
 										// Object[]{ExcelUtil.getCell(1,2)}
 							currE = e;
-						} else {
+						}else{
 							currE.setLinkedException(e);
 							currE = e;
 						}
-					} else {
+					}else{
 						throw topE;
 					}
 				}
@@ -2239,7 +2311,7 @@ public class ItemManagerImpl implements ItemManager {
 
 				Map<String, String> prop = itemCommand.getProps();
 				it = prop.keySet().iterator();
-				while (it.hasNext()) {
+				while (it.hasNext()){
 
 					itemCosIndex++;
 
@@ -2255,18 +2327,18 @@ public class ItemManagerImpl implements ItemManager {
 					if (property.getEditingType() == 1) {
 						itemProperties.setPropertyValue(prop.get(key));
 						ipslist.add(itemProperties);
-					} else if (property.getEditingType() == 2) {
+					}else if (property.getEditingType() == 2) {
 						Long pvId = null;
 						if (null != propValMap.get(propId)) {
 							pvId = propValMap.get(propId).get(prop.get(key));
 						}
 						if (pvId == null) {
 							itemProperties.setPropertyValue(prop.get(key));
-						} else {
+						}else{
 							itemProperties.setPropertyValueId(pvId);
 						}
 						ipslist.add(itemProperties);
-					} else if (property.getEditingType() == 3) {
+					}else if (property.getEditingType() == 3) {
 						if (Validator.isNotNullOrEmpty(prop.get(key))) {
 							Long pvId = null;
 							if (null != propValMap.get(propId)) {
@@ -2274,31 +2346,33 @@ public class ItemManagerImpl implements ItemManager {
 							}
 							if (pvId == null) {
 								if (++counter < 50) {
-									BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), prop.get(key) });
+									BusinessException e = new BusinessException(
+											ErrorCodes.CELL_ERROR,
+											new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), prop.get(key) });
 									if (topE == null) {
 										topE = e; // b-101 : Cell{}错误, new
 													// Object[]{ExcelUtil.getCell(1,2)}
 										currE = e;
-									} else {
+									}else{
 										currE.setLinkedException(e);
 										currE = e;
 									}
-								} else {
+								}else{
 									throw topE;
 								}
-							} else {
+							}else{
 								itemProperties.setPropertyValueId(pvId);
 							}
 							ipslist.add(itemProperties);
 						}
-					} else if (property.getEditingType() == 4) {
+					}else if (property.getEditingType() == 4) {
 						if (Validator.isNotNullOrEmpty(prop.get(key))) {
 
 							String propVals = prop.get(key);
 
 							String[] strs = propVals.split(DOUBLE_SLASH_SEPARATOR);
 
-							for (String str : strs) {
+							for (String str : strs){
 								Long pvId = null;
 								itemProperties = new ItemProperties();
 								itemProperties.setPropertyId(propId);
@@ -2307,19 +2381,21 @@ public class ItemManagerImpl implements ItemManager {
 								}
 								if (pvId == null) {
 									if (++counter < 50) {
-										BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), str });
+										BusinessException e = new BusinessException(
+												ErrorCodes.CELL_ERROR,
+												new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), str });
 										if (topE == null) {
 											topE = e; // b-101 : Cell{}错误, new
 														// Object[]{ExcelUtil.getCell(1,2)}
 											currE = e;
-										} else {
+										}else{
 											currE.setLinkedException(e);
 											currE = e;
 										}
-									} else {
+									}else{
 										throw topE;
 									}
-								} else {
+								}else{
 									itemProperties.setPropertyValueId(pvId);
 								}
 								ipslist.add(itemProperties);
@@ -2339,28 +2415,30 @@ public class ItemManagerImpl implements ItemManager {
 					// 反斜杠“/”
 					String[] strs = categoryCodes.split(BACK_SLANT_SEPARATOR);
 					if (Validator.isNotNullOrEmpty(strs)) {
-						for (String str : strs) {
-							if (Validator.isNullOrEmpty(leafNodeCategoryMap.get(str))) {//增加判断逻辑：如果不是叶子节点，也提示错误信息！产品挂分类必须挂在叶子节点。
+						for (String str : strs){
+							if (Validator.isNullOrEmpty(leafNodeCategoryMap.get(str))) {// 增加判断逻辑：如果不是叶子节点，也提示错误信息！产品挂分类必须挂在叶子节点。
 								if (++counter < 50) {
-									BusinessException e = new BusinessException(ErrorCodes.PRODUCT_CATEGORY_NOT_LEAFNODE, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 9), str });
+									BusinessException e = new BusinessException(
+											ErrorCodes.PRODUCT_CATEGORY_NOT_LEAFNODE,
+											new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 9), str });
 									if (topE == null) {
 										topE = e; // b-101 : Cell{}错误, new
 													// Object[]{ExcelUtil.getCell(1,2)}
 										currE = e;
-									} else {
+									}else{
 										currE.setLinkedException(e);
 										currE = e;
 									}
-								} else {
+								}else{
 									throw topE;
 								}
-							} else {
+							}else{
 								ItemCategory itemCategory = new ItemCategory();
 								itemCategory.setCategoryId(leafNodeCategoryMap.get(str));
 
 								if (itemCategoryList != null) {
 									itemCategoryList.add(itemCategory);
-								} else {
+								}else{
 									itemCategoryList = new ArrayList<ItemCategory>();
 									itemCategoryList.add(itemCategory);
 								}
@@ -2381,11 +2459,11 @@ public class ItemManagerImpl implements ItemManager {
 		List<ImpSkuCommand> impSkuCommandList = (List<ImpSkuCommand>) skuBeans.get("impSkuCommand");
 
 		Set<String> set = new HashSet<String>();
-		for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+		for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 			set.add(impSkuCommand.getCode());
 		}
 		List<Long> itemIdsToBeRemove = new ArrayList<Long>();
-		for (String str : set) {
+		for (String str : set){
 			itemIdsToBeRemove.add(itemMap.get(str));
 		}
 
@@ -2393,7 +2471,7 @@ public class ItemManagerImpl implements ItemManager {
 
 		List<Sku> skuList = skuDao.findSkuByItemIds(allItemIds);
 		if (Validator.isNotNullOrEmpty(skuList)) {
-			for (Sku sku : skuList) {
+			for (Sku sku : skuList){
 				skuUpcMap.put(sku.getOutid(), "");
 			}
 		}
@@ -2401,25 +2479,27 @@ public class ItemManagerImpl implements ItemManager {
 		skuRowIndex = SKUCOMM_SHEETDEFINITION_STARTROW;
 
 		if (Validator.isNotNullOrEmpty(impSkuCommandList)) {
-			for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+			for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 
 				skuCosIndex = SKUCOMM_SHEETDEFINITION_STARTCOL;
 				skuCosIndex1 = SKUCOMM_SHEETDEFINITION_STARTCOL;
 				// 检验upc是否重复
 				if (null == skuUpcMap.get(impSkuCommand.getUpc())) {
 					skuUpcMap.put(impSkuCommand.getUpc(), "");
-				} else {
+				}else{
 					if (++counter < 50) {
-						BusinessException e = new BusinessException(ErrorCodes.UPC_REPEAT_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 1) });
+						BusinessException e = new BusinessException(
+								ErrorCodes.UPC_REPEAT_ERROR,
+								new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 1) });
 						if (topE == null) {
 							topE = e; // b-101 : Cell{}错误, new
 										// Object[]{ExcelUtil.getCell(1,2)}
 							currE = e;
-						} else {
+						}else{
 							currE.setLinkedException(e);
 							currE = e;
 						}
-					} else {
+					}else{
 						throw topE;
 					}
 				}
@@ -2427,36 +2507,38 @@ public class ItemManagerImpl implements ItemManager {
 				// 检验code是否存在
 				if (itemStatusMap.get(impSkuCommand.getCode()) == null) {
 					if (++counter < 50) {
-						BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 0), impSkuCommand.getCode() });
+						BusinessException e = new BusinessException(
+								ErrorCodes.CELL_ERROR,
+								new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 0), impSkuCommand.getCode() });
 						if (topE == null) {
 							topE = e; // b-101 : Cell{}错误, new
 										// Object[]{ExcelUtil.getCell(1,2)}
 							currE = e;
-						} else {
+						}else{
 							currE.setLinkedException(e);
 							currE = e;
 						}
-					} else {
+					}else{
 						throw topE;
 					}
-				} else {
+				}else{
 					// 属性值
 					List<ItemProperties> ipslist = impSkuCommand.getItemProps();
-					if(ipslist == null){
+					if (ipslist == null) {
 						ipslist = new ArrayList<ItemProperties>();
 					}
 					Map<String, String> props = impSkuCommand.getProps();
 					it = props.keySet().iterator();
-					
-					while (it.hasNext()) {
+
+					while (it.hasNext()){
 						skuCosIndex1++;
 						skuCosIndex1++;
 						String key = it.next().toString();
 						Long propId = Long.valueOf(key.substring(1, key.length()));
 						Property property = (Property) propMap.get(propId);
 						ItemProperties itemProperties = new ItemProperties();
-						//何波 sheet2 添加多选检查 editType == 4
-						if(property.getEditingType()==4){
+						// 何波 sheet2 添加多选检查 editType == 4
+						if (property.getEditingType() == 4) {
 							if (Validator.isNotNullOrEmpty(props.get(key))) {
 								String propVals = props.get(key);
 								Long pvId = null;
@@ -2466,19 +2548,21 @@ public class ItemManagerImpl implements ItemManager {
 								}
 								if (pvId == null) {
 									if (++counter < 50) {
-										BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex1-1), propVals });
+										BusinessException e = new BusinessException(
+												ErrorCodes.CELL_ERROR,
+												new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex1 - 1), propVals });
 										if (topE == null) {
 											topE = e; // b-101 : Cell{}错误, new
 														// Object[]{ExcelUtil.getCell(1,2)}
 											currE = e;
-										} else {
+										}else{
 											currE.setLinkedException(e);
 											currE = e;
 										}
-									} else {
+									}else{
 										throw topE;
 									}
-								} else {
+								}else{
 									itemProperties.setPropertyValueId(pvId);
 								}
 								ipslist.add(itemProperties);
@@ -2495,8 +2579,8 @@ public class ItemManagerImpl implements ItemManager {
 					List<SearchConditionItem> searchConditionItems = impSkuCommand.getSearchConditionItems();
 					Map<String, String> scs = impSkuCommand.getScs();
 					it = scs.keySet().iterator();
-					
-					while (it.hasNext()) {
+
+					while (it.hasNext()){
 						skuCosIndex++;
 						skuCosIndex++;
 						String key = it.next().toString();
@@ -2507,29 +2591,31 @@ public class ItemManagerImpl implements ItemManager {
 							// 反斜杠“/”
 							String[] strs = value.split(BACK_SLANT_SEPARATOR);
 							if (Validator.isNotNullOrEmpty(strs)) {
-								for (String str : strs) {
+								for (String str : strs){
 									if (null == conItemMap.get(propId) || null == conItemMap.get(propId).get(str)) {
 										if (++counter < 50) {
-											BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex), str });
+											BusinessException e = new BusinessException(
+													ErrorCodes.CELL_ERROR,
+													new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex), str });
 											if (topE == null) {
 												topE = e; // b-101 : Cell{}错误,
 															// new
 															// Object[]{ExcelUtil.getCell(1,2)}
 												currE = e;
-											} else {
+											}else{
 												currE.setLinkedException(e);
 												currE = e;
 											}
-										} else {
+										}else{
 											throw topE;
 										}
-									} else {
+									}else{
 										SearchConditionItem searchConditionItem = new SearchConditionItem();
 										searchConditionItem.setId(conItemMap.get(propId).get(str));
 										searchConditionItem.setPropertyId(propId);
 										if (searchConditionItems != null) {
 											searchConditionItems.add(searchConditionItem);
-										} else {
+										}else{
 											searchConditionItems = new ArrayList<SearchConditionItem>();
 											searchConditionItems.add(searchConditionItem);
 										}
@@ -2549,29 +2635,58 @@ public class ItemManagerImpl implements ItemManager {
 
 		/**
 		 * 检验完成之后 保存数据
-		 * */
+		 */
 		if (topE != null)
 			throw topE;
 		// 保存。
-		List<Item> itemListr  = saveImpItemCommand(impItemCommandList, itemStatusMap, itemMap, propMap, 
-				itemPropIdMap, itemPropVMap, itemPropMap, shopId, 
-				industryId, notSalePropIdList);
-		
-		saveImpSkuCommand(impSkuCommandList, itemMap, itemReferenceMap, impItemCommandMap, 
-				itemPropVMap,propMap,itemPropIdMap,salePropIdList );
-		
+		List<Item> itemListr = saveImpItemCommand(
+				impItemCommandList,
+				itemStatusMap,
+				itemMap,
+				propMap,
+				itemPropIdMap,
+				itemPropVMap,
+				itemPropMap,
+				shopId,
+				industryId,
+				notSalePropIdList);
+
+		saveImpSkuCommand(
+				impSkuCommandList,
+				itemMap,
+				itemReferenceMap,
+				impItemCommandMap,
+				itemPropVMap,
+				propMap,
+				itemPropIdMap,
+				salePropIdList);
+
 		// 执行扩展点
-		if(null != itemExtendManager) {
-			itemExtendManager.extendAfterSaveImpItemCommand(impItemCommandList, itemStatusMap, itemMap, 
-					propMap, itemPropIdMap, itemPropVMap, itemPropMap, shopId, industryId, notSalePropIdList);
+		if (null != itemExtendManager) {
+			itemExtendManager.extendAfterSaveImpItemCommand(
+					impItemCommandList,
+					itemStatusMap,
+					itemMap,
+					propMap,
+					itemPropIdMap,
+					itemPropVMap,
+					itemPropMap,
+					shopId,
+					industryId,
+					notSalePropIdList);
 		}
 		return itemListr;
 	}
 
-	
-	public List<Item> dataValidateAndSaveI18n(List<Property> propertyList, Map<String, Object> itemBeans, Map<String, Object> skuBeans,
-			Long shopId, Long industryId, List<Long> notSalePropIdList, List<Long> salePropIdList,
-			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos) {
+	public List<Item> dataValidateAndSaveI18n(
+			List<Property> propertyList,
+			Map<String, Object> itemBeans,
+			Map<String, Object> skuBeans,
+			Long shopId,
+			Long industryId,
+			List<Long> notSalePropIdList,
+			List<Long> salePropIdList,
+			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos){
 
 		BusinessException topE = null, currE = null;
 		int counter = 0;
@@ -2600,7 +2715,7 @@ public class ItemManagerImpl implements ItemManager {
 		Map<String, Boolean> itemStatusMap = new HashMap<String, Boolean>();
 
 		if (Validator.isNotNullOrEmpty(itemList)) {
-			for (Item item : itemList) {
+			for (Item item : itemList){
 				itemMap.put(item.getCode(), item.getId());
 				itemStatusMap.put(item.getCode(), false);
 			}
@@ -2612,7 +2727,7 @@ public class ItemManagerImpl implements ItemManager {
 		// 去除该店铺，该行业的商品
 		allItemList.removeAll(itemList);
 		if (Validator.isNotNullOrEmpty(allItemList)) {
-			for (Item item : allItemList) {
+			for (Item item : allItemList){
 				otherItemMap.put(item.getCode(), item.getId());
 			}
 
@@ -2635,13 +2750,13 @@ public class ItemManagerImpl implements ItemManager {
 		if (Validator.isNotNullOrEmpty(itemIds)) {
 			List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertieListByItemIds(itemIds);
 			if (Validator.isNotNullOrEmpty(itemPropertiesList)) {
-				for (ItemProperties itemProperties : itemPropertiesList) {
+				for (ItemProperties itemProperties : itemPropertiesList){
 					String key = itemProperties.getItemId() + "_" + itemProperties.getPropertyId();
 					itemPropMap.put(key, itemProperties.getId());
 					if (itemProperties.getPropertyValue() != null) {
 						key = itemProperties.getItemId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValue();
 						itemPropVMap.put(key, itemProperties.getId());
-					} else {
+					}else{
 						key = itemProperties.getItemId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
 						itemPropIdMap.put(key, itemProperties.getId());
 					}
@@ -2663,7 +2778,7 @@ public class ItemManagerImpl implements ItemManager {
 		int itemCosIndex = 0;
 		int itemRowIndex = 0;
 		int skuCosIndex = 0;
-		int skuCosIndex1 =0;
+		int skuCosIndex1 = 0;
 		int skuRowIndex = 0;
 		Iterator it = null;
 
@@ -2678,7 +2793,7 @@ public class ItemManagerImpl implements ItemManager {
 		// 数据字典 12
 		// key = categorycode
 		// value = categoryid
-//		Map<String, Long> categoryMap = getCategoryMap();
+		// Map<String, Long> categoryMap = getCategoryMap();
 		Map<String, Long> leafNodeCategoryMap = categoryManager.getLeafNodeCategoryMap();
 
 		// 数据字典13 判断upc是否重复
@@ -2687,8 +2802,8 @@ public class ItemManagerImpl implements ItemManager {
 		Map<String, String> skuUpcMap = new HashMap<String, String>();
 		// 查询该配置是否存在
 		String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
-		
-		//数字字典14，判断excel里code是否重复
+
+		// 数字字典14，判断excel里code是否重复
 		List<String> itemCodeList = new ArrayList<String>();
 
 		/** sheet1 ***********/
@@ -2696,53 +2811,59 @@ public class ItemManagerImpl implements ItemManager {
 
 		itemRowIndex = ITEMCOMM_SHEETDEFINITION_STARTROW;
 		if (Validator.isNotNullOrEmpty(impItemCommandList)) {
-			for (ImpItemCommand itemCommand : impItemCommandList) {
+			for (ImpItemCommand itemCommand : impItemCommandList){
 				itemCosIndex = ITEMCOMM_SHEETDEFINITION_STARTCOL;
-				
-				//判断excel是否有重复商品编码
-				if(itemCodeList.contains(itemCommand.getCode())){
-					BusinessException e = new BusinessException(ErrorCodes.ITEMCODE_REPEAT_ERROR_EXCEL, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 1) });					
+
+				// 判断excel是否有重复商品编码
+				if (itemCodeList.contains(itemCommand.getCode())) {
+					BusinessException e = new BusinessException(
+							ErrorCodes.ITEMCODE_REPEAT_ERROR_EXCEL,
+							new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 1) });
 					if (topE == null) {
 						topE = e; // b-101 : Cell{}错误, new
 									// Object[]{ExcelUtil.getCell(1,2)}
 						currE = e;
-					} else {
+					}else{
 						currE.setLinkedException(e);
 						currE = e;
 					}
 				}else{
-					itemCodeList.add(itemCommand.getCode());					
+					itemCodeList.add(itemCommand.getCode());
 				}
-						
+
 				// true 表示修改 false表示新增
 				if (itemMap.get(itemCommand.getCode()) == null) {
 					itemStatusMap.put(itemCommand.getCode(), false);
-				} else {
+				}else{
 					itemStatusMap.put(itemCommand.getCode(), true);
 				}
 				// 配置了正则并且不满足正则条件的情况下
-				if(Validator.isNotNullOrEmpty(pdValidCode)){
-					if(!Pattern.matches(pdValidCode, itemCommand.getCode())){
-							BusinessException e = new BusinessException(ErrorCodes.ITEM_CODE_VALID_ERROR, new Object[] { itemCommand.getCode(), pdValidCode});
+				if (Validator.isNotNullOrEmpty(pdValidCode)) {
+					if (!Pattern.matches(pdValidCode, itemCommand.getCode())) {
+						BusinessException e = new BusinessException(
+								ErrorCodes.ITEM_CODE_VALID_ERROR,
+								new Object[] { itemCommand.getCode(), pdValidCode });
 
-							if (topE == null) {
-								topE = e; // b-101 : Cell{}错误, new
-											// Object[]{ExcelUtil.getCell(1,2)}
-								currE = e;
-							} else {
-								currE.setLinkedException(e);
-								currE = e;
-							}
+						if (topE == null) {
+							topE = e; // b-101 : Cell{}错误, new
+										// Object[]{ExcelUtil.getCell(1,2)}
+							currE = e;
+						}else{
+							currE.setLinkedException(e);
+							currE = e;
+						}
 					}
 				}
 				if (otherItemMap.get(itemCommand.getCode()) != null) {
-					BusinessException e = new BusinessException(ErrorCodes.ITEMCODE_REPEAT_ERROR, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 1) });
-					
+					BusinessException e = new BusinessException(
+							ErrorCodes.ITEMCODE_REPEAT_ERROR,
+							new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 1) });
+
 					if (topE == null) {
 						topE = e; // b-101 : Cell{}错误, new
 									// Object[]{ExcelUtil.getCell(1,2)}
 						currE = e;
-					} else {
+					}else{
 						currE.setLinkedException(e);
 						currE = e;
 					}
@@ -2752,7 +2873,7 @@ public class ItemManagerImpl implements ItemManager {
 
 				Map<String, String> prop = itemCommand.getProps();
 				it = prop.keySet().iterator();
-				while (it.hasNext()) {
+				while (it.hasNext()){
 
 					itemCosIndex++;
 
@@ -2768,46 +2889,48 @@ public class ItemManagerImpl implements ItemManager {
 					if (property.getEditingType() == 1) {
 						itemProperties.setPropertyValue(prop.get(key));
 						ipslist.add(itemProperties);
-					} else if (property.getEditingType() == 2) {
+					}else if (property.getEditingType() == 2) {
 						Long pvId = null;
 						if (null != propValMap.get(propId)) {
 							pvId = propValMap.get(propId).get(prop.get(key));
 						}
 						if (pvId == null) {
 							itemProperties.setPropertyValue(prop.get(key));
-						} else {
+						}else{
 							itemProperties.setPropertyValueId(pvId);
 						}
 						ipslist.add(itemProperties);
-					} else if (property.getEditingType() == 3) {
+					}else if (property.getEditingType() == 3) {
 						if (Validator.isNotNullOrEmpty(prop.get(key))) {
 							Long pvId = null;
 							if (null != propValMap.get(propId)) {
 								pvId = propValMap.get(propId).get(prop.get(key));
 							}
 							if (pvId == null) {
-								BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), prop.get(key) });
+								BusinessException e = new BusinessException(
+										ErrorCodes.CELL_ERROR,
+										new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), prop.get(key) });
 								if (topE == null) {
 									topE = e; // b-101 : Cell{}错误, new
 									// Object[]{ExcelUtil.getCell(1,2)}
 									currE = e;
-								} else {
+								}else{
 									currE.setLinkedException(e);
 									currE = e;
 								}
-							} else {
+							}else{
 								itemProperties.setPropertyValueId(pvId);
 							}
 							ipslist.add(itemProperties);
 						}
-					} else if (property.getEditingType() == 4) {
+					}else if (property.getEditingType() == 4) {
 						if (Validator.isNotNullOrEmpty(prop.get(key))) {
 
 							String propVals = prop.get(key);
 
 							String[] strs = propVals.split(DOUBLE_SLASH_SEPARATOR);
 
-							for (String str : strs) {
+							for (String str : strs){
 								Long pvId = null;
 								itemProperties = new ItemProperties();
 								itemProperties.setPropertyId(propId);
@@ -2815,16 +2938,18 @@ public class ItemManagerImpl implements ItemManager {
 									pvId = propValMap.get(propId).get(str);
 								}
 								if (pvId == null) {
-									BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), str });
+									BusinessException e = new BusinessException(
+											ErrorCodes.CELL_ERROR,
+											new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, itemCosIndex), str });
 									if (topE == null) {
 										topE = e; // b-101 : Cell{}错误, new
 										// Object[]{ExcelUtil.getCell(1,2)}
 										currE = e;
-									} else {
+									}else{
 										currE.setLinkedException(e);
 										currE = e;
 									}
-								} else {
+								}else{
 									itemProperties.setPropertyValueId(pvId);
 								}
 								ipslist.add(itemProperties);
@@ -2844,24 +2969,26 @@ public class ItemManagerImpl implements ItemManager {
 					// 反斜杠“/”
 					String[] strs = categoryCodes.split(BACK_SLANT_SEPARATOR);
 					if (Validator.isNotNullOrEmpty(strs)) {
-						for (String str : strs) {
-							if (Validator.isNullOrEmpty(leafNodeCategoryMap.get(str))) {//增加判断逻辑：如果不是叶子节点，也提示错误信息！产品挂分类必须挂在叶子节点。
-								BusinessException e = new BusinessException(ErrorCodes.PRODUCT_CATEGORY_NOT_LEAFNODE, new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 9), str });
+						for (String str : strs){
+							if (Validator.isNullOrEmpty(leafNodeCategoryMap.get(str))) {// 增加判断逻辑：如果不是叶子节点，也提示错误信息！产品挂分类必须挂在叶子节点。
+								BusinessException e = new BusinessException(
+										ErrorCodes.PRODUCT_CATEGORY_NOT_LEAFNODE,
+										new Object[] { 1, ExcelUtil.getCellIndex(itemRowIndex, 9), str });
 								if (topE == null) {
 									topE = e; // b-101 : Cell{}错误, new
 									// Object[]{ExcelUtil.getCell(1,2)}
 									currE = e;
-								} else {
+								}else{
 									currE.setLinkedException(e);
 									currE = e;
 								}
-							} else {
+							}else{
 								ItemCategory itemCategory = new ItemCategory();
 								itemCategory.setCategoryId(leafNodeCategoryMap.get(str));
 
 								if (itemCategoryList != null) {
 									itemCategoryList.add(itemCategory);
-								} else {
+								}else{
 									itemCategoryList = new ArrayList<ItemCategory>();
 									itemCategoryList.add(itemCategory);
 								}
@@ -2882,11 +3009,11 @@ public class ItemManagerImpl implements ItemManager {
 		List<ImpSkuCommand> impSkuCommandList = (List<ImpSkuCommand>) skuBeans.get("impSkuCommand");
 
 		Set<String> set = new HashSet<String>();
-		for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+		for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 			set.add(impSkuCommand.getCode());
 		}
 		List<Long> itemIdsToBeRemove = new ArrayList<Long>();
-		for (String str : set) {
+		for (String str : set){
 			itemIdsToBeRemove.add(itemMap.get(str));
 		}
 
@@ -2894,7 +3021,7 @@ public class ItemManagerImpl implements ItemManager {
 
 		List<Sku> skuList = skuDao.findSkuByItemIds(allItemIds);
 		if (Validator.isNotNullOrEmpty(skuList)) {
-			for (Sku sku : skuList) {
+			for (Sku sku : skuList){
 				skuUpcMap.put(sku.getOutid(), "");
 			}
 		}
@@ -2902,20 +3029,22 @@ public class ItemManagerImpl implements ItemManager {
 		skuRowIndex = SKUCOMM_SHEETDEFINITION_STARTROW;
 
 		if (Validator.isNotNullOrEmpty(impSkuCommandList)) {
-			for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+			for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 
 				skuCosIndex = SKUCOMM_SHEETDEFINITION_STARTCOL;
 				skuCosIndex1 = SKUCOMM_SHEETDEFINITION_STARTCOL;
 				// 检验upc是否重复
 				if (null == skuUpcMap.get(impSkuCommand.getUpc())) {
 					skuUpcMap.put(impSkuCommand.getUpc(), "");
-				} else {
-					BusinessException e = new BusinessException(ErrorCodes.UPC_REPEAT_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 1) });
+				}else{
+					BusinessException e = new BusinessException(
+							ErrorCodes.UPC_REPEAT_ERROR,
+							new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 1) });
 					if (topE == null) {
 						topE = e; // b-101 : Cell{}错误, new
 						// Object[]{ExcelUtil.getCell(1,2)}
 						currE = e;
-					} else {
+					}else{
 						currE.setLinkedException(e);
 						currE = e;
 					}
@@ -2923,34 +3052,36 @@ public class ItemManagerImpl implements ItemManager {
 
 				// 检验code是否存在
 				if (itemStatusMap.get(impSkuCommand.getCode()) == null) {
-					BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 0), impSkuCommand.getCode() });
+					BusinessException e = new BusinessException(
+							ErrorCodes.CELL_ERROR,
+							new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, 0), impSkuCommand.getCode() });
 					if (topE == null) {
 						topE = e; // b-101 : Cell{}错误, new
 						// Object[]{ExcelUtil.getCell(1,2)}
 						currE = e;
-					} else {
+					}else{
 						currE.setLinkedException(e);
 						currE = e;
 					}
-				} else {
-					
+				}else{
+
 					// 属性值
 					List<ItemProperties> ipslist = impSkuCommand.getItemProps();
-					if(ipslist == null){
+					if (ipslist == null) {
 						ipslist = new ArrayList<ItemProperties>();
 					}
 					Map<String, String> props = impSkuCommand.getProps();
 					it = props.keySet().iterator();
-					
-					while (it.hasNext()) {
+
+					while (it.hasNext()){
 						skuCosIndex1++;
 						skuCosIndex1++;
 						String key = it.next().toString();
 						Long propId = Long.valueOf(key.substring(1, key.length()));
 						Property property = (Property) propMap.get(propId);
 						ItemProperties itemProperties = new ItemProperties();
-						//何波 sheet2 添加多选检查 editType == 4
-						if(property.getEditingType()==4){
+						// 何波 sheet2 添加多选检查 editType == 4
+						if (property.getEditingType() == 4) {
 							if (Validator.isNotNullOrEmpty(props.get(key))) {
 								String propVals = props.get(key);
 								Long pvId = null;
@@ -2959,16 +3090,18 @@ public class ItemManagerImpl implements ItemManager {
 									pvId = propValMap.get(propId).get(propVals);
 								}
 								if (pvId == null) {
-									BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex1-1), propVals });
+									BusinessException e = new BusinessException(
+											ErrorCodes.CELL_ERROR,
+											new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex1 - 1), propVals });
 									if (topE == null) {
 										topE = e; // b-101 : Cell{}错误, new
 										// Object[]{ExcelUtil.getCell(1,2)}
 										currE = e;
-									} else {
+									}else{
 										currE.setLinkedException(e);
 										currE = e;
 									}
-								} else {
+								}else{
 									itemProperties.setPropertyValueId(pvId);
 								}
 								ipslist.add(itemProperties);
@@ -2985,8 +3118,8 @@ public class ItemManagerImpl implements ItemManager {
 					List<SearchConditionItem> searchConditionItems = impSkuCommand.getSearchConditionItems();
 					Map<String, String> scs = impSkuCommand.getScs();
 					it = scs.keySet().iterator();
-					
-					while (it.hasNext()) {
+
+					while (it.hasNext()){
 						skuCosIndex++;
 						skuCosIndex++;
 						String key = it.next().toString();
@@ -2997,25 +3130,27 @@ public class ItemManagerImpl implements ItemManager {
 							// 反斜杠“/”
 							String[] strs = value.split(BACK_SLANT_SEPARATOR);
 							if (Validator.isNotNullOrEmpty(strs)) {
-								for (String str : strs) {
+								for (String str : strs){
 									if (null == conItemMap.get(propId) || null == conItemMap.get(propId).get(str)) {
-										BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex), str });
+										BusinessException e = new BusinessException(
+												ErrorCodes.CELL_ERROR,
+												new Object[] { 2, ExcelUtil.getCellIndex(skuRowIndex, skuCosIndex), str });
 										if (topE == null) {
 											topE = e; // b-101 : Cell{}错误,
 											// new
 											// Object[]{ExcelUtil.getCell(1,2)}
 											currE = e;
-										} else {
+										}else{
 											currE.setLinkedException(e);
 											currE = e;
 										}
-									} else {
+									}else{
 										SearchConditionItem searchConditionItem = new SearchConditionItem();
 										searchConditionItem.setId(conItemMap.get(propId).get(str));
 										searchConditionItem.setPropertyId(propId);
 										if (searchConditionItems != null) {
 											searchConditionItems.add(searchConditionItem);
-										} else {
+										}else{
 											searchConditionItems = new ArrayList<SearchConditionItem>();
 											searchConditionItems.add(searchConditionItem);
 										}
@@ -3035,38 +3170,65 @@ public class ItemManagerImpl implements ItemManager {
 
 		/**
 		 * 检验完成之后 保存数据
-		 * */
+		 */
 		if (topE != null)
 			throw topE;
 		// 保存。
-		List<Item> itemListr  = saveImpItemCommandI18n(impItemCommandList, itemStatusMap, itemMap, propMap, 
-				itemPropIdMap, itemPropVMap, itemPropMap, shopId, 
-				industryId, notSalePropIdList,allI18nItemInfos);
-		
-		saveImpSkuCommandI18n(impSkuCommandList, itemMap, itemReferenceMap, impItemCommandMap, 
-				itemPropVMap,propMap,itemPropIdMap,salePropIdList,allI18nItemInfos);
+		List<Item> itemListr = saveImpItemCommandI18n(
+				impItemCommandList,
+				itemStatusMap,
+				itemMap,
+				propMap,
+				itemPropIdMap,
+				itemPropVMap,
+				itemPropMap,
+				shopId,
+				industryId,
+				notSalePropIdList,
+				allI18nItemInfos);
+
+		saveImpSkuCommandI18n(
+				impSkuCommandList,
+				itemMap,
+				itemReferenceMap,
+				impItemCommandMap,
+				itemPropVMap,
+				propMap,
+				itemPropIdMap,
+				salePropIdList,
+				allI18nItemInfos);
 
 		// 执行扩展点
-		if(null != itemExtendManager) {
-			itemExtendManager.extendAfterSaveImpItemCommandI18n(impItemCommandList, itemStatusMap, itemMap, 
-					propMap, itemPropIdMap, itemPropVMap, itemPropMap, shopId, industryId, notSalePropIdList, allI18nItemInfos);
+		if (null != itemExtendManager) {
+			itemExtendManager.extendAfterSaveImpItemCommandI18n(
+					impItemCommandList,
+					itemStatusMap,
+					itemMap,
+					propMap,
+					itemPropIdMap,
+					itemPropVMap,
+					itemPropMap,
+					shopId,
+					industryId,
+					notSalePropIdList,
+					allI18nItemInfos);
 		}
 		return itemListr;
 	}
-	
-	private void getItemIds(List<Item> itemList, List<Long> itemIds) {
+
+	private void getItemIds(List<Item> itemList,List<Long> itemIds){
 		if (Validator.isNotNullOrEmpty(itemList)) {
-			for (Item item : itemList) {
+			for (Item item : itemList){
 				itemIds.add(item.getId());
 			}
 		}
 	}
 
-	private Map<String, Long> getCategoryMap() {
+	private Map<String, Long> getCategoryMap(){
 		Map<String, Long> categoryMap = new HashMap<String, Long>();
 		List<Category> categoryList = categoryDao.findEnableCategoryList(null);
 		if (Validator.isNotNullOrEmpty(categoryList)) {
-			for (Category category : categoryList) {
+			for (Category category : categoryList){
 				categoryMap.put(category.getCode(), category.getId());
 			}
 		}
@@ -3085,20 +3247,28 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param shopId
 	 * @param industryId
 	 */
-	private List<Item> saveImpItemCommand(List<ImpItemCommand> impItemCommandList, Map<String, Boolean> itemStatusMap, Map<String, Long> itemMap, Map<Long, Property> propMap, Map<String, Long> itemPropIdMap, Map<String, Long> itemPropVMap,
-			Map<String, Long> itemPropMap, Long shopId, Long industryId, List<Long> notSalePropIdList) {
+	private List<Item> saveImpItemCommand(
+			List<ImpItemCommand> impItemCommandList,
+			Map<String, Boolean> itemStatusMap,
+			Map<String, Long> itemMap,
+			Map<Long, Property> propMap,
+			Map<String, Long> itemPropIdMap,
+			Map<String, Long> itemPropVMap,
+			Map<String, Long> itemPropMap,
+			Long shopId,
+			Long industryId,
+			List<Long> notSalePropIdList){
 		Item item = null;
 		ItemInfo itemInfo = null;
-		
-		List<Item> itemList =new ArrayList<Item>();
-		if (Validator.isNotNullOrEmpty(impItemCommandList)) {
-			
-			/*List<Long> itemIdsForSolr =new ArrayList<Long>();
-			
-			boolean isUpdateSolr =false;*/
-			
 
-			for (ImpItemCommand impItemCommand : impItemCommandList) {
+		List<Item> itemList = new ArrayList<Item>();
+		if (Validator.isNotNullOrEmpty(impItemCommandList)) {
+
+			/*
+			 * List<Long> itemIdsForSolr =new ArrayList<Long>(); boolean isUpdateSolr =false;
+			 */
+
+			for (ImpItemCommand impItemCommand : impItemCommandList){
 				boolean flag = itemStatusMap.get(impItemCommand.getCode());
 
 				String isStyle = sdkMataInfoManager.findValue(MataInfo.KEY_HAS_STYLE);
@@ -3114,15 +3284,14 @@ public class ItemManagerImpl implements ItemManager {
 					// 分类
 					if (Validator.isNotNullOrEmpty(itemCategoryList)) {
 						item.setIsaddcategory(1);
-					} else {
+					}else{
 						item.setIsaddcategory(0);
 					}
 					item = itemDao.save(item);
-					
-					if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
+
+					if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 						itemList.add(item);
 					}
-					
 
 					/** 商品信息itemInfo **/
 					ItemInfo res = itemInfoDao.findItemInfoByItemId(itemMap.get(impItemCommand.getCode()));
@@ -3144,9 +3313,9 @@ public class ItemManagerImpl implements ItemManager {
 					if (isStyle != null && isStyle.equals("true")) {
 						itemInfo.setStyle(impItemCommand.getItemStyle());
 					}
-					
-					//商品类型
-					if(impItemCommand.getItemType().trim().equals("赠品")){
+
+					// 商品类型
+					if (impItemCommand.getItemType().trim().equals("赠品")) {
 						itemInfo.setType(ItemInfo.TYPE_GIFT);
 					}else{
 						itemInfo.setType(ItemInfo.TYPE_MAIN);
@@ -3154,7 +3323,7 @@ public class ItemManagerImpl implements ItemManager {
 
 					itemInfo = itemInfoDao.save(itemInfo);
 
-				} else {
+				}else{
 					/** 商品item **/
 					item = new Item();
 					item.setCode(impItemCommand.getCode());
@@ -3166,7 +3335,7 @@ public class ItemManagerImpl implements ItemManager {
 					// 分类
 					if (Validator.isNotNullOrEmpty(itemCategoryList)) {
 						item.setIsaddcategory(1);
-					} else {
+					}else{
 						item.setIsaddcategory(0);
 					}
 
@@ -3194,13 +3363,13 @@ public class ItemManagerImpl implements ItemManager {
 						itemInfo.setStyle(impItemCommand.getItemStyle());
 					}
 
-					//商品类型
-					if(impItemCommand.getItemType().trim().equals("赠品")){
+					// 商品类型
+					if (impItemCommand.getItemType().trim().equals("赠品")) {
 						itemInfo.setType(ItemInfo.TYPE_GIFT);
 					}else{
 						itemInfo.setType(ItemInfo.TYPE_MAIN);
 					}
-					
+
 					itemInfo = itemInfoDao.save(itemInfo);
 
 				}
@@ -3210,13 +3379,13 @@ public class ItemManagerImpl implements ItemManager {
 				if (Validator.isNotNullOrEmpty(itemCategoryList)) {
 					Long[] icIds = new Long[itemCategoryList.size()];
 					int i = 0;
-					for (ItemCategory itemCategory : itemCategoryList) {
+					for (ItemCategory itemCategory : itemCategoryList){
 						icIds[i] = itemCategory.getCategoryId();
 						i++;
 					}
-					//Arrays.sort(icIds);
+					// Arrays.sort(icIds);
 					Long icId = icIds[0];
-					for (ItemCategory itemCategory : itemCategoryList) {
+					for (ItemCategory itemCategory : itemCategoryList){
 						boolean isDefault = false;
 						if (icId.equals(itemCategory.getCategoryId())) {
 							isDefault = true;
@@ -3228,17 +3397,12 @@ public class ItemManagerImpl implements ItemManager {
 				/** 商品属性 **/
 
 				/***
-				 * 
-				 * 编辑类型 ：1 单行输入2可输入单选3单选4多选
-				 * 
-				 * 类型为1 itemPropMap验证 有则改 无则加
-				 * 
-				 * 类型为2 vid 不为空 就用itemPropIdMap验证 无则加 val 不为空 就用itemPropVMap验证
-				 * 无则加 类型为3 itemPropIdMap验证 有则改 无则加 类型为4 itemPropIdMap验证 无则加
+				 * 编辑类型 ：1 单行输入2可输入单选3单选4多选 类型为1 itemPropMap验证 有则改 无则加 类型为2 vid 不为空 就用itemPropIdMap验证 无则加 val 不为空 就用itemPropVMap验证 无则加 类型为3
+				 * itemPropIdMap验证 有则改 无则加 类型为4 itemPropIdMap验证 无则加
 				 */
 				// 删除多选
 				if (Validator.isNotNullOrEmpty(notSalePropIdList)) {
-					for (Long propId : notSalePropIdList) {
+					for (Long propId : notSalePropIdList){
 						Property prop = propMap.get(propId);
 						if (prop.getEditingType() == 4) {
 							itemPropertiesDao.deleteItemPropertiesByItemIdAndPropId(item.getId(), propId);
@@ -3249,7 +3413,7 @@ public class ItemManagerImpl implements ItemManager {
 				List<ItemProperties> list = impItemCommand.getItemProps();
 				if (Validator.isNotNullOrEmpty(list)) {
 
-					for (ItemProperties itemProperties : list) {
+					for (ItemProperties itemProperties : list){
 						itemProperties.setItemId(item.getId());
 
 						Property prop = propMap.get(itemProperties.getPropertyId());
@@ -3257,10 +3421,10 @@ public class ItemManagerImpl implements ItemManager {
 							String key = item.getId() + "_" + itemProperties.getPropertyId();
 							if (Validator.isNullOrEmpty(itemPropMap.get(key))) {
 								saveImpItemproperties(itemProperties, itemPropMap, key);
-							} else {
+							}else{
 								updateImpItemproperties(itemProperties, itemPropMap, key);
 							}
-						} else if (prop.getEditingType() == 2) {
+						}else if (prop.getEditingType() == 2) {
 							if (itemProperties.getPropertyValue() != null) {
 								String key = item.getId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValue();
 								if (Validator.isNullOrEmpty(itemPropVMap.get(key))) {
@@ -3268,25 +3432,24 @@ public class ItemManagerImpl implements ItemManager {
 								}
 							}
 							if (itemProperties.getPropertyValueId() != null) {
-								String key = item.getId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
+								String key = item.getId() + "_" + itemProperties.getPropertyId() + "_"
+										+ itemProperties.getPropertyValueId();
 								if (Validator.isNullOrEmpty(itemPropIdMap.get(key))) {
 									saveImpItemproperties(itemProperties, itemPropIdMap, key);
 								}
 							}
-						} else if (prop.getEditingType() == 3) {
+						}else if (prop.getEditingType() == 3) {
 							String key = item.getId() + "_" + itemProperties.getPropertyId();
 							if (Validator.isNullOrEmpty(itemPropMap.get(key))) {
 								saveImpItemproperties(itemProperties, itemPropMap, key);
-							} else {
+							}else{
 								updateImpItemproperties(itemProperties, itemPropMap, key);
 							}
-						} else if (prop.getEditingType() == 4) {
+						}else if (prop.getEditingType() == 4) {
 							String key = item.getId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
 							/*
-							 * if
-							 * (Validator.isNullOrEmpty(itemPropIdMap.get(key)))
-							 * { saveImpItemproperties(itemProperties,
-							 * itemPropIdMap, key); }
+							 * if (Validator.isNullOrEmpty(itemPropIdMap.get(key))) { saveImpItemproperties(itemProperties, itemPropIdMap,
+							 * key); }
 							 */
 							// 先删后加 不用验证
 							saveImpItemproperties(itemProperties, itemPropIdMap, key);
@@ -3294,40 +3457,48 @@ public class ItemManagerImpl implements ItemManager {
 					}
 				}
 			}
-			
-			/*if(isUpdateSolr && Validator.isNotNullOrEmpty(itemIdsForSolr)){
-				itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
-			}*/
-			
+
+			/*
+			 * if(isUpdateSolr && Validator.isNotNullOrEmpty(itemIdsForSolr)){ itemSolrManager.saveOrUpdateItem(itemIdsForSolr); }
+			 */
+
 		}
 		return itemList;
 	}
-	
-	private List<Item> saveImpItemCommandI18n(List<ImpItemCommand> impItemCommandList, Map<String, Boolean> itemStatusMap, Map<String, Long> itemMap,
-			Map<Long, Property> propMap, Map<String, Long> itemPropIdMap, Map<String, Long> itemPropVMap,
-			Map<String, Long> itemPropMap, Long shopId, Long industryId, List<Long> notSalePropIdList,
-			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos) {
+
+	private List<Item> saveImpItemCommandI18n(
+			List<ImpItemCommand> impItemCommandList,
+			Map<String, Boolean> itemStatusMap,
+			Map<String, Long> itemMap,
+			Map<Long, Property> propMap,
+			Map<String, Long> itemPropIdMap,
+			Map<String, Long> itemPropVMap,
+			Map<String, Long> itemPropMap,
+			Long shopId,
+			Long industryId,
+			List<Long> notSalePropIdList,
+			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos){
 		Item item = null;
 		ItemInfo itemInfo = null;
 
-		List<Item> itemList =new ArrayList<Item>();
+		List<Item> itemList = new ArrayList<Item>();
 		if (Validator.isNotNullOrEmpty(impItemCommandList)) {
 			Map<String, ItemInfoLang> i18nItemInfos = new HashMap<String, ItemInfoLang>();
 			boolean i18n = LangProperty.getI18nOnOff();
-			if(i18n && Validator.isNotNullOrEmpty(allI18nItemInfos)){
-				Set<String>  keys = allI18nItemInfos.keySet();
-				for (String key : keys) {
+			if (i18n && Validator.isNotNullOrEmpty(allI18nItemInfos)) {
+				Set<String> keys = allI18nItemInfos.keySet();
+				for (String key : keys){
 					List<ItemInfoExcelCommand> list = allI18nItemInfos.get(key);
-					for (ItemInfoExcelCommand itemExcel : list) {
+					for (ItemInfoExcelCommand itemExcel : list){
 						String code = itemExcel.getCode();
 						ItemInfoLang lang = new ItemInfoLang();
 						LangProperty.I18nPropertyCopyExcelToLang(itemExcel, lang);
-						String newKey = key+"||"+code;
+						String newKey = key + "||" + code;
 						i18nItemInfos.put(newKey, lang);
 					}
 				}
 			}
-			for (ImpItemCommand impItemCommand : impItemCommandList) {
+			for (ImpItemCommand impItemCommand : impItemCommandList){
 				boolean flag = itemStatusMap.get(impItemCommand.getCode());
 
 				String isStyle = sdkMataInfoManager.findValue(MataInfo.KEY_HAS_STYLE);
@@ -3343,12 +3514,12 @@ public class ItemManagerImpl implements ItemManager {
 					// 分类
 					if (Validator.isNotNullOrEmpty(itemCategoryList)) {
 						item.setIsaddcategory(1);
-					} else {
+					}else{
 						item.setIsaddcategory(0);
 					}
 					item = itemDao.save(item);
-					
-					if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
+
+					if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 						itemList.add(item);
 					}
 
@@ -3367,35 +3538,49 @@ public class ItemManagerImpl implements ItemManager {
 					itemInfo.setSeoDescription(impItemCommand.getSeoDesc());
 					itemInfo.setSeoKeywords(impItemCommand.getSeoKeyWords());
 					itemInfo.setSeoTitle(impItemCommand.getSeoTitle());
-					if(i18n){
-						 //保存商品默认国际化信息
-						itemLangManager.saveOrUpdateItemInfoLang(impItemCommand.getTitle(), impItemCommand.getSubTitle(), impItemCommand.getDescription(),
-								impItemCommand.getSketch(), impItemCommand.getSeoDesc(), 
-								impItemCommand.getSeoKeyWords(), impItemCommand.getSeoTitle(), MutlLang.defaultLang(), itemInfoId);
+					if (i18n) {
+						// 保存商品默认国际化信息
+						itemLangManager.saveOrUpdateItemInfoLang(
+								impItemCommand.getTitle(),
+								impItemCommand.getSubTitle(),
+								impItemCommand.getDescription(),
+								impItemCommand.getSketch(),
+								impItemCommand.getSeoDesc(),
+								impItemCommand.getSeoKeyWords(),
+								impItemCommand.getSeoTitle(),
+								MutlLang.defaultLang(),
+								itemInfoId);
 						List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
-						for (I18nLang i18nLang : i18nLangs) {
+						for (I18nLang i18nLang : i18nLangs){
 							String value = i18nLang.getValue();
 							String key = i18nLang.getKey();
-							if(key.equals(MutlLang.defaultLang())){
+							if (key.equals(MutlLang.defaultLang())) {
 								continue;
 							}
-							String newKey = value+"||"+code;
+							String newKey = value + "||" + code;
 							ItemInfoLang infoLang = i18nItemInfos.get(newKey);
-							if(infoLang == null){
-								throw new BusinessException("商品编码:"+code +"没有编写对应的的多语言");
+							if (infoLang == null) {
+								throw new BusinessException("商品编码:" + code + "没有编写对应的的多语言");
 							}
-							itemLangManager.saveOrUpdateItemInfoLang(infoLang.getTitle(), infoLang.getSubTitle(), infoLang.getDescription(),
-									infoLang.getSketch(), infoLang.getSeoDescription(), 
-									infoLang.getSeoKeywords(), infoLang.getSeoTitle(), key, itemInfoId);
+							itemLangManager.saveOrUpdateItemInfoLang(
+									infoLang.getTitle(),
+									infoLang.getSubTitle(),
+									infoLang.getDescription(),
+									infoLang.getSketch(),
+									infoLang.getSeoDescription(),
+									infoLang.getSeoKeywords(),
+									infoLang.getSeoTitle(),
+									key,
+									itemInfoId);
 						}
 					}
 					// 商品款式
 					if (isStyle != null && isStyle.equals("true")) {
 						itemInfo.setStyle(impItemCommand.getItemStyle());
 					}
-					
-					//商品类型
-					if(impItemCommand.getItemType().trim().equals("赠品")){
+
+					// 商品类型
+					if (impItemCommand.getItemType().trim().equals("赠品")) {
 						itemInfo.setType(ItemInfo.TYPE_GIFT);
 					}else{
 						itemInfo.setType(ItemInfo.TYPE_MAIN);
@@ -3403,7 +3588,7 @@ public class ItemManagerImpl implements ItemManager {
 
 					itemInfo = itemInfoDao.save(itemInfo);
 
-				} else {
+				}else{
 					/** 商品item **/
 					item = new Item();
 					item.setCode(impItemCommand.getCode());
@@ -3415,7 +3600,7 @@ public class ItemManagerImpl implements ItemManager {
 					// 分类
 					if (Validator.isNotNullOrEmpty(itemCategoryList)) {
 						item.setIsaddcategory(1);
-					} else {
+					}else{
 						item.setIsaddcategory(0);
 					}
 
@@ -3443,33 +3628,47 @@ public class ItemManagerImpl implements ItemManager {
 						itemInfo.setStyle(impItemCommand.getItemStyle());
 					}
 
-					//商品类型
-					if(impItemCommand.getItemType().trim().equals("赠品")){
+					// 商品类型
+					if (impItemCommand.getItemType().trim().equals("赠品")) {
 						itemInfo.setType(ItemInfo.TYPE_GIFT);
 					}else{
 						itemInfo.setType(ItemInfo.TYPE_MAIN);
 					}
-					
+
 					itemInfo = itemInfoDao.save(itemInfo);
 					Long itemInfoId = itemInfo.getId();
-					if(i18n){
-						 //保存商品默认国际化信息
-						itemLangManager.saveOrUpdateItemInfoLang(impItemCommand.getTitle(), impItemCommand.getSubTitle(), impItemCommand.getDescription(),
-								impItemCommand.getSketch(), impItemCommand.getSeoDesc(), 
-								impItemCommand.getSeoKeyWords(), impItemCommand.getSeoTitle(), MutlLang.defaultLang(), itemInfoId);
+					if (i18n) {
+						// 保存商品默认国际化信息
+						itemLangManager.saveOrUpdateItemInfoLang(
+								impItemCommand.getTitle(),
+								impItemCommand.getSubTitle(),
+								impItemCommand.getDescription(),
+								impItemCommand.getSketch(),
+								impItemCommand.getSeoDesc(),
+								impItemCommand.getSeoKeyWords(),
+								impItemCommand.getSeoTitle(),
+								MutlLang.defaultLang(),
+								itemInfoId);
 						List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
-						for (I18nLang i18nLang : i18nLangs) {
+						for (I18nLang i18nLang : i18nLangs){
 							String value = i18nLang.getValue();
 							String key = i18nLang.getKey();
-							if(key.equals(MutlLang.defaultLang())){
+							if (key.equals(MutlLang.defaultLang())) {
 								continue;
 							}
-							String newKey = value+"||"+code;
+							String newKey = value + "||" + code;
 							ItemInfoLang infoLang = i18nItemInfos.get(newKey);
-							if(infoLang!=null){
-								itemLangManager.saveOrUpdateItemInfoLang(infoLang.getTitle(),infoLang.getSubTitle(),infoLang.getDescription(),
-										infoLang.getSketch(), infoLang.getSeoDescription(),infoLang.getSeoKeywords(), infoLang.getSeoTitle(), 
-										key, itemInfoId);
+							if (infoLang != null) {
+								itemLangManager.saveOrUpdateItemInfoLang(
+										infoLang.getTitle(),
+										infoLang.getSubTitle(),
+										infoLang.getDescription(),
+										infoLang.getSketch(),
+										infoLang.getSeoDescription(),
+										infoLang.getSeoKeywords(),
+										infoLang.getSeoTitle(),
+										key,
+										itemInfoId);
 							}
 						}
 					}
@@ -3481,13 +3680,13 @@ public class ItemManagerImpl implements ItemManager {
 				if (Validator.isNotNullOrEmpty(itemCategoryList)) {
 					Long[] icIds = new Long[itemCategoryList.size()];
 					int i = 0;
-					for (ItemCategory itemCategory : itemCategoryList) {
+					for (ItemCategory itemCategory : itemCategoryList){
 						icIds[i] = itemCategory.getCategoryId();
 						i++;
 					}
-					//Arrays.sort(icIds);
+					// Arrays.sort(icIds);
 					Long icId = icIds[0];
-					for (ItemCategory itemCategory : itemCategoryList) {
+					for (ItemCategory itemCategory : itemCategoryList){
 						boolean isDefault = false;
 						if (icId.equals(itemCategory.getCategoryId())) {
 							isDefault = true;
@@ -3499,23 +3698,18 @@ public class ItemManagerImpl implements ItemManager {
 				/** 商品属性 **/
 
 				/***
-				 * 
-				 * 编辑类型 ：1 单行输入2可输入单选3单选4多选
-				 * 
-				 * 类型为1 itemPropMap验证 有则改 无则加
-				 * 
-				 * 类型为2 vid 不为空 就用itemPropIdMap验证 无则加 val 不为空 就用itemPropVMap验证
-				 * 无则加 类型为3 itemPropIdMap验证 有则改 无则加 类型为4 itemPropIdMap验证 无则加
+				 * 编辑类型 ：1 单行输入2可输入单选3单选4多选 类型为1 itemPropMap验证 有则改 无则加 类型为2 vid 不为空 就用itemPropIdMap验证 无则加 val 不为空 就用itemPropVMap验证 无则加 类型为3
+				 * itemPropIdMap验证 有则改 无则加 类型为4 itemPropIdMap验证 无则加
 				 */
 				// 删除多选
 				if (Validator.isNotNullOrEmpty(notSalePropIdList)) {
-					for (Long propId : notSalePropIdList) {
+					for (Long propId : notSalePropIdList){
 						Property prop = propMap.get(propId);
 						if (prop.getEditingType() == 4) {
 							ItemProperties itemProperties = itemPropertiesDao.findItemPropertiesByItemIdAndPropertyId(item.getId(), propId);
-							if(itemProperties!=null){
+							if (itemProperties != null) {
 								itemPropertiesDao.deleteItemPropertiesByItemIdAndPropId(item.getId(), propId);
-								//删除对应国际化数据
+								// 删除对应国际化数据
 								List<Long> ids = new ArrayList<Long>();
 								ids.add(itemProperties.getId());
 								itemPropertiesDao.deleteItemPropertiesLangByIds(ids);
@@ -3527,26 +3721,26 @@ public class ItemManagerImpl implements ItemManager {
 				List<ItemProperties> list = impItemCommand.getItemProps();
 				if (Validator.isNotNullOrEmpty(list)) {
 
-					for (ItemProperties itemProperties : list) {
+					for (ItemProperties itemProperties : list){
 						itemProperties.setItemId(item.getId());
 
 						Property prop = propMap.get(itemProperties.getPropertyId());
 						if (prop.getEditingType() == 1) {
 							String key = item.getId() + "_" + itemProperties.getPropertyId();
 							if (Validator.isNullOrEmpty(itemPropMap.get(key))) {
-								if(i18n){
-									saveImpItempropertiesI18n(itemProperties, itemPropMap, key,allI18nItemInfos,prop,code);
+								if (i18n) {
+									saveImpItempropertiesI18n(itemProperties, itemPropMap, key, allI18nItemInfos, prop, code);
 								}else{
 									saveImpItemproperties(itemProperties, itemPropVMap, key);
 								}
-							} else {
-								if(i18n){
-									updateImpItempropertiesI18n(itemProperties, itemPropMap, key,allI18nItemInfos,prop,code);
+							}else{
+								if (i18n) {
+									updateImpItempropertiesI18n(itemProperties, itemPropMap, key, allI18nItemInfos, prop, code);
 								}else{
 									updateImpItemproperties(itemProperties, itemPropMap, key);
 								}
 							}
-						} else if (prop.getEditingType() == 2) {
+						}else if (prop.getEditingType() == 2) {
 							if (itemProperties.getPropertyValue() != null) {
 								String key = item.getId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValue();
 								if (Validator.isNullOrEmpty(itemPropVMap.get(key))) {
@@ -3554,30 +3748,31 @@ public class ItemManagerImpl implements ItemManager {
 								}
 							}
 							if (itemProperties.getPropertyValueId() != null) {
-								String key = item.getId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
+								String key = item.getId() + "_" + itemProperties.getPropertyId() + "_"
+										+ itemProperties.getPropertyValueId();
 								if (Validator.isNullOrEmpty(itemPropIdMap.get(key))) {
-									if(i18n){
+									if (i18n) {
 										saveImpItempropertiesRadioOrMutlSelectI18n(itemProperties, itemPropIdMap, key);
 									}else{
 										saveImpItemproperties(itemProperties, itemPropIdMap, key);
 									}
 								}
 							}
-						} else if (prop.getEditingType() == 3) {
+						}else if (prop.getEditingType() == 3) {
 							String key = item.getId() + "_" + itemProperties.getPropertyId();
 							if (Validator.isNullOrEmpty(itemPropMap.get(key))) {
-								if(i18n){
+								if (i18n) {
 									saveImpItempropertiesRadioOrMutlSelectI18n(itemProperties, itemPropMap, key);
 								}else{
 									saveImpItemproperties(itemProperties, itemPropMap, key);
 								}
-							} else {
+							}else{
 								updateImpItemproperties(itemProperties, itemPropMap, key);
 							}
-						} else if (prop.getEditingType() == 4) {
+						}else if (prop.getEditingType() == 4) {
 							String key = item.getId() + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
 							// 先删后加 不用验证
-							if(i18n){
+							if (i18n) {
 								saveImpItempropertiesRadioOrMutlSelectI18n(itemProperties, itemPropIdMap, key);
 							}else{
 								saveImpItemproperties(itemProperties, itemPropIdMap, key);
@@ -3599,16 +3794,22 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param itemPropVMap
 	 * @param itemReferenceMap
 	 */
-	private void saveImpSkuCommand(List<ImpSkuCommand> impSkuCommandList, Map<String, Long> itemMap, Map<String, Long> itemReferenceMap,
-			Map<String, ImpItemCommand> impItemCommandMap, Map<String, Long> itemPropVMap
-			, Map<Long, Property> propMap, Map<String, Long> itemPropIdMap,List<Long> salePropIdList) {
+	private void saveImpSkuCommand(
+			List<ImpSkuCommand> impSkuCommandList,
+			Map<String, Long> itemMap,
+			Map<String, Long> itemReferenceMap,
+			Map<String, ImpItemCommand> impItemCommandMap,
+			Map<String, Long> itemPropVMap,
+			Map<Long, Property> propMap,
+			Map<String, Long> itemPropIdMap,
+			List<Long> salePropIdList){
 		if (Validator.isNotNullOrEmpty(impSkuCommandList)) {
 			Set<String> set = new HashSet<String>();
-			for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+			for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 				set.add(impSkuCommand.getCode());
 			}
 			List<Long> itemIds = new ArrayList<Long>();
-			for (String str : set) {
+			for (String str : set){
 				itemIds.add(itemMap.get(str));
 			}
 
@@ -3619,12 +3820,11 @@ public class ItemManagerImpl implements ItemManager {
 			if (Validator.isNotNullOrEmpty(itemIds)) {
 				List<Sku> skuList = skuDao.findSkuByItemIds(itemIds);
 				if (Validator.isNotNullOrEmpty(skuList)) {
-					for (Sku sku : skuList) {
+					for (Sku sku : skuList){
 						skuMap.put(sku.getItemId() + "_" + sku.getProperties() + "_" + sku.getOutid(), sku.getId());
 						if (Validator.isNotNullOrEmpty(sku.getProperties())) {
-							List<Long> propertyIds = new Gson().fromJson(sku.getProperties(), new TypeToken<List<Long>>() {
-							}.getType());
-							for (Long propertyId : propertyIds) {
+							List<Long> propertyIds = new Gson().fromJson(sku.getProperties(), new TypeToken<List<Long>>(){}.getType());
+							for (Long propertyId : propertyIds){
 								oldPropertyIds.add(propertyId);
 							}
 						}
@@ -3637,44 +3837,44 @@ public class ItemManagerImpl implements ItemManager {
 
 			Set<Long> newPropertyIds = new HashSet<Long>();
 			List<ItemProperties> dbItemPropertiesIds = new ArrayList<ItemProperties>();
-			//保存sku属性
-			for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
-				
+			// 保存sku属性
+			for (ImpSkuCommand impSkuCommand : impSkuCommandList){
+
 				// List<Long> itemPropertiesIds 5自定义多选
 				List<Long> itemPropertiesIds = new ArrayList<Long>();
 				List<ItemProperties> list = impSkuCommand.getItemProps();
 				Long itemId = itemMap.get(impSkuCommand.getCode());
 				// 删除多选
 				if (Validator.isNotNullOrEmpty(salePropIdList)) {
-					for (Long propId : salePropIdList) {
+					for (Long propId : salePropIdList){
 						Property prop = propMap.get(propId);
 						if (prop.getEditingType() == 4) {
 							itemPropertiesDao.deleteItemPropertiesByItemIdAndPropId(itemId, propId);
 						}
 					}
 				}
-				
+
 				if (Validator.isNotNullOrEmpty(list)) {
-					for (ItemProperties itemProperties : list) {
+					for (ItemProperties itemProperties : list){
 						Property prop = propMap.get(itemProperties.getPropertyId());
-						String key = itemMap.get(impSkuCommand.getCode()) + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValue();
+						String key = itemMap.get(impSkuCommand.getCode()) + "_" + itemProperties.getPropertyId() + "_"
+								+ itemProperties.getPropertyValue();
 						itemProperties.setItemId(itemId);
-						//何波 多选保存
+						// 何波 多选保存
 						if (prop.getEditingType() == 4) {
 							// 先删后加 不用验证
-							boolean  mutlSelect = true;
-							for (ItemProperties ip : dbItemPropertiesIds) {
+							boolean mutlSelect = true;
+							for (ItemProperties ip : dbItemPropertiesIds){
 								Long pvId = ip.getPropertyValueId();
-								if(pvId != null){
-									//如果多选pvid已经保存了就不需要再保存了
-									if(itemId.equals(ip.getItemId()) 
-											&& pvId.equals(itemProperties.getPropertyValueId())){
+								if (pvId != null) {
+									// 如果多选pvid已经保存了就不需要再保存了
+									if (itemId.equals(ip.getItemId()) && pvId.equals(itemProperties.getPropertyValueId())) {
 										mutlSelect = false;
 										itemPropertiesIds.add(ip.getId());
 									}
 								}
 							}
-							if(mutlSelect){
+							if (mutlSelect) {
 								ItemProperties res = saveImpItemproperties(itemProperties, itemPropIdMap, key);
 								dbItemPropertiesIds.add(res);
 								Long id = res.getId();
@@ -3682,37 +3882,37 @@ public class ItemManagerImpl implements ItemManager {
 								itemPropertiesIds.add(id);
 							}
 						}else{
-							//何波 自定义多选保存
+							// 何波 自定义多选保存
 							Long propertyId = itemPropVMap.get(key);
 							if (Validator.isNullOrEmpty(propertyId)) {
 								itemProperties.setItemId(itemMap.get(impSkuCommand.getCode()));
 								ItemProperties res = saveImpItemproperties(itemProperties, itemPropVMap, key);
 								// add
 								newPropertyIds.add(res.getId());
-							} else {
+							}else{
 								newPropertyIds.add(propertyId);
 							}
 							itemPropertiesIds.add(itemPropVMap.get(key));
-					}
-					// 保存ref
-					List<SearchConditionItem> searchConditionItems = impSkuCommand.getSearchConditionItems();
-					if (Validator.isNotNullOrEmpty(searchConditionItems)) {
-						for (SearchConditionItem searchConditionItem : searchConditionItems) {
-							String key1 = itemPropVMap.get(key) + "_" + searchConditionItem.getId();
-							Long refId = itemReferenceMap.get(key1);
-							/****** 查询ref表中是否存在对应关系 ***/
-							if (Validator.isNullOrEmpty(refId)) {
-								ItemReference itemReference = new ItemReference();
-								itemReference.setItemPropertyId(itemPropVMap.get(key));
-								itemReference.setSearchConditionItemId(searchConditionItem.getId());
-								// 新增ref
-								ItemReference iref = itemReferenceDao.save(itemReference);
-								// map+
-								itemReferenceMap.put(key1, iref.getId());
+						}
+						// 保存ref
+						List<SearchConditionItem> searchConditionItems = impSkuCommand.getSearchConditionItems();
+						if (Validator.isNotNullOrEmpty(searchConditionItems)) {
+							for (SearchConditionItem searchConditionItem : searchConditionItems){
+								String key1 = itemPropVMap.get(key) + "_" + searchConditionItem.getId();
+								Long refId = itemReferenceMap.get(key1);
+								/****** 查询ref表中是否存在对应关系 ***/
+								if (Validator.isNullOrEmpty(refId)) {
+									ItemReference itemReference = new ItemReference();
+									itemReference.setItemPropertyId(itemPropVMap.get(key));
+									itemReference.setSearchConditionItemId(searchConditionItem.getId());
+									// 新增ref
+									ItemReference iref = itemReferenceDao.save(itemReference);
+									// map+
+									itemReferenceMap.put(key1, iref.getId());
+								}
 							}
 						}
 					}
-				}
 				}
 
 				Gson sg = new Gson();
@@ -3737,7 +3937,7 @@ public class ItemManagerImpl implements ItemManager {
 						sku.setListPrice(impItemCommandMap.get(impSkuCommand.getCode()).getListPrice());
 					}
 					sku = skuDao.save(sku);
-				} else {
+				}else{
 					sku = new Sku();
 					sku.setOutid(impSkuCommand.getUpc());
 					sku.setCreateTime(new Date());
@@ -3755,7 +3955,7 @@ public class ItemManagerImpl implements ItemManager {
 			}
 			List<Long> ids = new ArrayList<Long>();
 			if (Validator.isNotNullOrEmpty(oldPropertyIds)) {
-				for (Long id : oldPropertyIds) {
+				for (Long id : oldPropertyIds){
 					if (!newPropertyIds.contains(id)) {
 						ids.add(id);
 					}
@@ -3768,19 +3968,24 @@ public class ItemManagerImpl implements ItemManager {
 		}
 
 	}
-	
-	
-	private void saveImpSkuCommandI18n(List<ImpSkuCommand> impSkuCommandList, Map<String, Long> itemMap, Map<String, Long> itemReferenceMap,
-			Map<String, ImpItemCommand> impItemCommandMap, Map<String, Long> itemPropVMap
-			, Map<Long, Property> propMap, Map<String, Long> itemPropIdMap,List<Long> salePropIdList,
-			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos) {
+
+	private void saveImpSkuCommandI18n(
+			List<ImpSkuCommand> impSkuCommandList,
+			Map<String, Long> itemMap,
+			Map<String, Long> itemReferenceMap,
+			Map<String, ImpItemCommand> impItemCommandMap,
+			Map<String, Long> itemPropVMap,
+			Map<Long, Property> propMap,
+			Map<String, Long> itemPropIdMap,
+			List<Long> salePropIdList,
+			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos){
 		if (Validator.isNotNullOrEmpty(impSkuCommandList)) {
 			Set<String> set = new HashSet<String>();
-			for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+			for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 				set.add(impSkuCommand.getCode());
 			}
 			List<Long> itemIds = new ArrayList<Long>();
-			for (String str : set) {
+			for (String str : set){
 				itemIds.add(itemMap.get(str));
 			}
 
@@ -3791,12 +3996,11 @@ public class ItemManagerImpl implements ItemManager {
 			if (Validator.isNotNullOrEmpty(itemIds)) {
 				List<Sku> skuList = skuDao.findSkuByItemIds(itemIds);
 				if (Validator.isNotNullOrEmpty(skuList)) {
-					for (Sku sku : skuList) {
+					for (Sku sku : skuList){
 						skuMap.put(sku.getItemId() + "_" + sku.getProperties() + "_" + sku.getOutid(), sku.getId());
 						if (Validator.isNotNullOrEmpty(sku.getProperties())) {
-							List<Long> propertyIds = new Gson().fromJson(sku.getProperties(), new TypeToken<List<Long>>() {
-							}.getType());
-							for (Long propertyId : propertyIds) {
+							List<Long> propertyIds = new Gson().fromJson(sku.getProperties(), new TypeToken<List<Long>>(){}.getType());
+							for (Long propertyId : propertyIds){
 								oldPropertyIds.add(propertyId);
 							}
 						}
@@ -3809,8 +4013,8 @@ public class ItemManagerImpl implements ItemManager {
 
 			Set<Long> newPropertyIds = new HashSet<Long>();
 			List<ItemProperties> dbItemPropertiesIds = new ArrayList<ItemProperties>();
-			//保存sku属性
-			for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+			// 保存sku属性
+			for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 
 				// List<Long> itemPropertiesIds 5自定义多选
 				List<Long> itemPropertiesIds = new ArrayList<Long>();
@@ -3818,13 +4022,13 @@ public class ItemManagerImpl implements ItemManager {
 				Long itemId = itemMap.get(impSkuCommand.getCode());
 				// 删除多选
 				if (Validator.isNotNullOrEmpty(salePropIdList)) {
-					for (Long propId : salePropIdList) {
+					for (Long propId : salePropIdList){
 						Property prop = propMap.get(propId);
 						if (prop.getEditingType() == 4) {
 							ItemProperties itemProperties = itemPropertiesDao.findItemPropertiesByItemIdAndPropertyId(itemId, propId);
-							if(itemProperties!=null){
+							if (itemProperties != null) {
 								itemPropertiesDao.deleteItemPropertiesByItemIdAndPropId(itemId, propId);
-								//删除对应国际化数据
+								// 删除对应国际化数据
 								List<Long> ids = new ArrayList<Long>();
 								ids.add(itemProperties.getId());
 								itemPropertiesDao.deleteItemPropertiesLangByIds(ids);
@@ -3832,36 +4036,35 @@ public class ItemManagerImpl implements ItemManager {
 						}
 					}
 				}
-				
+
 				if (Validator.isNotNullOrEmpty(list)) {
-					//处理 商品多选国际化
+					// 处理 商品多选国际化
 					boolean i18n = LangProperty.getI18nOnOff();
 					List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
-					for (ItemProperties itemProperties : list) {
+					for (ItemProperties itemProperties : list){
 						Property prop = propMap.get(itemProperties.getPropertyId());
 						String code = impSkuCommand.getCode();
 						Long pid = itemProperties.getPropertyId();
 						String key = itemMap.get(code) + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValue();
 						itemProperties.setItemId(itemId);
-						//何波 多选保存
+						// 何波 多选保存
 						if (prop.getEditingType() == 4) {
 							key = itemMap.get(code) + "_" + itemProperties.getPropertyId() + "_" + itemProperties.getPropertyValueId();
 							// 先删后加 不用验证
-							boolean  mutlSelect = true;
-							for (ItemProperties ip : dbItemPropertiesIds) {
+							boolean mutlSelect = true;
+							for (ItemProperties ip : dbItemPropertiesIds){
 								Long pvId = ip.getPropertyValueId();
-								if(pvId != null){
-									//如果多选pvid已经保存了就不需要再保存了
-									if(pvId.equals(itemProperties.getPropertyValueId())
-											&& ip.getItemId().equals(itemId)){
+								if (pvId != null) {
+									// 如果多选pvid已经保存了就不需要再保存了
+									if (pvId.equals(itemProperties.getPropertyValueId()) && ip.getItemId().equals(itemId)) {
 										mutlSelect = false;
 										itemPropertiesIds.add(ip.getId());
 									}
 								}
 							}
-							if(mutlSelect){
+							if (mutlSelect) {
 								ItemProperties res = null;
-								if(i18n){
+								if (i18n) {
 									res = saveImpItempropertiesRadioOrMutlSelectI18n(itemProperties, itemPropIdMap, key);
 								}else{
 									res = saveImpItemproperties(itemProperties, itemPropIdMap, key);
@@ -3872,30 +4075,30 @@ public class ItemManagerImpl implements ItemManager {
 								itemPropertiesIds.add(id);
 							}
 						}else{
-							//何波 自定义多选保存
+							// 何波 自定义多选保存
 							Long propertyId = itemPropVMap.get(key);
 							Map<String, String> cusMutlmaps = impSkuCommand.getPropsI18n();
-							
+
 							if (Validator.isNullOrEmpty(propertyId)) {
 								itemProperties.setItemId(itemMap.get(impSkuCommand.getCode()));
 								ItemProperties res = saveImpItemproperties(itemProperties, itemPropVMap, key);
-								Long id  = res.getId();
-								//保存商品属性默认国际化信息
+								Long id = res.getId();
+								// 保存商品属性默认国际化信息
 								ItemPropertiesLang ipl = new ItemPropertiesLang();
 								ipl.setItemPropertiesId(id);
 								ipl.setLang(MutlLang.defaultLang());
 								ipl.setPropertyValue(itemProperties.getPropertyValue());
 								itemPropertiesLangDao.save(ipl);
-								//保存商品属性国际化信息
-								if(i18n){
-									for (I18nLang i18nLang : i18nLangs) {
+								// 保存商品属性国际化信息
+								if (i18n) {
+									for (I18nLang i18nLang : i18nLangs){
 										String lang = i18nLang.getKey();
-										if(lang.equals(MutlLang.defaultLang())){
+										if (lang.equals(MutlLang.defaultLang())) {
 											continue;
 										}
-										String newKey = lang+pid;
-										String  resI18n = cusMutlmaps.get(newKey);
-										if(resI18n != null){
+										String newKey = lang + pid;
+										String resI18n = cusMutlmaps.get(newKey);
+										if (resI18n != null) {
 											ipl = new ItemPropertiesLang();
 											ipl.setItemPropertiesId(id);
 											ipl.setLang(lang);
@@ -3906,30 +4109,30 @@ public class ItemManagerImpl implements ItemManager {
 								}
 								// add
 								newPropertyIds.add(res.getId());
-							} else {
+							}else{
 								newPropertyIds.add(propertyId);
 							}
 							itemPropertiesIds.add(itemPropVMap.get(key));
-					}
-					// 保存ref
-					List<SearchConditionItem> searchConditionItems = impSkuCommand.getSearchConditionItems();
-					if (Validator.isNotNullOrEmpty(searchConditionItems)) {
-						for (SearchConditionItem searchConditionItem : searchConditionItems) {
-							String key1 = itemPropVMap.get(key) + "_" + searchConditionItem.getId();
-							Long refId = itemReferenceMap.get(key1);
-							/****** 查询ref表中是否存在对应关系 ***/
-							if (Validator.isNullOrEmpty(refId)) {
-								ItemReference itemReference = new ItemReference();
-								itemReference.setItemPropertyId(itemPropVMap.get(key));
-								itemReference.setSearchConditionItemId(searchConditionItem.getId());
-								// 新增ref
-								ItemReference iref = itemReferenceDao.save(itemReference);
-								// map+
-								itemReferenceMap.put(key1, iref.getId());
+						}
+						// 保存ref
+						List<SearchConditionItem> searchConditionItems = impSkuCommand.getSearchConditionItems();
+						if (Validator.isNotNullOrEmpty(searchConditionItems)) {
+							for (SearchConditionItem searchConditionItem : searchConditionItems){
+								String key1 = itemPropVMap.get(key) + "_" + searchConditionItem.getId();
+								Long refId = itemReferenceMap.get(key1);
+								/****** 查询ref表中是否存在对应关系 ***/
+								if (Validator.isNullOrEmpty(refId)) {
+									ItemReference itemReference = new ItemReference();
+									itemReference.setItemPropertyId(itemPropVMap.get(key));
+									itemReference.setSearchConditionItemId(searchConditionItem.getId());
+									// 新增ref
+									ItemReference iref = itemReferenceDao.save(itemReference);
+									// map+
+									itemReferenceMap.put(key1, iref.getId());
+								}
 							}
 						}
 					}
-				}
 				}
 
 				Gson sg = new Gson();
@@ -3954,7 +4157,7 @@ public class ItemManagerImpl implements ItemManager {
 						sku.setListPrice(impItemCommandMap.get(impSkuCommand.getCode()).getListPrice());
 					}
 					sku = skuDao.save(sku);
-				} else {
+				}else{
 					sku = new Sku();
 					sku.setOutid(impSkuCommand.getUpc());
 					sku.setCreateTime(new Date());
@@ -3972,7 +4175,7 @@ public class ItemManagerImpl implements ItemManager {
 			}
 			List<Long> ids = new ArrayList<Long>();
 			if (Validator.isNotNullOrEmpty(oldPropertyIds)) {
-				for (Long id : oldPropertyIds) {
+				for (Long id : oldPropertyIds){
 					if (!newPropertyIds.contains(id)) {
 						ids.add(id);
 					}
@@ -3986,9 +4189,9 @@ public class ItemManagerImpl implements ItemManager {
 
 	}
 
-	private void deleteSkuByItemCodes(List<ImpSkuCommand> impSkuCommandList) {
+	private void deleteSkuByItemCodes(List<ImpSkuCommand> impSkuCommandList){
 		Set<String> itemCodes = new HashSet<String>();
-		for (ImpSkuCommand impSkuCommand : impSkuCommandList) {
+		for (ImpSkuCommand impSkuCommand : impSkuCommandList){
 			itemCodes.add(impSkuCommand.getCode());
 		}
 		List<String> itemCodesList = new ArrayList<String>(itemCodes);
@@ -4007,17 +4210,17 @@ public class ItemManagerImpl implements ItemManager {
 	 * @param industryId
 	 *            行业
 	 */
-	public void downloadFile(HttpServletRequest request, HttpServletResponse response, Long shopId, Long industryId) {
+	public void downloadFile(HttpServletRequest request,HttpServletResponse response,Long shopId,Long industryId){
 		String path = DEFAULT_PATH + "/tplt_sku_import.xls";
 		File file = new File(Thread.currentThread().getContextClassLoader().getResource(path).getPath());
 		InputStream is = null;
 		OutputStream out = null;
-		try {
+		try{
 			is = new FileInputStream(file);
-		} catch (FileNotFoundException e) {
+		}catch (FileNotFoundException e){
 			e.printStackTrace();
 		}
-		try {
+		try{
 			HSSFWorkbook xls = new HSSFWorkbook(is);
 			// 现根据动态属性重新构造excel
 			Industry industry = industryManager.findIndustryById(industryId);
@@ -4025,23 +4228,23 @@ public class ItemManagerImpl implements ItemManager {
 			// 查询这个开关配置（开关的作用是控制批量新建导入模板字段内容是否排序）
 			String pdUploadFieldSortFlag = sdkMataInfoManager.findValue(MataInfo.PD_UPLOAD_TEMPLATE_FIELD_SORT_BY_ID);
 			Sort[] sorts = null;
-			if("true".equalsIgnoreCase(pdUploadFieldSortFlag)){
+			if ("true".equalsIgnoreCase(pdUploadFieldSortFlag)) {
 				sorts = new Sort[1];
-				sorts[0] = new Sort("p.id","asc");	
+				sorts[0] = new Sort("p.id", "asc");
 			}
-			
+
 			List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industry.getId(), shopCommand.getShopid(), sorts);
 
 			List<Property> salesList = new ArrayList<Property>();
 			List<Property> notSalesList = new ArrayList<Property>();
 			List<Property> i18nProprtySelect = new ArrayList<Property>();
 			if (Validator.isNotNullOrEmpty(propertyList)) {
-				for (Property property : propertyList) {
+				for (Property property : propertyList){
 					if (property.getIsSaleProp()) {
 						salesList.add(property);
-					} else {
+					}else{
 						notSalesList.add(property);
-						if(property.getEditingType().equals(1)){
+						if (property.getEditingType().equals(1)) {
 							i18nProprtySelect.add(property);
 						}
 					}
@@ -4052,8 +4255,8 @@ public class ItemManagerImpl implements ItemManager {
 			reconstructExelOfItem(xls, industry, shopCommand, notSalesList);
 			reconstructExelOfSku(xls, industry, shopCommand, salesList);
 			boolean i18n = LangProperty.getI18nOnOff();
-			if(i18n){
-				createItemInfoSheet(xls,i18nProprtySelect);
+			if (i18n) {
+				createItemInfoSheet(xls, i18nProprtySelect);
 			}
 			// 下载
 			response.setHeader("Cache-Control", "no-cache");
@@ -4062,14 +4265,14 @@ public class ItemManagerImpl implements ItemManager {
 			response.addHeader("Content-Disposition", "attachment; filename=" + file.getName());
 			out = response.getOutputStream();
 			xls.write(out);
-		} catch (Exception e1) {
+		}catch (Exception e1){
 			e1.printStackTrace();
-		} finally {
-			try {
+		}finally{
+			try{
 				out.flush();
 				out.close();
 				is.close();
-			} catch (IOException e) {
+			}catch (IOException e){
 				e.printStackTrace();
 			}
 
@@ -4077,10 +4280,10 @@ public class ItemManagerImpl implements ItemManager {
 
 	}
 
-	private void propMatching(Map<String, String> map, List<Long> propIdList) {
+	private void propMatching(Map<String, String> map,List<Long> propIdList){
 		Iterator it = map.keySet().iterator();
 		int index = 0;
-		while (it.hasNext()) {
+		while (it.hasNext()){
 
 			String key = it.next().toString();
 
@@ -4092,16 +4295,16 @@ public class ItemManagerImpl implements ItemManager {
 		}
 	}
 
-	private BusinessException rsToE(ReadStatus rs, BusinessException topE, BusinessException currE) {
+	private BusinessException rsToE(ReadStatus rs,BusinessException topE,BusinessException currE){
 		if (rs.getStatus() != ReadStatus.STATUS_SUCCESS) {
 			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(rs, Locale.SIMPLIFIED_CHINESE);
-			for (String message : messageList) {
+			for (String message : messageList){
 				BusinessException e = new BusinessException(message);
 				if (topE == null) {
 					topE = e; // b-101 : Cell{}错误, new
 								// Object[]{ExcelUtil.getCell(1,2)}
 					currE = e;
-				} else {
+				}else{
 					currE.setLinkedException(e);
 					currE = e;
 				}
@@ -4112,21 +4315,21 @@ public class ItemManagerImpl implements ItemManager {
 
 	}
 
-	private void checkShopId(Map<String, Object> itemBeans, Long shopId) {
+	private void checkShopId(Map<String, Object> itemBeans,Long shopId){
 		Long fileShopId = (Long) itemBeans.get("shopId");
 		if (fileShopId == null || !fileShopId.equals(shopId)) {
 			throw new BusinessException(ErrorCodes.SHOP_NOT_MATCH_ERROR);
 		}
 	}
 
-	private void skuCommSheetDefinitonI18n(ExcelReader skuUpload, List<Long> ids, Map<Long, Boolean> isReqMap) {
+	private void skuCommSheetDefinitonI18n(ExcelReader skuUpload,List<Long> ids,Map<Long, Boolean> isReqMap){
 		ExcelSheet sheetDefinition = skuUpload.getDefinition().getExcelSheets().get(0);
 		ExcelBlock blockDefinition = sheetDefinition.getExcelBlock("A3", "H3");
 		int startCol = 7;
 		int startRow = 2;
-		for (Long pId : ids) {
+		for (Long pId : ids){
 			ExcelCell prop = new ExcelCell();
-			//values
+			// values
 			prop = new ExcelCell();
 			prop.setCol(startCol);
 			prop.setRow(startRow);
@@ -4137,26 +4340,24 @@ public class ItemManagerImpl implements ItemManager {
 		}
 
 	}
-	
-	
 
-	private void skuCommSheetDefiniton(ExcelReader skuUpload, List<Long> ids, Map<Long, Boolean> isReqMap) {
+	private void skuCommSheetDefiniton(ExcelReader skuUpload,List<Long> ids,Map<Long, Boolean> isReqMap){
 		ExcelSheet sheetDefinition = skuUpload.getDefinition().getExcelSheets().get(0);
 		ExcelBlock blockDefinition = sheetDefinition.getExcelBlock("A8", "B8");
 		int startCol = SKUCOMM_SHEETDEFINITION_STARTCOL;
 		int startRow = SKUCOMM_SHEETDEFINITION_STARTROW;
 		Long cmutliId = null;
-		//取出自定义多选id
+		// 取出自定义多选id
 		boolean i18n = LangProperty.getI18nOnOff();
-		if(i18n){
-			for (Long pId : ids) {
+		if (i18n) {
+			for (Long pId : ids){
 				Property property = propertyManager.findPropertyById(pId);
-				if(property.getEditingType()==5){
+				if (property.getEditingType() == 5) {
 					cmutliId = pId;
 				}
 			}
 		}
-		for (Long pId : ids) {
+		for (Long pId : ids){
 			ExcelCell prop = new ExcelCell();
 			prop.setCol(++startCol);
 			prop.setRow(startRow);
@@ -4171,51 +4372,51 @@ public class ItemManagerImpl implements ItemManager {
 			prop.setDataName("scs.v" + pId);
 			prop.setType("string");
 			blockDefinition.addCell(prop);
-			if(i18n && pId.equals(cmutliId)){
-				//读取国际化信息
+			if (i18n && pId.equals(cmutliId)) {
+				// 读取国际化信息
 				int size = ids.size();
 				int baseSize = 4;
-				if(size==1){
+				if (size == 1) {
 					int num = 0;
-					for (int i = 0; i < MutlLang.i18nLangs().size(); i++) {
+					for (int i = 0; i < MutlLang.i18nLangs().size(); i++){
 						String lang = MutlLang.i18nLangs().get(i);
-						if(lang.equals(MutlLang.defaultLang())){
+						if (lang.equals(MutlLang.defaultLang())) {
 							continue;
 						}
-						
+
 						prop = new ExcelCell();
-						prop.setCol(baseSize+num);
+						prop.setCol(baseSize + num);
 						prop.setRow(startRow);
-						prop.setDataName("propsI18n."+lang+ pId);
+						prop.setDataName("propsI18n." + lang + pId);
 						prop.setType("string");
 						blockDefinition.addCell(prop);
 						num++;
 					}
-				}else if(size==2){
+				}else if (size == 2) {
 					baseSize = 6;
 					int num = 0;
-					for (int i = 0; i < MutlLang.i18nLangs().size(); i++) {
+					for (int i = 0; i < MutlLang.i18nLangs().size(); i++){
 						String lang = MutlLang.i18nLangs().get(i);
-						if(lang.equals(MutlLang.defaultLang())){
+						if (lang.equals(MutlLang.defaultLang())) {
 							continue;
 						}
 						prop = new ExcelCell();
-						prop.setCol(baseSize+num);
+						prop.setCol(baseSize + num);
 						prop.setRow(startRow);
-						prop.setDataName("propsI18n."+lang+ pId);
+						prop.setDataName("propsI18n." + lang + pId);
 						prop.setType("string");
 						blockDefinition.addCell(prop);
 						num++;
 					}
 				}
 			}
-			
+
 		}
 
 		blockDefinition = sheetDefinition.getExcelBlock("A5", "B5");
 		startCol = SKUCOMM_SHEETDEFINITION_STARTCOL;
 		startRow = SKUCOMM_SHEETDEFINITION_PROPID_STARTROW;
-		for (Long id : ids) {
+		for (Long id : ids){
 			startCol++;
 			ExcelCell propId = new ExcelCell();
 			propId.setCol(++startCol);
@@ -4226,12 +4427,12 @@ public class ItemManagerImpl implements ItemManager {
 		}
 	}
 
-	private void itemCommSheetDefinition(ExcelReader itemUpload, List<Long> ids, Map<Long, Boolean> isReqMap) {
+	private void itemCommSheetDefinition(ExcelReader itemUpload,List<Long> ids,Map<Long, Boolean> isReqMap){
 		ExcelSheet sheetDefinition = itemUpload.getDefinition().getExcelSheets().get(ZERO);
 		ExcelBlock blockDefinition = sheetDefinition.getExcelBlock("A8", "M8");
 		int startCol = ITEMCOMM_SHEETDEFINITION_STARTCOL;
 		int startRow = ITEMCOMM_SHEETDEFINITION_STARTROW;
-		for (Long pId : ids) {
+		for (Long pId : ids){
 			ExcelCell prop = new ExcelCell();
 			prop.setCol(++startCol);
 			prop.setRow(startRow);
@@ -4244,7 +4445,7 @@ public class ItemManagerImpl implements ItemManager {
 		blockDefinition = sheetDefinition.getExcelBlock("A5", "I5");
 		startCol = ITEMCOMM_SHEETDEFINITION_STARTCOL;
 		startRow = ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW;
-		for (Long pId : ids) {
+		for (Long pId : ids){
 			ExcelCell propId = new ExcelCell();
 			propId.setCol(++startCol);
 			propId.setRow(startRow);
@@ -4259,20 +4460,20 @@ public class ItemManagerImpl implements ItemManager {
 	 * 
 	 * @param itemProperties
 	 */
-	private ItemProperties saveImpItemproperties(ItemProperties itemProperties, Map<String, Long> map, String key) {
+	private ItemProperties saveImpItemproperties(ItemProperties itemProperties,Map<String, Long> map,String key){
 		itemProperties.setCreateTime(new Date());
 		ItemProperties res = itemPropertiesDao.save(itemProperties);
 		// map+
 		map.put(key, res.getId());
 		return res;
 	}
-	
-	private ItemProperties saveImpItempropertiesRadioOrMutlSelectI18n(ItemProperties itemProperties, Map<String, Long> map, String key) {
+
+	private ItemProperties saveImpItempropertiesRadioOrMutlSelectI18n(ItemProperties itemProperties,Map<String, Long> map,String key){
 		itemProperties.setCreateTime(new Date());
 		ItemProperties res = itemPropertiesDao.save(itemProperties);
 		Long id = res.getId();
 		List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
-		for (I18nLang i18nLang : i18nLangs) {
+		for (I18nLang i18nLang : i18nLangs){
 			String lang = i18nLang.getKey();
 			ItemPropertiesLang ipl = new ItemPropertiesLang();
 			ipl.setItemPropertiesId(id);
@@ -4283,45 +4484,50 @@ public class ItemManagerImpl implements ItemManager {
 		map.put(key, res.getId());
 		return res;
 	}
-	
-	private ItemProperties saveImpItempropertiesI18n(ItemProperties itemProperties, Map<String, Long> map, String key,
-			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos,Property property,String code2) {
+
+	private ItemProperties saveImpItempropertiesI18n(
+			ItemProperties itemProperties,
+			Map<String, Long> map,
+			String key,
+			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos,
+			Property property,
+			String code2){
 		itemProperties.setCreateTime(new Date());
 		ItemProperties res = itemPropertiesDao.save(itemProperties);
-		Long id = res.getId(); 
-		 //保存商品属性默认国际化信息
+		Long id = res.getId();
+		// 保存商品属性默认国际化信息
 		ItemPropertiesLang ipl = new ItemPropertiesLang();
 		ipl.setItemPropertiesId(id);
 		ipl.setLang(MutlLang.defaultLang());
 		ipl.setPropertyValue(itemProperties.getPropertyValue());
 		itemPropertiesLangDao.save(ipl);
-	
+
 		Map<String, ItemInfoExcelCommand> i18nItemInfos = new HashMap<String, ItemInfoExcelCommand>();
 		boolean i18n = LangProperty.getI18nOnOff();
-		if(i18n && Validator.isNotNullOrEmpty(allI18nItemInfos)){
-			Set<String>  keys = allI18nItemInfos.keySet();
-			for (String key2 : keys) {
+		if (i18n && Validator.isNotNullOrEmpty(allI18nItemInfos)) {
+			Set<String> keys = allI18nItemInfos.keySet();
+			for (String key2 : keys){
 				List<ItemInfoExcelCommand> list = allI18nItemInfos.get(key2);
-				for (ItemInfoExcelCommand itemExcel : list) {
+				for (ItemInfoExcelCommand itemExcel : list){
 					String code1 = itemExcel.getCode();
-					String newKey = key2+"||"+code1;
+					String newKey = key2 + "||" + code1;
 					i18nItemInfos.put(newKey, itemExcel);
 				}
 			}
 			List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
-			for (I18nLang i18nLang : i18nLangs) {
+			for (I18nLang i18nLang : i18nLangs){
 				String key1 = i18nLang.getKey();
-				if(key1.equals(MutlLang.defaultLang())){
+				if (key1.equals(MutlLang.defaultLang())) {
 					continue;
 				}
 				String value = i18nLang.getValue();
-				String newKey = value+"||"+code2;
-				ItemInfoExcelCommand infoLang  = i18nItemInfos.get(newKey);
-				if(infoLang == null){
-					throw new BusinessException("商品编码:"+code2 +"没有编写对应的的多语言");
+				String newKey = value + "||" + code2;
+				ItemInfoExcelCommand infoLang = i18nItemInfos.get(newKey);
+				if (infoLang == null) {
+					throw new BusinessException("商品编码:" + code2 + "没有编写对应的的多语言");
 				}
 				Map<String, String> pvMap = infoLang.getPropValues();
-				String pv = pvMap.get("pv"+property.getId());
+				String pv = pvMap.get("pv" + property.getId());
 				ipl = new ItemPropertiesLang();
 				ipl.setItemPropertiesId(id);
 				ipl.setLang(key1);
@@ -4329,7 +4535,7 @@ public class ItemManagerImpl implements ItemManager {
 				itemPropertiesLangDao.save(ipl);
 			}
 		}
-	
+
 		// map+
 		map.put(key, res.getId());
 		return res;
@@ -4340,16 +4546,21 @@ public class ItemManagerImpl implements ItemManager {
 	 * 
 	 * @param itemProperties
 	 */
-	private void updateImpItemproperties(ItemProperties itemProperties, Map<String, Long> map, String key) {
+	private void updateImpItemproperties(ItemProperties itemProperties,Map<String, Long> map,String key){
 		ItemProperties ipt = itemPropertiesDao.getByPrimaryKey(map.get(key));
 		ipt.setPropertyValue(itemProperties.getPropertyValue());
 		ipt.setPropertyValueId(itemProperties.getPropertyValueId());
 		itemProperties.setModifyTime(new Date());
 		itemPropertiesDao.save(ipt);
 	}
-	
-	private void updateImpItempropertiesI18n(ItemProperties itemProperties, Map<String, Long> map, String key,
-			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos,Property property,String code2) {
+
+	private void updateImpItempropertiesI18n(
+			ItemProperties itemProperties,
+			Map<String, Long> map,
+			String key,
+			Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos,
+			Property property,
+			String code2){
 		ItemProperties ipt = itemPropertiesDao.getByPrimaryKey(map.get(key));
 		ipt.setPropertyValue(itemProperties.getPropertyValue());
 		ipt.setPropertyValueId(itemProperties.getPropertyValueId());
@@ -4360,46 +4571,46 @@ public class ItemManagerImpl implements ItemManager {
 		ids.add(id);
 		List<String> langs = new ArrayList<String>();
 		langs.add(MutlLang.defaultLang());
-		List<ItemPropertiesLang> ipls = itemPropertiesDao.findItemPropertiesLangByIds(ids,langs);
-		if(ipls==null || ipls.size()==0){
-			 //保存商品属性默认国际化信息
+		List<ItemPropertiesLang> ipls = itemPropertiesDao.findItemPropertiesLangByIds(ids, langs);
+		if (ipls == null || ipls.size() == 0) {
+			// 保存商品属性默认国际化信息
 			ItemPropertiesLang ipl = new ItemPropertiesLang();
 			ipl.setItemPropertiesId(id);
 			ipl.setLang(MutlLang.defaultLang());
 			ipl.setPropertyValue(itemProperties.getPropertyValue());
 			itemPropertiesLangDao.save(ipl);
 		}else{
-			//修改
-			Map<String, Object> params = new  HashMap<String, Object>();
+			// 修改
+			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("value", itemProperties.getPropertyValue());
 			params.put("itemPropertiesId", id);
 			params.put("lang", MutlLang.defaultLang());
 			itemPropertiesDao.updatePropertiesLang(params);
 		}
-		
+
 		Map<String, ItemInfoExcelCommand> i18nItemInfos = new HashMap<String, ItemInfoExcelCommand>();
 		boolean i18n = LangProperty.getI18nOnOff();
-		if(i18n && Validator.isNotNullOrEmpty(allI18nItemInfos)){
-			Set<String>  keys = allI18nItemInfos.keySet();
-			for (String key2 : keys) {
+		if (i18n && Validator.isNotNullOrEmpty(allI18nItemInfos)) {
+			Set<String> keys = allI18nItemInfos.keySet();
+			for (String key2 : keys){
 				List<ItemInfoExcelCommand> list = allI18nItemInfos.get(key2);
-				for (ItemInfoExcelCommand itemExcel : list) {
+				for (ItemInfoExcelCommand itemExcel : list){
 					String code1 = itemExcel.getCode();
-					String newKey = key2+"||"+code1;
+					String newKey = key2 + "||" + code1;
 					i18nItemInfos.put(newKey, itemExcel);
 				}
 			}
 			List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
-			for (I18nLang i18nLang : i18nLangs) {
+			for (I18nLang i18nLang : i18nLangs){
 				String lang = i18nLang.getKey();
-				if(lang.equals(MutlLang.defaultLang())){
+				if (lang.equals(MutlLang.defaultLang())) {
 					continue;
 				}
 				String value = i18nLang.getValue();
-				String newKey = value+"||"+code2;
-				ItemInfoExcelCommand infoLang  = i18nItemInfos.get(newKey);
+				String newKey = value + "||" + code2;
+				ItemInfoExcelCommand infoLang = i18nItemInfos.get(newKey);
 				Map<String, String> pvMap = infoLang.getPropValues();
-				String pv = pvMap.get("pv"+property.getId());
+				String pv = pvMap.get("pv" + property.getId());
 				ItemPropertiesLang ipl = new ItemPropertiesLang();
 				ipl.setItemPropertiesId(id);
 				ipl.setLang(lang);
@@ -4408,27 +4619,27 @@ public class ItemManagerImpl implements ItemManager {
 				ids.add(id);
 				langs.clear();
 				langs.add(lang);
-				if(ipls==null || ipls.size()==0){
+				if (ipls == null || ipls.size() == 0) {
 					itemPropertiesLangDao.save(ipl);
 				}else{
-					//修改
-					Map<String, Object> params = new  HashMap<String, Object>();
+					// 修改
+					Map<String, Object> params = new HashMap<String, Object>();
 					params.put("value", pv);
 					params.put("itemPropertiesId", id);
 					params.put("lang", lang);
 					itemPropertiesDao.updatePropertiesLang(params);
 				}
-				
+
 			}
 		}
-		
+
 	}
 
-	private Map<String, Long> getItemReferenceMap() {
+	private Map<String, Long> getItemReferenceMap(){
 		Map<String, Long> itemReferenceMap = new HashMap<String, Long>();
 		List<ItemReference> itemReferenceList = itemReferenceDao.findAllItemReferenceList();
 		if (Validator.isNotNullOrEmpty(itemReferenceList)) {
-			for (ItemReference itemReference : itemReferenceList) {
+			for (ItemReference itemReference : itemReferenceList){
 				String key = itemReference.getItemPropertyId() + "_" + itemReference.getSearchConditionItemId();
 				itemReferenceMap.put(key, itemReference.getId());
 			}
@@ -4436,12 +4647,12 @@ public class ItemManagerImpl implements ItemManager {
 		return itemReferenceMap;
 	}
 
-	private Map<String, Long> getSkuMap(List<Long> itemIds) {
+	private Map<String, Long> getSkuMap(List<Long> itemIds){
 		Map<String, Long> skuMap = new HashMap<String, Long>();
 		if (Validator.isNotNullOrEmpty(itemIds)) {
 			List<Sku> skuList = skuDao.findSkuByItemIds(itemIds);
 			if (Validator.isNotNullOrEmpty(skuList)) {
-				for (Sku sku : skuList) {
+				for (Sku sku : skuList){
 					skuMap.put(sku.getOutid(), sku.getId());
 				}
 			}
@@ -4449,7 +4660,7 @@ public class ItemManagerImpl implements ItemManager {
 		return skuMap;
 	}
 
-	public void reconstructExelOfItem(HSSFWorkbook xls, Industry industry, ShopCommand shopCommand, List<Property> notSalesList) {
+	public void reconstructExelOfItem(HSSFWorkbook xls,Industry industry,ShopCommand shopCommand,List<Property> notSalesList){
 		/********************************************* 样式start ***************************************/
 		// 对齐
 		HSSFCellStyle cellStyle = xls.createCellStyle();
@@ -4480,15 +4691,15 @@ public class ItemManagerImpl implements ItemManager {
 
 		if (sheet.getRow(ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW) != null) {
 			sheet.getRow(ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(0).setCellValue(shopCommand.getShopid());
-		} else {
+		}else{
 			sheet.createRow(ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(0).setCellValue(shopCommand.getShopid());
 		}
 		sheet.getRow(ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(1).setCellValue(industry.getId());
 		// 第1个sheet 第5行 第9列开始
 		int colNo = ITEMCOMM_SHEETDEFINITION_STARTCOL;
 		if (Validator.isNotNullOrEmpty(notSalesList)) {
-			for (Property property : notSalesList) {
-				try {
+			for (Property property : notSalesList){
+				try{
 					colNo++;
 
 					sheet.getRow(ITEMCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(colNo).setCellValue(property.getId());
@@ -4505,11 +4716,11 @@ public class ItemManagerImpl implements ItemManager {
 					int valueType = property.getValueType();
 					if (valueType == 2) {
 						valueTypeStr = "数值";
-					} else if (valueType == 3) {
+					}else if (valueType == 3) {
 						valueTypeStr = "日期";
-					} else if (valueType == 4) {
+					}else if (valueType == 4) {
 						valueTypeStr = "日期时间";
-					} else {
+					}else{
 						valueTypeStr = "字符串";
 					}
 
@@ -4517,22 +4728,22 @@ public class ItemManagerImpl implements ItemManager {
 					String isRequired = "";
 					if (property.getRequired()) {
 						isRequired = "(必填)";
-					} else {
+					}else{
 						isRequired = "(非必填)";
 					}
 
 					HSSFRow propTypeRow = sheet.getRow(DESC_ROW_INDEX);
 					HSSFCell propTypeCell = propTypeRow.createCell(colNo);
-					//添加动态类型选择
-					if(property.getEditingType()==3){
-						addExcelDynamicType(xls, property,colNo,true);
-					}else if(property.getEditingType()==2){
-						addExcelDynamicType(xls, property,colNo,false);
+					// 添加动态类型选择
+					if (property.getEditingType() == 3) {
+						addExcelDynamicType(xls, property, colNo, true);
+					}else if (property.getEditingType() == 2) {
+						addExcelDynamicType(xls, property, colNo, false);
 					}
 					// 列描述
 					propTypeCell.setCellValue(valueTypeStr + isRequired);
 
-				} catch (Exception e) {
+				}catch (Exception e){
 					e.printStackTrace();
 				}
 
@@ -4540,7 +4751,7 @@ public class ItemManagerImpl implements ItemManager {
 		}
 	}
 
-	public void reconstructExelOfSku(HSSFWorkbook xls, Industry industry, ShopCommand shopCommand, List<Property> salesList) {
+	public void reconstructExelOfSku(HSSFWorkbook xls,Industry industry,ShopCommand shopCommand,List<Property> salesList){
 		/********************************************* 样式start ***************************************/
 		// 对齐
 		HSSFCellStyle cellStyle = xls.createCellStyle();
@@ -4562,7 +4773,7 @@ public class ItemManagerImpl implements ItemManager {
 		/** 填充shopId industryId */
 		if (sheet.getRow(SKUCOMM_SHEETDEFINITION_PROPID_STARTROW) != null) {
 			sheet.getRow(SKUCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(0).setCellValue(shopCommand.getShopid());
-		} else {
+		}else{
 			sheet.createRow(SKUCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(0).setCellValue(shopCommand.getShopid());
 		}
 		sheet.getRow(SKUCOMM_SHEETDEFINITION_PROPID_STARTROW).createCell(1).setCellValue(industry.getId());
@@ -4571,8 +4782,8 @@ public class ItemManagerImpl implements ItemManager {
 		int colNo = SKUCOMM_SHEETDEFINITION_STARTCOL;
 		boolean i18n = LangProperty.getI18nOnOff();
 		if (Validator.isNotNullOrEmpty(salesList)) {
-			for (Property property : salesList) {
-				try {
+			for (Property property : salesList){
+				try{
 					colNo++;
 
 					/*** 创建动态属性 */
@@ -4587,11 +4798,11 @@ public class ItemManagerImpl implements ItemManager {
 					int valueType = property.getValueType();
 					if (valueType == 2) {
 						valueTypeStr = "数值";
-					} else if (valueType == 3) {
+					}else if (valueType == 3) {
 						valueTypeStr = "日期";
-					} else if (valueType == 4) {
+					}else if (valueType == 4) {
 						valueTypeStr = "日期时间";
-					} else {
+					}else{
 						valueTypeStr = "字符串";
 					}
 
@@ -4599,33 +4810,32 @@ public class ItemManagerImpl implements ItemManager {
 					String isRequired = "";
 					if (property.getRequired()) {
 						isRequired = "(必填)";
-					} else {
+					}else{
 						isRequired = "(非必填)";
 					}
-					Integer editType =	property.getEditingType();
-					if(i18n){
-						if(editType != null && editType == 5){
+					Integer editType = property.getEditingType();
+					if (i18n) {
+						if (editType != null && editType == 5) {
 							List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
 							int num = 1;
-							for (I18nLang i18nLang : i18nLangs) {
+							for (I18nLang i18nLang : i18nLangs){
 								String key = i18nLang.getKey();
 								String value = i18nLang.getValue();
-								if(key.equals(MutlLang.defaultLang())){
+								if (key.equals(MutlLang.defaultLang())) {
 									continue;
 								}
 								num++;
-								propCell = propRow.createCell(colNo+num);
+								propCell = propRow.createCell(colNo + num);
 								// 列标题
-								propCell.setCellValue(property.getName()+"("+value+")");
+								propCell.setCellValue(property.getName() + "(" + value + ")");
 								propCell.setCellStyle(cellStyle);
 								HSSFRow propTypeRow = sheet.getRow(DESC_ROW_INDEX);
-								HSSFCell propTypeCell = propTypeRow.createCell(colNo+num);
+								HSSFCell propTypeCell = propTypeRow.createCell(colNo + num);
 								// 列描述
 								propTypeCell.setCellValue(valueTypeStr + isRequired);
 							}
 						}
 					}
-					
 
 					HSSFRow propTypeRow = sheet.getRow(DESC_ROW_INDEX);
 					HSSFCell propTypeCell = propTypeRow.createCell(colNo);
@@ -4648,15 +4858,15 @@ public class ItemManagerImpl implements ItemManager {
 					propValueCell = propValueRow.createCell(colNo);
 					// 列标题
 					propValueCell.setCellValue(SKUCOMM_SC_REQ);
-					//添加动态类型选择
-					if(property.getEditingType()==3){
-						//单选
-						addExcelDynamicType(xls, property,colNo,true);
-					}else if(property.getEditingType()==2){
-						//可输入单选
-						addExcelDynamicType(xls, property,colNo,false);
+					// 添加动态类型选择
+					if (property.getEditingType() == 3) {
+						// 单选
+						addExcelDynamicType(xls, property, colNo, true);
+					}else if (property.getEditingType() == 2) {
+						// 可输入单选
+						addExcelDynamicType(xls, property, colNo, false);
 					}
-				} catch (Exception e) {
+				}catch (Exception e){
 					e.printStackTrace();
 				}
 
@@ -4665,7 +4875,7 @@ public class ItemManagerImpl implements ItemManager {
 
 	}
 
-	public void createItemInfoSheet(HSSFWorkbook xls,List<Property> cusMutliSelect) {
+	public void createItemInfoSheet(HSSFWorkbook xls,List<Property> cusMutliSelect){
 		// 对齐
 		HSSFCellStyle cellStyle = xls.createCellStyle();
 		cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
@@ -4684,53 +4894,54 @@ public class ItemManagerImpl implements ItemManager {
 		colNames.add("seo标题");
 		colNames.add("seo描述");
 		colNames.add("副标题");
-		if(i18nLangs != null){
-			for (I18nLang i18nLang : i18nLangs) {
-				if(i18nLang.getDefaultlang()!=null && i18nLang.getDefaultlang()==1){
+		if (i18nLangs != null) {
+			for (I18nLang i18nLang : i18nLangs){
+				if (i18nLang.getDefaultlang() != null && i18nLang.getDefaultlang() == 1) {
 					continue;
 				}
 				HSSFSheet hssfSheet = xls.createSheet(i18nLang.getValue());
 				HSSFRow propRow = hssfSheet.createRow(1);
-				propRow.setHeight((short)470);
-				//商品编码
-				for (int i = 0; i < colNames.size(); i++) {
+				propRow.setHeight((short) 470);
+				// 商品编码
+				for (int i = 0; i < colNames.size(); i++){
 					String name = colNames.get(i);
-					hssfSheet.setColumnWidth(i,5270);
+					hssfSheet.setColumnWidth(i, 5270);
 					HSSFCell propCell = propRow.createCell(i);
 					propCell.setCellValue(name);
 					propCell.setCellStyle(cellStyle);
 				}
-				//添加基本动态属性
-				if(cusMutliSelect.size() >0){
+				// 添加基本动态属性
+				if (cusMutliSelect.size() > 0) {
 					HSSFRow propertyIdRow = hssfSheet.createRow(0);
 					propertyIdRow.setZeroHeight(true);
-					for (int i = 0; i < cusMutliSelect.size(); i++) {
+					for (int i = 0; i < cusMutliSelect.size(); i++){
 						Property p = cusMutliSelect.get(i);
 						String value = p.getName();
-						hssfSheet.setColumnWidth(colNames.size()+i,5270);
-						HSSFCell propCell = propRow.createCell(colNames.size()+i);
+						hssfSheet.setColumnWidth(colNames.size() + i, 5270);
+						HSSFCell propCell = propRow.createCell(colNames.size() + i);
 						propCell.setCellValue(value);
 						propCell.setCellStyle(cellStyle);
-						//设置对应属性id
-						propertyIdRow.createCell(colNames.size()+i).setCellValue(p.getId());;
+						// 设置对应属性id
+						propertyIdRow.createCell(colNames.size() + i).setCellValue(p.getId());
+						;
 					}
 				}
 			}
-			
+
 		}
 	}
 
-	private Map<Long, Property> getPropMap(List<Property> propertyList) {
+	private Map<Long, Property> getPropMap(List<Property> propertyList){
 		Map<Long, Property> propMap = new HashMap<Long, Property>();
 		if (Validator.isNotNullOrEmpty(propertyList)) {
-			for (Property property : propertyList) {
+			for (Property property : propertyList){
 				propMap.put(property.getId(), property);
 			}
 		}
 		return propMap;
 	}
 
-	private Map<Long, Map<String, Long>> getConItemMap(List<Long> propertyIds) {
+	private Map<Long, Map<String, Long>> getConItemMap(List<Long> propertyIds){
 
 		Map<Long, Map<String, Long>> conItemMap = new HashMap<Long, Map<String, Long>>();
 
@@ -4741,7 +4952,7 @@ public class ItemManagerImpl implements ItemManager {
 			Map<String, Long> searchConItemMap = new HashMap<String, Long>();
 
 			int index = 0;
-			for (SearchConditionItem searchConditionItem : searchConditionItemList) {
+			for (SearchConditionItem searchConditionItem : searchConditionItemList){
 				index++;
 				if (null == propId) {
 					propId = searchConditionItem.getPropertyId();
@@ -4749,7 +4960,7 @@ public class ItemManagerImpl implements ItemManager {
 
 				if (propId.equals(searchConditionItem.getPropertyId())) {
 					searchConItemMap.put(searchConditionItem.getName(), searchConditionItem.getId());
-				} else {
+				}else{
 					conItemMap.put(propId, searchConItemMap);
 					propId = searchConditionItem.getPropertyId();
 					searchConItemMap = new HashMap<String, Long>();
@@ -4768,7 +4979,7 @@ public class ItemManagerImpl implements ItemManager {
 
 	}
 
-	private Map<Long, Map<String, Long>> getPropValMap(List<Long> propertyIds) {
+	private Map<Long, Map<String, Long>> getPropValMap(List<Long> propertyIds){
 
 		Map<Long, Map<String, Long>> propValMap = new HashMap<Long, Map<String, Long>>();
 
@@ -4779,7 +4990,7 @@ public class ItemManagerImpl implements ItemManager {
 			Map<String, Long> propertyValueMap = new HashMap<String, Long>();
 
 			int index = 0;
-			for (PropertyValue propertyValue : propertyValueList) {
+			for (PropertyValue propertyValue : propertyValueList){
 				index++;
 				if (null == propId) {
 					propId = propertyValue.getPropertyId();
@@ -4787,7 +4998,7 @@ public class ItemManagerImpl implements ItemManager {
 
 				if (propId.equals(propertyValue.getPropertyId())) {
 					propertyValueMap.put(propertyValue.getValue(), propertyValue.getId());
-				} else {
+				}else{
 					propValMap.put(propId, propertyValueMap);
 					propId = propertyValue.getPropertyId();
 					propertyValueMap = new HashMap<String, Long>();
@@ -4807,13 +5018,14 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public List<Long> importItemImgFromFile(String path, File zipFile, Long shopId, String uploadType) throws Exception {
-		//用于刷新solr索引
+	public List<Long> importItemImgFromFile(String path,File zipFile,Long shopId,String uploadType) throws Exception{
+		// 用于刷新solr索引
 		List<Long> itemIdsForSolr = new ArrayList<Long>();
-		
+
 		Map<String, String> tmpImgFilePathMap = new HashMap<String, String>();
 		Calendar calendar = Calendar.getInstance();
-		String userDefinedPath = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
+		String userDefinedPath = calendar.get(Calendar.YEAR) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/"
+				+ calendar.get(Calendar.DAY_OF_MONTH);
 		path = path + userDefinedPath;
 		File pathFile = new File(path);
 		if (!pathFile.exists()) {
@@ -4826,7 +5038,7 @@ public class ItemManagerImpl implements ItemManager {
 		List<String> itemCodeList = new ArrayList<String>();
 		/** itemMap(key: itemCode, value: item_id) */
 		Map<String, Long> itemMap = new HashMap<String, Long>();
-		
+
 		List<Long> itemIds = new ArrayList<Long>();
 
 		/** 解压zip文件 */
@@ -4840,10 +5052,10 @@ public class ItemManagerImpl implements ItemManager {
 		}
 		File[] itemFiles = file.listFiles();
 		File[] itemImgFiles = null;
-		try {
+		try{
 			if (itemFiles != null && itemFiles.length > 0) {
 				/** 验证商品图片文件名 */
-				for (File itemFile : itemFiles) {
+				for (File itemFile : itemFiles){
 					itemCodeList.add(itemFile.getName());
 				}
 				List<Item> itemList = itemDao.findItemListByCodes(itemCodeList, shopId);
@@ -4852,10 +5064,10 @@ public class ItemManagerImpl implements ItemManager {
 					throw new BusinessException(ErrorCodes.IMPORT_ITEM_CODE_NOT_EXISTS, new Object[] { "" });
 				}
 
-				for (Item item : itemList) {
+				for (Item item : itemList){
 					itemMap.put(item.getCode(), item.getId());
 					itemIds.add(item.getId());
-					if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
+					if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
 						itemIdsForSolr.add(item.getId());
 					}
 				}
@@ -4866,7 +5078,7 @@ public class ItemManagerImpl implements ItemManager {
 						throw new BusinessException(ErrorCodes.DATA_ERROR);
 					}
 					String notExistsCode = "";
-					for (String codeStr : itemCodeList) {
+					for (String codeStr : itemCodeList){
 						if (itemMap.get(codeStr) == null) {
 							notExistsCode += codeStr + ",";
 						}
@@ -4878,13 +5090,13 @@ public class ItemManagerImpl implements ItemManager {
 				/** 商品图片类型 */
 				List<ChooseOption> itemImgRoleList = chooseOptionManager.findOptionListByGroupCode(ITEM_IMG_ROLE);
 				Map<String, String> itemImgRoleMap = new HashMap<String, String>();
-				for (ChooseOption itemImgRole : itemImgRoleList) {
+				for (ChooseOption itemImgRole : itemImgRoleList){
 					itemImgRoleMap.put(itemImgRole.getOptionLabel(), itemImgRole.getOptionValue());
 				}
 				/** 商品图片尺寸 */
 				List<ChooseOption> itemImgTypeList = chooseOptionManager.findOptionListByGroupCode(ITEM_IMG_TYPE);
 				Map<String, String> itemImgTypeMap = new HashMap<String, String>();
-				for (ChooseOption itemImgRole : itemImgTypeList) {
+				for (ChooseOption itemImgRole : itemImgTypeList){
 					itemImgTypeMap.put(itemImgRole.getOptionLabel(), itemImgRole.getOptionValue());
 				}
 
@@ -4894,37 +5106,37 @@ public class ItemManagerImpl implements ItemManager {
 				Map<String, Long> itemPropMap = new HashMap<String, Long>();
 				/** key: itemId, value:item_properties_id */
 				Map<Long, String> isHaveColorPropMap = new HashMap<Long, String>();
-				for (ItemPropertiesCommand itemPropertiesCommand : itemPropertiesList) {
+				for (ItemPropertiesCommand itemPropertiesCommand : itemPropertiesList){
 					Integer editingType = itemPropertiesCommand.getType();
 					String propertyValue = "";
 					if (editingType.equals(Property.EDITING_TYPE_MULTI_SELECT)) {
 						/** 多选, 应该取property_value中的value */
 						propertyValue = itemPropertiesCommand.getProValue();
-					} else if (editingType.equals(Property.EDITING_TYPE_CUSTOM_MULTI_SELECT)) {
+					}else if (editingType.equals(Property.EDITING_TYPE_CUSTOM_MULTI_SELECT)) {
 						/** 自定义多选 */
 						propertyValue = itemPropertiesCommand.getPropertyValue();
 					}
 					String key = itemPropertiesCommand.getItemId() + "|" + propertyValue;
 					itemPropMap.put(key, itemPropertiesCommand.getId());
-					
+
 					isHaveColorPropMap.put(itemPropertiesCommand.getItemId(), propertyValue);
 				}
-				
+
 				/** 是否是全量导入, 是全量导入则删除原有的图片 */
-				if(UPLOAD_TYPE.equals(uploadType) && null != itemIds && itemIds.size() > 0){
+				if (UPLOAD_TYPE.equals(uploadType) && null != itemIds && itemIds.size() > 0) {
 					itemImageDao.removeItemImageByItemIds(itemIds);
 				}
-				
-				for (File itemFile : itemFiles) {
-				
+
+				for (File itemFile : itemFiles){
+
 					Boolean isHaveColorProp = false;
 					itemCode = itemFile.getName();
 					Long itemId = itemMap.get(itemCode);
 					itemImgFiles = new File(tmpPath + File.separator + zipDir + File.separator + itemCode).listFiles();
-					Map<String,ItemImage> itemImageMap = new HashMap<String, ItemImage>();
-					Map<String,ItemImageLang> itemImageLangMap = new HashMap<String, ItemImageLang>();
-					for (File itemImgFile : itemImgFiles) {
-						if(itemImgFile.isDirectory()){
+					Map<String, ItemImage> itemImageMap = new HashMap<String, ItemImage>();
+					Map<String, ItemImageLang> itemImageLangMap = new HashMap<String, ItemImageLang>();
+					for (File itemImgFile : itemImgFiles){
+						if (itemImgFile.isDirectory()) {
 							continue;
 						}
 						String itemImgFileName = itemImgFile.getName();
@@ -4949,7 +5161,7 @@ public class ItemManagerImpl implements ItemManager {
 							itemPropId = itemPropMap.get(itemId + "|" + color);
 							type = itemImgTypeMap.get(strs[2]);
 							position = strs[3];
-						} else {
+						}else{
 							/** 商品没有颜色属性 */
 							type = itemImgTypeMap.get(strs[1]);
 							position = strs[2];
@@ -4965,20 +5177,20 @@ public class ItemManagerImpl implements ItemManager {
 
 						FileInputStream fisItemImgFile = new FileInputStream(itemImgFile);
 						FileOutputStream fosOutFile = new FileOutputStream(outFile);
-						try {
+						try{
 							IOUtils.copy(fisItemImgFile, fosOutFile);
-						} catch (Exception e) { // 异常时关闭文件
+						}catch (Exception e){ // 异常时关闭文件
 							throw new Exception(e);
-						} finally {
+						}finally{
 							fisItemImgFile.close();
 							fosOutFile.close();
 						}
-						
+
 						/** 生成缩略图 */
 						String role = itemImgRoleMap.get(type);
-						if(StringUtils.isBlank(role)){
+						if (StringUtils.isBlank(role)) {
 							log.error("batch import item image : item image role is {} and type is {}", role, type);
-							throw new BusinessException(ErrorCodes.IMPORT_IMAGE_FILE_ROLE_NOT_EXIST, new Object[]{type});
+							throw new BusinessException(ErrorCodes.IMPORT_IMAGE_FILE_ROLE_NOT_EXIST, new Object[] { type });
 						}
 						tmpImgFilePathMap = uploadManager.upload(tmpImgFilePathMap, role, outFile);
 
@@ -4998,107 +5210,107 @@ public class ItemManagerImpl implements ItemManager {
 						itemImage.setType(StringUtils.trim(type));
 						itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
 						itemImage = itemImageDao.save(itemImage);
-						
+
 						itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
-						
+
 						// 国际化
 						boolean i18n = LangProperty.getI18nOnOff();
-						if(i18n){
+						if (i18n) {
 							List<String> languages = MutlLang.i18nLangs();
-							for(String language:languages){
-								ItemImageLang  itemImageLang = new ItemImageLang();
+							for (String language : languages){
+								ItemImageLang itemImageLang = new ItemImageLang();
 								itemImageLang.setItemImageId(itemImage.getId());
 								itemImageLang.setLang(language);
 								itemImageLang.setPicUrl(itemImage.getPicUrl());
 								itemImageLang.setDescription(itemImage.getDescription());
 								itemImageLang = itemImageLangDao.save(itemImageLang);
-								itemImageLangMap.put(itemImageLang.getItemImageId()+"_"+itemImageLang.getLang(), itemImageLang);
+								itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
 							}
 						}
 					}
-					
-					for (File directoryFile : itemImgFiles) {
-						if( directoryFile.isDirectory()){
+
+					for (File directoryFile : itemImgFiles){
+						if (directoryFile.isDirectory()) {
 							boolean i18n = LangProperty.getI18nOnOff();
-							if(!i18n){
+							if (!i18n) {
 								break;
 							}
 							String directoryName = directoryFile.getName();
 							List<String> languages = MutlLang.i18nLangs();
-							if(!languages.contains(directoryName)){
+							if (!languages.contains(directoryName)) {
 								throw new BusinessException(ErrorCodes.IMPORT_FILE_NOT_TRUE);
 							}
-							
-							File[] files= directoryFile.listFiles();
- 							for(File itemImgFile:files){
- 								String itemImgFileName = itemImgFile.getName();
- 								if (CACHE_FILE_NAME.equals(itemImgFileName)) {
- 									continue;
- 								}
- 								if (StringUtils.isNotBlank(isHaveColorPropMap.get(itemId))) {
- 									isHaveColorProp = true;
- 								}
- 								/** 检查图片名称 */
- 								checkUploadImgName(itemId, itemCode, itemImgFileName, isHaveColorProp, itemImgTypeMap, itemPropMap);
 
- 								/** 是否有颜色属性 */
- 								String imgExp = ImageOpeartion.getExp(itemImgFileName);
- 								String[] strs = itemImgFileName.replace(itemCode, "").replace(imgExp, "").split("-");
- 								Long itemPropId = null;
- 								String type = null;
- 								String position = null;
- 								if (isHaveColorProp) {
- 									/** 商品有颜色属性 */
- 									String color = strs[1];
- 									itemPropId = itemPropMap.get(itemId + "|" + color);
- 									type = itemImgTypeMap.get(strs[2]);
- 									position = strs[3];
- 								} else {
- 									/** 商品没有颜色属性 */
- 									type = itemImgTypeMap.get(strs[1]);
- 									position = strs[2];
- 								}
- 								/** 生成原图 */
- 								String picName = ImageOpeartion.getPicName();
- 								String srcPicName = picName + imgExp;
- 								File outFile = new File(tmpPath + File.separator + userDefinedPath + File.separator + srcPicName);
- 								tmpImgFilePathMap.put("source" + picName, srcPicName);
- 								if (!outFile.getParentFile().exists()) {
- 									outFile.getParentFile().mkdirs();// 创建文件夹
- 								}
+							File[] files = directoryFile.listFiles();
+							for (File itemImgFile : files){
+								String itemImgFileName = itemImgFile.getName();
+								if (CACHE_FILE_NAME.equals(itemImgFileName)) {
+									continue;
+								}
+								if (StringUtils.isNotBlank(isHaveColorPropMap.get(itemId))) {
+									isHaveColorProp = true;
+								}
+								/** 检查图片名称 */
+								checkUploadImgName(itemId, itemCode, itemImgFileName, isHaveColorProp, itemImgTypeMap, itemPropMap);
 
- 								FileInputStream fisItemImgFile = new FileInputStream(itemImgFile);
- 								FileOutputStream fosOutFile = new FileOutputStream(outFile);
- 								try {
- 									IOUtils.copy(fisItemImgFile, fosOutFile);
- 								} catch (Exception e) { // 异常时关闭文件
- 									throw new Exception(e);
- 								} finally {
- 									fisItemImgFile.close();
- 									fosOutFile.close();
- 								}
- 								
- 								/** 生成缩略图 */
- 								String role = itemImgRoleMap.get(type);
- 								if(StringUtils.isBlank(role)){
- 									log.error("batch import item image : item image role is {} and type is {}", role, type);
- 									throw new BusinessException(ErrorCodes.IMPORT_IMAGE_FILE_ROLE_NOT_EXIST, new Object[]{type});
- 								}
- 								tmpImgFilePathMap = uploadManager.upload(tmpImgFilePathMap, role, outFile);
+								/** 是否有颜色属性 */
+								String imgExp = ImageOpeartion.getExp(itemImgFileName);
+								String[] strs = itemImgFileName.replace(itemCode, "").replace(imgExp, "").split("-");
+								Long itemPropId = null;
+								String type = null;
+								String position = null;
+								if (isHaveColorProp) {
+									/** 商品有颜色属性 */
+									String color = strs[1];
+									itemPropId = itemPropMap.get(itemId + "|" + color);
+									type = itemImgTypeMap.get(strs[2]);
+									position = strs[3];
+								}else{
+									/** 商品没有颜色属性 */
+									type = itemImgTypeMap.get(strs[1]);
+									position = strs[2];
+								}
+								/** 生成原图 */
+								String picName = ImageOpeartion.getPicName();
+								String srcPicName = picName + imgExp;
+								File outFile = new File(tmpPath + File.separator + userDefinedPath + File.separator + srcPicName);
+								tmpImgFilePathMap.put("source" + picName, srcPicName);
+								if (!outFile.getParentFile().exists()) {
+									outFile.getParentFile().mkdirs();// 创建文件夹
+								}
 
- 								/** 获得图片url */
- 								String[] roles = role.split("\\|");
- 								String ru = roles[roles.length - 1];
- 								String imgUrl = tmpImgFilePathMap.get(ru + picName);
+								FileInputStream fisItemImgFile = new FileInputStream(itemImgFile);
+								FileOutputStream fosOutFile = new FileOutputStream(outFile);
+								try{
+									IOUtils.copy(fisItemImgFile, fosOutFile);
+								}catch (Exception e){ // 异常时关闭文件
+									throw new Exception(e);
+								}finally{
+									fisItemImgFile.close();
+									fosOutFile.close();
+								}
 
- 								/** 保存商品图片 */
- 								itemImage = itemImageMap.get(itemImgFileName.replace(imgExp, ""));
- 								
- 								ItemImageLang itemImageLang = itemImageLangMap.get(itemImage.getId()+"_"+directoryName);
- 								
- 								itemImageLang = itemImageLangDao.getByPrimaryKey(itemImageLang.getId());
- 								itemImageLang.setPicUrl(userDefinedPath + "/" + imgUrl);
-								 
+								/** 生成缩略图 */
+								String role = itemImgRoleMap.get(type);
+								if (StringUtils.isBlank(role)) {
+									log.error("batch import item image : item image role is {} and type is {}", role, type);
+									throw new BusinessException(ErrorCodes.IMPORT_IMAGE_FILE_ROLE_NOT_EXIST, new Object[] { type });
+								}
+								tmpImgFilePathMap = uploadManager.upload(tmpImgFilePathMap, role, outFile);
+
+								/** 获得图片url */
+								String[] roles = role.split("\\|");
+								String ru = roles[roles.length - 1];
+								String imgUrl = tmpImgFilePathMap.get(ru + picName);
+
+								/** 保存商品图片 */
+								itemImage = itemImageMap.get(itemImgFileName.replace(imgExp, ""));
+
+								ItemImageLang itemImageLang = itemImageLangMap.get(itemImage.getId() + "_" + directoryName);
+
+								itemImageLang = itemImageLangDao.getByPrimaryKey(itemImageLang.getId());
+								itemImageLang.setPicUrl(userDefinedPath + "/" + imgUrl);
+
 							}
 						}
 					}
@@ -5107,25 +5319,25 @@ public class ItemManagerImpl implements ItemManager {
 				/** 将临时文件拷贝到正式目录中 */
 				InputStream input = null;
 				OutputStream output = null;
-				for (Map.Entry<String, String> entry : tmpImgFilePathMap.entrySet()) {
+				for (Map.Entry<String, String> entry : tmpImgFilePathMap.entrySet()){
 					File tmpFile = new File(tmpPath + File.separator + userDefinedPath + File.separator + entry.getValue());
 					input = new FileInputStream(tmpFile);
 					output = new FileOutputStream(path + File.separator + entry.getValue());
-					try {
+					try{
 						IOUtils.copy(input, output);
-					} finally {
+					}finally{
 						input.close();
 						output.close();
 					}
 				}
 
-			} else {
+			}else{
 				throw new BusinessException(ErrorCodes.IMPORT_FILE_NOT_TRUE);
 			}
-		} finally {
+		}finally{
 
 			/** 删除临时图片文件 */
-			for (Map.Entry<String, String> entry : tmpImgFilePathMap.entrySet()) {
+			for (Map.Entry<String, String> entry : tmpImgFilePathMap.entrySet()){
 				File tmpFile = new File(tmpPath + File.separator + userDefinedPath + File.separator + entry.getValue());
 				tmpFile.delete();
 			}
@@ -5140,11 +5352,8 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	/**
-	 * 验证上传的zip中的文件名是否规定规格 : 图片名字规格 : 1, 有颜色属性:
-	 * ${商品编码}-${颜色}-${类型}-${position}.jpg 
-	 * 2,没有颜色属性:${商品编码}-${类型}-${position}.jpg
-	 * 
-	 * 1: 商品是否有颜色属性 2: 商品的类型是否存在
+	 * 验证上传的zip中的文件名是否规定规格 : 图片名字规格 : 1, 有颜色属性: ${商品编码}-${颜色}-${类型}-${position}.jpg 2,没有颜色属性:${商品编码}-${类型}-${position}.jpg 1: 商品是否有颜色属性 2:
+	 * 商品的类型是否存在
 	 * 
 	 * @param itemImgFileName
 	 *            :图片名称
@@ -5152,16 +5361,25 @@ public class ItemManagerImpl implements ItemManager {
 	 *            :商品是否有颜色属性
 	 * @return
 	 */
-	private void checkUploadImgName(Long itemId, String itemCode, String itemImgFileName, Boolean isHaveColorProp, Map<String, String> itemImgTypeMap, Map<String, Long> itemPropMap) throws Exception {
+	private void checkUploadImgName(
+			Long itemId,
+			String itemCode,
+			String itemImgFileName,
+			Boolean isHaveColorProp,
+			Map<String, String> itemImgTypeMap,
+			Map<String, Long> itemPropMap) throws Exception{
 		String fileName = itemImgFileName;
 		/** 文件名是以商品code开始 */
 		if (!fileName.startsWith(itemCode)) {
-			log.error("item image name is {}, item code is {}. item image name does not agree with commodity item code! ", fileName, itemCode);
+			log.error(
+					"item image name is {}, item code is {}. item image name does not agree with commodity item code! ",
+					fileName,
+					itemCode);
 			throw new BusinessException(ErrorCodes.IMPORT_FILE_NAME_NOT_TRUE_DIR, new Object[] { fileName, itemCode });
 		}
 		fileName = fileName.replace(itemCode, "");
 		String[] strs = fileName.split("-");
-		
+
 		if (strs == null || strs.length < 3 || StringUtils.isNotBlank(strs[0])) {
 			throw new BusinessException(ErrorCodes.IMPORT_FILE_NAME_NOT_TRUE, new Object[] { itemImgFileName });
 		}
@@ -5173,7 +5391,7 @@ public class ItemManagerImpl implements ItemManager {
 			if (itemPropMap.get(itemId + "|" + color) == null) {
 				throw new BusinessException(ErrorCodes.IMPORT_FILE_COLOR_PROP_NOT_EXIST, new Object[] { itemImgFileName, color });
 			}
-		} else {
+		}else{
 			type = strs[1];
 		}
 		if (StringUtils.isBlank(itemImgTypeMap.get(type))) {
@@ -5182,7 +5400,7 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public ItemCommand findItemCommandByCode(String code, String customBaseUrl) {
+	public ItemCommand findItemCommandByCode(String code,String customBaseUrl){
 		ItemCommand itemCommand = itemDao.findItemCommandByCode(code);
 		if (itemCommand != null) {
 			List<Long> itemIds = new ArrayList<Long>();
@@ -5199,13 +5417,10 @@ public class ItemManagerImpl implements ItemManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.manager.product.ItemManager#activeItemByIds(java.util
-	 * .List, java.lang.Integer)
+	 * @see com.baozun.nebula.manager.product.ItemManager#activeItemByIds(java.util .List, java.lang.Integer)
 	 */
 	@Override
-	public Integer activeItemByIds(List<Long> ids, Date activeBeginTime) {
+	public Integer activeItemByIds(List<Long> ids,Date activeBeginTime){
 		// Date activeBeginTime = null;
 
 		// if(StringUtils.isNotBlank(activeTimeStr)){
@@ -5219,7 +5434,7 @@ public class ItemManagerImpl implements ItemManager {
 		// 刷新索引
 		boolean i18n = LangProperty.getI18nOnOff();
 		boolean solrFlag = false;
-		if(i18n){
+		if (i18n) {
 			solrFlag = itemSolrManager.saveOrUpdateItemI18n(ids);
 		}else{
 			solrFlag = itemSolrManager.saveOrUpdateItem(ids);
@@ -5234,15 +5449,10 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	/**
-	 * 
-	 * @author 何波
-	 * @Description: 根据分类id 查询商品
-	 * @param cateIds
-	 * @return List<ItemInfo>
-	 * @throws
+	 * @author 何波 @Description: 根据分类id 查询商品 @param cateIds @return List<ItemInfo> @throws
 	 */
 	@Override
-	public List<ItemInfo> findItemInfosByCateIds(List<Long> cateIds) {
+	public List<ItemInfo> findItemInfosByCateIds(List<Long> cateIds){
 		if (CollectionUtils.isEmpty(cateIds)) {
 			return null;
 		}
@@ -5256,7 +5466,7 @@ public class ItemManagerImpl implements ItemManager {
 	 * @return
 	 */
 	@Override
-	public List<ItemInfo> findItemInfosByItemIds(List<Long> itemIds) {
+	public List<ItemInfo> findItemInfosByItemIds(List<Long> itemIds){
 		if (CollectionUtils.isEmpty(itemIds)) {
 			return null;
 		}
@@ -5264,21 +5474,15 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	/**
-	 * 
-	 * @author 何波
-	 * @Description: 处理全场优惠价格设置
-	 * @param cateIds
-	 * @param itemIds
-	 * @return List<ItemInfo>
-	 * @throws
+	 * @author 何波 @Description: 处理全场优惠价格设置 @param cateIds @param itemIds @return List<ItemInfo> @throws
 	 */
 	@Override
-	public List<ItemInfo> findCallItemInfos(List<Long> cateIds, List<Long> itemIds) {
+	public List<ItemInfo> findCallItemInfos(List<Long> cateIds,List<Long> itemIds){
 		return itemInfoDao.findCallItemInfos(cateIds, itemIds);
 	}
 
 	@Override
-	public List<ItemInfo> findItemInfosBySkuids(List<Long> skuIds) {
+	public List<ItemInfo> findItemInfosBySkuids(List<Long> skuIds){
 		if (CollectionUtils.isEmpty(skuIds)) {
 			return null;
 		}
@@ -5286,111 +5490,107 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public List<Item> findItemListByCodes(List<String> itemCodes) {
+	public List<Item> findItemListByCodes(List<String> itemCodes){
 		return itemDao.findItemListByCodes(itemCodes, null);
 	}
 
 	@Override
-	public List<ItemCommand> findItemCommandListByIds(List<Long> itemIds) {
+	public List<ItemCommand> findItemCommandListByIds(List<Long> itemIds){
 		return itemDao.findItemCommandListByIds(itemIds);
 	}
 
 	@Override
-	public void removeItemImageByItemId(Long itemId) {
+	public void removeItemImageByItemId(Long itemId){
 		List<Long> itemIds = new ArrayList<Long>();
 		itemIds.add(itemId);
 		itemImageDao.removeItemImageByItemIds(itemIds);
 	}
+
 	/**
-	 * 
-	* @author 何波
-	* @Description: 
-	* @param xls
-	* @param shopId   
-	* void   
-	* @throws
+	 * @author 何波 @Description: @param xls @param shopId void @throws
 	 */
-	private void addExcelDynamicType(HSSFWorkbook xls,Property property,int cell ,boolean validate){
-    	Long propertyId = property.getId();
-    	List<PropertyValue> ps = propertyValueDao.findPropertyValueListById(propertyId);
-    	if(ps==null || ps.size()==0){
-    		return ;
-    	}
-    	List<String>  valueList = new ArrayList<String>();
-    	for (PropertyValue pv : ps) {
-    		valueList.add(pv.getValue());
+	private void addExcelDynamicType(HSSFWorkbook xls,Property property,int cell,boolean validate){
+		Long propertyId = property.getId();
+		List<PropertyValue> ps = propertyValueDao.findPropertyValueListById(propertyId);
+		if (ps == null || ps.size() == 0) {
+			return;
+		}
+		List<String> valueList = new ArrayList<String>();
+		for (PropertyValue pv : ps){
+			valueList.add(pv.getValue());
 		}
 		Sheet sheet = xls.getSheetAt(0);
-		//添加商品类型选择
-		constructListCell(sheet,valueList,7,200,cell,validate);
+		// 添加商品类型选择
+		constructListCell(sheet, valueList, 7, 200, cell, validate);
 	}
+
 	/** 构建属性值下拉 */
-    private void constructListCell(Sheet sheet, List<String> valueList, int row, int lastRow, int startCol,boolean validate ) {
-        if (valueList == null) {
-            return;
-        }
-        DataValidationConstraint dvConstraint = this.dealDataValidationConstraint(sheet, valueList, startCol);
-        
-        CellRangeAddressList addressList = new CellRangeAddressList(row, lastRow, startCol, startCol);
-        
-        DataValidation validation = sheet.getDataValidationHelper().createValidation(dvConstraint, addressList);
-        validation.setShowErrorBox(validate);
-        sheet.addValidationData(validation);
-    }
-    
-    private DataValidationConstraint dealDataValidationConstraint(Sheet sheet, List<String> valueList, int startCol) {
-        DataValidationConstraint dc = null;
-        if (valueList.size() <= MAX_PROP_VALUE) {
-            dc = sheet.getDataValidationHelper().createExplicitListConstraint(valueList.toArray(new String[valueList.size()]));
-        } else {
-            String formula = this.dealOverMaxDataValidation(sheet.getWorkbook(), valueList, startCol);
-            dc = sheet.getDataValidationHelper().createFormulaListConstraint(formula);
-        }
-        return dc;
-    }
-    
-    private String dealOverMaxDataValidation(Workbook wb, List<String> valueList, int startCol) {
-        Sheet s3 = wb.getSheet(VALUES_SHEET);
-        Row row = null;
-        for (int i = 0; i < valueList.size(); i++) {
-            String value = valueList.get(i);
-            row = s3.getRow(i);
-            if (row == null) {
-                row = s3.createRow(i);
-            }
-            row.createCell(startCol, Cell.CELL_TYPE_STRING).setCellValue(value);
-        }
-        String colStr = CellReference.convertNumToColString(startCol);
-        return String.format("%s!$%s$1:$%s$%d", VALUES_SHEET, colStr, colStr, valueList.size());
-    }
+	private void constructListCell(Sheet sheet,List<String> valueList,int row,int lastRow,int startCol,boolean validate){
+		if (valueList == null) {
+			return;
+		}
+		DataValidationConstraint dvConstraint = this.dealDataValidationConstraint(sheet, valueList, startCol);
+
+		CellRangeAddressList addressList = new CellRangeAddressList(row, lastRow, startCol, startCol);
+
+		DataValidation validation = sheet.getDataValidationHelper().createValidation(dvConstraint, addressList);
+		validation.setShowErrorBox(validate);
+		sheet.addValidationData(validation);
+	}
+
+	private DataValidationConstraint dealDataValidationConstraint(Sheet sheet,List<String> valueList,int startCol){
+		DataValidationConstraint dc = null;
+		if (valueList.size() <= MAX_PROP_VALUE) {
+			dc = sheet.getDataValidationHelper().createExplicitListConstraint(valueList.toArray(new String[valueList.size()]));
+		}else{
+			String formula = this.dealOverMaxDataValidation(sheet.getWorkbook(), valueList, startCol);
+			dc = sheet.getDataValidationHelper().createFormulaListConstraint(formula);
+		}
+		return dc;
+	}
+
+	private String dealOverMaxDataValidation(Workbook wb,List<String> valueList,int startCol){
+		Sheet s3 = wb.getSheet(VALUES_SHEET);
+		Row row = null;
+		for (int i = 0; i < valueList.size(); i++){
+			String value = valueList.get(i);
+			row = s3.getRow(i);
+			if (row == null) {
+				row = s3.createRow(i);
+			}
+			row.createCell(startCol, Cell.CELL_TYPE_STRING).setCellValue(value);
+		}
+		String colStr = CellReference.convertNumToColString(startCol);
+		return String.format("%s!$%s$1:$%s$%d", VALUES_SHEET, colStr, colStr, valueList.size());
+	}
 
 	@Override
-	public ItemInfoCommand findItemInfoCommandByItemId(Long itemId) {
+	public ItemInfoCommand findItemInfoCommandByItemId(Long itemId){
 		ItemInfo itemInfo = findItemInfoByItemId(itemId);
 		ItemInfoCommand command = new ItemInfoCommand();
 		LangProperty.I18nPropertyCopyToSource(itemInfo, command);
 		boolean i18n = LangProperty.getI18nOnOff();
-		if (i18n){
+		if (i18n) {
 			List<Long> ids = new ArrayList<Long>();
 			ids.add(itemInfo.getId());
-			List<ItemInfoLang> infoLangs = itemInfoDao.findItemInfoLangList(ids,MutlLang.i18nLangs());
+			List<ItemInfoLang> infoLangs = itemInfoDao.findItemInfoLangList(ids, MutlLang.i18nLangs());
 			String[] titles = new String[MutlLang.i18nSize()];
-			
-			String[] subTiltes =new String[MutlLang.i18nSize()];
-			
+
+			String[] subTiltes = new String[MutlLang.i18nSize()];
+
 			String[] seoTitles = new String[MutlLang.i18nSize()];
-			
+
 			String[] seoKeywordss = new String[MutlLang.i18nSize()];
-			
-			String[] seoDescriptions =new String[MutlLang.i18nSize()];
-			
+
+			String[] seoDescriptions = new String[MutlLang.i18nSize()];
+
 			String[] sketchs = new String[MutlLang.i18nSize()];
-			
+
 			String[] descriptions = new String[MutlLang.i18nSize()];
-			
+
 			String[] langs = new String[MutlLang.i18nSize()];
-			if(Validator.isNotNullOrEmpty(infoLangs)){
-				for (int i = 0; i < infoLangs.size(); i++) {
+			if (Validator.isNotNullOrEmpty(infoLangs)) {
+				for (int i = 0; i < infoLangs.size(); i++){
 					ItemInfoLang lang = infoLangs.get(i);
 					titles[i] = lang.getTitle();
 					subTiltes[i] = lang.getSubTitle();
@@ -5399,7 +5599,7 @@ public class ItemManagerImpl implements ItemManager {
 					seoDescriptions[i] = lang.getSeoDescription();
 					sketchs[i] = lang.getSketch();
 					descriptions[i] = lang.getDescription();
-					
+
 					langs[i] = lang.getLang();
 				}
 			}
@@ -5407,62 +5607,62 @@ public class ItemManagerImpl implements ItemManager {
 			title.setLangs(langs);
 			title.setValues(titles);
 			command.setTitle(title);
-			
+
 			MutlLang subTilte = new MutlLang();
 			subTilte.setValues(subTiltes);
 			subTilte.setLangs(langs);
 			command.setSubTitle(subTilte);
-			
+
 			MutlLang seoTitle = new MutlLang();
 			seoTitle.setValues(seoTitles);
 			seoTitle.setLangs(langs);
 			command.setSeoTitle(seoTitle);
-			
+
 			MutlLang seoKeywords = new MutlLang();
 			seoKeywords.setValues(seoKeywordss);
 			seoKeywords.setLangs(langs);
 			command.setSeoKeywords(seoKeywords);
-			
+
 			MutlLang seoDescription = new MutlLang();
 			seoDescription.setValues(seoDescriptions);
 			seoDescription.setLangs(langs);
 			command.setSeoDescription(seoDescription);
-			
+
 			MutlLang sketch = new MutlLang();
 			sketch.setValues(sketchs);
 			sketch.setLangs(langs);
 			command.setSketch(sketch);
-			
+
 			MutlLang description = new MutlLang();
 			description.setValues(descriptions);
 			description.setLangs(langs);
 			command.setDescription(description);
-			
+
 		}else{
 			SingleLang title = new SingleLang();
 			title.setValue(itemInfo.getTitle());
 			command.setTitle(title);
-			
+
 			SingleLang subTilte = new SingleLang();
 			subTilte.setValue(itemInfo.getSubTitle());
 			command.setSubTitle(subTilte);
-			
+
 			SingleLang seoTitle = new SingleLang();
 			seoTitle.setValue(itemInfo.getSeoTitle());
 			command.setSeoTitle(seoTitle);
-			
+
 			SingleLang seoKeywords = new SingleLang();
 			seoKeywords.setValue(itemInfo.getSeoKeywords());
 			command.setSeoKeywords(seoKeywords);
-			
+
 			SingleLang seoDescription = new SingleLang();
 			seoDescription.setValue(itemInfo.getSeoDescription());
 			command.setSeoDescription(seoDescription);
-			
+
 			SingleLang sketch = new SingleLang();
 			sketch.setValue(itemInfo.getSketch());
 			command.setSketch(sketch);
-			
+
 			SingleLang description = new SingleLang();
 			description.setValue(itemInfo.getDescription());
 			command.setDescription(description);
@@ -5471,36 +5671,33 @@ public class ItemManagerImpl implements ItemManager {
 	}
 
 	@Override
-	public List<com.baozun.nebula.command.product.ItemPropertiesCommand> findItemPropertiesCommandListyByItemId(
-			Long itemId) {
+	public List<com.baozun.nebula.command.product.ItemPropertiesCommand> findItemPropertiesCommandListyByItemId(Long itemId){
 		List<ItemProperties> itemProperties = findItemPropertiesListyByItemId(itemId);
-		
-		List<com.baozun.nebula.command.product.ItemPropertiesCommand > pvcs 
-		 = new ArrayList<com.baozun.nebula.command.product.ItemPropertiesCommand>();
-		
-		if(Validator.isNullOrEmpty(itemProperties)){
-			 return pvcs;
+
+		List<com.baozun.nebula.command.product.ItemPropertiesCommand> pvcs = new ArrayList<com.baozun.nebula.command.product.ItemPropertiesCommand>();
+
+		if (Validator.isNullOrEmpty(itemProperties)) {
+			return pvcs;
 		}
-		
+
 		List<Long> ids = new ArrayList<Long>();
-		for (ItemProperties propertyValue : itemProperties) {
-			 com.baozun.nebula.command.product.ItemPropertiesCommand pvc
-			 = new com.baozun.nebula.command.product.ItemPropertiesCommand();
-			 LangProperty.I18nPropertyCopyToSource(propertyValue, pvc);
-			 Long pvId = propertyValue.getId();
-			 ids.add(pvId);
-			 pvcs.add(pvc);
+		for (ItemProperties propertyValue : itemProperties){
+			com.baozun.nebula.command.product.ItemPropertiesCommand pvc = new com.baozun.nebula.command.product.ItemPropertiesCommand();
+			LangProperty.I18nPropertyCopyToSource(propertyValue, pvc);
+			Long pvId = propertyValue.getId();
+			ids.add(pvId);
+			pvcs.add(pvc);
 		}
 		boolean i18n = LangProperty.getI18nOnOff();
-		if (i18n){
-			List<ItemPropertiesLang> propertyLangs = itemPropertiesDao.findItemPropertiesLangByIds(ids,MutlLang.i18nLangs());
-			if(Validator.isNullOrEmpty(propertyLangs)){
-				return  pvcs;
+		if (i18n) {
+			List<ItemPropertiesLang> propertyLangs = itemPropertiesDao.findItemPropertiesLangByIds(ids, MutlLang.i18nLangs());
+			if (Validator.isNullOrEmpty(propertyLangs)) {
+				return pvcs;
 			}
-			Map<Long, List<ItemPropertiesLang>>  map = new HashMap<Long, List<ItemPropertiesLang>>();
-			for (ItemPropertiesLang propertyLang : propertyLangs) {
-				Long  pid  = propertyLang.getItemPropertiesId();
-				if(map.containsKey(pid)){
+			Map<Long, List<ItemPropertiesLang>> map = new HashMap<Long, List<ItemPropertiesLang>>();
+			for (ItemPropertiesLang propertyLang : propertyLangs){
+				Long pid = propertyLang.getItemPropertiesId();
+				if (map.containsKey(pid)) {
 					map.get(pid).add(propertyLang);
 				}else{
 					List<ItemPropertiesLang> pls = new ArrayList<ItemPropertiesLang>();
@@ -5508,21 +5705,21 @@ public class ItemManagerImpl implements ItemManager {
 					map.put(pid, pls);
 				}
 			}
-			for (int i = 0; i < pvcs.size(); i++) {
-				com.baozun.nebula.command.product.ItemPropertiesCommand pvc =  pvcs.get(i);
-				Long propertyValueId =  pvc.getPropertyValueId();
-				if(propertyValueId != null){
+			for (int i = 0; i < pvcs.size(); i++){
+				com.baozun.nebula.command.product.ItemPropertiesCommand pvc = pvcs.get(i);
+				Long propertyValueId = pvc.getPropertyValueId();
+				if (propertyValueId != null) {
 					continue;
 				}
 				Long pvId = pvc.getId();
 				List<ItemPropertiesLang> pls = map.get(pvId);
-				if(Validator.isNullOrEmpty(pls)){
+				if (Validator.isNullOrEmpty(pls)) {
 					continue;
 				}
-				//名称
+				// 名称
 				String[] values = new String[MutlLang.i18nSize()];
 				String[] langs = new String[MutlLang.i18nSize()];
-				for (int j = 0; j < pls.size(); j++) {
+				for (int j = 0; j < pls.size(); j++){
 					ItemPropertiesLang propertyLang = pls.get(j);
 					values[j] = propertyLang.getPropertyValue();
 					langs[j] = propertyLang.getLang();
@@ -5532,40 +5729,39 @@ public class ItemManagerImpl implements ItemManager {
 				mutlLang.setLangs(langs);
 				pvc.setPropertyValue(mutlLang);
 			}
-			
+
 		}else{
-			for (int i = 0; i < itemProperties.size(); i++) {
+			for (int i = 0; i < itemProperties.size(); i++){
 				ItemProperties property = itemProperties.get(i);
 				com.baozun.nebula.command.product.ItemPropertiesCommand pvc = pvcs.get(i);
-				Long propertyValueId =  pvc.getPropertyValueId();
-				if(propertyValueId != null){
+				Long propertyValueId = pvc.getPropertyValueId();
+				if (propertyValueId != null) {
 					continue;
 				}
-				//名称
+				// 名称
 				SingleLang singleLang = new SingleLang();
 				singleLang.setValue(property.getPropertyValue());
 				pvc.setPropertyValue(singleLang);
 			}
 		}
-		
+
 		return pvcs;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Item> importItemFromFileI18n(InputStream is, Long shopId)
-			throws BusinessException {
+	public List<Item> importItemFromFileI18n(InputStream is,Long shopId) throws BusinessException{
 		BusinessException topE = null, currE = null;
 		/** 字节流存到内存方便多次读取 **/
 		InputStreamCacher cacher = null;
-		try {
+		try{
 			cacher = new InputStreamCacher(is);
-		} catch (Exception e) {
+		}catch (Exception e){
 			e.printStackTrace();
-		} finally {
-			try {
+		}finally{
+			try{
 				is.close();
-			} catch (IOException e) {
+			}catch (IOException e){
 				e.printStackTrace();
 			}
 		}
@@ -5578,7 +5774,6 @@ public class ItemManagerImpl implements ItemManager {
 
 		/***
 		 * 根据读取的数据 1：判断店铺是否一致 2：根据行业 查出该行业所对应的属性 3. 设置映射关系 4：根据属性对比excel属性是否一致
-		 * 
 		 */
 		/** 店铺ID检查 **/
 		checkShopId(itemBeans, shopId);
@@ -5589,11 +5784,11 @@ public class ItemManagerImpl implements ItemManager {
 		// 查询这个开关配置（开关的作用是控制批量新建导入模板字段内容是否排序）
 		String pdUploadFieldSortFlag = sdkMataInfoManager.findValue(MataInfo.PD_UPLOAD_TEMPLATE_FIELD_SORT_BY_ID);
 		Sort[] sorts = null;
-		if("true".equalsIgnoreCase(pdUploadFieldSortFlag)){
+		if ("true".equalsIgnoreCase(pdUploadFieldSortFlag)) {
 			sorts = new Sort[1];
-			sorts[0] = new Sort("p.id","asc");	
+			sorts[0] = new Sort("p.id", "asc");
 		}
-		
+
 		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industryId, shopId, sorts);
 		// 拆分成 销售属性List 非销售属性
 		List<Long> notSalePropIdList = new ArrayList<Long>();
@@ -5601,12 +5796,12 @@ public class ItemManagerImpl implements ItemManager {
 		List<Long> salePropIdList = new ArrayList<Long>();
 		Map<Long, Boolean> isReqMap = new HashMap<Long, Boolean>();
 		if (Validator.isNotNullOrEmpty(propertyList)) {
-			for (Property property : propertyList) {
+			for (Property property : propertyList){
 				if (property.getIsSaleProp()) {
 					salePropIdList.add(property.getId());
-				} else {
+				}else{
 					notSalePropIdList.add(property.getId());
-					if(property.getEditingType().equals(1)){
+					if (property.getEditingType().equals(1)) {
 						notSalePropIdI18nList.add(property.getId());
 					}
 				}
@@ -5623,7 +5818,7 @@ public class ItemManagerImpl implements ItemManager {
 
 		/****
 		 * 再次读取 重新赋值
-		 * ****/
+		 ****/
 		notSalePropIdMap = new LinkedHashMap<String, String>();
 		itemBeans = new HashMap<String, Object>();
 		itemBeans.put("propIds", notSalePropIdMap);
@@ -5643,77 +5838,84 @@ public class ItemManagerImpl implements ItemManager {
 		/*** 2：判断excel必填项 */
 		if (rs.getStatus() != ReadStatus.STATUS_SUCCESS) {
 			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(rs, Locale.SIMPLIFIED_CHINESE);
-			for (String message : messageList) {
-					BusinessException e = new BusinessException(message);
-					if (topE == null) {
-						topE = e; // b-101 : Cell{}错误, new
-						currE = e;
-					} else {
-						currE.setLinkedException(e);
-						currE = e;
-					}
-			}
-		}
-		if (rs2.getStatus() != ReadStatus.STATUS_SUCCESS) {
-			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(rs2, Locale.SIMPLIFIED_CHINESE);
-			for (String message : messageList) {
+			for (String message : messageList){
 				BusinessException e = new BusinessException(message);
 				if (topE == null) {
 					topE = e; // b-101 : Cell{}错误, new
 					currE = e;
-				} else {
+				}else{
+					currE.setLinkedException(e);
+					currE = e;
+				}
+			}
+		}
+		if (rs2.getStatus() != ReadStatus.STATUS_SUCCESS) {
+			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(rs2, Locale.SIMPLIFIED_CHINESE);
+			for (String message : messageList){
+				BusinessException e = new BusinessException(message);
+				if (topE == null) {
+					topE = e; // b-101 : Cell{}错误, new
+					currE = e;
+				}else{
 					currE.setLinkedException(e);
 					currE = e;
 				}
 			}
 		}
 		// 读取国际化信息
-		boolean  i18n = LangProperty.getI18nOnOff();
+		boolean i18n = LangProperty.getI18nOnOff();
 		Map<String, List<ItemInfoExcelCommand>> allI18nItemInfos = new HashMap<String, List<ItemInfoExcelCommand>>();
-		if(i18n){
-			//商品国际化
+		if (i18n) {
+			// 商品国际化
 			ExcelReader itemInfoI18n = excelFactory.createExcelReader("itemInfoI18n");
 			skuCommSheetDefinitonI18n(itemInfoI18n, notSalePropIdI18nList, isReqMap);
-			//读取商品基本动态属性值
+			// 读取商品基本动态属性值
 			List<I18nLang> i18nLangs = sdkI18nLangManager.geti18nLangCache();
 			int num = 0;
-			for (int i = 1; i < i18nLangs.size(); i++) {
-				String value =i18nLangs.get(i).getValue();
-				String key =i18nLangs.get(i).getKey();
-				if(key.equals(MutlLang.defaultLang())){
+			for (int i = 1; i < i18nLangs.size(); i++){
+				String value = i18nLangs.get(i).getValue();
+				String key = i18nLangs.get(i).getKey();
+				if (key.equals(MutlLang.defaultLang())) {
 					continue;
 				}
 				num++;
 				Map<String, Object> itemInfoExcelCommand = new HashMap<String, Object>();
-				ReadStatus readStatus = itemInfoI18n.readSheet(cacher.getInputStream(),2+num,itemInfoExcelCommand);
+				ReadStatus readStatus = itemInfoI18n.readSheet(cacher.getInputStream(), 2 + num, itemInfoExcelCommand);
 				if (readStatus.getStatus() != ReadStatus.STATUS_SUCCESS) {
 					List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(readStatus, Locale.SIMPLIFIED_CHINESE);
-					for (String message : messageList) {
+					for (String message : messageList){
 						BusinessException e = new BusinessException(message);
 						if (topE == null) {
 							topE = e; // b-101 : Cell{}错误, new
 							currE = e;
-						} else {
+						}else{
 							currE.setLinkedException(e);
 							currE = e;
 						}
 					}
 				}
-				List<ItemInfoExcelCommand>  list = (List<ItemInfoExcelCommand>) itemInfoExcelCommand.get("itemInfoI18n");
+				List<ItemInfoExcelCommand> list = (List<ItemInfoExcelCommand>) itemInfoExcelCommand.get("itemInfoI18n");
 				allI18nItemInfos.put(value, list);
-				
+
 			}
 		}
-		
-		if (topE != null){
+
+		if (topE != null) {
 			throw topE;
 		}
-		return dataValidateAndSaveI18n(propertyList, itemBeans, skuBeans, shopId, industryId, notSalePropIdList, salePropIdList,allI18nItemInfos);
+		return dataValidateAndSaveI18n(
+				propertyList,
+				itemBeans,
+				skuBeans,
+				shopId,
+				industryId,
+				notSalePropIdList,
+				salePropIdList,
+				allI18nItemInfos);
 	}
 
 	@Override
-	public void createOrUpdateItemImageIi18n(ItemImageLangCommand[] itemImages,
-			Long itemId, String baseImageUrl, boolean isImageTypeGroup) {
+	public void createOrUpdateItemImageIi18n(ItemImageLangCommand[] itemImages,Long itemId,String baseImageUrl,boolean isImageTypeGroup){
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("itemId", itemId);
 
@@ -5721,26 +5923,26 @@ public class ItemManagerImpl implements ItemManager {
 		List<Long> deleteList = new ArrayList<Long>();
 
 		List<ItemImage> oldImageList = itemImageDao.findItemImageByItemPropAndItemId(paramMap);
-		
+
 		// 1: 遍历从jsp页面传递过来的itemImages数组, 如果
 		// Id为空,则表示该itemImage是新增;否则是修改或不处理的(页面上没有修改过的数据)itemImage,
 		// 并放入newMap(key:id,value:itemImage对象)中;
-		
+
 		Map<String, Integer> typeItemPropertiesMap = new HashMap<String, Integer>();
 		boolean i18n = LangProperty.getI18nOnOff();
-		int idx =0;
-		for (ItemImageLangCommand itemImagecCommand : itemImages) {
-			// 商品图片的排序: 通过type分组,	每组type中的图片的位置都是1,2,3...
-			ItemImage  itemImage = new ItemImage();
+		int idx = 0;
+		for (ItemImageLangCommand itemImagecCommand : itemImages){
+			// 商品图片的排序: 通过type分组, 每组type中的图片的位置都是1,2,3...
+			ItemImage itemImage = new ItemImage();
 			MutlLang.I18nPropertyCopy(itemImagecCommand, itemImage);
-			if(!isImageTypeGroup){
+			if (!isImageTypeGroup) {
 				Integer position = 1;
 				String type = itemImage.getType();
-				String itemProperties = itemImage.getItemProperties() == null?"":String.valueOf(itemImage.getItemProperties());
-				if(typeItemPropertiesMap.containsKey(type+itemProperties)){
-					position = typeItemPropertiesMap.get(type+itemProperties)+1;
+				String itemProperties = itemImage.getItemProperties() == null ? "" : String.valueOf(itemImage.getItemProperties());
+				if (typeItemPropertiesMap.containsKey(type + itemProperties)) {
+					position = typeItemPropertiesMap.get(type + itemProperties) + 1;
 				}
-				typeItemPropertiesMap.put(type+itemProperties, position);
+				typeItemPropertiesMap.put(type + itemProperties, position);
 				itemImage.setPosition(position);
 				itemImagecCommand.setPosition(position);
 			}else{
@@ -5748,7 +5950,7 @@ public class ItemManagerImpl implements ItemManager {
 				idx++;
 			}
 			Long id = itemImage.getId();
-			if(i18n){
+			if (i18n) {
 				MutlLang mutlLang = (MutlLang) itemImagecCommand.getPicUrl();
 				MutlLang mdescs = (MutlLang) itemImagecCommand.getDescription();
 				String[] descs = mdescs.getValues();
@@ -5768,20 +5970,20 @@ public class ItemManagerImpl implements ItemManager {
 						itemImage.setDescription(descDv);
 						itemImage = itemImageDao.save(itemImage);
 						id = itemImage.getId();
-						for (int i = 0; i < picUrls.length; i++) {
+						for (int i = 0; i < picUrls.length; i++){
 							String val = picUrls[i];
 							String lang = langs[i];
 							String desc = descs[i];
-							ItemImageLang  itemImageLang = new ItemImageLang();
+							ItemImageLang itemImageLang = new ItemImageLang();
 							itemImageLang.setItemImageId(id);
 							itemImageLang.setLang(lang);
 							itemImageLang.setPicUrl(val);
 							itemImageLang.setDescription(desc);
 							itemImageLangDao.save(itemImageLang);
 						}
-						
+
 					}
-				} else {
+				}else{
 					newMap.put(itemImage.getId(), itemImagecCommand);
 				}
 			}else{
@@ -5800,63 +6002,64 @@ public class ItemManagerImpl implements ItemManager {
 						itemImage.setDescription(desc);
 						itemImageDao.save(itemImage);
 					}
-				} else {
+				}else{
 					newMap.put(itemImage.getId(), itemImagecCommand);
 				}
 			}
-			
+
 		}
 		// 2: 遍历DB中的数据, 通过Id去newMap中取itemIamge对象, 如果itemImage为null时,
 		// 则该数据是被删除的数据,将id加入到deleteList中; 否则判断数据是否需要修改还是不处理
 		// 3: 判断数据是否需要修改还是不处理: 通过itemImage中的description(描述),
 		// type(类型:列表页,内容页,两者都), position(位置),
 		// picUrl(图片路径)来判断该itemImage是否要修改
-		for (ItemImage oldImage : oldImageList) {
+		for (ItemImage oldImage : oldImageList){
 			Long oldId = oldImage.getId();
 			ItemImageLangCommand newImage = newMap.get(oldId);
 			if (newImage == null) {
 				deleteList.add(oldId);
-			} else {
+			}else{
 				// 判断数据是否需要修改还是不处理的数据
 				// lxy 改成数据一样不一样都修改。
-//				if (!diffImage(oldImage, newImage, baseImageUrl)) {
-					if(i18n){
-						MutlLang mutlLang = (MutlLang) newImage.getPicUrl();
-						MutlLang mdescs = (MutlLang) newImage.getDescription();
-						String[] descs = mdescs.getValues();
-						String[] values = mutlLang.getValues();
-						String[] langs = mutlLang.getLangs();
-						String dv = mutlLang.getDefaultValue();
-						String descDv = mdescs.getDefaultValue();
-						Long id = newImage.getId();
-						itemImageDao.updateItemImageById(newImage.getType(), replacePicUrl(dv, baseImageUrl), newImage.getPosition(), descDv, id);
-						for (int i = 0; i < values.length; i++) {
-							String val = values[i];
-							String lang = langs[i];
-							String desc = descs[i];
-							ItemImageLang db = itemImageDao.findItemImageLang(id, lang);
-							if(db == null){
-								ItemImageLang  itemImageLang = new ItemImageLang();
-								itemImageLang.setItemImageId(id);
-								itemImageLang.setLang(lang);
-								itemImageLang.setPicUrl(val);
-								itemImageLang.setDescription(desc);
-								itemImageLangDao.save(itemImageLang);
-							}else{
-								itemImageDao.updateItemImageLang(val, desc, lang, id);
-							}
+				// if (!diffImage(oldImage, newImage, baseImageUrl)) {
+				if (i18n) {
+					MutlLang mutlLang = (MutlLang) newImage.getPicUrl();
+					MutlLang mdescs = (MutlLang) newImage.getDescription();
+					String[] descs = mdescs.getValues();
+					String[] values = mutlLang.getValues();
+					String[] langs = mutlLang.getLangs();
+					String dv = mutlLang.getDefaultValue();
+					String descDv = mdescs.getDefaultValue();
+					Long id = newImage.getId();
+					itemImageDao
+							.updateItemImageById(newImage.getType(), replacePicUrl(dv, baseImageUrl), newImage.getPosition(), descDv, id);
+					for (int i = 0; i < values.length; i++){
+						String val = values[i];
+						String lang = langs[i];
+						String desc = descs[i];
+						ItemImageLang db = itemImageDao.findItemImageLang(id, lang);
+						if (db == null) {
+							ItemImageLang itemImageLang = new ItemImageLang();
+							itemImageLang.setItemImageId(id);
+							itemImageLang.setLang(lang);
+							itemImageLang.setPicUrl(val);
+							itemImageLang.setDescription(desc);
+							itemImageLangDao.save(itemImageLang);
+						}else{
+							itemImageDao.updateItemImageLang(val, desc, lang, id);
 						}
-					}else{
-						SingleLang singleLang = (SingleLang) newImage.getPicUrl();
-						String picUrl = replacePicUrl(singleLang.getValue(), baseImageUrl);
-						SingleLang sdesc = (SingleLang) newImage.getDescription();
-						String desc = sdesc.getValue();
-						
-						String rpicUrl =replacePicUrl(picUrl, baseImageUrl);
-						
-						itemImageDao.updateItemImageById(newImage.getType(),rpicUrl , newImage.getPosition(), desc, newImage.getId());
 					}
-//				}
+				}else{
+					SingleLang singleLang = (SingleLang) newImage.getPicUrl();
+					String picUrl = replacePicUrl(singleLang.getValue(), baseImageUrl);
+					SingleLang sdesc = (SingleLang) newImage.getDescription();
+					String desc = sdesc.getValue();
+
+					String rpicUrl = replacePicUrl(picUrl, baseImageUrl);
+
+					itemImageDao.updateItemImageById(newImage.getType(), rpicUrl, newImage.getPosition(), desc, newImage.getId());
+				}
+				// }
 			}
 		}
 		// 通过Ids删除图片信息
@@ -5864,12 +6067,11 @@ public class ItemManagerImpl implements ItemManager {
 			itemImageDao.removeItemImageByIds(deleteList);
 			itemImageDao.removeItemImageLangByIds(deleteList);
 		}
-		
+
 	}
 
 	@Override
-	public List<ItemImageLangCommand> findItemImageByItemPropAndItemIdI18n(
-			String itemProperties, Long itemId, Long propertyValueId) {
+	public List<ItemImageLangCommand> findItemImageByItemPropAndItemIdI18n(String itemProperties,Long itemId,Long propertyValueId){
 		Map<String, Object> paramMap = new HashMap<String, Object>();
 		paramMap.put("itemId", itemId);
 		if (StringUtils.isNotBlank(itemProperties)) {
@@ -5878,7 +6080,7 @@ public class ItemManagerImpl implements ItemManager {
 		// 多选
 		if (propertyValueId != null && StringUtils.isNotBlank(String.valueOf(propertyValueId))) {
 			List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertiesByItemId(itemId);
-			for (ItemProperties itemProp : itemPropertiesList) {
+			for (ItemProperties itemProp : itemPropertiesList){
 				if (propertyValueId.equals(itemProp.getPropertyValueId())) {
 					paramMap.put("itemProperties", String.valueOf(itemProp.getId()));
 				}
@@ -5886,14 +6088,14 @@ public class ItemManagerImpl implements ItemManager {
 		}
 		List<ItemImage> itemImages = itemImageDao.findItemImageByItemPropAndItemId(paramMap);
 		List<ItemImageLangCommand> commands = new ArrayList<ItemImageLangCommand>();
-		if(itemImages==null || itemImages.size()==0){
+		if (itemImages == null || itemImages.size() == 0) {
 			return null;
 		}
 		List<Long> ids = new ArrayList<Long>();
 		Map<Long, ItemImage> iiMap = new HashMap<Long, ItemImage>();
-		for (int i = 0; i < itemImages.size(); i++) {
+		for (int i = 0; i < itemImages.size(); i++){
 			ItemImage ii = itemImages.get(i);
-			Long id  = ii.getId();
+			Long id = ii.getId();
 			ids.add(id);
 			ItemImageLangCommand command = new ItemImageLangCommand();
 			LangProperty.I18nPropertyCopyToSource(ii, command);
@@ -5902,14 +6104,14 @@ public class ItemManagerImpl implements ItemManager {
 		}
 		List<ItemImageLang> itemImageLangs = itemImageDao.findItemImageLangList(ids, MutlLang.i18nLangs());
 		boolean i18n = LangProperty.getI18nOnOff();
-		if(i18n && (itemImageLangs==null || itemImageLangs.size()==0)){
+		if (i18n && (itemImageLangs == null || itemImageLangs.size() == 0)) {
 			return commands;
 		}
 		Map<Long, List<ItemImageLang>> maps = new HashMap<Long, List<ItemImageLang>>();
-		for (int i = 0; i < itemImageLangs.size(); i++) {
+		for (int i = 0; i < itemImageLangs.size(); i++){
 			ItemImageLang iil = itemImageLangs.get(i);
 			Long itemImageId = iil.getItemImageId();
-			if(maps.containsKey(itemImageId)){
+			if (maps.containsKey(itemImageId)) {
 				maps.get(itemImageId).add(iil);
 			}else{
 				List<ItemImageLang> list = new ArrayList<ItemImageLang>();
@@ -5917,13 +6119,13 @@ public class ItemManagerImpl implements ItemManager {
 				maps.put(itemImageId, list);
 			}
 		}
-		
-		for (ItemImageLangCommand command : commands) {
+
+		for (ItemImageLangCommand command : commands){
 			Long id = command.getId();
-			
-			if(i18n){
+
+			if (i18n) {
 				List<ItemImageLang> list = maps.get(id);
-				if(list == null || list.size() == 0){
+				if (list == null || list.size() == 0) {
 					continue;
 				}
 				MutlLang url = new MutlLang();
@@ -5931,7 +6133,7 @@ public class ItemManagerImpl implements ItemManager {
 				String[] urlvals = new String[MutlLang.i18nSize()];
 				String[] descVals = new String[MutlLang.i18nSize()];
 				String[] langs = new String[MutlLang.i18nSize()];
-				for (int i = 0; i < list.size(); i++) {
+				for (int i = 0; i < list.size(); i++){
 					ItemImageLang iil = list.get(i);
 					urlvals[i] = iil.getPicUrl();
 					descVals[i] = iil.getDescription();
@@ -5949,7 +6151,8 @@ public class ItemManagerImpl implements ItemManager {
 				SingleLang desc = new SingleLang();
 				String picUrl = ii.getPicUrl();
 				String descVal = ii.getDescription();
-				url.setValue(picUrl);;
+				url.setValue(picUrl);
+				;
 				desc.setValue(descVal);
 				command.setPicUrl(url);
 				command.setDescription(desc);
@@ -5957,17 +6160,19 @@ public class ItemManagerImpl implements ItemManager {
 		}
 		return commands;
 	}
-	
+
 	@Override
-	public List<ItemCommand> findItemCommandByQueryMap(Map<String, Object> paramMap, List<String> itemCodeList) {
+	public List<ItemCommand> findItemCommandByQueryMap(Map<String, Object> paramMap,List<String> itemCodeList){
 		return itemDao.findItemCommandByQueryMapAndItemCodes(paramMap, itemCodeList);
 	}
 
 	@Override
-	public List<ItemCommand> findItemCommandByQueryMapAndItemCodesI18n(Map<String, Object> paramMap, List<String> itemCodeList, String langKey) {
+	public List<ItemCommand> findItemCommandByQueryMapAndItemCodesI18n(
+			Map<String, Object> paramMap,
+			List<String> itemCodeList,
+			String langKey){
 		return itemDao.findItemCommandByQueryMapAndItemCodesI18n(paramMap, itemCodeList, langKey);
 	}
-
 	@Override
 	@Transactional(readOnly=true)
 	public Integer findItemCountByPropertyId(Long propertyId){
