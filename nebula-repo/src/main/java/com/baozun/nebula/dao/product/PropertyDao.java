@@ -140,6 +140,18 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	@NativeQuery(model = Property.class)
 	Property findPropertyByIdI18n(@QueryParam("propertyId") Long id,@QueryParam("lang") String lang);
 
+	
+	/**
+	 * 根据id查询属性
+	 *  不关联t_common_property
+	 * @param id
+	 * @return
+	 */
+	
+	@NativeQuery(model = Property.class)
+	Property findByIdWithoutCommonProperty(@QueryParam("propertyId") Long id);
+	
+	
 	/**
 	 * 根据name查询属性
 	 * 
@@ -237,4 +249,6 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 			@QueryParam("industryId") Long industryId,
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("commonPropertyId") Long commonPropertyId);
+
+	
 }

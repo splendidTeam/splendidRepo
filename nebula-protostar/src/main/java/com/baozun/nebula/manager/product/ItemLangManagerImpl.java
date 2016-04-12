@@ -39,6 +39,7 @@ import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
 import com.baozun.nebula.dao.product.ItemInfoLangDao;
+import com.baozun.nebula.dao.product.ItemProValGroupRelationDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemPropertiesLangDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
@@ -50,6 +51,7 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemInfoLang;
+import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
 import com.baozun.nebula.model.product.PropertyValue;
@@ -89,6 +91,9 @@ public class ItemLangManagerImpl implements ItemLangManager {
 
 	@Autowired
 	private ItemInfoLangDao itemInfoLangDao;
+	
+	@Autowired
+	private ItemProValGroupRelationDao itemProValGroupRelationDao;
 
 	@Autowired
 	private ItemManager itemManager;
@@ -100,7 +105,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	public Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties,
-			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception {
+			SkuPropertyMUtlLangCommand[] skuPropertyCommand,
+			List<ItemProValGroupRelation> groupRelation) throws Exception {
 
 		Item item = null;
 		if (itemCommand.getId() != null) {// 更新
@@ -142,6 +148,14 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		
 		ItemI18nCommand itemI18nCommand = new ItemI18nCommand();
 		itemI18nCommand.setItem(item);
+		
+		//商品属性值分组
+		if(groupRelation.size()>0){
+			for(ItemProValGroupRelation relation: groupRelation){
+				itemProValGroupRelationDao.save(relation);
+			}
+		}
+		
 		
 		// 商品所有的属性值集合
 		List<ItemPropertiesCommand> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand, itemI18nCommand);
@@ -515,7 +529,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 					String description = null;
 					if(descriptions!=null && descriptions.length>0){
 						description = descriptions[i];
-					}
+					} 
 					String sketch= null;
 					if(sketchs!=null && sketchs.length>0){
 						sketch = sketchs[i];

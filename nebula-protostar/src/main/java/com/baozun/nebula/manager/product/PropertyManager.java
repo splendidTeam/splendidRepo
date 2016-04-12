@@ -3,10 +3,6 @@ package com.baozun.nebula.manager.product;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.command.PropertyCommand;
 import com.baozun.nebula.command.product.CommonPropertyCommand;
 import com.baozun.nebula.command.product.PropertyValueCommand;
@@ -14,6 +10,11 @@ import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
+import com.baozun.nebula.web.command.DynamicPropertyCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 属性管理
@@ -180,4 +181,12 @@ public interface PropertyManager extends BaseManager{
 	boolean validatecommonPropertyName(String commonPropertyName);
 
 	List<PropertyValueLang> findPropertyValueCommandById(Long id);
+	
+	/**
+	 * 通过属性值分组ID找到相对的属性值列表
+	 * @param proGroupId
+	 * @return
+	 */
+	DynamicPropertyCommand  findByProGroupIdAndPropertyId(Long proGroupId,Long propertyId);
+	
 }

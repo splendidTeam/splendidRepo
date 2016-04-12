@@ -21,6 +21,7 @@ import java.util.List;
 import com.baozun.nebula.command.Command;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
+import com.baozun.nebula.model.product.PropertyValueGroup;
 
 /**
  * 获取动态属性集包含对应的属性及可选值
@@ -41,6 +42,11 @@ public class DynamicPropertyCommand implements Command{
 	 */
 	private List<PropertyValue> propertyValueList;
 	
+	/**
+	 * 属性值分组
+	 */
+	private List<PropertyValueGroup> propertyValueGroupList;
+	
 	
 	public Property getProperty() {
 		return property;
@@ -53,6 +59,14 @@ public class DynamicPropertyCommand implements Command{
 	}
 	public void setPropertyValueList(List<PropertyValue> propertyValueList) {
 		this.propertyValueList = propertyValueList;
+	}
+	
+	public List<PropertyValueGroup> getPropertyValueGroupList(){
+		return propertyValueGroupList;
+	}
+	
+	public void setPropertyValueGroupList(List<PropertyValueGroup> propertyValueGroupList){
+		this.propertyValueGroupList = propertyValueGroupList;
 	}
 	
 	

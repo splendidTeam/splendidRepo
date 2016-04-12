@@ -165,4 +165,15 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	List<PropertyValue> findPropertyValueListByCommonPropertyIdAndPropertyId(
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("commonPropertyId") Long commonPropertyId);
+	
+	
+	
+	/**
+	 * 通过属性值分组ID找到相对的属性值列表
+	 * @param proGroupId
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	List<PropertyValue>  findByProGroupId(@QueryParam("proGroupId")Long proGroupId);
+	
 }

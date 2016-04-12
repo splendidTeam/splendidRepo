@@ -1244,7 +1244,6 @@ return a - b;
 var editors =[];
 //验证表单
 function itemFormValidate(form){
-	
 	if(i18nOnOff){
 		for ( var i = 0; i < editors.length; i++) {
 			var editor = editors[i];
@@ -1767,8 +1766,125 @@ function initCategeoryTree() {
 	}
 }
 
-$j(document).ready(function(){
+// obj 下拉框dom对象,type 属性类型(1:销售属性，2:普通属性) 两种属性生成HTML不同故做区分
+function changeProGroup(obj,type){
 	
+	var propertyId=$j(obj).attr('propertyId');
+	var json={proGroupId:$j(obj).val(),propertyId:propertyId};
+	var backWarnEntity = loxia.syncXhr(base+'/item/findProGroupInfo.json', json,{type: "GET"});
+	var html = ""
+	//
+	if(backWarnEntity.isSuccess){
+  		var propertyValueArray = backWarnEntity.description.propertyValueList;	
+  		var property = backWarnEntity.description.property
+  		var picUrl = "";
+		if(propertyValueArray!=null && propertyValueArray.length>0){
+			if(type==1){
+				$j.each(propertyValueArray,function(j){
+					if(property.isColorProp && property.hasThumb ){
+						picUrl ="<img src='"+baseUrl+"/images/1.png'>";
+					}
+					html+= "<div class='priDiv'><span class='children-store'>" +
+							"<input type='checkbox' class='spCkb'  name='propertyValueIds' editingType='4' " ;
+					//属性值分组中后已选择的属性选中效果
+					for(var i = 0 ;i<itemPropertiesStr.length;i++){
+						var itemProperty = itemPropertiesStr[i];
+						if(itemProperty.propertyId==propertyId && itemProperty.propertyValueId==propertyValueArray[j].id){
+							html+= "checked='checked'";
+							break;
+						}
+					}
+					
+					html+=		" pvId='"+propertyValueArray[j].id+"' propertyId='"+property.id+"' " +
+							"pvValue='"+propertyValueArray[j].value+"' propertyName='"+property.name+ "'" +
+							"value='"+propertyValueArray[j].id+"'>"+picUrl+propertyValueArray[j].value+"</input></span> </div>";
+					
+			     });
+			}else if(type==2){
+				$j.each(propertyValueArray,function(j){
+					html+= " <div class='priDiv'><span class='children-store'>" +
+						   " <input type='checkbox' class='normalCheckBoxCls' name='filtratecolor'" ;
+					//属性值分组中后已选择的属性选中效果
+					for(var i = 0 ;i<itemPropertiesStr.length;i++){
+						var itemProperty = itemPropertiesStr[i];
+						if(itemProperty.propertyId==propertyId && itemProperty.propertyValueId==propertyValueArray[j].id){
+							html+= " checked='checked'";
+							break;
+						}
+					}
+					html+=	" pid='"+property.id+"' tname='" +propertyValueArray[j].value +
+							" 'mustcheck='"+property.name+ "'" +
+							" value='"+propertyValueArray[j].id+"'>"+propertyValueArray[j].value+"</input></span> </div>";
+					
+			     });
+			}
+			$j(obj).next().html(html);
+			//重新渲染
+			var curSize = $j("#notSalePropSize").val();
+			$j(".normalCheckBoxCls").each(function(){
+				var curCheckBox = $j(this);
+				//初始化选中的值
+				drawNoSalePropEditing4Type(curSize);
+				curCheckBox.change(function(){
+				drawNoSalePropEditing4Type(curSize);
+				});
+			});
+			
+			
+		}
+	}
+}
+
+function drawNoSalePropEditing4Type(curSize){
+	if(curSize==undefined ||curSize ==null){
+		curSize =0;
+	}
+	var tempNum =curSize;
+	//去除所有
+	$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").siblings().remove();
+	
+	$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").each(function(){
+		var pid=$j(this).attr("pid");
+		var pvid=$j(this).attr("pvid");
+		var isCheck =false;
+		$j(".normalCheckBoxCls").each(function(){
+			if(pid ==$j(this).attr("pid") &&pvid==$j(this).attr("value")){
+				if('checked' == $j(this).attr("checked")){
+					isCheck =true ;
+				}
+				return ;
+			}
+		});
+		if(isCheck){
+			var parent =$j(this).parent();
+			var ipropertiesHtml = "<input type='hidden' value='propertyId_toReplace' name='iProperties.propertyId'/>"+
+			"<input type='hidden' value='propertyValueId_toRepalce' name='iProperties.propertyValueId'/>"+
+			"<input type='hidden' value='' name='iProperties.id'><input type='hidden' value='' name='iProperties.propertyDisplayValue'><input type='hidden' value='' name='iProperties.createTime'><input type='hidden' value='' name='iProperties.modifyTime'><input type='hidden' value='' name='iProperties.version'><input type='hidden' value='' name='iProperties.itemId'><input type='hidden' value='' name='iProperties.picUrl'>";
+
+			if(i18nOnOff){
+			 	   for ( var j = 0; j < i18nLangs.length; j++) {
+							var i18nLang = i18nLangs[j];
+							ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.values["+tempNum+"-"+j+"]' value=''/>";
+							ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.langs["+tempNum+"-"+j+"]' value='"+i18nLang.key+"'/>";
+			 	   }
+			    }else{
+			    	ipropertiesHtml = ipropertiesHtml +"<input type='hidden'name='iProperties.propertyValue.value["+tempNum+"]' value=''/>";
+			    }
+			//}
+			ipropertiesHtml=ipropertiesHtml.replace("propertyId_toReplace", pid);
+			ipropertiesHtml=ipropertiesHtml.replace("propertyValueId_toRepalce", pvid);
+			parent.append(ipropertiesHtml);
+			tempNum ++;
+		}
+	});
+}
+
+
+
+
+
+
+$j(document).ready(function(){
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
 //    removeTextareaLastChar();
@@ -2416,59 +2532,22 @@ $j(document).ready(function(){
 	$j(".button.orange.imageManage").click(function(){
 		window.location.href= manageImagUrl+itemId;
 	});
-	var curSize = $j("#notSalePropSize").val();
-	$j(".normalCheckBoxCls").each(function(){
-		var curCheckBox = $j(this);
-		//初始化选中的值
-		drawNoSalePropEditing4Type(curSize);
-		curCheckBox.change(function(){
-		drawNoSalePropEditing4Type(curSize);
-		});
-	});
-	function drawNoSalePropEditing4Type(curSize){
-		if(curSize==undefined ||curSize ==null){
-			curSize =0;
-		}
-		var tempNum =curSize;
-		//去除所有
-		$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").siblings().remove();
-		
-		$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").each(function(){
-			var pid=$j(this).attr("pid");
-			var pvid=$j(this).attr("pvid");
-			var isCheck =false;
-			$j(".normalCheckBoxCls").each(function(){
-				if(pid ==$j(this).attr("pid") &&pvid==$j(this).attr("value")){
-					if('checked' == $j(this).attr("checked")){
-						isCheck =true ;
-					}
-					return ;
-				}
+	
+	function PropEditing4Typeinit(){
+		var curSize = $j("#notSalePropSize").val();
+		$j(".normalCheckBoxCls").each(function(){
+			var curCheckBox = $j(this);
+			//初始化选中的值
+			drawNoSalePropEditing4Type(curSize);
+			curCheckBox.change(function(){
+			drawNoSalePropEditing4Type(curSize);
 			});
-			if(isCheck){
-				var parent =$j(this).parent();
-				var ipropertiesHtml = "<input type='hidden' value='propertyId_toReplace' name='iProperties.propertyId'/>"+
-				"<input type='hidden' value='propertyValueId_toRepalce' name='iProperties.propertyValueId'/>"+
-				"<input type='hidden' value='' name='iProperties.id'><input type='hidden' value='' name='iProperties.propertyDisplayValue'><input type='hidden' value='' name='iProperties.createTime'><input type='hidden' value='' name='iProperties.modifyTime'><input type='hidden' value='' name='iProperties.version'><input type='hidden' value='' name='iProperties.itemId'><input type='hidden' value='' name='iProperties.picUrl'>";
-
-				if(i18nOnOff){
-				 	   for ( var j = 0; j < i18nLangs.length; j++) {
-								var i18nLang = i18nLangs[j];
-								ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.values["+tempNum+"-"+j+"]' value=''/>";
-								ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.langs["+tempNum+"-"+j+"]' value='"+i18nLang.key+"'/>";
-				 	   }
-				    }else{
-				    	ipropertiesHtml = ipropertiesHtml +"<input type='hidden'name='iProperties.propertyValue.value["+tempNum+"]' value=''/>";
-				    }
-				//}
-				ipropertiesHtml=ipropertiesHtml.replace("propertyId_toReplace", pid);
-				ipropertiesHtml=ipropertiesHtml.replace("propertyValueId_toRepalce", pvid);
-				parent.append(ipropertiesHtml);
-				tempNum ++;
-			}
 		});
 	}
+	PropEditing4Typeinit();
 	
+
+
 	
 	if(i18nOnOff){
 		var i18nSize = i18nLangs.length;
@@ -2567,4 +2646,9 @@ $j(document).ready(function(){
 		});
 	}
 	selectcheck(itemcolorrefcheckURL);
+	
+	
+
+	
+	
 });

@@ -39,10 +39,6 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.support.json.JSONArray;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -52,6 +48,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.jsoup.Jsoup;
@@ -74,7 +71,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.command.ItemCategoryCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPresalseInfoCommand;
@@ -105,6 +101,7 @@ import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
+import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
@@ -128,6 +125,10 @@ import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.google.gson.Gson;
+
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+import loxia.support.json.JSONArray;
 
 /**
  * 商品管理controller
@@ -237,7 +238,8 @@ public class ItemController extends BaseController{
 		model.addAttribute("pdValidCode", pdValidCode);
 		model.addAttribute("categoryList", categoryList);
 		model.addAttribute("isStyleEnable", isEnableStyle());
-
+		//测试
+		model.addAttribute("now", System.currentTimeMillis());
 		return "/product/item/add-item";
 	}
 
@@ -347,6 +349,17 @@ public class ItemController extends BaseController{
 		return SUCCESS;
 	}
 
+	
+	@RequestMapping("/item/findProGroupInfo.json")
+	@ResponseBody
+	public Object findProGroupInfo(Model model,@RequestParam("proGroupId") Long proGroupId,@RequestParam("propertyId") Long propertyId){
+		// 通过属性值分组ID找到相对的属性值列表
+		DynamicPropertyCommand dynamicPropertyCommand = propertyManager.findByProGroupIdAndPropertyId(proGroupId,propertyId);
+		SUCCESS.setDescription(dynamicPropertyCommand);
+		return SUCCESS;
+	}
+	
+	
 	public List<DynamicPropertyCommand> findDynamicPropertisByShopIdAndIndustryId(Long industryId){
 		// 查询orgId
 		UserDetails userDetails = this.getUserDetails();
@@ -361,7 +374,7 @@ public class ItemController extends BaseController{
 			shopId = shopCommand.getShopid();
 		}
 		// 根据行业Id和店铺Id查找对应属性和属性值
-		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertis(shopId, industryId);
+		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisNew(shopId, industryId);
 		return dynamicPropertyCommandList;
 	}
 
@@ -391,8 +404,10 @@ public class ItemController extends BaseController{
 
 		SkuPropertyCommand[] skuPropertyCommandArray = getCmdArrrayFromRequest(request, propertyIds, propertyValueInputs);
 
+		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
+		
 		// 保存商品
-		Item item = itemManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
+		Item item = itemManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray,groupRelation);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
@@ -448,9 +463,9 @@ public class ItemController extends BaseController{
 				propertyIds,
 				propertyValueInputs,
 				propertyValueInputIds);
-
+		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
 		// 保存商品
-		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
+		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray,groupRelation);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
@@ -1433,6 +1448,7 @@ public class ItemController extends BaseController{
 
 		List<SkuPropertyCommand> skuInfoList = null;
 		ObjectMapper om = new ObjectMapper();
+		om.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
 		TypeReference<List<SkuPropertyCommand>> valueTypeRef = new TypeReference<List<SkuPropertyCommand>>(){};
 
@@ -1737,6 +1753,8 @@ public class ItemController extends BaseController{
 		model.addAttribute("itemCodeValidMsg", itemCodeValidMsg);
 		String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
 		model.addAttribute("pdValidCode", pdValidCode);
+		//测试
+		model.addAttribute("now", System.currentTimeMillis());
 		return "/product/item/update-item";
 	}
 
@@ -2400,4 +2418,23 @@ public class ItemController extends BaseController{
 		}
 		return backWarnEntity;
 	}
+	
+	//获取商品属性值分组信息
+	private List<ItemProValGroupRelation> getItemProValueGroupRelation(HttpServletRequest request,Long[] propertyIds){
+		List<ItemProValGroupRelation> list = new ArrayList<ItemProValGroupRelation>();
+		if(propertyIds!=null && propertyIds.length>0){
+			for(Long propertyId:propertyIds){
+				String proValGroupId  = request.getParameter("proGroup_"+propertyId);
+				//存在分组并选择
+				if(proValGroupId !=null && proValGroupId.length()>0){
+					ItemProValGroupRelation relation = new ItemProValGroupRelation();
+					relation.setItemPropertyId(propertyId);
+					relation.setPropertyValueGroupId(Long.parseLong(proValGroupId));
+					list.add(relation);
+				}
+			}
+		}
+		return list;
+	}
+	
 }

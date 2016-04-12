@@ -39,6 +39,7 @@ import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemInfo;
+import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
@@ -70,6 +71,16 @@ public interface ItemManager extends BaseManager {
 	List<DynamicPropertyCommand> findDynamicPropertis(Long shopId,
 			Long industryId);
 
+	
+	/**
+	 * 根据店铺id和行业id查找对应属性 区别不关联表t_pd_common_propert
+	 * 
+	 * @param shopId
+	 * @param industryUd
+	 * @return
+	 */
+	List<DynamicPropertyCommand> findDynamicPropertisNew(Long shopId,
+			Long industryId);
 	/**
 	 * 保存商品
 	 * 
@@ -243,7 +254,8 @@ public interface ItemManager extends BaseManager {
 			Long[] propertyValueIds, // 动态
 			Long[] categoriesIds,// 商品分类Id
 			ItemProperties[] iProperties,// 普通商品属性
-			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
+			SkuPropertyCommand[] skuPropertyCommand,// sku 的信息，包含每个sku对应的价格
+			List<ItemProValGroupRelation> groupRelation// 商品属性分组
 	) throws Exception;
 
 	/**

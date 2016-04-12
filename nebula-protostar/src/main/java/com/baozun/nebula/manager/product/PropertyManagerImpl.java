@@ -7,10 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +34,11 @@ import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utils.Validator;
+import com.baozun.nebula.web.command.DynamicPropertyCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 属性管理
@@ -713,5 +714,24 @@ public class PropertyManagerImpl implements PropertyManager{
 		List<PropertyValueLang> propertyLangs = propertyValueDao.findPropertyValueLangByPvids(pvIds, MutlLang.i18nLangs());
 		
 		return propertyLangs;
+	}
+
+	@Override
+	public DynamicPropertyCommand findByProGroupIdAndPropertyId(Long proGroupId,Long propertyId){
+		DynamicPropertyCommand dynamicPropertyCommand = new DynamicPropertyCommand();
+		List<PropertyValue> propertyValueList = null;
+		//如果分组ID为空，则说明查询属性完全分类
+		if(proGroupId==null){
+			propertyValueList = propertyValueDao.findPropertyValueListById(propertyId);
+		}else{
+			propertyValueList = propertyValueDao.findByProGroupId(proGroupId);
+		}
+		
+		
+		
+		Property property = propertyDao.findByIdWithoutCommonProperty(propertyId);
+		dynamicPropertyCommand.setProperty(property);
+		dynamicPropertyCommand.setPropertyValueList(propertyValueList);
+		return dynamicPropertyCommand;
 	}
 }

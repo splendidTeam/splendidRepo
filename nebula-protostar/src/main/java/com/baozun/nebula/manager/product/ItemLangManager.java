@@ -15,11 +15,14 @@
  */
 package com.baozun.nebula.manager.product;
 
+import java.util.List;
+
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.model.product.ItemProValGroupRelation;
 
 /**
  * item 操作接口
@@ -32,7 +35,9 @@ public interface ItemLangManager extends BaseManager {
 	Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties,
-			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception;
+			SkuPropertyMUtlLangCommand[] skuPropertyCommand,
+			List<ItemProValGroupRelation> groupRelation// 商品属性分组
+			) throws Exception;
 	
 	Integer validateItemCode(String code, Long shopId);
 	
