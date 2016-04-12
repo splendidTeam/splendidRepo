@@ -33,7 +33,7 @@ tbody input[type="text"]{
 
 <div class="content-box width-percent100">
 		<div class="ui-title1">
-			<img src="${base}/images/wmi/blacks/32x32/wrench.png"><spring:message code="system.property.manager"/>
+			<img src="${base}/images/wmi/blacks/32x32/wrench.png"><spring:message code="system.property.manager"/> 【${property.name }】
 		</div>
 		<input type="hidden" id="propertyId" value="${property.id}" />
 		<div class="ui-block ui-block-fleft" style="width: 400px;">
@@ -66,25 +66,50 @@ tbody input[type="text"]{
 			        </tr>
 			    </table>
 			</div>
+			<div class="table-border0 border-grey" id="table2" caption="会员分组列表"></div>
 		</div>
+		 
 		<div class="ui-block " style="margin-left:400px;width:auto;padding-left: 10px;" >
 			<div class="ui-block-title1">属性值操作</div>
 			<div class="ui-block-content border-grey" style="margin-bottom: 10px;">
 				<div class="ui-block-line">
 					<label>属性值：</label>
 					<div>
+						<form name="propertyForm" action="/i18n/property/addOrUpdatePropertyValue.json" method="POST">
+							<input type="hidden" name="propertyId" id="propertyId" value="${property.id}" />
+						
+							<input type="hidden" name="propertyValues.id" value=""/>
+							<input type="hidden" name="propertyValues.propertyId" value="${property.id}" class="propertyValues-propertyId" />
+							<input type="hidden" name="propertyValues.sortNo" value="">
+							
 						 <c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 						   <div class="ui-block-line ">
-					         <input type="text" id="title" name="itemCommand.title.values[${status.index}]" style='width: 200px' loxiaType="input" value="" mandatory="true" placeholder="<spring:message code='item.update.name'/>"/>
+						   
+	<%-- 				         <input id="title" name="itemCommand.title.values[${status.index}]" 
+					          value="" type="text"  style='width: 200px' loxiaType="input" mandatory="true" placeholder="<spring:message code='item.update.name'/>"/>
+					         
 					         <input class="i18n-lang" type="text" name="itemCommand.title.langs[${status.index}]" value="${i18nLang.key}" />
-					        
-					         <span>${i18nLang.value}</span>
+					         <span>${i18nLang.value}</span> --%>
+					         
+							<input id="input3" 
+								name="propertyValues.value.values[${status.index}]" placeholder="<spring:message code='system.propertyvalue'/>"
+							  value=""  style='width: 200px' mandatory="true" type="text" class="name" loxiaType="input" trim="true"/>
+							
+							<input name="propertyValues.value.langs[${status.index}]"  value="${i18nLang.key}" 
+							 	mandatory="true" class="i18n-lang" type="text" loxiaType="input" trim="true" />
+						   
+						   
+						   	<span>${i18nLang.value}</span>		 
+						  
 						   </div>
-						</c:forEach>
+						   
+						   
+						 </c:forEach>
+						</form>
 					</div>
 				</div>
 				<div class="button-line1">
-					<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='btn.save'/>">
+					<a href="javascript:void(0);" class="func-button savePropertyValue" title="<spring:message code='btn.save'/>">
     				 		<span><spring:message code="btn.save"/></span>
     				</a>
     				<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.save.continue'/>">

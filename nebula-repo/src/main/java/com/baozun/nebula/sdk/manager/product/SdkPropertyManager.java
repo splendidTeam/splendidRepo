@@ -5,6 +5,11 @@ package com.baozun.nebula.sdk.manager.product;
 
 import java.util.List;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
+import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
@@ -77,4 +82,27 @@ public interface SdkPropertyManager extends BaseManager{
 	 */
 	List<PropertyValue> findFreeGroupPropertyValue(Long propertyId,Long proValGroupId);
 
+	/**
+	 * 分页查询属性值（i18n）【propertyId 和 proValueGroupId 必须有一个不为空】
+	 * 
+	 * @param page
+	 * @param sorts
+	 * @param propertyId
+	 *            属性id
+	 * @param proValueGroupId
+	 *            属性值组id
+	 * @return
+	 */
+	Pagination<PropertyValueCommand> findPropertyValueByPage(Page page,Sort[] sorts,Long propertyId,Long proValueGroupId);
+
+	/**
+	 * 添加或修改属性值
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @param propertyValues
+	 *            属性值对象
+	 * @return
+	 */
+	void addOrUpdatePropertyValue(Long propertyId,PropertyValueCommand propertyValues);
 }
