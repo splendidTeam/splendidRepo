@@ -1,3 +1,4 @@
+
 package com.baozun.nebula.manager.product;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import com.baozun.nebula.command.product.CommonPropertyCommand;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyLang;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
@@ -95,6 +97,16 @@ public interface PropertyManager extends BaseManager{
 	boolean createOrUpdateProperty(Property property);
 
 	com.baozun.nebula.command.product.PropertyCommand createOrUpdateProperty(com.baozun.nebula.command.product.PropertyCommand property);
+	
+	
+	/**
+	 * 新的创建或更新属性的方法(属性为平台级的)
+	 * @return com.baozun.nebula.command.product.PropertyCommand
+	 * @param property
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午3:08:57
+	 */
+	com.baozun.nebula.command.product.PropertyCommand nebulaCreateOrUpdateProperty(com.baozun.nebula.command.product.PropertyCommand property);
 
 	/**
 	 * 更新排序
@@ -188,5 +200,25 @@ public interface PropertyManager extends BaseManager{
 	 * @return
 	 */
 	DynamicPropertyCommand  findByProGroupIdAndPropertyId(Long proGroupId,Long propertyId);
+
+	
+	/**
+	 * 根据propertyId查询Property表(只查询Property表中数据并且生命周期不为2)
+	 * @return Property
+	 * @param propertyId
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:42:21
+	 */
+	Property findPropertyByPropertyId(Long propertyId);
+	
+	
+	/**
+	 * 根据propertyId查询Property国际化数据
+	 * @return List<PropertyValueLang>
+	 * @param propertyId
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:46:01
+	 */
+	List<PropertyLang> findPropertyLongByPropertyId(Long propertyId);
 	
 }

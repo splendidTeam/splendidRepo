@@ -18,18 +18,30 @@ package com.baozun.nebula.dao.product;
 
 import java.util.List;
 
-import com.baozun.nebula.model.product.PropertyValueGroup;
-
 import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
+import com.baozun.nebula.model.product.PropertyValueGroup;
+
 /**
- * 商品属性Dao
+ * 属性值分组dao
  * 
- * @author 黄大辉
+ * @author viktor huang
+ * @date Apr 7, 2016 3:44:43 PM
  */
 public interface PropertyValueGroupDao extends GenericEntityDao<PropertyValueGroup, Long>{
+
+	/**
+	 * 根据属性id查询它下面的所有属性值组，order by createTime
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValueGroup.class)
+	List<PropertyValueGroup> findPropertyValueGroupByPropertyId(@QueryParam("propertyId") Long propertyId);
+	
 
 	/**
 	 * 通过属性ID获取PropertyValueGroup列表
@@ -39,5 +51,4 @@ public interface PropertyValueGroupDao extends GenericEntityDao<PropertyValueGro
 	 */
 	@NativeQuery(model = PropertyValueGroup.class)
 	List<PropertyValueGroup> findByPropertyId(@QueryParam("propertyId") Long propertyId);
-
 }

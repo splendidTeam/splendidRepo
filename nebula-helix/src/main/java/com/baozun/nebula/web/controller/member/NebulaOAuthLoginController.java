@@ -186,7 +186,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	protected String doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
 
 		// 同步购物车 暂时省略
-		MemberDetails memberDetails = getMemberDetails(member);
+		MemberDetails memberDetails = getMemberDetails(member,request);
 
 		// 登录成功后处理
 		DefaultReturnResult result = (DefaultReturnResult) onAuthenticationSuccess(memberDetails, request, response);
@@ -200,10 +200,10 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	 * @param member
 	 * @return
 	 */
-	protected MemberDetails getMemberDetails(Member member){
+	protected MemberDetails getMemberDetails(Member member,HttpServletRequest request){
 		MemberCommand command = new MemberCommand();
 		PropertyUtil.copyProperties(command, member);
-		return constructMemberDetails(command);
+		return constructMemberDetails(command,request);
 	}
 
 }

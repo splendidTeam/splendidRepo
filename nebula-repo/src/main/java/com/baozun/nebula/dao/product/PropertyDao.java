@@ -249,6 +249,25 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 			@QueryParam("industryId") Long industryId,
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("commonPropertyId") Long commonPropertyId);
-
 	
+	/**
+	 * 根据propertyId查询Property表
+	 * @return Property
+	 * @param propertyId
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:39:20
+	 */
+	@NativeQuery(model = Property.class)
+	Property findPropertyByPropertyId(@QueryParam("propertyId") Long propertyId);
+	
+	
+	/**
+	 * 根据propertyId查询Property国际化数据
+	 * @return List<PropertyValueLang>
+	 * @param propertyId
+	 * @author 冯明雷
+	 * @time 2016年4月8日下午5:46:01
+	 */
+	@NativeQuery(model = PropertyLang.class)
+	List<PropertyLang> findPropertyLongByPropertyId(@QueryParam("propertyId") Long propertyId);
 }

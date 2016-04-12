@@ -471,5 +471,25 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	
+	<bean id="ItemProperties.findItemCountByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据属性id到itemProperties表中查询商品数量</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[
+					select
+						count(item_id) as num
+					from
+						t_pd_item_properties
+					where
+						property_id=:propertyId
+					group by item_id
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
 
 </beans>

@@ -618,4 +618,5 @@ public interface SdkMemberManager extends BaseManager{
 	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type,Long memberId);
 	
 	
+	
 }

@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-
+@Deprecated
 public class ShoppingCartLineCommandManagerSort {
 
 	/**

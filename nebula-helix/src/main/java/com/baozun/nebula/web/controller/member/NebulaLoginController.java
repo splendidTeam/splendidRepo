@@ -116,8 +116,11 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	
 	/**
 	 * 默认RemeberMe过期时间
+	 * @author 冯明雷
+	 * @version 1.0
+	 * @time 2016年3月31日  下午2:37:59
 	 */
-	public static final int 	DEFAULT_REMEBERME_MAX_AGE 		= 30*24*60*60;
+	private static final int 	DEFAULT_REMEBERME_MAX_AGE 		= 30*24*60*60;
 	
 	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
 	private int					remberMeValidityPeriod 			= -1;
@@ -246,7 +249,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			//处理RemeberMe和AutoLogin
 			doRememberMeProcess(loginForm, memberCommand, request, response, model);
 			
-			return onAuthenticationSuccess(constructMemberDetails(memberCommand), request, response); 
+			return onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
