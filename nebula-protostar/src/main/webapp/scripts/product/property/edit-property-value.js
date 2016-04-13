@@ -51,9 +51,9 @@ function refreshPropertyValueSection(){
 
 var propertyValuePages = base + '/i18n/property/findPropertyValueByPage.json';
 
+var findAllPropertyValueByPropertyId = base + '/i18n/property/findAllPropertyValueByPropertyId.json';
+
 $j(document).ready(function(){
-	var _propertyId = $j('#propertyId').val();
-	var _selectedGroupId = $j('.selectedGroupId').find("option:selected").val();
 	loxia.init({
 		debug : true,
 		region : 'zh-CN'
@@ -156,6 +156,47 @@ $j(document).ready(function(){
 		});
 //		
 	});
+	
+	
+	$j('.propertyValueSort').click(function(){
+		var propertyId = $j("#propertyId").val();
+		var json = {
+			'propertyId':propertyId
+		};
+		var data = nps.syncXhr(findAllPropertyValueByPropertyId, json,{type: "POST"});
+		if(data.isSuccess){
+			var propertyValues = data.description;
+			console.log(propertyValues)
+			console.log(propertyValues.length)
+			var html = "";
+			for(var i = 0; i<propertyValues.length; i++){
+				
+				var targetData = propertyValues[i];
+				html +="<div class='ui-block-line' style='padding:5px 0 5px 0;' propertyId='"+targetData.propertyId+"' sortNo='"+ targetData.sortNo+"'>";
+				for ( var j = 0; j < i18nLangs.length; j++) {
+					var i18nLang = i18nLangs[j];
+					var key = i18nLang.key;
+					html += "<input  readonly='value' value="+ targetData.value.langValues[key] +"  style='width: 150px'  class='name' loxiaType='input' /><span>"+i18nLang.value +"</span>";
+					if(j!=i18nLangs.length){
+						html += '<br>';
+					}
+				}
+				html += '</div>';
+			}
+			
+			$j(".proto-dialog-content").html(html);
+		}else{
+			
+		}
+		$j("#detail-dialog").dialogff({type:'open',close:'in',width:'800px',height:'630px'});
+	});
+	
+//	var sortTable1Height = jQuery('#detail-dialog').height();
+//	jQuery('#sortable').height(sortTable1Height);
+	
+	$j("#sortable").sortable();
+	$j("#sortable").disableSelection();
+	
 	
 	
 	$j("#table2").loxiasimpletable({

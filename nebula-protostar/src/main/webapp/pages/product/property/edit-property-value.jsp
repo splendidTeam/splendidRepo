@@ -10,6 +10,11 @@
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <script type="text/javascript" src="${base}/scripts/product/property/edit-property-value.js"></script>
 <script type="text/javascript" src="${base}/scripts/ajaxfileupload.js"></script>
+<script type="text/javascript" src="${base}/scripts/jquery/jqueryplugin/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.core.min.js"></script>
+<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.widget.min.js"></script>
+<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.mouse.min.js"></script>
+<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.sortable.min.js"></script>
 <style type="text/css">
 .i18n-lang{
 	display: none;
@@ -34,6 +39,8 @@ tbody input[type="text"]{
 <div class="content-box width-percent100">
 		<div class="ui-title1">
 			<img src="${base}/images/wmi/blacks/32x32/wrench.png"><spring:message code="system.property.manager"/> --【${property.name }】
+			
+			<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>
 		</div>
 		<input type="hidden" id="propertyId" value="${property.id}" />
 		<div class="ui-block ui-block-fleft" style="width: 400px;">
@@ -129,8 +136,27 @@ tbody input[type="text"]{
 				</div>
 				
 			</div>
+			 
+     <div class="button-line">
+		<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>
+    </div>
 		</div>
 	</div>
+	
+    <!-- 评价详细  dialog-->
+    <div id="detail-dialog" class="proto-dialog">
+		 <h5>属性值排序</h5>
+		 <div class="proto-dialog-content p10" id="sortable">	
 
+			
+			
+			
+		 </div>
+		 
+		 <div class="proto-dialog-button-line">
+		 	  <input type="button" value="提交回复" class="button orange copyok"/>
+		 	  <input type="button" value="取消" class="button black copycancel"/>
+		 </div>
+	</div>
 </body>
 </html>

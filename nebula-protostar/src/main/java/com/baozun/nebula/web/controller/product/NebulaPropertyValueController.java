@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Page;
 import loxia.dao.Pagination;
 
 import org.slf4j.Logger;
@@ -73,7 +74,6 @@ public class NebulaPropertyValueController extends BaseController{
 			HttpServletRequest request,
 			Model model,
 			@RequestParam(value = "propertyId",required = true) Long propertyId){
-		// request.getSession().setAttribute("propertyId", propertyId);
 
 		Property property = propertyManager.findPropertyById(propertyId);
 		model.addAttribute("property", property);
@@ -85,13 +85,6 @@ public class NebulaPropertyValueController extends BaseController{
 
 		List<PropertyValue> propertyValueList = propertyManager.findPropertyValueList(propertyId);
 		model.addAttribute("propertyValueList", propertyValueList);
-
-		// model.addAttribute("propertyName", property.getName());
-		// Industry industry = industryManager.findIndustryById(property.getIndustryId());
-		// model.addAttribute("industryId", industry.getId());
-		// model.addAttribute("industryName", industry.getName());
-		// List<PropertyValueCommand> propertyValue = propertyManager.findPropertyValuecCommandList(propertyId);
-		// model.addAttribute("propertyValue", propertyValue);
 
 		return "/product/property/edit-property-value";
 
@@ -247,6 +240,42 @@ public class NebulaPropertyValueController extends BaseController{
 			return FAILTRUE;
 		}
 
+	}
+
+	/**
+	 * 根据属性id查询下面所有的属性值ORDER BY proValue.sort_no ASC
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/findAllPropertyValueByPropertyId.json",method = RequestMethod.POST)
+	public BackWarnEntity findAllPropertyValueByPropertyId(@RequestParam("propertyId") Long propertyId){
+		BackWarnEntity backWarnEntity = new BackWarnEntity();
+		Page page = new Page(0, 10000);
+		try{
+			Pagination<PropertyValueCommand> properyValuePage = sdkPropertyManager.findPropertyValueByPage(page, null, propertyId, null);
+			List<PropertyValueCommand> propertyValueList = properyValuePage.getItems();
+			backWarnEntity.setIsSuccess(true);
+			backWarnEntity.setDescription(propertyValueList);
+		}catch (Exception e){
+			LOGGER.error("", e);
+			backWarnEntity.setIsSuccess(false);
+		}
+		return backWarnEntity;
+	}
+
+	// @ResponseBody
+	// @RequestMapping(value = "/i18n/property/exportPropertyValue.json", method = RequestMethod.POST)
+	public String itemExport(
+			@RequestParam("industryId") Long industryId,
+			@RequestParam("selectCodes") String[] selectCodes,
+			@RequestParam(value = "itemCodes",required = false) String itemCodes,
+			HttpServletRequest request,
+			HttpServletResponse response){
+
+		return "json";
 	}
 
 }
