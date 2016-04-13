@@ -63,6 +63,17 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="PropertyValue.updatePropertyValueSortById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					UPDATE t_pd_property_value SET sort_no =:sortNo  WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 
 	
 </beans>

@@ -229,4 +229,15 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 			Sort[] sorts,
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("proValGroupId") Long proValGroupId);
+
+	/**
+	 * 根据属性值id更新排序
+	 * 
+	 * @param id
+	 *            属性值id
+	 * @param sortNo
+	 * @return
+	 */
+	@NativeUpdate
+	Integer updatePropertyValueSortById(@QueryParam("id") Long id,@QueryParam("sortNo") Integer sortNo);
 }

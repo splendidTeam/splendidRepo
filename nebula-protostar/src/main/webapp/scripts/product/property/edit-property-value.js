@@ -53,6 +53,8 @@ var propertyValuePages = base + '/i18n/property/findPropertyValueByPage.json';
 
 var findAllPropertyValueByPropertyId = base + '/i18n/property/findAllPropertyValueByPropertyId.json';
 
+var updatePropertyValueSortNoById = base + '/i18n/property/updatePropertyValueSortNoById.json';
+
 $j(document).ready(function(){
 	loxia.init({
 		debug : true,
@@ -166,13 +168,13 @@ $j(document).ready(function(){
 		var data = nps.syncXhr(findAllPropertyValueByPropertyId, json,{type: "POST"});
 		if(data.isSuccess){
 			var propertyValues = data.description;
-			console.log(propertyValues)
-			console.log(propertyValues.length)
+//			console.log(propertyValues)
+//			console.log(propertyValues.length)
 			var html = "";
 			for(var i = 0; i<propertyValues.length; i++){
 				
 				var targetData = propertyValues[i];
-				html +="<div class='ui-block-line' style='padding:5px 0 5px 0;' propertyId='"+targetData.propertyId+"' sortNo='"+ targetData.sortNo+"'>";
+				html +="<div class='ui-block-line' style='padding:5px 0 5px 0;' proValId='"+targetData.id+"' sortNo='"+ targetData.sortNo+"'>";
 				for ( var j = 0; j < i18nLangs.length; j++) {
 					var i18nLang = i18nLangs[j];
 					var key = i18nLang.key;
@@ -191,12 +193,33 @@ $j(document).ready(function(){
 		$j("#detail-dialog").dialogff({type:'open',close:'in',width:'800px',height:'630px'});
 	});
 	
-//	var sortTable1Height = jQuery('#detail-dialog').height();
-//	jQuery('#sortable').height(sortTable1Height);
 	
-	$j("#sortable").sortable();
-	$j("#sortable").disableSelection();
+//    $j("#sortable").shapeshift();
+	$j(".copycancel").on("click",function(){
+		$j("#detail-dialog").dialogff({type:'close'});
+	})
 	
+	$j(".copyok").on("click",function(){
+		
+		var length = $j('.p10 .ui-block-line').length;
+		var result = "";
+		$j('.p10 .ui-block-line').each(function(index,data){
+			var pvId = $j(this).attr('proValId');
+			var sortNo = $j(this).attr('sortNo');
+			var newSortNo = index + 1;
+			result += pvId + "," + sortNo + "," + newSortNo;
+			if(length > index +1){
+				result += "-";
+			}
+		});
+		
+		console.log(result);
+		
+		var data = nps.syncXhr(updatePropertyValueSortNoById, {'result':result},{type: "POST"});
+		
+		
+		
+	});
 	
 	
 	$j("#table2").loxiasimpletable({

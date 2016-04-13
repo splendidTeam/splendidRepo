@@ -9,12 +9,11 @@
 <%@include file="/pages/commons/common-css.jsp"%>
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <script type="text/javascript" src="${base}/scripts/product/property/edit-property-value.js"></script>
-<script type="text/javascript" src="${base}/scripts/ajaxfileupload.js"></script>
-<script type="text/javascript" src="${base}/scripts/jquery/jqueryplugin/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.core.min.js"></script>
-<%-- <script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.widget.min.js"></script> --%>
-<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.mouse.min.js"></script>
-<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.sortable.min.js"></script>
+<%-- <script type="text/javascript" src="${base}/scripts/ajaxfileupload.js"></script> --%>
+
+<script src="${base}/scripts/jquery/shapeshift/jquery.touch-punch.min.js"></script>
+<script src="${base}/scripts/jquery/shapeshift/jquery.shapeshift.js"></script>
+
 <style type="text/css">
 .i18n-lang{
 	display: none;
@@ -148,7 +147,26 @@ tbody input[type="text"]{
 		 <h5>属性值排序</h5>
 		 <div class="proto-dialog-content p10" id="sortable">	
 
-			
+			<!-- <div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
+				<input readonly="value" value="红色1" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
+				<input readonly="value" value="red1" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
+				<input readonly="value" value="红色2" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
+				<input readonly="value" value="red2" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
+				<input readonly="value" value="红色3" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
+				<input readonly="value" value="red3" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
+				<input readonly="value" value="红色4" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
+				<input readonly="value" value="red4" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
+				<input readonly="value" value="红色5" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
+				<input readonly="value" value="red5" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
+			</div> -->
 			
 			
 		 </div>

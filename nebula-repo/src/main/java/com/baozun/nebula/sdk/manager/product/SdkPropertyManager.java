@@ -5,6 +5,8 @@ package com.baozun.nebula.sdk.manager.product;
 
 import java.util.List;
 
+import loxia.annotation.NativeUpdate;
+import loxia.annotation.QueryParam;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
@@ -105,4 +107,14 @@ public interface SdkPropertyManager extends BaseManager{
 	 * @return
 	 */
 	void addOrUpdatePropertyValue(Long groupId,PropertyValueCommand propertyValues);
+
+	/**
+	 * 根据属性值id更新排序
+	 * 
+	 * @param id
+	 *            属性值id
+	 * @param sortNo
+	 * @return
+	 */
+	Integer updatePropertyValueSortById(Long id,Integer sortNo);
 }

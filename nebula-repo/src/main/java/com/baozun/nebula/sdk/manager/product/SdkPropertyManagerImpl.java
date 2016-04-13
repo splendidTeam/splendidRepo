@@ -322,4 +322,13 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 		}
 
 	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#updatePropertyValueSortById(java.lang.Long, java.lang.Integer)
+	 */
+	@Override
+	public Integer updatePropertyValueSortById(Long id,Integer sortNo){
+		
+		return propertyValueDao.updatePropertyValueSortById(id, sortNo);
+	}
 }
