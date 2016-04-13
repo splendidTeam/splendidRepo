@@ -19,6 +19,8 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.DescriptorKey;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -146,6 +148,7 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 * @param id
 	 * @return
 	 */
+	@Deprecated
 	@NativeQuery(model = Property.class)
 	Property findPropertyById(@QueryParam("propertyId") Long id);
 

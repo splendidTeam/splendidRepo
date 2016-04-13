@@ -62,6 +62,14 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 	@Autowired
 	private PropertyValueLangDao			propertyValueLangDao;
 
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findPropertyById(java.lang.Long)
+	 */
+	@Override
+	public Property findPropertyById(Long id){
+		return propertyDao.getByPrimaryKey(id);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findProValueGroupByPropertyId(java.lang.Long)
@@ -331,4 +339,6 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 		
 		return propertyValueDao.updatePropertyValueSortById(id, sortNo);
 	}
+
+
 }

@@ -75,7 +75,7 @@ public class NebulaPropertyValueController extends BaseController{
 			Model model,
 			@RequestParam(value = "propertyId",required = true) Long propertyId){
 
-		Property property = propertyManager.findPropertyById(propertyId);
+		Property property = sdkPropertyManager.findPropertyById(propertyId);
 		model.addAttribute("property", property);
 		// 设置属性组分组只针对于属性类型为‘多选’类型
 		if (property.getEditingType().equals(Property.EDITING_TYPE_MULTI_SELECT)){

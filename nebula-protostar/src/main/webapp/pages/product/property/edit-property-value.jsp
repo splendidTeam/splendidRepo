@@ -42,8 +42,9 @@ tbody input[type="text"]{
 			<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>
 		</div>
 		<input type="hidden" id="propertyId" value="${property.id}" />
+		
 		<div class="ui-block ui-block-fleft" style="width: 400px;">
-			<div class="ui-block-content ui-block-content-lb">
+			<div class="ui-block-content ui-block-content-lb" <c:if test="${property.editingType != 4 }">style="display:none;" </c:if>>
   				<table >
 			        <tr>
 			            <td>
@@ -80,7 +81,8 @@ tbody input[type="text"]{
 			</div>
 			<div class="table-border0 border-grey" id="table2" caption="<spring:message code='shop.property.value.list'/>"></div>
 		</div>
-		 
+		
+		
 		<div class="ui-block " style="margin-left:400px;width:auto;padding-left: 10px;" >
 			<div class="ui-block-title1">属性值操作</div>
 			<div class="ui-block-content border-grey" style="margin-bottom: 10px;">

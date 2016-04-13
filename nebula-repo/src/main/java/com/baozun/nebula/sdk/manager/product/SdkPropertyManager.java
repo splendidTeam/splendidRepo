@@ -13,6 +13,7 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
 
@@ -23,6 +24,14 @@ import com.baozun.nebula.model.product.PropertyValueGroup;
  * @date Apr 7, 2016 5:12:51 PM
  */
 public interface SdkPropertyManager extends BaseManager{
+
+	/**
+	 * 根据id查找商品属性
+	 * 
+	 * @param id
+	 * @return
+	 */
+	Property findPropertyById(Long id);
 
 	/**
 	 * 根据属性id查询它下面的所有属性值组，order by createTime

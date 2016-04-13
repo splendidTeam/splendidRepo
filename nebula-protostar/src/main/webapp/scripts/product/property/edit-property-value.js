@@ -197,7 +197,7 @@ $j(document).ready(function(){
 //    $j("#sortable").shapeshift();
 	$j(".copycancel").on("click",function(){
 		$j("#detail-dialog").dialogff({type:'close'});
-	})
+	});
 	
 	$j(".copyok").on("click",function(){
 		
@@ -216,7 +216,14 @@ $j(document).ready(function(){
 		console.log(result);
 		
 		var data = nps.syncXhr(updatePropertyValueSortNoById, {'result':result},{type: "POST"});
-		
+		if(data.isSuccess){
+			
+			$j("#detail-dialog").dialogff({type:'close'});
+			nps.info(nps.i18n("INFO_TITLE_DATA"),"操作成功！");
+			refreshData();
+		}else{
+			nps.error(nps.i18n("ERROR_INFO"), "操作失败！");
+		}
 		
 		
 	});
