@@ -437,7 +437,7 @@
 					FROM t_pd_property p 
 					inner join t_pd_industry_property_relation ipr on   ipr.property_id=p.id
 					LEFT JOIN t_pd_shopproperty s ON p.id = s.property_id
-					WHERE  p.lifecycle != 2 and s.shop_id =:shopId AND ipr.industry_id =:industryId
+					WHERE  p.lifecycle != 2 and s.shop_id =:shopId AND ipr.industry_id =:industryId and s.industry_id=:industryId
 					
                  ]]>
 			</value>
