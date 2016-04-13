@@ -44,14 +44,17 @@ tbody input[type="text"]{
 			            	<label><spring:message code='shop.property.group'/></label>
 			            </td>
 			            <td>
+			             <form id="searchPropertyValueForm" action="" method="">
 			                <span >
-			                	<select  loxiaType="select"  mandatory="true" class="orgtype selectedGroupId" > 
+			                	<select name="proValueGroupId" loxiaType="select"  mandatory="true" class="orgtype selectedGroupId" > 
 			                		<option value=""> ---请选择属性值组---</option>
 									<c:forEach items="${propertyValueGroupList}" var="group">
 										<option value="${group.id}">${group.name}</option>
 									</c:forEach>
 								</select>
 			                </span>
+			                <input type="hidden" name="propertyId" value="${property.id}"  />
+			              </form>
 			            </td>
 			            <td>
 			                <span ><a href="javascript:void(0);" class="func-button addPropertyValueGroup"   title="<spring:message code='btn.add'/>">
@@ -106,10 +109,15 @@ tbody input[type="text"]{
 					</div>
 				</div>
 				<div class="button-line1">
+					<a href="javascript:void(0);" class="func-button refreshPropertyValue" title="<spring:message code='refresh'/>">
+    				 		<span><spring:message code="refresh"/></span>
+    				</a>
+				</div>
+				<div class="button-line1">
 					<a href="javascript:void(0);" class="func-button savePropertyValue" title="<spring:message code='btn.save'/>">
     				 		<span><spring:message code="btn.save"/></span>
     				</a>
-    				<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.save.continue'/>">
+    				<a href="javascript:void(0);" class="func-button savePropertyValue continue" title="<spring:message code='shop.property.value.save.continue'/>">
     				 		<span><spring:message code="shop.property.value.save.continue"/></span>
     				</a> 		
 				</div>
