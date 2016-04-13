@@ -29,7 +29,10 @@ tbody input[type="text"]{
 	float: left;
 	width:85%;
 }
-
+    .p10 > .ss-placeholder-child {
+      background: transparent;
+      border: 1px dashed blue;
+    }
 </style>
 </head>
 
@@ -141,6 +144,43 @@ tbody input[type="text"]{
      <div class="button-line">
 		<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>
     </div>
+    
+      <style>
+	    .container {
+	      border: 1px dashed #CCC;
+	      position: relative;
+	    }
+	    .container > div {
+	      position: absolute;
+	    }
+	    .container > .ss-placeholder-child {
+	      background: transparent;
+	      border: 1px dashed blue;
+	    }
+	  </style>
+	    <script>
+	    $j(document).ready(function() {
+	        $j(".container").shapeshift();
+	       })
+	  </script>
+     <!--  <div class="container">
+	    <div>1</div>
+	    <div>2</div>
+	    <div>3</div>
+	    <div>4</div>
+	    <div>5</div>
+	    <div>6</div>
+	    <div>7</div>
+	    <div>8</div>
+	  </div>
+	
+	  <div class="container">
+		<div>9</div>
+		<div>10</div>
+		<div>11</div>
+		<div>12</div>
+	  </div> -->
+	  
 		</div>
 		
 	</div>
@@ -148,13 +188,105 @@ tbody input[type="text"]{
     <!-- 评价详细  dialog-->
     <div id="detail-dialog" class="proto-dialog">
 		 <h5>属性值排序</h5>
-		 <div class="proto-dialog-content p10" id="sortable" >	
-
-<!-- 			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
-				<div class="ui-loxia-text">1111</div><span>简体中文</span><br>
-				<div class="ui-loxia-text">1111</div><span>英文</span><br>
-			</div>-->
-		 </div>
+		 <div class="proto-dialog-content p10"  style="height: 350px;">	
+		 
+		 	 <div class="container">
+			   <!--  <div>
+					<div class="ui-loxia-text">A</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">A</div><span>英文</span><br>
+				</div>
+			    <div><div class="ui-loxia-text">B</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">B</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">C</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">C</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">D</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">D</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">E</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">E</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">F</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">F</div><span>英文</span><br></div>
+			  	<div><div class="ui-loxia-text">G</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">G</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">H</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">H</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">i</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">i</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">g</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">g</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">k</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">k</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">m</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">m</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">H</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">H</div><span>英文</span><br></div>
+			    <div><div class="ui-loxia-text">H</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">H</div><span>英文</span><br></div> -->
+			  </div>
+			  
+			  
+	<!-- 		<div class="sortable" >
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">A</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">A</div><span>英文</span><br>
+				</div>
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">B</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">B</div><span>英文</span><br>
+				</div>
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">C</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">C</div><span>英文</span><br>
+				</div>
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">D</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">D</div><span>英文</span><br>
+				</div>
+			</div>
+			<div class="sortable" >
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">E</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">E</div><span>英文</span><br>
+				</div>
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">F</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">F</div><span>英文</span><br>
+				</div>
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">G</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">G</div><span>英文</span><br>
+				</div>
+				<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+					<div class="ui-loxia-text">H</div><span>简体中文</span><br>
+					<div class="ui-loxia-text">H</div><span>英文</span><br>
+				</div>
+			</div>	
+		 
+		 <div class="proto-dialog-content p10" id="sortable"  style="height: 350px;">	
+			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">E</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">E</div><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">F</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">F</div><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">G</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">G</div><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">H</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">H</div><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">I</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">I</div><span>英文</span><br>
+			</div>
+			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">J</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">J</div><span>英文</span><br>
+			</div> 
+		 </div>-->
 		 <div class="proto-dialog-button-line">
 		 	  <input type="button" value="提交回复" class="button orange copyok"/>
 		 	  <input type="button" value="取消" class="button black copycancel"/>
