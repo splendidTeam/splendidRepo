@@ -397,10 +397,12 @@ public class MemberManagerImpl implements MemberManager{
 		personData.setId(memberId);
 
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
-			if (RegexUtil.matches(RegexPattern.MOBILEPHONE, memberCommand.getLoginName())){
-				personData.setMobile(memberCommand.getLoginName());
-			}else if (RegexUtil.matches(RegexPattern.EMAIL, memberCommand.getLoginName())){
-				personData.setEmail(memberCommand.getLoginName());
+			if(Validator.isNotNullOrEmpty(memberCommand.getLoginName())){
+				if (RegexUtil.matches(RegexPattern.MOBILEPHONE, memberCommand.getLoginName())){
+					personData.setMobile(memberCommand.getLoginName());
+				}else if (RegexUtil.matches(RegexPattern.EMAIL, memberCommand.getLoginName())){
+					personData.setEmail(memberCommand.getLoginName());
+				}
 			}
 		}
 		// loginMobile不为null,则写入persondata
