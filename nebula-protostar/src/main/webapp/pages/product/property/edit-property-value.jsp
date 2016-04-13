@@ -12,7 +12,7 @@
 <script type="text/javascript" src="${base}/scripts/ajaxfileupload.js"></script>
 <script type="text/javascript" src="${base}/scripts/jquery/jqueryplugin/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.core.min.js"></script>
-<script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.widget.min.js"></script>
+<%-- <script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.widget.min.js"></script> --%>
 <script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.mouse.min.js"></script>
 <script type="text/javascript" src="${base}/scripts/jquery/sortgrid/jquery.ui.sortable.min.js"></script>
 <style type="text/css">
