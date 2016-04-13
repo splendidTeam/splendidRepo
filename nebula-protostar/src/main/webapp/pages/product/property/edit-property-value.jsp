@@ -142,37 +142,19 @@ tbody input[type="text"]{
 		<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>
     </div>
 		</div>
+		
 	</div>
 	
     <!-- 评价详细  dialog-->
     <div id="detail-dialog" class="proto-dialog">
 		 <h5>属性值排序</h5>
-		 <div class="proto-dialog-content p10" id="sortable">	
+		 <div class="proto-dialog-content p10" id="sortable" >	
 
-			<!-- <div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
-				<input readonly="value" value="红色1" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
-				<input readonly="value" value="red1" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
-			</div>
-			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
-				<input readonly="value" value="红色2" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
-				<input readonly="value" value="red2" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
-			</div>
-			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
-				<input readonly="value" value="红色3" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
-				<input readonly="value" value="red3" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
-			</div>
-			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
-				<input readonly="value" value="红色4" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
-				<input readonly="value" value="red4" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
-			</div>
-			<div class="ui-block-line" style="padding:5px 0 5px 0;" propertyid="1" sortno="2">
-				<input readonly="value" value="红色5" style="width: 150px" class="name" loxiatype="input"><span>简体中文</span><br>
-				<input readonly="value" value="red5" style="width: 150px" class="name" loxiatype="input"><span>英文</span><br>
-			</div> -->
-			
-			
+<!-- 			<div class="ui-block-line" style="padding:5px 0 5px 0; position: absolute; float: left; width: auto;" propertyid="1" sortno="2">
+				<div class="ui-loxia-text">1111</div><span>简体中文</span><br>
+				<div class="ui-loxia-text">1111</div><span>英文</span><br>
+			</div>-->
 		 </div>
-		 
 		 <div class="proto-dialog-button-line">
 		 	  <input type="button" value="提交回复" class="button orange copyok"/>
 		 	  <input type="button" value="取消" class="button black copycancel"/>

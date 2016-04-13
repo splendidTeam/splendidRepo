@@ -168,33 +168,29 @@ $j(document).ready(function(){
 		var data = nps.syncXhr(findAllPropertyValueByPropertyId, json,{type: "POST"});
 		if(data.isSuccess){
 			var propertyValues = data.description;
-//			console.log(propertyValues)
-//			console.log(propertyValues.length)
 			var html = "";
 			for(var i = 0; i<propertyValues.length; i++){
-				
 				var targetData = propertyValues[i];
-				html +="<div class='ui-block-line' style='padding:5px 0 5px 0;' proValId='"+targetData.id+"' sortNo='"+ targetData.sortNo+"'>";
+				html +="<div class='ui-block-line' style='padding:5px 0 5px 0; position: absolute; float: left; width: auto;' proValId='"+targetData.id+"' sortNo='"+ targetData.sortNo+"' >";
 				for ( var j = 0; j < i18nLangs.length; j++) {
 					var i18nLang = i18nLangs[j];
 					var key = i18nLang.key;
-					html += "<input  readonly='value' value="+ targetData.value.langValues[key] +"  style='width: 150px'  class='name' loxiaType='input' /><span>"+i18nLang.value +"</span>";
-					if(j!=i18nLangs.length){
-						html += '<br>';
-					}
+					html += "<div class='ui-loxia-text'>"+ targetData.value.langValues[key] +"</div><span>"+i18nLang.value +"</span><br>";
 				}
 				html += '</div>';
 			}
-			
+			console.log(html)
 			$j(".proto-dialog-content").html(html);
 		}else{
 			
 		}
-		$j("#detail-dialog").dialogff({type:'open',close:'in',width:'800px',height:'630px'});
+		$j("#detail-dialog").dialogff({type:'open',close:'in',width:'800px',height:'450px'});
+		$j("#sortable").shapeshift();
 	});
 	
 	
-//    $j("#sortable").shapeshift();
+    //$j("#sortable").shapeshift();
+    
 	$j(".copycancel").on("click",function(){
 		$j("#detail-dialog").dialogff({type:'close'});
 	});
