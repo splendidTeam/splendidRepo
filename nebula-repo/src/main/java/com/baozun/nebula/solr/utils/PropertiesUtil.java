@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0 2010-3-22 上午10:05:19
  * @since 1.0
  */
+@Deprecated
 public class PropertiesUtil {
 
 	private static final Logger	log	= LoggerFactory.getLogger(PropertiesUtil.class);

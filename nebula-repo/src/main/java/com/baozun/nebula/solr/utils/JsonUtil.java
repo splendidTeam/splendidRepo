@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 Jan 26, 2013 8:02:09 PM
  */
+@Deprecated
 public final class JsonUtil{
 
 	private static final Logger	log	= LoggerFactory.getLogger(JsonUtil.class);
