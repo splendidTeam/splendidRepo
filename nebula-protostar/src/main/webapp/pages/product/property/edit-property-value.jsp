@@ -152,11 +152,21 @@ tbody input[type="text"]{
 	    }
 	    .container > div {
 	      position: absolute;
+/* 	      width: 100px; */
 	    }
 	    .container > .ss-placeholder-child {
 	      background: transparent;
 	      border: 1px dashed blue;
 	    }
+	    .ui-loxia-text{
+			width:100px;
+			box-sizing:border-box;
+			border:1px solid #ccc;
+			border-radius:3px;
+			padding:3px;
+			color:#999;
+			background:#ededed;
+		}
 	  </style>
 	    <script>
 	    $j(document).ready(function() {
@@ -191,11 +201,11 @@ tbody input[type="text"]{
 		 <div class="proto-dialog-content p10"  style="height: 350px;">	
 		 
 		 	 <div class="container">
-			   <!--  <div>
-					<div class="ui-loxia-text">A</div><span>简体中文</span><br>
-					<div class="ui-loxia-text">A</div><span>英文</span><br>
+<!-- 			     <div>
+					<div class="ui-loxia-text" >A</div><span>简体中文</span><br>
+					<div class="ui-loxia-text" >A</div><span>英文</span><br>
 				</div>
-			    <div><div class="ui-loxia-text">B</div><span>简体中文</span><br>
+			    <div><div class="ui-loxia-text" >B</div><span>简体中文</span><br>
 					<div class="ui-loxia-text">B</div><span>英文</span><br></div>
 			    <div><div class="ui-loxia-text">C</div><span>简体中文</span><br>
 					<div class="ui-loxia-text">C</div><span>英文</span><br></div>
@@ -220,7 +230,7 @@ tbody input[type="text"]{
 			    <div><div class="ui-loxia-text">H</div><span>简体中文</span><br>
 					<div class="ui-loxia-text">H</div><span>英文</span><br></div>
 			    <div><div class="ui-loxia-text">H</div><span>简体中文</span><br>
-					<div class="ui-loxia-text">H</div><span>英文</span><br></div> -->
+					<div class="ui-loxia-text">H</div><span>英文</span><br></div>  -->
 			  </div>
 			  
 			  
@@ -287,10 +297,11 @@ tbody input[type="text"]{
 				<div class="ui-loxia-text">J</div><span>英文</span><br>
 			</div> 
 		 </div>-->
-		 <div class="proto-dialog-button-line">
+		
+	</div>
+	 <div class="proto-dialog-button-line">
 		 	  <input type="button" value="提交回复" class="button orange copyok"/>
 		 	  <input type="button" value="取消" class="button black copycancel"/>
 		 </div>
-	</div>
 </body>
 </html>
