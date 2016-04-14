@@ -74,6 +74,28 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="PropertyValue.findPropertyValueLangByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select
+                   		*
+                   from
+                   		t_pd_property_value_lang
+                   where
+                   		property_value_id in(
+                   			select id from t_pd_property_value where property_id=:propertyId
+                   		)
+                   		and lang in(
+		                   	#foreach($lang in $langs)
+		                   		'$lang',
+		                   	#end
+		                   	'-1'
+		                ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 	
 </beans>

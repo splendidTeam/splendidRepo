@@ -293,7 +293,7 @@ public class NebulaPropertyController extends BaseController{
 		boolean i18n = LangProperty.getI18nOnOff();
 		if (i18n){
 			//如果是国际化的要去查询属性国际化的名称等
-			List<PropertyLang> propertyLangs =propertyManager.findPropertyLongByPropertyId(propertyId);			
+			List<PropertyLang> propertyLangs =propertyManager.findPropertyLangByPropertyId(propertyId);			
 			model.addAttribute("propertyLangs", propertyLangs);
 		}
 		return "product/property/nebula-update-property";

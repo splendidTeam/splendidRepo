@@ -13,6 +13,7 @@ import com.baozun.nebula.model.product.PropertyLang;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
+import com.baozun.nebula.web.command.PropertyValueUploadCommand;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -225,11 +226,30 @@ public interface PropertyManager extends BaseManager{
 	
 	/**
 	 * 根据propertyId查询Property国际化数据
-	 * @return List<PropertyValueLang>
+	 * @return List<PropertyLang>
 	 * @param propertyId
 	 * @author 冯明雷
 	 * @time 2016年4月8日下午5:46:01
 	 */
-	List<PropertyLang> findPropertyLongByPropertyId(Long propertyId);
+	List<PropertyLang> findPropertyLangByPropertyId(Long propertyId);
+
+	/**
+	 * 根据propertyId和语言查询propertyValue的国际化的值
+	 * @return List<PropertyValueLang>
+	 * @param propertyId
+	 * @param langs
+	 * @author 冯明雷
+	 * @time 2016年4月14日上午11:20:06
+	 */
+	List<PropertyValueLang> findPropertyValueLangByPropertyId(Long propertyId);
 	
+	/**
+	 * 上传创建或更新属性值
+	 * @return void
+	 * @param propertyValueUploadCommandList
+	 * @param propertyId 
+	 * @author 冯明雷
+	 * @time 2016年4月14日下午4:28:14
+	 */
+	void createOrUpdatePropertyValueByUpload(List<PropertyValueUploadCommand> propertyValueUploadCommandList,Long propertyId);
 }
