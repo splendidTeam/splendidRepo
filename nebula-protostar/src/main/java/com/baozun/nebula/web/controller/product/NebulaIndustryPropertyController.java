@@ -91,7 +91,15 @@ public class NebulaIndustryPropertyController extends BaseController{
 			IndustryPropertyRelation industryPropertyRelation = new IndustryPropertyRelation();
 			industryPropertyRelation.setIndustryId(industryId);
 			industryPropertyRelation.setPropertyId(propertyId);
-			industryPropertyRelation.setSortNo(1);
+			//industryPropertyRelation.setSortNo(1);
+			//查找出某行业中属性排序的最大值
+			Integer maxSortNo = industryPropertyManager.findMaxIndustryPropertySortId(industryId);
+			LOG.info("the max sortNo is " + maxSortNo);
+			if(maxSortNo == null){
+				industryPropertyRelation.setSortNo(1);
+			}else{
+				industryPropertyRelation.setSortNo(maxSortNo + 1);
+			}
 			try {
 				industryPropertyManager.relationIndustryProperty(industryPropertyRelation);
 				result.setIsSuccess(true);

@@ -77,6 +77,17 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="IndustryPropertyRelation.findMaxIndustryPropertySortId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找出某个行业中属性排序的最大值</description>
+		<constructor-arg>
+			<value>
+			 <![CDATA[ 
+			 	SELECT max(sort_no) FROM t_pd_industry_property_relation WHERE industry_id = :industryId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 </beans>
 

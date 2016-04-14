@@ -178,7 +178,7 @@ $j(document).ready(function(){
 			var html = "";
 			for(var i = 0; i<propertyValues.length; i++){
 				var targetData = propertyValues[i];
-				html +="<div  proValId='"+targetData.id+"' sortNo='"+ targetData.sortNo+"' >";
+				html +="<div class='propertyValues'  proValId='"+targetData.id+"' sortNo='"+ targetData.sortNo+"' >";
 				for ( var j = 0; j < i18nLangs.length; j++) {
 					var i18nLang = i18nLangs[j];
 					var key = i18nLang.key;
@@ -191,7 +191,7 @@ $j(document).ready(function(){
 		}else{
 			
 		}
-		$j("#detail-dialog").dialogff({type:'open',close:'in',width:'800px',height:'450px'});
+		$j("#detail-dialog").dialogff({type:'open',close:'in',width:'800px',height:'650px'});
 //		$j(".sortable").shapeshift();
 		 $j(".container").shapeshift();
 	});
@@ -205,9 +205,9 @@ $j(document).ready(function(){
 	
 	$j(".copyok").on("click",function(){
 		
-		var length = $j('.p10 .ui-block-line').length;
+		var length = $j('.p10 .propertyValues').length;
 		var result = "";
-		$j('.p10 .ui-block-line').each(function(index,data){
+		$j('.p10 .propertyValues').each(function(index,data){
 			var pvId = $j(this).attr('proValId');
 			var sortNo = $j(this).attr('sortNo');
 			var newSortNo = index + 1;
