@@ -98,7 +98,7 @@ public class NebulaPropertyValueController extends BaseController{
 			Model model,
 			@RequestParam(value = "propertyId",required = true) Long propertyId){
 
-		Property property = propertyManager.findPropertyById(propertyId);
+		Property property = sdkPropertyManager.findPropertyById(propertyId);
 		model.addAttribute("property", property);
 		// 设置属性组分组只针对于属性类型为‘多选’类型
 		if (property.getEditingType().equals(Property.EDITING_TYPE_MULTI_SELECT)){
@@ -282,6 +282,36 @@ public class NebulaPropertyValueController extends BaseController{
 			List<PropertyValueCommand> propertyValueList = properyValuePage.getItems();
 			backWarnEntity.setIsSuccess(true);
 			backWarnEntity.setDescription(propertyValueList);
+		}catch (Exception e){
+			LOGGER.error("", e);
+			backWarnEntity.setIsSuccess(false);
+		}
+		return backWarnEntity;
+	}
+
+	/**
+	 * 根据属性id查询下面所有的属性值ORDER BY proValue.sort_no ASC
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/updatePropertyValueSortNoById.json",method = RequestMethod.POST)
+	public BackWarnEntity updatePropertyValueSortNoById(@RequestParam("result") String result){
+		BackWarnEntity backWarnEntity = new BackWarnEntity();
+		try{
+			String[] orderStrings = result.split("-");
+			for (int i = 0; i < orderStrings.length; i++){
+				String[] temp = orderStrings[i].split(",");
+				Long pvId = Long.valueOf(temp[0]);
+				Integer sortNo = Integer.valueOf(temp[1]);
+				Integer newSortNo = Integer.valueOf(temp[2]);
+				if (!sortNo.equals(newSortNo)){
+					sdkPropertyManager.updatePropertyValueSortById(pvId, newSortNo);
+				}
+			}
+			backWarnEntity.setIsSuccess(true);
 		}catch (Exception e){
 			LOGGER.error("", e);
 			backWarnEntity.setIsSuccess(false);
