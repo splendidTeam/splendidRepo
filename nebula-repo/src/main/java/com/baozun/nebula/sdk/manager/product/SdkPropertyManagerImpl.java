@@ -357,27 +357,6 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#validatePropertyValueRepeat(java.lang.Long, java.lang.Long,
-	 * com.baozun.nebula.command.i18n.MutlLang)
-	 */
-	@Override
-	public boolean validatePropertyValueRepeat(Long propertyId,Long pvId,MutlLang lang){
-		// BackWarnEntity backWarnEntity = new BackWarnEntity();
-		// 语言
-		String[] langs = lang.getLangs();
-		// 值
-		String[] values = lang.getValues();
-
-		for (int i = 0; i < langs.length; i++){
-
-//			Integer count = propertyValueLangDao.findCountByPVIdAndLangValue(propertyId, values[i]);
-		}
-
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findCountByPVIdAndLangValue(java.lang.Long, java.lang.String)
 	 */
 	@Override

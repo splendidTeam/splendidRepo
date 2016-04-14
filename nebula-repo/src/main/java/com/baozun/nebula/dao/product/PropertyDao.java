@@ -278,11 +278,11 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	
 	/**
 	 * 根据propertyId查询Property国际化数据
-	 * @return List<PropertyValueLang>
+	 * @return List<PropertyLang>
 	 * @param propertyId
 	 * @author 冯明雷
 	 * @time 2016年4月8日下午5:46:01
 	 */
 	@NativeQuery(model = PropertyLang.class)
-	List<PropertyLang> findPropertyLongByPropertyId(@QueryParam("propertyId") Long propertyId);
+	List<PropertyLang> findPropertyLangByPropertyId(@QueryParam("propertyId") Long propertyId);
 }

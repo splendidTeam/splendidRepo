@@ -10,9 +10,14 @@
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <script type="text/javascript" src="${base}/scripts/product/property/edit-property-value.js"></script>
 <%-- <script type="text/javascript" src="${base}/scripts/ajaxfileupload.js"></script> --%>
-
 <script src="${base}/scripts/jquery/shapeshift/jquery.touch-punch.min.js"></script>
 <script src="${base}/scripts/jquery/shapeshift/jquery.shapeshift.js"></script>
+
+<script type="text/javascript">
+var $ = jQuery.noConflict();
+</script>
+<link rel="stylesheet" type="text/css" href="${base}/scripts/uploadify3/uploadify.css" media="screen" />
+<script type="text/javascript" src="${base}/scripts/uploadify3/jquery.uploadify.min.js"></script>
 
 <style type="text/css">
 .i18n-lang{
@@ -45,6 +50,7 @@ tbody input[type="text"]{
 			<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>
 		</div>
 		<input type="hidden" id="propertyId" value="${property.id}" />
+		<input type="hidden" value="${pageContext.session.id }" id="session-id">
 		
 		<div class="ui-block ui-block-fleft" style="width: 400px;">
 			<div class="ui-block-content ui-block-content-lb" <c:if test="${property.editingType != 4 }">style="display:none;" </c:if>>
@@ -137,14 +143,37 @@ tbody input[type="text"]{
     				 		<span><spring:message code="shop.property.value.save.continue"/></span>
     				</a> 		
 				</div>
-				<div class="button-line1">
-					<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.export'/>">
-    				 		<span><spring:message code="shop.property.value.export"/></span></a>
-    				<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.import'/>">
-    				 		<span><spring:message code="shop.property.value.import"/></span></a>
-				</div>
-				
+				<%-- <div class="button-line1">
+					<a href="javascript:void(0);" id="downLoadTmplOfPropertyValue" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.export'/>"><span><spring:message code="shop.property.value.export"/></span></a>
+    				<a href="javascript:void(0);" id="uploadPropertyValue" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.import'/>"><span><spring:message code="shop.property.value.import"/></span></a>    				
+				</div>	 --%>			
 			</div>
+			
+			<div class="ui-block-content border-grey" style="margin-bottom: 10px;">
+				<div class="button-line1">
+					<a href="javascript:void(0);" id="downLoadTmplOfPropertyValue" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.export'/>"><span><spring:message code="shop.property.value.export"/></span></a>
+	   				<%-- <a href="javascript:void(0);" id="uploadPropertyValue" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.import'/>"><span><spring:message code="shop.property.value.import"/></span></a> --%>
+				</div>
+				<div class="ui-block-line">
+			        <label><spring:message code='shop.property.value.import'/></label>
+					<div id="propertyValue-upload"></div>
+					<p style="margin-top: 10px;">
+						<a href="javascript:void(0)" class="func-button" id="btn-ok">确认</a>
+						<a href="javascript:void(0)" class="func-button" id="btn-cancel">取消</a>
+					</p>
+					<p style="margin-top: 5px; font-size: 14px; font-weight: bold;"><span id="upload-sku-result"></span></p>
+					<div class="upload-message" id="propertyValue-upload-message"></div>
+					<div id="errorTip" style="display: none">
+				      	<div style="margin-top: 10px;" >信息提示：</div>
+						<div class="ui-block-content border-grey">
+							  <div class="ui-block-line showError" style="color: red">
+							       
+							  </div>		
+					      </div>
+				      </div>
+				  </div>
+			</div>
+			
 			 
      <div class="button-line">
 		<input type="button" value="<spring:message code='shop.property.value.sort'/>" class="button orange propertyValueSort" title="<spring:message code='shop.property.value.sort'/>"/>

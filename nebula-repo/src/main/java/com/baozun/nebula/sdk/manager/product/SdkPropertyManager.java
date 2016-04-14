@@ -135,18 +135,6 @@ public interface SdkPropertyManager extends BaseManager{
 	 */
 	void deletePropertyValueById(List<Long> ids);
 
-	/**
-	 * 验证属性值是否重复
-	 * 
-	 * @param propertyId
-	 *            属性id
-	 * @param pvId
-	 *            属性值id
-	 * @param lang
-	 *            属性值I18N
-	 * @return
-	 */
-	boolean validatePropertyValueRepeat(Long propertyId,Long pvId,MutlLang lang);
 
 	PropertyValue findCountByPVIdAndLangValue(Long propertyId,String langValue);
 }
