@@ -70,6 +70,11 @@ public class BundleSku extends BaseModel {
 	private Long bundleElementId;
 	
 	/**
+	 * 捆绑类商品扩展信息ID
+	 */
+	private Long bundleId;
+	
+	/**
 	 * sku id
 	 */
 	private Long skuId;
@@ -102,7 +107,7 @@ public class BundleSku extends BaseModel {
 		this.id = id;
 	}
 
-	@Column(name = "BUNDLE_ITEM_ID")
+	@Column(name = "BUNDLE_ELEMENT_ID")
 	@Index(name = "IDX_BUNDLE_SKU_BUNDLE_ELEMENT_ID")
 	public Long getBundleElementId() {
 		return bundleElementId;
@@ -110,6 +115,15 @@ public class BundleSku extends BaseModel {
 
 	public void setBundleElementId(Long bundleElementId) {
 		this.bundleElementId = bundleElementId;
+	}
+	
+	@Column(name = "BUNDLE_ID")
+	public Long getBundleId(){
+		return bundleId;
+	}
+	
+	public void setBundleId(Long bundleId) {
+		this.bundleId = bundleId;
 	}
 
 	@Column(name = "SKU_ID")
