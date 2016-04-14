@@ -23,6 +23,10 @@ import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyLang;
 import com.feilong.core.Validator;
 
+/**
+ * @author shouqun.li
+ * @version 2016年4月12日 上午11:04:23
+ */
 @Transactional
 @Service("industryPropertyManager")
 public class IndustryPropertyManagerImpl implements IndustryPropertyManager{
@@ -170,5 +174,10 @@ public class IndustryPropertyManagerImpl implements IndustryPropertyManager{
 			}
 		}
 		return flag;
+	}
+
+	@Override
+	public Integer findMaxIndustryPropertySortId(long industryId) {
+		return industryPropertyRelationDao.findMaxIndustryPropertySortId(industryId);
 	}
 }

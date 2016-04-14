@@ -55,4 +55,11 @@ public interface IndustryPropertyManager extends BaseManager{
 	 * @param str
 	 */
 	public boolean updateIndustryPropertySort(long industryId, String str);
+	
+	/**
+	 * 查找出某个行业中sortId的最大值
+	 * @param industryId
+	 * @return
+	 */
+	public Integer findMaxIndustryPropertySortId(long industryId);
 }
