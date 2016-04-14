@@ -83,6 +83,11 @@ tbody input[type="text"]{
 			    </table>
 			</div>
 			<div class="table-border0 border-grey" id="table2" caption="<spring:message code='shop.property.value.list'/>"></div>
+			<div class="button-line1">
+				<a href="javascript:void(0);" class="func-button deleteSelected" title="删除选中">
+   				 		<span>删除选中</span>
+   				</a>
+			</div>
 		</div>
 		
 		
@@ -102,7 +107,7 @@ tbody input[type="text"]{
 						 <c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 						   <div class="ui-block-line propertyValueInput">
 					         
-							<input id="input3" 
+							<input id="input3" lang="${i18nLang.key}"
 								name="propertyValues.value.values[${status.index}]" placeholder="<spring:message code='system.propertyvalue'/>"
 							  value=""  style='width: 200px' mandatory="true" type="text" class="name" loxiaType="input" trim="true"/>
 							
@@ -300,7 +305,7 @@ tbody input[type="text"]{
 		
 	</div>
 	 <div class="proto-dialog-button-line">
-		 	  <input type="button" value="提交回复" class="button orange copyok"/>
+		 	  <input type="button" value="提交" class="button orange copyok"/>
 		 	  <input type="button" value="取消" class="button black copycancel"/>
 		 </div>
 </body>

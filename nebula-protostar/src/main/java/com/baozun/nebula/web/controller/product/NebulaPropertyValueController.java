@@ -4,7 +4,9 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.product.PropertyManager;
 import com.baozun.nebula.model.product.Property;
@@ -112,6 +115,41 @@ public class NebulaPropertyValueController extends BaseController{
 			@I18nCommand PropertyValueCommand propertyValues){
 
 		try{
+			BackWarnEntity backWarnEntity = new BackWarnEntity();
+			backWarnEntity.setIsSuccess(true);
+			Long proValueId = propertyValues.getId();
+			Long propertyId = propertyValues.getPropertyId();
+
+			MutlLang lang = (MutlLang) propertyValues.getValue();
+			// 语言
+			String[] langs = lang.getLangs();
+			// 值
+			String[] values = lang.getValues();
+			Map<String, String> validateResult = new HashMap<String, String>();
+			for (int i = 0; i < langs.length; i++){
+				PropertyValue propertyValue = sdkPropertyManager.findCountByPVIdAndLangValue(propertyId, values[i]);
+				boolean flag = Validator.isNullOrEmpty(propertyValue);
+				if (Validator.isNotNullOrEmpty(proValueId)){
+					// update ,count可以 == 1
+					Long existId = propertyValue.getId();
+					if (!proValueId.equals(existId)){
+						backWarnEntity.setIsSuccess(false);
+						validateResult.put(langs[i], "1004");
+					}
+				}else{
+					// 新增
+					if (!flag){
+						backWarnEntity.setIsSuccess(false);
+						validateResult.put(langs[i], "1004");
+					}
+				}
+
+			}
+			if (!backWarnEntity.getIsSuccess()){
+				backWarnEntity.setDescription(validateResult);
+				return backWarnEntity;
+			}
+
 			sdkPropertyManager.addOrUpdatePropertyValue(groupId, propertyValues);
 		}catch (Exception e){
 			LOGGER.error("", e);
@@ -259,6 +297,36 @@ public class NebulaPropertyValueController extends BaseController{
 			List<PropertyValueCommand> propertyValueList = properyValuePage.getItems();
 			backWarnEntity.setIsSuccess(true);
 			backWarnEntity.setDescription(propertyValueList);
+		}catch (Exception e){
+			LOGGER.error("", e);
+			backWarnEntity.setIsSuccess(false);
+		}
+		return backWarnEntity;
+	}
+
+	/**
+	 * 根据属性值id删除属性值 会处理 【PropertyValue,PropertyValueLang,PropertyValueGroupRelation】
+	 * 
+	 * @param pvIds
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/deletePropertyValuesByIds.json",method = RequestMethod.POST)
+	public BackWarnEntity deletePropertyValuesByIds(@RequestParam("pvIds") String pvIds){
+		BackWarnEntity backWarnEntity = new BackWarnEntity();
+
+		try{
+
+			String[] split = pvIds.split(",");
+
+			List<Long> ids = new ArrayList<Long>();
+			if (Validator.isNotNullOrEmpty(split)){
+				for (String str : split){
+					ids.add(Long.valueOf(str));
+				}
+				sdkPropertyManager.deletePropertyValueById(ids);
+			}
+			backWarnEntity.setIsSuccess(true);
 		}catch (Exception e){
 			LOGGER.error("", e);
 			backWarnEntity.setIsSuccess(false);

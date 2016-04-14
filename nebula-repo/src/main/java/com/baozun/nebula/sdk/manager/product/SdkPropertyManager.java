@@ -11,6 +11,7 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
+import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Property;
@@ -126,4 +127,26 @@ public interface SdkPropertyManager extends BaseManager{
 	 * @return
 	 */
 	Integer updatePropertyValueSortById(Long id,Integer sortNo);
+
+	/**
+	 * 根据属性值id删除属性值 会处理 【PropertyValue,PropertyValueLang,PropertyValueGroupRelation】
+	 * 
+	 * @param ids
+	 */
+	void deletePropertyValueById(List<Long> ids);
+
+	/**
+	 * 验证属性值是否重复
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @param pvId
+	 *            属性值id
+	 * @param lang
+	 *            属性值I18N
+	 * @return
+	 */
+	boolean validatePropertyValueRepeat(Long propertyId,Long pvId,MutlLang lang);
+
+	PropertyValue findCountByPVIdAndLangValue(Long propertyId,String langValue);
 }
