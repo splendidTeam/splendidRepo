@@ -221,7 +221,10 @@ $j(document).ready(function(){
 	});
 	refreshData();
 	
-	
-	
+	//下载属性值模板
+	$j("#downLoadTmplOfPropertyValue").click(function(){
+		var propertyId = $j("#propertyId").val();
+		location.href="/product/tplt_property_value_import.xls?propertyId="+propertyId;
+	});
 	
 });

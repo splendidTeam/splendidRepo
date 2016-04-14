@@ -129,7 +129,7 @@ tbody input[type="text"]{
     				</a> 		
 				</div>
 				<div class="button-line1">
-					<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.export'/>">
+					<a href="javascript:void(0);" id="downLoadTmplOfPropertyValue" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.export'/>">
     				 		<span><spring:message code="shop.property.value.export"/></span></a>
     				<a href="javascript:void(0);" class="func-button deleteMultyGroup" title="<spring:message code='shop.property.value.import'/>">
     				 		<span><spring:message code="shop.property.value.import"/></span></a>
