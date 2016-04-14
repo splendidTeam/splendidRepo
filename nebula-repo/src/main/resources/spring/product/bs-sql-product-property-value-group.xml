@@ -15,6 +15,17 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean id="PropertyValueGroup.findByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过属性ID获取PropertyValueGroup列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_property_value_group where property_id=:propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 
 	
 </beans>

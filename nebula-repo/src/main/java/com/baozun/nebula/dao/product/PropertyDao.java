@@ -19,10 +19,7 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
-import com.baozun.nebula.command.PropertyCommand;
-import com.baozun.nebula.model.product.Property;
-import com.baozun.nebula.model.product.PropertyLang;
-import com.baozun.nebula.model.product.PropertyValue;
+import javax.management.DescriptorKey;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
@@ -31,6 +28,11 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
+
+import com.baozun.nebula.command.PropertyCommand;
+import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyLang;
+import com.baozun.nebula.model.product.PropertyValue;
 
 /**
  * 商品属性Dao
@@ -79,8 +81,7 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyCommand.class)
 	Pagination<PropertyCommand> findPropertyListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
-	
-	
+
 	/**
 	 * 根据条件分页查询属性
 	 * @return Pagination<PropertyCommand>
@@ -92,7 +93,7 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyCommand.class)
 	Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
-
+	
 	/**
 	 * 通过ids批量启用或禁用Property 设置lifecycle =0 或 1
 	 * 
@@ -147,12 +148,25 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 * @param id
 	 * @return
 	 */
+	@Deprecated
 	@NativeQuery(model = Property.class)
 	Property findPropertyById(@QueryParam("propertyId") Long id);
 
 	@NativeQuery(model = Property.class)
 	Property findPropertyByIdI18n(@QueryParam("propertyId") Long id,@QueryParam("lang") String lang);
 
+	
+	/**
+	 * 根据id查询属性
+	 *  不关联t_common_property
+	 * @param id
+	 * @return
+	 */
+	
+	@NativeQuery(model = Property.class)
+	Property findByIdWithoutCommonProperty(@QueryParam("propertyId") Long id);
+	
+	
 	/**
 	 * 根据name查询属性
 	 * 

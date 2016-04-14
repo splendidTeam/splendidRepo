@@ -62,6 +62,17 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	 */
 	@NativeQuery(model = Property.class)
 	List<Property> findPropertyListByIndustryIdAndShopId(@QueryParam("industryId") Long industryId, @QueryParam("shopId") Long shopId, Sort[] sorts);
+	/**
+	 * 根据行业id和店铺id查询 属性[不关联表t_pd_common_propert]
+	 * 
+	 * @param industryId
+	 *            行业id
+	 * @param shopId
+	 *            店铺id
+	 * @return
+	 */
+	@NativeQuery(model = Property.class)
+	List<Property> findPropertyListByIndustryIdAndShopIdWidthoutCommonProperty(@QueryParam("industryId") Long industryId, @QueryParam("shopId") Long shopId, Sort[] sorts);
 	
 	@NativeQuery(model = Property.class)
 	List<Property> findPropertyListByIndustryIdAndShopIdI18n(@QueryParam("industryId") Long industryId, 
@@ -214,7 +225,6 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	@NativeQuery(model = Industry.class)
 	List<Industry> findAllEnabledIndustryByShopId(@QueryParam("shopId") Long shopId);
 	
-	
 	/**
 	 * 根据属性名查询属性的数量,并排除当前属性id
 	 * @return Integer
@@ -235,7 +245,5 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	 */
 	@NativeQuery(clazzes = Integer.class, alias = "COUNT")
 	Integer findCountByPropertyNameAndLang(@QueryParam("propertyName") String propertyName,@QueryParam("lang")String lang,@QueryParam("propertyId") Long propertyId);
-	
-	
 	
 }

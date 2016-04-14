@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +18,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.product.PropertyManager;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
+import com.baozun.nebula.utils.query.bean.QueryBean;
+import com.baozun.nebula.web.bind.I18nCommand;
+import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
@@ -65,9 +74,8 @@ public class NebulaPropertyValueController extends BaseController{
 			HttpServletRequest request,
 			Model model,
 			@RequestParam(value = "propertyId",required = true) Long propertyId){
-		// request.getSession().setAttribute("propertyId", propertyId);
 
-		Property property = propertyManager.findPropertyById(propertyId);
+		Property property = sdkPropertyManager.findPropertyById(propertyId);
 		model.addAttribute("property", property);
 		// 设置属性组分组只针对于属性类型为‘多选’类型
 		if (property.getEditingType().equals(Property.EDITING_TYPE_MULTI_SELECT)){
@@ -75,16 +83,69 @@ public class NebulaPropertyValueController extends BaseController{
 			model.addAttribute("propertyValueGroupList", propertyValueGroupList);
 		}
 
-		// model.addAttribute("propertyName", property.getName());
-		// Industry industry = industryManager.findIndustryById(property.getIndustryId());
-		// model.addAttribute("industryId", industry.getId());
-		// model.addAttribute("industryName", industry.getName());
-		// List<PropertyValueCommand> propertyValue = propertyManager.findPropertyValuecCommandList(propertyId);
-		// model.addAttribute("propertyValue", propertyValue);
-		// List<PropertyValue> propertyValueList = propertyManager.findPropertyValueListBycommonPropertyId(propertyId);
-		// model.addAttribute("propertyValueList", propertyValueList);
+		List<PropertyValue> propertyValueList = propertyManager.findPropertyValueList(propertyId);
+		model.addAttribute("propertyValueList", propertyValueList);
+
 		return "/product/property/edit-property-value";
 
+	}
+
+	/**
+	 * 新建或更新商品属性值
+	 * 
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @param groupId
+	 *            属性值组id
+	 * @param propertyValues
+	 *            属性值
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/addOrUpdatePropertyValue.json",method = RequestMethod.POST)
+	public BackWarnEntity addOrUpdatePropertyValue(
+			Model model,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@RequestParam(value = "groupId",required = false) Long groupId,
+			@I18nCommand PropertyValueCommand propertyValues){
+
+		try{
+			sdkPropertyManager.addOrUpdatePropertyValue(groupId, propertyValues);
+		}catch (Exception e){
+			LOGGER.error("", e);
+			return FAILTRUE;
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 分页查询属性值（i18n）
+	 * 
+	 * @param model
+	 * @param propertyId
+	 *            属性id
+	 * @param proValueGroupId
+	 *            属性值组id
+	 * @param queryBean
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/findPropertyValueByPage.json")
+	public Pagination<PropertyValueCommand> findPropertyValueByPage(
+			Model model,
+			@RequestParam(value = "propertyId",required = true) Long propertyId,
+			@RequestParam(value = "proValueGroupId",required = false) Long proValueGroupId,
+			@QueryBeanParam QueryBean queryBean){
+
+		Pagination<PropertyValueCommand> result = sdkPropertyManager.findPropertyValueByPage(
+				queryBean.getPage(),
+				queryBean.getSorts(),
+				propertyId,
+				proValueGroupId);
+
+		return result;
 	}
 
 	/**
@@ -129,6 +190,21 @@ public class NebulaPropertyValueController extends BaseController{
 		return "/product/property/property-value-group";
 	}
 
+	/**
+	 * 更新或修改属性值组和组与属性值的关联
+	 * 
+	 * @param request
+	 * @param model
+	 * @param propertyId
+	 *            属性id
+	 * @param groupId
+	 *            属性值组id
+	 * @param groupName
+	 *            属性值组名称
+	 * @param propertyValueIds
+	 *            要关联到此属性值组的属性值ids
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/i18n/property/saveOrUpdatePropertyValueGroup.json")
 	public BackWarnEntity saveOrUpdatePropertyValueGroup(
@@ -164,6 +240,72 @@ public class NebulaPropertyValueController extends BaseController{
 			return FAILTRUE;
 		}
 
+	}
+
+	/**
+	 * 根据属性id查询下面所有的属性值ORDER BY proValue.sort_no ASC
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/findAllPropertyValueByPropertyId.json",method = RequestMethod.POST)
+	public BackWarnEntity findAllPropertyValueByPropertyId(@RequestParam("propertyId") Long propertyId){
+		BackWarnEntity backWarnEntity = new BackWarnEntity();
+		Page page = new Page(0, 10000);
+		try{
+			Pagination<PropertyValueCommand> properyValuePage = sdkPropertyManager.findPropertyValueByPage(page, null, propertyId, null);
+			List<PropertyValueCommand> propertyValueList = properyValuePage.getItems();
+			backWarnEntity.setIsSuccess(true);
+			backWarnEntity.setDescription(propertyValueList);
+		}catch (Exception e){
+			LOGGER.error("", e);
+			backWarnEntity.setIsSuccess(false);
+		}
+		return backWarnEntity;
+	}
+
+	/**
+	 * 根据属性id查询下面所有的属性值ORDER BY proValue.sort_no ASC
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/i18n/property/updatePropertyValueSortNoById.json",method = RequestMethod.POST)
+	public BackWarnEntity updatePropertyValueSortNoById(@RequestParam("result") String result){
+		BackWarnEntity backWarnEntity = new BackWarnEntity();
+		try{
+			String[] orderStrings = result.split("-");
+			for (int i = 0; i < orderStrings.length; i++){
+				String[] temp = orderStrings[i].split(",");
+				Long pvId = Long.valueOf(temp[0]);
+				Integer sortNo = Integer.valueOf(temp[1]);
+				Integer newSortNo = Integer.valueOf(temp[2]);
+				if (!sortNo.equals(newSortNo)){
+					sdkPropertyManager.updatePropertyValueSortById(pvId, newSortNo);
+				}
+			}
+			backWarnEntity.setIsSuccess(true);
+		}catch (Exception e){
+			LOGGER.error("", e);
+			backWarnEntity.setIsSuccess(false);
+		}
+		return backWarnEntity;
+	}
+
+	// @ResponseBody
+	// @RequestMapping(value = "/i18n/property/exportPropertyValue.json", method = RequestMethod.POST)
+	public String itemExport(
+			@RequestParam("industryId") Long industryId,
+			@RequestParam("selectCodes") String[] selectCodes,
+			@RequestParam(value = "itemCodes",required = false) String itemCodes,
+			HttpServletRequest request,
+			HttpServletResponse response){
+
+		return "json";
 	}
 
 }

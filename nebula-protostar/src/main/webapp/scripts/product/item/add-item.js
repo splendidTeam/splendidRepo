@@ -33,7 +33,8 @@ $j.extend(loxia.regional['zh-CN'],{
     "CUSTOM_PROPERTY_SAME":"填写的自定义属性相同",
     "SALES_PROPERTY_CHANGED":"销售属性已经更新，但是没有重新进行编码设置",
     "PLEASE_INPUT_ONE_SKU_CODE":"请输入至少一个sku编码",
-    "PLEASE_SET_DEF_CATEGORY":"请设定默认分类"
+    "PLEASE_SET_DEF_CATEGORY":"请设定默认分类",
+    "PLEASE_SELECT_PROPERTY_GROUP":"请选择属性分组"
 });
 var propertyArray  = new Array();
 var propertyNameArray  = new Array();
@@ -64,6 +65,10 @@ var propertyNameArray = new Array();
 var clickFlag = false;
 
 var spChangedFlag = false;
+
+//属性数量,全局范围，分组切换使用
+var num=0;
+
 
 var setting = {
 		check: {
@@ -1506,6 +1511,99 @@ function findItemPropertyByProvertyIdAndValue(propertyId,propertyValueId,propert
 	return null;
 }
 
+//obj 下拉框dom对象,type 属性类型(1:销售属性，2:普通属性) 两种属性生成HTML不同故做区分
+function changeProGroup(obj,type){
+		//获取分组下属性列表请求参数
+		var json={proGroupId:$j(obj).val(),propertyId:$j(obj).attr('propertyId')};
+		var backWarnEntity = loxia.syncXhr(base+'/item/findProGroupInfo.json', json,{type: "GET"});
+		var html = ""
+		//
+		if(backWarnEntity.isSuccess){
+	  		var propertyValueArray = backWarnEntity.description.propertyValueList;	
+	  		var property = backWarnEntity.description.property
+	  		var picUrl = "";
+			if(propertyValueArray!=null && propertyValueArray.length>0){
+				
+				if(type==1){
+					$j.each(propertyValueArray,function(j){
+						html+= "<div class='priDiv'><span class='children-store'>" +
+								"<input type='checkbox' class='spCkb'  name='propertyValueIds' editingType='4' " +
+								"pvId='"+propertyValueArray[j].id+"' propertyId='"+property.id+"' " +
+								"pvValue='"+propertyValueArray[j].value+"' propertyName='"+property.name+ "'" +
+								"value='"+propertyValueArray[j].id+"'>"+picUrl+propertyValueArray[j].value+"</input></span> </div>";
+						
+				     });
+				}else if(type==2){
+					$j.each(propertyValueArray,function(j,val){
+						html+= "<span class='children-store normalCheckBoxSpan'><input type='checkbox' class = 'normalCheckBoxCls' pid="+property.id+" mustCheck='"+property.name+"' name='' " +
+								"value='"+propertyValueArray[j].id+"'>"+propertyValueArray[j].value+"</input></span>";
+				     });
+					
+
+				}
+				
+				$j(obj).next().html(html);
+				$j(".normalCheckBoxCls").each(function(){
+					var curCheckBox = $j(this);
+					curCheckBox.change(function(){
+						drawNoSalePropEditing4Type(num);				
+					});
+				});
+				
+			}
+		}
+}
+
+
+
+
+function drawNoSalePropEditing4Type(curSize){
+	if(curSize==undefined ||curSize ==null){
+		curSize =0;
+	}
+	var tempNum =curSize;
+	//去除所有
+	$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").siblings().remove();
+	
+	$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").each(function(){
+		var pid=$j(this).attr("pid");
+		var pvid=$j(this).attr("pvid");
+		var isCheck =false;
+		$j(".normalCheckBoxCls").each(function(){
+			if(pid ==$j(this).attr("pid") &&pvid==$j(this).attr("value")){
+				if('checked' == $j(this).attr("checked")){
+					isCheck =true ;
+				}
+				return ;
+			}
+		});
+		if(isCheck){
+			var parent =$j(this).parent();
+			var ipropertiesHtml = "<input type='hidden' value='propertyId_toReplace' name='iProperties.propertyId'/>"+
+			"<input type='hidden' value='propertyValueId_toRepalce' name='iProperties.propertyValueId'/>"+
+			"<input type='hidden' value='' name='iProperties.id'><input type='hidden' value='' name='iProperties.propertyDisplayValue'><input type='hidden' value='' name='iProperties.createTime'><input type='hidden' value='' name='iProperties.modifyTime'><input type='hidden' value='' name='iProperties.version'><input type='hidden' value='' name='iProperties.itemId'><input type='hidden' value='' name='iProperties.picUrl'>";
+
+			if(i18nOnOff){
+			 	   for ( var j = 0; j < i18nLangs.length; j++) {
+							var i18nLang = i18nLangs[j];
+							ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.values["+tempNum+"-"+j+"]' value=''/>";
+							ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.langs["+tempNum+"-"+j+"]' value='"+i18nLang.key+"'/>";
+			 	   }
+			    }else{
+			    	ipropertiesHtml = ipropertiesHtml +"<input type='hidden'name='iProperties.propertyValue.value["+tempNum+"]' value=''/>";
+			    }
+			//}
+			ipropertiesHtml=ipropertiesHtml.replace("propertyId_toReplace", pid);
+			ipropertiesHtml=ipropertiesHtml.replace("propertyValueId_toRepalce", pvid);
+			parent.append(ipropertiesHtml);
+			tempNum ++;
+		}
+	});
+}
+
+
+
+
 $j(document).ready(function(){
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
@@ -1604,14 +1702,14 @@ $j(document).ready(function(){
     
     
 
-  //下一步
+    //下一步
 	$j(".button.orange.next").on("click",function(){
 		
 		$j("#secondBtnLineDiv").show();
 		$j("#firstBtnLineDiv").hide();
 		var ztree = $j.fn.zTree.getZTreeObj("industrytreeDemo");
 		var nodes_ = ztree.getCheckedNodes(true);
-		var num = 0;
+		num = 0;
 		if (nodes_.length>0) {
 			var industryId =nodes_[0].id;
 			var name = nodes_[0].name;
@@ -1645,8 +1743,17 @@ $j(document).ready(function(){
 							var html2 ="";
 							if(jsonArray[i].property.editingType == 4 && i18nLang.key == defaultlang){
 								jsonArray2 = jsonArray[i].propertyValueList;
+								
+								//属性值分组列表
+								jsonProGroupArray = jsonArray[i].propertyValueGroupList;
+								
 								var html1="";
 								var picUrl="";
+								
+								
+								// 属性分组相关HMTL
+								var html3 ="";  
+								
 								//如果选项值为空 不显示该多选框
 								if(jsonArray2!=null&&jsonArray2.length>0){
 									//销售属性
@@ -1663,10 +1770,22 @@ $j(document).ready(function(){
 												"value='"+jsonArray2[j].id+"'>"+picUrl+jsonArray2[j].value+"</input></span> </div>";
 										
 								     });
-										html2= "<div class='ui-block-line '><label style=''>"+jsonArray[i].property.name+"</label><div >"+
+									
+									//属性值分组处理
+									if(jsonProGroupArray != null && jsonProGroupArray.length>0){
+										 html3 = '<br><select  onchange="changeProGroup(this,1)" loxiaType="select"  propertyId="'+jsonArray[i].property.id+'">' ;
+										 html3 += '<option value="">'+nps.i18n("PLEASE_SELECT_PROPERTY_GROUP")+'</option>';
+										 $j.each(jsonProGroupArray, function (i) {
+										      html3 += '<option value="'+jsonProGroupArray[i].id + '">'+  jsonProGroupArray[i].name + '</option>';
+										 });
+										 html3 += "</select>"
+									}
+									
+									html2= "<div class='ui-block-line '><label style=''>"+jsonArray[i].property.name+"</label><div >"+
 										"<input type='hidden' value='"+ jsonArray[i].property.id +"'  name = 'propertyIds' />"+
 										"<input type='hidden' value=''  name='propertyValueInputIds' pid='"+jsonArray[i].property.id+"' />"+
-								          "<div class='wl-right-auto width-percent50 mt10'>"+
+										html3+
+								         "<div class='wl-right-auto width-percent50 mt10'>"+
 										          html1+
 								        " </div>"+
 								        " </div>"+
@@ -1734,15 +1853,23 @@ $j(document).ready(function(){
 						SalepropertySpaceHtmlObj.lang = i18nLang.key;
 						SalepropertySpaceHtmlArr.push(SalepropertySpaceHtmlObj);
 					}
-				}else{
+				}else{  //  i18nOn
 					var SalepropertySpaceHtml="";
 					$j.each(jsonArray,function(i,val){
 					   if(jsonArray[i].property.isSaleProp){
 						propertyIdArray[propertyIdArrayIndex] = jsonArray[i].property.id;
 						propertyIdArrayIndex++;
 						var html2 ="";
+						
+						// 属性分组相关HMTL
+						var html3 ="";  
 						if(jsonArray[i].property.editingType == 4){
+							
+							//属性值列表
 							jsonArray2 = jsonArray[i].propertyValueList;
+							
+							//属性值分组列表
+							jsonProGroupArray = jsonArray[i].propertyValueGroupList;
 							var html1="";
 							var picUrl="";
 							//如果选项值为空 不显示该多选框
@@ -1751,6 +1878,19 @@ $j(document).ready(function(){
 								propertyArray.push(jsonArray[i].property.id);
 								propertyNameArray.push(jsonArray[i].property.name);
 								//propSelectHtml+='<option value="'+jsonArray[i].property.name+'" }>'+jsonArray[i].property.name+'</option>';
+								
+								//属性值分组处理
+								if(jsonProGroupArray != null && jsonProGroupArray.length>0){
+									 html3 = '<br><select  onchange="changeProGroup(this,1)" loxiaType="select"  propertyId="'+jsonArray[i].property.id+'">' ;
+									 html3 += '<option value="">'+nps.i18n("PLEASE_SELECT_PROPERTY_GROUP")+'</option>';
+									 $j.each(jsonProGroupArray, function (i) {
+									      html3 += '<option value="'+jsonProGroupArray[i].id + '">'+  jsonProGroupArray[i].name + '</option>';
+									 });
+									 html3 += "</select>"
+								}
+								
+								
+								//属性值处理
 								$j.each(jsonArray2,function(j,val){
 									if(jsonArray[i].property.isColorProp && jsonArray[i].property.hasThumb ){
 										picUrl ="<img src='"+baseUrl+"/images/1.png'>";
@@ -1762,11 +1902,13 @@ $j(document).ready(function(){
 											"value='"+jsonArray2[j].id+"'>"+picUrl+jsonArray2[j].value+"</input></span> </div>";
 									
 							     });
-									html2= "<div class='ui-block-line '><label style=''>"+jsonArray[i].property.name+"</label><div >"+
+								
+								
+								
+								html2= "<div class='ui-block-line '><label style=''>"+jsonArray[i].property.name+"</label><div >"+
 									"<input type='hidden' value='"+ jsonArray[i].property.id +"'  name = 'propertyIds' />"+
 									"<input type='hidden' value='' name='propertyValueInputIds' pid='"+jsonArray[i].property.id+"' />"+
-							          "<div class='wl-right-auto width-percent50 mt10'>"+
-									          html1+
+									html3+"<div class='wl-right-auto width-percent50 mt10'>"+ html1+
 							        " </div>"+
 							        " </div>"+
 								    " </div>";
@@ -1958,10 +2100,30 @@ $j(document).ready(function(){
 								if(jsonArray[i].property.required){
 								    mustCheckArray.push(jsonArray[i].property.name);
 								}
+								
+								//属性值分组列表
+								jsonProGroupArray = jsonArray[i].propertyValueGroupList;
+								
+								//属性值分组处理
+								if(jsonProGroupArray != null && jsonProGroupArray.length>0){
+									html3 += '<br><select  onchange="changeProGroup(this,2)" loxiaType="select"  propertyId="'+jsonArray[i].property.id+'">' ;
+									html3 += '<option value="">'+nps.i18n("PLEASE_SELECT_PROPERTY_GROUP")+'</option>';
+									 $j.each(jsonProGroupArray, function (i) {
+										 html3 += '<option value="'+jsonProGroupArray[i].id + '">'+  jsonProGroupArray[i].name + '</option>';
+									 });
+									 html3 += "</select>"
+								}
+								
+								html3 += "<div>"
+								
 								$j.each(jsonArray2,function(j,val){
 									html3+= "<span class='children-store normalCheckBoxSpan'><input type='checkbox' class = 'normalCheckBoxCls' pid="+jsonArray[i].property.id+" mustCheck='"+jsonArray[i].property.name+"' name='' " +
-											"value='"+jsonArray2[j].id+"'>"+jsonArray2[j].value+"</input></span> ";
+											"value='"+jsonArray2[j].id+"'>"+jsonArray2[j].value+"</input></span>";
 							     });
+								
+								html3 += "</div>"
+
+								
 							}
 						}else if(jsonArray[i].property.editingType==5){
 							html3 = '<label>'+jsonArray[i].property.name+'</label>';
@@ -2070,7 +2232,9 @@ $j(document).ready(function(){
 				
 			
 	  		 }
-		}else{
+		}
+		// nodes_.length>0  end 
+		else{
 			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SYSTEM_ITEM_SELECT_INDUSTRY"));
 		}
 		//初始化id为colorPropertyContent的div内部的所有Loxia组件
@@ -2105,50 +2269,9 @@ $j(document).ready(function(){
 		});
 	});
 	
+	//  ($j.button.orange.next").on("click"..  end 
 	
-	function drawNoSalePropEditing4Type(curSize){
-		if(curSize==undefined ||curSize ==null){
-			curSize =0;
-		}
-		var tempNum =curSize;
-		//去除所有
-		$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").siblings().remove();
-		
-		$j(".hidBoxSpan").find("div[class='repNormalCheckBoxCls']").each(function(){
-			var pid=$j(this).attr("pid");
-			var pvid=$j(this).attr("pvid");
-			var isCheck =false;
-			$j(".normalCheckBoxCls").each(function(){
-				if(pid ==$j(this).attr("pid") &&pvid==$j(this).attr("value")){
-					if('checked' == $j(this).attr("checked")){
-						isCheck =true ;
-					}
-					return ;
-				}
-			});
-			if(isCheck){
-				var parent =$j(this).parent();
-				var ipropertiesHtml = "<input type='hidden' value='propertyId_toReplace' name='iProperties.propertyId'/>"+
-				"<input type='hidden' value='propertyValueId_toRepalce' name='iProperties.propertyValueId'/>"+
-				"<input type='hidden' value='' name='iProperties.id'><input type='hidden' value='' name='iProperties.propertyDisplayValue'><input type='hidden' value='' name='iProperties.createTime'><input type='hidden' value='' name='iProperties.modifyTime'><input type='hidden' value='' name='iProperties.version'><input type='hidden' value='' name='iProperties.itemId'><input type='hidden' value='' name='iProperties.picUrl'>";
 
-				if(i18nOnOff){
-				 	   for ( var j = 0; j < i18nLangs.length; j++) {
-								var i18nLang = i18nLangs[j];
-								ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.values["+tempNum+"-"+j+"]' value=''/>";
-								ipropertiesHtml = ipropertiesHtml+ "<input type='hidden' name='iProperties.propertyValue.langs["+tempNum+"-"+j+"]' value='"+i18nLang.key+"'/>";
-				 	   }
-				    }else{
-				    	ipropertiesHtml = ipropertiesHtml +"<input type='hidden'name='iProperties.propertyValue.value["+tempNum+"]' value=''/>";
-				    }
-				//}
-				ipropertiesHtml=ipropertiesHtml.replace("propertyId_toReplace", pid);
-				ipropertiesHtml=ipropertiesHtml.replace("propertyValueId_toRepalce", pvid);
-				parent.append(ipropertiesHtml);
-				tempNum ++;
-			}
-		});
-	}
 	
 	
 	
@@ -2525,5 +2648,10 @@ $j(document).ready(function(){
 			}
 		});
 	}
+	
+
+	
+	
+	
 	
 });
