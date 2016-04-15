@@ -41,13 +41,13 @@ public class NebulaForgetPasswordController extends BaseController{
 	private static final Logger			LOG							= LoggerFactory.getLogger(NebulaForgetPasswordController.class);
 
 	/* 忘记密码的页面定义 */
-	public static final String			VIEW_FORGET_PASSWORD		= "store.login.forgetpassword";
+	public static final String			VIEW_FORGET_PASSWORD		= "member.forgetpassword";
 
 	/* 重置密码的页面定义 */
-	public static final String			VIEW_RESET_PASSWORD			= "store.login.resetpassword";
+	public static final String			VIEW_RESET_PASSWORD			= "member.resetpassword";
 
 	/* 重置密码成功的页面定义 */
-	public static final String			VIEW_RESET_PASSWORD_SUCCESS	= "resetpassword.success";
+	public static final String			VIEW_RESET_PASSWORD_SUCCESS	= "member.resetpassword.success";
 
 	/* 页面传递过来的密码 */
 	public static final String			PASSWORD					= "password";
