@@ -207,21 +207,22 @@ public class ItemController extends BaseController{
 	@RequestMapping(value = "/item/createItem.htm")
 	public String createItem(Model model){
 		// 查询orgId
-		UserDetails userDetails = this.getUserDetails();
-
-		ShopCommand shopCommand = null;
-		Long shopId = 0L;
-
-		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
-		if (currentOrgId != null){
-			shopCommand = shopManager.findShopByOrgId(currentOrgId);
-			shopId = shopCommand.getShopid();
-		}
+//		UserDetails userDetails = this.getUserDetails();
+//
+//		ShopCommand shopCommand = null;
+//		Long shopId = 0L;
+//
+//		Long currentOrgId = userDetails.getCurrentOrganizationId();
+//		// 根据orgId查询shopId
+//		if (currentOrgId != null){
+//			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+//			shopId = shopCommand.getShopid();
+//		}
 
 		Sort[] sorts = Sort.parse("id desc");
 		// 获取行业信息
-		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts), shopId);
+//		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts), shopId);
+		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts));
 		model.addAttribute("industryList", industryList);
 		// 分类列表
 		sorts = Sort.parse("parent_id asc,sort_no asc");
@@ -258,12 +259,12 @@ public class ItemController extends BaseController{
 	 * @param industryList
 	 * @return
 	 */
-	private List<Map<String, Object>> processIndusgtryList(List<Industry> industryList,Long shopId){
+	private List<Map<String, Object>> processIndusgtryList(List<Industry> industryList){
 		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		List<ShopProperty> shopPropertyList = new ArrayList<ShopProperty>();
-		if (shopId != null){
-			shopPropertyList = shopManager.findShopPropertyByshopId(shopId);
-		}
+//		List<ShopProperty> shopPropertyList = new ArrayList<ShopProperty>();
+//		if (shopId != null){
+//			shopPropertyList = shopManager.findShopPropertyByshopId(shopId);
+//		}
 		for (Industry indu : industryList){
 			Map<String, Object> map = new HashMap<String, Object>();
 
@@ -278,47 +279,49 @@ public class ItemController extends BaseController{
 				}
 
 			}
+			
+			map.put("isShow", true);
 
-			if (shopPropertyList != null){
-				for (int i = 0; i < shopPropertyList.size(); i++){
-					if (indu.getId().equals(shopPropertyList.get(i).getIndustryId())){
-						map.put("checked", "true");
-						// map.put("open", true);
-						break;
-					}
-				}
-			}
+//			if (shopPropertyList != null){
+//				for (int i = 0; i < shopPropertyList.size(); i++){
+//					if (indu.getId().equals(shopPropertyList.get(i).getIndustryId())){
+//						map.put("checked", "true");
+//						// map.put("open", true);
+//						break;
+//					}
+//				}
+//			}
 			resultList.add(map);
 		}
-		if (shopPropertyList != null){
-			for (int i = 0; i < shopPropertyList.size(); i++){
-				for (Map<String, Object> map : resultList){
-					String industryId = shopPropertyList.get(i).getIndustryId().toString();
-					String mapId = map.get("id").toString();
-					if (industryId.equals(mapId)){
-						searchChecked(resultList, shopPropertyList.get(i).getIndustryId().toString());
-					}
-
-				}
-
-			}
-		}
+//		if (shopPropertyList != null){
+//			for (int i = 0; i < shopPropertyList.size(); i++){
+//				for (Map<String, Object> map : resultList){
+//					String industryId = shopPropertyList.get(i).getIndustryId().toString();
+//					String mapId = map.get("id").toString();
+//					if (industryId.equals(mapId)){
+//						searchChecked(resultList, shopPropertyList.get(i).getIndustryId().toString());
+//					}
+//
+//				}
+//
+//			}
+//		}
 
 		return resultList;
 	}
 
 	// 递归用于筛选checked
-	static void searchChecked(List<Map<String, Object>> resultList,String id){
-		for (Map<String, Object> map : resultList){
-			if (map.get("id").toString().equals(id)){
-				map.put("isShow", true);
-				if (!map.get("pId").toString().equals("0")){
-					searchChecked(resultList, map.get("pId").toString());
-				}
-			}
-
-		}
-	}
+//	static void searchChecked(List<Map<String, Object>> resultList,String id){
+//		for (Map<String, Object> map : resultList){
+//			if (map.get("id").toString().equals(id)){
+//				map.put("isShow", true);
+//				if (!map.get("pId").toString().equals("0")){
+//					searchChecked(resultList, map.get("pId").toString());
+//				}
+//			}
+//
+//		}
+//	}
 
 	/**
 	 * 下一步按钮
@@ -329,9 +332,8 @@ public class ItemController extends BaseController{
 	@RequestMapping("/item/findDynamicPropertis.json")
 	@ResponseBody
 	public Object findDynamicPropertis(Model model,@RequestParam("industryId") Long industryId){
-		// 根据行业Id和店铺Id查找对应属性和属性值
-		List<DynamicPropertyCommand> dynamicPropertyCommandList = this.findDynamicPropertisByShopIdAndIndustryId(industryId);
-
+		// 根据行业Id查找对应属性和属性值
+		List<DynamicPropertyCommand> dynamicPropertyCommandList =itemManager.findDynamicPropertisByIndustryId(industryId);
 		SUCCESS.setDescription(dynamicPropertyCommandList);
 		return SUCCESS;
 	}
@@ -339,8 +341,8 @@ public class ItemController extends BaseController{
 	@RequestMapping("/item/findDynamicPropertisJson.json")
 	@ResponseBody
 	public Object findDynamicPropertisJson(Model model,@RequestParam("industryId") Long industryId){
-		// 根据行业Id和店铺Id查找对应属性和属性值
-		List<DynamicPropertyCommand> dynamicPropertyCommandList = this.findDynamicPropertisByShopIdAndIndustryId(industryId);
+		// 根据行业Id查找对应属性和属性值
+		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisByIndustryId(industryId);
 		JSONArray dynamicPropertyCommandListJson = new JSONArray(dynamicPropertyCommandList, "***");
 		String dynamicPropertyCommandListJsonStr = dynamicPropertyCommandListJson.toString();
 		SUCCESS.setDescription(dynamicPropertyCommandListJsonStr);
@@ -358,23 +360,23 @@ public class ItemController extends BaseController{
 	}
 	
 	
-	public List<DynamicPropertyCommand> findDynamicPropertisByShopIdAndIndustryId(Long industryId){
-		// 查询orgId
-		UserDetails userDetails = this.getUserDetails();
-
-		ShopCommand shopCommand = null;
-		Long shopId = 0L;
-
-		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
-		if (currentOrgId != null){
-			shopCommand = shopManager.findShopByOrgId(currentOrgId);
-			shopId = shopCommand.getShopid();
-		}
-		// 根据行业Id和店铺Id查找对应属性和属性值
-		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisWidthoutCommonProperty(shopId, industryId);
-		return dynamicPropertyCommandList;
-	}
+//	public List<DynamicPropertyCommand> findDynamicPropertisByShopIdAndIndustryId(Long industryId){
+//		// 查询orgId
+//		UserDetails userDetails = this.getUserDetails();
+//
+//		ShopCommand shopCommand = null;
+//		Long shopId = 0L;
+//
+//		Long currentOrgId = userDetails.getCurrentOrganizationId();
+//		// 根据orgId查询shopId
+//		if (currentOrgId != null){
+//			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+//			shopId = shopCommand.getShopid();
+//		}
+//		// 根据行业Id和店铺Id查找对应属性和属性值
+//		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisByIndustryId(industryId);
+//		return dynamicPropertyCommandList;
+//	}
 
 	@RequestMapping("/item/saveItem.json")
 	@ResponseBody
@@ -402,10 +404,10 @@ public class ItemController extends BaseController{
 
 		SkuPropertyCommand[] skuPropertyCommandArray = getCmdArrrayFromRequest(request, propertyIds, propertyValueInputs);
 
-		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
+//		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
 		
 		// 保存商品
-		Item item = itemManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray,groupRelation);
+		Item item = itemManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
@@ -461,9 +463,9 @@ public class ItemController extends BaseController{
 				propertyIds,
 				propertyValueInputs,
 				propertyValueInputIds);
-		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
+//		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
 		// 保存商品
-		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray,groupRelation);
+		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
@@ -1649,7 +1651,7 @@ public class ItemController extends BaseController{
 		// 查找商品属性及属性值
 		List<ItemPropertiesCommand> itemProperties = itemManager.findItemPropertiesCommandListyByItemId(Long.valueOf(itemId));
 		// 根据行业Id和店铺Id查找对应属性和属性值
-		List<DynamicPropertyCommand> dynamicPropertyCommandList = this.findDynamicPropertisByShopIdAndIndustryId(item.getIndustryId());
+		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisByIndustryId(item.getIndustryId());
 		List<Object> propertyIdArray = new ArrayList<Object>();
 		List<Object> propertyNameArray = new ArrayList<Object>();
 		List<Object> mustCheckArray = new ArrayList<Object>();
@@ -2415,22 +2417,22 @@ public class ItemController extends BaseController{
 		return backWarnEntity;
 	}
 	
-	//获取商品属性值分组信息
-	private List<ItemProValGroupRelation> getItemProValueGroupRelation(HttpServletRequest request,Long[] propertyIds){
-		List<ItemProValGroupRelation> list = new ArrayList<ItemProValGroupRelation>();
-		if(propertyIds!=null && propertyIds.length>0){
-			for(Long propertyId:propertyIds){
-				String proValGroupId  = request.getParameter("proGroup_"+propertyId);
-				//存在分组并选择
-				if(proValGroupId !=null && proValGroupId.length()>0){
-					ItemProValGroupRelation relation = new ItemProValGroupRelation();
-					relation.setItemPropertyId(propertyId);
-					relation.setPropertyValueGroupId(Long.parseLong(proValGroupId));
-					list.add(relation);
-				}
-			}
-		}
-		return list;
-	}
-	
+//	//获取商品属性值分组信息
+//	private List<ItemProValGroupRelation> getItemProValueGroupRelation(HttpServletRequest request,Long[] propertyIds){
+//		List<ItemProValGroupRelation> list = new ArrayList<ItemProValGroupRelation>();
+//		if(propertyIds!=null && propertyIds.length>0){
+//			for(Long propertyId:propertyIds){
+//				String proValGroupId  = request.getParameter("proGroup_"+propertyId);
+//				//存在分组并选择
+//				if(proValGroupId !=null && proValGroupId.length()>0){
+//					ItemProValGroupRelation relation = new ItemProValGroupRelation();
+//					relation.setItemPropertyId(propertyId);
+//					relation.setPropertyValueGroupId(Long.parseLong(proValGroupId));
+//					list.add(relation);
+//				}
+//			}
+//		}
+//		return list;
+//	}
+//	
 }

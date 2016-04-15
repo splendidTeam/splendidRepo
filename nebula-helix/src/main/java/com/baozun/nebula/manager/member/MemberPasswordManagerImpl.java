@@ -7,15 +7,9 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-/**
- * 
- * @author Wanrong.Wang 2016/03/30
- * 
- * @Transactional
- * @Service("MemberPasswordManager")
- * 
- */
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.EmailConstants;
@@ -26,6 +20,7 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
+import com.feilong.core.Alphabet;
 import com.feilong.core.util.RandomUtil;
 
 /**
@@ -42,12 +37,18 @@ import com.feilong.core.util.RandomUtil;
  * @author Wanrong.Wang
  * @Date 2016/04/01
  */
+
+@Transactional
+@Service("memberPasswordManager")
 public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
-	private static final Logger	LOG				= LoggerFactory.getLogger(MemberPasswordManagerImpl.class);
+	private static final Logger	LOG						= LoggerFactory.getLogger(MemberPasswordManagerImpl.class);
 
 	/* 验证码的生存时间 */
-	private static final int	MAX_EXIST_TIME	= 60;
+	private static final int	MAX_EXIST_TIME			= 60;
+
+	/* 验证码的位数 */
+	private static final int	VALIDATE_CODE_LENGTH	= 4;
 
 	@Autowired
 	private SdkMemberManager	sdkMemberManager;
@@ -61,7 +62,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	@Autowired
 	private TokenManager		tokenManager;
 
-	public static final String	BUSINESS_CODE	= "FORGET_PASSWORD_BUSINESS";
+	public static final String	BUSINESS_CODE			= "FORGET_PASSWORD_BUSINESS";
 
 	/**
 	 * 发送验证码的方法
@@ -124,8 +125,10 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		// 对应邮箱的用户存在
 		if (memberCommand != null){
 
+			// 所有数字和大小写字母的组合
+			String str = Alphabet.DECIMAL_AND_LETTERS;
 			// 生成验证码
-			String code = RandomUtil.createRandomFromString("待定", 4);
+			String code = RandomUtil.createRandomFromString(str, VALIDATE_CODE_LENGTH);
 
 			// 保存发送的验证码到redis中
 			tokenManager.saveToken(BUSINESS_CODE, email, MAX_EXIST_TIME, code);
@@ -159,8 +162,11 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		// 对应手机号的用户存在
 		if (memberCommand != null){
 
+			// 所有数字和大小写字母的组合
+			String str = Alphabet.DECIMAL_AND_LETTERS;
+
 			// 生成验证码
-			String code = RandomUtil.createRandomFromString("待定", 4);
+			String code = RandomUtil.createRandomFromString(str, VALIDATE_CODE_LENGTH);
 
 			// 保存验证码到redis中，并且设置验证码的生存时间
 			tokenManager.saveToken(BUSINESS_CODE, mobile, MAX_EXIST_TIME, code);
