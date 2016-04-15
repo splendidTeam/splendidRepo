@@ -39,6 +39,7 @@ import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
 import com.baozun.nebula.dao.product.ItemInfoLangDao;
+import com.baozun.nebula.dao.product.ItemProValGroupRelationDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemPropertiesLangDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
@@ -50,6 +51,7 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemInfoLang;
+import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
 import com.baozun.nebula.model.product.PropertyValue;
@@ -89,6 +91,9 @@ public class ItemLangManagerImpl implements ItemLangManager {
 
 	@Autowired
 	private ItemInfoLangDao itemInfoLangDao;
+	
+	@Autowired
+	private ItemProValGroupRelationDao itemProValGroupRelationDao;
 
 	@Autowired
 	private ItemManager itemManager;
@@ -100,7 +105,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	public Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties,
-			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception {
+			SkuPropertyMUtlLangCommand[] skuPropertyCommand,
+			List<ItemProValGroupRelation> groupRelation) throws Exception {
 
 		Item item = null;
 		if (itemCommand.getId() != null) {// 更新
@@ -142,6 +148,14 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		
 		ItemI18nCommand itemI18nCommand = new ItemI18nCommand();
 		itemI18nCommand.setItem(item);
+		
+		//商品属性值分组
+		if(groupRelation.size()>0){
+			for(ItemProValGroupRelation relation: groupRelation){
+				itemProValGroupRelationDao.save(relation);
+			}
+		}
+		
 		
 		// 商品所有的属性值集合
 		List<ItemPropertiesCommand> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand, itemI18nCommand);
@@ -216,34 +230,12 @@ public class ItemLangManagerImpl implements ItemLangManager {
 			for (SkuPropertyMUtlLangCommand spc : skuPropertyCommandArray) {
 				Long skuId = spc.getId();
 				String extentionCode = spc.getCode();
-
-				/*
-				 * 检察sku表中是否存在, itemId, out_id,
-				 * item_properties与提交的都一致,且lifecycle=0的信息 1, 存在: 修改lifecycle=1
-				 * 2, 不存在: 新增一条记录
-				 */
 				String skuItemProperties = getSkuItemProperties(spc, savedItemProperties);
-				Map<String, Object> paraMap = new HashMap<String, Object>();
-				paraMap.put("itemId", itemId);
-				paraMap.put("itemProperties", skuItemProperties);
-				paraMap.put("outId", extentionCode);
-				paraMap.put("lifecycle", Sku.LIFECYCLE_DISABLE);
-				List<Sku> savedSkuList = skuDao.findSkuWithParaMap(paraMap);
 
-				if (null != savedSkuList && !savedSkuList.isEmpty()) {
-					for (Sku sku : savedSkuList) {
-						sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
-						skuDao.save(sku);
-						break;
-					}
-				} else if (skuId == null) {// 新增
-					Sku skunew = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
-					returnList.add(skunew);
-				} else {// 修改
-
+				Sku savedSku = null;
+				if (skuId != null) {// 修改
 					/* 如果修改了extention_code , 将该sku的lifecycle设置为0, 并新增一条数据 */
 					Sku dbSku = skuDao.findSkuById(skuId);
-					Sku savedSku = null;
 					if (extentionCode.equals(dbSku.getOutid())) {
 						Sku skuToBeUpdate = skuDao.getByPrimaryKey(skuId);
 						skuToBeUpdate.setListPrice(spc.getListPrice());
@@ -256,9 +248,33 @@ public class ItemLangManagerImpl implements ItemLangManager {
 
 						savedSku = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
 					}
+				} else {
+					/*
+					 * 检察sku表中是否存在, itemId, out_id,
+					 * item_properties与提交的都一致,且lifecycle=0的信息 1, 存在:
+					 * 修改lifecycle=1 2, 不存在: 新增一条记录
+					 */
 
-					returnList.add(savedSku);
+					Map<String, Object> paraMap = new HashMap<String, Object>();
+					paraMap.put("itemId", itemId);
+					paraMap.put("itemProperties", skuItemProperties);
+					paraMap.put("outId", extentionCode);
+					paraMap.put("lifecycle", Sku.LIFECYCLE_DISABLE);
+					List<Sku> savedSkuList = skuDao.findSkuWithParaMap(paraMap);
+
+					if (null != savedSkuList && !savedSkuList.isEmpty()) {
+						for (Sku sku : savedSkuList) {
+							sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
+							sku.setListPrice(spc.getListPrice());
+							sku.setSalePrice(spc.getSalePrice());
+							savedSku = skuDao.save(sku);
+							break;
+						}
+					} else if (skuId == null) {// 新增
+						savedSku = createSkuBySkuPropertyCommand(skuItemProperties, spc, itemId);
+					}
 				}
+				returnList.add(savedSku);
 			}
 			// 获得要删除的skuId集合
 			List<Long> skuToBeDelList = new ArrayList<Long>();
@@ -515,7 +531,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 					String description = null;
 					if(descriptions!=null && descriptions.length>0){
 						description = descriptions[i];
-					}
+					} 
 					String sketch= null;
 					if(sketchs!=null && sketchs.length>0){
 						sketch = sketchs[i];

@@ -34,6 +34,100 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="PropertyValue.findMaxSortNoByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT max(sort_no) AS CNT FROM t_pd_property_value WHERE property_id=:propertyId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="PropertyValue.findPropertyValueWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT proValue.* FROM t_pd_property_value proValue WHERE proValue.property_id=:propertyId
+					
+					#if($proValGroupId)
+					AND proValue.id  IN (
+						SELECT pro_value_id FROM t_pd_property_value_group_relation WHERE pro_val_group_id =:proValGroupId
+					) 
+					#end
+					
+					ORDER BY proValue.sort_no
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.updatePropertyValueSortById" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					UPDATE t_pd_property_value SET sort_no =:sortNo  WHERE id=:id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValueLang.deleteByPropertyValueIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					delete from t_pd_property_value_lang where PROPERTY_VALUE_ID in(
+		       		 #foreach($tid in $pvIds)
+		       			 $tid,
+		       		 #end
+		       		-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValueLang.findCountByPVIdAndLangValue" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					SELECT proValue.* FROM t_pd_property_value proValue
+					LEFT JOIN t_pd_property_value_lang proValueLang ON proValue.id = proValueLang.property_value_id
+					WHERE
+					 proValue.property_id =:propertyId
+					AND 
+					--proValueLang.lang='zh_CN' AND
+					 proValueLang.value=:langValue
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PropertyValue.findPropertyValueLangByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                   select
+                   		*
+                   from
+                   		t_pd_property_value_lang
+                   where
+                   		property_value_id in(
+                   			select id from t_pd_property_value where property_id=:propertyId
+                   		)
+                   		and lang in(
+		                   	#foreach($lang in $langs)
+		                   		'$lang',
+		                   	#end
+		                   	'-1'
+		                ) 
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 	
 </beans>

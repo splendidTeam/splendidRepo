@@ -23,6 +23,9 @@ import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
@@ -160,6 +163,15 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	PropertyValue findpropervalueId(@QueryParam("mapvalue") Map<String, String> mapvalue,@QueryParam("valuecolor") String valuecolor);
 
 	/**
+	 * 通过属性值分组ID找到相对的属性值列表
+	 * 
+	 * @param proGroupId
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	List<PropertyValue> findByProGroupId(@QueryParam("proGroupId") Long proGroupId);
+
+	/**
 	 * @param propertyIds
 	 * @return
 	 */
@@ -189,4 +201,57 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	 */
 	@NativeQuery(model = PropertyValue.class)
 	List<PropertyValue> findFreeGroupPropertyValue(@QueryParam("propertyId") Long propertyId,@QueryParam("proValGroupId") Long proValGroupId);
+
+	/**
+	 * 根据属性id查询属性值排序的最大值
+	 * 
+	 * @param propertyId
+	 *            属性id
+	 * @return
+	 */
+	@NativeQuery(alias = "CNT",clazzes = Integer.class)
+	Integer findMaxSortNoByPropertyId(@QueryParam("propertyId") Long propertyId);
+
+	/**
+	 * 分页查询属性值
+	 * 
+	 * @param page
+	 * @param sorts
+	 * @param propertyId
+	 *            属性id
+	 * @param proValueGroupId
+	 *            属性值组id
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	Pagination<PropertyValue> findPropertyValueWithPage(
+			Page page,
+			Sort[] sorts,
+			@QueryParam("propertyId") Long propertyId,
+			@QueryParam("proValGroupId") Long proValGroupId);
+
+	/**
+	 * 根据属性值id更新排序
+	 * 
+	 * @param id
+	 *            属性值id
+	 * @param sortNo
+	 * @return
+	 */
+	@NativeUpdate
+	Integer updatePropertyValueSortById(@QueryParam("id") Long id,@QueryParam("sortNo") Integer sortNo);
+	
+	
+	/**
+	 * 根据propertyId和语言查询propertyValue的国际化的值
+	 * @return List<PropertyValueLang>
+	 * @param propertyId
+	 * @param langs
+	 * @author 冯明雷
+	 * @time 2016年4月14日上午11:20:06
+	 */
+	@NativeQuery(model = PropertyValueLang.class)
+	List<PropertyValueLang> findPropertyValueLangByPropertyId(
+			@QueryParam("propertyId") Long propertyId,
+			@QueryParam("langs") List<String> langs);
 }

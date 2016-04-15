@@ -12,6 +12,7 @@
 <script type="text/javascript" src="/scripts/ckeditor/4-4-5/ckeditor.js"></script>
 <script type="text/javascript">	
 var itemCodeValidMsg = "${itemCodeValidMsg}";
+
 </script>
 <script type="text/javascript" src="${base}/scripts/product/item/update-item.js"></script>
 <SCRIPT type="text/javascript">	
@@ -403,7 +404,15 @@ display: none;
 						           <c:if test="${dynamicPropertyCommand.property.editingType==4 }">
 						             <c:if test="${not empty dynamicPropertyCommand.propertyValueList}">
 							         <label>${dynamicPropertyCommand.property.name }</label>
-
+									 <c:if test="${fn:length(dynamicPropertyCommand.propertyValueGroupList)>0}">
+										 <select  loxiaType="select" onchange="changeProGroup(this,2)"  propertyId='${dynamicPropertyCommand.property.id }'>
+										 	<option value=""><spring:message code="item.update.proGroupSelect" /></option>
+										 	<c:forEach var="propertyValueGroup"  items="${dynamicPropertyCommand.propertyValueGroupList}">
+										 		<option value="${propertyValueGroup.id}">${propertyValueGroup.name}</option>
+										 	</c:forEach>
+										 </select>
+									  </c:if>
+									  <div>
 							          <c:forEach var="propertyValue" items="${dynamicPropertyCommand.propertyValueList}">
 								     	 <div class="priDiv">
 									          	 <span class="children-store  normalCheckBoxSpan">
@@ -417,7 +426,9 @@ display: none;
 									          	 </span> 
 								         </div>
 								        </c:forEach>
+								        </div>
 								      </c:if>
+								      
 						          </c:if>
 						           <c:if test="${dynamicPropertyCommand.property.editingType==5 }">
 						             <%-- <c:if test="${not empty dynamicPropertyCommand.propertyValueList}"> --%>
@@ -636,7 +647,19 @@ display: none;
 						           <c:if test="${dynamicPropertyCommand.property.editingType==4 }">
 						             <c:if test="${not empty dynamicPropertyCommand.propertyValueList}">
 							         <label>${dynamicPropertyCommand.property.name }</label>
-
+							         
+							         <%-- 属性值分组  start --%>
+									 <c:if test="${fn:length(dynamicPropertyCommand.propertyValueGroupList)>0}">
+										 <select  loxiaType="select" onchange="changeProGroup(this,2)"  propertyId='${dynamicPropertyCommand.property.id }'>
+										 	<option value=""><spring:message code="item.update.proGroupSelect" /></option>
+										 	<c:forEach var="propertyValueGroup"  items="${dynamicPropertyCommand.propertyValueGroupList}">
+										 		<option value="${propertyValueGroup.id}">${propertyValueGroup.name}</option>
+										 	</c:forEach>
+										 </select>
+									  </c:if>
+									  <%-- 属性值分组  end --%>
+									  
+									  <div>
 							          <c:forEach var="propertyValue" items="${dynamicPropertyCommand.propertyValueList}">
 								     	 <div class="priDiv">
 									          	 <span class="children-store  normalCheckBoxSpan">
@@ -650,6 +673,7 @@ display: none;
 									          	 </span> 
 								         </div>
 								        </c:forEach>
+								        </div>
 								      </c:if>
 						          </c:if>
 						           <c:if test="${dynamicPropertyCommand.property.editingType==5 }">
@@ -743,35 +767,48 @@ display: none;
 	          <c:if test="${dynamicPropertyCommand.property.isSaleProp }">
 			        <div class="ui-block-line ">
 			        <c:if test="${ dynamicPropertyCommand.property.editingType == 4 && lang == defaultlang}">
-			         <c:if test="${not empty dynamicPropertyCommand.propertyValueList}">
-				         <label>${dynamicPropertyCommand.property.name }</label>
-				         <input type='hidden' value='${dynamicPropertyCommand.property.id }'  name = 'propertyIds' />
-						 <input type='hidden' value='' name='propertyValueInputIds' pid='${dynamicPropertyCommand.property.id}' />
-					          <c:forEach var="propertyValue" items="${dynamicPropertyCommand.propertyValueList}">
-						     	 <div class="priDiv">
-							          	 <span class="children-store">
-								          	 <input type="checkbox" class='spCkb' name="propertyValueIds"  
-								          	 pvId="${propertyValue.id }"
-								          	 pvValue="${propertyValue.value }"
-								          	 propertyId="${dynamicPropertyCommand.property.id }" 
-								          	 propertyName ="${dynamicPropertyCommand.property.name }"
-								          	 value="${propertyValue.id }"
-								          	 
-								          	   <c:forEach var="itemProperty" items="${itemProperties}">
-								          	      <c:if test="${itemProperty.propertyValueId==propertyValue.id }">
-								          	        checked=checked 
-								          	      </c:if>
-								          	   </c:forEach>
-								          	 
-								          	  />
-								          	  <c:if test="${dynamicPropertyCommand.property.isColorProp && dynamicPropertyCommand.property.hasThumb }">
-							             	      <img src="${base}/images/1.png">
-							                  </c:if>
-								          	  ${propertyValue.value }
-							          	 </span> 
-						         </div>
-					        </c:forEach>
-				      	 </c:if>
+				        <c:if test="${not empty dynamicPropertyCommand.propertyValueList}">
+					         <label>${dynamicPropertyCommand.property.name }</label>
+					         <input type='hidden' value='${dynamicPropertyCommand.property.id }'  name = 'propertyIds' />
+							 <input type='hidden' value='' name='propertyValueInputIds' pid='${dynamicPropertyCommand.property.id}' />
+						
+						  	 <%-- 属性值分组  start --%>
+							 <c:if test="${fn:length(dynamicPropertyCommand.propertyValueGroupList)>0}">
+								 <select  loxiaType="select" onchange="changeProGroup(this,1)"  propertyId='${dynamicPropertyCommand.property.id }'>
+								 	<option value=""><spring:message code="item.update.proGroupSelect" /></option>
+								 	<c:forEach var="propertyValueGroup"  items="${dynamicPropertyCommand.propertyValueGroupList}">
+								 		<option value="${propertyValueGroup.id}">${propertyValueGroup.name}</option>
+								 	</c:forEach>
+								 </select>
+							  </c:if>
+							  <%-- 属性值分组  end --%>
+							  
+							    <div>
+						          <c:forEach var="propertyValue" items="${dynamicPropertyCommand.propertyValueList}">
+							     	 <div class="priDiv">
+								          	 <span class="children-store">
+									          	 <input type="checkbox" class='spCkb' name="propertyValueIds"  
+									          	 pvId="${propertyValue.id }"
+									          	 pvValue="${propertyValue.value }"
+									          	 propertyId="${dynamicPropertyCommand.property.id }" 
+									          	 propertyName ="${dynamicPropertyCommand.property.name }"
+									          	 value="${propertyValue.id }"
+									          	   <c:forEach var="itemProperty" items="${itemProperties}">
+									          	      <c:if test="${itemProperty.propertyValueId==propertyValue.id }">
+									          	        checked=checked 
+									          	      </c:if>
+									          	   </c:forEach>
+									          	 
+									          	  />
+									          	  <c:if test="${dynamicPropertyCommand.property.isColorProp && dynamicPropertyCommand.property.hasThumb }">
+								             	      <img src="${base}/images/1.png">
+								                  </c:if>
+									          	  ${propertyValue.value }
+								          	 </span> 
+							         </div>
+						          </c:forEach>
+						        </div>
+					      	 </c:if>
 				      	 </c:if>
 				         <c:if test="${ dynamicPropertyCommand.property.editingType == 5 }">
 				         	  <label>${dynamicPropertyCommand.property.name }</label>
@@ -836,7 +873,16 @@ display: none;
 				         <label>${dynamicPropertyCommand.property.name }</label>
 				         <input type='hidden' value='${dynamicPropertyCommand.property.id }'  name = 'propertyIds' />
 						 <input type='hidden' value='' name='propertyValueInputIds' pid='${dynamicPropertyCommand.property.id}' />
-					
+							 <c:if test="${fn:length(dynamicPropertyCommand.propertyValueGroupList)>0}">
+								 <select  loxiaType="select" onchange="changeProGroup(this,1)"  propertyId='${dynamicPropertyCommand.property.id }'>
+								 	<option value=""><spring:message code="item.update.proGroupSelect" /></option>
+								 	<c:forEach var="propertyValueGroup"  items="${dynamicPropertyCommand.propertyValueGroupList}">
+								 		<option value="${propertyValueGroup.id}">${propertyValueGroup.name}</option>
+								 	</c:forEach>
+								 </select>
+							  </c:if>
+							 
+							  <div>
 					          <c:forEach var="propertyValue" items="${dynamicPropertyCommand.propertyValueList}">
 						     	 <div class="priDiv">
 							          	 <span class="children-store">
@@ -861,6 +907,7 @@ display: none;
 							          	 </span> 
 						         </div>
 					        </c:forEach>
+					        </div>
 				      	 </c:if>
 					   </c:if>
 				         <c:if test="${ dynamicPropertyCommand.property.editingType == 5 }">

@@ -1,7 +1,8 @@
 $j.extend(loxia.regional['zh-CN'],{
     "LABEL_PROPERTY_GROUP":"所属分组",
     "INFO_PROPERTY_VALUE_GROUP_NAME_EMPTY":"请填写属性值组名称！",
-    "SYS_ERROR":"系统异常！"
+    "SYS_ERROR":"系统异常！",
+    "INFO_TITLE_DATA":"系统提示"
 });
 
 var editPropertyValue= base + '/i18n/property/editPropertyValue.htm';

@@ -63,9 +63,9 @@ public class RSAEncryptor implements Encryptor {
 	private String strPublicKey;
 	
 	public RSAEncryptor(){
-		String privateKeyPlace = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey");	
+		String privateKeyPlace =ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey");	
 		String publicKeyPlace = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.publicKey");	
-		String pkcs8 = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.publicKey.pkcs8");	
+		String pkcs8 = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey.pkcs8");	
 		
 		assert privateKeyPlace != null : "Cannot find Configuration for RSA Private Key";
 		assert publicKeyPlace != null : "Cannot find Configuration for RSA Public Key";

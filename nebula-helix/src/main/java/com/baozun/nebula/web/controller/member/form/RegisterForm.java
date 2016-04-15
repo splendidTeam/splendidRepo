@@ -95,7 +95,7 @@ public class RegisterForm extends BaseForm{
 			LOGGER.error("", e);
 		}
 
-		return new MemberFrontendCommand();
+		return memberFrontendCommand;
 	}
 
 	public String getAge(){
