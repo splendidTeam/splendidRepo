@@ -55,7 +55,7 @@ var zNodes =
 	<div class="ui-tag-change">
        <ul class="tag-change-ul">
            <li id="setspp_2"><spring:message code="shop.update.updateshop"/></li>
-           <li id="setspp_1"><spring:message code="shop.update.setshopproperty"/></li>
+           <%-- <li id="setspp_1"><spring:message code="shop.update.setshopproperty"/></li> --%>
        </ul>
               
        <div class="tag-change-content">
@@ -117,7 +117,7 @@ var zNodes =
                     <div class="button-line">
                         <input type="button" title="<spring:message code="btn.save"/>" value="<spring:message code="btn.save"/>" class="button orange submit" /> 
 						<input type="button" title="<spring:message code="btn.return"/>" value="<spring:message code="btn.return"/>" class="button goBackBtn goBack" /> 
-						<input type="button" title="<spring:message code="shop.update.shopproperty"/>" value="<spring:message code="shop.update.shopproperty"/>"  class="button updateShopPropertyBtn submit" />
+						<%-- <input type="button" title="<spring:message code="shop.update.shopproperty"/>" value="<spring:message code="shop.update.shopproperty"/>"  class="button updateShopPropertyBtn submit" /> --%>
                     </div>
             </div>
             <div id="dialog" class="proto-dialog">

@@ -39,14 +39,24 @@ function drawCheckbox(data, args, idx){
 
 function drawEditShop(data){
 	
-	 var list = [{label:nps.i18n("OPERATOR_MODIFY"), type:"href", content:base+'/shop/updateShop.htm?shopid='+data.shopid},
-                 {label:nps.i18n("TO_DISABLE"), type:"jsfunc", content:"disableShop"},
-                 {label:nps.i18n("OPERATOR_DELETE"), type:"jsfunc", content:"removeshop"},
-                 {label:nps.i18n("SET_PROPERTY"), type:"href", content:setShopPropertyUrl+"?shopId="+data.shopid}];
-             if(data.lifecycle == 0){
-                 list[1].label = nps.i18n("TO_ENABLE");
-                 list[1].content = "enableShop";
-             }
+//	 var list = [{label:nps.i18n("OPERATOR_MODIFY"), type:"href", content:base+'/shop/updateShop.htm?shopid='+data.shopid},
+//                 {label:nps.i18n("TO_DISABLE"), type:"jsfunc", content:"disableShop"},
+//                 {label:nps.i18n("OPERATOR_DELETE"), type:"jsfunc", content:"removeshop"},
+//                 {label:nps.i18n("SET_PROPERTY"), type:"href", content:setShopPropertyUrl+"?shopId="+data.shopid}];
+//             if(data.lifecycle == 0){
+//                 list[1].label = nps.i18n("TO_ENABLE");
+//                 list[1].content = "enableShop";
+//             }
+	
+	var list = [{label:nps.i18n("OPERATOR_MODIFY"), type:"href", content:base+'/shop/updateShop.htm?shopid='+data.shopid},
+                {label:nps.i18n("TO_DISABLE"), type:"jsfunc", content:"disableShop"},
+                {label:nps.i18n("OPERATOR_DELETE"), type:"jsfunc", content:"removeshop"}];
+            if(data.lifecycle == 0){
+                list[1].label = nps.i18n("TO_ENABLE");
+                list[1].content = "enableShop";
+            }
+	
+	
       return list;
 	
 }
