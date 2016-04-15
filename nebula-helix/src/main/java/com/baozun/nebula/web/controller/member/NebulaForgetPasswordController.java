@@ -19,6 +19,7 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberPasswordManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
+import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.controller.BaseController;
@@ -59,6 +60,9 @@ public class NebulaForgetPasswordController extends BaseController{
 
 	/* redis中存储发送的验证码的业务码 */
 	public static final String			BUSINESS_CODE				= "FORGET_PASSWORD_BUSINESS";
+
+	@Autowired
+	private SdkMemberManager			sdkMemberManager;
 
 	@Autowired
 	private TokenManager				tokenManager;
