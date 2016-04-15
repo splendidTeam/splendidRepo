@@ -139,10 +139,13 @@ public class ShopManagerImpl implements ShopManager{
 			Organization getOrganization = organizationDao.save(organization);
 			shop.setOrgId(getOrganization.getId());
 			Shop getShop = shopDao.save(shop);
-			// 获取属性并在shopProperty中插入相关记录
-			for(ShopProperty shopProperty:shopProperties){
-                shopDao.createShopproperty(shopProperty.getIndustryId(), shop.getId(), shopProperty.getPropertyId());
-           }
+			
+			if(Validator.isNotNullOrEmpty(shopProperties)){
+				// 获取属性并在shopProperty中插入相关记录
+				for(ShopProperty shopProperty:shopProperties){
+	                shopDao.createShopproperty(shopProperty.getIndustryId(), shop.getId(), shopProperty.getPropertyId());
+				}
+			}
 			return getShop;
 		}catch (Exception e){
 			throw new BusinessException(ErrorCodes.PRODUCT_ADD_SHOP_FAIL);
@@ -167,11 +170,16 @@ public class ShopManagerImpl implements ShopManager{
 			// 修改组织表内容
 			Integer flag = shopDao.updateOrganization(organization.getId(), organization.getName(), organization.getCode(), organization
 					.getDescription(), organization.getLifecycle());
-			// 首先刪除該店铺下面的所有属性，然後增加相关的属性
-			shopDao.removeShopPropertyByshopId(shop.getId());
-			for(ShopProperty shopProperty:shopProperties){
-	             shopDao.createShopproperty(shopProperty.getIndustryId(), shop.getId(), shopProperty.getPropertyId());
-	        }
+			
+			
+			if(flag>0 && Validator.isNotNullOrEmpty(shopProperties)){
+				// 首先刪除該店铺下面的所有属性，然後增加相关的属性
+				shopDao.removeShopPropertyByshopId(shop.getId());
+				for(ShopProperty shopProperty:shopProperties){
+		             shopDao.createShopproperty(shopProperty.getIndustryId(), shop.getId(), shopProperty.getPropertyId());
+		        }
+			}
+			
 			return shop;
 		}catch (Exception e){
 			throw new BusinessException(ErrorCodes.PRODUCT_UPDATE_SHOP_FAIL);

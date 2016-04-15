@@ -86,7 +86,7 @@ var zNodes =[
     <div class="button-line">
         <input type="button" title="<spring:message code='btn.save'/>" value="<spring:message code="btn.save"/>" class="button orange submit"/>
         <input type="button" title="<spring:message code='btn.return'/>" value="<spring:message code="btn.return"/>" class="button goBackBtn goBack" />
-        <input type="button" title="<spring:message code='shop.add.saveandsetshopproperty'/>" value="<spring:message code="shop.add.saveandsetshopproperty"/>"  class="button configShopProperty submit"/>
+        <%-- <input type="button" title="<spring:message code='shop.add.saveandsetshopproperty'/>" value="<spring:message code="shop.add.saveandsetshopproperty"/>"  class="button configShopProperty submit"/> --%>
     </div>
     
 <div id="dialog" class="proto-dialog">
