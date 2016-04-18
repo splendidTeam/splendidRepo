@@ -28,19 +28,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	<bean id="SearchCondition.findConditionByCategoryIds" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据CategoryId查询分类列表下的所有搜索选项条件（同时返回所有CategoryId为null 的记录） </description>
-		<constructor-arg>
-			<value>
-				<![CDATA[ 
-					SELECT * from t_pd_search_con where (category_id is NULL or category_id in (#foreach( $id in $cids )
-	    					$id,
-						 #end
-			       		 -1) ) and lifecycle = 1
-                 ]]>
-			</value>
-		</constructor-arg>
-	</bean>
+	
 	<bean id="SearchCondition.updateSearchConditionLang" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据ID更新searchCondition</description>
 		<constructor-arg>
