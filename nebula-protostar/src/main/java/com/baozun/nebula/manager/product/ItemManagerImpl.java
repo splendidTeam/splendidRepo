@@ -352,8 +352,8 @@ public class ItemManagerImpl implements ItemManager{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<DynamicPropertyCommand> findDynamicPropertisWidthoutCommonProperty(Long shopId,Long industryId){
-		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopIdWidthoutCommonProperty(industryId, shopId, null);
+	public List<DynamicPropertyCommand> findDynamicPropertisByIndustryId(Long industryId){
+		List<Property> propertyList = shopDao.findPropertyListByIndustryId(industryId, null);
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = new ArrayList<DynamicPropertyCommand>();
 		List<PropertyValue> propertyValueList;
 		Long propertyId;
@@ -380,8 +380,7 @@ public class ItemManagerImpl implements ItemManager{
 			Long[] propertyValueIds, // 动态属性
 			Long[] categoriesIds,// 商品分类Id
 			ItemProperties[] iProperties,// 普通商品属性
-			SkuPropertyCommand[] skuPropertyCommand,// sku 的信息，包含每个sku对应的价格
-			List<ItemProValGroupRelation> groupRelation// 商品属性分组
+			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
 	) throws Exception{
 
 		// 分类校验
@@ -451,13 +450,6 @@ public class ItemManagerImpl implements ItemManager{
 		// 商品所有的属性值集合
 		List<ItemProperties> savedItemProperties = this
 				.createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand);
-
-		// 商品属性值分组
-		if (groupRelation.size() > 0) {
-			for (ItemProValGroupRelation relation : groupRelation){
-				itemProValGroupRelationDao.save(relation);
-			}
-		}
 
 		// 保存Sku
 		this.createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand, savedItemProperties);

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,13 +40,13 @@ import com.baozun.nebula.web.controller.member.validator.MemberPasswordFormValid
  * @author Wanrong.Wang 2016/03/31
  * @Controller NebulaModifyPasswordController
  */
-
+@Controller
 public class NebulaModifyPasswordController extends BaseController{
 
 	private static final Logger			LOG						= LoggerFactory.getLogger(NebulaModifyPasswordController.class);
 
 	/* 修改密码的页面定义 */
-	public static final String			VIEW_MODIFY_PASSWORD	= "member.modifyPassword";
+	public static final String			VIEW_MODIFY_PASSWORD	= "member.modifypassword";
 
 	@Autowired
 	private MemberPasswordManager		memberPasswordManager;
@@ -58,7 +59,7 @@ public class NebulaModifyPasswordController extends BaseController{
 	 * 去修改密码页面(此步骤的操作需要在登录状态下)
 	 * 
 	 * @NeedLogin
-	 * @RequestMapping(value = "/member/modifyPassword", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/member/modifypassword", method = RequestMethod.GET)
 	 */
 	public String showModifyPassword(){
 		return VIEW_MODIFY_PASSWORD;
@@ -68,7 +69,7 @@ public class NebulaModifyPasswordController extends BaseController{
 	 * 修改密码
 	 * 
 	 * @NeedLogin
-	 * @RequestMapping(value = "/member/modifyPassword.json", method = RequestMethod.POST)
+	 * @RequestMapping(value = "/member/modifypassword.json", method = RequestMethod.POST)
 	 * @param memberDetails
 	 * @param memberPasswordForm
 	 * @param result

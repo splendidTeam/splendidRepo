@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
-import com.baozun.nebula.command.i18n.SingleLang;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.dao.product.PropertyDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
@@ -62,14 +61,15 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 	@Autowired
 	private PropertyValueLangDao			propertyValueLangDao;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findPropertyById(java.lang.Long)
 	 */
 	@Override
 	public Property findPropertyById(Long id){
 		return propertyDao.getByPrimaryKey(id);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findProValueGroupByPropertyId(java.lang.Long)
@@ -188,13 +188,13 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 		 * 查询属性值对应的国际化
 		 */
 		List<PropertyValueLang> propertyLangs = propertyValueDao.findPropertyValueLangByPvids(pvIds, MutlLang.i18nLangs());
-		
+
 		if (Validator.isNullOrEmpty(propertyLangs)){
 
-//			return proValCommands;
+			// return proValCommands;
 
 		}
-		//Map[key：属性值id]
+		// Map[key：属性值id]
 		Map<Long, List<PropertyValueLang>> map = new HashMap<Long, List<PropertyValueLang>>();
 		for (PropertyValueLang propertyLang : propertyLangs){
 			Long pid = propertyLang.getPropertyValueId();
@@ -206,10 +206,10 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 				map.put(pid, pls);
 			}
 		}
-		
+
 		for (int i = 0; i < proValCommands.size(); i++){
 			PropertyValueCommand pvc = proValCommands.get(i);
-			
+
 			Long pvId = pvc.getId();
 			List<PropertyValueLang> pls = map.get(pvId);
 			if (Validator.isNullOrEmpty(pls)){
@@ -228,14 +228,14 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 			mutlLang.setLangs(langs);
 			pvc.setValue(mutlLang);
 		}
-		
-		Pagination<PropertyValueCommand>  result = new Pagination<PropertyValueCommand>(proValCommands, propertyValues.getCount());
+
+		Pagination<PropertyValueCommand> result = new Pagination<PropertyValueCommand>(proValCommands, propertyValues.getCount());
 		result.setCurrentPage(propertyValues.getCurrentPage());
 		result.setSize(propertyValues.getSize());
 		result.setSortStr(propertyValues.getSortStr());
 		result.setTotalPages(propertyValues.getTotalPages());
 		result.setStart(propertyValues.getStart());
-		
+
 		return result;
 	}
 
@@ -331,14 +331,37 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#updatePropertyValueSortById(java.lang.Long, java.lang.Integer)
 	 */
 	@Override
 	public Integer updatePropertyValueSortById(Long id,Integer sortNo){
-		
+
 		return propertyValueDao.updatePropertyValueSortById(id, sortNo);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#deletePropertyValueById(java.util.List)
+	 */
+	@Override
+	public void deletePropertyValueById(List<Long> ids){
+
+		propertyValueDao.deleteById(ids);
+
+		propertyValueLangDao.deleteByPropertyValueIds(ids);
+
+		propertyValueGroupRelationDao.deleteByPropertyValueIds(ids);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkPropertyManager#findCountByPVIdAndLangValue(java.lang.Long, java.lang.String)
+	 */
+	@Override
+	public PropertyValue findCountByPVIdAndLangValue(Long propertyId,String langValue){
+		return propertyValueLangDao.findCountByPVIdAndLangValue(propertyId, langValue);
+	}
 
 }

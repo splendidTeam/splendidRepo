@@ -16,8 +16,14 @@
  */
 package com.baozun.nebula.dao.product;
 
+import java.util.List;
+
+import loxia.annotation.NativeQuery;
+import loxia.annotation.NativeUpdate;
+import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
+import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueLang;
 
 /**
@@ -25,5 +31,20 @@ import com.baozun.nebula.model.product.PropertyValueLang;
  */
 public interface PropertyValueLangDao extends GenericEntityDao<PropertyValueLang, Long>{
 
-	
+	/**
+	 * 根据属性值id删除
+	 * 
+	 * @param pvIds
+	 * @return
+	 */
+	@NativeUpdate
+	Integer deleteByPropertyValueIds(@QueryParam("pvIds") List<Long> pvIds);
+
+	/**
+	 * @param propertyId
+	 * @param langValue
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	PropertyValue findCountByPVIdAndLangValue(@QueryParam("propertyId") Long propertyId,@QueryParam("langValue") String langValue);
 }

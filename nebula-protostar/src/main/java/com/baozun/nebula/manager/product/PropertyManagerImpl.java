@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
+import com.baozun.nebula.web.command.PropertyValueUploadCommand;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -827,7 +829,47 @@ public class PropertyManagerImpl implements PropertyManager{
 
 	@Override
 	@Transactional(readOnly=true)
-	public List<PropertyLang> findPropertyLongByPropertyId(Long propertyId){
-		return propertyDao.findPropertyLongByPropertyId(propertyId);
+	public List<PropertyLang> findPropertyLangByPropertyId(Long propertyId){
+		return propertyDao.findPropertyLangByPropertyId(propertyId);
+	}
+	@Override
+	public List<PropertyValueLang> findPropertyValueLangByPropertyId(Long propertyId){
+		return propertyValueDao.findPropertyValueLangByPropertyId(propertyId,MutlLang.i18nLangs());
+	}
+	@Override
+	public void createOrUpdatePropertyValueByUpload(List<PropertyValueUploadCommand> propertyValueUploadCommandList,Long propertyId){		
+		for (PropertyValueUploadCommand propertyValueUploadCommand : propertyValueUploadCommandList){
+			PropertyValue propertyValue=null;
+			
+			Long id = propertyValueUploadCommand.getId();
+			if(com.feilong.core.Validator.isNotNullOrEmpty(id)){
+				propertyValue=propertyValueDao.findPropertyValueById(id);
+			}else{
+				propertyValue=new PropertyValue();
+				propertyValue.setPropertyId(propertyId);
+				propertyValue.setCreateTime(new Date());
+			}			
+			propertyValue.setValue(propertyValueUploadCommand.getValue());
+			propertyValue.setSortNo(propertyValueUploadCommand.getSortNo());
+			propertyValue.setModifyTime(new Date());
+			
+			propertyValue=propertyValueDao.save(propertyValue);
+			Map<String, String> valueLangMap = propertyValueUploadCommand.getValueLangMap();
+			if(propertyValue!=null&&com.feilong.core.Validator.isNotNullOrEmpty(valueLangMap)){
+				PropertyValueLang propertyValueLang=null;
+				
+				for (Entry<String, String> entry : valueLangMap.entrySet()){
+					propertyValueLang = propertyValueDao.findPropertyValueLang(propertyValue.getId(), entry.getKey());
+					if(propertyValueLang==null){
+						propertyValueLang=new PropertyValueLang();
+					}
+					propertyValueLang.setLang(entry.getKey());
+					propertyValueLang.setValue(entry.getValue());
+					propertyValueLang.setPropertyValueId(propertyValue.getId());
+					propertyValueLangDao.save(propertyValueLang);
+				}
+				
+			}
+		}		
 	}
 }
