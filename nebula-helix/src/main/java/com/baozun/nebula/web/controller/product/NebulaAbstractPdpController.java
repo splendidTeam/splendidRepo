@@ -26,9 +26,19 @@ import loxia.dao.Pagination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.sdk.command.CurmbCommand;
+import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.sdk.command.SkuCommand;
+import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.PageForm;
+import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -91,6 +101,17 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	
 	/** 商品不存在 的默认定义 */
 	public static final String VIEW_PRODUCT_NOTEXIST 				= "product.notexist";
+	
+	@Autowired
+	private SdkItemManager											sdkItemManager;
+	
+	@Autowired
+	private ItemDetailManager										itemDetailManager;
+	
+	@Autowired
+	@Qualifier("breadcrumbsViewCommandConverter")
+	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
+	
 
 	
 	/**
@@ -100,7 +121,12 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @return
 	 */
 	protected ItemBaseInfoViewCommand buildProductBaseInfoViewCommand(Long itemId) {
-		return new ItemBaseInfoViewCommand();
+		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
+		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
+		if(itemBaseCommand!=null){
+			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
+		}
+		return itemBaseInfoViewCommand;
 	}
 	
 	/**
@@ -127,8 +153,19 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @param itemId
 	 * @return
 	 */
-	protected InventoryViewCommand buildInventoryViewCommand(Long itemId) {
-		return new InventoryViewCommand();
+	@SuppressWarnings("deprecation")
+	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
+		List<InventoryViewCommand> inventoryViewCommands = new ArrayList<InventoryViewCommand>();
+		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
+		if(Validator.isNotNullOrEmpty(skuCommands)){
+			for(SkuCommand skuCommand:skuCommands){
+				InventoryViewCommand inventoryViewCommand = new InventoryViewCommand();
+				BeanUtils.copyProperties(skuCommand, inventoryViewCommand);
+				inventoryViewCommand.setSkuId(skuCommand.getId());
+				inventoryViewCommands.add(inventoryViewCommand);
+			}
+		}
+		return inventoryViewCommands;
 	}
 	
 	/**
@@ -206,29 +243,46 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * 构造面包屑
 	 * @return
 	 */
-	protected BreadcrumbsViewCommand buildBreadcrumbsViewCommand(Long itemId) {
+	protected List<BreadcrumbsViewCommand> buildBreadcrumbsViewCommand(Long itemId) {
 		
-		BreadcrumbsViewCommand breadcrumbsViewCommand = null;
+		List<BreadcrumbsViewCommand> breadcrumbsViewCommandList = null;
 		
 		String breadcrumbsMode = getBreadcrumbsMode();
 		
 		switch (breadcrumbsMode) {
 			case BREADCRUMBS_MODE_NAVIGATION:
-				//TODO
+				//TODO 基于导航
 				break;
 			case BREADCRUMBS_MODE_CATEGORY:
-				//TODO
+				//TODO 基于分类
+				breadcrumbsViewCommandList =new ArrayList<BreadcrumbsViewCommand>();
+				List<CurmbCommand> curmbCommandList = itemDetailManager.findCurmbList(itemId);
+				breadcrumbsViewCommandList =constructBreadCrumbCommandList(curmbCommandList);
 				break;
 			default:
-				breadcrumbsViewCommand = customBuildBreadcrumbsViewCommand(itemId);
+				breadcrumbsViewCommandList = customBuildBreadcrumbsViewCommand(itemId);
 				break;
 		}
 		
 		// TODO
-		return breadcrumbsViewCommand;
+		return breadcrumbsViewCommandList;
 	}
 	
-	protected abstract BreadcrumbsViewCommand customBuildBreadcrumbsViewCommand(Long itemId);
+	private List<BreadcrumbsViewCommand> constructBreadCrumbCommandList(List<CurmbCommand> curmbCommandList){
+        List<BreadcrumbsViewCommand> breadCrumbEntityList = new ArrayList<BreadcrumbsViewCommand>();
+        for (int i = 0; i < curmbCommandList.size(); ++i){
+        	
+            CurmbCommand currentCurmbCommand = curmbCommandList.get(i);
+            
+            BreadcrumbsViewCommand breadcrumbsViewCommand =breadcrumbsViewCommandConverter
+            		.convert(currentCurmbCommand);
+            breadCrumbEntityList.add(breadcrumbsViewCommand);
+        }
+        return breadCrumbEntityList;
+    }
+	
+	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
+	
 	
 	/**
 	 * 面包屑的模式

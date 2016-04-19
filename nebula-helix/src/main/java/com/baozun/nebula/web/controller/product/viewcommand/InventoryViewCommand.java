@@ -20,7 +20,6 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
  * 库存
- *
  */
 public class InventoryViewCommand extends BaseViewCommand {
 
