@@ -49,7 +49,7 @@ public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	
 	/**
 	 * 根据主卖品的商品ID查询捆绑类商品信息
-	 * @param itemId 商品ID
+	 * @param itemId 主卖品的商品ID
 	 * @param lifecycle 捆绑类商品状态，如果为空，则忽略该条件字段
 	 * @return
 	 */
@@ -58,19 +58,13 @@ public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	
 	/**
 	 * 根据主卖品的商品款号查询捆绑类商品信息
-	 * @param style 商品款号
+	 * @param style 主卖品的商品款号
 	 * @param lifecycle 捆绑类商品状态，如果为空，则忽略该条件字段
 	 * @return
 	 */
 	@NativeQuery(model = Bundle.class)
 	List<Bundle> findBundlesByStyle(String style, Integer lifecycle);
 	
-	/**
-	 * 通过bundleId查询
-	 * @param bundleId
-	 * @return
-	 */
-	@NativeQuery(model = BundleSku.class)
-	List<BundleSku> findByBundleId(Long bundleId);
+	
 
 }
