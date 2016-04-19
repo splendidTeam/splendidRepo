@@ -34,6 +34,9 @@ public class PropertyViewCommand extends BaseViewCommand {
     /** 是否是颜色属性. */
     private Boolean           isColorProp;
     
+    /** 是否销售属性 */
+	private Boolean				isSaleProp;
+    
     /** 属性分组. */
     private String            groupName;
     
@@ -62,6 +65,14 @@ public class PropertyViewCommand extends BaseViewCommand {
 
 	public void setIsColorProp(Boolean isColorProp) {
 		this.isColorProp = isColorProp;
+	}
+
+	public Boolean getIsSaleProp() {
+		return isSaleProp;
+	}
+
+	public void setIsSaleProp(Boolean isSaleProp) {
+		this.isSaleProp = isSaleProp;
 	}
 
 	public String getGroupName() {
