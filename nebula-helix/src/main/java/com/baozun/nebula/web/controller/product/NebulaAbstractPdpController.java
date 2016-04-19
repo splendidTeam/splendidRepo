@@ -26,7 +26,13 @@ import loxia.dao.Pagination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.sdk.command.SkuCommand;
+import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
@@ -91,6 +97,9 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	
 	/** 商品不存在 的默认定义 */
 	public static final String VIEW_PRODUCT_NOTEXIST 				= "product.notexist";
+	
+	@Autowired
+	private SdkItemManager				sdkItemManager;
 
 	
 	/**
@@ -100,7 +109,12 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @return
 	 */
 	protected ItemBaseInfoViewCommand buildProductBaseInfoViewCommand(Long itemId) {
-		return new ItemBaseInfoViewCommand();
+		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
+		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
+		if(itemBaseCommand!=null){
+			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
+		}
+		return itemBaseInfoViewCommand;
 	}
 	
 	/**
@@ -127,8 +141,13 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @param itemId
 	 * @return
 	 */
-	protected InventoryViewCommand buildInventoryViewCommand(Long itemId) {
-		return new InventoryViewCommand();
+	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
+		List<InventoryViewCommand> inventoryViewCommands = new ArrayList<InventoryViewCommand>();
+		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
+		if(Validator.isNotNullOrEmpty(skuCommands)){
+			
+		}
+		return inventoryViewCommands;
 	}
 	
 	/**

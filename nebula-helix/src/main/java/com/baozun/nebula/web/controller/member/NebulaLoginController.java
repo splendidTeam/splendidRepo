@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.exception.LoginException;
+import com.baozun.nebula.manager.captcha.CaptchaUtil;
+import com.baozun.nebula.manager.captcha.entity.CaptchaContainerAndValidateConfig;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.utilities.common.EncryptUtil;
@@ -100,22 +102,22 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG								= LoggerFactory.getLogger(NebulaLoginController.class);
+	private static final Logger						LOG								= LoggerFactory.getLogger(NebulaLoginController.class);
 
 	/* Remember me user cookie key */
-	public static final String	COOKIE_KEY_REMEMBER_ME_USER		= "rmbu";
+	public static final String						COOKIE_KEY_REMEMBER_ME_USER		= "rmbu";
 
 	/* Remember me pwd cookie key */
-	public static final String	COOKIE_KEY_AUTO_LOGIN			= "rmbc";
+	public static final String						COOKIE_KEY_AUTO_LOGIN			= "rmbc";
 
 	/* Login Page 的默认定义 */
-	public static final String	VIEW_MEMBER_LOGIN				= "member.login";
+	public static final String						VIEW_MEMBER_LOGIN				= "member.login";
 
 	/* Login 登录ID */
-	public static final String	MODEL_KEY_MEMBER_LOGIN_ID		= "login";
+	public static final String						MODEL_KEY_MEMBER_LOGIN_ID		= "login";
 
 	/* Login 登录密码 */
-	public static final String	MODEL_KEY_MEMBER_LOGIN_PWD		= "password";
+	public static final String						MODEL_KEY_MEMBER_LOGIN_PWD		= "password";
 	
 	/**
 	 * 默认RemeberMe过期时间
@@ -123,23 +125,30 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @version 1.0
 	 * @time 2016年3月31日  下午2:37:59
 	 */
-	private static final int 	DEFAULT_REMEBERME_MAX_AGE 		= 30*24*60*60;
+	private static final int 						DEFAULT_REMEBERME_MAX_AGE 		= 30*24*60*60;
 	
 	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
-	private int					remberMeValidityPeriod 			= -1;
+	private int										remberMeValidityPeriod 			= -1;
 
 	/**
 	 * 会员登录Form的校验器
 	 */
 	@Autowired
 	@Qualifier("loginFormValidator")
-	private LoginFormValidator	loginFormValidator;
+	private LoginFormValidator						loginFormValidator;
+	
+	/**
+	 * 验证码校验器
+	 */
+	@Autowired(required = false)
+	@Qualifier("loginCaptchaContainerAndValidateConfig")
+	private CaptchaContainerAndValidateConfig 		loginCaptchaContainerAndValidateConfig;
 
 	/**
 	 * 会员业务管理类
 	 */
 	@Autowired
-	private MemberManager		memberManager;
+	private MemberManager							memberManager;
 	
 
 	/**
@@ -201,6 +210,19 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			HttpServletResponse response,
 			Model model){
 		
+		//校验验证码
+		boolean result = CaptchaUtil.validate(loginCaptchaContainerAndValidateConfig, request);
+		if (!result){
+			//因为目前都还是密文，所以可以直接Debug输出 
+			LOG.debug("loginForm captcha validate fail. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());			
+			DefaultReturnResult returnResult = new DefaultReturnResult();
+			returnResult.setResult(false);
+			DefaultResultMessage message = new DefaultResultMessage();
+			message.setMessage("login.captcha.error");
+			returnResult.setResultMessage(message);
+			return returnResult;
+        }
+		
 		//校验输入数据 
 		loginFormValidator.validate(loginForm, bindingResult);
 		
@@ -247,9 +269,13 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 				memberCommand=memberManager.login(memberFrontendCommand);
 			} catch (LoginException e) {
 				LOG.info("[MEM_LOGIN_FAILURE] {} [{}] \"{}\"", loginForm.getLoginName(), new Date(), e.getClass().getSimpleName());
-			} 
+			}
 		}
 		
+		if(loginCaptchaContainerAndValidateConfig != null && loginCaptchaContainerAndValidateConfig.getCaptchaContainer() != null){
+			//登录成功后，清空登录失败次数,登录失败记录失败次数，用来判断验证码显示 memberCommand!= null 为true代表登录成功
+			CaptchaUtil.clearOrIncrTryNumber(loginCaptchaContainerAndValidateConfig.getCaptchaContainer().getId(), loginForm.getLoginName(), memberCommand!= null, request);
+		}		
 		
 		if(memberCommand!= null){
 			//登录成功的处理
