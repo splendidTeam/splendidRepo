@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.manager.member.MemberManager;
@@ -245,7 +246,7 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @return
 	 */
 	public NebulaReturnResult setDefaultAddress(@LoginMember MemberDetails memberDetails,
-			@ModelAttribute("addressId") Long addressId, HttpServletRequest httpRequest,
+			@RequestParam("addressId") Long addressId, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
@@ -284,7 +285,7 @@ public class NebulaMemberAddressController extends BaseController {
 	 * @return
 	 */
 	public NebulaReturnResult deleteMemberAddress(@LoginMember MemberDetails memberDetails,
-			@ModelAttribute("addressId") Long addressId, HttpServletRequest httpRequest,
+			@RequestParam("addressId") Long addressId, HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
