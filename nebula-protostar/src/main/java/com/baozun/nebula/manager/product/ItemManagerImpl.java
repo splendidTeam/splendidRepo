@@ -4225,7 +4225,8 @@ public class ItemManagerImpl implements ItemManager{
 				sorts[0] = new Sort("p.id", "asc");
 			}
 
-			List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industry.getId(), shopCommand.getShopid(), sorts);
+//			List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industry.getId(), shopCommand.getShopid(), sorts);
+			List<Property> propertyList = shopDao.findPropertyListByIndustryId(industry.getId(), sorts);
 
 			List<Property> salesList = new ArrayList<Property>();
 			List<Property> notSalesList = new ArrayList<Property>();
@@ -5781,7 +5782,8 @@ public class ItemManagerImpl implements ItemManager{
 			sorts[0] = new Sort("p.id", "asc");
 		}
 
-		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industryId, shopId, sorts);
+//		List<Property> propertyList = shopDao.findPropertyListByIndustryIdAndShopId(industryId, shopId, sorts);
+		List<Property> propertyList = shopDao.findPropertyListByIndustryId(industryId, sorts);
 		// 拆分成 销售属性List 非销售属性
 		List<Long> notSalePropIdList = new ArrayList<Long>();
 		List<Long> notSalePropIdI18nList = new ArrayList<Long>();
