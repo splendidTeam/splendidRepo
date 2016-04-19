@@ -8,7 +8,10 @@ import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 
 /**
- * 短信校验码‘发送’和‘验证’的过程
+ * 短信校验码‘发送’;
+ * <p>
+ * ‘验证’的过程请参考{@link SMSCaptchaValidate}
+ * </p>
  * 
  * @author Viktor Huang
  * @date 2016年3月30日 上午11:29:51
@@ -52,6 +55,7 @@ public interface SMSManager extends BaseManager{
 	 *            发给上面手机的，需要验证的验证码
 	 * @return
 	 */
+	@Deprecated
 	VerifyResult validate(String mobile,String captcha);
 
 	enum CaptchaType{
