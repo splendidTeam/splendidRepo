@@ -33,7 +33,10 @@ public class RegisterForm extends BaseForm{
 	/** 再次输入密码 */
 	private String				repassword;
 
-	/** 验证码 */
+	/**
+	 * 验证码【此功能已由botdetect captcha替代】
+	 */
+	@Deprecated
 	private String				randomCode;
 
 	/** 是否接收AD邮件:1 接收 0 不接收 */

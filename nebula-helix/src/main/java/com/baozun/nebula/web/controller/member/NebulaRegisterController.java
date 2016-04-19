@@ -33,6 +33,8 @@ import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.manager.captcha.CaptchaUtil;
+import com.baozun.nebula.manager.captcha.entity.CaptchaContainerAndValidateConfig;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.system.SMSManager;
 import com.baozun.nebula.manager.system.SMSManager.CaptchaType;
@@ -82,18 +84,18 @@ import com.feilong.servlet.http.RequestUtil;
  */
 public class NebulaRegisterController extends NebulaLoginController{
 
-	private static final Logger			LOGGER						= LoggerFactory.getLogger(NebulaRegisterController.class);
+	private static final Logger					LOGGER						= LoggerFactory.getLogger(NebulaRegisterController.class);
 
 	/* Register Page 的默认定义 */
-	public static final String			VIEW_MEMBER_REGISTER		= "member.register";
+	public static final String					VIEW_MEMBER_REGISTER		= "member.register";
 
-	public static final String			VIEW_MEMBER_CENTER			= "/member/center.htm";
+	public static final String					VIEW_MEMBER_CENTER			= "/member/center.htm";
 
 	/** 发送手机验证码短信长度 */
-	public static Integer				SEND_MOBILE_MSG_LENGTH		= 5;
+	public static Integer						SEND_MOBILE_MSG_LENGTH		= 5;
 
 	/** 发送手机验证码有效期 */
-	public static Integer				SEND_MOBILE_MSG_LIVETIME	= 2 * 60;
+	public static Integer						SEND_MOBILE_MSG_LIVETIME	= 2 * 60;
 
 	/**
 	 * PC || Tablet <br/>
@@ -101,7 +103,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	@Autowired
 	@Qualifier("registerFormNormalValidator")
-	private RegisterFormNormalValidator	registerFormNormalValidator;
+	private RegisterFormNormalValidator			registerFormNormalValidator;
 
 	/**
 	 * Mobile <br/>
@@ -109,19 +111,26 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	@Autowired
 	@Qualifier("registerFormMobileValidator")
-	private RegisterFormMobileValidator	registerFormMobileValidator;
+	private RegisterFormMobileValidator			registerFormMobileValidator;
+
+	/**
+	 * botdetect captcha validate
+	 */
+	@Autowired(required = false)
+	@Qualifier("registerCaptchaContainerAndValidateConfig")
+	private CaptchaContainerAndValidateConfig	registerCaptchaContainerAndValidateConfig;
 
 	/**
 	 * 会员业务管理类
 	 */
 	@Autowired
-	private MemberManager				memberManager;
+	private MemberManager						memberManager;
 
 	@Autowired
-	private SdkMemberManager			sdkMemberManager;
+	private SdkMemberManager					sdkMemberManager;
 
 	@Autowired
-	private SMSManager					smsManager;
+	private SMSManager							smsManager;
 
 	/**
 	 * 注册页面，默认推荐配置如下
@@ -286,9 +295,13 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 		try{
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
-			/** TODO 检查验证码 */
-			defaultReturnResult = (DefaultReturnResult) checkCaptcha(request, memberFrontendCommand.getRandomCode());
-			if (!defaultReturnResult.isResult()){
+			/**
+			 * 检查验证码
+			 */
+			boolean result = CaptchaUtil.validate(registerCaptchaContainerAndValidateConfig, request);
+			if (!result){
+				defaultReturnResult.setResult(false);
+				defaultReturnResult.setStatusCode("reigster.captcha.validate.errors");
 				return defaultReturnResult;
 			}
 
@@ -312,7 +325,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 			 * 构造MemberDetails<br/>
 			 * 此时如果注册需要‘邮件激活’等功能，需要商城端设置 MemberDetails.status
 			 */
-			MemberDetails memberDetails = constructMemberDetails(memberCommand,request);
+			MemberDetails memberDetails = constructMemberDetails(memberCommand, request);
 
 			// 返回NebulaReturnResult中包含下一步动作的url
 			return onRegisterSuccess(memberDetails, request, response);
@@ -346,21 +359,6 @@ public class NebulaRegisterController extends NebulaLoginController{
 		NebulaReturnResult resultFromBindingResult = getResultFromBindingResult(bindingResult);
 
 		return resultFromBindingResult;
-	}
-
-	/**
-	 * 检查验证码是否正确
-	 * 
-	 * @param request
-	 * @param randomCode
-	 *            验证码
-	 */
-	protected NebulaReturnResult checkCaptcha(HttpServletRequest request,String randomCode){
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
-		// TODO 验证码
-		// smsManager.validate(mobile, randomCode)
-
-		return defaultReturnResult;
 	}
 
 	/**
