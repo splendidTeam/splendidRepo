@@ -39,6 +39,13 @@ public class BreadcrumbsViewCommand extends BaseViewCommand {
 	 */
 	private String path;
 	
+	/**
+	 * 
+	 */
+	public BreadcrumbsViewCommand() {
+		super();
+	}
+
 	public BreadcrumbsViewCommand(String title, String path) {
 		super();
 		this.title = title;
