@@ -40,6 +40,8 @@ import loxia.annotation.NativeQuery;
 import loxia.dao.GenericEntityDao;
 
 /**
+ * BundleSku Dao
+ * 
  * @author yue.ch
  *
  */
