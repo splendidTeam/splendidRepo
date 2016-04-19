@@ -88,13 +88,19 @@ public class BundleElement extends BaseModel {
 	private Long bundleId;
 	
 	/**
+	 * 捆绑类商品中每个具体个体商品的ID（现阶段仅为预留字段，无实际意义。）
+	 */
+	private Long itemId;
+	
+	/**
 	 * 捆绑装采用“固定价/一口价”价格模式设置的商品的价格，
 	 * 如果非此价格模式，则此属性无意义。
 	 */
 	private BigDecimal salesPrice;
 	
 	/**
-	 * 主卖品标志，一个捆绑商品仅以主卖品为依据加载捆绑成员信息
+	 * 主卖品标志，一个捆绑商品仅以主卖品为依据加载捆绑成员信息<br/>
+	 * 注意这里是主卖品而不是主商品的概念，是因为主卖品可以是一个具体的商品，也可以是以款汇聚的多个商品
 	 */
 	private Boolean mainElement;
 	
@@ -128,6 +134,16 @@ public class BundleElement extends BaseModel {
 
 	public void setBundleId(Long bundleId) {
 		this.bundleId = bundleId;
+	}
+	
+	@Column(name = "ITEM_ID")
+	@Index(name = "IDX_BUNDLE_ELEMENT_ITEM_ID")
+	public Long getItemId() {
+		return itemId;
+	}
+	
+	public void setItemId(Long itemId) {
+		this.itemId = itemId;
 	}
 
 	@Column(name = "SALES_PRICE")
