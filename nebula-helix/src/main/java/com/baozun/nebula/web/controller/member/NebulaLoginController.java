@@ -30,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.exception.LoginException;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
@@ -37,6 +38,7 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
+import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -46,6 +48,7 @@ import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberLoginViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
+import com.feilong.servlet.http.RequestUtil;
 import com.feilong.servlet.http.entity.CookieEntity;
 
 
@@ -235,7 +238,13 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		if(memberCommand == null){
 			LOG.debug("Check Login information for user {}", loginForm.getLoginName());
 			try{
-				memberCommand=memberManager.login(loginForm.toMemberFrontendCommand());
+				MemberFrontendCommand memberFrontendCommand = loginForm.toMemberFrontendCommand();
+				
+				//用户行为信息
+				MemberConductCommand memberConductCommand=new MemberConductCommand(new Date(), RequestUtil.getClientIp(request));
+				memberFrontendCommand.setMemberConductCommand(memberConductCommand);
+				
+				memberCommand=memberManager.login(memberFrontendCommand);
 			} catch (LoginException e) {
 				LOG.info("[MEM_LOGIN_FAILURE] {} [{}] \"{}\"", loginForm.getLoginName(), new Date(), e.getClass().getSimpleName());
 			} 
