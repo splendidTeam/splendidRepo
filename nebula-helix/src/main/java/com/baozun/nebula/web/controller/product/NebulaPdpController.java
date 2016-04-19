@@ -154,6 +154,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	@Override
 	protected String getBreadcrumbsMode() {
+		
 		return BREADCRUMBS_MODE_CATEGORY;
 	}
 	

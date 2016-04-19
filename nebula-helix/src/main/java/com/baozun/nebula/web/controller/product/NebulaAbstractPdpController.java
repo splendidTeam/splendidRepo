@@ -231,6 +231,7 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	
 	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	
+	
 	/**
 	 * 面包屑的模式
 	 * @return
