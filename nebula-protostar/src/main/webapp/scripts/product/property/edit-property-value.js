@@ -34,7 +34,7 @@ function drawProValue(data, args, idx){
 	for ( var j = 0; j < i18nLangs.length; j++) {
 		var i18nLang = i18nLangs[j];
 		var key = i18nLang.key;
-		html += "<input  readonly='value' value="+ data.value.langValues[key] +"  style='width: 150px'  class='ui-loxia-default' loxiaType='input' /><span>"+i18nLang.value +"</span>";
+		html += "<input  readonly='true' value='"+ data.value.langValues[key] +"'  style='width: 150px'  class='ui-loxia-default' loxiaType='input' /><span>"+i18nLang.value +"</span>";
 		if(j!=i18nLangs.length){
 			html += '<br>';
 		}
