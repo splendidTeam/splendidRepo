@@ -68,6 +68,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		//TODO 
 //		pdpViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
 		
+		
+		
 		pdpViewCommand.setSizeCompareChart(buildSizeCompareChart(pdpViewCommand.getItemBaseInfo().getId()));
 		model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 		return VIEW_PRODUCT_DETAIL;
