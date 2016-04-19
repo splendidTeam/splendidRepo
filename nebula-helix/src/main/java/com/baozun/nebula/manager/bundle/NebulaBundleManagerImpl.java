@@ -117,7 +117,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
     	
     	List<BundleElementCommand> bundleElementList = new ArrayList<BundleElementCommand>();
     	
-		List<BundleSku> skus  = bundleSkuDao.findByBundleId(bundle.getBundleId());
+		List<BundleSku> skus  = null;//bundleSkuDao.findByBundleId(bundle.getBundleId());
 		//BundleSku集合按照bundleElementId分组 . key : bundleElementId ; value : List<BundleSku>
 		Map<Long,List<BundleSku>> map = new HashMap<Long,List<BundleSku>>();
 		for(BundleSku sku : skus){
