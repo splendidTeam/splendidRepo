@@ -17,6 +17,8 @@
  */
 package com.baozun.nebula.web.controller.product;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -156,7 +158,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 	
 	@Override
-	protected BreadcrumbsViewCommand customBuildBreadcrumbsViewCommand(
+	protected List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(
 			Long itemId) {
 		// TODO Auto-generated method stub
 		return null;

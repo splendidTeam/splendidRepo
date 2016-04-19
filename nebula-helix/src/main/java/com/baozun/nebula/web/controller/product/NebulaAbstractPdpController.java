@@ -206,9 +206,9 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * 构造面包屑
 	 * @return
 	 */
-	protected BreadcrumbsViewCommand buildBreadcrumbsViewCommand(Long itemId) {
+	protected List<BreadcrumbsViewCommand> buildBreadcrumbsViewCommand(Long itemId) {
 		
-		BreadcrumbsViewCommand breadcrumbsViewCommand = null;
+		List<BreadcrumbsViewCommand> breadcrumbsViewCommandList = null;
 		
 		String breadcrumbsMode = getBreadcrumbsMode();
 		
@@ -218,17 +218,18 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 				break;
 			case BREADCRUMBS_MODE_CATEGORY:
 				//TODO
+				breadcrumbsViewCommandList =new ArrayList<BreadcrumbsViewCommand>();
 				break;
 			default:
-				breadcrumbsViewCommand = customBuildBreadcrumbsViewCommand(itemId);
+				breadcrumbsViewCommandList = customBuildBreadcrumbsViewCommand(itemId);
 				break;
 		}
 		
 		// TODO
-		return breadcrumbsViewCommand;
+		return breadcrumbsViewCommandList;
 	}
 	
-	protected abstract BreadcrumbsViewCommand customBuildBreadcrumbsViewCommand(Long itemId);
+	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	
 	/**
 	 * 面包屑的模式
