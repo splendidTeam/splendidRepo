@@ -18,6 +18,11 @@ import com.feilong.core.util.RandomUtil;
 import com.feilong.core.util.RegexUtil;
 
 /**
+ * 短信校验码‘发送’;
+ * <p>
+ * ‘验证’的过程请参考{@link SMSCaptchaValidate}
+ * </p>
+ * 
  * @author Viktor Huang
  * @date 2016年3月30日 下午6:28:04
  */
@@ -123,6 +128,7 @@ public class SMSManagerImpl implements SMSManager{
 	 * @see com.baozun.nebula.manager.system.SMSManager#validate(java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public VerifyResult validate(String mobile,String captcha){
 
 		String businessCode = SMS_REGISTER_CAPTCHA_CODE + mobile;

@@ -34,8 +34,10 @@ import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.captcha.CaptchaUtil;
+import com.baozun.nebula.manager.captcha.CaptchaValidate;
 import com.baozun.nebula.manager.captcha.entity.CaptchaContainerAndValidateConfig;
 import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.manager.system.SMSCaptchaValidate;
 import com.baozun.nebula.manager.system.SMSManager;
 import com.baozun.nebula.manager.system.SMSManager.CaptchaType;
 import com.baozun.nebula.model.member.Member;
@@ -119,6 +121,16 @@ public class NebulaRegisterController extends NebulaLoginController{
 	@Autowired(required = false)
 	@Qualifier("registerCaptchaContainerAndValidateConfig")
 	private CaptchaContainerAndValidateConfig	registerCaptchaContainerAndValidateConfig;
+
+	/**
+	 * botdetect captcha validate
+	 * <p>
+	 * 此处配置的{@link CaptchaValidate} 请参考 {@link SMSCaptchaValidate}
+	 * </p>
+	 */
+	@Autowired(required = false)
+	@Qualifier("registerSMSCaptchaContainerAndValidateConfig")
+	private CaptchaContainerAndValidateConfig	registerSMSCaptchaContainerAndValidateConfig;
 
 	/**
 	 * 会员业务管理类
@@ -294,11 +306,13 @@ public class NebulaRegisterController extends NebulaLoginController{
 		registerForm.setPassword(decryptSensitiveDataEncryptedByJs(registerForm.getPassword(), request));
 
 		try{
+
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
 			/**
 			 * 检查验证码
 			 */
-			boolean result = CaptchaUtil.validate(registerCaptchaContainerAndValidateConfig, request);
+			boolean result = registerCaptchaValidate(request);
+
 			if (!result){
 				defaultReturnResult.setResult(false);
 				defaultReturnResult.setStatusCode("reigster.captcha.validate.errors");
@@ -336,6 +350,24 @@ public class NebulaRegisterController extends NebulaLoginController{
 			defaultReturnResult.setStatusCode(getMessage("register.failed"));
 			return defaultReturnResult;
 		}
+	}
+
+	/**
+	 * 注册时候验证‘图形验证码’or‘手机短信’验证码是否合法
+	 * 
+	 * @param request
+	 * @return
+	 */
+	protected boolean registerCaptchaValidate(HttpServletRequest request){
+		Device device = getDevice(request);
+		boolean result = false;
+		if (device.isMobile()){
+			result = CaptchaUtil.validate(registerCaptchaContainerAndValidateConfig, request);
+		}else{
+			result = CaptchaUtil.validate(registerSMSCaptchaContainerAndValidateConfig, request);
+		}
+
+		return result;
 	}
 
 	/**
