@@ -64,5 +64,13 @@ public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	 */
 	@NativeQuery(model = Bundle.class)
 	List<Bundle> findBundlesByStyle(String style, Integer lifecycle);
+	
+	/**
+	 * 通过bundleId查询
+	 * @param bundleId
+	 * @return
+	 */
+	@NativeQuery(model = BundleSku.class)
+	List<BundleSku> findByBundleId(Long bundleId);
 
 }
