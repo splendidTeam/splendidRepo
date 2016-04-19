@@ -18,7 +18,6 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,13 +28,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.PageForm;
+import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -100,7 +103,15 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	public static final String VIEW_PRODUCT_NOTEXIST 				= "product.notexist";
 	
 	@Autowired
-	private SdkItemManager				sdkItemManager;
+	private SdkItemManager											sdkItemManager;
+	
+	@Autowired
+	private ItemDetailManager										itemDetailManager;
+	
+	@Autowired
+	@Qualifier("breadcrumbsViewCommandConverter")
+	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
+	
 
 	
 	/**
@@ -240,11 +251,13 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 		
 		switch (breadcrumbsMode) {
 			case BREADCRUMBS_MODE_NAVIGATION:
-				//TODO
+				//TODO 基于导航
 				break;
 			case BREADCRUMBS_MODE_CATEGORY:
-				//TODO
+				//TODO 基于分类
 				breadcrumbsViewCommandList =new ArrayList<BreadcrumbsViewCommand>();
+				List<CurmbCommand> curmbCommandList = itemDetailManager.findCurmbList(itemId);
+				breadcrumbsViewCommandList =constructBreadCrumbCommandList(curmbCommandList);
 				break;
 			default:
 				breadcrumbsViewCommandList = customBuildBreadcrumbsViewCommand(itemId);
@@ -254,6 +267,19 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 		// TODO
 		return breadcrumbsViewCommandList;
 	}
+	
+	private List<BreadcrumbsViewCommand> constructBreadCrumbCommandList(List<CurmbCommand> curmbCommandList){
+        List<BreadcrumbsViewCommand> breadCrumbEntityList = new ArrayList<BreadcrumbsViewCommand>();
+        for (int i = 0; i < curmbCommandList.size(); ++i){
+        	
+            CurmbCommand currentCurmbCommand = curmbCommandList.get(i);
+            
+            BreadcrumbsViewCommand breadcrumbsViewCommand =breadcrumbsViewCommandConverter
+            		.convert(currentCurmbCommand);
+            breadCrumbEntityList.add(breadcrumbsViewCommand);
+        }
+        return breadCrumbEntityList;
+    }
 	
 	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	

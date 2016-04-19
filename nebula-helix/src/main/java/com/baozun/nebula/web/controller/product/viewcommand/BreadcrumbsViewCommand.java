@@ -29,15 +29,12 @@ public class BreadcrumbsViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = -9009176806400593148L;
 
-	/** 面包屑一项的显示名称 */
+	/** 面包屑每一项的显示名称 */
 	private String title;
 	
-	/** 面包屑一项的路径 */
+	/** 面包屑每一项的路径 */
 	private String path;
 	
-	/**
-	 * 
-	 */
 	public BreadcrumbsViewCommand() {
 		super();
 	}
