@@ -35,8 +35,7 @@ public interface ItemLangManager extends BaseManager {
 	Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties,
-			SkuPropertyMUtlLangCommand[] skuPropertyCommand,
-			List<ItemProValGroupRelation> groupRelation// 商品属性分组
+			SkuPropertyMUtlLangCommand[] skuPropertyCommand
 			) throws Exception;
 	
 	Integer validateItemCode(String code, Long shopId);

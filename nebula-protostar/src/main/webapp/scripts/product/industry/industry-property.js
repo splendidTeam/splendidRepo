@@ -208,7 +208,8 @@ function showEnableSelectProperty(array2){
 			
 		}
 		array2[i].type = formatEditingType(array2[i].editingType);
-		$j('#enableSelectProperty').append('<div><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value='+array2[i].id +" />" + array2[i].text);
+		$j('#enableSelectProperty').append('<div class="enableSelectPropertyDiv"><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value='+array2[i].id +" /><span class='text'>" + array2[i].text +
+				"</span><span class='type'>" + array2[i].type + "</span>");
 	});
 	$j(".enableSelectPropertyList").change(function(){
 		if($j(".enableSelectPropertyList").is(':checked')){

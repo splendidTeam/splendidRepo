@@ -19,8 +19,8 @@ var setting = {
 //		},
 		view: {
 			dblClickExpand: true,
-			showIcon:false,
-			addDiyDom: addDiyDom
+			showIcon:false
+			//addDiyDom: addDiyDom
 		},
 		data: { 
 			simpleData: {
@@ -28,7 +28,7 @@ var setting = {
 			}  
 		},
 		callback: {
-			onClick : onClick
+			//onClick : onClick
 		}
 	};
 
@@ -117,10 +117,10 @@ var setting = {
 	}
 	
 	function userFormValidate(){
-		if($j("input[group='subArray']").length<=0)
-		{
-			return nps.i18n("shop.add.chooseonindustry");
-		}
+//		if($j("input[group='subArray']").length<=0)
+//		{
+//			return nps.i18n("shop.add.chooseonindustry");
+//		}
 		 return loxia.SUCCESS; 
 	}
 	
@@ -154,28 +154,24 @@ var setting = {
 		
 		$j(".button.orange.submit").click(function(){
 
-			var html="";
-			$j.each(propertys,function(i,n){
-					var arrays=n["list"];
-					$j.each(arrays,function(c,p){
-						if(p["checked"]){
-							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.industryId\" value=\""+i+"\">";
-							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.propertyId\" value=\""+p.id+"\">";
-						}
-					});
-			});
-			
-		   $j("#shopForm").append(html);
+//			var html="";
+//			$j.each(propertys,function(i,n){
+//					var arrays=n["list"];
+//					$j.each(arrays,function(c,p){
+//						if(p["checked"]){
+//							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.industryId\" value=\""+i+"\">";
+//							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.propertyId\" value=\""+p.id+"\">";
+//						}
+//					});
+//			});
+//			
+//		   $j("#shopForm").append(html);
 			
 			nps.submitForm('shopForm',{mode: 'async', 
 				successHandler : function(data){
-				if(data.isSuccess == true)
-				{
-					$j("input[group='subArray']").remove();
-					nps.info(nps.i18n("SHOP_MANAGER_TIPS"),nps.i18n("shop.update.updateshopsuccess"));
-					return false;
-				}else
-				{ 
+				if(data.isSuccess == true){
+					window.location.href=base+"/shop/shopList.htm";
+				}else{ 
 					$j("input[group='subArray']").remove();
 					nps.info(nps.i18n("SHOP_MANAGER_TIPS"),nps.i18n("shop.update.updateshopfail"));
 				    return false;
@@ -205,11 +201,12 @@ var setting = {
 			$j("#setspp_1").addClass("selected");
 			window.location.href=base+"/shop/shopPropertymanager.htm?shopId="+shopId;
 		});
+		
 		//顶部选项卡切换至修改店铺页面
-		$j("#setspp_2").click(function(){
-			var shopid = $j("#shopid").val();
-			window.location.href=base+"/shop/updateShop.htm?shopid="+shopid;
-		});
+//		$j("#setspp_2").click(function(){
+//			var shopid = $j("#shopid").val();
+//			window.location.href=base+"/shop/updateShop.htm?shopid="+shopid;
+//		});
 		
 		//检查店铺编码是否具有唯一性
 		$j("#shopcode").bind("blur",function()

@@ -13,7 +13,8 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-import com.baozun.nebula.solr.utils.JsonUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
+
 
 public class AddressUtilTest {
 

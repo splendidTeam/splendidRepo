@@ -52,7 +52,7 @@ import com.baozun.nebula.utilities.common.encryptor.EncryptionException.EncOpera
  * 然后确保私钥文件的名称和路径正确
  * 
  * @author Benjamin.Liu
- *
+ * @author D.C  添加 transformation
  */
 public class RSAEncryptor implements Encryptor {
 	
@@ -61,11 +61,12 @@ public class RSAEncryptor implements Encryptor {
 	private PrivateKey privateKey;
 	private PublicKey publicKey;
 	private String strPublicKey;
+	private String transformation = "RSA/None/PKCS1Padding";
 	
 	public RSAEncryptor(){
-		String privateKeyPlace = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey");	
+		String privateKeyPlace =ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey");	
 		String publicKeyPlace = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.publicKey");	
-		String pkcs8 = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.publicKey.pkcs8");	
+		String pkcs8 = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration("rsa.privateKey.pkcs8");	
 		
 		assert privateKeyPlace != null : "Cannot find Configuration for RSA Private Key";
 		assert publicKeyPlace != null : "Cannot find Configuration for RSA Public Key";
@@ -84,8 +85,11 @@ public class RSAEncryptor implements Encryptor {
 		
 		assert privateKey != null : "RSA Private Key do not setup properly";
 		assert publicKey != null : "RSA Public Key do not setup properly";
-		
-		
+	}
+	
+	public RSAEncryptor(String transformation){
+		this();
+		this.transformation = transformation;
 	}
 	
 	private Base64Convertor base64 = new Base64Convertor();
@@ -133,23 +137,23 @@ public class RSAEncryptor implements Encryptor {
 	private byte[] encrypt(String plainText, PublicKey publicKey) throws EncryptionException{
         Cipher cipher= null;  
         try {  
-            cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());  
+            cipher= Cipher.getInstance(transformation, new BouncyCastleProvider());  
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);  
             return cipher.doFinal(plainText.getBytes(ConfigurationUtil.DEFAULT_ENCODING)); 
         } catch (Exception e) {  
-            throw new EncryptionException(plainText, "RSA", EncOperation.ENCRYPT ,e);  
+            throw new EncryptionException(plainText, transformation, EncOperation.ENCRYPT ,e);  
         } 
 	}
 	
 	private String decrypt(byte[] cipherBytes, PrivateKey privateKey) throws EncryptionException {
         Cipher cipher= null;  
         try {  
-            cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());  
+            cipher= Cipher.getInstance(transformation, new BouncyCastleProvider());  
             cipher.init(Cipher.DECRYPT_MODE, privateKey);  
             byte[] output= cipher.doFinal(cipherBytes);  
             return new String(output, ConfigurationUtil.DEFAULT_ENCODING);
         } catch (Exception e) {  
-        	throw new EncryptionException(base64.format(cipherBytes), "RSA", EncOperation.DECRYPT ,e);  
+        	throw new EncryptionException(base64.format(cipherBytes), transformation, EncOperation.DECRYPT ,e);  
         }  
 	}
 	
@@ -217,7 +221,7 @@ public class RSAEncryptor implements Encryptor {
 		return toRSAPrivateKey(strKey);
 	}
 
-	private RSAPrivateKey toRSAPrivateKey(String privateKey) throws EncryptionException {
+	public RSAPrivateKey toRSAPrivateKey(String privateKey) throws EncryptionException {
 		if(privateKey == null)
 			throw new EncryptionException("No Key found, PrivateKey String is null");
 		try {  

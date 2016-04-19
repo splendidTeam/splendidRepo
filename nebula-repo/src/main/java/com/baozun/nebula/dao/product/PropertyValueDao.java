@@ -240,4 +240,18 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	 */
 	@NativeUpdate
 	Integer updatePropertyValueSortById(@QueryParam("id") Long id,@QueryParam("sortNo") Integer sortNo);
+	
+	
+	/**
+	 * 根据propertyId和语言查询propertyValue的国际化的值
+	 * @return List<PropertyValueLang>
+	 * @param propertyId
+	 * @param langs
+	 * @author 冯明雷
+	 * @time 2016年4月14日上午11:20:06
+	 */
+	@NativeQuery(model = PropertyValueLang.class)
+	List<PropertyValueLang> findPropertyValueLangByPropertyId(
+			@QueryParam("propertyId") Long propertyId,
+			@QueryParam("langs") List<String> langs);
 }

@@ -69,14 +69,14 @@ var zNodes =[
 			 <div id="propertySelDiv-1">
 			 	<div class="ui-block ui-block-fleft w240">
 			        
-			        <div class="ui-block-content ui-block-content-lb">
+			        <div class="ui-block-content ui-block-content-lb ui-block-content-lb-1">
 			         	
 						<div class="ui-block-title1" id="PropertyDiv"><spring:message code="system.property.selectable"/></div>
 						<div id="enableSelectProperty">
-							<div><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />颜色</div>
-							<div><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />尺寸</div>
-							<div><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />科技</div>
-							<div><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />面料</div>
+							<div class="enableSelectPropertyDiv"><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />颜色</div>
+							<div class="enableSelectPropertyDiv"><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />尺寸</div>
+							<div class="enableSelectPropertyDiv"><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />科技</div>
+							<div class="enableSelectPropertyDiv"><input name="propertyList" class="enableSelectPropertyList" type="checkbox" value="" />面料</div>
 						</div>
 				   	</div>
 			          

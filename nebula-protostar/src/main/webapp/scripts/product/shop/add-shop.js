@@ -21,8 +21,8 @@ var setting = {
 //		},
 		view: {
 			dblClickExpand: true,
-			showIcon:false,
-			addDiyDom: addDiyDom
+			showIcon:false
+			//addDiyDom: addDiyDom
 		},
 		data: {
 			simpleData: {
@@ -30,7 +30,7 @@ var setting = {
 			}
 		},
 		callback: {
-			onClick : onClick
+			//onClick : onClick
 		}
 	};
 	function beforeClick(treeId, treeNode) {
@@ -53,10 +53,10 @@ var setting = {
 	}
 
 	function userFormValidate(){
-		if($j("input[group='subArray']").length<=0)
-		{
-			return nps.i18n("shop.add.chooseonindustry");
-		}
+//		if($j("input[group='subArray']").length<=0)
+//		{
+//			return nps.i18n("shop.add.chooseonindustry");
+//		}
 		 return loxia.SUCCESS; 
 	}
 	
@@ -136,32 +136,30 @@ $j(document).ready(function(){
 		$j.fn.zTree.init($j("#treeDemo"), setting, zNodes);
 		
 		//保存店铺
-		$j(".button.orange.submit").click(function()
-		{
-			var html="";
-			$j.each(propertys,function(i,n){
-					var arrays=n["list"];
-					$j.each(arrays,function(c,p){
-						if(p["checked"]){
-							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.industryId\" value=\""+i+"\">";
-							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.propertyId\" value=\""+p.id+"\">";
-						}
-					});
-			});
+		$j(".button.orange.submit").click(function(){
+//			var html="";
+//			$j.each(propertys,function(i,n){
+//					var arrays=n["list"];
+//					$j.each(arrays,function(c,p){
+//						if(p["checked"]){
+//							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.industryId\" value=\""+i+"\">";
+//							html+="<input type=\"hidden\" group=\"subArray\" name=\"shopPropertys.propertyId\" value=\""+p.id+"\">";
+//						}
+//					});
+//			});
 			
-		   $j("#shopForm").append(html);
-		   nps.submitForm('userForm',{mode: 'async', 
-				successHandler : function(data){
-				if(data.isSuccess == true)
-				{
+//		   $j("#shopForm").append(html);
+		   nps.submitForm('userForm',{mode: 'async', successHandler : function(data){
+				if(data.isSuccess == true){
 					window.location.href=base+"/shop/shopList.htm";
-				}else
-				{
+				}else{
 					$j("input[group='subArray']").remove();
 					return nps.info(nps.i18n("SHOP_MANAGER_TIPS"),nps.i18n("shop.add.addshopfail"));
 				}
 		   }});
 	    });
+		
+		
 		 //保存并且设置店铺属性
 		 $j(".button.configShopProperty.submit").click(function(){
 			 nps.submitForm('userForm',{mode: 'async', 

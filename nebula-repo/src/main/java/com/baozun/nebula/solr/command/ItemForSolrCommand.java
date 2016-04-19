@@ -112,7 +112,7 @@ public class ItemForSolrCommand implements Serializable {
 	private Date listTime;
 	
 	/**
-	 * 活跃开始时间
+	 * 活动开始时间
 	 */
 	@Field
 	private Date activeBeginTime;

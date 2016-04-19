@@ -73,14 +73,13 @@ public interface ItemManager extends BaseManager {
 
 	
 	/**
-	 * 根据店铺id和行业id查找对应属性 区别不关联表t_pd_common_propert
+	 * 根据行业id查找对应属性 
 	 * 
 	 * @param shopId
 	 * @param industryUd
 	 * @return
 	 */
-	List<DynamicPropertyCommand> findDynamicPropertisWidthoutCommonProperty(Long shopId,
-			Long industryId);
+	List<DynamicPropertyCommand> findDynamicPropertisByIndustryId(Long industryId);
 	/**
 	 * 保存商品
 	 * 
@@ -254,8 +253,7 @@ public interface ItemManager extends BaseManager {
 			Long[] propertyValueIds, // 动态
 			Long[] categoriesIds,// 商品分类Id
 			ItemProperties[] iProperties,// 普通商品属性
-			SkuPropertyCommand[] skuPropertyCommand,// sku 的信息，包含每个sku对应的价格
-			List<ItemProValGroupRelation> groupRelation// 商品属性分组
+			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
 	) throws Exception;
 
 	/**

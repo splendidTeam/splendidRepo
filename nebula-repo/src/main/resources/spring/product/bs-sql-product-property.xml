@@ -1269,7 +1269,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="Property.findPropertyLongByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="Property.findPropertyLangByPropertyId" class="loxia.dao.support.DynamicQueryHolder">
 		<constructor-arg>
 			<value>
             <![CDATA[ 
@@ -1283,5 +1283,4 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
 </beans>
