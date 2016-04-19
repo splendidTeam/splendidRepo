@@ -20,7 +20,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
  * 面包屑
- * <p>这里只定义了面包屑的每一项，一个完整的面包屑应该是该类的列表，而且这个列表应该是有序的。</p>
+ * <p>这里只定义了面包屑的一项，一个完整的面包屑应该是该类的列表，而且这个列表应该是有序的。</p>
  * 
  * @author yimin.qiao
  *
@@ -29,19 +29,12 @@ public class BreadcrumbsViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = -9009176806400593148L;
 
-	/**
-	 * 面包屑每一项的显示名称
-	 */
+	/** 面包屑每一项的显示名称 */
 	private String title;
 	
-	/**
-	 * 面包屑每一项的路径
-	 */
+	/** 面包屑每一项的路径 */
 	private String path;
 	
-	/**
-	 * 
-	 */
 	public BreadcrumbsViewCommand() {
 		super();
 	}
