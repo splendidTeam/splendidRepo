@@ -18,6 +18,7 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
-import com.baozun.nebula.utilities.common.Validator;
+import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
@@ -141,11 +142,17 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @param itemId
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
 		List<InventoryViewCommand> inventoryViewCommands = new ArrayList<InventoryViewCommand>();
 		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
 		if(Validator.isNotNullOrEmpty(skuCommands)){
-			
+			for(SkuCommand skuCommand:skuCommands){
+				InventoryViewCommand inventoryViewCommand = new InventoryViewCommand();
+				BeanUtils.copyProperties(skuCommand, inventoryViewCommand);
+				inventoryViewCommand.setSkuId(skuCommand.getId());
+				inventoryViewCommands.add(inventoryViewCommand);
+			}
 		}
 		return inventoryViewCommands;
 	}
