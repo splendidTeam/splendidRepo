@@ -49,6 +49,12 @@ import com.baozun.nebula.model.BaseModel;
 /**
  * 捆绑类商品的单品sku信息
  * 
+ * <ul>
+ * 		<li>BundleSku是BundleElement的组成原子</li>
+ * 		<li>BundleSku是Sku的一个副本，除了销售价可能不同之外，其它与Sku并无区别</li>
+ * 		<li>一个普通商品的Sku可以全部或部分参与到捆绑类商品中</li>
+ * </ul>
+ * 
  * @author yue.ch
  *
  */

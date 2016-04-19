@@ -322,9 +322,9 @@ public class MemberManagerImpl implements MemberManager{
 	@Override
 	public MemberCommand findMemberCommandByLoginName(String loginName){
 		MemberCommand member;
-		if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, loginName)){
+		if (RegexUtil.matches(RegexPattern.MOBILEPHONE, loginName)){
 			member = sdkMemberManager.findMemberByLoginMobile(loginName);
-		}else if (!RegexUtil.matches(RegexPattern.EMAIL, loginName)){
+		}else if (RegexUtil.matches(RegexPattern.EMAIL, loginName)){
 			member = sdkMemberManager.findMemberByLoginEmail(loginName);
 		}else{
 			member = sdkMemberManager.findMemberByLoginName(loginName);
