@@ -39,7 +39,7 @@ public interface SearchManager<T> {
 	List<T> search(SolrQuery solrQuery);
 	
 	/**
-	 * 将页面传入参数转换成solr查询对象
+	 * 参数转换成solr查询对象
 	 * @param facetParameter
 	 * @return
 	 */
@@ -59,5 +59,12 @@ public interface SearchManager<T> {
 	 * @param itemForSolrCommands
 	 */
 	T convertSolrDoc(List<ItemForSolrCommand> itemForSolrCommands);
+	
+	/**
+	 * 页面需要的facet filter。facets的内容，需要从后台的筛选条件里面取值
+	 * @param solrQuery
+	 * @param facets
+	 */
+	void setSolrFacet(SolrQuery solrQuery,String[] facets);
 	
 }

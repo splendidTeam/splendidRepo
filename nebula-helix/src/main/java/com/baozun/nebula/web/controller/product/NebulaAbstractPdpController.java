@@ -110,10 +110,10 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
-	
 	@Autowired
 	ImageViewCommandConverter                                       imageViewCommandConverter;
 	
+
 	
 	/**
 	 * 构造商品的属性信息，包括销售属性和非销售属性

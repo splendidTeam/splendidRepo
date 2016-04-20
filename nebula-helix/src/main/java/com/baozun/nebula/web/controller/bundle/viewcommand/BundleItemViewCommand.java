@@ -33,49 +33,86 @@ package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
  * @author yue.ch
  *
  */
-public class BundleElementViewCommand extends BaseViewCommand {
+public class BundleItemViewCommand extends BaseViewCommand {
 
-	private static final long serialVersionUID = 2340192122967455038L;
-	
+	private static final long serialVersionUID = 7084586879135978741L;
 	
 	/**
-	 * 捆绑类商品成员最小原价（注意：此处的listPrice并非吊牌价，而是这个成员中所有普通商品原来的销售价的最小值）
+	 * 商品ID
+	 */
+	private Long itemId;
+	
+	/**
+	 * 商品标题
+	 */
+	private String title;
+	
+	/**
+	 * 商品图片
+	 */
+	private String imageUrl;
+	
+	/**
+	 * 最小原价（注意：此处的listPrice并非吊牌价，而是这个普通商品所有参与捆绑商品的sku原来的销售价的最小值）
 	 */
 	private BigDecimal minListPrice;
 	
 	/**
-	 * 捆绑类商品成员最大原价（注意：此处的listPrice并非吊牌价，而是这个成员中所有普通商品原来的销售价的最大值）
+	 * 最大原价（注意：此处的listPrice并非吊牌价，而是这个普通商品所有参与捆绑商品的sku原来的销售价的最大值）
 	 */
 	private BigDecimal maxListPrice;
 	
 	/**
-	 * 捆绑类商品成员中所有商品设置的捆绑销售价的最小值
+	 * 商品中所有参与捆绑销售的sku设置的捆绑销售价的最小值
 	 */
 	private BigDecimal minSalesPrice;
 	
 	/**
-	 * 捆绑类商品成员中所有商品设置的捆绑销售价的最小值
+	 * 商品中所有参与捆绑销售的sku设置的捆绑销售价的最大值
 	 */
 	private BigDecimal maxSalesPrice;
 	
 	/**
-	 * 捆绑类商品成员的属性和属性值
+	 * 商品属性与属性值
 	 */
-	private List<PropertyElementViewCommand> propertyElementViewCommands;
+	private Map<String, Object> properties;
 	
 	/**
-	 * 捆绑类商品成员中包含的商品
+	 * 商品中包含的sku
 	 */
-	private List<BundleItemViewCommand> bundleItemViewCommands;
-	
+	private List<BundleSkuViewCommand> skuViewCommands;
+
+	public Long getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(Long itemId) {
+		this.itemId = itemId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 
 	public BigDecimal getMinListPrice() {
 		return minListPrice;
@@ -109,20 +146,19 @@ public class BundleElementViewCommand extends BaseViewCommand {
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
-	public List<PropertyElementViewCommand> getPropertyElementViewCommands() {
-		return propertyElementViewCommands;
+	public Map<String, Object> getProperties() {
+		return properties;
 	}
 
-	public void setPropertyElementViewCommands(List<PropertyElementViewCommand> propertyElementViewCommands) {
-		this.propertyElementViewCommands = propertyElementViewCommands;
+	public void setProperties(Map<String, Object> properties) {
+		this.properties = properties;
 	}
 
-	public List<BundleItemViewCommand> getBundleItemViewCommands() {
-		return bundleItemViewCommands;
+	public List<BundleSkuViewCommand> getSkuViewCommands() {
+		return skuViewCommands;
 	}
 
-	public void setBundleItemViewCommands(List<BundleItemViewCommand> bundleItemViewCommands) {
-		this.bundleItemViewCommands = bundleItemViewCommands;
+	public void setSkuViewCommands(List<BundleSkuViewCommand> skuViewCommands) {
+		this.skuViewCommands = skuViewCommands;
 	}
-	
 }

@@ -35,6 +35,11 @@ public class PdpViewCommand extends BaseViewCommand {
 	
 	/** 颜色（或者其他属性，颜色是个统称）切换部分 */
 	private List<ItemColorSwatchViewCommand>  itemColorSwatches;
+	
+	/** sku */
+	private List<SkuViewCommand> skus;
+	
+	private PriceViewCommand price;
 
 	/** 尺码对照. */
     private String sizeCompareChart;
@@ -62,14 +67,30 @@ public class PdpViewCommand extends BaseViewCommand {
 	public void setItemProperty(ItemPropertyViewCommand itemProperty) {
 		this.itemProperty = itemProperty;
 	}
-
-	public List<ItemColorSwatchViewCommand> getItemColorSwitches() {
+	
+	public List<ItemColorSwatchViewCommand> getItemColorSwatches() {
 		return itemColorSwatches;
 	}
 
-	public void setItemColorSwitches(
+	public void setItemColorSwatches(
 			List<ItemColorSwatchViewCommand> itemColorSwatches) {
 		this.itemColorSwatches = itemColorSwatches;
+	}
+
+	public List<SkuViewCommand> getSkus() {
+		return skus;
+	}
+
+	public void setSkus(List<SkuViewCommand> skus) {
+		this.skus = skus;
+	}
+
+	public PriceViewCommand getPrice() {
+		return price;
+	}
+
+	public void setPrice(PriceViewCommand price) {
+		this.price = price;
 	}
 
 	public String getSizeCompareChart() {
