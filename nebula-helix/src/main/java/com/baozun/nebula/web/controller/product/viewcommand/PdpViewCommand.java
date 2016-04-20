@@ -36,6 +36,9 @@ public class PdpViewCommand extends BaseViewCommand {
 	/** 颜色（或者其他属性，颜色是个统称）切换部分 */
 	private List<ItemColorSwatchViewCommand>  itemColorSwatches;
 	
+	/** 商品的图片 */
+	private List<ItemImageViewCommand> images;
+	
 	/** sku */
 	private List<SkuViewCommand> skus;
 	
@@ -75,6 +78,14 @@ public class PdpViewCommand extends BaseViewCommand {
 	public void setItemColorSwatches(
 			List<ItemColorSwatchViewCommand> itemColorSwatches) {
 		this.itemColorSwatches = itemColorSwatches;
+	}
+	
+	public List<ItemImageViewCommand> getImages() {
+		return images;
+	}
+
+	public void setImages(List<ItemImageViewCommand> images) {
+		this.images = images;
 	}
 
 	public List<SkuViewCommand> getSkus() {
