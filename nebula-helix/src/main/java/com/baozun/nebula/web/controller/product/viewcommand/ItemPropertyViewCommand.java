@@ -33,21 +33,20 @@ public class ItemPropertyViewCommand extends BaseViewCommand {
 	private static final long serialVersionUID = 1077822621702435603L;
 
 	/**
-	 * 销售属性, [属性名称，属性值Command]
+	 * 销售属性
 	 */
-	private Map<String, PropertyElementViewCommand> salesProperties;
+	private List<PropertyElementViewCommand> salesProperties;
 	
 	/**
 	 * 非销售属性，[属性分组, 分组下的非销售属性集合]
 	 */
 	private Map<String, List<PropertyElementViewCommand>> nonSalesProperties;
 
-	public Map<String, PropertyElementViewCommand> getSalesProperties() {
+	public List<PropertyElementViewCommand> getSalesProperties() {
 		return salesProperties;
 	}
 
-	public void setSalesProperties(
-			Map<String, PropertyElementViewCommand> salesProperties) {
+	public void setSalesProperties(List<PropertyElementViewCommand> salesProperties) {
 		this.salesProperties = salesProperties;
 	}
 
