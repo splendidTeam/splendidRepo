@@ -1328,4 +1328,28 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		return null;
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<MemberCommand> findMembersByIds(List<Long> ids){
+		List<Member> members= memberDao.findMembersByIds(ids);
+		return convertMembersToMemberCommands(members);
+	}
+	
+	private List<MemberCommand> convertMembersToMemberCommands(List<Member> members){
+		if(null==members){
+			return null;
+		}
+		
+		List<MemberCommand> memberCommands = new ArrayList<MemberCommand>();
+		for(Member member : members){
+			MemberCommand memberCommand = null;
+			if (null != member){
+				memberCommand = convertMemberToMemberCommand(member);
+				// 敏感信息加密存储完后，解密传输至Controller
+				decrypt(memberCommand);
+				memberCommands.add(memberCommand);
+			}
+		}
+		return memberCommands;
+	}
 }
