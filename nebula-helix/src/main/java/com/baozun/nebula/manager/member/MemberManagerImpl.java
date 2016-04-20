@@ -310,6 +310,10 @@ public class MemberManagerImpl implements MemberManager{
 			PasswordNotMatchException{
 		MemberCommand member = findMemberCommandByLoginName(memberCommand.getLoginName());
 
+		if(member==null){
+			throw new UserNotExistsException();
+		}
+		
 		String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
 		if (!encodePassword.equals(member.getPassword())){
 			throw new PasswordNotMatchException();
