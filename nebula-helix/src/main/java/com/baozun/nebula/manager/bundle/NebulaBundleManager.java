@@ -30,10 +30,10 @@ public interface NebulaBundleManager extends BaseManager {
 	/**
 	 * <h3>查询bundle信息</h3>
 	 * <ul>
-	 *    <li>pdp入口 ： 至少会有一条记录</li>
+	 *    <li>pdp入口 ： 可能会有多条记录</li>
 	 * </ul>
 	 * 
-	 * @param itemId : bundle捆绑类商品Id
+	 * @param itemId : bundle捆绑类商品中主卖品的商品Id
 	 * @param showMainElementFlag : 是否填充主款或主商品信息
 	 * <ul>
 	 *    <li>到款的bundle : true -- > 包含主款 ; false --> 不包含主款</li>
