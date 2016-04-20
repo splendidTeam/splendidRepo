@@ -14,11 +14,12 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.command.bundle;
+package com.baozun.nebula.web.command.bundle;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.baozun.nebula.model.bundle.Bundle;
+import com.baozun.nebula.command.product.ItemInfoCommand;
 /**
  * 
   * @ClassName: BundleCommand
@@ -26,8 +27,53 @@ import com.baozun.nebula.model.bundle.Bundle;
   * @date 2016年4月15日 上午11:11:40
   *
  */
-public class BundleCommand extends Bundle{
+public class BundleCommand implements Serializable{
 	private static final long serialVersionUID = -3173190425455269096L;
+	
+	/**
+	 * 
+	 */
+	private Long bundleId ;
+	/**
+	 * 
+	 */
+	private Long itemId ;
+	/**
+	 * 商品编码
+	 */
+	private String code ;
+	/**
+	 * 商品生命周期
+	 */
+	private int lifeCycle;
+	
+	/**
+	 * 商品名称
+	 */
+	private String				title;
+
+	/**
+	 * 副标题
+	 */
+	private String				subTitle;
+	
+	/** 商品详细描述 */
+	private String				description;
+	
+	/**
+	 * seo搜索描述
+	 */
+	private String				seoDescription;
+
+	/**
+	 * seo搜索关键字
+	 */
+	private String				seoKeywords;
+
+	/**
+	 * seoTitle
+	 */
+	private String				seoTitle;
 	
 	/**
 	 * 最小吊牌价
@@ -45,6 +91,11 @@ public class BundleCommand extends Bundle{
 	 * 最大销售价
 	 */
 	private BigDecimal maxSalesPrice ;
+	
+	/**
+	 * bundle商品的扩展信息
+	 */
+	private ItemInfoCommand itemInfoCommand ;
 	
 	/**
 	 * 
@@ -92,6 +143,93 @@ public class BundleCommand extends Bundle{
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
+	public Long getBundleId() {
+		return bundleId;
+	}
+
+	public void setBundleId(Long bundleId) {
+		this.bundleId = bundleId;
+	}
+
+	public Long getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(Long itemId) {
+		this.itemId = itemId;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public int getLifeCycle() {
+		return lifeCycle;
+	}
+
+	public void setLifeCycle(int lifeCycle) {
+		this.lifeCycle = lifeCycle;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getSubTitle() {
+		return subTitle;
+	}
+
+	public void setSubTitle(String subTitle) {
+		this.subTitle = subTitle;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getSeoDescription() {
+		return seoDescription;
+	}
+
+	public void setSeoDescription(String seoDescription) {
+		this.seoDescription = seoDescription;
+	}
+
+	public String getSeoKeywords() {
+		return seoKeywords;
+	}
+
+	public void setSeoKeywords(String seoKeywords) {
+		this.seoKeywords = seoKeywords;
+	}
+
+	public String getSeoTitle() {
+		return seoTitle;
+	}
+
+	public void setSeoTitle(String seoTitle) {
+		this.seoTitle = seoTitle;
+	}
+
+	public ItemInfoCommand getItemInfoCommand() {
+		return itemInfoCommand;
+	}
+
+	public void setItemInfoCommand(ItemInfoCommand itemInfoCommand) {
+		this.itemInfoCommand = itemInfoCommand;
+	}
     /**
      * <h3>检验bundle返回值的类型</h3>
      * <ul>

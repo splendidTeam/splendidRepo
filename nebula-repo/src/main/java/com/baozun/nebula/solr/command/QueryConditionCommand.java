@@ -113,6 +113,11 @@ public class QueryConditionCommand implements Serializable {
 	 * 可见人群
 	 */
 	private List<String> visiblePersons;
+	
+	/**
+	 * 导航code
+	 */
+	private String	navigationCode;
 
 	public QueryConditionCommand() {
 	}

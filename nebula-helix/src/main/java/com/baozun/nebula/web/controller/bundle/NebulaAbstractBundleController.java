@@ -29,18 +29,22 @@
 *
  
 */
-package com.baozun.nebula.dao.bundle;
+package com.baozun.nebula.web.controller.bundle;
 
-import com.baozun.nebula.model.bundle.BundleSku;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import loxia.dao.GenericEntityDao;
+import com.baozun.nebula.web.controller.BaseController;
 
 /**
- * BundleSku Dao
+ * 捆绑类商品 controller
  * 
  * @author yue.ch
  *
  */
-public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
+public abstract class NebulaAbstractBundleController extends BaseController {
 	
+	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaAbstractBundleController.class);
+
+	 
 }

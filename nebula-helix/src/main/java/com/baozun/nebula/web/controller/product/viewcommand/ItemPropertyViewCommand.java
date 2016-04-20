@@ -38,7 +38,7 @@ public class ItemPropertyViewCommand extends BaseViewCommand {
 	private Map<String, PropertyElementViewCommand> salesProperties;
 	
 	/**
-	 * 非销售属性，[分组, 分组下的非销售属性集合]
+	 * 非销售属性，[属性分组, 分组下的非销售属性集合]
 	 */
 	private Map<String, List<PropertyElementViewCommand>> nonSalesProperties;
 

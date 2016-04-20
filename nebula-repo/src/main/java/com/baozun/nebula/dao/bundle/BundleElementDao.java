@@ -31,16 +31,16 @@
 */
 package com.baozun.nebula.dao.bundle;
 
-import com.baozun.nebula.model.bundle.BundleSku;
+import com.baozun.nebula.model.bundle.BundleElement;
 
 import loxia.dao.GenericEntityDao;
 
 /**
- * BundleSku Dao
+ * BundleElement Dao
  * 
  * @author yue.ch
  *
  */
-public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
+public interface BundleElementDao extends GenericEntityDao<BundleElement, Long> {
 	
 }

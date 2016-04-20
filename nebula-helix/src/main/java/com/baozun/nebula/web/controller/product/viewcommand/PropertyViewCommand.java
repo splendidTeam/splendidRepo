@@ -26,22 +26,22 @@ public class PropertyViewCommand extends BaseViewCommand {
 	private static final long serialVersionUID = 2591759228343538657L;
 
 	/** 属性Id. */
-	private Long              id;
+	private Long id;
 
     /** 属性名字. */
-    private String            name;
+    private String name;
 
     /** 是否是颜色属性. */
-    private Boolean           isColorProp;
+    private Boolean isColorProp;
     
     /** 是否销售属性 */
-	private Boolean				isSaleProp;
+	private Boolean isSaleProp;
     
     /** 属性分组. */
-    private String            groupName;
+    private String groupName;
     
     /** 属性值类型. */
-	private Integer			  valueType;
+	private Integer valueType;
 
 	public Long getId() {
 		return id;

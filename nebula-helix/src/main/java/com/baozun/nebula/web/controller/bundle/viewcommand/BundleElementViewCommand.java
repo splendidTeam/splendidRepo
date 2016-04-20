@@ -29,18 +29,16 @@
 *
  
 */
-package com.baozun.nebula.dao.bundle;
+package com.baozun.nebula.web.controller.bundle.viewcommand;
 
-import com.baozun.nebula.model.bundle.BundleSku;
-
-import loxia.dao.GenericEntityDao;
+import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * BundleSku Dao
- * 
  * @author yue.ch
  *
  */
-public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
-	
+public class BundleElementViewCommand extends BaseViewCommand {
+
+	private static final long serialVersionUID = 2340192122967455038L;
+
 }

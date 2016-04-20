@@ -25,8 +25,10 @@ public class ImageViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = -2915620332286200250L;
 	
+	/** 图片的url */
 	private String url;
 	
+	/** 图片的描述 */
 	private String description;
 
 	public String getUrl() {

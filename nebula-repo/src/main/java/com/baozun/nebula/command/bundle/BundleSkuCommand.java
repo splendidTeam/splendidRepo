@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016 Baozun All Rights Reserved.
+ * Copyright (c) 2012 Baozun All Rights Reserved.
  *
  * This software is the confidential and proprietary information of Baozun.
  * You shall not disclose such Confidential Information and shall use it only in
@@ -14,12 +14,28 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.search;
+package com.baozun.nebula.command.bundle;
+import java.math.BigDecimal;
 
-/**
- * @author D.C
- * @since 2016年4月14日 下午2:32:30
- */
-public enum FacetType {
-	ID, CATEGORY, FRONT_CATEGORY, TAG, PROPERTY;
+import com.baozun.nebula.model.bundle.BundleSku;
+
+
+public class BundleSkuCommand extends BundleSku{
+
+	private static final long serialVersionUID = -3663016675036644108L;
+
+	/**
+	 * sku原销售价
+	 * 
+	 */
+	private BigDecimal originalSalesPrice;
+	
+	public BigDecimal getOriginalSalesPrice() {
+		return originalSalesPrice;
+	}
+
+	public void setOriginalSalesPrice(BigDecimal originalSalesPrice) {
+		this.originalSalesPrice = originalSalesPrice;
+	}
+	
 }

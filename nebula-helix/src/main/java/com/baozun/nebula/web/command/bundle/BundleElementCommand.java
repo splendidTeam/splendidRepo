@@ -14,10 +14,11 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.command.bundle;
+package com.baozun.nebula.web.command.bundle;
+import java.io.Serializable;
 import java.util.List;
 
-import com.baozun.nebula.model.bundle.BundleElement;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
  　  * 
@@ -26,9 +27,19 @@ import com.baozun.nebula.model.bundle.BundleElement;
   * @date 2016年4月15日 上午10:14:39
   * {@link com.baozun.nebula.model.bundle.BundleElement}
  */
-public class BundleElementCommand extends BundleElement{
+public class BundleElementCommand implements Serializable{
 
 	private static final long serialVersionUID = -8462331832705645692L;
+	
+	/**
+	 * 
+	 */
+	private Long elementId ;
+	
+	/**
+	 * 商品的所有属性
+	 */
+	private List<PropertyElementViewCommand> salesProperties ;
 	
 	/**
 	 * <ul>
@@ -37,6 +48,22 @@ public class BundleElementCommand extends BundleElement{
 	 * </ul>
 	 */
 	private List<BundleItemCommand> items;
+
+	public Long getElementId() {
+		return elementId;
+	}
+
+	public void setElementId(Long elementId) {
+		this.elementId = elementId;
+	}
+
+	public List<PropertyElementViewCommand> getSalesProperties() {
+		return salesProperties;
+	}
+
+	public void setSalesProperties(List<PropertyElementViewCommand> salesProperties) {
+		this.salesProperties = salesProperties;
+	}
 
 	public List<BundleItemCommand> getItems() {
 		return items;

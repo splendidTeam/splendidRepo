@@ -47,4 +47,6 @@ public interface Facet {
      * @return selected
      */
     boolean isSelected();
+    
+    String	getValue();
 }
