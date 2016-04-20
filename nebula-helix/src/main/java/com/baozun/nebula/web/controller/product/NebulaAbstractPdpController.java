@@ -287,11 +287,11 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemExtraViewCommand buildItemExtraViewCommand(Long itemId){
+	protected ItemExtraViewCommand buildItemExtraViewCommand(String itemCode){
 		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
-		itemExtraViewCommand.setSales(getItemSales(itemId));
-		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemId));
-		itemExtraViewCommand.setSales(getItemRate(itemId));
+		itemExtraViewCommand.setSales(getItemSales(itemCode));
+		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
+		itemExtraViewCommand.setSales(getItemRate(itemCode));
 		return itemExtraViewCommand;
 	}
 	
@@ -316,11 +316,11 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 		return new Pagination<ItemReviewViewCommand>();
 	}
 	
-	protected abstract Long getItemSales(Long itemId);
+	protected abstract Long getItemSales(String itemCode);
 	
-	protected abstract Long getItemFavoriteCount(Long itemId);
+	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Long getItemRate(Long itemId);
+	protected abstract Long getItemRate(String itemCode);
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	
