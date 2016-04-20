@@ -61,14 +61,14 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private String imageUrl;
 	
 	/**
-	 * 最小原价（注意：此处的listPrice并非吊牌价，而是这个普通商品所有参与捆绑商品的sku原来的销售价的最小值）
+	 * 最小原价
 	 */
-	private BigDecimal minListPrice;
+	private BigDecimal minOriginalSalesPrice;
 	
 	/**
-	 * 最大原价（注意：此处的listPrice并非吊牌价，而是这个普通商品所有参与捆绑商品的sku原来的销售价的最大值）
+	 * 最大原价
 	 */
-	private BigDecimal maxListPrice;
+	private BigDecimal maxOriginalSalesPrice;
 	
 	/**
 	 * 商品中所有参与捆绑销售的sku设置的捆绑销售价的最小值
@@ -114,20 +114,20 @@ public class BundleItemViewCommand extends BaseViewCommand {
 		this.imageUrl = imageUrl;
 	}
 
-	public BigDecimal getMinListPrice() {
-		return minListPrice;
+	public BigDecimal getMinOriginalSalesPrice() {
+		return minOriginalSalesPrice;
 	}
 
-	public void setMinListPrice(BigDecimal minListPrice) {
-		this.minListPrice = minListPrice;
+	public void setMinOriginalSalesPrice(BigDecimal minOriginalSalesPrice) {
+		this.minOriginalSalesPrice = minOriginalSalesPrice;
 	}
 
-	public BigDecimal getMaxListPrice() {
-		return maxListPrice;
+	public BigDecimal getMaxOriginalSalesPrice() {
+		return maxOriginalSalesPrice;
 	}
 
-	public void setMaxListPrice(BigDecimal maxListPrice) {
-		this.maxListPrice = maxListPrice;
+	public void setMaxOriginalSalesPrice(BigDecimal maxOriginalSalesPrice) {
+		this.maxOriginalSalesPrice = maxOriginalSalesPrice;
 	}
 
 	public BigDecimal getMinSalesPrice() {

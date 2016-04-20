@@ -167,7 +167,7 @@ public class NebulaMemberAddressController extends BaseController {
 		//Form转contact
 		ContactCommand contact = memberAddressForm.toContactCommand();
 		contact.setMemberId(memberDetails.getMemberId());
-		ContactCommand contactCommand = sdkMemberManager.saveContactCommand(contact);
+		ContactCommand contactCommand = sdkMemberManager.createOrUpdateContact(contact);
 		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中	
 		MemberAddressViewCommand memberAddressViewCommand = memberAddressViewCommandConverter.convert(contactCommand);
 		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS,memberAddressViewCommand);		
@@ -224,7 +224,7 @@ public class NebulaMemberAddressController extends BaseController {
 		//另外字段添加
 		contact.setMemberId(memberDetails.getMemberId());
 		contact.setId(memberAddressForm.getId());		
-		ContactCommand contactCommand = sdkMemberManager.saveContactCommand(contact);
+		ContactCommand contactCommand = sdkMemberManager.createOrUpdateContact(contact);
 		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中
 		MemberAddressViewCommand memberAddressViewCommand = memberAddressViewCommandConverter.convert(contactCommand);
 		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS,memberAddressViewCommand);

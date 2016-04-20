@@ -37,7 +37,10 @@ import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
+<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.web.controller.product.converter.ImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
@@ -116,10 +119,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	ImageViewCommandConverter                                       imageViewCommandConverter;
 	
+<<<<<<< HEAD
 	
 	
 
 	
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 	
 	/**

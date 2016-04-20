@@ -50,9 +50,9 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	private Long skuId;
 	
 	/**
-	 * sku作为普通商品销售时的销售价（非吊牌价）
+	 * sku原价
 	 */
-	private BigDecimal listPrice;
+	private BigDecimal originalSalesPrice;
 	
 	/**
 	 * sku在捆绑类商品中的实际销售价
@@ -81,12 +81,12 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 		this.skuId = skuId;
 	}
 
-	public BigDecimal getListPrice() {
-		return listPrice;
+	public BigDecimal getOriginalSalesPrice() {
+		return originalSalesPrice;
 	}
 
-	public void setListPrice(BigDecimal listPrice) {
-		this.listPrice = listPrice;
+	public void setOriginalSalesPrice(BigDecimal originalSalesPrice) {
+		this.originalSalesPrice = originalSalesPrice;
 	}
 
 	public BigDecimal getSalesPrice() {
