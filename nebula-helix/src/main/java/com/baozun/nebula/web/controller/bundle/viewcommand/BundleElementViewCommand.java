@@ -31,7 +31,11 @@
 */
 package com.baozun.nebula.web.controller.bundle.viewcommand;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import com.baozun.nebula.web.controller.BaseViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
  * @author yue.ch
@@ -40,5 +44,85 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 public class BundleElementViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 2340192122967455038L;
+	
+	
+	/**
+	 * 捆绑类商品成员最小原价（注意：此处的listPrice并非吊牌价，而是这个成员中所有普通商品原来的销售价的最小值）
+	 */
+	private BigDecimal minListPrice;
+	
+	/**
+	 * 捆绑类商品成员最大原价（注意：此处的listPrice并非吊牌价，而是这个成员中所有普通商品原来的销售价的最大值）
+	 */
+	private BigDecimal maxListPrice;
+	
+	/**
+	 * 捆绑类商品成员中所有商品设置的捆绑销售价的最小值
+	 */
+	private BigDecimal minSalesPrice;
+	
+	/**
+	 * 捆绑类商品成员中所有商品设置的捆绑销售价的最小值
+	 */
+	private BigDecimal maxSalesPrice;
+	
+	/**
+	 * 捆绑类商品成员的属性和属性值
+	 */
+	private List<PropertyElementViewCommand> propertyElementViewCommands;
+	
+	/**
+	 * 捆绑类商品成员中包含的商品
+	 */
+	private List<BundleItemViewCommand> bundleItemViewCommands;
+	
 
+	public BigDecimal getMinListPrice() {
+		return minListPrice;
+	}
+
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
+	}
+
+	public BigDecimal getMaxListPrice() {
+		return maxListPrice;
+	}
+
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
+	}
+
+	public BigDecimal getMinSalesPrice() {
+		return minSalesPrice;
+	}
+
+	public void setMinSalesPrice(BigDecimal minSalesPrice) {
+		this.minSalesPrice = minSalesPrice;
+	}
+
+	public BigDecimal getMaxSalesPrice() {
+		return maxSalesPrice;
+	}
+
+	public void setMaxSalesPrice(BigDecimal maxSalesPrice) {
+		this.maxSalesPrice = maxSalesPrice;
+	}
+
+	public List<PropertyElementViewCommand> getPropertyElementViewCommands() {
+		return propertyElementViewCommands;
+	}
+
+	public void setPropertyElementViewCommands(List<PropertyElementViewCommand> propertyElementViewCommands) {
+		this.propertyElementViewCommands = propertyElementViewCommands;
+	}
+
+	public List<BundleItemViewCommand> getBundleItemViewCommands() {
+		return bundleItemViewCommands;
+	}
+
+	public void setBundleItemViewCommands(List<BundleItemViewCommand> bundleItemViewCommands) {
+		this.bundleItemViewCommands = bundleItemViewCommands;
+	}
+	
 }
