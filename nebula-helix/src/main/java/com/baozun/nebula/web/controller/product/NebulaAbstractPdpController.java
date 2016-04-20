@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2016 Jumbomart All Rights Reserved.
  *
@@ -194,7 +193,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
 		itemExtraViewCommand.setSales(getItemSales(itemCode));
 		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
-		itemExtraViewCommand.setSales(getItemRate(itemCode));
+	//	itemExtraViewCommand.setSales(getItemRate(itemCode));
 		return itemExtraViewCommand;
 	}
 	
@@ -223,7 +222,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Long getItemRate(String itemCode);
+	protected abstract Double getItemRate(String itemCode);
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	

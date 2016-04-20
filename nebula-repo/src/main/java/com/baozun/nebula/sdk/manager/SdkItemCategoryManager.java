@@ -5,7 +5,7 @@ import java.util.List;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.ItemCategory;
 
-public interface ItemCategoryManager extends BaseManager{
+public interface SdkItemCategoryManager extends BaseManager{
 
 	/**
 	 * 通过商品ID查找商品分类

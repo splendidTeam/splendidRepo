@@ -265,7 +265,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return null;
 	}
 
-	@Override
 	protected Long getItemReviewCount(String itemCode) {
 		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
 	}
