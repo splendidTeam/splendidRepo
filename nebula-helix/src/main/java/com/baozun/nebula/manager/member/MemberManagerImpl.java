@@ -542,4 +542,10 @@ public class MemberManagerImpl implements MemberManager{
 
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<MemberCommand> findMembersByIds(List<Long> ids) {
+		return sdkMemberManager.findMembersByIds(ids);
+	}
+
 }

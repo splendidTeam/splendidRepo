@@ -618,5 +618,10 @@ public interface SdkMemberManager extends BaseManager{
 	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type,Long memberId);
 	
 	
-	
+	/**
+	 * 根据member ids批量查询member
+	 * @param ids
+	 * @return
+	 */
+	List<MemberCommand> findMembersByIds(List<Long> ids);
 }

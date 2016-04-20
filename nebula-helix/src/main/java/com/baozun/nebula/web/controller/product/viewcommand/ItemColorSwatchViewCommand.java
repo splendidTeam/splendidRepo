@@ -23,7 +23,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * TODO 需要重构
  *
  */
-public class ItemColorSwitchViewCommand extends BaseViewCommand {
+public class ItemColorSwatchViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 3016160425868695170L;
     

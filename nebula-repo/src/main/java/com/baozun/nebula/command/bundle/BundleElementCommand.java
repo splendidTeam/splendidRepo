@@ -15,10 +15,9 @@
  *
  */
 package com.baozun.nebula.command.bundle;
-import java.io.Serializable;
 import java.util.List;
 
-import com.baozun.nebula.command.ItemCommand;
+import com.baozun.nebula.model.bundle.BundleElement;
 
 /**
  　  * 
@@ -27,31 +26,23 @@ import com.baozun.nebula.command.ItemCommand;
   * @date 2016年4月15日 上午10:14:39
   * {@link com.baozun.nebula.model.bundle.BundleElement}
  */
-public class BundleElementCommand implements Serializable{
+public class BundleElementCommand extends BundleElement{
 
 	private static final long serialVersionUID = -8462331832705645692L;
 	
-	//TODO propertyCommand
-	private List<Object> salesProperties ;
-	
-	//TODO 这个ItemCommand需要跟PDP那边确认
-	//TODO ItemCommand中需要包含商品的基本信息，以及一个ITEM参加bundle的所有sku
-	//TODO sku需要其一些基本信息，以及对应的属性Map<propertyId,propertyValueName>
-	private List<ItemCommand> items;
+	/**
+	 * <ul>
+	 * 	  <li>BundleItemCommand中需要包含商品的基本信息，以及一个ITEM参加bundle的所有sku</li>
+	 * 	  <li>sku需要其一些基本信息，以及对应的属性Map<propertyId,propertyValueName></li>
+	 * </ul>
+	 */
+	private List<BundleItemCommand> items;
 
-	public List<Object> getSalesProperties() {
-		return salesProperties;
-	}
-
-	public void setSalesProperties(List<Object> salesProperties) {
-		this.salesProperties = salesProperties;
-	}
-
-	public List<ItemCommand> getItems() {
+	public List<BundleItemCommand> getItems() {
 		return items;
 	}
 
-	public void setItems(List<ItemCommand> items) {
+	public void setItems(List<BundleItemCommand> items) {
 		this.items = items;
 	}
 	
