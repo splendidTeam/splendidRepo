@@ -232,6 +232,13 @@ public interface MemberDao extends GenericEntityDao<Member, Long>{
 	 */
 	@NativeUpdate
 	int updateMemberGroupIdById(@QueryParam("memberId") Long memberId,@QueryParam("groupId") Long groupId);
-	
+
+	/**
+	 * 根据member ids 批量查询member
+	 * @param ids
+	 * @return
+	 */
+	@NativeQuery(model = Member.class)
+	List<Member> findMembersByIds(@QueryParam("ids") List<Long> ids);
 }
 

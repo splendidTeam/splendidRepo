@@ -274,5 +274,12 @@ public interface MemberManager extends BaseManager{
 	 * @param clientIp
 	 */
 	void setupMemberReference(MemberFrontendCommand memberFrontendCommand,String clientIp);
+	
+	/**
+	 * 根据memberIds批量查询member
+	 * @param ids
+	 * @return
+	 */
+	List<MemberCommand> findMembersByIds(List<Long> ids);
 
 }
