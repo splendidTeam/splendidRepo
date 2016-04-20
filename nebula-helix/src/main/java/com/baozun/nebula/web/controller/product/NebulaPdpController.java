@@ -17,25 +17,39 @@
  */
 package com.baozun.nebula.web.controller.product;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Pagination;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.RateCommand;
+import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.manager.product.ItemRateManager;
+import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
+import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.feilong.core.Validator;
 
 
 /**
@@ -56,6 +70,21 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaPdpController.class);
 
+	@Autowired
+	private ItemRateManager itemRateManager;
+	
+	@Autowired
+	private MemberManager memberManager;
+	
+	@Autowired
+	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
+	
+	@Autowired
+	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
+	
+	@Autowired
+	private ItemDetailManager	itemDetailManager;
+	
 	/**
 	 * 进入商品详情页 	
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
@@ -144,7 +173,39 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult showItemReview(@RequestParam("itemId") Long itemId, @ModelAttribute("page") PageForm pageForm, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		Date current = new Date();
+		LOG.debug("[PDP_SHOW_ITEM_REVIEW]request start...[ItemId:{},CurrentPage:{},Sort:{}],{}",itemId,pageForm.getCurrentPage(),pageForm.getSort(),current);
+		
+		Pagination<RateCommand> rates = itemRateManager.findItemRateListByItemId(pageForm.getPage(), itemId, pageForm.getSorts());
+		
+		List<RateCommand> items  = rates.getItems();
+		List<MemberCommand> members = getMemberCommandsByRates(items);
+		
+		//convert to itemreviewViewCommand
+		Pagination<ItemReviewViewCommand> itemReviewViewCommands 
+					= itemReviewViewCommandConverter.convertFromTwoObjects(rates, reviewMemberViewCommandConverter.convert(members));
+		
+		model.addAttribute("itemReviewViewCommands", itemReviewViewCommands);
+		
+		LOG.debug("[PDP_SHOW_ITEM_REVIEW]request end...[ItemId:{},CurrentPage:{},Sort:{}],{}",itemId,pageForm.getCurrentPage(),pageForm.getSort(),new Date().getTime()-current.getTime());
 		return new DefaultReturnResult();
+	}
+	
+	/**
+	 * 集中将rate 的memberId进行封装，然后批量查询提高效率
+	 * @param rates
+	 * @return
+	 */
+	private List<MemberCommand> getMemberCommandsByRates(List<RateCommand> rates){
+		if(Validator.isNullOrEmpty(rates)){
+			return new ArrayList<MemberCommand>();
+		}
+		
+		List<Long> memberIds = new ArrayList<Long>();
+		for(RateCommand rate : rates){
+			memberIds.add(rate.getMemberId());
+		}
+		return memberManager.findMembersByIds(memberIds);
 	}
 	
 	
@@ -181,23 +242,20 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Long getItemSales(Long itemId) {
-		// TODO Auto-generated method stub
+	protected Long getItemSales(String itemCode) {
 		return null;
 	}
 
 
 	@Override
-	protected Long getItemFavoriteCount(Long itemId) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Long getItemFavoriteCount(String itemCode) {
+		return itemDetailManager.findItemFavCount(itemCode).longValue();
 	}
 
 
 	@Override
-	protected Long getItemRate(Long itemId) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Long getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode).longValue();
 	}
 
 

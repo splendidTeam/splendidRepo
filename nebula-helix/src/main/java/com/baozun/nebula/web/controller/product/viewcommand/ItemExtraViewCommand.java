@@ -18,6 +18,10 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
+/**
+ * 商品的一些扩展信息，比如销量、收藏量、评论量、评分等。
+ *
+ */
 public class ItemExtraViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = -7858212364897809214L;

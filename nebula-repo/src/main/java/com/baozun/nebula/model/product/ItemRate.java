@@ -29,17 +29,17 @@ public class ItemRate extends BaseModel {
 	/**
 	 * 待审核状态
 	 */
-	private static final Long LIFECYCLE_PENDING=5l;
+	public static final Long LIFECYCLE_PENDING=5l;
 	
 	/**
 	 * 审核通过
 	 */
-	private static final Long LIFECYCLE_PASS=1l;
+	public static final Long LIFECYCLE_PASS=1l;
 	
 	/**
 	 * 删除
 	 */
-	private static final Long LIFECYCLE_DELETE=0l;
+	public static final Long LIFECYCLE_DELETE=0l;
 	
 	private static final long	serialVersionUID	= 3378089752193285980L;
 	/** PK */

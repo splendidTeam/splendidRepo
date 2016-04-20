@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Bundle.findBundleByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID查找捆绑类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select b.* 
+						from t_pd_bundle b 
+						inner join t_pd_item i on i.id = b.item_id
+							#if($lifeCycle)
+			       				and i.lifecycle = :lifeCycle
+			       			#end
+						left join (select distinct bundle_id, bundle_element_id from t_pd_bundle_sku where item_id = :itemId) t on b.id = t.bundle_id
+						inner join t_pd_bundle_element e on t.bundle_element_id = e.id and e.is_main_element = 't'
+						order by b.modify_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.findBundleByStyle" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据款号查找捆绑类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select b.* 
+						from t_pd_bundle b 
+						inner join t_pd_item i on i.id = b.item_id
+							#if($lifeCycle)
+			       				and i.lifecycle = :lifeCycle
+			       			#end
+						left join (select distinct bundle_id, bundle_element_id from t_pd_bundle_sku where style = :style) t on b.id = t.bundle_id
+						inner join t_pd_bundle_element e on t.bundle_element_id = e.id and e.is_main_element = 't'
+						order by b.modify_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

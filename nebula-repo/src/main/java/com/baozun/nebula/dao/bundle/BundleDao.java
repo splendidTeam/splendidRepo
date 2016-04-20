@@ -31,9 +31,13 @@
 */
 package com.baozun.nebula.dao.bundle;
 
-import com.baozun.nebula.model.bundle.Bundle;
+import java.util.List;
 
+import loxia.annotation.NativeQuery;
 import loxia.dao.GenericEntityDao;
+
+import com.baozun.nebula.command.bundle.BundleCommand;
+import com.baozun.nebula.model.bundle.Bundle;
 
 /**
  * Bundle Dao
@@ -42,5 +46,23 @@ import loxia.dao.GenericEntityDao;
  *
  */
 public interface BundleDao extends GenericEntityDao<Bundle, Long> {
+	
+	/**
+	 * 根据主卖品的商品ID查询捆绑类商品信息
+	 * @param itemId 主卖品的商品ID
+	 * @param lifecycle 捆绑类商品状态，如果为空，则忽略该条件字段
+	 * @return
+	 */
+	@NativeQuery(model = BundleCommand.class)
+	List<BundleCommand> findBundlesByItemId(Long itemId, Integer lifecycle);
+	
+	/**
+	 * 根据主卖品的商品款号查询捆绑类商品信息
+	 * @param style 主卖品的商品款号
+	 * @param lifecycle 捆绑类商品状态，如果为空，则忽略该条件字段
+	 * @return
+	 */
+	@NativeQuery(model = BundleCommand.class)
+	List<BundleCommand> findBundlesByStyle(String style, Integer lifecycle);
 
 }

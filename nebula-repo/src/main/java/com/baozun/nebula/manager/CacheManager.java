@@ -363,12 +363,16 @@ public interface CacheManager{
 	public List<CacheItemCommand> findAllCacheItem(RowMapper<CacheItemCommand> rowMapper,Map<String, Object> paraMap);
 	
 	/**
-	 * 移除有序集中，指定分数（score）区间内的所有成员。
+	 * Rolling Time Window, 用于控制用户在某个时间窗口内的访问次数，
+	 * 比如：发送短信业务，5分钟内可以发送2次，24小时内可以发送5次
+	 * 如果验证通过后需要将本次调用添加进去
+	 * 基于redis集合特性实现
 	 * @param key
-	 * @param start
-	 * @param end
+	 * @param limit 限制次数
+	 * @param window 时间窗
+	 * @return　验证结果
 	 */
-	public void zremrangebyscore(String key,String start,String end);
+	public boolean applyRollingTimeWindow(String key, long limit, long window);
 	
 	
 	

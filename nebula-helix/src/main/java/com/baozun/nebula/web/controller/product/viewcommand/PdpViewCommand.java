@@ -34,7 +34,15 @@ public class PdpViewCommand extends BaseViewCommand {
 	private List<ItemCategoryViewCommand> categorys;
 	
 	/** 颜色（或者其他属性，颜色是个统称）切换部分 */
-	private List<ItemColorSwitchViewCommand>  itemColorSwitches;
+	private List<ItemColorSwatchViewCommand>  itemColorSwatches;
+	
+	/** 商品的图片 */
+	private List<ItemImageViewCommand> images;
+	
+	/** sku */
+	private List<SkuViewCommand> skus;
+	
+	private PriceViewCommand price;
 
 	/** 尺码对照. */
     private String sizeCompareChart;
@@ -62,14 +70,38 @@ public class PdpViewCommand extends BaseViewCommand {
 	public void setItemProperty(ItemPropertyViewCommand itemProperty) {
 		this.itemProperty = itemProperty;
 	}
-
-	public List<ItemColorSwitchViewCommand> getItemColorSwitches() {
-		return itemColorSwitches;
+	
+	public List<ItemColorSwatchViewCommand> getItemColorSwatches() {
+		return itemColorSwatches;
 	}
 
-	public void setItemColorSwitches(
-			List<ItemColorSwitchViewCommand> itemColorSwitches) {
-		this.itemColorSwitches = itemColorSwitches;
+	public void setItemColorSwatches(
+			List<ItemColorSwatchViewCommand> itemColorSwatches) {
+		this.itemColorSwatches = itemColorSwatches;
+	}
+	
+	public List<ItemImageViewCommand> getImages() {
+		return images;
+	}
+
+	public void setImages(List<ItemImageViewCommand> images) {
+		this.images = images;
+	}
+
+	public List<SkuViewCommand> getSkus() {
+		return skus;
+	}
+
+	public void setSkus(List<SkuViewCommand> skus) {
+		this.skus = skus;
+	}
+
+	public PriceViewCommand getPrice() {
+		return price;
+	}
+
+	public void setPrice(PriceViewCommand price) {
+		this.price = price;
 	}
 
 	public String getSizeCompareChart() {

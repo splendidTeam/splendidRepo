@@ -21,5 +21,5 @@ package com.baozun.nebula.search;
  * @since 2016年4月14日 下午2:32:30
  */
 public enum FacetType {
-	CATEGORY, FRONT_CATEGORY, TAG, PROPERTY;
+	ID, CATEGORY, FRONT_CATEGORY, TAG, PROPERTY;
 }

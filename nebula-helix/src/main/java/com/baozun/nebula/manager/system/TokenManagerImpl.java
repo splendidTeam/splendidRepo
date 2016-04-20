@@ -24,17 +24,21 @@ import org.springframework.stereotype.Service;
 import com.baozun.nebula.manager.CacheManager;
 import com.feilong.core.Validator;
 
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisSentinelPool;
 
 /**
  * @author D.C
  * @time 2016年3月24日 下午4:04:47
  */
 @Service("tokenManager")
-public class TokenManagerImpl implements TokenManager {
+public class TokenManagerImpl implements TokenManager, Serializable {
 
+	private static final long serialVersionUID = 7920926916890294158L;
 	@Autowired
 	private CacheManager cacheManager;
+
+	@Autowired(required = false)
+	private JedisSentinelPool jedisPool;
 
 	@Override
 	public void saveToken(String businessCode, String human, int liveTime, String code) {
@@ -48,7 +52,7 @@ public class TokenManagerImpl implements TokenManager {
 		if (!Validator.isNullOrEmpty(token)) {
 			if (code.equals(token.getCode())) {
 				cacheManager.remove(generateKey(businessCode, human));
-				if ((token.getCreated() + token.getLiveTime()) >= System.currentTimeMillis()) {
+				if ((token.getCreated() + token.getLiveTime() * 1000) >= System.currentTimeMillis()) {
 					return VerifyResult.SUCESS;
 				} else {
 					return VerifyResult.EXPIRED;
@@ -70,50 +74,10 @@ public class TokenManagerImpl implements TokenManager {
 		this.cacheManager = cacheManger;
 	}
 
-	class Token implements Serializable {
-		public Token(String code, long created, long liveTime) {
-			super();
-			this.code = code;
-			this.created = created;
-			this.liveTime = liveTime;
-		}
-
-		private static final long serialVersionUID = -6460180684340341983L;
-
-		public long getCreated() {
-			return created;
-		}
-
-		public void setCreated(long created) {
-			this.created = created;
-		}
-
-		public long getLiveTime() {
-			return liveTime;
-		}
-
-		public void setLiveTime(long liveTime) {
-			this.liveTime = liveTime;
-		}
-
-		private String code;
-
-		public String getCode() {
-			return code;
-		}
-
-		public void setCode(String code) {
-			this.code = code;
-		}
-
-		private long created;
-		private long liveTime;
-
-	}
-
 	@Override
 	public VerifyResult verifyAccess(String businessCode, String human, RollingTimeWindow rollingTimeWindow) {
-		return VerifyResult.SUCESS;
+		String key = generateKey(businessCode, human) + rollingTimeWindow;
+		return cacheManager.applyRollingTimeWindow(key, rollingTimeWindow.getLimit(), rollingTimeWindow.getWindow())
+				? VerifyResult.SUCESS : VerifyResult.LIMITED ;
 	}
-
 }

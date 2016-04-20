@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.product.viewcommand;
 
-import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
@@ -26,29 +25,23 @@ public class PropertyValueViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 3207776073529744700L;
 	
-	private Long              itemPropertiesId;
+	private Long itemPropertiesId;
 
     /** The property id. */
-    private Long              propertyId;
+    private Long propertyId;
 
     /** The property name(冗余,可能会用到). */
-    private String            propertyName;
+    private String propertyName;
 
     /**
      * 属性值 .
-     * <p>
-     * 不完全等价于 {@link ItemPropertiesCommand#getPropertyValue()}
-     * </p>
-     * 
-     * <p>
-     * (for show,如果有颜色对照,尺码对照将会显示 显示的值,因此在某种程度上可以做到根据不同的逻辑设置不同的值)
-     * </p>
-     * 
-     * <p style="color:green">
-     * 一般来说,系统中的接口码对于前端页面没有什么作用,前端只关心我要显示什么值,和后端交互都是使用xxxId来交互的
-     * </p>
      */
     private String            propertyValue;
+    
+    /**
+     * 属性值的显示值. 比如，属性值为red，页面可能需要显示为红色.
+     */
+    private String propertyDisplayValue;
 
     /**
      * 图片,一般是颜色的属性值有图片.
@@ -91,6 +84,14 @@ public class PropertyValueViewCommand extends BaseViewCommand {
 
 	public void setPropertyValue(String propertyValue) {
 		this.propertyValue = propertyValue;
+	}
+
+	public String getPropertyDisplayValue() {
+		return propertyDisplayValue;
+	}
+
+	public void setPropertyDisplayValue(String propertyDisplayValue) {
+		this.propertyDisplayValue = propertyDisplayValue;
 	}
 
 	public String getImageUrl() {

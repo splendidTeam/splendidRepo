@@ -62,6 +62,7 @@ public class ItemCollection {
 	 * 指定集合内的商品排序,ID英文逗号分割
 	 */
 	private String sequence;
+	
 	/** 创建时间. */
 	private Date createTime;
 

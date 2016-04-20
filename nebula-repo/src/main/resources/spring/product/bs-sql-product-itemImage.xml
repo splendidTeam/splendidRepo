@@ -105,7 +105,9 @@
 						#end
 						-1
 					)
-					and (type = :type )
+					#if($type)
+						and (type = :type )
+					#end
 					order by item_id, position
 				]]>
 			</value>
@@ -130,8 +132,9 @@
 					)
 					and image_lang.lang =:lang 
 					and image.id = image_lang.item_image_id 
-					and (type = :type )
-					
+					#if($type)
+						and (type = :type )
+					#end
 					order by item_id, position
 				]]>
 			</value>

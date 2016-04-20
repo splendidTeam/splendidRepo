@@ -674,4 +674,30 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="Member.findMembersByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						id,
+		       			lifecycle,
+		       			login_name,
+		       			source,
+		       			type,
+		       			login_email,
+		       			login_mobile
+
+					from T_MEM_MEMBER 
+	       			where lifecycle !=2 and id in (
+		       			 #foreach($id in $ids)
+						 $id,
+						 #end
+						 -1
+	       			 )
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 </beans>

@@ -26,6 +26,10 @@ public class ReviewMemberViewCommand extends BaseViewCommand {
 	private static final long serialVersionUID = 8656778129065768926L;
 
 	/**
+	 * id
+	 */
+	private Long id;
+	/**
 	 * 名称
 	 */
 	private String name;
@@ -89,5 +93,13 @@ public class ReviewMemberViewCommand extends BaseViewCommand {
 	public void setRealName(String realName) {
 		this.realName = realName;
 	}
-	
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 }
