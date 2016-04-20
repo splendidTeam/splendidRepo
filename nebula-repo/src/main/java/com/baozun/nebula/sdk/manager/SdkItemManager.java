@@ -386,5 +386,10 @@ public interface SdkItemManager extends BaseManager{
 	 */
 	public List<ItemImage> findItemImageByItemIds(List<Long> itemIds, String imageType);
 	
-	
+	/**
+	 * 根据itemCode查询Item的评论数量
+	 * @param itemCode
+	 * @return
+	 */
+	public Integer findRateCountByItemCode(String itemCode);
 }

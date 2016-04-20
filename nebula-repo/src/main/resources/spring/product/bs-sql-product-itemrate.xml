@@ -645,5 +645,21 @@
 			</value>
 		</constructor-arg>
 	</bean>	
+	
+	<bean id="ItemRate.findItemRateCountByItemCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>获取item的评论数</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					     count(1) c
+					from T_PD_ITEM_RATE tpir 
+					LEFT JOIN t_mem_member tmm on tmm.id = tpir.member_id
+					LEFT JOIN t_pd_item ti on tpir.item_id = ti.id
+					where tpir.lifecycle = 1 and tpir.item_code = :itemCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 	 
 </beans>

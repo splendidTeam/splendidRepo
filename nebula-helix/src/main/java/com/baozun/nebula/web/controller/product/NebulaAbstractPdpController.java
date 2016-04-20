@@ -116,14 +116,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	ImageViewCommandConverter                                       imageViewCommandConverter;
 	
-<<<<<<< HEAD
-	
-	
-
-	
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
-
 	
 	/**
 	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>

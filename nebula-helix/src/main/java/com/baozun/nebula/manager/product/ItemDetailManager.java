@@ -195,4 +195,10 @@ public interface ItemDetailManager extends BaseManager{
 	 */
 	List<SkuCommand> findEffectiveSkuInvByItemId(Long itemId);
 	
+	/**
+	 * 根据商品code查询销量
+	 * @param itemCode
+	 * @return
+	 */
+	Integer findItemSalesCount(String itemCode);
 }
