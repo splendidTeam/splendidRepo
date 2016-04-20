@@ -65,6 +65,7 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
+import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.google.gson.Gson;
 
@@ -139,6 +140,15 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		List<ItemProperties> dbItemPropertiesList = sdkItemManager.findItemPropertiesByItemId(itemId);
 		// 商品的动态属性Map
 		Map<String, Object> responseMap = getDynamicPropertyMap(dbItemPropertiesList, itemId);
+		return responseMap;
+	}
+	
+	@Transactional(readOnly=true)
+	@Override
+	public Map<String, Object> newFindDynamicProperty(Long itemId) {
+		List<ItemProperties> dbItemPropertiesList = sdkItemManager.findItemPropertiesByItemId(itemId);
+		// 商品的动态属性Map
+		Map<String, Object> responseMap = newGetDynamicPropertyMap(dbItemPropertiesList, itemId);
 		return responseMap;
 	}
 
@@ -346,6 +356,119 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		responseMap.put("groupNameList", groupNameList);
 		responseMap.put("salePropCommandList", salePropList);
 		responseMap.put("generalPropCommandList", generalPropCommandList);
+		return responseMap;
+	}
+	
+	
+	private Map<String, Object> newGetDynamicPropertyMap(List<ItemProperties> dbItemPropertiesList, Long itemId) {
+		Map<String, Object> responseMap = new HashMap<String, Object>();
+		List<DynamicPropertyCommand> salePropCommandList = new ArrayList<DynamicPropertyCommand>();
+		List<DynamicPropertyCommand> generalPropCommandList = null;
+		DynamicPropertyCommand salePropCommand = null;
+		DynamicPropertyCommand generalPropCommand = null;
+		List<ItemPropertiesCommand> itemPropertiesList = null;
+		// 属性Id集合
+		Set<Long> propertyIdSet = new HashSet<Long>();
+		List<Long> propertyIds = new ArrayList<Long>();
+		// 属性值Id集合
+		Set<Long> propertyValueIdSet = new HashSet<Long>();
+		List<Long> propertyValueIds = new ArrayList<Long>();
+		// [分组名称,一般属性集合]
+		Map<String, List<DynamicPropertyCommand>> generalGroupPropMap = new HashMap<String, List<DynamicPropertyCommand>>();
+		// 获得"属性Id集合"和"属性值Id集合"
+		for (ItemProperties itemProperties : dbItemPropertiesList) {
+			Long propertyId = itemProperties.getPropertyId();
+			propertyIdSet.add(propertyId);
+			Long propertyValueId = itemProperties.getPropertyValueId();
+			if (propertyValueId != null) {
+				propertyValueIdSet.add(propertyValueId);
+			}
+		}
+		propertyIds.addAll(propertyIdSet);
+		propertyValueIds.addAll(propertyValueIdSet);
+		// 通过"属性id的集合"获得"属性集合"
+		Sort[] sorts = Sort.parse("sort_no asc");
+		List<Property> propertyList = sdkItemManager.findPropertyListByIds(propertyIds, sorts);
+		// 通过"属性值id的集合"获得"属性值集合"
+		List<PropertyValue> propertyValueList = sdkItemManager.findPropertyValueListByIds(propertyValueIds);
+
+		Map<Long, String> propertyValueMap = new HashMap<Long, String>();
+		for (PropertyValue propertyValue : propertyValueList) {
+			propertyValueMap.put(propertyValue.getId(), propertyValue.getValue());
+		}
+		
+		Map<Long,Integer> propertySortMap =new HashMap<Long, Integer>();
+		for (PropertyValue propertyValue : propertyValueList) {
+			propertySortMap.put(propertyValue.getId(), propertyValue.getSortNo());
+		}
+		
+
+		ItemPropertiesCommand tempConvertIp =null;
+		
+		for (Property property : propertyList) {
+			Boolean isSaleProp = property.getIsSaleProp();
+			// 分离销售属性与一般属性
+			if (isSaleProp) {
+				// 销售属性
+				salePropCommand = new DynamicPropertyCommand();
+				itemPropertiesList = new ArrayList<ItemPropertiesCommand>();
+				for (ItemProperties itemProperties : dbItemPropertiesList) {
+					if (itemProperties.getPropertyId().equals(property.getId())) {
+						if (itemProperties.getPropertyValueId() == null) {
+							itemPropertiesList.add(itemPropertiesToCommand(itemProperties));
+						} else {
+							itemProperties.setPropertyValue(propertyValueMap.get(itemProperties.getPropertyValueId()));
+							//非自定义多选 设置排序
+							tempConvertIp =itemPropertiesToCommand(itemProperties);
+							tempConvertIp.setProSort(propertySortMap.get(itemProperties.getPropertyValueId()));
+							itemPropertiesList.add(tempConvertIp);
+						}
+					}
+				}
+				// 当商品属性只有一个属性值时, 就将其加到DynamicPropertyCommand对象中的itemProperties字段中
+				if (itemPropertiesList != null && itemPropertiesList.size() == 1) {
+					salePropCommand.setItemProperties(itemPropertiesList.get(0));
+				} else {
+					salePropCommand.setItemPropertiesList(itemPropertiesList);
+				}
+				salePropCommand.setProperty(property);
+				salePropCommandList.add(salePropCommand);
+			} else {
+				// 一般属性
+				String groupName =property.getGroupName();
+				generalPropCommand = new DynamicPropertyCommand();
+				itemPropertiesList = new ArrayList<ItemPropertiesCommand>();
+				for (ItemProperties itemProperties : dbItemPropertiesList) {
+					if (itemProperties.getPropertyId().equals(property.getId())) {
+						if (itemProperties.getPropertyValueId() == null) {
+							itemPropertiesList.add(itemPropertiesToCommand(itemProperties));
+						} else {
+							itemProperties.setPropertyValue(propertyValueMap.get(itemProperties.getPropertyValueId()));
+							itemPropertiesList.add(itemPropertiesToCommand(itemProperties));
+						}
+					}
+				}
+				// 当商品属性只有一个属性值时, 就将其加到DynamicPropertyCommand对象中的itemProperties字段中
+				if (itemPropertiesList != null && itemPropertiesList.size() == 1) {
+					generalPropCommand.setItemProperties(itemPropertiesList.get(0));
+				} else {
+					generalPropCommand.setItemPropertiesList(itemPropertiesList);
+				}
+				generalPropCommand.setProperty(property);
+				if(Validator.isNotNullOrEmpty(generalGroupPropMap)&&
+						generalGroupPropMap.get(groupName).contains(generalPropCommand)){
+					continue ;
+				}else{
+					generalPropCommandList = Validator.isNullOrEmpty(generalGroupPropMap) ? new ArrayList<DynamicPropertyCommand>() :
+						generalGroupPropMap.get(groupName);
+				}
+				generalPropCommandList.add(generalPropCommand);
+				generalGroupPropMap.put(groupName, generalPropCommandList);
+			}
+		}
+		List<DynamicPropertyCommand> salePropList = salePropHandle(salePropCommandList, itemId);
+		responseMap.put("salePropCommandList", salePropList);
+		responseMap.put("generalGroupPropMap", generalGroupPropMap);
 		return responseMap;
 	}
 
@@ -644,6 +767,15 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		}
 
 		return itemBaseCommand;
+	}
+
+	/* 
+	 * @see com.baozun.nebula.manager.product.ItemDetailManager#findEffectiveSkuInvByItemId(java.lang.Long)
+	 */
+	@Override
+	public List<SkuCommand> findEffectiveSkuInvByItemId(Long itemId) {
+		List<SkuCommand> skuCommands =sdkItemManager.findEffectiveSkuInvByItemId(itemId);
+		return skuCommands;
 	}
 
 }
