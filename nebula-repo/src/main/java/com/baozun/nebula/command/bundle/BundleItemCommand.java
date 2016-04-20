@@ -40,47 +40,48 @@ public class BundleItemCommand implements Serializable{
 	private BigDecimal maxOriginalSalesPrice;
 	
 	/**
+	 * 最小吊牌价
+	 */
+	private BigDecimal minOriginalListPrice ;
+	/**
+	 * 最大吊牌价
+	 */
+	private BigDecimal maxOriginalListPrice ;
+	
+	/**
 	 * bundle最小商品销售价
 	 */
-	private BigDecimal minBundleSalesPrice;
+	private BigDecimal minSalesPrice;
 	
 	/**
 	 * bundle最大商品销售价
 	 */
-	private BigDecimal maxBundleSalesPrice;
+	private BigDecimal maxSalesPrice;
 	
 	private List<BundleSkuCommand> bundleSkus;
 	
-	public BigDecimal getMinOriginalSalesPrice() {
-		return minOriginalSalesPrice;
+	public void setMinOriginalListPrice(BigDecimal minOriginalListPrice) {
+		this.minOriginalListPrice = minOriginalListPrice;
+	}
+
+	public void setMaxOriginalListPrice(BigDecimal maxOriginalListPrice) {
+		this.maxOriginalListPrice = maxOriginalListPrice;
+	}
+
+	public void setMinSalesPrice(BigDecimal minSalesPrice) {
+		this.minSalesPrice = minSalesPrice;
+	}
+
+	public void setMaxSalesPrice(BigDecimal maxSalesPrice) {
+		this.maxSalesPrice = maxSalesPrice;
 	}
 
 	public void setMinOriginalSalesPrice(BigDecimal minOriginalSalesPrice) {
 		this.minOriginalSalesPrice = minOriginalSalesPrice;
 	}
 
-	public BigDecimal getMaxOriginalSalesPrice() {
-		return maxOriginalSalesPrice;
-	}
-
 	public void setMaxOriginalSalesPrice(BigDecimal maxOriginalSalesPrice) {
 		this.maxOriginalSalesPrice = maxOriginalSalesPrice;
-	}
-
-	public BigDecimal getMinBundleSalesPrice() {
-		return minBundleSalesPrice;
-	}
-
-	public void setMinBundleSalesPrice(BigDecimal minBundleSalesPrice) {
-		this.minBundleSalesPrice = minBundleSalesPrice;
-	}
-
-	public BigDecimal getMaxBundleSalesPrice() {
-		return maxBundleSalesPrice;
-	}
-
-	public void setMaxBundleSalesPrice(BigDecimal maxBundleSalesPrice) {
-		this.maxBundleSalesPrice = maxBundleSalesPrice;
 	}
 
 	public List<BundleSkuCommand> getBundleSkus() {
@@ -98,5 +99,102 @@ public class BundleItemCommand implements Serializable{
 	public void setItemId(long itemId) {
 		this.itemId = itemId;
 	}
-	
+	/**
+	 * 
+	 * 查找商品中sku的最小原销售价格
+	 */
+	public BigDecimal getMinOriginalSalesPrice(){
+	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
+			if( i == 0 ){
+				minOriginalSalesPrice = bundleSkus.get(i).getOriginalSalesPrice();
+			}else{
+				if(minOriginalSalesPrice.compareTo(bundleSkus.get(i).getOriginalSalesPrice()) == 1){
+					minOriginalSalesPrice = bundleSkus.get(i).getOriginalSalesPrice();
+				}
+			}
+		}
+	    return minOriginalSalesPrice ;
+	 }
+	 
+	/**
+	 * 
+	 * 查找商品中sku的最大原销售价格
+	 */
+	public BigDecimal getMaxOriginalSalesPrice(){
+	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
+			if( i == 0 ){
+				maxOriginalSalesPrice = bundleSkus.get(i).getOriginalSalesPrice();
+			}else{
+				if(maxOriginalSalesPrice.compareTo(bundleSkus.get(i).getOriginalSalesPrice()) == -1){
+					maxOriginalSalesPrice = bundleSkus.get(i).getOriginalSalesPrice();
+				}
+			}
+		}
+	    return maxOriginalSalesPrice ;
+	  }
+	 
+	/**
+	 * 
+	 * 查找bundle商品中sku的最小售价格
+	 */
+	public BigDecimal getMinSalesPrice(){
+	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
+			if( i == 0 ){
+				minSalesPrice = bundleSkus.get(i).getSalesPrice();
+			}else{
+				if(minSalesPrice.compareTo(bundleSkus.get(i).getSalesPrice()) == 1){
+					minSalesPrice = bundleSkus.get(i).getSalesPrice();
+				}
+			}
+		}
+	    return minSalesPrice ;
+	   }
+	/**
+	 * 
+	 * 查找bundle商品中sku的最大售价格
+	 */    
+	public BigDecimal getMaxSalesPrice(){
+	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
+			if( i == 0 ){
+				maxSalesPrice = bundleSkus.get(i).getSalesPrice();
+			}else{
+				if(maxSalesPrice.compareTo(bundleSkus.get(i).getSalesPrice()) == -1){
+					maxSalesPrice = bundleSkus.get(i).getSalesPrice();
+				}
+			}
+		}
+	    return maxSalesPrice ;
+	}
+	/**
+	 * 
+	 * 查找商品中sku的最大吊牌价格
+	 */
+	public BigDecimal getMaxOriginalListPrice() {
+		for (int i = 0 ; i<bundleSkus.size() ;i++) {
+			if( i == 0 ){
+				maxOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+			}else{
+				if(maxOriginalListPrice.compareTo(bundleSkus.get(i).getOriginalListPrice()) == -1){
+					maxOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+				}
+			}
+		}
+		return maxOriginalListPrice;
+	}
+	/**
+	 * 
+	 * 查找商品中sku的最小吊牌价格
+	 */
+	public BigDecimal getMinOriginalListPrice() {
+		for (int i = 0 ; i<bundleSkus.size() ;i++) {
+			if( i == 0 ){
+				minOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+			}else{
+				if(minOriginalListPrice.compareTo(bundleSkus.get(i).getOriginalListPrice()) == 1){
+					minOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+				}
+			}
+		}
+		return minOriginalListPrice;
+	}
 }
