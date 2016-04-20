@@ -37,6 +37,8 @@ import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
+import com.baozun.nebula.web.controller.product.converter.ImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
@@ -105,21 +107,31 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemDetailManager										itemDetailManager;
 	
 	@Autowired
+	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	
+	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
+	@Autowired
+	ImageViewCommandConverter                                       imageViewCommandConverter;
+	
+	
+	
+
+	
+
 	
 	/**
-	 * 构造商品的属性信息，包括销售属性和非销售属性
+	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>
+	 * 此方法在构造销售颜色属性信息时，将需要商品图片信息，
+	 * 所以，之前需先获取商品图片(不一定有颜色属性，但无论如何必须先取图片)
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemPropertyViewCommand buildItemPropertyViewCommand(Long itemId) {
-		
-		Map<String, Object> dynamicPropertyMap = itemDetailManager.newFindDynamicProperty(itemId);
-		
-		
-		return new ItemPropertyViewCommand();
+	protected ItemPropertyViewCommand buildItemPropertyViewCommand(Long itemId, 
+			Map<String, List<ImageViewCommand>> images) {
+		return itemPropertyViewCommandResolver.resolve(itemId, images);
 	}
 	
 	
@@ -130,20 +142,29 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 */
 	protected ItemImageViewCommand buildItemImageViewCommand(Long itemId) {
-		ItemImageViewCommand itemImageViewCommand = new ItemImageViewCommand();
+		// 查询商品图片
 		List<Long> itemIds = new ArrayList<Long>();
 		itemIds.add(itemId);
 		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
-		// 查询商品图片
-		Long colorItemPropertyId =null;
+		// 根据类型构建图片列表Map
 		Map<String, List<ImageViewCommand>> images = new HashMap<String, List<ImageViewCommand>>();
+		Long colorItemPropertyId = constructImagesMap(itemImageList, images);
+		
+		ItemImageViewCommand itemImageViewCommand = new ItemImageViewCommand();
+		itemImageViewCommand.setColorItemPropertyId(colorItemPropertyId);
+		itemImageViewCommand.setImages(images);
+		itemImageViewCommand.setItemId(itemId);
+		
+		return itemImageViewCommand;
+	}
+
+	private Long constructImagesMap(List<ItemImage> itemImageList,Map<String, List<ImageViewCommand>> images) {
+		Long colorItemPropertyId =null;
 		if(Validator.isNotNullOrEmpty(itemImageList)){
 			for(ItemImage itemImage :itemImageList){
 				String type = itemImage.getType();
 				List<ImageViewCommand> imageViewCommands = images.get(type);
-				ImageViewCommand  imageViewCommand= new ImageViewCommand();
-				imageViewCommand.setDescription(itemImage.getDescription());
-				imageViewCommand.setUrl(itemImage.getPicUrl());
+				ImageViewCommand  imageViewCommand= imageViewCommandConverter.convert(itemImage);
 				if(imageViewCommands!=null){
 					imageViewCommands.add(imageViewCommand);
 				}else{
@@ -152,13 +173,12 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 					images.put(type, imageViewCommands);
 				}
 				
+				if(colorItemPropertyId==null && itemImage.getItemProperties()!=null){
+					colorItemPropertyId = itemImage.getItemProperties();
+				}
 			}
 		}
-		itemImageViewCommand.setColorItemPropertyId(colorItemPropertyId);
-		itemImageViewCommand.setImages(images);
-		itemImageViewCommand.setItemId(itemId);
-		
-		return itemImageViewCommand;
+		return colorItemPropertyId;
 	}
 	
 	/**

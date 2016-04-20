@@ -18,7 +18,6 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.product.converter.InventoryViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.SkuViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -65,6 +65,9 @@ public abstract class NebulaBasePdpController extends BaseController {
 	@Autowired
 	@Qualifier("skuViewCommandConverter")
 	private SkuViewCommandConverter skuViewCommandConverter;
+	
+	@Autowired
+	InventoryViewCommandConverter   inventoryViewCommandConverter;
 
 	/**
 	 * 构造商品基本信息
@@ -105,17 +108,8 @@ public abstract class NebulaBasePdpController extends BaseController {
 	 * @return
 	 */
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
-		List<InventoryViewCommand> inventoryViewCommands = new ArrayList<InventoryViewCommand>();
 		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
-		if(Validator.isNotNullOrEmpty(skuCommands)){
-			for(SkuCommand skuCommand:skuCommands){
-				InventoryViewCommand inventoryViewCommand = new InventoryViewCommand();
-				BeanUtils.copyProperties(skuCommand, inventoryViewCommand);
-				inventoryViewCommand.setSkuId(skuCommand.getId());
-				inventoryViewCommands.add(inventoryViewCommand);
-			}
-		}
-		return inventoryViewCommands;
+		return	inventoryViewCommandConverter.convert(skuCommands);
 	}
 	
 	/**
