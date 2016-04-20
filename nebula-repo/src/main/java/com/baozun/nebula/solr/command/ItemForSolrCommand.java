@@ -345,6 +345,19 @@ public class ItemForSolrCommand implements Serializable {
 	@Field
 	private List<String> channels;
 	
+	/**
+	 * 前端导航code
+	 * 需要将商品的导航树刷新进去。
+	 */
+	@Field("navigation_code")
+	private List<String> navigationCodes;
+	
+	/**
+	 * 前端导航id
+	 */
+	@Field("navigation_id")
+	private List<Long>	navigationIds;
+	
 	
 //	/**
 //	 * 活跃结束时间
