@@ -26,20 +26,19 @@ import com.feilong.core.Validator;
 
 import redis.clients.jedis.JedisSentinelPool;
 
-
 /**
  * @author D.C
  * @time 2016年3月24日 下午4:04:47
  */
 @Service("tokenManager")
-public class TokenManagerImpl implements TokenManager,Serializable {
+public class TokenManagerImpl implements TokenManager, Serializable {
 
 	private static final long serialVersionUID = 7920926916890294158L;
 	@Autowired
 	private CacheManager cacheManager;
-	
+
 	@Autowired(required = false)
-	private JedisSentinelPool	jedisPool;
+	private JedisSentinelPool jedisPool;
 
 	@Override
 	public void saveToken(String businessCode, String human, int liveTime, String code) {
@@ -53,7 +52,7 @@ public class TokenManagerImpl implements TokenManager,Serializable {
 		if (!Validator.isNullOrEmpty(token)) {
 			if (code.equals(token.getCode())) {
 				cacheManager.remove(generateKey(businessCode, human));
-				if ((token.getCreated() + token.getLiveTime()*1000) >= System.currentTimeMillis()) {
+				if ((token.getCreated() + token.getLiveTime() * 1000) >= System.currentTimeMillis()) {
 					return VerifyResult.SUCESS;
 				} else {
 					return VerifyResult.EXPIRED;
@@ -77,6 +76,8 @@ public class TokenManagerImpl implements TokenManager,Serializable {
 
 	@Override
 	public VerifyResult verifyAccess(String businessCode, String human, RollingTimeWindow rollingTimeWindow) {
-		return VerifyResult.SUCESS;
+		String key = generateKey(businessCode, human) + rollingTimeWindow;
+		return cacheManager.applyRollingTimeWindow(key, rollingTimeWindow.getLimit(), rollingTimeWindow.getWindow())
+				? VerifyResult.SUCESS : VerifyResult.LIMITED ;
 	}
 }
