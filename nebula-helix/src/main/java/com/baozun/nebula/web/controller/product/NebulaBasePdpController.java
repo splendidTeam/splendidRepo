@@ -161,7 +161,10 @@ public abstract class NebulaBasePdpController extends BaseController {
 			}
 			i++;
 		}
-		
-		return new PriceViewCommand();
+		priceViewCommand.setSkuMinListPrice(skuMinListPrice);
+		priceViewCommand.setSkuMaxListPrice(skuMaxListPrice);
+		priceViewCommand.setSkuMinSalesPrice(skuMinSalesPrice);
+		priceViewCommand.setSkuMaxSalesPrice(skuMaxSalesPrice);
+		return priceViewCommand;
 	}
 }
