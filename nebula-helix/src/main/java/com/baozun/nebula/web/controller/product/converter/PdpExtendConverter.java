@@ -28,6 +28,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
  * pdp的扩展抽象converter，以便于新增需要的方法
+ * 其他功能模块需要自己extend类
  * @author chengchao
  * @param <T>
  *
