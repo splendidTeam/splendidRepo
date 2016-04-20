@@ -51,6 +51,7 @@ public class FacetParameter {
     private String name;
     private List<String> values = new ArrayList<String>();
     private ParameterType type;
+    private FacetType facetType;
 
     /**
      * Create new facet parameter
