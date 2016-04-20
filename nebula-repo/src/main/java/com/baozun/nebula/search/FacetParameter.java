@@ -37,11 +37,11 @@ public class FacetParameter {
      * Parameter type
      */
     public enum ParameterType {
-        SINGLEVALUE,
-        MULTISELECT,
-        RANGE,
-        LESS_THAN,
-        GREATER_THAN
+        SINGLEVALUE, 	//单选
+        MULTISELECT,	//多选
+        RANGE,			//范围
+        LESS_THAN,		//小于
+        GREATER_THAN	//大于
     }
 
     static private Pattern RANGE_PATTERN = Pattern.compile("([0-9]+[\\.0-9]*)\\-([0-9]+[\\.0-9]*)");

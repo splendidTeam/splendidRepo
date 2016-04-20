@@ -131,5 +131,10 @@ public class SkuItemParam {
 	
 	public static final String dynamic_imageUrl="dynamic_image_url_";
 	
+	/**
+	 * 导航code
+	 */
+	public static final String NAVIGATION_CODE="navigation_code";
+	
 
 }
