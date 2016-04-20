@@ -28,31 +28,25 @@ import loxia.dao.Pagination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
-import com.baozun.nebula.sdk.command.ItemBaseCommand;
-import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.InventoryViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.PriceViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -67,7 +61,7 @@ import com.feilong.core.Validator;
  * @version 1.0
  * @time 2016年4月14日  上午10:15:30
  */
-public abstract class NebulaAbstractPdpController extends BaseController {
+public abstract class NebulaAbstractPdpController extends NebulaBasePdpController {
 
 	/**
 	 * log定义
@@ -116,22 +110,10 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
-
 	
-	/**
-	 * 构造商品基本信息
-	 * 这个方法暂时不用考虑pdp显示模式的问题，因为基本信息对于几种模式取法是一样的
-	 * @param itemId
-	 * @return
-	 */
-	protected ItemBaseInfoViewCommand buildProductBaseInfoViewCommand(Long itemId) {
-		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
-		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
-		if(itemBaseCommand!=null){
-			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
-		}
-		return itemBaseInfoViewCommand;
-	}
+	@Autowired
+	ImageViewCommandConverter                                       imageViewCommandConverter;
+	
 	
 	/**
 	 * 构造商品的属性信息，包括销售属性和非销售属性
@@ -140,44 +122,13 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 */
 	protected ItemPropertyViewCommand buildItemPropertyViewCommand(Long itemId) {
 		
+		Map<String, Object> dynamicPropertyMap = itemDetailManager.newFindDynamicProperty(itemId);
+		
+		
 		return new ItemPropertyViewCommand();
 	}
 	
-	/**
-	 * 构造sku信息
-	 * @param itemId
-	 * @return
-	 */
-	protected SkuViewCommand buildSkuViewCommand(Long itemId) {
-		return new SkuViewCommand();
-	}
 	
-	/**
-	 * 构造库存信息
-	 * @param itemId
-	 * @return
-	 */
-	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
-		List<InventoryViewCommand> inventoryViewCommands = new ArrayList<InventoryViewCommand>();
-		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
-		if(Validator.isNotNullOrEmpty(skuCommands)){
-			for(SkuCommand skuCommand:skuCommands){
-				InventoryViewCommand inventoryViewCommand = new InventoryViewCommand();
-				BeanUtils.copyProperties(skuCommand, inventoryViewCommand);
-				inventoryViewCommand.setSkuId(skuCommand.getId());
-				inventoryViewCommands.add(inventoryViewCommand);
-			}
-		}
-		return inventoryViewCommands;
-	}
-	
-	/**
-	 * 构造价格信息
-	 * @return
-	 */
-	protected PriceViewCommand buildPriceViewCommand() {
-		return new PriceViewCommand();
-	}
 	
 	/**
 	 * 构造商品的图片
@@ -185,20 +136,29 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @return
 	 */
 	protected ItemImageViewCommand buildItemImageViewCommand(Long itemId) {
-		ItemImageViewCommand itemImageViewCommand = new ItemImageViewCommand();
+		// 查询商品图片
 		List<Long> itemIds = new ArrayList<Long>();
 		itemIds.add(itemId);
 		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
-		// 查询商品图片
-		Long colorItemPropertyId =null;
+		// 根据类型构建图片列表Map
 		Map<String, List<ImageViewCommand>> images = new HashMap<String, List<ImageViewCommand>>();
+		Long colorItemPropertyId = constructImagesMap(itemImageList, images);
+		
+		ItemImageViewCommand itemImageViewCommand = new ItemImageViewCommand();
+		itemImageViewCommand.setColorItemPropertyId(colorItemPropertyId);
+		itemImageViewCommand.setImages(images);
+		itemImageViewCommand.setItemId(itemId);
+		
+		return itemImageViewCommand;
+	}
+
+	private Long constructImagesMap(List<ItemImage> itemImageList,Map<String, List<ImageViewCommand>> images) {
+		Long colorItemPropertyId =null;
 		if(Validator.isNotNullOrEmpty(itemImageList)){
 			for(ItemImage itemImage :itemImageList){
 				String type = itemImage.getType();
 				List<ImageViewCommand> imageViewCommands = images.get(type);
-				ImageViewCommand  imageViewCommand= new ImageViewCommand();
-				imageViewCommand.setDescription(itemImage.getDescription());
-				imageViewCommand.setUrl(itemImage.getPicUrl());
+				ImageViewCommand  imageViewCommand= imageViewCommandConverter.convert(itemImage);
 				if(imageViewCommands!=null){
 					imageViewCommands.add(imageViewCommand);
 				}else{
@@ -207,13 +167,12 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 					images.put(type, imageViewCommands);
 				}
 				
+				if(colorItemPropertyId==null && itemImage.getItemProperties()!=null){
+					colorItemPropertyId = itemImage.getItemProperties();
+				}
 			}
 		}
-		itemImageViewCommand.setColorItemPropertyId(colorItemPropertyId);
-		itemImageViewCommand.setImages(images);
-		itemImageViewCommand.setItemId(itemId);
-		
-		return itemImageViewCommand;
+		return colorItemPropertyId;
 	}
 	
 	/**
@@ -230,11 +189,11 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemExtraViewCommand buildItemExtraViewCommand(Long itemId){
+	protected ItemExtraViewCommand buildItemExtraViewCommand(String itemCode){
 		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
-		itemExtraViewCommand.setSales(getItemSales(itemId));
-		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemId));
-		itemExtraViewCommand.setSales(getItemRate(itemId));
+		itemExtraViewCommand.setSales(getItemSales(itemCode));
+		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
+		itemExtraViewCommand.setSales(getItemRate(itemCode));
 		return itemExtraViewCommand;
 	}
 	
@@ -259,11 +218,11 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 		return new Pagination<ItemReviewViewCommand>();
 	}
 	
-	protected abstract Long getItemSales(Long itemId);
+	protected abstract Long getItemSales(String itemCode);
 	
-	protected abstract Long getItemFavoriteCount(Long itemId);
+	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Long getItemRate(Long itemId);
+	protected abstract Long getItemRate(String itemCode);
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	
@@ -285,9 +244,8 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 				break;
 			case BREADCRUMBS_MODE_CATEGORY:
 				//TODO 基于分类
-				breadcrumbsViewCommandList =new ArrayList<BreadcrumbsViewCommand>();
 				List<CurmbCommand> curmbCommandList = itemDetailManager.findCurmbList(itemId);
-				breadcrumbsViewCommandList =constructBreadCrumbCommandList(curmbCommandList);
+				breadcrumbsViewCommandList =breadcrumbsViewCommandConverter.convert(curmbCommandList);
 				break;
 			default:
 				breadcrumbsViewCommandList = customBuildBreadcrumbsViewCommand(itemId);
@@ -297,19 +255,6 @@ public abstract class NebulaAbstractPdpController extends BaseController {
 		// TODO
 		return breadcrumbsViewCommandList;
 	}
-	
-	private List<BreadcrumbsViewCommand> constructBreadCrumbCommandList(List<CurmbCommand> curmbCommandList){
-        List<BreadcrumbsViewCommand> breadCrumbEntityList = new ArrayList<BreadcrumbsViewCommand>();
-        for (int i = 0; i < curmbCommandList.size(); ++i){
-        	
-            CurmbCommand currentCurmbCommand = curmbCommandList.get(i);
-            
-            BreadcrumbsViewCommand breadcrumbsViewCommand =breadcrumbsViewCommandConverter
-            		.convert(currentCurmbCommand);
-            breadCrumbEntityList.add(breadcrumbsViewCommand);
-        }
-        return breadCrumbEntityList;
-    }
 	
 	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	
