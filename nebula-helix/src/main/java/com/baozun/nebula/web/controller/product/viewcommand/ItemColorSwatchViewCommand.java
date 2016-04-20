@@ -19,24 +19,36 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * Pdp的颜色属性切换Command
- * TODO 需要重构
+ * Pdp同款商品的Command
+ * <p>
+ * 如果商品定义到款，Pdp展示时只是不同销售属性之间的切换。但如果商品定义到色（这个色是个笼统的概念，比如，衣服的颜色、眼镜的度数都可以叫色），Pdp展示时就会涉及到商品的切换。</br>
+ * 该Command就是为了表示同款下的不同商品，一般在商品定义到色时使用。为了和到款商品使用上的统一化，一般要求到色商品也同时定义一个颜色属性。
+ * </p>
  *
  */
 public class ItemColorSwatchViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 3016160425868695170L;
     
+	/** 商品Id */
 	private Long itemId;
 	
+	/** 商品编码 */
 	private String itemCode;
 	
-	private Long colorItemPropertyId;
+	/** 颜色属性Id */
+	private Long itemPropertyId;
 	
+	/** 颜色属性名称 */
 	private String propertyName;
 	
+	/** 颜色属性值 */
 	private String propertyValue;
 	
+	/** 颜色属性显示值 */
+	private String propertyDisplayValue;
+	
+	/** 颜色属性图片 */
 	private String image;
 
 	public Long getItemId() {
@@ -55,12 +67,12 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 		this.itemCode = itemCode;
 	}
 
-	public Long getColorItemPropertyId() {
-		return colorItemPropertyId;
+	public Long getItemPropertyId() {
+		return itemPropertyId;
 	}
 
-	public void setColorItemPropertyId(Long colorItemPropertyId) {
-		this.colorItemPropertyId = colorItemPropertyId;
+	public void setItemPropertyId(Long itemPropertyId) {
+		this.itemPropertyId = itemPropertyId;
 	}
 
 	public String getPropertyName() {
@@ -79,6 +91,14 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 		this.propertyValue = propertyValue;
 	}
 
+	public String getPropertyDisplayValue() {
+		return propertyDisplayValue;
+	}
+
+	public void setPropertyDisplayValue(String propertyDisplayValue) {
+		this.propertyDisplayValue = propertyDisplayValue;
+	}
+
 	public String getImage() {
 		return image;
 	}
@@ -86,4 +106,5 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 	public void setImage(String image) {
 		this.image = image;
 	}
+
 }

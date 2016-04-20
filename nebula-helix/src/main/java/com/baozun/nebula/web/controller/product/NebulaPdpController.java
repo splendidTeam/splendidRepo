@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
@@ -76,10 +77,13 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	private MemberManager memberManager;
 	
 	@Autowired
-	ItemReviewViewCommandConverter itemReviewViewCommandConverter;
+	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
 	
 	@Autowired
-	ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
+	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
+	
+	@Autowired
+	private ItemDetailManager	itemDetailManager;
 	
 	/**
 	 * 进入商品详情页 	
@@ -238,23 +242,20 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Long getItemSales(Long itemId) {
-		// TODO Auto-generated method stub
+	protected Long getItemSales(String itemCode) {
 		return null;
 	}
 
 
 	@Override
-	protected Long getItemFavoriteCount(Long itemId) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Long getItemFavoriteCount(String itemCode) {
+		return itemDetailManager.findItemFavCount(itemCode).longValue();
 	}
 
 
 	@Override
-	protected Long getItemRate(Long itemId) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Long getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode).longValue();
 	}
 
 

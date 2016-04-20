@@ -69,6 +69,14 @@ public interface ItemDetailManager extends BaseManager{
 	public Map<String, Object> findDynamicProperty(Long itemId);
 	
 	/**
+	 * 新的获取商品动态属性(规格参数)
+	 * 特殊处理一般属性的获取
+	 * @param itemId
+	 * @return
+	 */
+	public Map<String, Object> newFindDynamicProperty(Long itemId);
+	
+	/**
 	 * 通过sku的itemProperties属性获取库存
 	 * @param itemId
 	 * @param itemProperties
@@ -179,5 +187,12 @@ public interface ItemDetailManager extends BaseManager{
 	
 
 	ItemBaseCommand findItemBaseInfoLang(Long itemId, String customBaseUrl) ;
+	
+	/**
+	 * 通过商品id查询有效的sku
+	 * @param itemId
+	 * @return
+	 */
+	List<SkuCommand> findEffectiveSkuInvByItemId(Long itemId);
 	
 }

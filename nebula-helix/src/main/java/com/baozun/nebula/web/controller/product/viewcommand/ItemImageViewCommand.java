@@ -35,7 +35,14 @@ public class ItemImageViewCommand extends BaseViewCommand {
 	/** 商品Id */
 	private Long itemId;
 	
-	/** 到款商品颜色属性的Id{@link ItemProperties#getId()} */
+	/** 
+	 * <pre>	 
+	 * 1：到款商品颜色属性的Id{@link ItemProperties#getId()}；
+	 * 2：为了到色商品切换颜色图片的逻辑一致，最后规定到色商品也会定义颜色属性（之前是定义图片类型为
+	 * 颜色类型，现在是颜色属性对应的图片）。
+	 * </pre>
+	 */
+	
 	private Long colorItemPropertyId;
 	
 	/** [type，图片列表] */
