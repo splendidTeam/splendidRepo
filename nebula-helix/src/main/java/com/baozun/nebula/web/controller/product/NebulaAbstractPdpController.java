@@ -193,7 +193,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
 		itemExtraViewCommand.setSales(getItemSales(itemCode));
 		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
-	//	itemExtraViewCommand.setSales(getItemRate(itemCode));
+		itemExtraViewCommand.setReviewCount(getItemReviewCount(itemCode));
+		itemExtraViewCommand.setRate(getItemRate(itemCode));
 		return itemExtraViewCommand;
 	}
 	
@@ -223,6 +224,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract Long getItemFavoriteCount(String itemCode);
 	
 	protected abstract Double getItemRate(String itemCode);
+	
+	protected abstract Long getItemReviewCount(String itemCode);
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	
