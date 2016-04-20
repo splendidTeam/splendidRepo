@@ -19,24 +19,43 @@ package com.baozun.nebula.web.controller.product.resolver;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 
 /**   
- * 
- * 构造销售属性和一般属性
- * <p>
- * 		1.到款：颜色作为一个多选的属性，从数据库里取，图片从图片管理里取
- * </p>
- * <p>
- * 		2.到色：颜色作为一个单选的属性，图片也从图片管理里取，但额外补充同款其他商品(itemColorSwatches)
- * </p>
- * 
  * @Description 
  * @author dongliang ma
- * @date 2016年4月20日 上午11:37:08 
+ * @date 2016年4月20日 下午5:15:53 
  * @version   
  */
-public interface ItemPropertyViewCommandResolver {
-	ItemPropertyViewCommand resolve(Long itemId, Map<String, List<ImageViewCommand>> images);
+@Component
+public class ItemPropertyViewCommandResolverImpl implements
+		ItemPropertyViewCommandResolver {
+	
+	@Autowired
+	private ItemDetailManager										itemDetailManager;
+	
+	private static final String          KEY_PROPS_SALE		    	= "salePropCommandList";
+    
+    private static final String          KEY_PROPS_GENERAL 			= "generalGroupPropMap";
+
+    
+
+	/* 
+	 * @see com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver#resolve(java.lang.Long, java.util.Map)
+	 */
+	@Override
+	public ItemPropertyViewCommand resolve(Long itemId,
+			Map<String, List<ImageViewCommand>> images) {
+		
+		Map<String, Object> dynamicProperty = itemDetailManager.newFindDynamicProperty(itemId);
+		
+		//TODO
+		return null;
+	}
+
 }

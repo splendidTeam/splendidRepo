@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2016 Jumbomart All Rights Reserved.
  *
@@ -39,6 +38,7 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
@@ -107,25 +107,26 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemDetailManager										itemDetailManager;
 	
 	@Autowired
+	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	
+	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
 	@Autowired
 	ImageViewCommandConverter                                       imageViewCommandConverter;
 	
-
 	
 	/**
-	 * 构造商品的属性信息，包括销售属性和非销售属性
+	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>
+	 * 此方法在构造销售颜色属性信息时，将需要商品图片信息，
+	 * 所以，之前需先获取商品图片(不一定有颜色属性，但无论如何必须先取图片)
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemPropertyViewCommand buildItemPropertyViewCommand(Long itemId) {
-		
-		Map<String, Object> dynamicPropertyMap = itemDetailManager.newFindDynamicProperty(itemId);
-		
-		
-		return new ItemPropertyViewCommand();
+	protected ItemPropertyViewCommand buildItemPropertyViewCommand(Long itemId, 
+			Map<String, List<ImageViewCommand>> images) {
+		return itemPropertyViewCommandResolver.resolve(itemId, images);
 	}
 	
 	
@@ -210,6 +211,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		return images;
 	}
 	
+	
 	/**
 	 * 构造商品的分类信息
 	 * @param itemId
@@ -228,7 +230,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
 		itemExtraViewCommand.setSales(getItemSales(itemCode));
 		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
-		itemExtraViewCommand.setSales(getItemRate(itemCode));
+		itemExtraViewCommand.setReviewCount(getItemReviewCount(itemCode));
+		itemExtraViewCommand.setRate(getItemRate(itemCode));
 		return itemExtraViewCommand;
 	}
 	
@@ -257,7 +260,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Long getItemRate(String itemCode);
+	protected abstract Double getItemRate(String itemCode);
+	
+	protected abstract Long getItemReviewCount(String itemCode);
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	

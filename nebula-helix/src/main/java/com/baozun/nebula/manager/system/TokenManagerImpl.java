@@ -63,7 +63,7 @@ public class TokenManagerImpl implements TokenManager, Serializable {
 	}
 
 	private String generateKey(String businessCode, String human) {
-		return "token_" + businessCode + "_" + human;
+		return "token:" + businessCode + ":" + human;
 	}
 
 	public CacheManager getCacheManger() {
@@ -76,7 +76,7 @@ public class TokenManagerImpl implements TokenManager, Serializable {
 
 	@Override
 	public VerifyResult verifyAccess(String businessCode, String human, RollingTimeWindow rollingTimeWindow) {
-		String key = generateKey(businessCode, human) + rollingTimeWindow;
+		String key = generateKey(businessCode, human) + ":" + rollingTimeWindow;
 		return cacheManager.applyRollingTimeWindow(key, rollingTimeWindow.getLimit(), rollingTimeWindow.getWindow())
 				? VerifyResult.SUCESS : VerifyResult.LIMITED ;
 	}

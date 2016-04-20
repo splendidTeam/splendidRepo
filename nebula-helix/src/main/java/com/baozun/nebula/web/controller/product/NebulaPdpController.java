@@ -243,7 +243,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 	@Override
 	protected Long getItemSales(String itemCode) {
-		return null;
+		return itemDetailManager.findItemSalesCount(itemCode).longValue();
 	}
 
 
@@ -254,8 +254,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Long getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode).longValue();
+	protected Double getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode).doubleValue();
 	}
 
 
@@ -263,6 +263,11 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	protected String buildQrCodeUrl(Long itemId, HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected Long getItemReviewCount(String itemCode) {
+		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
 	}
 
 }

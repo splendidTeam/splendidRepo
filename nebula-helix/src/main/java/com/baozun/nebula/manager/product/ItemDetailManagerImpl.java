@@ -618,10 +618,8 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	public Float findItemAvgReview(String itemCode) {
 		List<Float> rankAvgList = new ArrayList<Float>();
 		Float rankAvg = 5.0F;
-		QueryConditionCommand queryConditionCommand = new QueryConditionCommand();
-		queryConditionCommand.setCode(itemCode);
-		queryConditionCommand.setLifecycle(1);
-		DataFromSolr dataFromSolr = sdkItemManager.findItemInfoByItemCode(queryConditionCommand);
+		
+		DataFromSolr dataFromSolr = findItemInfoByItemCodeFromSolr(itemCode);
 		List<ItemResultCommand> itemResultCommandList = null;
 		if (dataFromSolr != null && dataFromSolr.getItems() != null
 				&& (itemResultCommandList = dataFromSolr.getItems().getItems()) != null) {
@@ -638,6 +636,18 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 			}
 		}
 		return rankAvg;
+	}
+	
+	/**
+	 * 从solr中查询itemInfo数据，查询条件为itemCode
+	 * @param itemCode
+	 * @return
+	 */
+	private DataFromSolr findItemInfoByItemCodeFromSolr(String itemCode){
+		QueryConditionCommand queryConditionCommand = new QueryConditionCommand();
+		queryConditionCommand.setCode(itemCode);
+		queryConditionCommand.setLifecycle(1);
+		return sdkItemManager.findItemInfoByItemCode(queryConditionCommand);
 	}
 
 	@Transactional(readOnly=true)
@@ -717,10 +727,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	public Integer findItemFavCount(String itemCode) {
 		List<Integer> favoredCountList = null;
 		Integer favoredCount = 0;
-		QueryConditionCommand queryConditionCommand = new QueryConditionCommand();
-		queryConditionCommand.setCode(itemCode);
-		queryConditionCommand.setLifecycle(1);
-		DataFromSolr dataFromSolr = sdkItemManager.findItemInfoByItemCode(queryConditionCommand);
+		DataFromSolr dataFromSolr = findItemInfoByItemCodeFromSolr(itemCode);
 		List<ItemResultCommand> itemResultCommandList = null;
 		if (dataFromSolr != null && dataFromSolr.getItems() != null
 				&& (itemResultCommandList = dataFromSolr.getItems().getItems()) != null) {
@@ -737,6 +744,29 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 			}
 		}
 		return favoredCount;
+	}
+	
+	public Integer findItemSalesCount(String itemCode){
+		List<Integer> salesCountList = null;
+		Integer salesCount = 0;
+		DataFromSolr dataFromSolr = findItemInfoByItemCodeFromSolr(itemCode);
+		List<ItemResultCommand> itemResultCommandList = null;
+		if (dataFromSolr != null && dataFromSolr.getItems() != null
+				&& (itemResultCommandList = dataFromSolr.getItems().getItems()) != null) {
+			for (ItemResultCommand itemResultCommand : itemResultCommandList) {
+				salesCountList = itemResultCommand.getSalesCount();
+			}
+		}
+		
+		// 当评价平均分为null或0.0时, 修改为5.0
+		if (salesCountList != null && salesCountList.size() > 0) {
+			for (Integer sales : salesCountList) {
+				if (null != sales && !sales.equals(0)) {
+					salesCount = sales;
+				}
+			}
+		}
+		return salesCount;
 	}
 
 	@Transactional(readOnly=true)

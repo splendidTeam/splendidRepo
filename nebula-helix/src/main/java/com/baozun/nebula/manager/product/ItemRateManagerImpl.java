@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.RateCommand;
+import com.baozun.nebula.dao.product.ItemRateDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.product.ItemRate;
@@ -110,5 +111,10 @@ public class ItemRateManagerImpl implements ItemRateManager {
 			Long itemId, Sort[] sorts) {
 		Pagination<RateCommand> itemRateCommandPage = sdkItemManager.findItemRateListByItemId(page, itemId, sorts);
 		return itemRateCommandPage;
+	}
+
+	@Override
+	public Integer findRateCountByItemCode(String itemCode) {
+		return sdkItemManager.findRateCountByItemCode(itemCode);
 	}
 }
