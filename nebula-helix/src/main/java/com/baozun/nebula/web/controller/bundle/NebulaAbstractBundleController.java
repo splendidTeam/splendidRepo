@@ -90,12 +90,5 @@ public abstract class NebulaAbstractBundleController extends NebulaBasePdpContro
 	 * @return 
 	 */
 	protected abstract List<BundleSkuViewCommand> buildBundleSkuViewCommand(List<BundleSkuCommand> bundleSkuCommands);
-	 
-	/**
-	 * 获取捆绑类商品中某一个具体商品的展示图片
-	 * @param itemId
-	 * @return 
-	 */
-	protected abstract String getItemImage(Long itemId);
 	
 }
