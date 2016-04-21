@@ -43,11 +43,11 @@ public class BundleItemCommand implements Serializable{
 	/**
 	 * 最小吊牌价
 	 */
-	private BigDecimal minOriginalListPrice ;
+	private BigDecimal minListPrice ;
 	/**
 	 * 最大吊牌价
 	 */
-	private BigDecimal maxOriginalListPrice ;
+	private BigDecimal maxListPrice ;
 	
 	/**
 	 * bundle最小商品销售价
@@ -61,12 +61,12 @@ public class BundleItemCommand implements Serializable{
 	
 	private List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
 	
-	public void setMinOriginalListPrice(BigDecimal minOriginalListPrice) {
-		this.minOriginalListPrice = minOriginalListPrice;
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
 	}
 
-	public void setMaxOriginalListPrice(BigDecimal maxOriginalListPrice) {
-		this.maxOriginalListPrice = maxOriginalListPrice;
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
 	}
 
 	public void setMinSalesPrice(BigDecimal minSalesPrice) {
@@ -170,32 +170,32 @@ public class BundleItemCommand implements Serializable{
 	 * 
 	 * 查找商品中sku的最大吊牌价格
 	 */
-	public BigDecimal getMaxOriginalListPrice() {
+	public BigDecimal getMaxListPrice() {
 		for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
-				maxOriginalListPrice = bundleSkus.get(i).getListPrice();
+				maxListPrice = bundleSkus.get(i).getListPrice();
 			}else{
-				if(maxOriginalListPrice.compareTo(bundleSkus.get(i).getListPrice()) == -1){
-					maxOriginalListPrice = bundleSkus.get(i).getListPrice();
+				if(maxListPrice.compareTo(bundleSkus.get(i).getListPrice()) == -1){
+					maxListPrice = bundleSkus.get(i).getListPrice();
 				}
 			}
 		}
-		return maxOriginalListPrice;
+		return maxListPrice;
 	}
 	/**
 	 * 
 	 * 查找商品中sku的最小吊牌价格
 	 */
-	public BigDecimal getMinOriginalListPrice() {
+	public BigDecimal getMinListPrice() {
 		for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
-				minOriginalListPrice = bundleSkus.get(i).getListPrice();
+				minListPrice = bundleSkus.get(i).getListPrice();
 			}else{
-				if(minOriginalListPrice.compareTo(bundleSkus.get(i).getListPrice()) == 1){
-					minOriginalListPrice = bundleSkus.get(i).getListPrice();
+				if(minListPrice.compareTo(bundleSkus.get(i).getListPrice()) == 1){
+					minListPrice = bundleSkus.get(i).getListPrice();
 				}
 			}
 		}
-		return minOriginalListPrice;
+		return minListPrice;
 	}
 }
