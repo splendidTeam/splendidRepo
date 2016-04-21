@@ -36,8 +36,23 @@ import java.util.List;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 
 /**
+ * 捆绑类商品视图层对象
+ * 
+ * <ul>
+ * 	<li>捆绑类商品与普通商品一样存在商品扩展信息</li>
+ * 	<li>捆绑类商品不存在属性，所以最多只可能存在一套图片</li>
+ * 	<li>
+ * 		捆绑类商品存在三种价格，商城视需求可以采用listPrice或者originalSalesPrice作为原价的设置：
+ * 		<ol>
+ * 			<li>listPrice -- 吊牌价</li>
+ * 			<li>originalSalesPrice -- 原销售价</li>
+ * 			<li>salesPrice -- 在捆绑类商品中设置的销售价</li>
+ * 		</ol>
+ * 	</li>
+ * </ul>
  * @author yue.ch
  *
  */
@@ -46,26 +61,29 @@ public class BundleViewCommand extends BaseViewCommand {
 	private static final long serialVersionUID = -542377171565361284L;
 
 	/**
-	 * 
+	 * 捆绑类商品ID
 	 */
 	private Long bundleId ;
-	/**
-	 * 
-	 */
-	private Long itemId ;
-	/**
-	 * 商品编码
-	 */
-	private String code ;
-	/**
-	 * 商品生命周期
-	 */
-	private int lifeCycle;
 	
 	/**
-	 * bundle价格类型
+	 * 捆绑类商品对应的商品ID
 	 */
-	private Integer priceType;
+	private Long itemId ;
+	
+	/**
+	 * 捆绑类商品的编码
+	 */
+	private String code ;
+	
+	/**
+	 * 最小吊牌价
+	 */
+	private BigDecimal minListPrice;
+	
+	/**
+	 * 最大吊牌价
+	 */
+	private BigDecimal maxListPrice;
 	
 	/**
 	 * 最小原销售价
@@ -85,9 +103,14 @@ public class BundleViewCommand extends BaseViewCommand {
 	private BigDecimal maxSalesPrice ;
 	
 	/**
-	 * bundle商品的扩展信息
+	 * 捆绑类商品的扩展信息
 	 */
 	private ItemBaseInfoViewCommand itemBaseInfoViewCommand;
+	
+	/**
+	 * 捆绑类商品图片信息
+	 */
+	private ItemImageViewCommand itemImageViewCommand;
 	
 	/**
 	 * 
@@ -118,20 +141,20 @@ public class BundleViewCommand extends BaseViewCommand {
 		this.code = code;
 	}
 
-	public int getLifeCycle() {
-		return lifeCycle;
+	public BigDecimal getMinListPrice() {
+		return minListPrice;
 	}
 
-	public void setLifeCycle(int lifeCycle) {
-		this.lifeCycle = lifeCycle;
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
 	}
 
-	public Integer getPriceType() {
-		return priceType;
+	public BigDecimal getMaxListPrice() {
+		return maxListPrice;
 	}
 
-	public void setPriceType(Integer priceType) {
-		this.priceType = priceType;
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
 	}
 
 	public BigDecimal getMinOriginalSalesPrice() {
@@ -182,5 +205,13 @@ public class BundleViewCommand extends BaseViewCommand {
 	public void setBundleElementViewCommands(
 			List<BundleElementViewCommand> bundleElementViewCommands) {
 		this.bundleElementViewCommands = bundleElementViewCommands;
+	}
+
+	public ItemImageViewCommand getItemImageViewCommand() {
+		return itemImageViewCommand;
+	}
+
+	public void setItemImageViewCommand(ItemImageViewCommand itemImageViewCommand) {
+		this.itemImageViewCommand = itemImageViewCommand;
 	}
 }
