@@ -34,10 +34,15 @@ import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 public class NebulaPdpControllerTest extends BaseControllerTest{
 
 
+	private NebulaPdpController nebulaPdpController;
+	
 	@Before
 	public void setUp(){
 
 	}
 
-
+	@Test
+	public void testGetBuyLimit(){
+		
+	}
 }
