@@ -31,8 +31,6 @@
 */
 package com.baozun.nebula.web.controller.bundle;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +38,11 @@ import com.baozun.nebula.command.bundle.BundleCommand;
 import com.baozun.nebula.command.bundle.BundleElementCommand;
 import com.baozun.nebula.command.bundle.BundleItemCommand;
 import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.NebulaBasePdpController;
 
 /**
  * 捆绑类商品 controller
@@ -52,7 +50,7 @@ import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
  * @author yue.ch
  *
  */
-public abstract class NebulaAbstractBundleController extends BaseController {
+public abstract class NebulaAbstractBundleController extends NebulaBasePdpController {
 	
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaAbstractBundleController.class);
 
