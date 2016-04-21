@@ -208,7 +208,7 @@ public class BundleCommand extends Bundle{
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemSum = BigDecimal.ZERO;
 			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMinOriginalListPrice());
+				itemSum = itemSum.add(item.getMinListPrice());
 			}
 			maxListPrice = maxListPrice.add(itemSum);
 		}
@@ -220,7 +220,7 @@ public class BundleCommand extends Bundle{
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemSum = BigDecimal.ZERO;
 			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMaxOriginalListPrice());
+				itemSum = itemSum.add(item.getMaxListPrice());
 			}
 			maxListPrice = maxListPrice.add(itemSum);
 		}
