@@ -47,12 +47,12 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 	private static final long serialVersionUID = -2719089477406692090L;
 	
 	/**
-	 * 捆绑类商品的扩展信息
+	 * 捆绑商品的扩展信息
 	 */
 	private ItemBaseInfoViewCommand itemBaseInfoViewCommand;
 	
 	/**
-	 * 捆绑类商品图片信息
+	 * 捆绑商品图片信息
 	 */
 	private ItemImageViewCommand itemImageViewCommand;
 	
