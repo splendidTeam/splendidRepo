@@ -36,7 +36,7 @@ public class ItemExtraViewCommand extends BaseViewCommand {
 	private Long reviewCount;
 	
 	/** 商品评分     .*/
-	private Double rate;
+	private Float rate;
 
 	public Long getSales() {
 		return sales;
@@ -54,20 +54,20 @@ public class ItemExtraViewCommand extends BaseViewCommand {
 		this.favoriteCount = favoriteCount;
 	}
 
-	public Double getRate() {
-		return rate;
-	}
-
-	public void setRate(Double rate) {
-		this.rate = rate;
-	}
-
 	public Long getReviewCount() {
 		return reviewCount;
 	}
 
 	public void setReviewCount(Long reviewCount) {
 		this.reviewCount = reviewCount;
+	}
+
+	public Float getRate() {
+		return rate;
+	}
+
+	public void setRate(Float rate) {
+		this.rate = rate;
 	}
 	
 }
