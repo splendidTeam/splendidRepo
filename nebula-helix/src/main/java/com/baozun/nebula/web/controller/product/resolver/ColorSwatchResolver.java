@@ -19,7 +19,8 @@ package com.baozun.nebula.web.controller.product.resolver;
 import java.util.List;
 import java.util.Map;
 
-import com.baozun.nebula.model.product.ItemImage;
+import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 
 /**   
  * 获取颜色小色块
@@ -31,8 +32,8 @@ import com.baozun.nebula.model.product.ItemImage;
 public interface ColorSwatchResolver {
 
 	/**
-	 * @param itemImgList 商品图片
+	 * @param imageViewCommands 商品图片
 	 * @return
 	 */
-	Map<Long, String> resolve(List<ItemImage> itemImgList);
+	Map<Long, ImageViewCommand> resolve(List<ItemImageViewCommand> imageViewCommands);
 }
