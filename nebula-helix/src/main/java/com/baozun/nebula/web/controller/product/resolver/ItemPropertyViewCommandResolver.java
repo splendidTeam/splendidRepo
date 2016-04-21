@@ -40,7 +40,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewComm
  */
 public interface ItemPropertyViewCommandResolver {
 	/**
-	 * 根据baseInfoViewCommand(至少包含itemId)、images(图片信息)构造ViewCommand
+	 * 根据baseInfoViewCommand(至少包含itemId、itemCode)、images(图片信息)构造ViewCommand
 	 * @param baseInfoViewCommand
 	 * @param images
 	 * @return
