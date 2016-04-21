@@ -127,7 +127,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 */
 	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
-			Map<String, List<ImageViewCommand>> images) {
+			List<ItemImageViewCommand> images) {
 		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
 	}
 	
