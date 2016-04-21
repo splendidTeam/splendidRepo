@@ -28,12 +28,12 @@ public class BundleSkuCommand extends BundleSku{
 	 * sku原销售价
 	 * 
 	 */
-	private BigDecimal originalSalesPrice;
+	private BigDecimal originalSalesPrice = BigDecimal.ZERO;
 	
 	/**
 	 * sku吊牌价
 	 */
-	private BigDecimal listPrice;
+	private BigDecimal listPrice = BigDecimal.ZERO;
 	
 	/**
 	 * 库存数量

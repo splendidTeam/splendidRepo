@@ -8,12 +8,21 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-					select b.* 
-						from t_pd_bundle b 
-						inner join t_pd_item i on i.id = b.item_id
-							#if($lifecycle)
-			       				and i.lifecycle = :lifecycle
-			       			#end
+					select 
+					     b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
+					from t_pd_bundle b 
+					inner join t_pd_item i on i.id = b.item_id
+						#if($lifecycle)
+			       			and i.lifecycle = :lifecycle
+			       		#end
 						left join (select distinct bundle_id, bundle_element_id from t_pd_bundle_sku where item_id = :itemId) t on b.id = t.bundle_id
 						inner join t_pd_bundle_element e on t.bundle_element_id = e.id and e.is_main_element = true
 						order by b.modify_time desc
@@ -27,7 +36,16 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		select b.* 
+		       		select 
+		       		 	 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
 						from t_pd_bundle b 
 						inner join t_pd_item i on i.id = b.item_id
 							#if($lifecycle)
@@ -47,7 +65,15 @@
 			<value>
 				<![CDATA[  
 		       		select 
-		       			b.* 
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime 
 		       		from 
 		       			t_pd_bundle b 
 		       		left join
@@ -71,9 +97,17 @@
 			<value>
 				<![CDATA[  
 		       		select 
-		       			*
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
 		       		from 
-		       			t_pd_bundle  
+		       			t_pd_bundle  b
 		       		where 
 		       		    1 = 1
                  ]]>

@@ -102,7 +102,7 @@ public class BundleElement extends BaseModel {
 	 * 主卖品标志，一个捆绑商品仅以主卖品为依据加载捆绑成员信息<br/>
 	 * 注意这里是主卖品而不是主商品的概念，是因为主卖品可以是一个具体的商品，也可以是以款汇聚的多个商品
 	 */
-	private Boolean mainElement;
+	private Boolean isMainElement;
 	
 	/**
 	 * 排序因子，决定了捆绑类商品中除主卖品外其它成员的排列顺序
@@ -155,13 +155,12 @@ public class BundleElement extends BaseModel {
 		this.salesPrice = salesPrice;
 	}
 
-	@Column(name = "IS_MAIN_ELEMENT")
-	public Boolean isMainElement() {
-		return mainElement;
+	public Boolean getIsMainElement() {
+		return isMainElement;
 	}
-
-	public void setMainElement(Boolean mainElement) {
-		this.mainElement = mainElement;
+	@Column(name = "IS_MAIN_ELEMENT")
+	public void setIsMainElement(Boolean isMainElement) {
+		this.isMainElement = isMainElement;
 	}
 
 	@Column(name = "SORT_NO")

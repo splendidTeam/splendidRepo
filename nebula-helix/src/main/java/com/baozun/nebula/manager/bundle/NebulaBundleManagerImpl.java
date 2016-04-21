@@ -3,6 +3,7 @@ package com.baozun.nebula.manager.bundle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +78,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			removeInvalidBundle(bundles);
 		} else {
 			LOG.error("find bundles is null");
-			LOG.error("itemId : [{}]  showMainElementFlag : [{}]  lifeCycle : [{}]", itemId, 1);
+			LOG.error("itemId : [{}]  showMainElementFlag : {}  lifeCycle : {}  [{}]", itemId, 1 , new Date());
 		}
 
 		return bundles;
@@ -102,7 +103,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			removeInvalidBundle(bundles);
 		} else {
 			LOG.error("find bundles is null");
-			LOG.error("parametar : page [{}]  sorts[{}]", JsonUtil.format(page), JsonUtil.format(sorts));
+			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
 		}
 		pagination.setItems(bundles);
 		return pagination;
@@ -261,6 +262,12 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 						// lifecycle == 1 上架
 						if (item.getLifecycle().intValue() != 1) {
 							removeFlag = true;
+							LOG.debug("*******************************************************");
+							LOG.debug("current bundle info : {}  [{}]" , JsonUtil.format(bundle) ,new Date());
+							LOG.debug("current BundleElementCommand info : {} [{}]" , JsonUtil.format(bundleElementCommand) , new Date());
+							LOG.debug("current bundleItemCommand info : {} [{}]" , JsonUtil.format(bundleItemCommand), new Date());
+							LOG.debug("current item info : {} [{}]" , JsonUtil.format(item) , new Date());
+							LOG.debug("*******************************************************");
 							break;
 						}
 					}
@@ -479,6 +486,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
 				skuCommand.setQuantity(inventory.getAvailableQty());
 			}
+			
+			bundleSkus.add(skuCommand);
 		}
 
 		return bundleSkus;

@@ -11,9 +11,9 @@
 		       		select 
 		       			*
 		       		from 
-		       			t_pd_bundle  
+		       			t_pd_bundle_sku  
 		       		where 
-		       		    1 = 1
+		       		    bundle_id = :bundleId
                  ]]>
 			</value>
 		</constructor-arg>
