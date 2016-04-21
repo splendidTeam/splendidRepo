@@ -40,6 +40,16 @@ public class BundleSkuCommand extends BundleSku{
 	 */
 	private int quantity ;
 	
+	/**
+	 * 销售属性
+	 */
+	private String properties;
+	
+	/**
+	 * 外部编码
+	 */
+	private String extentionCode;
+	
 	public int getQuantity() {
 		return quantity;
 	}
@@ -64,5 +74,20 @@ public class BundleSkuCommand extends BundleSku{
 		this.listPrice = listPrice;
 	}
 
+	public String getProperties() {
+		return properties;
+	}
+
+	public void setProperties(String properties) {
+		this.properties = properties;
+	}
+
+	public String getExtentionCode() {
+		return extentionCode;
+	}
+
+	public void setExtentionCode(String extentionCode) {
+		this.extentionCode = extentionCode;
+	}
 	
 }
