@@ -28,12 +28,14 @@ import com.baozun.nebula.dao.bundle.BundleDao;
 import com.baozun.nebula.dao.bundle.BundleElementDao;
 import com.baozun.nebula.dao.bundle.BundleSkuDao;
 import com.baozun.nebula.dao.product.ItemDao;
+import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.bundle.BundleElement;
 import com.baozun.nebula.model.bundle.BundleSku;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.tools.jsonlib.JsonUtil;
 
@@ -56,6 +58,10 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Autowired
 	private ItemDao itemDao;
+	
+	
+	@Autowired
+	private SdkSkuInventoryDao sdkSkuInventoryDao;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -340,6 +346,14 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 				skuCommand.setSalesPrice(skuu.getSalePrice());
 			}
 			skuCommand.setListPrice(skuu.getListPrice());
+			//不需要同步扣减单品库存 并且 捆绑数量不为空 ,那么skuCommand的quantity就取 bundle的availableQty
+			//否则,skuCommand的quantity就取单品本身的库存
+			if(!bundle.getSyncWithInv() && bundle.getAvailableQty() != null){
+				skuCommand.setQuantity(bundle.getAvailableQty());
+			}else{
+				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
+				skuCommand.setQuantity(inventory.getAvailableQty());
+			}
 		}
 
 		return bundleSkus;
