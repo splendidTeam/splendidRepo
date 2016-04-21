@@ -254,8 +254,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Double getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode).doubleValue();
+	protected Float getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode);
 	}
 
 

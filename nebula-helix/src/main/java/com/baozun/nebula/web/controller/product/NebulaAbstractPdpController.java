@@ -195,7 +195,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Double getItemRate(String itemCode);
+	protected abstract Float getItemRate(String itemCode);
 	
 	protected abstract Long getItemReviewCount(String itemCode);
 	
