@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.annotation.NativeQuery;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
@@ -193,8 +192,10 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		bundle.setMinOriginalSalesPrice(bundle.getMinOriginalSalesPrice());
 		bundle.setMaxSalesPrice(bundle.getMaxSalesPrice());
 		bundle.setMinSalesPrice(bundle.getMinSalesPrice());
-	}
-
+		bundle.setMaxListPrice(bundle.getMaxListPrice());
+		bundle.setMinListPrice(bundle.getMinListPrice());
+    }
+   
 	/**
 	 * 分别给每个BundleElement填充信息
 	 * 
@@ -310,6 +311,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		bundleItemCommand.setMaxOriginalSalesPrice(bundleItemCommand.getMaxOriginalSalesPrice());
 		bundleItemCommand.setMinSalesPrice(bundleItemCommand.getMinSalesPrice());
 		bundleItemCommand.setMaxSalesPrice(bundleItemCommand.getMaxSalesPrice());
+		bundleItemCommand.setMaxOriginalSalesPrice(bundleItemCommand.getMaxOriginalListPrice());
+		bundleItemCommand.setMinOriginalListPrice(bundleItemCommand.getMinOriginalListPrice());
 
 		return bundleItemCommand;
 	}

@@ -42,11 +42,11 @@ public class BundleCommand extends Bundle{
 	/**
 	 * 最小吊牌价
 	 */
-	private BigDecimal minOriginalListPrice ;
+	private BigDecimal minListPrice ;
 	/**
 	 * 最大吊牌价
 	 */
-	private BigDecimal maxOriginalListPrice ;
+	private BigDecimal maxListPrice ;
 	/**
 	 * 最小销售价
 	 */
@@ -85,12 +85,12 @@ public class BundleCommand extends Bundle{
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
-	public void setMinOriginalListPrice(BigDecimal minOriginalListPrice) {
-		this.minOriginalListPrice = minOriginalListPrice;
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
 	}
 
-	public void setMaxOriginalListPrice(BigDecimal maxOriginalListPrice) {
-		this.maxOriginalListPrice = maxOriginalListPrice;
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
 	}
 
 	/**
@@ -203,12 +203,28 @@ public class BundleCommand extends Bundle{
 	    return maxSalesPrice ;
 	}
 	
-	public BigDecimal getMinOriginalListPrice() {
-		return minOriginalListPrice;
+	public BigDecimal getMinListPrice() {
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMinOriginalListPrice());
+			}
+			maxListPrice = maxListPrice.add(itemSum);
+		}
+		return minListPrice;
 	}
 	
-	public BigDecimal getMaxOriginalListPrice() {
-		return maxOriginalListPrice;
+	public BigDecimal getMaxListPrice() {
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMaxOriginalListPrice());
+			}
+			maxListPrice = maxListPrice.add(itemSum);
+		}
+		return maxListPrice;
 	}
     
 }
