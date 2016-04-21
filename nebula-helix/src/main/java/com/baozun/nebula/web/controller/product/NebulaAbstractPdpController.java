@@ -109,43 +109,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemDetailManager										itemDetailManager;
 	
 	@Autowired
-	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
-	
-	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
-	@Autowired
-	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
-	
-	
-	/**
-	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>
-	 * 此方法在构造销售颜色属性信息时，将需要商品图片信息，
-	 * 所以，之前需先获取商品图片(不一定有颜色属性，但无论如何必须先取图片)
-	 * @param itemId
-	 * @return
-	 */
-	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
-			List<ItemImageViewCommand> images) {
-		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
-	}
-	
-	
-	
-	/**
-	 * 构造商品的图片
-	 * @param itemId
-	 * @return
-	 */
-	protected List<ItemImageViewCommand> buildItemImageViewCommand(Long itemId) {
-		// 查询结果
-		List<Long> itemIds = new ArrayList<Long>();
-		itemIds.add(itemId);
-		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
-		// 数据转换
-		return itemImageViewCommandConverter.convert(itemImageList);
-	}
 	
 	/**
 	 * 构造商品的分类信息
@@ -195,7 +161,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Double getItemRate(String itemCode);
+	protected abstract Float getItemRate(String itemCode);
 	
 	protected abstract Long getItemReviewCount(String itemCode);
 	

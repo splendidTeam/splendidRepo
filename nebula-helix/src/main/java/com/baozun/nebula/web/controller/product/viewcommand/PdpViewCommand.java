@@ -25,27 +25,35 @@ public class PdpViewCommand extends BaseViewCommand {
 	private static final long serialVersionUID = -521994888015333539L;
 
 	//TODO 先放在这,后边决定在什么时机获取
+	/** 面包屑 */
 	private List<BreadcrumbsViewCommand> breadcrumbs;
 	
-	private ItemBaseInfoViewCommand itemBaseInfo;
+	/** 商品基本信息 */
+	private ItemBaseInfoViewCommand baseInfo;
 	
-	private ItemPropertyViewCommand itemProperty;
+	/** 商品属性，包括销售属性和非销售属性 */
+	private ItemPropertyViewCommand properties;
 	
-	private List<ItemCategoryViewCommand> categorys;
+	/** 颜色（或者其他属性，颜色是个统称）或商品切换部分 */
+	private List<ItemColorSwatchViewCommand>  colorSwatches;
 	
-	/** 颜色（或者其他属性，颜色是个统称）切换部分 */
-	private List<ItemColorSwatchViewCommand>  itemColorSwatches;
-	
-	/** 商品的图片 */
+	/** 商品图片 */
 	private List<ItemImageViewCommand> images;
 	
 	/** sku */
 	private List<SkuViewCommand> skus;
 	
+	/** 价格 */
 	private PriceViewCommand price;
+	
+	/** 商品分类 */
+	private List<ItemCategoryViewCommand> categorys;
 
-	/** 尺码对照. */
+	/** 尺码对照 */
     private String sizeCompareChart;
+    
+    /** 商品扩展信息 */
+    private ItemExtraViewCommand extra;
 
 	public List<BreadcrumbsViewCommand> getBreadcrumbs() {
 		return breadcrumbs;
@@ -55,31 +63,30 @@ public class PdpViewCommand extends BaseViewCommand {
 		this.breadcrumbs = breadcrumbs;
 	}
 
-	public ItemBaseInfoViewCommand getItemBaseInfo() {
-		return itemBaseInfo;
+	public ItemBaseInfoViewCommand getBaseInfo() {
+		return baseInfo;
 	}
 
-	public void setItemBaseInfo(ItemBaseInfoViewCommand itemBaseInfo) {
-		this.itemBaseInfo = itemBaseInfo;
+	public void setBaseInfo(ItemBaseInfoViewCommand baseInfo) {
+		this.baseInfo = baseInfo;
 	}
 
-	public ItemPropertyViewCommand getItemProperty() {
-		return itemProperty;
+	public ItemPropertyViewCommand getProperties() {
+		return properties;
 	}
 
-	public void setItemProperty(ItemPropertyViewCommand itemProperty) {
-		this.itemProperty = itemProperty;
-	}
-	
-	public List<ItemColorSwatchViewCommand> getItemColorSwatches() {
-		return itemColorSwatches;
+	public void setProperties(ItemPropertyViewCommand properties) {
+		this.properties = properties;
 	}
 
-	public void setItemColorSwatches(
-			List<ItemColorSwatchViewCommand> itemColorSwatches) {
-		this.itemColorSwatches = itemColorSwatches;
+	public List<ItemColorSwatchViewCommand> getColorSwatches() {
+		return colorSwatches;
 	}
-	
+
+	public void setColorSwatches(List<ItemColorSwatchViewCommand> colorSwatches) {
+		this.colorSwatches = colorSwatches;
+	}
+
 	public List<ItemImageViewCommand> getImages() {
 		return images;
 	}
@@ -104,6 +111,14 @@ public class PdpViewCommand extends BaseViewCommand {
 		this.price = price;
 	}
 
+	public List<ItemCategoryViewCommand> getCategorys() {
+		return categorys;
+	}
+
+	public void setCategorys(List<ItemCategoryViewCommand> categorys) {
+		this.categorys = categorys;
+	}
+
 	public String getSizeCompareChart() {
 		return sizeCompareChart;
 	}
@@ -112,12 +127,12 @@ public class PdpViewCommand extends BaseViewCommand {
 		this.sizeCompareChart = sizeCompareChart;
 	}
 
-	public List<ItemCategoryViewCommand> getCategorys() {
-		return categorys;
+	public ItemExtraViewCommand getExtra() {
+		return extra;
 	}
 
-	public void setCategorys(List<ItemCategoryViewCommand> categorys) {
-		this.categorys = categorys;
+	public void setExtra(ItemExtraViewCommand extra) {
+		this.extra = extra;
 	}
 
 }
