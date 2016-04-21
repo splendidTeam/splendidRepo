@@ -17,6 +17,7 @@
 package com.baozun.nebula.command.bundle;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -58,7 +59,7 @@ public class BundleItemCommand implements Serializable{
 	 */
 	private BigDecimal maxSalesPrice;
 	
-	private List<BundleSkuCommand> bundleSkus;
+	private List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
 	
 	public void setMinOriginalListPrice(BigDecimal minOriginalListPrice) {
 		this.minOriginalListPrice = minOriginalListPrice;

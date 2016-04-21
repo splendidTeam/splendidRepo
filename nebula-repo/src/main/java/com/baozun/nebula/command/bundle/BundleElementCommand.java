@@ -15,6 +15,7 @@
  *
  */
 package com.baozun.nebula.command.bundle;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.BundleElement;
@@ -36,7 +37,7 @@ public class BundleElementCommand extends BundleElement{
 	 * 	  <li>sku需要其一些基本信息，以及对应的属性Map<propertyId,propertyValueName></li>
 	 * </ul>
 	 */
-	private List<BundleItemCommand> items;
+	private List<BundleItemCommand> items = new ArrayList<BundleItemCommand>();
 
 	public List<BundleItemCommand> getItems() {
 		return items;
