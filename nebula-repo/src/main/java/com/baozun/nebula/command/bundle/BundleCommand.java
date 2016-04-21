@@ -33,28 +33,28 @@ public class BundleCommand extends Bundle{
 	/**
 	 * 最小原销售价
 	 */
-	private BigDecimal minOriginalSalesPrice ;
+	private BigDecimal minOriginalSalesPrice = BigDecimal.ZERO ;
 	/**
 	 * 最大原销售价
 	 */
-	private BigDecimal maxOriginalSalesPrice ;
+	private BigDecimal maxOriginalSalesPrice = BigDecimal.ZERO ;
 	
 	/**
 	 * 最小吊牌价
 	 */
-	private BigDecimal minListPrice ;
+	private BigDecimal minListPrice = BigDecimal.ZERO ;
 	/**
 	 * 最大吊牌价
 	 */
-	private BigDecimal maxListPrice ;
+	private BigDecimal maxListPrice = BigDecimal.ZERO ;
 	/**
 	 * 最小销售价
 	 */
-	private BigDecimal minSalesPrice ;
+	private BigDecimal minSalesPrice = BigDecimal.ZERO ;
 	/**
 	 * 最大销售价
 	 */
-	private BigDecimal maxSalesPrice ;
+	private BigDecimal maxSalesPrice = BigDecimal.ZERO ;
 	
 	/**
 	 * 
@@ -210,7 +210,7 @@ public class BundleCommand extends Bundle{
 			for (BundleItemCommand item : items) {
 				itemSum = itemSum.add(item.getMinListPrice());
 			}
-			maxListPrice = maxListPrice.add(itemSum);
+			minListPrice = minListPrice.add(itemSum);
 		}
 		return minListPrice;
 	}

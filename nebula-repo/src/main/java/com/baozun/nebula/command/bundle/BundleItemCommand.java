@@ -33,31 +33,31 @@ public class BundleItemCommand implements Serializable{
 	/**
 	 * 最小商品原销售价
 	 */
-	private BigDecimal minOriginalSalesPrice;
+	private BigDecimal minOriginalSalesPrice = BigDecimal.ZERO;
 	
 	/**
 	 * 最大商品原销售价
 	 */
-	private BigDecimal maxOriginalSalesPrice;
+	private BigDecimal maxOriginalSalesPrice = BigDecimal.ZERO;
 	
 	/**
 	 * 最小吊牌价
 	 */
-	private BigDecimal minListPrice ;
+	private BigDecimal minListPrice = BigDecimal.ZERO ;
 	/**
 	 * 最大吊牌价
 	 */
-	private BigDecimal maxListPrice ;
+	private BigDecimal maxListPrice = BigDecimal.ZERO ;
 	
 	/**
 	 * bundle最小商品销售价
 	 */
-	private BigDecimal minSalesPrice;
+	private BigDecimal minSalesPrice = BigDecimal.ZERO;
 	
 	/**
 	 * bundle最大商品销售价
 	 */
-	private BigDecimal maxSalesPrice;
+	private BigDecimal maxSalesPrice = BigDecimal.ZERO;
 	
 	private List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
 	
