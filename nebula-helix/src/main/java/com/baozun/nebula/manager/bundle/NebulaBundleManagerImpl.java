@@ -90,6 +90,24 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		fillBundleCommand(bundle);
 		return bundle;
 	}
+	
+	@Override
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts) {
+		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
+		List<BundleCommand> bundles = pagination.getItems();
+		if (bundles != null) {
+			// 2 填充bundleCommand的基本信息
+			fillBundleCommandList(bundles);
+			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
+			removeInvalidBundle(bundles);
+		} else {
+			LOG.error("find bundles is null");
+			LOG.error("parametar : page [{}]  sorts[{}]", JsonUtil.format(page), JsonUtil.format(sorts));
+		}
+		pagination.setItems(bundles);
+		return pagination;
+	}
+
 
 	@Override
 	@Transactional(readOnly = true)
@@ -221,23 +239,6 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		}
 	}
 
-	@Override
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts) {
-		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
-		List<BundleCommand> bundles = pagination.getItems();
-		if (bundles != null) {
-			// 2 填充bundleCommand的基本信息
-			fillBundleCommandList(bundles);
-			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			removeInvalidBundle(bundles);
-		} else {
-			LOG.error("find bundles is null");
-			LOG.error("parametar : page [{}]  sorts[{}]", JsonUtil.format(page), JsonUtil.format(sorts));
-		}
-		pagination.setItems(bundles);
-		return pagination;
-	}
-
 	/**
 	 * <h3>剔除掉无效的bundle</h3>
 	 * <ul>
@@ -246,7 +247,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * 
 	 * @param bundles
 	 */
-	public void removeInvalidBundle(List<BundleCommand> bundles) {
+	private void removeInvalidBundle(List<BundleCommand> bundles) {
 		Iterator<BundleCommand> iterator = bundles.iterator();
 		while (iterator.hasNext()) {
 			boolean removeFlag = false;
