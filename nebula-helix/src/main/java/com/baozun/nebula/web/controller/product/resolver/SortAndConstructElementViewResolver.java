@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
@@ -41,6 +42,6 @@ public interface SortAndConstructElementViewResolver {
 	 */
 	List<PropertyElementViewCommand> resolve(ItemBaseInfoViewCommand baseInfoViewCommand,
             List<DynamicPropertyCommand> dynamicPropertyCommandList,
-            Map<Long, String> colorswatchMap);
+            Map<Long, ImageViewCommand> colorswatchMap);
 	
 }

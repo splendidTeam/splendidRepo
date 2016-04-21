@@ -33,10 +33,7 @@ package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 import com.baozun.nebula.web.controller.BaseViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 
 /**
  * 捆绑类商品视图层对象
@@ -101,17 +98,6 @@ public class BundleViewCommand extends BaseViewCommand {
 	 * 最大销售价
 	 */
 	private BigDecimal maxSalesPrice ;
-	
-	/**
-	 * 捆绑类商品的扩展信息
-	 */
-	private ItemBaseInfoViewCommand itemBaseInfoViewCommand;
-	
-	/**
-	 * 捆绑类商品图片信息
-	 */
-	private ItemImageViewCommand itemImageViewCommand;
-	
 	/**
 	 * 捆绑类商品成员
 	 */
@@ -189,15 +175,6 @@ public class BundleViewCommand extends BaseViewCommand {
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
-	public ItemBaseInfoViewCommand getItemBaseInfoViewCommand() {
-		return itemBaseInfoViewCommand;
-	}
-
-	public void setItemBaseInfoViewCommand(
-			ItemBaseInfoViewCommand itemBaseInfoViewCommand) {
-		this.itemBaseInfoViewCommand = itemBaseInfoViewCommand;
-	}
-
 	public List<BundleElementViewCommand> getBundleElementViewCommands() {
 		return bundleElementViewCommands;
 	}
@@ -205,13 +182,5 @@ public class BundleViewCommand extends BaseViewCommand {
 	public void setBundleElementViewCommands(
 			List<BundleElementViewCommand> bundleElementViewCommands) {
 		this.bundleElementViewCommands = bundleElementViewCommands;
-	}
-
-	public ItemImageViewCommand getItemImageViewCommand() {
-		return itemImageViewCommand;
-	}
-
-	public void setItemImageViewCommand(ItemImageViewCommand itemImageViewCommand) {
-		this.itemImageViewCommand = itemImageViewCommand;
 	}
 }

@@ -1,0 +1,120 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
+package com.baozun.nebula.web.controller.product.viewcommand;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import com.baozun.nebula.web.controller.BaseViewCommand;
+
+/**
+ * 相关商品，比如推荐商品、最近浏览商品等
+ *
+ */
+public class RelationItemViewCommand extends BaseViewCommand {
+
+	private static final long serialVersionUID = -7068802000352169607L;
+
+	/** 商品id. */
+    private Long itemId;
+
+    /** 商品code. */
+    private String itemCode;
+
+    /** 商品名称. */
+    private String itemName;
+
+    /** 商品图片URL, 可能有多个. */
+    private List<String> imageUrl;
+
+    /** 吊牌价(原单价). */
+    private BigDecimal listPrice;
+
+    /** 销售价格. */
+    private BigDecimal salePrice;
+    
+    /** 商品的颜色属性（或者同款商品）, 非必须. */
+    private RelationItemColorSwatchViewCommand colorSwatch;
+    
+    /** 商品的扩展数据. {@link ItemExtraViewCommand} */
+    private ItemExtraViewCommand extra;
+
+	public Long getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(Long itemId) {
+		this.itemId = itemId;
+	}
+
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public List<String> getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(List<String> imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public BigDecimal getListPrice() {
+		return listPrice;
+	}
+
+	public void setListPrice(BigDecimal listPrice) {
+		this.listPrice = listPrice;
+	}
+
+	public BigDecimal getSalePrice() {
+		return salePrice;
+	}
+
+	public void setSalePrice(BigDecimal salePrice) {
+		this.salePrice = salePrice;
+	}
+
+	public RelationItemColorSwatchViewCommand getColorSwatch() {
+		return colorSwatch;
+	}
+
+	public void setColorSwatch(RelationItemColorSwatchViewCommand colorSwatch) {
+		this.colorSwatch = colorSwatch;
+	}
+
+	public ItemExtraViewCommand getExtra() {
+		return extra;
+	}
+
+	public void setExtra(ItemExtraViewCommand extra) {
+		this.extra = extra;
+	}
+    
+}
