@@ -37,6 +37,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Pagination;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,7 @@ import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewComm
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.feilong.core.Validator;
 
 /**
@@ -76,6 +79,10 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	private static final String VIEW_BUNDLE_LIST = "bundle.list";
 
 	private static final String VIEW_BUNDLE_DETAIL = "bundle.detail";
+	
+	public static final String MODEL_KEY_BUNDLE_LIST = "bundleList";
+	
+	public static final String MODEL_KEY_BUNDLE_VIEW_COMMAND = "bundleCommand";
 
 	@Autowired
 	private NebulaBundleManager nebulaBundleManager;
@@ -86,6 +93,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	@Autowired
 	@Qualifier("bundleViewCommandConvert")
 	private BundleViewCommandConvert bundleViewCommandConvert;
+	
 
 	/**
 	 * 查看捆绑类商品详细信息
@@ -100,7 +108,11 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 */
 	public String showBundleDetail(@PathVariable("bundleId") Long bundleId, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
-
+		BundleViewCommand bundleViewCommand=null;
+		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleId(bundleId);
+		if(bundleCommand!=null){
+			bundleViewCommand=buildBundleViewCommandForBundlePage(bundleCommand);
+		}
 		return VIEW_BUNDLE_DETAIL;
 	}
 
@@ -118,6 +130,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	public String showBundleList(@ModelAttribute("page") PageForm pageForm, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
+		Pagination<BundleCommand> bundleCommandPage = nebulaBundleManager.findBundleCommandByPage(pageForm.getPage(), pageForm.getSorts());
+		model.addAttribute(MODEL_KEY_BUNDLE_LIST, bundleViewCommandConvert.convert(bundleCommandPage));
 		return VIEW_BUNDLE_LIST;
 	}
 
@@ -170,10 +184,23 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		return null;
 	}
 
+	/**
+	 * 构造捆绑商品详情页视图对象
+	 * <p>
+	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片等
+	 * </p>
+	 * 
+	 */
 	@Override
 	protected BundleViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
-		// TODO Auto-generated method stub
-		return null;
+		BundleViewCommand bundleViewCommand=bundleViewCommandConvert.convert(bundleCommand);
+		//setter itemBaseInfoViewCommand
+		bundleViewCommand.setItemBaseInfoViewCommand(super.buildProductBaseInfoViewCommand(bundleViewCommand.getItemId()));
+		 //convert bundleElementViewCommand
+		 List<BundleElementCommand> bundleElementCommands = bundleCommand.getBundleElementCommands();
+		 List<BundleElementViewCommand> bundleElementViewCommands=convert(bundleElementCommands);
+		 bundleViewCommand.setBundleElementViewCommands(bundleElementViewCommands);
+		return bundleViewCommand;
 	}
 
 	/**
@@ -181,8 +208,12 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 */
 	@Override
 	protected BundleElementViewCommand buildBundleElementViewCommand(BundleElementCommand bundleElementCommand) {
-		// TODO Auto-generated method stub
-		return null;
+		//BundleElementViewCommand bundleElementViewCommand=bundleElementViewCommandConverter.convert(bundleElementCommand);
+		//propertyElementViewCommands:TODO super
+		BundleElementViewCommand bundleElementViewCommand=null;
+		List<PropertyElementViewCommand> propertyElementViewCommands=new ArrayList<PropertyElementViewCommand>();
+		 bundleElementViewCommand.setPropertyElementViewCommands(propertyElementViewCommands);
+		return bundleElementViewCommand;
 	}
 
 	/**
