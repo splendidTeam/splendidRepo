@@ -32,7 +32,9 @@
 package com.baozun.nebula.web.controller.bundle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,11 +56,16 @@ import com.baozun.nebula.command.bundle.BundleItemCommand;
 import com.baozun.nebula.command.bundle.BundleSkuCommand;
 import com.baozun.nebula.manager.bundle.NebulaBundleManager;
 import com.baozun.nebula.model.product.ItemImage;
+import com.baozun.nebula.model.product.ItemProperties;
+import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConvert;
+import com.baozun.nebula.web.controller.bundle.convert.BundleSkuViewCommandConverter;
+import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConverter;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
@@ -82,10 +89,17 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 
 	@Autowired
 	private SdkItemManager sdkItemManager;
+	
+	@Autowired
+	private SdkSkuManager sdkSkuManager;
 
 	@Autowired
 	@Qualifier("bundleViewCommandConvert")
-	private BundleViewCommandConvert bundleViewCommandConvert;
+	private BundleViewCommandConverter bundleViewCommandConvert;
+	
+	@Autowired
+	@Qualifier("bundleSkuViewCommandConvert")
+	private BundleSkuViewCommandConverter bundleSkuViewCommandConvert;
 
 	/**
 	 * 查看捆绑类商品详细信息
@@ -195,13 +209,35 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 默认实现<br/>
-	 * </br/>
+	 * 构造捆绑类商品SKU的视图层对象
+	 * 
+	 * <p>
+	 * 该方法的默认实现，包含如下的信息，如果需要更多的数据支持，需要重写该方法。
+	 * <ul>
+	 * <li>skuId</li>
+	 * <li>价格，包括listPrice、originalSalesPrice、salesPrice</li>
+	 * <li>库存，quantity</li>
+	 * <li>sku销售属性的属性id:属性值的key:value，properties</li>
+	 * </ul>
+	 * </p>
 	 */
 	@Override
 	protected BundleSkuViewCommand buildBundleSkuViewCommand(BundleSkuCommand bundleSkuCommand) {
-		// TODO Auto-generated method stub
-		return null;
+		BundleSkuViewCommand result = bundleSkuViewCommandConvert.convert(bundleSkuCommand);
+		// 查询sku的销售属性
+		Sku sku = sdkSkuManager.findSkuById(bundleSkuCommand.getSkuId());
+		List<SkuProperty> skuProperty = sdkSkuManager.getSkuPros(sku.getProperties());
+		if(Validator.isNotNullOrEmpty(skuProperty)) {
+			Map<Long, Object> properties = new HashMap<Long, Object>();
+			for(SkuProperty sp : skuProperty) {
+				ItemProperties ip = sp.getItemProperties();
+				properties.put(ip.getPropertyId(), ip.getPropertyValue());
+			}
+			
+			result.setProperties(properties);
+		}
+		
+		return result;
 	}
 
 	/**

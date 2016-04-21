@@ -76,13 +76,8 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	 * value:propertyValueName<br/>
 	 * {12:"红色"}
 	 */
-	private Map<String, Object> properties;
+	private Map<Long, Object> properties;
 	
-	/**
-	 * 扩展信息
-	 */
-	private Map<String, Object> extendedInfo;
-
 	public Long getSkuId() {
 		return skuId;
 	}
@@ -123,20 +118,12 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 		this.quantity = quantity;
 	}
 
-	public Map<String, Object> getProperties() {
+	public Map<Long, Object> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Map<Long, Object> properties) {
 		this.properties = properties;
-	}
-
-	public Map<String, Object> getExtendedInfo() {
-		return extendedInfo;
-	}
-
-	public void setExtendedInfo(Map<String, Object> extendedInfo) {
-		this.extendedInfo = extendedInfo;
 	}
 
 }
