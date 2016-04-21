@@ -462,14 +462,13 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			// 定制价格 一口价（）
 			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
 					|| bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
-				skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 				skuCommand.setSalesPrice(sku.getSalesPrice());
 			}
 			// 按照实际价格
 			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
-				skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 				skuCommand.setSalesPrice(skuu.getSalePrice());
 			}
+			skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 			skuCommand.setListPrice(skuu.getListPrice());
 			//不需要同步扣减单品库存 并且 捆绑数量不为空 ,那么skuCommand的quantity就取 bundle的availableQty
 			//否则,skuCommand的quantity就取单品本身的库存
