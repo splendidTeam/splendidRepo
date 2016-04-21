@@ -19,7 +19,7 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * 属性值的Command
+ * 商品属性值
  */
 public class PropertyValueViewCommand extends BaseViewCommand {
 
@@ -36,7 +36,7 @@ public class PropertyValueViewCommand extends BaseViewCommand {
     /**
      * 属性值 .
      */
-    private String            propertyValue;
+    private String propertyValue;
     
     /**
      * 属性值的显示值. 比如，属性值为red，页面可能需要显示为红色.
@@ -52,7 +52,7 @@ public class PropertyValueViewCommand extends BaseViewCommand {
      * 是相对地址,需要在页面使用自定义标签渲染.
      * </p>
      */
-    private String            imageUrl;
+    private String imageUrl;
 
 	public Long getItemPropertiesId() {
 		return itemPropertiesId;

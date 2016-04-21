@@ -27,8 +27,10 @@ public class PropertyElementViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 3337324347141885581L;
 
+	/** 商品属性 */
 	private PropertyViewCommand property;
 	
+	/** 商品属性值 */
 	private List<PropertyValueViewCommand> propertyValues;
 
 	public PropertyViewCommand getProperty() {
@@ -46,6 +48,5 @@ public class PropertyElementViewCommand extends BaseViewCommand {
 	public void setPropertyValues(List<PropertyValueViewCommand> propertyValues) {
 		this.propertyValues = propertyValues;
 	}
-	
 	
 }

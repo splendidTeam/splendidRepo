@@ -311,8 +311,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		bundleItemCommand.setMaxOriginalSalesPrice(bundleItemCommand.getMaxOriginalSalesPrice());
 		bundleItemCommand.setMinSalesPrice(bundleItemCommand.getMinSalesPrice());
 		bundleItemCommand.setMaxSalesPrice(bundleItemCommand.getMaxSalesPrice());
-		bundleItemCommand.setMaxOriginalSalesPrice(bundleItemCommand.getMaxOriginalListPrice());
-		bundleItemCommand.setMinOriginalListPrice(bundleItemCommand.getMinOriginalListPrice());
+		bundleItemCommand.setMaxListPrice(bundleItemCommand.getMaxListPrice());
+		bundleItemCommand.setMinListPrice(bundleItemCommand.getMinListPrice());
 
 		return bundleItemCommand;
 	}
