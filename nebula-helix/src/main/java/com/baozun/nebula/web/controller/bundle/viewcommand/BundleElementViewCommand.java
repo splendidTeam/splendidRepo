@@ -33,6 +33,7 @@ package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
@@ -85,7 +86,11 @@ public class BundleElementViewCommand extends BaseViewCommand {
 	 */
 	private List<BundleItemViewCommand> bundleItemViewCommands;
 	
-
+	/**
+	 * 扩展信息
+	 */
+	private Map<String, Object> extendedInfo;
+	
 	public BigDecimal getMinListPrice() {
 		return minListPrice;
 	}
@@ -148,6 +153,14 @@ public class BundleElementViewCommand extends BaseViewCommand {
 
 	public void setBundleItemViewCommands(List<BundleItemViewCommand> bundleItemViewCommands) {
 		this.bundleItemViewCommands = bundleItemViewCommands;
+	}
+
+	public Map<String, Object> getExtendedInfo() {
+		return extendedInfo;
+	}
+
+	public void setExtendedInfo(Map<String, Object> extendedInfo) {
+		this.extendedInfo = extendedInfo;
 	}
 	
 }
