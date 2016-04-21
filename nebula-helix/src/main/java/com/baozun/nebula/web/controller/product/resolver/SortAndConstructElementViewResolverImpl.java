@@ -73,9 +73,9 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
         											= new LinkedHashMap<PropertyViewCommand, List<PropertyValueViewCommand>>();
         for (DynamicPropertyCommand dynamicPropertyCommand : dynamicPropertyCommandList){
             //属性
-        	PropertyViewCommand propertySubViewCommand = constructPropertyViewSubCommand(dynamicPropertyCommand);
+        	PropertyViewCommand propertySubViewCommand = constructPropertyViewCommand(dynamicPropertyCommand);
             //属性值列表
-            List<PropertyValueViewCommand> propertyValueViewSubCommandList = constructPropertyValueViewSubCommandList(
+            List<PropertyValueViewCommand> propertyValueViewSubCommandList = constructPropertyValueViewCommandList(
                             itemCode,
                             dynamicPropertyCommand,
                             colorswatchMap);
@@ -119,7 +119,7 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
 	 * @param dynamicPropertyCommand
 	 * @return
 	 */
-	private PropertyViewCommand constructPropertyViewSubCommand(
+	private PropertyViewCommand constructPropertyViewCommand(
 			DynamicPropertyCommand dynamicPropertyCommand) {
 		Property property = dynamicPropertyCommand.getProperty();
 		PropertyViewCommand propertyViewCommand = new PropertyViewCommand();
@@ -141,7 +141,7 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
 	 * @param colorswatchMap
 	 * @return
 	 */
-	private List<PropertyValueViewCommand> constructPropertyValueViewSubCommandList(
+	private List<PropertyValueViewCommand> constructPropertyValueViewCommandList(
 			String itemCode, DynamicPropertyCommand dynamicPropertyCommand,
 			Map<Long, ImageViewCommand> colorswatchMap) {
 		List<ItemPropertiesCommand> itemPropertiesList = constructItemPropertiesCommandList(dynamicPropertyCommand);
