@@ -18,6 +18,7 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -67,7 +68,8 @@ public abstract class NebulaBasePdpController extends BaseController {
 	private SkuViewCommandConverter skuViewCommandConverter;
 	
 	@Autowired
-	InventoryViewCommandConverter   inventoryViewCommandConverter;
+	private InventoryViewCommandConverter inventoryViewCommandConverter;
+	
 
 	/**
 	 * 构造商品基本信息
@@ -109,7 +111,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	 */
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
 		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
-		return	inventoryViewCommandConverter.convert(skuCommands);
+		return inventoryViewCommandConverter.convert(skuCommands);
 	}
 	
 	/**

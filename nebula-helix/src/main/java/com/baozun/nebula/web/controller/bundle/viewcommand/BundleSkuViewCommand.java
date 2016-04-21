@@ -50,7 +50,12 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	private Long skuId;
 	
 	/**
-	 * sku原价
+	 * sku吊牌价
+	 */
+	private BigDecimal listPrice;
+	
+	/**
+	 * sku销售价
 	 */
 	private BigDecimal originalSalesPrice;
 	
@@ -71,14 +76,22 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	 * value:propertyValueName<br/>
 	 * {12:"红色"}
 	 */
-	private Map<String, Object> properties;
-
+	private Map<Long, Object> properties;
+	
 	public Long getSkuId() {
 		return skuId;
 	}
 
 	public void setSkuId(Long skuId) {
 		this.skuId = skuId;
+	}
+
+	public BigDecimal getListPrice() {
+		return listPrice;
+	}
+
+	public void setListPrice(BigDecimal listPrice) {
+		this.listPrice = listPrice;
 	}
 
 	public BigDecimal getOriginalSalesPrice() {
@@ -105,11 +118,11 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 		this.quantity = quantity;
 	}
 
-	public Map<String, Object> getProperties() {
+	public Map<Long, Object> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Map<String, Object> properties) {
+	public void setProperties(Map<Long, Object> properties) {
 		this.properties = properties;
 	}
 

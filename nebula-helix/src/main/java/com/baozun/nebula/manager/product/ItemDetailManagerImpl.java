@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
@@ -145,10 +146,10 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	
 	@Transactional(readOnly=true)
 	@Override
-	public Map<String, Object> newFindDynamicProperty(Long itemId) {
+	public Map<String, Object> gatherDynamicProperty(Long itemId) {
 		List<ItemProperties> dbItemPropertiesList = sdkItemManager.findItemPropertiesByItemId(itemId);
 		// 商品的动态属性Map
-		Map<String, Object> responseMap = newGetDynamicPropertyMap(dbItemPropertiesList, itemId);
+		Map<String, Object> responseMap = gatherDynamicPropertyMap(dbItemPropertiesList, itemId);
 		return responseMap;
 	}
 
@@ -360,7 +361,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	}
 	
 	
-	private Map<String, Object> newGetDynamicPropertyMap(List<ItemProperties> dbItemPropertiesList, Long itemId) {
+	private Map<String, Object> gatherDynamicPropertyMap(List<ItemProperties> dbItemPropertiesList, Long itemId) {
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		List<DynamicPropertyCommand> salePropCommandList = new ArrayList<DynamicPropertyCommand>();
 		List<DynamicPropertyCommand> generalPropCommandList = null;
@@ -618,10 +619,8 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	public Float findItemAvgReview(String itemCode) {
 		List<Float> rankAvgList = new ArrayList<Float>();
 		Float rankAvg = 5.0F;
-		QueryConditionCommand queryConditionCommand = new QueryConditionCommand();
-		queryConditionCommand.setCode(itemCode);
-		queryConditionCommand.setLifecycle(1);
-		DataFromSolr dataFromSolr = sdkItemManager.findItemInfoByItemCode(queryConditionCommand);
+		
+		DataFromSolr dataFromSolr = findItemInfoByItemCodeFromSolr(itemCode);
 		List<ItemResultCommand> itemResultCommandList = null;
 		if (dataFromSolr != null && dataFromSolr.getItems() != null
 				&& (itemResultCommandList = dataFromSolr.getItems().getItems()) != null) {
@@ -638,6 +637,18 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 			}
 		}
 		return rankAvg;
+	}
+	
+	/**
+	 * 从solr中查询itemInfo数据，查询条件为itemCode
+	 * @param itemCode
+	 * @return
+	 */
+	private DataFromSolr findItemInfoByItemCodeFromSolr(String itemCode){
+		QueryConditionCommand queryConditionCommand = new QueryConditionCommand();
+		queryConditionCommand.setCode(itemCode);
+		queryConditionCommand.setLifecycle(1);
+		return sdkItemManager.findItemInfoByItemCode(queryConditionCommand);
 	}
 
 	@Transactional(readOnly=true)
@@ -717,10 +728,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	public Integer findItemFavCount(String itemCode) {
 		List<Integer> favoredCountList = null;
 		Integer favoredCount = 0;
-		QueryConditionCommand queryConditionCommand = new QueryConditionCommand();
-		queryConditionCommand.setCode(itemCode);
-		queryConditionCommand.setLifecycle(1);
-		DataFromSolr dataFromSolr = sdkItemManager.findItemInfoByItemCode(queryConditionCommand);
+		DataFromSolr dataFromSolr = findItemInfoByItemCodeFromSolr(itemCode);
 		List<ItemResultCommand> itemResultCommandList = null;
 		if (dataFromSolr != null && dataFromSolr.getItems() != null
 				&& (itemResultCommandList = dataFromSolr.getItems().getItems()) != null) {
@@ -737,6 +745,29 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 			}
 		}
 		return favoredCount;
+	}
+	
+	public Integer findItemSalesCount(String itemCode){
+		List<Integer> salesCountList = null;
+		Integer salesCount = 0;
+		DataFromSolr dataFromSolr = findItemInfoByItemCodeFromSolr(itemCode);
+		List<ItemResultCommand> itemResultCommandList = null;
+		if (dataFromSolr != null && dataFromSolr.getItems() != null
+				&& (itemResultCommandList = dataFromSolr.getItems().getItems()) != null) {
+			for (ItemResultCommand itemResultCommand : itemResultCommandList) {
+				salesCountList = itemResultCommand.getSalesCount();
+			}
+		}
+		
+		// 当评价平均分为null或0.0时, 修改为5.0
+		if (salesCountList != null && salesCountList.size() > 0) {
+			for (Integer sales : salesCountList) {
+				if (null != sales && !sales.equals(0)) {
+					salesCount = sales;
+				}
+			}
+		}
+		return salesCount;
 	}
 
 	@Transactional(readOnly=true)
@@ -776,6 +807,22 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	public List<SkuCommand> findEffectiveSkuInvByItemId(Long itemId) {
 		List<SkuCommand> skuCommands =sdkItemManager.findEffectiveSkuInvByItemId(itemId);
 		return skuCommands;
+	}
+
+	@Override
+	public Integer getItemBuyLimited(
+			ItemBuyLimitedBaseCommand itemBuyLimitedCommand,
+			Integer defaultValue) {
+		/**
+		 * do something...
+		 * 可以根据channel做限购  itemBuyLimitedCommand.getChannels()
+		 * 可以根据member做限购 itemBuyLimitedCommand.getItemId(),itemBuyLimitedCommand.getMemberSource(),itemBuyLimitedCommand.getMemberGroupId()
+		 * 可以根据Item做限购 itemBuyLimitedCommand.getItemCode(),itemBuyLimitedCommand.getItemId()
+		 * 如果需要扩展可以复写此方法和itemBuyLimitedCommand以达到扩展的目的
+		 * 最后返回计算出的最小值与商城级的defaultValue进行对比，返回较小值
+		 */
+		
+		return defaultValue;
 	}
 
 }

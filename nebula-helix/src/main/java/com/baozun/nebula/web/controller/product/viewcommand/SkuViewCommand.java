@@ -20,28 +20,33 @@ import java.math.BigDecimal;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
+/**
+ * Sku
+ *
+ */
 public class SkuViewCommand extends BaseViewCommand {
 
-	private static final long serialVersionUID = -279881686608936208L;
+	private static final long serialVersionUID = -161322431659093080L;
 
-	/**
-	 * 所属商品
-	 */
+	/** 所属商品Id */
 	private Long itemId;
 	
+	/** SkuId */
     private Long skuId;
     
+    /** 外部对接编码 */
 	private String extentionCode;
     
+	/** 商品属性值列表 {@link com.baozun.nebula.model.product.Sku#properties} */
     private String properties;
     
+    /** Sku的生命周期 */
     private Integer lifecycle;
     
+    /** Sku的销售价 */
     private BigDecimal salePrice;
 
-	/**
-	 * 吊牌价(原单价)
-	 */
+	/** Sku的吊牌价(原单价) */
 	private BigDecimal listPrice;
 
 	public Long getItemId() {

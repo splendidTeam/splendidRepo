@@ -23,10 +23,12 @@ import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * 分到款和到色两种情况，
- * 到款时：取某一个颜色属性下的图片
- * 到色时：取该商品下的图片
- * 
+ * 商品的图片
+ * <ul>
+ *   <li>Nebula里商品如果有颜色属性，那么每一个颜色属性都会有一套图片。如果没有颜色属性，那么该商品只会有一套图片。</li>
+ *   <li>在实施层面，一个商品一般会定义多个类型的图片用于不同的显示需求，比如，商品的多角度图、颜色图、尺码对照图、描述图等会分别定义不同的类型。</li>
+ *   <li>无论商品是定义到款或是到色，在构造数据时会把该商品下的所有图片全部取出。不同的是，到色时，pdp切换了颜色意味着切换了商品，需要重新加载该商品的图片。</li>
+ * </ul>
  */
 public class ItemImageViewCommand extends BaseViewCommand {
 
@@ -36,13 +38,9 @@ public class ItemImageViewCommand extends BaseViewCommand {
 	private Long itemId;
 	
 	/** 
-	 * <pre>	 
-	 * 1：到款商品颜色属性的Id{@link ItemProperties#getId()}；
-	 * 2：为了到色商品切换颜色图片的逻辑一致，最后规定到色商品也会定义颜色属性（之前是定义图片类型为
-	 * 颜色类型，现在是颜色属性对应的图片）。
-	 * </pre>
+	 * 商品颜色属性的Id{@link ItemProperties#getId()}。
+	 * 如果商品没有颜色属性，则该属性为空。<strong>推荐的做法是，商品定义到色同时定义颜色属性。</strong>
 	 */
-	
 	private Long colorItemPropertyId;
 	
 	/** [type，图片列表] */

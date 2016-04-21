@@ -6,7 +6,6 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.manager.BaseManager;  
-import com.baozun.nebula.model.product.ItemRate;
 import com.baozun.nebula.sdk.command.ItemRateCommand;
 
 public interface ItemRateManager extends BaseManager {
@@ -39,4 +38,11 @@ public interface ItemRateManager extends BaseManager {
 	 * @return
 	 */
 	public Pagination<RateCommand> findItemRateListByItemId(Page page, Long itemId, Sort[] sorts);
+	
+	/**
+	 * 根据itemCode查询评论数量
+	 * @param itemCode
+	 * @return
+	 */
+	public Integer findRateCountByItemCode(String itemCode);
 }

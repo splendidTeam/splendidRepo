@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
@@ -235,15 +236,14 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Integer getBuyLimit(Long itemId) {
-		// TODO Auto-generated method stub
-		return DEFAULT_SKU_BUY_LIMIT;
+	protected Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand) {
+		return itemDetailManager.getItemBuyLimited(itemBuyLimitedCommand, DEFAULT_SKU_BUY_LIMIT);
 	}
 
 
 	@Override
 	protected Long getItemSales(String itemCode) {
-		return null;
+		return itemDetailManager.findItemSalesCount(itemCode).longValue();
 	}
 
 
@@ -254,8 +254,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Long getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode).longValue();
+	protected Double getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode).doubleValue();
 	}
 
 
@@ -263,6 +263,11 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	protected String buildQrCodeUrl(Long itemId, HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	protected Long getItemReviewCount(String itemCode) {
+		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
 	}
 
 }

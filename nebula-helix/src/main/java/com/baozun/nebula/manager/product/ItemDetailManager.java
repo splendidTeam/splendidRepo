@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
@@ -69,12 +70,12 @@ public interface ItemDetailManager extends BaseManager{
 	public Map<String, Object> findDynamicProperty(Long itemId);
 	
 	/**
-	 * 新的获取商品动态属性(规格参数)
-	 * 特殊处理一般属性的获取
+	 * <p>新的获取商品动态属性(规格参数)</p>
+	 * <p>特殊处理一般属性的获取</p>
 	 * @param itemId
 	 * @return
 	 */
-	public Map<String, Object> newFindDynamicProperty(Long itemId);
+	public Map<String, Object> gatherDynamicProperty(Long itemId);
 	
 	/**
 	 * 通过sku的itemProperties属性获取库存
@@ -195,4 +196,16 @@ public interface ItemDetailManager extends BaseManager{
 	 */
 	List<SkuCommand> findEffectiveSkuInvByItemId(Long itemId);
 	
+	/**
+	 * 根据商品code查询销量
+	 * @param itemCode
+	 * @return
+	 */
+	Integer findItemSalesCount(String itemCode);
+	
+	/**
+	 * 根据传入的值进行计算，最终返回计算出的限购数量
+	 * @return
+	 */
+	Integer getItemBuyLimited(ItemBuyLimitedBaseCommand itemBuyLimitedCommand,Integer defaultValue);
 }

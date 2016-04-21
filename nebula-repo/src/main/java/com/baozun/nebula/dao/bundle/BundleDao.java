@@ -35,6 +35,9 @@ import java.util.List;
 
 import loxia.annotation.NativeQuery;
 import loxia.dao.GenericEntityDao;
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 import com.baozun.nebula.command.bundle.BundleCommand;
 import com.baozun.nebula.model.bundle.Bundle;
@@ -64,5 +67,14 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	 */
 	@NativeQuery(model = BundleCommand.class)
 	List<BundleCommand> findBundlesByStyle(String style, Integer lifecycle);
+	
+	@NativeQuery(model = BundleCommand.class)
+	BundleCommand findBundlesById(Long id, Integer lifecycle);
+	
+	@NativeQuery(model = BundleCommand.class)
+	Pagination<BundleCommand> findBundlesByPage(Page page ,Sort[] sort);
+	
+	@NativeQuery(model = BundleCommand.class)
+	BundleCommand findBundleById(Long id);
 
 }

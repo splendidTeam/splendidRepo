@@ -22,8 +22,9 @@ import java.util.List;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * 商品评论ViewCommand
+ * 商品评论
  *
+ * @see com.baozun.nebula.web.controller.product.viewcommand.ReviewMemberViewCommand
  */
 public class ItemReviewViewCommand extends BaseViewCommand {
 

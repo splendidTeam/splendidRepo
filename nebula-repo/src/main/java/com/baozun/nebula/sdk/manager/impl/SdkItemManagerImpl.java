@@ -585,4 +585,8 @@ public class SdkItemManagerImpl implements SdkItemManager {
 		 List<ItemInfo> infos = itemInfoDao.findItemInfosByItemIds(itemIds);
 		 return infos;
 	}
+	
+	public Integer findRateCountByItemCode(String itemCode){
+		return itemRateDao.findItemRateCountByItemCode(itemCode);
+	}
 }

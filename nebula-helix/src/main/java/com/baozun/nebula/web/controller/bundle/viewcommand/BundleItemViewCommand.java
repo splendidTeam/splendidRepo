@@ -56,9 +56,24 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private String title;
 	
 	/**
+	 * 商品副标题
+	 */
+	private String subTitle;
+	
+	/**
 	 * 商品图片
 	 */
 	private String imageUrl;
+	
+	/**
+	 * 最小吊牌价
+	 */
+	private BigDecimal minListPrice;
+	
+	/**
+	 * 最大吊牌价
+	 */
+	private BigDecimal maxListPrice;
 	
 	/**
 	 * 最小原价
@@ -89,7 +104,7 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	 * 商品中包含的sku
 	 */
 	private List<BundleSkuViewCommand> skuViewCommands;
-
+	
 	public Long getItemId() {
 		return itemId;
 	}
@@ -106,12 +121,36 @@ public class BundleItemViewCommand extends BaseViewCommand {
 		this.title = title;
 	}
 
+	public String getSubTitle() {
+		return subTitle;
+	}
+
+	public void setSubTitle(String subTitle) {
+		this.subTitle = subTitle;
+	}
+
 	public String getImageUrl() {
 		return imageUrl;
 	}
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+
+	public BigDecimal getMinListPrice() {
+		return minListPrice;
+	}
+
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
+	}
+
+	public BigDecimal getMaxListPrice() {
+		return maxListPrice;
+	}
+
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
 	}
 
 	public BigDecimal getMinOriginalSalesPrice() {
@@ -161,4 +200,5 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	public void setSkuViewCommands(List<BundleSkuViewCommand> skuViewCommands) {
 		this.skuViewCommands = skuViewCommands;
 	}
+
 }

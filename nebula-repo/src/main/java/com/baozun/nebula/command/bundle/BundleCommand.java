@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.command.bundle;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.Bundle;
@@ -28,6 +29,15 @@ import com.baozun.nebula.model.bundle.Bundle;
  */
 public class BundleCommand extends Bundle{
 	private static final long serialVersionUID = -3173190425455269096L;
+	
+	/**
+	 * 最小原销售价
+	 */
+	private BigDecimal minOriginalSalesPrice ;
+	/**
+	 * 最大原销售价
+	 */
+	private BigDecimal maxOriginalSalesPrice ;
 	
 	/**
 	 * 最小吊牌价
@@ -49,10 +59,18 @@ public class BundleCommand extends Bundle{
 	/**
 	 * 
 	 */
-	private List<BundleElementCommand> bundleElementCommands;
+	private List<BundleElementCommand> bundleElementCommands = new ArrayList<BundleElementCommand>();
 	
 	public List<BundleElementCommand> getBundleElementCommands() {
 		return bundleElementCommands;
+	}
+
+	public void setMinOriginalSalesPrice(BigDecimal minOriginalSalesPrice) {
+		this.minOriginalSalesPrice = minOriginalSalesPrice;
+	}
+
+	public void setMaxOriginalSalesPrice(BigDecimal maxOriginalSalesPrice) {
+		this.maxOriginalSalesPrice = maxOriginalSalesPrice;
 	}
 
 	public void setBundleElementCommands(
@@ -60,39 +78,22 @@ public class BundleCommand extends Bundle{
 		this.bundleElementCommands = bundleElementCommands;
 	}
 
-	public BigDecimal getMinListPrice() {
-		return minListPrice;
+	public void setMinSalesPrice(BigDecimal minSalesPrice) {
+		this.minSalesPrice = minSalesPrice;
+	}
+	public void setMaxSalesPrice(BigDecimal maxSalesPrice) {
+		this.maxSalesPrice = maxSalesPrice;
 	}
 
 	public void setMinListPrice(BigDecimal minListPrice) {
 		this.minListPrice = minListPrice;
 	}
 
-	public BigDecimal getMaxListPrice() {
-		return maxListPrice;
-	}
-
 	public void setMaxListPrice(BigDecimal maxListPrice) {
 		this.maxListPrice = maxListPrice;
 	}
 
-	public BigDecimal getMinSalesPrice() {
-		return minSalesPrice;
-	}
-
-	public void setMinSalesPrice(BigDecimal minSalesPrice) {
-		this.minSalesPrice = minSalesPrice;
-	}
-
-	public BigDecimal getMaxSalesPrice() {
-		return maxSalesPrice;
-	}
-
-	public void setMaxSalesPrice(BigDecimal maxSalesPrice) {
-		this.maxSalesPrice = maxSalesPrice;
-	}
-
-    /**
+	/**
      * <h3>检验bundle返回值的类型</h3>
      * <ul>
      *      <li>1 : 正常</li>
@@ -147,6 +148,83 @@ public class BundleCommand extends Bundle{
 	    	return status;
 	    }
 		
+	}
+	
+	public BigDecimal getMinOriginalSalesPrice(){
+	    for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMinOriginalSalesPrice());
+			}
+			minOriginalSalesPrice = minOriginalSalesPrice.add(itemSum);
+		}
+	    	
+	    return minOriginalSalesPrice ;
+	 }
+	    
+	public BigDecimal getMaxOriginalSalesPrice(){
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMaxOriginalSalesPrice());
+			}
+			maxOriginalSalesPrice = maxOriginalSalesPrice.add(itemSum);
+		}
+	    	
+	    return maxOriginalSalesPrice ;
+	  }
+	    
+	public BigDecimal getMinSalesPrice(){
+
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMinSalesPrice());
+			}
+			minSalesPrice = minSalesPrice.add(itemSum);
+		}
+	    	
+	    return minSalesPrice ;
+	   }
+	    
+	public BigDecimal getMaxSalesPrice(){
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMaxSalesPrice());
+			}
+			maxSalesPrice = maxSalesPrice.add(itemSum);
+		}
+	    	
+	    return maxSalesPrice ;
+	}
+	
+	public BigDecimal getMinListPrice() {
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMinListPrice());
+			}
+			maxListPrice = maxListPrice.add(itemSum);
+		}
+		return minListPrice;
+	}
+	
+	public BigDecimal getMaxListPrice() {
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMaxListPrice());
+			}
+			maxListPrice = maxListPrice.add(itemSum);
+		}
+		return maxListPrice;
 	}
     
 }

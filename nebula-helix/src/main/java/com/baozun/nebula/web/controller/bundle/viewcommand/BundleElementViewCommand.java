@@ -45,6 +45,19 @@ public class BundleElementViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 2340192122967455038L;
 	
+	/**
+	 * elementId
+	 */
+	private Long id;
+	/**
+	 * 最小吊牌价
+	 */
+	private BigDecimal minListPrice;
+	
+	/**
+	 * 最大吊牌价
+	 */
+	private BigDecimal maxListPrice;
 	
 	/**
 	 * 捆绑类商品成员最小原价
@@ -76,6 +89,21 @@ public class BundleElementViewCommand extends BaseViewCommand {
 	 */
 	private List<BundleItemViewCommand> bundleItemViewCommands;
 	
+	public BigDecimal getMinListPrice() {
+		return minListPrice;
+	}
+
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
+	}
+
+	public BigDecimal getMaxListPrice() {
+		return maxListPrice;
+	}
+
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
+	}
 
 	public BigDecimal getMinOriginalSalesPrice() {
 		return minOriginalSalesPrice;
@@ -123,6 +151,14 @@ public class BundleElementViewCommand extends BaseViewCommand {
 
 	public void setBundleItemViewCommands(List<BundleItemViewCommand> bundleItemViewCommands) {
 		this.bundleItemViewCommands = bundleItemViewCommands;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 }

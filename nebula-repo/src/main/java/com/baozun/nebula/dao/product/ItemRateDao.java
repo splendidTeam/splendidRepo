@@ -175,4 +175,12 @@ public interface ItemRateDao extends GenericEntityDao<ItemRate,Long>{
 	 */
 	@NativeQuery(model = RateCommand.class)
 	Pagination<RateCommand> findItemRateListByMemberId(Page page, Sort[] sorts, @QueryParam("memberId") Long memberId);
+	
+	/**
+	 * 根据itemcode查询item的评论数
+	 * @param itemCode
+	 * @return
+	 */
+	@NativeQuery(clazzes = Integer.class,alias={"c"})
+	Integer findItemRateCountByItemCode(@QueryParam("itemCode") String itemCode);
 }

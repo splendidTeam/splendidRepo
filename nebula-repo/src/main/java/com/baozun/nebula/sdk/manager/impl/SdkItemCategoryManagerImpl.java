@@ -7,15 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.model.product.ItemCategory;
-import com.baozun.nebula.sdk.manager.ItemCategoryManager;
+import com.baozun.nebula.sdk.manager.SdkItemCategoryManager;
 /**
  * 商品分类
  * @author xy
  *
  */
 @Transactional
-@Service("itemCategoryManager")
-public class ItemCategoryManagerImpl implements ItemCategoryManager {
+@Service("sdkItemCategoryManager")
+public class SdkItemCategoryManagerImpl implements SdkItemCategoryManager {
 
 	@Autowired
 	private ItemCategoryDao itemCategoryDao;
