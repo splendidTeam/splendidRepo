@@ -39,6 +39,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Pagination;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +59,14 @@ import com.baozun.nebula.command.bundle.BundleSkuCommand;
 import com.baozun.nebula.manager.bundle.NebulaBundleManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemProperties;
+import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -87,6 +92,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	private static final String VIEW_BUNDLE_LIST = "bundle.list";
 
 	private static final String VIEW_BUNDLE_DETAIL = "bundle.detail";
+	
+	public static final String MODEL_KEY_BUNDLE_LIST = "bundleList";
 
 	@Autowired
 	private NebulaBundleManager nebulaBundleManager;
@@ -96,6 +103,9 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	
 	@Autowired
 	private SdkSkuManager sdkSkuManager;
+	
+	@Autowired
+	private SdkPropertyManager sdkPropertyManager;
 
 	@Autowired
 	@Qualifier("bundleViewCommandConverter")
@@ -144,6 +154,9 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	public String showBundleList(@ModelAttribute("page") PageForm pageForm, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
+		Pagination<BundleCommand> bundleCommandPage = nebulaBundleManager.findBundleCommandByPage(pageForm.getPage(), pageForm.getSorts());
+		model.addAttribute(MODEL_KEY_BUNDLE_LIST, bundleViewCommandConverter.convert(bundleCommandPage));
+		
 		return VIEW_BUNDLE_LIST;
 	}
 
@@ -207,7 +220,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 默认实现
+	 * 构造捆绑类商品成员的视图层对象
 	 */
 	@Override
 	protected List<BundleElementViewCommand> buildBundleElementViewCommand(List<BundleElementCommand> bundleElementCommands) {
@@ -237,7 +250,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * <li>title & subTitle -- 标题</li>
 	 * <li>imageUrl -- 商品图片</li>
 	 * <li>listPrice、originalSalesPrice、salesPrice -- 价格相关</li>
-	 * <li>properties -- 商品销售属性的属性id:属性值的key:value</li>
+	 * <li>salesProperties -- 商品销售属性</li>
 	 * <li>skuViewCommands -- 商品中包含的sku</li>
 	 * </ol>
 	 * </p>
@@ -253,6 +266,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		for(int i = 0; i < result.size(); i++) {
 			BundleItemViewCommand command = result.get(i);
 			Long itemId = command.getItemId();
+			
 			// 设置商品图片
 			command.setImageUrl(getItemImage(itemId));
 			
@@ -262,6 +276,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 			command.setSubTitle(itemViewCommand.getSubTitle());
 			
 			// TODO 加载商品销售属性
+			ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildProductBaseInfoViewCommand(itemId);
+			
 			
 			// 加载sku
 			command.setSkuViewCommands(buildBundleSkuViewCommand(bundleItemCommands.get(i).getBundleSkus()));
