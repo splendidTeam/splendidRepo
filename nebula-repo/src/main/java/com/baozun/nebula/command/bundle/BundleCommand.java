@@ -204,10 +204,26 @@ public class BundleCommand extends Bundle{
 	}
 	
 	public BigDecimal getMinOriginalListPrice() {
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMinOriginalListPrice());
+			}
+			maxOriginalListPrice = maxOriginalListPrice.add(itemSum);
+		}
 		return minOriginalListPrice;
 	}
 	
 	public BigDecimal getMaxOriginalListPrice() {
+		for (BundleElementCommand element : bundleElementCommands) {
+			List<BundleItemCommand> items = element.getItems();
+			BigDecimal itemSum = BigDecimal.ZERO;
+			for (BundleItemCommand item : items) {
+				itemSum = itemSum.add(item.getMaxOriginalListPrice());
+			}
+			maxOriginalListPrice = maxOriginalListPrice.add(itemSum);
+		}
 		return maxOriginalListPrice;
 	}
     
