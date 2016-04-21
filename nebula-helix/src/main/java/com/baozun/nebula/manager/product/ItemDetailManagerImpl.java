@@ -145,10 +145,10 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	
 	@Transactional(readOnly=true)
 	@Override
-	public Map<String, Object> newFindDynamicProperty(Long itemId) {
+	public Map<String, Object> gatherDynamicProperty(Long itemId) {
 		List<ItemProperties> dbItemPropertiesList = sdkItemManager.findItemPropertiesByItemId(itemId);
 		// 商品的动态属性Map
-		Map<String, Object> responseMap = newGetDynamicPropertyMap(dbItemPropertiesList, itemId);
+		Map<String, Object> responseMap = gatherDynamicPropertyMap(dbItemPropertiesList, itemId);
 		return responseMap;
 	}
 
@@ -360,7 +360,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	}
 	
 	
-	private Map<String, Object> newGetDynamicPropertyMap(List<ItemProperties> dbItemPropertiesList, Long itemId) {
+	private Map<String, Object> gatherDynamicPropertyMap(List<ItemProperties> dbItemPropertiesList, Long itemId) {
 		Map<String, Object> responseMap = new HashMap<String, Object>();
 		List<DynamicPropertyCommand> salePropCommandList = new ArrayList<DynamicPropertyCommand>();
 		List<DynamicPropertyCommand> generalPropCommandList = null;

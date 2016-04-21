@@ -41,6 +41,7 @@ import com.baozun.nebula.web.controller.product.converter.ImageViewCommandConver
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
@@ -124,9 +125,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemPropertyViewCommand buildItemPropertyViewCommand(Long itemId, 
+	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
 			Map<String, List<ImageViewCommand>> images) {
-		return itemPropertyViewCommandResolver.resolve(itemId, images);
+		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
 	}
 	
 	
