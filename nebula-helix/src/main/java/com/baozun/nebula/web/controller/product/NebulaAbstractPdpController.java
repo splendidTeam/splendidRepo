@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
@@ -311,7 +312,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected abstract Integer getBuyLimit(Long itemId);
+	protected abstract Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand);
 	
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合

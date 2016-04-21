@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
@@ -806,6 +807,22 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	public List<SkuCommand> findEffectiveSkuInvByItemId(Long itemId) {
 		List<SkuCommand> skuCommands =sdkItemManager.findEffectiveSkuInvByItemId(itemId);
 		return skuCommands;
+	}
+
+	@Override
+	public Integer getItemBuyLimited(
+			ItemBuyLimitedBaseCommand itemBuyLimitedCommand,
+			Integer defaultValue) {
+		/**
+		 * do something...
+		 * 可以根据channel做限购  itemBuyLimitedCommand.getChannels()
+		 * 可以根据member做限购 itemBuyLimitedCommand.getItemId(),itemBuyLimitedCommand.getMemberSource(),itemBuyLimitedCommand.getMemberGroupId()
+		 * 可以根据Item做限购 itemBuyLimitedCommand.getItemCode(),itemBuyLimitedCommand.getItemId()
+		 * 如果需要扩展可以复写此方法和itemBuyLimitedCommand以达到扩展的目的
+		 * 最后返回计算出的最小值与商城级的defaultValue进行对比，返回较小值
+		 */
+		
+		return defaultValue;
 	}
 
 }
