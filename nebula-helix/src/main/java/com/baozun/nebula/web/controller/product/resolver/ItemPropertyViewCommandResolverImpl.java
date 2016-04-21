@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 
 /**   
@@ -49,10 +50,10 @@ public class ItemPropertyViewCommandResolverImpl implements
 	 * @see com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver#resolve(java.lang.Long, java.util.Map)
 	 */
 	@Override
-	public ItemPropertyViewCommand resolve(Long itemId,
+	public ItemPropertyViewCommand resolve(ItemBaseInfoViewCommand baseInfoViewCommand,
 			Map<String, List<ImageViewCommand>> images) {
 		
-		Map<String, Object> dynamicProperty = itemDetailManager.newFindDynamicProperty(itemId);
+		Map<String, Object> dynamicProperty = itemDetailManager.gatherDynamicProperty(baseInfoViewCommand.getId());
 		
 		//TODO
 		return null;

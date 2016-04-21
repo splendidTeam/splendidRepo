@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 
 /**   
@@ -38,5 +39,11 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewComm
  * @version   
  */
 public interface ItemPropertyViewCommandResolver {
-	ItemPropertyViewCommand resolve(Long itemId, Map<String, List<ImageViewCommand>> images);
+	/**
+	 * 根据baseInfoViewCommand(至少包含itemId)、images(图片信息)构造ViewCommand
+	 * @param baseInfoViewCommand
+	 * @param images
+	 * @return
+	 */
+	ItemPropertyViewCommand resolve(ItemBaseInfoViewCommand baseInfoViewCommand, Map<String, List<ImageViewCommand>> images);
 }

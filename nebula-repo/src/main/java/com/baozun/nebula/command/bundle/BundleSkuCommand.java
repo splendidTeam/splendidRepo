@@ -35,6 +35,19 @@ public class BundleSkuCommand extends BundleSku{
 	 */
 	private BigDecimal listPrice;
 	
+	/**
+	 * 库存数量
+	 */
+	private int quantity ;
+	
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
 	public BigDecimal getOriginalSalesPrice() {
 		return originalSalesPrice;
 	}
