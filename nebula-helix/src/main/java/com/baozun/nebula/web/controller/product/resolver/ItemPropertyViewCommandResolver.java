@@ -17,10 +17,9 @@
 package com.baozun.nebula.web.controller.product.resolver;
 
 import java.util.List;
-import java.util.Map;
 
-import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 
 /**   
@@ -42,8 +41,8 @@ public interface ItemPropertyViewCommandResolver {
 	/**
 	 * 根据baseInfoViewCommand(至少包含itemId、itemCode)、images(图片信息)构造ViewCommand
 	 * @param baseInfoViewCommand
-	 * @param images
+	 * @param imageViewCommands
 	 * @return
 	 */
-	ItemPropertyViewCommand resolve(ItemBaseInfoViewCommand baseInfoViewCommand, Map<String, List<ImageViewCommand>> images);
+	ItemPropertyViewCommand resolve(ItemBaseInfoViewCommand baseInfoViewCommand, List<ItemImageViewCommand> imageViewCommands);
 }
