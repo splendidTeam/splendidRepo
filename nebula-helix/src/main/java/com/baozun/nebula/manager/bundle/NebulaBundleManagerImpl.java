@@ -467,6 +467,9 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			ConvertUtils.convertTwoObject(skuCommand, sku);
 
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
+			skuCommand.setProperties(skuu.getProperties());
+			skuCommand.setExtentionCode(skuu.getOutid());
+			
 			// 定制价格 一口价（）
 			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
 					|| bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
@@ -478,13 +481,18 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			}
 			skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 			skuCommand.setListPrice(skuu.getListPrice());
-			//不需要同步扣减单品库存 并且 捆绑数量不为空 ,那么skuCommand的quantity就取 bundle的availableQty
-			//否则,skuCommand的quantity就取单品本身的库存
-			if(!bundle.getSyncWithInv() && bundle.getAvailableQty() != null){
-				skuCommand.setQuantity(bundle.getAvailableQty());
-			}else{
-				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
-				skuCommand.setQuantity(inventory.getAvailableQty());
+			
+			Integer availableQty = bundle.getAvailableQty();
+			// 如果捆绑装单独维护了库存
+			if(availableQty != null) {
+				// 如果不需要同步扣减单品库存 ,那么就以捆绑装设置的库存为准；否则取捆绑装库存与sku实际可用库存的最小值
+				if(!bundle.getSyncWithInv()){
+					skuCommand.setQuantity(availableQty);
+				}else{
+					skuCommand.setQuantity(Math.min(availableQty, sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty()));
+				}
+			} else {
+				skuCommand.setQuantity(sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty());
 			}
 			
 			bundleSkus.add(skuCommand);
