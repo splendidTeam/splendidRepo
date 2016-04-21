@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
  * @author yue.ch
@@ -96,9 +97,9 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private BigDecimal maxSalesPrice;
 	
 	/**
-	 * 商品属性与属性值
+	 * 商品销售属性
 	 */
-	private Map<String, Object> properties;
+	private List<PropertyElementViewCommand> salesProperties;
 	
 	/**
 	 * 商品中包含的sku
@@ -185,12 +186,12 @@ public class BundleItemViewCommand extends BaseViewCommand {
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
-	public Map<String, Object> getProperties() {
-		return properties;
+	public List<PropertyElementViewCommand> getSalesProperties() {
+		return salesProperties;
 	}
 
-	public void setProperties(Map<String, Object> properties) {
-		this.properties = properties;
+	public void setSalesProperties(List<PropertyElementViewCommand> salesProperties) {
+		this.salesProperties = salesProperties;
 	}
 
 	public List<BundleSkuViewCommand> getSkuViewCommands() {
