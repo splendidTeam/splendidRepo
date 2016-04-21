@@ -28,10 +28,10 @@
 	</bean>
 	<!--dataSource -->
 	<bean id="parentSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-		 p:driverClass="org.postgresql.Driver']}">
-		<property name="user" value="user_samsung"></property>
-		<property name="password" value="user_samsung1234">
-			
+		 p:driverClass="#{meta['dataSource.driverClassName']}">
+		<property name="user" value="#{meta['dataSource.username']}"></property>
+		<property name="password">
+			<value><![CDATA[#{meta['dataSource.password']}]]></value>
 		</property>
 		<property name="minPoolSize" value="#{meta['dataSource.minPoolSize']}" />
 		<property name="maxPoolSize" value="#{meta['dataSource.maxPoolSize']}" />
@@ -69,15 +69,15 @@
 	
 	<!-- 写节点 -->
 	<bean id="writeSource" parent="parentSource">
-		<property name="jdbcUrl" value="jdbc:postgresql://10.8.12.210/db_nebula_20160405">
-			
+		<property name="jdbcUrl">
+			<value><![CDATA[#{meta['dataSource.url.write']}]]></value>
 		</property>
 	</bean>
 
 	<!-- 读节点 -->
 	<bean id="readSource" parent="parentSource">
-		<property name="jdbcUrl" value="jdbc:postgresql://10.8.12.210/db_nebula_20160405">
-			
+		<property name="jdbcUrl">
+			<value><![CDATA[#{meta['dataSource.url.read']}]]></value>
 		</property>
 	</bean>
 </beans>
