@@ -19,39 +19,27 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * 评论用户的Command
+ * 发表评论的会员
  */
 public class ReviewMemberViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 8656778129065768926L;
 
-	/**
-	 * id
-	 */
+	/** id */
 	private Long id;
-	/**
-	 * 名称
-	 */
+	/** 名称 */
 	private String name;
 
-	/**
-	 * 邮箱
-	 */
+	/** 邮箱 */
 	private String email;
 
-	/**
-	 * 手机
-	 */
+	/** 手机 */
 	private String mobile;
 
-	/**
-	 * 昵称
-	 */
+	/** 昵称 */
 	private String nickName;
 
-	/**
-	 * 真实姓名
-	 */
+	/** 真实姓名 */
 	private String realName;
 
 	public String getName() {

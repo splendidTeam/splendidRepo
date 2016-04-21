@@ -19,7 +19,7 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * 属性定义的Command
+ * 属性定义
  */
 public class PropertyViewCommand extends BaseViewCommand {
 
