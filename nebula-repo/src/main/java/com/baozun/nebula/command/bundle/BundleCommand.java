@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.command.bundle;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.Bundle;
@@ -58,7 +59,7 @@ public class BundleCommand extends Bundle{
 	/**
 	 * 
 	 */
-	private List<BundleElementCommand> bundleElementCommands;
+	private List<BundleElementCommand> bundleElementCommands = new ArrayList<BundleElementCommand>();
 	
 	public List<BundleElementCommand> getBundleElementCommands() {
 		return bundleElementCommands;
