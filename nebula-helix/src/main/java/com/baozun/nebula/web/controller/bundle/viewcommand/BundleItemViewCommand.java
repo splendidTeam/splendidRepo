@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 
 /**
  * @author yue.ch
@@ -45,6 +47,7 @@ public class BundleItemViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 7084586879135978741L;
 	
+	/* 基础信息 */
 	/**
 	 * 商品ID
 	 */
@@ -56,9 +59,24 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private String title;
 	
 	/**
+	 * 商品副标题
+	 */
+	private String subTitle;
+	
+	/**
 	 * 商品图片
 	 */
 	private String imageUrl;
+	
+	/**
+	 * 最小吊牌价
+	 */
+	private BigDecimal minListPrice;
+	
+	/**
+	 * 最大吊牌价
+	 */
+	private BigDecimal maxListPrice;
 	
 	/**
 	 * 最小原价
@@ -89,6 +107,13 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	 * 商品中包含的sku
 	 */
 	private List<BundleSkuViewCommand> skuViewCommands;
+	/* 基础信息 end */
+	
+	/* 扩展信息 */
+	private ItemImageViewCommand itemImageViewCommand;
+	
+	private ItemPropertyViewCommand itemPropertyViewCommand;
+	/* 扩展信息 end*/
 
 	public Long getItemId() {
 		return itemId;
@@ -106,12 +131,36 @@ public class BundleItemViewCommand extends BaseViewCommand {
 		this.title = title;
 	}
 
+	public String getSubTitle() {
+		return subTitle;
+	}
+
+	public void setSubTitle(String subTitle) {
+		this.subTitle = subTitle;
+	}
+
 	public String getImageUrl() {
 		return imageUrl;
 	}
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+
+	public BigDecimal getMinListPrice() {
+		return minListPrice;
+	}
+
+	public void setMinListPrice(BigDecimal minListPrice) {
+		this.minListPrice = minListPrice;
+	}
+
+	public BigDecimal getMaxListPrice() {
+		return maxListPrice;
+	}
+
+	public void setMaxListPrice(BigDecimal maxListPrice) {
+		this.maxListPrice = maxListPrice;
 	}
 
 	public BigDecimal getMinOriginalSalesPrice() {
@@ -160,5 +209,21 @@ public class BundleItemViewCommand extends BaseViewCommand {
 
 	public void setSkuViewCommands(List<BundleSkuViewCommand> skuViewCommands) {
 		this.skuViewCommands = skuViewCommands;
+	}
+
+	public ItemImageViewCommand getItemImageViewCommand() {
+		return itemImageViewCommand;
+	}
+
+	public void setItemImageViewCommand(ItemImageViewCommand itemImageViewCommand) {
+		this.itemImageViewCommand = itemImageViewCommand;
+	}
+
+	public ItemPropertyViewCommand getItemPropertyViewCommand() {
+		return itemPropertyViewCommand;
+	}
+
+	public void setItemPropertyViewCommand(ItemPropertyViewCommand itemPropertyViewCommand) {
+		this.itemPropertyViewCommand = itemPropertyViewCommand;
 	}
 }

@@ -173,10 +173,10 @@ public class BundleItemCommand implements Serializable{
 	public BigDecimal getMaxOriginalListPrice() {
 		for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
-				maxOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+				maxOriginalListPrice = bundleSkus.get(i).getListPrice();
 			}else{
-				if(maxOriginalListPrice.compareTo(bundleSkus.get(i).getOriginalListPrice()) == -1){
-					maxOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+				if(maxOriginalListPrice.compareTo(bundleSkus.get(i).getListPrice()) == -1){
+					maxOriginalListPrice = bundleSkus.get(i).getListPrice();
 				}
 			}
 		}
@@ -189,10 +189,10 @@ public class BundleItemCommand implements Serializable{
 	public BigDecimal getMinOriginalListPrice() {
 		for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
-				minOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+				minOriginalListPrice = bundleSkus.get(i).getListPrice();
 			}else{
-				if(minOriginalListPrice.compareTo(bundleSkus.get(i).getOriginalListPrice()) == 1){
-					minOriginalListPrice = bundleSkus.get(i).getOriginalListPrice();
+				if(minOriginalListPrice.compareTo(bundleSkus.get(i).getListPrice()) == 1){
+					minOriginalListPrice = bundleSkus.get(i).getListPrice();
 				}
 			}
 		}

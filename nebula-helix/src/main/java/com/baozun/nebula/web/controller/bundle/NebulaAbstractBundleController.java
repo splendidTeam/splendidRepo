@@ -31,10 +31,20 @@
 */
 package com.baozun.nebula.web.controller.bundle;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.command.bundle.BundleCommand;
+import com.baozun.nebula.command.bundle.BundleElementCommand;
+import com.baozun.nebula.command.bundle.BundleItemCommand;
+import com.baozun.nebula.command.bundle.BundleSkuCommand;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
+import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
+import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
+import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
 
 /**
  * 捆绑类商品 controller
@@ -46,5 +56,46 @@ public abstract class NebulaAbstractBundleController extends BaseController {
 	
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaAbstractBundleController.class);
 
+	/**
+	 * 构造商品详情页面捆绑类商品视图层对象
+	 * @param bundleCommand
+	 * @return
+	 */
+	protected abstract BundleViewCommand buildBundleViewCommandForPDP(BundleCommand bundleCommand);
+	
+	/**
+	 * 构造捆绑类商品页面捆绑类商品视图层对象
+	 * @param bundleCommand
+	 * @return
+	 */
+	protected abstract BundleViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand);
+	
+	/**
+	 * 构造捆绑类商品成员的视图层对象
+	 * @param bundleElementCommand
+	 * @return
+	 */
+	protected abstract BundleElementViewCommand buildBundleElementViewCommand(BundleElementCommand bundleElementCommand);
+	
+	/**
+	 * 构造捆绑类商品中的商品的视图层对象
+	 * @param bundleItemCommand
+	 * @return 
+	 */
+	protected abstract BundleItemViewCommand buildBundleItemViewCommand(BundleItemCommand bundleItemCommand);
+	
+	/**
+	 * 构造捆绑类商品SKU的视图层对象
+	 * @param bundleSkuCommand
+	 * @return 
+	 */
+	protected abstract BundleSkuViewCommand buildBundleSkuViewCommand(BundleSkuCommand bundleSkuCommand);
 	 
+	/**
+	 * 获取捆绑类商品中某一个具体商品的展示图片
+	 * @param itemId
+	 * @return 
+	 */
+	protected abstract String getItemImage(Long itemId);
+	
 }

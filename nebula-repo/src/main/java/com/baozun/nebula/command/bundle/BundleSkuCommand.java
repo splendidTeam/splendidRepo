@@ -31,9 +31,9 @@ public class BundleSkuCommand extends BundleSku{
 	private BigDecimal originalSalesPrice;
 	
 	/**
-	 * sku原吊牌价
+	 * sku吊牌价
 	 */
-	private BigDecimal originalListPrice;
+	private BigDecimal listPrice;
 	
 	public BigDecimal getOriginalSalesPrice() {
 		return originalSalesPrice;
@@ -43,12 +43,13 @@ public class BundleSkuCommand extends BundleSku{
 		this.originalSalesPrice = originalSalesPrice;
 	}
 
-	public BigDecimal getOriginalListPrice() {
-		return originalListPrice;
+	public BigDecimal getListPrice() {
+		return listPrice;
 	}
 
-	public void setOriginalListPrice(BigDecimal originalListPrice) {
-		this.originalListPrice = originalListPrice;
+	public void setListPrice(BigDecimal listPrice) {
+		this.listPrice = listPrice;
 	}
+
 	
 }

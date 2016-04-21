@@ -35,14 +35,9 @@ public interface NebulaBundleManager extends BaseManager {
 	 * </ul>
 	 * 
 	 * @param itemId : bundle捆绑类商品中主卖品的商品Id
-	 * @param showMainElementFlag : 是否填充主款或主商品信息
-	 * <ul>
-	 *    <li>到款的bundle : true -- > 包含主款 ; false --> 不包含主款</li>
-	 *    <li>到色的bundle : true -- > 包含主商品 ; false --> 不包含主商品</li>
-	 * </ul> 
 	 * @return
 	 */
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId,boolean showMainElementFlag);
+	public List<BundleCommand> findBundleCommandByItemId(Long itemId);
 	/**
 	 * 
 	 * <h3>查询bundle信息</h3>
@@ -50,14 +45,9 @@ public interface NebulaBundleManager extends BaseManager {
 	 *    <li>bundle列表入口 ： 只会查询出一条记录</li>
 	 * </ul>
 	 * @param boundleId
-	 * @param showMainElementFlag
-	 * <ul>
-	 *    <li>到款的bundle : true -- > 包含主款 ; false --> 不包含主款</li>
-	 *    <li>到色的bundle : true -- > 包含主商品 ; false --> 不包含主商品</li>
-	 * </ul> 
 	 * @return
 	 */
-	public BundleCommand findBundleCommandByBundleId(Long boundleId,boolean showMainElementFlag);
+	public BundleCommand findBundleCommandByBundleId(Long boundleId);
 	
 	/**
 	 * <h3>bundle信息分页查询</h3>
