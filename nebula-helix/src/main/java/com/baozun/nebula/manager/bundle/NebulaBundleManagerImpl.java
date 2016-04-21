@@ -98,7 +98,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		
 		BundleValidateResult result = null;
 		//查询bundle的所有相关信息
-		BundleCommand command = bundleDao.findBundleById(bundleId);
+		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
 		//bundle本身就是一个特殊的商品
 		Item bundleItem = itemDao.findItemById(command.getItemId());
 		//校验bundle
@@ -142,7 +142,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 					for (BundleSku bundleSku : bundleSkus) {
 						bundleSkusIdAndItemId.put(bundleSku.getSkuId(),bundleSku.getItemId());
 					}
-				}
+				} 
 				
 				if(bundleSkusIdAndItemId.size() > 0){
 					if(command.getAvailableQty() == null){//只判断sku的库存足不足
