@@ -32,17 +32,18 @@
 package com.baozun.nebula.web.controller.bundle;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Pagination;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -71,12 +72,17 @@ import com.baozun.nebula.web.controller.bundle.convert.BundleElementViewCommandC
 import com.baozun.nebula.web.controller.bundle.convert.BundleItemViewCommandConverter;
 import com.baozun.nebula.web.controller.bundle.convert.BundleSkuViewCommandConverter;
 import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConverter;
+import com.baozun.nebula.web.controller.bundle.viewcommand.BundleDetailViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.feilong.core.Validator;
+
+import loxia.dao.Pagination;
 
 /**
  * @author yue.ch
@@ -91,6 +97,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	private static final String VIEW_BUNDLE_DETAIL = "bundle.detail";
 	
 	public static final String MODEL_KEY_BUNDLE_LIST = "bundleList";
+	
+	public static final String MODEL_KEY_BUNDLE = "bundle";
 
 	@Autowired
 	private NebulaBundleManager nebulaBundleManager;
@@ -134,6 +142,14 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	public String showBundleDetail(@PathVariable("bundleId") Long bundleId, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
+		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleId(bundleId);
+		if(Validator.isNotNullOrEmpty(bundleCommand)){
+			BundleDetailViewCommand bundleDetailViewCommand=buildBundleViewCommandForBundlePage(bundleCommand);
+			model.addAttribute(MODEL_KEY_BUNDLE,bundleDetailViewCommand);
+		}else{
+			LOG.info("Bundle error...bundleCommand is null;bundleId:{} [{}]",bundleId,new Date());
+		}
+		
 		return VIEW_BUNDLE_DETAIL;
 	}
 
@@ -210,10 +226,39 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		return result;
 	}
 
+	/**
+	 * 构造捆绑商品详情页视图对象
+	 * <p>
+	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等
+	 * </p>
+	 * 
+	 */
 	@Override
-	protected BundleViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
-		// TODO Auto-generated method stub
-		return null;
+	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
+		//bundle 商品的lifecycle状态
+		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildProductBaseInfoViewCommand(bundleCommand.getItemId());
+		if(itemBaseInfoViewCommand.getLifecycle()!=1){
+			LOG.info("Bundle error...bundleLifecycle is not active;Lifecycle:{} [{}]",itemBaseInfoViewCommand.getLifecycle(),new Date());
+			return null;
+		}
+		BundleViewCommand bundleViewCommand=bundleViewCommandConverter.convert(bundleCommand);
+		//buildBundleElements
+		List<BundleElementCommand> bundleElementCommands = bundleCommand.getBundleElementCommands();
+		List<BundleElementViewCommand> bundleElementViewCommand = buildBundleElementViewCommand(bundleElementCommands);
+		if(Validator.isNullOrEmpty(bundleElementViewCommand)){
+			LOG.info("Bundle error...bundleElementViewCommand is null;bundleId:{} [{}]",bundleCommand.getId(),new Date());
+			return null;
+		}
+		bundleViewCommand.setBundleElementViewCommands(bundleElementViewCommand);
+		BundleDetailViewCommand bundleDetailViewCommand=new BundleDetailViewCommand();
+		BeanUtils.copyProperties(bundleViewCommand, bundleDetailViewCommand);
+		//budle拓展信息
+		//TODO 调用NebulaBasePdpController中的build方法
+		bundleDetailViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
+		bundleDetailViewCommand.setItemExtraViewCommand(null);
+		bundleDetailViewCommand.setItemImageViewCommand(null);
+		bundleDetailViewCommand.setItemReviewViewCommand(null);
+		return bundleDetailViewCommand;
 	}
 
 	/**
@@ -229,9 +274,15 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		
 		for(int i = 0; i < result.size(); i++) {
 			BundleElementViewCommand command = result.get(i);
-			// TODO 加载销售属性
+			List<BundleItemViewCommand> bundleItemViewCommands = buildBundleItemViewCommand(bundleElementCommands.get(i).getItems());
+			command.setBundleItemViewCommands(bundleItemViewCommands);
 			
-			command.setBundleItemViewCommands(buildBundleItemViewCommand(bundleElementCommands.get(i).getItems()));
+			// TODO 加载销售属性
+			Map<Long, Set> properties = new HashMap<Long, Set>();
+			for(BundleItemViewCommand c : bundleItemViewCommands) {
+				List<PropertyElementViewCommand> propertyElementViewCommands = c.getSalesProperties();
+				
+			}
 		}
 		
 		return result;
@@ -245,10 +296,10 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * <ol>
 	 * <li>itemId -- 商品ID</li>
 	 * <li>title & subTitle -- 标题</li>
-	 * <li>imageUrl -- 商品图片</li>
 	 * <li>listPrice、originalSalesPrice、salesPrice -- 价格相关</li>
 	 * <li>salesProperties -- 商品销售属性</li>
 	 * <li>skuViewCommands -- 商品中包含的sku</li>
+	 * <li>images -- 商品图片</li>
 	 * </ol>
 	 * </p>
 	 */
@@ -265,16 +316,16 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 			Long itemId = command.getItemId();
 			
 			// 设置商品图片
-			command.setImageUrl(getItemImage(itemId));
+			command.setImages(buildItemImageViewCommand(itemId));
 			
 			// 设置商品标题
 			ItemBaseInfoViewCommand itemViewCommand = buildProductBaseInfoViewCommand(itemId);
 			command.setTitle(itemViewCommand.getTitle());
 			command.setSubTitle(itemViewCommand.getSubTitle());
 			
-			// TODO 加载商品销售属性
-			ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildProductBaseInfoViewCommand(itemId);
-			
+			// 加载商品销售属性
+			ItemPropertyViewCommand itemPropertyViewCommand = buildItemPropertyViewCommand(buildProductBaseInfoViewCommand(itemId), buildItemImageViewCommand(itemId));
+			command.setSalesProperties(itemPropertyViewCommand.getSalesProperties());
 			
 			// 加载sku
 			command.setSkuViewCommands(buildBundleSkuViewCommand(bundleItemCommands.get(i).getBundleSkus()));
@@ -292,7 +343,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * <li>skuId -- sku id</li>
 	 * <li>listPrice、originalSalesPrice、salesPrice -- 价格相关</li>
 	 * <li>quantity -- 可用库存</li>
-	 * <li>properties -- sku销售属性的属性id:属性值的key:value</li>
+	 * <li>properties -- 销售属性</li>
 	 * </ul>
 	 * </p>
 	 */
@@ -304,43 +355,27 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		
 		List<BundleSkuViewCommand> result = bundleSkuViewCommandConvert.convert(bundleSkuCommands);
 		
-		for(BundleSkuViewCommand c : result) {
-			// 查询sku的销售属性
-			Sku sku = sdkSkuManager.findSkuById(c.getSkuId());
-			List<SkuProperty> skuProperty = sdkSkuManager.getSkuPros(sku.getProperties());
-			if(Validator.isNotNullOrEmpty(skuProperty)) {
-				Map<Long, Object> properties = new HashMap<Long, Object>();
-				for(SkuProperty sp : skuProperty) {
-					ItemProperties ip = sp.getItemProperties();
-					properties.put(ip.getPropertyId(), ip.getPropertyValue());
-				}
-				
-				c.setProperties(properties);
-			}
-		}
+//		for(BundleSkuViewCommand c : result) {
+//			// 查询sku的销售属性
+//			Sku sku = sdkSkuManager.findSkuById(c.getSkuId());
+//			List<SkuProperty> skuProperty = sdkSkuManager.getSkuPros(sku.getProperties());
+//			if(Validator.isNotNullOrEmpty(skuProperty)) {
+//				Map<Long, Object> properties = new HashMap<Long, Object>();
+//				for(SkuProperty sp : skuProperty) {
+//					ItemProperties ip = sp.getItemProperties();
+//					Long propertyValueId = ip.getPropertyValueId();
+//					if(propertyValueId != null) {
+//						
+//						properties.put(ip.getId(), ip.getPropertyValue());
+//					} else {
+//						properties.put(ip.getId(), ip.getPropertyValue());
+//					}
+//				}
+//				
+//				c.setProperties(properties);
+//			}
+//		}
 		
 		return result;
-	}
-
-	/**
-	 * 获取捆绑类商品中某一个具体商品的展示图片
-	 * 
-	 * <p>
-	 * 默认取商品列表页图片作为商品的展示图片,商城端可以重写该方法自定义商品图片的展示方式。
-	 * </p>
-	 */
-	@Override
-	protected String getItemImage(Long itemId) {
-		if (itemId != null) {
-			List<Long> itemIds = new ArrayList<Long>();
-			itemIds.add(itemId);
-			List<ItemImageCommand> itemImages = sdkItemManager.findItemImagesByItemIds(itemIds,
-					ItemImage.IMG_TYPE_LIST);
-			if (Validator.isNotNullOrEmpty(itemImages)) {
-				return itemImages.get(0).getPicUrl();
-			}
-		}
-
-		return null;
 	}
 }
