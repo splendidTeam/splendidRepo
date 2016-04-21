@@ -146,8 +146,6 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * 
 	 * @param bundles
 	 *            ： bundle集合
-	 * @param showMainElementFlag
-	 *            ： 是否包含主款
 	 */
 	private void fillBundleCommandList(List<BundleCommand> bundles) {
 		for (BundleCommand bundle : bundles) {
@@ -204,9 +202,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * @param map
 	 *            ： BundleSku集合按照bundleElementId分组 . key : bundleElementId ;
 	 *            value : List<BundleSku>
-	 *            <ul>
-	 *            <li>false : 屏蔽对应的BundleElement</li>
-	 *            </ul>
+	 *           
 	 */
 	private void fillBundleElementInfo(List<BundleElementCommand> bundleElementList, Map<Long, List<BundleSku>> map,
 			BundleCommand bundle) {
