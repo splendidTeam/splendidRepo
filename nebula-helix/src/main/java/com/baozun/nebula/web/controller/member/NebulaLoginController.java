@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.exception.LoginException;
+import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.manager.captcha.CaptchaUtil;
 import com.baozun.nebula.manager.captcha.entity.CaptchaContainerAndValidateConfig;
 import com.baozun.nebula.manager.member.MemberManager;
@@ -117,15 +118,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	public static final String						MODEL_KEY_MEMBER_LOGIN_ID		= "login";
 
 	/* Login 登录密码 */
-	public static final String						MODEL_KEY_MEMBER_LOGIN_PWD		= "password";
-	
-	/**
-	 * 默认RemeberMe过期时间
-	 * @author 冯明雷
-	 * @version 1.0
-	 * @time 2016年3月31日  下午2:37:59
-	 */
-	private static final int 						DEFAULT_REMEBERME_MAX_AGE 		= 30*24*60*60;
+	public static final String						MODEL_KEY_MEMBER_LOGIN_PWD		= "password";	
 	
 	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
 	private int										remberMeValidityPeriod 			= -1;
@@ -605,7 +598,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @return remberMeValidityPeriod  
 	 */
 	public int getRemberMeValidityPeriod(){
-		return remberMeValidityPeriod >0 ? remberMeValidityPeriod : DEFAULT_REMEBERME_MAX_AGE;
+		return remberMeValidityPeriod >0 ? remberMeValidityPeriod : TimeInterval.SECONDS_PER_MONTH;
 	}
 
 	

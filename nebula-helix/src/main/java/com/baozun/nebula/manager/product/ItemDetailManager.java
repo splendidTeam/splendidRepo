@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
@@ -201,4 +202,10 @@ public interface ItemDetailManager extends BaseManager{
 	 * @return
 	 */
 	Integer findItemSalesCount(String itemCode);
+	
+	/**
+	 * 根据传入的值进行计算，最终返回计算出的限购数量
+	 * @return
+	 */
+	Integer getItemBuyLimited(ItemBuyLimitedBaseCommand itemBuyLimitedCommand,Integer defaultValue);
 }
