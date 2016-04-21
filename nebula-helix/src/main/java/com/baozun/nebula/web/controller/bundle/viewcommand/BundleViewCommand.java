@@ -33,6 +33,7 @@ package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -113,9 +114,14 @@ public class BundleViewCommand extends BaseViewCommand {
 	private ItemImageViewCommand itemImageViewCommand;
 	
 	/**
-	 * 
+	 * 捆绑类商品成员
 	 */
 	private List<BundleElementViewCommand> bundleElementViewCommands;
+	
+	/**
+	 * 扩展信息
+	 */
+	private Map<String, Object> extendedInfo;
 
 	public Long getBundleId() {
 		return bundleId;
@@ -213,5 +219,13 @@ public class BundleViewCommand extends BaseViewCommand {
 
 	public void setItemImageViewCommand(ItemImageViewCommand itemImageViewCommand) {
 		this.itemImageViewCommand = itemImageViewCommand;
+	}
+
+	public Map<String, Object> getExtendedInfo() {
+		return extendedInfo;
+	}
+
+	public void setExtendedInfo(Map<String, Object> extendedInfo) {
+		this.extendedInfo = extendedInfo;
 	}
 }

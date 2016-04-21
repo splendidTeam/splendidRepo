@@ -109,11 +109,10 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private List<BundleSkuViewCommand> skuViewCommands;
 	/* 基础信息 end */
 	
-	/* 扩展信息 */
-	private ItemImageViewCommand itemImageViewCommand;
-	
-	private ItemPropertyViewCommand itemPropertyViewCommand;
-	/* 扩展信息 end*/
+	/**
+	 * 扩展信息
+	 */
+	private Map<String, Object> extendedInfo;
 
 	public Long getItemId() {
 		return itemId;
@@ -211,19 +210,12 @@ public class BundleItemViewCommand extends BaseViewCommand {
 		this.skuViewCommands = skuViewCommands;
 	}
 
-	public ItemImageViewCommand getItemImageViewCommand() {
-		return itemImageViewCommand;
+	public Map<String, Object> getExtendedInfo() {
+		return extendedInfo;
 	}
 
-	public void setItemImageViewCommand(ItemImageViewCommand itemImageViewCommand) {
-		this.itemImageViewCommand = itemImageViewCommand;
+	public void setExtendedInfo(Map<String, Object> extendedInfo) {
+		this.extendedInfo = extendedInfo;
 	}
 
-	public ItemPropertyViewCommand getItemPropertyViewCommand() {
-		return itemPropertyViewCommand;
-	}
-
-	public void setItemPropertyViewCommand(ItemPropertyViewCommand itemPropertyViewCommand) {
-		this.itemPropertyViewCommand = itemPropertyViewCommand;
-	}
 }
