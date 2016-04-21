@@ -32,7 +32,6 @@
 package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
@@ -73,6 +72,11 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	 * sku的销售属性
 	 */
 	private String properties;
+	
+	/**
+	 * sku外部编码
+	 */
+	private String extentionCode;
 	
 	public Long getSkuId() {
 		return skuId;
@@ -120,5 +124,13 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 
 	public void setProperties(String properties) {
 		this.properties = properties;
+	}
+
+	public String getExtentionCode() {
+		return extentionCode;
+	}
+
+	public void setExtentionCode(String extentionCode) {
+		this.extentionCode = extentionCode;
 	}
 }
