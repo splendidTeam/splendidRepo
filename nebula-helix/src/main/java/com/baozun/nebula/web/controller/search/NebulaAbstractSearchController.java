@@ -32,7 +32,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		//将 searchForm 转成 searchCommand
 		SearchCommand searchCommand = null;
 		
-		//将 searchForm 中 filterConditionStr 转成FacetParameter
+		//将 searchCommand 中 filterConditionStr 转成FacetParameter
 		seachParamProcess(searchCommand);
 		
 		//创建solrquery对象

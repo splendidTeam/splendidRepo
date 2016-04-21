@@ -38,7 +38,7 @@ import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
@@ -116,7 +116,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
 	@Autowired
-	ImageViewCommandConverter                                       imageViewCommandConverter;
+	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
 	
 	/**
@@ -127,7 +127,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 */
 	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
-			Map<String, List<ImageViewCommand>> images) {
+			List<ItemImageViewCommand> images) {
 		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
 	}
 	
@@ -144,75 +144,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		itemIds.add(itemId);
 		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
 		// 数据转换
-		return getItemImageViewCommands(itemImageList);
+		return itemImageViewCommandConverter.convert(itemImageList);
 	}
-
-
-
-	private List<ItemImageViewCommand> getItemImageViewCommands(List<ItemImage> itemImageList) {
-		List<ItemImageViewCommand> itemImageViewCommands   = new ArrayList<ItemImageViewCommand>();
-		Map<Long,List<ItemImage>> map = new HashMap<Long,List<ItemImage>>();
-	    //根据商品颜色属性区分图片
-		if(Validator.isNotNullOrEmpty(itemImageList)){
-			for(ItemImage itemImage:itemImageList){
-				Long itemProperties = itemImage.getItemProperties();
-				List<ItemImage> res =  map.get(itemProperties);
-				if(res!=null){
-					res.add(itemImage);
-				}else{
-					res = new ArrayList<ItemImage>();
-					res.add(itemImage);
-					map.put(itemProperties, res);
-				}
-			}
-			if(Validator.isNotNullOrEmpty(map)){
-				// 有颜色属性
-				for(Entry<Long, List<ItemImage>> entry:map.entrySet()){
-					List<ItemImage> itemImages = entry.getValue();
-					ItemImageViewCommand itemImageViewCommand = new ItemImageViewCommand();
-					itemImageViewCommand.setColorItemPropertyId(entry.getKey());
-					//每个颜色属性对应构造一个图片集
-					itemImageViewCommand.setImages(constructImagesMap(itemImages));
-					itemImageViewCommand.setItemId(itemImages.get(0).getItemId());
-					
-					itemImageViewCommands.add(itemImageViewCommand);
-				}
-			}else{
-				// 无颜色属性
-				ItemImageViewCommand itemImageViewCommand = new ItemImageViewCommand();
-				itemImageViewCommand.setColorItemPropertyId(null);
-				itemImageViewCommand.setImages(constructImagesMap(itemImageList));
-				itemImageViewCommand.setItemId(itemImageList.get(0).getItemId());
-				
-				itemImageViewCommands.add(itemImageViewCommand);
-			}
-			
-			
-		}
-		return itemImageViewCommands;
-	}
-
-	private Map<String, List<ImageViewCommand>> constructImagesMap(List<ItemImage> itemImageList) {
-		Map<String, List<ImageViewCommand>> images = new HashMap<String, List<ImageViewCommand>>();
-        // 根据图片类型区分
-		if(Validator.isNotNullOrEmpty(itemImageList)){
-			for(ItemImage itemImage :itemImageList){
-				String type = itemImage.getType();
-				List<ImageViewCommand> imageViewCommands = images.get(type);
-				ImageViewCommand  imageViewCommand= imageViewCommandConverter.convert(itemImage);
-				if(imageViewCommands!=null){
-					imageViewCommands.add(imageViewCommand);
-				}else{
-					imageViewCommands = new ArrayList<ImageViewCommand>();
-					imageViewCommands.add(imageViewCommand);
-					images.put(type, imageViewCommands);
-				}
-			}
-		}
-		
-		return images;
-	}
-	
 	
 	/**
 	 * 构造商品的分类信息
