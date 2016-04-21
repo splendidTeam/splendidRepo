@@ -70,13 +70,9 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	private Integer quantity;
 	
 	/**
-	 * sku的属性与属性值<br/><br/>
-	 * 
-	 * key:propertyId<br/>
-	 * value:propertyValueName<br/>
-	 * {12:"红色"}
+	 * sku的销售属性
 	 */
-	private Map<Long, Object> properties;
+	private String properties;
 	
 	public Long getSkuId() {
 		return skuId;
@@ -118,12 +114,11 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 		this.quantity = quantity;
 	}
 
-	public Map<Long, Object> getProperties() {
+	public String getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Map<Long, Object> properties) {
+	public void setProperties(String properties) {
 		this.properties = properties;
 	}
-
 }
