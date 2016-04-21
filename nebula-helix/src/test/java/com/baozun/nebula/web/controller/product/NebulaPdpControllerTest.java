@@ -84,11 +84,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		
 		control.replay();
 		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemCode);
-		
-		assertEquals(itemExtraViewCommand.getFavoriteCount(), actualCommand.getFavoriteCount());
-		assertEquals(itemExtraViewCommand.getRate(), actualCommand.getRate());
-		assertEquals(itemExtraViewCommand.getReviewCount(), actualCommand.getReviewCount());
-		assertEquals(itemExtraViewCommand.getSales(), actualCommand.getSales());
+		assertEquals(itemExtraViewCommand, actualCommand);
 		control.verify();
 	}
 }
