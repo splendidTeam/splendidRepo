@@ -242,4 +242,12 @@ public class FacetParameter {
         return sb.toString();
     }
 
+	public FacetType getFacetType() {
+		return facetType;
+	}
+
+	public void setFacetType(FacetType facetType) {
+		this.facetType = facetType;
+	}
+	
 }
