@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
+import com.baozun.nebula.exception.IllegalItemStateException;
+import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
@@ -41,6 +44,8 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.feilong.core.Validator;
+import com.feilong.core.date.DateUtil;
 
 
 /**
@@ -105,17 +110,63 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造PdpViewCommand
+	 * @throws IllegalItemStateException 
 	 */
-	protected PdpViewCommand buildPdpViewCommand(String itemCode) {
-		ItemBaseInfoViewCommand itemBaseInfo = buildItemBaseInfoViewCommand(itemCode);
+	protected PdpViewCommand buildPdpViewCommand(String itemCode) throws IllegalItemStateException {
 		
 		PdpViewCommand pdpViewCommand = new PdpViewCommand();
 		
-		
+		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
+		pdpViewCommand.setBaseInfo(itemBaseInfo);
 		
 		return pdpViewCommand;
 	}
 	
+	/**
+	 * 获取并校验商品基本信息 
+	 * @param itemBaseInfo
+	 * @return
+	 */
+	protected ItemBaseInfoViewCommand getAndValidateItemBaseInfo(String itemCode) throws IllegalItemStateException {
+		// 取得商品的基本信息
+		ItemBaseInfoViewCommand itemBaseInfo = buildItemBaseInfoViewCommand(itemCode);
+		
+		// 商品不存在
+		if (Validator.isNullOrEmpty(itemBaseInfo)) {
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item not exists. itemCode:{}.", itemCode);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_NOT_EXISTS);
+        }
+				
+		Integer lifecycle = itemBaseInfo.getLifecycle();
+		if(2 == lifecycle) {
+			// 商品逻辑删除
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item logical deleted. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED);
+		} else if(3 == lifecycle) {
+			// 商品新建状态
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
+		} else if(0 == lifecycle) {
+			// 商品未上架
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);
+		}
+		
+		Date activeBeginTime = itemBaseInfo.getActiveBeginTime();
+		if (Validator.isNotNullOrEmpty(activeBeginTime) && !DateUtil.isAfter(new Date(), activeBeginTime)) {
+			// 商品未上架
+ 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item before active begin time. itemCode:{}, activeBeginTime:{}.", itemCode, activeBeginTime);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME);
+        }
+		
+		if(0 == itemBaseInfo.getType()) {
+			// 商品是赠品
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
+            throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);
+		}
+		
+		return itemBaseInfo;
+	}
 	
 	/**
 	 * 构造商品的分类信息
