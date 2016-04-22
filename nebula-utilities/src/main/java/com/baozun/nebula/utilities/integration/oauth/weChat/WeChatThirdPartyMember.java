@@ -160,12 +160,7 @@ public class WeChatThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 		member.setAvatar(jsonMap.get("headimgurl"));
 		
 		//性别  普通用户性别，1为男性，2为女性
-		if("1".equals(jsonMap.get("sex"))){
-			member.setSex("1");
-		}else if("2".equals(jsonMap.get("sex"))){
-			member.setSex("2");
-		}
-		
+		member.setSex(jsonMap.get("sex"));
 		return member;
 
 	}

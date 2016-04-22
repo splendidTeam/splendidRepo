@@ -245,6 +245,11 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 */
 	@Override
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
+		//校验bundle中item,sku的lifecycle状态
+		if(!bundleCommand.isEnabled()){
+			LOG.info("Bundle disable...have disable item or sku...... [{}]",new Date());
+			return null;
+		}
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
 		if(itemBaseInfoViewCommand.getLifecycle()!=1){
