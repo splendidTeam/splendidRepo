@@ -31,8 +31,7 @@
 */
 package com.baozun.nebula.web.controller.bundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
 
 import com.baozun.nebula.command.bundle.BundleCommand;
 import com.baozun.nebula.command.bundle.BundleElementCommand;
@@ -52,48 +51,39 @@ import com.baozun.nebula.web.controller.product.NebulaBasePdpController;
  */
 public abstract class NebulaAbstractBundleController extends NebulaBasePdpController {
 	
-	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaAbstractBundleController.class);
-
 	/**
-	 * 构造商品详情页面捆绑类商品视图层对象
-	 * @param bundleCommand
+	 * 构造商品详情页面捆绑类商品视图模型
+	 * @param bundleCommands
 	 * @return
 	 */
-	protected abstract BundleViewCommand buildBundleViewCommandForPDP(BundleCommand bundleCommand);
+	protected abstract List<BundleViewCommand> buildBundleViewCommandForPDP(List<BundleCommand> bundleCommands);
 	
 	/**
-	 * 构造捆绑类商品页面捆绑类商品视图层对象
+	 * 构造捆绑类商品页面捆绑类商品视图模型
 	 * @param bundleCommand
 	 * @return
 	 */
 	protected abstract BundleViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand);
 	
 	/**
-	 * 构造捆绑类商品成员的视图层对象
-	 * @param bundleElementCommand
+	 * 构造捆绑类商品成员的视图模型
+	 * @param bundleElementCommands
 	 * @return
 	 */
-	protected abstract BundleElementViewCommand buildBundleElementViewCommand(BundleElementCommand bundleElementCommand);
+	protected abstract List<BundleElementViewCommand> buildBundleElementViewCommand(List<BundleElementCommand> bundleElementCommands);
 	
 	/**
-	 * 构造捆绑类商品中的商品的视图层对象
-	 * @param bundleItemCommand
+	 * 构造捆绑类商品中的商品的视图模型
+	 * @param bundleItemCommands
 	 * @return 
 	 */
-	protected abstract BundleItemViewCommand buildBundleItemViewCommand(BundleItemCommand bundleItemCommand);
+	protected abstract List<BundleItemViewCommand> buildBundleItemViewCommand(List<BundleItemCommand> bundleItemCommands);
 	
 	/**
-	 * 构造捆绑类商品SKU的视图层对象
+	 * 构造捆绑类商品SKU的视图模型
 	 * @param bundleSkuCommand
 	 * @return 
 	 */
-	protected abstract BundleSkuViewCommand buildBundleSkuViewCommand(BundleSkuCommand bundleSkuCommand);
-	 
-	/**
-	 * 获取捆绑类商品中某一个具体商品的展示图片
-	 * @param itemId
-	 * @return 
-	 */
-	protected abstract String getItemImage(Long itemId);
+	protected abstract List<BundleSkuViewCommand> buildBundleSkuViewCommand(List<BundleSkuCommand> bundleSkuCommands);
 	
 }

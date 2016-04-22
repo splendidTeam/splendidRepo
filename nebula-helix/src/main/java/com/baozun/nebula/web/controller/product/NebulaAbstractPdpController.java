@@ -17,8 +17,15 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
+=======
+import java.util.Date;
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Map;
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,26 +37,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
+<<<<<<< HEAD
 import com.baozun.nebula.command.ItemCommand;
+=======
+import com.baozun.nebula.exception.IllegalItemStateException;
+import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.manager.product.ItemDetailManager;
+<<<<<<< HEAD
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.ItemImage;
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
+<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
+<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
+=======
+import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
+<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+=======
+import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.feilong.core.Validator;
+import com.feilong.core.date.DateUtil;
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 
 /**
@@ -115,15 +142,19 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemDetailManager										itemDetailManager;
 	
 	@Autowired
+<<<<<<< HEAD
 	private ItemRecommandManager                                    itemRecommandManager;
 	
 	@Autowired
 	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Autowired
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
+<<<<<<< HEAD
 	@Autowired
 	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
@@ -131,32 +162,66 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
 	
 	
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	/**
-	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>
-	 * 此方法在构造销售颜色属性信息时，将需要商品图片信息，
-	 * 所以，之前需先获取商品图片(不一定有颜色属性，但无论如何必须先取图片)
-	 * @param itemId
-	 * @return
+	 * 构造PdpViewCommand
+	 * @throws IllegalItemStateException 
 	 */
-	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
-			Map<String, List<ImageViewCommand>> images) {
-		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
+	protected PdpViewCommand buildPdpViewCommand(String itemCode) throws IllegalItemStateException {
+		
+		PdpViewCommand pdpViewCommand = new PdpViewCommand();
+		
+		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
+		pdpViewCommand.setBaseInfo(itemBaseInfo);
+		
+		return pdpViewCommand;
 	}
 	
-	
-	
 	/**
-	 * 构造商品的图片
-	 * @param itemId
+	 * 获取并校验商品基本信息 
+	 * @param itemBaseInfo
 	 * @return
 	 */
-	protected List<ItemImageViewCommand> buildItemImageViewCommand(Long itemId) {
-		// 查询结果
-		List<Long> itemIds = new ArrayList<Long>();
-		itemIds.add(itemId);
-		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
-		// 数据转换
-		return itemImageViewCommandConverter.convert(itemImageList);
+	protected ItemBaseInfoViewCommand getAndValidateItemBaseInfo(String itemCode) throws IllegalItemStateException {
+		// 取得商品的基本信息
+		ItemBaseInfoViewCommand itemBaseInfo = buildItemBaseInfoViewCommand(itemCode);
+		
+		// 商品不存在
+		if (Validator.isNullOrEmpty(itemBaseInfo)) {
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item not exists. itemCode:{}.", itemCode);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_NOT_EXISTS);
+        }
+				
+		Integer lifecycle = itemBaseInfo.getLifecycle();
+		if(2 == lifecycle) {
+			// 商品逻辑删除
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item logical deleted. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED);
+		} else if(3 == lifecycle) {
+			// 商品新建状态
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
+		} else if(0 == lifecycle) {
+			// 商品未上架
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);
+		}
+		
+		Date activeBeginTime = itemBaseInfo.getActiveBeginTime();
+		if (Validator.isNotNullOrEmpty(activeBeginTime) && !DateUtil.isAfter(new Date(), activeBeginTime)) {
+			// 商品未上架
+ 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item before active begin time. itemCode:{}, activeBeginTime:{}.", itemCode, activeBeginTime);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME);
+        }
+		
+		if(0 == itemBaseInfo.getType()) {
+			// 商品是赠品
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
+            throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);
+		}
+		
+		return itemBaseInfo;
 	}
 	
 	/**
@@ -235,7 +300,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract Long getItemFavoriteCount(String itemCode);
 	
-	protected abstract Double getItemRate(String itemCode);
+	protected abstract Float getItemRate(String itemCode);
 	
 	protected abstract Long getItemReviewCount(String itemCode);
 	

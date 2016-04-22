@@ -34,6 +34,7 @@ package com.baozun.nebula.dao.bundle;
 import java.util.List;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
 import com.baozun.nebula.model.bundle.BundleSku;
@@ -47,5 +48,5 @@ import com.baozun.nebula.model.bundle.BundleSku;
 public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	
 	@NativeQuery(model = BundleSku.class)
-	List<BundleSku> findByBundleId(Long bundleId);
+	List<BundleSku> findByBundleId(@QueryParam("bundleId")Long bundleId);
 }

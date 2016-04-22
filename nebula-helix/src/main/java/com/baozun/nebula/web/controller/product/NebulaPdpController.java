@@ -47,11 +47,20 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
+<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.feilong.core.Validator;
 
 
@@ -88,6 +97,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Autowired
 	private ItemDetailManager	itemDetailManager;
 	
+	@Autowired
+	private ItemColorSwatchViewCommandResolver		colorSwatchViewCommandResolver;
+	
 	/**
 	 * 进入商品详情页 	
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
@@ -99,12 +111,21 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public String showPdp(@PathVariable("itemCode") String itemCode, HttpServletRequest request, HttpServletResponse response, Model model) {
 		PdpViewCommand pdpViewCommand =new PdpViewCommand();
-		//TODO 
+		ItemBaseInfoViewCommand baseInfoViewCommand =buildItemBaseInfoViewCommand(itemCode);
+		//TODO 整合
 //		pdpViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
 		
 		
+		List<ItemImageViewCommand> imageViewCommands =buildItemImageViewCommand(baseInfoViewCommand.getId());
+		//..设置了基础信息后
+		String pMode =getPdpMode(itemCode);
+		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
+			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
+			pdpViewCommand.setColorSwatches(colorSwatches);
+		}
 		
-		pdpViewCommand.setSizeCompareChart(buildSizeCompareChart(pdpViewCommand.getItemBaseInfo().getId()));
+		
+		pdpViewCommand.setSizeCompareChart(buildSizeCompareChart(pdpViewCommand.getBaseInfo().getId()));
 		model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 		return VIEW_PRODUCT_DETAIL;
 	}
@@ -137,9 +158,36 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult switchColorForItem(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		// TODO 重新构造PdpViewCommand
+		//重新构造PdpViewCommand TODO 整合
+		PdpViewCommand pdpViewCommand =new PdpViewCommand();
+		//buildItemBaseInfoViewCommand(itemCode);code?
+		ItemBaseInfoViewCommand baseInfoViewCommand =buildItemBaseInfoViewCommand(itemId);
+		pdpViewCommand.setBaseInfo(baseInfoViewCommand);
+		List<ItemImageViewCommand> imageViewCommands =buildItemImageViewCommand(itemId);
+		pdpViewCommand.setImages(imageViewCommands);
+		pdpViewCommand.setProperties(buildItemPropertyViewCommand(baseInfoViewCommand,
+				imageViewCommands));
+		//切换
+		
+		
 		// TODO 同时加入库存信息
+		List<SkuViewCommand> skus =buildSkuViewCommand(itemId);
+		pdpViewCommand.setSkus(skus );
+		pdpViewCommand.setPrice(buildPriceViewCommand(baseInfoViewCommand, skus));
+		List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
+		//pdpViewCommand.set?
+		String pMode =getPdpMode(baseInfoViewCommand.getCode());
+		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
+			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
+			pdpViewCommand.setColorSwatches(colorSwatches);
+		}
 		return new DefaultReturnResult();
+	}
+	
+	
+	public List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand
+			){
+		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
 	}
 	
 	/**
@@ -176,8 +224,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult showItemReview(@RequestParam("itemId") Long itemId, @ModelAttribute("page") PageForm pageForm, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		Date current = new Date();
-		LOG.debug("[PDP_SHOW_ITEM_REVIEW]request start...[ItemId:{},CurrentPage:{},Sort:{}],{}",itemId,pageForm.getCurrentPage(),pageForm.getSort(),current);
+		LOG.debug("[PDP_SHOW_ITEM_REVIEW]ItemId:{},CurrentPage:{},Sort:{} [{}] \"{}\"",itemId,pageForm.getCurrentPage(),pageForm.getSort(),new Date(),this.getClass().getSimpleName());
 		
 		Pagination<RateCommand> rates = itemRateManager.findItemRateListByItemId(pageForm.getPage(), itemId, pageForm.getSorts());
 		
@@ -190,8 +237,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		model.addAttribute("itemReviewViewCommands", itemReviewViewCommands);
 		
-		LOG.debug("[PDP_SHOW_ITEM_REVIEW]request end...[ItemId:{},CurrentPage:{},Sort:{}],{}",itemId,pageForm.getCurrentPage(),pageForm.getSort(),new Date().getTime()-current.getTime());
-		return new DefaultReturnResult();
+		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
@@ -256,8 +302,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Double getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode).doubleValue();
+	protected Float getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode);
 	}
 
 
