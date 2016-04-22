@@ -67,6 +67,7 @@ import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyViewCommand;

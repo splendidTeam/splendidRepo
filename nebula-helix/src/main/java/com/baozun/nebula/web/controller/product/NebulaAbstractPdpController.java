@@ -17,10 +17,7 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,23 +30,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.manager.product.ItemDetailManager;
-import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
-import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
-import com.feilong.core.Validator;
+import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 
 
 /**
@@ -111,6 +102,19 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
+	
+	/**
+	 * 构造PdpViewCommand
+	 */
+	protected PdpViewCommand buildPdpViewCommand(String itemCode) {
+		ItemBaseInfoViewCommand itemBaseInfo = buildItemBaseInfoViewCommand(itemCode);
+		
+		PdpViewCommand pdpViewCommand = new PdpViewCommand();
+		
+		
+		
+		return pdpViewCommand;
+	}
 	
 	
 	/**

@@ -187,7 +187,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		model.addAttribute("itemReviewViewCommands", itemReviewViewCommands);
 		
-		return new DefaultReturnResult();
+		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
