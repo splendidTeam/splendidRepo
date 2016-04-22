@@ -39,6 +39,7 @@ import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
 
 /**
+ * 捆绑类商品成员商品视图模型转换器
  * @author yue.ch
  * @time 2016年4月21日 下午2:20:40
  */
