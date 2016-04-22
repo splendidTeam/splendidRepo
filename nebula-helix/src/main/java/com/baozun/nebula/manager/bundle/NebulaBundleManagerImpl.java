@@ -87,8 +87,9 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	@Override
 	@Transactional(readOnly = true)
 	public BundleCommand findBundleCommandByBundleId(Long boundleId) {
-		BundleCommand bundle = bundleDao.findBundlesById(boundleId, 1);
+		BundleCommand bundle = bundleDao.findBundlesById(boundleId, null);
 		fillBundleCommand(bundle);
+		
 		return bundle;
 	}
 	
@@ -100,7 +101,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
 			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			removeInvalidBundle(bundles);
+			//removeInvalidBundle(bundles);
 		} else {
 			LOG.error("find bundles is null");
 			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
@@ -251,35 +252,16 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	private void removeInvalidBundle(List<BundleCommand> bundles) {
 		Iterator<BundleCommand> iterator = bundles.iterator();
 		while (iterator.hasNext()) {
-			boolean removeFlag = false;
 			BundleCommand bundle = iterator.next();
-			List<BundleElementCommand> bundleElement = bundle.getBundleElementCommands();
-			for (BundleElementCommand bundleElementCommand : bundleElement) {
-				if (!removeFlag) {
-					List<BundleItemCommand> bundleItem = bundleElementCommand.getItems();
-					for (BundleItemCommand bundleItemCommand : bundleItem) {
-						Item item = itemDao.findItemById(bundleItemCommand.getItemId());
-						// lifecycle == 1 上架
-						if (item.getLifecycle().intValue() != 1) {
-							removeFlag = true;
-							LOG.debug("*******************************************************");
-							LOG.debug("current bundle info : {}  [{}]" , JsonUtil.format(bundle) ,new Date());
-							LOG.debug("current BundleElementCommand info : {} [{}]" , JsonUtil.format(bundleElementCommand) , new Date());
-							LOG.debug("current bundleItemCommand info : {} [{}]" , JsonUtil.format(bundleItemCommand), new Date());
-							LOG.debug("current item info : {} [{}]" , JsonUtil.format(item) , new Date());
-							LOG.debug("*******************************************************");
-							break;
-						}
-					}
-				}
-
-			}
-			if (removeFlag) {
+			if (!bundle.isEnabled()) {
+				LOG.debug("***********************************");
+				LOG.debug("current bundle invailed , bundleId [{}] current time : [{}]" , bundle.getId(), new Date());
+				LOG.debug("***********************************");
 				iterator.remove();
 			}
 		}
 	}
-
+	
 	/**
 	 * 分别给每个bundle填充其基本信息
 	 * 
@@ -437,7 +419,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	private BundleItemCommand packagingBundleItemCommandInfo(Long itemId, List<BundleSku> skus, BundleCommand bundle) {
 
 		BundleItemCommand bundleItemCommand = new BundleItemCommand();
-
+        Item item = itemDao.findItemById(itemId);
+        bundleItemCommand.setLifecycle(item.getLifecycle());
 		bundleItemCommand.setItemId(itemId);
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
 		bundleItemCommand.setBundleSkus(skuCommands);
@@ -469,6 +452,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
 			skuCommand.setProperties(skuu.getProperties());
 			skuCommand.setExtentionCode(skuu.getOutid());
+			skuCommand.setLifeCycle(skuu.getLifecycle());
 			
 			// 定制价格 一口价（）
 			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE

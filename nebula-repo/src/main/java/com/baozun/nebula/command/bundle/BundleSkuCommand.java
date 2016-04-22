@@ -50,6 +50,19 @@ public class BundleSkuCommand extends BundleSku{
 	 */
 	private String extentionCode;
 	
+	/**
+	 * 生命周期
+	 */
+	private Integer lifeCycle;
+	
+	public Integer getLifeCycle() {
+		return lifeCycle;
+	}
+
+	public void setLifeCycle(Integer lifeCycle) {
+		this.lifeCycle = lifeCycle;
+	}
+
 	public int getQuantity() {
 		return quantity;
 	}

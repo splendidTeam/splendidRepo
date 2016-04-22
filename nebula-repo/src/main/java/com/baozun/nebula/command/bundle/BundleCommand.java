@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.Bundle;
+import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.model.product.Sku;
 /**
  * 
   * @ClassName: BundleCommand
@@ -227,4 +229,75 @@ public class BundleCommand extends Bundle{
 		return maxListPrice;
 	}
     
+	/**
+	 * <h3>校验bundle是否有效</h3>
+	 * <p>校验的范围如下 ： </p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>捆绑销售 的商品是否有效 </li>
+	 *   	<li>商品中的sku是否有效</li>
+	 *   </ol>
+	 * </ul>
+	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
+	 * @return 　返回结果 布尔类型
+	 * <ul>
+	 *   <li>true : 有效 </li>
+	 *   <li>false : 失效</li>
+	 * </ul>
+	 */
+	public boolean isEnabled(){
+		Boolean removeFlag = Boolean.TRUE;
+		
+		for (BundleElementCommand bundleElementCommand : bundleElementCommands) {
+			if(removeFlag){
+				removeFlag = validateBundleElement(removeFlag , bundleElementCommand);
+			}
+		}
+		return removeFlag;
+	}
+	
+	
+
+	/**
+	 * <h3>验证bundle是否失效</h3>
+	 * <p>失效的情景如下 ：</p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>item 中的 lifecycle != 1 </li>
+	 *   	<li>sku 中的 lifecycle != 1 </li>
+	 *   </ol>
+	 * </ul>
+	 * @param removeFlag : 标识
+	 * @param bundleElementCommand : 校验对象
+	 * @return 　返回结果 布尔类型
+	 * <ul>
+	 *   <li>true : 失效 </li>
+	 *   <li>false : 有效</li>
+	 * </ul>
+	 */
+	private boolean validateBundleElement(Boolean removeFlag , BundleElementCommand bundleElementCommand){
+
+		List<BundleItemCommand> bundleItem = bundleElementCommand.getItems();
+		for (BundleItemCommand bundleItemCommand : bundleItem) {
+			if(removeFlag){
+				//item lifecycle == 1 上架
+				if (bundleItemCommand.getLifecycle().intValue() != 1) {
+					removeFlag = Boolean.FALSE;
+					break;
+				}
+				//sku lifecycle == 1 上架
+				List<BundleSkuCommand> skus = bundleItemCommand.getBundleSkus();
+				for (BundleSkuCommand bundleSkuCommand : skus) {
+					
+					if(bundleSkuCommand.getLifeCycle().intValue() != 1){
+						removeFlag = Boolean.FALSE;
+						break;
+					}
+				}
+			}
+			
+		}
+
+		return removeFlag;
+	}
 }
