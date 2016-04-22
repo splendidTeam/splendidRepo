@@ -1,5 +1,6 @@
 package com.baozun.nebula.manager.bundle;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.command.bundle.BundleCommand;
+import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -30,5 +32,18 @@ public class NebulaBundleManagerTest {
 		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
+	}
+	
+	@Test
+	public void testValidateBundle(){
+		List<Long> skuIds = new ArrayList<Long>();
+		skuIds.add(9L);
+		skuIds.add(10L);
+		skuIds.add(13L);
+		skuIds.add(18L);
+		skuIds.add(20L);
+//		skuIds.add(2L);
+		BundleValidateResult result = bundleManager.validateBundle(1L, skuIds, 10);
+		System.out.println(result.getType());
 	}
 }
