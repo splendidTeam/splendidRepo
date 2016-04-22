@@ -36,7 +36,7 @@ import java.util.List;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * 捆绑类商品视图层对象
+ * 捆绑类商品视图模型
  * 
  * <ul>
  * 	<li>捆绑类商品与普通商品一样存在商品扩展信息</li>

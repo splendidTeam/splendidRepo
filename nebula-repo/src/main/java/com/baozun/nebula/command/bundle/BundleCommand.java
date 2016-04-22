@@ -149,82 +149,225 @@ public class BundleCommand extends Bundle{
 	    }
 		
 	}
-	
+	/**
+	 * <ul>
+	 * 		<li>每个bundle中可能包含多个element</li>
+	 * 		<li>每个element中可能包含多个item</li>
+	 * </ul>
+	 * @return 返回值<li>每个element中item最小原销售价的累加</li>
+	 */
 	public BigDecimal getMinOriginalSalesPrice(){
 	    for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemSum = BigDecimal.ZERO;
-			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMinOriginalSalesPrice());
+			BigDecimal itemTemp = BigDecimal.ZERO;
+			for (int i = 0 ; i< items.size(); i++) {
+				if(i == 0){
+					itemTemp = items.get(i).getMinOriginalSalesPrice();
+				}else{
+					if(itemTemp.compareTo(items.get(i).getMinOriginalSalesPrice()) == 1){
+						itemTemp = items.get(i).getMinOriginalSalesPrice();
+					}
+				}
 			}
-			minOriginalSalesPrice = minOriginalSalesPrice.add(itemSum);
+			minOriginalSalesPrice = minOriginalSalesPrice.add(itemTemp);
 		}
 	    	
 	    return minOriginalSalesPrice ;
 	 }
-	    
+	/**
+	 * <ul>
+	 * 		<li>每个bundle中可能包含多个element</li>
+	 * 		<li>每个element中可能包含多个item</li>
+	 * </ul>
+	 * @return 返回值<li>每个element中item最大原销售价的累加</li>
+	 */   
 	public BigDecimal getMaxOriginalSalesPrice(){
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemSum = BigDecimal.ZERO;
-			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMaxOriginalSalesPrice());
+			BigDecimal itemTemp = BigDecimal.ZERO;
+			for (int i = 0 ; i< items.size(); i++) {
+				if(i == 0){
+					itemTemp = items.get(i).getMaxOriginalSalesPrice();
+				}else{
+					if(itemTemp.compareTo(items.get(i).getMaxOriginalSalesPrice()) == -1){
+						itemTemp = items.get(i).getMaxOriginalSalesPrice();
+					}
+				}
 			}
-			maxOriginalSalesPrice = maxOriginalSalesPrice.add(itemSum);
+			maxOriginalSalesPrice = maxOriginalSalesPrice.add(itemTemp);
 		}
 	    	
 	    return maxOriginalSalesPrice ;
 	  }
-	    
+	/**
+	 * <ul>
+	 * 		<li>每个bundle中可能包含多个element</li>
+	 * 		<li>每个element中可能包含多个item</li>
+	 * </ul>
+	 * @return 返回值<li>每个element中item最小销售价的累加</li>
+	 */      
 	public BigDecimal getMinSalesPrice(){
 
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemSum = BigDecimal.ZERO;
-			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMinSalesPrice());
+			BigDecimal itemTemp = BigDecimal.ZERO;
+			for (int i = 0 ; i< items.size(); i++) {
+				if(i == 0){
+					itemTemp = items.get(i).getMinSalesPrice();
+				}else{
+					if(itemTemp.compareTo(items.get(i).getMinSalesPrice()) == 1){
+						itemTemp = items.get(i).getMinSalesPrice();
+					}
+				}
 			}
-			minSalesPrice = minSalesPrice.add(itemSum);
+			minSalesPrice = minSalesPrice.add(itemTemp);
 		}
 	    	
 	    return minSalesPrice ;
 	   }
-	    
+	/**
+	 * <ul>
+	 * 		<li>每个bundle中可能包含多个element</li>
+	 * 		<li>每个element中可能包含多个item</li>
+	 * </ul>
+	 * @return 返回值<li>每个element中item最大销售价的累加</li>
+	 */       
 	public BigDecimal getMaxSalesPrice(){
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemSum = BigDecimal.ZERO;
-			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMaxSalesPrice());
+			BigDecimal itemTemp = BigDecimal.ZERO;
+			for (int i = 0 ; i< items.size(); i++) {
+				if(i == 0){
+					itemTemp = items.get(i).getMaxSalesPrice();
+				}else{
+					if(itemTemp.compareTo(items.get(i).getMaxSalesPrice()) == -1){
+						itemTemp = items.get(i).getMaxSalesPrice();
+					}
+				}
 			}
-			maxSalesPrice = maxSalesPrice.add(itemSum);
+			maxSalesPrice = maxSalesPrice.add(itemTemp);
 		}
 	    	
 	    return maxSalesPrice ;
 	}
-	
+	/**
+	 * <ul>
+	 * 		<li>每个bundle中可能包含多个element</li>
+	 * 		<li>每个element中可能包含多个item</li>
+	 * </ul>
+	 * @return 返回值<li>每个element中item最小吊牌价的累加</li>
+	 */   
 	public BigDecimal getMinListPrice() {
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemSum = BigDecimal.ZERO;
-			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMinListPrice());
+			BigDecimal itemTemp = BigDecimal.ZERO;
+			for (int i = 0 ; i< items.size(); i++) {
+				if(i == 0){
+					itemTemp = items.get(i).getMinListPrice();
+				}else{
+					if(itemTemp.compareTo(items.get(i).getMinListPrice()) == 1){
+						itemTemp = items.get(i).getMinListPrice();
+					}
+				}
 			}
-			minListPrice = minListPrice.add(itemSum);
+			minListPrice = minListPrice.add(itemTemp);
 		}
 		return minListPrice;
 	}
-	
+	/**
+	 * <ul>
+	 * 		<li>每个bundle中可能包含多个element</li>
+	 * 		<li>每个element中可能包含多个item</li>
+	 * </ul>
+	 * @return 返回值<li>每个element中item最大吊牌价的累加</li>
+	 */   
 	public BigDecimal getMaxListPrice() {
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemSum = BigDecimal.ZERO;
-			for (BundleItemCommand item : items) {
-				itemSum = itemSum.add(item.getMaxListPrice());
+			BigDecimal itemTemp = BigDecimal.ZERO;
+			for (int i = 0 ; i< items.size(); i++) {
+				if(i == 0){
+					itemTemp = items.get(i).getMaxListPrice();
+				}else{
+					if(itemTemp.compareTo(items.get(i).getMaxListPrice()) == -1){
+						itemTemp = items.get(i).getMaxListPrice();
+					}
+				}
 			}
-			maxListPrice = maxListPrice.add(itemSum);
+			maxListPrice = maxListPrice.add(itemTemp);
 		}
 		return maxListPrice;
 	}
     
+	/**
+	 * <h3>校验bundle是否有效</h3>
+	 * <p>校验的范围如下 ： </p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>捆绑销售 的商品是否有效 </li>
+	 *   	<li>商品中的sku是否有效</li>
+	 *   </ol>
+	 * </ul>
+	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
+	 * @return 　返回结果 布尔类型
+	 * <ul>
+	 *   <li>true : 有效 </li>
+	 *   <li>false : 失效</li>
+	 * </ul>
+	 */
+	public boolean isEnabled(){
+		Boolean removeFlag = Boolean.TRUE;
+		
+		for (BundleElementCommand bundleElementCommand : bundleElementCommands) {
+			if(removeFlag){
+				removeFlag = validateBundleElement(removeFlag , bundleElementCommand);
+			}
+		}
+		return removeFlag;
+	}
+	
+	
+
+	/**
+	 * <h3>验证bundle是否失效</h3>
+	 * <p>失效的情景如下 ：</p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>item 中的 lifecycle != 1 </li>
+	 *   	<li>sku 中的 lifecycle != 1 </li>
+	 *   </ol>
+	 * </ul>
+	 * @param removeFlag : 标识
+	 * @param bundleElementCommand : 校验对象
+	 * @return 　返回结果 布尔类型
+	 * <ul>
+	 *   <li>true : 失效 </li>
+	 *   <li>false : 有效</li>
+	 * </ul>
+	 */
+	private boolean validateBundleElement(Boolean removeFlag , BundleElementCommand bundleElementCommand){
+
+		List<BundleItemCommand> bundleItem = bundleElementCommand.getItems();
+		for (BundleItemCommand bundleItemCommand : bundleItem) {
+			if(removeFlag){
+				//item lifecycle == 1 上架
+				if (bundleItemCommand.getLifecycle().intValue() != 1) {
+					removeFlag = Boolean.FALSE;
+					break;
+				}
+				//sku lifecycle == 1 上架
+				List<BundleSkuCommand> skus = bundleItemCommand.getBundleSkus();
+				for (BundleSkuCommand bundleSkuCommand : skus) {
+					
+					if(bundleSkuCommand.getLifeCycle().intValue() != 1){
+						removeFlag = Boolean.FALSE;
+						break;
+					}
+				}
+			}
+			
+		}
+
+		return removeFlag;
+	}
 }

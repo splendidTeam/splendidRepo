@@ -31,6 +31,11 @@ public class BundleItemCommand implements Serializable{
 	private long itemId;
 	
 	/**
+	 * 生命周期
+	 */
+	private Integer lifecycle;
+	
+	/**
 	 * 最小商品原销售价
 	 */
 	private BigDecimal minOriginalSalesPrice = BigDecimal.ZERO;
@@ -61,6 +66,14 @@ public class BundleItemCommand implements Serializable{
 	
 	private List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
 	
+	public Integer getLifecycle() {
+		return lifecycle;
+	}
+
+	public void setLifecycle(Integer lifecycle) {
+		this.lifecycle = lifecycle;
+	}
+
 	public void setMinListPrice(BigDecimal minListPrice) {
 		this.minListPrice = minListPrice;
 	}

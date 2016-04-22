@@ -36,6 +36,12 @@ import java.math.BigDecimal;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
+ * 捆绑类商品的sku视图模型
+ * 
+ * <p>
+ * 捆绑类商品sku基本信息的封装，如果需要额外的信息，可以使用extraData属性进行扩展。
+ * </p>
+ * 
  * @author yue.ch
  *
  */

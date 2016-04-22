@@ -18,6 +18,7 @@ package com.baozun.nebula.manager;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 
 /**
@@ -56,10 +59,16 @@ public class ItemDetailManagerTest{
 	 * Test method for {@link com.baozun.nebula.manager.product.ItemManagerImpl#findItemListByItemIds(java.lang.Long[])}.
 	 */
 	
+	private static final Long itemId =14060L;
+	
+	@Before
+	public void setM(){
+		ProfileConfigUtil.setMode("dev");
+	}
+	
 	@Test
 	public void testFindDynamicProperty() {
 		LangUtil.setCurrentLang("zh_HK");
-		Long itemId = 1L;
 		Map<String, Object> dyp = itemDetailManager.findDynamicProperty(itemId);
 		if(dyp != null) {
 			System.out.println("===========" + dyp.size());
@@ -68,6 +77,12 @@ public class ItemDetailManagerTest{
 				System.out.println("=========" + key + ":" + dyp.get(key));
 			}
 		}
+	}
+	
+	@Test
+	public void testGatherDy(){
+		Map<String, Object> dyp = itemDetailManager.gatherDynamicProperty(itemId);
+		log.debug("sssssss:{}", JsonUtil.format(dyp));
 	}
 	
 
