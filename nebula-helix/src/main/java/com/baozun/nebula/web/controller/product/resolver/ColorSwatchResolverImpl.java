@@ -25,11 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
@@ -59,7 +57,6 @@ public class ColorSwatchResolverImpl implements ColorSwatchResolver {
             return Collections.emptyMap();
         }
 		Map<Long, ImageViewCommand> resultMap =new HashMap<Long, ImageViewCommand>();
-		List<ImageViewCommand> colorswatchItemImageList =null;
 		List<ImageViewCommand> imageList =null;
 		for (ItemImageViewCommand itemImageViewCommand : imageViewCommands) {
 			if(Validator.isNotNullOrEmpty(itemImageViewCommand.getColorItemPropertyId())&&
