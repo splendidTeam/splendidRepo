@@ -31,6 +31,8 @@
 */
 package com.baozun.nebula.web.controller.bundle.viewcommand;
 
+import java.util.List;
+
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
@@ -54,7 +56,7 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 	/**
 	 * 捆绑商品图片信息
 	 */
-	private ItemImageViewCommand itemImageViewCommand;
+	private List<ItemImageViewCommand> itemImageViewCommands;
 	
 	/**
 	 * 捆绑商品的拓展信息
@@ -75,14 +77,6 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 		this.itemBaseInfoViewCommand = itemBaseInfoViewCommand;
 	}
 
-	public ItemImageViewCommand getItemImageViewCommand() {
-		return itemImageViewCommand;
-	}
-
-	public void setItemImageViewCommand(ItemImageViewCommand itemImageViewCommand) {
-		this.itemImageViewCommand = itemImageViewCommand;
-	}
-
 	public ItemExtraViewCommand getItemExtraViewCommand() {
 		return itemExtraViewCommand;
 	}
@@ -97,6 +91,15 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 
 	public void setItemReviewViewCommand(ItemReviewViewCommand itemReviewViewCommand) {
 		this.itemReviewViewCommand = itemReviewViewCommand;
+	}
+
+	public List<ItemImageViewCommand> getItemImageViewCommands() {
+		return itemImageViewCommands;
+	}
+
+	public void setItemImageViewCommands(
+			List<ItemImageViewCommand> itemImageViewCommands) {
+		this.itemImageViewCommands = itemImageViewCommands;
 	}
 	
 }
