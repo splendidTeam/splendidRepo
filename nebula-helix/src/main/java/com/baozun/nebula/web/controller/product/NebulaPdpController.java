@@ -50,6 +50,8 @@ import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewComman
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -268,6 +270,25 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected Long getItemReviewCount(String itemCode) {
 		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
+	}
+
+	@Override
+	protected List<RelationItemViewCommand> customBuildItemRecommendViewCommand(
+			Long itemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String getItemImageType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String getItemRecommendMode() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

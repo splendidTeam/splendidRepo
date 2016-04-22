@@ -17,10 +17,8 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,13 +30,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
+import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
@@ -47,9 +48,8 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
-import com.feilong.core.Validator;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 
 
 /**
@@ -87,6 +87,12 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 面包屑的模式  模式二, 基于后端分类构建. [value: breadcrumbs_mode_category] */
 	public static final String BREADCRUMBS_MODE_CATEGORY 			= "breadcrumbs_mode_category";
 	
+	/** 商品推荐的模式  模式一, 后台配置. [value: recommend_mode_general] */
+	public static final String RECOMMEND_MODE_GENERAL 			    = "recommend_mode_general";
+	
+	/** 商品推荐的模式  模式一, 自定义 需要商城自己实现. [value: recommend_mode_custom] */
+	public static final String RECOMMEND_MODE_CUSTOM 			= "recommend_mode_custom";
+	
 	// 每个sku默认最大购买的数量
 	/** 每个sku默认最大购买的数量. [value: 6] */
 	public static final Integer DEFAULT_SKU_BUY_LIMIT 				= 6;
@@ -109,6 +115,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemDetailManager										itemDetailManager;
 	
 	@Autowired
+	private ItemRecommandManager                                    itemRecommandManager;
+	
+	@Autowired
 	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Autowired
@@ -117,6 +126,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	@Autowired
 	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	
+	@Autowired
+	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
 	
 	
 	/**
@@ -172,13 +184,41 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造推荐商品信息
-	 * TODO 推荐商品的结构未定义,最近浏览的商品和推荐应该是一个结构
+	 * 1：后台配置，pdp，购物车（暂不考虑）
+	 * 2：匹配规则 预留参考面包屑
 	 * @param itemId
 	 * @return
 	 */
-	protected List<ItemRecommendViewCommand> buildItemRecommendViewCommand(Long itemId) {
-		List<ItemRecommendViewCommand> itemRecommendList = new ArrayList<ItemRecommendViewCommand>();
+	protected List<RelationItemViewCommand> buildItemRecommendViewCommand(Long itemId) {
+		List<RelationItemViewCommand> itemRecommendList = null;
+		
+		String itemRecommendMode = getItemRecommendMode();
+	
+		switch (itemRecommendMode){
+		    case RECOMMEND_MODE_CUSTOM:
+		    	itemRecommendList = customBuildItemRecommendViewCommand(itemId);
+		    	break;
+		    default:
+		    	List<ItemCommand> itemCommands = itemRecommandManager.getRecommandItemByItemId(itemId, getItemImageType());
+		    	itemRecommendList =  relationItemViewCommandConverter.convert(itemCommands);
+		        break;
+		}
+		
 		return itemRecommendList;
+
+	}
+	
+	protected abstract List<RelationItemViewCommand> customBuildItemRecommendViewCommand(Long itemId);
+	
+	/**
+	 * 构造最近浏览的商品信息
+	 * 1：用cookie 参考金总
+	 * @param itemId
+	 * @return
+	 */
+	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(Long itemId) {
+		List<RelationItemViewCommand> itemBrowsingHistoryList = new ArrayList<RelationItemViewCommand>();
+		return itemBrowsingHistoryList;
 	}
 	
 	/**
@@ -233,12 +273,22 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	
-	
+	/**
+	 * 面包屑的模式
+	 * @return
+	 */
+	protected abstract String getItemImageType();
 	/**
 	 * 面包屑的模式
 	 * @return
 	 */
 	protected abstract String getBreadcrumbsMode();
+	
+	/**
+	 * 商品推荐的模式
+	 * @return
+	 */
+	protected abstract String getItemRecommendMode();
 	
 	/**
 	 * sku最大可购买的数量
