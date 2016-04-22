@@ -72,6 +72,7 @@ import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.feilong.core.Validator;
@@ -223,7 +224,10 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	/**
 	 * 构造捆绑商品详情页视图对象
 	 * <p>
-	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等
+	 * bundle本身作为无属性类商品
+	 * </p>
+	 * <p>
+	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等.
 	 * </p>
 	 * 
 	 */
@@ -250,7 +254,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		//TODO 调用NebulaBasePdpController中的build方法
 		bundleDetailViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
 		bundleDetailViewCommand.setItemExtraViewCommand(null);
-		bundleDetailViewCommand.setItemImageViewCommand(null);
+		bundleDetailViewCommand.setItemImageViewCommands(buildItemImageViewCommand(bundleCommand.getItemId()));
 		bundleDetailViewCommand.setItemReviewViewCommand(null);
 		return bundleDetailViewCommand;
 	}
