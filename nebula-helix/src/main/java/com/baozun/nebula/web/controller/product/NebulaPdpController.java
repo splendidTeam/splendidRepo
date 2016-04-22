@@ -59,10 +59,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewComman
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
-<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.feilong.core.Validator;
 
 
