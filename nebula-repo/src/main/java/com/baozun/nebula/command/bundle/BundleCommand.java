@@ -157,6 +157,7 @@ public class BundleCommand extends Bundle{
 	 * @return 返回值<li>每个element中item最小原销售价的累加</li>
 	 */
 	public BigDecimal getMinOriginalSalesPrice(){
+		minOriginalSalesPrice = BigDecimal.ZERO;
 	    for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemTemp = BigDecimal.ZERO;
@@ -182,6 +183,7 @@ public class BundleCommand extends Bundle{
 	 * @return 返回值<li>每个element中item最大原销售价的累加</li>
 	 */   
 	public BigDecimal getMaxOriginalSalesPrice(){
+		maxOriginalSalesPrice = BigDecimal.ZERO;
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemTemp = BigDecimal.ZERO;
@@ -207,7 +209,7 @@ public class BundleCommand extends Bundle{
 	 * @return 返回值<li>每个element中item最小销售价的累加</li>
 	 */      
 	public BigDecimal getMinSalesPrice(){
-
+		minSalesPrice = BigDecimal.ZERO;
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemTemp = BigDecimal.ZERO;
@@ -233,6 +235,7 @@ public class BundleCommand extends Bundle{
 	 * @return 返回值<li>每个element中item最大销售价的累加</li>
 	 */       
 	public BigDecimal getMaxSalesPrice(){
+		maxSalesPrice = BigDecimal.ZERO;
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemTemp = BigDecimal.ZERO;
@@ -258,6 +261,7 @@ public class BundleCommand extends Bundle{
 	 * @return 返回值<li>每个element中item最小吊牌价的累加</li>
 	 */   
 	public BigDecimal getMinListPrice() {
+		minListPrice = BigDecimal.ZERO ;
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemTemp = BigDecimal.ZERO;
@@ -282,16 +286,13 @@ public class BundleCommand extends Bundle{
 	 * @return 返回值<li>每个element中item最大吊牌价的累加</li>
 	 */   
 	public BigDecimal getMaxListPrice() {
+		maxListPrice = BigDecimal.ZERO;
 		for (BundleElementCommand element : bundleElementCommands) {
 			List<BundleItemCommand> items = element.getItems();
 			BigDecimal itemTemp = BigDecimal.ZERO;
 			for (int i = 0 ; i< items.size(); i++) {
-				if(i == 0){
+				if(itemTemp.compareTo(items.get(i).getMaxListPrice()) == -1){
 					itemTemp = items.get(i).getMaxListPrice();
-				}else{
-					if(itemTemp.compareTo(items.get(i).getMaxListPrice()) == -1){
-						itemTemp = items.get(i).getMaxListPrice();
-					}
 				}
 			}
 			maxListPrice = maxListPrice.add(itemTemp);

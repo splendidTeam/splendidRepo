@@ -154,11 +154,11 @@ public class BundleElement extends BaseModel {
 	public void setSalesPrice(BigDecimal salesPrice) {
 		this.salesPrice = salesPrice;
 	}
-
+	@Column(name = "IS_MAIN_ELEMENT")
 	public Boolean getIsMainElement() {
 		return isMainElement;
 	}
-	@Column(name = "IS_MAIN_ELEMENT")
+	
 	public void setIsMainElement(Boolean isMainElement) {
 		this.isMainElement = isMainElement;
 	}

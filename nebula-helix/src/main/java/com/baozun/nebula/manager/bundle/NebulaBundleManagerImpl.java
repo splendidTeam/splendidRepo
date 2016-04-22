@@ -309,12 +309,6 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		fillBundleElementInfo(bundleElementList, map, bundle);
 
 		bundle.setBundleElementCommands(bundleElementList);
-		bundle.setMaxOriginalSalesPrice(bundle.getMaxOriginalSalesPrice());
-		bundle.setMinOriginalSalesPrice(bundle.getMinOriginalSalesPrice());
-		bundle.setMaxSalesPrice(bundle.getMaxSalesPrice());
-		bundle.setMinSalesPrice(bundle.getMinSalesPrice());
-		bundle.setMaxListPrice(bundle.getMaxListPrice());
-		bundle.setMinListPrice(bundle.getMinListPrice());
     }
    
 	/**
@@ -427,13 +421,6 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
 		bundleItemCommand.setBundleSkus(skuCommands);
 
-		bundleItemCommand.setMinOriginalSalesPrice(bundleItemCommand.getMinOriginalSalesPrice());
-		bundleItemCommand.setMaxOriginalSalesPrice(bundleItemCommand.getMaxOriginalSalesPrice());
-		bundleItemCommand.setMinSalesPrice(bundleItemCommand.getMinSalesPrice());
-		bundleItemCommand.setMaxSalesPrice(bundleItemCommand.getMaxSalesPrice());
-		bundleItemCommand.setMaxListPrice(bundleItemCommand.getMaxListPrice());
-		bundleItemCommand.setMinListPrice(bundleItemCommand.getMinListPrice());
-
 		return bundleItemCommand;
 	}
 
@@ -457,12 +444,12 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			skuCommand.setLifeCycle(skuu.getLifecycle());
 			
 			// 定制价格 一口价（）
-			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
+			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
 					|| bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
 				skuCommand.setSalesPrice(sku.getSalesPrice());
 			}
 			// 按照实际价格
-			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
+			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
 				skuCommand.setSalesPrice(skuu.getSalePrice());
 			}
 			skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
@@ -475,7 +462,12 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 				if(!bundle.getSyncWithInv()){
 					skuCommand.setQuantity(availableQty);
 				}else{
-					skuCommand.setQuantity(Math.min(availableQty, sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty()));
+					SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
+					int qty = 0 ;
+					if(inventory != null && inventory.getAvailableQty() != null){
+						qty = inventory.getAvailableQty();
+					}
+					skuCommand.setQuantity(Math.min(availableQty, qty));
 				}
 			} else {
 				skuCommand.setQuantity(sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty());

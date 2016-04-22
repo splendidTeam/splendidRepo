@@ -2,6 +2,9 @@ package com.baozun.nebula.manager.bundle;
 
 import java.util.List;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -28,6 +31,23 @@ public class NebulaBundleManagerTest {
 	@Test
 	public void testFindBundleCommandByItemId(){
 		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L);
+		
+		log.debug("result : {}" ,JsonUtil.format(bundles));
+	}
+	
+	@Test
+	public void testFindBundleCommandByBundleId(){
+		BundleCommand bundle =	bundleManager.findBundleCommandByBundleId(1L);
+		
+		log.debug("result : {}" ,JsonUtil.format(bundle));
+	}
+	
+	@Test
+	public void testFindBundleCommandByPage(){
+		Page page = new Page();
+		page.setSize(8);
+		page.setStart(0);
+		Pagination<BundleCommand> bundles =	bundleManager.findBundleCommandByPage(page, null);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
 	}

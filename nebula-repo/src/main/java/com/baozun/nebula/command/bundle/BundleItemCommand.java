@@ -118,6 +118,7 @@ public class BundleItemCommand implements Serializable{
 	 * 查找商品中sku的最小原销售价格
 	 */
 	public BigDecimal getMinOriginalSalesPrice(){
+		minOriginalSalesPrice = BigDecimal.ZERO;
 	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
 				minOriginalSalesPrice = bundleSkus.get(i).getOriginalSalesPrice();
@@ -135,6 +136,7 @@ public class BundleItemCommand implements Serializable{
 	 * 查找商品中sku的最大原销售价格
 	 */
 	public BigDecimal getMaxOriginalSalesPrice(){
+		maxOriginalSalesPrice = BigDecimal.ZERO;
 	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
 				maxOriginalSalesPrice = bundleSkus.get(i).getOriginalSalesPrice();
@@ -152,6 +154,7 @@ public class BundleItemCommand implements Serializable{
 	 * 查找bundle商品中sku的最小售价格
 	 */
 	public BigDecimal getMinSalesPrice(){
+		minSalesPrice = BigDecimal.ZERO;
 	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
 				minSalesPrice = bundleSkus.get(i).getSalesPrice();
@@ -168,6 +171,7 @@ public class BundleItemCommand implements Serializable{
 	 * 查找bundle商品中sku的最大售价格
 	 */    
 	public BigDecimal getMaxSalesPrice(){
+		maxSalesPrice = BigDecimal.ZERO;
 	    for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
 				maxSalesPrice = bundleSkus.get(i).getSalesPrice();
@@ -184,6 +188,7 @@ public class BundleItemCommand implements Serializable{
 	 * 查找商品中sku的最大吊牌价格
 	 */
 	public BigDecimal getMaxListPrice() {
+		maxListPrice = BigDecimal.ZERO;
 		for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
 				maxListPrice = bundleSkus.get(i).getListPrice();
@@ -200,6 +205,7 @@ public class BundleItemCommand implements Serializable{
 	 * 查找商品中sku的最小吊牌价格
 	 */
 	public BigDecimal getMinListPrice() {
+		minListPrice = BigDecimal.ZERO;
 		for (int i = 0 ; i<bundleSkus.size() ;i++) {
 			if( i == 0 ){
 				minListPrice = bundleSkus.get(i).getListPrice();
