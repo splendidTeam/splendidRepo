@@ -309,7 +309,7 @@ public class BundleCommand extends Bundle{
 	 *   	<li>商品中的sku是否有效</li>
 	 *   </ol>
 	 * </ul>
-	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
+	 * <h3>注意 ： 该方法不会校验库存的信息 以及 bundle本身是否上架</h3>
 	 * @return 　返回结果 布尔类型
 	 * <ul>
 	 *   <li>true : 有效 </li>
