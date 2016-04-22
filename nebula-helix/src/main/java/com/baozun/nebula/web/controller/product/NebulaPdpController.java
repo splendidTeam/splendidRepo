@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
+import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
@@ -57,6 +59,10 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
+<<<<<<< HEAD
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.feilong.core.Validator;
 
 
@@ -96,6 +102,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Autowired
 	private ItemColorSwatchViewCommandResolver		colorSwatchViewCommandResolver;
 	
+	
 	/**
 	 * 进入商品详情页 	
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
@@ -106,24 +113,20 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 */
 	public String showPdp(@PathVariable("itemCode") String itemCode, HttpServletRequest request, HttpServletResponse response, Model model) {
-		PdpViewCommand pdpViewCommand =new PdpViewCommand();
-		ItemBaseInfoViewCommand baseInfoViewCommand =buildItemBaseInfoViewCommand(itemCode);
-		//TODO 整合
-//		pdpViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
-		
-		
-		List<ItemImageViewCommand> imageViewCommands =buildItemImageViewCommand(baseInfoViewCommand.getId());
-		//..设置了基础信息后
-		String pMode =getPdpMode(itemCode);
-		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
-			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
-			pdpViewCommand.setColorSwatches(colorSwatches);
+		try {
+			
+			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
+			
+			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
+			
+			return VIEW_PRODUCT_DETAIL;
+			
+		} catch (IllegalItemStateException e) {
+			
+			LOG.error("[PDP_SHOW_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
+			
+			throw new BusinessException("Show pdp error.");
 		}
-		
-		
-		pdpViewCommand.setSizeCompareChart(buildSizeCompareChart(pdpViewCommand.getBaseInfo().getId()));
-		model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
-		return VIEW_PRODUCT_DETAIL;
 	}
 	
 	/**
@@ -172,7 +175,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		pdpViewCommand.setPrice(buildPriceViewCommand(baseInfoViewCommand, skus));
 		List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
 		//pdpViewCommand.set?
-		String pMode =getPdpMode(baseInfoViewCommand.getCode());
+		String pMode =getPdpMode(baseInfoViewCommand.getId());
 		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
 			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
 			pdpViewCommand.setColorSwatches(colorSwatches);
@@ -180,11 +183,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return new DefaultReturnResult();
 	}
 	
-	
-	public List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand
-			){
-		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
-	}
 	
 	/**
 	 * 加入收藏(这个功能应该在用户收藏的Controller中定义)
@@ -312,6 +310,25 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected Long getItemReviewCount(String itemCode) {
 		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
+	}
+
+	@Override
+	protected List<RelationItemViewCommand> customBuildItemRecommendViewCommand(
+			Long itemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String getItemImageType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected String getItemRecommendMode() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

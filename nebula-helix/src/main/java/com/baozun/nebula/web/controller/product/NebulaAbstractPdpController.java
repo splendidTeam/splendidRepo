@@ -30,20 +30,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
+import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 
@@ -68,45 +75,67 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	//PDP的展示模式
 	/** PDP的展示模式  模式一, 商品到款，PDP到款显示. [value: pdp_mode_style] */
-	public static final String PDP_MODE_STYLE 						= "pdp_mode_style";
+	public static final String 		PDP_MODE_STYLE 						= "pdp_mode_style";
 	
 	/** PDP的展示模式  模式二， 商品到色，PDP根据款号聚合（到款显示）. [value: pdp_mode_color_combine] */
-	public static final String PDP_MODE_COLOR_COMBINE 				= "pdp_mode_color_combine";
+	public static final String 		PDP_MODE_COLOR_COMBINE 				= "pdp_mode_color_combine";
 	
 	/** PDP的展示模式 模式三， 商品到色，PDP不需要聚合（到色显示）. [value: pdp_mode_color_uncombine] */
-	public static final String PDP_MODE_COLOR_UNCOMBINE 			= "pdp_mode_color_uncombine";
+	public static final String 		PDP_MODE_COLOR_UNCOMBINE 			= "pdp_mode_color_uncombine";
 	
 	//面包屑的模式
 	/** 面包屑的模式  模式一, 基于前端导航构建. [value: breadcrumbs_mode_navigation] */
-	public static final String BREADCRUMBS_MODE_NAVIGATION 			= "breadcrumbs_mode_navigation";
+	public static final String 		BREADCRUMBS_MODE_NAVIGATION 			= "breadcrumbs_mode_navigation";
 	
 	/** 面包屑的模式  模式二, 基于后端分类构建. [value: breadcrumbs_mode_category] */
-	public static final String BREADCRUMBS_MODE_CATEGORY 			= "breadcrumbs_mode_category";
+	public static final String 		BREADCRUMBS_MODE_CATEGORY 			= "breadcrumbs_mode_category";
+	
+	/** 商品推荐的模式  模式一, 后台配置. [value: recommend_mode_general] */
+	public static final String RECOMMEND_MODE_GENERAL 			    = "recommend_mode_general";
+	
+	/** 商品推荐的模式  模式一, 自定义 需要商城自己实现. [value: recommend_mode_custom] */
+	public static final String RECOMMEND_MODE_CUSTOM 			= "recommend_mode_custom";
 	
 	// 每个sku默认最大购买的数量
 	/** 每个sku默认最大购买的数量. [value: 6] */
-	public static final Integer DEFAULT_SKU_BUY_LIMIT 				= 6;
+	public static final Integer 	DEFAULT_SKU_BUY_LIMIT 				= 6;
 	
 	//model key的常量定义
 	/** 商品详情页 的相关展示数据 */
-	public static final String	MODEL_KEY_PRODUCT_DETAIL			= "product";
+	public static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
 	
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
-	public static final String	VIEW_PRODUCT_DETAIL					= "product.detail";
+	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	/** 商品不存在 的默认定义 */
-	public static final String VIEW_PRODUCT_NOTEXIST 				= "product.notexist";
+	public static final String 		VIEW_PRODUCT_NOTEXIST 				= "product.notexist";
 	
 	@Autowired
-	private SdkItemManager											sdkItemManager;
+	private SdkItemManager sdkItemManager;
 	
 	@Autowired
-	private ItemDetailManager										itemDetailManager;
+	private ItemDetailManager itemDetailManager;
 	
 	@Autowired
+	private ItemRecommandManager itemRecommandManager;
+	
+	@Autowired
+	private ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
+	
+	
 	@Qualifier("breadcrumbsViewCommandConverter")
-	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
+	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
+	
+	@Autowired
+	private ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
+	
+	@Autowired
+	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	
+	
+	@Autowired
+	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
 	
 	/**
 	 * 构造PdpViewCommand
@@ -116,8 +145,32 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		
 		PdpViewCommand pdpViewCommand = new PdpViewCommand();
 		
+		//商品基本信息
 		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
 		pdpViewCommand.setBaseInfo(itemBaseInfo);
+		
+		//面包屑
+		pdpViewCommand.setBreadcrumbs(buildBreadcrumbsViewCommand(itemBaseInfo.getId()));
+		
+		//商品图片
+		pdpViewCommand.setImages(buildItemImageViewCommand(itemBaseInfo.getId()));
+		
+		//商品属性
+		pdpViewCommand.setProperties(buildItemPropertyViewCommand(itemBaseInfo, pdpViewCommand.getImages()));
+		
+		//sku
+		pdpViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
+		
+		//price
+		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
+		
+        //extra
+		pdpViewCommand.setExtra(buildItemExtraViewCommand(itemCode));
+		
+		//colorSwatch
+		if(PDP_MODE_COLOR_COMBINE.equals(getPdpMode(itemBaseInfo.getId()))) {
+			pdpViewCommand.setColorSwatches(buildItemColorSwatchViewCommands(itemBaseInfo));
+		}
 		
 		return pdpViewCommand;
 	}
@@ -177,6 +230,10 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		return new ItemCategoryViewCommand();
 	}
 	
+	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
+		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
+	}
+	
 	/**
 	 * 构造商品的扩展数据
 	 * @param itemId
@@ -193,13 +250,41 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造推荐商品信息
-	 * TODO 推荐商品的结构未定义,最近浏览的商品和推荐应该是一个结构
+	 * 1：后台配置，pdp，购物车（暂不考虑）
+	 * 2：匹配规则 预留参考面包屑
 	 * @param itemId
 	 * @return
 	 */
-	protected List<ItemRecommendViewCommand> buildItemRecommendViewCommand(Long itemId) {
-		List<ItemRecommendViewCommand> itemRecommendList = new ArrayList<ItemRecommendViewCommand>();
+	protected List<RelationItemViewCommand> buildItemRecommendViewCommand(Long itemId) {
+		List<RelationItemViewCommand> itemRecommendList = null;
+		
+		String itemRecommendMode = getItemRecommendMode();
+	
+		switch (itemRecommendMode){
+		    case RECOMMEND_MODE_CUSTOM:
+		    	itemRecommendList = customBuildItemRecommendViewCommand(itemId);
+		    	break;
+		    default:
+		    	List<ItemCommand> itemCommands = itemRecommandManager.getRecommandItemByItemId(itemId, getItemImageType());
+		    	itemRecommendList =  relationItemViewCommandConverter.convert(itemCommands);
+		        break;
+		}
+		
 		return itemRecommendList;
+ 
+	}
+	
+	protected abstract List<RelationItemViewCommand> customBuildItemRecommendViewCommand(Long itemId);
+	
+	/**
+	 * 构造最近浏览的商品信息
+	 * 1：用cookie 参考金总
+	 * @param itemId
+	 * @return
+	 */
+	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(Long itemId) {
+		List<RelationItemViewCommand> itemBrowsingHistoryList = new ArrayList<RelationItemViewCommand>();
+		return itemBrowsingHistoryList;
 	}
 	
 	/**
@@ -254,12 +339,22 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	
-	
+	/**
+	 * 面包屑的模式
+	 * @return
+	 */
+	protected abstract String getItemImageType();
 	/**
 	 * 面包屑的模式
 	 * @return
 	 */
 	protected abstract String getBreadcrumbsMode();
+	
+	/**
+	 * 商品推荐的模式
+	 * @return
+	 */
+	protected abstract String getItemRecommendMode();
 	
 	/**
 	 * sku最大可购买的数量
@@ -273,7 +368,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * 
 	 * @return
 	 */
-	protected String getPdpMode(String itemCode) {
+	protected String getPdpMode(Long itemId) {
 		return PDP_MODE_COLOR_COMBINE;
 	}
 

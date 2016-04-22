@@ -26,6 +26,11 @@ public class IllegalItemStateException extends Exception {
 	public IllegalItemStateException(String message){
 		super(message);
 	}
+	
+	public IllegalItemStateException(IllegalItemState state, String message){
+		super(message);
+		this.state = state;
+	}
 
 	public IllegalItemStateException(Throwable cause){
 		super(cause);
