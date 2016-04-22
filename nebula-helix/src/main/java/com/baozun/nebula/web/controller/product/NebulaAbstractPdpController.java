@@ -17,15 +17,8 @@
 package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
-<<<<<<< HEAD
-=======
 import java.util.Date;
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import java.util.List;
-<<<<<<< HEAD
-import java.util.Map;
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,46 +30,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
-<<<<<<< HEAD
 import com.baozun.nebula.command.ItemCommand;
-=======
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.manager.product.ItemDetailManager;
-<<<<<<< HEAD
 import com.baozun.nebula.manager.product.ItemRecommandManager;
-import com.baozun.nebula.model.product.ItemImage;
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
-<<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
-<<<<<<< HEAD
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
-=======
-import com.baozun.nebula.web.controller.product.viewcommand.ItemRecommendViewCommand;
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
-<<<<<<< HEAD
-import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
-=======
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 
 /**
@@ -142,28 +116,21 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemDetailManager										itemDetailManager;
 	
 	@Autowired
-<<<<<<< HEAD
+
 	private ItemRecommandManager                                    itemRecommandManager;
 	
 	@Autowired
 	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
-	@Autowired
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter							breadcrumbsViewCommandConverter;
 	
-<<<<<<< HEAD
 	@Autowired
 	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
 	
-	
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	/**
 	 * 构造PdpViewCommand
 	 * @throws IllegalItemStateException 
