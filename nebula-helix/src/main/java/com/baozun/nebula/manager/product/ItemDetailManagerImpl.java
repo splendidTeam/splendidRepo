@@ -66,8 +66,8 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.feilong.core.Validator;
 import com.google.gson.Gson;
 
 /**
@@ -457,10 +457,12 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 				}
 				generalPropCommand.setProperty(property);
 				if(Validator.isNotNullOrEmpty(generalGroupPropMap)&&
+						Validator.isNotNullOrEmpty(generalGroupPropMap.get(groupName))&&
 						generalGroupPropMap.get(groupName).contains(generalPropCommand)){
 					continue ;
 				}else{
-					generalPropCommandList = Validator.isNullOrEmpty(generalGroupPropMap) ? new ArrayList<DynamicPropertyCommand>() :
+					generalPropCommandList = Validator.isNullOrEmpty(generalGroupPropMap)||Validator.isNullOrEmpty(generalGroupPropMap.get(groupName))
+							? new ArrayList<DynamicPropertyCommand>() :
 						generalGroupPropMap.get(groupName);
 				}
 				generalPropCommandList.add(generalPropCommand);

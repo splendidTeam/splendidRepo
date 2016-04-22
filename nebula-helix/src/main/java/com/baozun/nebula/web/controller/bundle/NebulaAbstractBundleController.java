@@ -33,9 +33,6 @@ package com.baozun.nebula.web.controller.bundle;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.baozun.nebula.command.bundle.BundleCommand;
 import com.baozun.nebula.command.bundle.BundleElementCommand;
 import com.baozun.nebula.command.bundle.BundleItemCommand;
@@ -54,38 +51,36 @@ import com.baozun.nebula.web.controller.product.NebulaBasePdpController;
  */
 public abstract class NebulaAbstractBundleController extends NebulaBasePdpController {
 	
-	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaAbstractBundleController.class);
-
 	/**
-	 * 构造商品详情页面捆绑类商品视图层对象
+	 * 构造商品详情页面捆绑类商品视图模型
 	 * @param bundleCommands
 	 * @return
 	 */
 	protected abstract List<BundleViewCommand> buildBundleViewCommandForPDP(List<BundleCommand> bundleCommands);
 	
 	/**
-	 * 构造捆绑类商品页面捆绑类商品视图层对象
+	 * 构造捆绑类商品页面捆绑类商品视图模型
 	 * @param bundleCommand
 	 * @return
 	 */
 	protected abstract BundleViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand);
 	
 	/**
-	 * 构造捆绑类商品成员的视图层对象
+	 * 构造捆绑类商品成员的视图模型
 	 * @param bundleElementCommands
 	 * @return
 	 */
 	protected abstract List<BundleElementViewCommand> buildBundleElementViewCommand(List<BundleElementCommand> bundleElementCommands);
 	
 	/**
-	 * 构造捆绑类商品中的商品的视图层对象
+	 * 构造捆绑类商品中的商品的视图模型
 	 * @param bundleItemCommands
 	 * @return 
 	 */
 	protected abstract List<BundleItemViewCommand> buildBundleItemViewCommand(List<BundleItemCommand> bundleItemCommands);
 	
 	/**
-	 * 构造捆绑类商品SKU的视图层对象
+	 * 构造捆绑类商品SKU的视图模型
 	 * @param bundleSkuCommand
 	 * @return 
 	 */
