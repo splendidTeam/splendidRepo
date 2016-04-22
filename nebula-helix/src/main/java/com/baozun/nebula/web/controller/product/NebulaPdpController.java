@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
@@ -101,7 +102,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		
 		
-		pdpViewCommand.setSizeCompareChart(buildSizeCompareChart(pdpViewCommand.getItemBaseInfo().getId()));
+		pdpViewCommand.setSizeCompareChart(buildSizeCompareChart(pdpViewCommand.getBaseInfo().getId()));
 		model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 		return VIEW_PRODUCT_DETAIL;
 	}
@@ -173,8 +174,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult showItemReview(@RequestParam("itemId") Long itemId, @ModelAttribute("page") PageForm pageForm, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		Date current = new Date();
-		LOG.debug("[PDP_SHOW_ITEM_REVIEW]request start...[ItemId:{},CurrentPage:{},Sort:{}],{}",itemId,pageForm.getCurrentPage(),pageForm.getSort(),current);
+		LOG.debug("[PDP_SHOW_ITEM_REVIEW]ItemId:{},CurrentPage:{},Sort:{} [{}] \"{}\"",itemId,pageForm.getCurrentPage(),pageForm.getSort(),new Date(),this.getClass().getSimpleName());
 		
 		Pagination<RateCommand> rates = itemRateManager.findItemRateListByItemId(pageForm.getPage(), itemId, pageForm.getSorts());
 		
@@ -187,7 +187,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		model.addAttribute("itemReviewViewCommands", itemReviewViewCommands);
 		
-		LOG.debug("[PDP_SHOW_ITEM_REVIEW]request end...[ItemId:{},CurrentPage:{},Sort:{}],{}",itemId,pageForm.getCurrentPage(),pageForm.getSort(),new Date().getTime()-current.getTime());
 		return new DefaultReturnResult();
 	}
 	
@@ -235,9 +234,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Integer getBuyLimit(Long itemId) {
-		// TODO Auto-generated method stub
-		return DEFAULT_SKU_BUY_LIMIT;
+	protected Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand) {
+		return itemDetailManager.getItemBuyLimited(itemBuyLimitedCommand, DEFAULT_SKU_BUY_LIMIT);
 	}
 
 
@@ -254,8 +252,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Double getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode).doubleValue();
+	protected Float getItemRate(String itemCode) {
+		return itemDetailManager.findItemAvgReview(itemCode);
 	}
 
 

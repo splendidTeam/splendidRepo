@@ -17,32 +17,23 @@
 package com.baozun.nebula.web.controller.product.resolver;
 
 import java.util.List;
+import java.util.Map;
 
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 
 /**   
- * 
- * 构造销售属性和一般属性
- * <p>
- * 		1.到款：颜色作为一个多选的属性，从数据库里取，图片从图片管理里取
- * </p>
- * <p>
- * 		2.到色：颜色作为一个单选的属性，图片也从图片管理里取，但额外补充同款其他商品(itemColorSwatches)
- * </p>
- * 
+ * 获取颜色小色块
  * @Description 
  * @author dongliang ma
- * @date 2016年4月20日 上午11:37:08 
+ * @date 2016年4月21日 上午11:22:32 
  * @version   
  */
-public interface ItemPropertyViewCommandResolver {
+public interface ColorSwatchResolver {
+
 	/**
-	 * 根据baseInfoViewCommand(至少包含itemId、itemCode)、images(图片信息)构造ViewCommand
-	 * @param baseInfoViewCommand
-	 * @param imageViewCommands
+	 * @param imageViewCommands 商品图片
 	 * @return
 	 */
-	ItemPropertyViewCommand resolve(ItemBaseInfoViewCommand baseInfoViewCommand, List<ItemImageViewCommand> imageViewCommands);
+	Map<Long, ImageViewCommand> resolve(List<ItemImageViewCommand> imageViewCommands);
 }

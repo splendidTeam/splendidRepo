@@ -28,13 +28,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.product.converter.InventoryViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.SkuViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PriceViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
@@ -65,6 +71,16 @@ public abstract class NebulaBasePdpController extends BaseController {
 	@Autowired
 	@Qualifier("skuViewCommandConverter")
 	private SkuViewCommandConverter skuViewCommandConverter;
+	
+	@Autowired
+	private InventoryViewCommandConverter inventoryViewCommandConverter;
+	
+	@Autowired
+	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	
+	@Autowired
+	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	
 
 	/**
 	 * 构造商品基本信息
@@ -105,17 +121,8 @@ public abstract class NebulaBasePdpController extends BaseController {
 	 * @return
 	 */
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
-		List<InventoryViewCommand> inventoryViewCommands = new ArrayList<InventoryViewCommand>();
 		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
-		if(Validator.isNotNullOrEmpty(skuCommands)){
-			for(SkuCommand skuCommand:skuCommands){
-				InventoryViewCommand inventoryViewCommand = new InventoryViewCommand();
-				BeanUtils.copyProperties(skuCommand, inventoryViewCommand);
-				inventoryViewCommand.setSkuId(skuCommand.getId());
-				inventoryViewCommands.add(inventoryViewCommand);
-			}
-		}
-		return inventoryViewCommands;
+		return inventoryViewCommandConverter.convert(skuCommands);
 	}
 	
 	/**
@@ -166,5 +173,31 @@ public abstract class NebulaBasePdpController extends BaseController {
 		priceViewCommand.setSkuMinSalesPrice(skuMinSalesPrice);
 		priceViewCommand.setSkuMaxSalesPrice(skuMaxSalesPrice);
 		return priceViewCommand;
+	}
+	
+	/**
+	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>
+	 * 此方法在构造销售颜色属性信息时，将需要商品图片信息，
+	 * 所以，之前需先获取商品图片(不一定有颜色属性，但无论如何必须先取图片)
+	 * @param itemId
+	 * @return
+	 */
+	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
+			List<ItemImageViewCommand> images) {
+		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
+	}
+	
+	/**
+	 * 构造商品的图片
+	 * @param itemId
+	 * @return
+	 */
+	protected List<ItemImageViewCommand> buildItemImageViewCommand(Long itemId) {
+		// 查询结果
+		List<Long> itemIds = new ArrayList<Long>();
+		itemIds.add(itemId);
+		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
+		// 数据转换
+		return itemImageViewCommandConverter.convert(itemImageList);
 	}
 }

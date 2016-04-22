@@ -34,6 +34,7 @@ package com.baozun.nebula.dao.bundle;
 import java.util.List;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -57,7 +58,7 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	 * @return
 	 */
 	@NativeQuery(model = BundleCommand.class)
-	List<BundleCommand> findBundlesByItemId(Long itemId, Integer lifecycle);
+	List<BundleCommand> findBundlesByItemId(@QueryParam("itemId")Long itemId, @QueryParam("lifecycle")Integer lifecycle);
 	
 	/**
 	 * 根据主卖品的商品款号查询捆绑类商品信息
@@ -66,10 +67,10 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	 * @return
 	 */
 	@NativeQuery(model = BundleCommand.class)
-	List<BundleCommand> findBundlesByStyle(String style, Integer lifecycle);
+	List<BundleCommand> findBundlesByStyle(@QueryParam("style")String style, @QueryParam("lifecycle")Integer lifecycle);
 	
 	@NativeQuery(model = BundleCommand.class)
-	BundleCommand findBundlesById(Long id, Integer lifecycle);
+	BundleCommand findBundlesById(@QueryParam("id")Long id, @QueryParam("lifecycle")Integer lifecycle);
 	
 	@NativeQuery(model = BundleCommand.class)
 	Pagination<BundleCommand> findBundlesByPage(Page page ,Sort[] sort);

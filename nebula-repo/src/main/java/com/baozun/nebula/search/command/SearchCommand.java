@@ -1,5 +1,7 @@
 package com.baozun.nebula.search.command;
 
+import java.util.List;
+
 import com.baozun.nebula.search.FacetParameter;
 
 public class SearchCommand {
@@ -21,7 +23,7 @@ public class SearchCommand {
 	/**
 	 * 后端查询参数（solr.fq）,从这个值里面体现filterquery之间的关系
 	 */
-	private FacetParameter	facetParameter;
+	private List<FacetParameter>	facetParameters;
 	/**
 	 * 排序
 	 */
@@ -63,11 +65,13 @@ public class SearchCommand {
 	public void setFilterConditionStr(String filterConditionStr) {
 		this.filterConditionStr = filterConditionStr;
 	}
-	public FacetParameter getFacetParameter() {
-		return facetParameter;
+
+	
+	public List<FacetParameter> getFacetParameters() {
+		return facetParameters;
 	}
-	public void setFacetParameter(FacetParameter facetParameter) {
-		this.facetParameter = facetParameter;
+	public void setFacetParameters(List<FacetParameter> facetParameters) {
+		this.facetParameters = facetParameters;
 	}
 	public void setSortStr(String sortStr) {
 		this.sortStr = sortStr;

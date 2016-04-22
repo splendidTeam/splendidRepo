@@ -3,6 +3,7 @@ package com.baozun.nebula.manager.bundle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +78,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			removeInvalidBundle(bundles);
 		} else {
 			LOG.error("find bundles is null");
-			LOG.error("itemId : [{}]  showMainElementFlag : [{}]  lifeCycle : [{}]", itemId, 1);
+			LOG.error("itemId : [{}]  showMainElementFlag : {}  lifeCycle : {}  [{}]", itemId, 1 , new Date());
 		}
 
 		return bundles;
@@ -90,6 +91,24 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		fillBundleCommand(bundle);
 		return bundle;
 	}
+	
+	@Override
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts) {
+		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
+		List<BundleCommand> bundles = pagination.getItems();
+		if (bundles != null) {
+			// 2 填充bundleCommand的基本信息
+			fillBundleCommandList(bundles);
+			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
+			removeInvalidBundle(bundles);
+		} else {
+			LOG.error("find bundles is null");
+			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
+		}
+		pagination.setItems(bundles);
+		return pagination;
+	}
+
 
 	@Override
 	@Transactional(readOnly = true)
@@ -221,23 +240,6 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		}
 	}
 
-	@Override
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts) {
-		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
-		List<BundleCommand> bundles = pagination.getItems();
-		if (bundles != null) {
-			// 2 填充bundleCommand的基本信息
-			fillBundleCommandList(bundles);
-			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			removeInvalidBundle(bundles);
-		} else {
-			LOG.error("find bundles is null");
-			LOG.error("parametar : page [{}]  sorts[{}]", JsonUtil.format(page), JsonUtil.format(sorts));
-		}
-		pagination.setItems(bundles);
-		return pagination;
-	}
-
 	/**
 	 * <h3>剔除掉无效的bundle</h3>
 	 * <ul>
@@ -246,7 +248,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * 
 	 * @param bundles
 	 */
-	public void removeInvalidBundle(List<BundleCommand> bundles) {
+	private void removeInvalidBundle(List<BundleCommand> bundles) {
 		Iterator<BundleCommand> iterator = bundles.iterator();
 		while (iterator.hasNext()) {
 			boolean removeFlag = false;
@@ -260,6 +262,12 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 						// lifecycle == 1 上架
 						if (item.getLifecycle().intValue() != 1) {
 							removeFlag = true;
+							LOG.debug("*******************************************************");
+							LOG.debug("current bundle info : {}  [{}]" , JsonUtil.format(bundle) ,new Date());
+							LOG.debug("current BundleElementCommand info : {} [{}]" , JsonUtil.format(bundleElementCommand) , new Date());
+							LOG.debug("current bundleItemCommand info : {} [{}]" , JsonUtil.format(bundleItemCommand), new Date());
+							LOG.debug("current item info : {} [{}]" , JsonUtil.format(item) , new Date());
+							LOG.debug("*******************************************************");
 							break;
 						}
 					}
@@ -459,26 +467,35 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			ConvertUtils.convertTwoObject(skuCommand, sku);
 
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
+			skuCommand.setProperties(skuu.getProperties());
+			skuCommand.setExtentionCode(skuu.getOutid());
+			
 			// 定制价格 一口价（）
 			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
 					|| bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
-				skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 				skuCommand.setSalesPrice(sku.getSalesPrice());
 			}
 			// 按照实际价格
 			if (bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
-				skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 				skuCommand.setSalesPrice(skuu.getSalePrice());
 			}
+			skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
 			skuCommand.setListPrice(skuu.getListPrice());
-			//不需要同步扣减单品库存 并且 捆绑数量不为空 ,那么skuCommand的quantity就取 bundle的availableQty
-			//否则,skuCommand的quantity就取单品本身的库存
-			if(!bundle.getSyncWithInv() && bundle.getAvailableQty() != null){
-				skuCommand.setQuantity(bundle.getAvailableQty());
-			}else{
-				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
-				skuCommand.setQuantity(inventory.getAvailableQty());
+			
+			Integer availableQty = bundle.getAvailableQty();
+			// 如果捆绑装单独维护了库存
+			if(availableQty != null) {
+				// 如果不需要同步扣减单品库存 ,那么就以捆绑装设置的库存为准；否则取捆绑装库存与sku实际可用库存的最小值
+				if(!bundle.getSyncWithInv()){
+					skuCommand.setQuantity(availableQty);
+				}else{
+					skuCommand.setQuantity(Math.min(availableQty, sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty()));
+				}
+			} else {
+				skuCommand.setQuantity(sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty());
 			}
+			
+			bundleSkus.add(skuCommand);
 		}
 
 		return bundleSkus;

@@ -17,32 +17,31 @@
 package com.baozun.nebula.web.controller.product.resolver;
 
 import java.util.List;
+import java.util.Map;
 
+import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
-/**   
- * 
- * 构造销售属性和一般属性
- * <p>
- * 		1.到款：颜色作为一个多选的属性，从数据库里取，图片从图片管理里取
- * </p>
- * <p>
- * 		2.到色：颜色作为一个单选的属性，图片也从图片管理里取，但额外补充同款其他商品(itemColorSwatches)
- * </p>
- * 
+/**
+ * 构造有序的ElementView
  * @Description 
  * @author dongliang ma
- * @date 2016年4月20日 上午11:37:08 
+ * @date 2016年4月21日 上午11:13:04 
  * @version   
  */
-public interface ItemPropertyViewCommandResolver {
+public interface SortAndConstructElementViewResolver {
+	
 	/**
-	 * 根据baseInfoViewCommand(至少包含itemId、itemCode)、images(图片信息)构造ViewCommand
-	 * @param baseInfoViewCommand
-	 * @param imageViewCommands
+	 * 构造有序的ElementView解决方案
+	 * @param baseInfoViewCommand (至少包含itemId、itemCode)
+	 * @param dynamicPropertyCommandList
+	 * @param colorswatchMap
 	 * @return
 	 */
-	ItemPropertyViewCommand resolve(ItemBaseInfoViewCommand baseInfoViewCommand, List<ItemImageViewCommand> imageViewCommands);
+	List<PropertyElementViewCommand> resolve(ItemBaseInfoViewCommand baseInfoViewCommand,
+            List<DynamicPropertyCommand> dynamicPropertyCommandList,
+            Map<Long, ImageViewCommand> colorswatchMap);
+	
 }

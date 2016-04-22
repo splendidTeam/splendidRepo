@@ -34,6 +34,7 @@ package com.baozun.nebula.dao.bundle;
 import com.baozun.nebula.model.bundle.BundleElement;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
 /**
@@ -45,6 +46,6 @@ import loxia.dao.GenericEntityDao;
 public interface BundleElementDao extends GenericEntityDao<BundleElement, Long> {
 	
 	@NativeQuery(model = BundleElement.class)
-	BundleElement findById(Long id);
+	BundleElement findById(@QueryParam("id")Long id);
 	
 }

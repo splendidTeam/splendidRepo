@@ -36,7 +36,7 @@ public class ItemExtraViewCommand extends BaseViewCommand {
 	private Long reviewCount;
 	
 	/** 商品评分     .*/
-	private Double rate;
+	private Float rate;
 
 	public Long getSales() {
 		return sales;
@@ -54,20 +54,65 @@ public class ItemExtraViewCommand extends BaseViewCommand {
 		this.favoriteCount = favoriteCount;
 	}
 
-	public Double getRate() {
-		return rate;
-	}
-
-	public void setRate(Double rate) {
-		this.rate = rate;
-	}
-
 	public Long getReviewCount() {
 		return reviewCount;
 	}
 
 	public void setReviewCount(Long reviewCount) {
 		this.reviewCount = reviewCount;
+	}
+
+	public Float getRate() {
+		return rate;
+	}
+
+	public void setRate(Float rate) {
+		this.rate = rate;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((favoriteCount == null) ? 0 : favoriteCount.hashCode());
+		result = prime * result + ((rate == null) ? 0 : rate.hashCode());
+		result = prime * result
+				+ ((reviewCount == null) ? 0 : reviewCount.hashCode());
+		result = prime * result + ((sales == null) ? 0 : sales.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemExtraViewCommand other = (ItemExtraViewCommand) obj;
+		if (favoriteCount == null) {
+			if (other.favoriteCount != null)
+				return false;
+		} else if (!favoriteCount.equals(other.favoriteCount))
+			return false;
+		if (rate == null) {
+			if (other.rate != null)
+				return false;
+		} else if (!rate.equals(other.rate))
+			return false;
+		if (reviewCount == null) {
+			if (other.reviewCount != null)
+				return false;
+		} else if (!reviewCount.equals(other.reviewCount))
+			return false;
+		if (sales == null) {
+			if (other.sales != null)
+				return false;
+		} else if (!sales.equals(other.sales))
+			return false;
+		return true;
 	}
 	
 }

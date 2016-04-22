@@ -33,7 +33,6 @@ package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
@@ -46,6 +45,10 @@ public class BundleElementViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = 2340192122967455038L;
 	
+	/**
+	 * elementId
+	 */
+	private Long id;
 	/**
 	 * 最小吊牌价
 	 */
@@ -85,11 +88,6 @@ public class BundleElementViewCommand extends BaseViewCommand {
 	 * 捆绑类商品成员中包含的商品
 	 */
 	private List<BundleItemViewCommand> bundleItemViewCommands;
-	
-	/**
-	 * 扩展信息
-	 */
-	private Map<String, Object> extendedInfo;
 	
 	public BigDecimal getMinListPrice() {
 		return minListPrice;
@@ -155,12 +153,12 @@ public class BundleElementViewCommand extends BaseViewCommand {
 		this.bundleItemViewCommands = bundleItemViewCommands;
 	}
 
-	public Map<String, Object> getExtendedInfo() {
-		return extendedInfo;
+	public Long getId() {
+		return id;
 	}
 
-	public void setExtendedInfo(Map<String, Object> extendedInfo) {
-		this.extendedInfo = extendedInfo;
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 }
