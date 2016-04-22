@@ -84,11 +84,29 @@ public abstract class NebulaBasePdpController extends BaseController {
 
 	/**
 	 * 构造商品基本信息
+	 * @param itemCode 商品编码
+	 * @return ItemBaseInfoViewCommand
+	 */
+	protected ItemBaseInfoViewCommand buildItemBaseInfoViewCommand(String itemCode) {
+		
+		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
+		
+		ItemBaseCommand itemBaseCommand = itemDetailManager.findItemBaseInfoByCode(itemCode);
+		if(itemBaseCommand != null){
+			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
+		}
+		
+		return itemBaseInfoViewCommand;
+	}
+	
+	/**
+	 * 构造商品基本信息
 	 * 这个方法不用考虑pdp显示模式的问题，因为基本信息对于几种模式取法是一样的
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemBaseInfoViewCommand buildProductBaseInfoViewCommand(Long itemId) {
+	@Deprecated
+	protected ItemBaseInfoViewCommand buildItemBaseInfoViewCommand(Long itemId) {
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
 		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
 		if(itemBaseCommand!=null){

@@ -72,6 +72,7 @@ import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.feilong.core.Validator;
@@ -223,14 +224,17 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	/**
 	 * 构造捆绑商品详情页视图对象
 	 * <p>
-	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等
+	 * bundle本身作为无属性类商品
+	 * </p>
+	 * <p>
+	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等.
 	 * </p>
 	 * 
 	 */
 	@Override
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
 		//bundle 商品的lifecycle状态
-		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildProductBaseInfoViewCommand(bundleCommand.getItemId());
+		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
 		if(itemBaseInfoViewCommand.getLifecycle()!=1){
 			LOG.info("Bundle error...bundleLifecycle is not active;Lifecycle:{} [{}]",itemBaseInfoViewCommand.getLifecycle(),new Date());
 			return null;
@@ -250,7 +254,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		//TODO 调用NebulaBasePdpController中的build方法
 		bundleDetailViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
 		bundleDetailViewCommand.setItemExtraViewCommand(null);
-		bundleDetailViewCommand.setItemImageViewCommand(null);
+		bundleDetailViewCommand.setItemImageViewCommands(buildItemImageViewCommand(bundleCommand.getItemId()));
 		bundleDetailViewCommand.setItemReviewViewCommand(null);
 		return bundleDetailViewCommand;
 	}
@@ -313,12 +317,12 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 			command.setImages(buildItemImageViewCommand(itemId));
 			
 			// 设置商品标题
-			ItemBaseInfoViewCommand itemViewCommand = buildProductBaseInfoViewCommand(itemId);
+			ItemBaseInfoViewCommand itemViewCommand = buildItemBaseInfoViewCommand(itemId);
 			command.setTitle(itemViewCommand.getTitle());
 			command.setSubTitle(itemViewCommand.getSubTitle());
 			
 			// 加载商品销售属性
-			ItemPropertyViewCommand itemPropertyViewCommand = buildItemPropertyViewCommand(buildProductBaseInfoViewCommand(itemId), buildItemImageViewCommand(itemId));
+			ItemPropertyViewCommand itemPropertyViewCommand = buildItemPropertyViewCommand(buildItemBaseInfoViewCommand(itemId), buildItemImageViewCommand(itemId));
 			command.setSalesProperties(itemPropertyViewCommand.getSalesProperties());
 			
 			// 加载sku
