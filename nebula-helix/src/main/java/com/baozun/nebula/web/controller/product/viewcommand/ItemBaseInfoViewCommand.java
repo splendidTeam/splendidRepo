@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
@@ -59,11 +60,14 @@ public class ItemBaseInfoViewCommand extends BaseViewCommand {
     /** 商品详细描述. */
     private String description;
     
-    /** 商品类型. */
+    /** 商品类型(0代表赠品, 1代表主卖品). */
 	private Integer type;
 	
 	/** 分组style */
 	private String style;
+	
+	/** 商品激活开始时间(用于定时上架的商品). */
+	private Date activeBeginTime;
 	
     /** seo搜索描述. */
     private String seoDescription;
@@ -165,6 +169,14 @@ public class ItemBaseInfoViewCommand extends BaseViewCommand {
 
 	public void setStyle(String style) {
 		this.style = style;
+	}
+
+	public Date getActiveBeginTime() {
+		return activeBeginTime;
+	}
+
+	public void setActiveBeginTime(Date activeBeginTime) {
+		this.activeBeginTime = activeBeginTime;
 	}
 
 	public BigDecimal getSalePrice() {
