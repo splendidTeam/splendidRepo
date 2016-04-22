@@ -31,6 +31,7 @@
 */
 package com.baozun.nebula.web.controller.bundle;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,6 +55,8 @@ import com.baozun.nebula.command.bundle.BundleElementCommand;
 import com.baozun.nebula.command.bundle.BundleItemCommand;
 import com.baozun.nebula.command.bundle.BundleSkuCommand;
 import com.baozun.nebula.manager.bundle.NebulaBundleManager;
+import com.baozun.nebula.web.bind.ArrayCommand;
+import com.baozun.nebula.web.command.BundleValidateResult;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -190,6 +193,22 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 
 		return result;
 	}
+	
+	/**
+	 * 
+	  * bundle的异步校验
+	  * 返回值 . 参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}
+	 */
+	public NebulaReturnResult validatorBundle(@RequestParam("bundleId") Long bundleId,@RequestParam("quantity") int quantity,@ArrayCommand(dataBind = true) Long[] skuIds, HttpServletRequest request,
+			HttpServletResponse response, Model model){
+		DefaultReturnResult result = new DefaultReturnResult();
+		result.setResult(true);
+		result.setStatusCode(String.valueOf(HttpStatus.OK));
+		List<Long> skuList = Arrays.asList(skuIds);
+		BundleValidateResult validateBundle = nebulaBundleManager.validateBundle(bundleId, skuList, quantity);
+		result.setReturnObject(validateBundle);
+		return result;
+	}
 
 	/**
 	 * 构造商品详情页面捆绑类商品视图层对象
@@ -217,12 +236,11 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 
 	/**
 	 * 构造捆绑商品详情页视图对象
-	 * <p>
-	 * bundle本身作为无属性类商品
-	 * </p>
-	 * <p>
-	 * 默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等.
-	 * </p>
+	 * <ul>
+	 * <li>bundle本身作为无属性类商品。</li>
+	 * <li>默认只显示正常上架的bundle，如果需要预览未上架、下架bundle</li>
+	 * <li>默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等.</li>
+	 * </ul>
 	 * 
 	 */
 	@Override
