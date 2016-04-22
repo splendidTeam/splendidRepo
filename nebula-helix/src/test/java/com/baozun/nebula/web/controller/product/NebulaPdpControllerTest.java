@@ -47,7 +47,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand
  * 
  * @author chengchao
  */
-@SuppressWarnings("unused")
 public class NebulaPdpControllerTest extends BaseControllerTest{
 
 
