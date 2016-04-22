@@ -138,14 +138,9 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		//查询bundle的所有相关信息
 		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
 		
-		if(command == null){//bundle不存在
-			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
-			return result ;
-		}
-
-		//bundle本身就是一个特殊的商品
 		Item bundleItem = itemDao.findItemById(command.getItemId());
-		if(bundleItem == null){//bundle不存在
+		
+		if(bundleItem == null || command == null){//bundle不存在
 			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
 			return result ;
 		}
