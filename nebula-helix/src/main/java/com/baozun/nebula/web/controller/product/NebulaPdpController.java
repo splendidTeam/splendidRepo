@@ -55,9 +55,9 @@ import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 <<<<<<< HEAD
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
@@ -143,7 +143,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		return new DefaultReturnResult();
+		model.addAttribute("inventoryViewCommands", super.buildInventoryViewCommand(itemId));
+		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**

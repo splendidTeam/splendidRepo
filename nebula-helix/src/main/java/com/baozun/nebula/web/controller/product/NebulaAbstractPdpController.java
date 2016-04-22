@@ -96,6 +96,12 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品推荐的模式  模式一, 自定义 需要商城自己实现. [value: recommend_mode_custom] */
 	public static final String RECOMMEND_MODE_CUSTOM 			= "recommend_mode_custom";
 	
+	/** 商品推荐的模式  模式一, 后台配置. [value: recommend_mode_general] */
+	public static final String RECOMMEND_MODE_GENERAL 			    = "recommend_mode_general";
+	
+	/** 商品推荐的模式  模式一, 自定义 需要商城自己实现. [value: recommend_mode_custom] */
+	public static final String RECOMMEND_MODE_CUSTOM 			= "recommend_mode_custom";
+	
 	// 每个sku默认最大购买的数量
 	/** 每个sku默认最大购买的数量. [value: 6] */
 	public static final Integer 	DEFAULT_SKU_BUY_LIMIT 				= 6;
@@ -122,7 +128,11 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	@Autowired
 	private ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
+
+	private ItemRecommandManager                                    itemRecommandManager;
 	
+	@Autowired
+	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
@@ -271,7 +281,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 		
 		return itemRecommendList;
- 
+
 	}
 	
 	protected abstract List<RelationItemViewCommand> customBuildItemRecommendViewCommand(Long itemId);
