@@ -47,6 +47,10 @@ public class BundleValidateResult implements Serializable {
 		this.itemId = itemId;
 		this.skuId = skuId;
 	}
+	
+	public BundleValidateResult() {
+	
+	}
 
 	public int getType() {
 		return type;
