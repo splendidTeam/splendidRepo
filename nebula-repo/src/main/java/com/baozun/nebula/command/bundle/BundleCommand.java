@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.Bundle;
-import com.baozun.nebula.model.product.Item;
-import com.baozun.nebula.model.product.Sku;
 /**
  * 
   * @ClassName: BundleCommand
