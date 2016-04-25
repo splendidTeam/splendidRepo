@@ -76,7 +76,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	private InventoryViewCommandConverter inventoryViewCommandConverter;
 	
 	@Autowired
-	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	protected ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Autowired
 	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;

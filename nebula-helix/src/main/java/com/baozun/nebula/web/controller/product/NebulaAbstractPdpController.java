@@ -48,7 +48,6 @@ import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommand
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
-import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
@@ -127,9 +126,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	private ItemRecommandManager itemRecommandManager;
 	
-	@Autowired
-	private ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
-
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
