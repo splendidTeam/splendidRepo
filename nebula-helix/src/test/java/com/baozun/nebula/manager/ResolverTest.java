@@ -144,13 +144,14 @@ public class ResolverTest {
 		
 		
 		ItemImageViewCommand itemImageViewCommand =new ItemImageViewCommand();
+		itemImageViewCommand.setColorItemPropertyId(57571l);
 		itemImageViewCommand.setItemId(14060L);
 		Map<String, List<ImageViewCommand>> imagesMap =new HashMap<String, List<ImageViewCommand>>();
 		List<ImageViewCommand> imageViewCommands =new ArrayList<ImageViewCommand>();
 		ImageViewCommand imageViewCommand =new ImageViewCommand();
 		imageViewCommand.setUrl("http://www.baidu.com");
 		imageViewCommands.add(imageViewCommand);
-		imagesMap.put("sss", imageViewCommands);
+		imagesMap.put("IMG_TYPE_COLOR", imageViewCommands);
 		itemImageViewCommand.setImages(imagesMap);
 		images.add(itemImageViewCommand);
 		

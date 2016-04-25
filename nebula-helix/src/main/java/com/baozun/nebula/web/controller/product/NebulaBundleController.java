@@ -29,7 +29,7 @@
 *
  
 */
-package com.baozun.nebula.web.controller.bundle;
+package com.baozun.nebula.web.controller.product;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -50,27 +50,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
-import com.baozun.nebula.command.bundle.BundleItemCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.manager.bundle.NebulaBundleManager;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.manager.product.NebulaBundleManager;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.bundle.convert.BundleElementViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleItemViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleSkuViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleDetailViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.converter.BundleElementViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleSkuViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleViewCommandConverter;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleDetailViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleElementViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleSkuViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyViewCommand;
@@ -169,8 +168,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	/**
 	 * 异步加载bundle信息
 	 * 
-	 * @RequestMapping(value = "/bundle/loadBundles.json", method =
-	 *                       RequestMethod.GET)
+	 * @RequestMapping(value = "/bundle/loadBundles.json", method = RequestMethod.GET)
+	 * @ResponseBody
 	 * 
 	 * @param itemId
 	 * @param request
@@ -186,7 +185,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		result.setStatusCode(String.valueOf(HttpStatus.OK));
 		
 		// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-		List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId);
+		List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
 		if (Validator.isNotNullOrEmpty(bundleCommands)) {
 			result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
 		}
@@ -211,7 +210,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造商品详情页面捆绑类商品视图层对象
+	 * 构造商品详情页面捆绑类商品视图模型
 	 * 
 	 * <p>
 	 * 一般情况下商品详情页面不需要加载捆绑类商品本身的商品描述、seo等扩展信息以及图片等， 
@@ -226,7 +225,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		}
 		
 		List<BundleViewCommand> result = bundleViewCommandConverter.convert(bundleCommands);
-		for(int i = 0; i <  result.size(); i++) {
+		for(int i = 0; i < result.size(); i++) {
 			BundleViewCommand command = result.get(i);
 			command.setBundleElementViewCommands(buildBundleElementViewCommand(bundleCommands.get(i).getBundleElementCommands()));
 		}
@@ -235,7 +234,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑商品详情页视图对象
+	 * 构造捆绑商品详情页视图模型
 	 * <ul>
 	 * <li>bundle本身作为无属性类商品。</li>
 	 * <li>默认只显示正常上架的bundle，如果需要预览未上架、下架bundle需要重构此方法</li>
@@ -245,11 +244,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 */
 	@Override
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
-		//校验bundle中item,sku的lifecycle状态
-		if(!bundleCommand.isEnabled()){
-			LOG.info("Bundle disable...have disable item or sku...... [{}]",new Date());
-			return null;
-		}
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
 		if(itemBaseInfoViewCommand.getLifecycle()!=1){
@@ -277,7 +271,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑类商品成员的视图层对象
+	 * 构造捆绑类商品成员的视图模型
 	 * 
 	 * <p>
 	 * 该方法的默认实现，包含如下信息，如果需要更多的数据，需要重写该方法。
@@ -318,7 +312,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑类商品中的商品的视图层对象
+	 * 构造捆绑类商品中的商品的视图模型
 	 * 
 	 * <p>
 	 * 该方法的默认实现，包含如下信息，如果需要更多的数据，需要重写该方法。
@@ -364,7 +358,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑类商品sku的视图层对象
+	 * 构造捆绑类商品sku的视图模型
 	 * 
 	 * <p>
 	 * 该方法的默认实现，包含如下的信息，如果需要更多的数据支持，需要重写该方法。

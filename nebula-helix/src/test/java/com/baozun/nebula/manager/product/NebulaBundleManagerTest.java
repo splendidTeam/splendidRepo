@@ -1,10 +1,7 @@
-package com.baozun.nebula.manager.bundle;
+package com.baozun.nebula.manager.product;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,9 +12,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.baozun.nebula.command.bundle.BundleCommand;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.tools.jsonlib.JsonUtil;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath*:loxia-hibernate-context.xml",
@@ -32,7 +32,7 @@ public class NebulaBundleManagerTest {
 	
 	@Test
 	public void testFindBundleCommandByItemId(){
-		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L);
+		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L ,false);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
 	}

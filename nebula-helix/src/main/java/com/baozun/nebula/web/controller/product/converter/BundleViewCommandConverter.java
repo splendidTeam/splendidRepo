@@ -29,39 +29,41 @@
 *
  
 */
-package com.baozun.nebula.web.controller.bundle.convert;
+package com.baozun.nebula.web.controller.product.converter;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
 
 /**
- * 捆绑类商品成员视图模型转换器
+ * 捆绑类商品视图模型转换器
  * @author yue.ch
- * @time 2016年4月21日
+ *
  */
-public class BundleElementViewCommandConverter extends BaseConverter<BundleElementViewCommand>{
+public class BundleViewCommandConverter extends BaseConverter<BundleViewCommand> {
 
-	private static final long serialVersionUID = -1953333026575350055L;
+	private static final long serialVersionUID = -2308896727474580410L;
 
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.web.controller.BaseConverter#convert(java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.baozun.nebula.web.controller.BaseConverter#convert(java.lang.Object)
 	 */
 	@Override
-	public BundleElementViewCommand convert(Object data) {
+	public BundleViewCommand convert(Object data) {
 		if (data == null) {
 			return null;
 		}
 		
-		if (data instanceof BundleElementCommand) {
-			BundleElementCommand bundleElementCommand = (BundleElementCommand) data;
-			return (BundleElementViewCommand)ConvertUtils.convertTwoObject(new BundleElementViewCommand(), bundleElementCommand);
+		if (data instanceof BundleCommand) {
+			BundleCommand bundleCommand = (BundleCommand) data;
+			return (BundleViewCommand)ConvertUtils.convertTwoObject(new BundleViewCommand(), bundleCommand);
 		} else {
 			throw new UnsupportDataTypeException(
-					data.getClass() + " cannot convert to " + BundleElementViewCommand.class + "yet.");
+					data.getClass() + " cannot convert to " + BundleViewCommand.class + "yet.");
 		}
 	}
 

@@ -29,41 +29,38 @@
 *
  
 */
-package com.baozun.nebula.web.controller.bundle.convert;
+package com.baozun.nebula.web.controller.product.converter;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.command.bundle.BundleCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleItemViewCommand;
 
 /**
- * 捆绑类商品视图模型转换器
+ * 捆绑类商品成员商品视图模型转换器
  * @author yue.ch
- *
+ * @time 2016年4月21日 下午2:20:40
  */
-public class BundleViewCommandConverter extends BaseConverter<BundleViewCommand> {
+public class BundleItemViewCommandConverter extends BaseConverter<BundleItemViewCommand>{
 
-	private static final long serialVersionUID = -2308896727474580410L;
+	private static final long serialVersionUID = 2469968187118747476L;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.baozun.nebula.web.controller.BaseConverter#convert(java.lang.Object)
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.web.controller.BaseConverter#convert(java.lang.Object)
 	 */
 	@Override
-	public BundleViewCommand convert(Object data) {
+	public BundleItemViewCommand convert(Object data) {
 		if (data == null) {
 			return null;
 		}
 		
-		if (data instanceof BundleCommand) {
-			BundleCommand bundleCommand = (BundleCommand) data;
-			return (BundleViewCommand)ConvertUtils.convertTwoObject(new BundleViewCommand(), bundleCommand);
+		if (data instanceof BundleItemCommand) {
+			BundleItemCommand bundleItemCommand = (BundleItemCommand) data;
+			return (BundleItemViewCommand)ConvertUtils.convertTwoObject(new BundleItemViewCommand(), bundleItemCommand);
 		} else {
 			throw new UnsupportDataTypeException(
-					data.getClass() + " cannot convert to " + BundleViewCommand.class + "yet.");
+					data.getClass() + " cannot convert to " + BundleItemViewCommand.class + "yet.");
 		}
 	}
 

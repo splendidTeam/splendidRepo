@@ -29,23 +29,24 @@
 *
  
 */
-package com.baozun.nebula.dao.bundle;
+package com.baozun.nebula.dao.product;
 
-import com.baozun.nebula.model.bundle.BundleElement;
+import java.util.List;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
+import com.baozun.nebula.model.bundle.BundleSku;
+
 /**
- * BundleElement Dao
+ * BundleSku Dao
  * 
  * @author yue.ch
  *
  */
-public interface BundleElementDao extends GenericEntityDao<BundleElement, Long> {
+public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	
-	@NativeQuery(model = BundleElement.class)
-	BundleElement findById(@QueryParam("id")Long id);
-	
+	@NativeQuery(model = BundleSku.class)
+	List<BundleSku> findByBundleId(@QueryParam("bundleId")Long bundleId);
 }

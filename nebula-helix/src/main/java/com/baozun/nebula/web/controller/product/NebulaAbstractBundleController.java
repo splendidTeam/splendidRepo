@@ -29,19 +29,18 @@
 *
  
 */
-package com.baozun.nebula.web.controller.bundle;
+package com.baozun.nebula.web.controller.product;
 
 import java.util.List;
 
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
-import com.baozun.nebula.command.bundle.BundleItemCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
-import com.baozun.nebula.web.controller.product.NebulaBasePdpController;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleElementViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleSkuViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
 
 /**
  * 捆绑类商品 controller

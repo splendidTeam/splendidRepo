@@ -1,30 +1,36 @@
 /**
  * 
  */
-package com.baozun.nebula.web.controller.bundle;
+package com.baozun.nebula.web.controller.product;
 
 import static org.junit.Assert.assertEquals;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
-import com.baozun.nebula.command.bundle.BundleItemCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.manager.bundle.NebulaBundleManager;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.manager.product.NebulaBundleManager;
+import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.BaseControllerTest;
-import com.baozun.nebula.web.controller.bundle.convert.BundleElementViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleItemViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleSkuViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConverter;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.baozun.nebula.web.controller.product.converter.BundleElementViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleSkuViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 public class NebulaBundleControllerTest extends BaseControllerTest{
 
@@ -33,6 +39,8 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 	
 	private NebulaBundleManager nebulaBundleManager;
 	
+	private SdkItemManager sdkItemManager;
+	
 	private BundleViewCommandConverter bundleViewCommandConverter;
 	
 	private BundleElementViewCommandConverter bundleElementViewCommandConverter;
@@ -40,6 +48,13 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 	private BundleItemViewCommandConverter bundleItemViewCommandConverter;
 	
 	private BundleSkuViewCommandConverter bundleSkuViewCommandConvert;
+	
+	private ItemImageViewCommandConverter itemImageViewCommandConverter;
+	
+	@Autowired
+	private ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
+	
+	
 	private BundleCommand bundleCommand;
 	
 	@Before
@@ -65,20 +80,27 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 		bundletBundleSkuCommands.add(bundleSkuCommand);
 		bundleItemCommand.setBundleSkus(bundletBundleSkuCommands);
 		bundletBundleItemCommands.add(bundleItemCommand);
+		bundleElementCommand.setItems(bundletBundleItemCommands);
 		bundleElementCommands.add(bundleElementCommand);
 		bundleCommand.setBundleElementCommands(bundleElementCommands);
 		
-		nebulaBundleManager=control.createMock("NebulaBundleManager", NebulaBundleManager.class);
+		sdkItemManager = control.createMock("sdkItemManager", SdkItemManager.class);
+		nebulaBundleManager=control.createMock("nebulaBundleManager", NebulaBundleManager.class);
+		itemPropertyViewCommandResolver=control.createMock("itemPropertyViewCommandResolver", ItemPropertyViewCommandResolver.class);
 		bundleViewCommandConverter=new BundleViewCommandConverter();
 		bundleElementViewCommandConverter=new BundleElementViewCommandConverter();
 		bundleItemViewCommandConverter=new BundleItemViewCommandConverter();
 		bundleSkuViewCommandConvert=new BundleSkuViewCommandConverter();
+		itemImageViewCommandConverter = new ItemImageViewCommandConverter();
 		
+		ReflectionTestUtils.setField(bebulabundBundleController, "sdkItemManager", sdkItemManager);
 		ReflectionTestUtils.setField(bebulabundBundleController, "nebulaBundleManager", nebulaBundleManager);
 		ReflectionTestUtils.setField(bebulabundBundleController, "bundleViewCommandConverter", bundleViewCommandConverter);
 		ReflectionTestUtils.setField(bebulabundBundleController, "bundleElementViewCommandConverter", bundleElementViewCommandConverter);
 		ReflectionTestUtils.setField(bebulabundBundleController, "bundleItemViewCommandConverter", bundleItemViewCommandConverter);
 		ReflectionTestUtils.setField(bebulabundBundleController, "bundleSkuViewCommandConvert", bundleSkuViewCommandConvert);
+		ReflectionTestUtils.setField(bebulabundBundleController, "itemImageViewCommandConverter", itemImageViewCommandConverter);
+		ReflectionTestUtils.setField(bebulabundBundleController, "itemPropertyViewCommandResolver", itemPropertyViewCommandResolver);
 	}
 
 	@Test
@@ -90,5 +112,14 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 		EasyMock.verify(nebulaBundleManager);
 	}
 	
-	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadBundleInfo(){
+		EasyMock.expect(nebulaBundleManager.findBundleCommandByItemId(4L)).andReturn(Arrays.asList(bundleCommand)).times(1);
+		control.replay();
+		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfo(4L, request, response, model);
+		System.out.println(JsonUtil.format(defaultReturnResult));
+		assertEquals(Long.valueOf(1), ((List<BundleViewCommand>)defaultReturnResult.getReturnObject()).get(0).getId());
+		control.verify();
+	}
 }
