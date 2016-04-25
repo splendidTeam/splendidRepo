@@ -77,7 +77,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		PropertyUtil.copyProperties(searchCommand, searchForm);
 
 		// 将 searchCommand 中 filterConditionStr 转成FacetParameter
-		seachParamProcess(searchCommand);
+		searchParamProcess(searchCommand);
 
 		// 创建solrquery对象
 		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);

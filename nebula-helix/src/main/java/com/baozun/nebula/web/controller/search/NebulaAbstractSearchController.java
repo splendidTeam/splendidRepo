@@ -29,7 +29,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	 * 
 	 * @param searchCommand
 	 */
-	public void seachParamProcess(SearchCommand searchCommand){
+	public void searchParamProcess(SearchCommand searchCommand){
 
 		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
 

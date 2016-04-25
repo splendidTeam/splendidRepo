@@ -250,22 +250,16 @@ public class FacetParameter {
 		this.facetType = facetType;
 	}
 
-	
-	/**
-	 * set name 
-	 * @param name
-	 */
-	public void setName(String name){
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	
-	/**
-	 * set values 
-	 * @param values
-	 */
-	public void setValues(List<String> values){
+	public void setValues(List<String> values) {
 		this.values = values;
+	}
+
+	public void setType(ParameterType type) {
+		this.type = type;
 	}
 	
 }

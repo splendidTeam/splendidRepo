@@ -10,35 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.easymock.EasyMock;
-import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.validation.BindingResult;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
-import com.baozun.nebula.event.EventPublisher;
-import com.baozun.nebula.manager.member.MemberExtraManager;
-import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
-import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseControllerTest;
-import com.baozun.nebula.web.controller.DefaultReturnResult;
-import com.baozun.nebula.web.controller.member.form.LoginForm;
-import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.baozun.nebula.web.controller.product.resolver.ColorSwatchResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolverImpl;
-import com.baozun.nebula.web.controller.product.resolver.SortAndConstructElementViewResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
@@ -60,41 +44,23 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 
 	private NebulaPdpController nebulaPdpController;
 	
-	@Autowired
 	private ItemDetailManager itemDetailManager;
 	
-	@Autowired
 	private ItemRateManager itemRateManager;
 	
 	@Autowired
 	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
-	@Autowired
-	private ColorSwatchResolver										colorSwatchResolver;
-	
-	@Autowired
-	private SortAndConstructElementViewResolver						sortAndConstructElementViewResolver;
-	
-	@Autowired
-	private ItemPropertyViewCommandResolverImpl						itemPropertyViewCommandResolverImpl;
-	
 	@Before
 	public void setUp(){
 		nebulaPdpController = new NebulaPdpController();
-		itemPropertyViewCommandResolverImpl =new ItemPropertyViewCommandResolverImpl();
 		itemDetailManager = control.createMock(ItemDetailManager.class);
 		itemRateManager = control.createMock(ItemRateManager.class);
-		colorSwatchResolver =control.createMock(ColorSwatchResolver.class);
-		sortAndConstructElementViewResolver =control.createMock(SortAndConstructElementViewResolver.class);
-		itemPropertyViewCommandResolver = new ItemPropertyViewCommandResolverImpl();
+//		itemPropertyViewCommandResolver =new ItemPropertyViewCommandResolverImpl();
 		
 		ReflectionTestUtils.setField(nebulaPdpController, "itemRateManager", itemRateManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemDetailManager", itemDetailManager);
-		ReflectionTestUtils.setField(itemPropertyViewCommandResolverImpl, "itemDetailManager", itemDetailManager);
-		ReflectionTestUtils.setField(itemPropertyViewCommandResolverImpl, "colorSwatchResolver", colorSwatchResolver);
-		ReflectionTestUtils.setField(itemPropertyViewCommandResolverImpl, "sortAndConstructElementViewResolver", sortAndConstructElementViewResolver);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemPropertyViewCommandResolver", itemPropertyViewCommandResolver);
-		
 	}
 
 	@Test
