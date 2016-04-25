@@ -39,6 +39,7 @@ import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
@@ -59,7 +60,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewComm
 import com.baozun.nebula.web.interceptor.browsingHistory.BrowsingHistoryResolver;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
-import com.baozun.nebula.model.product.ItemImage;
 
 
 /**
@@ -139,13 +139,10 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
 	
-<<<<<<< HEAD
     /** The browsing history resolver. */
     @Autowired
     private BrowsingHistoryResolver     browsingHistoryResolver;
 	
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	/**
 	 * 构造PdpViewCommand
 	 * @throws IllegalItemStateException 
