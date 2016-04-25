@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.Bundle;
+
+import com.baozun.nebula.command.bundle.BundleElementCommand;
 /**
  * 
   * @ClassName: BundleCommand
@@ -159,19 +161,9 @@ public class BundleCommand extends Bundle{
 	 */
 	public BigDecimal getMinOriginalSalesPrice(){
 		minOriginalSalesPrice = BigDecimal.ZERO;
-	    for (BundleElementCommand element : bundleElementCommands) {
-			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemTemp = BigDecimal.ZERO;
-			for (int i = 0 ; i< items.size(); i++) {
-				if(i == 0){
-					itemTemp = items.get(i).getMinOriginalSalesPrice();
-				}else{
-					if(itemTemp.compareTo(items.get(i).getMinOriginalSalesPrice()) == 1){
-						itemTemp = items.get(i).getMinOriginalSalesPrice();
-					}
-				}
-			}
-			minOriginalSalesPrice = minOriginalSalesPrice.add(itemTemp);
+	    for (BundleElementCommand elementCommand : bundleElementCommands) {
+			
+			minOriginalSalesPrice = minOriginalSalesPrice.add(elementCommand.getMinOriginalSalesPrice());
 		}
 	    	
 	    return minOriginalSalesPrice ;
@@ -185,19 +177,9 @@ public class BundleCommand extends Bundle{
 	 */   
 	public BigDecimal getMaxOriginalSalesPrice(){
 		maxOriginalSalesPrice = BigDecimal.ZERO;
-		for (BundleElementCommand element : bundleElementCommands) {
-			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemTemp = BigDecimal.ZERO;
-			for (int i = 0 ; i< items.size(); i++) {
-				if(i == 0){
-					itemTemp = items.get(i).getMaxOriginalSalesPrice();
-				}else{
-					if(itemTemp.compareTo(items.get(i).getMaxOriginalSalesPrice()) == -1){
-						itemTemp = items.get(i).getMaxOriginalSalesPrice();
-					}
-				}
-			}
-			maxOriginalSalesPrice = maxOriginalSalesPrice.add(itemTemp);
+		for (BundleElementCommand elementCommand : bundleElementCommands) {
+			
+			maxOriginalSalesPrice = maxOriginalSalesPrice.add(elementCommand.getMaxOriginalSalesPrice());
 		}
 	    	
 	    return maxOriginalSalesPrice ;
@@ -211,19 +193,9 @@ public class BundleCommand extends Bundle{
 	 */      
 	public BigDecimal getMinSalesPrice(){
 		minSalesPrice = BigDecimal.ZERO;
-		for (BundleElementCommand element : bundleElementCommands) {
-			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemTemp = BigDecimal.ZERO;
-			for (int i = 0 ; i< items.size(); i++) {
-				if(i == 0){
-					itemTemp = items.get(i).getMinSalesPrice();
-				}else{
-					if(itemTemp.compareTo(items.get(i).getMinSalesPrice()) == 1){
-						itemTemp = items.get(i).getMinSalesPrice();
-					}
-				}
-			}
-			minSalesPrice = minSalesPrice.add(itemTemp);
+		for (BundleElementCommand elementCommand : bundleElementCommands) {
+			
+			minSalesPrice = minSalesPrice.add(elementCommand.getMinSalesPrice());
 		}
 	    	
 	    return minSalesPrice ;
@@ -237,19 +209,9 @@ public class BundleCommand extends Bundle{
 	 */       
 	public BigDecimal getMaxSalesPrice(){
 		maxSalesPrice = BigDecimal.ZERO;
-		for (BundleElementCommand element : bundleElementCommands) {
-			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemTemp = BigDecimal.ZERO;
-			for (int i = 0 ; i< items.size(); i++) {
-				if(i == 0){
-					itemTemp = items.get(i).getMaxSalesPrice();
-				}else{
-					if(itemTemp.compareTo(items.get(i).getMaxSalesPrice()) == -1){
-						itemTemp = items.get(i).getMaxSalesPrice();
-					}
-				}
-			}
-			maxSalesPrice = maxSalesPrice.add(itemTemp);
+		for (BundleElementCommand elementCommand : bundleElementCommands) {
+			
+			maxSalesPrice = maxSalesPrice.add(elementCommand.getMaxSalesPrice());
 		}
 	    	
 	    return maxSalesPrice ;
@@ -263,19 +225,9 @@ public class BundleCommand extends Bundle{
 	 */   
 	public BigDecimal getMinListPrice() {
 		minListPrice = BigDecimal.ZERO ;
-		for (BundleElementCommand element : bundleElementCommands) {
-			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemTemp = BigDecimal.ZERO;
-			for (int i = 0 ; i< items.size(); i++) {
-				if(i == 0){
-					itemTemp = items.get(i).getMinListPrice();
-				}else{
-					if(itemTemp.compareTo(items.get(i).getMinListPrice()) == 1){
-						itemTemp = items.get(i).getMinListPrice();
-					}
-				}
-			}
-			minListPrice = minListPrice.add(itemTemp);
+		for (BundleElementCommand elementCommand : bundleElementCommands) {
+			
+			minListPrice = minListPrice.add(elementCommand.getMinListPrice());
 		}
 		return minListPrice;
 	}
@@ -288,15 +240,9 @@ public class BundleCommand extends Bundle{
 	 */   
 	public BigDecimal getMaxListPrice() {
 		maxListPrice = BigDecimal.ZERO;
-		for (BundleElementCommand element : bundleElementCommands) {
-			List<BundleItemCommand> items = element.getItems();
-			BigDecimal itemTemp = BigDecimal.ZERO;
-			for (int i = 0 ; i< items.size(); i++) {
-				if(itemTemp.compareTo(items.get(i).getMaxListPrice()) == -1){
-					itemTemp = items.get(i).getMaxListPrice();
-				}
-			}
-			maxListPrice = maxListPrice.add(itemTemp);
+		for (BundleElementCommand elementCommand : bundleElementCommands) {
+			
+			maxListPrice = maxListPrice.add(elementCommand.getMaxListPrice());
 		}
 		return maxListPrice;
 	}
