@@ -35,9 +35,15 @@ public interface NebulaBundleManager extends BaseManager {
 	 * </ul>
 	 * 
 	 * @param itemId : bundle捆绑类商品中主卖品的商品Id
+	 * @param flag : 动态布尔参数
+	 * <ul>
+	 * 	  <li>为空 :　默认是会踢掉无效的bundle</li>
+	 *    <li>不为空 并且 为 true :　踢掉无效的bundle</li>
+	 *    <li>不为空 并且 为 false :　不会踢掉无效的bundle</li>
+	 * </ul>
 	 * @return
 	 */
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId);
+	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean ...flag);
 	/**
 	 * 
 	 * <h3>查询bundle信息</h3>
@@ -45,17 +51,29 @@ public interface NebulaBundleManager extends BaseManager {
 	 *    <li>bundle列表入口 ： 只会查询出一条记录</li>
 	 * </ul>
 	 * @param boundleId
+	 * @param flag : 动态布尔参数
+	 * <ul>
+	 * 	  <li>为空 :　默认是会踢掉无效的bundle</li>
+	 *    <li>不为空 并且 为 true :　踢掉无效的bundle</li>
+	 *    <li>不为空 并且 为 false :　不会踢掉无效的bundle</li>
+	 * </ul>
 	 * @return
 	 */
-	public BundleCommand findBundleCommandByBundleId(Long boundleId);
+	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag);
 	
 	/**
 	 * <h3>bundle信息分页查询</h3>
 	 * @param page
 	 * @param sorts
+	 * @param flag : 动态布尔参数
+	 * <ul>
+	 * 	  <li>为空 :　默认是会踢掉无效的bundle</li>
+	 *    <li>不为空 并且 为 true :　踢掉无效的bundle</li>
+	 *    <li>不为空 并且 为 false :　不会踢掉无效的bundle</li>
+	 * </ul>
 	 * @return
 	 */
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts);
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean ...flag);
 	
 	/**
 	 * <h3>下单 加入购物车时验证bundle的信息</h3>
