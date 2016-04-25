@@ -27,6 +27,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
@@ -80,6 +81,9 @@ public abstract class NebulaBasePdpController extends BaseController {
 	
 	@Autowired
 	protected ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	
+	@Autowired
+	protected CacheManager cacheManager;
 	
 
 	/**

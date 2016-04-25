@@ -36,6 +36,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
+import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
@@ -116,6 +117,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
+	
+	public static final String 		ITEM_EXTRA_CACHE_KEY				= "item_extra_cache_key";
 	
 	@Autowired
 	private ItemRecommandManager itemRecommandManager;
@@ -239,11 +242,28 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 */
 	protected ItemExtraViewCommand buildItemExtraViewCommand(String itemCode){
-		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
-		itemExtraViewCommand.setSales(getItemSales(itemCode));
-		itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
-		itemExtraViewCommand.setReviewCount(getItemReviewCount(itemCode));
-		itemExtraViewCommand.setRate(getItemRate(itemCode));
+		String key = ITEM_EXTRA_CACHE_KEY + "-" + itemCode;
+		
+		
+		ItemExtraViewCommand itemExtraViewCommand = null;
+		try{
+			itemExtraViewCommand = cacheManager.getObject(key);
+		}catch(Exception e){
+			LOG.error("[PDP_BUILD_ITETM_EXTRA_VIEW_COMMAND] item extra view command cache exception.itemCode:{},exception:{} [{}] \"{}\"",itemCode,e.getMessage(),new Date(),this.getClass().getSimpleName());
+		}
+		
+		if(itemExtraViewCommand == null){
+			itemExtraViewCommand = new ItemExtraViewCommand();
+			itemExtraViewCommand.setSales(getItemSales(itemCode));
+			itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemCode));
+			itemExtraViewCommand.setReviewCount(getItemReviewCount(itemCode));
+			itemExtraViewCommand.setRate(getItemRate(itemCode));
+			cacheManager.setObject(key ,
+					itemExtraViewCommand, TimeInterval.SECONDS_PER_HOUR);
+		}
+		
+		
+		
 		return itemExtraViewCommand;
 	}
 	
