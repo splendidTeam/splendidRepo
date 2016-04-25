@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 
@@ -19,6 +18,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
+import com.baozun.nebula.manager.CacheManager;
+import com.baozun.nebula.manager.CacheManagerImpl;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
@@ -50,11 +51,13 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 	
 	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
 	
+	private CacheManager cacheManager;
 	@Before
 	public void setUp(){
 		nebulaPdpController = new NebulaPdpController();
 		reviewMemberViewCommandConverter = new ReviewMemberViewCommandConverter();
 		itemReviewViewCommandConverter = new ItemReviewViewCommandConverter();
+		cacheManager = control.createMock(CacheManager.class);
 		itemDetailManager = control.createMock(ItemDetailManager.class);
 		itemRateManager = control.createMock(ItemRateManager.class);
 		memberManager = control.createMock(MemberManager.class);
@@ -64,6 +67,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		ReflectionTestUtils.setField(nebulaPdpController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemRateManager", itemRateManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemDetailManager", itemDetailManager);
+		ReflectionTestUtils.setField(nebulaPdpController, "cacheManager", cacheManager);
 	}
 
 	@Test
