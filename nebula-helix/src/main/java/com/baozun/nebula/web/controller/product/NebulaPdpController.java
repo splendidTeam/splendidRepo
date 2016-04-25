@@ -41,6 +41,7 @@ import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -93,9 +94,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
 	@Autowired
-	private ItemDetailManager	itemDetailManager;
-	
-	@Autowired
 	private ItemColorSwatchViewCommandResolver		colorSwatchViewCommandResolver;
 	
 	
@@ -113,6 +111,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
+			model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, pdpViewCommand.getBaseInfo().getId()));
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;

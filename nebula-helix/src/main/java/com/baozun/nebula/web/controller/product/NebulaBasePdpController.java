@@ -63,10 +63,10 @@ public abstract class NebulaBasePdpController extends BaseController {
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaBasePdpController.class);
 	
 	@Autowired
-	private SdkItemManager sdkItemManager;
+	protected SdkItemManager sdkItemManager;
 	
 	@Autowired
-	private ItemDetailManager itemDetailManager;
+	protected ItemDetailManager itemDetailManager;
 	
 	@Autowired
 	@Qualifier("skuViewCommandConverter")
@@ -76,10 +76,10 @@ public abstract class NebulaBasePdpController extends BaseController {
 	private InventoryViewCommandConverter inventoryViewCommandConverter;
 	
 	@Autowired
-	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	protected ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Autowired
-	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	protected ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
 
 	/**
@@ -139,7 +139,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	 * @return
 	 */
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
-		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
+		List<SkuCommand> skuCommands = sdkItemManager.findEffectiveSkuInvByItemId(itemId);
 		return inventoryViewCommandConverter.convert(skuCommands);
 	}
 	

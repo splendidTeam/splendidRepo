@@ -48,7 +48,6 @@ import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommand
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
-import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
@@ -111,30 +110,21 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品详情页 的相关展示数据 */
 	public static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
 	
+	/** 用户浏览商品历史记录 */
+	public static final String      MODEL_KEY_BROWSING_HISTORY          ="history";
+	
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	@Autowired
-	private SdkItemManager sdkItemManager;
-	
-	@Autowired
-	private ItemDetailManager itemDetailManager;
-	
-	@Autowired
 	private ItemRecommandManager itemRecommandManager;
 	
-	@Autowired
-	private ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
-
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
 	@Autowired
 	private ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
-	
-	@Autowired
-	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
@@ -177,6 +167,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		if(PDP_MODE_COLOR_COMBINE.equals(getPdpMode(itemBaseInfo.getId()))) {
 			pdpViewCommand.setColorSwatches(buildItemColorSwatchViewCommands(itemBaseInfo));
 		}
+
+		//商品推荐信息
+		pdpViewCommand.setRelations(buildItemRecommendViewCommand(itemBaseInfo.getId()));
 		
 		return pdpViewCommand;
 	}
@@ -256,8 +249,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造推荐商品信息
-	 * 1：后台配置，pdp，购物车（暂不考虑）
-	 * 2：匹配规则 预留参考面包屑
+	 * 方式一：pts为商品设置的的推荐商品
+	 * 方式二：自定义
 	 * @param itemId
 	 * @return
 	 */
@@ -283,32 +276,23 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造最近浏览的商品信息
-	 * 1：用cookie 参考金总
 	 * @param itemId
 	 * @return
 	 */
 	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
-		Map<Long, String> picUrlMap = getItemPicMap(browsingHistoryItemIds, getItemImageType());
-		if (Validator.isNotNullOrEmpty(itemCommands)) {
-			for (ItemCommand itemCmd : itemCommands) {
-				String picUrl = picUrlMap.get(itemCmd.getId());
-				if (null != picUrl) {
-					itemCmd.setPicUrl(picUrl);
-				}
-			}
-		}
+		setImageData(browsingHistoryItemIds, itemCommands);
 		return relationItemViewCommandConverter.convert(itemCommands);
 	}
 	
-	private Map<Long, String> getItemPicMap(List<Long> itemIdList, String type) {
+	private void setImageData(List<Long> itemIdList,List<ItemCommand> itemCommands ) {
 
 		// picUrlMap key： itemId value：picUrl
 		Map<Long, String> picUrlMap = new HashMap<Long, String>();
 
 		// 根据商品找到 对应的列表图
-		List<ItemImageCommand> cmdList = sdkItemManager.findItemImagesByItemIds(itemIdList, type);
+		List<ItemImageCommand> cmdList = sdkItemManager.findItemImagesByItemIds(itemIdList, getItemImageType());
 
 		if (Validator.isNotNullOrEmpty(cmdList)) {
 			for (ItemImageCommand cmd : cmdList) {
@@ -326,7 +310,15 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 			}
 
 		}
-		return picUrlMap;
+		
+		if (Validator.isNotNullOrEmpty(itemCommands)) {
+			for (ItemCommand itemCmd : itemCommands) {
+				String picUrl = picUrlMap.get(itemCmd.getId());
+				if (null != picUrl) {
+					itemCmd.setPicUrl(picUrl);
+				}
+			}
+		}
 	}
 	
 	/**
