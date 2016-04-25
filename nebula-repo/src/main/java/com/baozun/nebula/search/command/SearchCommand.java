@@ -4,84 +4,97 @@ import java.util.List;
 
 import com.baozun.nebula.search.FacetParameter;
 
-public class SearchCommand {
+public class SearchCommand{
+
 	/**
 	 * 搜索关键字
 	 */
-	private String searchWord;
+	private String					searchWord;
+
 	/**
 	 * 过滤条件
 	 */
-	private String filterConditionStr;
-	
+	private String					filterConditionStr;
+
 	/**
-	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。
-	 * 记录这个顺序用于后面facet tag作用
+	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用
 	 */
-	private String	filterParamOrder;
-	
+	private String					filterParamOrder;
+
 	/**
 	 * 后端查询参数（solr.fq）,从这个值里面体现filterquery之间的关系
 	 */
 	private List<FacetParameter>	facetParameters;
+
 	/**
 	 * 排序
 	 */
-	private String sortStr;
+	private String					sortStr;
+
 	/**
 	 * 页大小
 	 */
-	private Integer pageSize = 10;
+	private Integer					pageSize	= 20;
+
 	/**
 	 * 第几页 zero based
 	 */
-	private Integer pageNumber;
-	
-	public String getFilterParamOrder() {
+	private Integer					pageNumber;
+
+	public String getFilterParamOrder(){
 		return filterParamOrder;
 	}
-	public void setFilterParamOrder(String filterParamOrder) {
+
+	public void setFilterParamOrder(String filterParamOrder){
 		this.filterParamOrder = filterParamOrder;
 	}
-	
-	public String getSearchWord() {
+
+	public String getSearchWord(){
 		return searchWord;
 	}
-	public String getFilterConditionStr() {
+
+	public String getFilterConditionStr(){
 		return filterConditionStr;
 	}
-	public String getSortStr() {
+
+	public String getSortStr(){
 		return sortStr;
 	}
-	public Integer getPageSize() {
+
+	public Integer getPageSize(){
 		return pageSize;
 	}
-	public Integer getPageNumber() {
+
+	public Integer getPageNumber(){
 		return pageNumber;
 	}
-	public void setSearchWord(String searchWord) {
+
+	public void setSearchWord(String searchWord){
 		this.searchWord = searchWord;
 	}
-	public void setFilterConditionStr(String filterConditionStr) {
+
+	public void setFilterConditionStr(String filterConditionStr){
 		this.filterConditionStr = filterConditionStr;
 	}
 
-	
-	public List<FacetParameter> getFacetParameters() {
+	public List<FacetParameter> getFacetParameters(){
 		return facetParameters;
 	}
-	public void setFacetParameters(List<FacetParameter> facetParameters) {
+
+	public void setFacetParameters(List<FacetParameter> facetParameters){
 		this.facetParameters = facetParameters;
 	}
-	public void setSortStr(String sortStr) {
+
+	public void setSortStr(String sortStr){
 		this.sortStr = sortStr;
 	}
-	public void setPageSize(Integer pageSize) {
+
+	public void setPageSize(Integer pageSize){
 		this.pageSize = pageSize;
 	}
-	public void setPageNumber(Integer pageNumber) {
+
+	public void setPageNumber(Integer pageNumber){
 		this.pageNumber = pageNumber;
 	}
-	
-	
+
 }
