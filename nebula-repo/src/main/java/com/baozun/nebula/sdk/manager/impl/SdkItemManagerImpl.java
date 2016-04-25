@@ -170,6 +170,20 @@ public class SdkItemManagerImpl implements SdkItemManager {
 	}
 	
 	@Override
+	@Transactional(readOnly=true)
+	public List<ItemProperties> findItemPropertiesByItemIds(List<Long> itemIds) {
+		boolean  i18n = LangProperty.getI18nOnOff();
+		if(i18n){
+			String lang = LangUtil.getCurrentLang();
+			List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertieListByItemIdsI18n(itemIds, lang);
+			return itemPropertiesList;
+		}else{
+			List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertieListByItemIds(itemIds);
+			return itemPropertiesList;
+		}
+	}
+	
+	@Override
 	public List<ItemProperties> findItemPropertiesByIds(List<Long> ids) {
 		boolean  i18n = LangProperty.getI18nOnOff();
 		if(i18n){

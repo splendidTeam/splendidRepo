@@ -39,6 +39,8 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
+ * 捆绑类商品的商品视图模型
+ * 
  * @author yue.ch
  *
  */
