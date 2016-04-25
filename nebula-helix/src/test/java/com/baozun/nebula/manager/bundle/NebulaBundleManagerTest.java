@@ -32,7 +32,7 @@ public class NebulaBundleManagerTest {
 	
 	@Test
 	public void testFindBundleCommandByItemId(){
-		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L);
+		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L ,false);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
 	}

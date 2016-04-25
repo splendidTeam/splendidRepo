@@ -311,20 +311,17 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected List<RelationItemViewCommand> customBuildItemRecommendViewCommand(
 			Long itemId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<RelationItemViewCommand>();
 	}
 
 	@Override
 	protected String getItemImageType() {
-		// TODO Auto-generated method stub
-		return null;
+		return ItemImage.IMG_TYPE_LIST;
 	}
 
 	@Override
 	protected String getItemRecommendMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return RECOMMEND_MODE_GENERAL;
 	}
 
 }

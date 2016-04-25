@@ -67,15 +67,17 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId) {
+	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean ...flag) {
 
 		// 1、 根据itemId,lifeCycle查询bundle （只需要查询出可售的bundle）
 		List<BundleCommand> bundles = bundleDao.findBundlesByItemId(itemId, 1);
 		if (bundles != null) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			removeInvalidBundle(bundles);
+			if(flag.length == 0 || Boolean.TRUE.equals(flag[0])){
+				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
+				removeInvalidBundleInfo(bundles);
+			}
 		} else {
 			LOG.error("find bundles is null");
 			LOG.error("itemId : [{}]  showMainElementFlag : {}  lifeCycle : {}  [{}]", itemId, 1 , new Date());
@@ -86,20 +88,27 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public BundleCommand findBundleCommandByBundleId(Long boundleId) {
+	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag) {
 		BundleCommand bundle = bundleDao.findBundlesById(boundleId, null);
 		fillBundleCommand(bundle);
-		
+		if((flag.length == 0 || Boolean.TRUE.equals(flag[0])) && needRemoveInvalidBundle(bundle)){
+			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
+			return null;
+		}
 		return bundle;
 	}
 	
 	@Override
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts) {
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean ...flag) {
 		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
 		List<BundleCommand> bundles = pagination.getItems();
 		if (bundles != null) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
+			if(flag.length == 0 || Boolean.TRUE.equals(flag[0])){
+				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
+				removeInvalidBundleInfo(bundles);
+			}
 		} else {
 			LOG.error("find bundles is null");
 			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
@@ -322,17 +331,117 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * 
 	 * @param bundles
 	 */
-	private void removeInvalidBundle(List<BundleCommand> bundles) {
+	private void removeInvalidBundleInfo(List<BundleCommand> bundles) {
 		Iterator<BundleCommand> iterator = bundles.iterator();
 		while (iterator.hasNext()) {
 			BundleCommand bundle = iterator.next();
-			if (!bundle.isEnabled()) {
+			
+			if (needRemoveInvalidBundle(bundle)) {
 				LOG.debug("***********************************");
 				LOG.debug("current bundle invailed , bundleId [{}] current time : [{}]" , bundle.getId(), new Date());
 				LOG.debug("***********************************");
 				iterator.remove();
 			}
 		}
+	}
+	/**
+	 * <h3>校验是否需要删除bundle</h3>
+	 * <p>校验的范围如下 ： </p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>bundle本身的商品就失效</li>
+	 *   	<li>最少有一个element中的商品都失效了 ,bundle就失效</li>
+	 *   </ol>
+	 * </ul>
+	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
+	 * @return 　返回结果 布尔类型
+	 * <ul>
+	 *   <li>true : 需要删除 </li>
+	 *   <li>false : 不需要删除 </li>
+	 * </ul>
+	 * @param bundle
+	 * @return
+	 */
+   private boolean needRemoveInvalidBundle(BundleCommand bundle){
+	   List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
+	   if (bundle.getLifeCycle() != 1 || !isEnabled(bundleElementCommands)){
+		   return true;
+	   }
+	  return false; 
+   }
+	/**
+	 * <h3>校验bundle是否有效</h3>
+	 * <p>校验的范围如下 ： </p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>最少有一个element中的商品都失效了 ,bundle就失效</li>
+	 *   </ol>
+	 * </ul>
+	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
+	 * @return 　返回结果 布尔类型
+	 * <ul>
+	 *   <li>true : 有效 </li>
+	 *   <li>false : 失效</li>
+	 * </ul>
+	 */
+	private boolean isEnabled(List<BundleElementCommand> bundleElementCommands){
+		Boolean removeFlag = Boolean.TRUE;
+		
+		for (BundleElementCommand bundleElementCommand : bundleElementCommands) {
+			removeFlag = validateBundleElement( bundleElementCommand);
+			if(!removeFlag){
+				break;
+			}
+		}
+		return removeFlag;
+	}
+	
+	/**
+	 * <p>校验的步骤 ： </p>
+	 * <ul>
+	 *   <ol>
+	 *   	<li>踢掉所有不是上架状态的商品</li>
+	 *      <li>踢掉商品中所有不是上架状态的sku</li>
+	 *      <li>如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉</li>
+	 *   </ol>
+	 * </ul>
+	 * @param bundleElementCommand
+	 * @return
+	 */
+	private boolean validateBundleElement(BundleElementCommand bundleElementCommand){
+
+		List<BundleItemCommand> bundleItem = bundleElementCommand.getItems();
+		
+		Iterator<BundleItemCommand> iterator = bundleItem.iterator();
+		while (iterator.hasNext()) {
+			BundleItemCommand bundleItemCommand = iterator.next();
+			//1 踢掉所有不是上架状态的商品
+			if (bundleItemCommand.getLifecycle().intValue() != 1) {
+				iterator.remove();
+				continue;
+			}
+			//2 踢掉商品中所有不是上架状态的sku
+			List<BundleSkuCommand> skus = bundleItemCommand.getBundleSkus();
+			Iterator<BundleSkuCommand> iterator2 = skus.iterator();
+			while (iterator2.hasNext()) {
+				BundleSkuCommand bundleSkuCommand = (BundleSkuCommand) iterator2.next();
+				if(bundleSkuCommand.getLifeCycle().intValue() != 1){
+					iterator2.remove();
+					continue;
+				}
+			}
+			//3 如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉
+			if(bundleItemCommand.getBundleSkus() == null || bundleItemCommand.getBundleSkus().size() == 0){
+				iterator.remove();
+				continue;
+			}
+		}
+		
+		if(bundleElementCommand.getItems() == null || bundleElementCommand.getItems().size() == 0){
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -378,7 +487,9 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		}
 
 		fillBundleElementInfo(bundleElementList, map, bundle);
-
+		
+        bundle.setLifeCycle(itemDao.findItemById(bundle.getItemId()).getLifecycle());
+       
 		bundle.setBundleElementCommands(bundleElementList);
     }
    
@@ -472,8 +583,9 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		for (Long key : keys) {
 			items.add(packagingBundleItemCommandInfo(key, elementSkus.get(key), bundle));
 		}
-
+		
 		bundleElementCommand.setItems(items);
+		
 	}
 
 	/**
@@ -491,6 +603,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		bundleItemCommand.setItemId(itemId);
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
 		bundleItemCommand.setBundleSkus(skuCommands);
+		
 
 		return bundleItemCommand;
 	}

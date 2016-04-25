@@ -70,7 +70,6 @@ import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyViewCommand;
@@ -246,10 +245,10 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	@Override
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
 		//校验bundle中item,sku的lifecycle状态
-		if(!bundleCommand.isEnabled()){
+		/*if(!bundleCommand.isEnabled()){
 			LOG.info("Bundle disable...have disable item or sku...... [{}]",new Date());
 			return null;
-		}
+		}*/
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
 		if(itemBaseInfoViewCommand.getLifecycle()!=1){
