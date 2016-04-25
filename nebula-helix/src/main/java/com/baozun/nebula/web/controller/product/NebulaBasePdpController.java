@@ -63,10 +63,10 @@ public abstract class NebulaBasePdpController extends BaseController {
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaBasePdpController.class);
 	
 	@Autowired
-	private SdkItemManager sdkItemManager;
+	protected SdkItemManager sdkItemManager;
 	
 	@Autowired
-	private ItemDetailManager itemDetailManager;
+	protected ItemDetailManager itemDetailManager;
 	
 	@Autowired
 	@Qualifier("skuViewCommandConverter")
@@ -79,7 +79,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	protected ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Autowired
-	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	protected ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
 
 	/**

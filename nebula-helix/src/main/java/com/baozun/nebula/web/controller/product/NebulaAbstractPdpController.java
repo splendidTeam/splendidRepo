@@ -118,12 +118,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	@Autowired
-	private SdkItemManager sdkItemManager;
-	
-	@Autowired
-	private ItemDetailManager itemDetailManager;
-	
-	@Autowired
 	private ItemRecommandManager itemRecommandManager;
 	
 	@Qualifier("breadcrumbsViewCommandConverter")
@@ -131,9 +125,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	@Autowired
 	private ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
-	
-	@Autowired
-	ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
 	
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;

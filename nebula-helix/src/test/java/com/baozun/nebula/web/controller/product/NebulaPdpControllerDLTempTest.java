@@ -46,8 +46,7 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 	
 	private ItemDetailManager itemDetailManager;
 	
-	
-	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	private ItemPropertyViewCommandResolver	itemPropertyViewCommandResolver;
 	
 	
 	@Before
@@ -94,8 +93,6 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 		
 		//test...
 		EasyMock.expect(itemDetailManager.gatherDynamicProperty(EasyMock.eq(14060L))).andReturn(returnMap).times(1);
-		EasyMock.expect(itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images)).andReturn(itemPropertyViewCommand).times(1);
-		
 		
 		control.replay();
 		ItemPropertyViewCommand actualCommand = nebulaPdpController.buildItemPropertyViewCommand(baseInfoViewCommand, images);
