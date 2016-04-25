@@ -17,6 +17,7 @@
 package com.baozun.nebula.command.bundle;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.baozun.nebula.model.bundle.Bundle;
@@ -305,8 +306,7 @@ public class BundleCommand extends Bundle{
 	 * <p>校验的范围如下 ： </p>
 	 * <ul>
 	 *   <ol>
-	 *   	<li>捆绑销售 的商品是否有效 </li>
-	 *   	<li>商品中的sku是否有效</li>
+	 *   	<li>最少有一个element中的商品都失效了 ,bundle就失效</li>
 	 *   </ol>
 	 * </ul>
 	 * <h3>注意 ： 该方法不会校验库存的信息 以及 bundle本身是否上架</h3>
@@ -320,55 +320,59 @@ public class BundleCommand extends Bundle{
 		Boolean removeFlag = Boolean.TRUE;
 		
 		for (BundleElementCommand bundleElementCommand : bundleElementCommands) {
-			if(removeFlag){
-				removeFlag = validateBundleElement(removeFlag , bundleElementCommand);
+			removeFlag = validateBundleElement( bundleElementCommand);
+			if(!removeFlag){
+				break;
 			}
 		}
 		return removeFlag;
 	}
 	
-	
-
 	/**
-	 * <h3>验证bundle是否失效</h3>
-	 * <p>失效的情景如下 ：</p>
+	 * <p>校验的步骤 ： </p>
 	 * <ul>
 	 *   <ol>
-	 *   	<li>item 中的 lifecycle != 1 </li>
-	 *   	<li>sku 中的 lifecycle != 1 </li>
+	 *   	<li>踢掉所有不是上架状态的商品</li>
+	 *      <li>踢掉商品中所有不是上架状态的sku</li>
+	 *      <li>如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉</li>
 	 *   </ol>
 	 * </ul>
-	 * @param removeFlag : 标识
-	 * @param bundleElementCommand : 校验对象
-	 * @return 　返回结果 布尔类型
-	 * <ul>
-	 *   <li>true : 失效 </li>
-	 *   <li>false : 有效</li>
-	 * </ul>
+	 * @param bundleElementCommand
+	 * @return
 	 */
-	private boolean validateBundleElement(Boolean removeFlag , BundleElementCommand bundleElementCommand){
+	private boolean validateBundleElement(BundleElementCommand bundleElementCommand){
 
 		List<BundleItemCommand> bundleItem = bundleElementCommand.getItems();
-		for (BundleItemCommand bundleItemCommand : bundleItem) {
-			if(removeFlag){
-				//item lifecycle == 1 上架
-				if (bundleItemCommand.getLifecycle().intValue() != 1) {
-					removeFlag = Boolean.FALSE;
-					break;
-				}
-				//sku lifecycle == 1 上架
-				List<BundleSkuCommand> skus = bundleItemCommand.getBundleSkus();
-				for (BundleSkuCommand bundleSkuCommand : skus) {
-					
-					if(bundleSkuCommand.getLifeCycle().intValue() != 1){
-						removeFlag = Boolean.FALSE;
-						break;
-					}
+		
+		Iterator<BundleItemCommand> iterator = bundleItem.iterator();
+		while (iterator.hasNext()) {
+			BundleItemCommand bundleItemCommand = iterator.next();
+			//1 踢掉所有不是上架状态的商品
+			if (bundleItemCommand.getLifecycle().intValue() != 1) {
+				iterator.remove();
+				continue;
+			}
+			//2 踢掉商品中所有不是上架状态的sku
+			List<BundleSkuCommand> skus = bundleItemCommand.getBundleSkus();
+			Iterator<BundleSkuCommand> iterator2 = skus.iterator();
+			while (iterator2.hasNext()) {
+				BundleSkuCommand bundleSkuCommand = (BundleSkuCommand) iterator2.next();
+				if(bundleSkuCommand.getLifeCycle().intValue() != 1){
+					iterator2.remove();
+					continue;
 				}
 			}
-			
+			//3 如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉
+			if(bundleItemCommand.getBundleSkus() == null || bundleItemCommand.getBundleSkus().size() == 0){
+				iterator.remove();
+				continue;
+			}
 		}
-
-		return removeFlag;
+		
+		if(bundleElementCommand.getItems() == null || bundleElementCommand.getItems().size() == 0){
+			return false;
+		}
+		
+		return true;
 	}
 }

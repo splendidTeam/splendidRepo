@@ -70,6 +70,13 @@ public interface ItemDetailManager extends BaseManager{
 	public Map<String, Object> findDynamicProperty(Long itemId);
 	
 	/**
+	 * 获取一批商品动态属性(规格参数)
+	 * @param itemIds
+	 * @return
+	 */
+	public Map<String, Object> findDynamicPropertyByItemIds(List<Long> itemIds);
+	
+	/**
 	 * <p>新的获取商品动态属性(规格参数)</p>
 	 * <p>特殊处理一般属性的获取</p>
 	 * @param itemId
