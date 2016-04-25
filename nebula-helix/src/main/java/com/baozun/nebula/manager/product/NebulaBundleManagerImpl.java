@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager.bundle;
+package com.baozun.nebula.manager.product;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleCommand.BundleStatus;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
-import com.baozun.nebula.command.bundle.BundleItemCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.dao.bundle.BundleDao;
-import com.baozun.nebula.dao.bundle.BundleElementDao;
-import com.baozun.nebula.dao.bundle.BundleSkuDao;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleCommand.BundleStatus;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.dao.product.BundleDao;
+import com.baozun.nebula.dao.product.BundleElementDao;
+import com.baozun.nebula.dao.product.BundleSkuDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
@@ -40,6 +36,10 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.tools.jsonlib.JsonUtil;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 @Transactional
 @Service
