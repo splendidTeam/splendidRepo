@@ -1,94 +1,93 @@
 package com.baozun.nebula.web.controller.search;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.search.Boost;
-import com.baozun.nebula.search.FacetFilterHelper;
-import com.baozun.nebula.search.FacetGroup;
-import com.baozun.nebula.search.SearchManager;
+import com.baozun.nebula.search.FacetParameter;
 import com.baozun.nebula.search.command.SearchCommand;
-import com.baozun.nebula.search.command.SearchResultPage;
-import com.baozun.nebula.search.convert.SolrQueryConvert;
-import com.baozun.nebula.solr.command.ItemForSolrCommand;
+import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.web.controller.search.form.SearchForm;
+import com.feilong.core.Validator;
 
 public abstract class NebulaAbstractSearchController extends BaseController{
-	
-	private SolrQueryConvert solrQueryConvert;
-	
-	private SearchManager	searchManager;
-	
-	private FacetFilterHelper	facetFilterHelper;
-	
-	public String search(@ModelAttribute SearchForm searchForm,HttpServletRequest request,HttpServletResponse response,Model model){
-		//将 searchForm 转成 searchCommand
-		SearchCommand searchCommand = null;
-		
-		//将 searchForm 中 filterConditionStr 转成FacetParameter
-		seachParamProcess(searchCommand);
-		
-		//创建solrquery对象
-		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
-		
-		//set facet相关信息
-		setFacet(solrQuery,searchCommand);
-		
-		//设置权重信息
-		Boost boost = this.createBoost();
-		searchManager.setSolrBoost(solrQuery, boost);
-		
-		//查询
-		SearchResultPage<ItemForSolrCommand> solrDataPage= searchManager.search(solrQuery);
-		
-		//页面左侧筛选项
-		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(solrDataPage);
-		
-		//将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
-		
-		return "item.list";
-	}
-	
+
+	/** 逗号分隔符 */
+	private final static String	SEPARATORCHARS_COMMA	= ",";
+
+	/** -分隔符 */
+	private final static String	SEPARATORCHARS_MINUS	= "-";
 
 	/**
-	 * 将 searchCommand 里面的filterConditionStr 转成 FacetParameter
-	 * 用做后面solr查询
+	 * 将 searchCommand 里面的filterConditionStr 转成 FacetParameter 用做后面solr查询
+	 * 
 	 * @param searchCommand
 	 */
-	public void seachParamProcess(SearchCommand searchCommand){
-		
-		//FacetParameter facetParameter = searc
-		//searchCommand.setFacetParameter(facetParameter);
+	public void searchParamProcess(SearchCommand searchCommand){
+
+		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
+
+		// 筛选条件
+		String filterConditionStr = searchCommand.getFilterConditionStr();
+
+		// 如果不为空
+		if (Validator.isNotNullOrEmpty(filterConditionStr)) {
+			// 以逗号分隔开
+			String[] filterStrs = StringUtils.split(filterConditionStr, SEPARATORCHARS_COMMA);
+
+			Map<String, FacetParameter> map = new HashMap<String, FacetParameter>();
+
+			for (String filter : filterStrs){
+				// 以短横线-分隔开
+				if (StringUtils.contains(filter, SEPARATORCHARS_MINUS)) {
+					// 名称
+					String name = SkuItemParam.dynamicCondition + StringUtils.substringBefore(filter, SEPARATORCHARS_MINUS);
+
+					// value值
+					List<String> values = new ArrayList<String>();
+					values.add(StringUtils.substringAfter(filter, SEPARATORCHARS_MINUS));
+					FacetParameter facetParameter = new FacetParameter(name);
+					facetParameter.setValues(values);
+
+					if (map.containsKey(name)) {
+						facetParameter.getValues().addAll(map.get(name).getValues());
+					}
+					map.put(name, facetParameter);
+				}
+			}
+
+			for (Entry<String, FacetParameter> entry : map.entrySet()){
+				facetParameters.add(entry.getValue());
+			}
+		}
+
+		searchCommand.setFacetParameters(facetParameters);
 	}
-	
+
 	/**
 	 * 设置solrfacet信息，需要结合t_pd_search_con 设置
+	 * 
 	 * @param solrQuery
 	 * @param searchCommand
 	 */
 	public void setFacet(SolrQuery solrQuery,SearchCommand searchCommand){
-		
+
 	}
-	
+
 	/**
 	 * 创建solr boost对象，用做默认排序的权重打分
+	 * 
 	 * @return
 	 */
 	public Boost createBoost(){
 		Boost boost = new Boost();
 		return boost;
 	}
-	
-	
-	
-	
-	
 
 }
