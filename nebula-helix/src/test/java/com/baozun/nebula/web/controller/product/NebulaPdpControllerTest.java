@@ -150,7 +150,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		members.add(member2);
 		
 		EasyMock.expect(itemRateManager.findItemRateListByItemId(EasyMock.isA(Page.class), EasyMock.eq(12345L), EasyMock.aryEq(pageForm.getSorts()))).andReturn(rates).times(1);
-		EasyMock.expect(memberManager.findMembersByIds(memberIds)).andReturn(members);
+		EasyMock.expect(memberManager.findMembersByIds(memberIds)).andReturn(members).times(1);
 		control.replay();
 		
 		assertEquals(DefaultReturnResult.SUCCESS, nebulaPdpController.showItemReview(12345L, pageForm, request, response, model));

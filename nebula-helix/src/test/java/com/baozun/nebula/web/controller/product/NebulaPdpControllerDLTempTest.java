@@ -46,58 +46,71 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 	
 	private ItemDetailManager itemDetailManager;
 	
-	private ItemRateManager itemRateManager;
+	private ItemPropertyViewCommandResolver	itemPropertyViewCommandResolver;
 	
-	@Autowired
-	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
 	@Before
 	public void setUp(){
 		nebulaPdpController = new NebulaPdpController();
 		itemDetailManager = control.createMock(ItemDetailManager.class);
-		itemRateManager = control.createMock(ItemRateManager.class);
-//		itemPropertyViewCommandResolver =new ItemPropertyViewCommandResolverImpl();
 		
-		ReflectionTestUtils.setField(nebulaPdpController, "itemRateManager", itemRateManager);
-		ReflectionTestUtils.setField(nebulaPdpController, "itemDetailManager", itemDetailManager);
+		//DB
+		itemPropertyViewCommandResolver = new ItemPropertyViewCommandResolverImpl();
+		
+		ReflectionTestUtils.setField(itemPropertyViewCommandResolver, "itemDetailManager", itemDetailManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemPropertyViewCommandResolver", itemPropertyViewCommandResolver);
-	}
-
-	@Test
-	public void testGetBuyLimit(){
-		ItemBuyLimitedBaseCommand itemBuyLimitedCommand = new ItemBuyLimitedBaseCommand();
-		itemBuyLimitedCommand.setItemId(2L);
-		
-		EasyMock.expect(itemDetailManager.getItemBuyLimited(EasyMock.isA(ItemBuyLimitedBaseCommand.class),EasyMock.eq(6))).andReturn(Integer.valueOf(3)).times(1);
-		EasyMock.replay(itemDetailManager);
-		
-		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand));
-		EasyMock.verify(itemDetailManager);
 	}
 	
 	@Test
-	public void testBuildItemExtraViewCommand(){
+	public void testResolve(){
+		Map<String, Object> returnMap =new HashMap<String, Object>();
+		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
+		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
+		//构造数据
+		ItemPropertyViewCommand itemPropertyViewCommand = constrData(returnMap,
+				baseInfoViewCommand, images);
 		
-		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
-		itemExtraViewCommand.setFavoriteCount(Long.valueOf(200));
-		itemExtraViewCommand.setRate(3.6F);
-		itemExtraViewCommand.setReviewCount(Long.valueOf(153));
-		itemExtraViewCommand.setSales(Long.valueOf(60));
-		
-		String itemCode = "testItemCode";
-		EasyMock.expect(itemDetailManager.findItemSalesCount(itemCode)).andReturn(Integer.valueOf(60)).times(1);
-		EasyMock.expect(itemDetailManager.findItemFavCount(itemCode)).andReturn(Integer.valueOf(200)).times(1);
-		EasyMock.expect(itemRateManager.findRateCountByItemCode(itemCode)).andReturn(Integer.valueOf(153)).times(1);
-		EasyMock.expect(itemDetailManager.findItemAvgReview(itemCode)).andReturn(3.6F).times(1);
+		EasyMock.expect(itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images)).andReturn(itemPropertyViewCommand).times(1);
 		
 		control.replay();
-		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemCode);
-		assertEquals(itemExtraViewCommand, actualCommand);
+		ItemPropertyViewCommand actualCommand = itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
+		assertEquals(itemPropertyViewCommand, actualCommand);
 		control.verify();
+		
 	}
+	
 	
 	@Test
 	public void testBuildItemPropertyViewCommand(){
+		
+		Map<String, Object> returnMap =new HashMap<String, Object>();
+		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
+		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
+		//构造数据
+		ItemPropertyViewCommand itemPropertyViewCommand = constrData(returnMap,
+				baseInfoViewCommand, images);
+		
+		
+		//test...
+		EasyMock.expect(itemDetailManager.gatherDynamicProperty(EasyMock.eq(14060L))).andReturn(returnMap).times(1);
+		
+		control.replay();
+		ItemPropertyViewCommand actualCommand = nebulaPdpController.buildItemPropertyViewCommand(baseInfoViewCommand, images);
+		assertEquals(itemPropertyViewCommand, actualCommand);
+		control.verify();
+		
+	}
+
+	/**
+	 * 
+	 * @param returnMap
+	 * @param baseInfoViewCommand
+	 * @param images
+	 * @return
+	 */
+	private ItemPropertyViewCommand constrData(Map<String, Object> returnMap,
+			ItemBaseInfoViewCommand baseInfoViewCommand,
+			List<ItemImageViewCommand> images) {
 		ItemPropertyViewCommand itemPropertyViewCommand =new ItemPropertyViewCommand();
 		Map<String, List<PropertyElementViewCommand>> nonSalesProperties = new HashMap<String, List<PropertyElementViewCommand>>();
 		List<PropertyElementViewCommand> elementViewCommands =new ArrayList<PropertyElementViewCommand>();
@@ -142,11 +155,11 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 		
 		itemPropertyViewCommand.setSalesProperties(salesProperties);
 		
-		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
+		
 		baseInfoViewCommand.setId(14060L);
 		baseInfoViewCommand.setCode("42611WP364B33");
 		
-		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
+		
 		ItemImageViewCommand itemImageViewCommand =new ItemImageViewCommand();
 		itemImageViewCommand.setItemId(14060L);
 		Map<String, List<ImageViewCommand>> imagesMap =new HashMap<String, List<ImageViewCommand>>();
@@ -158,21 +171,12 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 		itemImageViewCommand.setImages(imagesMap);
 		images.add(itemImageViewCommand);
 		
-		Map<String, Object> returnMap =new HashMap<String, Object>();
+		
 		List<DynamicPropertyCommand> commands =new ArrayList<DynamicPropertyCommand>();
 		Map<String, Object> gMap =new HashMap<String, Object>();
 		gMap.put("ABC", commands);
 		returnMap.put("salePropCommandList", commands);
 		returnMap.put("generalGroupPropMap", gMap);
-		
-		
-		EasyMock.expect(itemDetailManager.gatherDynamicProperty(14060L)).andReturn(returnMap).times(1);
-		
-		
-		control.replay();
-		ItemPropertyViewCommand actualCommand = nebulaPdpController.buildItemPropertyViewCommand(baseInfoViewCommand, images);
-		assertEquals(itemPropertyViewCommand, actualCommand);
-		control.verify();
-		
+		return itemPropertyViewCommand;
 	}
 }
