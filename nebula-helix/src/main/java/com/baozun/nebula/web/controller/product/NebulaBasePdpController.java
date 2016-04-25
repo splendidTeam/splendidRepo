@@ -139,7 +139,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	 * @return
 	 */
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
-		List<SkuCommand> skuCommands = sdkItemManager.findInventoryByItemId(itemId);
+		List<SkuCommand> skuCommands = sdkItemManager.findEffectiveSkuInvByItemId(itemId);
 		return inventoryViewCommandConverter.convert(skuCommands);
 	}
 	
