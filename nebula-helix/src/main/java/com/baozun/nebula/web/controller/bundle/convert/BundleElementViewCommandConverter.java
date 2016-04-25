@@ -56,7 +56,7 @@ public class BundleElementViewCommandConverter extends BaseConverter<BundleEleme
 			return null;
 		}
 		
-		if (data instanceof BundleCommand) {
+		if (data instanceof BundleElementCommand) {
 			BundleElementCommand bundleElementCommand = (BundleElementCommand) data;
 			return (BundleElementViewCommand)ConvertUtils.convertTwoObject(new BundleElementViewCommand(), bundleElementCommand);
 		} else {
