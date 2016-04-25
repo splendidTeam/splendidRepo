@@ -17,7 +17,8 @@
 					     b.bundle_type as bundleType,
 					     b.modify_time as modifyTime,
 					     b.version as version,
-					     b.create_time as createTime
+					     b.create_time as createTime,
+					     i.code
 					from t_pd_bundle b 
 					inner join t_pd_item i on i.id = b.item_id
 						#if($lifecycle)
@@ -45,7 +46,8 @@
 					     b.bundle_type as bundleType,
 					     b.modify_time as modifyTime,
 					     b.version as version,
-					     b.create_time as createTime
+					     b.create_time as createTime,
+					     i.code
 						from t_pd_bundle b 
 						inner join t_pd_item i on i.id = b.item_id
 							#if($lifecycle)
@@ -73,7 +75,8 @@
 					     b.bundle_type as bundleType,
 					     b.modify_time as modifyTime,
 					     b.version as version,
-					     b.create_time as createTime 
+					     b.create_time as createTime,
+					     i.code
 		       		from 
 		       			t_pd_bundle b 
 		       		left join
