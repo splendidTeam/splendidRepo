@@ -116,11 +116,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	public BundleValidateResult validateBundle(Long bundleId,
 			List<Long> skuIds, int quantity) {
 		
-		BundleValidateResult result = new BundleValidateResult();
-		//校验bundle
-		isBundleEnough(bundleId,skuIds,quantity,result);
-		
-		return result;
+		return validateBundleInfo(bundleId,skuIds,quantity);
 	}
 	
 	/**
@@ -132,9 +128,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * @param command
 	 * @param bundleItemInfo
 	 */
-	private BundleValidateResult isBundleEnough(Long bundleId,List<Long> skuIds, int quantity,
-			BundleValidateResult result){
-		
+	private BundleValidateResult validateBundleInfo(Long bundleId,List<Long> skuIds, int quantity){
+		BundleValidateResult result = new BundleValidateResult();
 		//查询bundle的所有相关信息
 		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
 		
@@ -184,20 +179,19 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		for (Long skuId : skuIds) {
 			//2 ,=============sku 以及其所在的商品 的状态校验通过================
 			if(skuIdToItemId.get(skuId) == null){
-				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, null);
+				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, skuId);
 				break;
 			}
 			//item sku lifecycle校验
 			Item item = itemDao.findItemById(skuIdToItemId.get(skuId));
 			Sku sku = skuDao.findSkuById(skuId);
 			if(item == null || sku == null || item.getLifecycle().intValue() != 1 || sku.getLifecycle().intValue() != 1){
-				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, null);
+				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),skuIdToItemId.get(skuId), skuId);
 				break;
 			}
 			//3 ,=============sku 的库存状态校验通过================
 			//库存校验
-			if(!validateSkuInventory(command ,  quantity , bundleSkuMap.get(skuId) ,  sku)){
-				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),item.getId(), skuId);
+			if(!validateBundleInventory(command ,  quantity , bundleSkuMap.get(skuId) ,  sku , result) ){
 				break;
 			}
 			
@@ -260,19 +254,21 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	}
 	
 	/**
-	 * 校验单个sku的库存是否足够
+	 * <li>bundle本身库存是否足够</li>
+	 * <li>校验单个sku的库存是否足够</li>
 	 * @param result
 	 * @param bundle
 	 * @param quantity
 	 * @param sku
 	 * @return
 	 */
-	private boolean validateSkuInventory(BundleCommand bundle , int quantity ,BundleSku bundleSku , Sku sku){
+	private boolean validateBundleInventory(BundleCommand bundle , int quantity ,BundleSku bundleSku , Sku sku ,BundleValidateResult result ){
 		Integer availableQty = bundle.getAvailableQty();
 		// 如果捆绑装单独维护了库存
 		if(availableQty != null) {
 			// 如果不需要同步扣减单品库存 ,那么就以捆绑装设置的库存为准；否则取捆绑装库存与sku实际可用库存的最小值
 			if(!bundle.getSyncWithInv() && availableQty.intValue() < quantity){
+				buildValidateResult( result ,BundleStatus.BUNDLE_NO_INVENTORY.getStatus() , bundle.getId(),null, null);
 				return false;
 			}
 			if(bundle.getSyncWithInv()){
@@ -281,7 +277,14 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 				if(inventory != null && inventory.getAvailableQty() != null){
 					qty = inventory.getAvailableQty();
 				}
-				if((Math.min(availableQty, qty)) < quantity){
+				
+				if(availableQty <= qty && availableQty < quantity){
+					buildValidateResult( result ,BundleStatus.BUNDLE_NO_INVENTORY.getStatus() , bundle.getId(),null, null);
+					return false;
+				}
+				
+				if(availableQty > qty && qty < quantity){
+					buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NO_INVENTORY.getStatus() , bundle.getId(),bundleSku.getItemId(), bundleSku.getSkuId());
 					return false;
 				}
 			}
@@ -289,6 +292,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		
 		SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
 		if(inventory == null ||inventory.getAvailableQty().intValue() < quantity){
+			buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NO_INVENTORY.getStatus() , bundle.getId(),bundleSku.getItemId(), bundleSku.getSkuId());
 			return false;
 		}
 		
