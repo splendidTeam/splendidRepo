@@ -146,7 +146,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 *   <li>bundle本身是一个商品,校验该商品是否上架状态</li>
 	 *   <li>购买的sku是否是上架状态</li>
 	 *   <li>购买的sku对应的商品是否是上架状态</li>
-	 *   <li>购买的sku是否有库存</li>
+	 *   <li>购买的bundle是否库存足够</li>
+	 *   <li>购买的sku是否库存足够</li>
 	 * </ul>
 	 * @param result
 	 * @param bundleItem
