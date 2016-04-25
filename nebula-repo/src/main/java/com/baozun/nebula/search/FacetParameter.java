@@ -249,5 +249,17 @@ public class FacetParameter {
 	public void setFacetType(FacetType facetType) {
 		this.facetType = facetType;
 	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setValues(List<String> values) {
+		this.values = values;
+	}
+
+	public void setType(ParameterType type) {
+		this.type = type;
+	}
 	
 }

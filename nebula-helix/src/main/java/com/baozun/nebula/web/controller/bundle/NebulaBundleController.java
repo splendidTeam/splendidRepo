@@ -238,7 +238,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * 构造捆绑商品详情页视图对象
 	 * <ul>
 	 * <li>bundle本身作为无属性类商品。</li>
-	 * <li>默认只显示正常上架的bundle，如果需要预览未上架、下架bundle</li>
+	 * <li>默认只显示正常上架的bundle，如果需要预览未上架、下架bundle需要重构此方法</li>
 	 * <li>默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等.</li>
 	 * </ul>
 	 * 
@@ -259,12 +259,12 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		BundleViewCommand bundleViewCommand=bundleViewCommandConverter.convert(bundleCommand);
 		//buildBundleElements
 		List<BundleElementCommand> bundleElementCommands = bundleCommand.getBundleElementCommands();
-		List<BundleElementViewCommand> bundleElementViewCommand = buildBundleElementViewCommand(bundleElementCommands);
-		if(Validator.isNullOrEmpty(bundleElementViewCommand)){
+		List<BundleElementViewCommand> bundleElementViewCommands = buildBundleElementViewCommand(bundleElementCommands);
+		if(Validator.isNullOrEmpty(bundleElementViewCommands)){
 			LOG.info("Bundle error...bundleElementViewCommand is null;bundleId:{} [{}]",bundleCommand.getId(),new Date());
 			return null;
 		}
-		bundleViewCommand.setBundleElementViewCommands(bundleElementViewCommand);
+		bundleViewCommand.setBundleElementViewCommands(bundleElementViewCommands);
 		BundleDetailViewCommand bundleDetailViewCommand=new BundleDetailViewCommand();
 		BeanUtils.copyProperties(bundleViewCommand, bundleDetailViewCommand);
 		//budle拓展信息

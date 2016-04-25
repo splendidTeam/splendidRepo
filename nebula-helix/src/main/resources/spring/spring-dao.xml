@@ -28,25 +28,25 @@
 	</bean>
 	<!--dataSource -->
 	<bean id="parentSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-		 p:driverClass="#{meta['dataSource.driverClassName']}">
-		<property name="user" value="#{meta['dataSource.username']}"></property>
+		 p:driverClass="org.postgresql.Driver">
+		<property name="user" value="user_samsung"></property>
 		<property name="password">
-			<value><![CDATA[#{meta['dataSource.password']}]]></value>
+			<value>user_samsung1234</value>
 		</property>
-		<property name="minPoolSize" value="#{meta['dataSource.minPoolSize']}" />
-		<property name="maxPoolSize" value="#{meta['dataSource.maxPoolSize']}" />
+		<property name="minPoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
 		<property name="initialPoolSize"
-			value="#{meta['dataSource.initialPoolSize']}" />
+			value="5" />
 
-		<property name="maxIdleTime" value="#{meta['dataSource.maxIdleTime']}" />
+		<property name="maxIdleTime" value="30" />
 
 		<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
 		<property name="acquireIncrement"
-			value="#{meta['dataSource.acquireIncrement']}" />
+			value="3" />
 		<property name="idleConnectionTestPeriod"
-			value="#{meta['dataSource.idleConnectionTestPeriod']}" />
+			value="18000" />
 		<property name="preferredTestQuery">
-			<value><![CDATA[#{meta['dataSource.preferredTestQuery']}]]></value>
+			<value>select 1</value>
 		</property>
 	</bean>
 
@@ -70,14 +70,14 @@
 	<!-- 写节点 -->
 	<bean id="writeSource" parent="parentSource">
 		<property name="jdbcUrl">
-			<value><![CDATA[#{meta['dataSource.url.write']}]]></value>
+			<value>jdbc:postgresql://10.8.12.210/db_nebula_20160405</value>
 		</property>
 	</bean>
 
 	<!-- 读节点 -->
 	<bean id="readSource" parent="parentSource">
 		<property name="jdbcUrl">
-			<value><![CDATA[#{meta['dataSource.url.read']}]]></value>
+			<value>jdbc:postgresql://10.8.12.210/db_nebula_20160405</value>
 		</property>
 	</bean>
 </beans>
