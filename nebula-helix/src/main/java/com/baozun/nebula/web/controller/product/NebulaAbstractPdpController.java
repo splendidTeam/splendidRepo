@@ -16,9 +16,11 @@
  */
 package com.baozun.nebula.web.controller.product;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,19 +33,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
+import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
-import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -53,6 +57,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+import com.baozun.nebula.web.interceptor.browsingHistory.BrowsingHistoryResolver;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 
@@ -133,6 +138,10 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
+	
+    /** The browsing history resolver. */
+    @Autowired
+    private BrowsingHistoryResolver     browsingHistoryResolver;
 	
 	/**
 	 * 构造PdpViewCommand
@@ -278,9 +287,46 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(Long itemId) {
-		List<RelationItemViewCommand> itemBrowsingHistoryList = new ArrayList<RelationItemViewCommand>();
-		return itemBrowsingHistoryList;
+	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
+		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
+		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
+		Map<Long, String> picUrlMap = getItemPicMap(browsingHistoryItemIds, getItemImageType());
+		if (Validator.isNotNullOrEmpty(itemCommands)) {
+			for (ItemCommand itemCmd : itemCommands) {
+				String picUrl = picUrlMap.get(itemCmd.getId());
+				if (null != picUrl) {
+					itemCmd.setPicUrl(picUrl);
+				}
+			}
+		}
+		return relationItemViewCommandConverter.convert(itemCommands);
+	}
+	
+	private Map<Long, String> getItemPicMap(List<Long> itemIdList, String type) {
+
+		// picUrlMap key： itemId value：picUrl
+		Map<Long, String> picUrlMap = new HashMap<Long, String>();
+
+		// 根据商品找到 对应的列表图
+		List<ItemImageCommand> cmdList = sdkItemManager.findItemImagesByItemIds(itemIdList, type);
+
+		if (Validator.isNotNullOrEmpty(cmdList)) {
+			for (ItemImageCommand cmd : cmdList) {
+				if (Validator.isNotNullOrEmpty(cmd)) {
+					List<ItemImage> imgList = cmd.getItemIamgeList();
+
+					if (Validator.isNotNullOrEmpty(imgList)) {
+						Long itemId = cmd.getItemId();
+						String imgStr = imgList.get(0).getPicUrl();
+						// imgStr = sdkItemManager.convertItemImageWithDomain(imgStr);
+
+						picUrlMap.put(itemId, imgStr);
+					}
+				}
+			}
+
+		}
+		return picUrlMap;
 	}
 	
 	/**
@@ -336,10 +382,11 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
 	
 	/**
-	 * 面包屑的模式
+	 * 商品推荐图片类型
 	 * @return
 	 */
 	protected abstract String getItemImageType();
+	
 	/**
 	 * 面包屑的模式
 	 * @return
