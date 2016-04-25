@@ -1,12 +1,7 @@
 package solr.repository.skuItem;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
