@@ -663,7 +663,8 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 					skuCommand.setQuantity(Math.min(availableQty, qty));
 				}
 			} else {
-				skuCommand.setQuantity(sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid()).getAvailableQty());
+				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
+				skuCommand.setQuantity(inventory == null ? 0 : inventory.getAvailableQty());
 			}
 			
 			bundleSkus.add(skuCommand);
