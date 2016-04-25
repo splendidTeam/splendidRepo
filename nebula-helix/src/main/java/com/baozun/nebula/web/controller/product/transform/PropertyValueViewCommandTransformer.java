@@ -19,6 +19,7 @@ package com.baozun.nebula.web.controller.product.transform;
 import java.util.Map;
 
 import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.PropertyValueViewCom
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
-/** 
- *   将itemPropertiesCommand转换为PropertyValueViewCommand，并用于排序
+/**   
  * @Description 
  * @author dongliang ma
  * @date 2016年4月21日 下午2:20:44 
@@ -98,9 +98,11 @@ public class PropertyValueViewCommandTransformer implements Transformer<ItemProp
         propertyValueViewCommand.setItemPropertiesId(itemPropertiesId);
         propertyValueViewCommand.setPropertyId(itemPropertiesCommand.getPropertyId());
         propertyValueViewCommand.setPropertyName(propertyName);
+        //TODO
         propertyValueViewCommand.setPropertyValue(itemPropertiesCommand.getPropertyValue());
         propertyValueViewCommand.setImageUrl(colorswatch == null ? "" : colorswatch.getUrl());
-        propertyValueViewCommand.setPropertyDisplayValue(colorswatch == null ? "" : colorswatch.getDescription());
+        //set displayValue
+        //propertyValueViewCommand.setPropertyDisplayValue(colorswatch == null ? "" : colorswatch.getDescription());
         return propertyValueViewCommand;
 	}
 
