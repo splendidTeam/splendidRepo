@@ -100,8 +100,6 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		if (bundles != null) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			//removeInvalidBundle(bundles);
 		} else {
 			LOG.error("find bundles is null");
 			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
