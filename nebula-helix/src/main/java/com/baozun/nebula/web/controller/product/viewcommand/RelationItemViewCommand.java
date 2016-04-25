@@ -47,7 +47,7 @@ public class RelationItemViewCommand extends BaseViewCommand {
     /** 销售价格. */
     private BigDecimal salePrice;
     
-    /** 商品的颜色属性（或者同款商品）, 非必须. */
+    /** 商品的颜色属性（或者同款商品）, 非必须. 暂不考虑 */
     private RelationItemColorSwatchViewCommand colorSwatch;
     
     /** 商品的扩展数据. {@link ItemExtraViewCommand} */

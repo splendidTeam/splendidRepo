@@ -132,121 +132,183 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * @param command
 	 * @param bundleItemInfo
 	 */
-	private void isBundleEnough(Long bundleId,List<Long> skuIds, int quantity,
+	private BundleValidateResult isBundleEnough(Long bundleId,List<Long> skuIds, int quantity,
 			BundleValidateResult result){
 		
 		//查询bundle的所有相关信息
 		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
 		
-		if(command == null){//bundle不存在
-			result.setType(BundleStatus.BUNDLE_NOT_EXIST.getStatus());
-			result.setBundleId(bundleId);
-		}else{
-			//bundle本身就是一个特殊的商品
-			Item bundleItem = itemDao.findItemById(command.getItemId());
-			if(bundleItem == null){//bundle不存在
-				result.setType(BundleStatus.BUNDLE_NOT_EXIST.getStatus());
-				result.setBundleId(bundleId);
-			}else{
-				if(bundleItem.getLifecycle().intValue() == 2){//bundle不存在
-					result.setType(BundleStatus.BUNDLE_NOT_EXIST.getStatus());
-					result.setBundleId(bundleId);
-				}else if(bundleItem.getLifecycle().intValue() == 3){//bundle未上架
-					result.setType(BundleStatus.BUNDLE_NOT_PUTAWAY.getStatus());
-					result.setBundleId(bundleId);
-				}else if(bundleItem.getLifecycle().intValue() == 0){//bundle已下架
-					result.setType(BundleStatus.BUNDLE_SOLD_OUT.getStatus());
-					result.setBundleId(bundleId);
-				}else if(bundleItem.getLifecycle().intValue() == 1){//=============bundle验证通过,bundle已上架================
-					//根据bundleId查询所有的skuId
-					List<BundleSku> bundleSkus = bundleSkuDao.findByBundleId(command.getId());
-					//bundle的所有skuId
-					Map<Long,Long> bundleSkusIdAndItemId = new HashMap<Long, Long>();
-					
-					if(bundleSkus.size() > 0){
-						for (BundleSku bundleSku : bundleSkus) {
-							bundleSkusIdAndItemId.put(bundleSku.getSkuId(),bundleSku.getItemId());
-						}
-					} 
-					
-					if(bundleSkusIdAndItemId.size() > 0){
-						if(command.getAvailableQty() == null){//只判断sku的库存足不足
-							//校验sku
-							isSkuInventoryEnough(bundleId,skuIds,quantity,bundleSkusIdAndItemId,result);
-						}else{
-							if(command.getSyncWithInv()){//即要判断bundle的availableQty是否满足，又要判断每个单品是否满足
-								if(command.getAvailableQty() < quantity){//bundle库存不足
-									result.setType(BundleStatus.BUNDLE_NO_INVENTORY.getStatus());
-									result.setBundleId(bundleId);
-								}else{//判断sku的库存足不足
-									//校验sku
-									isSkuInventoryEnough(bundleId,skuIds,quantity,bundleSkusIdAndItemId,result);
-								}
-							}else{//只要判断bundle的availableQty是否满足
-								if(command.getAvailableQty() < quantity){//bundle库存不足
-									result.setType(BundleStatus.BUNDLE_NO_INVENTORY.getStatus());
-									result.setBundleId(bundleId);
-								}else{//正常
-									result.setType(BundleStatus.BUNDLE_CAN_SALE.getStatus());
-								}
-							}
-						}
-					}
-				}
-			}
+		Item bundleItem = itemDao.findItemById(command.getItemId());
+		
+		if(bundleItem == null || command == null){//bundle不存在
+			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
+			return result ;
 		}
+        
+		return validateBundle(result,bundleItem,command,skuIds,quantity);
+	}
+	/**
+	 * 校验bundle选中的一个sku组合是否可以购买
+	 * <ul>
+	 *   <li>bundle本身是一个商品,校验该商品是否上架状态</li>
+	 *   <li>购买的sku是否是上架状态</li>
+	 *   <li>购买的sku对应的商品是否是上架状态</li>
+	 *   <li>购买的sku是否有库存</li>
+	 * </ul>
+	 * @param result
+	 * @param bundleItem
+	 * @param command
+	 * @param skuIds
+	 * @param quantity
+	 * @return
+	 */
+	private BundleValidateResult validateBundle(BundleValidateResult result , Item bundleItem , BundleCommand command,List<Long> skuIds , int quantity){
+		
+		//1 ,=============bundle验证是否上架校验================
+		if(!validateBundleLifeCycle( command , bundleItem , result)){
+			return result;
+		}
+		
+		//根据bundleId查询所有的skuId
+		List<BundleSku> bundleSkus = bundleSkuDao.findByBundleId(command.getId());
+		
+		if(bundleSkus == null || bundleSkus.size() == 0){
+			buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, null);
+			return result ;
+		}
+		
+		Map<Long,Long> skuIdToItemId = skuIdToItemId(bundleSkus,skuIds);
+		
+		Map<Long,BundleSku> bundleSkuMap = skuIdToBundleSku(bundleSkus);
+		
+		for (Long skuId : skuIds) {
+			//2 ,=============sku 以及其所在的商品 的状态校验通过================
+			if(skuIdToItemId.get(skuId) == null){
+				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, null);
+				break;
+			}
+			//item sku lifecycle校验
+			Item item = itemDao.findItemById(skuIdToItemId.get(skuId));
+			Sku sku = skuDao.findSkuById(skuId);
+			if(item == null || sku == null || item.getLifecycle().intValue() != 1 || sku.getLifecycle().intValue() != 1){
+				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, null);
+				break;
+			}
+			//3 ,=============sku 的库存状态校验通过================
+			//库存校验
+			if(!validateSkuInventory(command ,  quantity , bundleSkuMap.get(skuId) ,  sku)){
+				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),item.getId(), skuId);
+				break;
+			}
+			
+		}
+
+		return result;
+		
+	}
+	/**
+	 * 校验bundle本身的lifecycle是否上架
+	 * @param command
+	 * @param bundleItem
+	 * @param result
+	 * @return
+	 */
+	private boolean validateBundleLifeCycle(BundleCommand command ,Item bundleItem ,BundleValidateResult result ){
+		if(bundleItem.getLifecycle().intValue() == 2){//bundle不存在
+			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , command.getId(),null, null);
+			return false ;
+		}
+		if(bundleItem.getLifecycle().intValue() == 3){//bundle未上架
+			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_PUTAWAY.getStatus() , command.getId(),null, null);
+			return false ;
+		}
+		if(bundleItem.getLifecycle().intValue() == 0){//bundle已下架
+			buildValidateResult( result ,BundleStatus.BUNDLE_SOLD_OUT.getStatus() , command.getId(),null, null);
+			return false ;
+		}
+		return true;
 	}
 	
 	/**
-	 * 校验sku的库存和状态
-	 * @param bundleId
+	 * key : skuId ; value : itemId
+	 * @param bundleSkus
 	 * @param skuIds
-	 * @param quantity
-	 * @param bundleSkusIdAndItemId
-	 * @param result
+	 * @return
 	 */
-	private void isSkuInventoryEnough(Long bundleId,List<Long> skuIds, 
-			int quantity,Map<Long,Long> bundleSkusIdAndItemId,BundleValidateResult result){
-		//判断bundle库存是否足
-		boolean inventoryFlag = true;
-		for(Long skuId : skuIds){
-			if(bundleSkusIdAndItemId.containsKey(skuId)){
-				Sku sku = skuDao.findSkuById(skuId);
-				SkuInventory skuInventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
-				if(sku != null && skuInventory != null){
-					if(sku.getLifecycle().intValue() == 0 || sku.getLifecycle().intValue() == 2 || sku.getLifecycle().intValue() == 3){
-						result.setType(BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus());
-						result.setSkuId(skuId);
-						result.setItemId(bundleSkusIdAndItemId.get(skuId));
-						result.setBundleId(bundleId);
-						inventoryFlag = false;
-					}else if(sku.getLifecycle().intValue() == 1){
-						if(skuInventory.getAvailableQty() < quantity){
-							result.setType(BundleStatus.BUNDLE_ITEM_NO_INVENTORY.getStatus());
-							result.setSkuId(skuId);
-							result.setItemId(bundleSkusIdAndItemId.get(skuId));
-							result.setBundleId(bundleId);
-							inventoryFlag = false;
-						}
-					}
-				}else{
-					result.setType(BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus());
-					result.setSkuId(skuId);
-					result.setItemId(bundleSkusIdAndItemId.get(skuId));
-					result.setBundleId(bundleId);
-					inventoryFlag = false;
-				}
-			}else{
-				result.setType(BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus());
-				result.setSkuId(skuId);
-				result.setItemId(bundleSkusIdAndItemId.get(skuId));
-				result.setBundleId(bundleId);
-				inventoryFlag = false;
+	private Map<Long,Long> skuIdToItemId(List<BundleSku> bundleSkus , List<Long> skuIds){
+		Map<Long,Long> skuIdToItemId = new HashMap<Long, Long>();
+		for (BundleSku sku : bundleSkus) {
+			if(!skuIdToItemId.containsKey(sku.getSkuId()) && skuIds.contains(sku.getSkuId())){
+				skuIdToItemId.put(sku.getSkuId(), sku.getItemId());
 			}
 		}
-		if(inventoryFlag){//sku有库存
-			result.setType(BundleStatus.BUNDLE_CAN_SALE.getStatus());
+		return skuIdToItemId;
+	}
+	/**
+	 * key : skuId , value : BundleSku
+	 * @param bundleSkus
+	 * @return
+	 */
+	private Map<Long,BundleSku> skuIdToBundleSku(List<BundleSku> bundleSkus){
+		Map<Long,BundleSku> skuIdToItemId = new HashMap<Long, BundleSku>();
+		for (BundleSku sku : bundleSkus) {
+			if(!skuIdToItemId.containsKey(sku.getSkuId())){
+				skuIdToItemId.put(sku.getSkuId(), sku);
+			}
 		}
+		return skuIdToItemId;
+	}
+	
+	/**
+	 * 校验单个sku的库存是否足够
+	 * @param result
+	 * @param bundle
+	 * @param quantity
+	 * @param sku
+	 * @return
+	 */
+	private boolean validateSkuInventory(BundleCommand bundle , int quantity ,BundleSku bundleSku , Sku sku){
+		Integer availableQty = bundle.getAvailableQty();
+		// 如果捆绑装单独维护了库存
+		if(availableQty != null) {
+			// 如果不需要同步扣减单品库存 ,那么就以捆绑装设置的库存为准；否则取捆绑装库存与sku实际可用库存的最小值
+			if(!bundle.getSyncWithInv() && availableQty.intValue() < quantity){
+				return false;
+			}
+			if(bundle.getSyncWithInv()){
+				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
+				int qty = 0 ;
+				if(inventory != null && inventory.getAvailableQty() != null){
+					qty = inventory.getAvailableQty();
+				}
+				if((Math.min(availableQty, qty)) < quantity){
+					return false;
+				}
+			}
+		} 
+		
+		SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
+		if(inventory == null ||inventory.getAvailableQty().intValue() < quantity){
+			return false;
+		}
+		
+	   return true;
+	}
+	
+	/**
+	 * 构建校验结果对象
+	 * @param result
+	 * @param type
+	 * @param bundleId
+	 * @param itemId
+	 * @param skuId
+	 * @return
+	 */
+	private void buildValidateResult(BundleValidateResult result ,int type , Long bundleId,Long itemId, Long skuId){
+		result.setBundleId(bundleId);
+		result.setItemId(itemId);
+		result.setSkuId(skuId);
+		result.setType(type);
 	}
 
 	/**
