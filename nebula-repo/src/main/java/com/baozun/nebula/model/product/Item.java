@@ -44,7 +44,7 @@ public class Item extends BaseModel {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 882446624240577496L;
-
+	
 	/** PK. */
 	private Long id;
 

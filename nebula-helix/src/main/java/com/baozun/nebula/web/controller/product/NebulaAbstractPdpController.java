@@ -40,6 +40,7 @@ import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.CurmbCommand;
+import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
@@ -138,10 +139,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
 	
+<<<<<<< HEAD
     /** The browsing history resolver. */
     @Autowired
     private BrowsingHistoryResolver     browsingHistoryResolver;
 	
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	/**
 	 * 构造PdpViewCommand
 	 * @throws IllegalItemStateException 
@@ -196,15 +200,15 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
         }
 				
 		Integer lifecycle = itemBaseInfo.getLifecycle();
-		if(2 == lifecycle) {
+		if(Item.LIFECYCLE_DELETED == lifecycle) {
 			// 商品逻辑删除
 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item logical deleted. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED);
-		} else if(3 == lifecycle) {
+		} else if(Item.LIFECYCLE_UNACTIVE == lifecycle) {
 			// 商品新建状态
 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
-		} else if(0 == lifecycle) {
+		} else if(Item.LIFECYCLE_DISABLE == lifecycle) {
 			// 商品未上架
 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);
@@ -217,7 +221,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
             throw new IllegalItemStateException(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME);
         }
 		
-		if(0 == itemBaseInfo.getType()) {
+		if(Constants.ITEM_TYPE_PREMIUMS == itemBaseInfo.getType()) {
 			// 商品是赠品
 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
             throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);

@@ -59,7 +59,7 @@ public class BundleSkuViewCommandConverter extends BaseConverter<BundleSkuViewCo
 			return null;
 		}
 		
-		if (data instanceof BundleCommand) {
+		if (data instanceof BundleSkuCommand) {
 			BundleSkuCommand bundleSkuCommand = (BundleSkuCommand) data;
 			return (BundleSkuViewCommand)ConvertUtils.convertTwoObject(new BundleSkuViewCommand(), bundleSkuCommand);
 		} else {
