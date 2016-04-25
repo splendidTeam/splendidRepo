@@ -74,7 +74,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		if (bundles != null) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			if(flag.length == 0 || Boolean.TRUE.equals(flag[0])){
+			if(flag == null || flag.length == 0 || Boolean.TRUE.equals(flag[0])){
 				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 				removeInvalidBundleInfo(bundles);
 			}
@@ -91,7 +91,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag) {
 		BundleCommand bundle = bundleDao.findBundlesById(boundleId, null);
 		fillBundleCommand(bundle);
-		if((flag.length == 0 || Boolean.TRUE.equals(flag[0])) && needRemoveInvalidBundle(bundle)){
+		if((flag == null || flag.length == 0 || Boolean.TRUE.equals(flag[0])) && needRemoveInvalidBundle(bundle)){
 			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 			return null;
 		}
@@ -105,7 +105,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		if (bundles != null) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			if(flag.length == 0 || Boolean.TRUE.equals(flag[0])){
+			if(flag == null || flag.length == 0 || Boolean.TRUE.equals(flag[0])){
 				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 				removeInvalidBundleInfo(bundles);
 			}
