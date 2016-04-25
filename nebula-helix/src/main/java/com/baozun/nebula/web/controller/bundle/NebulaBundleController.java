@@ -168,8 +168,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	/**
 	 * 异步加载bundle信息
 	 * 
-	 * @RequestMapping(value = "/bundle/loadBundles.json", method =
-	 *                       RequestMethod.GET)
+	 * @RequestMapping(value = "/bundle/loadBundles.json", method = RequestMethod.GET)
+	 * @ResponseBody
 	 * 
 	 * @param itemId
 	 * @param request
@@ -185,7 +185,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		result.setStatusCode(String.valueOf(HttpStatus.OK));
 		
 		// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-		List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId);
+		List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
 		if (Validator.isNotNullOrEmpty(bundleCommands)) {
 			result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
 		}
@@ -210,7 +210,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造商品详情页面捆绑类商品视图层对象
+	 * 构造商品详情页面捆绑类商品视图模型
 	 * 
 	 * <p>
 	 * 一般情况下商品详情页面不需要加载捆绑类商品本身的商品描述、seo等扩展信息以及图片等， 
@@ -225,7 +225,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		}
 		
 		List<BundleViewCommand> result = bundleViewCommandConverter.convert(bundleCommands);
-		for(int i = 0; i <  result.size(); i++) {
+		for(int i = 0; i < result.size(); i++) {
 			BundleViewCommand command = result.get(i);
 			command.setBundleElementViewCommands(buildBundleElementViewCommand(bundleCommands.get(i).getBundleElementCommands()));
 		}
@@ -234,7 +234,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑商品详情页视图对象
+	 * 构造捆绑商品详情页视图模型
 	 * <ul>
 	 * <li>bundle本身作为无属性类商品。</li>
 	 * <li>默认只显示正常上架的bundle，如果需要预览未上架、下架bundle需要重构此方法</li>
@@ -244,11 +244,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 */
 	@Override
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
-		//校验bundle中item,sku的lifecycle状态
-		/*if(!bundleCommand.isEnabled()){
-			LOG.info("Bundle disable...have disable item or sku...... [{}]",new Date());
-			return null;
-		}*/
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
 		if(itemBaseInfoViewCommand.getLifecycle()!=1){
@@ -276,7 +271,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑类商品成员的视图层对象
+	 * 构造捆绑类商品成员的视图模型
 	 * 
 	 * <p>
 	 * 该方法的默认实现，包含如下信息，如果需要更多的数据，需要重写该方法。
@@ -317,7 +312,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑类商品中的商品的视图层对象
+	 * 构造捆绑类商品中的商品的视图模型
 	 * 
 	 * <p>
 	 * 该方法的默认实现，包含如下信息，如果需要更多的数据，需要重写该方法。
@@ -363,7 +358,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	}
 
 	/**
-	 * 构造捆绑类商品sku的视图层对象
+	 * 构造捆绑类商品sku的视图模型
 	 * 
 	 * <p>
 	 * 该方法的默认实现，包含如下的信息，如果需要更多的数据支持，需要重写该方法。
