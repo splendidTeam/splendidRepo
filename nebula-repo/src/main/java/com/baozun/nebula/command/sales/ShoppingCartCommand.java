@@ -26,7 +26,9 @@ import com.baozun.nebula.command.Command;
 /**
  * @author xianze.zhang
  *@creattime 2013-11-27
+ * @deprecated 搜索了一遍貌似没有被引用
  */
+@Deprecated
 public class ShoppingCartCommand implements Command{
 	/**
 	 * 

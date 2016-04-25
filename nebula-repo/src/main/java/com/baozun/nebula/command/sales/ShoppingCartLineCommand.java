@@ -13,187 +13,186 @@ import com.baozun.nebula.command.Command;
 /**
  * @author xianze.zhang
  * @creattime 2013-11-27
+ * @deprecated 搜索了一遍貌似没有被引用
  */
+@Deprecated
 public class ShoppingCartLineCommand implements Command{
 
-	/**
-	 * 
-	 */
-	private static final long	serialVersionUID	= -423227208998561781L;
+    private static final long serialVersionUID = -423227208998561781L;
 
-	/** The list price. */
-	private BigDecimal		listPrice;
+    /** extentioncode */
+    private String            extentionCode;
 
-	/** extentioncode */
-	private String			extentionCode;
+    private Long              itemId;
 
-	private Long			itemId;
+    /** 商品编码 */
+    private String            code;
 
-	/** 商品编码 */
-	private String			code;
+    /** 商品名称 */
+    private String            name;
 
-	/** 商品名称 */
-	private String			name;
+    /** 商品图片 */
+    private String            pic;
 
-	/** 商品图片 */
-	private String			pic;
+    /** The add time. */
+    private Long              addTime;
 
-	/** The add time. */
-	private Long			addTime;
+    /** 数量. */
+    private Integer           quantity;
 
-	// 原单价
-	/** The original unit price. */
-	private BigDecimal		originalUnitPrice;
+    //******************************************************************************
 
-	// 活动单价
-	/** The activity unit price. */
-	private BigDecimal		activityUnitPrice;
+    /** The list price. */
+    private BigDecimal        listPrice;
 
-	// 数量
-	/** The quantity. */
-	private Integer			quantity;
+    /** 原单价. */
+    private BigDecimal        originalUnitPrice;
 
-	// 库存可用量
-	/** The inv available qty. */
-	private Integer			invAvailableQty;
+    /** 活动单价. */
+    private BigDecimal        activityUnitPrice;
 
-	// 赠品列表,行赠品列表
-	private List<GiftBean>	giftList	= new ArrayList<GiftBean>();
+    /** 库存可用量. */
+    private Integer           invAvailableQty;
 
-	/**
-	 *  是否选中
-	 *  作用：
-	 *  1、用户可以选择一部分商品进行提交订单
-	 *  2、当是赠品行的时候可以用于标识用户选中了哪些赠品
-	 */
-	private Boolean			isChecked;
+    /**
+     * 赠品列表,行赠品列表
+     */
+    private List<GiftBean>    giftList         = new ArrayList<GiftBean>();
 
-	// 活动对象，封装了所有活动信息
-	// private SalesActivityBean activityBean = new SalesActivityBean();
+    /**
+     * 是否选中
+     * 作用：
+     * 1、用户可以选择一部分商品进行提交订单
+     * 2、当是赠品行的时候可以用于标识用户选中了哪些赠品
+     */
+    private Boolean           isChecked;
 
-	/**
-	 * Cal original total amount.
-	 * 
-	 * @return the big decimal
-	 */
-	public BigDecimal calOriginalTotalAmount(){
-		BigDecimal originalTotalAmount = this.originalUnitPrice.multiply(new BigDecimal(this.quantity)).setScale(2, RoundingMode.HALF_UP);
-		return originalTotalAmount.doubleValue() > 0 ? originalTotalAmount : BigDecimal.ZERO;
-	}
+    // 活动对象，封装了所有活动信息
+    // private SalesActivityBean activityBean = new SalesActivityBean();
 
-	/**
-	 * Cal activity total amount.
-	 * 
-	 * @return the big decimal
-	 */
-	public BigDecimal calActivityTotalAmount(){
-		if (activityUnitPrice == null || quantity == null)
-			throw new RuntimeException("ActivityUntiPrice & quantity should be set at this moment");
-		return this.activityUnitPrice.multiply(new BigDecimal(this.quantity));
-	}
+    /**
+     * Cal original total amount.
+     * 
+     * @return the big decimal
+     */
+    public BigDecimal calOriginalTotalAmount(){
+        BigDecimal originalTotalAmount = this.originalUnitPrice.multiply(new BigDecimal(this.quantity)).setScale(2, RoundingMode.HALF_UP);
+        return originalTotalAmount.doubleValue() > 0 ? originalTotalAmount : BigDecimal.ZERO;
+    }
 
-	public BigDecimal getListPrice(){
-		return listPrice;
-	}
+    /**
+     * Cal activity total amount.
+     * 
+     * @return the big decimal
+     */
+    public BigDecimal calActivityTotalAmount(){
+        if (activityUnitPrice == null || quantity == null)
+            throw new RuntimeException("ActivityUntiPrice & quantity should be set at this moment");
+        return this.activityUnitPrice.multiply(new BigDecimal(this.quantity));
+    }
 
-	public void setListPrice(BigDecimal listPrice){
-		this.listPrice = listPrice;
-	}
+    public BigDecimal getListPrice(){
+        return listPrice;
+    }
 
-	public String getExtentionCode(){
-		return extentionCode;
-	}
+    public void setListPrice(BigDecimal listPrice){
+        this.listPrice = listPrice;
+    }
 
-	public void setExtentionCode(String extentionCode){
-		this.extentionCode = extentionCode;
-	}
+    public String getExtentionCode(){
+        return extentionCode;
+    }
 
-	public String getCode(){
-		return code;
-	}
+    public void setExtentionCode(String extentionCode){
+        this.extentionCode = extentionCode;
+    }
 
-	public void setCode(String code){
-		this.code = code;
-	}
+    public String getCode(){
+        return code;
+    }
 
-	public String getName(){
-		return name;
-	}
+    public void setCode(String code){
+        this.code = code;
+    }
 
-	public void setName(String name){
-		this.name = name;
-	}
+    public String getName(){
+        return name;
+    }
 
-	public String getPic(){
-		return pic;
-	}
+    public void setName(String name){
+        this.name = name;
+    }
 
-	public void setPic(String pic){
-		this.pic = pic;
-	}
+    public String getPic(){
+        return pic;
+    }
 
-	public Long getAddTime(){
-		return addTime;
-	}
+    public void setPic(String pic){
+        this.pic = pic;
+    }
 
-	public void setAddTime(Long addTime){
-		this.addTime = addTime;
-	}
+    public Long getAddTime(){
+        return addTime;
+    }
 
-	public BigDecimal getOriginalUnitPrice(){
-		return originalUnitPrice;
-	}
+    public void setAddTime(Long addTime){
+        this.addTime = addTime;
+    }
 
-	public void setOriginalUnitPrice(BigDecimal originalUnitPrice){
-		this.originalUnitPrice = originalUnitPrice;
-	}
+    public BigDecimal getOriginalUnitPrice(){
+        return originalUnitPrice;
+    }
 
-	public BigDecimal getActivityUnitPrice(){
-		return activityUnitPrice;
-	}
+    public void setOriginalUnitPrice(BigDecimal originalUnitPrice){
+        this.originalUnitPrice = originalUnitPrice;
+    }
 
-	public void setActivityUnitPrice(BigDecimal activityUnitPrice){
-		this.activityUnitPrice = activityUnitPrice;
-	}
+    public BigDecimal getActivityUnitPrice(){
+        return activityUnitPrice;
+    }
 
-	public Integer getQuantity(){
-		return quantity;
-	}
+    public void setActivityUnitPrice(BigDecimal activityUnitPrice){
+        this.activityUnitPrice = activityUnitPrice;
+    }
 
-	public void setQuantity(Integer quantity){
-		this.quantity = quantity;
-	}
+    public Integer getQuantity(){
+        return quantity;
+    }
 
-	public Integer getInvAvailableQty(){
-		return invAvailableQty;
-	}
+    public void setQuantity(Integer quantity){
+        this.quantity = quantity;
+    }
 
-	public void setInvAvailableQty(Integer invAvailableQty){
-		this.invAvailableQty = invAvailableQty;
-	}
+    public Integer getInvAvailableQty(){
+        return invAvailableQty;
+    }
 
-	public List<GiftBean> getGiftList(){
-		return giftList;
-	}
+    public void setInvAvailableQty(Integer invAvailableQty){
+        this.invAvailableQty = invAvailableQty;
+    }
 
-	public void setGiftList(List<GiftBean> giftList){
-		this.giftList = giftList;
-	}
+    public List<GiftBean> getGiftList(){
+        return giftList;
+    }
 
-	public Boolean getIsChecked(){
-		return isChecked;
-	}
+    public void setGiftList(List<GiftBean> giftList){
+        this.giftList = giftList;
+    }
 
-	public void setIsChecked(Boolean isChecked){
-		this.isChecked = isChecked;
-	}
+    public Boolean getIsChecked(){
+        return isChecked;
+    }
 
-	public Long getItemId(){
-		return itemId;
-	}
+    public void setIsChecked(Boolean isChecked){
+        this.isChecked = isChecked;
+    }
 
-	public void setItemId(Long itemId){
-		this.itemId = itemId;
-	}
+    public Long getItemId(){
+        return itemId;
+    }
+
+    public void setItemId(Long itemId){
+        this.itemId = itemId;
+    }
 
 }
