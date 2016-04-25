@@ -127,17 +127,26 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * @param bundleItemInfo
 	 */
 	private BundleValidateResult validateBundleInfo(Long bundleId,List<Long> skuIds, int quantity){
-		BundleValidateResult result = new BundleValidateResult();
+		BundleValidateResult result = new BundleValidateResult(BundleStatus.BUNDLE_CAN_SALE.getStatus(),null,null,null);
+		//校验前台返回数据
+		if(skuIds == null || skuIds.size() == 0 || quantity < 1){
+		   buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
+		   return result;
+		}
 		//查询bundle的所有相关信息
 		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
 		
-		Item bundleItem = itemDao.findItemById(command.getItemId());
+		if(command == null){//bundle不存在
+			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
+			return result ;
+		} 
 		
-		if(bundleItem == null || command == null){//bundle不存在
+		Item bundleItem = itemDao.findItemById(command.getItemId());
+		if(bundleItem == null){//bundle不存在
 			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
 			return result ;
 		}
-        
+				
 		return validateBundle(result,bundleItem,command,skuIds,quantity);
 	}
 	/**
