@@ -99,7 +99,7 @@ public class BundleSku extends BaseModel {
 	 * 捆绑装采用“定制价格”价格模式设置的sku的价格，
 	 * 如果非此价格模式，则此属性无意义。
 	 */
-	private BigDecimal salesPrice;
+	private BigDecimal salesPrice = BigDecimal.ZERO;
 
 	@Id
 	@Column(name = "ID")

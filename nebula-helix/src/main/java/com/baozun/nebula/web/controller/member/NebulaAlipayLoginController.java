@@ -56,7 +56,7 @@ public class NebulaAlipayLoginController extends NebulaOAuthLoginController{
 		ThirdPartyMember member = adaptor.returnMember(request);
 
 		// 判断支付宝用户登录信息是否成功获取
-		if (member.getErrorCode() == null || member.getErrorCode().trim().length() == 0) {
+		if (member.getErrorCode() != null && member.getErrorCode().trim().length() >0) {
 			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_ALIPAY, member.getErrorCode());
 			return null;
 		}

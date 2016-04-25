@@ -73,6 +73,8 @@ public class ItemReviewViewCommandConverter extends
 			}catch(Exception e){
 				e.printStackTrace();
 			}
+			
+			return itemReviewViewCommand;
 		}else{
 			if(obj1 instanceof RateCommand){
 				throw new UnsupportDataTypeException(obj2.getClass()
@@ -82,7 +84,6 @@ public class ItemReviewViewCommandConverter extends
 						+ " cannot convert to " + ItemReviewViewCommand.class + "yet.");
 			}
 		}
-		return null;
 	}
 
 

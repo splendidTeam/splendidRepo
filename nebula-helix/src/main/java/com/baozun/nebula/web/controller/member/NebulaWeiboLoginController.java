@@ -54,7 +54,7 @@ public class NebulaWeiboLoginController extends NebulaOAuthLoginController{
 		ThirdPartyMember member = adaptor.returnMember(request);
 
 		// 判断微博用户登录信息是否成功获取
-		if (member.getErrorCode() == null || member.getErrorCode().trim().length() == 0) {
+		if (member.getErrorCode() != null && member.getErrorCode().trim().length() >0) {
 			LOG.error("thirdParty source {} login failure, errorCode is {}", ThirdPartyMemberFactory.TYPE_WEIBO, member.getErrorCode());
 			return null;
 		}

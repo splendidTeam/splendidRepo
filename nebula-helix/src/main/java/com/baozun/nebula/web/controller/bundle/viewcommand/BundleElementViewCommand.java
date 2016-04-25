@@ -32,12 +32,14 @@
 package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
+ * 捆绑类商品成员视图模型
+ * 
  * @author yue.ch
  *
  */
@@ -80,9 +82,9 @@ public class BundleElementViewCommand extends BaseViewCommand {
 	private BigDecimal maxSalesPrice;
 	
 	/**
-	 * 捆绑类商品成员的属性和属性值
+	 * 捆绑类商品成员中商品存在的属性id和属性名
 	 */
-	private List<PropertyElementViewCommand> propertyElementViewCommands;
+	private LinkedHashMap<Long, Object> properties; 
 	
 	/**
 	 * 捆绑类商品成员中包含的商品
@@ -137,14 +139,6 @@ public class BundleElementViewCommand extends BaseViewCommand {
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
-	public List<PropertyElementViewCommand> getPropertyElementViewCommands() {
-		return propertyElementViewCommands;
-	}
-
-	public void setPropertyElementViewCommands(List<PropertyElementViewCommand> propertyElementViewCommands) {
-		this.propertyElementViewCommands = propertyElementViewCommands;
-	}
-
 	public List<BundleItemViewCommand> getBundleItemViewCommands() {
 		return bundleItemViewCommands;
 	}
@@ -159,6 +153,14 @@ public class BundleElementViewCommand extends BaseViewCommand {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public LinkedHashMap<Long, Object> getProperties() {
+		return properties;
+	}
+
+	public void setProperties(LinkedHashMap<Long, Object> properties) {
+		this.properties = properties;
 	}
 	
 }

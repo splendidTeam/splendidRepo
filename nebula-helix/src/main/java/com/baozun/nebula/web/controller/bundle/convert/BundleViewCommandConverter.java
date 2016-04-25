@@ -33,18 +33,12 @@ package com.baozun.nebula.web.controller.bundle.convert;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
-import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
-import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
-
-import loxia.utils.PropListCopyable;
-import loxia.utils.PropertyUtil;
 
 /**
+ * 捆绑类商品视图模型转换器
  * @author yue.ch
  *
  */

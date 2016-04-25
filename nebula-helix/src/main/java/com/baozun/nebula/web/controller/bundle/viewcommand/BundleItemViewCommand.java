@@ -33,11 +33,14 @@ package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 
 /**
+ * 捆绑类商品的商品视图模型
+ * 
  * @author yue.ch
  *
  */
@@ -59,11 +62,6 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	 * 商品副标题
 	 */
 	private String subTitle;
-	
-	/**
-	 * 商品图片
-	 */
-	private String imageUrl;
 	
 	/**
 	 * 最小吊牌价
@@ -96,9 +94,14 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private BigDecimal maxSalesPrice;
 	
 	/**
-	 * 商品属性与属性值
+	 * 商品销售属性
 	 */
-	private Map<String, Object> properties;
+	private List<PropertyElementViewCommand> salesProperties;
+	
+	/**
+	 * 商品图片
+	 */
+	private List<ItemImageViewCommand> images;
 	
 	/**
 	 * 商品中包含的sku
@@ -127,14 +130,6 @@ public class BundleItemViewCommand extends BaseViewCommand {
 
 	public void setSubTitle(String subTitle) {
 		this.subTitle = subTitle;
-	}
-
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
 	}
 
 	public BigDecimal getMinListPrice() {
@@ -185,12 +180,12 @@ public class BundleItemViewCommand extends BaseViewCommand {
 		this.maxSalesPrice = maxSalesPrice;
 	}
 
-	public Map<String, Object> getProperties() {
-		return properties;
+	public List<PropertyElementViewCommand> getSalesProperties() {
+		return salesProperties;
 	}
 
-	public void setProperties(Map<String, Object> properties) {
-		this.properties = properties;
+	public void setSalesProperties(List<PropertyElementViewCommand> salesProperties) {
+		this.salesProperties = salesProperties;
 	}
 
 	public List<BundleSkuViewCommand> getSkuViewCommands() {
@@ -199,6 +194,14 @@ public class BundleItemViewCommand extends BaseViewCommand {
 
 	public void setSkuViewCommands(List<BundleSkuViewCommand> skuViewCommands) {
 		this.skuViewCommands = skuViewCommands;
+	}
+
+	public List<ItemImageViewCommand> getImages() {
+		return images;
+	}
+
+	public void setImages(List<ItemImageViewCommand> images) {
+		this.images = images;
 	}
 
 }

@@ -25,7 +25,7 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
-		<version.feilong-platform>1.5.3</version.feilong-platform>
+		<version.feilong-platform>1.5.4-SNAPSHOT</version.feilong-platform>
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
@@ -58,7 +58,7 @@
 		<!-- **********************end native2ascii config******************************************* -->
 
 		<version.esapi>2.0GA</version.esapi>
-		<version.solr-solrj>3.6.2</version.solr-solrj>
+		<version.solr-solrj>4.7.0</version.solr-solrj>
 
 		<version.velocity>1.7</version.velocity>
 		<version.loxia>2.5.2</version.loxia>

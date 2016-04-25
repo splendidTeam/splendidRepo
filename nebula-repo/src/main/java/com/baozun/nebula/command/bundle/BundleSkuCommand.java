@@ -28,18 +28,41 @@ public class BundleSkuCommand extends BundleSku{
 	 * sku原销售价
 	 * 
 	 */
-	private BigDecimal originalSalesPrice;
+	private BigDecimal originalSalesPrice = BigDecimal.ZERO;
 	
 	/**
 	 * sku吊牌价
 	 */
-	private BigDecimal listPrice;
+	private BigDecimal listPrice = BigDecimal.ZERO;
 	
 	/**
 	 * 库存数量
 	 */
 	private int quantity ;
 	
+	/**
+	 * 销售属性
+	 */
+	private String properties;
+	
+	/**
+	 * 外部编码
+	 */
+	private String extentionCode;
+	
+	/**
+	 * 生命周期
+	 */
+	private Integer lifeCycle;
+	
+	public Integer getLifeCycle() {
+		return lifeCycle;
+	}
+
+	public void setLifeCycle(Integer lifeCycle) {
+		this.lifeCycle = lifeCycle;
+	}
+
 	public int getQuantity() {
 		return quantity;
 	}
@@ -64,5 +87,20 @@ public class BundleSkuCommand extends BundleSku{
 		this.listPrice = listPrice;
 	}
 
+	public String getProperties() {
+		return properties;
+	}
+
+	public void setProperties(String properties) {
+		this.properties = properties;
+	}
+
+	public String getExtentionCode() {
+		return extentionCode;
+	}
+
+	public void setExtentionCode(String extentionCode) {
+		this.extentionCode = extentionCode;
+	}
 	
 }

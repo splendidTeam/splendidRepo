@@ -101,6 +101,13 @@ public interface SdkItemManager extends BaseManager{
 	public List<ItemProperties> findItemPropertiesByItemId(Long itemId);
 	
 	/**
+	 * 获取一批商品动态属性(规格参数)
+	 * @param itemIds
+	 * @return
+	 */
+	List<ItemProperties> findItemPropertiesByItemIds(List<Long> itemIds);
+	
+	/**
 	 * 获取商品动态属性(规格参数)
 	 * @param ids id列表
 	 * @return
@@ -392,4 +399,6 @@ public interface SdkItemManager extends BaseManager{
 	 * @return
 	 */
 	public Integer findRateCountByItemCode(String itemCode);
+
+	
 }

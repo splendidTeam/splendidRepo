@@ -32,11 +32,16 @@
 package com.baozun.nebula.web.controller.bundle.viewcommand;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
+ * 捆绑类商品的sku视图模型
+ * 
+ * <p>
+ * 捆绑类商品sku基本信息的封装，如果需要额外的信息，可以使用extraData属性进行扩展。
+ * </p>
+ * 
  * @author yue.ch
  *
  */
@@ -70,13 +75,14 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 	private Integer quantity;
 	
 	/**
-	 * sku的属性与属性值<br/><br/>
-	 * 
-	 * key:propertyId<br/>
-	 * value:propertyValueName<br/>
-	 * {12:"红色"}
+	 * sku的销售属性
 	 */
-	private Map<Long, Object> properties;
+	private String properties;
+	
+	/**
+	 * sku外部编码
+	 */
+	private String extentionCode;
 	
 	public Long getSkuId() {
 		return skuId;
@@ -118,12 +124,19 @@ public class BundleSkuViewCommand extends BaseViewCommand {
 		this.quantity = quantity;
 	}
 
-	public Map<Long, Object> getProperties() {
+	public String getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Map<Long, Object> properties) {
+	public void setProperties(String properties) {
 		this.properties = properties;
 	}
 
+	public String getExtentionCode() {
+		return extentionCode;
+	}
+
+	public void setExtentionCode(String extentionCode) {
+		this.extentionCode = extentionCode;
+	}
 }
