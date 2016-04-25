@@ -58,7 +58,7 @@
 		<!-- **********************end native2ascii config******************************************* -->
 
 		<version.esapi>2.0GA</version.esapi>
-		<version.solr-solrj>3.6.2</version.solr-solrj>
+		<version.solr-solrj>4.7.0</version.solr-solrj>
 
 		<version.velocity>1.7</version.velocity>
 		<version.loxia>2.5.2</version.loxia>

@@ -19,7 +19,6 @@ import java.io.IOException;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -39,23 +38,26 @@ public class DeleteSolrTest extends AbstractJUnit4SpringContextTests{
 	
 	protected SolrServer		solrServer;
 
-	@SuppressWarnings("deprecation")
-	@Test
-	public void remove() {    
-		try {  
-			
-			 solrServer = new CommonsHttpSolrServer("http://localhost:2002/solr-nebula/sku");//测试多核选择需要测试的那个
-			
-			//删除id为1的索引        
-			 solrServer.deleteById("2");        
-			 solrServer.commit();        
-				} 
-		catch (SolrServerException e) 
-		{        
-			e.printStackTrace();    
-			} catch (IOException e) {       
-				e.printStackTrace();   
-				}
-		}
+	/**
+	 * solr换成solr4.7.0
+	 */
+//	@SuppressWarnings("deprecation")
+//	@Test
+//	public void remove() {    
+//		try {  
+//			
+//			 solrServer = new CommonsHttpSolrServer("http://localhost:2002/solr-nebula/sku");//测试多核选择需要测试的那个
+//			
+//			//删除id为1的索引        
+//			 solrServer.deleteById("2");        
+//			 solrServer.commit();        
+//				} 
+//		catch (SolrServerException e) 
+//		{        
+//			e.printStackTrace();    
+//			} catch (IOException e) {       
+//				e.printStackTrace();   
+//				}
+//		}
 	
 }
