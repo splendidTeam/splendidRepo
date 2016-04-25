@@ -141,7 +141,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		model.addAttribute("inventoryViewCommands", super.buildInventoryViewCommand(itemId));
+		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
 		return DefaultReturnResult.SUCCESS;
 	}
 	
