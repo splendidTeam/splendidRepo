@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.product.resolver;
 
 import java.util.List;
 
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 
@@ -38,12 +39,14 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewC
  * @version   
  */
 public interface ItemColorSwatchViewCommandResolver {
+	
 	/**
 	 * 
 	 * @param baseInfoViewCommand (应至少包含itemId、itemCode)
-	 * @param itemPropertyViewCommand
+	 * @param itemImageViewCommandConverter
 	 * @return
 	 */
-	List<ItemColorSwatchViewCommand> resolve(ItemBaseInfoViewCommand baseInfoViewCommand
+	List<ItemColorSwatchViewCommand> resolve(ItemBaseInfoViewCommand baseInfoViewCommand,
+			ItemImageViewCommandConverter itemImageViewCommandConverter
 			);
 }

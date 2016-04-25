@@ -236,7 +236,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
-		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
+		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
 	}
 	
 	/**

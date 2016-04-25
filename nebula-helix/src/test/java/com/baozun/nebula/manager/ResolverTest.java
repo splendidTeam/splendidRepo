@@ -33,6 +33,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -63,6 +65,12 @@ public class ResolverTest {
 	@Autowired
 	private ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
 	
+	@Autowired
+	private ItemColorSwatchViewCommandResolver						itemColorSwatchViewCommandResolver;
+	
+	@Autowired
+	private ItemImageViewCommandConverter 							itemImageViewCommandConverter;
+	
 	@Before
 	public void setM(){
 		ProfileConfigUtil.setMode("dev");
@@ -83,6 +91,18 @@ public class ResolverTest {
 		LOG.debug("sss:{}", JsonUtil.format(itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images)));
 		
 	}
+	
+	@Test
+	public void testItemColorSwatchViewCommandResolver(){
+		
+		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
+		baseInfoViewCommand.setId(14027L);
+		baseInfoViewCommand.setCode("42611PO033");
+		LOG.debug("sss:{}", JsonUtil.format(itemColorSwatchViewCommandResolver.resolve(baseInfoViewCommand,
+				itemImageViewCommandConverter)));
+	}
+	
+	
 	
 	/**
 	 * 

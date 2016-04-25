@@ -173,7 +173,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		//pdpViewCommand.set?
 		String pMode =getPdpMode(baseInfoViewCommand.getId());
 		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
-			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
+			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand,
+					itemImageViewCommandConverter);
 			pdpViewCommand.setColorSwatches(colorSwatches);
 		}
 		return new DefaultReturnResult();

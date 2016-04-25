@@ -25,7 +25,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
@@ -48,6 +48,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @date 2016年4月22日 下午4:00:31 
  * @version   
  */
+@Component
 public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchViewCommandResolver{
 	
 	private static final Logger         LOGGER                        	= LoggerFactory.getLogger(ItemColorSwatchViewCommandResolverImpl.class);
@@ -58,20 +59,17 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 	@Autowired
 	private SdkItemManager 												sdkItemManager;
 	
-	@Autowired
-	@Qualifier("itemImageViewCommandConverter")
-	ItemImageViewCommandConverter                                   	itemImageViewCommandConverter;
-	
 	private static final String			IMG_TYPE_COLOR				   	="IMG_TYPE_COLOR";
 	
 	private static final String          KEY_PROPS_SALE		    		= "salePropCommandList";
 
 	/* 
-	 * @see com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver#resolve(com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand, java.util.List, com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand)
+	 * @see com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver#resolve(com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand, com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter)
 	 */
 	@Override
 	public List<ItemColorSwatchViewCommand> resolve(
-			ItemBaseInfoViewCommand baseInfoViewCommand) {
+			ItemBaseInfoViewCommand baseInfoViewCommand,
+			ItemImageViewCommandConverter itemImageViewCommandConverter) {
 		Long itemId =baseInfoViewCommand.getId();
 		String itemCode =baseInfoViewCommand.getCode();
 		String style =baseInfoViewCommand.getStyle();
