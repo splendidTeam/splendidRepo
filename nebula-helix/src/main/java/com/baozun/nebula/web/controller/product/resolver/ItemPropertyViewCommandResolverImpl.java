@@ -71,7 +71,7 @@ public class ItemPropertyViewCommandResolverImpl implements
 			List<ItemImageViewCommand> imageViewCommands) {
 		
 		Map<String, Object> dynamicPropertyMap = itemDetailManager.gatherDynamicProperty(baseInfoViewCommand.getId());
-		if(Validator.isNotNullOrEmpty(dynamicPropertyMap)){
+		if(Validator.isNullOrEmpty(dynamicPropertyMap)){
 			return new ItemPropertyViewCommand();
 		}
 		ItemPropertyViewCommand viewCommand =new ItemPropertyViewCommand();
