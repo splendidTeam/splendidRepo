@@ -13,17 +13,17 @@
  * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
  * THIS SOFTWARE OR ITS DERIVATIVES.
  */
-package com.baozun.nebula.manager.bundle;
+package com.baozun.nebula.manager.product;
 
 import java.util.List;
+
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.web.command.BundleValidateResult;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.web.command.BundleValidateResult;
 
 
 public interface NebulaBundleManager extends BaseManager {

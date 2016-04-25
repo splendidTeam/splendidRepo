@@ -1,4 +1,4 @@
-package com.baozun.nebula.command.bundle;
+package com.baozun.nebula.command.product;
 /**
  * Copyright (c) 2012 Baozun All Rights Reserved.
  *

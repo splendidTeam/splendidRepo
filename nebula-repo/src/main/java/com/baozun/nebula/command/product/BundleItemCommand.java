@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.command.bundle;
+package com.baozun.nebula.command.product;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;

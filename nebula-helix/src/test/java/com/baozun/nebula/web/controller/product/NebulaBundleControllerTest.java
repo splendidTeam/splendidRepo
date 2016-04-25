@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.baozun.nebula.web.controller.bundle;
+package com.baozun.nebula.web.controller.product;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,21 +15,21 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
-import com.baozun.nebula.command.bundle.BundleItemCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.manager.bundle.NebulaBundleManager;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.manager.product.NebulaBundleManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
-import com.baozun.nebula.web.controller.bundle.convert.BundleElementViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleItemViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleSkuViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.converter.BundleElementViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleSkuViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 public class NebulaBundleControllerTest extends BaseControllerTest{

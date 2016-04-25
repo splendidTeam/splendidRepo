@@ -29,9 +29,12 @@
 *
  
 */
-package com.baozun.nebula.dao.bundle;
+package com.baozun.nebula.dao.product;
 
 import java.util.List;
+
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.model.bundle.Bundle;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
@@ -39,9 +42,6 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.model.bundle.Bundle;
 
 /**
  * Bundle Dao

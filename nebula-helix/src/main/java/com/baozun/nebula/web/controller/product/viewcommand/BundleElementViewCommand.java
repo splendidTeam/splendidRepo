@@ -29,7 +29,7 @@
 *
  
 */
-package com.baozun.nebula.web.controller.bundle.viewcommand;
+package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;

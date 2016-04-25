@@ -29,7 +29,7 @@
 *
  
 */
-package com.baozun.nebula.web.controller.bundle;
+package com.baozun.nebula.web.controller.product;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -50,25 +50,25 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.command.bundle.BundleCommand;
-import com.baozun.nebula.command.bundle.BundleElementCommand;
-import com.baozun.nebula.command.bundle.BundleItemCommand;
-import com.baozun.nebula.command.bundle.BundleSkuCommand;
-import com.baozun.nebula.manager.bundle.NebulaBundleManager;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.manager.product.NebulaBundleManager;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.bundle.convert.BundleElementViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleItemViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleSkuViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.convert.BundleViewCommandConverter;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleDetailViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleElementViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleItemViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleSkuViewCommand;
-import com.baozun.nebula.web.controller.bundle.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.converter.BundleElementViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleSkuViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.BundleViewCommandConverter;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleDetailViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleElementViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleSkuViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
