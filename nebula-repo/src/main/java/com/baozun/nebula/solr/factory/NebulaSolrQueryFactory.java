@@ -1,0 +1,141 @@
+package com.baozun.nebula.solr.factory;
+
+import java.util.List;
+
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.common.params.GroupParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.baozun.nebula.search.FacetParameter;
+import com.baozun.nebula.search.command.SearchCommand;
+import com.baozun.nebula.solr.Param.SkuItemParam;
+import com.baozun.nebula.solr.command.QueryConditionCommand;
+import com.baozun.nebula.solr.utils.SolrOrderSort;
+import com.feilong.core.Validator;
+
+import loxia.dao.Sort;
+
+public class NebulaSolrQueryFactory{
+
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaSolrQueryFactory.class);
+
+	/**
+	 * 创建查询SolrQuery 将SearchCommand组合成SOLR查询语句
+	 * 
+	 * @return SolrQuery
+	 * @param searchCommand
+	 * @param solrQuery
+	 * @author 冯明雷
+	 * @time 2016年4月22日下午3:16:45
+	 */
+	public static SolrQuery createSolrQuery(SearchCommand searchCommand,SolrQuery solrQuery){
+		if (Validator.isNullOrEmpty(searchCommand.getSearchWord())) {
+			solrQuery.setQuery("*:*");
+		}else{
+			add_FQKEYWORD(searchCommand.getSearchWord(), solrQuery);
+		}
+
+		List<FacetParameter> facetParameters = searchCommand.getFacetParameters();
+		if (Validator.isNotNullOrEmpty(facetParameters)) {
+			for (FacetParameter facetParameter : facetParameters){
+				add_FQAccurateForStringList(solrQuery, facetParameter.getValues(), facetParameter.getName());
+			}
+		}
+
+		return solrQuery;
+	}
+
+	/**
+	 * Sets the sort.
+	 * 
+	 * @param solrQuery
+	 *            the solr query
+	 * @param sorts
+	 *            the sorts
+	 */
+	public static void setSort(SolrQuery solrQuery,SolrOrderSort[] order){
+		if (Validator.isNullOrEmpty(order)) {
+			/*
+			 * 设置默认排序
+			 */
+			solrQuery.addSortField(SkuItemParam.default_sort, ORDER.desc);
+		}else{
+			for (SolrOrderSort sort : order){
+				solrQuery.addSortField(sort.getField(), sort.getType().equalsIgnoreCase(Sort.ASC) ? ORDER.asc : ORDER.desc);
+			}
+		}
+	}
+	
+	public static SolrQuery setGroup(SolrQuery solrQuery) {
+		String groupName = "tagId";
+		solrQuery.set(GroupParams.GROUP, true);
+		solrQuery.set(GroupParams.GROUP_TOTAL_COUNT, true);
+		solrQuery.set(GroupParams.GROUP_LIMIT, 200);
+		solrQuery.set(GroupParams.GROUP_FORMAT, "grouped");
+		String groupNameList = "";
+		String groupSortList = "";
+		
+		solrQuery.set(GroupParams.GROUP_FIELD, groupName);
+
+//		if (null != queryConditionCommand.getGroupSorts()
+//				&& queryConditionCommand.getGroupSorts().size() > 0) {
+//			List<String> groupSorts = queryConditionCommand.getGroupSorts();
+//			for (int i = 0; i < groupSorts.size(); i++) {
+//				groupSortList += groupSorts.get(i).toString();
+//				if (i < groupSorts.size() - 1) {
+//					groupSortList += ",";
+//				}
+//			}
+//			solrQuery.set(GroupParams.GROUP_SORT, groupSortList);
+//		}
+
+		return solrQuery;
+	}
+	
+	
+
+	/**
+	 * 设置关键字搜索
+	 * 
+	 * @param groupField
+	 * @param solrQuery
+	 * @return
+	 */
+	public static void add_FQKEYWORD(String keyword,SolrQuery solrQuery){
+		solrQuery.setQuery(SkuItemParam.keyword + ":" + escape(keyword));
+	}
+
+	/**
+	 * 设置精确搜索条件
+	 */
+	public static void add_FQAccurateForStringList(SolrQuery solrQuery,List<String> words,String type){
+		if (null != words && words.size() > 0) {
+			String fq_keyword = "";
+			int size = words.size();
+			for (int i = 0; i < size; i++){
+				fq_keyword += type + ":" + escape(words.get(i));
+				if (i < size - 1) {
+					fq_keyword += " OR ";
+				}
+			}
+			solrQuery.addFilterQuery(fq_keyword);
+		}
+	}
+
+	public static String escape(String s){
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < s.length(); i++){
+			char c = s.charAt(i);
+			// These characters are part of the query syntax and must be escaped
+			if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':' || c == '^' || c == '[' || c == ']'
+					|| c == '\"' || c == '{' || c == '}' || c == '~' || c == '*' || c == '?' || c == '|' || c == '&') {
+				sb.append('\\');
+			}
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
+}

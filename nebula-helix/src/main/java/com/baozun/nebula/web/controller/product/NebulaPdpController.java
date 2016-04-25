@@ -59,7 +59,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewComman
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 
 
