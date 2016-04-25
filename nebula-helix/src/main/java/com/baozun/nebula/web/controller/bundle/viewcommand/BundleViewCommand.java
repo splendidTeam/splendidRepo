@@ -60,7 +60,7 @@ public class BundleViewCommand extends BaseViewCommand {
 	/**
 	 * 捆绑类商品ID
 	 */
-	private Long bundleId ;
+	private Long id ;
 	
 	/**
 	 * 捆绑类商品对应的商品ID
@@ -103,12 +103,12 @@ public class BundleViewCommand extends BaseViewCommand {
 	 */
 	private List<BundleElementViewCommand> bundleElementViewCommands;
 
-	public Long getBundleId() {
-		return bundleId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setBundleId(Long bundleId) {
-		this.bundleId = bundleId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public Long getItemId() {

@@ -32,11 +32,6 @@ public class BundleCommand extends Bundle{
 	private static final long serialVersionUID = -3173190425455269096L;
 	
 	/**
-	 * 捆绑类商品的编码
-	 */
-	private String code ;
-	
-	/**
 	 * 最小原销售价
 	 */
 	private BigDecimal minOriginalSalesPrice = BigDecimal.ZERO ;
@@ -67,14 +62,6 @@ public class BundleCommand extends Bundle{
 	 */
 	private List<BundleElementCommand> bundleElementCommands = new ArrayList<BundleElementCommand>();
 	
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public List<BundleElementCommand> getBundleElementCommands() {
 		return bundleElementCommands;
 	}
