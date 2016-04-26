@@ -53,13 +53,9 @@ import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandC
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -186,16 +182,15 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		Map<String, Object> returnObject =new HashMap<String, Object>();
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
-		String itemCode ="";
 		try {
 			//PdpViewCommand
-			PdpViewCommand pdpViewCommand = buildPdpViewCommandByObj(itemCode);
+			PdpViewCommand pdpViewCommand = buildPdpViewCommandWhenSwitch(itemId);
 			returnObject.put(SWITCH_COLOR_KEY_PDP_VIEW, pdpViewCommand);
 			//库存信息
 			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
 			returnObject.put(SWITCH_COLOR_KEY_PDP_INVENTORY, inventoryViewCommands);
 		} catch (IllegalItemStateException e) {
-			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
+			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemId, e.getState().name());
 			
 			throw new BusinessException("Show pdp error.");
 		}

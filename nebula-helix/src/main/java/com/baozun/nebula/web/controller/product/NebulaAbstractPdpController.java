@@ -186,15 +186,12 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 * @throws IllegalItemStateException
 	 */
-	protected PdpViewCommand buildPdpViewCommandByObj(Object obj) throws IllegalItemStateException{
+	protected PdpViewCommand buildPdpViewCommandWhenSwitch(Long itemId) throws IllegalItemStateException{
 		PdpViewCommand pdpViewCommand = new PdpViewCommand();
 		
 		//商品基本信息
-		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfoByIdOrCode(obj);
+		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfoByIdOrCode(itemId);
 		pdpViewCommand.setBaseInfo(itemBaseInfo);
-		
-		//面包屑
-		pdpViewCommand.setBreadcrumbs(buildBreadcrumbsViewCommand(itemBaseInfo.getId()));
 		
 		//商品图片
 		pdpViewCommand.setImages(buildItemImageViewCommand(itemBaseInfo.getId()));
@@ -207,17 +204,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		
 		//price
 		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
-		
-        //extra
-		pdpViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfo.getCode()));
-		
-		//colorSwatch
-		if(PDP_MODE_COLOR_COMBINE.equals(getPdpMode(itemBaseInfo.getId()))) {
-			pdpViewCommand.setColorSwatches(buildItemColorSwatchViewCommands(itemBaseInfo));
-		}
-
-		//商品推荐信息
-		pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
 		
 		return pdpViewCommand;
 	}
