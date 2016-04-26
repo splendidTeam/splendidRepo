@@ -51,12 +51,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleCommand.BundleStatus;
 import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.manager.product.NebulaBundleManager;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.command.BundleValidateResult;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -175,37 +177,68 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @return
+	 * @return 封装捆绑类商品视图模型集合， 参考{@link com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand}
 	 */
 	public NebulaReturnResult loadBundleInfo(@RequestParam("itemId") Long itemId, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 		
 		DefaultReturnResult result = new DefaultReturnResult();
-		result.setResult(true);
-		result.setStatusCode(String.valueOf(HttpStatus.OK));
 		
-		// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-		List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
-		if (Validator.isNotNullOrEmpty(bundleCommands)) {
-			result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
+		try {
+			// 根据当前的商品id查询针对该商品为主卖品配置的bundle
+			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
+			if (Validator.isNotNullOrEmpty(bundleCommands)) {
+				result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
+			}
+			result.setResult(true);
+			result.setStatusCode(String.valueOf(HttpStatus.OK));
+		} catch (Exception e) {
+			LOG.error("[LOAD_BUNDLE_INFO] itemId={} [{}] \"{}\"", itemId, new Date(), e.getClass().getSimpleName());
+			result.setResult(false);
+			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
 
 		return result;
 	}
 	
 	/**
+	 * bundle的异步校验
 	 * 
-	  * bundle的异步校验
-	  * 返回值 . 参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}
+	 * @RequestMapping(value = "/bundle/validateBundle.json", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param quantity
+	 * @param skuIds
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return 封装捆绑类商品校验结果，参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}
+	 * 
 	 */
-	public NebulaReturnResult validatorBundle(@RequestParam("bundleId") Long bundleId,@RequestParam("quantity") int quantity,@ArrayCommand(dataBind = true) Long[] skuIds, HttpServletRequest request,
+	public NebulaReturnResult validateBundle(@RequestParam("itemId") Long itemId, @RequestParam("quantity") int quantity,@ArrayCommand(dataBind = true) Long[] skuIds, HttpServletRequest request,
 			HttpServletResponse response, Model model){
 		DefaultReturnResult result = new DefaultReturnResult();
-		result.setResult(true);
-		result.setStatusCode(String.valueOf(HttpStatus.OK));
-		List<Long> skuList = Arrays.asList(skuIds);
-		BundleValidateResult validateBundle = nebulaBundleManager.validateBundle(bundleId, skuList, quantity);
-		result.setReturnObject(validateBundle);
+		
+		try {
+			BundleValidateResult validateBundle = null;
+			Long bundleId = nebulaBundleManager.findBundleIdByBundleItemId(itemId);
+			if(bundleId != null) {
+				List<Long> skuList = Arrays.asList(skuIds);
+				validateBundle = nebulaBundleManager.validateBundle(bundleId, skuList, quantity);
+			} else {
+				validateBundle = new BundleValidateResult();
+				validateBundle.setType(BundleStatus.BUNDLE_NOT_EXIST.getStatus());
+			}
+			result.setResult(true);
+			result.setStatusCode(String.valueOf(HttpStatus.OK));
+			result.setReturnObject(validateBundle);
+		} catch (Exception e) {
+			LOG.error("[VALIDATE_BUNDLE] itemId={} [{}] \"{}\"", itemId, new Date(), e.getClass().getSimpleName());
+			result.setResult(false);
+			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
+		}
+		
 		return result;
 	}
 
