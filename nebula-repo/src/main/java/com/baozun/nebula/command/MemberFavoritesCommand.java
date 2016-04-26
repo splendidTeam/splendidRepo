@@ -8,7 +8,7 @@ import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.SkuProperty;
 
 /**
- * Modify by hy
+ * Modified by hy
  * 
  * @date 2016年4月26日 下午7:09:42
  */
@@ -51,7 +51,7 @@ public class MemberFavoritesCommand implements Command{
 	private Integer							lifecycle;
 
 	/** 如果商品上架，看是否有库存 */
-	private boolean							hasIvt;
+	private Integer							itemIvt;
 
 	/**
 	 * skuId
@@ -235,17 +235,18 @@ public class MemberFavoritesCommand implements Command{
 	}
 
 	/**
-	 * @return the hasIvt
+	 * @return the itemIvt
 	 */
-	public boolean isHasIvt(){
-		return hasIvt;
+	public Integer getItemIvt(){
+		return itemIvt;
 	}
 
 	/**
-	 * @param hasIvt
-	 *            the hasIvt to set
+	 * @param itemIvt
+	 *            the itemIvt to set
 	 */
-	public void setHasIvt(boolean hasIvt){
-		this.hasIvt = hasIvt;
+	public void setItemIvt(Integer itemIvt){
+		this.itemIvt = itemIvt;
 	}
+
 }
