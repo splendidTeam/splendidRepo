@@ -176,7 +176,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		   return result;
 		}
 		//查询bundle的所有相关信息
-		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
+		BundleCommand command = bundleDao.findBundlesById(bundleId,1);
 		
 		if(command == null){//bundle不存在
 			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
