@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.product.resolver;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,17 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
-/**   
+/**  
+ * 颜色（或者其他属性，颜色是个统称）或商品切换部分
+ * <p>
+ * 		[条件]当pdp展示模式取:
+ * </p>
+ * <p>
+ * 		商品到色，PDP根据款号聚合（到款显示）,即模式二@see (NebulaAbstractPdpController.PDP_MODE_COLOR_COMBINE)
+ * </p>
+ * <p>
+ * 		设置pdp的view切换属性
+ * </p>  
  * @Description 
  * @author dongliang ma
  * @date 2016年4月22日 下午4:00:31 
@@ -64,6 +75,7 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 	private static final String          KEY_PROPS_SALE		    		= "salePropCommandList";
 
 	/* 
+	 * ItemColorSwatchViewCommand中有三类东西:商品信息、图片信息、属性/值信息@see com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand
 	 * @see com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver#resolve(com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand, com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter)
 	 */
 	@Override
@@ -79,7 +91,9 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
                     new Date(),
                     JsonUtil.format(baseInfoViewCommand),
                     itemCode);
+			return Collections.emptyList();
 		}
+		//①.商品信息、图片信息
 		List<ItemColorSwatchViewCommand> colorSwatchViewCommands =new ArrayList<ItemColorSwatchViewCommand>();
 		//根据商品的style获取同款商品
 		List<ItemCommand> itemCommands =itemDetailManager.findItemListByItemId(itemId, style);
@@ -90,39 +104,35 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 			itemIds.add(itemCommand.getId());
 			codeMap.put(itemCommand.getId(), itemCommand.getCode());
 		}
-		Long colorItemPropertyId =null;
 		//获取所有相关的图片
 		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
+		//转换或者说是抽取我们所需要的颜色图片信息
 		List<ItemImageViewCommand> imageViewCommands =itemImageViewCommandConverter.convert(itemImageList);
 		if(Validator.isNotNullOrEmpty(imageViewCommands)){
 			for (ItemImageViewCommand itemImageViewCommand : imageViewCommands) {
+				//找到colorItemPropertyId，设值
 				if(Validator.isNotNullOrEmpty(itemImageViewCommand.getColorItemPropertyId())){
 					colorSwatchViewCommands.add(contructItemColorSwatchViewCommand(codeMap,
 							itemImageViewCommand));
 				}
-				if(itemImageViewCommand.getItemId().equals(itemId)){
-					//取一个colorItemPropertyId，便于设置属性信息
-					colorItemPropertyId =itemImageViewCommand.getColorItemPropertyId();
-				}
 			}
 		}
-		if(Validator.isNotNullOrEmpty(colorItemPropertyId)&&
-				Validator.isNotNullOrEmpty(colorSwatchViewCommands)){
-			correctColorSwatchViewinfos(colorSwatchViewCommands, itemIds,
-					colorItemPropertyId);
+		//②.属性/值信息
+		if(Validator.isNotNullOrEmpty(colorSwatchViewCommands)){
+			return filtrateColorSwatchViewinfos(colorSwatchViewCommands, itemIds);
 		}
-		return colorSwatchViewCommands;
+		return Collections.emptyList();
 	}
 
 	/**
-	 * 修正(补充)属性或属性值信息
+	 * 筛选出最终颜色销售属性信息，并设值属性/值信息
 	 * @param colorSwatchViewCommands
 	 * @param itemIds
-	 * @param colorItemPropertyId
 	 */
-	private void correctColorSwatchViewinfos(
+	private List<ItemColorSwatchViewCommand> filtrateColorSwatchViewinfos(
 			List<ItemColorSwatchViewCommand> colorSwatchViewCommands,
-			List<Long> itemIds, Long colorItemPropertyId) {
+			List<Long> itemIds) {
+		List<ItemColorSwatchViewCommand> resultList =new ArrayList<ItemColorSwatchViewCommand>();
 		Map<String, Object> dynamicPropertyMap =itemDetailManager.findDynamicPropertyByItemIds(itemIds);
 		@SuppressWarnings("unchecked")
 		List<DynamicPropertyCommand> saleDynamicPropertyCommandList = (List<DynamicPropertyCommand>) dynamicPropertyMap
@@ -130,17 +140,21 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 		
 		if(Validator.isNotNullOrEmpty(saleDynamicPropertyCommandList)){
 			Property property =null;
-			//1.获取属性propery信息
+			//1.获取属性propery信息( 取颜色属性，目前处理只会有一个颜色属性的情况)
 			//2.获取[propertiesId,ItemPropertiesCommand]，便于设置属性值
 			Map<Long, ItemPropertiesCommand> propertiesMap =new HashMap<Long, ItemPropertiesCommand>();
 			for (DynamicPropertyCommand dynamicPropertyCommand : saleDynamicPropertyCommandList) {
+				if(Validator.isNullOrEmpty(property)){
+					boolean isSetProperty =Validator.isNotNullOrEmpty(dynamicPropertyCommand.getProperty())&&
+							dynamicPropertyCommand.getProperty().getIsSaleProp()&&
+							dynamicPropertyCommand.getProperty().getIsColorProp();
+					if(isSetProperty){
+						property =dynamicPropertyCommand.getProperty();
+					}
+				}
 				if(Validator.isNotNullOrEmpty(dynamicPropertyCommand.getItemProperties())){
 					Long ipId =dynamicPropertyCommand.getItemProperties().getItem_properties_id();
 					if(Validator.isNotNullOrEmpty(ipId)){
-						if(Validator.isNullOrEmpty(property)&&
-								ipId.equals(colorItemPropertyId)){
-							property =dynamicPropertyCommand.getProperty();
-						}
 						if(Validator.isNotNullOrEmpty(propertiesMap)&&
 								Validator.isNotNullOrEmpty(propertiesMap.get(ipId))){
 							continue ;
@@ -150,11 +164,6 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 					}
 				}else if(Validator.isNotNullOrEmpty(dynamicPropertyCommand.getItemPropertiesList())){
 					for (ItemPropertiesCommand itemPropertiesCommand : dynamicPropertyCommand.getItemPropertiesList()) {
-						if(itemPropertiesCommand.getItem_properties_id().equals(colorItemPropertyId)){
-							if(Validator.isNotNullOrEmpty(property)){
-								property =dynamicPropertyCommand.getProperty();
-							}
-						}
 						if(Validator.isNotNullOrEmpty(propertiesMap)&&
 								Validator.isNotNullOrEmpty(propertiesMap.get(itemPropertiesCommand.getItem_properties_id()))){
 							continue ;
@@ -164,20 +173,27 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 					}
 				}
 			}
+			//是销售属性，且颜色属性
 			if(Validator.isNotNullOrEmpty(property)){
 				for (ItemColorSwatchViewCommand colorSwatchViewCommand : colorSwatchViewCommands) {
 					//属性名
 					colorSwatchViewCommand.setPropertyName(property.getName());
+					//取属性匹配的颜色信息
 					if(Validator.isNotNullOrEmpty(propertiesMap)&&
 							Validator.isNotNullOrEmpty(propertiesMap.get(colorSwatchViewCommand.getItemPropertyId()))){
 						ItemPropertiesCommand itemPropertiesCommand =propertiesMap.get(colorSwatchViewCommand.getItemPropertyId());
-						//属性值
-						colorSwatchViewCommand.setPropertyValue(itemPropertiesCommand.getPropertyValue());
+						if(Validator.isNotNullOrEmpty(itemPropertiesCommand.getPropertyId())&&
+								property.getId().equals(itemPropertiesCommand.getPropertyId())){
+							//属性值
+							colorSwatchViewCommand.setPropertyValue(itemPropertiesCommand.getPropertyValue());
+							resultList.add(colorSwatchViewCommand);
+						}
 					}
 					
 				}
 			}
 		}
+		return resultList;
 	}
 	
 	/**

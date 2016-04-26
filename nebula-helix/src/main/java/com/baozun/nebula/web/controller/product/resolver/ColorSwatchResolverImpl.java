@@ -31,6 +31,9 @@ import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
+ * 获取颜色小色块
+ * <p>将pdp页面获取的图片信息封装成[itemPropertyId,imageCommand]的形式,便于补充属性信息的图片信息;</p>
+ * <p>一般用于拥有颜色块属性的信息补充.</p>
  * @Description 
  * @author dongliang ma
  * @date 2016年4月21日 上午11:31:36 
@@ -42,13 +45,13 @@ public class ColorSwatchResolverImpl implements ColorSwatchResolver {
 	private static final Logger         LOGGER                        	= LoggerFactory.getLogger(ColorSwatchResolverImpl.class);
 	
 	/** 
-	 * 商品图<br/>
-	 * 常见使用场景：<br/>
-	 * 商品列表页 ，购物车页,商品详情页
+	 * 颜色图片的type
 	 * */
 	private static final String			IMG_TYPE_COLOR				   	="IMG_TYPE_COLOR";
 
 	/* 
+	 * 
+	 * 
 	 * @see com.baozun.nebula.web.controller.product.resolver.ColorSwatchResolver#resolve(java.util.List)
 	 */
 	@Override
@@ -59,6 +62,8 @@ public class ColorSwatchResolverImpl implements ColorSwatchResolver {
 		Map<Long, ImageViewCommand> resultMap =new HashMap<Long, ImageViewCommand>();
 		List<ImageViewCommand> imageList =null;
 		for (ItemImageViewCommand itemImageViewCommand : imageViewCommands) {
+			//ItemImageViewCommand中的colorItemPropertyId如果有值，一般就说明这是个颜色属性，
+			//这个值就是itemPropertyId，可根据这个值获取图片信息
 			if(Validator.isNotNullOrEmpty(itemImageViewCommand.getColorItemPropertyId())&&
 					Validator.isNotNullOrEmpty(itemImageViewCommand.getImages())){
 				imageList =itemImageViewCommand.getImages().get(IMG_TYPE_COLOR);
