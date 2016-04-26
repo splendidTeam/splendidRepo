@@ -181,6 +181,49 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	/**
+	 * 构造PdpViewCommand
+	 * @param obj 商品id或者code
+	 * @return
+	 * @throws IllegalItemStateException
+	 */
+	protected PdpViewCommand buildPdpViewCommandByObj(Object obj) throws IllegalItemStateException{
+		PdpViewCommand pdpViewCommand = new PdpViewCommand();
+		
+		//商品基本信息
+		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfoByIdOrCode(obj);
+		pdpViewCommand.setBaseInfo(itemBaseInfo);
+		
+		//面包屑
+		pdpViewCommand.setBreadcrumbs(buildBreadcrumbsViewCommand(itemBaseInfo.getId()));
+		
+		//商品图片
+		pdpViewCommand.setImages(buildItemImageViewCommand(itemBaseInfo.getId()));
+		
+		//商品属性
+		pdpViewCommand.setProperties(buildItemPropertyViewCommand(itemBaseInfo, pdpViewCommand.getImages()));
+		
+		//sku
+		pdpViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
+		
+		//price
+		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
+		
+        //extra
+		pdpViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfo.getCode()));
+		
+		//colorSwatch
+		if(PDP_MODE_COLOR_COMBINE.equals(getPdpMode(itemBaseInfo.getId()))) {
+			pdpViewCommand.setColorSwatches(buildItemColorSwatchViewCommands(itemBaseInfo));
+		}
+
+		//商品推荐信息
+		pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		
+		return pdpViewCommand;
+	}
+	
+	
+	/**
 	 * 获取并校验商品基本信息 
 	 * @param itemBaseInfo
 	 * @return
@@ -220,6 +263,62 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		if(Constants.ITEM_TYPE_PREMIUMS == itemBaseInfo.getType()) {
 			// 商品是赠品
 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
+            throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);
+		}
+		
+		return itemBaseInfo;
+	}
+	
+	/**
+	 * 获取并校验商品基本信息 
+	 * @param obj 商品id或者code
+	 * @return
+	 * @throws IllegalItemStateException
+	 */
+	protected ItemBaseInfoViewCommand getAndValidateItemBaseInfoByIdOrCode(Object obj) throws IllegalItemStateException{
+		// 取得商品的基本信息
+		ItemBaseInfoViewCommand itemBaseInfo =null;
+		if(obj instanceof Long){
+			itemBaseInfo= buildItemBaseInfoViewCommand((Long) obj);	
+		}else if(obj instanceof String){
+			itemBaseInfo= buildItemBaseInfoViewCommand((String) obj);	
+		}else {
+			//参数有误
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] invalide param !");
+            throw new IllegalItemStateException(IllegalItemState.INVALIDE_PARAM);
+		}
+		String param =obj instanceof Long ? String.valueOf(obj) : (String)obj;
+		// 商品不存在
+		if (Validator.isNullOrEmpty(itemBaseInfo)) {
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item not exists. itemCode or id:{}.", param);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_NOT_EXISTS);
+        }
+				
+		Integer lifecycle = itemBaseInfo.getLifecycle();
+		if(Item.LIFECYCLE_DELETED == lifecycle) {
+			// 商品逻辑删除
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item logical deleted. itemCode or id:{}, lifecycle:{}.", param, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED);
+		} else if(Item.LIFECYCLE_UNACTIVE == lifecycle) {
+			// 商品新建状态
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status new. itemCode or id:{}, lifecycle:{}.", param, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
+		} else if(Item.LIFECYCLE_DISABLE == lifecycle) {
+			// 商品未上架
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status offSale. itemCode or id:{}, lifecycle:{}.", param, lifecycle);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);
+		}
+		
+		Date activeBeginTime = itemBaseInfo.getActiveBeginTime();
+		if (Validator.isNotNullOrEmpty(activeBeginTime) && !DateUtil.isAfter(new Date(), activeBeginTime)) {
+			// 商品未上架
+ 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item before active begin time. itemCode or id:{}, activeBeginTime:{}.", param, activeBeginTime);
+            throw new IllegalItemStateException(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME);
+        }
+		
+		if(Constants.ITEM_TYPE_PREMIUMS == itemBaseInfo.getType()) {
+			// 商品是赠品
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item is gift. itemCode or id:{}, type:{}.", param, itemBaseInfo.getType());
             throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);
 		}
 		
