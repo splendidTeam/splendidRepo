@@ -37,16 +37,13 @@ import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.TimeInterval;
-import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
@@ -175,7 +172,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 
 		//商品推荐信息
-		pdpViewCommand.setRelations(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
 		
 		return pdpViewCommand;
 	}
