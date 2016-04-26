@@ -124,7 +124,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	
 	@Override
 	public Long findBundleIdByBundleItemId(Long bundleItemId) {
-		return bundleDao.findBundleIdByItemCode(null);
+		return bundleDao.findBundleIdByBundleItemId(bundleItemId);
 	}
 	
 	@Override
