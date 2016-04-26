@@ -118,10 +118,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** PDP商品推荐 */
 	public static final String      MODEL_KEY_PDP_RECOMMEND             = "recommend";
 	
-	public static final String 		MODEL_KEY_COLOR_SWATCH 				="switch_color_key_pdp_view";
-	
-	public static final String 		SWITCH_COLOR_KEY_PDP_INVENTORY 		="switch_color_key_pdp_inventory";
-	
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";

@@ -173,7 +173,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
@@ -192,14 +194,14 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		try {
 			
-			Map<String, Object> returnObject =new HashMap<String, Object>();
+			Map<String, Object> returnObject = new HashMap<String, Object>();
 			
 			//商品信息
 			PdpViewCommand pdpViewCommand = buildSimplePdpViewCommand(itemCode);
 			returnObject.put(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			//库存信息
-			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(pdpViewCommand.getBaseInfo().getId());
+			List<InventoryViewCommand> inventoryViewCommands = buildInventoryViewCommand(pdpViewCommand.getBaseInfo().getId());
 			returnObject.put(MODEL_KEY_INVENTORY, inventoryViewCommands);
 			
 			result.setReturnObject(returnObject);
