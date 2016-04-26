@@ -111,7 +111,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
-			model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, pdpViewCommand.getBaseInfo().getId()));
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;
@@ -122,6 +121,38 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			throw new BusinessException("Show pdp error.");
 		}
+	}
+	
+	/**
+	 * @RequestMapping(value = "/item/browsinghistory/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		return DefaultReturnResult.SUCCESS;
+	}
+	
+	/**
+	 * @RequestMapping(value = "/item/pdprecommend/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**

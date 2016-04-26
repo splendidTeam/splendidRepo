@@ -112,10 +112,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	public static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
 	
 	/** 用户浏览商品历史记录 */
-	public static final String      MODEL_KEY_BROWSING_HISTORY          ="history";
+	public static final String      MODEL_KEY_BROWSING_HISTORY          = "history";
 	 
 	/** 商品库存 */
-	public static final String      MODEL_KEY_INVENTORY                 ="inventory";
+	public static final String      MODEL_KEY_INVENTORY                 = "inventory";
+	
+	/** PDP商品推荐 */
+	public static final String      MODEL_KEY_PDP_RECOMMEND                 = "pdprecommend";
 	
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
