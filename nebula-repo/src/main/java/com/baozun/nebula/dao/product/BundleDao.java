@@ -78,4 +78,7 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	@NativeQuery(model = BundleCommand.class)
 	Pagination<BundleCommand> findBundlesByPage(Page page ,Sort[] sort);
 	
+	@NativeQuery(model = Long.class)
+	Long findBundleIdByBundleItemId(@QueryParam("itemId")Long itemId);
+	
 }

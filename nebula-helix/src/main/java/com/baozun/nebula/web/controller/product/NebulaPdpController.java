@@ -364,6 +364,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
+	@Override
 	protected String getPdpMode(Long itemId) {
 		return PDP_MODE_COLOR_COMBINE;
 	}
