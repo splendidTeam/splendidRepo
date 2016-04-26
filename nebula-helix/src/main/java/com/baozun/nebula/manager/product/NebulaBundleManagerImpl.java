@@ -138,9 +138,10 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public BundleValidateResult validateBundle(Long bundleId,
+	public BundleValidateResult validateBundle(Long bundleItemId,
 			List<Long> skuIds, int quantity) {
-		LOG.debug("paramater : bundleId [{}] , skuIds [{}] , quantity [{}] , {}" , bundleId, JsonUtil.format(skuIds),quantity,new Date());
+		LOG.debug("paramater : bundleItemId [{}] , skuIds [{}] , quantity [{}] , {}" , bundleItemId, JsonUtil.format(skuIds),quantity,new Date());
+		Long bundleId = bundleDao.findBundleIdByBundleItemId(bundleItemId);
 		return validateBundleInfo(bundleId,skuIds,quantity);
 	}
 	

@@ -93,12 +93,12 @@ public interface NebulaBundleManager extends BaseManager {
 	 *    	 <li>bundle所包含的商品是否库存足够</li>
 	 *    </ol>
 	 * </ul> 
-	 * @param bundleId : bundle的PK
+	 * @param bundleItemId : bundle的itemId
 	 * @param skuIds : bundle中选中的一组sku
 	 * @param quantity ：购买bundle的数量
 	 * @return ：返回值 . 参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}}
 	 * 
 	 */
-	public BundleValidateResult validateBundle(Long bundleId,List<Long> skuIds,int quantity);
+	public BundleValidateResult validateBundle(Long bundleItemId,List<Long> skuIds,int quantity);
 	
 }
