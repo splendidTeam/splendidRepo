@@ -108,6 +108,11 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	}
 	
 	@Override
+	public Long findBundleIdByItemCode(String itemCode) {
+		return bundleDao.findBundleIdByItemCode(itemCode);
+	}
+	
+	@Override
 	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean ...flag) {
 		LOG.debug("paramater : page [{}] , sort [{}] , flag [{}]  , {}" ,JsonUtil.format(page),JsonUtil.format(sorts),flag,new Date());
 		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);

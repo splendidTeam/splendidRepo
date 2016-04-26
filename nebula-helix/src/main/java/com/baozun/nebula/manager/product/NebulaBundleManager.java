@@ -62,6 +62,13 @@ public interface NebulaBundleManager extends BaseManager {
 	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag);
 	
 	/**
+	 * 通过itemCode查询出对应的bundleId
+	 * @param itemCode
+	 * @return
+	 */
+	public Long findBundleIdByItemCode(String itemCode);
+	
+	/**
 	 * <h3>bundle信息分页查询</h3>
 	 * @param page
 	 * @param sorts
