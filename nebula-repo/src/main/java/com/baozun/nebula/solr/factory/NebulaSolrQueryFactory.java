@@ -1,5 +1,6 @@
 package com.baozun.nebula.solr.factory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -60,36 +61,43 @@ public class NebulaSolrQueryFactory{
 			/*
 			 * 设置默认排序
 			 */
-			solrQuery.addSortField(SkuItemParam.default_sort, ORDER.desc);
+			solrQuery.addSort(SkuItemParam.default_sort, ORDER.desc);
 		}else{
 			for (SolrOrderSort sort : order){
-				solrQuery.addSortField(sort.getField(), sort.getType().equalsIgnoreCase(Sort.ASC) ? ORDER.asc : ORDER.desc);
+				solrQuery.addSort(sort.getField(), sort.getType().equalsIgnoreCase(Sort.ASC) ? ORDER.asc : ORDER.desc);
 			}
 		}
 	}
 	
-	public static SolrQuery setGroup(SolrQuery solrQuery) {
-		String groupName = "tagId";
+	/**
+	 * 设置分组聚合的参数
+	 * @return SolrQuery
+	 * @param solrQuery
+	 * @param orders
+	 * @author 冯明雷
+	 * @time 2016年4月25日上午10:56:50
+	 */
+	public static SolrQuery setGroup(SolrQuery solrQuery,SolrOrderSort[] orders) {
+		String groupName = SkuItemParam.style;
+		
 		solrQuery.set(GroupParams.GROUP, true);
 		solrQuery.set(GroupParams.GROUP_TOTAL_COUNT, true);
 		solrQuery.set(GroupParams.GROUP_LIMIT, 200);
-		solrQuery.set(GroupParams.GROUP_FORMAT, "grouped");
-		String groupNameList = "";
-		String groupSortList = "";
-		
+		solrQuery.set(GroupParams.GROUP_FORMAT, "grouped");	
+		solrQuery.set(GroupParams.GROUP_FACET, true);
 		solrQuery.set(GroupParams.GROUP_FIELD, groupName);
 
-//		if (null != queryConditionCommand.getGroupSorts()
-//				&& queryConditionCommand.getGroupSorts().size() > 0) {
-//			List<String> groupSorts = queryConditionCommand.getGroupSorts();
-//			for (int i = 0; i < groupSorts.size(); i++) {
-//				groupSortList += groupSorts.get(i).toString();
-//				if (i < groupSorts.size() - 1) {
-//					groupSortList += ",";
-//				}
-//			}
-//			solrQuery.set(GroupParams.GROUP_SORT, groupSortList);
-//		}
+		if (null != orders) {
+			StringBuffer sb=new StringBuffer();
+			for (int i = 0; i < orders.length; i++) {
+				SolrOrderSort solrOrderSort = orders[i];
+				sb.append(solrOrderSort.getField()+" "+solrOrderSort.getType());
+				if (i < orders.length - 1) {
+					sb.append(",");
+				}
+			}
+			solrQuery.set(GroupParams.GROUP_SORT, sb.toString());
+		}
 
 		return solrQuery;
 	}

@@ -23,11 +23,11 @@ public class SimpleGroupSolrQueryConvert implements SolrQueryConvert {
 		
 		//设置排序
 		SortTypeEnum sortTypeEnum=SortTypeEnum.getInstance(searchCommand.getSortStr());
-		SolrOrderSort[] order=sortTypeEnum.getSolrOrderSort();
-		NebulaSolrQueryFactory.setSort(solrQuery, order);
+		SolrOrderSort[] orders=sortTypeEnum.getSolrOrderSort();
+		NebulaSolrQueryFactory.setSort(solrQuery, orders);
 		
 		//设置分组
-		
+		NebulaSolrQueryFactory.setGroup(solrQuery, orders);
 		
 		return solrQuery;
 	}

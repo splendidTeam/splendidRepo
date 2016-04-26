@@ -21,6 +21,8 @@ public class SkuItemParam {
 	
 	public static final String title = "title";
 	
+	public static final String style = "style";
+	
 	public static final String shopName = "shopName";
 
 	public static final String itemId = "itemId";

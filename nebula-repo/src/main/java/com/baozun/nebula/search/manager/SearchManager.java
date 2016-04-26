@@ -1,7 +1,11 @@
-package com.baozun.nebula.search;
+package com.baozun.nebula.search.manager;
+
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 
+import com.baozun.nebula.sdk.command.SearchConditionCommand;
+import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
 
@@ -24,5 +28,16 @@ public interface SearchManager {
 	 * @param bq
 	 */
 	void setSolrBoost(SolrQuery solrQuery,Boost boost);
+	
+	
+	
+	/**
+	 * 根据分类id查询筛选条件(加缓存)
+	 * @return List<SearchConditionCommand>
+	 * @param categoryIds
+	 * @author 冯明雷
+	 * @time 2016年4月26日上午10:23:10
+	 */
+	List<SearchConditionCommand> findConditionByCategoryIdsWithCache(List<Long> categoryIds);
 	
 }
