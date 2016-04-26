@@ -92,6 +92,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	
 	/**
 	 * 进入商品详情页 	
+	 * 
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
 	 * 
 	 * @param itemCode 商品编码
@@ -119,7 +120,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 	
 	/**
-	 * @RequestMapping(value = "/item/browsinghistory/get", method = RequestMethod.GET)
+	 * 获取浏览历史记录
+	 * 
+	 * @RequestMapping(value = "/item/history/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId 商品Id
@@ -130,12 +133,16 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
-	 * @RequestMapping(value = "/item/pdprecommend/get", method = RequestMethod.GET)
+	 * 获取推荐商品
+	 * 
+	 * @RequestMapping(value = "/item/recommend/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId
@@ -146,7 +153,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
@@ -164,7 +173,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
@@ -183,14 +194,14 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		try {
 			
-			Map<String, Object> returnObject =new HashMap<String, Object>();
+			Map<String, Object> returnObject = new HashMap<String, Object>();
 			
 			//商品信息
 			PdpViewCommand pdpViewCommand = buildSimplePdpViewCommand(itemCode);
 			returnObject.put(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			//库存信息
-			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(pdpViewCommand.getBaseInfo().getId());
+			List<InventoryViewCommand> inventoryViewCommands = buildInventoryViewCommand(pdpViewCommand.getBaseInfo().getId());
 			returnObject.put(MODEL_KEY_INVENTORY, inventoryViewCommands);
 			
 			result.setReturnObject(returnObject);
@@ -222,6 +233,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult addFavorite(@LoginMember MemberDetails memberDetails, 
 			@PathVariable("itemId") Long itemId, @PathVariable("skuId") Long skuId,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		//TODO
 		return new DefaultReturnResult();
 	}
 	
@@ -347,6 +359,13 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected String getItemRecommendMode() {
 		return RECOMMEND_MODE_GENERAL;
+	}
+	
+	/**
+	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
+	 */
+	protected String getPdpMode(Long itemId) {
+		return PDP_MODE_COLOR_COMBINE;
 	}
 
 }
