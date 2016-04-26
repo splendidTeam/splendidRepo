@@ -104,7 +104,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 * @param bundleItemId : bundle的itemId
 	 * @param skuIds : bundle中选中的一组sku
 	 * @param quantity ：购买bundle的数量
-	 * @return ：返回值 . 参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}}
+	 * @return ：返回值 . 参考{@link com.baozun.nebula.command.product.BundleCommand.BundleStatus}}
 	 * 
 	 */
 	public BundleValidateResult validateBundle(Long bundleItemId,List<Long> skuIds,int quantity);

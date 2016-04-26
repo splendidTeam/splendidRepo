@@ -193,7 +193,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 			result.setResult(true);
 			result.setStatusCode(String.valueOf(HttpStatus.OK));
 		} catch (Exception e) {
-			LOG.error("[LOAD_BUNDLE_INFO] itemId={} [{}] \"{}\"", itemId, new Date(), e.getClass().getSimpleName());
+			LOG.error("[LOAD_BUNDLE_INFO_ERROR] itemId={" + itemId + "}", e);
 			result.setResult(false);
 			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
@@ -234,7 +234,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 			result.setStatusCode(String.valueOf(HttpStatus.OK));
 			result.setReturnObject(validateBundle);
 		} catch (Exception e) {
-			LOG.error("[VALIDATE_BUNDLE] itemId={} [{}] \"{}\"", itemId, new Date(), e.getClass().getSimpleName());
+			LOG.error("[VALIDATE_BUNDLE_ERROR] itemId={" + itemId + "}", e);
 			result.setResult(false);
 			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
