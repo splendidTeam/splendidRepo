@@ -69,7 +69,7 @@ public interface NebulaBundleManager extends BaseManager {
 	
 	/**
 	 * <h3>一个bundle其实本身也就是一个商品,也就有相应的itemId</h3>
-	 * 通过itemCode查询出对应的bundleId
+	 * 通过bundleItemId查询出对应的bundleId
 	 * 
 	 * @param bundleItemId
 	 * @return
