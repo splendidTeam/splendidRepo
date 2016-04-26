@@ -85,7 +85,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		} else {
 			LOG.error("find bundles is null . itemId : [{}]  lifecycle : [{}]  {}" , itemId,1 ,new Date());
 		}
-
+        LOG.debug("bundles : {} , current time : {}" , JsonUtil.format(bundles) , new Date());
 		return bundles;
 	}
 
@@ -103,6 +103,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			LOG.debug("the bundle invalid , so it removed. {}" , new Date());
 			return null;
 		}
+		LOG.debug("bundle : {} , current time : {}" , JsonUtil.format(bundle) , new Date());
 		return bundle;
 	}
 	
@@ -125,6 +126,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
 		}
 		pagination.setItems(bundles);
+		LOG.debug("pagination : {} , current time : {}" , JsonUtil.format(pagination) , new Date());
 		return pagination;
 	}
 

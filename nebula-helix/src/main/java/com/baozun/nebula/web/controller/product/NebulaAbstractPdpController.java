@@ -90,7 +90,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	//面包屑的模式
 	/** 面包屑的模式  模式一, 基于前端导航构建. [value: breadcrumbs_mode_navigation] */
-	public static final String 		BREADCRUMBS_MODE_NAVIGATION 			= "breadcrumbs_mode_navigation";
+	public static final String 		BREADCRUMBS_MODE_NAVIGATION 		= "breadcrumbs_mode_navigation";
 	
 	/** 面包屑的模式  模式二, 基于后端分类构建. [value: breadcrumbs_mode_category] */
 	public static final String 		BREADCRUMBS_MODE_CATEGORY 			= "breadcrumbs_mode_category";

@@ -92,6 +92,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	
 	/**
 	 * 进入商品详情页 	
+	 * 
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
 	 * 
 	 * @param itemCode 商品编码
@@ -119,7 +120,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 	
 	/**
-	 * @RequestMapping(value = "/item/browsinghistory/get", method = RequestMethod.GET)
+	 * 获取浏览历史记录
+	 * 
+	 * @RequestMapping(value = "/item/history/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId 商品Id
@@ -130,12 +133,16 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
-	 * @RequestMapping(value = "/item/pdprecommend/get", method = RequestMethod.GET)
+	 * 获取推荐商品
+	 * 
+	 * @RequestMapping(value = "/item/recommend/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId
@@ -146,7 +153,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
