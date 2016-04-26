@@ -222,6 +222,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult addFavorite(@LoginMember MemberDetails memberDetails, 
 			@PathVariable("itemId") Long itemId, @PathVariable("skuId") Long skuId,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		//TODO
 		return new DefaultReturnResult();
 	}
 	
@@ -347,6 +348,13 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected String getItemRecommendMode() {
 		return RECOMMEND_MODE_GENERAL;
+	}
+	
+	/**
+	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
+	 */
+	protected String getPdpMode(Long itemId) {
+		return PDP_MODE_COLOR_COMBINE;
 	}
 
 }
