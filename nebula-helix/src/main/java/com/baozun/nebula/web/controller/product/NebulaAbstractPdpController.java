@@ -130,7 +130,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
 	@Autowired
-	private ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
+	protected ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
 	
 	@Autowired
 	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
