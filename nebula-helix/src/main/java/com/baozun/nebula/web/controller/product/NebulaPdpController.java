@@ -19,7 +19,9 @@ package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,13 +53,9 @@ import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandC
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -92,22 +90,23 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
 	
-	
 	/**
 	 * 进入商品详情页 	
+	 * 
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
 	 * 
-	 * @param itemCode
+	 * @param itemCode 商品编码
 	 * @param request
 	 * @param response
 	 * @param model
 	 */
-	public String showPdp(@PathVariable("itemCode") String itemCode, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String showPdp(@PathVariable("itemCode") String itemCode, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		try {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
-			model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, pdpViewCommand.getBaseInfo().getId()));
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;
@@ -118,6 +117,46 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			throw new BusinessException("Show pdp error.");
 		}
+	}
+	
+	/**
+	 * 获取浏览历史记录
+	 * 
+	 * @RequestMapping(value = "/item/history/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId 商品Id
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
+		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		
+		return DefaultReturnResult.SUCCESS;
+	}
+	
+	/**
+	 * 获取推荐商品
+	 * 
+	 * @RequestMapping(value = "/item/recommend/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
+		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+		
+		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
@@ -134,46 +173,46 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
+		
 		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
-	 * 商品定义到色，到款显示，切换颜色时，实际上是变更了商品，需要ajax加载该商品信息
-	 * 商品定义到款，到款显示，切换颜色时，只是更换了销售属性，此处不需要重新加载
+	 * 商品定义到色，需要到款汇聚显示，当切换颜色时，实际上是变更了商品，需要ajax加载该商品的信息
 	 * 
 	 * @RequestMapping(value = "/item/detail/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
-	 * @return
+	 * 
 	 */
-	public NebulaReturnResult switchColorForItem(@PathVariable("itemId") Long itemId, 
+	public NebulaReturnResult switchColorForItem(@PathVariable("itemCode") String itemCode, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		//重新构造PdpViewCommand TODO 整合
-		PdpViewCommand pdpViewCommand =new PdpViewCommand();
-		//buildItemBaseInfoViewCommand(itemCode);code?
-		ItemBaseInfoViewCommand baseInfoViewCommand =buildItemBaseInfoViewCommand(itemId);
-		pdpViewCommand.setBaseInfo(baseInfoViewCommand);
-		List<ItemImageViewCommand> imageViewCommands =buildItemImageViewCommand(itemId);
-		pdpViewCommand.setImages(imageViewCommands);
-		pdpViewCommand.setProperties(buildItemPropertyViewCommand(baseInfoViewCommand,
-				imageViewCommands));
-		//切换
 		
+		DefaultReturnResult result = new DefaultReturnResult();
 		
-		// TODO 同时加入库存信息
-		List<SkuViewCommand> skus =buildSkuViewCommand(itemId);
-		pdpViewCommand.setSkus(skus );
-		pdpViewCommand.setPrice(buildPriceViewCommand(baseInfoViewCommand, skus));
-		List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
-		//pdpViewCommand.set?
-		String pMode =getPdpMode(baseInfoViewCommand.getId());
-		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
-			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand,
-					itemImageViewCommandConverter);
-			pdpViewCommand.setColorSwatches(colorSwatches);
+		try {
+			
+			Map<String, Object> returnObject = new HashMap<String, Object>();
+			
+			//商品信息
+			PdpViewCommand pdpViewCommand = buildSimplePdpViewCommand(itemCode);
+			returnObject.put(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
+			
+			//库存信息
+			List<InventoryViewCommand> inventoryViewCommands = buildInventoryViewCommand(pdpViewCommand.getBaseInfo().getId());
+			returnObject.put(MODEL_KEY_INVENTORY, inventoryViewCommands);
+			
+			result.setReturnObject(returnObject);
+			
+		} catch (IllegalItemStateException e) {
+			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemCode, e.getState().name());
+			
+			throw new BusinessException("Show pdp error.");
 		}
-		return new DefaultReturnResult();
+		
+		return result;
 	}
 	
 	
@@ -194,6 +233,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult addFavorite(@LoginMember MemberDetails memberDetails, 
 			@PathVariable("itemId") Long itemId, @PathVariable("skuId") Long skuId,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		//TODO
 		return new DefaultReturnResult();
 	}
 	
@@ -319,6 +359,13 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected String getItemRecommendMode() {
 		return RECOMMEND_MODE_GENERAL;
+	}
+	
+	/**
+	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
+	 */
+	protected String getPdpMode(Long itemId) {
+		return PDP_MODE_COLOR_COMBINE;
 	}
 
 }

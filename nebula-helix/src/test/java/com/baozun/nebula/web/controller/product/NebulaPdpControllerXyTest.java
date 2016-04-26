@@ -13,11 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.baozun.nebula.manager.product.ItemDetailManager;
+import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.product.converter.InventoryViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 
 /**
  * 
@@ -37,15 +40,24 @@ public class NebulaPdpControllerXyTest extends BaseControllerTest{
 	
 	private SdkItemManager sdkItemManager;
 	
+	private ItemDetailManager itemDetailManager;
+	
 	private InventoryViewCommandConverter inventoryViewCommandConverter;
 	
 	@Before
 	public void setUp(){
 		nebulaPdpController = new NebulaPdpController();
+		
 		inventoryViewCommandConverter = new InventoryViewCommandConverter();
+		
 		sdkItemManager = control.createMock(SdkItemManager.class);
+		itemDetailManager = control.createMock(ItemDetailManager.class);
+		
 		ReflectionTestUtils.setField(nebulaPdpController, "sdkItemManager", sdkItemManager);
+		ReflectionTestUtils.setField(nebulaPdpController, "itemDetailManager", itemDetailManager);
+		
 		ReflectionTestUtils.setField(nebulaPdpController, "inventoryViewCommandConverter", inventoryViewCommandConverter);
+		
 	}
 	
 	@Test
@@ -76,5 +88,31 @@ public class NebulaPdpControllerXyTest extends BaseControllerTest{
 		EasyMock.verify();
 		
 	}
+	
+	@Test
+	public void testBuildItemBaseInfoViewCommand(){
+		ItemBaseInfoViewCommand expected = new ItemBaseInfoViewCommand();
+		expected.setCode("code1");
+		expected.setId(1L);
+		expected.setTitle("衣服");
+		
+		String code ="code";
+		
+		ItemBaseCommand itemBaseCommand = new ItemBaseCommand();
+		itemBaseCommand.setCode("code1");
+		itemBaseCommand.setId(1L);
+		itemBaseCommand.setTitle("衣服");
+		
+		EasyMock.expect(itemDetailManager.findItemBaseInfoByCode(code)).andReturn(itemBaseCommand).times(1);
+		
+		control.replay();
+		
+		ItemBaseInfoViewCommand actual = nebulaPdpController.buildItemBaseInfoViewCommand(code);
+		
+		assertEquals(expected, actual);
+		EasyMock.verify();
+		
+	}
+	
 
 }

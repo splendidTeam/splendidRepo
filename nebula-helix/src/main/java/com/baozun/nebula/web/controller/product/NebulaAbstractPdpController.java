@@ -57,6 +57,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewComm
 import com.baozun.nebula.web.interceptor.browsingHistory.BrowsingHistoryResolver;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 
 /**
@@ -75,7 +76,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaAbstractPdpController.class);
+	private static final Logger	LOG										= LoggerFactory.getLogger(NebulaAbstractPdpController.class);
 	
 	//PDP的展示模式
 	/** PDP的展示模式  模式一, 商品到款，PDP到款显示. [value: pdp_mode_style] */
@@ -89,7 +90,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	//面包屑的模式
 	/** 面包屑的模式  模式一, 基于前端导航构建. [value: breadcrumbs_mode_navigation] */
-	public static final String 		BREADCRUMBS_MODE_NAVIGATION 			= "breadcrumbs_mode_navigation";
+	public static final String 		BREADCRUMBS_MODE_NAVIGATION 		= "breadcrumbs_mode_navigation";
 	
 	/** 面包屑的模式  模式二, 基于后端分类构建. [value: breadcrumbs_mode_category] */
 	public static final String 		BREADCRUMBS_MODE_CATEGORY 			= "breadcrumbs_mode_category";
@@ -109,10 +110,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	public static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
 	
 	/** 用户浏览商品历史记录 */
-	public static final String      MODEL_KEY_BROWSING_HISTORY          ="history";
+	public static final String      MODEL_KEY_BROWSING_HISTORY          = "history";
 	 
 	/** 商品库存 */
-	public static final String      MODEL_KEY_INVENTORY                 ="inventory";
+	public static final String      MODEL_KEY_INVENTORY                 = "inventory";
+	
+	/** PDP商品推荐 */
+	public static final String      MODEL_KEY_PDP_RECOMMEND             = "recommend";
 	
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
@@ -130,7 +134,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
 	
 	@Autowired
-	RelationItemViewCommandConverter                                relationItemViewCommandConverter;
+	RelationItemViewCommandConverter relationItemViewCommandConverter;
 	
     /** The browsing history resolver. */
     @Autowired
@@ -178,6 +182,35 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	/**
+	 * 构造一个简单的PdpViewCommand，主要用于到色商品切换颜色时，取商品基本信息
+	 * @param itemCode 商品编码
+	 * @return PdpViewCommand 商品信息Comande
+	 * @throws IllegalItemStateException
+	 */
+	protected PdpViewCommand buildSimplePdpViewCommand(String itemCode) throws IllegalItemStateException{
+		PdpViewCommand pdpViewCommand = new PdpViewCommand();
+		
+		//商品基本信息
+		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
+		pdpViewCommand.setBaseInfo(itemBaseInfo);
+		
+		//商品图片
+		pdpViewCommand.setImages(buildItemImageViewCommand(itemBaseInfo.getId()));
+		
+		//商品属性
+		pdpViewCommand.setProperties(buildItemPropertyViewCommand(itemBaseInfo, pdpViewCommand.getImages()));
+		
+		//sku
+		pdpViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
+		
+		//price
+		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
+		
+		return pdpViewCommand;
+	}
+	
+	
+	/**
 	 * 获取并校验商品基本信息 
 	 * @param itemBaseInfo
 	 * @return
@@ -188,35 +221,39 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		
 		// 商品不存在
 		if (Validator.isNullOrEmpty(itemBaseInfo)) {
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item not exists. itemCode:{}.", itemCode);
+			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item not exists. itemCode:{}.", itemCode);
             throw new IllegalItemStateException(IllegalItemState.ITEM_NOT_EXISTS);
         }
-				
+		
+		if(LOG.isInfoEnabled()) {
+			LOG.info("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] itemCode:{}, baseInfo:{}", itemCode, JsonUtil.format(itemBaseInfo));
+		}
+		
 		Integer lifecycle = itemBaseInfo.getLifecycle();
 		if(Item.LIFECYCLE_DELETED == lifecycle) {
 			// 商品逻辑删除
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item logical deleted. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item logical deleted. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED);
 		} else if(Item.LIFECYCLE_UNACTIVE == lifecycle) {
 			// 商品新建状态
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
 		} else if(Item.LIFECYCLE_DISABLE == lifecycle) {
 			// 商品未上架
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
+			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);
 		}
 		
 		Date activeBeginTime = itemBaseInfo.getActiveBeginTime();
 		if (Validator.isNotNullOrEmpty(activeBeginTime) && !DateUtil.isAfter(new Date(), activeBeginTime)) {
 			// 商品未上架
- 			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item before active begin time. itemCode:{}, activeBeginTime:{}.", itemCode, activeBeginTime);
+ 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item before active begin time. itemCode:{}, activeBeginTime:{}.", itemCode, activeBeginTime);
             throw new IllegalItemStateException(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME);
         }
 		
 		if(Constants.ITEM_TYPE_PREMIUMS == itemBaseInfo.getType()) {
 			// 商品是赠品
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
+			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
             throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);
 		}
 		
@@ -419,12 +456,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand);
 	
 	/**
-	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
-	 * 
-	 * @return
+	 * 获取Pdp的显示模式
 	 */
-	protected String getPdpMode(Long itemId) {
-		return PDP_MODE_COLOR_COMBINE;
-	}
-
+	protected abstract String getPdpMode(Long itemId);
 }
