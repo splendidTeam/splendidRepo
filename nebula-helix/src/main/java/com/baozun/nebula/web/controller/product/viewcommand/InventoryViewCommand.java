@@ -57,4 +57,45 @@ public class InventoryViewCommand extends BaseViewCommand {
 	public void setAvailableQty(Integer availableQty) {
 		this.availableQty = availableQty;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((availableQty == null) ? 0 : availableQty.hashCode());
+		result = prime * result
+				+ ((extentionCode == null) ? 0 : extentionCode.hashCode());
+		result = prime * result + ((skuId == null) ? 0 : skuId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		InventoryViewCommand other = (InventoryViewCommand) obj;
+		if (availableQty == null) {
+			if (other.availableQty != null)
+				return false;
+		} else if (!availableQty.equals(other.availableQty))
+			return false;
+		if (extentionCode == null) {
+			if (other.extentionCode != null)
+				return false;
+		} else if (!extentionCode.equals(other.extentionCode))
+			return false;
+		if (skuId == null) {
+			if (other.skuId != null)
+				return false;
+		} else if (!skuId.equals(other.skuId))
+			return false;
+		return true;
+	}
+	
+	
 }
