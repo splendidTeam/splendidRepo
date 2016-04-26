@@ -96,11 +96,11 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		BundleCommand bundle = bundleDao.findBundlesById(bundleId, null);
 		fillBundleCommand(bundle);
 		if(Validator.isNullOrEmpty(bundle)){
-			LOG.debug("get bundle is null by bundleId .");
+			LOG.debug("get bundle is null by bundleId . {}" , new  Date());
 		}
 		else if((Validator.isNullOrEmpty(flag) || Boolean.TRUE.equals(flag[0])) && needRemoveInvalidBundle(bundle)){
 			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			LOG.debug("the bundle invalid , so it removed.");
+			LOG.debug("the bundle invalid , so it removed. {}" , new Date());
 			return null;
 		}
 		return bundle;
@@ -548,7 +548,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		fillBundleElementInfo(bundleElementList, map, bundle);
 		Item item = itemDao.findItemById(bundle.getItemId());
 		if(Validator.isNullOrEmpty(item)){
-			LOG.error("find item is null by itemId : [{}]. so set item lifecycle is 2" , bundle.getItemId());
+			LOG.error("find item is null by itemId : [{}] , bundleId : [{}] {}. so set item lifecycle is 2" , bundle.getItemId() , bundle.getId() , new Date());
 		}
 		//如果item == null 就设置为逻辑删除的状态 2
         bundle.setLifeCycle(item == null ? 2 : item.getLifecycle());
@@ -663,7 +663,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		BundleItemCommand bundleItemCommand = new BundleItemCommand();
         Item item = itemDao.findItemById(itemId);
         if(Validator.isNullOrEmpty(item)){
-			LOG.error("get item is null by itemId : [{}]. so set item lifecycle is 2" , itemId);
+			LOG.error("get item is null by itemId : [{}] , bundleId : [{}] , {}. so set item lifecycle is 2" , itemId , bundle.getId() , new Date());
 		}
         bundleItemCommand.setLifecycle(item == null ? 2 : item.getLifecycle());
 		bundleItemCommand.setItemId(itemId);
@@ -683,7 +683,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 */
 	private List<BundleSkuCommand> packagingBundleSkuCommands(List<BundleSku> skus, Bundle bundle) {
 		List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
-		LOG.debug("bundle price type is {} , availableQty is {}  , syncWithInv is {}" , bundle.getPriceType() , bundle.getAvailableQty() , bundle.getSyncWithInv());
+		LOG.debug("bundle price type is {} , availableQty is {}  , syncWithInv is {} , bundleId [{}] , {}" , bundle.getPriceType() , bundle.getAvailableQty() , bundle.getSyncWithInv() , bundle.getId() , new Date());
 		for (BundleSku sku : skus) {
 			BundleSkuCommand skuCommand = new BundleSkuCommand();
 
@@ -691,7 +691,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
 			if(Validator.isNullOrEmpty(skuu)){
-				LOG.error("get Sku is null by skuId : [{}]. so set sku lifecycle is 2" , sku.getSkuId());
+				LOG.error("get Sku is null by skuId : [{}] {}. so set sku lifecycle is 2" , sku.getSkuId() , new Date());
 			}
 			skuCommand.setProperties(skuu == null ? "" : skuu.getProperties());
 			skuCommand.setExtentionCode(skuu == null ? "" : skuu.getOutid());
@@ -721,7 +721,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 					if(inventory != null && inventory.getAvailableQty() != null){
 						qty = inventory.getAvailableQty();
 					}
-					LOG.debug("Math.min(availableQty, qty) : availableQty [{}] , qty [{}]  min : {}" ,availableQty , qty, Math.min(availableQty, qty));
+					LOG.debug("Math.min(availableQty, qty) : availableQty [{}] , qty [{}] ,  min : {} , skuId [{}] , bundleId [{}],{}" ,availableQty , qty, Math.min(availableQty, qty) , sku.getSkuId() ,bundle.getId(), new Date());
 					skuCommand.setQuantity(Math.min(availableQty, qty));
 				}
 			} else {
