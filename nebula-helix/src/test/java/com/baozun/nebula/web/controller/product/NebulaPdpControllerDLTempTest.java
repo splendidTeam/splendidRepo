@@ -19,12 +19,18 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
+import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.BaseControllerTest;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
+import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolverImpl;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolverImpl;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
@@ -48,17 +54,31 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 	
 	private ItemPropertyViewCommandResolver	itemPropertyViewCommandResolver;
 	
+	private ItemColorSwatchViewCommandResolver	colorSwatchViewCommandResolver;
+	
+	protected ItemImageViewCommandConverter             itemImageViewCommandConverter;
+	
+	private SdkItemManager 												sdkItemManager;
+	
 	
 	@Before
 	public void setUp(){
 		nebulaPdpController = new NebulaPdpController();
 		itemDetailManager = control.createMock(ItemDetailManager.class);
-		
+		sdkItemManager =control.createMock(SdkItemManager.class);
 		//DB
 		itemPropertyViewCommandResolver = new ItemPropertyViewCommandResolverImpl();
+		colorSwatchViewCommandResolver =new ItemColorSwatchViewCommandResolverImpl();
+		
+		itemImageViewCommandConverter =new ItemImageViewCommandConverter();
 		
 		ReflectionTestUtils.setField(itemPropertyViewCommandResolver, "itemDetailManager", itemDetailManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemPropertyViewCommandResolver", itemPropertyViewCommandResolver);
+		ReflectionTestUtils.setField(nebulaPdpController, "colorSwatchViewCommandResolver", colorSwatchViewCommandResolver);
+		
+		ReflectionTestUtils.setField(colorSwatchViewCommandResolver, "sdkItemManager", sdkItemManager);
+		ReflectionTestUtils.setField(nebulaPdpController, "itemImageViewCommandConverter", itemImageViewCommandConverter);
+		
 	}
 	
 	@Test
@@ -75,6 +95,42 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 		control.replay();
 		ItemPropertyViewCommand actualCommand = itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
 		assertEquals(itemPropertyViewCommand, actualCommand);
+		control.verify();
+		
+	}
+	
+	@Test
+	public void testbuildItemColorSwatchViewCommands(){
+		
+		Map<String, Object> returnMap =new HashMap<String, Object>();
+		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
+		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
+		//构造数据
+		ItemPropertyViewCommand itemPropertyViewCommand = constrData(returnMap,
+				baseInfoViewCommand, images);
+		List<Long> itemIds =new ArrayList<Long>();
+		itemIds.add(57502L);
+		
+		List<ItemImage> itemImageList =new ArrayList<ItemImage>();
+		ItemImage img1=new ItemImage();
+		img1.setItemId(57502l);
+		img1.setId(3081l);
+		img1.setPicUrl("2014/11/12/14157706660105740_800X800.JPG");
+		img1.setType("IMG_TYPE_COLOR");
+		itemImageList.add(img1);
+		
+		//
+		
+		List<ItemColorSwatchViewCommand> colorSwatchViewCommands =new ArrayList<ItemColorSwatchViewCommand>();
+		
+		
+		
+		EasyMock.expect(sdkItemManager.findItemImageByItemIds(itemIds, null)).andReturn(itemImageList).times(1);
+		EasyMock.expect(itemImageViewCommandConverter.convert(itemImageList)).andReturn(images);
+		
+		control.replay();
+		List<ItemColorSwatchViewCommand> actualCommand = nebulaPdpController.buildItemColorSwatchViewCommands(baseInfoViewCommand);
+		assertEquals(colorSwatchViewCommands, actualCommand);
 		control.verify();
 		
 	}

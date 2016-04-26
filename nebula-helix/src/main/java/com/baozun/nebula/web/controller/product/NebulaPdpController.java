@@ -93,8 +93,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Autowired
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
-	@Autowired
-	private ItemColorSwatchViewCommandResolver		colorSwatchViewCommandResolver;
 	
 	
 	/**
