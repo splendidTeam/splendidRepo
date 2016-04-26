@@ -21,8 +21,6 @@ import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
-import com.baozun.nebula.solr.factory.SortTypeEnum;
-import com.baozun.nebula.solr.utils.SolrOrderSort;
 import com.baozun.nebula.web.controller.search.form.SearchForm;
 import com.feilong.core.bean.PropertyUtil;
 
@@ -75,8 +73,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		// 将页面传来的参数searchForm转换为 searchCommand
 		SearchCommand searchCommand = new SearchCommand();
 		PropertyUtil.copyProperties(searchCommand, searchForm);
+		
 
-		// 将 searchCommand 中 filterConditionStr 转成FacetParameter
+		// 将 searchCommand 中 filterConditionStr,categoryConditionStr 转成FacetParameter
 		searchParamProcess(searchCommand);
 
 		// 创建solrquery对象
@@ -86,7 +85,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		setFacet(solrQuery, searchCommand);
 
 		// 设置权重信息
-		Boost boost = this.createBoost();
+		Boost boost = createBoost();
 		searchManager.setSolrBoost(solrQuery, boost);
 
 		// 查询
