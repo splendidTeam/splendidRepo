@@ -45,8 +45,8 @@ public class NebulaBundleManagerTest {
 	}
 	
 	@Test
-	public void testFindBundleIdByItemCode(){
-		Long bundleId = bundleManager.findBundleIdByItemCode("111111114");
+	public void testFindBundleIdByBundleItemId(){
+		Long bundleId = bundleManager.findBundleIdByBundleItemId(3L);
 		
 		log.debug("result : {}" ,bundleId);
 	}
