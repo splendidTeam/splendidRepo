@@ -186,16 +186,15 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		Map<String, Object> returnObject =new HashMap<String, Object>();
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
-		String itemCode ="";
 		try {
 			//PdpViewCommand
-			PdpViewCommand pdpViewCommand = buildPdpViewCommandByObj(itemCode);
+			PdpViewCommand pdpViewCommand = buildPdpViewCommandWhenSwitch(itemId);
 			returnObject.put(SWITCH_COLOR_KEY_PDP_VIEW, pdpViewCommand);
 			//库存信息
 			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
 			returnObject.put(SWITCH_COLOR_KEY_PDP_INVENTORY, inventoryViewCommands);
 		} catch (IllegalItemStateException e) {
-			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
+			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemId, e.getState().name());
 			
 			throw new BusinessException("Show pdp error.");
 		}
