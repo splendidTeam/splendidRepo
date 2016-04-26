@@ -19,7 +19,9 @@ package com.baozun.nebula.web.controller.product;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,13 +53,9 @@ import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandC
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -91,7 +89,9 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Autowired
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
+	private static final String SWITCH_COLOR_KEY_PDP_VIEW 		="switch_color_key_pdp_view";
 	
+	private static final String SWITCH_COLOR_KEY_PDP_INVENTORY 	="switch_color_key_pdp_inventory";
 	
 	/**
 	 * 进入商品详情页 	
@@ -107,7 +107,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
-			model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, pdpViewCommand.getBaseInfo().getId()));
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;
@@ -118,6 +117,38 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			throw new BusinessException("Show pdp error.");
 		}
+	}
+	
+	/**
+	 * @RequestMapping(value = "/item/browsinghistory/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		return DefaultReturnResult.SUCCESS;
+	}
+	
+	/**
+	 * @RequestMapping(value = "/item/pdprecommend/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+		return DefaultReturnResult.SUCCESS;
 	}
 	
 	/**
@@ -149,31 +180,23 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult switchColorForItem(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		//重新构造PdpViewCommand TODO 整合
-		PdpViewCommand pdpViewCommand =new PdpViewCommand();
-		//buildItemBaseInfoViewCommand(itemCode);code?
-		ItemBaseInfoViewCommand baseInfoViewCommand =buildItemBaseInfoViewCommand(itemId);
-		pdpViewCommand.setBaseInfo(baseInfoViewCommand);
-		List<ItemImageViewCommand> imageViewCommands =buildItemImageViewCommand(itemId);
-		pdpViewCommand.setImages(imageViewCommands);
-		pdpViewCommand.setProperties(buildItemPropertyViewCommand(baseInfoViewCommand,
-				imageViewCommands));
-		//切换
-		
-		
-		// TODO 同时加入库存信息
-		List<SkuViewCommand> skus =buildSkuViewCommand(itemId);
-		pdpViewCommand.setSkus(skus );
-		pdpViewCommand.setPrice(buildPriceViewCommand(baseInfoViewCommand, skus));
-		List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
-		//pdpViewCommand.set?
-		String pMode =getPdpMode(baseInfoViewCommand.getId());
-		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
-			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand,
-					itemImageViewCommandConverter);
-			pdpViewCommand.setColorSwatches(colorSwatches);
+		Map<String, Object> returnObject =new HashMap<String, Object>();
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+		try {
+			//PdpViewCommand
+			PdpViewCommand pdpViewCommand = buildPdpViewCommandWhenSwitch(itemId);
+			returnObject.put(SWITCH_COLOR_KEY_PDP_VIEW, pdpViewCommand);
+			//库存信息
+			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
+			returnObject.put(SWITCH_COLOR_KEY_PDP_INVENTORY, inventoryViewCommands);
+		} catch (IllegalItemStateException e) {
+			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemId, e.getState().name());
+			
+			throw new BusinessException("Show pdp error.");
 		}
-		return new DefaultReturnResult();
+		
+		defaultReturnResult.setReturnObject(returnObject);
+		return defaultReturnResult;
 	}
 	
 	
