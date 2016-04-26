@@ -37,6 +37,7 @@ import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
+ * 构造pdp商品的属性信息
  * @Description 
  * @author dongliang ma
  * @date 2016年4月20日 下午5:15:53 
@@ -105,12 +106,14 @@ public class ItemPropertyViewCommandResolverImpl implements
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("saleDynamicPropertyCommandList:{}", JsonUtil.format(saleDynamicPropertyCommandList));
         }
+        //获取颜色图片信息
         Map<Long, ImageViewCommand> itemPropertiesIdAndColorswatchMap = colorSwatchResolver.resolve(imageViewCommands);
+        //属性设值和排序
         return sortAndConstructElementViewResolver.resolve(baseInfoViewCommand, saleDynamicPropertyCommandList, itemPropertiesIdAndColorswatchMap);
 	}
 	
 	/**
-	 * 构造一般属性
+	 * 构造一般属性，从DB查询出的结果已经做了分组，所以只需要按组遍历，依次设值改组下的属性信息
 	 * @param baseInfoViewCommand
 	 * @param dynamicPropertyMap
 	 * @return
@@ -128,12 +131,15 @@ public class ItemPropertyViewCommandResolverImpl implements
             return Collections.emptyMap();
         }
 		Map<String, List<PropertyElementViewCommand>> resultMap =new HashMap<String, List<PropertyElementViewCommand>>();
+		//按组遍历
 		for (Map.Entry<String, List<DynamicPropertyCommand>> entry :generalGroupPropMap.entrySet()) {
 			if(Validator.isNotNullOrEmpty(entry.getValue())){
 				List<DynamicPropertyCommand> generalPropCommandList = entry.getValue();
+				//设值
 				List<PropertyElementViewCommand> elementViewCommands = sortAndConstructElementViewResolver.resolve(baseInfoViewCommand,
 						generalPropCommandList, null);
 				if(Validator.isNotNullOrEmpty(elementViewCommands)){
+					//放入结果集
 					resultMap.put(entry.getKey(), elementViewCommands);
 				}
 			}
