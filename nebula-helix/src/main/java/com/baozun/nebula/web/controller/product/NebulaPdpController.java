@@ -89,20 +89,19 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Autowired
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
-	private static final String SWITCH_COLOR_KEY_PDP_VIEW 		="switch_color_key_pdp_view";
-	
-	private static final String SWITCH_COLOR_KEY_PDP_INVENTORY 	="switch_color_key_pdp_inventory";
 	
 	/**
 	 * 进入商品详情页 	
 	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
 	 * 
-	 * @param itemCode
+	 * @param itemCode 商品编码
 	 * @param request
 	 * @param response
 	 * @param model
 	 */
-	public String showPdp(@PathVariable("itemCode") String itemCode, HttpServletRequest request, HttpServletResponse response, Model model) {
+	public String showPdp(@PathVariable("itemCode") String itemCode, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		
 		try {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
@@ -123,7 +122,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @RequestMapping(value = "/item/browsinghistory/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
-	 * @param itemId
+	 * @param itemId 商品Id
 	 * @param request
 	 * @param response
 	 * @param model
@@ -170,33 +169,39 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 	
 	/**
-	 * 商品定义到色，到款显示，切换颜色时，实际上是变更了商品，需要ajax加载该商品信息
-	 * 商品定义到款，到款显示，切换颜色时，只是更换了销售属性，此处不需要重新加载
+	 * 商品定义到色，需要到款汇聚显示，当切换颜色时，实际上是变更了商品，需要ajax加载该商品的信息
 	 * 
 	 * @RequestMapping(value = "/item/detail/get", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
-	 * @return
+	 * 
 	 */
-	public NebulaReturnResult switchColorForItem(@PathVariable("itemId") Long itemId, 
+	public NebulaReturnResult switchColorForItem(@PathVariable("itemCode") String itemCode, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		Map<String, Object> returnObject =new HashMap<String, Object>();
-		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+		
+		DefaultReturnResult result = new DefaultReturnResult();
+		
 		try {
-			//PdpViewCommand
-			PdpViewCommand pdpViewCommand = buildPdpViewCommandWhenSwitch(itemId);
-			returnObject.put(SWITCH_COLOR_KEY_PDP_VIEW, pdpViewCommand);
+			
+			Map<String, Object> returnObject =new HashMap<String, Object>();
+			
+			//商品信息
+			PdpViewCommand pdpViewCommand = buildSimplePdpViewCommand(itemCode);
+			returnObject.put(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
+			
 			//库存信息
-			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(itemId);
-			returnObject.put(SWITCH_COLOR_KEY_PDP_INVENTORY, inventoryViewCommands);
+			List<InventoryViewCommand> inventoryViewCommands =buildInventoryViewCommand(pdpViewCommand.getBaseInfo().getId());
+			returnObject.put(MODEL_KEY_INVENTORY, inventoryViewCommands);
+			
+			result.setReturnObject(returnObject);
+			
 		} catch (IllegalItemStateException e) {
-			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemId, e.getState().name());
+			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemCode, e.getState().name());
 			
 			throw new BusinessException("Show pdp error.");
 		}
 		
-		defaultReturnResult.setReturnObject(returnObject);
-		return defaultReturnResult;
+		return result;
 	}
 	
 	
