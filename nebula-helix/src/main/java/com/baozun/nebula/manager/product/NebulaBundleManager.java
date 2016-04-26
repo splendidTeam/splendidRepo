@@ -55,7 +55,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 * <ul>
 	 *    <li>bundle列表入口 ： 可能会查询出一条记录</li>
 	 * </ul>
-	 * @param boundleId
+	 * @param bundleItemCode 
 	 * @param flag : 是否踢掉无效bundle的标记
 	 * <ul>
 	 *    <li> true :　踢掉无效的bundle</li>
