@@ -45,6 +45,7 @@ import com.feilong.core.util.comparator.PropertyComparator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
+ * 根据商品的基本信息、已获取的属性信息、色块信息构造属性元素集信息
  * @Description 
  * @author dongliang ma
  * @date 2016年4月21日 上午11:32:17 
@@ -68,9 +69,8 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
 		//按照property.sortNo排序 
         Collections.sort(dynamicPropertyCommandList, new PropertyComparator<DynamicPropertyCommand>("property.sortNo"));
 
-        //按照property的sortNo字段排序
-        Map<PropertyViewCommand, List<PropertyValueViewCommand>> sortableAndEnablePropertiesMap 
-        											= new LinkedHashMap<PropertyViewCommand, List<PropertyValueViewCommand>>();
+        List<PropertyElementViewCommand> elementViewCommands =new ArrayList<PropertyElementViewCommand>();
+        PropertyElementViewCommand elementViewCommand =null;
         for (DynamicPropertyCommand dynamicPropertyCommand : dynamicPropertyCommandList){
             //属性
         	PropertyViewCommand propertySubViewCommand = constructPropertyViewCommand(dynamicPropertyCommand);
@@ -82,35 +82,18 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
             if (null == propertyValueViewSubCommandList) {
                 propertyValueViewSubCommandList = Collections.emptyList();
             }
-            sortableAndEnablePropertiesMap.put(propertySubViewCommand, propertyValueViewSubCommandList);
+            //添加商品属性元素
+            elementViewCommand =new PropertyElementViewCommand();
+        	elementViewCommand.setProperty(propertySubViewCommand);
+        	elementViewCommand.setPropertyValues(propertyValueViewSubCommandList);
+        	elementViewCommands.add(elementViewCommand);
         }
-        if (Validator.isNullOrEmpty(sortableAndEnablePropertiesMap)) {
+        if (Validator.isNullOrEmpty(elementViewCommands)) {
             LOGGER.warn(
-                            "itemId:[{}],itemCode:[{}],sortableAndEnablePropertiesMap isNullOrEmpty,but input param saleDynamicPropertyCommandList is:[{}]",
+                            "itemId:[{}],itemCode:[{}],elementViewCommands isNullOrEmpty,but input param saleDynamicPropertyCommandList is:[{}]",
                             itemId,
                             itemCode,
                             JsonUtil.format(dynamicPropertyCommandList));
-        }else{
-            if (LOGGER.isDebugEnabled()) {
-                Set<PropertyViewCommand> keySet = sortableAndEnablePropertiesMap.keySet();
-                List<Object> propertyValueList = CollectionsUtil.getPropertyValueList(keySet, "name");
-                LOGGER.debug(
-                                "item id:[{}],code:[{}],sortableAndEnablePropertiesMap names:[{}],sortableAndEnablePropertiesMap:{}",
-                                itemId,
-                                itemCode,
-                                JsonUtil.format(propertyValueList),
-                                JsonUtil.format(sortableAndEnablePropertiesMap));
-            }
-        }
-        //有序map转换成list
-        List<PropertyElementViewCommand> elementViewCommands =new ArrayList<PropertyElementViewCommand>();
-        PropertyElementViewCommand elementViewCommand =null;
-        for(Map.Entry<PropertyViewCommand, List<PropertyValueViewCommand>> entry :
-        			sortableAndEnablePropertiesMap.entrySet()){
-        	elementViewCommand =new PropertyElementViewCommand();
-        	elementViewCommand.setProperty(entry.getKey());
-        	elementViewCommand.setPropertyValues(entry.getValue());
-        	elementViewCommands.add(elementViewCommand);
         }
         return elementViewCommands;
 	}
@@ -149,12 +132,12 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
             return Collections.emptyList();
         }
         Property property = dynamicPropertyCommand.getProperty();
+        
         PropertyValueViewCommandTransformer transformer = new PropertyValueViewCommandTransformer(
                         itemCode,
                         property,
-                        //propertyValueConvertResolver,
                         colorswatchMap);
-
+        //根据itemPropertiesList转换PropertyValueViewCommand
         List<PropertyValueViewCommand> propertyValueViewSubCommands = (List<PropertyValueViewCommand>) CollectionUtils
                         .collect(itemPropertiesList, transformer);
 
@@ -170,7 +153,7 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
 	}
 	
 	/**
-	 * 
+	 * 获取该属性的itemPropertiesCommand集合
 	 * @param dynamicPropertyCommand
 	 * @return
 	 */
