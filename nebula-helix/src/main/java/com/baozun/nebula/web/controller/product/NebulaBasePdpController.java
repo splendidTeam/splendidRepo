@@ -61,7 +61,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaBasePdpController.class);
+	private static final Logger	LOG = LoggerFactory.getLogger(NebulaBasePdpController.class);
 	
 	@Autowired
 	protected SdkItemManager sdkItemManager;
@@ -77,11 +77,11 @@ public abstract class NebulaBasePdpController extends BaseController {
 	private InventoryViewCommandConverter inventoryViewCommandConverter;
 	
 	@Autowired
-	protected ItemPropertyViewCommandResolver							itemPropertyViewCommandResolver;
+	protected ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
 	
 	@Autowired
 	@Qualifier("itemImageViewCommandConverter")
-	protected ItemImageViewCommandConverter                                   itemImageViewCommandConverter;
+	protected ItemImageViewCommandConverter itemImageViewCommandConverter;
 	
 	@Autowired
 	protected CacheManager cacheManager;
@@ -106,11 +106,9 @@ public abstract class NebulaBasePdpController extends BaseController {
 	
 	/**
 	 * 构造商品基本信息
-	 * 这个方法不用考虑pdp显示模式的问题，因为基本信息对于几种模式取法是一样的
-	 * @param itemId
-	 * @return
+	 * @param itemId 商品Id
+	 * @return ItemBaseInfoViewCommand
 	 */
-	@Deprecated
 	protected ItemBaseInfoViewCommand buildItemBaseInfoViewCommand(Long itemId) {
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
 		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
