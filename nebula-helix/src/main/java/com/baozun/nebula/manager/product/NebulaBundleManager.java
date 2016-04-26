@@ -25,7 +25,13 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
-
+/**
+ * 捆绑接口
+ * @Description : com.baozun.nebula.manager.productNebulaBundleManager.java
+ * @Company  : BAOZUN
+ * @author :  jiaolong.chen
+ * @data : 2016年4月26日下午5:11:30
+ */
 public interface NebulaBundleManager extends BaseManager {
 
 	/**
@@ -48,7 +54,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 * 
 	 * <h3>查询bundle信息</h3>
 	 * <ul>
-	 *    <li>bundle列表入口 ： 只会查询出一条记录</li>
+	 *    <li>bundle列表入口 ： 可能会查询出一条记录</li>
 	 * </ul>
 	 * @param boundleId
 	 * @param flag : 动态布尔参数
@@ -62,11 +68,13 @@ public interface NebulaBundleManager extends BaseManager {
 	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag);
 	
 	/**
+	 * <h3>一个bundle其实本身也就是一个商品,也就有相应的itemId</h3>
 	 * 通过itemCode查询出对应的bundleId
-	 * @param itemCode
+	 * 
+	 * @param bundleItemId
 	 * @return
 	 */
-	public Long findBundleIdByItemCode(String itemCode);
+	public Long findBundleIdByBundleItemId(Long bundleItemId);
 	
 	/**
 	 * <h3>bundle信息分页查询</h3>
