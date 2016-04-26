@@ -101,6 +101,9 @@ public class Navigation extends BaseModel {
 	
 	/** version. */
 	private Date				version;
+	
+	/**商品集合id*/
+	private Long				collectionId;	
 
 	
 	@Id
@@ -223,6 +226,15 @@ public class Navigation extends BaseModel {
 
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
+	}
+
+	@Column(name="COLLECTION_ID")
+	public Long getCollectionId() {
+		return collectionId;
+	}
+
+	public void setCollectionId(Long collectionId) {
+		this.collectionId = collectionId;
 	}
 	
 	
