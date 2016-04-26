@@ -17,6 +17,7 @@
 package com.baozun.nebula.search;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,35 +26,59 @@ import java.util.List;
  *
  * @author nic
  */
-public interface FacetGroup {
+public class FacetGroup {
 
-    /**
-     * Get unique identifier for this facet group
-     * @return id
-     */
-    String getId();
+	private Long 	id;
+	
+	private String	title;
+	
+	private String 	type;
+	
+	/**筛选项的值*/
+	private List<Facet>	facets = new ArrayList<Facet>();
+	
+	/**是否是分类*/
+	private	Boolean category=false;
 
-    /**
-     * Get title of the facet group. Should be localized to current language.
-     * @return
-     */
-    String getTitle();
+	public Long getId() {
+		return id;
+	}
 
-    /**
-     * Get type of facet group.
-     * @return type
-     */
-    String getType(); 
+	public String getTitle() {
+		return title;
+	}
 
-    /**
-     * Get all belonging facets
-     * @return facets
-     */
-    List<Facet> getFacets();
+	public String getType() {
+		return type;
+	}
 
-    /**
-     * Indicate if current facet group represents a product category or not.
-     * @return is category
-     */
-    boolean isCategory();
+	public List<Facet> getFacets() {
+		return facets;
+	}
+
+	public Boolean isCategory() {
+		return category;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setFacets(List<Facet> facets) {
+		this.facets = facets;
+	}
+
+	public void setCategory(Boolean category) {
+		this.category = category;
+	}
+	
+	
 }

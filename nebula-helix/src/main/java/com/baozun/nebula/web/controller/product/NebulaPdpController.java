@@ -39,8 +39,8 @@ import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -49,7 +49,6 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
-import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -59,7 +58,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewComman
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -93,11 +91,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Autowired
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
-	@Autowired
-	private ItemDetailManager	itemDetailManager;
-	
-	@Autowired
-	private ItemColorSwatchViewCommandResolver		colorSwatchViewCommandResolver;
 	
 	
 	/**
@@ -127,6 +120,38 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 	
 	/**
+	 * @RequestMapping(value = "/item/browsinghistory/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		return DefaultReturnResult.SUCCESS;
+	}
+	
+	/**
+	 * @RequestMapping(value = "/item/pdprecommend/get", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+		return DefaultReturnResult.SUCCESS;
+	}
+	
+	/**
 	 * 加载商品库存
 	 * 
 	 * @RequestMapping(value = "/item/inventory/get", method = RequestMethod.GET)
@@ -140,7 +165,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 */
 	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		model.addAttribute("inventoryViewCommands", super.buildInventoryViewCommand(itemId));
+		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
 		return DefaultReturnResult.SUCCESS;
 	}
 	
@@ -175,7 +200,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		//pdpViewCommand.set?
 		String pMode =getPdpMode(baseInfoViewCommand.getId());
 		if(pMode.equals(PDP_MODE_COLOR_COMBINE)){//?
-			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand);
+			List<ItemColorSwatchViewCommand>  colorSwatches =colorSwatchViewCommandResolver.resolve(baseInfoViewCommand,
+					itemImageViewCommandConverter);
 			pdpViewCommand.setColorSwatches(colorSwatches);
 		}
 		return new DefaultReturnResult();
@@ -313,20 +339,17 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected List<RelationItemViewCommand> customBuildItemRecommendViewCommand(
 			Long itemId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<RelationItemViewCommand>();
 	}
 
 	@Override
 	protected String getItemImageType() {
-		// TODO Auto-generated method stub
-		return null;
+		return ItemImage.IMG_TYPE_LIST;
 	}
 
 	@Override
 	protected String getItemRecommendMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return RECOMMEND_MODE_GENERAL;
 	}
 
 }

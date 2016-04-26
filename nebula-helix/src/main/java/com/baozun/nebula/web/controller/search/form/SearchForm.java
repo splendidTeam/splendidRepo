@@ -12,9 +12,19 @@ public class SearchForm extends BaseForm{
 	private String				searchWord;
 
 	/**
-	 * 过滤条件
+	 * 属性的过滤条件
 	 */
 	private String				filterConditionStr;
+	
+	/**
+	 * 分类的过滤条件
+	 */
+	private String				categoryConditionStr;
+	
+	/**
+	 * 前端导航的过滤条件
+	 */
+	private String				navigationConditionStr;
 	
 	/**
 	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用
@@ -82,6 +92,22 @@ public class SearchForm extends BaseForm{
 
 	public void setPageNumber(Integer pageNumber){
 		this.pageNumber = pageNumber;
+	}
+
+	public String getCategoryConditionStr() {
+		return categoryConditionStr;
+	}
+
+	public String getNavigationConditionStr() {
+		return navigationConditionStr;
+	}
+
+	public void setCategoryConditionStr(String categoryConditionStr) {
+		this.categoryConditionStr = categoryConditionStr;
+	}
+
+	public void setNavigationConditionStr(String navigationConditionStr) {
+		this.navigationConditionStr = navigationConditionStr;
 	}
 
 }

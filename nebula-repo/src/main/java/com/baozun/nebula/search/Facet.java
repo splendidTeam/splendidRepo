@@ -16,37 +16,107 @@
  */
 package com.baozun.nebula.search;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Facet
  *
- * @author nic
+ * @author long.xia
  */
-public interface Facet {
+public class Facet {
 
-    /**
-     * Get facet title. Should be localized to current language.
-     * @return
-     */
-    String getTitle();
+	private Long id;
+	
+	private String title;
 
-    /**
-     * Get URL to activate this facet on current result set.
-     * @return url
-     */
-    String getUrl();
+	private String url;
 
-    /**
-     * Get number of products in current result set.
-     * @return count
-     */
-    int getCount();
+	private long count;
 
-    /**
-     * Indicate if the facet has been selected (for multi-select).
-     * @return selected
-     */
-    boolean isSelected();
-    
-    String	getValue();
+	private boolean selected;
+
+	private String value;
+	
+	private	Long	parentId;
+
+	public List<Facet> childrens = new ArrayList<Facet>();
+	
+	public Facet(){}
+	
+	public Facet(Facet facet){
+		this.id = facet.getId();
+		this.title = facet.getTitle();
+		this.parentId = facet.getParentId();
+		this.count = facet.getCount();
+		this.childrens = facet.getChildrens();
+	}
+	
+
+	public String getTitle() {
+		return title;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public long getCount() {
+		return count;
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public List<Facet> getChildrens() {
+		return childrens;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public void setCount(long count) {
+		this.count = count;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setChildrens(List<Facet> childrens) {
+		this.childrens = childrens;
+	}
+
+	public Long getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
+	}
+
+	
+
 }

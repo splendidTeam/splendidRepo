@@ -6,38 +6,27 @@ package com.baozun.nebula.web.controller.product;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.http.HttpSession;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 
 import org.easymock.EasyMock;
-import org.easymock.Mock;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.validation.BindingResult;
 
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
-import com.baozun.nebula.event.EventPublisher;
-import com.baozun.nebula.manager.member.MemberExtraManager;
+import com.baozun.nebula.manager.CacheManager;
+import com.baozun.nebula.manager.CacheManagerImpl;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseControllerTest;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.member.form.LoginForm;
-import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
@@ -62,11 +51,13 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 	
 	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
 	
+	private CacheManager cacheManager;
 	@Before
 	public void setUp(){
 		nebulaPdpController = new NebulaPdpController();
 		reviewMemberViewCommandConverter = new ReviewMemberViewCommandConverter();
 		itemReviewViewCommandConverter = new ItemReviewViewCommandConverter();
+		cacheManager = control.createMock(CacheManager.class);
 		itemDetailManager = control.createMock(ItemDetailManager.class);
 		itemRateManager = control.createMock(ItemRateManager.class);
 		memberManager = control.createMock(MemberManager.class);
@@ -76,6 +67,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		ReflectionTestUtils.setField(nebulaPdpController, "memberManager", memberManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemRateManager", itemRateManager);
 		ReflectionTestUtils.setField(nebulaPdpController, "itemDetailManager", itemDetailManager);
+		ReflectionTestUtils.setField(nebulaPdpController, "cacheManager", cacheManager);
 	}
 
 	@Test
@@ -162,7 +154,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		members.add(member2);
 		
 		EasyMock.expect(itemRateManager.findItemRateListByItemId(EasyMock.isA(Page.class), EasyMock.eq(12345L), EasyMock.aryEq(pageForm.getSorts()))).andReturn(rates).times(1);
-		EasyMock.expect(memberManager.findMembersByIds(memberIds)).andReturn(members);
+		EasyMock.expect(memberManager.findMembersByIds(memberIds)).andReturn(members).times(1);
 		control.replay();
 		
 		assertEquals(DefaultReturnResult.SUCCESS, nebulaPdpController.showItemReview(12345L, pageForm, request, response, model));

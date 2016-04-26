@@ -54,6 +54,9 @@ public class PdpViewCommand extends BaseViewCommand {
     
     /** 商品扩展信息 */
     private ItemExtraViewCommand extra;
+    
+    /** 商品推荐 */
+    private List<RelationItemViewCommand> recommend;
 
 	public List<BreadcrumbsViewCommand> getBreadcrumbs() {
 		return breadcrumbs;
@@ -133,6 +136,14 @@ public class PdpViewCommand extends BaseViewCommand {
 
 	public void setExtra(ItemExtraViewCommand extra) {
 		this.extra = extra;
+	}
+
+	public List<RelationItemViewCommand> getRecommend() {
+		return recommend;
+	}
+
+	public void setRecommend(List<RelationItemViewCommand> recommend) {
+		this.recommend = recommend;
 	}
 
 }

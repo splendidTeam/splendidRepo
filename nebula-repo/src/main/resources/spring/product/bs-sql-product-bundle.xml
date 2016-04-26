@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="Bundle.findBundlesByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据商品ID查找捆绑类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					     b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime,
+					     i.code
+					from t_pd_bundle b 
+					inner join t_pd_item i on i.id = b.item_id
+						#if($lifecycle)
+			       			and i.lifecycle = :lifecycle
+			       		#end
+						left join (select distinct bundle_id, bundle_element_id from t_pd_bundle_sku where item_id = :itemId) t on b.id = t.bundle_id
+						inner join t_pd_bundle_element e on t.bundle_element_id = e.id and e.is_main_element = true
+						order by b.modify_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.findBundlesByStyle" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据款号查找捆绑类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       		 	 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime,
+					     i.code
+						from t_pd_bundle b 
+						inner join t_pd_item i on i.id = b.item_id
+							#if($lifecycle)
+			       				and i.lifecycle = :lifecycle
+			       			#end
+						left join (select distinct bundle_id, bundle_element_id from t_pd_bundle_sku where style = :style) t on b.id = t.bundle_id
+						inner join t_pd_bundle_element e on t.bundle_element_id = e.id and e.is_main_element = true
+						order by b.modify_time desc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.findBundlesById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据bundId查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime,
+					     i.code
+		       		from 
+		       			t_pd_bundle b 
+		       		left join
+		       		    t_pd_item i
+		       		on
+		       			i.id = b.item_id
+		       		where 
+		       		    b.id = :id
+		       		#if($lifecycle)
+			       		and i.lifecycle = :lifecycle
+			       	#end
+		       			
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.findBundlesByPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
+		       		from 
+		       			t_pd_bundle  b
+		       		where 
+		       		    1 = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

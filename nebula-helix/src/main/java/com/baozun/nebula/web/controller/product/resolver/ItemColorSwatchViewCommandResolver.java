@@ -18,22 +18,35 @@ package com.baozun.nebula.web.controller.product.resolver;
 
 import java.util.List;
 
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 
-/**   
+/** 
+ * 颜色（或者其他属性，颜色是个统称）或商品切换部分
+ * <p>
+ * 		[条件]当pdp展示模式取:
+ * </p>
+ * <p>
+ * 		商品到色，PDP根据款号聚合（到款显示）,即模式二@see (NebulaAbstractPdpController.PDP_MODE_COLOR_COMBINE)
+ * </p>
+ * <p>
+ * 		设置pdp的view切换属性
+ * </p> 
  * @Description 
  * @author dongliang ma
  * @date 2016年4月22日 下午3:59:09 
  * @version   
  */
 public interface ItemColorSwatchViewCommandResolver {
+	
 	/**
 	 * 
-	 * @param baseInfoViewCommand
-	 * @param itemPropertyViewCommand
+	 * @param baseInfoViewCommand (应至少包含itemId、itemCode、style,因为此command在之前已经查到，所以不难设置这些值)
+	 * @param itemImageViewCommandConverter
 	 * @return
 	 */
-	List<ItemColorSwatchViewCommand> resolve(ItemBaseInfoViewCommand baseInfoViewCommand
+	List<ItemColorSwatchViewCommand> resolve(ItemBaseInfoViewCommand baseInfoViewCommand,
+			ItemImageViewCommandConverter itemImageViewCommandConverter
 			);
 }
