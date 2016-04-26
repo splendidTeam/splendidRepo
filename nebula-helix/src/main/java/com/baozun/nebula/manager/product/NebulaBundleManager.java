@@ -49,7 +49,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 * </ul>
 	 * @return
 	 */
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean ...flag);
+	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean flag);
 	/**
 	 * 
 	 * <h3>查询bundle信息</h3>
@@ -65,16 +65,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 * </ul>
 	 * @return
 	 */
-	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag);
-	
-	/**
-	 * <h3>一个bundle其实本身也就是一个商品,也就有相应的itemId</h3>
-	 * 通过bundleItemId查询出对应的bundleId
-	 * 
-	 * @param bundleItemId
-	 * @return
-	 */
-	public Long findBundleIdByBundleItemId(Long bundleItemId);
+	public BundleCommand findBundleCommandByBundleItemCode(String bundleItemCode , Boolean flag);
 	
 	/**
 	 * <h3>bundle信息分页查询</h3>
@@ -88,7 +79,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 * </ul>
 	 * @return
 	 */
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean ...flag);
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean flag);
 	
 	/**
 	 * <h3>下单 加入购物车时验证bundle的信息</h3>
