@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -69,6 +70,7 @@ public class ResolverTest {
 	private ItemColorSwatchViewCommandResolver						itemColorSwatchViewCommandResolver;
 	
 	@Autowired
+	@Qualifier("itemImageViewCommandConverter")
 	private ItemImageViewCommandConverter 							itemImageViewCommandConverter;
 	
 	@Before
@@ -92,7 +94,7 @@ public class ResolverTest {
 		
 	}
 	
-	@Test
+/*	@Test
 	public void testItemColorSwatchViewCommandResolver(){
 		
 		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
@@ -102,7 +104,7 @@ public class ResolverTest {
 				itemImageViewCommandConverter)));
 	}
 	
-	
+	*/
 	
 	/**
 	 * 

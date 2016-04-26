@@ -12,9 +12,16 @@ public class SearchCommand{
 	private String					searchWord;
 
 	/**
-	 * 过滤条件
+	 * 过滤条件(属性)<br/>
+	 * 参数格式：属性Id-属性值Id,属性Id-属性值Id....
 	 */
 	private String					filterConditionStr;
+
+	/** 
+	 * 过滤条件(分类)
+	 * 参数格式：父级分类id-父级分类id-分类id,父级分类id-父级分类id-分类id......
+	 */
+	private String					filterCategoryStr;
 
 	/**
 	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用

@@ -48,10 +48,17 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     /** 添加时间,此处的时间通常用于页面购物车行的排序,仅此而已. */
     private Date              addTime;
 
-    //**************************************************************
+    /**
+     * 哪一个组,以往相同sku添加到购物车,那么购物车是一行记录,数量是2;
+     * <p>
+     * 但是我们要实现,两行记录,每行的数量是1, 因为可能其中的一个sku是bundle里面的,另外一个不是
+     * </p>
+     * 
+     * 此处主要是为了区分按组显示
+     */
+    private Integer           group;
 
-    /** 买的哪个店铺 . */
-    private Long              shopId;
+    //**************************************************************
 
     /** 买的什么商品id. */
     private Long              itemId;
@@ -110,6 +117,8 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     /** 吊牌价(原单价). */
     private BigDecimal        listPrice;
 
+    //***********************************************************************************
+
     /**
      * 获得 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
      *
@@ -146,25 +155,6 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     public void setAddTime(Date addTime){
         this.addTime = addTime;
-    }
-
-    /**
-     * 获得 买的哪个店铺 .
-     *
-     * @return the shopId
-     */
-    public Long getShopId(){
-        return shopId;
-    }
-
-    /**
-     * 设置 买的哪个店铺 .
-     *
-     * @param shopId
-     *            the shopId to set
-     */
-    public void setShopId(Long shopId){
-        this.shopId = shopId;
     }
 
     /**
@@ -393,6 +383,21 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     public void setListPrice(BigDecimal listPrice){
         this.listPrice = listPrice;
+    }
+
+    /**
+     * @return the group
+     */
+    public Integer getGroup(){
+        return group;
+    }
+
+    /**
+     * @param group
+     *            the group to set
+     */
+    public void setGroup(Integer group){
+        this.group = group;
     }
 
 }
