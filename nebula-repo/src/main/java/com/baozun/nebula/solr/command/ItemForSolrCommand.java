@@ -322,6 +322,27 @@ public class ItemForSolrCommand implements Serializable {
 	@Field("all_category_ids")
 	private List<Long> allCategoryIds;
 	
+	/**
+	 * 该商品的分类树
+	 * 数据格式为：
+	 * 
+	 * 		1
+	 * 		1-11
+	 * 		1-11-1101
+	 */
+	@Field("category_tree")
+	private List<String>	categoryTree;
+	
+	/**
+	 * 该商品对应的导航树
+	 * 数据格式为：
+	 * 
+	 * 		1
+	 * 		1-11
+	 * 		1-11-1101 	
+	 */
+	@Field("navigation_tree")
+	private List<String>	navigationTree;
 	
 //	/** 标签Map **/
 //	@Field("tag_name_*")
