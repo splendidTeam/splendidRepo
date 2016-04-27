@@ -1277,4 +1277,23 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	
+		<bean id="Property.findWidthoutCommonPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						tpp. ID as id, tpp. NAME as name, tpp.group_name as group_name, tpp.hasthumb as hasthumb, tpp.industry_id as industry_id,
+						tpp.is_common_industry as is_common_industry, tpp.lifecycle as lifecycle, tpp.required as required, tpp.searchable as searchable, tpp.sort_no as sort_no,
+						tpp.create_time as create_time, tpp.editing_type as editing_type, tpp.is_color_prop as is_color_prop, tpp.is_salep_rop as is_salep_rop,
+						tpp.modify_time as modify_time, tpp.value_type as value_type, tpp. VERSION as version, tpp.common_property_id as common_property_id
+					FROM
+						t_pd_property tpp where tpp.lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

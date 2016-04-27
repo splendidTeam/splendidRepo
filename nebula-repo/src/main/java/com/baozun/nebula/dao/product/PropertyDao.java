@@ -296,4 +296,14 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyLang.class)
 	List<PropertyLang> findPropertyLangByPropertyId(@QueryParam("propertyId") Long propertyId);
+	
+	
+	/**
+	 * 查询单t_pd_property表 lifecycle = 1
+	 * @return List<Property>
+	 * @author 黄大辉
+	 */
+	@NativeQuery(model = Property.class)
+	List<Property> findWidthoutCommonPropertyId();
+	
 }
