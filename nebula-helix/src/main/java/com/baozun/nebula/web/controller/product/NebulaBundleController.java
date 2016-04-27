@@ -88,7 +88,7 @@ import loxia.dao.Pagination;
  * @author yue.ch
  *
  */
-public class NebulaBundleController extends NebulaAbstractBundleController {
+public class NebulaBundleController extends NebulaPdpController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaBundleController.class);
 
@@ -240,7 +240,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </p>
 	 * 
 	 */
-	@Override
 	protected List<BundleViewCommand> buildBundleViewCommandForPDP(List<BundleCommand> bundleCommands) {
 		if(Validator.isNullOrEmpty(bundleCommands)) {
 			return null;
@@ -264,7 +263,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ul>
 	 * 
 	 */
-	@Override
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
@@ -304,7 +302,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ol>
 	 * </p>
 	 */
-	@Override
 	protected List<BundleElementViewCommand> buildBundleElementViewCommand(List<BundleElementCommand> bundleElementCommands) {
 		if(Validator.isNullOrEmpty(bundleElementCommands)) {
 			return null;
@@ -348,7 +345,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ol>
 	 * </p>
 	 */
-	@Override
 	protected List<BundleItemViewCommand> buildBundleItemViewCommand(List<BundleItemCommand> bundleItemCommands) {
 		if(Validator.isNullOrEmpty(bundleItemCommands)) {
 			return null;
@@ -393,7 +389,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ul>
 	 * </p>
 	 */
-	@Override
 	protected List<BundleSkuViewCommand> buildBundleSkuViewCommand(List<BundleSkuCommand> bundleSkuCommands) {
 		if(Validator.isNullOrEmpty(bundleSkuCommands)) {
 			return null;
