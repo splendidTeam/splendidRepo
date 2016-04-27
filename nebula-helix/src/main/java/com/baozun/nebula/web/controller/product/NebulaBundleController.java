@@ -69,6 +69,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.BundleItemViewComman
 import com.baozun.nebula.web.controller.product.viewcommand.BundleSkuViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyViewCommand;
@@ -88,7 +89,7 @@ import loxia.dao.Pagination;
  * @author yue.ch
  *
  */
-public class NebulaBundleController extends NebulaAbstractBundleController {
+public class NebulaBundleController extends NebulaPdpController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NebulaBundleController.class);
 
@@ -122,6 +123,8 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	/**
 	 * 查看捆绑类商品详细信息
 	 * 
+	 * <li>获取bundle商品评论直接调用父类方法showItemReview：{@link com.baozun.nebula.web.controller.product.NebulaPdpController#showItemReview}</li>
+	 * 
 	 * @RequestMapping(value = "/bundle/{itemCode}", method = RequestMethod.GET)
 	 * 
 	 * @param itemCode
@@ -130,15 +133,15 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * @param model
 	 * @return
 	 */
-	public String showBundleDetail(@PathVariable("itemCode") String itemCode, HttpServletRequest request,
+	public String showBundleDetail(@PathVariable("itemCode") String bundleItemCode, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
-		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleItemCode(itemCode, true);
+		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleItemCode(bundleItemCode, true);
 		if(Validator.isNotNullOrEmpty(bundleCommand)){
-			BundleDetailViewCommand bundleDetailViewCommand=buildBundleViewCommandForBundlePage(bundleCommand);
+			BundleDetailViewCommand bundleDetailViewCommand=buildBundleViewCommandForBundlePage(bundleCommand,bundleItemCode);
 			model.addAttribute(MODEL_KEY_BUNDLE,bundleDetailViewCommand);
 		}else{
-			LOG.info("Bundle error...bundleCommand is null;itemCode:{} [{}]",itemCode,new Date());
+			LOG.info("Bundle error...bundleCommand is null;bundleItemCode:{} [{}]",bundleItemCode,new Date());
 		}
 		
 		return VIEW_BUNDLE_DETAIL;
@@ -240,7 +243,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </p>
 	 * 
 	 */
-	@Override
 	protected List<BundleViewCommand> buildBundleViewCommandForPDP(List<BundleCommand> bundleCommands) {
 		if(Validator.isNullOrEmpty(bundleCommands)) {
 			return null;
@@ -260,12 +262,11 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * <ul>
 	 * <li>bundle本身作为无属性类商品。</li>
 	 * <li>默认只显示正常上架的bundle，如果需要预览未上架、下架bundle需要重构此方法</li>
-	 * <li>默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片，评论等.</li>
+	 * <li>默认加载捆绑商品本身的商品描述、seo等扩展信息以及图片</li>
 	 * </ul>
 	 * 
 	 */
-	@Override
-	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand) {
+	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand,String bundleItemCode) {
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
 		if(itemBaseInfoViewCommand.getLifecycle()!=1){
@@ -283,12 +284,12 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 		bundleViewCommand.setBundleElementViewCommands(bundleElementViewCommands);
 		BundleDetailViewCommand bundleDetailViewCommand=new BundleDetailViewCommand();
 		BeanUtils.copyProperties(bundleViewCommand, bundleDetailViewCommand);
-		//budle拓展信息
-		//TODO 调用NebulaBasePdpController中的build方法
-		bundleDetailViewCommand.setItemBaseInfoViewCommand(itemBaseInfoViewCommand);
-		bundleDetailViewCommand.setItemExtraViewCommand(null);
-		bundleDetailViewCommand.setItemImageViewCommands(buildItemImageViewCommand(bundleCommand.getItemId()));
-		bundleDetailViewCommand.setItemReviewViewCommand(null);
+		//budleItem相关信息
+		bundleDetailViewCommand.setBaseInfo(itemBaseInfoViewCommand);
+		bundleDetailViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfoViewCommand));
+		List<ItemImageViewCommand> itemImageViewCommands = buildItemImageViewCommand(bundleCommand.getItemId());
+		bundleDetailViewCommand.setImages(itemImageViewCommands);
+		bundleDetailViewCommand.setProperty(buildItemPropertyViewCommand(itemBaseInfoViewCommand, itemImageViewCommands));
 		return bundleDetailViewCommand;
 	}
 
@@ -304,7 +305,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ol>
 	 * </p>
 	 */
-	@Override
 	protected List<BundleElementViewCommand> buildBundleElementViewCommand(List<BundleElementCommand> bundleElementCommands) {
 		if(Validator.isNullOrEmpty(bundleElementCommands)) {
 			return null;
@@ -348,7 +348,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ol>
 	 * </p>
 	 */
-	@Override
 	protected List<BundleItemViewCommand> buildBundleItemViewCommand(List<BundleItemCommand> bundleItemCommands) {
 		if(Validator.isNullOrEmpty(bundleItemCommands)) {
 			return null;
@@ -393,7 +392,6 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * </ul>
 	 * </p>
 	 */
-	@Override
 	protected List<BundleSkuViewCommand> buildBundleSkuViewCommand(List<BundleSkuCommand> bundleSkuCommands) {
 		if(Validator.isNullOrEmpty(bundleSkuCommands)) {
 			return null;

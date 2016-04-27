@@ -53,6 +53,7 @@ import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandC
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
@@ -107,7 +108,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
-			constructBrowsingHistoryViewCommand(request, response, pdpViewCommand.getBaseInfo().getId());
+			constructBrowsingHistory(request, response, pdpViewCommand.getBaseInfo().getId());
 			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
@@ -308,29 +309,23 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	
 	
 	/**
-	 * 面包屑的模式
-	 * @return
+	 * 获取面包屑的构建模式，默认根据分类构建
 	 */
 	@Override
 	protected String getBreadcrumbsMode() {
-		
 		return BREADCRUMBS_MODE_CATEGORY;
 	}
 	
 	@Override
 	protected List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(
 			Long itemId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 	@Override
 	protected String buildSizeCompareChart(Long itemId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 	@Override
 	protected Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand) {
@@ -339,32 +334,31 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Long getItemSales(String itemCode) {
-		return itemDetailManager.findItemSalesCount(itemCode).longValue();
+	protected Long getItemSales(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemSalesCount(itemBaseInfo.getCode()).longValue();
 	}
 
 
 	@Override
-	protected Long getItemFavoriteCount(String itemCode) {
-		return itemDetailManager.findItemFavCount(itemCode).longValue();
+	protected Long getItemFavoriteCount(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemFavCount(itemBaseInfo.getCode()).longValue();
 	}
 
 
 	@Override
-	protected Float getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode);
+	protected Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
 	}
 
 
 	@Override
-	protected String buildQrCodeUrl(Long itemId, HttpServletRequest request) {
-		// TODO Auto-generated method stub
+	protected String buildMobileShareUrl(String itemCode) {
 		return null;
 	}
 
 	@Override
-	protected Long getItemReviewCount(String itemCode) {
-		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
+	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
 	}
 
 	@Override
@@ -374,15 +368,10 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected String getItemImageType() {
+	protected String getItemMainImageType() {
 		return ItemImage.IMG_TYPE_LIST;
 	}
 
-	@Override
-	protected String getItemRecommendMode() {
-		return RECOMMEND_MODE_GENERAL;
-	}
-	
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */

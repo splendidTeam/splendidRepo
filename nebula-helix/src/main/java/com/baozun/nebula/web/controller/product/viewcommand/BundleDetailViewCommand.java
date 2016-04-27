@@ -33,11 +33,6 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.util.List;
 
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
-
 
 /**
  * 捆绑商品视图层对象(bundle本身Item)
@@ -49,57 +44,55 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 	private static final long serialVersionUID = -2719089477406692090L;
 	
 	/**
-	 * 捆绑商品的扩展信息
+	 * 捆绑商品的基本信息
 	 */
-	private ItemBaseInfoViewCommand itemBaseInfoViewCommand;
+	private ItemBaseInfoViewCommand baseInfo;
 	
 	/**
 	 * 捆绑商品图片信息
 	 */
-	private List<ItemImageViewCommand> itemImageViewCommands;
+	private List<ItemImageViewCommand> images;
 	
 	/**
 	 * 捆绑商品的拓展信息
 	 */
-	private ItemExtraViewCommand itemExtraViewCommand;
+	private ItemExtraViewCommand extra;
 	
 	/**
-	 * 捆绑商品的评论
+	 * bundleItem的属性，包括销售和功能属性
 	 */
-	private ItemReviewViewCommand itemReviewViewCommand;
-
-	public ItemBaseInfoViewCommand getItemBaseInfoViewCommand() {
-		return itemBaseInfoViewCommand;
-	}
-
-	public void setItemBaseInfoViewCommand(
-			ItemBaseInfoViewCommand itemBaseInfoViewCommand) {
-		this.itemBaseInfoViewCommand = itemBaseInfoViewCommand;
-	}
-
-	public ItemExtraViewCommand getItemExtraViewCommand() {
-		return itemExtraViewCommand;
-	}
-
-	public void setItemExtraViewCommand(ItemExtraViewCommand itemExtraViewCommand) {
-		this.itemExtraViewCommand = itemExtraViewCommand;
-	}
-
-	public ItemReviewViewCommand getItemReviewViewCommand() {
-		return itemReviewViewCommand;
-	}
-
-	public void setItemReviewViewCommand(ItemReviewViewCommand itemReviewViewCommand) {
-		this.itemReviewViewCommand = itemReviewViewCommand;
-	}
-
-	public List<ItemImageViewCommand> getItemImageViewCommands() {
-		return itemImageViewCommands;
-	}
-
-	public void setItemImageViewCommands(
-			List<ItemImageViewCommand> itemImageViewCommands) {
-		this.itemImageViewCommands = itemImageViewCommands;
-	}
+	private ItemPropertyViewCommand property;
 	
+	public ItemBaseInfoViewCommand getBaseInfo() {
+		return baseInfo;
+	}
+
+	public void setBaseInfo(ItemBaseInfoViewCommand baseInfo) {
+		this.baseInfo = baseInfo;
+	}
+
+	public List<ItemImageViewCommand> getImages() {
+		return images;
+	}
+
+	public void setImages(List<ItemImageViewCommand> images) {
+		this.images = images;
+	}
+
+	public ItemExtraViewCommand getExtra() {
+		return extra;
+	}
+
+	public void setExtra(ItemExtraViewCommand extra) {
+		this.extra = extra;
+	}
+
+	public ItemPropertyViewCommand getProperty() {
+		return property;
+	}
+
+	public void setProperty(ItemPropertyViewCommand property) {
+		this.property = property;
+	}
+
 }
