@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
 
 /**
