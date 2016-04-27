@@ -15,8 +15,6 @@ import java.util.Map;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.baozun.nebula.command.ItemCommand;
@@ -334,13 +332,5 @@ public class NebulaPdpControllerXyTest extends BaseControllerTest{
 		EasyMock.verify();
 		
 	}
-	
-	@Test
-	public void testConstructBrowsingHistoryViewCommand(){
-//		  assertEquals("login",loginController.loginIn(request,response)) ; 
-//		  browsingHistoryCommand browsingHistoryCommand = new browsingHistoryCommand();
-//		  browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
-	}
-	
 
 }
