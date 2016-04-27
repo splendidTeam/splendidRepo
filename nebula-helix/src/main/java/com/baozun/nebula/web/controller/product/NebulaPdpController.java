@@ -108,7 +108,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
-			constructBrowsingHistoryViewCommand(request, response, pdpViewCommand.getBaseInfo().getId());
+			constructBrowsingHistory(request, response, pdpViewCommand.getBaseInfo().getId());
 			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
@@ -368,15 +368,10 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected String getItemImageType() {
+	protected String getItemMainImageType() {
 		return ItemImage.IMG_TYPE_LIST;
 	}
 
-	@Override
-	protected String getItemRecommendMode() {
-		return RECOMMEND_MODE_GENERAL;
-	}
-	
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
