@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baozun.nebula.web.interceptor.browsingHistory;
+package com.baozun.nebula.web.controller.product.resolver;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -26,19 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.date.TimeInterval;
 import com.baozun.nebula.utils.lang.CharsetType;
-import com.baozun.nebula.utils.security.EncryptionException;
-import com.baozun.nebula.utils.security.symmetric.SymmetricEncryption;
-import com.baozun.nebula.utils.security.symmetric.SymmetricType;
-import com.baozun.nebula.web.interceptor.browsingHistory.command.BrowsingHistoryCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
 import com.feilong.core.bean.ToStringConfig;
 import com.feilong.core.lang.StringUtil;
 import com.feilong.servlet.http.CookieUtil;
 import com.feilong.servlet.http.entity.CookieEntity;
-import com.feilong.tools.slf4j.Slf4jUtil;
 
 /**
  * The Class DefaultBrowsingHistory.
@@ -51,12 +48,6 @@ import com.feilong.tools.slf4j.Slf4jUtil;
  * <th align="left">字段</th>
  * <th align="left">说明</th>
  * <th align="left">必须</th>
- * </tr>
- * <tr valign="top">
- * <td>symmetricEncryption</td>
- * <td>加密算法</td>
- * <td>
- * <span style="color:red">true</span>,推荐使用 {@link SymmetricType#AES}</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>cookieName</td>
@@ -101,15 +92,9 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
 
     /** 单位秒 默认 3个月. */
     private int                 cookieMaxAge       = TimeInterval.SECONDS_PER_MONTH * 3;
-
-    /** cookie编码. */
-    private String              cookieCharsetName  = CharsetType.UTF8;
-
+    
     /** 最大记录数量,超过的记录将被去掉. */
-    private Integer             maxCount           = 5;
-
-    /** 加密算法. */
-    private SymmetricEncryption symmetricEncryption;
+    private Integer             maxCount           = 10;
 
     /*
      * (non-Javadoc)
@@ -211,7 +196,13 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
         String original = ConvertUtil.toString(toStringConfig, linkedList);
 
         //如果cookie没有,表示第一次访问PDP页面 ,这时逻辑是构建一个往cookie 里加入
-        String encryptHex = symmetricEncryption.encryptHex(original, cookieCharsetName);
+        String encryptHex = null;
+		try {
+			encryptHex = EncryptUtil.getInstance().encrypt(original);
+		} catch (Exception e) {
+			LOGGER.error("", e);
+			throw new IllegalArgumentException(e);
+		}
 
         if (LOGGER.isDebugEnabled()){
             LOGGER.debug("will add to cookie,original:[{}],encryptHex:[{}]", original, encryptHex);
@@ -236,7 +227,7 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
 
             if (Validator.isNotNullOrEmpty(value)){
                 try{
-                    String decryptHex = symmetricEncryption.decryptHex(value, cookieCharsetName);
+                    String decryptHex = EncryptUtil.getInstance().encrypt(value);
                     String[] tokenizeToStringArray = StringUtil.tokenizeToStringArray(decryptHex, DEFAULT_CONNECTOR);
                     for (String string : tokenizeToStringArray){
                         linkedList.add(ConvertUtil.convert(string, klass));
@@ -244,15 +235,10 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
                 }catch (NumberFormatException e){
                     LOGGER.error("", e);
                     throw new IllegalArgumentException(e);
-                }catch (EncryptionException e){
-                    LOGGER.error(
-                                    Slf4jUtil.formatMessage(
-                                                    "decryptHex cookie error,value:{},cookieCharsetName:{}",
-                                                    value,
-                                                    cookieCharsetName),
-                                    e);
-                    throw new IllegalArgumentException(e);
-                }
+                }catch (Exception e) {
+                    LOGGER.error("", e);
+					throw new IllegalArgumentException(e);
+				}
             }
         }
         return linkedList;
@@ -277,17 +263,7 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
     public void setCookieMaxAge(int cookieMaxAge){
         this.cookieMaxAge = cookieMaxAge;
     }
-
-    /**
-     * 设置 cookie编码.
-     *
-     * @param cookieCharsetName
-     *            the cookieCharsetName to set
-     */
-    public void setCookieCharsetName(String cookieCharsetName){
-        this.cookieCharsetName = cookieCharsetName;
-    }
-
+    
     /**
      * 设置 最大记录数量,超过的记录将被去掉.
      *
@@ -298,13 +274,4 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
         this.maxCount = maxCount;
     }
 
-    /**
-     * 设置 加密算法.
-     *
-     * @param symmetricEncryption
-     *            the symmetricEncryption to set
-     */
-    public void setSymmetricEncryption(SymmetricEncryption symmetricEncryption){
-        this.symmetricEncryption = symmetricEncryption;
-    }
 }

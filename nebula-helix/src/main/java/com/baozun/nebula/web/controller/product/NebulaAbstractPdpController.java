@@ -24,6 +24,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+<<<<<<< HEAD
+=======
+
+import loxia.dao.Pagination;
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -345,6 +350,17 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
 		return relationItemViewCommandConverter.convert(itemCommands);
+	}
+	
+	/**
+	 * 更新最近浏览的商品信息
+	 * @param itemId
+	 * @return
+	 */
+	protected void constructBrowsingHistoryViewCommand(HttpServletRequest request,HttpServletResponse response,Long itemId) {
+		 BrowsingHistoryViewCommand browsingHistoryCommand = new DefaultBrowsingHistoryViewCommand();
+         browsingHistoryCommand.setId(itemId);
+         browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
 	}
 	
 	/**

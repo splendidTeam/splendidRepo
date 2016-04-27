@@ -17,11 +17,16 @@ public class SearchCommand{
 	 */
 	private String					filterConditionStr;
 
-	/** 
-	 * 过滤条件(分类)
+	/**
+	 * 过滤条件(分类)<br/>
 	 * 参数格式：父级分类id-父级分类id-分类id,父级分类id-父级分类id-分类id......
 	 */
-	private String					filterCategoryStr;
+	private String					categoryConditionStr;
+
+	/**
+	 * 导航
+	 */
+	private String					navigationConditionStr;
 
 	/**
 	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用
@@ -102,6 +107,42 @@ public class SearchCommand{
 
 	public void setPageNumber(Integer pageNumber){
 		this.pageNumber = pageNumber;
+	}
+
+	/**
+	 * get categoryConditionStr
+	 * 
+	 * @return categoryConditionStr
+	 */
+	public String getCategoryConditionStr(){
+		return categoryConditionStr;
+	}
+
+	/**
+	 * set categoryConditionStr
+	 * 
+	 * @param categoryConditionStr
+	 */
+	public void setCategoryConditionStr(String categoryConditionStr){
+		this.categoryConditionStr = categoryConditionStr;
+	}
+
+	/**
+	 * get navigationConditionStr
+	 * 
+	 * @return navigationConditionStr
+	 */
+	public String getNavigationConditionStr(){
+		return navigationConditionStr;
+	}
+
+	/**
+	 * set navigationConditionStr
+	 * 
+	 * @param navigationConditionStr
+	 */
+	public void setNavigationConditionStr(String navigationConditionStr){
+		this.navigationConditionStr = navigationConditionStr;
 	}
 
 }

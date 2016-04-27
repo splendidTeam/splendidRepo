@@ -189,6 +189,7 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 		ItemPropertiesCommand itemProperties =new ItemPropertiesCommand();
 		itemProperties.setItem_properties_id(57571l);
 		itemProperties.setPropertyValue("经典黑");
+		itemProperties.setPropertyId(30l);
 		dynamicPropertyCommand.setItemProperties(itemProperties );
 		commands.add(dynamicPropertyCommand);
 		
@@ -204,6 +205,7 @@ public class NebulaPdpControllerDLTempTest extends BaseControllerTest{
 		ItemPropertiesCommand itemProperties2 =new ItemPropertiesCommand();
 		itemProperties2.setItem_properties_id(57573l);
 		itemProperties2.setPropertyValue("土豪金");
+		itemProperties2.setPropertyId(30l);
 		dynamicPropertyCommand2.setItemProperties(itemProperties2 );
 		commands.add(dynamicPropertyCommand2);
 		

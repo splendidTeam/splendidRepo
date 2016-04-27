@@ -4,12 +4,13 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 
+import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
 
-public interface SearchManager {
+public interface SearchManager extends BaseManager{
 	/**
 	 * solr查询接口，返回分页数据
 	 * @param page
