@@ -371,12 +371,22 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	protected String getItemMainImageType() {
 		return ItemImage.IMG_TYPE_LIST;
 	}
+	
+	@Override
+	protected boolean isSyncLoadItemExtra() {
+		return false;
+	}
+	
+	@Override
+	protected boolean isSyncLoadRecommend() {
+		return false;
+	}
 
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
 	@Override
-	protected String getPdpMode(Long itemId) {
+	protected String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo) {
 		return PDP_MODE_COLOR_COMBINE;
 	}
 
