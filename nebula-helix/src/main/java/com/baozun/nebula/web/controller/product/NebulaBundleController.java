@@ -286,7 +286,7 @@ public class NebulaBundleController extends NebulaPdpController {
 		BeanUtils.copyProperties(bundleViewCommand, bundleDetailViewCommand);
 		//budleItem相关信息
 		bundleDetailViewCommand.setBaseInfo(itemBaseInfoViewCommand);
-		bundleDetailViewCommand.setExtra(buildItemExtraViewCommand(bundleItemCode));
+		bundleDetailViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfoViewCommand));
 		List<ItemImageViewCommand> itemImageViewCommands = buildItemImageViewCommand(bundleCommand.getItemId());
 		bundleDetailViewCommand.setImages(itemImageViewCommands);
 		bundleDetailViewCommand.setProperty(buildItemPropertyViewCommand(itemBaseInfoViewCommand, itemImageViewCommands));

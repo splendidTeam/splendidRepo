@@ -53,6 +53,7 @@ import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandC
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
@@ -333,20 +334,20 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected Long getItemSales(String itemCode) {
-		return itemDetailManager.findItemSalesCount(itemCode).longValue();
+	protected Long getItemSales(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemSalesCount(itemBaseInfo.getCode()).longValue();
 	}
 
 
 	@Override
-	protected Long getItemFavoriteCount(String itemCode) {
-		return itemDetailManager.findItemFavCount(itemCode).longValue();
+	protected Long getItemFavoriteCount(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemFavCount(itemBaseInfo.getCode()).longValue();
 	}
 
 
 	@Override
-	protected Float getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode);
+	protected Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
 	}
 
 
@@ -356,8 +357,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected Long getItemReviewCount(String itemCode) {
-		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
+	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
 	}
 
 	@Override
