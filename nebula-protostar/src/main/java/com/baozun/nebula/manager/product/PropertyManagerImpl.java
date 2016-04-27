@@ -113,7 +113,9 @@ public class PropertyManagerImpl implements PropertyManager{
 	@Override
 	public List<Property> findPropertyListByIndustryId(Long industryId){
 
-		return propertyDao.findPropertyListByIndustryId(industryId);
+//		return propertyDao.findPropertyListByIndustryId(industryId);
+		
+		return propertyDao.findPropertysByIndustryId(industryId);
 	}
 
 	/*
