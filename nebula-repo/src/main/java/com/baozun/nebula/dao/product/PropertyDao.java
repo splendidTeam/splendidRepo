@@ -84,6 +84,7 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 
 	/**
 	 * 根据条件分页查询属性
+	 * 
 	 * @return Pagination<PropertyCommand>
 	 * @param page
 	 * @param sorts
@@ -93,7 +94,7 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyCommand.class)
 	Pagination<PropertyCommand> findPropertyPaginationByQueryMap(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
-	
+
 	/**
 	 * 通过ids批量启用或禁用Property 设置lifecycle =0 或 1
 	 * 
@@ -155,18 +156,16 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	@NativeQuery(model = Property.class)
 	Property findPropertyByIdI18n(@QueryParam("propertyId") Long id,@QueryParam("lang") String lang);
 
-	
 	/**
-	 * 根据id查询属性
-	 *  不关联t_common_property
+	 * 根据id查询属性 不关联t_common_property
+	 * 
 	 * @param id
 	 * @return
 	 */
-	
+
 	@NativeQuery(model = Property.class)
 	Property findByIdWithoutCommonProperty(@QueryParam("propertyId") Long id);
-	
-	
+
 	/**
 	 * 根据name查询属性
 	 * 
@@ -196,9 +195,20 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 * 
 	 * @param industryId
 	 *            行业id
+	 * @deprecated 此查询sql中有关联t_pd_common_property，而t_pd_common_property在骨架之后不使用
 	 */
 	@NativeQuery(model = Property.class)
 	List<Property> findPropertyListByIndustryId(@QueryParam("industryId") Long industryId);
+
+	/**
+	 * 根据行业id查询 属性，没有加入'I18N'
+	 * 
+	 * @param industryId
+	 *            行业id
+	 * @return
+	 */
+	@NativeQuery(model = Property.class)
+	List<Property> findPropertysByIndustryId(@QueryParam("industryId") Long industryId);
 
 	/**
 	 * 根据分类ID和行业Id查询 属性
@@ -264,9 +274,10 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 			@QueryParam("industryId") Long industryId,
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("commonPropertyId") Long commonPropertyId);
-	
+
 	/**
 	 * 根据propertyId查询Property表
+	 * 
 	 * @return Property
 	 * @param propertyId
 	 * @author 冯明雷
@@ -274,10 +285,10 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = Property.class)
 	Property findPropertyByPropertyId(@QueryParam("propertyId") Long propertyId);
-	
-	
+
 	/**
 	 * 根据propertyId查询Property国际化数据
+	 * 
 	 * @return List<PropertyLang>
 	 * @param propertyId
 	 * @author 冯明雷
@@ -285,4 +296,14 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyLang.class)
 	List<PropertyLang> findPropertyLangByPropertyId(@QueryParam("propertyId") Long propertyId);
+	
+	
+	/**
+	 * 查询单t_pd_property表 lifecycle = 1
+	 * @return List<Property>
+	 * @author 黄大辉
+	 */
+	@NativeQuery(model = Property.class)
+	List<Property> findWidthoutCommonPropertyId();
+	
 }
