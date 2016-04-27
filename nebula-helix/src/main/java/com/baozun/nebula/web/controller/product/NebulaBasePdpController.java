@@ -124,9 +124,12 @@ public abstract class NebulaBasePdpController extends BaseController {
 	 */
 	protected List<SkuViewCommand> buildSkuViewCommand(Long itemId) {
 		assert itemId != null : "Please Check itemId!";
+		//获取所有有效的sku信息
 		List<SkuCommand> commands =itemDetailManager.findEffectiveSkuInvByItemId(itemId);
 		if(Validator.isNotNullOrEmpty(commands)){
+			//转换
 			List<SkuViewCommand> skuViewCommands =skuViewCommandConverter.convert(commands);
+			//单独出来设置itemId
 			for (SkuViewCommand skuViewCommand : skuViewCommands) {
 				skuViewCommand.setItemId(itemId);
 			}
@@ -154,12 +157,18 @@ public abstract class NebulaBasePdpController extends BaseController {
 		assert baseInfoViewCommand != null && Validator.isNullOrEmpty(skuViewCommands)
 				: "Please Check baseInfo and skuInfos!";
 		PriceViewCommand priceViewCommand =new PriceViewCommand();
+		//商品上定义的吊牌价
 		priceViewCommand.setItemListPrice(baseInfoViewCommand.getListPrice());
+		//商品上定义的销售价
 		priceViewCommand.setItemSalesPrice(baseInfoViewCommand.getSalePrice());
 		
+		//该商品所有sku吊牌价的最小值
 		BigDecimal skuMinListPrice=BigDecimal.ZERO;
+		//该商品所有sku吊牌价的最大值
 		BigDecimal skuMaxListPrice=BigDecimal.ZERO;
+		//该商品所有sku销售价的最小值
 		BigDecimal skuMinSalesPrice=BigDecimal.ZERO;
+		//该商品所有sku销售价的最大值
 		BigDecimal skuMaxSalesPrice=BigDecimal.ZERO;
 		int i =0;
 		for (SkuViewCommand skuViewCommand : skuViewCommands) {
