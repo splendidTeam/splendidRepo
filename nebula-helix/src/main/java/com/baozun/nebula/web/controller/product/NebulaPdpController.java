@@ -227,7 +227,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			result.setReturnObject(returnObject);
 			
 		} catch (IllegalItemStateException e) {
-			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemCode, e.getState().name());
+			LOG.error("[PDP_SWITCH_PDP] get item exception. itemCode:{}, {}", itemCode, e.getState().name());
 			
 			throw new BusinessException("Show pdp error.");
 		}

@@ -87,7 +87,7 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 		String style =baseInfoViewCommand.getStyle();
 		if(Validator.isNullOrEmpty(style)){
 			LOGGER.warn(
-                    "resolve:{},can not find style=[{}] in baseInfoViewCommand, itemCode =[{}]",
+                    "[RESOLVER_ITEMCOLORSWATCHVIEW] function resolve:{},can not find style=[{}] in baseInfoViewCommand, itemCode =[{}]",
                     new Date(),
                     JsonUtil.format(baseInfoViewCommand),
                     itemCode);
