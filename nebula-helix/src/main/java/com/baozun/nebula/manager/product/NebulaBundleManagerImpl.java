@@ -109,11 +109,13 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	public BundleCommand findBundleCommandByBundleItemCode(String bundleItemCode , Boolean flag) {
 		LOG.debug("paramater : bundleItemCode [{}] , flag [{}] , {}" , bundleItemCode,flag , new Date());
 		BundleCommand bundle = bundleDao.findBundlesByItemCode(bundleItemCode);
-		fillBundleCommand(bundle);
+		
 		if(Validator.isNullOrEmpty(bundle)){
-			LOG.debug("get bundle is null by bundleId . {}" , new  Date());
+			LOG.debug("get bundle is null by bundleItemCode [{}] . {}" ,bundleItemCode, new  Date());
+			return bundle;
 		}
-		else if(flag && needRemoveInvalidBundle(bundle)){
+		fillBundleCommand(bundle);
+		if(flag && needRemoveInvalidBundle(bundle)){
 			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 			LOG.debug("the bundle invalid , so it removed. {}" , new Date());
 			return null;
