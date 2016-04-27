@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.date.TimeInterval;
-import com.baozun.nebula.utils.lang.CharsetType;
-import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
 import com.feilong.core.bean.ToStringConfig;
@@ -104,10 +103,10 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
      * com.feilong.spring.web.servlet.interceptor.browsingHistory.command.BrowsingHistoryCommand)
      */
     @Override
-    public void resolveBrowsingHistory(HttpServletRequest request,HttpServletResponse response,BrowsingHistoryCommand browsingHistoryCommand){
-        if (Validator.isNotNullOrEmpty(browsingHistoryCommand)){
+    public void resolveBrowsingHistory(HttpServletRequest request,HttpServletResponse response,BrowsingHistoryViewCommand browsingHistoryViewCommand){
+        if (Validator.isNotNullOrEmpty(browsingHistoryViewCommand)){
             try{
-                String cookieValue = constructItemBrowsingHistoryCookieValue(request, response, browsingHistoryCommand);
+                String cookieValue = constructItemBrowsingHistoryCookieValue(request, response, browsingHistoryViewCommand);
 
                 if (Validator.isNotNullOrEmpty(cookieValue)){
                     CookieEntity cookieEntity = new CookieEntity(cookieName, cookieValue, cookieMaxAge);
@@ -137,13 +136,13 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
     private String constructItemBrowsingHistoryCookieValue(
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    BrowsingHistoryCommand browsingHistoryCommand){
+                    BrowsingHistoryViewCommand browsingHistoryViewCommand){
 
-        if (Validator.isNullOrEmpty(browsingHistoryCommand)){
+        if (Validator.isNullOrEmpty(browsingHistoryViewCommand)){
             return null;
         }
 
-        Serializable id = browsingHistoryCommand.getId();
+        Serializable id = browsingHistoryViewCommand.getId();
 
         LinkedList<String> linkedList = null;
         try{
