@@ -67,6 +67,11 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 	 * 捆绑商品的评论
 	 */
 	private ItemReviewViewCommand itemReviewViewCommand;
+	
+	/**
+	 * bundleItem的属性，包括销售和功能属性
+	 */
+	private ItemPropertyViewCommand itemPropertyViewCommand;
 
 	public ItemBaseInfoViewCommand getItemBaseInfoViewCommand() {
 		return itemBaseInfoViewCommand;
@@ -100,6 +105,15 @@ public class BundleDetailViewCommand extends BundleViewCommand {
 	public void setItemImageViewCommands(
 			List<ItemImageViewCommand> itemImageViewCommands) {
 		this.itemImageViewCommands = itemImageViewCommands;
+	}
+
+	public ItemPropertyViewCommand getItemPropertyViewCommand() {
+		return itemPropertyViewCommand;
+	}
+
+	public void setItemPropertyViewCommand(
+			ItemPropertyViewCommand itemPropertyViewCommand) {
+		this.itemPropertyViewCommand = itemPropertyViewCommand;
 	}
 	
 }
