@@ -49,9 +49,7 @@ import com.baozun.nebula.web.controller.product.converter.RelationItemViewComman
 import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.DefaultBrowsingHistoryCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.DefaultBrowsingHistoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
