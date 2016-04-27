@@ -107,6 +107,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
+			constructBrowsingHistoryViewCommand(request, response, pdpViewCommand.getBaseInfo().getId());
+			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;
@@ -134,9 +136,19 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
-		
-		return DefaultReturnResult.SUCCESS;
+		 DefaultReturnResult result = new DefaultReturnResult();
+			try {
+				Map<String, Object> returnObject = new HashMap<String, Object>();
+		        returnObject.put(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		        result.setReturnObject(returnObject);
+				
+			} catch (Exception e) {
+				LOG.error("[PDP_BROWSING_HISTORY] error itemId:{}", itemId );
+				
+				throw new BusinessException("get browsing history error.");
+			}
+			
+			return result;
 	}
 	
 	/**
@@ -154,9 +166,19 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+        DefaultReturnResult result = new DefaultReturnResult();
+		try {
+			Map<String, Object> returnObject = new HashMap<String, Object>();
+	        returnObject.put(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+	        result.setReturnObject(returnObject);
+			
+		} catch (Exception e) {
+			LOG.error("[PDP_RECOMMEND] error itemId:{}", itemId );
+			
+			throw new BusinessException("get pdp recommend error.");
+		}
 		
-		return DefaultReturnResult.SUCCESS;
+		return result;
 	}
 	
 	/**
@@ -207,7 +229,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			result.setReturnObject(returnObject);
 			
 		} catch (IllegalItemStateException e) {
-			LOG.error("[PDP_SWITCH_PDP] Item state illegal. itemId:{}, {}", itemCode, e.getState().name());
+			LOG.error("[PDP_SWITCH_PDP] get item exception. itemCode:{}, {}", itemCode, e.getState().name());
 			
 			throw new BusinessException("Show pdp error.");
 		}
@@ -364,6 +386,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
+	@Override
 	protected String getPdpMode(Long itemId) {
 		return PDP_MODE_COLOR_COMBINE;
 	}

@@ -56,7 +56,6 @@ import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.manager.product.NebulaBundleManager;
 import com.baozun.nebula.web.bind.ArrayCommand;
-import com.baozun.nebula.web.command.BundleValidateResult;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -123,23 +122,23 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	/**
 	 * 查看捆绑类商品详细信息
 	 * 
-	 * @RequestMapping(value = "/bundle/{bundleId}", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/bundle/{itemCode}", method = RequestMethod.GET)
 	 * 
-	 * @param bundleId
+	 * @param itemCode
 	 * @param request
 	 * @param response
 	 * @param model
 	 * @return
 	 */
-	public String showBundleDetail(@PathVariable("bundleId") Long bundleId, HttpServletRequest request,
+	public String showBundleDetail(@PathVariable("itemCode") String itemCode, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
-		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleId(bundleId);
+		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleItemCode(itemCode, true);
 		if(Validator.isNotNullOrEmpty(bundleCommand)){
 			BundleDetailViewCommand bundleDetailViewCommand=buildBundleViewCommandForBundlePage(bundleCommand);
 			model.addAttribute(MODEL_KEY_BUNDLE,bundleDetailViewCommand);
 		}else{
-			LOG.info("Bundle error...bundleCommand is null;bundleId:{} [{}]",bundleId,new Date());
+			LOG.info("Bundle error...bundleCommand is null;itemCode:{} [{}]",itemCode,new Date());
 		}
 		
 		return VIEW_BUNDLE_DETAIL;
@@ -159,7 +158,7 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	public String showBundleList(@ModelAttribute("page") PageForm pageForm, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
-		Pagination<BundleCommand> bundleCommandPage = nebulaBundleManager.findBundleCommandByPage(pageForm.getPage(), pageForm.getSorts());
+		Pagination<BundleCommand> bundleCommandPage = nebulaBundleManager.findBundleCommandByPage(pageForm.getPage(), pageForm.getSorts(), true);
 		model.addAttribute(MODEL_KEY_BUNDLE_LIST, bundleViewCommandConverter.convert(bundleCommandPage));
 		
 		return VIEW_BUNDLE_LIST;
@@ -175,37 +174,60 @@ public class NebulaBundleController extends NebulaAbstractBundleController {
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @return
+	 * @return 封装捆绑类商品视图模型集合， 参考{@link com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand}
 	 */
 	public NebulaReturnResult loadBundleInfo(@RequestParam("itemId") Long itemId, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 		
 		DefaultReturnResult result = new DefaultReturnResult();
-		result.setResult(true);
-		result.setStatusCode(String.valueOf(HttpStatus.OK));
 		
-		// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-		List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
-		if (Validator.isNotNullOrEmpty(bundleCommands)) {
-			result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
+		try {
+			// 根据当前的商品id查询针对该商品为主卖品配置的bundle
+			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
+			if (Validator.isNotNullOrEmpty(bundleCommands)) {
+				result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
+			}
+			result.setResult(true);
+			result.setStatusCode(String.valueOf(HttpStatus.OK));
+		} catch (Exception e) {
+			LOG.error("load bundle info error, itemId=" + itemId, e);
+			result.setResult(false);
+			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
 
 		return result;
 	}
 	
 	/**
+	 * bundle的异步校验
 	 * 
-	  * bundle的异步校验
-	  * 返回值 . 参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}
+	 * @RequestMapping(value = "/bundle/validateBundle.json", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @param itemId
+	 * @param quantity
+	 * @param skuIds
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return 封装捆绑类商品校验结果，参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}
+	 * 
 	 */
-	public NebulaReturnResult validatorBundle(@RequestParam("bundleId") Long bundleId,@RequestParam("quantity") int quantity,@ArrayCommand(dataBind = true) Long[] skuIds, HttpServletRequest request,
+	public NebulaReturnResult validateBundle(@RequestParam("itemId") Long itemId, @RequestParam("quantity") int quantity,@ArrayCommand(dataBind = true) Long[] skuIds, HttpServletRequest request,
 			HttpServletResponse response, Model model){
 		DefaultReturnResult result = new DefaultReturnResult();
-		result.setResult(true);
-		result.setStatusCode(String.valueOf(HttpStatus.OK));
-		List<Long> skuList = Arrays.asList(skuIds);
-		BundleValidateResult validateBundle = nebulaBundleManager.validateBundle(bundleId, skuList, quantity);
-		result.setReturnObject(validateBundle);
+		
+		try {
+			List<Long> skuList = Arrays.asList(skuIds);
+			result.setReturnObject(nebulaBundleManager.validateBundle(itemId, skuList, quantity));
+			result.setResult(true);
+			result.setStatusCode(String.valueOf(HttpStatus.OK));
+		} catch (Exception e) {
+			LOG.error("validate bundle error, itemId=" + itemId, e);
+			result.setResult(false);
+			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
+		}
+		
 		return result;
 	}
 

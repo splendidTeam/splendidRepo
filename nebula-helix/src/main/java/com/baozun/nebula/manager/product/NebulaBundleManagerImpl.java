@@ -1,3 +1,18 @@
+/**
+ * Copyright (c) 2012 Baozun All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Baozun.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Baozun.
+ *
+ * BAOZUN MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. BAOZUN SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ */
 package com.baozun.nebula.manager.product;
 
 import java.math.BigDecimal;
@@ -69,14 +84,14 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean ...flag) {
+	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean flag) {
         LOG.debug("paramater : itemId [{}]  flag[{}]  {}" , itemId,flag, new Date());
 		// 1、 根据itemId,lifeCycle查询bundle （只需要查询出可售的bundle）
 		List<BundleCommand> bundles = bundleDao.findBundlesByItemId(itemId, 1);
 		if (Validator.isNotNullOrEmpty(bundles)) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			if(Validator.isNullOrEmpty(flag) || Boolean.TRUE.equals(flag[0])){
+			if(flag){
 				LOG.debug("start delete invalid bundled preparation. bundles size : [{}]" , bundles.size());
 				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 				removeInvalidBundleInfo(bundles);
@@ -91,14 +106,16 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public BundleCommand findBundleCommandByBundleId(Long bundleId , Boolean ...flag) {
-		LOG.debug("paramater : bundleId [{}] , flag [{}] , {}" , bundleId,flag , new Date());
-		BundleCommand bundle = bundleDao.findBundlesById(bundleId, null);
-		fillBundleCommand(bundle);
+	public BundleCommand findBundleCommandByBundleItemCode(String bundleItemCode , Boolean flag) {
+		LOG.debug("paramater : bundleItemCode [{}] , flag [{}] , {}" , bundleItemCode,flag , new Date());
+		BundleCommand bundle = bundleDao.findBundlesByItemCode(bundleItemCode);
+		
 		if(Validator.isNullOrEmpty(bundle)){
-			LOG.debug("get bundle is null by bundleId . {}" , new  Date());
+			LOG.debug("get bundle is null by bundleItemCode [{}] . {}" ,bundleItemCode, new  Date());
+			return bundle;
 		}
-		else if((Validator.isNullOrEmpty(flag) || Boolean.TRUE.equals(flag[0])) && needRemoveInvalidBundle(bundle)){
+		fillBundleCommand(bundle);
+		if(flag && needRemoveInvalidBundle(bundle)){
 			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 			LOG.debug("the bundle invalid , so it removed. {}" , new Date());
 			return null;
@@ -108,19 +125,15 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	}
 	
 	@Override
-	public Long findBundleIdByItemCode(String itemCode) {
-		return bundleDao.findBundleIdByItemCode(itemCode);
-	}
-	
-	@Override
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean ...flag) {
+	@Transactional(readOnly = true)
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean flag) {
 		LOG.debug("paramater : page [{}] , sort [{}] , flag [{}]  , {}" ,JsonUtil.format(page),JsonUtil.format(sorts),flag,new Date());
 		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
 		List<BundleCommand> bundles = pagination.getItems();
 		if (Validator.isNotNullOrEmpty(bundles)) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			if(Validator.isNullOrEmpty(flag) || Boolean.TRUE.equals(flag[0])){
+			if(flag){
 				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
 				LOG.debug("start delete invalid bundled preparation. bundles size : [{}]" , bundles.size());
 				removeInvalidBundleInfo(bundles);
@@ -138,9 +151,10 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Override
 	@Transactional(readOnly = true)
-	public BundleValidateResult validateBundle(Long bundleId,
+	public BundleValidateResult validateBundle(Long bundleItemId,
 			List<Long> skuIds, int quantity) {
-		LOG.debug("paramater : bundleId [{}] , skuIds [{}] , quantity [{}] , {}" , bundleId, JsonUtil.format(skuIds),quantity,new Date());
+		LOG.debug("paramater : bundleItemId [{}] , skuIds [{}] , quantity [{}] , {}" , bundleItemId, JsonUtil.format(skuIds),quantity,new Date());
+		Long bundleId = bundleDao.findBundleIdByBundleItemId(bundleItemId);
 		return validateBundleInfo(bundleId,skuIds,quantity);
 	}
 	
@@ -164,7 +178,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		   return result;
 		}
 		//查询bundle的所有相关信息
-		BundleCommand command = bundleDao.findBundlesById(bundleId,null);
+		BundleCommand command = bundleDao.findBundlesById(bundleId,1);
 		
 		if(command == null){//bundle不存在
 			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);

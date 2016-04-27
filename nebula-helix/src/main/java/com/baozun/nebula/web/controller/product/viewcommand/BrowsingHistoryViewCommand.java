@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baozun.nebula.web.interceptor.browsingHistory.command;
+package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.io.Serializable;
 
@@ -24,7 +24,7 @@ import java.io.Serializable;
  * @version 1.2.2 2015年7月19日 下午11:29:32
  * @since 1.2.2
  */
-public interface BrowsingHistoryCommand{
+public interface BrowsingHistoryViewCommand{
 
     /**
      * 获得 id.

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baozun.nebula.web.interceptor.browsingHistory.command;
+package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.io.Serializable;
 
 /**
  * 目前只支持 主键, 以后视情况而定吧 看看要不要把价格等信息放这里.
  */
-public class DefaultBrowsingHistoryCommand implements BrowsingHistoryCommand,Serializable{
+public class DefaultBrowsingHistoryViewCommand implements BrowsingHistoryViewCommand,Serializable{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -2860276539206053398L;

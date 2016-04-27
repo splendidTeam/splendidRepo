@@ -45,13 +45,11 @@ public class Item extends BaseModel {
 	/** 商品类型：普通商品 */
 	public static final Integer ITEM_TYPE_SIMPLE = 1;
 	/** 商品类型：捆绑类商品 */
-	public static final Integer ITEM_TYPE_BUNDLE = 2;
-	/** 商品类型：配置类商品 */
-	public static final Integer ITEM_TYPE_CONFIGURATION = 3;
+	public static final Integer ITEM_TYPE_BUNDLE = 3;
 	/** 商品类型：组商品 */
-	public static final Integer ITEM_TYPE_GROUP = 4;
+	public static final Integer ITEM_TYPE_GROUP = 5;
 	/** 商品类型：虚拟商品 */
-	public static final Integer ITEM_TYPE_VIRTUAL = 5;
+	public static final Integer ITEM_TYPE_VIRTUAL = 7;
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 882446624240577496L;
@@ -80,7 +78,6 @@ public class Item extends BaseModel {
 	 * <ol>
 	 * <li>{@link Item#ITEM_TYPE_SIMPLE} </li>
 	 * <li>{@link Item#ITEM_TYPE_BUNDLE} </li>
-	 * <li>{@link Item#ITEM_TYPE_CONFIGURATION} </li>
 	 * <li>{@link Item#ITEM_TYPE_GROUP} </li>
 	 * <li>{@link Item#ITEM_TYPE_VIRTUAL} </li>
 	 * </ol>
