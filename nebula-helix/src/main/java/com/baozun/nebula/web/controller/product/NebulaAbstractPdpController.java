@@ -43,7 +43,6 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
@@ -55,7 +54,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
@@ -180,6 +178,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 
 		//商品推荐信息
 		pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		
+		//移动端分享url
+		pdpViewCommand.setMobileShareUrl(buildMobileShareUrl(itemCode));
 		
 		return pdpViewCommand;
 	}
@@ -394,16 +395,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 	}
 	
-	/**
-	 * 构造商品评论信息
-	 * TODO 需要新的controller入口，并通过converter转换
-	 * @param itemId
-	 * @return
-	 */
-	protected Pagination<ItemReviewViewCommand> buildItemReviewViewCommand(Long itemId, PageForm pageForm) {
-		return new Pagination<ItemReviewViewCommand>();
-	}
-	
 	protected abstract Long getItemSales(String itemCode);
 	
 	protected abstract Long getItemFavoriteCount(String itemCode);
@@ -414,7 +405,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	
-	protected abstract String buildQrCodeUrl(Long itemId,HttpServletRequest request);
+	protected abstract String buildMobileShareUrl(String itemCode);
 
 	/**
 	 * 构造面包屑
@@ -428,10 +419,11 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		
 		switch (breadcrumbsMode) {
 			case BREADCRUMBS_MODE_NAVIGATION:
-				//TODO 基于导航
+				//TODO 
+				//基于导航
 				break;
 			case BREADCRUMBS_MODE_CATEGORY:
-				//TODO 基于分类
+				//基于分类
 				List<CurmbCommand> curmbCommandList = itemDetailManager.findCurmbList(itemId);
 				breadcrumbsViewCommandList =breadcrumbsViewCommandConverter.convert(curmbCommandList);
 				break;
@@ -440,7 +432,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 				break;
 		}
 		
-		// TODO
 		return breadcrumbsViewCommandList;
 	}
 	

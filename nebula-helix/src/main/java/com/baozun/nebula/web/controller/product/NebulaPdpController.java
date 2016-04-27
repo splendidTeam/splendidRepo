@@ -308,29 +308,23 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	
 	
 	/**
-	 * 面包屑的模式
-	 * @return
+	 * 获取面包屑的构建模式，默认根据分类构建
 	 */
 	@Override
 	protected String getBreadcrumbsMode() {
-		
 		return BREADCRUMBS_MODE_CATEGORY;
 	}
 	
 	@Override
 	protected List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(
 			Long itemId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 	@Override
 	protected String buildSizeCompareChart(Long itemId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 
 	@Override
 	protected Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand) {
@@ -357,8 +351,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 
 
 	@Override
-	protected String buildQrCodeUrl(Long itemId, HttpServletRequest request) {
-		// TODO Auto-generated method stub
+	protected String buildMobileShareUrl(String itemCode) {
 		return null;
 	}
 
