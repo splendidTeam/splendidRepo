@@ -69,4 +69,46 @@ public class ItemImageViewCommand extends BaseViewCommand {
 	public void setImages(Map<String, List<ImageViewCommand>> images) {
 		this.images = images;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((colorItemPropertyId == null) ? 0 : colorItemPropertyId
+						.hashCode());
+		result = prime * result + ((images == null) ? 0 : images.hashCode());
+		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemImageViewCommand other = (ItemImageViewCommand) obj;
+		if (colorItemPropertyId == null) {
+			if (other.colorItemPropertyId != null)
+				return false;
+		} else if (!colorItemPropertyId.equals(other.colorItemPropertyId))
+			return false;
+		if (images == null) {
+			if (other.images != null)
+				return false;
+		} else if (!images.equals(other.images))
+			return false;
+		if (itemId == null) {
+			if (other.itemId != null)
+				return false;
+		} else if (!itemId.equals(other.itemId))
+			return false;
+		return true;
+	}
+	
+	
 }

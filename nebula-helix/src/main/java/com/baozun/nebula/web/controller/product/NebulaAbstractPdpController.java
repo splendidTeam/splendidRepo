@@ -338,8 +338,11 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 */
 	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
+        browsingHistoryItemIds.remove(itemId);
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
+		
+		
 		return relationItemViewCommandConverter.convert(itemCommands);
 	}
 	

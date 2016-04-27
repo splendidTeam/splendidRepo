@@ -80,7 +80,6 @@ public abstract class NebulaBasePdpController extends BaseController {
 	protected ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
 	
 	@Autowired
-	@Qualifier("itemImageViewCommandConverter")
 	protected ItemImageViewCommandConverter itemImageViewCommandConverter;
 	
 	@Autowired

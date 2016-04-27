@@ -134,9 +134,19 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		model.addAttribute(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
-		
-		return DefaultReturnResult.SUCCESS;
+		 DefaultReturnResult result = new DefaultReturnResult();
+			try {
+				Map<String, Object> returnObject = new HashMap<String, Object>();
+		        returnObject.put(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
+		        result.setReturnObject(returnObject);
+				
+			} catch (Exception e) {
+				LOG.error("[PDP_BROWSING_HISTORY] error itemId:{}", itemId );
+				
+				throw new BusinessException("get browsing history error.");
+			}
+			
+			return result;
 	}
 	
 	/**
@@ -154,9 +164,19 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		model.addAttribute(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+        DefaultReturnResult result = new DefaultReturnResult();
+		try {
+			Map<String, Object> returnObject = new HashMap<String, Object>();
+	        returnObject.put(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+	        result.setReturnObject(returnObject);
+			
+		} catch (Exception e) {
+			LOG.error("[PDP_RECOMMEND] error itemId:{}", itemId );
+			
+			throw new BusinessException("get pdp recommend error.");
+		}
 		
-		return DefaultReturnResult.SUCCESS;
+		return result;
 	}
 	
 	/**
