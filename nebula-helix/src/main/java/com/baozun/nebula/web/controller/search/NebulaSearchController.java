@@ -76,11 +76,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * @time 2016年4月21日上午11:25:30
 	 */
 	public String searchPage(@ModelAttribute SearchForm searchForm,HttpServletRequest request,HttpServletResponse response,Model model){
-
 		// 将页面传来的参数searchForm转换为 searchCommand
 		SearchCommand searchCommand = new SearchCommand();
 		PropertyUtil.copyProperties(searchCommand, searchForm);
-		
 
 		// 将 searchCommand 中 filterConditionStr,categoryConditionStr 转成FacetParameter
 		searchParamProcess(searchCommand);
@@ -89,10 +87,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
 		// set facet相关信息
-		setFacet(solrQuery, searchCommand);
+		setFacet(solrQuery);
 
 		// 设置权重信息
-		Boost boost = createBoost();
+		Boost boost = createBoost(searchCommand);
 		searchManager.setSolrBoost(solrQuery, boost);
 
 		// 查询
