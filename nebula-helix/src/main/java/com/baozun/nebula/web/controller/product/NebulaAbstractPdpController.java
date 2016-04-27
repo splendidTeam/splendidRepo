@@ -318,14 +318,23 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		List<RelationItemViewCommand> itemRecommendList = null;
 		
 		String itemRecommendMode = getItemRecommendMode();
+		
+		String imageType = getItemImageType();
 	
 		switch (itemRecommendMode){
 		    case RECOMMEND_MODE_CUSTOM:
 		    	itemRecommendList = customBuildItemRecommendViewCommand(itemId);
 		    	break;
 		    default:
-		    	List<ItemCommand> itemCommands = itemRecommandManager.getRecommandItemByItemId(itemId, getItemImageType());
+		    	List<ItemCommand> itemCommands = itemRecommandManager.getRecommandItemByItemId(itemId, imageType);
 		    	itemRecommendList =  relationItemViewCommandConverter.convert(itemCommands);
+		    	//扩展信息
+		    	if(Validator.isNotNullOrEmpty(itemRecommendList)){
+		    		for(RelationItemViewCommand relationItemViewCommand:itemRecommendList){
+		    			ItemExtraViewCommand itemExtraViewCommand = this.buildItemExtraViewCommand(relationItemViewCommand.getItemCode());
+		    			relationItemViewCommand.setExtra(itemExtraViewCommand);
+		    		}
+		    	}
 		        break;
 		}
 		
@@ -341,7 +350,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 */
 	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
-		//delete current item
+		//PDP要删除当前商品记录
         browsingHistoryItemIds.remove(itemId);
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
@@ -377,7 +386,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 						String imgStr = imgList.get(0).getPicUrl();
 						// imgStr = sdkItemManager.convertItemImageWithDomain(imgStr);
 
-						picUrlMap.put(itemId, imgStr);
+						picUrlMap.put(itemId, imgStr);         
 					}
 				}
 			}
