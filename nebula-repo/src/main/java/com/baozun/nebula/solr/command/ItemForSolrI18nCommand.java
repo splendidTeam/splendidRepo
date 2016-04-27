@@ -299,6 +299,29 @@ public class ItemForSolrI18nCommand implements Serializable {
 	private List<String> pinyinAllList_B;
 	
 	/**
+	 * 该商品的分类树
+	 * 数据格式为：
+	 * 
+	 * 		1
+	 * 		1-11
+	 * 		1-11-1101
+	 */
+	@Field("category_tree")
+	private List<String>	categoryTree;
+	
+	/**
+	 * 该商品对应的导航树
+	 * 数据格式为：
+	 * 
+	 * 		1
+	 * 		1-11
+	 * 		1-11-1101 	
+	 */
+	@Field("navigation_tree")
+	private List<String>	navigationTree;
+	
+	
+	/**
 	 * 渠道
 	 */
 	@Field
@@ -748,6 +771,22 @@ public class ItemForSolrI18nCommand implements Serializable {
 
 	public void setAllCategoryIds(List<Long> allCategoryIds) {
 		this.allCategoryIds = allCategoryIds;
+	}
+
+	public List<String> getCategoryTree() {
+		return categoryTree;
+	}
+
+	public List<String> getNavigationTree() {
+		return navigationTree;
+	}
+
+	public void setCategoryTree(List<String> categoryTree) {
+		this.categoryTree = categoryTree;
+	}
+
+	public void setNavigationTree(List<String> navigationTree) {
+		this.navigationTree = navigationTree;
 	}
 	
 	
