@@ -60,6 +60,13 @@ public class FacetParameter {
     public FacetParameter(String name) {
         this.name = name;
     }
+    
+    /***
+     * json转换使用
+     */
+    public FacetParameter(){
+    	
+    }
 
     /**
      * Create a new facet. The value is parsed to extract current type and values.
