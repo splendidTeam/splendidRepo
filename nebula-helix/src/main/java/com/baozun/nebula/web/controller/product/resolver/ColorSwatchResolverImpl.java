@@ -75,8 +75,7 @@ public class ColorSwatchResolverImpl implements ColorSwatchResolver {
 		}
 		
         if (Validator.isNullOrEmpty(resultMap)) {
-            LOGGER.warn(
-                            "from itemImgList:{},can not find type=[{}] itemImage Map",
+            LOGGER.warn("	[RESOLVER_COLORSWATCH] function resolve:{},can not find type=[{}] imageViewCommandList",
                             JsonUtil.format(imageViewCommands),
                             IMG_TYPE_COLOR);
             return Collections.emptyMap();

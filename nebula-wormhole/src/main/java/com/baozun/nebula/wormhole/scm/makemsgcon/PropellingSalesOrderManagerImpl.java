@@ -251,7 +251,8 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 				orderLineV5.setPromotions(promotions);
 				//订单行包装信息
 				orderLineV5.setProductPackages(null);
-				
+				//设置商品图片
+				orderLineV5.setItemPic(orderLine.getItemPic());
 				orderLines.add(orderLineV5);
 			}
 		}

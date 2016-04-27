@@ -65,7 +65,6 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 
 		List<BundleElementCommand> bundleElementCommands=new ArrayList<BundleElementCommand>();
 		BundleElementCommand bundleElementCommand=new BundleElementCommand();
-		bundleElementCommand.setItemId(1L);
 		
 		List<BundleItemCommand> bundletBundleItemCommands=new ArrayList<BundleItemCommand>();
 		BundleItemCommand bundleItemCommand=new BundleItemCommand();
@@ -106,16 +105,16 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 	@Test
 	public void testShowBundleDetail(){
 		
-		EasyMock.expect(nebulaBundleManager.findBundleCommandByBundleId(4L)).andReturn(bundleCommand);
+		EasyMock.expect(nebulaBundleManager.findBundleCommandByBundleItemCode("bundle1", true)).andReturn(bundleCommand);
 		EasyMock.replay(nebulaBundleManager);
-		assertEquals(bebulabundBundleController.MODEL_KEY_BUNDLE,bebulabundBundleController.showBundleDetail(4L, request, response, model));
+		assertEquals(bebulabundBundleController.MODEL_KEY_BUNDLE,bebulabundBundleController.showBundleDetail("bundle1", request, response, model));
 		EasyMock.verify(nebulaBundleManager);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadBundleInfo(){
-		EasyMock.expect(nebulaBundleManager.findBundleCommandByItemId(4L)).andReturn(Arrays.asList(bundleCommand)).times(1);
+		EasyMock.expect(nebulaBundleManager.findBundleCommandByItemId(1L, true)).andReturn(Arrays.asList(bundleCommand)).times(1);
 		control.replay();
 		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfo(4L, request, response, model);
 		System.out.println(JsonUtil.format(defaultReturnResult));

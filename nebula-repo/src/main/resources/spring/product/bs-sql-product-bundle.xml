@@ -124,7 +124,15 @@
 			<value>
 				<![CDATA[  
 		       		SELECT 
-		       			b.id
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
 		       		FROM 
 		       			t_pd_item i 
 		       		LEFT JOIN 
@@ -144,7 +152,15 @@
 			<value>
 				<![CDATA[  
 		       		SELECT 
-		       			b.*
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
 		       		FROM 
 		       			t_pd_item i 
 		       		LEFT JOIN 

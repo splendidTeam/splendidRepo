@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import loxia.dao.Pagination;
 
@@ -45,8 +46,11 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.DefaultBrowsingHistoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
@@ -54,7 +58,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
-import com.baozun.nebula.web.interceptor.browsingHistory.BrowsingHistoryResolver;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -338,9 +341,22 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 */
 	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
+		//delete current item
+        browsingHistoryItemIds.remove(itemId);
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
 		return relationItemViewCommandConverter.convert(itemCommands);
+	}
+	
+	/**
+	 * 更新最近浏览的商品信息
+	 * @param itemId
+	 * @return
+	 */
+	protected void constructBrowsingHistoryViewCommand(HttpServletRequest request,HttpServletResponse response,Long itemId) {
+		 BrowsingHistoryViewCommand browsingHistoryCommand = new DefaultBrowsingHistoryViewCommand();
+         browsingHistoryCommand.setId(itemId);
+         browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
 	}
 	
 	private void setImageData(List<Long> itemIdList,List<ItemCommand> itemCommands ) {

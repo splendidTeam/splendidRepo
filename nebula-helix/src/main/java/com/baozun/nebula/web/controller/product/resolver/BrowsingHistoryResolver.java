@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baozun.nebula.web.interceptor.browsingHistory;
+package com.baozun.nebula.web.controller.product.resolver;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.web.interceptor.browsingHistory.command.BrowsingHistoryCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
 
 /**
  * The Interface BrowsingHistory.
@@ -70,7 +70,7 @@ public interface BrowsingHistoryResolver{
      * @param browsingHistoryCommand
      *            the browsing history command
      */
-    void resolveBrowsingHistory(HttpServletRequest request,HttpServletResponse response,BrowsingHistoryCommand browsingHistoryCommand);
+    void resolveBrowsingHistory(HttpServletRequest request,HttpServletResponse response,BrowsingHistoryViewCommand browsingHistoryCommand);
 
     /**
      * 获得 browsing history.

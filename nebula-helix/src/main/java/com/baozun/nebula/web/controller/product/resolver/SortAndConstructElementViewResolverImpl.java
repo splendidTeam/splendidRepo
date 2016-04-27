@@ -90,7 +90,7 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
         }
         if (Validator.isNullOrEmpty(elementViewCommands)) {
             LOGGER.warn(
-                            "itemId:[{}],itemCode:[{}],elementViewCommands isNullOrEmpty,but input param saleDynamicPropertyCommandList is:[{}]",
+                            "[RESOLVER_ITEMCOLORSWATCHVIEW] function resolve:itemId:[{}],itemCode:[{}],result isNullOrEmpty,but dynamicPropertyCommandList is:[{}]",
                             itemId,
                             itemCode,
                             JsonUtil.format(dynamicPropertyCommandList));
@@ -170,7 +170,7 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
             }
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("after returnItemPropertiesList:{}", JsonUtil.format(resultItemPropertiesList));
+            LOGGER.debug("[RESOLVER_ITEMCOLORSWATCHVIEW] function constructItemPropertiesCommandList:{}", JsonUtil.format(resultItemPropertiesList));
         }
         return resultItemPropertiesList;
 	}
