@@ -12,6 +12,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
+import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.FacetParameter;
@@ -58,6 +60,22 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		// TODO
 
 		searchCommand.setFacetParameters(facetParameters);
+	}
+	
+	/**
+	 * 将后台设置的导航的商品范围，转成searchCommand对象
+	 * @param collection
+	 * @return
+	 */
+	protected SearchCommand collectionToSearchCommand(ItemCollection collection) {
+		SearchCommand searchCommand = new SearchCommand();
+		
+		String facetParameters = collection.getFacetParameters();
+		List<FacetParameter> params =JSON.parseArray(facetParameters,FacetParameter.class);
+		searchCommand.setFacetParameters(params);
+		return searchCommand;
+
+		
 	}
 
 	/**

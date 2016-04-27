@@ -18,6 +18,8 @@ package com.baozun.nebula.dao.product;
 
 import com.baozun.nebula.model.product.ItemCollection;
 
+import loxia.annotation.NativeQuery;
+import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
 /**
@@ -26,5 +28,8 @@ import loxia.dao.GenericEntityDao;
  * @author chen.kf
  */
 public interface ItemCollectionDao extends GenericEntityDao<ItemCollection, Long>{
+	
+	@NativeQuery(model=ItemCollection.class)
+	public ItemCollection findItemCollectionById(@QueryParam("id")Long id);
 
 }

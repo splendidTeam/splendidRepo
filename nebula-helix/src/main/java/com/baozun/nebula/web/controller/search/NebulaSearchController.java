@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.model.product.ItemCollection;
+import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.FacetGroup;
@@ -22,6 +25,7 @@ import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.web.controller.search.form.SearchForm;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 
 /**
@@ -55,6 +59,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 	@Autowired
 	private FacetFilterHelper	facetFilterHelper;
+	
+	@Autowired
+	private SdkItemCollectionManager	sdkItemCollectionManager;
 
 	/**
 	 * 搜索列表页面
@@ -96,6 +103,43 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 
+		return "item.list";
+	}
+	
+	/**
+	 * 导航着陆页的。navigationfilter 直接跳转到这个连接
+	 * @param navId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @requestMapping("/sys/navigation")
+	 * @return
+	 */
+	public String navigationPage(@RequestParam(value="navId") Long navId,HttpServletRequest request,HttpServletResponse response,Model model){
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
+		if(Validator.isNotNullOrEmpty(collection)){
+			SearchCommand searchCommand = collectionToSearchCommand(collection);
+			
+			//***************** 下面这些查询和searchPage是一致的
+			// 创建solrquery对象
+			SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
+
+			// set facet相关信息
+			setFacet(solrQuery, searchCommand);
+
+			// 设置权重信息
+			Boost boost = createBoost();
+			searchManager.setSolrBoost(solrQuery, boost);
+
+			// 查询
+			SearchResultPage<ItemForSolrCommand> solrDataPage = searchManager.search(solrQuery);
+
+			// 页面左侧筛选项
+			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(solrDataPage);
+			
+			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
+			
+		}
 		return "item.list";
 	}
 }
