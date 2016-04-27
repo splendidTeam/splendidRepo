@@ -349,7 +349,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	/**
-	 * 最近浏览的商品信息
+	 * 更新最近浏览的商品信息
 	 * @param itemId
 	 * @return
 	 */
