@@ -104,6 +104,28 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 	}
 	
 	@Test
+	public void testBuildItemExtraViewCommandCacheException(){
+		
+		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
+		itemExtraViewCommand.setFavoriteCount(Long.valueOf(200));
+		itemExtraViewCommand.setRate(3.6F);
+		itemExtraViewCommand.setReviewCount(Long.valueOf(153));
+		itemExtraViewCommand.setSales(Long.valueOf(60));
+		
+		String itemCode = "testItemCode";
+		EasyMock.expect(cacheManager.getObject("item_extra_cache_key-testItemCode")).andThrow(new RuntimeException("Timeout")).times(1);
+		EasyMock.expect(itemDetailManager.findItemSalesCount(itemCode)).andReturn(Integer.valueOf(60)).times(1);
+		EasyMock.expect(itemDetailManager.findItemFavCount(itemCode)).andReturn(Integer.valueOf(200)).times(1);
+		EasyMock.expect(itemRateManager.findRateCountByItemCode(itemCode)).andReturn(Integer.valueOf(153)).times(1);
+		EasyMock.expect(itemDetailManager.findItemAvgReview(itemCode)).andReturn(3.6F).times(1);
+		
+		control.replay();
+		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemCode);
+		assertEquals(itemExtraViewCommand, actualCommand);
+		control.verify();
+	}
+	
+	@Test
 	public void testShowItemReview(){
 		PageForm pageForm = new PageForm();
 		pageForm.setSize(5);

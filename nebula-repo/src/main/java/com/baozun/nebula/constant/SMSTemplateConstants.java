@@ -13,4 +13,7 @@ public class SMSTemplateConstants{
 
 	/** 注册发送验证码短信模板 */
 	public static final String	SMS_REGISTER_CAPTCHA	= "register_captcha";
+	
+	/** 忘记密码发送验证码短信模板 */
+	public static final String	SMS_FORGET_PASSWORD_CAPTCHA	= "forget_password_captcha";
 }

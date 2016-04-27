@@ -13,11 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.EmailConstants;
+import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.manager.member.CommonEmailManager.SendEmailResultCode;
+import com.baozun.nebula.manager.system.SMSManager;
+import com.baozun.nebula.manager.system.SMSManager.CaptchaType;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.feilong.core.Alphabet;
@@ -57,7 +59,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	private CommonEmailManager	commonEmailManager;
 
 	@Autowired
-	private SdkSMSManager		smsManager;
+	private SMSManager		smsManager;
 
 	@Autowired
 	private TokenManager		tokenManager;
@@ -162,24 +164,14 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		// 对应手机号的用户存在
 		if (memberCommand != null){
 
-			// 所有数字和大小写字母的组合
-			String str = Alphabet.DECIMAL_AND_LETTERS;
-
-			// 生成验证码
-			String code = RandomUtil.createRandomFromString(str, VALIDATE_CODE_LENGTH);
-
-			// 保存验证码到redis中，并且设置验证码的生存时间
-			tokenManager.saveToken(BUSINESS_CODE, mobile, MAX_EXIST_TIME, code);
-
 			// 调用发送手机验证码的方法，发送相应的验证码到邮箱中
 			SMSCommand smsCommand = new SMSCommand();
-			smsCommand.addVar("securityCode", code);
+			smsCommand.setTemplateCode(SMSTemplateConstants.SMS_FORGET_PASSWORD_CAPTCHA);
 			smsCommand.setMobile(mobile);
 
 			// 发送验证码结束
-			smsManager.send(smsCommand);
-
-			flag = true;
+			boolean sendFailOrSuccess = smsManager.send(smsCommand, CaptchaType.MIXED, VALIDATE_CODE_LENGTH, MAX_EXIST_TIME);
+			flag = sendFailOrSuccess;
 		}
 		return flag;
 	}

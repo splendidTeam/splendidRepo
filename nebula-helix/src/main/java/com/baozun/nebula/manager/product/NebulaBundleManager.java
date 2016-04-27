@@ -25,7 +25,13 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
-
+/**
+ * 捆绑接口
+ * @Description : com.baozun.nebula.manager.productNebulaBundleManager.java
+ * @Company  : BAOZUN
+ * @author :  jiaolong.chen
+ * @data : 2016年4月26日下午5:11:30
+ */
 public interface NebulaBundleManager extends BaseManager {
 
 	/**
@@ -35,45 +41,42 @@ public interface NebulaBundleManager extends BaseManager {
 	 * </ul>
 	 * 
 	 * @param itemId : bundle捆绑类商品中主卖品的商品Id
-	 * @param flag : 动态布尔参数
+	 * @param flag : 是否踢掉无效bundle的标记
 	 * <ul>
-	 * 	  <li>为空 :　默认是会踢掉无效的bundle</li>
-	 *    <li>不为空 并且 为 true :　踢掉无效的bundle</li>
-	 *    <li>不为空 并且 为 false :　不会踢掉无效的bundle</li>
+	 *    <li> true :　踢掉无效的bundle</li>
+	 *    <li> false :　不会踢掉无效的bundle</li>
 	 * </ul>
 	 * @return
 	 */
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean ...flag);
+	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean flag);
 	/**
 	 * 
 	 * <h3>查询bundle信息</h3>
 	 * <ul>
-	 *    <li>bundle列表入口 ： 只会查询出一条记录</li>
+	 *    <li>bundle列表入口 ： 可能会查询出一条记录</li>
 	 * </ul>
-	 * @param boundleId
-	 * @param flag : 动态布尔参数
+	 * @param bundleItemCode 
+	 * @param flag : 是否踢掉无效bundle的标记
 	 * <ul>
-	 * 	  <li>为空 :　默认是会踢掉无效的bundle</li>
-	 *    <li>不为空 并且 为 true :　踢掉无效的bundle</li>
-	 *    <li>不为空 并且 为 false :　不会踢掉无效的bundle</li>
+	 *    <li> true :　踢掉无效的bundle</li>
+	 *    <li> false :　不会踢掉无效的bundle</li>
 	 * </ul>
 	 * @return
 	 */
-	public BundleCommand findBundleCommandByBundleId(Long boundleId , Boolean ...flag);
+	public BundleCommand findBundleCommandByBundleItemCode(String bundleItemCode , Boolean flag);
 	
 	/**
 	 * <h3>bundle信息分页查询</h3>
 	 * @param page
 	 * @param sorts
-	 * @param flag : 动态布尔参数
+	 * @param flag : 是否踢掉无效bundle的标记
 	 * <ul>
-	 * 	  <li>为空 :　默认是会踢掉无效的bundle</li>
-	 *    <li>不为空 并且 为 true :　踢掉无效的bundle</li>
-	 *    <li>不为空 并且 为 false :　不会踢掉无效的bundle</li>
+	 *    <li> true :　踢掉无效的bundle</li>
+	 *    <li> false :　不会踢掉无效的bundle</li>
 	 * </ul>
 	 * @return
 	 */
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean ...flag);
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean flag);
 	
 	/**
 	 * <h3>下单 加入购物车时验证bundle的信息</h3>
@@ -86,12 +89,12 @@ public interface NebulaBundleManager extends BaseManager {
 	 *    	 <li>bundle所包含的商品是否库存足够</li>
 	 *    </ol>
 	 * </ul> 
-	 * @param bundleId : bundle的PK
+	 * @param bundleItemId : bundle的itemId
 	 * @param skuIds : bundle中选中的一组sku
 	 * @param quantity ：购买bundle的数量
-	 * @return ：返回值 . 参考{@link com.baozun.nebula.command.bundle.BundleCommand.BundleStatus}}
+	 * @return ：返回值 . 参考{@link com.baozun.nebula.command.product.BundleCommand.BundleStatus}}
 	 * 
 	 */
-	public BundleValidateResult validateBundle(Long bundleId,List<Long> skuIds,int quantity);
+	public BundleValidateResult validateBundle(Long bundleItemId,List<Long> skuIds,int quantity);
 	
 }

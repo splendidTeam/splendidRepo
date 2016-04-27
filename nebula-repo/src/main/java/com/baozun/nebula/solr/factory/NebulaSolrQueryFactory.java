@@ -1,10 +1,10 @@
 package com.baozun.nebula.solr.factory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.params.GroupParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.baozun.nebula.search.FacetParameter;
 import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.solr.Param.SkuItemParam;
-import com.baozun.nebula.solr.command.QueryConditionCommand;
 import com.baozun.nebula.solr.utils.SolrOrderSort;
 import com.feilong.core.Validator;
 
@@ -32,6 +31,18 @@ public class NebulaSolrQueryFactory{
 	 * @time 2016年4月22日下午3:16:45
 	 */
 	public static SolrQuery createSolrQuery(SearchCommand searchCommand,SolrQuery solrQuery){
+		
+		//设置solr查询第几页和查询多少行
+		Integer pageNumber=searchCommand.getPageNumber();
+		Integer rows=searchCommand.getPageSize();		
+		if (null == pageNumber || pageNumber < 1){
+			// 默认
+			pageNumber = 1;
+		}
+		Integer start = (pageNumber - 1) * rows;
+		solrQuery.setStart(start);
+		solrQuery.setRows(rows);
+		
 		if (Validator.isNullOrEmpty(searchCommand.getSearchWord())) {
 			solrQuery.setQuery("*:*");
 		}else{
@@ -99,6 +110,28 @@ public class NebulaSolrQueryFactory{
 			solrQuery.set(GroupParams.GROUP_SORT, sb.toString());
 		}
 
+		return solrQuery;
+	}
+	
+	/**
+	 * 设置facetField
+	 * @return SolrQuery
+	 * @param facetFields
+	 * @param solrQuery
+	 * @author 冯明雷
+	 * @time 2016年4月26日下午2:17:50
+	 */
+	public static SolrQuery setFacetField(String[] facetFields,SolrQuery solrQuery) {
+		if (Validator.isNotNullOrEmpty(facetFields)) {
+			solrQuery.set(FacetParams.FACET, true);
+			for (String facetField : facetFields) {
+				if (facetField.split(":").length > 1) {
+					solrQuery.addFacetQuery(facetField);
+				} else {
+					solrQuery.addFacetField(facetField);
+				}
+			}
+		}
 		return solrQuery;
 	}
 	

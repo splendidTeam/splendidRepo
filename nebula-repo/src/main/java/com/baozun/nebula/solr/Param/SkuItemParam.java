@@ -43,6 +43,8 @@ public class SkuItemParam {
 	
 	public static final String lifecycle = "lifecycle";
 	
+	public static final String categorys = "categorys";
+	
 	public static final String categoryname = "category_name_";
 	
 	public static final String categoryorder = "category_order_";

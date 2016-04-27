@@ -38,8 +38,8 @@ public class NebulaBundleManagerTest {
 	}
 	
 	@Test
-	public void testFindBundleCommandByBundleId(){
-		BundleCommand bundle =	bundleManager.findBundleCommandByBundleId(1L);
+	public void testFindBundleCommandByBundleItemCode(){
+		BundleCommand bundle =	bundleManager.findBundleCommandByBundleItemCode("11111111111", true);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundle));
 	}
@@ -49,7 +49,7 @@ public class NebulaBundleManagerTest {
 		Page page = new Page();
 		page.setSize(8);
 		page.setStart(0);
-		Pagination<BundleCommand> bundles =	bundleManager.findBundleCommandByPage(page, null);
+		Pagination<BundleCommand> bundles =	bundleManager.findBundleCommandByPage(page,null, true);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
 	}
