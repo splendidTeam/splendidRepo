@@ -21,5 +21,11 @@ public class SdkItemCollectionManagerImpl implements SdkItemCollectionManager {
 		// TODO Auto-generated method stub
 		return itemCollectionDao.findItemCollectionById(id);
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public ItemCollection findItemCollectionByNavigationId(Long navigationId){
+		return itemCollectionDao.findItemCollectionByNavigationId(navigationId);
+	}
 
 }

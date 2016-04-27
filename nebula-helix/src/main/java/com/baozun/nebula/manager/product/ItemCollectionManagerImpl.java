@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.dao.product.ItemCollectionDao;
 import com.baozun.nebula.model.product.ItemCollection;
+import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 
 @Transactional
 @Service("itemCollectionManager")
@@ -32,12 +32,12 @@ public class ItemCollectionManagerImpl implements ItemCollectionManager{
 	private static final Logger	LOG	= LoggerFactory.getLogger(ItemCollectionManagerImpl.class);
 
 	@Autowired
-	private ItemCollectionDao	itemCollectionDao;
+	private SdkItemCollectionManager	sdkItemCollectionManager;
 
 	@Transactional(readOnly = true)
 	@Override
 	public ItemCollection findItemCollectionByNavigationId(Long navigationId){
-		return itemCollectionDao.findItemCollectionByNavigationId(navigationId);
+		return sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 	}
 
 }
