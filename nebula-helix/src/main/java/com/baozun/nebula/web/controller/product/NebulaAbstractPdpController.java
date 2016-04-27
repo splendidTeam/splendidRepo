@@ -360,17 +360,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
          browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
 	}
 	
-	/**
-	 * 更新最近浏览的商品信息
-	 * @param itemId
-	 * @return
-	 */
-	protected void constructBrowsingHistoryViewCommand(HttpServletRequest request,HttpServletResponse response,Long itemId) {
-		 BrowsingHistoryViewCommand browsingHistoryCommand = new DefaultBrowsingHistoryViewCommand();
-         browsingHistoryCommand.setId(itemId);
-         browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
-	}
-	
 	private void setImageData(List<Long> itemIdList,List<ItemCommand> itemCommands ) {
 
 		// picUrlMap key： itemId value：picUrl
