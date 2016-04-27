@@ -41,10 +41,12 @@ public class Navigation extends BaseModel {
 	/**
 	 * URL类型
 	 */
+	@Deprecated
 	public static final Integer TYPE_URL = 1;
 	/**
 	 * 分类类型
 	 */
+	@Deprecated
 	public static final Integer TYPE_CATEGORY = 2;
 	
 	/**

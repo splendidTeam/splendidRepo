@@ -14,11 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.baozun.nebula.model.baseinfo.Navigation;
-import com.baozun.nebula.model.product.ItemCollection;
-import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
 import com.feilong.core.Validator;
 
+/**
+ * 导航的filter，将商品集合的导航跳转到对应的collection中去
+ * @author long.xia
+ *
+ */
 public class NavigationFilter implements Filter{
 	
 	private WebApplicationContext webApplicationContext;
@@ -45,8 +48,7 @@ public class NavigationFilter implements Filter{
 		Navigation navigation = sdkNavigationManager.findEffectNavigationByUrl(pathURI);
 		//如果导航是实际的商品列表导航页面，那需要跳转到导航的列表页，
 		if(Validator.isNotNullOrEmpty(navigation) && Navigation.TYPE_ITEM_LIST.equals(navigation.getType())){
-			
-			
+			request.getRequestDispatcher("/sys/navigation?navId="+navigation.getId()).forward(request, response);
 		}else{
 			chain.doFilter(request, response);
 		}

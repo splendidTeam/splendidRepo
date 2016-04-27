@@ -123,10 +123,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
 			// set facet相关信息
-			setFacet(solrQuery, searchCommand);
+			setFacet(solrQuery);
 
 			// 设置权重信息
-			Boost boost = createBoost();
+			Boost boost = createBoost(searchCommand);
 			searchManager.setSolrBoost(solrQuery, boost);
 
 			// 查询
