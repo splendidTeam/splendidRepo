@@ -117,7 +117,7 @@ public class ItemCollection {
 		this.name = name;
 	}
 
-	@Column(name = "FACET_PARAMETERS")
+	@Column(name = "FACET_PARAMETERS",length=1000)
 	public String getFacetParameters() {
 		return facetParameters;
 	}

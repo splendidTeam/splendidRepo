@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
@@ -629,6 +630,21 @@ public class CommandConvert {
 			allCategoryCodes.add(itemForCategoryCommand.getCode());
 			allCategoryIds.add(itemForCategoryCommand.getCategoryId());
 		}
+		
+		List<String> categoryTree = new ArrayList<String>();
+		for(Entry<Long, ItemForCategoryCommand> entry : categoryMap.entrySet()){
+			ItemForCategoryCommand tmp = entry.getValue();
+			String treeTmp = String.valueOf(tmp.getCategoryId());
+			while(true){
+				if(Validator.isNotNullOrEmpty(tmp.getParent_id())&& Validator.isNotNullOrEmpty(categoryMap.get(tmp.getParent_id()))){
+					tmp = categoryMap.get(tmp.getParent_id());
+					treeTmp = tmp.getCategoryId()+"-"+treeTmp;
+				}else{
+					break;
+				}
+			}
+			categoryTree.add(treeTmp);
+		}
 
 		if (null != imgOrColorList && imgOrColorList.size() > 0) {
 			for (ItemImageCommand itemImageCommand : imgOrColorList) {
@@ -657,6 +673,7 @@ public class CommandConvert {
 		itemSolr.setCategoryCode(categoryCodeMap);		
 		itemSolr.setAllCategoryCodes(allCategoryCodes);
 		itemSolr.setAllCategoryIds(allCategoryIds);
+		itemSolr.setCategoryTree(categoryTree);
 		itemSolr.setCategoryName(categoryNameMap);
 		itemSolr.setDynamicForSearchMap(dynamicForSearchMap);
 		itemSolr.setDynamicWithoutSearchMap(dynamicWithOutSearchMap);
@@ -1023,6 +1040,22 @@ public class CommandConvert {
 						itemTagCommand.getName());
 			}
 		}
+		
+		List<String> categoryTree = new ArrayList<String>();
+		for(Entry<Long, ItemForCategoryCommand> entry : categoryMap.entrySet()){
+			ItemForCategoryCommand tmp = entry.getValue();
+			String treeTmp = String.valueOf(tmp.getCategoryId());
+			while(true){
+				if(Validator.isNotNullOrEmpty(tmp.getParent_id())&& Validator.isNotNullOrEmpty(categoryMap.get(tmp.getParent_id()))){
+					tmp = categoryMap.get(tmp.getParent_id());
+					treeTmp = tmp.getCategoryId()+"-"+treeTmp;
+				}else{
+					break;
+				}
+			}
+			categoryTree.add(treeTmp);
+		}
+
 
 		itemSolr.setImageUrl(imgList);
 		itemSolr.setSort_no(0);
@@ -1031,6 +1064,7 @@ public class CommandConvert {
 		itemSolr.setCategoryCode(categoryCodeMap);
 		itemSolr.setAllCategoryCodes(allCategoryCodes);
 		itemSolr.setAllCategoryIds(allCategoryIds);
+		itemSolr.setCategoryTree(categoryTree);
 		itemSolr.setCategoryName(categoryNameMap);
 		itemSolr.setDynamicForSearchMap(dynamicForSearchMap);
 		itemSolr.setDynamicWithoutSearchMap(dynamicWithOutSearchMap);
