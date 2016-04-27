@@ -161,10 +161,12 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
 		
         //extra
-		pdpViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfo));
+		if(isSyncLoadItemExtra()) {
+			pdpViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfo));
+		}
 		
 		//colorSwatch
-		if(PDP_MODE_COLOR_COMBINE.equals(getPdpMode(itemBaseInfo.getId()))) {
+		if(PDP_MODE_COLOR_COMBINE.equals(getPdpMode(itemBaseInfo))) {
 			pdpViewCommand.setColorSwatches(buildItemColorSwatchViewCommands(itemBaseInfo));
 		}
 
@@ -301,16 +303,21 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造推荐商品信息
-	 * 方式一：pts为商品设置的的推荐商品
-	 * 方式二：自定义
 	 * @param itemId
 	 * @return
 	 */
 	protected List<RelationItemViewCommand> buildItemRecommendViewCommand(Long itemId) {
-		
 		List<ItemCommand> itemCommands = itemRecommandManager.getRecommandItemByItemId(itemId, getItemMainImageType());
 		List<RelationItemViewCommand> itemRecommendList = relationItemViewCommandConverter.convert(itemCommands);
-		
+    	//扩展信息
+    	if(Validator.isNotNullOrEmpty(itemRecommendList)){
+    		for(RelationItemViewCommand relationItemViewCommand:itemRecommendList){
+    			ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
+    			itemBaseInfo.setCode(relationItemViewCommand.getItemCode());
+    			ItemExtraViewCommand itemExtraViewCommand = this.buildItemExtraViewCommand(itemBaseInfo);
+    			relationItemViewCommand.setExtra(itemExtraViewCommand);
+    		}
+    	}
 		return itemRecommendList;
 	}
 	
@@ -323,7 +330,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 */
 	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
-		//delete current item
+		//PDP要删除当前商品记录
         browsingHistoryItemIds.remove(itemId);
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
@@ -359,7 +366,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 						String imgStr = imgList.get(0).getPicUrl();
 						// imgStr = sdkItemManager.convertItemImageWithDomain(imgStr);
 
-						picUrlMap.put(itemId, imgStr);
+						picUrlMap.put(itemId, imgStr);         
 					}
 				}
 			}
@@ -436,7 +443,19 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand);
 	
 	/**
+	 * 是否在进入pdp时即同步加载商品扩展信息
+	 * @return
+	 */
+	protected abstract boolean isSyncLoadItemExtra();
+	
+	/**
+	 * 是否在进入pdp时即同步加载推荐商品
+	 * @return
+	 */
+	protected abstract boolean isSyncLoadRecommend();
+	
+	/**
 	 * 获取Pdp的显示模式
 	 */
-	protected abstract String getPdpMode(Long itemId);
+	protected abstract String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo);
 }
