@@ -24,11 +24,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-<<<<<<< HEAD
-=======
 
 import loxia.dao.Pagination;
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
