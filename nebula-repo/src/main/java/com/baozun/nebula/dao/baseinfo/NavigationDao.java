@@ -21,6 +21,7 @@ import java.util.List;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
+import loxia.annotation.Query;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Sort;
@@ -84,5 +85,13 @@ public interface NavigationDao extends GenericEntityDao<Navigation, Long> {
 	
 	@NativeQuery(model = Navigation.class)
 	Navigation findEffectNavigationByName(@QueryParam("name")String name);
+	
+	/**
+	 * 根据url查找有效的导航菜单，主要是为导航菜单服务
+	 * @param url
+	 * @return
+	 */
+	@NativeQuery(model=Navigation.class)
+	Navigation findEffectNavigationByUrl(@QueryParam("url") String url);
 	
 }
