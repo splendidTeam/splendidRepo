@@ -740,6 +740,19 @@
 		</constructor-arg>
 	</bean>	
 
+	<bean id="Property.findPropertysByIndustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT property.* FROM t_pd_property property
+					LEFT JOIN t_pd_industry_property_relation relation ON property.id = relation.property_id
+					WHERE relation.industry_id =:industryId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
 	<bean id="Property.updateSortById" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>
 		<constructor-arg>
