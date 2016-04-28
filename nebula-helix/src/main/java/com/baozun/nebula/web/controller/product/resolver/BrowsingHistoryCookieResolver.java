@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.date.TimeInterval;
@@ -75,6 +76,7 @@ import com.feilong.servlet.http.entity.CookieEntity;
  * @version 1.2.2 2015年7月20日 下午6:44:27
  * @since 1.2.2
  */
+@Component("browsingHistoryResolver")
 public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
 
     /** The Constant log. */
