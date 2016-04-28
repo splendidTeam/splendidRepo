@@ -114,7 +114,7 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadBundleInfo(){
-		EasyMock.expect(nebulaBundleManager.findBundleCommandByItemId(1L, true)).andReturn(Arrays.asList(bundleCommand)).times(1);
+		EasyMock.expect(nebulaBundleManager.findBundleCommandByMainItemId(1L, true)).andReturn(Arrays.asList(bundleCommand)).times(1);
 		control.replay();
 		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfo(4L, request, response, model);
 		System.out.println(JsonUtil.format(defaultReturnResult));
