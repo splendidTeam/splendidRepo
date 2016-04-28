@@ -45,6 +45,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.PriceViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 
 /**
@@ -195,19 +196,19 @@ public abstract class NebulaBasePdpController extends BaseController {
 			}else{
 				//>
 				if(skuMinListPrice.compareTo(skuViewCommand.getListPrice()) == 1){
-					skuMinListPrice =skuViewCommand.getListPrice();
+					skuMinListPrice = skuViewCommand.getListPrice();
 				}
 				//<
 				if(skuMaxListPrice.compareTo(skuViewCommand.getListPrice()) == -1){
-					skuMaxListPrice =skuViewCommand.getListPrice();
+					skuMaxListPrice = skuViewCommand.getListPrice();
 				}
 				//>
 				if(skuMinSalesPrice.compareTo(skuViewCommand.getSalePrice()) == 1){
-					skuMinSalesPrice =skuViewCommand.getSalePrice();
+					skuMinSalesPrice = skuViewCommand.getSalePrice();
 				}
 				//<
 				if(skuMaxSalesPrice.compareTo(skuViewCommand.getSalePrice()) == -1){
-					skuMaxSalesPrice =skuViewCommand.getSalePrice();
+					skuMaxSalesPrice = skuViewCommand.getSalePrice();
 				}
 			}
 			i++;
@@ -216,6 +217,11 @@ public abstract class NebulaBasePdpController extends BaseController {
 		priceViewCommand.setSkuMaxListPrice(skuMaxListPrice);
 		priceViewCommand.setSkuMinSalesPrice(skuMinSalesPrice);
 		priceViewCommand.setSkuMaxSalesPrice(skuMaxSalesPrice);
+		
+		if(LOG.isDebugEnabled()) {
+			LOG.debug("[PDP_BUILD_PRICE_VIEW_COMMAND] price:{}", JsonUtil.format(priceViewCommand));
+		}
+		
 		return priceViewCommand;
 	}
 	
