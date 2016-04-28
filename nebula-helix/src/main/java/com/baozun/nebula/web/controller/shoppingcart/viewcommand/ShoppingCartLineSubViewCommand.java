@@ -23,6 +23,7 @@ import java.util.Map;
 
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
+import com.baozun.nebula.sdk.command.SkuProperty;
 
 /**
  * 购物车里面的每行明细.
@@ -57,7 +58,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     private Long              itemId;
 
     /** 买的什么商品code. */
-    private Long              itemCode;
+    private String            itemCode;
 
     /** 商品名称是什么. */
     private String            itemName;
@@ -72,10 +73,10 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     //参见 stander架构里面的  Map<PropertySubViewCommand, List<PropertyValueSubViewCommand>> salesPropertiesMap  
     //但是可能的结构是  Map<PropertySubViewCommand, PropertyValueSubViewCommand> salesPropertiesMap  
     //也可能的结构是  Map<String, String> salesPropertiesMap  
-    /** The map. */
-    private Map               map;
+    /** The map. key:property名称，value：property对象*/
+    private Map<String, SkuProperty>               propertiesMap;
 
-    /** 数量几个. */
+	/** 数量几个. */
     private Integer           quantity;
 
     //**************************************************************
@@ -191,7 +192,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      *
      * @return the itemCode
      */
-    public Long getItemCode(){
+    public String getItemCode(){
         return itemCode;
     }
 
@@ -201,7 +202,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      * @param itemCode
      *            the itemCode to set
      */
-    public void setItemCode(Long itemCode){
+    public void setItemCode(String itemCode){
         this.itemCode = itemCode;
     }
 
@@ -260,25 +261,6 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     public void setExtentionCode(String extentionCode){
         this.extentionCode = extentionCode;
-    }
-
-    /**
-     * 获得 map.
-     *
-     * @return the map
-     */
-    public Map getMap(){
-        return map;
-    }
-
-    /**
-     * 设置 map.
-     *
-     * @param map
-     *            the map to set
-     */
-    public void setMap(Map map){
-        this.map = map;
     }
 
     /**
@@ -394,5 +376,14 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     public void setListPrice(BigDecimal listPrice){
         this.listPrice = listPrice;
     }
+    
+
+    public Map<String, SkuProperty> getPropertiesMap() {
+		return propertiesMap;
+	}
+
+	public void setPropertiesMap(Map<String, SkuProperty> propertiesMap) {
+		this.propertiesMap = propertiesMap;
+	}
 
 }

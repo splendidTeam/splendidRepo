@@ -244,4 +244,14 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	@NativeQuery(clazzes = Integer.class, alias = "COUNT")
 	Integer findCountByPropertyNameAndLang(@QueryParam("propertyName") String propertyName,@QueryParam("lang")String lang,@QueryParam("propertyId") Long propertyId);
 	
+	/**
+	 * 根据shopIds查询店铺信息
+	 * 
+	 * @param shopIds
+	 * @return List<ShopCommand>
+	 */
+	@NativeQuery(model = ShopCommand.class)
+	List<ShopCommand> findByShopIds(@QueryParam("shopIds")List<Long> shopIds);
+
+
 }
