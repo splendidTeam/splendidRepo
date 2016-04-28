@@ -24,6 +24,7 @@ import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
+import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 import com.baozun.nebula.web.controller.search.form.SearchForm;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
@@ -57,8 +58,8 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	@Autowired
 	private SearchManager		searchManager;
 
-	@Autowired
-	private FacetFilterHelper	facetFilterHelper;
+//	@Autowired(required=false)
+//	private FacetFilterHelper	facetFilterHelper;
 	
 	@Autowired
 	private SdkItemCollectionManager	sdkItemCollectionManager;
@@ -94,10 +95,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		searchManager.setSolrBoost(solrQuery, boost);
 
 		// 查询
-		SearchResultPage<ItemForSolrCommand> solrDataPage = searchManager.search(solrQuery);
+		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchManager.search(solrQuery);
 
 		// 页面左侧筛选项
-		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(solrDataPage);
+		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 
@@ -113,8 +114,8 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * @requestMapping("/sys/navigation")
 	 * @return
 	 */
-	public String navigationPage(@RequestParam(value="navId") Long navId,HttpServletRequest request,HttpServletResponse response,Model model){
-		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
+	public String navigationPage(@RequestParam(value="cid") Long cid,HttpServletRequest request,HttpServletResponse response,Model model){
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if(Validator.isNotNullOrEmpty(collection)){
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
 			
@@ -130,10 +131,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			searchManager.setSolrBoost(solrQuery, boost);
 
 			// 查询
-			SearchResultPage<ItemForSolrCommand> solrDataPage = searchManager.search(solrQuery);
+			SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchManager.search(solrQuery);
 
 			// 页面左侧筛选项
-			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(solrDataPage);
+			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
 			
 			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 			

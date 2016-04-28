@@ -27,23 +27,90 @@ import java.util.Map;
  */
 public class FacetFilterMetaData implements Serializable{
 
-	private static final long	serialVersionUID	= 1337274838133771487L;
+	private static final long	serialVersionUID		= 1337274838133771487L;
+
+	/** 分类的元数据，key是分类的id，value是分类的名称 */
+	private Map<String, Object>	categoryMetaMap			= new HashMap<String, Object>();
+
+	/** 属性的元数据，key是属性的id，value是属性的名称 */
+	private Map<String, Object>	propertyMetaMap			= new HashMap<String, Object>();
+
+	/** 属性值的元数据，key是属性值的id，value是属性值的名称 */
+	private Map<String, Object>	propertyValueMetaMap	= new HashMap<String, Object>();
+
+	/** 导航的元数据，key是导航的id，value是导航的名称 */
+	private Map<String, Object>	navigationMetaMap		= new HashMap<String, Object>();
 
 	/**
-	 * key 一般是facet结果的key部分 value 一般是关于key的明细对象
+	 * get categoryMetaMap
+	 * 
+	 * @return categoryMetaMap
 	 */
-	private Map<String, Object> 	metaMap	= new HashMap<String, Object>();
-
-	public Map<String, Object> getMetaMap(){
-		return metaMap;
+	public Map<String, Object> getCategoryMetaMap(){
+		return categoryMetaMap;
 	}
 
-	public void add(String key,Object value){
-		metaMap.put(key, value);
+	/**
+	 * set categoryMetaMap
+	 * 
+	 * @param categoryMetaMap
+	 */
+	public void setCategoryMetaMap(Map<String, Object> categoryMetaMap){
+		this.categoryMetaMap = categoryMetaMap;
 	}
 
-	public void clear(){
-		metaMap.clear();
+	/**
+	 * get propertyMetaMap
+	 * 
+	 * @return propertyMetaMap
+	 */
+	public Map<String, Object> getPropertyMetaMap(){
+		return propertyMetaMap;
+	}
+
+	/**
+	 * set propertyMetaMap
+	 * 
+	 * @param propertyMetaMap
+	 */
+	public void setPropertyMetaMap(Map<String, Object> propertyMetaMap){
+		this.propertyMetaMap = propertyMetaMap;
+	}
+
+	/**
+	 * get propertyValueMetaMap
+	 * 
+	 * @return propertyValueMetaMap
+	 */
+	public Map<String, Object> getPropertyValueMetaMap(){
+		return propertyValueMetaMap;
+	}
+
+	/**
+	 * set propertyValueMetaMap
+	 * 
+	 * @param propertyValueMetaMap
+	 */
+	public void setPropertyValueMetaMap(Map<String, Object> propertyValueMetaMap){
+		this.propertyValueMetaMap = propertyValueMetaMap;
+	}
+
+	/**
+	 * get navigationMetaMap
+	 * 
+	 * @return navigationMetaMap
+	 */
+	public Map<String, Object> getNavigationMetaMap(){
+		return navigationMetaMap;
+	}
+
+	/**
+	 * set navigationMetaMap
+	 * 
+	 * @param navigationMetaMap
+	 */
+	public void setNavigationMetaMap(Map<String, Object> navigationMetaMap){
+		this.navigationMetaMap = navigationMetaMap;
 	}
 
 }
