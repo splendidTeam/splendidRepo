@@ -12,12 +12,31 @@ public class SearchCommand{
 	private String					searchWord;
 
 	/**
-	 * 过滤条件
+	 * 过滤条件(属性)<br/>
+	 * 参数格式：属性Id-属性值Id,属性Id-属性值Id....
 	 */
 	private String					filterConditionStr;
 
 	/**
-	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用
+	 * 过滤条件(分类)<br/>
+	 * 参数格式：父级分类id-父级分类id-分类id,父级分类id-父级分类id-分类id......
+	 */
+	private String					categoryConditionStr;
+
+	/**
+	 * 导航Id
+	 */
+	private Long					navigationId;
+
+	/**
+	 * 导航
+	 */
+	private String					navigationConditionStr;
+
+	/**
+	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用<br/>
+	 * 参数格式：c分类id,P属性id,P属性id,c分类id......
+	 * 
 	 */
 	private String					filterParamOrder;
 
@@ -95,6 +114,60 @@ public class SearchCommand{
 
 	public void setPageNumber(Integer pageNumber){
 		this.pageNumber = pageNumber;
+	}
+
+	/**
+	 * get categoryConditionStr
+	 * 
+	 * @return categoryConditionStr
+	 */
+	public String getCategoryConditionStr(){
+		return categoryConditionStr;
+	}
+
+	/**
+	 * set categoryConditionStr
+	 * 
+	 * @param categoryConditionStr
+	 */
+	public void setCategoryConditionStr(String categoryConditionStr){
+		this.categoryConditionStr = categoryConditionStr;
+	}
+
+	/**
+	 * get navigationConditionStr
+	 * 
+	 * @return navigationConditionStr
+	 */
+	public String getNavigationConditionStr(){
+		return navigationConditionStr;
+	}
+
+	/**
+	 * set navigationConditionStr
+	 * 
+	 * @param navigationConditionStr
+	 */
+	public void setNavigationConditionStr(String navigationConditionStr){
+		this.navigationConditionStr = navigationConditionStr;
+	}
+
+	/**
+	 * get navigationId
+	 * 
+	 * @return navigationId
+	 */
+	public Long getNavigationId(){
+		return navigationId;
+	}
+
+	/**
+	 * set navigationId
+	 * 
+	 * @param navigationId
+	 */
+	public void setNavigationId(Long navigationId){
+		this.navigationId = navigationId;
 	}
 
 }

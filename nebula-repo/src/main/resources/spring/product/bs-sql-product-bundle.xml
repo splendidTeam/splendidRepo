@@ -117,5 +117,60 @@
 			</value>
 		</constructor-arg>
 	</bean>
-
+	
+	 <bean id="Bundle.findBundleIdByBundleItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemId查出对应的bundleId</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT 
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
+		       		FROM 
+		       			t_pd_item i 
+		       		LEFT JOIN 
+		       			t_pd_bundle b 
+		       		on 
+		       			i.id = b.item_id 
+		       		WHERE 
+		       			i.id = :itemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	 <bean id="Bundle.findBundlesByItemCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过itemCode查出对应的bundle</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT 
+		       			 b.id,
+					     b.item_id as itemId,
+					     b.price_type as priceType,
+					     b.available_qty as availableQty,
+					     b.sync_with_inv as syncWithInv,
+					     b.bundle_type as bundleType,
+					     b.modify_time as modifyTime,
+					     b.version as version,
+					     b.create_time as createTime
+		       		FROM 
+		       			t_pd_item i 
+		       		LEFT JOIN 
+		       			t_pd_bundle b 
+		       		on 
+		       			i.id = b.item_id 
+		       		WHERE 
+		       			i.code = :itemCode
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

@@ -21,6 +21,8 @@ public class SkuItemParam {
 	
 	public static final String title = "title";
 	
+	public static final String style = "style";
+	
 	public static final String shopName = "shopName";
 
 	public static final String itemId = "itemId";
@@ -41,6 +43,8 @@ public class SkuItemParam {
 	
 	public static final String lifecycle = "lifecycle";
 	
+	public static final String category_tree = "category_tree";
+	
 	public static final String categoryname = "category_name_";
 	
 	public static final String categoryorder = "category_order_";
@@ -48,6 +52,8 @@ public class SkuItemParam {
 	public static final String categorycode = "category_code_";
 	
 	public static final String categoryParent = "category_Parent_";
+	
+	public static final String allCategoryCodes="all_category_codes";
 	
 	public static final String salesCount = "salesCount";
 	

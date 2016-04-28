@@ -90,7 +90,7 @@ public class BundleElement extends BaseModel {
 	/**
 	 * 捆绑类商品中每个具体个体商品的ID（现阶段仅为预留字段，无实际意义。）
 	 */
-	private Long itemId;
+//	private Long itemId;
 	
 	/**
 	 * 捆绑装采用“固定价/一口价”价格模式设置的商品的价格，
@@ -136,15 +136,15 @@ public class BundleElement extends BaseModel {
 		this.bundleId = bundleId;
 	}
 	
-	@Column(name = "ITEM_ID")
-	@Index(name = "IDX_BUNDLE_ELEMENT_ITEM_ID")
-	public Long getItemId() {
-		return itemId;
-	}
-	
-	public void setItemId(Long itemId) {
-		this.itemId = itemId;
-	}
+//	@Column(name = "ITEM_ID")
+//	@Index(name = "IDX_BUNDLE_ELEMENT_ITEM_ID")
+//	public Long getItemId() {
+//		return itemId;
+//	}
+//	
+//	public void setItemId(Long itemId) {
+//		this.itemId = itemId;
+//	}
 
 	@Column(name = "SALES_PRICE")
 	public BigDecimal getSalesPrice() {

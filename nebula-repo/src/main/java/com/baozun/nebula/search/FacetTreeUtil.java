@@ -16,13 +16,18 @@ import java.util.Map;
  */
 public class FacetTreeUtil {
 
-	private static final String TREE_LEVEL_SEPARATOR = "/";
+	private static final String TREE_LEVEL_SEPARATOR = "-";
 
-	public static List<Facet> f1(FacetGroup facetGroup) {
+	/**
+	 * 创建facet树，为navigation和category服务
+	 * @param facetGroup
+	 * @return
+	 */
+	public static List<Facet> createFacetTree(FacetGroup facetGroup) {
 		// 一级节点
-		List<Long> lv1Nodes = new ArrayList<>();
+		List<Long> lv1Nodes = new ArrayList<Long>();
 		// 所有节点数据
-		List<Facet> allNodeData = new ArrayList<>();
+		List<Facet> allNodeData = new ArrayList<Facet>();
 		Map<Long, List<Long>> childrenMapping = null;
 		// 根节点
 		Facet rootNode = null;

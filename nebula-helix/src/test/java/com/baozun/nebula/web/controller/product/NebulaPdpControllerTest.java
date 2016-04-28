@@ -29,6 +29,7 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 
 /**
@@ -78,7 +79,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		EasyMock.expect(itemDetailManager.getItemBuyLimited(EasyMock.isA(ItemBuyLimitedBaseCommand.class),EasyMock.eq(6))).andReturn(Integer.valueOf(3)).times(1);
 		EasyMock.replay(itemDetailManager);
 		
-		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand));
+		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand.getItemId()));
 		EasyMock.verify(itemDetailManager);
 	}
 	
@@ -98,7 +99,33 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		EasyMock.expect(itemDetailManager.findItemAvgReview(itemCode)).andReturn(3.6F).times(1);
 		
 		control.replay();
-		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemCode);
+		ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
+		itemBaseInfo.setCode(itemCode);
+		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemBaseInfo);
+		assertEquals(itemExtraViewCommand, actualCommand);
+		control.verify();
+	}
+	
+	@Test
+	public void testBuildItemExtraViewCommandCacheException(){
+		
+		ItemExtraViewCommand itemExtraViewCommand = new ItemExtraViewCommand();
+		itemExtraViewCommand.setFavoriteCount(Long.valueOf(200));
+		itemExtraViewCommand.setRate(3.6F);
+		itemExtraViewCommand.setReviewCount(Long.valueOf(153));
+		itemExtraViewCommand.setSales(Long.valueOf(60));
+		
+		String itemCode = "testItemCode";
+		EasyMock.expect(cacheManager.getObject("item_extra_cache_key-testItemCode")).andThrow(new RuntimeException("Timeout")).times(1);
+		EasyMock.expect(itemDetailManager.findItemSalesCount(itemCode)).andReturn(Integer.valueOf(60)).times(1);
+		EasyMock.expect(itemDetailManager.findItemFavCount(itemCode)).andReturn(Integer.valueOf(200)).times(1);
+		EasyMock.expect(itemRateManager.findRateCountByItemCode(itemCode)).andReturn(Integer.valueOf(153)).times(1);
+		EasyMock.expect(itemDetailManager.findItemAvgReview(itemCode)).andReturn(3.6F).times(1);
+		
+		control.replay();
+		ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
+		itemBaseInfo.setCode(itemCode);
+		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemBaseInfo);
 		assertEquals(itemExtraViewCommand, actualCommand);
 		control.verify();
 	}

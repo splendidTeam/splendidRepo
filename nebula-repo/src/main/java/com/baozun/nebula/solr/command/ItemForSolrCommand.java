@@ -322,6 +322,27 @@ public class ItemForSolrCommand implements Serializable {
 	@Field("all_category_ids")
 	private List<Long> allCategoryIds;
 	
+	/**
+	 * 该商品的分类树
+	 * 数据格式为：
+	 * 
+	 * 		1
+	 * 		1-11
+	 * 		1-11-1101
+	 */
+	@Field("category_tree")
+	private List<String>	categoryTree;
+	
+	/**
+	 * 该商品对应的导航树
+	 * 数据格式为：
+	 * 
+	 * 		1
+	 * 		1-11
+	 * 		1-11-1101 	
+	 */
+	@Field("navigation_tree")
+	private List<String>	navigationTree;
 	
 //	/** 标签Map **/
 //	@Field("tag_name_*")
@@ -344,19 +365,6 @@ public class ItemForSolrCommand implements Serializable {
 	 */
 	@Field
 	private List<String> channels;
-	
-	/**
-	 * 前端导航code
-	 * 需要将商品的导航树刷新进去。
-	 */
-	@Field("navigation_code")
-	private List<String> navigationCodes;
-	
-	/**
-	 * 前端导航id
-	 */
-	@Field("navigation_id")
-	private List<Long>	navigationIds;
 	
 	
 //	/**
@@ -913,7 +921,24 @@ public class ItemForSolrCommand implements Serializable {
 	public void setDynamicColorRefMap(Map<String, List<String>> dynamicColorRefMap) {
 		this.dynamicColorRefMap = dynamicColorRefMap;
 	}
-	
+
+	public List<String> getCategoryTree() {
+		return categoryTree;
+	}
+
+	public List<String> getNavigationTree() {
+		return navigationTree;
+	}
+
+
+	public void setCategoryTree(List<String> categoryTree) {
+		this.categoryTree = categoryTree;
+	}
+
+	public void setNavigationTree(List<String> navigationTree) {
+		this.navigationTree = navigationTree;
+	}
+
 
 //	public void setPosition(List<Integer> position) {
 //		this.position = position;

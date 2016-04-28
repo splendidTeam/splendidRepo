@@ -42,6 +42,9 @@ public class IllegalItemStateException extends Exception {
 
 
 	public enum IllegalItemState {
+		
+		/** 无效参数*/
+		INVALIDE_PARAM,
 
 	    /** 商品不存在. */
 	    ITEM_NOT_EXISTS,

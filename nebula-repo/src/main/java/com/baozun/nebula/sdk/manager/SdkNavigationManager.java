@@ -49,4 +49,11 @@ public interface SdkNavigationManager extends BaseManager{
 	 */
 	public void sortNavigationsByIds(List<Long> idList, Long userId);
 	
+	/**
+	 * 根据url查找有效的导航菜单，主要是为导航菜单服务
+	 * @param url
+	 * @return
+	 */
+	public Navigation findEffectNavigationByUrl(String url);
+	
 }

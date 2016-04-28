@@ -12,12 +12,14 @@ public class SearchForm extends BaseForm{
 	private String				searchWord;
 
 	/**
-	 * 属性的过滤条件
+	 * 过滤条件(属性)<br/>
+	 * 参数格式：属性Id-属性值Id,属性Id-属性值Id....
 	 */
 	private String				filterConditionStr;
 	
 	/**
-	 * 分类的过滤条件
+	 * 过滤条件(分类)<br/>
+	 * 参数格式：父级分类id-父级分类id-分类id,父级分类id-父级分类id-分类id......
 	 */
 	private String				categoryConditionStr;
 	
@@ -27,9 +29,16 @@ public class SearchForm extends BaseForm{
 	private String				navigationConditionStr;
 	
 	/**
-	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用
+	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用<br/>
+	 * 参数格式：c分类id,P属性id,P属性id,c分类id......
+	 * 
 	 */
 	private String				filterParamOrder;
+	
+	/**
+	 * 导航Id
+	 */
+	private Long				navigationId;
 
 	/**
 	 * 排序
@@ -108,6 +117,24 @@ public class SearchForm extends BaseForm{
 
 	public void setNavigationConditionStr(String navigationConditionStr) {
 		this.navigationConditionStr = navigationConditionStr;
+	}
+
+	
+	/**   
+	 * get navigationId  
+	 * @return navigationId  
+	 */
+	public Long getNavigationId(){
+		return navigationId;
+	}
+
+	
+	/**
+	 * set navigationId 
+	 * @param navigationId
+	 */
+	public void setNavigationId(Long navigationId){
+		this.navigationId = navigationId;
 	}
 
 }

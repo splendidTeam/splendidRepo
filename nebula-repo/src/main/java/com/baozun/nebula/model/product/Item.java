@@ -41,6 +41,15 @@ import com.baozun.nebula.model.BaseModel;
 @Table(name = "t_pd_item")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Item extends BaseModel {
+	
+	/** 商品类型：普通商品 */
+	public static final Integer ITEM_TYPE_SIMPLE = 1;
+	/** 商品类型：捆绑类商品 */
+	public static final Integer ITEM_TYPE_BUNDLE = 3;
+	/** 商品类型：组商品 */
+	public static final Integer ITEM_TYPE_GROUP = 5;
+	/** 商品类型：虚拟商品 */
+	public static final Integer ITEM_TYPE_VIRTUAL = 7;
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 882446624240577496L;
@@ -62,6 +71,18 @@ public class Item extends BaseModel {
 	 * 所属行业
 	 */
 	private Long industryId;
+	
+	/**
+	 * 商品类型
+	 * 
+	 * <ol>
+	 * <li>{@link Item#ITEM_TYPE_SIMPLE} </li>
+	 * <li>{@link Item#ITEM_TYPE_BUNDLE} </li>
+	 * <li>{@link Item#ITEM_TYPE_GROUP} </li>
+	 * <li>{@link Item#ITEM_TYPE_VIRTUAL} </li>
+	 * </ol>
+	 */
+	private Integer type;
 
 	/**
 	 * 生命周期
@@ -267,6 +288,15 @@ public class Item extends BaseModel {
 	@Column(name = "INDUSTRY_ID")
 	public Long getIndustryId() {
 		return industryId;
+	}
+
+	@Column(name = "TYPE")
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 
 	/**

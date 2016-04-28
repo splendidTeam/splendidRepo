@@ -42,7 +42,7 @@ public interface ItemColorSwatchViewCommandResolver {
 	
 	/**
 	 * 
-	 * @param baseInfoViewCommand (应至少包含itemId、itemCode)
+	 * @param baseInfoViewCommand (应至少包含itemId、itemCode、style,因为此command在之前已经查到，所以不难设置这些值)
 	 * @param itemImageViewCommandConverter
 	 * @return
 	 */

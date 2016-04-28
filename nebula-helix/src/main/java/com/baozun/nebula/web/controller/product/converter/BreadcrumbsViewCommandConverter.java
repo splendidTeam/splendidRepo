@@ -24,11 +24,11 @@ import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewComma
 /** 
  * 
  *   面包屑信息的视图模型转换器
-* @Description 
-* @author dongliang ma
-* @date 2016年4月19日 下午4:45:34 
-* @version   
-*/
+ * @Description 
+ * @author dongliang ma
+ * @date 2016年4月19日 下午4:45:34 
+ * @version   
+ */
 public class BreadcrumbsViewCommandConverter extends
 		BaseConverter<BreadcrumbsViewCommand> {
 

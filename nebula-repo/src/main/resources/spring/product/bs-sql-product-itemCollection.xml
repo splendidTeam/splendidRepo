@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="ItemCollection.findItemCollectionByNavigationId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有指定商品的排序</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						*
+					from
+						t_pd_item_collection
+					where
+						id=(select collection_id from t_base_navigation where id=:navigationId)						
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="ItemCollection.findItemCollectionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有指定商品的排序</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						*
+					from
+						t_pd_item_collection
+					where
+						id=:id					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+</beans>

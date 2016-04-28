@@ -47,7 +47,8 @@
 						(case when favorites.sku_id is not null then sku.list_price else itemInfo.list_price end) as listPrice,
 						item.lifecycle as lifecycle,
 						(case when favorites.sku_id is not null then sku.properties else '' end ) as properties,
-						(case when favorites.sku_id is not null then sku.out_id else '' end) as extentionCode
+						(case when favorites.sku_id is not null then sku.out_id else '' end) as extentionCode,
+						(SELECT sum(available_qty) FROM t_pd_sku_inventory WHERE extention_code IN (SELECT out_id FROM t_pd_sku WHERE item_id=item.id)) as itemIvt
 					from t_member_favorites favorites 
 						left join t_pd_item  item on  favorites.item_id = item.id
 						left join t_pd_iteminfo itemInfo on itemInfo.item_id = item.id

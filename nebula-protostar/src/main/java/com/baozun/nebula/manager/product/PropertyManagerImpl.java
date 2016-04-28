@@ -113,7 +113,9 @@ public class PropertyManagerImpl implements PropertyManager{
 	@Override
 	public List<Property> findPropertyListByIndustryId(Long industryId){
 
-		return propertyDao.findPropertyListByIndustryId(industryId);
+//		return propertyDao.findPropertyListByIndustryId(industryId);
+		
+		return propertyDao.findPropertysByIndustryId(industryId);
 	}
 
 	/*
@@ -871,5 +873,25 @@ public class PropertyManagerImpl implements PropertyManager{
 				
 			}
 		}		
+	}
+	
+	@Override
+	public List<DynamicPropertyCommand> findAllDynamicPropertyCommand(){
+		List<DynamicPropertyCommand> dynamicPropertyCommandList = new ArrayList<DynamicPropertyCommand>();
+		List<Property> properties = propertyDao.findWidthoutCommonPropertyId();
+		if(properties!=null && !properties.isEmpty()){
+			for(Property property:properties){
+				List<PropertyValue>  values = propertyValueDao.findPropertyValueListById(property.getId());
+				if(values==null || values.isEmpty()){
+					continue;
+				}
+				DynamicPropertyCommand dynamicPropertyCommand = new DynamicPropertyCommand();
+				dynamicPropertyCommand.setProperty(property);
+				dynamicPropertyCommand.setPropertyValueList(propertyValueDao.findPropertyValueListById(property.getId()));
+				dynamicPropertyCommandList.add(dynamicPropertyCommand);
+			}
+		}
+		return dynamicPropertyCommandList;
+		
 	}
 }

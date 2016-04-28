@@ -376,6 +376,124 @@ public class ItemBaseInfoViewCommand extends BaseViewCommand {
         this.lifecycle = lifecycle;
     }
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((activeBeginTime == null) ? 0 : activeBeginTime.hashCode());
+		result = prime * result + ((code == null) ? 0 : code.hashCode());
+		result = prime * result
+				+ ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((lifecycle == null) ? 0 : lifecycle.hashCode());
+		result = prime * result
+				+ ((listPrice == null) ? 0 : listPrice.hashCode());
+		result = prime * result
+				+ ((salePrice == null) ? 0 : salePrice.hashCode());
+		result = prime * result
+				+ ((seoDescription == null) ? 0 : seoDescription.hashCode());
+		result = prime * result
+				+ ((seoKeywords == null) ? 0 : seoKeywords.hashCode());
+		result = prime * result
+				+ ((seoTitle == null) ? 0 : seoTitle.hashCode());
+		result = prime * result + ((sketch == null) ? 0 : sketch.hashCode());
+		result = prime * result + ((style == null) ? 0 : style.hashCode());
+		result = prime * result
+				+ ((subTitle == null) ? 0 : subTitle.hashCode());
+		result = prime * result + ((title == null) ? 0 : title.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ItemBaseInfoViewCommand other = (ItemBaseInfoViewCommand) obj;
+		if (activeBeginTime == null) {
+			if (other.activeBeginTime != null)
+				return false;
+		} else if (!activeBeginTime.equals(other.activeBeginTime))
+			return false;
+		if (code == null) {
+			if (other.code != null)
+				return false;
+		} else if (!code.equals(other.code))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (lifecycle == null) {
+			if (other.lifecycle != null)
+				return false;
+		} else if (!lifecycle.equals(other.lifecycle))
+			return false;
+		if (listPrice == null) {
+			if (other.listPrice != null)
+				return false;
+		} else if (!listPrice.equals(other.listPrice))
+			return false;
+		if (salePrice == null) {
+			if (other.salePrice != null)
+				return false;
+		} else if (!salePrice.equals(other.salePrice))
+			return false;
+		if (seoDescription == null) {
+			if (other.seoDescription != null)
+				return false;
+		} else if (!seoDescription.equals(other.seoDescription))
+			return false;
+		if (seoKeywords == null) {
+			if (other.seoKeywords != null)
+				return false;
+		} else if (!seoKeywords.equals(other.seoKeywords))
+			return false;
+		if (seoTitle == null) {
+			if (other.seoTitle != null)
+				return false;
+		} else if (!seoTitle.equals(other.seoTitle))
+			return false;
+		if (sketch == null) {
+			if (other.sketch != null)
+				return false;
+		} else if (!sketch.equals(other.sketch))
+			return false;
+		if (style == null) {
+			if (other.style != null)
+				return false;
+		} else if (!style.equals(other.style))
+			return false;
+		if (subTitle == null) {
+			if (other.subTitle != null)
+				return false;
+		} else if (!subTitle.equals(other.subTitle))
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
+	}
+
 
 
 }

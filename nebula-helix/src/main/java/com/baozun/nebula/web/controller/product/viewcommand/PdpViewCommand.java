@@ -52,11 +52,17 @@ public class PdpViewCommand extends BaseViewCommand {
 	/** 尺码对照 */
     private String sizeCompareChart;
     
+    /** 用于在移动端分享的 */
+    private String mobileShareUrl;
+    
     /** 商品扩展信息 */
     private ItemExtraViewCommand extra;
     
-    /** 商品推荐信息 */
-    private List<RelationItemViewCommand> relations;
+    /** 商品推荐 */
+    private List<RelationItemViewCommand> recommend;
+    
+    /** 每个商品限制的购买数量 */
+    private Integer buyLimit;
 
 	public List<BreadcrumbsViewCommand> getBreadcrumbs() {
 		return breadcrumbs;
@@ -130,6 +136,14 @@ public class PdpViewCommand extends BaseViewCommand {
 		this.sizeCompareChart = sizeCompareChart;
 	}
 
+	public String getMobileShareUrl() {
+		return mobileShareUrl;
+	}
+
+	public void setMobileShareUrl(String mobileShareUrl) {
+		this.mobileShareUrl = mobileShareUrl;
+	}
+
 	public ItemExtraViewCommand getExtra() {
 		return extra;
 	}
@@ -138,12 +152,20 @@ public class PdpViewCommand extends BaseViewCommand {
 		this.extra = extra;
 	}
 
-	public List<RelationItemViewCommand> getRelations() {
-		return relations;
+	public List<RelationItemViewCommand> getRecommend() {
+		return recommend;
 	}
 
-	public void setRelations(List<RelationItemViewCommand> relations) {
-		this.relations = relations;
+	public void setRecommend(List<RelationItemViewCommand> recommend) {
+		this.recommend = recommend;
+	}
+
+	public Integer getBuyLimit() {
+		return buyLimit;
+	}
+
+	public void setBuyLimit(Integer buyLimit) {
+		this.buyLimit = buyLimit;
 	}
 
 }
