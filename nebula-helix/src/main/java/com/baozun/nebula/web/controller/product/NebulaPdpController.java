@@ -107,7 +107,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		
 		try {
 			
-			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
+			PdpViewCommand pdpViewCommand = buildPdpViewCommandWithCache(itemCode);
 			
 			constructBrowsingHistory(request, response, pdpViewCommand.getBaseInfo().getId());
 			
@@ -377,6 +377,12 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return false;
 	}
 
+	@Override
+	protected Integer getPdpViewCommandExpireSeconds() {
+		// 5分钟
+		return 5 * 60;
+	}
+	
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
@@ -384,5 +390,5 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	protected String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo) {
 		return PDP_MODE_COLOR_COMBINE;
 	}
-
+	
 }

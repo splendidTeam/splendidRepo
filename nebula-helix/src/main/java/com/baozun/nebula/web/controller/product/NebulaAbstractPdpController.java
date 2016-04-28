@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
+import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.TimeInterval;
@@ -40,6 +41,7 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
@@ -114,7 +116,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品详情页 的默认定义 */
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
-	public static final String 		ITEM_EXTRA_CACHE_KEY				= "item_extra_cache_key";
+	//缓存key的定义
+	/** pdpViewCommand的缓存key */
+	public static final String 		CACHE_KEY_PDP_VIEW_COMMAND			= "nebula_cache_pdp_view_command";
+	
+	/** 商品的extra数据的缓存key */
+	public static final String 		CACHE_KEY_ITEM_EXTRA				= "nebula_cache_item_extra";
+	
 	
 	@Autowired
 	private ItemRecommandManager itemRecommandManager;
@@ -132,7 +140,45 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
     /** The browsing history resolver. */
     @Autowired
-    private BrowsingHistoryResolver     browsingHistoryResolver;
+    @Qualifier("browsingHistoryResolver")
+    private BrowsingHistoryResolver browsingHistoryResolver;
+    
+    /**
+     * 构造PdpViewCommand
+     * <p>
+     * 先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+     * </p>
+     * @param itemCode
+     * @return
+     * @throws IllegalItemStateException
+     */
+    protected PdpViewCommand buildPdpViewCommandWithCache(String itemCode) throws IllegalItemStateException {
+    	PdpViewCommand pdpViewCommand = null;
+    	
+    	String pdpViewCommandCachekey = getPdpViewCommandCacheKey(itemCode);
+		
+		try {
+			pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
+		} catch(Exception e) {
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
+					itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
+		}
+		
+		if(pdpViewCommand == null) {
+			pdpViewCommand = buildPdpViewCommand(itemCode);
+			
+			// put to cache
+			try {
+				cacheManager.setObject(pdpViewCommandCachekey, pdpViewCommand, getPdpViewCommandExpireSeconds());
+				pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
+			} catch(Exception e) {
+				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
+						itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
+			}
+		}
+		
+		return pdpViewCommand;
+    }
 	
 	/**
 	 * 构造PdpViewCommand
@@ -283,7 +329,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 */
 	protected ItemExtraViewCommand buildItemExtraViewCommand(ItemBaseInfoViewCommand itemBaseInfo){
-		String key = ITEM_EXTRA_CACHE_KEY + "-" + itemBaseInfo.getCode();
+		String key = CACHE_KEY_ITEM_EXTRA + "-" + itemBaseInfo.getCode();
 		
 		ItemExtraViewCommand itemExtraViewCommand = null;
 		try {
@@ -456,7 +502,27 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract boolean isSyncLoadRecommend();
 	
 	/**
+	 * 获取pdpViewCommand缓存的有效期
+	 * @return
+	 */
+	protected abstract Integer getPdpViewCommandExpireSeconds();
+	
+	/**
 	 * 获取Pdp的显示模式
 	 */
 	protected abstract String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo);
+	
+	/**
+	 * 获取pdpViewCommand缓存的key
+	 * @param itemCode
+	 * @return
+	 */
+	private String getPdpViewCommandCacheKey(String itemCode) {
+		boolean i18n = LangProperty.getI18nOnOff();
+		if(i18n) {
+			String lang = LangUtil.getCurrentLang();
+			return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode).concat("-").concat(lang);
+		}
+		return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode);
+	}
 }

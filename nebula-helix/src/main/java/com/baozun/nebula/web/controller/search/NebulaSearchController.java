@@ -115,13 +115,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * 			@requestMapping("/sys/navigation")
 	 * @return
 	 */
-	public String navigationPage(
-			@RequestParam(value = "navId") Long navId,
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Model model){
-		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
-		if (Validator.isNotNullOrEmpty(collection)) {
+	public String navigationPage(@RequestParam(value="cid") Long cid,HttpServletRequest request,HttpServletResponse response,Model model){
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
+		if(Validator.isNotNullOrEmpty(collection)){
+
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
 
 			// ***************** 下面这些查询和searchPage是一致的
