@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.DisMaxParams;
 import org.apache.solr.common.params.GroupParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,21 @@ public class SearchManagerImpl<T, PK extends Serializable> implements SearchMana
 
 	@Override
 	public void setSolrBoost(SolrQuery solrQuery,Boost boost){
-		// TODO Auto-generated method stub
+		if(Validator.isNotNullOrEmpty(boost.getDeftype())){
+			solrQuery.set("defType", boost.getDeftype());
+		}
+		if(Validator.isNotNullOrEmpty(boost.getBq())){
+			solrQuery.set(DisMaxParams.BQ, boost.getBq());
+		}
+		if(Validator.isNotNullOrEmpty(boost.getQf())){
+			solrQuery.set(DisMaxParams.QF, boost.getQf());
+		}
+		if(Validator.isNotNullOrEmpty(boost.getPf())){
+			solrQuery.set(DisMaxParams.PF, boost.getPf());
+		}
+		if(Validator.isNotNullOrEmpty(boost.getBf())){
+			solrQuery.set(DisMaxParams.BF, boost.getBf());
+		}
 
 	}
 

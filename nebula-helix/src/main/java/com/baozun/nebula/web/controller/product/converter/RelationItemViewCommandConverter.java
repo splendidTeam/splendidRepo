@@ -16,15 +16,14 @@
  */
 package com.baozun.nebula.web.controller.product.converter;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import org.jsoup.helper.StringUtil;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+import com.feilong.core.Validator;
 
 /**
  * 商品图片视图模型转换
@@ -48,14 +47,12 @@ public class RelationItemViewCommandConverter extends BaseConverter<RelationItem
 				relationItemViewCommand.setItemName(itemCommand.getTitle());
 				relationItemViewCommand.setListPrice(itemCommand.getListPrice());
 				relationItemViewCommand.setSalePrice(itemCommand.getSalePrice());
-				//TODO
-				relationItemViewCommand.setExtra(null);
-				//暂时就是一张图片
-				List<String> imageUrls =  null;
-				if(StringUtil.isBlank(itemCommand.getPicUrl())){
+				//默认放一张图片
+				if(Validator.isNotNullOrEmpty(itemCommand.getPicUrl())){
+					List<String> imageUrls = new ArrayList<String>();
 					imageUrls.add(itemCommand.getPicUrl());
+					relationItemViewCommand.setImageUrl(imageUrls);
 				}
-				relationItemViewCommand.setImageUrl(imageUrls);
 				//暂无
 				relationItemViewCommand.setColorSwatch(null);
 				return relationItemViewCommand;
