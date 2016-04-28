@@ -58,7 +58,7 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	 * @return
 	 */
 	@NativeQuery(model = BundleCommand.class)
-	List<BundleCommand> findBundlesByItemId(@QueryParam("itemId")Long itemId, @QueryParam("lifecycle")Integer lifecycle);
+	List<BundleCommand> findBundlesByMainItemId(@QueryParam("mainItemId")Long mainItemId, @QueryParam("lifecycle")Integer lifecycle);
 	
 	/**
 	 * 根据主卖品的商品款号查询捆绑类商品信息
@@ -70,15 +70,25 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	List<BundleCommand> findBundlesByStyle(@QueryParam("style")String style, @QueryParam("lifecycle")Integer lifecycle);
 	
 	@NativeQuery(model = BundleCommand.class)
-	BundleCommand findBundlesById(@QueryParam("id")Long id, @QueryParam("lifecycle")Integer lifecycle);
-	
-	@NativeQuery(model = BundleCommand.class)
-	BundleCommand findBundlesByItemCode(@QueryParam("itemCode")String itemCode);
+	BundleCommand findBundleById(@QueryParam("id")Long id, @QueryParam("lifecycle")Integer lifecycle);
 	
 	@NativeQuery(model = BundleCommand.class)
 	Pagination<BundleCommand> findBundlesByPage(Page page ,Sort[] sort);
 	
-	@NativeQuery(model = Long.class)
-	Long findBundleIdByBundleItemId(@QueryParam("itemId")Long itemId);
+	/**
+	 * 根据主卖品的商品id查询捆绑类商品id
+	 * @param mainItemId
+	 * @return
+	 */
+	@NativeQuery(alias = "item_id",clazzes = Long.class)
+	List<Long> findBundleItemIdByMainItemId(@QueryParam("mainItemId") Long mainItemId);
+	
+	/**
+	 * 根据捆绑类商品的商品id查找捆绑装
+	 * @param bundleItemId
+	 * @return
+	 */
+	@NativeQuery(model = BundleCommand.class)
+	BundleCommand findBundleByBundleItemId(@QueryParam("bundleItemId") Long bundleItemId);
 	
 }
