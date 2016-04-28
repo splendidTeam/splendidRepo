@@ -58,15 +58,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	@Autowired
 	private SearchManager				searchManager;
 
-<<<<<<< HEAD
-//	@Autowired(required=false)
-//	private FacetFilterHelper	facetFilterHelper;
-	
-=======
 	@Autowired
 	private FacetFilterHelper			facetFilterHelper;
 
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	@Autowired
 	private SdkItemCollectionManager	sdkItemCollectionManager;
 
@@ -121,19 +115,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * 			@requestMapping("/sys/navigation")
 	 * @return
 	 */
-<<<<<<< HEAD
 	public String navigationPage(@RequestParam(value="cid") Long cid,HttpServletRequest request,HttpServletResponse response,Model model){
 		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if(Validator.isNotNullOrEmpty(collection)){
-=======
-	public String navigationPage(
-			@RequestParam(value = "navId") Long navId,
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Model model){
-		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
-		if (Validator.isNotNullOrEmpty(collection)) {
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
+
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
 
 			// ***************** 下面这些查询和searchPage是一致的
@@ -152,11 +137,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 			// 页面左侧筛选项
 			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
-<<<<<<< HEAD
-			
-=======
 
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 
 		}
