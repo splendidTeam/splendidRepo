@@ -164,7 +164,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	protected PriceViewCommand buildPriceViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand,
 			List<SkuViewCommand> skuViewCommands) {
 		
-		assert baseInfoViewCommand != null && Validator.isNullOrEmpty(skuViewCommands)
+		assert baseInfoViewCommand != null && Validator.isNotNullOrEmpty(skuViewCommands)
 				: "Please Check baseInfo and skuInfos!";
 		
 		PriceViewCommand priceViewCommand = new PriceViewCommand();
