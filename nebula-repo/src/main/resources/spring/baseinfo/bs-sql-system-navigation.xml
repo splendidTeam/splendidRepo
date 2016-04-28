@@ -104,4 +104,15 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Navigation.findEffectNavigationByUrl" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据url查找有效导航菜单</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * from t_base_navigation where url = :url and lifecycle = 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

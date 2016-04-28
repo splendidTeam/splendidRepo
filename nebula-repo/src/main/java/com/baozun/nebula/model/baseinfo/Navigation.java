@@ -41,11 +41,24 @@ public class Navigation extends BaseModel {
 	/**
 	 * URL类型
 	 */
+	@Deprecated
 	public static final Integer TYPE_URL = 1;
 	/**
 	 * 分类类型
 	 */
+	@Deprecated
 	public static final Integer TYPE_CATEGORY = 2;
+	
+	/**
+	 * 活动推广连接
+	 */
+	public static final Integer	TYPE_ACTIVTY = 3;
+	
+	/**
+	 * 商品集合连接，这个是需要进入商品列表页面的
+	 */
+	public static final Integer	TYPE_ITEM_LIST = 5;
+
 
 	/** PK. */
 	private Long				id;

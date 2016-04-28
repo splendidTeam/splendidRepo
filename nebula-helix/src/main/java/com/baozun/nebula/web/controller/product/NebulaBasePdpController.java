@@ -89,7 +89,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 	/**
 	 * 构造商品基本信息
 	 * @param itemCode 商品编码
-	 * @return ItemBaseInfoViewCommand
+	 * @return {@link ItemBaseInfoViewCommand}
 	 */
 	protected ItemBaseInfoViewCommand buildItemBaseInfoViewCommand(String itemCode) {
 		
@@ -106,77 +106,92 @@ public abstract class NebulaBasePdpController extends BaseController {
 	/**
 	 * 构造商品基本信息
 	 * @param itemId 商品Id
-	 * @return ItemBaseInfoViewCommand
+	 * @return {@link ItemBaseInfoViewCommand}
 	 */
 	protected ItemBaseInfoViewCommand buildItemBaseInfoViewCommand(Long itemId) {
+		
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = new ItemBaseInfoViewCommand();
+		
 		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
 		if(itemBaseCommand!=null){
 			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
 		}
+		
 		return itemBaseInfoViewCommand;
 	}
 	
 	/**
 	 * 构造sku信息
 	 * @param itemId
-	 * @return
+	 * @return List {@link SkuViewCommand}
 	 */
 	protected List<SkuViewCommand> buildSkuViewCommand(Long itemId) {
 		assert itemId != null : "Please Check itemId!";
+		
 		//获取所有有效的sku信息
-		List<SkuCommand> commands =itemDetailManager.findEffectiveSkuInvByItemId(itemId);
+		List<SkuCommand> commands = itemDetailManager.findEffectiveSkuInvByItemId(itemId);
+		
 		if(Validator.isNotNullOrEmpty(commands)){
 			//转换
-			List<SkuViewCommand> skuViewCommands =skuViewCommandConverter.convert(commands);
-			//单独出来设置itemId
-			for (SkuViewCommand skuViewCommand : skuViewCommands) {
-				skuViewCommand.setItemId(itemId);
-			}
+			List<SkuViewCommand> skuViewCommands = skuViewCommandConverter.convert(commands);
+			
 			return skuViewCommands;
 		}
+		
 		return null;
 	}
 	
 	/**
 	 * 构造库存信息
 	 * @param itemId
-	 * @return
+	 * @return List {@link InventoryViewCommand}
+	 * 
 	 */
 	protected List<InventoryViewCommand> buildInventoryViewCommand(Long itemId) {
+		
 		List<SkuCommand> skuCommands = sdkItemManager.findEffectiveSkuInvByItemId(itemId);
+		
 		return inventoryViewCommandConverter.convert(skuCommands);
 	}
 	
 	/**
 	 * 构造价格信息
-	 * @return
+	 * @return {@link PriceViewCommand}
 	 */
 	protected PriceViewCommand buildPriceViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand,
 			List<SkuViewCommand> skuViewCommands) {
+		
 		assert baseInfoViewCommand != null && Validator.isNullOrEmpty(skuViewCommands)
 				: "Please Check baseInfo and skuInfos!";
-		PriceViewCommand priceViewCommand =new PriceViewCommand();
+		
+		PriceViewCommand priceViewCommand = new PriceViewCommand();
+		
 		//商品上定义的吊牌价
 		priceViewCommand.setItemListPrice(baseInfoViewCommand.getListPrice());
+		
 		//商品上定义的销售价
 		priceViewCommand.setItemSalesPrice(baseInfoViewCommand.getSalePrice());
 		
 		//该商品所有sku吊牌价的最小值
-		BigDecimal skuMinListPrice=BigDecimal.ZERO;
+		BigDecimal skuMinListPrice = BigDecimal.ZERO;
+		
 		//该商品所有sku吊牌价的最大值
-		BigDecimal skuMaxListPrice=BigDecimal.ZERO;
+		BigDecimal skuMaxListPrice = BigDecimal.ZERO;
+		
 		//该商品所有sku销售价的最小值
-		BigDecimal skuMinSalesPrice=BigDecimal.ZERO;
+		BigDecimal skuMinSalesPrice = BigDecimal.ZERO;
+		
 		//该商品所有sku销售价的最大值
-		BigDecimal skuMaxSalesPrice=BigDecimal.ZERO;
+		BigDecimal skuMaxSalesPrice = BigDecimal.ZERO;
+		
 		int i =0;
 		for (SkuViewCommand skuViewCommand : skuViewCommands) {
 			if(i == 0){
-				skuMinListPrice =skuViewCommand.getListPrice();
-				skuMaxListPrice =skuViewCommand.getListPrice();
-				skuMinSalesPrice =skuViewCommand.getSalePrice();
-				skuMaxSalesPrice =skuViewCommand.getSalePrice();
+				skuMinListPrice = skuViewCommand.getListPrice();
+				skuMaxListPrice = skuViewCommand.getListPrice();
+				
+				skuMinSalesPrice = skuViewCommand.getSalePrice();
+				skuMaxSalesPrice = skuViewCommand.getSalePrice();
 			}else{
 				//>
 				if(skuMinListPrice.compareTo(skuViewCommand.getListPrice()) == 1){
@@ -205,27 +220,33 @@ public abstract class NebulaBasePdpController extends BaseController {
 	}
 	
 	/**
-	 * <p>构造商品的属性信息，包括销售属性和非销售属性</p>
-	 * 此方法在构造销售颜色属性信息时，将需要商品图片信息，
+	 * 构造商品的属性信息，包括销售属性和非销售属性
+	 * 
+	 * <p>此方法在构造销售颜色属性信息时，将需要商品图片信息，
 	 * 所以，之前需先获取商品图片(不一定有颜色属性，但无论如何必须先取图片)
+	 * </p>
+	 * 
 	 * @param itemId
-	 * @return
+	 * @return {@link ItemPropertyViewCommand}
 	 */
 	protected ItemPropertyViewCommand buildItemPropertyViewCommand(ItemBaseInfoViewCommand baseInfoViewCommand, 
 			List<ItemImageViewCommand> images) {
+		
 		return itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
 	}
 	
 	/**
 	 * 构造商品的图片
 	 * @param itemId
-	 * @return
+	 * @return List {@link ItemImageViewCommand}
 	 */
 	protected List<ItemImageViewCommand> buildItemImageViewCommand(Long itemId) {
 		// 查询结果
 		List<Long> itemIds = new ArrayList<Long>();
 		itemIds.add(itemId);
+		
 		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
+		
 		// 数据转换
 		return itemImageViewCommandConverter.convert(itemImageList);
 	}

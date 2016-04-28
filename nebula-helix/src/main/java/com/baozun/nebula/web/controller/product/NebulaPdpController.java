@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
@@ -56,7 +55,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -328,8 +326,8 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand) {
-		return itemDetailManager.getItemBuyLimited(itemBuyLimitedCommand, DEFAULT_SKU_BUY_LIMIT);
+	protected Integer getBuyLimit(Long itemId) {
+		return DEFAULT_SKU_BUY_LIMIT;
 	}
 
 
@@ -362,21 +360,25 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected List<RelationItemViewCommand> customBuildItemRecommendViewCommand(
-			Long itemId) {
-		return new ArrayList<RelationItemViewCommand>();
-	}
-
-	@Override
 	protected String getItemMainImageType() {
 		return ItemImage.IMG_TYPE_LIST;
+	}
+	
+	@Override
+	protected boolean isSyncLoadItemExtra() {
+		return false;
+	}
+	
+	@Override
+	protected boolean isSyncLoadRecommend() {
+		return false;
 	}
 
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
 	@Override
-	protected String getPdpMode(Long itemId) {
+	protected String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo) {
 		return PDP_MODE_COLOR_COMBINE;
 	}
 
