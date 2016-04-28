@@ -58,22 +58,19 @@ import com.feilong.servlet.http.entity.CookieEntity;
  * <td>cookie最大存活时间,单位秒</td>
  * <td>false,默认 3个月</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
- * <td>cookieCharsetName</td>
- * <td>cookie编码</td>
- * <td>false,默认 UTF-8</td>
- * </tr>
  * <tr valign="top">
  * <td>maxCount</td>
  * <td>最大记录数量,超过的记录将被去掉</td>
- * <td>false,默认 5</td>
+ * <td>false,默认 10</td>
  * </tr>
  * </table>
  * </blockquote>
- *
- * @author feilong
- * @version 1.2.2 2015年7月20日 下午6:44:27
- * @since 1.2.2
+ * 
+ * 加密方式改成用工具类EncryptUtil加密
+ * 
+ * @author xingyu.liu 
+ * @version 1.2.3 
+ * @since  1.2.2  by feilong
  */
 public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
 
