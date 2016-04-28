@@ -24,6 +24,11 @@ public class SearchCommand{
 	private String					categoryConditionStr;
 
 	/**
+	 * 导航Id
+	 */
+	private Long					navigationId;
+
+	/**
 	 * 导航
 	 */
 	private String					navigationConditionStr;
@@ -143,6 +148,24 @@ public class SearchCommand{
 	 */
 	public void setNavigationConditionStr(String navigationConditionStr){
 		this.navigationConditionStr = navigationConditionStr;
+	}
+
+	/**
+	 * get navigationId
+	 * 
+	 * @return navigationId
+	 */
+	public Long getNavigationId(){
+		return navigationId;
+	}
+
+	/**
+	 * set navigationId
+	 * 
+	 * @param navigationId
+	 */
+	public void setNavigationId(Long navigationId){
+		this.navigationId = navigationId;
 	}
 
 }

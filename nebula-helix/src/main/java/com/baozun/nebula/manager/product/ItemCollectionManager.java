@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 Baozun All Rights Reserved.
+ * Copyright (c) 2013 Baozun All Rights Reserved.
  *
  * This software is the confidential and proprietary information of Baozun.
  * You shall not disclose such Confidential Information and shall use it only in
@@ -14,31 +14,19 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.dao.product;
+package com.baozun.nebula.manager.product;
 
+import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.ItemCollection;
 
-import loxia.annotation.NativeQuery;
-import loxia.annotation.QueryParam;
-import loxia.dao.GenericEntityDao;
-
-/**
- * IndustryDao
- * 
- * @author chen.kf
- */
-public interface ItemCollectionDao extends GenericEntityDao<ItemCollection, Long>{
-	
-	@NativeQuery(model=ItemCollection.class)
-	public ItemCollection findItemCollectionById(@QueryParam("id")Long id);
+public interface ItemCollectionManager extends BaseManager{
 
 	/**
 	 * 根据导航id查询商品指定排序
-	 * 
-	 * @return List<ItemCollection>
+	 * @return ItemCollection
+	 * @param navigationId
 	 * @author 冯明雷
-	 * @time 2016年4月27日下午2:22:09
+	 * @time 2016年4月27日下午3:33:30
 	 */
-	@NativeQuery(model = ItemCollection.class)
-	ItemCollection findItemCollectionByNavigationId(@QueryParam("navigationId") Long navigationId);
+	ItemCollection findItemCollectionByNavigationId(Long navigationId);
 }
