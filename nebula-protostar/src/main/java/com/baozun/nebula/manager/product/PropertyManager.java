@@ -252,4 +252,10 @@ public interface PropertyManager extends BaseManager{
 	 * @time 2016年4月14日下午4:28:14
 	 */
 	void createOrUpdatePropertyValueByUpload(List<PropertyValueUploadCommand> propertyValueUploadCommandList,Long propertyId);
+	
+	/***
+	 * 查询全部有效并且有属性值的属性信息
+	 */
+	List<DynamicPropertyCommand> findAllDynamicPropertyCommand();	
+	
 }
