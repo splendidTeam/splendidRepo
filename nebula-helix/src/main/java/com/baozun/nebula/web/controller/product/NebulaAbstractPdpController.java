@@ -119,6 +119,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	@Autowired
 	private ItemRecommandManager itemRecommandManager;
 	
+	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
@@ -126,6 +127,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
 	
 	@Autowired
+	@Qualifier("relationItemViewCommandConverter")
 	RelationItemViewCommandConverter relationItemViewCommandConverter;
 	
     /** The browsing history resolver. */

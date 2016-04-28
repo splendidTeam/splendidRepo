@@ -31,6 +31,7 @@ import loxia.dao.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,9 +84,11 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	private MemberManager memberManager;
 	
 	@Autowired
+	@Qualifier("itemReviewViewCommandConverter")
 	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
 	
 	@Autowired
+	@Qualifier("reviewMemberViewCommandConverter")
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
 	
