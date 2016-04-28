@@ -171,7 +171,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 
 		//商品推荐信息
-		pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		if(isSyncLoadRecommend()) {
+			pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		}
 		
 		//移动端分享url
 		pdpViewCommand.setMobileShareUrl(buildMobileShareUrl(itemCode));
