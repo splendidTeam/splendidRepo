@@ -8,7 +8,7 @@ import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.command.SearchResultPage;
-import com.baozun.nebula.solr.command.ItemForSolrCommand;
+import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 
 public interface SearchManager extends BaseManager{
 	/**
@@ -19,7 +19,7 @@ public interface SearchManager extends BaseManager{
 	 * 			solr查询对象
 	 * @return
 	 */
-	SearchResultPage<ItemForSolrCommand> search(SolrQuery solrQuery);
+	SearchResultPage<ItemForSolrI18nCommand> search(SolrQuery solrQuery);
 	
 	/**
 	 * 设置solr查询权重，一般用作默认排序
