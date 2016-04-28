@@ -52,7 +52,7 @@ public class SkuViewCommandConverter extends
 				SkuViewCommand viewCommand =new SkuViewCommand();
 				// 完成转换
 				PropertyUtil.copyProperties(command, viewCommand,
-						new PropListCopyable("extentionCode", "properties", "salePrice","listPrice"));
+						new PropListCopyable("extentionCode", "properties", "salePrice","listPrice","availableQty"));
 				viewCommand.setSkuId(command.getId());
 				viewCommand.setLifecycle(Integer.valueOf(command.getState()));
 				
