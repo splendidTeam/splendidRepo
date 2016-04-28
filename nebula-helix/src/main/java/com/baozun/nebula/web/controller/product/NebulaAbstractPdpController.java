@@ -140,6 +140,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
     /** The browsing history resolver. */
     @Autowired
+    @Qualifier("browsingHistoryResolver")
     private BrowsingHistoryResolver browsingHistoryResolver;
     
     /**
