@@ -31,12 +31,12 @@ import loxia.dao.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
@@ -53,9 +53,9 @@ import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandC
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
 
 
@@ -84,9 +84,11 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	private MemberManager memberManager;
 	
 	@Autowired
+	@Qualifier("itemReviewViewCommandConverter")
 	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
 	
 	@Autowired
+	@Qualifier("reviewMemberViewCommandConverter")
 	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
 	
@@ -107,7 +109,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommand(itemCode);
 			
-			constructBrowsingHistoryViewCommand(request, response, pdpViewCommand.getBaseInfo().getId());
+			constructBrowsingHistory(request, response, pdpViewCommand.getBaseInfo().getId());
 			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
@@ -327,26 +329,26 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand) {
-		return itemDetailManager.getItemBuyLimited(itemBuyLimitedCommand, DEFAULT_SKU_BUY_LIMIT);
+	protected Integer getBuyLimit(Long itemId) {
+		return DEFAULT_SKU_BUY_LIMIT;
 	}
 
 
 	@Override
-	protected Long getItemSales(String itemCode) {
-		return itemDetailManager.findItemSalesCount(itemCode).longValue();
+	protected Long getItemSales(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemSalesCount(itemBaseInfo.getCode()).longValue();
 	}
 
 
 	@Override
-	protected Long getItemFavoriteCount(String itemCode) {
-		return itemDetailManager.findItemFavCount(itemCode).longValue();
+	protected Long getItemFavoriteCount(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemFavCount(itemBaseInfo.getCode()).longValue();
 	}
 
 
 	@Override
-	protected Float getItemRate(String itemCode) {
-		return itemDetailManager.findItemAvgReview(itemCode);
+	protected Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
 	}
 
 
@@ -356,31 +358,30 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected Long getItemReviewCount(String itemCode) {
-		return itemRateManager.findRateCountByItemCode(itemCode).longValue();
+	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
+		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
 	}
 
 	@Override
-	protected List<RelationItemViewCommand> customBuildItemRecommendViewCommand(
-			Long itemId) {
-		return new ArrayList<RelationItemViewCommand>();
-	}
-
-	@Override
-	protected String getItemImageType() {
+	protected String getItemMainImageType() {
 		return ItemImage.IMG_TYPE_LIST;
 	}
-
+	
 	@Override
-	protected String getItemRecommendMode() {
-		return RECOMMEND_MODE_GENERAL;
+	protected boolean isSyncLoadItemExtra() {
+		return false;
 	}
 	
+	@Override
+	protected boolean isSyncLoadRecommend() {
+		return false;
+	}
+
 	/**
 	 * PDP支持的模式, 默认模式二，商品定义到色，PDP根据款号聚合
 	 */
 	@Override
-	protected String getPdpMode(Long itemId) {
+	protected String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo) {
 		return PDP_MODE_COLOR_COMBINE;
 	}
 

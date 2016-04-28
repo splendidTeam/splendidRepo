@@ -1,12 +1,13 @@
 package com.baozun.nebula.search.manager;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.DisMaxParams;
 import org.apache.solr.common.params.GroupParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,20 +19,21 @@ import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.search.Boost;
+import com.baozun.nebula.search.Facet;
+import com.baozun.nebula.search.FacetGroup;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.Param.SkuItemParam;
-import com.baozun.nebula.solr.command.ItemForSolrCommand;
+import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 import com.baozun.nebula.solr.command.SolrGroup;
 import com.baozun.nebula.solr.command.SolrGroupCommand;
 import com.baozun.nebula.solr.command.SolrGroupData;
 import com.baozun.nebula.solr.manager.SolrManager;
 import com.baozun.nebula.solr.manager.SolrManagerImpl;
-import com.baozun.nebula.solr.utils.PaginationForSolr;
 import com.feilong.core.Validator;
 
-@Service("searchManager")
 @Transactional
-public class SearchManagerImpl<T, PK extends Serializable> implements SearchManager{
+@Service("searchManager")
+public class SearchManagerImpl implements SearchManager{
 
 	private static final Logger			LOG					= LoggerFactory.getLogger(SolrManagerImpl.class);
 
@@ -48,7 +50,7 @@ public class SearchManagerImpl<T, PK extends Serializable> implements SearchMana
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public SearchResultPage<ItemForSolrCommand> search(SolrQuery solrQuery){
+	public SearchResultPage<ItemForSolrI18nCommand> search(SolrQuery solrQuery){
 		LOG.debug(solrQuery.toString());
 
 		// 多少行
@@ -56,11 +58,13 @@ public class SearchManagerImpl<T, PK extends Serializable> implements SearchMana
 		// 第几页
 		Integer currentPage = solrQuery.getStart();
 
-		SearchResultPage<ItemForSolrCommand> searchResultPage = null;
-		SolrGroupData<T> solrGroup = new SolrGroupData<T>();
+		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = null;
+		SolrGroupData<ItemForSolrI18nCommand> solrGroup = new SolrGroupData<ItemForSolrI18nCommand>();
 
 		// 是否分组显示
 		String isGroup = solrQuery.get(GroupParams.GROUP);
+
+		// 如果需要分组显示
 		if (Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)) {
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithGroup(solrQuery);
 			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, currentPage, rows);
@@ -69,21 +73,48 @@ public class SearchManagerImpl<T, PK extends Serializable> implements SearchMana
 			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, currentPage, rows);
 		}
 		return searchResultPage;
+
 	}
 
 	@Override
 	public void setSolrBoost(SolrQuery solrQuery,Boost boost){
-		// TODO Auto-generated method stub
+		if (Validator.isNotNullOrEmpty(boost.getDeftype())) {
+			solrQuery.set("defType", boost.getDeftype());
+		}
+		if (Validator.isNotNullOrEmpty(boost.getBq())) {
+			solrQuery.set(DisMaxParams.BQ, boost.getBq());
+		}
+		if (Validator.isNotNullOrEmpty(boost.getQf())) {
+			solrQuery.set(DisMaxParams.QF, boost.getQf());
+		}
+		if (Validator.isNotNullOrEmpty(boost.getPf())) {
+			solrQuery.set(DisMaxParams.PF, boost.getPf());
+		}
+		if (Validator.isNotNullOrEmpty(boost.getBf())) {
+			solrQuery.set(DisMaxParams.BF, boost.getBf());
+		}
 
 	}
 
 	@Override
 	public List<SearchConditionCommand> findConditionByCategoryIdsWithCache(List<Long> categoryIds){
-		List<SearchConditionCommand> searchConditionCommands = cacheManager.getObject(conditionCacheKey);
+		List<SearchConditionCommand> searchConditionCommands = null;
+
+		try{
+			searchConditionCommands = cacheManager.getObject(conditionCacheKey);
+		}catch (Exception e){
+			LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager getObect() error. time:{}", new Date());
+		}
 
 		if (Validator.isNullOrEmpty(searchConditionCommands)) {
 			searchConditionCommands = sdkSearchConditionManager.findConditionByCategoryIdList(categoryIds);
-			cacheManager.setObject(conditionCacheKey, searchConditionCommands);
+
+			try{
+				cacheManager.setObject(conditionCacheKey, searchConditionCommands);
+			}catch (Exception e){
+				LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager setObject() error. time:{}", new Date());
+			}
+
 		}
 		return searchConditionCommands;
 	}
@@ -98,43 +129,30 @@ public class SearchManagerImpl<T, PK extends Serializable> implements SearchMana
 	 * @author 冯明雷
 	 * @time 2016年4月26日下午3:58:16
 	 */
-	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithGroup(
-			SolrGroupData<T> solrGroupData,
+	private SearchResultPage<ItemForSolrI18nCommand> solrGroupConverterSearchResultPageWithGroup(
+			SolrGroupData<ItemForSolrI18nCommand> solrGroupData,
 			Integer currentPage,
 			Integer size){
-		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<>();
 
-		Map<String, String> categoryMap = new HashMap<String, String>();
-		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
-
-		Map<String, SolrGroupCommand<T>> it = solrGroupData.getSolrGroupCommandMap();
+		List<ItemForSolrI18nCommand> list = new ArrayList<ItemForSolrI18nCommand>();
+		Map<String, SolrGroupCommand<ItemForSolrI18nCommand>> it = solrGroupData.getSolrGroupCommandMap();
 		for (String key : it.keySet()){
-			SolrGroupCommand<T> solrGroupCommand = it.get(key);
-			List<SolrGroup<T>> solrGroupList = solrGroupCommand.getItemForSolrCommandList();
-			for (SolrGroup<T> solrGroup : solrGroupList){
-				List<ItemForSolrCommand> itemForSolrCommandList = (List<ItemForSolrCommand>) solrGroup.getBeans();
-				list.addAll(itemForSolrCommandList);
-				for (ItemForSolrCommand itemForSolrCommand : itemForSolrCommandList){
-					if (null != itemForSolrCommand.getCategoryName() && itemForSolrCommand.getCategoryName().size() > 0) {
-						Map<String, String> itemCategoryMap = itemForSolrCommand.getCategoryName();
-						for (String categoryKey : itemCategoryMap.keySet()){
-							String categoryId = categoryKey.replace(SkuItemParam.categoryname, "");
-							categoryMap.put(categoryId, categoryId);
-						}
-					}
-				}
+			SolrGroupCommand<ItemForSolrI18nCommand> solrGroupCommand = it.get(key);
+			List<SolrGroup<ItemForSolrI18nCommand>> solrGroupList = solrGroupCommand.getItemForSolrCommandList();
+			for (SolrGroup<ItemForSolrI18nCommand> solrGroup : solrGroupList){
+				list.addAll(solrGroup.getBeans());
 			}
 		}
 
 		Integer start = (currentPage - 1) * size;
-		PaginationForSolr<ItemForSolrCommand> pagination = getPagination(start, size, solrGroupData.getNumFound(), list);
 
-		sdfsdfs(solrGroupData, size, searchResultPage, start, pagination);
-		// dataFromSolr.setFacetMap(facetMap);
-		// dataFromSolr.setFacetQueryMap(facetQueryMap);
-		// dataFromSolr.setCategoryMap(categoryMap);
-
-		return searchResultPage;
+		return convertSearchPageFacet(
+				start,
+				size,
+				solrGroupData.getNumFound(),
+				list,
+				solrGroupData.getFacetQueryMap(),
+				solrGroupData.getFacetMap());
 	}
 
 	/**
@@ -147,63 +165,97 @@ public class SearchManagerImpl<T, PK extends Serializable> implements SearchMana
 	 * @author 冯明雷
 	 * @time 2016年4月26日下午3:58:16
 	 */
-	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithOutGroup(
-			SolrGroupData<T> solrGroupData,
+	private SearchResultPage<ItemForSolrI18nCommand> solrGroupConverterSearchResultPageWithOutGroup(
+			SolrGroupData<ItemForSolrI18nCommand> solrGroupData,
 			Integer currentPage,
 			Integer size){
-		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<>();
+		List<ItemForSolrI18nCommand> list = new ArrayList<ItemForSolrI18nCommand>();
 
-		Map<String, String> categoryMap = new HashMap<String, String>();
-		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
-		List<ItemForSolrCommand> it = (List<ItemForSolrCommand>) solrGroupData.getSolrCommandMap();
-
+		List<ItemForSolrI18nCommand> it = solrGroupData.getSolrCommandMap();
 		if (null != it && it.size() > 0) {
-			for (ItemForSolrCommand itemForSolrCommand : it){
-				list.add(itemForSolrCommand);
-				if (null != itemForSolrCommand.getCategoryName() && itemForSolrCommand.getCategoryName().size() > 0) {
-					Map<String, String> itemCategoryMap = itemForSolrCommand.getCategoryName();
-					for (String categoryKey : itemCategoryMap.keySet()){
-						String categoryId = categoryKey.replace(SkuItemParam.categoryname, "");
-						categoryMap.put(categoryId, categoryId);
-					}
-				}
-			}
+			list.addAll(it);
 		}
 
 		Integer start = (currentPage - 1) * size;
 		Long count = Long.parseLong(list.size() + "");
-		PaginationForSolr<ItemForSolrCommand> pagination = getPagination(start, size, count, list);
 
-		sdfsdfs(solrGroupData, size, searchResultPage, start, pagination);
+		return convertSearchPageFacet(start, size, count, list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
+	}
+
+	/**
+	 * 转换facetMap
+	 * 
+	 * @return searchResultPage
+	 * @param solrGroupData
+	 * @param size
+	 * @param searchResultPage
+	 * @param start
+	 * @param pagination
+	 * @author 冯明雷
+	 * @time 2016年4月28日上午11:02:29
+	 */
+	private SearchResultPage<ItemForSolrI18nCommand> convertSearchPageFacet(
+			Integer start,
+			Integer rows,
+			Long numFound,
+			List<ItemForSolrI18nCommand> items,
+			Map<String, Integer> facetQueryMap,
+			Map<String, Map<String, Long>> facetMap){
+
+		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = new SearchResultPage<ItemForSolrI18nCommand>();
+		searchResultPage.setItems(items);
+		searchResultPage.setCurrentPage(rows == 0 ? 1 : (start / rows + 1));
+		searchResultPage.setCount(numFound);
+		searchResultPage.setSize(rows);
+		searchResultPage.setStart(start);
+		searchResultPage.setTotalPages(rows == 0 ? 0 : numFound.intValue() / rows + (numFound.intValue() % rows == 0 ? 0 : 1));
+
+		List<FacetGroup> facetGroups = new ArrayList<FacetGroup>();
+
+		for (Entry<String, Map<String, Long>> entry : facetMap.entrySet()){
+			String key = entry.getKey();
+			Map<String, Long> valueMap = entry.getValue();
+
+			FacetGroup facetGroup = new FacetGroup();
+			// 如果key等于category_tree代表是分类的facet
+			if (SkuItemParam.category_tree.equals(key)) {
+				facetGroup = convertFacetGroup(valueMap);
+				facetGroup.setCategory(true);
+			}else{
+				// 否则是属性的facet
+				facetGroup = convertFacetGroup(valueMap);
+				facetGroup.setCategory(false);
+				facetGroup.setId(Long.valueOf(entry.getKey()));
+			}
+
+			facetGroups.add(facetGroup);
+		}
+
+		searchResultPage.setFacetGroups(facetGroups);
 
 		return searchResultPage;
 	}
 
-	private void sdfsdfs(
-			SolrGroupData<T> solrGroupData,
-			Integer size,
-			SearchResultPage<ItemForSolrCommand> searchResultPage,
-			Integer start,
-			PaginationForSolr<ItemForSolrCommand> pagination){
-		searchResultPage.setItems(pagination.getCurrentPageItem());
-		searchResultPage.setCount(pagination.getCount());
-		searchResultPage.setSize(size);
-		searchResultPage.setStart(start);
-		searchResultPage.setTotalPages(pagination.getTotalPages());
+	/**
+	 * 转换FacetGroup
+	 * 
+	 * @return List<FacetGroup>
+	 * @param valueMap
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午2:04:18
+	 */
+	private FacetGroup convertFacetGroup(Map<String, Long> valueMap){
+		FacetGroup facetGroup = new FacetGroup();
 
-		Map<String, Map<String, Long>> facetMap = solrGroupData.getFacetMap();
-		Map<String, Integer> facetQueryMap = solrGroupData.getFacetQueryMap();
-	}
-
-	private PaginationForSolr<ItemForSolrCommand> getPagination(int start,int rows,Long count,List<ItemForSolrCommand> items){
-		PaginationForSolr<ItemForSolrCommand> page = new PaginationForSolr<ItemForSolrCommand>();
-		page.setCount(count);
-		page.setCurrentPage(rows == 0 ? 1 : (start / rows + 1));
-		page.setStart(start);
-		page.setSize(rows);
-		page.setTotalPages(rows == 0 ? 0 : (int) page.getCount() / rows + (page.getCount() % rows == 0 ? 0 : 1));
-		page.setItems(items);
-		return page;
+		List<Facet> facets = new ArrayList<Facet>();
+		for (Entry<String, Long> entry : valueMap.entrySet()){
+			Facet facet = new Facet();
+			facet.setValue(entry.getKey());
+			facet.setCount(entry.getValue());
+			facets.add(facet);
+		}
+		facetGroup.setFacets(facets);
+		return facetGroup;
 	}
 
 }

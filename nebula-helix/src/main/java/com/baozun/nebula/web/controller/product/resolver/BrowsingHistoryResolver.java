@@ -25,39 +25,13 @@ import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewC
 
 /**
  * The Interface BrowsingHistory.
- * 
- * <h3>为什么要单独建个 {@link BrowsingHistoryResolver}接口, 逻辑不能直接 在 {@link BrowsingHistoryInterceptor}中处理吗?</h3>
- * 
- * <blockquote>
- * <p>
- * 原因在于, 我需要在controller 里面拿到历史记录, 如果所有的逻辑都在 {@link BrowsingHistoryInterceptor}中, 那么我没有办法直接在controller中拿到历史记录
- * </p>
- * <p>
- * 现在, 你只需要这么做
- * </p>
- * 
- * <pre>
- * &#64;Controller
- * public class StdRecommendationEngineController {
- * 
- *    &#64;Autowired
- *    private BrowsingHistoryResolver browsingHistoryResolver;
- * 
- * &#64;RequestMapping("******")
- *    public ModelAndView doHandler(HttpServletRequest request,HttpServletResponse response){
- *        LinkedList<Serializable> browsingHistory = browsingHistoryResolver.getBrowsingHistory(request);
- *       ......
- * </pre>
- * 
- * 就可以很方便的得到历史浏览记录了
- * 
- * </blockquote>
- *
- * @author feilong
- * @version 1.2.2 2015年7月20日 下午6:44:27
- * @see com.feilong.spring.web.servlet.interceptor.browsingHistory.BrowsingHistoryInterceptor
- * @since 1.2.2
+ * 去掉拦截器  直接通过controller调用
+ * @author xingyu.liu 
+ * @version 1.2.3 
+ * @since  1.2.2  by feilong
  */
+
+
 public interface BrowsingHistoryResolver{
 
     /**

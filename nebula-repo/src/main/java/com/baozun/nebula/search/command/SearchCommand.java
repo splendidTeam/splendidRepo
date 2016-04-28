@@ -24,12 +24,19 @@ public class SearchCommand{
 	private String					categoryConditionStr;
 
 	/**
+	 * 导航Id
+	 */
+	private Long					navigationId;
+
+	/**
 	 * 导航
 	 */
 	private String					navigationConditionStr;
 
 	/**
-	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用
+	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用<br/>
+	 * 参数格式：c分类id,P属性id,P属性id,c分类id......
+	 * 
 	 */
 	private String					filterParamOrder;
 
@@ -143,6 +150,24 @@ public class SearchCommand{
 	 */
 	public void setNavigationConditionStr(String navigationConditionStr){
 		this.navigationConditionStr = navigationConditionStr;
+	}
+
+	/**
+	 * get navigationId
+	 * 
+	 * @return navigationId
+	 */
+	public Long getNavigationId(){
+		return navigationId;
+	}
+
+	/**
+	 * set navigationId
+	 * 
+	 * @param navigationId
+	 */
+	public void setNavigationId(Long navigationId){
+		this.navigationId = navigationId;
 	}
 
 }

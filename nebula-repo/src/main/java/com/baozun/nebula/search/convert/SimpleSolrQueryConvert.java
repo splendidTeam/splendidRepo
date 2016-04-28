@@ -19,6 +19,8 @@ public class SimpleSolrQueryConvert implements SolrQueryConvert{
 	public SolrQuery convert(SearchCommand searchCommand) {
 		SolrQuery solrQuery = new SolrQuery();
 		
+		solrQuery=NebulaSolrQueryFactory.createSolrQuery(searchCommand,solrQuery);
+		
 		//设置排序
 		SortTypeEnum sortTypeEnum=SortTypeEnum.getInstance(searchCommand.getSortStr());
 		SolrOrderSort[] order=sortTypeEnum.getSolrOrderSort();

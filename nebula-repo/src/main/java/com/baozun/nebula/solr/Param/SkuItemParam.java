@@ -43,7 +43,7 @@ public class SkuItemParam {
 	
 	public static final String lifecycle = "lifecycle";
 	
-	public static final String categorys = "categorys";
+	public static final String category_tree = "category_tree";
 	
 	public static final String categoryname = "category_name_";
 	
@@ -52,6 +52,8 @@ public class SkuItemParam {
 	public static final String categorycode = "category_code_";
 	
 	public static final String categoryParent = "category_Parent_";
+	
+	public static final String allCategoryCodes="all_category_codes";
 	
 	public static final String salesCount = "salesCount";
 	

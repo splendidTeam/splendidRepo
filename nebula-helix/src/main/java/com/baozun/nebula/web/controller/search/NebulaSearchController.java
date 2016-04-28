@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.model.product.ItemCollection;
+import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.FacetGroup;
@@ -21,7 +24,9 @@ import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
+import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 import com.baozun.nebula.web.controller.search.form.SearchForm;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 
 /**
@@ -44,17 +49,20 @@ import com.feilong.core.bean.PropertyUtil;
 public class NebulaSearchController extends NebulaAbstractSearchController{
 
 	/** log定义 */
-	private static final Logger	LOG	= LoggerFactory.getLogger(NebulaSearchController.class);
+	private static final Logger			LOG	= LoggerFactory.getLogger(NebulaSearchController.class);
 
 	@Autowired
 	@Qualifier("simpleGroupSolrQueryConvert")
-	private SolrQueryConvert	solrQueryConvert;
+	private SolrQueryConvert			solrQueryConvert;
 
 	@Autowired
-	private SearchManager		searchManager;
+	private SearchManager				searchManager;
 
 	@Autowired
-	private FacetFilterHelper	facetFilterHelper;
+	private FacetFilterHelper			facetFilterHelper;
+
+	@Autowired
+	private SdkItemCollectionManager	sdkItemCollectionManager;
 
 	/**
 	 * 搜索列表页面
@@ -69,11 +77,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * @time 2016年4月21日上午11:25:30
 	 */
 	public String searchPage(@ModelAttribute SearchForm searchForm,HttpServletRequest request,HttpServletResponse response,Model model){
-
 		// 将页面传来的参数searchForm转换为 searchCommand
 		SearchCommand searchCommand = new SearchCommand();
 		PropertyUtil.copyProperties(searchCommand, searchForm);
-		
 
 		// 将 searchCommand 中 filterConditionStr,categoryConditionStr 转成FacetParameter
 		searchParamProcess(searchCommand);
@@ -82,20 +88,62 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
 		// set facet相关信息
-		setFacet(solrQuery, searchCommand);
+		setFacet(solrQuery);
 
 		// 设置权重信息
-		Boost boost = createBoost();
+		Boost boost = createBoost(searchCommand);
 		searchManager.setSolrBoost(solrQuery, boost);
 
 		// 查询
-		SearchResultPage<ItemForSolrCommand> solrDataPage = searchManager.search(solrQuery);
+		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchManager.search(solrQuery);
 
 		// 页面左侧筛选项
-		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(solrDataPage);
+		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 
+		return "item.list";
+	}
+
+	/**
+	 * 导航着陆页的。navigationfilter 直接跳转到这个连接
+	 * 
+	 * @param navId
+	 * @param request
+	 * @param response
+	 * @param model
+	 * 			@requestMapping("/sys/navigation")
+	 * @return
+	 */
+	public String navigationPage(
+			@RequestParam(value = "navId") Long navId,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model){
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
+		if (Validator.isNotNullOrEmpty(collection)) {
+			SearchCommand searchCommand = collectionToSearchCommand(collection);
+
+			// ***************** 下面这些查询和searchPage是一致的
+			// 创建solrquery对象
+			SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
+
+			// set facet相关信息
+			setFacet(solrQuery);
+
+			// 设置权重信息
+			Boost boost = createBoost(searchCommand);
+			searchManager.setSolrBoost(solrQuery, boost);
+
+			// 查询
+			SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchManager.search(solrQuery);
+
+			// 页面左侧筛选项
+			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
+
+			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
+
+		}
 		return "item.list";
 	}
 }

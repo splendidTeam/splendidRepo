@@ -94,6 +94,13 @@ public class SdkNavigationManagerImpl implements SdkNavigationManager {
 	public List<Navigation> findAvailableNavigationList(Sort[] sorts) {
 		return navigationDao.findAvailableNavigationList(sorts);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Navigation findEffectNavigationByUrl(String url) {
+		// TODO Auto-generated method stub
+		return navigationDao.findEffectNavigationByUrl(url);
+	}
 }
 
 

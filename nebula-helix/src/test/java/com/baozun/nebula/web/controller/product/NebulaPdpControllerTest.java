@@ -29,6 +29,7 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 
 /**
@@ -78,7 +79,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		EasyMock.expect(itemDetailManager.getItemBuyLimited(EasyMock.isA(ItemBuyLimitedBaseCommand.class),EasyMock.eq(6))).andReturn(Integer.valueOf(3)).times(1);
 		EasyMock.replay(itemDetailManager);
 		
-		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand));
+		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand.getItemId()));
 		EasyMock.verify(itemDetailManager);
 	}
 	
@@ -98,7 +99,9 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		EasyMock.expect(itemDetailManager.findItemAvgReview(itemCode)).andReturn(3.6F).times(1);
 		
 		control.replay();
-		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemCode);
+		ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
+		itemBaseInfo.setCode(itemCode);
+		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemBaseInfo);
 		assertEquals(itemExtraViewCommand, actualCommand);
 		control.verify();
 	}
@@ -120,7 +123,9 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		EasyMock.expect(itemDetailManager.findItemAvgReview(itemCode)).andReturn(3.6F).times(1);
 		
 		control.replay();
-		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemCode);
+		ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
+		itemBaseInfo.setCode(itemCode);
+		ItemExtraViewCommand actualCommand = nebulaPdpController.buildItemExtraViewCommand(itemBaseInfo);
 		assertEquals(itemExtraViewCommand, actualCommand);
 		control.verify();
 	}
