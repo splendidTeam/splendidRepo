@@ -8,8 +8,27 @@ import loxia.dao.Pagination;
 
 public class SearchResultPage<T> extends Pagination<T>{
 
-	List<FacetGroup> facets;
-	
-//	Map<String,List<FacetGroup>> 
-	
+	private static final long	serialVersionUID	= 1L;
+
+	/** Facet Group */
+	private List<FacetGroup>	facetGroups;
+
+	/**
+	 * get facetGroups
+	 * 
+	 * @return facetGroups
+	 */
+	public List<FacetGroup> getFacetGroups(){
+		return facetGroups;
+	}
+
+	/**
+	 * set facetGroups
+	 * 
+	 * @param facetGroups
+	 */
+	public void setFacetGroups(List<FacetGroup> facetGroups){
+		this.facetGroups = facetGroups;
+	}
+
 }

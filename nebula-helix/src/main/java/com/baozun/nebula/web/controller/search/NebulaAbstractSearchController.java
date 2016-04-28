@@ -95,13 +95,11 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	 * @time 2016年4月25日下午6:18:02
 	 */
 	protected void setFacet(SolrQuery solrQuery){
-
 		// facetFileds，set防止重复数据
 		Set<String> facetFields = new HashSet<String>();
 
 		// ***************************************************设置分类的facet
 		facetFields.add(SkuItemParam.category_tree);
-		
 
 		// **************************************************设置属性的facet
 		List<SearchConditionCommand> cmdList = searchManager.findConditionByCategoryIdsWithCache(new ArrayList<Long>());

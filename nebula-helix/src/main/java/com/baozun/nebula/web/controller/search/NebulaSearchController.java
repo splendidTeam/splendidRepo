@@ -49,18 +49,24 @@ import com.feilong.core.bean.PropertyUtil;
 public class NebulaSearchController extends NebulaAbstractSearchController{
 
 	/** log定义 */
-	private static final Logger	LOG	= LoggerFactory.getLogger(NebulaSearchController.class);
+	private static final Logger			LOG	= LoggerFactory.getLogger(NebulaSearchController.class);
 
 	@Autowired
 	@Qualifier("simpleGroupSolrQueryConvert")
-	private SolrQueryConvert	solrQueryConvert;
+	private SolrQueryConvert			solrQueryConvert;
 
 	@Autowired
-	private SearchManager		searchManager;
+	private SearchManager				searchManager;
 
+<<<<<<< HEAD
 //	@Autowired(required=false)
 //	private FacetFilterHelper	facetFilterHelper;
 	
+=======
+	@Autowired
+	private FacetFilterHelper			facetFilterHelper;
+
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 	@Autowired
 	private SdkItemCollectionManager	sdkItemCollectionManager;
 
@@ -104,22 +110,33 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 		return "item.list";
 	}
-	
+
 	/**
 	 * 导航着陆页的。navigationfilter 直接跳转到这个连接
+	 * 
 	 * @param navId
 	 * @param request
 	 * @param response
 	 * @param model
-	 * @requestMapping("/sys/navigation")
+	 * 			@requestMapping("/sys/navigation")
 	 * @return
 	 */
+<<<<<<< HEAD
 	public String navigationPage(@RequestParam(value="cid") Long cid,HttpServletRequest request,HttpServletResponse response,Model model){
 		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if(Validator.isNotNullOrEmpty(collection)){
+=======
+	public String navigationPage(
+			@RequestParam(value = "navId") Long navId,
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model){
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
+		if (Validator.isNotNullOrEmpty(collection)) {
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
-			
-			//***************** 下面这些查询和searchPage是一致的
+
+			// ***************** 下面这些查询和searchPage是一致的
 			// 创建solrquery对象
 			SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
@@ -135,9 +152,13 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 			// 页面左侧筛选项
 			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
+<<<<<<< HEAD
 			
+=======
+
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
-			
+
 		}
 		return "item.list";
 	}

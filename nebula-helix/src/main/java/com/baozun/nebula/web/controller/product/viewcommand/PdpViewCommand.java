@@ -60,6 +60,9 @@ public class PdpViewCommand extends BaseViewCommand {
     
     /** 商品推荐 */
     private List<RelationItemViewCommand> recommend;
+    
+    /** 每个商品限制的购买数量 */
+    private Integer buyLimit;
 
 	public List<BreadcrumbsViewCommand> getBreadcrumbs() {
 		return breadcrumbs;
@@ -155,6 +158,14 @@ public class PdpViewCommand extends BaseViewCommand {
 
 	public void setRecommend(List<RelationItemViewCommand> recommend) {
 		this.recommend = recommend;
+	}
+
+	public Integer getBuyLimit() {
+		return buyLimit;
+	}
+
+	public void setBuyLimit(Integer buyLimit) {
+		this.buyLimit = buyLimit;
 	}
 
 }

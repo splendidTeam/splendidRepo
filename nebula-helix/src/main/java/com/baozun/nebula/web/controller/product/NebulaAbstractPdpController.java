@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
+import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.TimeInterval;
@@ -41,6 +41,7 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
@@ -115,11 +116,18 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品详情页 的默认定义 */
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
-	public static final String 		ITEM_EXTRA_CACHE_KEY				= "item_extra_cache_key";
+	//缓存key的定义
+	/** pdpViewCommand的缓存key */
+	public static final String 		CACHE_KEY_PDP_VIEW_COMMAND			= "nebula_cache_pdp_view_command";
+	
+	/** 商品的extra数据的缓存key */
+	public static final String 		CACHE_KEY_ITEM_EXTRA				= "nebula_cache_item_extra";
+	
 	
 	@Autowired
 	private ItemRecommandManager itemRecommandManager;
 	
+	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
@@ -127,11 +135,49 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
 	
 	@Autowired
+	@Qualifier("relationItemViewCommandConverter")
 	RelationItemViewCommandConverter relationItemViewCommandConverter;
 	
     /** The browsing history resolver. */
     @Autowired
-    private BrowsingHistoryResolver     browsingHistoryResolver;
+    private BrowsingHistoryResolver browsingHistoryResolver;
+    
+    /**
+     * 构造PdpViewCommand
+     * <p>
+     * 先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+     * </p>
+     * @param itemCode
+     * @return
+     * @throws IllegalItemStateException
+     */
+    protected PdpViewCommand buildPdpViewCommandWithCache(String itemCode) throws IllegalItemStateException {
+    	PdpViewCommand pdpViewCommand = null;
+    	
+    	String pdpViewCommandCachekey = getPdpViewCommandCacheKey(itemCode);
+		
+		try {
+			pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
+		} catch(Exception e) {
+			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
+					itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
+		}
+		
+		if(pdpViewCommand == null) {
+			pdpViewCommand = buildPdpViewCommand(itemCode);
+			
+			// put to cache
+			try {
+				cacheManager.setObject(pdpViewCommandCachekey, pdpViewCommand, getPdpViewCommandExpireSeconds());
+				pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
+			} catch(Exception e) {
+				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
+						itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
+			}
+		}
+		
+		return pdpViewCommand;
+    }
 	
 	/**
 	 * 构造PdpViewCommand
@@ -160,6 +206,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		//price
 		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
 		
+		//每个商品限制购买的数量
+		pdpViewCommand.setBuyLimit(getBuyLimit(itemBaseInfo.getId()));
+		
         //extra
 		if(isSyncLoadItemExtra()) {
 			pdpViewCommand.setExtra(buildItemExtraViewCommand(itemBaseInfo));
@@ -171,7 +220,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 
 		//商品推荐信息
-		pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		if(isSyncLoadRecommend()) {
+			pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
+		}
 		
 		//移动端分享url
 		pdpViewCommand.setMobileShareUrl(buildMobileShareUrl(itemCode));
@@ -277,26 +328,23 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @return
 	 */
 	protected ItemExtraViewCommand buildItemExtraViewCommand(ItemBaseInfoViewCommand itemBaseInfo){
-		String key = ITEM_EXTRA_CACHE_KEY + "-" + itemBaseInfo.getCode();
-		
+		String key = CACHE_KEY_ITEM_EXTRA + "-" + itemBaseInfo.getCode();
 		
 		ItemExtraViewCommand itemExtraViewCommand = null;
-		try{
+		try {
 			itemExtraViewCommand = cacheManager.getObject(key);
-		}catch(Exception e){
+		} catch(Exception e) {
 			LOG.error("[PDP_BUILD_ITETM_EXTRA_VIEW_COMMAND] item extra view command cache exception.itemCode:{},exception:{} [{}] \"{}\"",itemBaseInfo.getCode(),e.getMessage(),new Date(),this.getClass().getSimpleName());
 		}
 		
-		if(itemExtraViewCommand == null){
+		if(itemExtraViewCommand == null) {
 			itemExtraViewCommand = new ItemExtraViewCommand();
 			itemExtraViewCommand.setSales(getItemSales(itemBaseInfo));
 			itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemBaseInfo));
 			itemExtraViewCommand.setReviewCount(getItemReviewCount(itemBaseInfo));
 			itemExtraViewCommand.setRate(getItemRate(itemBaseInfo));
-			cacheManager.setObject(key , itemExtraViewCommand, TimeInterval.SECONDS_PER_HOUR);
+			cacheManager.setObject(key, itemExtraViewCommand, TimeInterval.SECONDS_PER_HOUR);
 		}
-		
-		
 		
 		return itemExtraViewCommand;
 	}
@@ -310,7 +358,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		List<ItemCommand> itemCommands = itemRecommandManager.getRecommandItemByItemId(itemId, getItemMainImageType());
 		List<RelationItemViewCommand> itemRecommendList = relationItemViewCommandConverter.convert(itemCommands);
     	//扩展信息
-    	if(Validator.isNotNullOrEmpty(itemRecommendList)){
+    	if(Validator.isNotNullOrEmpty(itemRecommendList)) {
     		for(RelationItemViewCommand relationItemViewCommand:itemRecommendList){
     			ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
     			itemBaseInfo.setCode(relationItemViewCommand.getItemCode());
@@ -320,8 +368,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
     	}
 		return itemRecommendList;
 	}
-	
-	protected abstract List<RelationItemViewCommand> customBuildItemRecommendViewCommand(Long itemId);
 	
 	/**
 	 * 构造最近浏览的商品信息
@@ -348,7 +394,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
          browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
 	}
 	
-	private void setImageData(List<Long> itemIdList,List<ItemCommand> itemCommands ) {
+	private void setImageData(List<Long> itemIdList, List<ItemCommand> itemCommands ) {
 
 		// picUrlMap key： itemId value：picUrl
 		Map<Long, String> picUrlMap = new HashMap<Long, String>();
@@ -440,7 +486,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected abstract Integer getBuyLimit(ItemBuyLimitedBaseCommand itemBuyLimitedCommand);
+	protected abstract Integer getBuyLimit(Long itemId);
 	
 	/**
 	 * 是否在进入pdp时即同步加载商品扩展信息
@@ -455,7 +501,27 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract boolean isSyncLoadRecommend();
 	
 	/**
+	 * 获取pdpViewCommand缓存的有效期
+	 * @return
+	 */
+	protected abstract Integer getPdpViewCommandExpireSeconds();
+	
+	/**
 	 * 获取Pdp的显示模式
 	 */
 	protected abstract String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo);
+	
+	/**
+	 * 获取pdpViewCommand缓存的key
+	 * @param itemCode
+	 * @return
+	 */
+	private String getPdpViewCommandCacheKey(String itemCode) {
+		boolean i18n = LangProperty.getI18nOnOff();
+		if(i18n) {
+			String lang = LangUtil.getCurrentLang();
+			return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode).concat("-").concat(lang);
+		}
+		return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode);
+	}
 }

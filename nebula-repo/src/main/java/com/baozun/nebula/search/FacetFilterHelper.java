@@ -19,7 +19,7 @@ package com.baozun.nebula.search;
 import java.util.List;
 
 import com.baozun.nebula.search.command.SearchResultPage;
-import com.baozun.nebula.solr.command.ItemForSolrCommand;
+import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 
 /**
  * 实例设置为single， metaData数据需要定期更新
@@ -27,11 +27,15 @@ import com.baozun.nebula.solr.command.ItemForSolrCommand;
  *
  */
 public interface FacetFilterHelper{
+	
 	/**
-	 * 加载元数据，此处需要考虑缓存
-	 * @return
+	 * 加载元数据，从数据库中获取所有有效的分类、属性、属性值、导航的id和国际化的名称(有24H的缓存)
+	 * @return FacetFilterMetaData
+	 * @param storeId
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午2:35:45
 	 */
-	public abstract FacetFilterMetaData loadFacetFilterMetaData(Long storeId);
+	FacetFilterMetaData loadFacetFilterMetaData(Long storeId);
 	
 	/**
 	 * 将facet查询结果封装成页面显示的数据，这个结果是有顺序的，
@@ -39,5 +43,5 @@ public interface FacetFilterHelper{
 	 * @param page
 	 * @return
 	 */
-	public abstract  List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrCommand> pagination);
+	List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrI18nCommand> pagination);
 }

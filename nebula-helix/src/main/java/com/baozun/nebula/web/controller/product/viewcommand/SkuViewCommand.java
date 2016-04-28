@@ -28,9 +28,6 @@ public class SkuViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = -161322431659093080L;
 
-	/** 所属商品Id */
-	private Long itemId;
-	
 	/** SkuId */
     private Long skuId;
     
@@ -48,14 +45,9 @@ public class SkuViewCommand extends BaseViewCommand {
 
 	/** Sku的吊牌价(原单价) */
 	private BigDecimal listPrice;
-
-	public Long getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(Long itemId) {
-		this.itemId = itemId;
-	}
+	
+	/** 库存（这里的库存并不是一个准确的值，因为该对象会被缓存）. */
+	private Integer availableQty;
 
 	public Long getSkuId() {
 		return skuId;
@@ -103,6 +95,14 @@ public class SkuViewCommand extends BaseViewCommand {
 
 	public void setListPrice(BigDecimal listPrice) {
 		this.listPrice = listPrice;
+	}
+
+	public Integer getAvailableQty() {
+		return availableQty;
+	}
+
+	public void setAvailableQty(Integer availableQty) {
+		this.availableQty = availableQty;
 	}
 	
 }

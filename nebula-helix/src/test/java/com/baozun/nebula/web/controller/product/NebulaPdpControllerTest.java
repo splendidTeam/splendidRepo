@@ -79,7 +79,7 @@ public class NebulaPdpControllerTest extends BaseControllerTest{
 		EasyMock.expect(itemDetailManager.getItemBuyLimited(EasyMock.isA(ItemBuyLimitedBaseCommand.class),EasyMock.eq(6))).andReturn(Integer.valueOf(3)).times(1);
 		EasyMock.replay(itemDetailManager);
 		
-		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand));
+		assertEquals(Integer.valueOf(3), nebulaPdpController.getBuyLimit(itemBuyLimitedCommand.getItemId()));
 		EasyMock.verify(itemDetailManager);
 	}
 	
