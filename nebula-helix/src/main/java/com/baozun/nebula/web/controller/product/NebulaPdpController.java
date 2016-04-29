@@ -56,6 +56,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 
 
@@ -171,7 +172,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
         DefaultReturnResult result = new DefaultReturnResult();
 		try {
 			Map<String, Object> returnObject = new HashMap<String, Object>();
-	        returnObject.put(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
+	        returnObject.put(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommandWithCache(itemId));
 	        result.setReturnObject(returnObject);
 			
 		} catch (Exception e) {
@@ -378,9 +379,15 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected Integer getPdpViewCommandExpireSeconds() {
+	protected Integer getPdpViewCommandCacheExpireSeconds() {
 		// 5分钟
-		return 5 * 60;
+		return 5 * TimeInterval.SECONDS_PER_MINUTE;
+	}
+	
+	@Override
+	protected Integer getItemRecommendCacheExpireSeconds() {
+		// 1天
+		return TimeInterval.SECONDS_PER_DAY;
 	}
 	
 	/**
