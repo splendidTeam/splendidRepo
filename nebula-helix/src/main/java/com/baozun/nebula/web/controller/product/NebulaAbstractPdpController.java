@@ -516,4 +516,14 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 		return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode);
 	}
+	
+	
+	protected String buildCacheKeyWithLang(String cacheKey) {
+		boolean i18n = LangProperty.getI18nOnOff();
+		if(i18n) {
+			String lang = LangUtil.getCurrentLang();
+			return cacheKey.concat("-").concat(lang);
+		}
+		return cacheKey;
+	}
 }
