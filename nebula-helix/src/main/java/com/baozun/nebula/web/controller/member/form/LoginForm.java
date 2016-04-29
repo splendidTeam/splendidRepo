@@ -1,5 +1,6 @@
 package com.baozun.nebula.web.controller.member.form;
 
+import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseForm;
 

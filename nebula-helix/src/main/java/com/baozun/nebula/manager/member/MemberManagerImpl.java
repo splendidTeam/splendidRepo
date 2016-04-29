@@ -191,8 +191,10 @@ public class MemberManagerImpl implements MemberManager{
 			count = count + 1;
 		}
 		condCommand.setLoginCount(count);
+		if(codunctCommand!=null){
 		condCommand.setLoginTime(codunctCommand.getLoginTime());
 		condCommand.setLoginIp(codunctCommand.getLoginIp());
+		}
 		sdkMemberManager.saveMemberConduct(condCommand);
 	}
 
@@ -397,7 +399,9 @@ public class MemberManagerImpl implements MemberManager{
 
 		MemberPersonalData personData = new MemberPersonalData();
 		personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
-
+                if(null ==personData){
+                    personData=new MemberPersonalData();
+                }
 		personData.setId(memberId);
 
 		if (memberCommand.getType() != Member.MEMBER_TYPE_THIRD_PARTY_MEMBER){
