@@ -76,7 +76,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG										= LoggerFactory.getLogger(NebulaAbstractPdpController.class);
+	private static final Logger		LOG									= LoggerFactory.getLogger(NebulaAbstractPdpController.class);
 	
 	//PDP的展示模式
 	/** PDP的展示模式  模式一, 商品到款，PDP到款显示. [value: pdp_mode_style] */
@@ -152,30 +152,22 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
      * @return
      * @throws IllegalItemStateException 
      */
-    protected PdpViewCommand buildPdpViewCommandWithCache(String itemCode) throws IllegalItemStateException {
-    	PdpViewCommand pdpViewCommand = null;
+    protected PdpViewCommand buildPdpViewCommandWithCache(final String itemCode) throws IllegalItemStateException {
     	
+    	//缓存的key
     	String pdpViewCommandCachekey = getPdpViewCommandCacheKey(itemCode);
     	
-		try {
-			pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
-		} catch(Exception e) {
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
-					itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
-		}
-		
-		if(pdpViewCommand == null) {
-			pdpViewCommand = buildPdpViewCommand(itemCode);
-			
-			// put to cache
-			try {
-				cacheManager.setObject(pdpViewCommandCachekey, pdpViewCommand, getPdpViewCommandExpireSeconds());
-			} catch(Exception e) {
-				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp build pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
-						itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
+    	//缓存的有效期
+    	Integer pdpViewCommandExpireSeconds = getPdpViewCommandExpireSeconds();
+    	
+    	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+    	PdpViewCommand pdpViewCommand = new NebulaAbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(pdpViewCommandCachekey, pdpViewCommandExpireSeconds) {
+			@Override
+			protected PdpViewCommand buildCachedObject() throws IllegalItemStateException {
+				return buildPdpViewCommand(itemCode);
 			}
-		}
-		
+    	}.getCachedObject();
+    	
 		return pdpViewCommand;
     }
 	
