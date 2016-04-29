@@ -26,6 +26,7 @@ import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.sdk.manager.SdkCategoryManager;
+import com.baozun.nebula.search.command.MetaDataCommand;
 
 /**
  * 商品分类sdkManager实现类
@@ -52,6 +53,11 @@ public class SdkCategoryManagerImpl implements SdkCategoryManager{
 	@Override
 	public ItemCategory saveItemCategory(ItemCategory itemCategory) {
 		return itemCategoryDao.save(itemCategory);
+	}
+
+	@Override
+	public List<MetaDataCommand> findCategoryMetaDataByLang(String lang){
+		return categoryDao.findCategoryMetaDataByLang(lang);
 	}
 
 }

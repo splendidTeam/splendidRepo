@@ -1296,4 +1296,26 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean id="Property.findPropertyMetaDataByLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select
+						property.id as id,
+					  	propertyLang.name as name,
+						property.sort_No as sortNo
+					from
+						t_pd_property property,t_pd_property_lang propertyLang
+					WHERE
+						property.lifecycle = 1
+						and property.id=propertyLang.property_id
+						and propertyLang.lang=:lang
+						order by property.sort_No
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

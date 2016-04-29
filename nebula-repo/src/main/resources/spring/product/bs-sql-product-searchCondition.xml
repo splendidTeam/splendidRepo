@@ -76,4 +76,26 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	
+	<bean id="SearchCondition.findSearchConditionMetDataByLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                select
+					con.property_id as id,
+					conLang.name as name,
+					con.sort as sortNo
+				from
+					t_pd_search_con con,t_pd_search_con_lang conLang
+				WHERE
+					con.id=conLang.search_condition_id
+					and con.lifecycle=1
+					and conLang.lang=:lang
+					order by con.sort
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>
