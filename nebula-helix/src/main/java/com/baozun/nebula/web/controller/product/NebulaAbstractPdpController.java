@@ -50,6 +50,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewComma
 import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.DefaultBrowsingHistoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
@@ -196,6 +197,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		
 		//商品属性
 		pdpViewCommand.setProperties(buildItemPropertyViewCommand(itemBaseInfo, pdpViewCommand.getImages()));
+		
+		//商品分类
+		pdpViewCommand.setCategories(buildItemCategoryViewCommand(itemBaseInfo.getId()));
 		
 		//sku
 		pdpViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
@@ -432,6 +436,16 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		 BrowsingHistoryViewCommand browsingHistoryCommand = new DefaultBrowsingHistoryViewCommand();
          browsingHistoryCommand.setId(itemId);
          browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
+	}
+	
+	/**
+	 * 构造商品的分类信息
+	 * <p>一般情况下后端分类在Pdp展示时不太常用，所以这里暂不实现。需要时请重写该方法。</p>
+	 * @param itemId
+	 * @return
+	 */
+	protected List<ItemCategoryViewCommand> buildItemCategoryViewCommand(Long itemId){
+		return null;
 	}
 	
 	private void setImageData(List<Long> itemIdList, List<ItemCommand> itemCommands ) {

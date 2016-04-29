@@ -44,8 +44,6 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -238,28 +236,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		}
 		
 		return result;
-	}
-	
-	
-	/**
-	 * 加入收藏(这个功能应该在用户收藏的Controller中定义)
-	 * 
-	 * 如果收藏到商品，传入itemId；如果收藏到sku，传入skuId。
-	 * 如果itemId和skuId都传入，则以skuId为准
-	 * 
-	 * @RequestMapping(value = "/favorite/add", method = RequestMethod.POST)
-	 * @ResponseBody
-	 * 
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	public NebulaReturnResult addFavorite(@LoginMember MemberDetails memberDetails, 
-			@PathVariable("itemId") Long itemId, @PathVariable("skuId") Long skuId,
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-		//TODO
-		return new DefaultReturnResult();
 	}
 	
 	/**
