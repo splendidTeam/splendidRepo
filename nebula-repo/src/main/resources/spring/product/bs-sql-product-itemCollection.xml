@@ -20,4 +20,21 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean id="ItemCollection.findItemCollectionById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有指定商品的排序</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						*
+					from
+						t_pd_item_collection
+					where
+						id=:id					
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

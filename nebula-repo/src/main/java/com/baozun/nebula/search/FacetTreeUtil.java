@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class FacetTreeUtil {
 
-	private static final String TREE_LEVEL_SEPARATOR = "/";
+	private static final String TREE_LEVEL_SEPARATOR = "-";
 
 	/**
 	 * 创建facet树，为navigation和category服务
@@ -67,7 +67,8 @@ public class FacetTreeUtil {
 				facetTmp.setId(Long.parseLong(cTmp[cTmp.length - 1]));
 				facetTmp.setCount(facet.getCount());
 			}
-
+			
+			facetTmp.setValue(facet.getValue());
 			allNodeData.add(facetTmp);
 		}
 	}
