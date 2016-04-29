@@ -237,7 +237,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			//状态流转
 			Object returnObject = result.getReturnObject();
 			if(null !=returnObject){
-			    return returnObject.toString();
+			    return  "redirect"+returnObject.toString();
 			}
 		}else{
 			//登录失败的处理 
