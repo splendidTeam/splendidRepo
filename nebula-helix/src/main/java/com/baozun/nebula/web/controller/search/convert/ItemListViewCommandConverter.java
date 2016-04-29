@@ -41,15 +41,7 @@ public class ItemListViewCommandConverter extends BaseConverter<ItemListViewComm
 			ItemListViewCommand itemListViewCommand = new ItemListViewCommand();
 			try{
 				SearchResultPage<ItemForSolrI18nCommand> searchResultPage = (SearchResultPage<ItemForSolrI18nCommand>) data;
-
-				itemListViewCommand.setCount(searchResultPage.getCount());
-				itemListViewCommand.setCurrentPage(searchResultPage.getCurrentPage());
-				itemListViewCommand.setFacetGroups(searchResultPage.getFacetGroups());
 				itemListViewCommand.setItemForSolrI18nCommands(searchResultPage.getItems());
-				itemListViewCommand.setSize(searchResultPage.getSize());
-				itemListViewCommand.setStart(searchResultPage.getStart());
-				itemListViewCommand.setTotalPages(searchResultPage.getTotalPages());
-
 				return itemListViewCommand;
 			}catch (Exception e){
 				e.printStackTrace();

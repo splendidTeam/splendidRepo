@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
+import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
+import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.Facet;
@@ -36,18 +38,23 @@ import com.feilong.core.Validator;
 @Service("searchManager")
 public class SearchManagerImpl implements SearchManager{
 
-	private static final Logger			LOG					= LoggerFactory.getLogger(SolrManagerImpl.class);
+	private static final Logger				LOG						= LoggerFactory.getLogger(SolrManagerImpl.class);
 
-	private final static String			conditionCacheKey	= "findConditionByCategoryIdListKey";
+	private final static String				conditionCacheKey		= "findConditionByCategoryIdListKey";
 
-	@Autowired
-	private SdkSearchConditionManager	sdkSearchConditionManager;
-
-	@Autowired
-	private CacheManager				cacheManager;
+	private final static String				conditionItemCacheKey	= "findCoditionItemByCoditionIdtKey";
 
 	@Autowired
-	private SolrManager					solrManager;
+	private SdkSearchConditionManager		sdkSearchConditionManager;
+
+	@Autowired
+	private SdkSearchConditionItemManager	sdkSearchConditionItemManager;
+
+	@Autowired
+	private CacheManager					cacheManager;
+
+	@Autowired
+	private SolrManager						solrManager;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -118,6 +125,29 @@ public class SearchManagerImpl implements SearchManager{
 
 		}
 		return searchConditionCommands;
+	}
+
+	@Override
+	public List<SearchConditionItemCommand> findCoditionItemByCoditionIdWithCache(Long coditionId){
+		List<SearchConditionItemCommand> searchConditionItemCommands = null;
+
+		try{
+			searchConditionItemCommands = cacheManager.getObject(conditionItemCacheKey);
+		}catch (Exception e){
+			LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager getObect() error. time:{}", new Date());
+		}
+
+		if (Validator.isNullOrEmpty(searchConditionItemCommands)) {
+			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySId(coditionId);
+
+			try{
+				cacheManager.setObject(conditionItemCacheKey, searchConditionItemCommands, TimeInterval.SECONDS_PER_DAY);
+			}catch (Exception e){
+				LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager setObject() error. time:{}", new Date());
+			}
+
+		}
+		return searchConditionItemCommands;
 	}
 
 	/**
@@ -226,7 +256,7 @@ public class SearchManagerImpl implements SearchManager{
 				// 否则是属性的facet
 				facetGroup = convertFacetGroup(valueMap);
 				facetGroup.setCategory(false);
-				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition,"")));
+				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
 			}
 
 			facetGroups.add(facetGroup);

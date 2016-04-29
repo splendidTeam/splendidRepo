@@ -30,16 +30,14 @@ import com.baozun.nebula.web.controller.search.viewcommand.ItemListViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 
+import loxia.dao.Pagination;
+
 /**
  * 搜索相关方法controller
  * <ol>
  * <li>{@link #searchPage(searchForm,request,response,model)}</li>
+ * <li>{@link #navigationPage(navId,request,response,model)}</li>
  * </ol>
- * <h3>searchPage方法,主要有以下几点:</h3> <blockquote>
- * <ol>
- * <li></li>
- * <li></li>
- * <li></li>
  * </ol>
  * </blockquote>
  * 
@@ -109,7 +107,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 		ItemListViewCommandConverter listViewCommandConverter = new ItemListViewCommandConverter();
-		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convert(listViewCommandConverter);
+		Pagination<ItemListViewCommand> itemListViewCommand = listViewCommandConverter.convert(searchResultPage);
 		
 		model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
 		

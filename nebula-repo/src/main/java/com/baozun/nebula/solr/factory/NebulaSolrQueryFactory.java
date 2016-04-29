@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.search.FacetParameter;
+import com.baozun.nebula.search.FacetType;
 import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.utils.SolrOrderSort;
@@ -25,7 +26,7 @@ public class NebulaSolrQueryFactory{
 	private static final String	PROPERTY_VARIABLE	= "p";
 
 	/** 分类 */
-	private static final String	CATEGORY_VARIABLE	= "C";
+	private static final String	CATEGORY_VARIABLE	= "c";
 
 	/**
 	 * 创建查询SolrQuery 将SearchCommand组合成SOLR查询语句
@@ -68,15 +69,23 @@ public class NebulaSolrQueryFactory{
 			for (int i = 0; i < facetParameters.size(); i++){
 				FacetParameter facetParameter = facetParameters.get(i);
 				List<String> values = facetParameter.getValues();
-				
-				for (String value : values){
-					variable = variable + value;
-					if (variable.equals(lastFilerStr)) {
-						addFqAccurateForStringListWithTag(solrQuery, facetParameter.getValues(), facetParameter.getName());
-						break;
-					}else{
-						addFqAccurateForStringList(solrQuery, facetParameter.getValues(), facetParameter.getName());
-						break;
+
+				// 如果是价格范围的条件
+				if (FacetType.RANGE.equals(facetParameter.getFacetType())) {
+					addFqForPriceArea(solrQuery, facetParameter.getValues(), facetParameter.getName());
+				}else{
+					// 分类、属性、导航的条件
+					for (String value : values){
+						String[] strs = value.split("-");
+						variable = variable + strs[strs.length - 1];
+
+						if (variable.equals(lastFilerStr)) {
+							addFqAccurateForStringListWithTag(solrQuery, facetParameter.getValues(), facetParameter.getName());
+							break;
+						}else{
+							addFqAccurateForStringList(solrQuery, facetParameter.getValues(), facetParameter.getName());
+							break;
+						}
 					}
 				}
 			}
@@ -254,4 +263,40 @@ public class NebulaSolrQueryFactory{
 		String fq_keyword = SkuItemParam.activeBeginTime + ":[* TO NOW]";
 		solrQuery.addFilterQuery(fq_keyword);
 	}
+
+	/**
+	 * 设置价格搜索条件
+	 * 
+	 * @return void
+	 * @param solrQuery
+	 * @param areaWord
+	 * @param type
+	 * @author 冯明雷
+	 * @time 2016年4月29日下午4:29:55
+	 */
+	public static void addFqForPriceArea(SolrQuery solrQuery,List<String> priceAreaWords,String type){
+		String fq_keyword ="{!tag=priceTag}"+ type;
+		try{
+			String str = priceAreaWords.get(0);
+
+			String[] priceAreaWord = str.split("-");
+
+			Integer max_price = null;
+			Integer min_price = null;
+			min_price = Integer.parseInt(priceAreaWord[0]);
+			max_price = Integer.parseInt(priceAreaWord[1]);
+			if (min_price < 1) {
+				min_price = 1;
+			}
+			fq_keyword += ":[" + min_price + " TO " + max_price + "]";
+		}catch (Exception e){
+			LOG.error(e.getMessage());
+			fq_keyword += ":[0 TO *]";
+		}
+
+		if (Validator.isNotNullOrEmpty(fq_keyword))
+			solrQuery.addFilterQuery(fq_keyword);
+
+	}
+
 }
