@@ -40,7 +40,7 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 	/**
 	 * 销售属性
 	 */
-	private List<PropertyElementViewCommand> salesProperties;
+	private List<ShopdogPropertyViewCommand> salesProperties;
 	
 	/**
 	 * sku
@@ -83,14 +83,6 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 		this.itemName = itemName;
 	}
 
-	public List<PropertyElementViewCommand> getSalesProperties() {
-		return salesProperties;
-	}
-
-	public void setSalesProperties(List<PropertyElementViewCommand> salesProperties) {
-		this.salesProperties = salesProperties;
-	}
-
 	public List<SkuViewCommand> getSkus() {
 		return skus;
 	}
@@ -129,6 +121,14 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 
 	public void setPicUrls(List<String> picUrls) {
 		this.picUrls = picUrls;
+	}
+
+	public List<ShopdogPropertyViewCommand> getSalesProperties() {
+		return salesProperties;
+	}
+
+	public void setSalesProperties(List<ShopdogPropertyViewCommand> salesProperties) {
+		this.salesProperties = salesProperties;
 	}
 	
 	
