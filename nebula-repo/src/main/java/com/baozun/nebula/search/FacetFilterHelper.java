@@ -35,7 +35,7 @@ public interface FacetFilterHelper{
 	 * @author 冯明雷
 	 * @time 2016年4月28日下午2:35:45
 	 */
-	FacetFilterMetaData loadFacetFilterMetaData(Long storeId);
+	FacetFilterMetaData loadFacetFilterMetaData();
 	
 	/**
 	 * 将facet查询结果封装成页面显示的数据，这个结果是有顺序的，

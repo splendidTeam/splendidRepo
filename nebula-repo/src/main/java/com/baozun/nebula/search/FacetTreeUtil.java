@@ -67,7 +67,8 @@ public class FacetTreeUtil {
 				facetTmp.setId(Long.parseLong(cTmp[cTmp.length - 1]));
 				facetTmp.setCount(facet.getCount());
 			}
-
+			
+			facetTmp.setValue(facet.getValue());
 			allNodeData.add(facetTmp);
 		}
 	}

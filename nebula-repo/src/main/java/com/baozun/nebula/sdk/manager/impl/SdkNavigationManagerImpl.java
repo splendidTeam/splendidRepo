@@ -3,8 +3,6 @@ package com.baozun.nebula.sdk.manager.impl;
 import java.util.Date;
 import java.util.List;
 
-import loxia.dao.Sort;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.baseinfo.NavigationDao;
 import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
+import com.baozun.nebula.search.command.MetaDataCommand;
+
+import loxia.dao.Sort;
 
 /**
  * 
@@ -100,6 +101,11 @@ public class SdkNavigationManagerImpl implements SdkNavigationManager {
 	public Navigation findEffectNavigationByUrl(String url) {
 		// TODO Auto-generated method stub
 		return navigationDao.findEffectNavigationByUrl(url);
+	}
+
+	@Override
+	public List<MetaDataCommand> findNavigationMetaDataBylang(String lang){
+		return navigationDao.findNavigationMetaDataBylang(lang);
 	}
 }
 

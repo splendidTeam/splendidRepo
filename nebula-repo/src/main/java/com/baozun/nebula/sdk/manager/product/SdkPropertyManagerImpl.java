@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +29,12 @@ import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.model.product.PropertyValueGroupRelation;
 import com.baozun.nebula.model.product.PropertyValueLang;
+import com.baozun.nebula.search.command.MetaDataCommand;
 import com.feilong.core.Validator;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * @author Viktor Huang
@@ -362,6 +363,16 @@ public class SdkPropertyManagerImpl implements SdkPropertyManager{
 	@Override
 	public PropertyValue findCountByPVIdAndLangValue(Long propertyId,String langValue){
 		return propertyValueLangDao.findCountByPVIdAndLangValue(propertyId, langValue);
+	}
+
+	@Override
+	public List<MetaDataCommand> findPropertyMetaDataByLang(String lang){
+		return propertyDao.findPropertyMetaDataByLang(lang);
+	}
+
+	@Override
+	public List<MetaDataCommand> findPropertyValueMetaDataByLang(String lang){
+		return propertyValueDao.findPropertyValueMetaDataByLang(lang);
 	}
 
 }

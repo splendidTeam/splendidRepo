@@ -42,294 +42,293 @@ import com.baozun.nebula.model.BaseModel;
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Consignee extends BaseModel{
 
+    private static final long serialVersionUID = -8782230075078229172L;
 
-	private static final long serialVersionUID = -8782230075078229172L;
+    /** PK. */
+    private Long              id;
 
+    /** 订单id */
+    private Long              orderId;
 
-	/** PK. */
-	private Long				id;
+    /** 姓名 */
+    private String            name;
 
-	/** 订单id */
-	private Long				orderId;
-	
-	/** 姓名 */
-	private String				name;
-	
-	/**
-	 * 国家id 
-	 */
-	private Long 				countryId;
-	
-	/** 省 id*/
-	private Long				provinceId;
-	
-	/** 市id */
-	private Long			    cityId;
-	
-	/** 区 id*/
-	private Long			    areaId;
-	
-	/** 镇id*/
-	private Long				townId;
-	
-	/** 国 */
-	private String				country;
-	
-	/** 省 */
-	private String				province;
-	
-	/** 市 */
-	private String			    city;
-	
-	/** 区 */
-	private String			    area;
-	
-	/** 镇 */
-	private String 				town;
-	
-	/** 地址 */
-	private String				address;
-	
-	/** 手机 */
-	private String				mobile;
-	
-	/** 固话 */
-	private String				tel;
-	
-	/** email */
-	private String				email;
-	
-	/** 邮编 */
-	private String				postcode;
-	
-	/** 指定时间段 */
-	private String				appointTimeQuantum;
-	
-	/** 指定日期 */
-	private String				appointTime;
-	
-	/** 指定类型 */
-	private String				appointType;
-	
-	/** 修改时间 */
-	private Date				modifyTime;
-	
-	/** version*/
-	private Date				version;
-	
-	
-	@Id
-	@Column(name = "ID")
-	@SequenceGenerator(name = "SEQ_T_SAL_CONSIGNEE",sequenceName = "S_T_SAL_CONSIGNEE",allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SAL_CONSIGNEE")
-	public Long getId(){
-		return id;
-	}
+    //************************************************************************
+    /**
+     * 国家id
+     */
+    private Long              countryId;
 
-	public void setId(Long id){
-		this.id = id;
-	}
+    /** 省 id */
+    private Long              provinceId;
 
-	@Column(name = "ORDER_ID")
-	public Long getOrderId() {
-		return orderId;
-	}
+    /** 市id */
+    private Long              cityId;
 
-	public void setOrderId(Long orderId) {
-		this.orderId = orderId;
-	}
+    /** 区 id */
+    private Long              areaId;
 
-	@Column(name = "NAME", length = 100)
-	public String getName() {
-		return name;
-	}
+    /** 镇id */
+    private Long              townId;
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	@Column(name = "COUNTRY_ID")
-	public Long getCountryId() {
-		return countryId;
-	}
+    //************************************************************************
 
-	public void setCountryId(Long countryId) {
-		this.countryId = countryId;
-	}
+    /** 国 */
+    private String            country;
 
-	@Column(name = "PROVINCE_ID")
-	public Long getProvinceId() {
-		return provinceId;
-	}
+    /** 省 */
+    private String            province;
 
-	public void setProvinceId(Long provinceId) {
-		this.provinceId = provinceId;
-	}
+    /** 市 */
+    private String            city;
 
-	@Column(name = "CITY_ID")
-	public Long getCityId() {
-		return cityId;
-	}
+    /** 区 */
+    private String            area;
 
-	public void setCityId(Long cityId) {
-		this.cityId = cityId;
-	}
+    /** 镇 */
+    private String            town;
 
-	@Column(name = "AREA_ID")
-	public Long getAreaId() {
-		return areaId;
-	}
+    //************************************************************************
 
-	public void setAreaId(Long areaId) {
-		this.areaId = areaId;
-	}
+    /** 地址 */
+    private String            address;
 
-	@Column(name = "TOWN_ID")
-	public Long getTownId() {
-		return townId;
-	}
+    /** 邮编 */
+    private String            postcode;
 
-	public void setTownId(Long townId) {
-		this.townId = townId;
-	}
+    /** 手机 */
+    private String            mobile;
 
+    /** 固话 */
+    private String            tel;
 
-	@Column(name = "COUNTRY", length = 50)
-	public String getCountry() {
-		return country;
-	}
+    /** email */
+    private String            email;
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
-	
-	@Column(name = "PROVINCE", length = 50)
-	public String getProvince() {
-		return province;
-	}
+    /** 指定时间段 */
+    private String            appointTimeQuantum;
 
-	public void setProvince(String province) {
-		this.province = province;
-	}
+    /** 指定日期 */
+    private String            appointTime;
 
-	@Column(name = "CITY", length = 50)
-	public String getCity() {
-		return city;
-	}
+    /** 指定类型 */
+    private String            appointType;
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+    /** 修改时间 */
+    private Date              modifyTime;
 
-	@Column(name = "AREA", length = 50)
-	public String getArea() {
-		return area;
-	}
+    /** version */
+    private Date              version;
 
-	public void setArea(String area) {
-		this.area = area;
-	}
+    @Id
+    @Column(name = "ID")
+    @SequenceGenerator(name = "SEQ_T_SAL_CONSIGNEE",sequenceName = "S_T_SAL_CONSIGNEE",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SAL_CONSIGNEE")
+    public Long getId(){
+        return id;
+    }
 
-	@Column(name = "TOWN", length = 500)
-	public String getTown() {
-		return town;
-	}
+    public void setId(Long id){
+        this.id = id;
+    }
 
-	public void setTown(String town) {
-		this.town = town;
-	}
+    @Column(name = "ORDER_ID")
+    public Long getOrderId(){
+        return orderId;
+    }
 
-	@Column(name = "ADDRESS", length = 200)
-	public String getAddress() {
-		return address;
-	}
+    public void setOrderId(Long orderId){
+        this.orderId = orderId;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    @Column(name = "NAME",length = 100)
+    public String getName(){
+        return name;
+    }
 
-	@Column(name = "MOBILE", length = 20)
-	public String getMobile() {
-		return mobile;
-	}
+    public void setName(String name){
+        this.name = name;
+    }
 
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
+    @Column(name = "COUNTRY_ID")
+    public Long getCountryId(){
+        return countryId;
+    }
 
-	@Column(name = "TEL", length = 50)
-	public String getTel() {
-		return tel;
-	}
+    public void setCountryId(Long countryId){
+        this.countryId = countryId;
+    }
 
-	public void setTel(String tel) {
-		this.tel = tel;
-	}
+    @Column(name = "PROVINCE_ID")
+    public Long getProvinceId(){
+        return provinceId;
+    }
 
-	@Column(name = "EMAIL", length = 200)
-	public String getEmail() {
-		return email;
-	}
+    public void setProvinceId(Long provinceId){
+        this.provinceId = provinceId;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Column(name = "CITY_ID")
+    public Long getCityId(){
+        return cityId;
+    }
 
-	@Column(name = "POSTCODE", length = 50)
-	public String getPostcode() {
-		return postcode;
-	}
+    public void setCityId(Long cityId){
+        this.cityId = cityId;
+    }
 
-	public void setPostcode(String postcode) {
-		this.postcode = postcode;
-	}
+    @Column(name = "AREA_ID")
+    public Long getAreaId(){
+        return areaId;
+    }
 
-	@Column(name = "APPOINT_TIME_QUANTUM", length = 200)
-	public String getAppointTimeQuantum() {
-		return appointTimeQuantum;
-	}
+    public void setAreaId(Long areaId){
+        this.areaId = areaId;
+    }
 
-	public void setAppointTimeQuantum(String appointTimeQuantum) {
-		this.appointTimeQuantum = appointTimeQuantum;
-	}
+    @Column(name = "TOWN_ID")
+    public Long getTownId(){
+        return townId;
+    }
 
-	@Column(name = "APPOINT_TIME", length = 100)
-	public String getAppointTime() {
-		return appointTime;
-	}
+    public void setTownId(Long townId){
+        this.townId = townId;
+    }
 
-	public void setAppointTime(String appointTime) {
-		this.appointTime = appointTime;
-	}
-	
+    @Column(name = "COUNTRY",length = 50)
+    public String getCountry(){
+        return country;
+    }
 
-	@Column(name = "MODIFY_TIME")
-	public Date getModifyTime() {
-		return modifyTime;
-	}
+    public void setCountry(String country){
+        this.country = country;
+    }
 
-	public void setModifyTime(Date modifyTime) {
-		this.modifyTime = modifyTime;
-	}
+    @Column(name = "PROVINCE",length = 50)
+    public String getProvince(){
+        return province;
+    }
 
-	@Column(name = "APPOINT_TYPE", length = 100)
-	public String getAppointType() {
-		return appointType;
-	}
+    public void setProvince(String province){
+        this.province = province;
+    }
 
-	public void setAppointType(String appointType) {
-		this.appointType = appointType;
-	}
+    @Column(name = "CITY",length = 50)
+    public String getCity(){
+        return city;
+    }
 
-	
-	@Version
-	@Column(name = "VERSION")
-	public Date getVersion() {
-		return version;
-	}
+    public void setCity(String city){
+        this.city = city;
+    }
 
-	public void setVersion(Date version) {
-		this.version = version;
-	}
-	
+    @Column(name = "AREA",length = 50)
+    public String getArea(){
+        return area;
+    }
+
+    public void setArea(String area){
+        this.area = area;
+    }
+
+    @Column(name = "TOWN",length = 500)
+    public String getTown(){
+        return town;
+    }
+
+    public void setTown(String town){
+        this.town = town;
+    }
+
+    @Column(name = "ADDRESS",length = 200)
+    public String getAddress(){
+        return address;
+    }
+
+    public void setAddress(String address){
+        this.address = address;
+    }
+
+    @Column(name = "MOBILE",length = 20)
+    public String getMobile(){
+        return mobile;
+    }
+
+    public void setMobile(String mobile){
+        this.mobile = mobile;
+    }
+
+    @Column(name = "TEL",length = 50)
+    public String getTel(){
+        return tel;
+    }
+
+    public void setTel(String tel){
+        this.tel = tel;
+    }
+
+    @Column(name = "EMAIL",length = 200)
+    public String getEmail(){
+        return email;
+    }
+
+    public void setEmail(String email){
+        this.email = email;
+    }
+
+    @Column(name = "POSTCODE",length = 50)
+    public String getPostcode(){
+        return postcode;
+    }
+
+    public void setPostcode(String postcode){
+        this.postcode = postcode;
+    }
+
+    @Column(name = "APPOINT_TIME_QUANTUM",length = 200)
+    public String getAppointTimeQuantum(){
+        return appointTimeQuantum;
+    }
+
+    public void setAppointTimeQuantum(String appointTimeQuantum){
+        this.appointTimeQuantum = appointTimeQuantum;
+    }
+
+    @Column(name = "APPOINT_TIME",length = 100)
+    public String getAppointTime(){
+        return appointTime;
+    }
+
+    public void setAppointTime(String appointTime){
+        this.appointTime = appointTime;
+    }
+
+    @Column(name = "MODIFY_TIME")
+    public Date getModifyTime(){
+        return modifyTime;
+    }
+
+    public void setModifyTime(Date modifyTime){
+        this.modifyTime = modifyTime;
+    }
+
+    @Column(name = "APPOINT_TYPE",length = 100)
+    public String getAppointType(){
+        return appointType;
+    }
+
+    public void setAppointType(String appointType){
+        this.appointType = appointType;
+    }
+
+    @Version
+    @Column(name = "VERSION")
+    public Date getVersion(){
+        return version;
+    }
+
+    public void setVersion(Date version){
+        this.version = version;
+    }
+
 }

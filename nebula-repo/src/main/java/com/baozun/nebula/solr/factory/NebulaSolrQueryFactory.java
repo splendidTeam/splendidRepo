@@ -2,7 +2,6 @@ package com.baozun.nebula.solr.factory;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.common.params.FacetParams;
@@ -44,17 +43,22 @@ public class NebulaSolrQueryFactory{
 			addFqKeyword(searchCommand.getSearchWord(), solrQuery);
 		}
 
+		// 最后一个点击的过滤条件
+		String lastFilerStr = "";
+
 		// 点击顺序
 		String filterParamOrder = searchCommand.getFilterParamOrder();
-		// 最后一个点击的属性或分类
-		String substringAfterLast = StringUtils.substringAfterLast(filterParamOrder, ",");
-		String variable = "";
+		if (filterParamOrder != null) {
+			String[] strs = filterParamOrder.split(",");
+			lastFilerStr = strs[strs.length - 1];
+		}
 
-		if (Validator.isNotNullOrEmpty(substringAfterLast)) {
-			if (substringAfterLast.indexOf(CATEGORY_VARIABLE) > -1) {
+		String variable = "";
+		if (Validator.isNotNullOrEmpty(lastFilerStr)) {
+			if (lastFilerStr.indexOf(CATEGORY_VARIABLE) > -1) {
 				variable = CATEGORY_VARIABLE;
 			}
-			if (substringAfterLast.indexOf(PROPERTY_VARIABLE) > -1) {
+			if (lastFilerStr.indexOf(PROPERTY_VARIABLE) > -1) {
 				variable = PROPERTY_VARIABLE;
 			}
 		}
@@ -63,11 +67,11 @@ public class NebulaSolrQueryFactory{
 		if (Validator.isNotNullOrEmpty(facetParameters)) {
 			for (int i = 0; i < facetParameters.size(); i++){
 				FacetParameter facetParameter = facetParameters.get(i);
-
 				List<String> values = facetParameter.getValues();
+				
 				for (String value : values){
 					variable = variable + value;
-					if (variable.equals(substringAfterLast)) {
+					if (variable.equals(lastFilerStr)) {
 						addFqAccurateForStringListWithTag(solrQuery, facetParameter.getValues(), facetParameter.getName());
 						break;
 					}else{

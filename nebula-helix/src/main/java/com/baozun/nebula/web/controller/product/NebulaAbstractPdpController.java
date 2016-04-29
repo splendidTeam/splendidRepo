@@ -140,6 +140,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
     /** The browsing history resolver. */
     @Autowired
+    @Qualifier("browsingHistoryResolver")
     private BrowsingHistoryResolver browsingHistoryResolver;
     
     /**
@@ -149,13 +150,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
      * </p>
      * @param itemCode
      * @return
-     * @throws IllegalItemStateException
+     * @throws IllegalItemStateException 
      */
     protected PdpViewCommand buildPdpViewCommandWithCache(String itemCode) throws IllegalItemStateException {
     	PdpViewCommand pdpViewCommand = null;
     	
     	String pdpViewCommandCachekey = getPdpViewCommandCacheKey(itemCode);
-		
+    	
 		try {
 			pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
 		} catch(Exception e) {
@@ -169,9 +170,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 			// put to cache
 			try {
 				cacheManager.setObject(pdpViewCommandCachekey, pdpViewCommand, getPdpViewCommandExpireSeconds());
-				pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
 			} catch(Exception e) {
-				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
+				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp build pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
 						itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
 			}
 		}
