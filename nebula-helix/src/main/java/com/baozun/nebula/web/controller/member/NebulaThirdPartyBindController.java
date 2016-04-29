@@ -213,8 +213,8 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			LOG.debug("loginForm validation error. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());
 			getResultFromBindingResult(bindingResult);
 		}
-		loginForm.setLoginName(loginForm.getLoginName());
-		loginForm.setPassword(loginForm.getPassword());
+		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
+		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
 		//此后使用 loginForm.toMemberCommand 就可以获得业务层模型了
 		MemberCommand memberCommand = null;		
 		
@@ -328,8 +328,12 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		LOG.debug("{} login success", memberCommand.getLoginName());
 		String resultCode = thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(), type);
 		model.addAttribute("resultCode", resultCode);
-		onAuthenticationSuccess(memberDetails, request, response);
-
+		DefaultReturnResult result =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
+                //状态流转
+                Object returnObject = result.getReturnObject();
+                if(null !=returnObject){
+                    return returnObject.toString();
+                }
 		return VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS;
 	}
 	
