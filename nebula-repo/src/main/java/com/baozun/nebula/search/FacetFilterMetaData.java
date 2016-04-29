@@ -17,7 +17,7 @@
 package com.baozun.nebula.search;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,16 +30,19 @@ public class FacetFilterMetaData implements Serializable{
 	private static final long	serialVersionUID		= 1337274838133771487L;
 
 	/** 分类的元数据，key是分类的id，value是分类的名称 */
-	private Map<String, Object>	categoryMetaMap			= new HashMap<String, Object>();
+	private Map<String, Object>	categoryMetaMap			= new LinkedHashMap<String, Object>();
 
 	/** 属性的元数据，key是属性的id，value是属性的名称 */
-	private Map<String, Object>	propertyMetaMap			= new HashMap<String, Object>();
+	private Map<String, Object>	propertyMetaMap			= new LinkedHashMap<String, Object>();
 
 	/** 属性值的元数据，key是属性值的id，value是属性值的名称 */
-	private Map<String, Object>	propertyValueMetaMap	= new HashMap<String, Object>();
+	private Map<String, Object>	propertyValueMetaMap	= new LinkedHashMap<String, Object>();
 
 	/** 导航的元数据，key是导航的id，value是导航的名称 */
-	private Map<String, Object>	navigationMetaMap		= new HashMap<String, Object>();
+	private Map<String, Object>	navigationMetaMap		= new LinkedHashMap<String, Object>();
+
+	/** 搜索条件的元数据，key是搜索条件的id，value是搜索条件的名称 */
+	private Map<String, Object>	searchConditionMetaMap	= new LinkedHashMap<String, Object>();
 
 	/**
 	 * get categoryMetaMap
@@ -111,6 +114,24 @@ public class FacetFilterMetaData implements Serializable{
 	 */
 	public void setNavigationMetaMap(Map<String, Object> navigationMetaMap){
 		this.navigationMetaMap = navigationMetaMap;
+	}
+
+	/**
+	 * get searchConditionMetaMap
+	 * 
+	 * @return searchConditionMetaMap
+	 */
+	public Map<String, Object> getSearchConditionMetaMap(){
+		return searchConditionMetaMap;
+	}
+
+	/**
+	 * set searchConditionMetaMap
+	 * 
+	 * @param searchConditionMetaMap
+	 */
+	public void setSearchConditionMetaMap(Map<String, Object> searchConditionMetaMap){
+		this.searchConditionMetaMap = searchConditionMetaMap;
 	}
 
 }

@@ -2,10 +2,11 @@ package com.baozun.nebula.sdk.manager;
 
 import java.util.List;
 
-import loxia.dao.Sort;
-
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.baseinfo.Navigation;
+import com.baozun.nebula.search.command.MetaDataCommand;
+
+import loxia.dao.Sort;
 
 /**
  * 菜单导航管理
@@ -55,5 +56,14 @@ public interface SdkNavigationManager extends BaseManager{
 	 * @return
 	 */
 	public Navigation findEffectNavigationByUrl(String url);
+	
+	/**
+	 * 根据语言查询所有导航的数据(只有id、name、sortNo字段)
+	 * @return List<Navigation>
+	 * @param lang
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午4:29:08
+	 */
+	List<MetaDataCommand> findNavigationMetaDataBylang(String lang);
 	
 }

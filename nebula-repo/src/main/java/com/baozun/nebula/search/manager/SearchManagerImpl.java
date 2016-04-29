@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.manager.CacheManager;
+import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.search.Boost;
@@ -110,7 +111,7 @@ public class SearchManagerImpl implements SearchManager{
 			searchConditionCommands = sdkSearchConditionManager.findConditionByCategoryIdList(categoryIds);
 
 			try{
-				cacheManager.setObject(conditionCacheKey, searchConditionCommands);
+				cacheManager.setObject(conditionCacheKey, searchConditionCommands, TimeInterval.SECONDS_PER_DAY);
 			}catch (Exception e){
 				LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager setObject() error. time:{}", new Date());
 			}
@@ -225,7 +226,7 @@ public class SearchManagerImpl implements SearchManager{
 				// 否则是属性的facet
 				facetGroup = convertFacetGroup(valueMap);
 				facetGroup.setCategory(false);
-				facetGroup.setId(Long.valueOf(entry.getKey()));
+				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition,"")));
 			}
 
 			facetGroups.add(facetGroup);

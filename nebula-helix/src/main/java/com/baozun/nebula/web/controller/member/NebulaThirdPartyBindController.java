@@ -130,7 +130,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * 会员注册Form的校验器
 	 */
 	@Autowired
-	@Qualifier("registerFormMobileValidator")
+	@Qualifier("bindRegisterFormMobileValidator")
 	private BindRegisterFormMobileValidator	registerFormMobileValidator;
 	
 	/**
@@ -138,7 +138,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * 会员注册Form的校验器
 	 */
 	@Autowired
-	@Qualifier("registerFormNormalValidator")
+	@Qualifier("bindRegisterFormNormalValidator")
 	private BindRegisterFormNormalValidator	registerFormNormalValidator;
 
 	/**

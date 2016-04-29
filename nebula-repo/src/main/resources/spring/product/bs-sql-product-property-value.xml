@@ -128,6 +128,25 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="PropertyValue.findPropertyValueMetaDataByLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                  select
+					propertyValue.id as id,
+				  	propertyValueLang.value as value,					
+					propertyValue.sort_No as sortNo
+				from
+					t_pd_property_value propertyValue,t_pd_property_value_lang propertyValueLang
+				WHERE
+					propertyValue.id=propertyValueLang.property_value_id
+					and propertyValueLang.lang=:lang
+					order by propertyValue.sort_No
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 	
 </beans>

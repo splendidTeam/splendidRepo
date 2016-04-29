@@ -19,7 +19,11 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.DescriptorKey;
+import com.baozun.nebula.command.PropertyCommand;
+import com.baozun.nebula.model.product.Property;
+import com.baozun.nebula.model.product.PropertyLang;
+import com.baozun.nebula.model.product.PropertyValue;
+import com.baozun.nebula.search.command.MetaDataCommand;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
@@ -28,11 +32,6 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.command.PropertyCommand;
-import com.baozun.nebula.model.product.Property;
-import com.baozun.nebula.model.product.PropertyLang;
-import com.baozun.nebula.model.product.PropertyValue;
 
 /**
  * 商品属性Dao
@@ -306,4 +305,13 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	@NativeQuery(model = Property.class)
 	List<Property> findWidthoutCommonPropertyId();
 	
+	
+	/**
+	 * 根据语言，查询所有属性的数据(只有id、name、sortNo字段)
+	 * @return List<MetaDataCommand>
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午3:28:54
+	 */
+	@NativeQuery(model = MetaDataCommand.class)
+	List<MetaDataCommand> findPropertyMetaDataByLang(@QueryParam("lang") String lang);
 }

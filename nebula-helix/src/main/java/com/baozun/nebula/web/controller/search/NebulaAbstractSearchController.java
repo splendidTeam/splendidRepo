@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.manager.product.ItemCollectionManager;
 
 import com.baozun.nebula.model.product.ItemCollection;
+import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.FacetParameter;
@@ -111,7 +112,13 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		for (SearchConditionCommand cmd : cmdList){
 			Long propertyId = cmd.getPropertyId();
 			if (propertyId != null) {
-				facetFields.add(SkuItemParam.dynamicCondition + propertyId);
+				if(SearchCondition.NORMAL_TYPE.equals(cmd.getType())){
+					facetFields.add(SkuItemParam.dynamicCondition + propertyId);
+				}else if(SearchCondition.NORMAL_AREA_TYPE.equals(cmd.getType())){
+					
+					
+				}
+				
 			}
 		}
 
