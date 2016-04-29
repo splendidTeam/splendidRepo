@@ -190,26 +190,32 @@ public abstract class NebulaBasePdpController extends BaseController {
 		int i =0;
 		for (SkuViewCommand skuViewCommand : skuViewCommands) {
 			if(i == 0){
-				skuMinListPrice = skuViewCommand.getListPrice();
-				skuMaxListPrice = skuViewCommand.getListPrice();
+				skuMinListPrice = Validator.isNotNullOrEmpty(skuViewCommand.getListPrice())?
+						skuViewCommand.getListPrice() : BigDecimal.ZERO;
+				skuMaxListPrice =skuMinListPrice;
 				
-				skuMinSalesPrice = skuViewCommand.getSalePrice();
-				skuMaxSalesPrice = skuViewCommand.getSalePrice();
+				skuMinSalesPrice = Validator.isNotNullOrEmpty(skuViewCommand.getSalePrice())?
+						skuViewCommand.getListPrice() : BigDecimal.ZERO;
+				skuMaxSalesPrice = skuMinSalesPrice;
 			}else{
 				//>
-				if(skuMinListPrice.compareTo(skuViewCommand.getListPrice()) == 1){
+				if(Validator.isNotNullOrEmpty(skuViewCommand.getListPrice())&&
+						skuMinListPrice.compareTo(skuViewCommand.getListPrice()) == 1){
 					skuMinListPrice = skuViewCommand.getListPrice();
 				}
 				//<
-				if(skuMaxListPrice.compareTo(skuViewCommand.getListPrice()) == -1){
+				if(Validator.isNotNullOrEmpty(skuViewCommand.getListPrice())&&
+						skuMaxListPrice.compareTo(skuViewCommand.getListPrice()) == -1){
 					skuMaxListPrice = skuViewCommand.getListPrice();
 				}
 				//>
-				if(skuMinSalesPrice.compareTo(skuViewCommand.getSalePrice()) == 1){
+				if(Validator.isNotNullOrEmpty(skuViewCommand.getSalePrice())&&
+						skuMinSalesPrice.compareTo(skuViewCommand.getSalePrice()) == 1){
 					skuMinSalesPrice = skuViewCommand.getSalePrice();
 				}
 				//<
-				if(skuMaxSalesPrice.compareTo(skuViewCommand.getSalePrice()) == -1){
+				if(Validator.isNotNullOrEmpty(skuViewCommand.getSalePrice())&&
+						skuMaxSalesPrice.compareTo(skuViewCommand.getSalePrice()) == -1){
 					skuMaxSalesPrice = skuViewCommand.getSalePrice();
 				}
 			}
