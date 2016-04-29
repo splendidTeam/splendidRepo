@@ -49,7 +49,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * 		[条件]当pdp展示模式取:
  * </p>
  * <p>
- * 		商品到色，PDP根据款号聚合（到款显示）,即模式二@see (NebulaAbstractPdpController.PDP_MODE_COLOR_COMBINE)
+ * 		商品到色，PDP根据款号聚合（到款显示）,即模式二@see NebulaAbstractPdpController.PDP_MODE_COLOR_COMBINE
  * </p>
  * <p>
  * 		设置pdp的view切换属性

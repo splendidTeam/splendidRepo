@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="Bundle.findBundlesByItemId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据商品ID查找捆绑类商品</description>
+	<bean id="Bundle.findBundlesByMainItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据主卖品商品ID查找捆绑类商品</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
@@ -18,7 +18,8 @@
 					     b.modify_time as modifyTime,
 					     b.version as version,
 					     b.create_time as createTime,
-					     i.code
+					     i.code,
+					     i.lifecycle
 					from t_pd_bundle b 
 					inner join t_pd_item i on i.id = b.item_id
 						#if($lifecycle)
@@ -31,7 +32,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Bundle.findBundlesByStyle" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据款号查找捆绑类商品</description>
 		<constructor-arg>
@@ -47,7 +48,8 @@
 					     b.modify_time as modifyTime,
 					     b.version as version,
 					     b.create_time as createTime,
-					     i.code
+					     i.code,
+					     i.lifecycle
 						from t_pd_bundle b 
 						inner join t_pd_item i on i.id = b.item_id
 							#if($lifecycle)
@@ -60,8 +62,8 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
-	<bean id="Bundle.findBundlesById" class="loxia.dao.support.DynamicQueryHolder">
+
+	<bean id="Bundle.findBundleById" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据bundId查询</description>
 		<constructor-arg>
 			<value>
@@ -76,7 +78,8 @@
 					     b.modify_time as modifyTime,
 					     b.version as version,
 					     b.create_time as createTime,
-					     i.code
+					     i.code,
+					     i.lifecycle
 		       		from 
 		       			t_pd_bundle b 
 		       		left join
@@ -93,7 +96,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Bundle.findBundlesByPage" class="loxia.dao.support.DynamicQueryHolder">
 		<description>分页查询</description>
 		<constructor-arg>
@@ -108,67 +111,63 @@
 					     b.bundle_type as bundleType,
 					     b.modify_time as modifyTime,
 					     b.version as version,
-					     b.create_time as createTime
+					     b.create_time as createTime,
+					     i.code,
+					     i.lifecycle
 		       		from 
 		       			t_pd_bundle  b
+		       		inner join 
+		       			t_pd_item i on b.item_id = i.id
 		       		where 
 		       		    1 = 1
                  ]]>
 			</value>
 		</constructor-arg>
 	</bean>
-	
-	 <bean id="Bundle.findBundleIdByBundleItemId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>通过itemId查出对应的bundleId</description>
+
+	<bean id="Bundle.findBundleItemIdByMainItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过主卖品的商品id查询bundle的商品id</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		SELECT 
-		       			 b.id,
-					     b.item_id as itemId,
-					     b.price_type as priceType,
-					     b.available_qty as availableQty,
-					     b.sync_with_inv as syncWithInv,
-					     b.bundle_type as bundleType,
-					     b.modify_time as modifyTime,
-					     b.version as version,
-					     b.create_time as createTime
-		       		FROM 
-		       			t_pd_item i 
-		       		LEFT JOIN 
-		       			t_pd_bundle b 
-		       		on 
-		       			i.id = b.item_id 
-		       		WHERE 
-		       			i.id = :itemId
+		       		select 
+		       			distinct b.item_id
+					from 
+						t_pd_bundle b
+					inner join 
+						t_pd_bundle_sku bs on b.id = bs.bundle_id
+					inner join 
+						t_pd_bundle_element be on be.id = bs.bundle_element_id and be.is_main_element = 't'
+					where 
+						bs.item_id = :mainItemId
                  ]]>
 			</value>
 		</constructor-arg>
 	</bean>
-	
-	 <bean id="Bundle.findBundlesByItemCode" class="loxia.dao.support.DynamicQueryHolder">
-		<description>通过itemCode查出对应的bundle</description>
+
+	<bean id="Bundle.findBundleByBundleItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过bundle的itemid查出对应的bundle</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
 		       		SELECT 
-		       			 b.id,
-					     b.item_id as itemId,
-					     b.price_type as priceType,
-					     b.available_qty as availableQty,
-					     b.sync_with_inv as syncWithInv,
-					     b.bundle_type as bundleType,
-					     b.modify_time as modifyTime,
-					     b.version as version,
-					     b.create_time as createTime
+		       		 	b.id,
+					    b.item_id as itemId,
+					    b.price_type as priceType,
+					    b.available_qty as availableQty,
+					    b.sync_with_inv as syncWithInv,
+					    b.bundle_type as bundleType,
+					    b.modify_time as modifyTime,
+					    b.version as version,
+					    b.create_time as createTime,
+					    i.code,
+					    i.lifecycle
 		       		FROM 
-		       			t_pd_item i 
-		       		LEFT JOIN 
-		       			t_pd_bundle b 
-		       		on 
-		       			i.id = b.item_id 
+		       			t_pd_bundle b
+		       		INNER JOIN 
+		       			t_pd_item i on i.id = b.item_id 
 		       		WHERE 
-		       			i.code = :itemCode
+		       			b.item_id = :bundleItemId
                  ]]>
 			</value>
 		</constructor-arg>

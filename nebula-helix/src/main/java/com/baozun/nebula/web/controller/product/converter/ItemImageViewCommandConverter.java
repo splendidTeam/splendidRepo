@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.web.controller.BaseConverter;
@@ -41,6 +42,7 @@ public class ItemImageViewCommandConverter extends BaseConverter<ItemImageViewCo
 	private static final long serialVersionUID = -2286315924775522534L;
 	
 	@Autowired
+	@Qualifier("imageViewCommandConverter")
 	ImageViewCommandConverter                                       imageViewCommandConverter;
 
 	public List<ItemImageViewCommand> convert(List<? extends Object> objectList) {

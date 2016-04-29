@@ -57,9 +57,14 @@ public class BundleCommand extends Bundle{
 	private BigDecimal maxSalesPrice = BigDecimal.ZERO ;
 	
 	/**
+	 * 捆绑类商品的编码
+	 */
+	private String code ;
+	
+	/**
 	 * 生命周期
 	 */
-	private Integer lifeCycle;
+	private Integer lifecycle;
 	
 	/**
 	 * 
@@ -70,12 +75,20 @@ public class BundleCommand extends Bundle{
 		return bundleElementCommands;
 	}
 
-	public Integer getLifeCycle() {
-		return lifeCycle;
+	public String getCode() {
+		return code;
 	}
 
-	public void setLifeCycle(Integer lifeCycle) {
-		this.lifeCycle = lifeCycle;
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public Integer getLifecycle() {
+		return lifecycle;
+	}
+
+	public void setLifecycle(Integer lifecycle) {
+		this.lifecycle = lifecycle;
 	}
 
 	public void setMinOriginalSalesPrice(BigDecimal minOriginalSalesPrice) {
@@ -111,7 +124,7 @@ public class BundleCommand extends Bundle{
      * <ul>
      *      <li>1 : 正常</li>
      *      <li>2 : bundle不存在</li>
-     *      <li>3 : bundle中的某个商品不可售（包括：商品的下架 未上架 和 不存在）</li>
+     *      <li>3 : bundle中的某个sku不可售（包括：sku的下架 未上架 和 不在此捆绑装中）</li>
      *      <li>4 : bundle未上架</li>
      *      <li>5 : bundle下架</li>
      *      <li>6 : bundle库存不足</li>
@@ -131,9 +144,9 @@ public class BundleCommand extends Bundle{
 		 */
 		BUNDLE_NOT_EXIST(2),
 		/**
-		 * bundle中的某个商品不可售（包括：商品的下架 未上架 和 不存在）
+		 * bundle中的某个sku不可售（包括：sku的下架 未上架 和 不在此捆绑装中）
 		 */
-		BUNDLE_ITEM_NOT_EXIST(3),
+		BUNDLE_SKU_CANNOT_SALE(3),
 		/**
 		 * bundle未上架
 		 */
@@ -147,9 +160,9 @@ public class BundleCommand extends Bundle{
 		 */
 		BUNDLE_NO_INVENTORY(6),
 		/**
-		 * bundle中的某个商品的sku库存不足
+		 * bundle中的某个sku库存不足
 		 */
-		BUNDLE_ITEM_NO_INVENTORY(7);
+		BUNDLE_SKU_NO_INVENTORY(7);
 		
 		private int status ;
 		

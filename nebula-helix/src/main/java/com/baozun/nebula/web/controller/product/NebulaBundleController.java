@@ -186,7 +186,7 @@ public class NebulaBundleController extends NebulaPdpController {
 		
 		try {
 			// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
+			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByMainItemId(itemId, Boolean.TRUE);
 			if (Validator.isNotNullOrEmpty(bundleCommands)) {
 				result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
 			}

@@ -20,8 +20,10 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:loxia-hibernate-context.xml",
-		"classpath*:loxia-service-context.xml", "classpath*:spring.xml" })
+@ContextConfiguration(locations = {
+		"classpath*:loxia-hibernate-context.xml",
+		"classpath*:loxia-service-context.xml",
+		"classpath*:spring.xml" })
 @ActiveProfiles("dev")
 public class NebulaBundleManagerTest {
 
@@ -31,15 +33,15 @@ public class NebulaBundleManagerTest {
 	private static final Logger log = LoggerFactory.getLogger(NebulaBundleManagerTest.class);
 	
 	@Test
-	public void testFindBundleCommandByItemId(){
-		List<BundleCommand> bundles =	bundleManager.findBundleCommandByItemId(4L ,false);
+	public void testFindBundleCommandByMainItemId(){
+		List<BundleCommand> bundles =	bundleManager.findBundleCommandByMainItemId(4L ,false);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
 	}
 	
 	@Test
 	public void testFindBundleCommandByBundleItemCode(){
-		BundleCommand bundle =	bundleManager.findBundleCommandByBundleItemCode("11111111111", true);
+		BundleCommand bundle =	bundleManager.findBundleCommandByBundleItemCode("111111114", true);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundle));
 	}
@@ -62,7 +64,7 @@ public class NebulaBundleManagerTest {
 		skuIds.add(18L);
 		skuIds.add(20L);
 //		skuIds.add(2L);
-		BundleValidateResult result = bundleManager.validateBundle(1L, skuIds, 10);
+		BundleValidateResult result = bundleManager.validateBundle(3L, skuIds, 10);
 		System.out.println(result.getType());
 
 	}

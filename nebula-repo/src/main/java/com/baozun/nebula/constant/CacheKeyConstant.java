@@ -35,4 +35,11 @@ public class CacheKeyConstant{
 
 	/*** 购物车促销存储时间 **/
 	public static final Integer	SHOPPING_CART_PRM_TIME				= 60 * 60 * 24 * 360;
+	
+	/** bundle(将bundle类商品的id作为key值) */
+	public static final String 	BUNDLE_CACHE_KEY					= "BUNDLE";
+	
+	/** bundle缓存时间 */
+	public static final Integer	BUNDLE_CACHE_TIME					= 60 * 60;
+	
 }

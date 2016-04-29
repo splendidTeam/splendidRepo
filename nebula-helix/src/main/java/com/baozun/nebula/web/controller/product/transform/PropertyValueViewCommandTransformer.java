@@ -30,7 +30,7 @@ import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
- * 将itemPropertiesCommand转换为PropertyValueViewCommand，并用于排序
+ * 将itemPropertiesCommand转换为PropertyValueViewCommand
  * @Description 
  * @author dongliang ma
  * @date 2016年4月21日 下午2:20:44 
