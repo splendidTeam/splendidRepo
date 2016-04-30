@@ -10,7 +10,7 @@
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
-<script type="text/javascript" src="${base}/scripts/system/navigation/navigation.js"></script>
+<script type="text/javascript" src="${base}/scripts/system/navigation/navigation.js?v=${now}"></script>
 <SCRIPT type="text/javascript">	
 var zNodes =[           
 	{ id:0, name:"ROOT",state:"1", open:true,root:"true"},
@@ -98,6 +98,7 @@ var category_ZNodes = [
                 <spring:message code="navigation.list.type"/>
               </label>
               <opt:select id="update-type" name="update-type" loxiaType="select" expression="chooseOption.NAVIGATION_TYPE" />
+              <a href="#" class="func-button persist" id="toItemSort">进入排序</a>
             </div>
             <div class="ui-block-line">
               <label>
@@ -110,7 +111,7 @@ var category_ZNodes = [
                 <spring:message code="navigation.list.parameter"/>
               </label>
                 <input type="text" disabled="disabled" loxiaType="input" value="" name="update-parameter" id="update-parameter" placeholder="<spring:message code="item.list.catagory"/>" />
-                <a href="javascript:void(0);" class="func-button persist select-category"><spring:message code="navigation.list.category"/></a>
+                <a href="javascript:void(0);" class="func-button persist select-category" title="update">选择分类与属性</a>
             </div>
             <div class="ui-block-line">
               <label>
@@ -127,6 +128,48 @@ var category_ZNodes = [
                </label>
             </div>
            
+           
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>seo搜索标题</label>
+			            <input type="text" style='width: 600px'  class="seoTitle" lang="${i18nLang.key}" loxiatype="input"  />
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>
+           
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>seo搜索关键字</label>
+			            <input type="text" style='width: 600px'  class="seoKeyWords" lang="${i18nLang.key}" loxiatype="input"  />
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>           
+
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>seo搜索描述</label>
+			             <textarea rows="10px" class="seoDescription" loxiaType="input"  lang="${i18nLang.key}"  style="width: 600px;">seo搜索描述</textarea>
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>   
+
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>Extention</label>
+			             <textarea rows="10px"  class="seoExtntion" loxiaType="input" style="width: 600px;" lang="${i18nLang.key}" >Extention</textarea>
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>   
+
+      
          <div class="button-line1">
               <a href="javascript:void(0);" class="func-button persist" id="save_father_Name"><spring:message code="btn.save"/></a> 
 	 		  <a href="javascript:void(0);" class="func-button delete" id="remove_element"><spring:message code="btn.delete"/></a>
@@ -164,14 +207,14 @@ var category_ZNodes = [
               <label>
                 <spring:message code="navigation.list.url"/>
               </label>
-                <input type="text" loxiaType="input" value="" name="add-url" id="add-url" placeholder="<spring:message code="navigation.list.url"/>" />
+                <input type="text"  loxiaType="input" value="" name="add-url" id="add-url" placeholder="<spring:message code="navigation.list.url"/>" />
             </div>
             <div class="ui-block-line navi-param">
               <label>
                 <spring:message code="navigation.list.parameter"/>
               </label>
                 <input type="text" disabled="disabled" loxiaType="input" value="" name="add-parameter" id="add-parameter" placeholder="<spring:message code="item.list.catagory"/>" />
-                <a href="javascript:void(0);" class="func-button persist select-category"><spring:message code="navigation.list.category"/></a>
+                <a href="javascript:void(0);" class="func-button persist select-category" title="add"><spring:message code="navigation.list.category"/></a>
             </div>
             <div class="ui-block-line">
               <label>
@@ -181,6 +224,47 @@ var category_ZNodes = [
                 <input type="checkbox" name="add-newWindow" id="add-newWindow" />
                </label>
             </div>
+            
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>seo搜索标题</label>
+			            <input type="text" style='width: 600px'  class="seoTitle" lang="${i18nLang.key}" loxiatype="input"  />
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>
+           
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>seo搜索关键字</label>
+			            <input type="text" style='width: 600px'  class="seoKeyWords" lang="${i18nLang.key}" loxiatype="input"  />
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>           
+
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>seo搜索描述</label>
+			             <textarea rows="10px" class="seoDescription" loxiaType="input"  lang="${i18nLang.key}"  style="width: 600px;">seo搜索描述</textarea>
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>   
+
+            <c:if test="${i18nOnOff == true}">
+	         	<c:forEach items="${i18nLangs}" var="i18nLang">
+		         	<div class="ui-block-line">
+			            <label>Extention</label>
+			             <textarea rows="10px"  class="seoExtntion" loxiaType="input" style="width: 600px;" lang="${i18nLang.key}" >Extention</textarea>
+			            <span>${i18nLang.value}</span>
+		        	</div>
+		     	</c:forEach>
+	         </c:if>   
+            
 
             <div class="button-line1">
 					<a href="javascript:void(0);" class="func-button persist" id="addLeaf"><spring:message code="btn.save"/></a>
@@ -190,7 +274,28 @@ var category_ZNodes = [
     </div>
 </div>
 <div id="categoryMenuContent" class="menuContent" style="display: none; position: absolute; background-color: #f0f6e4; border: 1px solid #617775; padding: 3px;">
+	<div class="ui-block-title1">选择分类</div>
 	<ul id="categoryDemo" class="ztree" style="margin-top: 0; width: 180px; height: 100%;"></ul>
+	
+	
+	<div>
+		<div class="ui-block-title1">选择属性</div>
+		<div id="propertiesDiv">
+		<c:forEach items="${dynamicPropertyCommand}" var="command">
+			<div class="propertyDiv" style="padding-bottom:10px;">
+				<span>${command.property.name }</span>
+				<c:forEach items="${command.propertyValueList}" var="propertyValue">
+					<input type="checkbox" value="${propertyValue.id}" lang="${command.property.id}" class="propertySelectEvent">
+					<label>${propertyValue.value}</label>
+				</c:forEach>
+			</div>
+		</c:forEach>
+	</div>
+	
+	<div style="text-align:center;">
+	<button id="selectCategoryBtn">确定</button>
+	<br>
+	</div>
 </div>
 </body>
 </html>
