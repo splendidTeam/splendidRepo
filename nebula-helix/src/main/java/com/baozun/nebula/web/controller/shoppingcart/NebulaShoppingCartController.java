@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.manager.shoppingcart.ShoppingcartResolver;
-import com.baozun.nebula.manager.shoppingcart.ShoppingcartResult;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
@@ -41,6 +39,8 @@ import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.converter.ShoppingcartViewCommandConverter;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
  * 购物车控制器.
@@ -122,270 +122,283 @@ import com.baozun.nebula.web.controller.member.converter.ShoppingcartViewCommand
  *      ShoppingCartViewCommand
  * @since 5.3.1
  */
-public class NebulaShoppingCartController extends BaseController {
+public class NebulaShoppingCartController extends BaseController{
 
-	/** The Constant log. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
+    /** The Constant log. */
+    private static final Logger              LOGGER                 = LoggerFactory.getLogger(NebulaShoppingCartController.class);
 
-	/** The Constant MODEL_KEY_SHOPPINGCART. */
-	private static final String MODEL_KEY_SHOPPINGCART = "shoppingCartViewCommand";
+    /** The Constant MODEL_KEY_SHOPPINGCART. */
+    private static final String              MODEL_KEY_SHOPPINGCART = "shoppingCartViewCommand";
 
-	/** The Constant VIEW_MEMBER_SHOPPINGCART_LIST. */
-	private static final String VIEW_SHOPPINGCART = "shoppingcart.shoppingcart";
+    /** The Constant VIEW_MEMBER_SHOPPINGCART_LIST. */
+    private static final String              VIEW_SHOPPINGCART      = "shoppingcart.shoppingcart";
 
-	@Autowired
-	private SdkShoppingCartManager sdkShoppingCartManager;
+    @Autowired
+    private SdkShoppingCartManager           sdkShoppingCartManager;
 
-	@Autowired
-	@Qualifier("guestShoppingcartResolver")
-	private ShoppingcartResolver guestShoppingcartResolver;
+    @Autowired
+    @Qualifier("guestShoppingcartResolver")
+    private ShoppingcartResolver             guestShoppingcartResolver;
 
-	@Autowired
-	@Qualifier("memberShoppingcartResolver")
-	private ShoppingcartResolver memberShoppingcartResolver;
+    @Autowired
+    @Qualifier("memberShoppingcartResolver")
+    private ShoppingcartResolver             memberShoppingcartResolver;
 
-	@Autowired
-	@Qualifier("shoppingcartViewCommandConverter")
-	private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
+    @Autowired
+    @Qualifier("shoppingcartViewCommandConverter")
+    private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
-	private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
-		return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
-	};
+    private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
+        return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
+    };
 
-	/**
-	 * 显示用户的购物车.
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @param request
-	 *            the request
-	 * @param response
-	 *            the response
-	 * @param model
-	 *            the model
-	 * @return the string
-	 * @RequestMapping(value = "/shoppingcart", method = RequestMethod.GET)
-	 */
-	public String showShoppingCart(@LoginMember MemberDetails memberDetails, HttpServletRequest request,
-			HttpServletResponse response, Model model) {
+    /**
+     * 显示用户的购物车.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the string
+     * @RequestMapping(value = "/shoppingcart", method = RequestMethod.GET)
+     */
+    public String showShoppingCart(
+                    @LoginMember MemberDetails memberDetails,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
 
-		// 获取购物车信息
-		ShoppingCartCommand cartCommand = getCartInfo(request, memberDetails);
+        // 获取购物车信息
+        ShoppingCartCommand cartCommand = getCartInfo(request, memberDetails);
 
-		// 封装viewCommand
-		model.addAttribute(MODEL_KEY_SHOPPINGCART, shoppingcartViewCommandConverter.convert(cartCommand));
-		return VIEW_SHOPPINGCART;
-	}
+        // 封装viewCommand
+        model.addAttribute(MODEL_KEY_SHOPPINGCART, shoppingcartViewCommandConverter.convert(cartCommand));
+        return VIEW_SHOPPINGCART;
+    }
 
-	/**
-	 * 获取购物车信息
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	protected ShoppingCartCommand getCartInfo(HttpServletRequest request, MemberDetails memberDetails) {
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(request,
-				memberDetails);
-		if (null == cartLines) {
-			return null;
-		}
-		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
-		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
-	}
+    /**
+     * 获取购物车信息
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    protected ShoppingCartCommand getCartInfo(HttpServletRequest request,MemberDetails memberDetails){
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
+        if (null == cartLines){
+            return null;
+        }
+        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
+        return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+    }
 
-	/**
-	 * 添加购物车.
-	 * 
-	 * <p>
-	 * 用户购买选定的sku,指定数量加入到购物车
-	 * </p>
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @param skuId
-	 *            the sku id
-	 * @param count
-	 *            the count
-	 * @param request
-	 *            the request
-	 * @param response
-	 *            the response
-	 * @param model
-	 *            the model
-	 * @return the nebula return result
-	 * @RequestMapping(value = "/shoppingcart/add", method = RequestMethod.POST)
-	 */
-	public NebulaReturnResult addShoppingCart(@LoginMember MemberDetails memberDetails,
-			@RequestParam(value = "skuId", required = true) Long skuId,
-			@RequestParam(value = "count", required = true) Integer count, HttpServletRequest request,
-			HttpServletResponse response, Model model) {
+    /**
+     * 添加购物车.
+     * 
+     * <p>
+     * 用户购买选定的sku,指定数量加入到购物车
+     * </p>
+     *
+     * @param memberDetails
+     *            the member details
+     * @param skuId
+     *            the sku id
+     * @param count
+     *            the count
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @RequestMapping(value = "/shoppingcart/add", method = RequestMethod.POST)
+     */
+    public NebulaReturnResult addShoppingCart(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "skuId",required = true) Long skuId,
+                    @RequestParam(value = "count",required = true) Integer count,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
 
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
-		ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count,
-				request, response);
-		// 判断处理结果
-		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-		if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())) {
-			result = DefaultReturnResult.FAILURE;
-			DefaultResultMessage message = new DefaultResultMessage();
-			message.setMessage(getMessage(shoppingcartResult.toString()));
-			result.setResultMessage(message);
-			LOGGER.error(getMessage(shoppingcartResult.toString()));
-		}
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
+        // 判断处理结果
+        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
+            result = DefaultReturnResult.FAILURE;
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(getMessage(shoppingcartResult.toString()));
+            result.setResultMessage(message);
+            LOGGER.error(getMessage(shoppingcartResult.toString()));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	/**
-	 * 删除购物车行.
-	 * <p>
-	 * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
-	 * 
-	 * <br>
-	 * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
-	 * 
-	 * <br>
-	 * <span style="color:red">服务端必须同时拿shoppingcartLineId和memberId做参数,
-	 * 否则可能会出现安全漏洞</span>
-	 * </p>
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @param shoppingcartLineId
-	 *            the shoppingcartline id
-	 * @param request
-	 *            the request
-	 * @param response
-	 *            the response
-	 * @param model
-	 *            the model
-	 * @return the nebula return result
-	 * @RequestMapping(value = "/shoppingcart/delete", method =
-	 *                       RequestMethod.POST)
-	 */
-	public NebulaReturnResult deleteShoppingCartLine(@LoginMember MemberDetails memberDetails,
-			@RequestParam(value = "shoppingcartLineId", required = true) Long shoppingcartLineId,
-			HttpServletRequest request, HttpServletResponse response, Model model) {
+    /**
+     * 删除购物车行.
+     * <p>
+     * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
+     * 
+     * <br>
+     * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
+     * 
+     * <br>
+     * <span style="color:red">服务端必须同时拿shoppingcartLineId和memberId做参数,
+     * 否则可能会出现安全漏洞</span>
+     * </p>
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingcartLineId
+     *            the shoppingcartline id
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @RequestMapping(value = "/shoppingcart/delete", method =
+     *                       RequestMethod.POST)
+     */
+    public NebulaReturnResult deleteShoppingCartLine(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "shoppingcartLineId",required = true) Long shoppingcartLineId,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
 
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
-		ShoppingcartResult shoppingcartResult = shoppingcartResolver.deleteShoppingCartLine(memberDetails,
-				shoppingcartLineId, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver
+                        .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
 
-		// 判断处理结果
-		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-		if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())) {
-			result = DefaultReturnResult.FAILURE;
-			DefaultResultMessage message = new DefaultResultMessage();
-			message.setMessage(getMessage(shoppingcartResult.toString()));
-			result.setResultMessage(message);
-			LOGGER.error(getMessage(shoppingcartResult.toString()));
-		}
-		return result;
-	}
+        // 判断处理结果
+        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
+            result = DefaultReturnResult.FAILURE;
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(getMessage(shoppingcartResult.toString()));
+            result.setResultMessage(message);
+            LOGGER.error(getMessage(shoppingcartResult.toString()));
+        }
+        return result;
+    }
 
-	/**
-	 * 修改用户的购物车数量.
-	 * 
-	 * <p>
-	 * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
-	 * 
-	 * <br>
-	 * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
-	 * </p>
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @param shoppingcartLineId
-	 *            the shoppingcartline id
-	 * @param count
-	 *            最终数量值,而非 incr值
-	 * @param request
-	 *            the request
-	 * @param response
-	 *            the response
-	 * @param model
-	 *            the model
-	 * @return the nebula return result
-	 * @RequestMapping(value = "/shoppingcart/update", method =
-	 *                       RequestMethod.POST)
-	 */
-	public NebulaReturnResult updateShoppingCartCount(@LoginMember MemberDetails memberDetails,
-			@RequestParam(value = "shoppingcartLineId", required = true) Long shoppingcartLineId,
-			@RequestParam(value = "count", required = true) Integer count, HttpServletRequest request,
-			HttpServletResponse response, Model model) {
+    /**
+     * 修改用户的购物车数量.
+     * 
+     * <p>
+     * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
+     * 
+     * <br>
+     * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
+     * </p>
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingcartLineId
+     *            the shoppingcartline id
+     * @param count
+     *            最终数量值,而非 incr值
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @RequestMapping(value = "/shoppingcart/update", method =
+     *                       RequestMethod.POST)
+     */
+    public NebulaReturnResult updateShoppingCartCount(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "shoppingcartLineId",required = true) Long shoppingcartLineId,
+                    @RequestParam(value = "count",required = true) Integer count,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
 
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
-		ShoppingcartResult shoppingcartResult = shoppingcartResolver.updateShoppingCart(memberDetails,
-				shoppingcartLineId, count, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver
+                        .updateShoppingCart(memberDetails, shoppingcartLineId, count, request, response);
 
-		// 判断处理结果
-		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-		if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())) {
-			result = DefaultReturnResult.FAILURE;
-			DefaultResultMessage message = new DefaultResultMessage();
-			message.setMessage(getMessage(shoppingcartResult.toString()));
-			result.setResultMessage(message);
-			LOGGER.error(getMessage(shoppingcartResult.toString()));
-		}
-		return result;
-	}
+        // 判断处理结果
+        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
+            result = DefaultReturnResult.FAILURE;
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(getMessage(shoppingcartResult.toString()));
+            result.setResultMessage(message);
+            LOGGER.error(getMessage(shoppingcartResult.toString()));
+        }
+        return result;
+    }
 
-	// TODO 修改销售属性
-	// TODO 删除bundle
+    // TODO 修改销售属性
+    // TODO 删除bundle
 
-	// TODO 选中 /**
-	/**
-	 * 修改用户的购物车选中状态.
-	 * 
-	 * <p>
-	 * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
-	 * 
-	 * <br>
-	 * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
-	 * </p>
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @param shoppingcartLineId
-	 *            the shoppingcartline id
-	 * @param count
-	 *            最终数量值,而非 incr值
-	 * @param request
-	 *            the request
-	 * @param response
-	 *            the response
-	 * @param model
-	 *            the model
-	 * @return the nebula return result
-	 * @RequestMapping(value = "/shoppingcart/select", method =
-	 *                       RequestMethod.POST)
-	 */
-	public NebulaReturnResult selectShoppingCartCount(@LoginMember MemberDetails memberDetails,
-			@RequestParam(value = "shoppingcartLineId", required = true) Long shoppingcartLineId,
-			@RequestParam(value = "checked", required = false) Integer settlementState, HttpServletRequest request,
-			HttpServletResponse response, Model model) {
+    // TODO 选中 /**
+    /**
+     * 修改用户的购物车选中状态.
+     * 
+     * <p>
+     * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
+     * 
+     * <br>
+     * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
+     * </p>
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingcartLineId
+     *            the shoppingcartline id
+     * @param count
+     *            最终数量值,而非 incr值
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @RequestMapping(value = "/shoppingcart/select", method =
+     *                       RequestMethod.POST)
+     */
+    public NebulaReturnResult selectShoppingCartCount(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "shoppingcartLineId",required = true) Long shoppingcartLineId,
+                    @RequestParam(value = "checked",required = false) Integer settlementState,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
 
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
-		ShoppingcartResult shoppingcartResult = shoppingcartResolver.selectShoppingCartLine(memberDetails,
-				shoppingcartLineId, settlementState, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver
+                        .selectShoppingCartLine(memberDetails, shoppingcartLineId, settlementState, request, response);
 
-		// 判断处理结果
-		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-		if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())) {
-			result = DefaultReturnResult.FAILURE;
-			DefaultResultMessage message = new DefaultResultMessage();
-			message.setMessage(getMessage(shoppingcartResult.toString()));
-			result.setResultMessage(message);
-			LOGGER.error(getMessage(shoppingcartResult.toString()));
-		}
-		return result;
-	}
+        // 判断处理结果
+        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
+            result = DefaultReturnResult.FAILURE;
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(getMessage(shoppingcartResult.toString()));
+            result.setResultMessage(message);
+            LOGGER.error(getMessage(shoppingcartResult.toString()));
+        }
+        return result;
+    }
 
 }
