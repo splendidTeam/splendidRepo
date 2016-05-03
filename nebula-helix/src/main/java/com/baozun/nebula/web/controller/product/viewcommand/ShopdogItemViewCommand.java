@@ -65,7 +65,7 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 	/**
 	 * 所有图片
 	 */
-	private List<String> picUrls;
+	private List<ShopdogItemImageViewCommand> picUrls;
 
 	public String getItemCode() {
 		return itemCode;
@@ -115,11 +115,11 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 		this.mainPicUrl = mainPicUrl;
 	}
 
-	public List<String> getPicUrls() {
+	public List<ShopdogItemImageViewCommand> getPicUrls() {
 		return picUrls;
 	}
 
-	public void setPicUrls(List<String> picUrls) {
+	public void setPicUrls(List<ShopdogItemImageViewCommand> picUrls) {
 		this.picUrls = picUrls;
 	}
 
