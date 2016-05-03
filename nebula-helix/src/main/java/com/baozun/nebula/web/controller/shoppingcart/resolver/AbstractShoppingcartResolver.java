@@ -86,27 +86,25 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         // 获取购物车行信息
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        // 找不到 就抛
         ShoppingCartLineCommand shoppingCartLineCommand = CollectionsUtil.find(mainlines, "id", shoppingcartLineId);
         if (Validator.isNullOrEmpty(shoppingCartLineCommand)){
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        ShoppingcartResult deleteShoppingCartShoppingcartResult = doDeleteShoppingCartLine(
+        shoppingCartLineCommandList = CollectionsUtil.remove(shoppingCartLineCommandList, shoppingCartLineCommand);
+
+        ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(
                         memberDetails,
                         shoppingCartLineCommandList,
                         shoppingCartLineCommand,
                         request,
                         response);
 
-        if (null != deleteShoppingCartShoppingcartResult){
-            return deleteShoppingCartShoppingcartResult;
+        if (null != deleteShoppingCartResult){
+            return deleteShoppingCartResult;
         }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandListAfterDelete = CollectionsUtil
-                        .remove(shoppingCartLineCommandList, shoppingCartLineCommand);
-
-        afterMergeShoppingCart(memberDetails, shoppingCartLineCommandListAfterDelete, request, response);
+        afterMergeShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
 
         return ShoppingcartResult.SUCCESS;
     }
@@ -166,96 +164,13 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        // 找到实际需要操作的行
-        List<ShoppingCartLineCommand> needChangeCheckedCommandList = mainlines;
         return toggleShoppingCartLineCheckStatus(
                         memberDetails,
                         shoppingCartLineCommandList,
-                        needChangeCheckedCommandList,
+                        mainlines, // 找到实际需要操作的行
                         checkStatus,
                         request,
                         response);
-    }
-
-    /**
-     * Toggle shopping cart line check status.
-     *
-     * @param memberDetails
-     *            the member details
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @param needChangeCheckedCommandList
-     *            the need change checked command list
-     * @param checkStatus
-     *            the check status
-     * @param request
-     *            the request
-     * @param response
-     *            the response
-     * @return the shoppingcart result
-     * @since 5.3.1
-     */
-    private ShoppingcartResult toggleShoppingCartLineCheckStatus(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    List<ShoppingCartLineCommand> needChangeCheckedCommandList,
-                    boolean checkStatus,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-        if (Validator.isNullOrEmpty(needChangeCheckedCommandList)){
-            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
-        }
-
-        List<String> extentionCodeList = new ArrayList<String>();
-        for (ShoppingCartLineCommand needChangeCheckedCommand : needChangeCheckedCommandList){
-            // 跳过已经是该状态的购物车行
-            if (isSameCheckStatus(needChangeCheckedCommand.getSettlementState(), checkStatus)){
-                continue;
-            }
-
-            // ********* 商品验证***********
-            Long skuId = needChangeCheckedCommand.getSkuId();
-            Sku sku = sdkSkuManager.findSkuById(skuId);
-            ShoppingcartResult commandValidateShoppingcartResult = doCommandValidate(sku, needChangeCheckedCommand.getQuantity());
-
-            if (null != commandValidateShoppingcartResult){
-                return commandValidateShoppingcartResult;
-            }
-
-            // ********* 库存验证***********
-            SkuInventory inventory = sdkItemManager.getSkuInventoryByExtentionCode(sku.getOutid());
-            Integer stock = CollectionsUtil
-                            .sum(CollectionsUtil.select(shoppingCartLineCommandList, "extentionCode", sku.getOutid()), "quantity")
-                            .intValue();
-
-            // 如果超过库存量
-            if (stock > inventory.getAvailableQty()){
-                return ShoppingcartResult.MAX_THAN_INVENTORY;
-            }
-
-            extentionCodeList.add(needChangeCheckedCommand.getExtentionCode());
-            needChangeCheckedCommand.setSettlementState(checkStatus ? 1 : 0);
-
-        }
-
-        if (Validator.isNullOrEmpty(extentionCodeList)){
-            return ShoppingcartResult.SUCCESS;
-        }
-
-        // ********* 改变选中状态***********
-        ShoppingcartResult checkShoppingCartShoppingcartResult = doToggleShoppingCartLineCheckStatus(
-                        memberDetails,
-                        extentionCodeList,
-                        needChangeCheckedCommandList,
-                        checkStatus,
-                        request,
-                        response);
-
-        if (null != checkShoppingCartShoppingcartResult){
-            return checkShoppingCartShoppingcartResult;
-        }
-
-        return ShoppingcartResult.SUCCESS;
     }
 
     /*
@@ -294,12 +209,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         // 验证库存
         shoppingCartLineCommand.setQuantity(count);
 
-        SkuInventory inventory = sdkItemManager.getSkuInventoryByExtentionCode(sku.getOutid());
-        Integer stock = CollectionsUtil
-                        .sum(CollectionsUtil.select(shoppingCartLineCommandList, "extentionCode", sku.getOutid()), "quantity").intValue();
-
-        // 如果超过库存量
-        if (stock > inventory.getAvailableQty()){
+        if (isMoreThanInventory(shoppingCartLineCommandList, sku.getOutid())){
             return ShoppingcartResult.MAX_THAN_INVENTORY;
         }
 
@@ -312,15 +222,15 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         // 封装购物车行数据
         sdkEngineManager.packShoppingCartLine(currentLine);
 
-        ShoppingcartResult updateShoppingCartShoppingcartResult = doUpdateShoppingCart(
+        ShoppingcartResult updateShoppingcartResult = doUpdateShoppingCart(
                         memberDetails,
                         shoppingCartLineCommandList,
                         currentLine,
                         request,
                         response);
 
-        if (null != updateShoppingCartShoppingcartResult){
-            return updateShoppingCartShoppingcartResult;
+        if (null != updateShoppingcartResult){
+            return updateShoppingcartResult;
         }
 
         afterMergeShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
@@ -379,13 +289,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                             .setQuantity(sameExtentionCodeInCartShoppingCartLineCommand.getQuantity() + count);
         }
 
-        // 验证库存
-        SkuInventory inventory = sdkItemManager.getSkuInventoryByExtentionCode(sku.getOutid());
-        Integer stock = CollectionsUtil
-                        .sum(CollectionsUtil.select(shoppingCartLineCommandList, "extentionCode", sku.getOutid()), "quantity").intValue();
-
-        // 如果超过库存量
-        if (stock > inventory.getAvailableQty()){
+        if (isMoreThanInventory(shoppingCartLineCommandList, sku.getOutid())){
             return ShoppingcartResult.MAX_THAN_INVENTORY;
         }
 
@@ -419,14 +323,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
+     *            用户所有的购物车list
      * @param currentLine
-     *            the current line
+     *            需要被操作的行
      * @param request
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果没有操作过程中没有错,那么返回null
      */
     protected abstract ShoppingcartResult doAddShoppingCart(
                     MemberDetails memberDetails,
@@ -441,14 +345,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
+     *            用户所有的购物车list
      * @param currentLine
-     *            the current line
+     *            需要被操作的行
      * @param request
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果没有操作过程中没有错,那么返回null
      */
     protected abstract ShoppingcartResult doUpdateShoppingCart(
                     MemberDetails memberDetails,
@@ -458,19 +362,19 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletResponse response);
 
     /**
-     * Do delete shopping cart line.
+     * 每个实现类具体的实现.
      *
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
+     *            用户所有的购物车list
      * @param currentLine
-     *            the current line
+     *            需要被操作的行
      * @param request
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果没有操作过程中没有错,那么返回null
      */
     protected abstract ShoppingcartResult doDeleteShoppingCartLine(
                     MemberDetails memberDetails,
@@ -486,28 +390,52 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the member details
      * @param extentionCodeList
      *            the extention code list
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
+     * @param needChangeCheckedStatusShoppingCartLineCommandList
+     *            需要更改状态的购物车行list
      * @param checkStatus
      *            the settlement state
      * @param request
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果没有操作过程中没有错,那么返回null
      */
     protected abstract ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
                     List<String> extentionCodeList,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> needChangeCheckedStatusShoppingCartLineCommandList,
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response);
 
     //**************************************************************************************
+    /**
+     * 获得主卖品(剔除 促銷行 贈品),通常我们只操作主卖品.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @return the main shopping cart line command list
+     * @since 5.3.1
+     */
+    protected List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        // 主賣品(剔除 促銷行 贈品)
+        return CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
+    }
 
     /**
      * 公共的校验.
+     * 
+     * <h3>代码流程:</h3>
+     * <blockquote>
+     * <ol>
+     * <li>count必须 {@code >=} 1</li>
+     * <li>sku必须不为null</li>
+     * <li>sku.getLifecycle() 必须 等于 {@link Sku#LIFE_CYCLE_ENABLE}</li>
+     * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS}</li>
+     * <li>判断 {@link #checkActiveBeginTime(ItemCommand)} 激活时间</li>
+     * <li>判断商品是非赠品</li>
+     * </ol>
+     * </blockquote>
      *
      * @param sku
      *            the sku
@@ -516,44 +444,40 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @return 如果检验没有错 返回null
      */
     private ShoppingcartResult doCommandValidate(Sku sku,Integer count){
-        // ******************************validate**********************************************************
 
-        // 数量不能小于1
+        //===============① 数量不能小于1===============
         Validate.isTrue(count >= 1, "count:%s can not <1", count);
 
-        // 判断sku是否存在
+        //===============② 判断sku是否存在===============
         if (Validator.isNullOrEmpty(sku)){
             return ShoppingcartResult.SKU_NOT_EXIST;
         }
 
-        // ********************************************************************************************
-
         // TODO
-        // 判断sku生命周期
+        //===============③ 判断sku生命周期===============
         if (!sku.getLifecycle().equals(Sku.LIFE_CYCLE_ENABLE)){
             return ShoppingcartResult.SKU_NOT_ENABLE;
         }
 
-        // ********************************************************************************************
-        ItemCommand item = sdkItemManager.findItemCommandById(sku.getItemId());
+        ItemCommand itemCommand = sdkItemManager.findItemCommandById(sku.getItemId());
         // item生命周期验证
-        Integer lifecycle = item.getLifecycle();
+        Integer lifecycle = itemCommand.getLifecycle();
 
+        //===============④  判断item的生命周期===============
         if (!com.baozun.nebula.sdk.constants.Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
-            // 还没上架
-            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", item.getId(), lifecycle);
+            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", itemCommand.getId(), lifecycle);
             return ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
         }
 
         // ********************************************************************************************
-        if (!checkActiveBeginTime(item)){
-            // 还没上架
+        //===============⑤  还没上架===============
+        if (!checkActiveBeginTime(itemCommand)){
             // TODO log
             return ShoppingcartResult.ITEM_NOT_ACTIVE_TIME;
         }
 
-        // 赠品验证
-        if (ItemInfo.TYPE_GIFT.equals(item.getType())){
+        //===============⑥ 赠品验证===============
+        if (ItemInfo.TYPE_GIFT.equals(itemCommand.getType())){
             return ShoppingcartResult.ITEM_IS_GIFT;
         }
         return null;
@@ -594,14 +518,15 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
-     * merge购物车之后做的事情.通常
-     * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)}
-     * ,
-     * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)}
-     * ,
-     * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model)}
-     * 都需要调用他
-     *
+     * merge购物车之后做的事情.
+     * 
+     * <p>
+     * 通常
+     * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model) addShoppingCart},
+     * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model) updateShoppingCartCount},
+     * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model) deleteShoppingCartLine} 都需要调用他
+     * </p>
+     * 
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
@@ -624,6 +549,82 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * Toggle shopping cart line check status.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param needChangeCheckedCommandList
+     *            the need change checked command list
+     * @param checkStatus
+     *            the check status
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     * @since 5.3.1
+     */
+    private ShoppingcartResult toggleShoppingCartLineCheckStatus(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> needChangeCheckedCommandList,
+                    boolean checkStatus,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+        if (Validator.isNullOrEmpty(needChangeCheckedCommandList)){
+            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        }
+
+        //TODO 这个目前会员购物车更新状态 需要这个参数
+        List<String> extentionCodeList = new ArrayList<String>();
+
+        for (ShoppingCartLineCommand needChangeCheckedCommand : needChangeCheckedCommandList){
+            // 跳过已经是该状态的购物车行
+            if (isSameCheckStatus(needChangeCheckedCommand.getSettlementState(), checkStatus)){
+                continue;
+            }
+
+            // ********* 商品验证***********
+            Long skuId = needChangeCheckedCommand.getSkuId();
+            Sku sku = sdkSkuManager.findSkuById(skuId);
+            ShoppingcartResult commandValidateShoppingcartResult = doCommandValidate(sku, needChangeCheckedCommand.getQuantity());
+
+            if (null != commandValidateShoppingcartResult){
+                return commandValidateShoppingcartResult;
+            }
+
+            if (isMoreThanInventory(shoppingCartLineCommandList, sku.getOutid())){
+                return ShoppingcartResult.MAX_THAN_INVENTORY;
+            }
+
+            extentionCodeList.add(needChangeCheckedCommand.getExtentionCode());
+            needChangeCheckedCommand.setSettlementState(checkStatus ? 1 : 0);
+
+        }
+
+        if (Validator.isNullOrEmpty(extentionCodeList)){
+            return ShoppingcartResult.SUCCESS;
+        }
+
+        // ********* 改变选中状态***********
+        ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(
+                        memberDetails,
+                        extentionCodeList,
+                        needChangeCheckedCommandList,
+                        checkStatus,
+                        request,
+                        response);
+
+        if (null != toggleShoppingcartResult){
+            return toggleShoppingcartResult;
+        }
+
+        return ShoppingcartResult.SUCCESS;
+    }
+
+    /**
      * 是不是相同的状态.
      *
      * @param settlementState
@@ -638,16 +639,22 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
-     * 获得主卖品(剔除 促銷行 贈品),通常我们只操作主卖品.
+     * 校验购物车里面的指定的skuId 是否超过库存量.
      *
      * @param shoppingCartLineCommandList
      *            the shopping cart line command list
-     * @return the main shopping cart line command list
+     * @param outId
+     *            the out id
+     * @return true, if a
      * @since 5.3.1
      */
-    private List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        // 主賣品(剔除 促銷行 贈品)
-        return CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
+    private boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,String outId){
+        SkuInventory inventoryInDb = sdkItemManager.getSkuInventoryByExtentionCode(outId);
+        Integer sumStock = CollectionsUtil.sum(CollectionsUtil.select(shoppingCartLineCommandList, "extentionCode", outId), "quantity")
+                        .intValue();
+
+        // 如果超过库存量
+        return sumStock > inventoryInDb.getAvailableQty();
     }
     // /**
     // * 游客的memboIds
