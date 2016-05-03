@@ -55,6 +55,7 @@ import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.manager.product.NebulaBundleManager;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -269,7 +270,7 @@ public class NebulaBundleController extends NebulaPdpController {
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand,String bundleItemCode) {
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
-		if(itemBaseInfoViewCommand.getLifecycle()!=1){
+		if(Item.LIFECYCLE_ENABLE != itemBaseInfoViewCommand.getLifecycle()){
 			LOG.info("Bundle error...bundleLifecycle is not active;Lifecycle:{} [{}]",itemBaseInfoViewCommand.getLifecycle(),new Date());
 			return null;
 		}
