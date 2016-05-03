@@ -172,7 +172,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 	}
 
 	@Override
-	public List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrI18nCommand> pagination){
+	public List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrI18nCommand> pagination,List<FacetParameter> facetParameters){
 		FacetFilterMetaData facetFilterMetaData = loadFacetFilterMetaData();
 
 		List<FacetGroup> newFacetGroups = new ArrayList<FacetGroup>();
