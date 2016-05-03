@@ -65,7 +65,7 @@
 
 <script type="text/javascript" src="${base}/scripts/system/navigation/spin.min.js" ></script>
 <script type="text/javascript" src="${base}/scripts/system/navigation/jquery.spin.js"></script>
-<script type="text/javascript" src="${base}/scripts/system/navigation/item-navigation-sort.js?v=2443344"></script>
+<script type="text/javascript" src="${base}/scripts/system/navigation/item-navigation-sort.js"></script>
 
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
