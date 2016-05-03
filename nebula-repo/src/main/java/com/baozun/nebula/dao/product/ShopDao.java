@@ -254,6 +254,4 @@ public interface ShopDao extends GenericEntityDao<Shop, Long> {
 	 */
 	@NativeQuery(model = ShopCommand.class)
 	List<ShopCommand> findByShopIds(@QueryParam("shopIds")List<Long> shopIds);
-
-
 }
