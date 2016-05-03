@@ -19,14 +19,15 @@ package com.baozun.nebula.manager.baseinfo;
 
 import java.util.List;
 
-import loxia.dao.Sort;
-
 import com.baozun.nebula.command.baseinfo.NavigationCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.CodeRepeatException;
 import com.baozun.nebula.exception.NameRepeatException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.baseinfo.Navigation;
+import com.baozun.nebula.model.product.ItemCollection;
+
+import loxia.dao.Sort;
 
 /**
  * @author - 项硕
@@ -83,5 +84,23 @@ public interface NavigationManager extends BaseManager {
 	 */
 	public NavigationCommand i18nFindNavigationLangByNavigationId(Long navigationId);
 	
+	/**
+	 * 更新itemCollection的商品排序
+	 * @param itemCollection
+	 * @return
+	 */
+	public ItemCollection updateSequenceById(Long itemCollectionId,String sequence);
+	
+	/***导航节点添加商品排序
+	 * @param navigationId 导航节点ID
+	 * @param codes  待添加的商品编码数组
+	 */
+	public Boolean AddSortedItemCodeById(Long navigationId,String[] codes);
+	
+	/***导航节点删除商品排序
+	 * @param navigationId 导航节点ID
+	 * @param codes  待添加的商品编码数组
+	 */	
+	public Boolean removeSortedItemCodeById(Long navigationId,String[] codes);
 	
 }

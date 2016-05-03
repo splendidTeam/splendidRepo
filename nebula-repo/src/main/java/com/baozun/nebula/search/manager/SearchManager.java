@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
+import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
@@ -40,5 +41,15 @@ public interface SearchManager extends BaseManager{
 	 * @time 2016年4月26日上午10:23:10
 	 */
 	List<SearchConditionCommand> findConditionByCategoryIdsWithCache(List<Long> categoryIds);
+	
+	
+	/**
+	 * 根据搜索条件id查询搜索条件
+	 * @return List<SearchConditionItemCommand>
+	 * @param coditionId
+	 * @author 冯明雷
+	 * @time 2016年4月29日下午5:03:18
+	 */
+	List<SearchConditionItemCommand> findCoditionItemByCoditionIdWithCache(Long coditionId);
 	
 }
