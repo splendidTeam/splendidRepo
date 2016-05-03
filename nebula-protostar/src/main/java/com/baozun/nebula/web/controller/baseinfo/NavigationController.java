@@ -112,14 +112,14 @@ public class NavigationController extends BaseController{
 	
 	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
 	
-	 {
-			try{
-				solrQueryConvert =  (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
-			}catch (Exception e){
-				log.error(e.getMessage());
-			}
-		
-	}
+//	 {
+//			try{
+//				solrQueryConvert =  (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
+//			}catch (Exception e){
+//				log.error(e.getMessage());
+//			}
+//		
+//	}
 	/**
 	 * 前往页面 将 分类列表 与 导航列表 传给页面
 	 * 
@@ -139,8 +139,6 @@ public class NavigationController extends BaseController{
 		List<Navigation> naviList = navigationManager.findAllNavigationList(Navigation.COMMOM_SORTS);
 		model.addAttribute("navigationList", naviList);
 		log.debug(JsonFormatUtil.format(naviList));
-
-		model.addAttribute("now", System.currentTimeMillis());
 		return "system/navigation/navigation";
 	}
 

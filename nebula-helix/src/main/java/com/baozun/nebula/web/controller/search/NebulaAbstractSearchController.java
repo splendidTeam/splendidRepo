@@ -308,7 +308,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 						Integer score = itemIdStrs.length * 100;
 
 						// 商品id
-						String itemId = itemIdStrs[1];
+						String itemId = itemIdStrs[i];
 						// 计算得分
 						score = score - i * 10;
 
