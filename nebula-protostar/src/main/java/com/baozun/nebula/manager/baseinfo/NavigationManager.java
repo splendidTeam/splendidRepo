@@ -103,4 +103,10 @@ public interface NavigationManager extends BaseManager {
 	 */	
 	public Boolean removeSortedItemCodeById(Long navigationId,String[] codes);
 	
+	
+	/***通过商品集合ID找到对应的前台导航
+	 * @param itemCollectionId 商品集合ID
+	 */	
+	public  Navigation findByItemCollectionId (Long itemCollectionId);
+	
 }

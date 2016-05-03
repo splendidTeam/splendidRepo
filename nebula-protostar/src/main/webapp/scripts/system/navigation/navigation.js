@@ -653,162 +653,31 @@ $j(document).ready(function(){
 	
 	//关闭选择属性的弹层
 	$j("#selectCategoryBtn").click(function(){
-		//存储选择的分类与属性
-		var facetParameters = new Array();
-		
-		//分类
-		var arryInfo=new Object();
-		var keys= "";
-		var nodes = CATE_TREE.getCheckedNodes(true);
-		if (nodes.length > 0) {
-			for(var i=0;i<nodes.length;i++){
-				var parentTId=nodes[i].parentTId;
-				var tId = nodes[i].tId;
-				if(keys.indexOf(parentTId)<0){
-					keys = keys  + parentTId + ","
-					arryInfo[parentTId] = tId;
-				}else{
-					arryInfo[parentTId] = arryInfo[parentTId] + "," + tId;
-				}
-			}
-			
-			//取消末尾,
-			keys = keys.substring(0,keys.length-1);
-			var arrayKeys = keys.split(",");
-		
-			for(var i=0;i<arrayKeys.length;i++){
-				var parentTId = arrayKeys[i];
-				if(parentTId!=""){
-					var facetParameter = new Object();
-					facetParameter.facetType="CATEGORY";
-					//分类类型的FacetParameter.name统一固定 category_tree
-					facetParameter.name="category_tree";
-					var tIds = arryInfo[parentTId];
-					var arraytIds = tIds.split(",");
-					
-					var values = new Array();
-					
-					for(var j=0;j<arraytIds.length;j++){
-						
-						var tid = arraytIds[j];
-						if(tid!= ""){
-							var node = CATE_TREE.getNodeByTId(tid)
-							
-							if(!node){
-								continue;
-							}
-							
-							//结点树ID的倒序连接
-							var value = node.id+"";
-							
-							var parentNode = node.getParentNode();
-							while(parentNode!=null && parentNode.id!='0'){
-								value  = value + "-" + parentNode.id;
-								parentNode = parentNode.getParentNode()
-							}
-							//设置 FacetParameter.name
-//							if(!facetParameter.name){
-//								//同级分类只有一个节点, facetParameter.name='dynamic_forsearch_'+ 该节点ID
-//								if(arraytIds.length==1){
-//									facetParameter.name="dynamic_forsearch_"+node.id;
-//								}
-//								//同级分类超过一个节点, facetParameter.name='dynamic_forsearch_'+ 该节点的父节点ID
-//								else if(arraytIds.length>1){
-//									facetParameter.name="dynamic_forsearch_"+parentNode.id;
-//								}
-//							}
-//							if(value.indexOf("-")>=0){
-								//value颠倒 
-								var info = value.split("-");
-								for(var k=0;k<info.length;k++){
-									if(k==0){
-										value = info[info.length-1]
-									}else{
-										value  = value +"-"+ info[info.length-1-k]
-									}
-								}
-//							}
-							values.push(value);
-						}
-					}
-					facetParameter.values=values;
-					
-					facetParameters.push(facetParameter);
-				}
-			}
-		}
-		
-		//属性
-		var propertyIds ="";
-		$j("div#propertiesDiv > div").each(function(){
-			var $checkInfo=$j(this).find('input:checkbox:checked');
-			if($checkInfo.size()>0){
-				var facetParameter = new Object();
-				facetParameter.name="dynamic_forsearch_"+$checkInfo.eq(0).attr("lang");
-				facetParameter.facetType="PROPERTY";
-				var values = new Array();
-				for(var j=0;j<$checkInfo.size();j++){
-					values.push($checkInfo.eq(j).val());
-					propertyIds += $checkInfo.eq(j).val()+","
-				}
-				
-				facetParameter.values=values;
-				
-				facetParameters.push(facetParameter);
-			}
-		});
-		if(propertyIds){
-			curParameterInput.data("property", propertyIds.substring(0,propertyIds.length-1));
-		}else{
-			curParameterInput.data("property", "");
-		}
-		
-		//构建转递到服务器的数据
-		if(facetParameters.length>0){
-			var jsonstr="";
-			for(var j=0;j<facetParameters.length;j++){
-				jsonstr += facetParameters[j].name+",";
-				jsonstr += facetParameters[j].facetType+",";
-				
-				var value="";
-				for(var k=0;k<facetParameters[j].values.length;k++){
-					if(k==facetParameters[j].values.length-1){
-						value += facetParameters[j].values[k];
-					}else{
-						value += facetParameters[j].values[k]+"_";
-					}
-				}
-				jsonstr += value;
-				jsonstr += ";";
-			}
-			//
-			curParameterInput.data("json", jsonstr);
-//			CATE_TREE.checkAllNodes(false);  //取消所有选中效果
-			
-			
-		}
+		dealNavigationParam();
 		categoryHideMenu();
-		
-		
-//		setTimeout($j("#propertiesDiv input").attr("checked", false),500)
-		$j("#propertiesDiv input").attr("checked", false);  //全部取消勾选
 		
 	});
 	
 	$j(".propertySelectEvent").click(function(){
 		createShowParamLabel();
+		dealNavigationParam();
 	});
 	
 	
 	
-	//默认选中节点ID为0的
-	var node = NAVI_TREE.getNodeByParam("id",0);
+	var navigationId = $j("#navigationId").val();
+	var node = null;
+	if(navigationId){
+		 node = NAVI_TREE.getNodeByParam("id",navigationId);
+	}else{
+		//默认选中节点ID为0的
+		 node = NAVI_TREE.getNodeByParam("id",0);
+		 navigationId = "0";
+	}
 	if(node){
 		NAVI_TREE.selectNode(node);
+		$j("#tree_"+navigationId+"_a").click();
 	}
-	
-	console.dir(NAVI_TREE.getNodes()[0]);
-	
 	
 });
 
@@ -1271,6 +1140,7 @@ function categoryCheck(e, treeId, treeNode) {
 //	}
 	
 	createShowParamLabel();
+	dealNavigationParam();
 	//categoryHideMenu();
 }
 
@@ -1439,5 +1309,122 @@ function createShowParamLabel(){
 	}
 }
 
+//处理分类类型导航参数
+function dealNavigationParam(){
+	//存储选择的分类与属性
+	var facetParameters = new Array();
+	
+	//分类
+	var arryInfo=new Object();
+	var keys= "";
+	var nodes = CATE_TREE.getCheckedNodes(true);
+	if (nodes.length > 0) {
+		for(var i=0;i<nodes.length;i++){
+			var parentTId=nodes[i].parentTId;
+			var tId = nodes[i].tId;
+			if(keys.indexOf(parentTId)<0){
+				keys = keys  + parentTId + ","
+				arryInfo[parentTId] = tId;
+			}else{
+				arryInfo[parentTId] = arryInfo[parentTId] + "," + tId;
+			}
+		}
+		
+		//取消末尾,
+		keys = keys.substring(0,keys.length-1);
+		var arrayKeys = keys.split(",");
+	
+		for(var i=0;i<arrayKeys.length;i++){
+			var parentTId = arrayKeys[i];
+			if(parentTId!=""){
+				var facetParameter = new Object();
+				facetParameter.facetType="CATEGORY";
+				//分类类型的FacetParameter.name统一固定 category_tree
+				facetParameter.name="category_tree";
+				var tIds = arryInfo[parentTId];
+				var arraytIds = tIds.split(",");
+				
+				var values = new Array();
+				
+				for(var j=0;j<arraytIds.length;j++){
+					
+					var tid = arraytIds[j];
+					if(tid!= ""){
+						var node = CATE_TREE.getNodeByTId(tid)
+						if(node){
+							//结点树ID的倒序连接
+							var value = node.id+"";
+						
+							var parentNode = node.getParentNode();
+							while(parentNode!=null && parentNode.id!='0'){
+								value  = value + "-" + parentNode.id;
+								parentNode = parentNode.getParentNode()
+							}
+							var info = value.split("-");
+							for(var k=0;k<info.length;k++){
+								if(k==0){
+									value = info[info.length-1]
+								}else{
+									value  = value +"-"+ info[info.length-1-k]
+								}
+							}
+							values.push(value);
+						}
+					}
+				}
+				facetParameter.values=values;
+				facetParameters.push(facetParameter);
+			}
+		}
+	}
+	
+	//属性
+	var propertyIds ="";
+	$j("div#propertiesDiv > div").each(function(){
+		var $checkInfo=$j(this).find('input:checkbox:checked');
+		if($checkInfo.size()>0){
+			var facetParameter = new Object();
+			facetParameter.name="dynamic_forsearch_"+$checkInfo.eq(0).attr("lang");
+			facetParameter.facetType="PROPERTY";
+			var values = new Array();
+			for(var j=0;j<$checkInfo.size();j++){
+				values.push($checkInfo.eq(j).val());
+				propertyIds += $checkInfo.eq(j).val()+","
+			}
+			
+			facetParameter.values=values;
+			
+			facetParameters.push(facetParameter);
+		}
+	});
+	if(propertyIds){
+		curParameterInput.data("property", propertyIds.substring(0,propertyIds.length-1));
+	}else{
+		curParameterInput.data("property", "");
+	}
+	
+	//构建转递到服务器的数据
+	if(facetParameters.length>0){
+		var jsonstr="";
+		for(var j=0;j<facetParameters.length;j++){
+			jsonstr += facetParameters[j].name+",";
+			jsonstr += facetParameters[j].facetType+",";
+			
+			var value="";
+			for(var k=0;k<facetParameters[j].values.length;k++){
+				if(k==facetParameters[j].values.length-1){
+					value += facetParameters[j].values[k];
+				}else{
+					value += facetParameters[j].values[k]+"_";
+				}
+			}
+			jsonstr += value;
+			jsonstr += ";";
+		}
+		curParameterInput.data("json", jsonstr);
+	}
+	
+	$j("#propertiesDiv input").attr("checked", false);  //全部取消勾选
+}
 
 

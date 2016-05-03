@@ -65,7 +65,7 @@
 
 <script type="text/javascript" src="${base}/scripts/system/navigation/spin.min.js" ></script>
 <script type="text/javascript" src="${base}/scripts/system/navigation/jquery.spin.js"></script>
-<script type="text/javascript" src="${base}/scripts/system/navigation/item-navigation-sort.js"></script>
+<script type="text/javascript" src="${base}/scripts/system/navigation/item-navigation-sort.js?v=2443344"></script>
 
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
@@ -144,6 +144,7 @@ ul,li{list-style: none;  margin: 0;  padding: 0;}
 			<img src="${base}/images/wmi/blacks/32x32/tag.png"> 前台导航管理
 					<input type="button" style="display: none;" value="<spring:message code='itemcategorysort.action.del'/>" title="<spring:message code='itemcategorysort.action.del'/>" class="button orange removesort" />
 					<input type="button" value="<spring:message code='itemcategorysort.action.add'/>" title="<spring:message code='itemcategorysort.action.add'/>" class="button orange addsort" />
+					<a href="/base/navigation.htm?navigationId=${navigationId}" style="float: right;color:#069;font-size: 14px;" id="backNavigation">返回菜单导航</a>
 		</div>
 		
 		<%-- 

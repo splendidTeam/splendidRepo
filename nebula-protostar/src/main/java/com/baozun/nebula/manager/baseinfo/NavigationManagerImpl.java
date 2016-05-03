@@ -542,7 +542,18 @@ public class NavigationManagerImpl implements NavigationManager {
 	@Override
 	public ItemCollection updateSequenceById(Long itemCollectionId,String sequence){
 		ItemCollection  itemCollection = itemCollectionDao.getByPrimaryKey(itemCollectionId);
-		itemCollection.setSequence(sequence);
+		
+		String[] CodeArray= sequence.split(",");
+		StringBuffer buffer =new StringBuffer();
+		for(String itemCode:CodeArray){
+			//检验商品是否存在
+			ItemCommand itemCommand = itemDao.findItemCommandByCode(itemCode);
+			if(itemCommand==null){
+				return null;
+			}
+			buffer.append(itemCommand.getId()+",");
+		}
+		itemCollection.setSequence(buffer.toString());
 		return itemCollectionDao.save(itemCollection);
 		
 	}
@@ -553,6 +564,7 @@ public class NavigationManagerImpl implements NavigationManager {
 		if(itemCollection==null){
 			return false;
 		}
+		String sequence = itemCollection.getSequence();
 		StringBuffer buffer =new StringBuffer();
 		for(String code:codes){
 			//检验商品是否存在
@@ -560,7 +572,11 @@ public class NavigationManagerImpl implements NavigationManager {
 			if(itemCommand==null){
 				return false;
 			}
-			buffer.append(code+",");
+			//存在排序中
+			if(sequence!=null && sequence.indexOf(itemCommand.getId()+"") >-1){
+				return false;
+			}
+			buffer.append(itemCommand.getId()+",");
 		}
 		
 		if(itemCollection.getSequence()==null){
@@ -585,30 +601,33 @@ public class NavigationManagerImpl implements NavigationManager {
 		
 		//验证待删除排序的商品存在并存在排序中
 		String sequence = itemCollection.getSequence();
+		
+		List<Long> newIdList = new  ArrayList<Long>();
 		for(String code:codes){
 			ItemCommand itemCommand = itemDao.findItemCommandByCode(code);
 			//商品不存在|| 不存在排序中
-			if(itemCommand==null || sequence.indexOf(code)<0){
+			if(itemCommand==null  || sequence.indexOf(itemCommand.getId()+"") <0){
 				return false;
 			}
+			newIdList.add(itemCommand.getId());
 		}
 		
 		//重置排序
-		String[] existCodes= sequence.split(",");
+		String[] existIds= sequence.split(",");
 		//拼接
 		StringBuffer buffer =new StringBuffer();
-		for(String existcode:existCodes){
-			if(existcode.length()>0){
+		for(String existId:existIds){
+			if(existId.length()>0){
 				//删除标志
 				boolean deleteFlg =false;
-				for(String code:codes){
-					if(existcode.equals(code)){
+				for(Long itemId:newIdList){
+					if(itemId.toString().equals(existId)){
 						deleteFlg = true;
 						break;
 					}
 				}
 				if(!deleteFlg){
-					buffer.append(existcode+",");
+					buffer.append(existId+",");
 				}
 			}
 		}
@@ -618,4 +637,11 @@ public class NavigationManagerImpl implements NavigationManager {
 		
 		return itemCollection!=null;
 	}
+	
+	@Override
+	public  Navigation findByItemCollectionId (Long itemCollectionId){
+		return navigationDao.findByItemCollectionId(itemCollectionId);
+	}
+	
+	
 }

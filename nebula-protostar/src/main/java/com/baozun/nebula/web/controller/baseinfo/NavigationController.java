@@ -61,6 +61,7 @@ import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.Param.SkuItemParam;
+import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 import com.baozun.nebula.solr.factory.NebulaSolrQueryFactory;
 import com.baozun.nebula.solr.utils.FilterUtil;
@@ -83,12 +84,8 @@ import loxia.dao.Sort;
 public class NavigationController extends BaseController{
 
 	private static final Logger			log	= LoggerFactory.getLogger(NavigationController.class);
-	
-
 	/** 逗号分隔符 */
 	private final static String		SEPARATORCHARS_COMMA	= ",";
-
-	/** -分隔符 */
 
 	@Autowired
 	private NavigationManager			navigationManager;
@@ -112,14 +109,7 @@ public class NavigationController extends BaseController{
 	
 	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
 	
-//	 {
-//			try{
-//				solrQueryConvert =  (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
-//			}catch (Exception e){
-//				log.error(e.getMessage());
-//			}
-//		
-//	}
+		
 	/**
 	 * 前往页面 将 分类列表 与 导航列表 传给页面
 	 * 
@@ -127,7 +117,7 @@ public class NavigationController extends BaseController{
 	 * @return
 	 */
 	@RequestMapping(value = "/base/navigation.htm",method = RequestMethod.GET)
-	public String navigationList(Model model){
+	public String navigationList(Long navigationId,Model model){
 		Sort[] sorts = Sort.parse("parent_id asc,sort_no asc");
 		List<Category> cateList = categoryManager.findEnableCategoryList(sorts);
 		model.addAttribute("categoryList", cateList);
@@ -138,6 +128,7 @@ public class NavigationController extends BaseController{
 
 		List<Navigation> naviList = navigationManager.findAllNavigationList(Navigation.COMMOM_SORTS);
 		model.addAttribute("navigationList", naviList);
+		model.addAttribute("navigationId", navigationId);
 		log.debug(JsonFormatUtil.format(naviList));
 		return "system/navigation/navigation";
 	}
@@ -286,7 +277,7 @@ public class NavigationController extends BaseController{
 		model.addAttribute("navigationList", naviList);
 		
 		//已排序商品集合
-		SearchResultPage<ItemForSolrI18nCommand>  resultPage =  getSortedList(navigationId);
+		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		
 		//导航ID
@@ -300,7 +291,7 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemUnsortedList.json")
 	@ResponseBody
-	public SearchResultPage<ItemForSolrI18nCommand> findItemCtListJson(@PathVariable Long navigationId){
+	public SearchResultPage<ItemForSolrCommand> findItemCtListJson(@PathVariable Long navigationId){
 		return  getUnsortedList(navigationId);
 	}
 
@@ -309,7 +300,7 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemSortedList.htm")
 	public String findSortedItem(@PathVariable Long navigationId,Model model){
-		SearchResultPage<ItemForSolrI18nCommand>  resultPage =  getSortedList(navigationId);
+		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		model.addAttribute("isSuccess", "success");
 		return "/system/navigation/item-navigation-detail";
@@ -362,9 +353,15 @@ public class NavigationController extends BaseController{
 			itemCodeArray = new String[tempSet.size()];
 			itemCodeArray = tempSet.toArray(itemCodeArray);
 		}
+		if(!allInNavigationSolr(itemCodeArray,navigationId)){
+			result.setIsSuccess(false);
+			result.setDescription("商品编码不在该导航下");
+		}
 		if(!navigationManager.AddSortedItemCodeById(navigationId,itemCodeArray)){
 			result.setIsSuccess(false);
 			result.setDescription("添加失败");
+		}else{
+			result.setDescription(itemCodeArray);
 		}
 		return result;
 	}
@@ -386,12 +383,39 @@ public class NavigationController extends BaseController{
 			result.setIsSuccess(false);
 			result.setDescription("请勾选待删除排序的商品");
 		}
+		String[] codes = itemCodes.split(",");
+		if(!allInNavigationSolr(codes,navigationId)){
+			result.setIsSuccess(false);
+			result.setDescription("商品编码不在该导航下");
+		}
 		if(!navigationManager.removeSortedItemCodeById(navigationId, itemCodes.split(","))){
 			result.setIsSuccess(false);
 			result.setDescription("删除失败");
 		}
 		return result;
-
+	}
+	
+	
+	private boolean allInNavigationSolr(String[] codes,Long navigationId ){
+		 SearchResultPage<ItemForSolrCommand> searchResultPage= searchNavigation(navigationId);
+		for (String code : codes){
+			if(code.length()==0){
+				continue;
+			}
+			if (code != null && code.length() > 0) {
+				boolean haveFlg = false;
+				for(ItemForSolrCommand command :searchResultPage.getItems()){
+					if (code.equals(command.getCode())) {
+						haveFlg = true;
+						break;
+					}
+				}
+				if(!haveFlg){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	
@@ -435,7 +459,7 @@ public class NavigationController extends BaseController{
 	}
 
 	
-	public SearchResultPage<ItemForSolrI18nCommand> getUnsortedList(Long navigationId){
+	public SearchResultPage<ItemForSolrCommand> getUnsortedList(Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		if(itemCollection==null ){
 			return null;
@@ -443,13 +467,13 @@ public class NavigationController extends BaseController{
 		if(itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
 			return searchNavigation(navigationId);
 		}
-		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchNavigation(navigationId);
-		String[] codes = itemCollection.getSequence().split(",");
-		for (String code : codes){
-			if (code != null && code.length() > 0) {
-				Iterator<ItemForSolrI18nCommand> iterator = searchResultPage.getItems().iterator();
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(navigationId);
+		String[] idList = itemCollection.getSequence().split(",");
+		for (String itemId : idList){
+			if (itemId != null && itemId.length() > 0) {
+				Iterator<ItemForSolrCommand> iterator = searchResultPage.getItems().iterator();
 				while (iterator.hasNext()){
-					if (code.equals(iterator.next().getCode())) {
+					if (itemId.equals(iterator.next().getId().toString())) {
 						iterator.remove();
 						break;
 					}
@@ -460,23 +484,23 @@ public class NavigationController extends BaseController{
 		return searchResultPage;
 	}
 	
-	public  SearchResultPage<ItemForSolrI18nCommand> getSortedList(Long navigationId){
+	public  SearchResultPage<ItemForSolrCommand> getSortedList(Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		//商品集合不存在
 		if(itemCollection==null || itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
 			return null;
 		}
-		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchNavigation(navigationId);
-		SearchResultPage<ItemForSolrI18nCommand>  sortList = new  SearchResultPage<ItemForSolrI18nCommand>();
-		List<ItemForSolrI18nCommand> commands = new ArrayList<ItemForSolrI18nCommand>();
-		String[] codes  = itemCollection.getSequence().split(",");
-		for(String code:codes){
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(navigationId);
+		SearchResultPage<ItemForSolrCommand>  sortList = new  SearchResultPage<ItemForSolrCommand>();
+		List<ItemForSolrCommand> commands = new ArrayList<ItemForSolrCommand>();
+		String[] idList  = itemCollection.getSequence().split(",");
+		for(String itemId:idList){
 			//检索结果存在
 			boolean sureFlg=false;
-			ItemForSolrI18nCommand command = null;
-			if(code!=null && code.length()>0){
-				for(ItemForSolrI18nCommand curCommand:searchResultPage.getItems()){
-					if(code.equals(curCommand.getCode())){
+			ItemForSolrCommand command = null;
+			if(itemId!=null && itemId.length()>0){
+				for(ItemForSolrCommand curCommand:searchResultPage.getItems()){
+					if(itemId.equals(curCommand.getId().toString())){
 						command = curCommand;
 						sureFlg = true;
 						break;
@@ -500,27 +524,37 @@ public class NavigationController extends BaseController{
 		return sortList;
 	}
 	
-	private SearchResultPage<ItemForSolrI18nCommand>  searchNavigation(Long navigationId){
+	private SearchResultPage<ItemForSolrCommand>  searchNavigation(Long navigationId){
 		
-		SearchResultPage<ItemForSolrI18nCommand> searchResultPage =null;
+		SearchResultPage<ItemForSolrCommand> searchResultPage =null;
 		
 		ItemCollection collection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
+		
+		if(solrQueryConvert==null){
+			try{
+				solrQueryConvert =  (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
+			}catch (Exception e){
+				log.error(e.getMessage());
+			}
+			
+		}
 		if (Validator.isNotNullOrEmpty(collection)) {
-			SearchCommand searchCommand = collectionToSearchCommand(collection);
+			 
+				SearchCommand searchCommand = collectionToSearchCommand(collection);
 
-			// ***************** 下面这些查询和searchPage是一致的
-			// 创建solrquery对象
-			SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
+				// ***************** 下面这些查询和searchPage是一致的
+				// 创建solrquery对象
+				SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
-			// set facet相关信息
-			setFacet(solrQuery);
+				// set facet相关信息
+				setFacet(solrQuery);
 
-			// 设置权重信息
-			Boost boost = createBoost(searchCommand);
-			searchManager.setSolrBoost(solrQuery, boost);
+				// 设置权重信息
+				Boost boost = createBoost(searchCommand);
+				searchManager.setSolrBoost(solrQuery, boost);
 
-			// 查询
-			 searchResultPage = searchManager.search(solrQuery);
+				// 查询
+				searchResultPage = searchManager.search(solrQuery);
 		}
 		return searchResultPage;
 		
@@ -533,21 +567,22 @@ public class NavigationController extends BaseController{
 //			ItemForSolrI18nCommand command1 = new ItemForSolrI18nCommand();
 //			command1.setTitle("商品1");
 //			command1.setCode("111");
+//			command1.setId(111L);
 //			command1.setSort_no(1);
 //			
 //			ItemForSolrI18nCommand command2 = new ItemForSolrI18nCommand();
 //			command2.setTitle("商品2");
-//			command2.setCode("222");
+//			command2.setId(222L);
 //			command2.setSort_no(2);
 //			
 //			ItemForSolrI18nCommand command3 = new ItemForSolrI18nCommand();
 //			command3.setTitle("商品3");
-//			command3.setCode("333");
+//			command3.setId(333L);
 //			command3.setSort_no(3);
 //			
 //			ItemForSolrI18nCommand command4 = new ItemForSolrI18nCommand();
 //			command4.setTitle("商品4");
-//			command4.setCode("444");
+//			command4.setId(444L);
 //			command4.setSort_no(4);
 //			
 //			List<ItemForSolrI18nCommand> commands = new ArrayList<ItemForSolrI18nCommand>();
@@ -567,16 +602,21 @@ public class NavigationController extends BaseController{
 //			return searchResultPage;
 		}
 	
-	private SearchCommand collectionToSearchCommand(ItemCollection collection) {
+	protected SearchCommand collectionToSearchCommand(ItemCollection collection) {
 		SearchCommand searchCommand = new SearchCommand();
 		
 		String facetParameters = collection.getFacetParameters();
 		List<FacetParameter> params =JSON.parseArray(facetParameters,FacetParameter.class);
 		searchCommand.setFacetParameters(params);
+		
+		Navigation navi = navigationManager.findByItemCollectionId(collection.getId());
+		searchCommand.setNavigationId(navi.getId());
+		
 		return searchCommand;
 	}
 	
-	private void setFacet(SolrQuery solrQuery){
+	
+	protected void setFacet(SolrQuery solrQuery){
 		// facetFileds，set防止重复数据
 		Set<String> facetFields = new HashSet<String>();
 
@@ -595,7 +635,7 @@ public class NavigationController extends BaseController{
 			if (propertyId != null) {
 				if(SearchCondition.NORMAL_TYPE.equals(cmd.getType())){
 					facetFields.add(SkuItemParam.dynamicCondition + propertyId);
-				}else if(SearchCondition.NORMAL_AREA_TYPE.equals(cmd.getType())){
+				}else if(SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())){
 					List<SearchConditionItemCommand> searchConditionItemCommands= searchManager.findCoditionItemByCoditionIdWithCache(cmd.getId());
 					for(SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
 						if(null!= scItemCmd){
@@ -615,8 +655,9 @@ public class NavigationController extends BaseController{
 		// 设置solrQuery的facetFiled
 		NebulaSolrQueryFactory.setFacetField(facetFields.toArray(new String[facetFields.size()]), solrQuery);
 	}
+
 	
-	private Boost createBoost(SearchCommand searchCommand){
+	protected Boost createBoost(SearchCommand searchCommand){
 		Boost boost = new Boost();
 
 		// 设置商品置顶
@@ -627,13 +668,23 @@ public class NavigationController extends BaseController{
 
 		return boost;
 	}
-	
-	private void setBoostBq(Boost boost,SearchCommand searchCommand){
+
+	/**
+	 * 设置boost中的bq属性
+	 * 
+	 * @return void
+	 * @param boost
+	 * @param searchCommand
+	 * @author 冯明雷
+	 * @time 2016年4月27日下午2:46:24
+	 */
+	protected void setBoostBq(Boost boost,SearchCommand searchCommand){
 		// 根据商品指定排序表中的数据，将商品置顶
-		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(searchCommand.getNavigationId());
+		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(searchCommand.getNavigationId()); 
+
 		if (itemCollection != null) {
 			String sequence = itemCollection.getSequence();
-			if (sequence != null) {
+			if (Validator.isNotNullOrEmpty(sequence)) {
 				String[] itemIdStrs = sequence.split(SEPARATORCHARS_COMMA);
 				if (itemIdStrs != null && itemIdStrs.length > 0) {
 					StringBuffer bq = new StringBuffer();
@@ -642,15 +693,22 @@ public class NavigationController extends BaseController{
 						Integer score = itemIdStrs.length * 100;
 
 						// 商品id
-						String itemId = itemIdStrs[1];
-						// 计算得分
-						score = score - i * 10;
+						String itemId = itemIdStrs[i];
+						
+						if(Validator.isNotNullOrEmpty(itemId)){
+							
+							// 计算得分
+							score = score - i * 10;
 
-						bq.append("id:" + itemId + "^" + score);
+							bq.append("id:" + itemId + "^" + score);
 
-						if (i > itemIdStrs.length - 1) {
-							bq.append(" OR ");
+							if (i > itemIdStrs.length - 1) {
+								bq.append(" OR ");
+							}
+							
 						}
+						
+
 					}
 					boost.setBq(bq.toString());
 				}
@@ -660,7 +718,16 @@ public class NavigationController extends BaseController{
 	}
 	
 	
-	private void setBoostPfAndbf(Boost boost,String searchKeyWord){
+	/**
+	 * 设置搜索关键字权重(商城可以重写这个方法)
+	 * 
+	 * @return void
+	 * @param boost
+	 * @param searchCommand
+	 * @author 冯明雷
+	 * @time 2016年4月27日下午2:51:19
+	 */
+	protected void setBoostPfAndbf(Boost boost,String searchKeyWord){
 		if (Validator.isNullOrEmpty(searchKeyWord)) {
 			return;
 		}
@@ -691,7 +758,4 @@ public class NavigationController extends BaseController{
 
 		boost.setPf(pf.toString());
 	}
-	
-
-	
 }

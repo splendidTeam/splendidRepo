@@ -37,7 +37,18 @@
 	<ul class="gbin1-list" id="sortTable">
 	<c:forEach items="${resultPage.items }" var="item" varStatus="index">
 		<li>
-		
+			<c:if test="${fn:length(item.imageUrl)>0 }">
+					<c:forEach items="${item.imageUrl}" var="imageUrl"  begin="0" end="0">
+						<c:if test="${! empty mainColorList.itemColor }">
+						
+							<%--   图片暂时不显示，
+							<span> 
+								<img id="${item.id }" src="${UPLOAD_IMG_DOMAIN }<url:img size='150X200' imgUrl='${imageUrl}'/>" />
+		                	</span>
+		                	--%>
+	                	</c:if>
+	                </c:forEach>
+	        </c:if>
 			<%-- 
 			<c:choose>
 				<c:when test="${fn:length(itemProties.colorCommandUAs.mainColorImageList)>=1 }">
@@ -155,7 +166,7 @@
 	               <label class="check-txt" id="${item.code}" >
 	               	   <i class="check-input" ></i>
 					   <span>${item.code }</span>
-			           <span>(${item.sort_no})</span>
+			           <span>(${index.count})</span>
 					</label>
 			   </div>
 		</li>
