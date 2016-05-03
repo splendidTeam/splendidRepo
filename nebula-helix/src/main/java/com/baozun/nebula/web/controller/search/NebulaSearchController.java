@@ -1,5 +1,6 @@
 package com.baozun.nebula.web.controller.search;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -87,17 +88,26 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		searchParamProcess(searchCommand);
 
 		// 创建solrquery对象
-		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
+		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);		
+		LOG.debug("solr solrQuery before setFacet:"+solrQuery.toString());
 
 		// set facet相关信息
 		setFacet(solrQuery);
+		LOG.debug("solr solrQuery after setFacet:"+solrQuery.toString());
+		
 
 		// 设置权重信息
 		Boost boost = createBoost(searchCommand);
 		searchManager.setSolrBoost(solrQuery, boost);
+		LOG.debug("solr solrQuery after setSolrBoost:"+solrQuery.toString());
 
 		// 查询
-		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);		
+		if(searchResultPage==null){
+			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+			return ITEM_LIST;
+		}
+		LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]",searchResultPage.getCount(), new Date());
 
 		// 页面左侧筛选项
 		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage,searchCommand.getFacetParameters());

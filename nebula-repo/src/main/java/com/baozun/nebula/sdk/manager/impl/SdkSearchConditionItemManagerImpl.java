@@ -24,6 +24,7 @@ import com.baozun.nebula.model.product.SearchConditionItem;
 import com.baozun.nebula.model.product.SearchConditionItemlang;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;
+import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.utils.Validator;
 
 /**
@@ -277,6 +278,11 @@ public class SdkSearchConditionItemManagerImpl implements
 			 searchConditionItemCommand.setName(singleLang);
 		 }
 		return searchConditionItemCommand;
+	}
+
+	@Override
+	public List<MetaDataCommand> findSearchConditionItemMetDataByLang(String lang){
+		return searchConditionItemDao.findSearchConditionItemMetDataByLang(lang);
 	}
 
 }
