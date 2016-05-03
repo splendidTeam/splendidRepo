@@ -415,11 +415,12 @@ $j(document).ready(function() {
 	
 	//导航节点默认选中
 	var navigationId = $j("#navigationId").val();
+	alert(navigationId);
 	if(navigationId){
 		var node = treeObj.getNodeByParam("id",navigationId)
 		if(node){
 			treeObj.selectNode(node);
-			$j("#tree_"+navigationId+"_a").click();
+			treeObj.checkNode(node,true,true);
 		}
 	}
 });

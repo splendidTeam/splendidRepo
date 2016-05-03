@@ -676,7 +676,7 @@ $j(document).ready(function(){
 	}
 	if(node){
 		NAVI_TREE.selectNode(node);
-		$j("#tree_"+navigationId+"_a").click();
+		NAVI_TREE.checkNode(node,true,true);
 	}
 	
 });
