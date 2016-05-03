@@ -10,7 +10,7 @@
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
-<script type="text/javascript" src="${base}/scripts/system/navigation/navigation.js?v=${now}"></script>
+<script type="text/javascript" src="${base}/scripts/system/navigation/navigation.js?"></script>
 <SCRIPT type="text/javascript">	
 var zNodes =[           
 	{ id:0, name:"ROOT",state:"1", open:true,root:"true"},
