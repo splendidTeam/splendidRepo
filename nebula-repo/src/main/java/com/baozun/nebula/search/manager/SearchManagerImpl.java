@@ -17,14 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
+import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
+import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
+import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.Facet;
 import com.baozun.nebula.search.FacetGroup;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.Param.SkuItemParam;
-import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
+import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.solr.command.SolrGroup;
 import com.baozun.nebula.solr.command.SolrGroupCommand;
 import com.baozun.nebula.solr.command.SolrGroupData;
@@ -36,22 +39,27 @@ import com.feilong.core.Validator;
 @Service("searchManager")
 public class SearchManagerImpl implements SearchManager{
 
-	private static final Logger			LOG					= LoggerFactory.getLogger(SolrManagerImpl.class);
+	private static final Logger				LOG						= LoggerFactory.getLogger(SolrManagerImpl.class);
 
-	private final static String			conditionCacheKey	= "findConditionByCategoryIdListKey";
+	private final static String				conditionCacheKey		= "findConditionByCategoryIdListKey";
 
-	@Autowired
-	private SdkSearchConditionManager	sdkSearchConditionManager;
-
-	@Autowired
-	private CacheManager				cacheManager;
+	private final static String				conditionItemCacheKey	= "findCoditionItemByCoditionIdtKey";
 
 	@Autowired
-	private SolrManager					solrManager;
+	private SdkSearchConditionManager		sdkSearchConditionManager;
+
+	@Autowired
+	private SdkSearchConditionItemManager	sdkSearchConditionItemManager;
+
+	@Autowired
+	private CacheManager					cacheManager;
+
+	@Autowired
+	private SolrManager						solrManager;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public SearchResultPage<ItemForSolrI18nCommand> search(SolrQuery solrQuery){
+	public SearchResultPage<ItemForSolrCommand> search(SolrQuery solrQuery){
 		LOG.debug(solrQuery.toString());
 
 		// 多少行
@@ -59,8 +67,8 @@ public class SearchManagerImpl implements SearchManager{
 		// 第几页
 		Integer currentPage = solrQuery.getStart();
 
-		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = null;
-		SolrGroupData<ItemForSolrI18nCommand> solrGroup = new SolrGroupData<ItemForSolrI18nCommand>();
+		SearchResultPage<ItemForSolrCommand> searchResultPage = null;
+		SolrGroupData<ItemForSolrCommand> solrGroup = new SolrGroupData<ItemForSolrCommand>();
 
 		// 是否分组显示
 		String isGroup = solrQuery.get(GroupParams.GROUP);
@@ -120,6 +128,29 @@ public class SearchManagerImpl implements SearchManager{
 		return searchConditionCommands;
 	}
 
+	@Override
+	public List<SearchConditionItemCommand> findCoditionItemByCoditionIdWithCache(Long coditionId){
+		List<SearchConditionItemCommand> searchConditionItemCommands = null;
+
+		try{
+			searchConditionItemCommands = cacheManager.getObject(conditionItemCacheKey);
+		}catch (Exception e){
+			LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager getObect() error. time:{}", new Date());
+		}
+
+		if (Validator.isNullOrEmpty(searchConditionItemCommands)) {
+			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySId(coditionId);
+
+			try{
+				cacheManager.setObject(conditionItemCacheKey, searchConditionItemCommands, TimeInterval.SECONDS_PER_DAY);
+			}catch (Exception e){
+				LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager setObject() error. time:{}", new Date());
+			}
+
+		}
+		return searchConditionItemCommands;
+	}
+
 	/**
 	 * 将solrGroup转换为SearchResultPage(分组显示)
 	 * 
@@ -130,17 +161,17 @@ public class SearchManagerImpl implements SearchManager{
 	 * @author 冯明雷
 	 * @time 2016年4月26日下午3:58:16
 	 */
-	private SearchResultPage<ItemForSolrI18nCommand> solrGroupConverterSearchResultPageWithGroup(
-			SolrGroupData<ItemForSolrI18nCommand> solrGroupData,
+	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithGroup(
+			SolrGroupData<ItemForSolrCommand> solrGroupData,
 			Integer currentPage,
 			Integer size){
 
-		List<ItemForSolrI18nCommand> list = new ArrayList<ItemForSolrI18nCommand>();
-		Map<String, SolrGroupCommand<ItemForSolrI18nCommand>> it = solrGroupData.getSolrGroupCommandMap();
+		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
+		Map<String, SolrGroupCommand<ItemForSolrCommand>> it = solrGroupData.getSolrGroupCommandMap();
 		for (String key : it.keySet()){
-			SolrGroupCommand<ItemForSolrI18nCommand> solrGroupCommand = it.get(key);
-			List<SolrGroup<ItemForSolrI18nCommand>> solrGroupList = solrGroupCommand.getItemForSolrCommandList();
-			for (SolrGroup<ItemForSolrI18nCommand> solrGroup : solrGroupList){
+			SolrGroupCommand<ItemForSolrCommand> solrGroupCommand = it.get(key);
+			List<SolrGroup<ItemForSolrCommand>> solrGroupList = solrGroupCommand.getItemForSolrCommandList();
+			for (SolrGroup<ItemForSolrCommand> solrGroup : solrGroupList){
 				list.addAll(solrGroup.getBeans());
 			}
 		}
@@ -166,13 +197,13 @@ public class SearchManagerImpl implements SearchManager{
 	 * @author 冯明雷
 	 * @time 2016年4月26日下午3:58:16
 	 */
-	private SearchResultPage<ItemForSolrI18nCommand> solrGroupConverterSearchResultPageWithOutGroup(
-			SolrGroupData<ItemForSolrI18nCommand> solrGroupData,
+	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithOutGroup(
+			SolrGroupData<ItemForSolrCommand> solrGroupData,
 			Integer currentPage,
 			Integer size){
-		List<ItemForSolrI18nCommand> list = new ArrayList<ItemForSolrI18nCommand>();
+		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
 
-		List<ItemForSolrI18nCommand> it = solrGroupData.getSolrCommandMap();
+		List<ItemForSolrCommand> it = solrGroupData.getSolrCommandMap();
 		if (null != it && it.size() > 0) {
 			list.addAll(it);
 		}
@@ -195,15 +226,15 @@ public class SearchManagerImpl implements SearchManager{
 	 * @author 冯明雷
 	 * @time 2016年4月28日上午11:02:29
 	 */
-	private SearchResultPage<ItemForSolrI18nCommand> convertSearchPageFacet(
+	private SearchResultPage<ItemForSolrCommand> convertSearchPageFacet(
 			Integer start,
 			Integer rows,
 			Long numFound,
-			List<ItemForSolrI18nCommand> items,
+			List<ItemForSolrCommand> items,
 			Map<String, Integer> facetQueryMap,
 			Map<String, Map<String, Long>> facetMap){
 
-		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = new SearchResultPage<ItemForSolrI18nCommand>();
+		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<ItemForSolrCommand>();
 		searchResultPage.setItems(items);
 		searchResultPage.setCurrentPage(rows == 0 ? 1 : (start / rows + 1));
 		searchResultPage.setCount(numFound);
@@ -213,6 +244,7 @@ public class SearchManagerImpl implements SearchManager{
 
 		List<FacetGroup> facetGroups = new ArrayList<FacetGroup>();
 
+		//****************************属性和分类的facet
 		for (Entry<String, Map<String, Long>> entry : facetMap.entrySet()){
 			String key = entry.getKey();
 			Map<String, Long> valueMap = entry.getValue();
@@ -226,11 +258,33 @@ public class SearchManagerImpl implements SearchManager{
 				// 否则是属性的facet
 				facetGroup = convertFacetGroup(valueMap);
 				facetGroup.setCategory(false);
-				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition,"")));
+				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
 			}
-
 			facetGroups.add(facetGroup);
 		}
+		
+		
+		//**************************价格范围的facetGroup
+		FacetGroup priceGroup = new FacetGroup();
+		priceGroup.setCategory(false);
+		priceGroup.setType(SearchCondition.SALE_PRICE_TYPE.toString());		
+		List<Facet> facets = new ArrayList<Facet>();
+		for (Entry<String, Integer> entry : facetQueryMap.entrySet()){
+			String key = entry.getKey();
+			Integer count = entry.getValue();
+			if(key.indexOf(SkuItemParam.sale_price)!=-1){
+				Facet facet=new Facet();
+				facet.setValue(key);
+				facet.setCount(count);
+				facets.add(facet);
+			}
+		}
+		if(facets.size()>0){
+			priceGroup.setFacets(facets);
+			facetGroups.add(priceGroup);
+		}
+		
+		
 
 		searchResultPage.setFacetGroups(facetGroups);
 
@@ -248,6 +302,9 @@ public class SearchManagerImpl implements SearchManager{
 	private FacetGroup convertFacetGroup(Map<String, Long> valueMap){
 		FacetGroup facetGroup = new FacetGroup();
 
+		//常规属性
+		facetGroup.setType(SearchCondition.NORMAL_TYPE.toString());
+		
 		List<Facet> facets = new ArrayList<Facet>();
 		for (Entry<String, Long> entry : valueMap.entrySet()){
 			Facet facet = new Facet();

@@ -21,12 +21,12 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.manager.CacheManager;
+import com.baozun.nebula.utils.spring.SpringUtil;
 
 
-public abstract class NebulaAbstractCacheBuilder<T> {
+public abstract class NebulaAbstractCacheBuilder<T, EX extends Exception> {
 
 	/**
 	 * log定义
@@ -37,17 +37,25 @@ public abstract class NebulaAbstractCacheBuilder<T> {
 	
 	private int expire;
 	
-	@Autowired
 	protected CacheManager cacheManager;
 	
-	public T getCachedObject() {
+	
+	public NebulaAbstractCacheBuilder(String key, int expire) {
+		super();
+		this.key = key;
+		this.expire = expire;
+		this.cacheManager = (CacheManager)SpringUtil.getBean(CacheManager.class);
+	}
+
+	public T getCachedObject() throws EX {
 		T t = null;
 		
 		try {
 			t = cacheManager.getObject(getKey());
 		} catch(Exception e) {
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
-					"", e.getMessage(), new Date(), this.getClass().getSimpleName());
+			LOG.error("get cache exception. exception:{} [{}] \"{}\"",
+					    e.getMessage(), new Date(), this.getClass().getSimpleName());
+			LOG.error("cache exception.", e);
 		}
 		
 		if(t == null) {
@@ -57,15 +65,16 @@ public abstract class NebulaAbstractCacheBuilder<T> {
 			try {
 				cacheManager.setObject(getKey(), t, getExpire());
 			} catch(Exception e) {
-				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
-						"", e.getMessage(), new Date(), this.getClass().getSimpleName());
+				LOG.error("set cache exception. exception:{} [{}] \"{}\"",
+						    e.getMessage(), new Date(), this.getClass().getSimpleName());
+				LOG.error("cache exception.", e);
 			}
 		}
 		
 		return t;
 	}
 
-	protected abstract T buildCachedObject();
+	protected abstract T buildCachedObject() throws EX;
 
 	public String getKey() {
 		return key;
@@ -82,7 +91,5 @@ public abstract class NebulaAbstractCacheBuilder<T> {
 	public void setExpire(int expire) {
 		this.expire = expire;
 	}
-	
-	
 
 }

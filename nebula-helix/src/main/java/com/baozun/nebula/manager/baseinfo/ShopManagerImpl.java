@@ -16,6 +16,8 @@
 package com.baozun.nebula.manager.baseinfo;
 
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +51,17 @@ public class ShopManagerImpl implements ShopManager{
 		ShopCommand shopCommand =shopDao.findShopByOrgId(id);
 		return shopCommand;
 	}
+	
+	/**
+	 * 根据shopIds查询店铺信息
+	 * 
+	 * @param shopIds
+	 * @return List<ShopCommand>
+	 */
+	public List<ShopCommand> findByShopIds(List<Long> shopIds){
+		
+		return shopDao.findByShopIds(shopIds);
+	}
+	 
 	
 }

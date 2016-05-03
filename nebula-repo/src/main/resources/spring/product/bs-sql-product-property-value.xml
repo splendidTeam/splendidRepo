@@ -135,7 +135,7 @@
             <![CDATA[ 
                   select
 					propertyValue.id as id,
-				  	propertyValueLang.value as value,					
+				  	propertyValueLang.value as name,					
 					propertyValue.sort_No as sortNo
 				from
 					t_pd_property_value propertyValue,t_pd_property_value_lang propertyValueLang

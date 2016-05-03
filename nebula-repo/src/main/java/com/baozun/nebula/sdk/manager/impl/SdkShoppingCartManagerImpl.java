@@ -43,7 +43,6 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.limit.LimitCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
-import com.baozun.nebula.command.promotion.PromotionMarkdownPriceCommand;
 import com.baozun.nebula.command.rule.ItemTagRuleCommand;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -1290,6 +1289,60 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager {
 		}
 		return Constants.SUCCESS;
 	}
+	
+
+	/**
+	 * 限购检查
+	 * 
+	 * @param cart
+	 * @param shoppingCartLine
+	 * @param memboIds
+	 * @return
+	 */
+	public Integer doPromotionCheck(ShoppingCartCommand cart,Set<String> memboIds) {
+		// 购物车的所属店铺
+		List<Long> shopIds = getShopIds(cart.getShoppingCartLineCommands());
+		// 获取购物车行的itemComboIds
+		Set<String> itemComboIds = getItemComboIds(cart.getShoppingCartLineCommands());
+
+		cart = getShoppingCart(cart.getShoppingCartLineCommands(), null, cart.getUserDetails().getMemberId(), null,
+				cart.getUserDetails().getMemComboList());
+
+		// 获取限购规则
+		List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(
+				shopIds, memboIds, itemComboIds, new Date());
+		if (null == purchaseLimitationList || purchaseLimitationList.size() == 0)
+			purchaseLimitationList = new ArrayList<LimitCommand>();
+
+		// 限购检查
+		List<ShoppingCartLineCommand> errorLineList = sdkEngineManager.doEngineCheckLimit(cart, purchaseLimitationList);
+		if (null != errorLineList && errorLineList.size() > 0) {
+			StringBuffer errorPrompt = new StringBuffer();
+			List<Long> skuIdList = new ArrayList<Long>();
+			for (ShoppingCartLineCommand cartLine : errorLineList) {
+				if ("".equals(errorPrompt.toString())) {
+					errorPrompt.append(cartLine.getItemName());
+					for (SkuProperty skuProperty : cartLine.getSkuPropertys()) {
+						errorPrompt.append(" ").append(skuProperty.getpName()).append(":")
+								.append(skuProperty.getValue());
+					}
+					skuIdList.add(cartLine.getSkuId());
+				} else {
+					if (!skuIdList.contains(cartLine.getSkuId())) {
+						errorPrompt.append("<br />").append(cartLine.getItemName());
+						for (SkuProperty skuProperty : cartLine.getSkuPropertys()) {
+							errorPrompt.append(" ").append(skuProperty.getpName()).append(":")
+									.append(skuProperty.getValue());
+						}
+						skuIdList.add(cartLine.getSkuId());
+					}
+				}
+			}
+			throw new BusinessException(Constants.THE_ORDER_CONTAINS_LIMIT_ITEM,
+					new Object[] { errorPrompt.toString() });
+		}
+		return Constants.SUCCESS;
+	}
 
 	/**
 	 * 移除购物车行
@@ -1558,6 +1611,61 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager {
 			saveCartLine(shoppingCartLine);
 		}
 		return SUCCESS;
+	}
+	
+	/**
+	 * 新增或者修改购物车行
+	 * 
+	 * @param userId
+	 * @param shoppingCartLine
+	 * @param saveFlage
+	 * @return
+	 */
+	public boolean merageShoppingCartLineById(Long userId, ShoppingCartLineCommand shoppingCartLine) {
+
+		String extentionCode = shoppingCartLine.getExtentionCode();
+		if (null == extentionCode) {
+			return false;
+		}
+
+		// 先查询是否已经有购物车行的信息
+		List<ShoppingCartLineCommand> lines = findShoppingCartLinesByMemberId(userId, null);
+		boolean existFlag = false;
+		boolean updateResultFlag = false;
+
+		// 如果有，就修改数量
+		// 如果没有，就添加一条记录
+		if (null != lines && lines.size() > 0) {// 如果有
+
+			// 判断加入的该商品是否已经在购物车中，
+			for (ShoppingCartLineCommand line : lines) {
+				if (!line.isGift() && extentionCode.equals(line.getExtentionCode())) {// 如果在的话，就修改数量
+					existFlag = true;
+					//如果sku在购物车行中已经存在  添加和修改都 全量修改数量
+					Integer effectedRows = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(userId, line.getId(),shoppingCartLine.getQuantity());
+
+					if (1 == effectedRows) {
+						updateResultFlag = true;
+					} else {
+						updateResultFlag = false;
+					}
+					break;
+				}
+			}
+
+			if (existFlag) {
+					return updateResultFlag;
+			} else {// 不存在
+					// 添加
+				saveCartLine(shoppingCartLine);
+			}
+
+		} else {// 如果表中没有购物车，那么 创建购物车,同时计算价格
+
+			// 保存 shoppingCartLine
+			saveCartLine(shoppingCartLine);
+		}
+		return true;
 	}
 
 	/**

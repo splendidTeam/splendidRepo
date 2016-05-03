@@ -17,10 +17,11 @@
 package com.baozun.nebula.web.controller.search.convert;
 
 import com.baozun.nebula.search.command.SearchResultPage;
-import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
+import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
-import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.search.viewcommand.ItemListViewCommand;
+
+import loxia.utils.PropertyUtil;
 
 /**
  * 商品列表模型转换
@@ -33,30 +34,34 @@ public class ItemListViewCommandConverter extends BaseConverter<ItemListViewComm
 
 	private static final long serialVersionUID = -8622427014008080905L;
 
+	/**
+	 * 这个方法暂时没有用
+	 */
 	public ItemListViewCommand convert(Object data){
-		if (null == data) {
-			return null;
-		}
-		if (data instanceof SearchResultPage) {
-			ItemListViewCommand itemListViewCommand = new ItemListViewCommand();
-			try{
-				SearchResultPage<ItemForSolrI18nCommand> searchResultPage = (SearchResultPage<ItemForSolrI18nCommand>) data;
-
-				itemListViewCommand.setCount(searchResultPage.getCount());
-				itemListViewCommand.setCurrentPage(searchResultPage.getCurrentPage());
-				itemListViewCommand.setFacetGroups(searchResultPage.getFacetGroups());
-				itemListViewCommand.setItemForSolrI18nCommands(searchResultPage.getItems());
-				itemListViewCommand.setSize(searchResultPage.getSize());
-				itemListViewCommand.setStart(searchResultPage.getStart());
-				itemListViewCommand.setTotalPages(searchResultPage.getTotalPages());
-
-				return itemListViewCommand;
-			}catch (Exception e){
-				e.printStackTrace();
-			}
-		}else{
-			throw new UnsupportDataTypeException(data.getClass() + " cannot convert to " + ItemListViewCommandConverter.class + "yet.");
-		}
 		return null;
+	}
+
+	/**
+	 * 转换viewCommand
+	 * 
+	 * @return ItemListViewCommand
+	 * @param searchResultPage
+	 * @author 冯明雷
+	 * @time 2016年5月3日下午2:29:01
+	 */
+	public ItemListViewCommand convertViewCommand(SearchResultPage<ItemForSolrCommand> pageData){
+		if (pageData == null)
+			return null;
+
+		ItemListViewCommand result = new ItemListViewCommand();
+		try{
+			PropertyUtil.copyProperties(result, pageData);
+			result.setItemForSolrCommands(pageData.getItems());
+			result.setFacetGroups(pageData.getFacetGroups());
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 }
