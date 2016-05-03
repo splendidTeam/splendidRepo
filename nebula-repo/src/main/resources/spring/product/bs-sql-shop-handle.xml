@@ -443,4 +443,29 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Shop.findByShopIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shopIds查询店铺信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						shop.id as shopid,
+						org.name as shopname,
+						org.code as shopcode,
+						org.lifecycle as lifecycle
+					from 
+						t_ma_shop shop 
+						
+					inner join 
+						t_au_organization org on shop.org_id = org.id
+					where shop.id in(
+					#foreach($id in $shopIds)
+    					$id,
+					 #end
+		       		 -1)
+				 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
 </beans>

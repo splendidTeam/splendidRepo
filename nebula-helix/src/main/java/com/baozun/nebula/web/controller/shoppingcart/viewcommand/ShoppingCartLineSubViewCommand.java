@@ -23,6 +23,7 @@ import java.util.Map;
 
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
+import com.baozun.nebula.sdk.command.SkuProperty;
 
 /**
  * 购物车里面的每行明细.
@@ -64,7 +65,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     private Long              itemId;
 
     /** 买的什么商品code. */
-    private Long              itemCode;
+    private String              itemCode;
 
     /** 商品名称是什么. */
     private String            itemName;
@@ -80,9 +81,9 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     //但是可能的结构是  Map<PropertySubViewCommand, PropertyValueSubViewCommand> salesPropertiesMap  
     //也可能的结构是  Map<String, String> salesPropertiesMap  
     /** The map. */
-    private Map               map;
+    Map<String, SkuProperty>               propertiesMap;
 
-    /** 数量几个. */
+	/** 数量几个. */
     private Integer           quantity;
 
     //**************************************************************
@@ -116,10 +117,21 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
 
     /** 吊牌价(原单价). */
     private BigDecimal        listPrice;
+    
+	/** 购物车行 金额小计 **/
+	private BigDecimal subTotalAmt = BigDecimal.ZERO;
 
     //***********************************************************************************
 
-    /**
+    public BigDecimal getSubTotalAmt() {
+		return subTotalAmt;
+	}
+
+	public void setSubTotalAmt(BigDecimal subTotalAmt) {
+		this.subTotalAmt = subTotalAmt;
+	}
+
+	/**
      * 获得 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
      *
      * @return the id
@@ -181,7 +193,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      *
      * @return the itemCode
      */
-    public Long getItemCode(){
+    public String getItemCode(){
         return itemCode;
     }
 
@@ -191,7 +203,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      * @param itemCode
      *            the itemCode to set
      */
-    public void setItemCode(Long itemCode){
+    public void setItemCode(String itemCode){
         this.itemCode = itemCode;
     }
 
@@ -250,25 +262,6 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     public void setExtentionCode(String extentionCode){
         this.extentionCode = extentionCode;
-    }
-
-    /**
-     * 获得 map.
-     *
-     * @return the map
-     */
-    public Map getMap(){
-        return map;
-    }
-
-    /**
-     * 设置 map.
-     *
-     * @param map
-     *            the map to set
-     */
-    public void setMap(Map map){
-        this.map = map;
     }
 
     /**
@@ -400,4 +393,11 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
         this.group = group;
     }
 
+    public Map<String, SkuProperty> getPropertiesMap() {
+		return propertiesMap;
+	}
+
+	public void setPropertiesMap(Map<String, SkuProperty> propertiesMap) {
+		this.propertiesMap = propertiesMap;
+	}
 }

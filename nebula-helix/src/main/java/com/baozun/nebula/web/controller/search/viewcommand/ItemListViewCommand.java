@@ -19,7 +19,7 @@ package com.baozun.nebula.web.controller.search.viewcommand;
 import java.util.List;
 
 import com.baozun.nebula.search.FacetGroup;
-import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
+import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
@@ -31,45 +31,45 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  */
 public class ItemListViewCommand extends BaseViewCommand{
 
-	private static final long				serialVersionUID	= -7224847778759734419L;
+	private static final long			serialVersionUID	= -7224847778759734419L;
 
 	/** 商品列表 */
-	private List<ItemForSolrI18nCommand>	itemForSolrI18nCommands;
+	private List<ItemForSolrCommand>	itemForSolrCommands;
 
 	/** 数量 */
-	private long							count;
+	private long						count;
 
 	/** 当前页码 */
-	private int								currentPage;
+	private int							currentPage;
 
 	/** 总页数 */
-	private int								totalPages;
+	private int							totalPages;
 
 	/** 从第几条开始 */
-	private int								start;
+	private int							start;
 
 	/** 每页多少条 */
-	private int								size;
+	private int							size;
 
 	/** 筛选 */
-	private List<FacetGroup>				facetGroups;
+	private List<FacetGroup>			facetGroups;
 
 	/**
-	 * get itemForSolrI18nCommands
+	 * get itemForSolrCommands
 	 * 
-	 * @return itemForSolrI18nCommands
+	 * @return itemForSolrCommands
 	 */
-	public List<ItemForSolrI18nCommand> getItemForSolrI18nCommands(){
-		return itemForSolrI18nCommands;
+	public List<ItemForSolrCommand> getItemForSolrCommands(){
+		return itemForSolrCommands;
 	}
 
 	/**
-	 * set itemForSolrI18nCommands
+	 * set itemForSolrCommands
 	 * 
-	 * @param itemForSolrI18nCommands
+	 * @param itemForSolrCommands
 	 */
-	public void setItemForSolrI18nCommands(List<ItemForSolrI18nCommand> itemForSolrI18nCommands){
-		this.itemForSolrI18nCommands = itemForSolrI18nCommands;
+	public void setItemForSolrCommands(List<ItemForSolrCommand> itemForSolrCommands){
+		this.itemForSolrCommands = itemForSolrCommands;
 	}
 
 	/**

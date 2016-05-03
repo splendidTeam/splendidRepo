@@ -34,6 +34,7 @@ import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
 import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
+import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
@@ -172,7 +173,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 	}
 
 	@Override
-	public List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrI18nCommand> pagination){
+	public List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrCommand> pagination,List<FacetParameter> facetParameters){
 		FacetFilterMetaData facetFilterMetaData = loadFacetFilterMetaData();
 
 		List<FacetGroup> newFacetGroups = new ArrayList<FacetGroup>();

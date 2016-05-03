@@ -43,7 +43,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	public static final String	VIEW_MEMBER_BINDING			= "member.binding";
 
 	/* 第三方帐号登录成功跳转页面的默认定义 */
-	public static final String	VIEW_MEMBER_LOGIN_SUCC		= "member.succ";
+	public static final String	VIEW_MEMBER_LOGIN_SUCC		= "redirect:/index";
 
 	/* 第三方帐号登录失败跳转页面的默认定义 */
 	public static final String	VIEW_MEMBER_LOGIN_FAIL		= "member.fail";
@@ -123,7 +123,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 			LOG.debug("[{} / {}] is the first time to the store", thirdPartyMember.getOpenId(), thirdPartyMember.getSource());
 			// 创建用户
 			MemberFrontendCommand frontendCommand = generateThirdPartyMember(thirdPartyMember, request);
-			memberManager.rewriteRegister(frontendCommand);
+			member=memberManager.rewriteRegister(frontendCommand);
 		}
 
 		// 第三方登录
@@ -190,8 +190,8 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 
 		// 登录成功后处理
 		DefaultReturnResult result = (DefaultReturnResult) onAuthenticationSuccess(memberDetails, request, response);
-
-		return result.getReturnObject().toString();
+		Object returnObject = result.getReturnObject();
+		return returnObject==null?null:returnObject.toString();
 	}
 
 	/**
