@@ -77,14 +77,14 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     }
 
     @Override
-    protected ShoppingcartResult doSelectShoppingCartLine(
+    protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
-                    Integer settlementState,
                     List<String> extentionCodeList,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        sdkShoppingCartManager.updateCartLineSettlementState(memberDetails.getMemberId(), extentionCodeList, settlementState);
+        sdkShoppingCartManager.updateCartLineSettlementState(memberDetails.getMemberId(), extentionCodeList, checkStatus ? 1 : 0);
         return null;
     }
 }

@@ -378,8 +378,8 @@ public class NebulaShoppingCartController extends BaseController{
      */
     public NebulaReturnResult selectShoppingCartCount(
                     @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "shoppingcartLineId",required = true) Long shoppingcartLineId,
-                    @RequestParam(value = "checked",required = false) Integer settlementState,
+                    @RequestParam(value = "shoppingcartLineId",required = false) Long shoppingcartLineId,
+                    @RequestParam(value = "checked",required = true) boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
@@ -387,7 +387,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
-                        .selectShoppingCartLine(memberDetails, shoppingcartLineId, settlementState, request, response);
+                        .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
 
         // 判断处理结果
         DefaultReturnResult result = DefaultReturnResult.SUCCESS;

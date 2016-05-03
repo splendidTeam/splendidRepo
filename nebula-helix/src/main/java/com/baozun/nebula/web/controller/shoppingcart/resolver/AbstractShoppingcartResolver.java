@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 import java.util.ArrayList;
@@ -28,20 +44,38 @@ import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.servlet.http.CookieUtil;
 
+/**
+ * The Class AbstractShoppingcartResolver.
+ *
+ * @author weihui.tang
+ * @author feilong
+ * @version 5.3.1 2016年5月3日 下午1:35:48
+ * @since 5.3.1
+ */
 public abstract class AbstractShoppingcartResolver implements ShoppingcartResolver{
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractShoppingcartResolver.class);
 
+    /** The sdk sku manager. */
     @Autowired
     private SdkSkuManager       sdkSkuManager;
 
+    /** The sdk item manager. */
     @Autowired
     private SdkItemManager      sdkItemManager;
 
+    /** The sdk engine manager. */
     @Autowired
     private SdkEngineManager    sdkEngineManager;
 
+    //**************************************************************************************
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#deleteShoppingCartLine(com.baozun.nebula.web.
+     * MemberDetails, java.lang.Long, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public ShoppingcartResult deleteShoppingCartLine(
                     MemberDetails memberDetails,
@@ -51,8 +85,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         // 获取购物车行信息
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息
-        List<ShoppingCartLineCommand> mainlines = CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
+        List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 找不到 就抛
         ShoppingCartLineCommand shoppingCartLineCommand = CollectionsUtil.find(mainlines, "id", shoppingcartLineId);
         if (Validator.isNullOrEmpty(shoppingCartLineCommand)){
@@ -78,20 +111,56 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         return ShoppingcartResult.SUCCESS;
     }
 
+    //**************************************************************************************
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#toggleShoppingCartLineCheckStatus(com.baozun.nebula.web.
+     * MemberDetails, java.lang.Long, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
-    public ShoppingcartResult selectShoppingCartLine(
+    public ShoppingcartResult toggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
                     Long shoppingcartLineId,
-                    Integer settlementState,
+                    boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
 
-        // 是否是全选操作
-        boolean allCheckFlag = Validator.isNullOrEmpty(shoppingcartLineId);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
+        List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        if (Validator.isNullOrEmpty(mainlines)){
+            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        }
+
+        // 找到实际需要操作的行
+        List<ShoppingCartLineCommand> needChangeCheckedCommandList = CollectionsUtil.select(mainlines, "id", shoppingcartLineId);
+        return toggleShoppingCartLineCheckStatus(
+                        memberDetails,
+                        shoppingCartLineCommandList,
+                        needChangeCheckedCommandList,
+                        checkStatus,
+                        request,
+                        response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#toggleAllShoppingCartLineCheckStatus(com.baozun.nebula.
+     * web.MemberDetails, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult toggleAllShoppingCartLineCheckStatus(
+                    MemberDetails memberDetails,
+                    boolean checkStatus,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        // 主賣品(剔除 促銷行 贈品)
-        List<ShoppingCartLineCommand> mainlines = CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
+        List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 找不到 就抛
         if (Validator.isNullOrEmpty(mainlines)){
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
@@ -99,18 +168,48 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         // 找到实际需要操作的行
         List<ShoppingCartLineCommand> needChangeCheckedCommandList = mainlines;
-        if (!allCheckFlag){
-            // 非全选就找到当前操作的购物车行 找不到 就抛
-            needChangeCheckedCommandList = CollectionsUtil.select(mainlines, "id", shoppingcartLineId);
-            if (Validator.isNullOrEmpty(needChangeCheckedCommandList)){
-                return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
-            }
+        return toggleShoppingCartLineCheckStatus(
+                        memberDetails,
+                        shoppingCartLineCommandList,
+                        needChangeCheckedCommandList,
+                        checkStatus,
+                        request,
+                        response);
+    }
+
+    /**
+     * Toggle shopping cart line check status.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param needChangeCheckedCommandList
+     *            the need change checked command list
+     * @param checkStatus
+     *            the check status
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     * @since 5.3.1
+     */
+    private ShoppingcartResult toggleShoppingCartLineCheckStatus(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> needChangeCheckedCommandList,
+                    boolean checkStatus,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+        if (Validator.isNullOrEmpty(needChangeCheckedCommandList)){
+            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
         List<String> extentionCodeList = new ArrayList<String>();
         for (ShoppingCartLineCommand needChangeCheckedCommand : needChangeCheckedCommandList){
             // 跳过已经是该状态的购物车行
-            if (settlementState.toString().equals(needChangeCheckedCommand.getSettlementState() + "")){
+            if (isSameCheckStatus(needChangeCheckedCommand.getSettlementState(), checkStatus)){
                 continue;
             }
 
@@ -135,7 +234,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             }
 
             extentionCodeList.add(needChangeCheckedCommand.getExtentionCode());
-            needChangeCheckedCommand.setSettlementState(settlementState);
+            needChangeCheckedCommand.setSettlementState(checkStatus ? 1 : 0);
 
         }
 
@@ -144,11 +243,11 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         }
 
         // ********* 改变选中状态***********
-        ShoppingcartResult checkShoppingCartShoppingcartResult = doSelectShoppingCartLine(
+        ShoppingcartResult checkShoppingCartShoppingcartResult = doToggleShoppingCartLineCheckStatus(
                         memberDetails,
-                        settlementState,
                         extentionCodeList,
                         needChangeCheckedCommandList,
+                        checkStatus,
                         request,
                         response);
 
@@ -159,6 +258,12 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         return ShoppingcartResult.SUCCESS;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#updateShoppingCartCount(com.baozun.nebula.web.
+     * MemberDetails, java.lang.Long, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public ShoppingcartResult updateShoppingCartCount(
                     MemberDetails memberDetails,
@@ -223,28 +328,12 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         return ShoppingcartResult.SUCCESS;
     }
 
-    protected abstract ShoppingcartResult doUpdateShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
-
-    protected abstract ShoppingcartResult doDeleteShoppingCartLine(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
-
-    protected abstract ShoppingcartResult doSelectShoppingCartLine(
-                    MemberDetails memberDetails,
-                    Integer settlementState,
-                    List<String> extentionCodeList,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
-
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#addShoppingCart(com.baozun.nebula.web.MemberDetails,
+     * java.lang.Long, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public ShoppingcartResult addShoppingCart(
                     MemberDetails memberDetails,
@@ -266,8 +355,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         if (null == shoppingCartLineCommandList){
             shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
         }
-        // 主賣品(剔除 促銷行 贈品)
-        List<ShoppingCartLineCommand> mainLines = CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
+        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
 
         // 购物车里面相同的 extentionCode 从main 里面找
         ShoppingCartLineCommand sameExtentionCodeInCartShoppingCartLineCommand = CollectionsUtil
@@ -324,6 +412,22 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         return ShoppingcartResult.SUCCESS;
     }
 
+    //**************************************************************************************
+    /**
+     * Do add shopping cart.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param currentLine
+     *            the current line
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     */
     protected abstract ShoppingcartResult doAddShoppingCart(
                     MemberDetails memberDetails,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
@@ -332,10 +436,83 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletResponse response);
 
     /**
-     * 公共的校验
-     * 
-     * @param skuId
+     * Do update shopping cart.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param currentLine
+     *            the current line
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     */
+    protected abstract ShoppingcartResult doUpdateShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    ShoppingCartLineCommand currentLine,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
+
+    /**
+     * Do delete shopping cart line.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param currentLine
+     *            the current line
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     */
+    protected abstract ShoppingcartResult doDeleteShoppingCartLine(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    ShoppingCartLineCommand currentLine,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
+
+    /**
+     * Do select shopping cart line.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param extentionCodeList
+     *            the extention code list
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param checkStatus
+     *            the settlement state
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     */
+    protected abstract ShoppingcartResult doToggleShoppingCartLineCheckStatus(
+                    MemberDetails memberDetails,
+                    List<String> extentionCodeList,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    boolean checkStatus,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
+
+    //**************************************************************************************
+
+    /**
+     * 公共的校验.
+     *
+     * @param sku
+     *            the sku
      * @param count
+     *            the count
      * @return 如果检验没有错 返回null
      */
     private ShoppingcartResult doCommandValidate(Sku sku,Integer count){
@@ -383,8 +560,12 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
-     * 
+     * Check active begin time.
+     *
      * @author 何波 @Description: 检查商品是否上架 @param skuId @return Boolean @throws
+     * @param item
+     *            the item
+     * @return true, if check active begin time
      */
     private Boolean checkActiveBeginTime(ItemCommand item){
         Date activeBeginTime = item.getActiveBeginTime();
@@ -392,12 +573,15 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
-     * 转换为ShoppingCartLineCommand对象
-     * 
-     * @param extensionCode
-     * @param quantity
+     * 转换为ShoppingCartLineCommand对象.
+     *
      * @param skuId
-     * @return
+     *            the sku id
+     * @param quantity
+     *            the quantity
+     * @param extensionCode
+     *            the extension code
+     * @return the shopping cart line command
      */
     private ShoppingCartLineCommand buildShoppingCartLineCommand(Long skuId,Integer quantity,String extensionCode){
         ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
@@ -418,6 +602,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model)}
      * 都需要调用他
      *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param request
+     *            the request
+     * @param response
+     *            the response
      * @since 5.3.1
      */
     private void afterMergeShoppingCart(
@@ -431,6 +623,32 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         CookieUtil.addCookie(CookieKeyConstants.SHOPPING_CART_COUNT, "" + totalCount, response);
     }
 
+    /**
+     * 是不是相同的状态.
+     *
+     * @param settlementState
+     *            the settlement state
+     * @param checkStatus
+     *            the check status
+     * @return true, if checks if is same check status
+     * @since 5.3.1
+     */
+    private boolean isSameCheckStatus(Integer settlementState,boolean checkStatus){
+        return checkStatus ? settlementState.equals(1) : settlementState.equals(0);
+    }
+
+    /**
+     * 获得主卖品(剔除 促銷行 贈品),通常我们只操作主卖品.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @return the main shopping cart line command list
+     * @since 5.3.1
+     */
+    private List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        // 主賣品(剔除 促銷行 贈品)
+        return CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
+    }
     // /**
     // * 游客的memboIds
     // *

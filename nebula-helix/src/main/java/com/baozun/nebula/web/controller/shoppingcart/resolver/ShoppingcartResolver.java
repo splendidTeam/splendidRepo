@@ -27,7 +27,6 @@ import com.baozun.nebula.web.MemberDetails;
 /**
  * 购物车操作处理器.
  * 
- * 
  * <h3>主要定义以下接口或者操作:</h3>
  * <blockquote>
  * <table border="1" cellspacing="0" cellpadding="4">
@@ -37,32 +36,34 @@ import com.baozun.nebula.web.MemberDetails;
  * </tr>
  * 
  * <tr valign="top">
- * <td>{@link #getShoppingCartLineCommandList(MemberDetails,HttpServletRequest )}</td>
+ * <td>{@link #getShoppingCartLineCommandList(MemberDetails,HttpServletRequest ) getShoppingCartLineCommandList}</td>
  * <td>获得指定用户的购物车list(所有的包括选中的及没有选中的).</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
- * <td>{@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse)}</td>
- * <td></td>
+ * <td>{@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse) addShoppingCart}</td>
+ * <td>将特定的skuid,指定的数量count,加入到用户的购物车里面去.</td>
  * </tr>
  * 
  * 
  * <tr valign="top">
- * <td>{@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse)}</td>
- * <td></td>
+ * <td>{@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse) updateShoppingCartCount}</td>
+ * <td>更新指定的购物车行shoppingcartLineId的数量count.</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
- * <td>{@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse)}</td>
- * <td></td>
+ * <td>{@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse) deleteShoppingCartLine}</td>
+ * <td>删除某个用户的某个特定 shoppingcartLineId 的购物车行.</td>
  * </tr>
  * 
  * 
  * <tr valign="top">
- * <td>{@link #selectShoppingCartLine(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse)}</td>
- * <td></td>
+ * <td>{@link #toggleShoppingCartLineCheckStatus(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse)
+ * toggleShoppingCartLineCheckStatus}</td>
+ * <td>切换指定购物车行的选中状态.</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
- * <td></td>
- * <td></td>
+ * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse)
+ * toggleAllShoppingCartLineCheckStatus}</td>
+ * <td>切换所有购物车行的选中状态.</td>
  * </tr>
  * 
  * </table>
@@ -78,10 +79,10 @@ public interface ShoppingcartResolver{
     /**
      * 获得指定用户的购物车list(所有的包括选中的及没有选中的).
      *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
      * @param request
      *            the request
-     * @param memberDetails
-     *            the member details
      * @return 如果指定的用户的购物车是空的,那么返回null
      */
     List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request);
@@ -91,7 +92,7 @@ public interface ShoppingcartResolver{
      * 将特定的<code>skuid</code>,指定的数量<code>count</code>,加入到用户的购物车里面去.
      *
      * @param memberDetails
-     *            the member details
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
      * @param skuId
      *            相关skuId
      * @param count
@@ -117,11 +118,11 @@ public interface ShoppingcartResolver{
      * </p>
      *
      * @param memberDetails
-     *            the member details
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
      * @param shoppingcartLineId
      *            指定的购物车行id,以前可能直接通过skuid来进行操作,现在用户的购物车可能相同的skuid存在不同的购物车行里面(比如bundle)
      * @param count
-     *            the count
+     *            全量数量
      * @param request
      *            the request
      * @param response
@@ -139,7 +140,7 @@ public interface ShoppingcartResolver{
      * 删除某个用户的某个特定 <code>shoppingcartLineId</code> 的购物车行.
      *
      * @param memberDetails
-     *            the member details
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
      * @param shoppingcartLineId
      *            指定的购物车行id,以前可能直接通过skuid来进行操作,现在用户的购物车可能相同的skuid存在不同的购物车行里面(比如bundle)
      * @param request
@@ -155,24 +156,51 @@ public interface ShoppingcartResolver{
                     HttpServletResponse response);
 
     /**
-     * 勾选购物车行.
+     * 切换指定购物车行的选中状态.
+     * 
+     * <p>
+     * 参数 <code>checkStatus</code>,用来标识选中还是不选中,true为将当前行选中,false为将当前行不选中
+     * </p>
      *
      * @param memberDetails
-     *            the member details
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
      * @param shoppingcartLineId
-     *            the shoppingcart line id
-     * @param settlementState
-     *            the settlement state
+     *            指定的购物车行
+     * @param checkStatus
+     *            true为将当前行选中,false为将当前行不选中
      * @param request
      *            the request
      * @param response
      *            the response
      * @return the shoppingcart result
      */
-    ShoppingcartResult selectShoppingCartLine(
+    ShoppingcartResult toggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
                     Long shoppingcartLineId,
-                    Integer settlementState,
+                    boolean checkStatus,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
+
+    /**
+     * 切换所有购物车行的选中状态.
+     * 
+     * <p>
+     * 参数 <code>checkStatus</code>,用来标识选中还是不选中,true为将当前行选中,false为将当前行不选中
+     * </p>
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param checkStatus
+     *            true为将当前行选中,false为将当前行不选中
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     */
+    ShoppingcartResult toggleAllShoppingCartLineCheckStatus(
+                    MemberDetails memberDetails,
+                    boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response);
 

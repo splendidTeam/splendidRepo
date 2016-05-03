@@ -216,11 +216,11 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     }
 
     @Override
-    protected ShoppingcartResult doSelectShoppingCartLine(
+    protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
-                    Integer settlementState,
                     List<String> extentionCodeList,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 将修改后的购物车保存cookie
