@@ -145,7 +145,7 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
 			viewCommand.setItemCode(command.getProductCode());
 			viewCommand.setAddTime(command.getCreateTime());
 			PropertyUtil.copyProperties(viewCommand, command, "extentionCode", "itemId", "itemName", "listPrice",
-					"quantity", "salePrice", "skuId", "itemPic", "id");
+					"quantity", "salePrice", "skuId", "itemPic", "id","subTotalAmt");
 
 			Map<String, SkuProperty> map = CollectionsUtil.groupOne(command.getSkuPropertys(), "pName");
 			viewCommand.setPropertiesMap(map);

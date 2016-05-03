@@ -117,10 +117,21 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
 
     /** 吊牌价(原单价). */
     private BigDecimal        listPrice;
+    
+	/** 购物车行 金额小计 **/
+	private BigDecimal subTotalAmt = BigDecimal.ZERO;
 
     //***********************************************************************************
 
-    /**
+    public BigDecimal getSubTotalAmt() {
+		return subTotalAmt;
+	}
+
+	public void setSubTotalAmt(BigDecimal subTotalAmt) {
+		this.subTotalAmt = subTotalAmt;
+	}
+
+	/**
      * 获得 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
      *
      * @return the id
