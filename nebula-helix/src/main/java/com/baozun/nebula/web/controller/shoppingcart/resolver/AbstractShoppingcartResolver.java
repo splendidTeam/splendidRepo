@@ -42,28 +42,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Autowired
     private SdkEngineManager    sdkEngineManager;
 
-    /**
-     * merge购物车之后做的事情.通常
-     * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)}
-     * ,
-     * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)}
-     * ,
-     * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model)}
-     * 都需要调用他
-     *
-     * @since 5.3.1
-     */
-    private void afterMergeShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-        // 将购物车数量塞到Cookie 里面去
-        int totalCount = Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
-                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
-        CookieUtil.addCookie(CookieKeyConstants.SHOPPING_CART_COUNT, "" + totalCount, response);
-    }
-
     @Override
     public ShoppingcartResult deleteShoppingCartLine(
                     MemberDetails memberDetails,
@@ -112,7 +90,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         boolean allCheckFlag = Validator.isNullOrEmpty(shoppingcartLineId);
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        ;
         // 主賣品(剔除 促銷行 贈品)
         List<ShoppingCartLineCommand> mainlines = CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
         // 找不到 就抛
@@ -191,7 +168,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletResponse response){
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        ;
 
         // 找不到 就抛
         ShoppingCartLineCommand shoppingCartLineCommand = CollectionsUtil.find(shoppingCartLineCommandList, "id", shoppingcartLineId);
@@ -431,6 +407,28 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         shoppingCartLineCommand.setCreateTime(new Date());
         shoppingCartLineCommand.setSettlementState(Constants.CHECKED_CHOOSE_STATE);
         return shoppingCartLineCommand;
+    }
+
+    /**
+     * merge购物车之后做的事情.通常
+     * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)}
+     * ,
+     * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)}
+     * ,
+     * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model)}
+     * 都需要调用他
+     *
+     * @since 5.3.1
+     */
+    private void afterMergeShoppingCart(
+                    MemberDetails memberDetails,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+        // 将购物车数量塞到Cookie 里面去
+        int totalCount = Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
+                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
+        CookieUtil.addCookie(CookieKeyConstants.SHOPPING_CART_COUNT, "" + totalCount, response);
     }
 
     // /**

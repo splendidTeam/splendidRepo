@@ -114,7 +114,7 @@ public interface ShoppingcartResolver{
      * @param memberDetails
      *            the member details
      * @param shoppingcartLineId
-     *            the shoppingcart line id
+     *            指定的购物车行id,以前可能直接通过skuid来进行操作,现在用户的购物车可能相同的skuid存在不同的购物车行里面(比如bundle)
      * @param count
      *            the count
      * @param request
@@ -131,12 +131,12 @@ public interface ShoppingcartResolver{
                     HttpServletResponse response);
 
     /**
-     * 删除购物车行.
+     * 删除某个用户的某个特定的购物车行.
      *
      * @param memberDetails
      *            the member details
      * @param shoppingcartLineId
-     *            the shoppingcart line id
+     *            指定的购物车行id,以前可能直接通过skuid来进行操作,现在用户的购物车可能相同的skuid存在不同的购物车行里面(比如bundle)
      * @param request
      *            the request
      * @param response
