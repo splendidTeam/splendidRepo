@@ -53,7 +53,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommond";
 
 	@Autowired
-	@Qualifier("simpleGroupSolrQueryConvert")
+	@Qualifier("solrQueryConvert")
 	private SolrQueryConvert			solrQueryConvert;
 
 	@Autowired
