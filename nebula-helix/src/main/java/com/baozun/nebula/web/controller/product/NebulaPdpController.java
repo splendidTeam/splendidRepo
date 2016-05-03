@@ -60,9 +60,10 @@ import com.feilong.core.Validator;
 
 /**
  * 商品详情页controller
+ * 一般情况下商品详情页会包含两部分内容：
+ * 一、数据展示部分
+ * 二、操作部分
  * 
- * 
- * TODO 商品展示模式的说明和使用 -- 星语
  * 
  * 
  * @author yimin.qiao
@@ -326,12 +327,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo) {
 		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
-	}
-
-
-	@Override
-	protected String buildMobileShareUrl(String itemCode) {
-		return null;
 	}
 
 	@Override

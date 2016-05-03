@@ -225,9 +225,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 			pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
 		}
 		
-		//移动端分享url
-		pdpViewCommand.setMobileShareUrl(buildMobileShareUrl(itemCode));
-		
 		return pdpViewCommand;
 	}
 	
@@ -493,8 +490,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	
-	protected abstract String buildMobileShareUrl(String itemCode);
-
 	/**
 	 * 构造面包屑
 	 * @return
