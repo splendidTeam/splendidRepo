@@ -160,7 +160,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     @Override
-    public ShoppingcartResult updateShoppingCart(
+    public ShoppingcartResult updateShoppingCartCount(
                     MemberDetails memberDetails,
                     Long shoppingcartLineId,
                     Integer count,

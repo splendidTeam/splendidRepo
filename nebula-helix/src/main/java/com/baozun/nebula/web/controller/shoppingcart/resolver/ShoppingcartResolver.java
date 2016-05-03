@@ -38,7 +38,7 @@ import com.baozun.nebula.web.MemberDetails;
  * 
  * <tr valign="top">
  * <td>{@link #getShoppingCartLineCommandList(MemberDetails,HttpServletRequest )}</td>
- * <td></td>
+ * <td>获得指定用户的购物车list(所有的包括选中的及没有选中的).</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>{@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse)}</td>
@@ -47,7 +47,7 @@ import com.baozun.nebula.web.MemberDetails;
  * 
  * 
  * <tr valign="top">
- * <td>{@link #updateShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse)}</td>
+ * <td>{@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse)}</td>
  * <td></td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
@@ -76,25 +76,26 @@ import com.baozun.nebula.web.MemberDetails;
 public interface ShoppingcartResolver{
 
     /**
-     * 获得指定用户的购物车list.
+     * 获得指定用户的购物车list(所有的包括选中的及没有选中的).
      *
      * @param request
      *            the request
      * @param memberDetails
      *            the member details
-     * @return 如果获取不到返回null
+     * @return 如果指定的用户的购物车是空的,那么返回null
      */
     List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request);
 
+    //***************************************************************************************
     /**
-     * 加入购物车.
+     * 将特定的<code>skuid</code>,指定的数量<code>count</code>,加入到用户的购物车里面去.
      *
      * @param memberDetails
      *            the member details
      * @param skuId
-     *            the sku id
+     *            相关skuId
      * @param count
-     *            the count
+     *            数量
      * @param request
      *            the request
      * @param response
@@ -109,7 +110,11 @@ public interface ShoppingcartResolver{
                     HttpServletResponse response);
 
     /**
-     * 更新购物车.
+     * 更新指定的购物车行<code>shoppingcartLineId</code>的数量<code>count</code>.
+     * 
+     * <p>
+     * 注意,参数count是全量数量
+     * </p>
      *
      * @param memberDetails
      *            the member details
@@ -123,7 +128,7 @@ public interface ShoppingcartResolver{
      *            the response
      * @return the shoppingcart result
      */
-    ShoppingcartResult updateShoppingCart(
+    ShoppingcartResult updateShoppingCartCount(
                     MemberDetails memberDetails,
                     Long shoppingcartLineId,
                     Integer count,
@@ -131,7 +136,7 @@ public interface ShoppingcartResolver{
                     HttpServletResponse response);
 
     /**
-     * 删除某个用户的某个特定的购物车行.
+     * 删除某个用户的某个特定 <code>shoppingcartLineId</code> 的购物车行.
      *
      * @param memberDetails
      *            the member details

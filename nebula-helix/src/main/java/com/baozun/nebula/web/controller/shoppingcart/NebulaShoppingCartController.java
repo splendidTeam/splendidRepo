@@ -332,7 +332,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
-                        .updateShoppingCart(memberDetails, shoppingcartLineId, count, request, response);
+                        .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
 
         // 判断处理结果
         DefaultReturnResult result = DefaultReturnResult.SUCCESS;
