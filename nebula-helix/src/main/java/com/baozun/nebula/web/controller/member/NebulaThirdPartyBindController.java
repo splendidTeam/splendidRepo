@@ -111,10 +111,10 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	public static final String	VIEW_THIRDPARTY_MEMBER_BIND				= "member.thirdParty.bind";
 	
 	/* bindSuccess Page 的默认定义 */
-	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS		= "member.thirdParty.bindSuccess";
+	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS		= "redirect:/index";
 	
 	/* bindfailure Page 的默认定义 */
-	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_FAILURE		= "member.thirdParty.bindFailure";
+	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_FAILURE		= "member.thirdParty.bind";
 
 	
 	/**
@@ -237,7 +237,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			//状态流转
 			Object returnObject = result.getReturnObject();
 			if(null !=returnObject){
-			    return  "redirect"+returnObject.toString();
+			    return "redirect:"+returnObject.toString();
 			}
 		}else{
 			//登录失败的处理 
@@ -330,10 +330,10 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		model.addAttribute("resultCode", resultCode);
 		DefaultReturnResult result =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
                 //状态流转
-                Object returnObject = result.getReturnObject();
-                if(null !=returnObject){
-                    return returnObject.toString();
-                }
+		 Object returnObject = result.getReturnObject();
+	                if(null !=returnObject){
+	                    return "redirect:"+returnObject.toString();
+	                }
 		return VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS;
 	}
 	

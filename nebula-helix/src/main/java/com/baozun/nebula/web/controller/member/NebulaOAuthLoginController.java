@@ -43,7 +43,7 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	public static final String	VIEW_MEMBER_BINDING			= "member.binding";
 
 	/* 第三方帐号登录成功跳转页面的默认定义 */
-	public static final String	VIEW_MEMBER_LOGIN_SUCC		= "member.succ";
+	public static final String	VIEW_MEMBER_LOGIN_SUCC		= "redirect:/index";
 
 	/* 第三方帐号登录失败跳转页面的默认定义 */
 	public static final String	VIEW_MEMBER_LOGIN_FAIL		= "member.fail";
