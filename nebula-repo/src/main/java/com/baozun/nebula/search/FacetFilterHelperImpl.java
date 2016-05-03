@@ -159,7 +159,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		if (categoryMetaMap != null)
 			facetFilterMetaData.setCategoryMetaMap(categoryMetaMap);
-		if (categoryMetaMap != null)
+		if (navigationMetaMap != null)
 			facetFilterMetaData.setNavigationMetaMap(navigationMetaMap);
 		if (propertyMetaMap != null)
 			facetFilterMetaData.setPropertyMetaMap(propertyMetaMap);
