@@ -221,7 +221,7 @@ public class NebulaShoppingCartController extends BaseController{
 
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
 
-        return ToNebulaReturnResult(shoppingcartResult);
+        return toNebulaReturnResult(shoppingcartResult);
     }
     
     //**********************************updateShoppingCartCount************************************************
@@ -264,7 +264,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
 
-        return ToNebulaReturnResult(shoppingcartResult);
+        return toNebulaReturnResult(shoppingcartResult);
     }
 
     //**********************************updateShoppingCartCount************************************************
@@ -307,7 +307,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
 
-        return ToNebulaReturnResult(shoppingcartResult);
+        return toNebulaReturnResult(shoppingcartResult);
     }
 
     //************************************选中不选中**********************************************************
@@ -350,7 +350,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
 
-        return ToNebulaReturnResult(shoppingcartResult);
+        return toNebulaReturnResult(shoppingcartResult);
     }
 
     /**
@@ -382,7 +382,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
 
-        return ToNebulaReturnResult(shoppingcartResult);
+        return toNebulaReturnResult(shoppingcartResult);
     }
 
     // TODO 修改销售属性
@@ -420,16 +420,25 @@ public class NebulaShoppingCartController extends BaseController{
         return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
     }
     
-    private DefaultReturnResult ToNebulaReturnResult(ShoppingcartResult shoppingcartResult) {
-    	DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
-            result = DefaultReturnResult.FAILURE;
+    /**
+     * 返回结果填充
+     * @param shoppingcartResult
+     * @return
+     */
+    private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult) {
+        if (ShoppingcartResult.SUCCESS != shoppingcartResult){
+        	DefaultReturnResult  result = DefaultReturnResult.FAILURE;
+        	
+        	String messageStr = getMessage(shoppingcartResult.toString());
+        	
             DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(getMessage(shoppingcartResult.toString()));
+			message.setMessage(messageStr);
             result.setResultMessage(message);
-            LOGGER.error(getMessage(shoppingcartResult.toString()));
+            
+            LOGGER.error(messageStr);
+            return result;
         }
-        return result;
+        return DefaultReturnResult.SUCCESS;
     }
 
 }
