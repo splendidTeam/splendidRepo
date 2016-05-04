@@ -37,13 +37,12 @@ import com.baozun.nebula.sdk.command.shoppingcart.CookieShoppingCartLine;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
-import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.CookieKeyConstants;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 
 /**
- * The Class GuestShoppingcartCookiePersister.
+ * 基于cookie的游客购物车持久化处理方式.
  *
  * @author feilong
  * @version 5.3.1 2016年5月3日 下午4:20:24
@@ -106,6 +105,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
         }
     }
 
+    //*******************************************************************************************
     /**
      * 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象.
      *
