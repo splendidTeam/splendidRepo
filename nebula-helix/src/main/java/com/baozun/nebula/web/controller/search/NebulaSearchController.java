@@ -1,5 +1,6 @@
 package com.baozun.nebula.web.controller.search;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +24,12 @@ import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
-import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
+import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.web.controller.search.convert.ItemListViewCommandConverter;
 import com.baozun.nebula.web.controller.search.form.SearchForm;
 import com.baozun.nebula.web.controller.search.viewcommand.ItemListViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
-
-import loxia.dao.Pagination;
 
 /**
  * 搜索相关方法controller
@@ -55,7 +54,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommond";
 
 	@Autowired
-	@Qualifier("simpleGroupSolrQueryConvert")
+	@Qualifier("solrQueryConvert")
 	private SolrQueryConvert			solrQueryConvert;
 
 	@Autowired
@@ -89,28 +88,36 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		searchParamProcess(searchCommand);
 
 		// 创建solrquery对象
-		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
+		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);		
+		LOG.debug("solr solrQuery before setFacet:"+solrQuery.toString());
 
 		// set facet相关信息
 		setFacet(solrQuery);
+		LOG.debug("solr solrQuery after setFacet:"+solrQuery.toString());
+		
 
 		// 设置权重信息
 		Boost boost = createBoost(searchCommand);
 		searchManager.setSolrBoost(solrQuery, boost);
+		LOG.debug("solr solrQuery after setSolrBoost:"+solrQuery.toString());
 
 		// 查询
-		SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchManager.search(solrQuery);
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);		
+		if(searchResultPage==null){
+			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+			return ITEM_LIST;
+		}
+		LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]",searchResultPage.getCount(), new Date());
 
 		// 页面左侧筛选项
-		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
+		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage,searchCommand.getFacetParameters());
 		searchResultPage.setFacetGroups(facetGroups);
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 		ItemListViewCommandConverter listViewCommandConverter = new ItemListViewCommandConverter();
-		Pagination<ItemListViewCommand> itemListViewCommand = listViewCommandConverter.convert(searchResultPage);
+		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convertViewCommand(searchResultPage);
 		
 		model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
-		
 		
 		return ITEM_LIST;
 	}
@@ -146,15 +153,15 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			searchManager.setSolrBoost(solrQuery, boost);
 
 			// 查询
-			SearchResultPage<ItemForSolrI18nCommand> searchResultPage = searchManager.search(solrQuery);
+			SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
 
 			// 页面左侧筛选项
-			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage);
+			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage,searchCommand.getFacetParameters());
 			searchResultPage.setFacetGroups(facetGroups);
 
 			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 			ItemListViewCommandConverter listViewCommandConverter = new ItemListViewCommandConverter();
-			ItemListViewCommand itemListViewCommand = listViewCommandConverter.convert(listViewCommandConverter);
+			ItemListViewCommand itemListViewCommand = listViewCommandConverter.convertViewCommand(searchResultPage);
 			
 			model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
 		}

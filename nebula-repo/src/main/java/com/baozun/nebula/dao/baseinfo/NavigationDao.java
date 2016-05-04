@@ -104,4 +104,11 @@ public interface NavigationDao extends GenericEntityDao<Navigation, Long> {
 	 */
 	@NativeQuery(model = MetaDataCommand.class)
 	List<MetaDataCommand> findNavigationMetaDataBylang(@QueryParam("lang") String lang);
+	
+	/***通过商品集合ID找到对应的前台导航
+	 * @param itemCollectionId 商品集合ID
+	 */	
+	@NativeQuery(model = Navigation.class)
+	Navigation findByItemCollectionId(@QueryParam("itemCollectId")Long itemCollectId);
+	
 }

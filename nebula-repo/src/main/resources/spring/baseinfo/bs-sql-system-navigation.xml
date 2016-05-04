@@ -135,4 +135,20 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Navigation.findByItemCollectionId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						*
+					from
+						t_base_navigation nav
+					WHERE
+						nav.collection_id=:itemCollectId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
 </beans>

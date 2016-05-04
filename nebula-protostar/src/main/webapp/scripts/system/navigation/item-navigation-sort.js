@@ -90,6 +90,10 @@ function onClick(event, treeId, treeNode) {
 		refreshSort(navigationId);
 		refreshUnSortTable();
 		showItemList(treeNode.name);
+		//清空添加排序结果
+		$j(".showDesc").val("");
+		//重设返回导航链接
+		$j("#backNavigation").attr("href","/base/navigation.htm?navigationId="+treeNode.id);
 //	}
 }
 
@@ -217,7 +221,7 @@ function refreshUnSortTable(){
 			label : nps.i18n("LABEL_ITEM_CODE"),
 			width : "10%",
 		}, {
-			name : "name",
+			name : "title",
 			label : nps.i18n("LABEL_ITEM_TITLE"),
 			width : "10%",
 		}],
@@ -364,6 +368,16 @@ $j(document).ready(function() {
 		var navigationId = $j("#navigationId").val();
 		
 		var itemCodes = $j(".itemCodes").val();
+		if(itemCodes){
+			var codeArray = itemCodes.split("\n");
+			itemCodes = "";
+			for(var i=0;i<codeArray.length;i++){
+				 var code= $j.trim(codeArray[i]);
+				 if(code){
+					 itemCodes += code+","
+				 }
+			}
+		}
 		$j(".checkId:checked").each(function(i, n) {
 			itemCodes += $j(this).attr("data-style") +",";
 		});
@@ -378,29 +392,35 @@ $j(document).ready(function() {
         		success: function(data){  		
         			if(data.isSuccess){
         				$j(".itemCodes").val("");
-        				$j(".showDesc").val(data.description);
+        				var html ="";
+        				$j.each(data.description,function(idx,obj){
+        					html+=obj+"加入排序成功！\n";
+        				});
+        				$j(".showDesc").val(html);
+        				
         				refreshSort(navigationId);
         				refreshUnSortTable();
         			}else{
         				$j(".showDesc").val(data.description);
         			}
-        			
         		}
         	});
 		});
 	});
 
 	$j(".memberbase").on("click",function(){
+		$j(".showDesc").val("");
 		refreshUnSortTable();
 	});
 	
 	//导航节点默认选中
 	var navigationId = $j("#navigationId").val();
+	alert(navigationId);
 	if(navigationId){
 		var node = treeObj.getNodeByParam("id",navigationId)
 		if(node){
 			treeObj.selectNode(node);
+			treeObj.checkNode(node,true,true);
 		}
 	}
-	
 });

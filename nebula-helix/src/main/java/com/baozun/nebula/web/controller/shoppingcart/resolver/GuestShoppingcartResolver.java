@@ -1,61 +1,66 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.CookieGenerator;
-import org.springframework.web.util.WebUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.baozun.nebula.sdk.command.shoppingcart.CookieShoppingCartLine;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.utilities.common.EncryptUtil;
-import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.constants.CookieKeyConstants;
-import com.feilong.core.Validator;
-import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.util.CollectionsUtil;
 
 /**
- * 游客操作购物车
- * 
- * @author jumbo
+ * 游客操作购物车.
  *
+ * @author weihui.tang
+ * @author feilong
+ * @version 5.3.1 2016年5月3日 下午4:23:16
+ * @since 5.3.1
  */
 @Component("guestShoppingcartResolver")
 public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
 
-    /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GuestShoppingcartResolver.class);
+    /** The cookie shoppingcart. */
+    @Autowired
+    private GuestShoppingcartPersister guestShoppingcartPersister;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#getShoppingCartLineCommandList(com.baozun.nebula.web.
+     * MemberDetails, javax.servlet.http.HttpServletRequest)
+     */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
-        try{
-            // 获取cookie中的购物车行集合
-            List<CookieShoppingCartLine> cookieShoppingCartLineList = getCookieShoppingCartLines(request);
-
-            if (Validator.isNullOrEmpty(cookieShoppingCartLineList)){
-                return null;
-            }
-
-            return toShoppingCartLineCommandList(cookieShoppingCartLineList);
-
-        }catch (EncryptionException e){
-            LOGGER.error("EncryptionException e :", e);
-            throw new IllegalArgumentException(e);// TODO 换成更好的 runtimeexception
-        }
+        return guestShoppingcartPersister.load(request);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.
+     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected ShoppingcartResult doAddShoppingCart(
                     MemberDetails memberDetails,
@@ -64,11 +69,18 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        List<ShoppingCartLineCommand> mainLines = CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
-        addGuestIndentifyCartCookie(response, toCookieShoppingCartLineList(mainLines));
+        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        guestShoppingcartPersister.save(mainLines, request, response);
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.
+     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected ShoppingcartResult doUpdateShoppingCart(
                     MemberDetails memberDetails,
@@ -77,122 +89,19 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        List<ShoppingCartLineCommand> mainLines = CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
-        addGuestIndentifyCartCookie(response, toCookieShoppingCartLineList(mainLines));
+        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        guestShoppingcartPersister.save(mainLines, request, response);
         return null;
     }
 
-    /**
-     * 把cookie购物车行对象加入cookie当中
+    /*
+     * (non-Javadoc)
      * 
-     * @param guestIndentify
-     * @param response
-     * @param cartLineList
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doDeleteShoppingCartLine(com.baozun.nebula.web.
+     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
-    private void addGuestIndentifyCartCookie(HttpServletResponse response,List<CookieShoppingCartLine> cartLineList){
-        String json = JSON.toJSONString(cartLineList);
-        CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName(CookieKeyConstants.GUEST_COOKIE_GC);
-        cookieGenerator.setCookieMaxAge(Integer.MAX_VALUE);
-        try{
-            String encrypt = EncryptUtil.getInstance().encrypt(json);
-            cookieGenerator.addCookie(response, encrypt);
-        }catch (EncryptionException e){
-            LOGGER.error("EncryptionException e:", e);
-        }
-    }
-
-    /**
-     * 获取cookie中的购物车行集合
-     * 
-     * @param request
-     * @return
-     * @throws EncryptionException
-     */
-    private List<CookieShoppingCartLine> getCookieShoppingCartLines(HttpServletRequest request) throws EncryptionException{
-        Cookie cookie = WebUtils.getCookie(request, CookieKeyConstants.GUEST_COOKIE_GC);
-
-        if (null == cookie){
-            return null;
-        }
-
-        if (StringUtils.isBlank(cookie.getValue())){
-            return null;
-        }
-
-        String decrypt = EncryptUtil.getInstance().decrypt(cookie.getValue());
-        return JSON.parseObject(decrypt, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
-    }
-
-    /**
-     * 获取cookie中的购物车行信息.将cookie中的购物车 转换为 shoppingCartLineCommand
-     * 
-     * @param callType
-     * @param validedLines
-     * @param effectEngine
-     * @param memberContext
-     * @param cookieShoppingCartLineList
-     * @return
-     */
-    private List<ShoppingCartLineCommand> toShoppingCartLineCommandList(List<CookieShoppingCartLine> cookieShoppingCartLineList){
-        List<ShoppingCartLineCommand> shoppingCartLines = new ArrayList<ShoppingCartLineCommand>();
-        for (CookieShoppingCartLine cookieShoppingCartLine : cookieShoppingCartLineList){
-
-            // 将cookie中的购物车 转换为 shoppingCartLineCommand
-            ShoppingCartLineCommand shoppingLineCommand = new ShoppingCartLineCommand();
-            PropertyUtil.copyProperties(
-                            shoppingLineCommand,
-                            cookieShoppingCartLine,
-                            "createTime",
-                            "skuId",
-                            "quantity",
-                            "extentionCode",
-                            "settlementState",
-                            "shopId",
-                            "promotionId",
-                            "lineGroup",
-                            "id");
-            shoppingLineCommand.setGift(null == cookieShoppingCartLine.getIsGift() ? false : cookieShoppingCartLine.getIsGift());
-            shoppingCartLines.add(shoppingLineCommand);
-        }
-        return shoppingCartLines;
-    }
-
-    /**
-     * 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象
-     * 
-     * @param shoppingCartLine
-     * @return
-     */
-    private List<CookieShoppingCartLine> toCookieShoppingCartLineList(List<ShoppingCartLineCommand> shoppingCartLines){
-        // 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象
-        List<CookieShoppingCartLine> cookieLines = new ArrayList<CookieShoppingCartLine>();
-        if (Validator.isNotNullOrEmpty(shoppingCartLines)){
-            for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLines){
-                CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
-
-                PropertyUtil.copyProperties(
-                                cookieShoppingCartLine,
-                                shoppingCartLineCommand,
-                                "extentionCode",
-                                "skuId",
-                                "quantity",
-                                "createTime",
-                                "settlementState",
-                                "shopId",
-                                "promotionId",
-                                "lineGroup");
-                cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
-                // TODO bundle 以后再考虑 id
-                cookieShoppingCartLine.setId(
-                                null == shoppingCartLineCommand.getId() ? shoppingCartLines.size() : shoppingCartLineCommand.getId());
-
-                cookieLines.add(cookieShoppingCartLine);
-            }
-        }
-        return cookieLines;
-    }
-
     @Override
     protected ShoppingcartResult doDeleteShoppingCartLine(
                     MemberDetails memberDetails,
@@ -200,32 +109,30 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     ShoppingCartLineCommand currentLine,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        List<ShoppingCartLineCommand> mainLines = new ArrayList<ShoppingCartLineCommand>();// 主賣品行
-        List<ShoppingCartLineCommand> shoppingCartLineCommands = getShoppingCartLineCommandList(memberDetails, request);
-        for (int i = 0; i < shoppingCartLineCommands.size(); i++){
-            ShoppingCartLineCommand line = shoppingCartLineCommands.get(i);
-            if (!line.isCaptionLine() && !line.isGift()){// 促銷行 & 贈品行 不參與遍曆
-                if (!currentLine.getId().equals(line.getId())){
-                    mainLines.add(line);
-                }
-            }
-        }
+        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 将修改后的购物车保存cookie
-        addGuestIndentifyCartCookie(response, toCookieShoppingCartLineList(mainLines));
+        guestShoppingcartPersister.save(mainLines, request, response);
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doToggleShoppingCartLineCheckStatus(com.baozun.
+     * nebula.web.MemberDetails, java.util.List, java.util.List, boolean, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
     @Override
-    protected ShoppingcartResult doSelectShoppingCartLine(
+    protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
-                    Integer settlementState,
                     List<String> extentionCodeList,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<ShoppingCartLineCommand> needChangeCheckedStatusShoppingCartLineCommandList,
+                    boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 将修改后的购物车保存cookie
-        addGuestIndentifyCartCookie(response, toCookieShoppingCartLineList(shoppingCartLineCommandList));
+        guestShoppingcartPersister.save(needChangeCheckedStatusShoppingCartLineCommandList, request, response);
         return null;
     }
-
 }

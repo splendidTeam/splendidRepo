@@ -144,6 +144,7 @@ ul,li{list-style: none;  margin: 0;  padding: 0;}
 			<img src="${base}/images/wmi/blacks/32x32/tag.png"> 前台导航管理
 					<input type="button" style="display: none;" value="<spring:message code='itemcategorysort.action.del'/>" title="<spring:message code='itemcategorysort.action.del'/>" class="button orange removesort" />
 					<input type="button" value="<spring:message code='itemcategorysort.action.add'/>" title="<spring:message code='itemcategorysort.action.add'/>" class="button orange addsort" />
+					<a href="/base/navigation.htm?navigationId=${navigationId}" style="float: right;color:#069;font-size: 14px;" id="backNavigation">返回菜单导航</a>
 		</div>
 		
 		<%-- 

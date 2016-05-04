@@ -103,4 +103,25 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="SearchConditionItem.findSearchConditionItemMetDataByLang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                select
+					con.id as id,
+					conLang.name as name,
+					con.sort as sortNo
+				from
+					t_pd_search_con_item con,t_pd_search_con_item_lang conLang
+				WHERE
+					con.id=conLang.search_condition_item_id
+					and con.lifecycle=1
+					and conLang.lang=:lang
+					order by con.sort
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

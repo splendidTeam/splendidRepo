@@ -16,27 +16,40 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
-import org.apache.commons.collections4.Predicate;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
- * 主卖品行的选择器.
+ * 游客购物车 持久化.
  *
  * @author feilong
- * @version 5.3.1 2016年5月3日 下午3:16:19
+ * @version 5.3.1 2016年5月3日 下午4:32:39
  * @since 5.3.1
  */
-public class MainLinesPredicate implements Predicate<ShoppingCartLineCommand>{
+public interface GuestShoppingcartPersister{
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.commons.collections4.Predicate#evaluate(java.lang.Object)
+    /**
+     * 加载.
+     *
+     * @param request
+     *            the request
+     * @return the shopping cart line command list
      */
-    @Override
-    public boolean evaluate(ShoppingCartLineCommand shoppingCartLineCommand){
-        // 促銷行 & 贈品 不參與遍曆
-        return !shoppingCartLineCommand.isCaptionLine() && !shoppingCartLineCommand.isGift();
-    }
+    List<ShoppingCartLineCommand> load(HttpServletRequest request);
+
+    /**
+     * 保存.
+     *
+     * @param shoppingCartLineCommandList
+     *            the need change checked command list
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     */
+    void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response);
 }

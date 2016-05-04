@@ -12,11 +12,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 import com.alibaba.fastjson.JSON;
-
 import com.baozun.nebula.manager.product.ItemCollectionManager;
-
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
@@ -55,7 +52,17 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
 
 		// ***************************************导航部分
-		// TODO
+		Long navigationId = searchCommand.getNavigationId();
+		if (Validator.isNotNullOrEmpty(navigationId)) {
+			ItemCollection collection = itemCollectionManager.findItemCollectionByNavigationId(Long.valueOf(navigationId));
+
+			if (collection != null) {
+				SearchCommand temp = collectionToSearchCommand(collection);
+				if (temp != null && temp.getFacetParameters() != null) {
+					facetParameters.addAll(temp.getFacetParameters());
+				}
+			}
+		}
 
 		// **************************************属性筛选部分
 		List<FacetParameter> facetParametersWithProperty = setFacetParametersWithProperty(searchCommand);
@@ -68,32 +75,30 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		if (Validator.isNotNullOrEmpty(facetParametersWithCategory)) {
 			facetParameters.addAll(facetParametersWithCategory);
 		}
-		
-		//***************************************价格范围筛选部分
+
+		// ***************************************价格范围筛选部分
 		List<FacetParameter> facetParametersWithRange = setFacetParametersWithRange(searchCommand);
 		if (Validator.isNotNullOrEmpty(facetParametersWithRange)) {
 			facetParameters.addAll(facetParametersWithRange);
 		}
-		
-		
 
 		searchCommand.setFacetParameters(facetParameters);
 	}
-	
+
 	/**
 	 * 将后台设置的导航的商品范围，转成searchCommand对象
+	 * 
 	 * @param collection
 	 * @return
 	 */
-	protected SearchCommand collectionToSearchCommand(ItemCollection collection) {
+	protected SearchCommand collectionToSearchCommand(ItemCollection collection){
 		SearchCommand searchCommand = new SearchCommand();
-		
+
 		String facetParameters = collection.getFacetParameters();
-		List<FacetParameter> params =JSON.parseArray(facetParameters,FacetParameter.class);
+		List<FacetParameter> params = JSON.parseArray(facetParameters, FacetParameter.class);
 		searchCommand.setFacetParameters(params);
 		return searchCommand;
 
-		
 	}
 
 	/**
@@ -122,18 +127,20 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		for (SearchConditionCommand cmd : cmdList){
 			Long propertyId = cmd.getPropertyId();
 			if (propertyId != null) {
-				if(SearchCondition.NORMAL_TYPE.equals(cmd.getType())){
+				if (SearchCondition.NORMAL_TYPE.equals(cmd.getType())) {
 					facetFields.add(SkuItemParam.dynamicCondition + propertyId);
-				}else if(SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())){
-					List<SearchConditionItemCommand> searchConditionItemCommands= searchManager.findCoditionItemByCoditionIdWithCache(cmd.getId());
-					for(SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
-						if(null!= scItemCmd){
+				}else if (SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())) {
+					List<SearchConditionItemCommand> searchConditionItemCommands = searchManager
+							.findCoditionItemByCoditionIdWithCache(cmd.getId());
+					for (SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
+						if (null != scItemCmd) {
 							Integer min = scItemCmd.getAreaMin();
 							Integer max = scItemCmd.getAreaMax();
-							if(null!=min&&null!=max&&min<=max){
+							if (null != min && null != max && min <= max) {
 								String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
 								StringBuilder sb = new StringBuilder();
-								sb.append("{!ex=priceTag}"+SkuItemParam.sale_price).append(":").append(areaStr);
+								sb.append("{!ex=priceTag}" + SkuItemParam.sale_price).append(":").append(areaStr);
+								facetFields.add(sb.toString());
 							}
 						}
 					}
@@ -251,8 +258,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 		return facetParameters;
 	}
-	
-	
+
 	/**
 	 * searchCommand中的范围相关条件设置
 	 * 
@@ -270,19 +276,18 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 			if (StringUtils.contains(rangeConditionStr, SEPARATORCHARS_MINUS)) {
 				List<String> values = new ArrayList<String>();
 				values.add(rangeConditionStr);
-				
+
 				FacetParameter facetParameter = new FacetParameter(SkuItemParam.sale_price);
 				facetParameter.setValues(values);
 				facetParameter.setFacetType(FacetType.RANGE);
-				
+
 				facetParameters.add(facetParameter);
 			}
-			
+
 		}
 
 		return facetParameters;
 	}
-	
 
 	/**
 	 * 设置boost中的bq属性
@@ -299,7 +304,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 		if (itemCollection != null) {
 			String sequence = itemCollection.getSequence();
-			if (sequence != null) {
+			if (Validator.isNotNullOrEmpty(sequence)) {
 				String[] itemIdStrs = sequence.split(SEPARATORCHARS_COMMA);
 				if (itemIdStrs != null && itemIdStrs.length > 0) {
 					StringBuffer bq = new StringBuffer();
@@ -309,13 +314,16 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 						// 商品id
 						String itemId = itemIdStrs[i];
-						// 计算得分
-						score = score - i * 10;
+						
+						if (Validator.isNotNullOrEmpty(itemId)){
+							// 计算得分
+							score = score - i * 10;
 
-						bq.append("id:" + itemId + "^" + score);
+							bq.append("id:" + itemId + "^" + score);
 
-						if (i > itemIdStrs.length - 1) {
-							bq.append(" OR ");
+							if (i > itemIdStrs.length - 1) {
+								bq.append(" OR ");
+							}
 						}
 					}
 					boost.setBq(bq.toString());
