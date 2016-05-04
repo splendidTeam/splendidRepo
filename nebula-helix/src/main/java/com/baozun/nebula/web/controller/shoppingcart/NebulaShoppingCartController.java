@@ -85,12 +85,12 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>
- * {@link #toggleShoppingCartCount(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse, Model)
+ * {@link #toggleShoppingCart(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse, Model)
  * toggleShoppingCartCount}</td>
  * <td>修改用户的购物车选中状态.</td>
  * </tr>
  * <tr valign="top">
- * <td>{@link #toggleShoppingCartCountAll(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model)
+ * <td>{@link #toggleAllShoppingCartCount(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model)
  * toggleShoppingCartCountAll}</td>
  * <td>全选全不选</td>
  * </tr>
@@ -364,7 +364,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @RequestMapping(value = "/shoppingcart/select", method =
      *                       RequestMethod.POST)
      */
-    public NebulaReturnResult toggleShoppingCartCount(
+    public NebulaReturnResult toggleShoppingCart(
                     @LoginMember MemberDetails memberDetails,
                     @RequestParam(value = "shoppingcartLineId",required = false) Long shoppingcartLineId,
                     @RequestParam(value = "checked",required = true) boolean checkStatus,
@@ -406,7 +406,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @RequestMapping(value = "/shoppingcart/select", method =
      *                       RequestMethod.POST)
      */
-    public NebulaReturnResult toggleShoppingCartCountAll(
+    public NebulaReturnResult toggleAllShoppingCartCount(
                     @LoginMember MemberDetails memberDetails,
                     @RequestParam(value = "checked",required = true) boolean checkStatus,
                     HttpServletRequest request,
