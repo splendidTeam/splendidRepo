@@ -90,7 +90,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * <td>修改用户的购物车选中状态.</td>
  * </tr>
  * <tr valign="top">
- * <td>{@link #toggleAllShoppingCartCount(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model)
+ * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model)
  * toggleShoppingCartCountAll}</td>
  * <td>全选全不选</td>
  * </tr>
@@ -179,7 +179,7 @@ public class NebulaShoppingCartController extends BaseController{
      */
     public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,Model model){
         // 获取购物车信息
-        ShoppingCartCommand cartCommand = getCartInfo(request, memberDetails);
+        ShoppingCartCommand cartCommand = getShoppingCartCommand(request, memberDetails);
 
         // 封装viewCommand
         model.addAttribute(MODEL_KEY_SHOPPINGCART, shoppingcartViewCommandConverter.convert(cartCommand));
@@ -220,19 +220,10 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
-        // 判断处理结果
-        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
-            result = DefaultReturnResult.FAILURE;
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(getMessage(shoppingcartResult.toString()));
-            result.setResultMessage(message);
-            LOGGER.error(getMessage(shoppingcartResult.toString()));
-        }
 
-        return result;
+        return ToNebulaReturnResult(shoppingcartResult);
     }
-
+    
     //**********************************updateShoppingCartCount************************************************
     /**
      * 删除购物车行.
@@ -273,16 +264,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
 
-        // 判断处理结果
-        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
-            result = DefaultReturnResult.FAILURE;
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(getMessage(shoppingcartResult.toString()));
-            result.setResultMessage(message);
-            LOGGER.error(getMessage(shoppingcartResult.toString()));
-        }
-        return result;
+        return ToNebulaReturnResult(shoppingcartResult);
     }
 
     //**********************************updateShoppingCartCount************************************************
@@ -325,16 +307,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
 
-        // 判断处理结果
-        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
-            result = DefaultReturnResult.FAILURE;
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(getMessage(shoppingcartResult.toString()));
-            result.setResultMessage(message);
-            LOGGER.error(getMessage(shoppingcartResult.toString()));
-        }
-        return result;
+        return ToNebulaReturnResult(shoppingcartResult);
     }
 
     //************************************选中不选中**********************************************************
@@ -377,16 +350,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
 
-        // 判断处理结果
-        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
-            result = DefaultReturnResult.FAILURE;
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(getMessage(shoppingcartResult.toString()));
-            result.setResultMessage(message);
-            LOGGER.error(getMessage(shoppingcartResult.toString()));
-        }
-        return result;
+        return ToNebulaReturnResult(shoppingcartResult);
     }
 
     /**
@@ -406,7 +370,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @RequestMapping(value = "/shoppingcart/select", method =
      *                       RequestMethod.POST)
      */
-    public NebulaReturnResult toggleAllShoppingCartCount(
+    public NebulaReturnResult toggleAllShoppingCartLineCheckStatus(
                     @LoginMember MemberDetails memberDetails,
                     @RequestParam(value = "checked",required = true) boolean checkStatus,
                     HttpServletRequest request,
@@ -418,16 +382,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
 
-        // 判断处理结果
-        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
-            result = DefaultReturnResult.FAILURE;
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(getMessage(shoppingcartResult.toString()));
-            result.setResultMessage(message);
-            LOGGER.error(getMessage(shoppingcartResult.toString()));
-        }
-        return result;
+        return ToNebulaReturnResult(shoppingcartResult);
     }
 
     // TODO 修改销售属性
@@ -443,7 +398,7 @@ public class NebulaShoppingCartController extends BaseController{
      *            the member details
      * @return the cart info
      */
-    protected ShoppingCartCommand getCartInfo(HttpServletRequest request,MemberDetails memberDetails){
+    protected ShoppingCartCommand getShoppingCartCommand(HttpServletRequest request,MemberDetails memberDetails){
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
         List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
         if (null == cartLines){
@@ -463,6 +418,18 @@ public class NebulaShoppingCartController extends BaseController{
      */
     private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
         return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
+    }
+    
+    private DefaultReturnResult ToNebulaReturnResult(ShoppingcartResult shoppingcartResult) {
+    	DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
+            result = DefaultReturnResult.FAILURE;
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(getMessage(shoppingcartResult.toString()));
+            result.setResultMessage(message);
+            LOGGER.error(getMessage(shoppingcartResult.toString()));
+        }
+        return result;
     }
 
 }
