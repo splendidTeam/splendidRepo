@@ -559,7 +559,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 				salePropCommandList.add(salePropCommand);
 			} else {
 				// 一般属性
-				String groupName =property.getGroupName();
+				String groupName =property.getGroupName() == null ? "" : property.getGroupName();
 				generalPropCommand = new DynamicPropertyCommand();
 				itemPropertiesList = new ArrayList<ItemPropertiesCommand>();
 				for (ItemProperties itemProperties : dbItemPropertiesList) {
