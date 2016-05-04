@@ -16,25 +16,24 @@ public class SearchForm extends BaseForm{
 	 * 参数格式：属性Id-属性值Id,属性Id-属性值Id....
 	 */
 	private String				filterConditionStr;
-	
+
 	/**
 	 * 过滤条件(分类)<br/>
 	 * 参数格式：父级分类id-父级分类id-分类id,父级分类id-父级分类id-分类id......
 	 */
 	private String				categoryConditionStr;
-	
+
 	/**
 	 * 前端导航的过滤条件
 	 */
 	private String				navigationConditionStr;
-	
+
 	/**
 	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用<br/>
 	 * 参数格式：c分类id,P属性id,P属性id,c分类id......
-	 * 
 	 */
 	private String				filterParamOrder;
-	
+
 	/**
 	 * 导航Id
 	 */
@@ -44,6 +43,12 @@ public class SearchForm extends BaseForm{
 	 * 排序
 	 */
 	private String				sortStr;
+
+	/**
+	 * 价格范围的过滤条件：比如价格范围等<br/>
+	 * 参数格式：开始价格-结束价格
+	 */
+	private String				priceRangeConditionStr;
 
 	/**
 	 * 页大小
@@ -103,38 +108,56 @@ public class SearchForm extends BaseForm{
 		this.pageNumber = pageNumber;
 	}
 
-	public String getCategoryConditionStr() {
+	public String getCategoryConditionStr(){
 		return categoryConditionStr;
 	}
 
-	public String getNavigationConditionStr() {
+	public String getNavigationConditionStr(){
 		return navigationConditionStr;
 	}
 
-	public void setCategoryConditionStr(String categoryConditionStr) {
+	public void setCategoryConditionStr(String categoryConditionStr){
 		this.categoryConditionStr = categoryConditionStr;
 	}
 
-	public void setNavigationConditionStr(String navigationConditionStr) {
+	public void setNavigationConditionStr(String navigationConditionStr){
 		this.navigationConditionStr = navigationConditionStr;
 	}
 
-	
-	/**   
-	 * get navigationId  
-	 * @return navigationId  
+	/**
+	 * get navigationId
+	 * 
+	 * @return navigationId
 	 */
 	public Long getNavigationId(){
 		return navigationId;
 	}
 
-	
 	/**
-	 * set navigationId 
+	 * set navigationId
+	 * 
 	 * @param navigationId
 	 */
 	public void setNavigationId(Long navigationId){
 		this.navigationId = navigationId;
+	}
+
+	/**
+	 * get priceRangeConditionStr
+	 * 
+	 * @return priceRangeConditionStr
+	 */
+	public String getPriceRangeConditionStr(){
+		return priceRangeConditionStr;
+	}
+
+	/**
+	 * set priceRangeConditionStr
+	 * 
+	 * @param priceRangeConditionStr
+	 */
+	public void setPriceRangeConditionStr(String priceRangeConditionStr){
+		this.priceRangeConditionStr = priceRangeConditionStr;
 	}
 
 }

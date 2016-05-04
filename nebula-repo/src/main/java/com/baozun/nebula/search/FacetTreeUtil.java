@@ -125,10 +125,13 @@ public class FacetTreeUtil {
 				continue;
 			}
 			dto = new Facet(allNodeData.get(index));
-			if (childrenMapping.containsKey(dto.getId())) {
-				List<Long> temp = childrenMapping.get(dto.getId());
-				dto.getChildrens().addAll(constructTree(temp,allNodeData,childrenMapping));
+			if(childrenMapping!=null){
+				if (childrenMapping.containsKey(dto.getId())) {
+					List<Long> temp = childrenMapping.get(dto.getId());
+					dto.getChildrens().addAll(constructTree(temp,allNodeData,childrenMapping));
+				}
 			}
+			
 			result.add(dto);
 		}
 		return result;

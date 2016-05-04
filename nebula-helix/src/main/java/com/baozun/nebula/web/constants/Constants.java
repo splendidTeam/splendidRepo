@@ -59,4 +59,16 @@ public class Constants {
 	public static final String code = "code";
 	
 	public static final String url = "url";
+	
+	/** 购物车中商品最大行数*/
+	public static final int SHOPPING_CART_SKU_MAX_COUNT	=	30;
+	
+	/** 新增商品*/
+	public static final String SHOPPING_CART_ACT_ADD	=	"add";
+	/** 修改数量*/
+	public static final String SHOPPING_CART_ACT_UPDATE	=	"update";
+	/** 替换商品*/
+	public static final String SHOPPING_CART_ACT_REPLACE	=	"replace";
+	/** cookie中存放的商品總數key*/
+	public static final String 	SHOPPING_CART_SESSION_SKU_COUNT	=	"cart_sku_count";
 }

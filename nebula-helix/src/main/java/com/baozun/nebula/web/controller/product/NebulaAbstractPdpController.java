@@ -76,7 +76,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG										= LoggerFactory.getLogger(NebulaAbstractPdpController.class);
+	private static final Logger		LOG									= LoggerFactory.getLogger(NebulaAbstractPdpController.class);
 	
 	//PDP的展示模式
 	/** PDP的展示模式  模式一, 商品到款，PDP到款显示. [value: pdp_mode_style] */
@@ -120,8 +120,14 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** pdpViewCommand的缓存key */
 	public static final String 		CACHE_KEY_PDP_VIEW_COMMAND			= "nebula_cache_pdp_view_command";
 	
+	/** simplePdpViewCommand的缓存key */
+	public static final String 		CACHE_KEY_SIMPLE_PDP_VIEW_COMMAND	= "cache_key_simple_pdp_view_command";
+	
 	/** 商品的extra数据的缓存key */
 	public static final String 		CACHE_KEY_ITEM_EXTRA				= "nebula_cache_item_extra";
+	
+	/** 商品的推荐数据的缓存key */
+	public static final String 		CACHE_KEY_ITEM_RECOMMEND 			= "nebula_cache_item_recommend";
 	
 	
 	@Autowired
@@ -152,30 +158,22 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
      * @return
      * @throws IllegalItemStateException 
      */
-    protected PdpViewCommand buildPdpViewCommandWithCache(String itemCode) throws IllegalItemStateException {
-    	PdpViewCommand pdpViewCommand = null;
+    protected PdpViewCommand buildPdpViewCommandWithCache(final String itemCode) throws IllegalItemStateException {
     	
-    	String pdpViewCommandCachekey = getPdpViewCommandCacheKey(itemCode);
+    	//缓存的key
+    	String pdpViewCommandCachekey = buildCacheKeyWithLang(CACHE_KEY_PDP_VIEW_COMMAND).concat("-").concat(itemCode);
     	
-		try {
-			pdpViewCommand = cacheManager.getObject(pdpViewCommandCachekey);
-		} catch(Exception e) {
-			LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp get pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
-					itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
-		}
-		
-		if(pdpViewCommand == null) {
-			pdpViewCommand = buildPdpViewCommand(itemCode);
-			
-			// put to cache
-			try {
-				cacheManager.setObject(pdpViewCommandCachekey, pdpViewCommand, getPdpViewCommandExpireSeconds());
-			} catch(Exception e) {
-				LOG.error("[PDP_BUILD_PDP_VIEW_COMMAND_WITH_CACHE] pdp build pdp view command cache exception. itemCode:{}, exception:{} [{}] \"{}\"",
-						itemCode, e.getMessage(), new Date(), this.getClass().getSimpleName());
+    	//缓存的有效期
+    	Integer pdpViewCommandExpireSeconds = getPdpViewCommandCacheExpireSeconds();
+    	
+    	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+    	PdpViewCommand pdpViewCommand = new NebulaAbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(pdpViewCommandCachekey, pdpViewCommandExpireSeconds) {
+			@Override
+			protected PdpViewCommand buildCachedObject() throws IllegalItemStateException {
+				return buildPdpViewCommand(itemCode);
 			}
-		}
-		
+    	}.getCachedObject();
+    	
 		return pdpViewCommand;
     }
 	
@@ -199,6 +197,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		
 		//商品属性
 		pdpViewCommand.setProperties(buildItemPropertyViewCommand(itemBaseInfo, pdpViewCommand.getImages()));
+		
+		//商品分类
+		pdpViewCommand.setCategories(buildItemCategoryViewCommand(itemBaseInfo.getId()));
 		
 		//sku
 		pdpViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
@@ -224,16 +225,37 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 			pdpViewCommand.setRecommend(buildItemRecommendViewCommand(itemBaseInfo.getId()));
 		}
 		
-		//移动端分享url
-		pdpViewCommand.setMobileShareUrl(buildMobileShareUrl(itemCode));
-		
+		return pdpViewCommand;
+	}
+	
+	/**
+	 * 从缓存中获取一个简单的PdpViewCommand，主要用于到色商品切换颜色时，取商品基本信息
+	 * @param itemCode 商品编码
+	 * @return PdpViewCommand 商品信息Command
+	 * @throws IllegalItemStateException
+	 */
+	protected PdpViewCommand buildSimplePdpViewCommandWithCache(final String itemCode) throws IllegalItemStateException{
+		//缓存的key
+    	String simplePdpViewCommandCachekey = buildCacheKeyWithLang(CACHE_KEY_SIMPLE_PDP_VIEW_COMMAND).concat("-").concat(itemCode);
+    	
+    	//缓存的有效期
+    	Integer simplePdpViewCommandExpireSeconds = getPdpViewCommandCacheExpireSeconds();
+    	
+    	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+    	PdpViewCommand pdpViewCommand = new NebulaAbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(simplePdpViewCommandCachekey, simplePdpViewCommandExpireSeconds) {
+			@Override
+			protected PdpViewCommand buildCachedObject() throws IllegalItemStateException {
+				return buildSimplePdpViewCommand(itemCode);
+			}
+    	}.getCachedObject();
+    	
 		return pdpViewCommand;
 	}
 	
 	/**
 	 * 构造一个简单的PdpViewCommand，主要用于到色商品切换颜色时，取商品基本信息
 	 * @param itemCode 商品编码
-	 * @return PdpViewCommand 商品信息Comande
+	 * @return PdpViewCommand 商品信息Command
 	 * @throws IllegalItemStateException
 	 */
 	protected PdpViewCommand buildSimplePdpViewCommand(String itemCode) throws IllegalItemStateException{
@@ -309,15 +331,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		return itemBaseInfo;
 	}
 	
-	/**
-	 * 构造商品的分类信息
-	 * @param itemId
-	 * @return
-	 */
-	protected ItemCategoryViewCommand buildItemCategoryViewCommand(Long itemId){
-		return new ItemCategoryViewCommand();
-	}
-	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
 		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
 	}
@@ -351,6 +364,33 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/**
 	 * 构造推荐商品信息
+	 * <p>
+     * 先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+     * </p>
+	 * @param itemId
+	 * @return
+	 */
+	protected List<RelationItemViewCommand> buildItemRecommendViewCommandWithCache(final Long itemId) {
+				
+		//缓存的key
+    	String itemRecommendCachekey = buildCacheKeyWithLang(CACHE_KEY_ITEM_RECOMMEND).concat("-").concat(itemId.toString());
+    	
+    	//缓存的有效期
+    	Integer itemRecommendExpireSeconds = getItemRecommendCacheExpireSeconds();
+    	
+    	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+    	List<RelationItemViewCommand> itemRecommendList = new NebulaAbstractCacheBuilder<List<RelationItemViewCommand>, RuntimeException>(itemRecommendCachekey, itemRecommendExpireSeconds) {
+			@Override
+			protected List<RelationItemViewCommand> buildCachedObject() {
+				return buildItemRecommendViewCommand(itemId);
+			}
+    	}.getCachedObject();
+    	
+		return itemRecommendList;
+	}
+	
+	/**
+	 * 构造推荐商品信息
 	 * @param itemId
 	 * @return
 	 */
@@ -359,10 +399,11 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		List<RelationItemViewCommand> itemRecommendList = relationItemViewCommandConverter.convert(itemCommands);
     	//扩展信息
     	if(Validator.isNotNullOrEmpty(itemRecommendList)) {
-    		for(RelationItemViewCommand relationItemViewCommand:itemRecommendList){
+    		for(RelationItemViewCommand relationItemViewCommand : itemRecommendList){
     			ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
     			itemBaseInfo.setCode(relationItemViewCommand.getItemCode());
-    			ItemExtraViewCommand itemExtraViewCommand = this.buildItemExtraViewCommand(itemBaseInfo);
+    			
+    			ItemExtraViewCommand itemExtraViewCommand = buildItemExtraViewCommand(itemBaseInfo);
     			relationItemViewCommand.setExtra(itemExtraViewCommand);
     		}
     	}
@@ -392,6 +433,16 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		 BrowsingHistoryViewCommand browsingHistoryCommand = new DefaultBrowsingHistoryViewCommand();
          browsingHistoryCommand.setId(itemId);
          browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
+	}
+	
+	/**
+	 * 构造商品的分类信息
+	 * <p>一般情况下后端分类在Pdp展示时不太常用，所以这里暂不实现。需要时请重写该方法。</p>
+	 * @param itemId
+	 * @return
+	 */
+	protected List<ItemCategoryViewCommand> buildItemCategoryViewCommand(Long itemId){
+		return null;
 	}
 	
 	private void setImageData(List<Long> itemIdList, List<ItemCommand> itemCommands ) {
@@ -439,8 +490,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	
-	protected abstract String buildMobileShareUrl(String itemCode);
-
 	/**
 	 * 构造面包屑
 	 * @return
@@ -504,7 +553,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * 获取pdpViewCommand缓存的有效期
 	 * @return
 	 */
-	protected abstract Integer getPdpViewCommandExpireSeconds();
+	protected abstract Integer getPdpViewCommandCacheExpireSeconds();
+	
+	/**
+	 * 获取itemRecommend缓存的有效期
+	 * @return
+	 */
+	protected abstract Integer getItemRecommendCacheExpireSeconds();
 	
 	/**
 	 * 获取Pdp的显示模式
@@ -512,16 +567,15 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected abstract String getPdpMode(ItemBaseInfoViewCommand itemBaseInfo);
 	
 	/**
-	 * 获取pdpViewCommand缓存的key
-	 * @param itemCode
-	 * @return
+	 * 获取带语言的缓存的key
+	 * @param cacheKey
 	 */
-	private String getPdpViewCommandCacheKey(String itemCode) {
+	protected String buildCacheKeyWithLang(String cacheKey) {
 		boolean i18n = LangProperty.getI18nOnOff();
 		if(i18n) {
 			String lang = LangUtil.getCurrentLang();
-			return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode).concat("-").concat(lang);
+			return cacheKey.concat("_").concat(lang);
 		}
-		return CACHE_KEY_PDP_VIEW_COMMAND.concat("-").concat(itemCode);
+		return cacheKey;
 	}
 }

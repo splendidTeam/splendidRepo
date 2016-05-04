@@ -30,6 +30,8 @@ import com.baozun.nebula.web.controller.product.converter.BundleViewCommandConve
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 public class NebulaBundleControllerTest extends BaseControllerTest{
@@ -114,7 +116,8 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testLoadBundleInfo(){
-		EasyMock.expect(nebulaBundleManager.findBundleCommandByMainItemId(1L, true)).andReturn(Arrays.asList(bundleCommand)).times(1);
+		EasyMock.expect(itemPropertyViewCommandResolver.resolve(EasyMock.anyObject(ItemBaseInfoViewCommand.class), EasyMock.anyObject(List.class))).andReturn(new ItemPropertyViewCommand()).times(1);
+		EasyMock.expect(nebulaBundleManager.findBundleCommandByMainItemId(4L, true)).andReturn(Arrays.asList(bundleCommand)).times(1);
 		control.replay();
 		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfo(4L, request, response, model);
 		System.out.println(JsonUtil.format(defaultReturnResult));

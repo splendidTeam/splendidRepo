@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,23 +28,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.baseinfo.NavigationCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
-import com.baozun.nebula.command.product.CategoryCommand;
 import com.baozun.nebula.dao.baseinfo.NavigationDao;
 import com.baozun.nebula.dao.baseinfo.NavigationLangDao;
+import com.baozun.nebula.dao.product.ItemCollectionDao;
+import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.CodeRepeatException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.exception.NameRepeatException;
 import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.model.baseinfo.NavigationLang;
-import com.baozun.nebula.model.product.Category;
-import com.baozun.nebula.model.product.CategoryLang;
+import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
-import com.baozun.nebula.utilities.common.Validator;
+import com.baozun.nebula.search.FacetParameter;
+
+import loxia.dao.Sort;
 
 /**
  * 菜单导航管理
@@ -65,6 +67,13 @@ public class NavigationManagerImpl implements NavigationManager {
 	
 	@Autowired
 	private NavigationDao navigationDao;
+	
+	@Autowired
+	private ItemCollectionDao itemCollectionDao;
+	
+	@Autowired
+	private ItemDao itemDao;
+	
 	
 	@SuppressWarnings("unused")
 	private static final Logger	logger	= LoggerFactory.getLogger(NavigationManagerImpl.class);
@@ -158,7 +167,19 @@ public class NavigationManagerImpl implements NavigationManager {
 		if(dbNavi ==null ||dbNavi.getId() ==null){
 			ifNotExpectedCountThrowException(1, 0);
 		}
-		
+		if(navigationCommand.getFacetParameterList()!=null && navigationCommand.getFacetParameterList().size()>0 ){
+			if(dbNavi.getCollectionId()!=null){
+				ItemCollection refItemCollection= itemCollectionDao.getByPrimaryKey(dbNavi.getCollectionId());
+				refItemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
+				itemCollectionDao.save(refItemCollection);
+			}else{
+				ItemCollection itemCollection = new ItemCollection();
+				itemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
+				ItemCollection refItemCollection =  itemCollectionDao.save(itemCollection);
+				//关联导航
+				dbNavi.setCollectionId(refItemCollection.getId());
+			}
+		}
 		
 		//父节点
 		Long parentId =dbNavi.getParentId();
@@ -184,6 +205,10 @@ public class NavigationManagerImpl implements NavigationManager {
 		}
 		if(i18n){
 			MutlLang mutlLang = (MutlLang)navigationCommand.getName();
+			MutlLang seoTitle = (MutlLang)navigationCommand.getSeoTitle();
+			MutlLang seoKeyWords = (MutlLang)navigationCommand.getSeoKeyWords();
+			MutlLang seoDescription = (MutlLang)navigationCommand.getSeoDescription();
+			MutlLang extention = (MutlLang)navigationCommand.getExtention();
 			String[] values = mutlLang.getValues();
 			String[] langs = mutlLang.getLangs();
 			defaultName =mutlLang.getDefaultValue();
@@ -195,10 +220,11 @@ public class NavigationManagerImpl implements NavigationManager {
 			//平级Ids
 			List<Long> nIds =new ArrayList<Long>();
 			
-			if(Validator.isNotNullOrEmpty(navList)){
+			if(navList!=null && !navList.isEmpty()){
 				for (Navigation n : navList) {
-					if(n.getId().equals(dbNavi.getId())) 
+					if(n.getId().equals(dbNavi.getId())){ 
 						continue;
+					}
 					nIds.add(n.getId());
 				}
 				
@@ -206,14 +232,10 @@ public class NavigationManagerImpl implements NavigationManager {
 					String val = values[i];
 					String lang =langs[i];
 					
-					
 					int count =navigationLangDao.findNavigationLangByNameAndNavids(val, lang, nIds);
-					
 					if(count > 0){
-						Object[] args = { pName,
-								val};
-						throw new NameRepeatException(
-								ErrorCodes.SYSTEM_NAVIGATION_PARENT_EXIST_NAME, args);
+						Object[] args = { pName,val};
+						throw new NameRepeatException(ErrorCodes.SYSTEM_NAVIGATION_PARENT_EXIST_NAME, args);
 					}
 				}
 			}
@@ -224,18 +246,17 @@ public class NavigationManagerImpl implements NavigationManager {
 				String lang =langs[i];
 				
 				NavigationLang navigationLang  =navigationLangDao.findNavigationLangByNavidAndLang(dbNavi.getId(), lang);
-				if(navigationLang!=null){
-					//update
-					navigationLangDao.updateNavigationLangByNavigationIdAndLang(val, lang, dbNavi.getId());
-				}else{
-					//add
-					NavigationLang navigationLang2 =new NavigationLang();
-					navigationLang2.setNavigationId(dbNavi.getId());
-					navigationLang2.setName(val);
-					navigationLang2.setLang(lang);
-					navigationLangDao.save(navigationLang2);
+				if(navigationLang==null){
+					navigationLang =new NavigationLang();
+					navigationLang.setNavigationId(dbNavi.getId());
 				}
-				
+				navigationLang.setName(val);
+				navigationLang.setLang(lang);
+				navigationLang.setSeoTitle(seoTitle.getValues()[i]);
+				navigationLang.setSeoKeywords(seoKeyWords.getValues()[i]);
+				navigationLang.setSeoDescription(seoDescription.getValues()[i]);
+				navigationLang.setExtention(extention.getValues()[i]);
+				navigationLangDao.save(navigationLang);
 			}
 		}else{
 			
@@ -284,7 +305,7 @@ public class NavigationManagerImpl implements NavigationManager {
 		}else{
 			pName =repeatParent.getName();
 		}
-		if(Validator.isNotNullOrEmpty(chilRepeat)){
+		if(chilRepeat!=null && !chilRepeat.isEmpty()){
 			boolean flag =false;
 			for(Navigation navigation:chilRepeat){
 				//更新
@@ -321,16 +342,25 @@ public class NavigationManagerImpl implements NavigationManager {
 		}else{
 			pName =repeatParent.getName();
 		}
-		if(Validator.isNotNullOrEmpty(chilRepeat)){
-			Object[] args = { pName,
-					defaultName};
-			throw new NameRepeatException(
-					ErrorCodes.SYSTEM_NAVIGATION_PARENT_EXIST_NAME, args);
+		if(chilRepeat!=null && !chilRepeat.isEmpty()){
+			Object[] args = { pName,defaultName};
+			throw new NameRepeatException(ErrorCodes.SYSTEM_NAVIGATION_PARENT_EXIST_NAME, args);
 		}
 	}
 
 	private Navigation extractCreateNav(NavigationCommand navigationCommand,
 			Navigation navigation) {
+		
+		//导航关联分类与属性
+		if(navigationCommand.getFacetParameterList()!=null && navigationCommand.getFacetParameterList().size()>0 ){
+			ItemCollection itemCollection = new ItemCollection();
+			itemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
+			ItemCollection refItemCollection =  itemCollectionDao.save(itemCollection);
+			
+			//设置导航与类型关联
+			navigation.setCollectionId(refItemCollection.getId());
+		}
+		
 		Long parentId =navigationCommand.getParentId();
 		
 		Navigation repeatParent =navigationDao.findEffectNavigationById(parentId);
@@ -349,7 +379,7 @@ public class NavigationManagerImpl implements NavigationManager {
 			
 			Navigation retNavigation =navigationDao.save(navigation);
 			
-			if(Validator.isNullOrEmpty(retNavigation)){
+			if(retNavigation==null){
 				ifNotExpectedCountThrowException(1,0);
 			}
 			
@@ -361,7 +391,7 @@ public class NavigationManagerImpl implements NavigationManager {
 			//平级Ids
 			List<Long> nIds =new ArrayList<Long>();
 			
-			if(Validator.isNotNullOrEmpty(navList)){
+			if(navList!=null && !navList.isEmpty()){
 				for (Navigation n : navList) {
 					nIds.add(n.getId());
 				}
@@ -382,10 +412,8 @@ public class NavigationManagerImpl implements NavigationManager {
 					int count =navigationLangDao.findNavigationLangByNameAndNavids(val, lang, nIds);
 					
 					if(count > 0){
-						Object[] args = { pName,
-								val};
-						throw new NameRepeatException(
-								ErrorCodes.SYSTEM_NAVIGATION_PARENT_EXIST_NAME, args);
+						Object[] args = { pName,val};
+						throw new NameRepeatException(ErrorCodes.SYSTEM_NAVIGATION_PARENT_EXIST_NAME, args);
 					}
 				}
 			}
@@ -434,36 +462,74 @@ public class NavigationManagerImpl implements NavigationManager {
 			Integer actual) {
 		if (expected != actual) {
 			throw new BusinessException(
-					ErrorCodes.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, new Object[] {
-							expected, actual });
+					ErrorCodes.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, new Object[] {expected, actual });
 			// throw new EffectRangeUnexpectedException(expected, actual);
 		}
 	}
 
 	@Override
-	public NavigationCommand i18nFindNavigationLangByNavigationId(
-			Long navigationId) {
+	public NavigationCommand i18nFindNavigationLangByNavigationId(Long navigationId) {
 		Navigation navigation = navigationDao.getByPrimaryKey(navigationId);
 		if(navigation == null){
 			return null;
 		}
+		
 		NavigationCommand navigationCommand = new NavigationCommand();
+		
+		//查询导航关联的属性与分类
+		if(navigation.getCollectionId()!=null){
+			ItemCollection refItemCollection= itemCollectionDao.getByPrimaryKey(navigation.getCollectionId());
+			List<FacetParameter> params =JSON.parseArray(refItemCollection.getFacetParameters(),FacetParameter.class);
+			navigationCommand.setFacetParameterList(params);
+		}
+		
 		LangProperty.I18nPropertyCopyToSource(navigation, navigationCommand);
 		boolean i18n = LangProperty.getI18nOnOff();
 		if (i18n){
 			List<NavigationLang> navigationLangs = navigationLangDao.findNavigationLangListByNavidAndLangs(navigationId,MutlLang.i18nLangs());
-			if(Validator.isNotNullOrEmpty(navigationLangs)){
+			if(navigationLangs!=null && !navigationLangs.isEmpty()){
 				String[] values = new String[MutlLang.i18nSize()];
 				String[] langs = new String[MutlLang.i18nSize()];
+				String[] seoTitle = new String[MutlLang.i18nSize()];
+				String[] seoKeywords = new String[MutlLang.i18nSize()];
+				String[] seoDescription = new String[MutlLang.i18nSize()];
+				String[] extention = new String[MutlLang.i18nSize()];
 				for (int i = 0; i < navigationLangs.size(); i++) {
 					NavigationLang navigationLang = navigationLangs.get(i);
 					values[i] = navigationLang.getName();
 					langs[i] = navigationLang.getLang();
+					seoTitle[i] = navigationLang.getSeoTitle();
+					seoKeywords[i] = navigationLang.getSeoKeywords();
+					seoDescription[i] = navigationLang.getSeoDescription();
+					extention[i] = navigationLang.getExtention();
+					
 				}
 				MutlLang mutlLang = new MutlLang();
 				mutlLang.setValues(values);
 				mutlLang.setLangs(langs);
 				navigationCommand.setName(mutlLang);
+				
+				MutlLang seoTitleLang = new MutlLang();
+				seoTitleLang.setValues(seoTitle);
+				seoTitleLang.setLangs(langs);
+				navigationCommand.setSeoTitle(seoTitleLang);
+				
+				MutlLang seoKeywordsLang = new MutlLang();
+				seoKeywordsLang.setValues(seoKeywords);
+				seoKeywordsLang.setLangs(langs);
+				navigationCommand.setSeoKeyWords(seoKeywordsLang);
+				
+				MutlLang seoDescriptionLang = new MutlLang();
+				seoDescriptionLang.setValues(seoDescription);
+				seoDescriptionLang.setLangs(langs);
+				navigationCommand.setSeoDescription(seoDescriptionLang);
+				
+				
+				MutlLang  extentionLang = new MutlLang();
+				extentionLang.setValues(extention);
+				extentionLang.setLangs(langs);
+				navigationCommand.setExtention(extentionLang);			
+				
 			}
 		}else{
 			SingleLang singleLang = new SingleLang();
@@ -472,4 +538,110 @@ public class NavigationManagerImpl implements NavigationManager {
 		}
 		return navigationCommand;
 	}
+
+	@Override
+	public ItemCollection updateSequenceById(Long itemCollectionId,String sequence){
+		ItemCollection  itemCollection = itemCollectionDao.getByPrimaryKey(itemCollectionId);
+		
+		String[] CodeArray= sequence.split(",");
+		StringBuffer buffer =new StringBuffer();
+		for(String itemCode:CodeArray){
+			//检验商品是否存在
+			ItemCommand itemCommand = itemDao.findItemCommandByCode(itemCode);
+			if(itemCommand==null){
+				return null;
+			}
+			buffer.append(itemCommand.getId()+",");
+		}
+		itemCollection.setSequence(buffer.toString());
+		return itemCollectionDao.save(itemCollection);
+		
+	}
+
+	@Override
+	public Boolean AddSortedItemCodeById(Long navigationId,String[] codes){
+		ItemCollection  itemCollection = itemCollectionDao.findItemCollectionByNavigationId(navigationId);
+		if(itemCollection==null){
+			return false;
+		}
+		String sequence = itemCollection.getSequence();
+		StringBuffer buffer =new StringBuffer();
+		for(String code:codes){
+			//检验商品是否存在
+			ItemCommand itemCommand = itemDao.findItemCommandByCode(code);
+			if(itemCommand==null){
+				return false;
+			}
+			//存在排序中
+			if(sequence!=null && sequence.indexOf(itemCommand.getId()+"") >-1){
+				return false;
+			}
+			buffer.append(itemCommand.getId()+",");
+		}
+		
+		if(itemCollection.getSequence()==null){
+			itemCollection.setSequence(buffer.toString());
+		}else{
+			itemCollection.setSequence(itemCollection.getSequence()+buffer.toString());
+		}
+		
+		itemCollection=  itemCollectionDao.save(itemCollection);
+		
+		return itemCollection!=null;
+	}
+	
+	@Override
+	public Boolean removeSortedItemCodeById(Long navigationId,String[] codes){
+		
+		//验证导航集合存在
+		ItemCollection  itemCollection = itemCollectionDao.findItemCollectionByNavigationId(navigationId);
+		if(itemCollection==null || itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
+			return false;
+		}
+		
+		//验证待删除排序的商品存在并存在排序中
+		String sequence = itemCollection.getSequence();
+		
+		List<Long> newIdList = new  ArrayList<Long>();
+		for(String code:codes){
+			ItemCommand itemCommand = itemDao.findItemCommandByCode(code);
+			//商品不存在|| 不存在排序中
+			if(itemCommand==null  || sequence.indexOf(itemCommand.getId()+"") <0){
+				return false;
+			}
+			newIdList.add(itemCommand.getId());
+		}
+		
+		//重置排序
+		String[] existIds= sequence.split(",");
+		//拼接
+		StringBuffer buffer =new StringBuffer();
+		for(String existId:existIds){
+			if(existId.length()>0){
+				//删除标志
+				boolean deleteFlg =false;
+				for(Long itemId:newIdList){
+					if(itemId.toString().equals(existId)){
+						deleteFlg = true;
+						break;
+					}
+				}
+				if(!deleteFlg){
+					buffer.append(existId+",");
+				}
+			}
+		}
+		
+		itemCollection.setSequence(buffer.toString());
+		itemCollection=  itemCollectionDao.save(itemCollection);
+		
+		return itemCollection!=null;
+	}
+	
+	@Override
+	public  Navigation findByItemCollectionId (Long itemCollectionId){
+		return navigationDao.findByItemCollectionId(itemCollectionId);
+	}
+	
+	
 }

@@ -135,8 +135,8 @@ public class NebulaOrderConfirmController extends BaseController{
 
         //TODO 获得购物车数据
 
-        //TODO 收获地址信息
-
+        //TODO 收获地址信息 參見 addresscontroller
+ 
         return "transaction.check";
     }
 
@@ -171,7 +171,7 @@ public class NebulaOrderConfirmController extends BaseController{
 
         //dosome logic
 
-        //
+        //取到支付地址
         //TODO
         return null;
     }

@@ -32,12 +32,27 @@ var SORT_URL = base + "/base/sortNavigation.json";
 var TREE_URL = base + "/base/navigationTree.json";
 
 /********************************************** 全局变量 **********************************************/
-var key,lastValue = "", nodeList = [], fontCss = {}, curCategoryInput = null;
+var key,lastValue = "", nodeList = [], fontCss = {}, curParameterInput = null;
 var NAVI_TREE = null;	//导航树
 var CATE_TREE = null;	//分类树
 
+//增加导航json
+//var addJsonStr=null;
+//
+//
+////更新导航json
+//var updateJsonStr=null;
+//
+////分类与属性弹出框所属，增加(add)或更新(update)
+//var dialogType="";
+
+//所有属性
+//var dynamicPropertyCommand="${dynamicPropertyCommand}";
+
 /********************************************** ready **********************************************/
 $j(document).ready(function(){
+	$j("#toItemSort").css('visibility','hidden');
+	
 	
 	$j.fn.zTree.init($j("#tree"), setting, zNodes);
 	$j.fn.zTree.init($j("#categoryDemo"), categorySetting, category_ZNodes);
@@ -51,6 +66,11 @@ $j(document).ready(function(){
 	$j("#tree_1_span").click();
 	
 	NAVI_TREE = $j.fn.zTree.getZTreeObj("tree");
+	
+
+	
+	
+	
 	CATE_TREE = $j.fn.zTree.getZTreeObj("categoryDemo");
 	
 	NAVI_TREE.expandAll(true)
@@ -78,14 +98,16 @@ $j(document).ready(function(){
 	 * 3.如果当前节点是无效节点，则需要将子节点也置为无效
 	 */
 	$j("#save_father_Name").click(function(){
+		
 		var name = $j.trim($j("#tree_name_zh_cn").val());
+		//类型  1：URL类型; 2：分类类型
 		var type = $j("#update-type").val();
 		var url = $j.trim($j("#update-url").val());
-		var param = $j("#update-parameter").data("id");
+		var param = $j("#update-parameter").data("category") +  $j("#update-parameter").data("property");
 		var status = $j("#update-status").val();
 		var isNewWin = $j("#update-newWindow").prop("checked");
 		
-		if(name == null || name == "") {
+		if(!name) {
 			nps.info(nps.i18n("NAVIGATION_MESSAGE"),nps.i18n("NAVIGATION_EDIT_NAME"));
 			$j("#tree_name_zh_cn").focus();
 			return false;
@@ -93,7 +115,7 @@ $j(document).ready(function(){
 
 		var nodes = NAVI_TREE.getSelectedNodes();
 		if (type == "2") {
-			if(param == null || param == "") {
+			if(!param) {
 				nps.info(nps.i18n("NAVIGATION_MESSAGE"),nps.i18n("NAVIGATION_EDIT_PARAM"));
 				$j("#update-parameter").addClass("ui-loxia-error");
 				return false;
@@ -153,6 +175,7 @@ $j(document).ready(function(){
 			    	nps.error(nps.i18n("NAVIGATION_MESSAGE"), "导航名不能为空");
 	  			    return;
 			    }
+			    
 		    	var multlangs = '{"navigationCommand.id":"'+ nodes[0].id+'"';
 		    	multlangs += ',"navigationCommand.lifecycle":"'+ status+'"';
 		    	multlangs += ',"navigationCommand.type":"' + type+'"';
@@ -161,6 +184,8 @@ $j(document).ready(function(){
 		    	multlangs += ',"navigationCommand.sort":"' + nodes[0].diy_sort+'"';
 		    	multlangs += ',"navigationCommand.isNewWin":"' + isNewWin+'"';
 		    	multlangs += ',"navigationCommand.ids":"' + ids+'"';
+			    multlangs += ',"naviStr":"'+ $j("#update-parameter").data("json") +'"';
+			    
 		    	$j(".nav-update .mutl-lang").each(function(i,dom){
 		    		var me = $j(this);
 		    		var val = me.val();
@@ -171,8 +196,61 @@ $j(document).ready(function(){
 		    		multlangs+=',"navigationCommand.name.values['+i+']":"'+val+'"';
 		    		multlangs+=',"navigationCommand.name.langs['+i+']":"'+lang+'"';
 		    	});
+			    
+		    	//seo标题
+		    	$j(".nav-update .seoTitle").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.seoTitle.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.seoTitle.langs['+i+']":"'+lang+'"';
+		    	});
+		    	
+		    	
+		    	//seo关键字
+		    	$j(".nav-update .seoKeyWords").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.seoKeyWords.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.seoKeyWords.langs['+i+']":"'+lang+'"';
+		    	});		    	
+		    	
+		    	//seo描述
+		    	$j(".nav-update .seoDescription").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.seoDescription.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.seoDescription.langs['+i+']":"'+lang+'"';
+		    	});
+		    	
+		    	//扩展
+		    	$j(".nav-update .seoExtntion").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.extention.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.extention.langs['+i+']":"'+lang+'"';
+		    	});
+		    	
 		    	multlangs+="}";
+		    	
 		    	json = eval('('+multlangs+')');
+		    	
+		    	
 			}else{
 				json={
 						"navigationCommand.id":nodes[0].id,
@@ -329,11 +407,10 @@ $j(document).ready(function(){
 		var name = $j.trim($j("#add_name_zh_cn").val());
 		var type = $j("#add-type").val();
 		var url = $j.trim($j("#add-url").val());
-		var param = $j("#add-parameter").data("id");
+		var param = $j("#add-parameter").data("category") +  $j("#add-parameter").data("property");
 		var isNewWin = $j("#add-newWindow").prop("checked");
-		
 		if (type == "2") {
-			if(param == null || param == "") {
+			if(!param) {
 				nps.info(nps.i18n("NAVIGATION_MESSAGE"),nps.i18n("NAVIGATION_EDIT_PARAM"));
 				$j("#add-parameter").addClass("ui-loxia-error");
 				return false;
@@ -394,6 +471,7 @@ $j(document).ready(function(){
 		    	multlangs += ',"navigationCommand.param":"' + param+'"';
 		    	multlangs += ',"navigationCommand.sort":"' + sort+'"';
 		    	multlangs += ',"navigationCommand.isNewWin":"' + isNewWin+'"';
+			    multlangs += ',"naviStr":"'+ $j("#add-parameter").data("json") +'"';
 		    	$j(".nav-add .mutl-lang").each(function(i,dom){
 		    		var me = $j(this);
 		    		var val = me.val();
@@ -404,6 +482,60 @@ $j(document).ready(function(){
 		    		multlangs+=',"navigationCommand.name.values['+i+']":"'+val+'"';
 		    		multlangs+=',"navigationCommand.name.langs['+i+']":"'+lang+'"';
 		    	});
+		    	
+		    	
+		    	
+		    	
+		    	//seo标题
+		    	$j(".nav-add .seoTitle").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.seoTitle.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.seoTitle.langs['+i+']":"'+lang+'"';
+		    	});
+		    	
+		    	
+		    	//seo关键字
+		    	$j(".nav-add .seoKeyWords").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.seoKeyWords.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.seoKeyWords.langs['+i+']":"'+lang+'"';
+		    	});		    	
+		    	
+		    	//seo描述
+		    	$j(".nav-add .seoDescription").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.seoDescription.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.seoDescription.langs['+i+']":"'+lang+'"';
+		    	});
+		    	
+		    	//扩展
+		    	$j(".nav-add .seoExtntion").each(function(i,dom){
+		    		var me = $j(this);
+		    		var val = me.val();
+		    		var lang = me.attr("lang");
+		    		if(defaultlang==lang){
+		    			defualt = val;
+		    		}
+		    		multlangs+=',"navigationCommand.extention.values['+i+']":"'+val+'"';
+		    		multlangs+=',"navigationCommand.extention.langs['+i+']":"'+lang+'"';
+		    	});
+		    	
+		    	
 		    	multlangs+="}";
 		    	json = eval('('+multlangs+')');
 				
@@ -467,19 +599,38 @@ $j(document).ready(function(){
 	});
 
 	$j(".select-category").click(function() {
-		curCategoryInput = $j(this).siblings("input").eq(0);
-		var categoryId = curCategoryInput.data("id");
-		nodes = CATE_TREE.getCheckedNodes(true);
-		if (nodes.length > 0) {
-			for (var i = 0; i < nodes.length; i++) {
-				CATE_TREE.checkNode(nodes[i], false);
+		curParameterInput = $j(this).siblings("input").eq(0);
+		
+//		alert($j("#update-parameter").data("property"));
+		
+		var categoryIds = curParameterInput.data("category");
+		var propertyIds = curParameterInput.data("property");
+		
+		CATE_TREE.checkAllNodes(false);  //取消所有选中效果
+		if(categoryIds){
+			var ids = (categoryIds+"").split(",");
+			if(ids.length>0){
+				for(var i=0;i<ids.length;i++){
+					var node = CATE_TREE.getNodeByParam("id", ids[i], null);
+					if (node) {
+						CATE_TREE.checkNode(node, true);
+					}
+				}
 			}
 		}
-		var node = CATE_TREE.getNodeByParam("id", categoryId, null);
-		if (node) {
-			CATE_TREE.checkNode(node, true);
-		}
 		
+		
+		
+		
+		//属性勾选
+		$j("#propertiesDiv input").attr("checked", false);  //全部取消勾选
+		if(propertyIds){
+			var propertyArray=propertyIds.split(",");
+			for(var i=0;i<propertyArray.length;i++){
+				$j("#propertiesDiv input[value='"+propertyArray[i] +"']").attr("checked", true);
+			}
+		}
+
 		var cityObj = $j(this);
 		var cityOffset = $j(this).offset();
 		$j("#categoryMenuContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
@@ -492,10 +643,44 @@ $j(document).ready(function(){
 		var type = $j(this).val();
 		if (type == "1") {
 			$j(this).parent().siblings(".navi-param").hide();
+			$j("#toItemSort").css('visibility','hidden');
+			
 		} else {
 			$j(this).parent().siblings(".navi-param").show();
+			$j("#toItemSort").css('visibility','visible');
 		}
 	});
+	
+	//关闭选择属性的弹层
+	$j("#selectCategoryBtn").click(function(){
+		dealNavigationParam();
+		categoryHideMenu();
+		
+	});
+	
+	$j(".propertySelectEvent").click(function(){
+		createShowParamLabel();
+		dealNavigationParam();
+	});
+	
+	
+	
+	var navigationId = $j("#navigationId").val();
+	var node = null;
+	if(navigationId){
+		 node = NAVI_TREE.getNodeByParam("id",navigationId);
+	}else{
+		//默认选中节点ID为0的
+		 node = NAVI_TREE.getNodeByParam("id",0);
+		 navigationId = "0";
+	}
+	if(node){
+		NAVI_TREE.selectNode(node);
+//		NAVI_TREE.checkNode(node,true,true);
+		NAVI_TREE.setting.callback.onClick(null, NAVI_TREE.setting.treeId, node);//调用事件  
+	}
+	
+	
 	
 });
 
@@ -543,8 +728,9 @@ var setting = {
 var categorySetting = {
 	check: {
 		enable: true,
-		chkStyle: "radio",
-		radioType: "all"
+//		chkStyle: "radio",    由单选改成复选
+//		radioType: "all"
+		chkboxType: { "Y":"", "N":""}  //父子节点选中与取消选择级联情况：不相关
 	},  
 	view: {
 		dblClickExpand: false,
@@ -561,6 +747,7 @@ var categorySetting = {
 		simpleData: {
 			enable: true
 		}
+		
 	},
 	callback: {
 		onClick: categoryClick,
@@ -588,6 +775,7 @@ function onClick(event, treeId, treeNode)  {
 		
 		var id = treeNode.id;
 		if(id==0){
+			$j("#toItemSort").css('visibility','hidden');
 			return;
 		}
 		var data = nps.syncXhrPost(base+"/i18n/navigation/findNavigationLangByNavigationId.json", {'navigationId': id});
@@ -596,6 +784,8 @@ function onClick(event, treeId, treeNode)  {
 			 return;
 		}
 		if(i18nOnOff){
+			
+			//名称
 			$j(".nav-update .mutl-lang").each(function(i,dom){
 	    		var me = $j(this);
 	    		var lang = me.attr("lang");
@@ -604,12 +794,7 @@ function onClick(event, treeId, treeNode)  {
 		    		var langs = data.name.langs;
 		    		var num = 0;
 		    		for (var i = 0; i < langs.length; i++) {
-		    			var l = langs[i];
-		    			if(l == null){
-		    				num = i;
-		    				break;
-		    			}
-		    			if(l==lang){
+		    			if(langs[i]==lang){
 		    				num = i;
 		    				break;
 		    			}
@@ -618,11 +803,161 @@ function onClick(event, treeId, treeNode)  {
 	    		}else{
 	    			me.val(null);
 	    		}
-    			
 		    });
+			
+			
+			//seo标题
+			$j(".nav-update .seoTitle").each(function(i,dom){
+	    		var me = $j(this);
+	    		var lang = me.attr("lang");
+	    		if(data.seoTitle!=null){
+	    			var values = data.seoTitle.values;
+		    		var langs = data.seoTitle.langs;
+		    		var num = 0;
+		    		for (var i = 0; i < langs.length; i++) {
+		    			if(langs[i]==lang){
+		    				num = i;
+		    				break;
+		    			}
+					}
+		    		me.val(values[num]);
+	    		}else{
+	    			me.val(null);
+	    		}
+		    });
+			
+			//seoKeyWords
+			$j(".nav-update .seoKeyWords").each(function(i,dom){
+	    		var me = $j(this);
+	    		var lang = me.attr("lang");
+	    		if(data.seoKeyWords!=null){
+	    			var values = data.seoKeyWords.values;
+		    		var langs = data.seoKeyWords.langs;
+		    		var num = 0;
+		    		for (var i = 0; i < langs.length; i++) {
+		    			if(langs[i]==lang){
+		    				num = i;
+		    				break;
+		    			}
+					}
+		    		me.val(values[num]);
+	    		}else{
+	    			me.val(null);
+	    		}
+		    });
+			
+			//seoDescription
+			$j(".nav-update .seoDescription").each(function(i,dom){
+	    		var me = $j(this);
+	    		var lang = me.attr("lang");
+	    		if(data.seoDescription!=null){
+	    			var values = data.seoDescription.values;
+		    		var langs = data.seoDescription.langs;
+		    		var num = 0;
+		    		for (var i = 0; i < langs.length; i++) {
+		    			if(langs[i]==lang){
+		    				num = i;
+		    				break;
+		    			}
+					}
+		    		me.val(values[num]);
+	    		}else{
+	    			me.val(null);
+	    		}
+		    });
+			//extention
+			$j(".nav-update .seoExtntion").each(function(i,dom){
+	    		var me = $j(this);
+	    		var lang = me.attr("lang");
+	    		if(data.extention!=null){
+	    			var values = data.extention.values;
+		    		var langs = data.extention.langs;
+		    		var num = 0;
+		    		for (var i = 0; i < langs.length; i++) {
+		    			if(langs[i]==lang){
+		    				num = i;
+		    				break;
+		    			}
+					}
+		    		me.val(values[num]);
+	    		}else{
+	    			me.val(null);
+	    		}
+		    });
+			
+			
 		}else{
 			$j("#tree_name_zh_cn").val(treeNode.name);
 		}
+		
+		//全部取消选中
+		CATE_TREE.checkAllNodes(false);
+		
+		//默认当前分类与属性信息指向修改导航
+		curParameterInput = $j("#update-parameter");
+		
+		//分类与属性设置
+		if(data.facetParameterList && data.facetParameterList.length>0){
+			//页面显示 “参数”显示
+//			var paramLabel="";
+			
+			 //勾选的属性ID拼接串
+			var propertIds = "";
+			
+			//勾选的分类ID拼接串
+			var categoryIds = "";  
+			for(var i=0;i<data.facetParameterList.length;i++){
+				var facetParameter = data.facetParameterList[i];
+				
+				//分类
+				if(facetParameter.facetType=="CATEGORY"){
+					for(var j=0;j<facetParameter.values.length;j++){
+						var info = facetParameter.values[j].split("-")
+						var id=info[info.length-1];
+						var node = CATE_TREE.getNodeByParam("id", id, null);
+						if (node) {
+							CATE_TREE.checkNode(node, true, false,false);
+							categoryIds +=  facetParameter.values[j] +","
+						}
+					}
+				}
+				//属性
+				if(facetParameter.facetType=="PROPERTY"){
+					for(var j=0;j<facetParameter.values.length;j++){
+							propertIds  +=  facetParameter.values[j] +","
+							$j("#propertiesDiv input[value='"+facetParameter.values[j]+"']").attr("checked", true);
+					}
+				}
+
+			}
+			
+			
+			//重置隐藏属性值
+			if(propertIds){
+				curParameterInput.data("property",propertIds.substring(0,propertIds.length-1));
+			}else{
+				curParameterInput.data("property","");
+			}
+			
+			//重置隐藏分类值
+			if(categoryIds){
+				curParameterInput.data("category",categoryIds.substring(0,categoryIds.length-1));
+			}else{
+				curParameterInput.data("category","");
+			}
+			
+			createShowParamLabel();
+			
+			//触发选中分类与属性
+			$j("#selectCategoryBtn").click();
+			
+		}else{
+			//无分类与属性信息，置空
+			curParameterInput.val("");
+			curParameterInput.data("category", "");
+			curParameterInput.data("property", "");
+		}
+		
 		
 		if (isParentNavigationURLType(treeNode)) {	// 父节点是URL类型，不能更改类型为分类类型的节点，或添加分类类型的子节点
 			$j("#update-type").val(1);
@@ -632,12 +967,12 @@ function onClick(event, treeId, treeNode)  {
 			$j("#add-type option[value='2']").remove();
 			$j("#add-type").parent().siblings(".navi-param").hide();
 		} else {
-			
 			if (treeNode.diy_type == 1) {	// 当前节点是URL类型，不能添加分类类型的子节点
 				$j("#add-type").val(1);
 				$j("#add-type option[value='2']").remove();
 				$j("#add-type").parent().siblings(".navi-param").hide();
 			} else {
+				//新增导航初始化
 				var addFlag = false;
 				
 				$j("#add-type option").each(function(){
@@ -653,8 +988,10 @@ function onClick(event, treeId, treeNode)  {
 				if ($j("#add-type").find("option:selected").val() == 2) {
 					$j("#add-type").parent().siblings(".navi-param").show();
 				}
+				
 			}
 			
+			//修改导航初始化
 			var updateFlag = false;
 			
 			$j("#update-type option").each(function(){
@@ -669,6 +1006,11 @@ function onClick(event, treeId, treeNode)  {
 			
 			if ($j("#update-type").find("option:selected").val() == 2) {
 				$j("#update-type").parent().siblings(".navi-param").show();
+				//重置排序链接
+				$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
+				
+			}else{
+				$j("#toItemSort").css('visibility','hidden');
 			}
 			
 			$j("#update-type").val(treeNode.diy_type);
@@ -676,20 +1018,15 @@ function onClick(event, treeId, treeNode)  {
 			$j("#update-type").change();	//触发事件，是否显示 “参数” 输入框
 		}
 		
+		//页面“URL”显示
 		$j("#update-url").val(treeNode.diy_url);
 		
-		var zTree = $j.fn.zTree.getZTreeObj("categoryDemo");
-		var node = zTree.getNodeByParam("id", treeNode.diy_param, null);
-		if (node) {
-			$j("#update-parameter").val(node.name);
-			$j("#update-parameter").data("id", node.id);
-		} else {
-			$j("#update-parameter").val("");
-			$j("#update-parameter").data("id", "");
-		}
-		
+		//页面“状态”显示
 		$j("#update-status").val(treeNode.state);
+		
+		//页面“新窗口”显示
 		$j("#update-newWindow").prop("checked", treeNode.diy_isNewWin);
+		
 	}
 }
 
@@ -784,19 +1121,32 @@ function categoryClick(e, treeId, treeNode) {
 	return false;
 }
 
-//分类点击函数 获得树结构值
+//分类节点点击事件
 function categoryCheck(e, treeId, treeNode) {
-	nodes = CATE_TREE.getCheckedNodes(true);
-	if (nodes.length > 0) {
-		curCategoryInput.data("id", nodes[0].id);
-		curCategoryInput.val(nodes[0].name);
-		curCategoryInput.blur();
-		curCategoryInput.removeClass("ui-loxia-error");
-	} else {
-		curCategoryInput.val('');
-		curCategoryInput.data('id', "");
-	}
-	categoryHideMenu();
+//	nodes = CATE_TREE.getCheckedNodes(true);
+//	if (nodes.length > 0) {
+//		var nodeIds = "";
+////		var nodeNames  = "";
+//		for(var i=0;i<nodes.length;i++){
+//			nodeIds = nodeIds +  nodes[i].id +",";
+////			nodeNames += nodes[i].name +",";
+//		}
+//		//去掉最后 一个,
+//		nodeIds = nodeIds.substring(0,nodeIds.length-1);
+////		nodeNames = nodeNames.substring(0,nodeNames.length-1);
+//		
+//		curParameterInput.data("category", nodeIds);
+////		curParameterInput.val(nodeNames);
+//		curParameterInput.blur();
+//		curParameterInput.removeClass("ui-loxia-error");
+//	} else {
+//		curParameterInput.val("");
+//		curParameterInput.data("category", "");
+//	}
+	
+	createShowParamLabel();
+	dealNavigationParam();
+	//categoryHideMenu();
 }
 
 //鼠标移动隐藏事件
@@ -927,3 +1277,159 @@ function isParentNavigationURLType(treeNode){
 		return false;
 	}
 }
+
+//处理显示页面"参数"
+function createShowParamLabel(){
+	var param="";
+	//分类
+	var nodes = CATE_TREE.getCheckedNodes(true);
+	if (nodes.length > 0) {
+		var nodeIds = "";
+		for(var i=0;i<nodes.length;i++){
+			nodeIds = nodeIds +  nodes[i].id +",";
+			param += nodes[i].name +",";
+		}
+		nodeIds = nodeIds.substring(0,nodeIds.length-1);
+		curParameterInput.data("category", nodeIds);
+		curParameterInput.blur();
+		curParameterInput.removeClass("ui-loxia-error");
+	}else {
+		curParameterInput.val("");
+		curParameterInput.data("category", "");
+	}
+
+	//属性
+	
+	$j("div#propertiesDiv > div").each(function(){
+		var $checkInfo=$j(this).find('input:checkbox:checked');
+		if($checkInfo.size()>0){
+			for(var j=0;j<$checkInfo.size();j++){
+				param += $checkInfo.eq(j).next().html() +",";
+			}
+		}
+	});
+//	alert(param);
+	if(param){
+		curParameterInput.val(param.substring(0,param.length-1));
+	}
+}
+
+//处理分类类型导航参数
+function dealNavigationParam(){
+	//存储选择的分类与属性
+	var facetParameters = new Array();
+	
+	//分类
+	var arryInfo=new Object();
+	var keys= "";
+	var nodes = CATE_TREE.getCheckedNodes(true);
+	if (nodes.length > 0) {
+		for(var i=0;i<nodes.length;i++){
+			var parentTId=nodes[i].parentTId;
+			var tId = nodes[i].tId;
+			if(keys.indexOf(parentTId)<0){
+				keys = keys  + parentTId + ","
+				arryInfo[parentTId] = tId;
+			}else{
+				arryInfo[parentTId] = arryInfo[parentTId] + "," + tId;
+			}
+		}
+		
+		//取消末尾,
+		keys = keys.substring(0,keys.length-1);
+		var arrayKeys = keys.split(",");
+	
+		for(var i=0;i<arrayKeys.length;i++){
+			var parentTId = arrayKeys[i];
+			if(parentTId!=""){
+				var facetParameter = new Object();
+				facetParameter.facetType="CATEGORY";
+				//分类类型的FacetParameter.name统一固定 category_tree
+				facetParameter.name="category_tree";
+				var tIds = arryInfo[parentTId];
+				var arraytIds = tIds.split(",");
+				
+				var values = new Array();
+				
+				for(var j=0;j<arraytIds.length;j++){
+					
+					var tid = arraytIds[j];
+					if(tid!= ""){
+						var node = CATE_TREE.getNodeByTId(tid)
+						if(node){
+							//结点树ID的倒序连接
+							var value = node.id+"";
+						
+							var parentNode = node.getParentNode();
+							while(parentNode!=null && parentNode.id!='0'){
+								value  = value + "-" + parentNode.id;
+								parentNode = parentNode.getParentNode()
+							}
+							var info = value.split("-");
+							for(var k=0;k<info.length;k++){
+								if(k==0){
+									value = info[info.length-1]
+								}else{
+									value  = value +"-"+ info[info.length-1-k]
+								}
+							}
+							values.push(value);
+						}
+					}
+				}
+				facetParameter.values=values;
+				facetParameters.push(facetParameter);
+			}
+		}
+	}
+	
+	//属性
+	var propertyIds ="";
+	$j("div#propertiesDiv > div").each(function(){
+		var $checkInfo=$j(this).find('input:checkbox:checked');
+		if($checkInfo.size()>0){
+			var facetParameter = new Object();
+			facetParameter.name="dynamic_forsearch_"+$checkInfo.eq(0).attr("lang");
+			facetParameter.facetType="PROPERTY";
+			var values = new Array();
+			for(var j=0;j<$checkInfo.size();j++){
+				values.push($checkInfo.eq(j).val());
+				propertyIds += $checkInfo.eq(j).val()+","
+			}
+			
+			facetParameter.values=values;
+			
+			facetParameters.push(facetParameter);
+		}
+	});
+	if(propertyIds){
+		curParameterInput.data("property", propertyIds.substring(0,propertyIds.length-1));
+	}else{
+		curParameterInput.data("property", "");
+	}
+	
+	//构建转递到服务器的数据
+	if(facetParameters.length>0){
+		var jsonstr="";
+		for(var j=0;j<facetParameters.length;j++){
+			jsonstr += facetParameters[j].name+",";
+			jsonstr += facetParameters[j].facetType+",";
+			
+			var value="";
+			for(var k=0;k<facetParameters[j].values.length;k++){
+				if(k==facetParameters[j].values.length-1){
+					value += facetParameters[j].values[k];
+				}else{
+					value += facetParameters[j].values[k]+"_";
+				}
+			}
+			jsonstr += value;
+			jsonstr += ";";
+		}
+		curParameterInput.data("json", jsonstr);
+	}
+	
+	$j("#propertiesDiv input").attr("checked", false);  //全部取消勾选
+}
+
+
