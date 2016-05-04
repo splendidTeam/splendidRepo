@@ -52,9 +52,6 @@ public class PdpViewCommand extends BaseViewCommand {
 	/** 尺码对照 */
     private String sizeCompareChart;
     
-    /** 用于在移动端分享的 */
-    private String mobileShareUrl;
-    
     /** 商品扩展信息 */
     private ItemExtraViewCommand extra;
     
@@ -134,14 +131,6 @@ public class PdpViewCommand extends BaseViewCommand {
 
 	public void setSizeCompareChart(String sizeCompareChart) {
 		this.sizeCompareChart = sizeCompareChart;
-	}
-
-	public String getMobileShareUrl() {
-		return mobileShareUrl;
-	}
-
-	public void setMobileShareUrl(String mobileShareUrl) {
-		this.mobileShareUrl = mobileShareUrl;
 	}
 
 	public ItemExtraViewCommand getExtra() {

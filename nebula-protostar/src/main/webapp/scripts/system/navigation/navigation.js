@@ -676,8 +676,11 @@ $j(document).ready(function(){
 	}
 	if(node){
 		NAVI_TREE.selectNode(node);
-		NAVI_TREE.checkNode(node,true,true);
+//		NAVI_TREE.checkNode(node,true,true);
+		NAVI_TREE.setting.callback.onClick(null, NAVI_TREE.setting.treeId, node);//调用事件  
 	}
+	
+	
 	
 });
 
@@ -775,9 +778,6 @@ function onClick(event, treeId, treeNode)  {
 			$j("#toItemSort").css('visibility','hidden');
 			return;
 		}
-		//重置排序链接
-		$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+id).css('visibility','visible');
-		
 		var data = nps.syncXhrPost(base+"/i18n/navigation/findNavigationLangByNavigationId.json", {'navigationId': id});
 		if(data == null){
 			 nps.info(nps.i18n("NAVIGATION_MESSAGE"),"选择数据已经不存在了");
@@ -1006,6 +1006,11 @@ function onClick(event, treeId, treeNode)  {
 			
 			if ($j("#update-type").find("option:selected").val() == 2) {
 				$j("#update-type").parent().siblings(".navi-param").show();
+				//重置排序链接
+				$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
+				
+			}else{
+				$j("#toItemSort").css('visibility','hidden');
 			}
 			
 			$j("#update-type").val(treeNode.diy_type);
