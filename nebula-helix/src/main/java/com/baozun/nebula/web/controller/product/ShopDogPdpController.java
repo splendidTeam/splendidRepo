@@ -43,6 +43,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -162,9 +163,19 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 		//图片
 		List<ItemImageViewCommand> itemImageViewCommands = buildItemImageViewCommand(itemBaseInfo.getId());
 		
+		if(Validator.isNotNullOrEmpty(itemImageViewCommands)){
+			for(ItemImageViewCommand itemImageViewCommand:itemImageViewCommands){
+				itemImageViewCommand.getColorItemPropertyId();
+				
+			}
+		}
+		
+		
+		
 		//销售属性
 		
 		//sku
+		shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
 	
 		return shopdogItemViewCommand;
 		

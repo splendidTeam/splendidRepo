@@ -376,7 +376,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @RequestMapping(value = "/shoppingcart/select", method =
      *                       RequestMethod.POST)
      */
-    public NebulaReturnResult selectShoppingCartCount(
+    public NebulaReturnResult toggleShoppingCartCount(
                     @LoginMember MemberDetails memberDetails,
                     @RequestParam(value = "shoppingcartLineId",required = false) Long shoppingcartLineId,
                     @RequestParam(value = "checked",required = true) boolean checkStatus,
@@ -388,6 +388,49 @@ public class NebulaShoppingCartController extends BaseController{
 
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
+
+        // 判断处理结果
+        DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+        if (!shoppingcartResult.toString().equals(ShoppingcartResult.SUCCESS.toString())){
+            result = DefaultReturnResult.FAILURE;
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(getMessage(shoppingcartResult.toString()));
+            result.setResultMessage(message);
+            LOGGER.error(getMessage(shoppingcartResult.toString()));
+        }
+        return result;
+    }
+    
+    /**
+     * 全选全不选
+     * 
+     * @param memberDetails
+     *            the member details
+     * @param shoppingcartLineId
+     *            the shoppingcartline id
+     * @param count
+     *            最终数量值,而非 incr值
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @RequestMapping(value = "/shoppingcart/select", method =
+     *                       RequestMethod.POST)
+     */
+    public NebulaReturnResult toggleShoppingCartCountAll(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "checked",required = true) boolean checkStatus,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
+
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver
+                        .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
 
         // 判断处理结果
         DefaultReturnResult result = DefaultReturnResult.SUCCESS;
