@@ -57,7 +57,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * </tr>
  * <tr valign="top">
  * <td>
- * {@link #showShoppingCart(MemberDetails, HttpServletRequest, HttpServletResponse, Model)
+ * {@link #showShoppingCart(MemberDetails, HttpServletRequest, Model)
  * showShoppingCart}</td>
  * <td>显示购物车页面</td>
  * </tr>
