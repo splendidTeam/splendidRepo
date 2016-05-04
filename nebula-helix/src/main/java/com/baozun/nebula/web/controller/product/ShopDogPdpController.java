@@ -151,7 +151,7 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
 		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
 			shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
-			shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
+			shopdogItemViewCommand.setMainPicUrl(shopdogItemImageViewCommands.get(0).getImages().get(0).getUrl());
 		}
 		
 		//设置销售属性之前先设置baseInfoViewCommand、picUrls
@@ -226,6 +226,7 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 		ItemBaseCommand itemBaseCommand = itemDetailManager.findItemBaseInfoByCode(itemCode);
 		if(itemBaseCommand != null){
 			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
+			itemBaseInfoViewCommand.setId(itemBaseCommand.getItemId());
 		}
 		
 		return itemBaseInfoViewCommand;
