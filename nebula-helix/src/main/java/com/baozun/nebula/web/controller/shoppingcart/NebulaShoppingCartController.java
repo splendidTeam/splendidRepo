@@ -144,24 +144,26 @@ public class NebulaShoppingCartController extends BaseController{
     /** The Constant VIEW_MEMBER_SHOPPINGCART_LIST. */
     private static final String              VIEW_SHOPPINGCART      = "shoppingcart.shoppingcart";
 
+    /** The sdk shopping cart manager. */
     @Autowired
     private SdkShoppingCartManager           sdkShoppingCartManager;
 
+    /** The guest shoppingcart resolver. */
     @Autowired
     @Qualifier("guestShoppingcartResolver")
     private ShoppingcartResolver             guestShoppingcartResolver;
 
+    /** The member shoppingcart resolver. */
     @Autowired
     @Qualifier("memberShoppingcartResolver")
     private ShoppingcartResolver             memberShoppingcartResolver;
 
+    /** The shoppingcart view command converter. */
     @Autowired
     @Qualifier("shoppingcartViewCommandConverter")
     private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
-    private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
-        return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
-    };
+    //**********************************showShoppingCart************************************************
 
     /**
      * 显示用户的购物车.
@@ -170,19 +172,12 @@ public class NebulaShoppingCartController extends BaseController{
      *            the member details
      * @param request
      *            the request
-     * @param response
-     *            the response
      * @param model
      *            the model
      * @return the string
      * @RequestMapping(value = "/shoppingcart", method = RequestMethod.GET)
      */
-    public String showShoppingCart(
-                    @LoginMember MemberDetails memberDetails,
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    Model model){
-
+    public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,Model model){
         // 获取购物车信息
         ShoppingCartCommand cartCommand = getCartInfo(request, memberDetails);
 
@@ -191,24 +186,7 @@ public class NebulaShoppingCartController extends BaseController{
         return VIEW_SHOPPINGCART;
     }
 
-    /**
-     * 获取购物车信息
-     * 
-     * @param model
-     * @param request
-     * @return
-     */
-    protected ShoppingCartCommand getCartInfo(HttpServletRequest request,MemberDetails memberDetails){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-        List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
-        if (null == cartLines){
-            return null;
-        }
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
-        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
-    }
-
+    //**********************************updateShoppingCartCount************************************************
     /**
      * 添加购物车.
      * 
@@ -255,6 +233,7 @@ public class NebulaShoppingCartController extends BaseController{
         return result;
     }
 
+    //**********************************updateShoppingCartCount************************************************
     /**
      * 删除购物车行.
      * <p>
@@ -306,6 +285,7 @@ public class NebulaShoppingCartController extends BaseController{
         return result;
     }
 
+    //**********************************updateShoppingCartCount************************************************
     /**
      * 修改用户的购物车数量.
      * 
@@ -357,10 +337,7 @@ public class NebulaShoppingCartController extends BaseController{
         return result;
     }
 
-    // TODO 修改销售属性
-    // TODO 删除bundle
-
-    // TODO 选中 /**
+    //************************************选中不选中**********************************************************
     /**
      * 修改用户的购物车选中状态.
      * 
@@ -375,8 +352,8 @@ public class NebulaShoppingCartController extends BaseController{
      *            the member details
      * @param shoppingcartLineId
      *            the shoppingcartline id
-     * @param count
-     *            最终数量值,而非 incr值
+     * @param checkStatus
+     *            the check status
      * @param request
      *            the request
      * @param response
@@ -413,14 +390,12 @@ public class NebulaShoppingCartController extends BaseController{
     }
 
     /**
-     * 全选全不选
-     * 
+     * 全选全不选.
+     *
      * @param memberDetails
      *            the member details
-     * @param shoppingcartLineId
-     *            the shoppingcartline id
-     * @param count
-     *            最终数量值,而非 incr值
+     * @param checkStatus
+     *            the check status
      * @param request
      *            the request
      * @param response
@@ -453,6 +428,41 @@ public class NebulaShoppingCartController extends BaseController{
             LOGGER.error(getMessage(shoppingcartResult.toString()));
         }
         return result;
+    }
+
+    // TODO 修改销售属性
+    // TODO 删除bundle
+
+    //******************************************************************************************************
+    /**
+     * 获取购物车信息.
+     *
+     * @param request
+     *            the request
+     * @param memberDetails
+     *            the member details
+     * @return the cart info
+     */
+    protected ShoppingCartCommand getCartInfo(HttpServletRequest request,MemberDetails memberDetails){
+        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
+        if (null == cartLines){
+            return null;
+        }
+        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
+        return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+    }
+
+    /**
+     * Detect shoppingcart resolver.
+     *
+     * @param memberDetails
+     *            the member details
+     * @return the shoppingcart resolver
+     */
+    private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
+        return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
     }
 
 }
