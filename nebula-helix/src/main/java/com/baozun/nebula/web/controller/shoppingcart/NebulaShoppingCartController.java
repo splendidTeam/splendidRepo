@@ -195,7 +195,7 @@ public class NebulaShoppingCartController extends BaseController{
         return VIEW_SHOPPINGCART;
     }
 
-    //**********************************updateShoppingCartCount************************************************
+    //**********************************addShoppingCart************************************************
     /**
      * 添加购物车.
      * 
@@ -225,15 +225,12 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
-
         return toNebulaReturnResult(shoppingcartResult);
     }
 
-    //**********************************updateShoppingCartCount************************************************
+    //**********************************deleteShoppingCartLine************************************************
     /**
      * 删除购物车行.
      * <p>
@@ -267,12 +264,9 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
-
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -310,12 +304,9 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
-
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -353,12 +344,9 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
-
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -385,12 +373,9 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
-
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -450,5 +435,4 @@ public class NebulaShoppingCartController extends BaseController{
         }
         return DefaultReturnResult.SUCCESS;
     }
-
 }
