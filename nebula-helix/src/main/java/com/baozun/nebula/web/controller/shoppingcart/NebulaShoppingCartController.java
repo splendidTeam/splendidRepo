@@ -63,7 +63,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * </tr>
  * <tr valign="top">
  * <td>
- * {@link #addShoppingCart(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)
+ * {@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
  * addShoppingCart}</td>
  * <td>加入购物车</td>
  * </tr>
@@ -75,13 +75,24 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>
- * {@link #updateShoppingCartCount(MemberDetails, Long, Long, HttpServletRequest, HttpServletResponse, Model)
+ * {@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
  * updateShoppingCartCount}</td>
  * <td>修改购物车数量</td>
  * </tr>
  * <tr valign="top">
  * <td>//TODO</td>
  * <td>修改商品销售属性</td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>
+ * {@link #toggleShoppingCartCount(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse, Model)
+ * toggleShoppingCartCount}</td>
+ * <td>修改用户的购物车选中状态.</td>
+ * </tr>
+ * <tr valign="top">
+ * <td>{@link #toggleShoppingCartCountAll(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model)
+ * toggleShoppingCartCountAll}</td>
+ * <td>全选全不选</td>
  * </tr>
  * </table>
  * </blockquote>
@@ -400,7 +411,7 @@ public class NebulaShoppingCartController extends BaseController{
         }
         return result;
     }
-    
+
     /**
      * 全选全不选
      * 
