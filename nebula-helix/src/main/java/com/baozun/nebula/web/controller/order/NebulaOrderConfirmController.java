@@ -51,7 +51,7 @@ import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>创建订单</td>
- * <td>参见 {@link #createOrder(MemberDetails, HttpServletRequest, HttpServletResponse, Model)}</td>
+ * <td>参见 {@link #createOrder(MemberDetails, OrderForm, BindingResult, HttpServletRequest, HttpServletResponse, Model)}</td>
  * </tr>
  * <tr valign="top">
  * <td>新增收获地址</td>
