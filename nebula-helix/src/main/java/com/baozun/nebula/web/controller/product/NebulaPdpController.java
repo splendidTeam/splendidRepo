@@ -54,6 +54,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 
@@ -109,8 +110,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommandWithCache(itemCode);
 			
-			constructBrowsingHistory(request, response, pdpViewCommand.getBaseInfo().getId());
-			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;
@@ -135,22 +134,11 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
+	public List<RelationItemViewCommand> getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		
-		 DefaultReturnResult result = new DefaultReturnResult();
-			try {
-				Map<String, Object> returnObject = new HashMap<String, Object>();
-		        returnObject.put(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
-		        result.setReturnObject(returnObject);
-				
-			} catch (Exception e) {
-				LOG.error("[PDP_BROWSING_HISTORY] error itemId:{}", itemId );
-				
-				throw new BusinessException("get browsing history error.");
-			}
 			
-			return result;
+        return buildItemBrowsingHistoryViewCommand(itemId, request, response);
+	        
 	}
 	
 	/**
@@ -165,22 +153,11 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
+	public List<RelationItemViewCommand> getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-        DefaultReturnResult result = new DefaultReturnResult();
-		try {
-			Map<String, Object> returnObject = new HashMap<String, Object>();
-	        returnObject.put(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommandWithCache(itemId));
-	        result.setReturnObject(returnObject);
-			
-		} catch (Exception e) {
-			LOG.error("[PDP_RECOMMEND] error itemId:{}", itemId );
-			
-			throw new BusinessException("get pdp recommend error.");
-		}
+	    return buildItemRecommendViewCommandWithCache(itemId);
 		
-		return result;
 	}
 	
 	/**
@@ -195,12 +172,10 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
+	public List<InventoryViewCommand> getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
-		
-		return DefaultReturnResult.SUCCESS;
+		return buildInventoryViewCommand(itemId);
 	}
 	
 	/**
