@@ -145,7 +145,8 @@ public class ItemPropertyViewCommandResolverImpl implements
 						generalPropCommandList, null);
 				if(Validator.isNotNullOrEmpty(elementViewCommands)){
 					//放入结果集
-					resultMap.put(entry.getKey(), elementViewCommands);
+					resultMap.put(Validator.isNullOrEmpty(entry.getKey()) ? ItemPropertyViewCommand.NULL_GROUP
+							: entry.getKey(), elementViewCommands);
 				}
 			}
 		}
