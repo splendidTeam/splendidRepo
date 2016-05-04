@@ -6,7 +6,6 @@ import java.util.Map;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.SearchConditionItem;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
-import com.baozun.nebula.search.command.MetaDataCommand;
 
 import loxia.annotation.QueryParam;
 import loxia.dao.Page;
@@ -81,19 +80,10 @@ public interface SdkSearchConditionItemManager extends BaseManager{
 	
 	public List<SearchConditionItemCommand> findItemByPropertyValueId(Long pValueId);
 	
-	public List<SearchConditionItemCommand> findItemBySId(Long sId);
+	public List<SearchConditionItemCommand> findItemBySId(Long sId,String lang);
 	
 	public SearchConditionItemCommand findItemById(Long id);
 	
 	public List<SearchConditionItemCommand> findItemByPropertyId(Long propertyId);
 	
-	
-	/**
-	 * 根据语言查询所有搜索条件选项的数据(只有propertyId、name、sortNo字段)
-	 * @return List<MetaDataCommand>
-	 * @param lang
-	 * @author 冯明雷
-	 * @time 2016年5月3日下午4:32:46
-	 */
-	List<MetaDataCommand> findSearchConditionItemMetDataByLang(String lang);
 }

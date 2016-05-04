@@ -275,7 +275,8 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		if (Validator.isNotNullOrEmpty(rangeConditionStr)) {
 			if (StringUtils.contains(rangeConditionStr, SEPARATORCHARS_MINUS)) {
 				List<String> values = new ArrayList<String>();
-				values.add(rangeConditionStr);
+				values.add(StringUtils.substringBeforeLast(rangeConditionStr, SEPARATORCHARS_MINUS));
+				values.add(StringUtils.substringAfterLast(rangeConditionStr, SEPARATORCHARS_MINUS));
 
 				FacetParameter facetParameter = new FacetParameter(SkuItemParam.sale_price);
 				facetParameter.setValues(values);
@@ -283,7 +284,6 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 				facetParameters.add(facetParameter);
 			}
-
 		}
 
 		return facetParameters;

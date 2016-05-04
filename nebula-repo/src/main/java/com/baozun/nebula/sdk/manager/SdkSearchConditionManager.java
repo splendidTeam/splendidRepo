@@ -6,7 +6,6 @@ import java.util.Map;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
-import com.baozun.nebula.search.command.MetaDataCommand;
 
 import loxia.annotation.QueryParam;
 import loxia.dao.Page;
@@ -88,13 +87,13 @@ public interface SdkSearchConditionManager extends BaseManager{
 	public List<SearchConditionCommand> findConditionByCategoryIdList(List<Long> cids);
 	
 	/**
-	 * 根据语言查询所有搜索条件的数据(只有propertyId、name、sortNo字段)
+	 * 根据语言查询所有搜索条件的数据
 	 * @return List<MetaDataCommand>
 	 * @param lang
 	 * @return 
 	 * @author 冯明雷
 	 * @time 2016年4月28日下午5:33:44
 	 */
-	List<MetaDataCommand> findSearchConditionMetDataByLang(String lang);
+	List<SearchConditionCommand> findSearchConditionMetDataByLang(String lang);
 	
 }

@@ -83,7 +83,9 @@
 			<value>
             <![CDATA[ 
                 select
-					con.property_id as id,
+					con.id as id,
+					con.property_id as propertyId,
+					con.type as type,
 					conLang.name as name,
 					con.sort as sortNo
 				from
