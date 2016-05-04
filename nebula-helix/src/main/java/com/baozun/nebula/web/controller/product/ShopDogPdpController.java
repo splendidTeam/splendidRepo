@@ -37,14 +37,14 @@ import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.web.controller.product.converter.ShopDogItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopDogItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -72,11 +72,15 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 	private static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	@Autowired
-	private ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
+	private ItemColorSwatchViewCommandResolver    colorSwatchViewCommandResolver;
 	
 	@Autowired
 	@Qualifier("shopDogItemViewCommandConverter")
-	private ShopDogItemViewCommandConverter shopDogItemViewCommandConverter;
+	private ShopDogItemViewCommandConverter    shopDogItemViewCommandConverter;
+	
+	@Autowired
+	@Qualifier("shopDogItemImageViewCommandConverter")
+	private ShopDogItemImageViewCommandConverter    shopDogItemImageViewCommandConverter;
 
 	@Autowired
 	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
@@ -138,47 +142,20 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 	
 	protected ShopdogItemViewCommand buildShopdogItemViewCommand(String itemCode) throws IllegalItemStateException{
 		
-//        PdpViewCommand pdpViewCommand = new PdpViewCommand();
-//		
-//		//商品基本信息
-//		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
-//		pdpViewCommand.setBaseInfo(itemBaseInfo);
-//		
-//		//商品图片
-//		pdpViewCommand.setImages(buildItemImageViewCommand(itemBaseInfo.getId()));
-//		
-//		//商品属性
-//		pdpViewCommand.setProperties(buildItemPropertyViewCommand(itemBaseInfo, pdpViewCommand.getImages()));
-//		
-//		//sku
-//		pdpViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
-//		
-//		//price
-//		pdpViewCommand.setPrice(buildPriceViewCommand(itemBaseInfo, pdpViewCommand.getSkus()));
-//		
-//		//colorSwatch
-//		pdpViewCommand.setColorSwatches(buildItemColorSwatchViewCommands(itemBaseInfo));
-		
 		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
 		
 		//商品基本信息
 		ShopdogItemViewCommand shopdogItemViewCommand =  shopDogItemViewCommandConverter.convert(itemBaseInfo);
 		
 		//图片
-		List<ItemImageViewCommand> itemImageViewCommands = buildItemImageViewCommand(itemBaseInfo.getId());
-		
-		if(Validator.isNotNullOrEmpty(itemImageViewCommands)){
-			for(ItemImageViewCommand itemImageViewCommand:itemImageViewCommands){
-				itemImageViewCommand.getColorItemPropertyId();
-				
-			}
+		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
+			shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
+			shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
 		}
 		
-		
-		
-		//销售属性
 		//设置销售属性之前先设置baseInfoViewCommand、picUrls
-		//shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, itemImageViewCommands));
+		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
 		
 		//sku
 		shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
