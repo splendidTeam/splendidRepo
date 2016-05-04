@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 import java.util.List;
@@ -13,22 +29,39 @@ import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.MemberDetails;
 
 /**
- * 会员购物车操作
- * 
- * @author weihui.tang
+ * 会员购物车操作.
  *
+ * @author weihui.tang
+ * @author feilong
+ * @version 5.3.1 2016年5月3日 下午1:35:48
+ * @since 5.3.1
  */
 @Component("memberShoppingcartResolver")
 public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
 
+    /** The sdk shopping cart manager. */
     @Autowired
     private SdkShoppingCartManager sdkShoppingCartManager;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#getShoppingCartLineCommandList(com.baozun.nebula.web.
+     * MemberDetails, javax.servlet.http.HttpServletRequest)
+     */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
         return sdkShoppingCartManager.findShoppingCartLinesByMemberId(memberDetails.getMemberId(), null);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.
+     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected ShoppingcartResult doAddShoppingCart(
                     MemberDetails memberDetails,
@@ -45,6 +78,13 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.
+     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected ShoppingcartResult doUpdateShoppingCart(
                     MemberDetails memberDetails,
@@ -61,6 +101,14 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doDeleteShoppingCartLine(com.baozun.nebula.web.
+     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected ShoppingcartResult doDeleteShoppingCartLine(
                     MemberDetails memberDetails,
@@ -76,6 +124,14 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
 
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doToggleShoppingCartLineCheckStatus(com.baozun.
+     * nebula.web.MemberDetails, java.util.List, java.util.List, boolean, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
     @Override
     protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
