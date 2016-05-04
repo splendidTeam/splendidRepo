@@ -101,6 +101,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 		ItemBaseCommand itemBaseCommand = itemDetailManager.findItemBaseInfoByCode(itemCode);
 		if(itemBaseCommand != null){
 			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
+			itemBaseInfoViewCommand.setId(itemBaseCommand.getItemId());
 		}
 		
 		return itemBaseInfoViewCommand;
@@ -118,6 +119,7 @@ public abstract class NebulaBasePdpController extends BaseController {
 		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
 		if(itemBaseCommand!=null){
 			BeanUtils.copyProperties(itemBaseCommand, itemBaseInfoViewCommand);
+			itemBaseInfoViewCommand.setId(itemBaseCommand.getItemId());
 		}
 		
 		return itemBaseInfoViewCommand;
