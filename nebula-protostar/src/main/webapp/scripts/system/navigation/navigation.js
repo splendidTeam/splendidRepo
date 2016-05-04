@@ -63,12 +63,7 @@ $j(document).ready(function(){
 		.bind("propertychange", searchNode)
 		.bind("input", searchNode);
 
-	$j("#tree_1_span").click();
-	
 	NAVI_TREE = $j.fn.zTree.getZTreeObj("tree");
-	
-
-	
 	
 	
 	CATE_TREE = $j.fn.zTree.getZTreeObj("categoryDemo");
@@ -663,7 +658,7 @@ $j(document).ready(function(){
 		dealNavigationParam();
 	});
 	
-	
+	$j("#property-container-event").css('display','none');
 	
 	var navigationId = $j("#navigationId").val();
 	var node = null;
@@ -680,6 +675,16 @@ $j(document).ready(function(){
 		NAVI_TREE.setting.callback.onClick(null, NAVI_TREE.setting.treeId, node);//调用事件  
 	}
 	
+	//绑定显示或隐藏属性
+	$j("#toggle-property-event").click(function(){
+		if($j("#property-container-event").css('display')=='none'){
+			$j(this).html('隐藏属性');
+			
+		}else{
+			$j(this).html('显示属性');
+		}
+		$j("#property-container-event").fadeToggle();
+	});
 	
 	
 });
@@ -890,8 +895,10 @@ function onClick(event, treeId, treeNode)  {
 			$j("#tree_name_zh_cn").val(treeNode.name);
 		}
 		
-		//全部取消选中
+		//分类全部取消选中
 		CATE_TREE.checkAllNodes(false);
+		//属性全部取消选中
+		$j("#propertiesDiv input").attr("checked", false);
 		
 		//默认当前分类与属性信息指向修改导航
 		curParameterInput = $j("#update-parameter");
@@ -957,7 +964,6 @@ function onClick(event, treeId, treeNode)  {
 			curParameterInput.data("category", "");
 			curParameterInput.data("property", "");
 		}
-		
 		
 		if (isParentNavigationURLType(treeNode)) {	// 父节点是URL类型，不能更改类型为分类类型的节点，或添加分类类型的子节点
 			$j("#update-type").val(1);
@@ -1123,29 +1129,10 @@ function categoryClick(e, treeId, treeNode) {
 
 //分类节点点击事件
 function categoryCheck(e, treeId, treeNode) {
-//	nodes = CATE_TREE.getCheckedNodes(true);
-//	if (nodes.length > 0) {
-//		var nodeIds = "";
-////		var nodeNames  = "";
-//		for(var i=0;i<nodes.length;i++){
-//			nodeIds = nodeIds +  nodes[i].id +",";
-////			nodeNames += nodes[i].name +",";
-//		}
-//		//去掉最后 一个,
-//		nodeIds = nodeIds.substring(0,nodeIds.length-1);
-////		nodeNames = nodeNames.substring(0,nodeNames.length-1);
-//		
-//		curParameterInput.data("category", nodeIds);
-////		curParameterInput.val(nodeNames);
-//		curParameterInput.blur();
-//		curParameterInput.removeClass("ui-loxia-error");
-//	} else {
-//		curParameterInput.val("");
-//		curParameterInput.data("category", "");
-//	}
-	
 	createShowParamLabel();
 	dealNavigationParam();
+	//
+	$j("#propertiesDiv input").attr("checked", false);
 	//categoryHideMenu();
 }
 
@@ -1281,7 +1268,7 @@ function isParentNavigationURLType(treeNode){
 //处理显示页面"参数"
 function createShowParamLabel(){
 	var param="";
-	//分类
+	//拼接分类
 	var nodes = CATE_TREE.getCheckedNodes(true);
 	if (nodes.length > 0) {
 		var nodeIds = "";
@@ -1298,9 +1285,10 @@ function createShowParamLabel(){
 		curParameterInput.data("category", "");
 	}
 
-	//属性
-	
+	//拼接属性
 	$j("div#propertiesDiv > div").each(function(){
+		
+		//所有勾选的属性值
 		var $checkInfo=$j(this).find('input:checkbox:checked');
 		if($checkInfo.size()>0){
 			for(var j=0;j<$checkInfo.size();j++){
@@ -1308,10 +1296,12 @@ function createShowParamLabel(){
 			}
 		}
 	});
-//	alert(param);
+	//去掉最后一个逗号
 	if(param){
 		curParameterInput.val(param.substring(0,param.length-1));
 	}
+	
+	
 }
 
 //处理分类类型导航参数
@@ -1428,8 +1418,6 @@ function dealNavigationParam(){
 		}
 		curParameterInput.data("json", jsonstr);
 	}
-	
-	$j("#propertiesDiv input").attr("checked", false);  //全部取消勾选
 }
 
 

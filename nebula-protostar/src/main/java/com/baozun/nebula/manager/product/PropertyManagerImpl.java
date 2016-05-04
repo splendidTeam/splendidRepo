@@ -878,7 +878,7 @@ public class PropertyManagerImpl implements PropertyManager{
 	@Override
 	public List<DynamicPropertyCommand> findAllDynamicPropertyCommand(){
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = new ArrayList<DynamicPropertyCommand>();
-		List<Property> properties = propertyDao.findWidthoutCommonPropertyId();
+		List<Property> properties = propertyDao.findSearchableProperty();
 		if(properties!=null && !properties.isEmpty()){
 			for(Property property:properties){
 				List<PropertyValue>  values = propertyValueDao.findPropertyValueListById(property.getId());

@@ -214,7 +214,7 @@ var category_ZNodes = [
                 <spring:message code="navigation.list.parameter"/>
               </label>
                 <input type="text" disabled="disabled" loxiaType="input" value="" name="add-parameter" id="add-parameter" placeholder="<spring:message code="item.list.catagory"/>" />
-                <a href="javascript:void(0);" class="func-button persist select-category" title="add"><spring:message code="navigation.list.category"/></a>
+                <a href="javascript:void(0);" class="func-button persist select-category" title="add">选择分类与属性</a>
             </div>
             <div class="ui-block-line">
               <label>
@@ -276,27 +276,26 @@ var category_ZNodes = [
 <div id="categoryMenuContent" class="menuContent" style="display: none; position: absolute; background-color: #f0f6e4; border: 1px solid #617775; padding: 3px;">
 	<div class="ui-block-title1">选择分类</div>
 	<ul id="categoryDemo" class="ztree" style="margin-top: 0; width: 180px; height: 100%;"></ul>
-	
-	
-	<div>
+	<div id="property-container-event">
 		<div class="ui-block-title1">选择属性</div>
 		<div id="propertiesDiv">
-		<c:forEach items="${dynamicPropertyCommand}" var="command">
-			<div class="propertyDiv" style="padding-bottom:10px;">
-				<span>${command.property.name }</span>
-				<c:forEach items="${command.propertyValueList}" var="propertyValue">
-					<input type="checkbox" value="${propertyValue.id}" lang="${command.property.id}" class="propertySelectEvent">
-					<label>${propertyValue.value}</label>
-				</c:forEach>
-			</div>
-		</c:forEach>
+			<c:forEach items="${dynamicPropertyCommand}" var="command">
+				<div class="propertyDiv" style="padding-bottom:10px;">
+					<span>${command.property.name }</span>
+					<c:forEach items="${command.propertyValueList}" var="propertyValue">
+						<input type="checkbox" value="${propertyValue.id}" lang="${command.property.id}" class="propertySelectEvent">
+						<label>${propertyValue.value}</label>
+					</c:forEach>
+				</div>
+			</c:forEach>
+		</div>
+		<input type="hidden" value="${navigationId}" id="navigationId">
 	</div>
 	
-	<div style="text-align:center;">
-	<button id="selectCategoryBtn">确定</button>
-	<br>
-	</div>
-	<input type="hidden" value="${navigationId}" id="navigationId">
+		<div style="text-align:center;">
+			<a href="javascript:void(0);" class="func-button" id="toggle-property-event">显示属性</a>
+			<button id="selectCategoryBtn">确定</button>
+		</div>
 	
 </div>
 </body>

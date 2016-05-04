@@ -62,7 +62,6 @@ import com.baozun.nebula.search.convert.SolrQueryConvert;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
-import com.baozun.nebula.solr.command.ItemForSolrI18nCommand;
 import com.baozun.nebula.solr.factory.NebulaSolrQueryFactory;
 import com.baozun.nebula.solr.utils.FilterUtil;
 import com.baozun.nebula.solr.utils.JsonFormatUtil;
@@ -517,29 +516,26 @@ public class NavigationController extends BaseController{
 		
 		sortList.setCurrentPage(searchResultPage.getCurrentPage());
 		sortList.setCount(commands.size());
-		sortList.setSize(20);
-		sortList.setStart(1);
-		sortList.setTotalPages(1);
+		sortList.setSize(searchResultPage.getSize());
+		sortList.setStart(searchResultPage.getStart());
+		sortList.setTotalPages(searchResultPage.getTotalPages());
 		
 		return sortList;
 	}
 	
 	private SearchResultPage<ItemForSolrCommand>  searchNavigation(Long navigationId){
-		
 		SearchResultPage<ItemForSolrCommand> searchResultPage =null;
-		
 		ItemCollection collection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		
+		//初始化Solr转换器
 		if(solrQueryConvert==null){
 			try{
 				solrQueryConvert =  (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
 			}catch (Exception e){
 				log.error(e.getMessage());
 			}
-			
 		}
 		if (Validator.isNotNullOrEmpty(collection)) {
-			 
 				SearchCommand searchCommand = collectionToSearchCommand(collection);
 
 				// ***************** 下面这些查询和searchPage是一致的
@@ -557,50 +553,8 @@ public class NavigationController extends BaseController{
 				searchResultPage = searchManager.search(solrQuery);
 		}
 		return searchResultPage;
-		
-		
-		
-		
-			// 查询
-//			SearchResultPage<ItemForSolrI18nCommand> searchResultPage = new SearchResultPage<ItemForSolrI18nCommand>();
-//			
-//			ItemForSolrI18nCommand command1 = new ItemForSolrI18nCommand();
-//			command1.setTitle("商品1");
-//			command1.setCode("111");
-//			command1.setId(111L);
-//			command1.setSort_no(1);
-//			
-//			ItemForSolrI18nCommand command2 = new ItemForSolrI18nCommand();
-//			command2.setTitle("商品2");
-//			command2.setId(222L);
-//			command2.setSort_no(2);
-//			
-//			ItemForSolrI18nCommand command3 = new ItemForSolrI18nCommand();
-//			command3.setTitle("商品3");
-//			command3.setId(333L);
-//			command3.setSort_no(3);
-//			
-//			ItemForSolrI18nCommand command4 = new ItemForSolrI18nCommand();
-//			command4.setTitle("商品4");
-//			command4.setId(444L);
-//			command4.setSort_no(4);
-//			
-//			List<ItemForSolrI18nCommand> commands = new ArrayList<ItemForSolrI18nCommand>();
-//			commands.add(command1);
-//			commands.add(command2);
-//			commands.add(command3);
-//			commands.add(command4);
-//			
-//			searchResultPage.setItems(commands);
-//			
-//			searchResultPage.setCurrentPage(1);
-//			searchResultPage.setCount(2);
-//			searchResultPage.setSize(20);
-//			searchResultPage.setStart(1);
-//			searchResultPage.setTotalPages(1);
-//			
-//			return searchResultPage;
-		}
+
+	}
 	
 	protected SearchCommand collectionToSearchCommand(ItemCollection collection) {
 		SearchCommand searchCommand = new SearchCommand();
