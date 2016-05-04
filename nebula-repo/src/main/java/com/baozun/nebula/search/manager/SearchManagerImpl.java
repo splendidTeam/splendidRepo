@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
-import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;
@@ -25,6 +24,7 @@ import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.Facet;
 import com.baozun.nebula.search.FacetGroup;
+import com.baozun.nebula.search.FacetType;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
@@ -33,6 +33,7 @@ import com.baozun.nebula.solr.command.SolrGroupCommand;
 import com.baozun.nebula.solr.command.SolrGroupData;
 import com.baozun.nebula.solr.manager.SolrManager;
 import com.baozun.nebula.solr.manager.SolrManagerImpl;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
 
 @Transactional
@@ -131,18 +132,21 @@ public class SearchManagerImpl implements SearchManager{
 	@Override
 	public List<SearchConditionItemCommand> findCoditionItemByCoditionIdWithCache(Long coditionId){
 		List<SearchConditionItemCommand> searchConditionItemCommands = null;
+		
+		String lang = LangUtil.getCurrentLang();
 
+		String key = conditionItemCacheKey+coditionId+"-"+lang;
 		try{
-			searchConditionItemCommands = cacheManager.getObject(conditionItemCacheKey);
+			searchConditionItemCommands = cacheManager.getObject(key);
 		}catch (Exception e){
 			LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager getObect() error. time:{}", new Date());
 		}
 
 		if (Validator.isNullOrEmpty(searchConditionItemCommands)) {
-			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySId(coditionId);
+			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySId(coditionId,lang);
 
 			try{
-				cacheManager.setObject(conditionItemCacheKey, searchConditionItemCommands, TimeInterval.SECONDS_PER_DAY);
+				cacheManager.setObject(key, searchConditionItemCommands, TimeInterval.SECONDS_PER_DAY);
 			}catch (Exception e){
 				LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager setObject() error. time:{}", new Date());
 			}
@@ -254,10 +258,12 @@ public class SearchManagerImpl implements SearchManager{
 			if (SkuItemParam.category_tree.equals(key)) {
 				facetGroup = convertFacetGroup(valueMap);
 				facetGroup.setCategory(true);
+				facetGroup.setType(FacetType.CATEGORY.toString());
 			}else{
 				// 否则是属性的facet
 				facetGroup = convertFacetGroup(valueMap);
 				facetGroup.setCategory(false);
+				facetGroup.setType(FacetType.PROPERTY.toString());
 				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
 			}
 			facetGroups.add(facetGroup);
@@ -267,7 +273,7 @@ public class SearchManagerImpl implements SearchManager{
 		//**************************价格范围的facetGroup
 		FacetGroup priceGroup = new FacetGroup();
 		priceGroup.setCategory(false);
-		priceGroup.setType(SearchCondition.SALE_PRICE_TYPE.toString());		
+		priceGroup.setType(FacetType.RANGE.toString());		
 		List<Facet> facets = new ArrayList<Facet>();
 		for (Entry<String, Integer> entry : facetQueryMap.entrySet()){
 			String key = entry.getKey();
@@ -302,9 +308,6 @@ public class SearchManagerImpl implements SearchManager{
 	private FacetGroup convertFacetGroup(Map<String, Long> valueMap){
 		FacetGroup facetGroup = new FacetGroup();
 
-		//常规属性
-		facetGroup.setType(SearchCondition.NORMAL_TYPE.toString());
-		
 		List<Facet> facets = new ArrayList<Facet>();
 		for (Entry<String, Long> entry : valueMap.entrySet()){
 			Facet facet = new Facet();

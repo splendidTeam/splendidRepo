@@ -243,7 +243,7 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 	}
 
 	@Override
-	public List<MetaDataCommand> findSearchConditionMetDataByLang(String lang){
+	public List<SearchConditionCommand> findSearchConditionMetDataByLang(String lang){
 		return searchConditionDao.findSearchConditionMetDataByLang(lang);
 	}
 

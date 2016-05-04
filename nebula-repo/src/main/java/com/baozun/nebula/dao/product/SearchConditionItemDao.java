@@ -19,6 +19,10 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
+import com.baozun.nebula.model.product.SearchConditionItem;
+import com.baozun.nebula.model.product.SearchConditionItemlang;
+import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -26,12 +30,6 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.model.product.SearchConditionItem;
-import com.baozun.nebula.model.product.SearchConditionItemlang;
-import com.baozun.nebula.model.product.SearchConditionLang;
-import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
-import com.baozun.nebula.search.command.MetaDataCommand;
 
 /**
  * @author Tianlong.Zhang
@@ -140,13 +138,16 @@ public interface SearchConditionItemDao extends GenericEntityDao<SearchCondition
 	@NativeQuery(model = SearchConditionItemlang.class)
 	SearchConditionItemlang findSearchConditionItemlang(@QueryParam("id")Long id,@QueryParam("lang") String lang);
 	
+	
 	/**
-	 * 根据语言查询所有搜索条件选项的数据(只有propertyId、name、sortNo字段)
-	 * @return List<MetaDataCommand>
+	 * 根据搜索条件id和语言查询搜索条件选项
+	 * @return List<SearchConditionItemCommand>
+	 * @param sid
 	 * @param lang
 	 * @author 冯明雷
-	 * @time 2016年5月3日下午4:32:46
+	 * @time 2016年5月4日下午4:32:01
 	 */
-	@NativeQuery(model = MetaDataCommand.class)
-	List<MetaDataCommand> findSearchConditionItemMetDataByLang(@QueryParam("lang") String lang);
+	@NativeQuery(model = SearchConditionItemCommand.class)
+	List<SearchConditionItemCommand> findItemMetaBySIdAndLang(@QueryParam("sid")Long sid,@QueryParam("lang") String lang);
+	
 }

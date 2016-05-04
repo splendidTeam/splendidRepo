@@ -275,16 +275,12 @@ public class NebulaSolrQueryFactory{
 	 * @time 2016年4月29日下午4:29:55
 	 */
 	public static void addFqForPriceArea(SolrQuery solrQuery,List<String> priceAreaWords,String type){
-		String fq_keyword ="{!tag=priceTag}"+ type;
+		String fq_keyword = "{!tag=priceTag}" + type;
 		try{
-			String str = priceAreaWords.get(0);
-
-			String[] priceAreaWord = str.split("-");
-
 			Integer max_price = null;
 			Integer min_price = null;
-			min_price = Integer.parseInt(priceAreaWord[0]);
-			max_price = Integer.parseInt(priceAreaWord[1]);
+			min_price = Integer.parseInt(priceAreaWords.get(0));
+			max_price = Integer.parseInt(priceAreaWords.get(1));
 			if (min_price < 1) {
 				min_price = 1;
 			}

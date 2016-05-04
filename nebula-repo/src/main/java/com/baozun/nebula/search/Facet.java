@@ -39,6 +39,9 @@ public class Facet {
 	private String value;
 	
 	private	Long	parentId;
+	
+	private Integer	sortNo;
+	
 
 	public List<Facet> childrens = new ArrayList<Facet>();
 	
@@ -50,6 +53,7 @@ public class Facet {
 		this.parentId = facet.getParentId();
 		this.count = facet.getCount();
 		this.childrens = facet.getChildrens();
+		this.sortNo=facet.getSortNo();
 	}
 	
 
@@ -115,6 +119,24 @@ public class Facet {
 
 	public void setParentId(Long parentId) {
 		this.parentId = parentId;
+	}
+
+	
+	/**   
+	 * get sortNo  
+	 * @return sortNo  
+	 */
+	public Integer getSortNo(){
+		return sortNo;
+	}
+
+	
+	/**
+	 * set sortNo 
+	 * @param sortNo
+	 */
+	public void setSortNo(Integer sortNo){
+		this.sortNo = sortNo;
 	}
 
 	

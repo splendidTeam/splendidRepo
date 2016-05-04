@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.search.command.MetaDataCommand;
 
 /**
@@ -29,25 +30,22 @@ import com.baozun.nebula.search.command.MetaDataCommand;
  */
 public class FacetFilterMetaData implements Serializable{
 
-	private static final long			serialVersionUID			= 1337274838133771487L;
+	private static final long					serialVersionUID		= 1337274838133771487L;
 
 	/** 分类的元数据，key是分类的id，value是具体的数据 */
-	private Map<Long, MetaDataCommand>	categoryMetaMap				= new LinkedHashMap<Long, MetaDataCommand>();
+	private Map<Long, MetaDataCommand>			categoryMetaMap			= new LinkedHashMap<Long, MetaDataCommand>();
 
 	/** 属性的元数据，key是属性的id，value是具体的数据 */
-	private Map<Long, MetaDataCommand>	propertyMetaMap				= new LinkedHashMap<Long, MetaDataCommand>();
+	private Map<Long, MetaDataCommand>			propertyMetaMap			= new LinkedHashMap<Long, MetaDataCommand>();
 
 	/** 属性值的元数据，key是属性值的id，value是具体的数据 */
-	private Map<Long, MetaDataCommand>	propertyValueMetaMap		= new LinkedHashMap<Long, MetaDataCommand>();
+	private Map<Long, MetaDataCommand>			propertyValueMetaMap	= new LinkedHashMap<Long, MetaDataCommand>();
 
 	/** 导航的元数据，key是导航的id，value是具体的数据 */
-	private Map<Long, MetaDataCommand>	navigationMetaMap			= new LinkedHashMap<Long, MetaDataCommand>();
+	private Map<Long, MetaDataCommand>			navigationMetaMap		= new LinkedHashMap<Long, MetaDataCommand>();
 
 	/** 搜索条件的元数据，key是搜索条件的id，value是具体的数据 */
-	private Map<Long, MetaDataCommand>	searchConditionMetaMap		= new LinkedHashMap<Long, MetaDataCommand>();
-
-	/** 搜索条件的选项 ，key是搜索条件选项的id，value是具体的数据 */
-	private Map<Long, MetaDataCommand>	searchConditionItemMetaMap	= new LinkedHashMap<Long, MetaDataCommand>();
+	private Map<Long, SearchConditionCommand>	searchConditionMetaMap	= new LinkedHashMap<Long, SearchConditionCommand>();
 
 	/**
 	 * get categoryMetaMap
@@ -126,7 +124,7 @@ public class FacetFilterMetaData implements Serializable{
 	 * 
 	 * @return searchConditionMetaMap
 	 */
-	public Map<Long, MetaDataCommand> getSearchConditionMetaMap(){
+	public Map<Long, SearchConditionCommand> getSearchConditionMetaMap(){
 		return searchConditionMetaMap;
 	}
 
@@ -135,26 +133,8 @@ public class FacetFilterMetaData implements Serializable{
 	 * 
 	 * @param searchConditionMetaMap
 	 */
-	public void setSearchConditionMetaMap(Map<Long, MetaDataCommand> searchConditionMetaMap){
+	public void setSearchConditionMetaMap(Map<Long, SearchConditionCommand> searchConditionMetaMap){
 		this.searchConditionMetaMap = searchConditionMetaMap;
-	}
-
-	/**
-	 * get searchConditionItemMetaMap
-	 * 
-	 * @return searchConditionItemMetaMap
-	 */
-	public Map<Long, MetaDataCommand> getSearchConditionItemMetaMap(){
-		return searchConditionItemMetaMap;
-	}
-
-	/**
-	 * set searchConditionItemMetaMap
-	 * 
-	 * @param searchConditionItemMetaMap
-	 */
-	public void setSearchConditionItemMetaMap(Map<Long, MetaDataCommand> searchConditionItemMetaMap){
-		this.searchConditionItemMetaMap = searchConditionItemMetaMap;
-	}
+	}	
 
 }
