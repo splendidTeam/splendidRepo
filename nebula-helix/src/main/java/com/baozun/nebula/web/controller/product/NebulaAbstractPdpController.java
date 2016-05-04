@@ -103,14 +103,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品详情页 的相关展示数据 */
 	public static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
 	
-	/** 用户浏览商品历史记录 */
-	public static final String      MODEL_KEY_BROWSING_HISTORY          = "history";
-	 
 	/** 商品库存 */
 	public static final String      MODEL_KEY_INVENTORY                 = "inventory";
-	
-	/** PDP商品推荐 */
-	public static final String      MODEL_KEY_PDP_RECOMMEND             = "recommend";
 	
 	//view的常量定义
 	/** 商品详情页 的默认定义 */
@@ -415,13 +409,16 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(HttpServletRequest request,Long itemId) {
+	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(Long itemId, HttpServletRequest request, HttpServletResponse response) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
-		//PDP要删除当前商品记录
-        browsingHistoryItemIds.remove(itemId);
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
-		return relationItemViewCommandConverter.convert(itemCommands);
+		List<RelationItemViewCommand> browsingHistory = relationItemViewCommandConverter.convert(itemCommands);
+		
+		//把当前商品放入历史记录
+		constructBrowsingHistory(itemId, request, response);
+		
+		return browsingHistory;
 	}
 	
 	/**
@@ -429,7 +426,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected void constructBrowsingHistory(HttpServletRequest request, HttpServletResponse response, Long itemId) {
+	protected void constructBrowsingHistory(Long itemId, HttpServletRequest request, HttpServletResponse response) {
 		 BrowsingHistoryViewCommand browsingHistoryCommand = new DefaultBrowsingHistoryViewCommand();
          browsingHistoryCommand.setId(itemId);
          browsingHistoryResolver.resolveBrowsingHistory(request, response, browsingHistoryCommand);
