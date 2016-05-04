@@ -39,6 +39,7 @@ import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.web.controller.product.converter.ShopDogItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
+import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
@@ -76,6 +77,9 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 	@Autowired
 	@Qualifier("shopDogItemViewCommandConverter")
 	private ShopDogItemViewCommandConverter shopDogItemViewCommandConverter;
+
+	@Autowired
+	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
 	
 	/**
 	 * 进入商品详情页 	
@@ -173,6 +177,8 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 		
 		
 		//销售属性
+		//设置销售属性之前先设置baseInfoViewCommand、picUrls
+		//shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, itemImageViewCommands));
 		
 		//sku
 		shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
