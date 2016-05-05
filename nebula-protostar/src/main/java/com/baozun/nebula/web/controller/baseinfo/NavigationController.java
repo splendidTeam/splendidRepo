@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +56,7 @@ import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.FacetParameter;
 import com.baozun.nebula.search.FacetType;
+import com.baozun.nebula.search.command.ExcludeSearchCommand;
 import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.search.convert.SolrQueryConvert;
@@ -108,6 +108,19 @@ public class NavigationController extends BaseController{
 	protected  String CONFIG = "config/metainfo.properties";
 	
 	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
+	
+	
+	/***
+	 * 未排序标志
+	 */
+	private final String UNSORT_FLG="UNSORT";
+	
+	/***
+	 * 已排序标志
+	 */
+	private final String SORT_FLG="SORT";
+	
+	
 	
 	/**
 	 * 上传图片的域名
@@ -374,8 +387,6 @@ public class NavigationController extends BaseController{
 		return result;
 	}
 	
-	
-
 	/**
 	 * 删除商品排序
 	 */
@@ -403,9 +414,10 @@ public class NavigationController extends BaseController{
 		return result;
 	}
 	
-	
 	private boolean allInNavigationSolr(String[] codes,Long navigationId ){
-		 SearchResultPage<ItemForSolrCommand> searchResultPage= searchNavigation(navigationId);
+		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
+		SearchCommand SearchCommand = buildSearchCommand(itemCollection,null);
+		 SearchResultPage<ItemForSolrCommand> searchResultPage= searchNavigation(SearchCommand);
 		for (String code : codes){
 			if(code.length()==0){
 				continue;
@@ -472,23 +484,8 @@ public class NavigationController extends BaseController{
 		if(itemCollection==null ){
 			return null;
 		}
-		if(itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
-			return searchNavigation(navigationId);
-		}
-		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(navigationId);
-		String[] idList = itemCollection.getSequence().split(",");
-		for (String itemId : idList){
-			if (itemId != null && itemId.length() > 0) {
-				Iterator<ItemForSolrCommand> iterator = searchResultPage.getItems().iterator();
-				while (iterator.hasNext()){
-					if (itemId.equals(iterator.next().getId().toString())) {
-						iterator.remove();
-						break;
-					}
-				}
-			}
-		}
-		searchResultPage.setCount(searchResultPage.getItems().size());
+		SearchCommand SearchCommand = buildSearchCommand(itemCollection,UNSORT_FLG);
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(SearchCommand);
 		return searchResultPage;
 	}
 	
@@ -498,7 +495,9 @@ public class NavigationController extends BaseController{
 		if(itemCollection==null || itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
 			return null;
 		}
-		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(navigationId);
+		SearchCommand SearchCommand = buildSearchCommand(itemCollection,SORT_FLG);
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(SearchCommand);
+		
 		SearchResultPage<ItemForSolrCommand>  sortList = new  SearchResultPage<ItemForSolrCommand>();
 		List<ItemForSolrCommand> commands = new ArrayList<ItemForSolrCommand>();
 		String[] idList  = itemCollection.getSequence().split(",");
@@ -522,52 +521,42 @@ public class NavigationController extends BaseController{
 		}
 		
 		sortList.setItems(commands);
-		
-		sortList.setCurrentPage(searchResultPage.getCurrentPage());
-		sortList.setCount(commands.size());
-		sortList.setSize(searchResultPage.getSize());
-		sortList.setStart(searchResultPage.getStart());
-		sortList.setTotalPages(searchResultPage.getTotalPages());
-		
 		return sortList;
 	}
 	
-	private SearchResultPage<ItemForSolrCommand>  searchNavigation(Long navigationId){
-		SearchResultPage<ItemForSolrCommand> searchResultPage =null;
-		ItemCollection collection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
-		
+	protected SearchResultPage<ItemForSolrCommand>  searchNavigation(SearchCommand searchCommand){
 		//初始化Solr转换器
-		if(solrQueryConvert==null){
+		if (solrQueryConvert == null) {
 			try{
-				solrQueryConvert =  (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
+				solrQueryConvert = (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
 			}catch (Exception e){
 				log.error(e.getMessage());
 			}
 		}
-		if (Validator.isNotNullOrEmpty(collection)) {
-				SearchCommand searchCommand = collectionToSearchCommand(collection);
+		// ***************** 下面这些查询和searchPage是一致的
+		// 创建solrquery对象
+		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
-				// ***************** 下面这些查询和searchPage是一致的
-				// 创建solrquery对象
-				SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
+		// set facet相关信息
+		setFacet(solrQuery);
 
-				// set facet相关信息
-				setFacet(solrQuery);
+		// 设置权重信息
+		Boost boost = createBoost(searchCommand);
+		searchManager.setSolrBoost(solrQuery, boost);
 
-				// 设置权重信息
-				Boost boost = createBoost(searchCommand);
-				searchManager.setSolrBoost(solrQuery, boost);
-
-				// 查询
-				searchResultPage = searchManager.search(solrQuery);
-		}
+		// 查询
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
 		return searchResultPage;
-
 	}
 	
-	protected SearchCommand collectionToSearchCommand(ItemCollection collection) {
+	/**
+	 * 
+	 * @param navigationId
+	 * @param type  类型  unsort：未排序; sort:已排序
+	 * @return
+	 */
+	protected SearchCommand buildSearchCommand(ItemCollection collection,String type) {
 		SearchCommand searchCommand = new SearchCommand();
-		
 		String facetParameters = collection.getFacetParameters();
 		List<FacetParameter> params =JSON.parseArray(facetParameters,FacetParameter.class);
 		searchCommand.setFacetParameters(params);
@@ -575,8 +564,22 @@ public class NavigationController extends BaseController{
 		Navigation navi = navigationManager.findByItemCollectionId(collection.getId());
 		searchCommand.setNavigationId(navi.getId());
 		
+		//未排序
+		if(UNSORT_FLG.equals(type)){
+			String seqence = collection.getSequence();
+			if(seqence!=null && seqence.length()>0){
+				String[] ids = seqence.split(",");
+				ExcludeSearchCommand excludeSearchCommand = new ExcludeSearchCommand();
+				excludeSearchCommand.setFieldName("id");
+				excludeSearchCommand.setValues( Arrays.asList(ids));
+				List<ExcludeSearchCommand> excludeList = new ArrayList<ExcludeSearchCommand>();
+				excludeList.add(excludeSearchCommand);
+				searchCommand.setExcludeList(excludeList);
+			}
+		}
 		return searchCommand;
 	}
+	
 	
 	
 	protected void setFacet(SolrQuery solrQuery){

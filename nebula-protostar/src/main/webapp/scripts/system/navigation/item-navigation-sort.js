@@ -289,7 +289,7 @@ var saveItemSort = function(){
 	var sequence = "";
 	var lis = $j("#sortTable").children();
 	for ( var i = 0; i < lis.length; i++) {
-		var code = $j(lis[i]).children().eq(1).find("span")[0].innerHTML;
+		var code = $j(lis[i]).children().eq(3).find("span")[0].innerHTML;
 		sequence += code +","
 	}
 	sequence = sequence.substring(0, sequence.length - 1);
