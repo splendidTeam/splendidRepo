@@ -16,40 +16,50 @@
  */
 package com.baozun.nebula.web.controller.product.converter;
 
-import org.springframework.beans.BeanUtils;
+import loxia.utils.PropListCopyable;
+import loxia.utils.PropertyUtil;
 
+import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogSkuViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 
-/**
- * 驻店宝PDP-sku视图模型转换
+/** 
+ * shopdog  sku信息的视图模型转换器
  * @author xingyu.liu
  *
  */
-public class ShopdogSkuViewCommandConverter extends BaseConverter<ShopdogSkuViewCommand> {
-
-	private static final long serialVersionUID = -1961008406160845011L;
+public class ShopdogSkuViewCommandConverter extends
+		BaseConverter<ShopdogSkuViewCommand> {
+	
+	private static final long serialVersionUID = 2122116108014878879L;
 
 	public ShopdogSkuViewCommand convert(Object data) {
-		if(null == data){
+		if (data == null) {
 			return null;
 		}
-		if(data instanceof ItemBaseInfoViewCommand){
-			ShopdogSkuViewCommand  shopdogSkuViewCommand= new ShopdogSkuViewCommand();
-			try{
-				SkuViewCommand skuViewCommand = (SkuViewCommand) data;
-				BeanUtils.copyProperties(skuViewCommand, shopdogSkuViewCommand);
-				return shopdogSkuViewCommand;
-			}catch(Exception e){
+		if (data instanceof SkuCommand) {
+			try {
+				SkuCommand command = (SkuCommand) data;
+				
+				ShopdogSkuViewCommand viewCommand =new ShopdogSkuViewCommand();
+				// 完成转换
+				PropertyUtil.copyProperties(command, viewCommand,
+						new PropListCopyable("extentionCode", "properties", "salePrice","listPrice","availableQty"));
+				viewCommand.setSkuId(command.getId());
+				viewCommand.setLifecycle(Integer.valueOf(command.getState()));
+				
+				return viewCommand;
+			} catch (Exception e) {
+				// TODO should not occur
 				e.printStackTrace();
 			}
-		}else{
+		} else {
 			throw new UnsupportDataTypeException(data.getClass()
-					+ " cannot convert to " + ShopdogSkuViewCommandConverter.class + "yet.");
+					+ " cannot convert to " + ShopdogSkuViewCommand.class + "yet.");
 		}
+
 		return null;
 	}
+
 }
