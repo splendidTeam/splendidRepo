@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -47,11 +48,11 @@ import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
  * </tr>
  * <tr valign="top">
  * <td>显示订单确认页面</td>
- * <td>参见 {@link #showTransactionCheck(MemberDetails, HttpServletRequest, HttpServletResponse, Model)}</td>
+ * <td>参见 {@link #showTransactionCheck(MemberDetails, String, HttpServletRequest, HttpServletResponse, Model)}</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>创建订单</td>
- * <td>参见 {@link #createOrder(MemberDetails, OrderForm, BindingResult, HttpServletRequest, HttpServletResponse, Model)}</td>
+ * <td>参见 {@link #createOrder(MemberDetails, OrderForm, String, BindingResult, HttpServletRequest, HttpServletResponse, Model)}</td>
  * </tr>
  * <tr valign="top">
  * <td>新增收获地址</td>
@@ -117,6 +118,8 @@ public class NebulaOrderConfirmController extends BaseController{
      *
      * @param memberDetails
      *            the member details
+     * @param key
+     *            购买的商品list的钥匙,如果没有传入key 那么就是普通的购物车购买情况
      * @param request
      *            the request
      * @param response
@@ -124,19 +127,20 @@ public class NebulaOrderConfirmController extends BaseController{
      * @param model
      *            the model
      * @return the string
-     * @NeedLogin
+     * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/check", method = RequestMethod.GET)
      */
     public String showTransactionCheck(
                     @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "key",required = false) String key,
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
 
-        //TODO 获得购物车数据
+        //TODO 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
 
         //TODO 收获地址信息 參見 addresscontroller
- 
+
         return "transaction.check";
     }
 
@@ -147,6 +151,8 @@ public class NebulaOrderConfirmController extends BaseController{
      *            the member details
      * @param orderForm
      *            the order form
+     * @param key
+     *            购买的商品list的钥匙,如果没有传入key 那么就是普通的购物车购买情况
      * @param bindingResult
      *            the binding result
      * @param request
@@ -156,12 +162,13 @@ public class NebulaOrderConfirmController extends BaseController{
      * @param model
      *            the model
      * @return the string
-     * @NeedLogin
+     * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/create", method = RequestMethod.POST)
      */
     public NebulaReturnResult createOrder(
                     @LoginMember MemberDetails memberDetails,
                     @ModelAttribute("orderForm") OrderForm orderForm,
+                    @RequestParam(value = "key",required = false) String key,//隐藏域中传递
                     BindingResult bindingResult,
                     HttpServletRequest request,
                     HttpServletResponse response,
