@@ -16,10 +16,6 @@ import java.util.Set;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +102,11 @@ import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.Validator;
+import com.feilong.core.Validator;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 @Transactional
 @Service("sdkOrderService")
@@ -755,6 +755,7 @@ public class OrderManagerImpl implements OrderManager {
 		return name;
 	}
 
+	//TODO 如果有bundle 逻辑处理
 	private void liquidateSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList) {
 		if (Validator.isNotNullOrEmpty(shoppingCartLineCommandList)) {
 			for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList) {
@@ -923,6 +924,7 @@ public class OrderManagerImpl implements OrderManager {
 	/**
 	 * 保存订单行
 	 */
+	//TODO bundle 下单要进行拆分
 	protected OrderLine saveOrderLine(Long orderId, ShoppingCartLineCommand shoppingCartLineCommand) {
 		OrderLine orderLine = new OrderLine();
 		// 商品数量
@@ -1562,30 +1564,6 @@ public class OrderManagerImpl implements OrderManager {
 		return order;
 	}
 
-	//
-	// private OrderCodeCreatorManager getOrderCodeCreator() {
-	// // TODO 可以考虑使用 com.baozun.nebula.utils.spring.SpringUtil 来动态加载bean
-	// // 不用反射的方式
-	// if (orderCodeCreator != null) {
-	// return orderCodeCreator;
-	// }
-	//
-	// orderCodeCreator = getDefaultCreator();
-	//
-	// try {
-	//
-	// String className = orderCodeCreatorPath;
-	// @SuppressWarnings("unchecked")
-	// Class<OrderCodeCreatorManager> cls = (Class<OrderCodeCreatorManager>)
-	// Class
-	// .forName(className);
-	// orderCodeCreator = cls.newInstance();
-	// } catch (Exception e) {
-	// log.error("getDefined Creator error" + e.getMessage());
-	// e.printStackTrace();
-	// }
-	// return orderCodeCreator;
-	// }
 
 	@Override
 	@Transactional(readOnly=true)
