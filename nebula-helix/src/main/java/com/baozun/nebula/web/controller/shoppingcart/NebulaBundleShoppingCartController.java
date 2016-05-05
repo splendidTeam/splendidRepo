@@ -53,7 +53,7 @@ public class NebulaBundleShoppingCartController extends BaseController{
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
 
     /**
-     * 不走购物车直接走购物通道.
+     * (立即购买)不走购物车直接走购物通道.
      *
      * @param memberDetails
      *            某个用户
@@ -70,9 +70,9 @@ public class NebulaBundleShoppingCartController extends BaseController{
      * @param model
      *            the model
      * @return the nebula return result
-     * @RequestMapping(value = "/transaction/buybundle", method = RequestMethod.POST)
+     * @RequestMapping(value = "/transaction/immediatelybuybundle", method = RequestMethod.POST)
      */
-    public NebulaReturnResult buyBundle(
+    public NebulaReturnResult immediatelyBuyBundle(
                     @LoginMember MemberDetails memberDetails,
                     @RequestParam(value = "bundleId",required = true) Long bundleId,
                     @RequestParam(value = "skuIds",required = true) Long[] skuIds,
@@ -84,7 +84,7 @@ public class NebulaBundleShoppingCartController extends BaseController{
 
         //TODO 构造bundle购物车信息
 
-        //        //save in session/redis
+        //        //save in session
         String key = buildKey();//TODO 构造key
         //        //value是商品list
         //        request.getSession().setAttribute(key, "");
@@ -96,8 +96,6 @@ public class NebulaBundleShoppingCartController extends BaseController{
         //return toNebulaReturnResult(shoppingcartResult);
         return null;
     }
-    
-    // TODO 删除bundle
 
     /**
      * Builds the key.
