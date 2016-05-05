@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
@@ -29,7 +30,8 @@ public class ShopdogItemImageViewCommand extends BaseViewCommand {
 	 */
     private Long colorItemPropertyId;
 	
-	private List<ImageViewCommand> images;
+	/** [type，图片列表] */
+	private Map<String, List<ImageViewCommand>> images;
 
 	public Long getColorItemPropertyId() {
 		return colorItemPropertyId;
@@ -39,11 +41,12 @@ public class ShopdogItemImageViewCommand extends BaseViewCommand {
 		this.colorItemPropertyId = colorItemPropertyId;
 	}
 
-	public List<ImageViewCommand> getImages() {
+	public Map<String, List<ImageViewCommand>> getImages() {
 		return images;
 	}
 
-	public void setImages(List<ImageViewCommand> images) {
+	public void setImages(Map<String, List<ImageViewCommand>> images) {
 		this.images = images;
 	}
+
 }

@@ -26,7 +26,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewComma
  * @author xingyu.liu
  *
  */
-public class ShopDogItemViewCommandConverter extends BaseConverter<ShopdogItemViewCommand> {
+public class ShopdogItemViewCommandConverter extends BaseConverter<ShopdogItemViewCommand> {
 
 	private static final long serialVersionUID = -1961008406160845011L;
 
@@ -38,8 +38,8 @@ public class ShopDogItemViewCommandConverter extends BaseConverter<ShopdogItemVi
 			ShopdogItemViewCommand  shopdogItemViewCommand= new ShopdogItemViewCommand();
 			try{
 				ItemBaseInfoViewCommand itemBaseInfo = (ItemBaseInfoViewCommand) data;
-				shopdogItemViewCommand.setItemCode(itemBaseInfo.getCode());		
-				shopdogItemViewCommand.setItemName(itemBaseInfo.getTitle());
+				shopdogItemViewCommand.setCode(itemBaseInfo.getCode());		
+				shopdogItemViewCommand.setTitle(itemBaseInfo.getTitle());
 				shopdogItemViewCommand.setSalesPrice(itemBaseInfo.getSalePrice());
 				shopdogItemViewCommand.setListPrice(itemBaseInfo.getListPrice());
 				return shopdogItemViewCommand;
@@ -48,7 +48,7 @@ public class ShopDogItemViewCommandConverter extends BaseConverter<ShopdogItemVi
 			}
 		}else{
 			throw new UnsupportDataTypeException(data.getClass()
-					+ " cannot convert to " + ShopDogItemViewCommandConverter.class + "yet.");
+					+ " cannot convert to " + ShopdogItemViewCommandConverter.class + "yet.");
 		}
 		return null;
 	}
