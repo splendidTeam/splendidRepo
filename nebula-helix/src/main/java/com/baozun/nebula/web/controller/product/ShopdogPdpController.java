@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
@@ -43,6 +44,8 @@ import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewComm
 import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
 import com.feilong.core.Validator;
@@ -84,6 +87,30 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 
 	@Autowired
 	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
+	
+	/**
+	 * shopdog商品接口
+	 * <p>
+	 * 用于生成shopdog构造pdp页面所需要的数据。参数itemCode和barCode二选一, 如果从列表页面进入pdp，则需要传入itemCode, 如果扫码方式进入pdp，则会传入extCode。
+	 * 此处的extCode对应Nebula系统中的extentionCode。所以当shopdog传入extCode时，需要先转成itemCode（或itemId）再进行统一处理。
+	 * </p>
+	 * 
+	 * @param itemCode 商品编码
+	 * @param extCode 外部对接编码
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	public List<ShopdogItemViewCommand> getItem(
+			@RequestParam(value = "itemCode", required = false) String itemCode, 
+			@RequestParam(value = "extCode", required = false) String extCode,
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+		List<ShopdogItemViewCommand> items = new ArrayList<ShopdogItemViewCommand>();
+		
+		
+		return items;
+	}
 	
 	/**
 	 * 进入商品详情页 	
@@ -149,10 +176,21 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		
 		//图片
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		
+		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
 		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
-			//shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
-			//shopdogItemViewCommand.setMainPicUrl(shopdogItemImageViewCommands.get(0).getImages().get(0).getUrl());
+			ItemImageViewCommand imageViewCommand =null;
+			for (ShopdogItemImageViewCommand shopdogItemImageViewCommand : shopdogItemImageViewCommands) {
+				imageViewCommand =new ItemImageViewCommand();
+				imageViewCommand.setItemId(itemBaseInfo.getId());
+				imageViewCommand.setColorItemPropertyId(shopdogItemImageViewCommand.getColorItemPropertyId());
+				imageViewCommand.setImages(shopdogItemImageViewCommand.getImages());
+				images.add(imageViewCommand);
+			}
 		}
+		ItemPropertyViewCommand itemPropertyViewCommand =itemPropertyViewCommandResolver.resolve(itemBaseInfo, images);
+		//TODO convert
+		
 		
 		//设置销售属性之前先设置baseInfoViewCommand、picUrls
 		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
