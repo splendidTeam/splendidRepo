@@ -103,6 +103,23 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 		return result;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<BundleCommand> findBundleCommandByMainStyle(String style, Boolean flag) {
+		
+		List<BundleCommand> result = null;
+		
+		List<Long> bundleItemIds = bundleDao.findBundleItemIdByMainStyle(style);
+		if (Validator.isNotNullOrEmpty(bundleItemIds)) {
+			result = new ArrayList<BundleCommand>();
+			for (Long bundleItemId : bundleItemIds) {
+				result.add(getBundleByBundleItemId(bundleItemId, flag, false));
+			}
+		}
+
+		return result;
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -761,4 +778,5 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		
 		return true;
 	}
+
 }
