@@ -20,9 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.baozun.nebula.web.controller.BaseViewCommand;
-
-public class ShopdogItemViewCommand extends BaseViewCommand {
+public class ShopdogItemViewCommand extends ShopdogBaseCommand {
 	
 	private static final long serialVersionUID = -3799906776769234650L;
 
