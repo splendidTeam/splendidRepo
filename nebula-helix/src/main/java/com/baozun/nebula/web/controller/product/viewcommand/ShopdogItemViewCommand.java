@@ -70,7 +70,7 @@ public class ShopdogItemViewCommand extends ShopdogBaseCommand {
 	/**
 	 * 销售价
 	 */
-	private BigDecimal salesPrice;
+	private BigDecimal salePrice;
 	
 	/**
 	 * 销售属性
@@ -169,14 +169,6 @@ public class ShopdogItemViewCommand extends ShopdogBaseCommand {
 		this.listPrice = listPrice;
 	}
 
-	public BigDecimal getSalesPrice() {
-		return salesPrice;
-	}
-
-	public void setSalesPrice(BigDecimal salesPrice) {
-		this.salesPrice = salesPrice;
-	}
-
 	public List<ShopdogPropertyViewCommand> getSalesProperties() {
 		return salesProperties;
 	}
@@ -216,6 +208,14 @@ public class ShopdogItemViewCommand extends ShopdogBaseCommand {
 
 	public void setAllPictures(List<ShopdogItemImageViewCommand> allPictures) {
 		this.allPictures = allPictures;
+	}
+
+	public BigDecimal getSalePrice() {
+		return salePrice;
+	}
+
+	public void setSalePrice(BigDecimal salePrice) {
+		this.salePrice = salePrice;
 	}
 
 }
