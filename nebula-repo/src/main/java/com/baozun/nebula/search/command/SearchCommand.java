@@ -64,6 +64,11 @@ public class SearchCommand{
 	 * 第几页 zero based
 	 */
 	private Integer					pageNumber;
+	
+	/**
+	 * 排除字段查询语句 这里传入的应该是直接写好的fq。如：-id:45,排除id为45的数据
+	 */
+	private List<ExcludeSearchCommand>		excludeList;
 
 	public String getFilterParamOrder(){
 		return filterParamOrder;
@@ -192,5 +197,16 @@ public class SearchCommand{
 	public void setPriceRangeConditionStr(String priceRangeConditionStr){
 		this.priceRangeConditionStr = priceRangeConditionStr;
 	}
+
+	public List<ExcludeSearchCommand> getExcludeList() {
+		return excludeList;
+	}
+
+	public void setExcludeList(List<ExcludeSearchCommand> excludeList) {
+		this.excludeList = excludeList;
+	}
+	
+	
+
 
 }
