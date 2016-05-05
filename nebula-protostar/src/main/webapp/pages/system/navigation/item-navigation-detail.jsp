@@ -39,13 +39,10 @@
 		<li>
 			<c:if test="${fn:length(item.imageUrl)>0 }">
 					<c:forEach items="${item.imageUrl}" var="imageUrl"  begin="0" end="0">
-						<c:if test="${! empty mainColorList.itemColor }">
-						
-							<%--   图片暂时不显示，
+						<c:if test="${! empty imageUrl}">
 							<span> 
-								<img id="${item.id }" src="${UPLOAD_IMG_DOMAIN }<url:img size='150X200' imgUrl='${imageUrl}'/>" />
+								<img id="${item.id }" src="${UPLOAD_IMG_DOMAIN}${imageUrl}" width="150px" height="200px"/>
 		                	</span>
-		                	--%>
 	                	</c:if>
 	                </c:forEach>
 	        </c:if>

@@ -32,6 +32,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,6 +108,12 @@ public class NavigationController extends BaseController{
 	protected  String CONFIG = "config/metainfo.properties";
 	
 	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
+	
+	/**
+	 * 上传图片的域名
+	 */
+	@Value("#{meta['upload.img.domain.base']}")
+	private String				UPLOAD_IMG_DOMAIN	= "";
 	
 		
 	/**
@@ -281,6 +288,7 @@ public class NavigationController extends BaseController{
 		
 		//导航ID
 		model.addAttribute("navigationId", navigationId);
+		model.addAttribute("UPLOAD_IMG_DOMAIN", UPLOAD_IMG_DOMAIN);
 		
 		return "/system/navigation/item-navigation-sort";
 	}
@@ -302,6 +310,7 @@ public class NavigationController extends BaseController{
 		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		model.addAttribute("isSuccess", "success");
+		model.addAttribute("UPLOAD_IMG_DOMAIN", UPLOAD_IMG_DOMAIN);
 		return "/system/navigation/item-navigation-detail";
 	}
 
