@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
+import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
@@ -91,6 +92,9 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	@Qualifier("shopdogItemPropertyCommandConverter")
 	private ShopdogItemPropertyCommandConverter		shopdogItemPropertyCommandConverter;
 	
+	@Autowired
+	private ItemDetailManager						detailManager;
+	
 	/**
 	 * shopdog商品接口
 	 * <p>
@@ -114,8 +118,19 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		try {
 				
 	        ShopdogResultCommand result = new ShopdogResultCommand();
-			
-			List<ShopdogItemViewCommand> items  =  buildPdpViewCommand(itemCode);
+	        List<ShopdogItemViewCommand> items =null;
+			if(Validator.isNotNullOrEmpty(itemCode)){
+				items=  buildPdpViewCommand(itemCode);
+			}else if(Validator.isNotNullOrEmpty(extCode)){
+				Item item =detailManager.findItemByExtentionCode(extCode);
+				if(Validator.isNotNullOrEmpty(item)){
+					items=  buildPdpViewCommand(item.getCode());
+				}else{
+					LOG.warn("[PDP_SHOW_PDP] can not find item by extCode. extCode:{}", extCode);
+				}
+			}else{
+				LOG.warn("[PDP_SHOW_PDP] itemCode and extCode shouldn't all be empty.");
+			}
 			
 			result.setData(items);
 			

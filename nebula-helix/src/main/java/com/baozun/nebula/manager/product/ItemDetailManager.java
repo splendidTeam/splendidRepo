@@ -26,6 +26,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
@@ -215,4 +216,11 @@ public interface ItemDetailManager extends BaseManager{
 	 * @return
 	 */
 	Integer getItemBuyLimited(ItemBuyLimitedBaseCommand itemBuyLimitedCommand,Integer defaultValue);
+	
+	/**
+	 * 根据extentionCode查询item
+	 * @param extentionCode
+	 * @return
+	 */
+	Item findItemByExtentionCode(String extentionCode);
 }

@@ -853,4 +853,14 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	<bean id="Item.findItemByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询Item</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_item WHERE id in (select item_id from t_pd_sku where out_id=:extentionCode)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>
