@@ -43,7 +43,8 @@ public class ShopdogItemImageViewCommandConverter extends BaseConverter<ShopdogI
 				if(Validator.isNotNullOrEmpty(itemImageViewCommand.getImages())){
 					shopdogItemImageViewCommand= new ShopdogItemImageViewCommand();
 					shopdogItemImageViewCommand.setColorItemPropertyId(itemImageViewCommand.getColorItemPropertyId());
-					shopdogItemImageViewCommand.setImages(itemImageViewCommand.getImages());
+					//TODO
+					//shopdogItemImageViewCommand.setImages(itemImageViewCommand.getImages());
 				}
 				return shopdogItemImageViewCommand;
 			}catch(Exception e){

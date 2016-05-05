@@ -29,7 +29,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,7 +46,6 @@ import com.baozun.nebula.web.controller.product.converter.ShopdogItemPropertyCom
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopdogSkuViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
-import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
@@ -73,14 +71,6 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	 * log定义
 	 */
 	private static final Logger	LOG										= LoggerFactory.getLogger(ShopdogPdpController.class);
-	
-	//model key的常量定义
-	/** 商品详情页 的相关展示数据 */
-	private static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
-	
-	//view的常量定义
-	/** 商品详情页 的默认定义 */
-	private static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	@Autowired
 	private ItemColorSwatchViewCommandResolver    colorSwatchViewCommandResolver;
@@ -138,35 +128,6 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 				throw new BusinessException("Show pdp error.");
 			}
 		
-	}
-	
-	/**
-	 * 进入商品详情页 	
-	 * 
-	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
-	 * 
-	 * @param itemCode 商品编码
-	 * @param request
-	 * @param response
-	 * @param model
-	 */
-	public String showPdp(@PathVariable("itemCode") String itemCode, 
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-		
-		try {
-			
-			List<ShopdogItemViewCommand>  shopdogItemViewCommands =  buildPdpViewCommand(itemCode);
-			
-			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, shopdogItemViewCommands);
-			
-			return VIEW_PRODUCT_DETAIL;
-			
-		} catch (IllegalItemStateException e) {
-			
-			LOG.error("[PDP_SHOW_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
-			
-			throw new BusinessException("Show pdp error.");
-		}
 	}
 	
 	
@@ -229,16 +190,8 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	}
 
 	private List<String> getMainUrls(List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands) {
-		 List<String> urls = null;
-			
-		 if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
-			urls =  new ArrayList<String>();
-			List<ImageViewCommand> imageViewCommands = shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
-			for(ImageViewCommand imageViewCommand:imageViewCommands){
-				urls.add(imageViewCommand.getUrl());
-			}
-		 }
-		 return urls;
+		
+		return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
 	}
 
 	/**
