@@ -18,10 +18,9 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
-import com.baozun.nebula.web.controller.BaseViewCommand;
-
-public class ShopdogItemViewCommand extends BaseViewCommand {
+public class ShopdogItemViewCommand extends ShopdogBaseCommand {
 	
 	private static final long serialVersionUID = -3799906776769234650L;
 
@@ -81,7 +80,7 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 	/**
 	 * 非销售属性，[属性分组, 分组下的非销售属性集合]
 	 */
-	private List<ShopdogPropertyViewCommand> nonSalesProperties;
+	private Map<String, List<ShopdogPropertyViewCommand>> nonSalesProperties;
 	
 	/**
 	 * sku
@@ -186,12 +185,12 @@ public class ShopdogItemViewCommand extends BaseViewCommand {
 		this.salesProperties = salesProperties;
 	}
 
-	public List<ShopdogPropertyViewCommand> getNonSalesProperties() {
+	public Map<String, List<ShopdogPropertyViewCommand>> getNonSalesProperties() {
 		return nonSalesProperties;
 	}
 
 	public void setNonSalesProperties(
-			List<ShopdogPropertyViewCommand> nonSalesProperties) {
+			Map<String, List<ShopdogPropertyViewCommand>> nonSalesProperties) {
 		this.nonSalesProperties = nonSalesProperties;
 	}
 
