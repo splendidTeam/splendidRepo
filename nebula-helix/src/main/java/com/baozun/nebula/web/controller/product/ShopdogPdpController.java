@@ -71,7 +71,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @author xingyu.liu
  *
  */
-public class ShopdogPdpController{
+public class ShopdogPdpController {
 	
 	/**
 	 * log定义
@@ -111,6 +111,9 @@ public class ShopdogPdpController{
 	protected ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
 	
 	
+	@Autowired
+	private ItemDetailManager						detailManager;
+	
 	/**
 	 * shopdog商品接口
 	 * <p>
@@ -135,8 +138,19 @@ public class ShopdogPdpController{
 		ShopdogResultCommand result = new ShopdogResultCommand();
 		
 		try {
-			
-			List<ShopdogItemViewCommand> items  =  buildPdpViewCommand(itemCode);
+	        List<ShopdogItemViewCommand> items =null;
+			if(Validator.isNotNullOrEmpty(itemCode)){
+				items=  buildPdpViewCommand(itemCode);
+			}else if(Validator.isNotNullOrEmpty(extCode)){
+				Item item =detailManager.findItemByExtentionCode(extCode);
+				if(Validator.isNotNullOrEmpty(item)){
+					items=  buildPdpViewCommand(item.getCode());
+				}else{
+					LOG.warn("[PDP_SHOW_PDP] can not find item by extCode. extCode:{}", extCode);
+				}
+			}else{
+				LOG.warn("[PDP_SHOW_PDP] itemCode and extCode shouldn't all be empty.");
+			}
 			
 			result.setData(items);
 			result.setResult(ShopdogResultCommand.RESULT_SUCCESS);

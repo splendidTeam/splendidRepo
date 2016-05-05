@@ -399,6 +399,13 @@ public interface SdkItemManager extends BaseManager{
 	 * @return
 	 */
 	public Integer findRateCountByItemCode(String itemCode);
+	
+	/**
+	 * 根据extentionCode查询item
+	 * @param extentionCode
+	 * @return
+	 */
+	public Item findItemByExtentionCode(String extentionCode);
 
 	
 }
