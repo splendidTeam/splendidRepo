@@ -42,14 +42,15 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ShopdogItemPropertyCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
-import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogResultCommand;
 import com.feilong.core.Validator;
@@ -90,7 +91,8 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	private ShopdogItemImageViewCommandConverter    shopDogItemImageViewCommandConverter;
 
 	@Autowired
-	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
+	@Qualifier("shopdogItemPropertyCommandConverter")
+	private ShopdogItemPropertyCommandConverter		shopdogItemPropertyCommandConverter;
 	
 	/**
 	 * shopdog商品接口
@@ -198,11 +200,13 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 			}
 		}
 		ItemPropertyViewCommand itemPropertyViewCommand =itemPropertyViewCommandResolver.resolve(itemBaseInfo, images);
-		//TODO convert
+		ShopdogItemPropertyViewCommand shopdogItemPropertyViewCommand =shopdogItemPropertyCommandConverter.convert(itemPropertyViewCommand);
 		
 		
-		//设置销售属性之前先设置baseInfoViewCommand、picUrls
-		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
+		//设置销售属性
+		if(Validator.isNotNullOrEmpty(shopdogItemPropertyViewCommand)){
+			shopdogItemViewCommand.setSalesProperties(shopdogItemPropertyViewCommand.getSalesProperties());
+		}
 		
 		//sku
 		//shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
