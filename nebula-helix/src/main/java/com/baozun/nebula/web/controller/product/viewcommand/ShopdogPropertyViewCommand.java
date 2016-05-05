@@ -30,9 +30,7 @@ public class ShopdogPropertyViewCommand extends BaseViewCommand {
     /** 是否是颜色属性. */
     private Boolean isColorProp;
     
-    /**
-     * 属性值列表
-     */
+    /** 属性值列表 */
     private List<ShopdogPropertyValueViewCommand> propertyValues;
 
 	public String getName() {

@@ -37,8 +37,8 @@ import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.web.controller.product.converter.ShopDogItemImageViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ShopDogItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -56,12 +56,12 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @author xingyu.liu
  *
  */
-public class ShopDogPdpController extends NebulaBasePdpController {
+public class ShopdogPdpController extends NebulaBasePdpController {
 	
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG										= LoggerFactory.getLogger(ShopDogPdpController.class);
+	private static final Logger	LOG										= LoggerFactory.getLogger(ShopdogPdpController.class);
 	
 	//model key的常量定义
 	/** 商品详情页 的相关展示数据 */
@@ -76,11 +76,11 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 	
 	@Autowired
 	@Qualifier("shopDogItemViewCommandConverter")
-	private ShopDogItemViewCommandConverter    shopDogItemViewCommandConverter;
+	private ShopdogItemViewCommandConverter    shopDogItemViewCommandConverter;
 	
 	@Autowired
 	@Qualifier("shopDogItemImageViewCommandConverter")
-	private ShopDogItemImageViewCommandConverter    shopDogItemImageViewCommandConverter;
+	private ShopdogItemImageViewCommandConverter    shopDogItemImageViewCommandConverter;
 
 	@Autowired
 	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
@@ -150,15 +150,15 @@ public class ShopDogPdpController extends NebulaBasePdpController {
 		//图片
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
 		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
-			shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
-			shopdogItemViewCommand.setMainPicUrl(shopdogItemImageViewCommands.get(0).getImages().get(0).getUrl());
+			//shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
+			//shopdogItemViewCommand.setMainPicUrl(shopdogItemImageViewCommands.get(0).getImages().get(0).getUrl());
 		}
 		
 		//设置销售属性之前先设置baseInfoViewCommand、picUrls
 		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
 		
 		//sku
-		shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
+		//shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
 	
 		return shopdogItemViewCommand;
 		

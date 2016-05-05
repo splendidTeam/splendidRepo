@@ -28,7 +28,7 @@ import com.feilong.core.Validator;
  * @author xingyu.liu
  *
  */
-public class ShopDogItemImageViewCommandConverter extends BaseConverter<ShopdogItemImageViewCommand> {
+public class ShopdogItemImageViewCommandConverter extends BaseConverter<ShopdogItemImageViewCommand> {
 
 	private static final long serialVersionUID = -127066731936568196L;
 
@@ -43,7 +43,8 @@ public class ShopDogItemImageViewCommandConverter extends BaseConverter<ShopdogI
 				if(Validator.isNotNullOrEmpty(itemImageViewCommand.getImages())){
 					shopdogItemImageViewCommand= new ShopdogItemImageViewCommand();
 					shopdogItemImageViewCommand.setColorItemPropertyId(itemImageViewCommand.getColorItemPropertyId());
-					shopdogItemImageViewCommand.setImages(itemImageViewCommand.getImages().get(ItemImage.IMG_TYPE_LIST));
+					//TODO
+					//shopdogItemImageViewCommand.setImages(itemImageViewCommand.getImages().get(ItemImage.IMG_TYPE_LIST));
 				}
 				return shopdogItemImageViewCommand;
 			}catch(Exception e){
@@ -51,7 +52,7 @@ public class ShopDogItemImageViewCommandConverter extends BaseConverter<ShopdogI
 			}
 		}else{
 			throw new UnsupportDataTypeException(data.getClass()
-					+ " cannot convert to " + ShopDogItemImageViewCommandConverter.class + "yet.");
+					+ " cannot convert to " + ShopdogItemImageViewCommandConverter.class + "yet.");
 		}
 		return null;
 	}
