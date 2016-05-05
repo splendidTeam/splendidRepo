@@ -43,6 +43,7 @@ import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ShopdogSkuViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -52,6 +53,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogResultCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -82,12 +84,16 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	private ItemColorSwatchViewCommandResolver    colorSwatchViewCommandResolver;
 	
 	@Autowired
-	@Qualifier("shopDogItemViewCommandConverter")
-	private ShopdogItemViewCommandConverter    shopDogItemViewCommandConverter;
+	@Qualifier("shopdogItemViewCommandConverter")
+	private ShopdogItemViewCommandConverter    shopdogItemViewCommandConverter;
 	
 	@Autowired
-	@Qualifier("shopDogItemImageViewCommandConverter")
-	private ShopdogItemImageViewCommandConverter    shopDogItemImageViewCommandConverter;
+	@Qualifier("shopdogItemImageViewCommandConverter")
+	private ShopdogItemImageViewCommandConverter    shopdogItemImageViewCommandConverter;
+	
+	@Autowired
+	@Qualifier("shopdogSkuViewCommandConverter")
+	private ShopdogSkuViewCommandConverter shopdogSkuViewCommandConverter;
 
 	@Autowired
 	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
@@ -181,10 +187,10 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
 		
 		//商品基本信息
-		ShopdogItemViewCommand shopdogItemViewCommand =  shopDogItemViewCommandConverter.convert(itemBaseInfo);
+		ShopdogItemViewCommand shopdogItemViewCommand =  shopdogItemViewCommandConverter.convert(itemBaseInfo);
 		
 		//图片
-		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
 		
 		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
 		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
@@ -205,7 +211,7 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
 		
 		//sku
-		//shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
+		shopdogItemViewCommand.setSkus(shopdogSkuViewCommandConverter.convert(buildSkuViewCommand(itemBaseInfo.getId())));
 	
 		return shopdogItemViewCommand;
 		
