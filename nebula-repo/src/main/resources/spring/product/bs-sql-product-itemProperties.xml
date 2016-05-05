@@ -63,11 +63,11 @@
 				<![CDATA[ 
 					SELECT 
 						itemProperties.id,
-						itemProperties.item_id as itemId,
-						itemProperties.property_id as propertyId,
-						itemPropertiesLang.property_value as propertyValue,
-						itemProperties.propertyValue_id as propertyValueId,
-						itemProperties.modify_time as modifyTime
+						itemProperties.item_id as item_id,
+						itemProperties.property_id as property_id,
+						itemPropertiesLang.property_value as property_value,
+						itemProperties.propertyValue_id as propertyValue_id,
+						itemProperties.modify_time as modify_time
 					FROM T_PD_ITEM_PROPERTIES itemProperties
 					left join t_pd_item_properties_lang itemPropertiesLang on itemProperties.id = itemPropertiesLang.item_properties_id
 					WHERE 
