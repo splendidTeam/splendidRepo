@@ -25,9 +25,7 @@ public class ShopdogItemImageViewCommand extends BaseViewCommand {
 	
 	private static final long serialVersionUID = 7522687758516133640L;
 	
-	/**
-	 * 商品颜色属性Id
-	 */
+	/** 商品颜色属性Id */
     private Long colorItemPropertyId;
 	
 	/** [type，图片列表] */

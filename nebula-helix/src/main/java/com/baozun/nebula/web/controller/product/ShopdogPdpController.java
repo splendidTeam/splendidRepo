@@ -30,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
@@ -48,6 +51,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogResultCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -102,14 +106,19 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	 * @param model
 	 * @return
 	 */
-	public List<ShopdogItemViewCommand> getItem(
+	@RequestMapping(value = "/item.json", method = RequestMethod.GET)
+	@ResponseBody
+	public ShopdogResultCommand getItem(
 			@RequestParam(value = "itemCode", required = false) String itemCode, 
 			@RequestParam(value = "extCode", required = false) String extCode,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+		ShopdogResultCommand result = new ShopdogResultCommand();
+		
 		List<ShopdogItemViewCommand> items = new ArrayList<ShopdogItemViewCommand>();
 		
+		result.setData(items);
 		
-		return items;
+		return result;
 	}
 	
 	/**
