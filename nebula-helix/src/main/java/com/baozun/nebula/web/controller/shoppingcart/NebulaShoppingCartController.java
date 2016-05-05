@@ -380,7 +380,6 @@ public class NebulaShoppingCartController extends BaseController{
     }
 
     // TODO 修改销售属性
-    // TODO 删除bundle
 
     //******************************************************************************************************
     /**
