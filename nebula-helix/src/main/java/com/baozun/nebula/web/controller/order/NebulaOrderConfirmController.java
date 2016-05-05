@@ -164,6 +164,10 @@ public class NebulaOrderConfirmController extends BaseController{
      * @return the string
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/create", method = RequestMethod.POST)
+     * @see com.baozun.nebula.sdk.manager.OrderManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand, com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
+     * @see com.baozun.nebula.sdk.manager.impl.OrderManagerImpl#saveOrderInfo(SalesOrderCommand, ShoppingCartCommand)
+     * @see com.baozun.nebula.sdk.manager.impl.OrderManagerImpl#liquidateSkuInventory(List<ShoppingCartLineCommand>)
+     * @see com.baozun.nebula.sdk.manager.impl.OrderManagerImpl#saveOrderLine(Long, ShoppingCartLineCommand)
      */
     public NebulaReturnResult createOrder(
                     @LoginMember MemberDetails memberDetails,

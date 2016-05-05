@@ -16,39 +16,39 @@
  */
 package com.baozun.nebula.web.controller.product.converter;
 
+import org.springframework.beans.BeanUtils;
+
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogSkuViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 
 /**
- * 驻店宝PDP视图模型转换
+ * 驻店宝PDP-sku视图模型转换
  * @author xingyu.liu
  *
  */
-public class ShopDogItemViewCommandConverter extends BaseConverter<ShopdogItemViewCommand> {
+public class ShopdogSkuViewCommandConverter extends BaseConverter<ShopdogSkuViewCommand> {
 
 	private static final long serialVersionUID = -1961008406160845011L;
 
-	public ShopdogItemViewCommand convert(Object data) {
+	public ShopdogSkuViewCommand convert(Object data) {
 		if(null == data){
 			return null;
 		}
 		if(data instanceof ItemBaseInfoViewCommand){
-			ShopdogItemViewCommand  shopdogItemViewCommand= new ShopdogItemViewCommand();
+			ShopdogSkuViewCommand  shopdogSkuViewCommand= new ShopdogSkuViewCommand();
 			try{
-				ItemBaseInfoViewCommand itemBaseInfo = (ItemBaseInfoViewCommand) data;
-				shopdogItemViewCommand.setItemCode(itemBaseInfo.getCode());		
-				shopdogItemViewCommand.setItemName(itemBaseInfo.getTitle());
-				shopdogItemViewCommand.setSalesPrice(itemBaseInfo.getSalePrice());
-				shopdogItemViewCommand.setListPrice(itemBaseInfo.getListPrice());
-				return shopdogItemViewCommand;
+				SkuViewCommand skuViewCommand = (SkuViewCommand) data;
+				BeanUtils.copyProperties(skuViewCommand, shopdogSkuViewCommand);
+				return shopdogSkuViewCommand;
 			}catch(Exception e){
 				e.printStackTrace();
 			}
 		}else{
 			throw new UnsupportDataTypeException(data.getClass()
-					+ " cannot convert to " + ShopDogItemViewCommandConverter.class + "yet.");
+					+ " cannot convert to " + ShopdogSkuViewCommandConverter.class + "yet.");
 		}
 		return null;
 	}
