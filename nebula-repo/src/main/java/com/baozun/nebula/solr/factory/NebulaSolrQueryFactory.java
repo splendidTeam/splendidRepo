@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.search.FacetParameter;
 import com.baozun.nebula.search.FacetType;
+import com.baozun.nebula.search.command.ExcludeSearchCommand;
 import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.utils.SolrOrderSort;
@@ -90,6 +91,29 @@ public class NebulaSolrQueryFactory{
 				}
 			}
 		}
+		
+		//排除字段列表，设置排除字段的查询
+		List<ExcludeSearchCommand> excludeList = searchCommand.getExcludeList();
+		if(Validator.isNotNullOrEmpty(excludeList)){
+			for(ExcludeSearchCommand excludeCommand : excludeList){
+				StringBuilder fqStrBuilder = new StringBuilder();
+				if(Validator.isNotNullOrEmpty(excludeCommand.getFieldName()) && Validator.isNotNullOrEmpty(excludeCommand.getValues())){
+					fqStrBuilder.append("-").append(excludeCommand.getFieldName()).append(":(");
+					List<String> values = excludeCommand.getValues();
+					for(int i=0;i<values.size();i++){
+						fqStrBuilder.append(values.get(i));
+						if(i < values.size()-1){
+							fqStrBuilder.append(" OR ");
+						}
+						if(i == values.size()-1){
+							fqStrBuilder.append(")");
+						}
+					}
+					
+					solrQuery.addFilterQuery(fqStrBuilder.toString());
+				}
+			}
+		}
 
 		// 设置时间
 		addFqTime(solrQuery);
@@ -145,7 +169,7 @@ public class NebulaSolrQueryFactory{
 
 		solrQuery.set(GroupParams.GROUP, true);
 		solrQuery.set(GroupParams.GROUP_TOTAL_COUNT, true);
-		solrQuery.set(GroupParams.GROUP_LIMIT, 200);
+		solrQuery.set(GroupParams.GROUP_LIMIT, -1);
 		solrQuery.set(GroupParams.GROUP_FORMAT, "grouped");
 		solrQuery.set(GroupParams.GROUP_FACET, true);
 		solrQuery.set(GroupParams.GROUP_FIELD, groupName);
