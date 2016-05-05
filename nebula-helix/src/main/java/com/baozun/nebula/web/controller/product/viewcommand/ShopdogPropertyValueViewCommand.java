@@ -25,9 +25,7 @@ public class ShopdogPropertyValueViewCommand extends BaseViewCommand {
 
 	private Long itemPropertiesId;
 
-    /**
-     * 属性值
-     */
+    /** 属性值 */
     private String propertyValue;
 
 	public Long getItemPropertiesId() {
