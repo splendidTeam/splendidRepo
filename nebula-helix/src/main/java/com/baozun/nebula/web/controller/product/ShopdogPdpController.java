@@ -43,6 +43,8 @@ import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewComm
 import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
 import com.feilong.core.Validator;
@@ -149,10 +151,21 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		
 		//图片
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		
+		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
 		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
-			//shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
-			//shopdogItemViewCommand.setMainPicUrl(shopdogItemImageViewCommands.get(0).getImages().get(0).getUrl());
+			ItemImageViewCommand imageViewCommand =null;
+			for (ShopdogItemImageViewCommand shopdogItemImageViewCommand : shopdogItemImageViewCommands) {
+				imageViewCommand =new ItemImageViewCommand();
+				imageViewCommand.setItemId(itemBaseInfo.getId());
+				imageViewCommand.setColorItemPropertyId(shopdogItemImageViewCommand.getColorItemPropertyId());
+				imageViewCommand.setImages(shopdogItemImageViewCommand.getImages());
+				images.add(imageViewCommand);
+			}
 		}
+		ItemPropertyViewCommand itemPropertyViewCommand =itemPropertyViewCommandResolver.resolve(itemBaseInfo, images);
+		//TODO convert
+		
 		
 		//设置销售属性之前先设置baseInfoViewCommand、picUrls
 		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
