@@ -80,10 +80,12 @@ public interface SdkSearchConditionItemManager extends BaseManager{
 	
 	public List<SearchConditionItemCommand> findItemByPropertyValueId(Long pValueId);
 	
-	public List<SearchConditionItemCommand> findItemBySId(Long sId,String lang);
+	public List<SearchConditionItemCommand> findItemBySId(Long sId);
 	
 	public SearchConditionItemCommand findItemById(Long id);
 	
 	public List<SearchConditionItemCommand> findItemByPropertyId(Long propertyId);
+	
+	public List<SearchConditionItemCommand> findItemBySIdAndLang(Long sId,String lang);
 	
 }

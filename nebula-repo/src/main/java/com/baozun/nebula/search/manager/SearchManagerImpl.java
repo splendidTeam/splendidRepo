@@ -143,7 +143,7 @@ public class SearchManagerImpl implements SearchManager{
 		}
 
 		if (Validator.isNullOrEmpty(searchConditionItemCommands)) {
-			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySId(coditionId,lang);
+			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySIdAndLang(coditionId,lang);
 
 			try{
 				cacheManager.setObject(key, searchConditionItemCommands, TimeInterval.SECONDS_PER_DAY);

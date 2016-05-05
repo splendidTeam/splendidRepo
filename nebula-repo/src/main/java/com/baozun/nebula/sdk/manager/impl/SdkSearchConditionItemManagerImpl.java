@@ -119,8 +119,19 @@ public class SdkSearchConditionItemManagerImpl implements
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public List<SearchConditionItemCommand> findItemBySId(Long sId,String lang) {
-		return searchConditionItemDao.findItemMetaBySIdAndLang(sId, lang);
+	public List<SearchConditionItemCommand> findItemBySId(Long sId) {
+//		List<SearchConditionItem> cmdList = new ArrayList<SearchConditionItem>();//
+		List<SearchConditionItem> cmdList = searchConditionItemDao.findItemBySearchId(sId);
+		List<SearchConditionItemCommand> resultList = new ArrayList<SearchConditionItemCommand>();
+		
+		if(null!= cmdList){
+			for(SearchConditionItem s : cmdList){
+				SearchConditionItemCommand cmd = new SearchConditionItemCommand();
+				cmd =(SearchConditionItemCommand) ConvertUtils.convertFromTarget(cmd, s);
+				resultList.add(cmd);
+			}
+		}
+		return resultList;
 	}
 
 	/* (non-Javadoc)
@@ -266,6 +277,11 @@ public class SdkSearchConditionItemManagerImpl implements
 			 searchConditionItemCommand.setName(singleLang);
 		 }
 		return searchConditionItemCommand;
+	}
+
+	@Override
+	public List<SearchConditionItemCommand> findItemBySIdAndLang(Long sId,String lang){
+		return searchConditionItemDao.findItemMetaBySIdAndLang(sId, lang);
 	}
 
 }
