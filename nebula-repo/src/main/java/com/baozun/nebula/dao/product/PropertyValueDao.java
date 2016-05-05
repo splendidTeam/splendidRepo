@@ -19,6 +19,10 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
+import com.baozun.nebula.model.product.PropertyValue;
+import com.baozun.nebula.model.product.PropertyValueLang;
+import com.baozun.nebula.search.command.MetaDataCommand;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -26,9 +30,6 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.model.product.PropertyValue;
-import com.baozun.nebula.model.product.PropertyValueLang;
 
 /**
  * @author wenxiu.ke
@@ -241,7 +242,6 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	@NativeUpdate
 	Integer updatePropertyValueSortById(@QueryParam("id") Long id,@QueryParam("sortNo") Integer sortNo);
 	
-	
 	/**
 	 * 根据propertyId和语言查询propertyValue的国际化的值
 	 * @return List<PropertyValueLang>
@@ -254,4 +254,13 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	List<PropertyValueLang> findPropertyValueLangByPropertyId(
 			@QueryParam("propertyId") Long propertyId,
 			@QueryParam("langs") List<String> langs);
+	
+	/**
+	 * 根据语言查询所有属性值的数据(只有id、value、sortNo字段)
+	 * @return List<MetaDataCommand>
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午3:28:54
+	 */
+	@NativeQuery(model = MetaDataCommand.class)
+	List<MetaDataCommand> findPropertyValueMetaDataByLang(@QueryParam("lang")String lang);
 }

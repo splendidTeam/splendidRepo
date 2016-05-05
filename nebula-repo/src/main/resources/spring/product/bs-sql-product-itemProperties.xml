@@ -185,13 +185,13 @@
 						tpip.item_id as itemId, 
 						tpip.property_value as propertyValue,
 						tppv.value as  proValue,
-						tpcp.editing_type as type
+						tpp.editing_type as type
 					from t_pd_item_properties tpip 
 					left join t_pd_item tpi on tpip.item_id = tpi.id
 					left join t_pd_property tpp on tpp.id = tpip.property_id
-					left join t_pd_common_property tpcp on tpp.common_property_id = tpcp.id 
 					left join t_pd_property_value tppv on tppv.id = tpip.propertyvalue_id
-					where tpcp.is_color_prop = true and tpi.code in (
+					where tpp.is_color_prop = true 
+						and tpi.code in (
 						#foreach($itemCode in $itemCodes)
 							'$itemCode',
 						#end

@@ -2,7 +2,6 @@ package com.baozun.nebula.solr.factory;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.common.params.FacetParams;
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.search.FacetParameter;
+import com.baozun.nebula.search.FacetType;
 import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.utils.SolrOrderSort;
@@ -26,7 +26,7 @@ public class NebulaSolrQueryFactory{
 	private static final String	PROPERTY_VARIABLE	= "p";
 
 	/** 分类 */
-	private static final String	CATEGORY_VARIABLE	= "C";
+	private static final String	CATEGORY_VARIABLE	= "c";
 
 	/**
 	 * 创建查询SolrQuery 将SearchCommand组合成SOLR查询语句
@@ -44,17 +44,22 @@ public class NebulaSolrQueryFactory{
 			addFqKeyword(searchCommand.getSearchWord(), solrQuery);
 		}
 
+		// 最后一个点击的过滤条件
+		String lastFilerStr = "";
+
 		// 点击顺序
 		String filterParamOrder = searchCommand.getFilterParamOrder();
-		// 最后一个点击的属性或分类
-		String substringAfterLast = StringUtils.substringAfterLast(filterParamOrder, ",");
-		String variable = "";
+		if (filterParamOrder != null) {
+			String[] strs = filterParamOrder.split(",");
+			lastFilerStr = strs[strs.length - 1];
+		}
 
-		if (Validator.isNotNullOrEmpty(substringAfterLast)) {
-			if (substringAfterLast.indexOf(CATEGORY_VARIABLE) > -1) {
+		String variable = "";
+		if (Validator.isNotNullOrEmpty(lastFilerStr)) {
+			if (lastFilerStr.indexOf(CATEGORY_VARIABLE) > -1) {
 				variable = CATEGORY_VARIABLE;
 			}
-			if (substringAfterLast.indexOf(PROPERTY_VARIABLE) > -1) {
+			if (lastFilerStr.indexOf(PROPERTY_VARIABLE) > -1) {
 				variable = PROPERTY_VARIABLE;
 			}
 		}
@@ -63,16 +68,24 @@ public class NebulaSolrQueryFactory{
 		if (Validator.isNotNullOrEmpty(facetParameters)) {
 			for (int i = 0; i < facetParameters.size(); i++){
 				FacetParameter facetParameter = facetParameters.get(i);
-
 				List<String> values = facetParameter.getValues();
-				for (String value : values){
-					variable = variable + value;
-					if (variable.equals(substringAfterLast)) {
-						addFqAccurateForStringListWithTag(solrQuery, facetParameter.getValues(), facetParameter.getName());
-						break;
-					}else{
-						addFqAccurateForStringList(solrQuery, facetParameter.getValues(), facetParameter.getName());
-						break;
+
+				// 如果是价格范围的条件
+				if (FacetType.RANGE.equals(facetParameter.getFacetType())) {
+					addFqForPriceArea(solrQuery, facetParameter.getValues(), facetParameter.getName());
+				}else{
+					// 分类、属性、导航的条件
+					for (String value : values){
+						String[] strs = value.split("-");
+						variable = variable + strs[strs.length - 1];
+
+						if (variable.equals(lastFilerStr)) {
+							addFqAccurateForStringListWithTag(solrQuery, facetParameter.getValues(), facetParameter.getName());
+							break;
+						}else{
+							addFqAccurateForStringList(solrQuery, facetParameter.getValues(), facetParameter.getName());
+							break;
+						}
 					}
 				}
 			}
@@ -250,4 +263,36 @@ public class NebulaSolrQueryFactory{
 		String fq_keyword = SkuItemParam.activeBeginTime + ":[* TO NOW]";
 		solrQuery.addFilterQuery(fq_keyword);
 	}
+
+	/**
+	 * 设置价格搜索条件
+	 * 
+	 * @return void
+	 * @param solrQuery
+	 * @param areaWord
+	 * @param type
+	 * @author 冯明雷
+	 * @time 2016年4月29日下午4:29:55
+	 */
+	public static void addFqForPriceArea(SolrQuery solrQuery,List<String> priceAreaWords,String type){
+		String fq_keyword = "{!tag=priceTag}" + type;
+		try{
+			Integer max_price = null;
+			Integer min_price = null;
+			min_price = Integer.parseInt(priceAreaWords.get(0));
+			max_price = Integer.parseInt(priceAreaWords.get(1));
+			if (min_price < 1) {
+				min_price = 1;
+			}
+			fq_keyword += ":[" + min_price + " TO " + max_price + "]";
+		}catch (Exception e){
+			LOG.error(e.getMessage());
+			fq_keyword += ":[0 TO *]";
+		}
+
+		if (Validator.isNotNullOrEmpty(fq_keyword))
+			solrQuery.addFilterQuery(fq_keyword);
+
+	}
+
 }

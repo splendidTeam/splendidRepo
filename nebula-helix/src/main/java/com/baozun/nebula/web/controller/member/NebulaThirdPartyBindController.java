@@ -111,10 +111,10 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	public static final String	VIEW_THIRDPARTY_MEMBER_BIND				= "member.thirdParty.bind";
 	
 	/* bindSuccess Page 的默认定义 */
-	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS		= "member.thirdParty.bindSuccess";
+	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS		= "redirect:/index";
 	
 	/* bindfailure Page 的默认定义 */
-	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_FAILURE		= "member.thirdParty.bindFailure";
+	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_FAILURE		= "member.thirdParty.bind";
 
 	
 	/**
@@ -130,7 +130,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * 会员注册Form的校验器
 	 */
 	@Autowired
-	@Qualifier("registerFormMobileValidator")
+	@Qualifier("bindRegisterFormMobileValidator")
 	private BindRegisterFormMobileValidator	registerFormMobileValidator;
 	
 	/**
@@ -138,7 +138,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * 会员注册Form的校验器
 	 */
 	@Autowired
-	@Qualifier("registerFormNormalValidator")
+	@Qualifier("bindRegisterFormNormalValidator")
 	private BindRegisterFormNormalValidator	registerFormNormalValidator;
 
 	/**
@@ -213,11 +213,8 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			LOG.debug("loginForm validation error. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());
 			getResultFromBindingResult(bindingResult);
 		}
-		
-		//处理Form中数据的加解密
 		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
 		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
-		
 		//此后使用 loginForm.toMemberCommand 就可以获得业务层模型了
 		MemberCommand memberCommand = null;		
 		
@@ -236,7 +233,12 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			LOG.debug("{} login success", memberCommand.getLoginName());
 			String resultCode=thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(),type);
 			model.addAttribute("resultCode", resultCode);
-			onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
+			DefaultReturnResult result =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
+			//状态流转
+			Object returnObject = result.getReturnObject();
+			if(null !=returnObject){
+			    return "redirect:"+returnObject.toString();
+			}
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
@@ -326,8 +328,12 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		LOG.debug("{} login success", memberCommand.getLoginName());
 		String resultCode = thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(), type);
 		model.addAttribute("resultCode", resultCode);
-		onAuthenticationSuccess(memberDetails, request, response);
-
+		DefaultReturnResult result =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
+                //状态流转
+		 Object returnObject = result.getReturnObject();
+	                if(null !=returnObject){
+	                    return "redirect:"+returnObject.toString();
+	                }
 		return VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS;
 	}
 	

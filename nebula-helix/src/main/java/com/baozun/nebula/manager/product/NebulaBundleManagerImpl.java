@@ -26,10 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +33,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.BundleCommand.BundleStatus;
 import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleElementDao;
 import com.baozun.nebula.dao.product.BundleSkuDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.bundle.BundleElement;
 import com.baozun.nebula.model.bundle.BundleSku;
@@ -57,6 +56,10 @@ import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 @Transactional
 @Service
@@ -77,327 +80,207 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 	@Autowired
 	private ItemDao itemDao;
-	
-	
+
 	@Autowired
 	private SdkSkuInventoryDao sdkSkuInventoryDao;
 
+	@Autowired
+	private CacheManager cacheManager;
+
 	@Override
 	@Transactional(readOnly = true)
-	public List<BundleCommand> findBundleCommandByItemId(Long itemId , Boolean flag) {
-        LOG.debug("paramater : itemId [{}]  flag[{}]  {}" , itemId,flag, new Date());
-		// 1、 根据itemId,lifeCycle查询bundle （只需要查询出可售的bundle）
-		List<BundleCommand> bundles = bundleDao.findBundlesByItemId(itemId, 1);
-		if (Validator.isNotNullOrEmpty(bundles)) {
-			// 2 填充bundleCommand的基本信息
-			fillBundleCommandList(bundles);
-			if(flag){
-				LOG.debug("start delete invalid bundled preparation. bundles size : [{}]" , bundles.size());
-				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-				removeInvalidBundleInfo(bundles);
-				LOG.debug("end remove invalid bundled . bundles size : [{}]" , bundles == null ? 0 : bundles.size());
+	public List<BundleCommand> findBundleCommandByMainItemId(Long itemId, Boolean flag) {
+
+		List<BundleCommand> result = null;
+		
+		List<Long> bundleItemIds = bundleDao.findBundleItemIdByMainItemId(itemId);
+		if (Validator.isNotNullOrEmpty(bundleItemIds)) {
+			result = new ArrayList<BundleCommand>();
+			for (Long bundleItemId : bundleItemIds) {
+				result.add(getBundleByBundleItemId(bundleItemId, flag, false));
 			}
-		} else {
-			LOG.error("find bundles is null . itemId : [{}]  lifecycle : [{}]  {}" , itemId,1 ,new Date());
 		}
-        LOG.debug("bundles : {} , current time : {}" , JsonUtil.format(bundles) , new Date());
-		return bundles;
+
+		return result;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public BundleCommand findBundleCommandByBundleItemCode(String bundleItemCode , Boolean flag) {
-		LOG.debug("paramater : bundleItemCode [{}] , flag [{}] , {}" , bundleItemCode,flag , new Date());
-		BundleCommand bundle = bundleDao.findBundlesByItemCode(bundleItemCode);
-		
-		if(Validator.isNullOrEmpty(bundle)){
-			LOG.debug("get bundle is null by bundleItemCode [{}] . {}" ,bundleItemCode, new  Date());
-			return bundle;
-		}
-		fillBundleCommand(bundle);
-		if(flag && needRemoveInvalidBundle(bundle)){
-			// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-			LOG.debug("the bundle invalid , so it removed. {}" , new Date());
-			return null;
-		}
-		LOG.debug("bundle : {} , current time : {}" , JsonUtil.format(bundle) , new Date());
-		return bundle;
+	public BundleCommand findBundleCommandByBundleItemCode(String bundleItemCode, Boolean flag) {
+		ItemCommand itemCommand = itemDao.findItemCommandByCode(bundleItemCode);
+		Long itemId = itemCommand.getId();
+		return getBundleByBundleItemId(itemId, flag, false);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
-	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean flag) {
-		LOG.debug("paramater : page [{}] , sort [{}] , flag [{}]  , {}" ,JsonUtil.format(page),JsonUtil.format(sorts),flag,new Date());
+	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts, Boolean flag) {
+		LOG.debug("paramater : page [{}] , sort [{}] , flag [{}]  , {}", JsonUtil.format(page), JsonUtil.format(sorts),
+				flag, new Date());
 		Pagination<BundleCommand> pagination = bundleDao.findBundlesByPage(page, sorts);
 		List<BundleCommand> bundles = pagination.getItems();
 		if (Validator.isNotNullOrEmpty(bundles)) {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
-			if(flag){
-				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
-				LOG.debug("start delete invalid bundled preparation. bundles size : [{}]" , bundles.size());
+			if (flag) {
+				// 3如果bundle中的某个element失效，那么就踢掉该bundle
+				LOG.debug("start delete invalid bundled preparation. bundles size : [{}]", bundles.size());
 				removeInvalidBundleInfo(bundles);
-				LOG.debug("end remove invalid bundled . bundles size : [{}]" , bundles == null ? 0 : bundles.size());
+				LOG.debug("end remove invalid bundled . bundles size : [{}]", bundles == null ? 0 : bundles.size());
 			}
 		} else {
 			LOG.error("find bundles is null");
-			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts) , new Date());
+			LOG.error("parametar : page {}  sorts{}  [{}]", JsonUtil.format(page), JsonUtil.format(sorts), new Date());
 		}
 		pagination.setItems(bundles);
-		LOG.debug("pagination : {} , current time : {}" , JsonUtil.format(pagination) , new Date());
+		LOG.debug("pagination : {} , current time : {}", JsonUtil.format(pagination), new Date());
 		return pagination;
 	}
 
-
 	@Override
 	@Transactional(readOnly = true)
-	public BundleValidateResult validateBundle(Long bundleItemId,
-			List<Long> skuIds, int quantity) {
-		LOG.debug("paramater : bundleItemId [{}] , skuIds [{}] , quantity [{}] , {}" , bundleItemId, JsonUtil.format(skuIds),quantity,new Date());
-		Long bundleId = bundleDao.findBundleIdByBundleItemId(bundleItemId);
-		return validateBundleInfo(bundleId,skuIds,quantity);
-	}
-	
-	/**
-	 * 校验bundle的库存和状态
-	 * @param bundleId
-	 * @param skuIds
-	 * @param quantity
-	 * @param result
-	 * @param command
-	 * @param bundleItemInfo
-	 */
-	private BundleValidateResult validateBundleInfo(Long bundleId,List<Long> skuIds, int quantity){
-		BundleValidateResult result = new BundleValidateResult(BundleStatus.BUNDLE_CAN_SALE.getStatus(),null,null,null);
-		//校验前台返回数据
-		if(skuIds == null || skuIds.size() == 0 || quantity < 1){
-		   buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
-		   LOG.debug("***********************************");
-		   LOG.debug("the parameter 'skuIds' is null or 'skuIds.size()' equal '0' or 'quantity' lt '1': [{}]" , "skuIds:"+skuIds,"skuIds.size()"+skuIds.size(), "quantity"+quantity);
-	   	   LOG.debug("***********************************");
-		   return result;
+	public BundleValidateResult validateBundle(Long bundleItemId, List<Long> skuIds, int quantity) {
+		LOG.debug("[VALIDATE_BUNDLE] paramater : bundleItemId={} , skuIds={} , quantity={} , [{}]", bundleItemId,
+				JsonUtil.format(skuIds), quantity, new Date());
+		
+		BundleValidateResult result = null;
+		
+		BundleCommand bundleCommand = getBundleByBundleItemId(bundleItemId, false, true);
+		if(bundleCommand != null) {
+			result = validateBundle(bundleCommand, skuIds, quantity);
+		} else {
+			LOG.debug("[VALIDATE_BUNDLE] bundle is null: bundleItemId={}", bundleItemId);
+			result = new BundleValidateResult(BundleStatus.BUNDLE_NOT_EXIST.getStatus(), bundleItemId, null, null);
 		}
-		//查询bundle的所有相关信息
-		BundleCommand command = bundleDao.findBundlesById(bundleId,1);
-		
-		if(command == null){//bundle不存在
-			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
-			LOG.debug("***********************************");
-			LOG.debug("the parameter 'bundleId' can't find the bundle: [{}]" , "bundleId:"+bundleId);
-		   	LOG.debug("***********************************");
-			return result ;
-		} 
-		
-		Item bundleItem = itemDao.findItemById(command.getItemId());
-		if(bundleItem == null){//bundle不存在
-			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , bundleId,null, null);
-			LOG.debug("***********************************");
-			LOG.debug("the parameter 'bundleId' can't find the bundle: [{}]" , "bundleId:"+bundleId);
-		   	LOG.debug("***********************************");
-			return result ;
-		}
-        
-		return validateBundle(result,bundleItem,command,skuIds,quantity);
-	}
-	/**
-	 * 校验bundle选中的一个sku组合是否可以购买
-	 * <ul>
-	 *   <li>bundle本身是一个商品,校验该商品是否上架状态</li>
-	 *   <li>购买的sku是否是上架状态</li>
-	 *   <li>购买的sku对应的商品是否是上架状态</li>
-	 *   <li>购买的bundle是否库存足够</li>
-	 *   <li>购买的sku是否库存足够</li>
-	 * </ul>
-	 * @param result
-	 * @param bundleItem
-	 * @param command
-	 * @param skuIds
-	 * @param quantity
-	 * @return
-	 */
-	private BundleValidateResult validateBundle(BundleValidateResult result , Item bundleItem , BundleCommand command,List<Long> skuIds , int quantity){
-		
-		//1 ,=============bundle验证是否上架校验================
-		if(!validateBundleLifeCycle( command , bundleItem , result)){
-			return result;
-		}
-		
-		//根据bundleId查询所有的skuId
-		List<BundleSku> bundleSkus = bundleSkuDao.findByBundleId(command.getId());
-		
-		if(bundleSkus == null || bundleSkus.size() == 0){
-			buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, null);
-			LOG.debug("***********************************");
-			LOG.debug("the BundleSku is null or size equal '0': [{}]" , "bundleSkus:"+bundleSkus,"bundleSkus.size()"+bundleSkus.size());
-		   	LOG.debug("***********************************");
-			return result ;
-		}
-		
-		Map<Long,Long> skuIdToItemId = skuIdToItemId(bundleSkus,skuIds);
-		
-		Map<Long,BundleSku> bundleSkuMap = skuIdToBundleSku(bundleSkus);
-		
-		for (Long skuId : skuIds) {
-			//2 ,=============sku 以及其所在的商品 的状态校验通过================
-			if(skuIdToItemId.get(skuId) == null){
-				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),null, skuId);
-				LOG.debug("***********************************");
-				LOG.debug("the parameter 'skuIds' is not exist in SQL: [{}]" , "skuIds:"+skuIds);
-			   	LOG.debug("***********************************");
-				break;
+
+		// 如果校验结果有任何异常，刷新bundle缓存。
+		if (BundleStatus.BUNDLE_CAN_SALE.getStatus() != result.getType()) {
+			LOG.debug("[VALIDATE_BUNDLE] bundle validate failed, flush cache: cache-key=\"{}\"", CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)));
+			try {
+				// 删除以bundle类商品id为key的缓存
+				cacheManager.removeMapValue(CacheKeyConstant.BUNDLE_CACHE_KEY, String.valueOf(bundleItemId));
+			} catch (Exception e) {
+				LOG.error("remove bundle from cache error: bundleItemId=" + bundleItemId, e);
 			}
-			//item sku lifecycle校验
-			Item item = itemDao.findItemById(skuIdToItemId.get(skuId));
-			Sku sku = skuDao.findSkuById(skuId);
-			if(item == null || sku == null || item.getLifecycle().intValue() != 1 || sku.getLifecycle().intValue() != 1){
-				buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NOT_EXIST.getStatus() , command.getId(),skuIdToItemId.get(skuId), skuId);
-				LOG.debug("***********************************");
-				LOG.debug("the item or sku is null or lifecycle not equal '1': [{}]" , "item:"+item,"sku:"+sku,"item.getLifecycle():"+item.getLifecycle(),"sku.getLifecycle():"+sku.getLifecycle());
-			   	LOG.debug("***********************************");
-				break;
-			}
-			//3 ,=============sku 的库存状态校验通过================
-			//库存校验
-			if(!validateBundleInventory(command ,  quantity , bundleSkuMap.get(skuId) ,  sku , result) ){
-				break;
-			}
-			
 		}
 
 		return result;
-		
 	}
+
+	/**
+	 * 校验bundle选中的一个sku组合是否可以购买
+	 * <ul>
+	 * <li>bundle本身是一个商品,校验该商品是否上架状态</li>
+	 * <li>购买的sku是否是上架状态</li>
+	 * <li>购买的sku对应的商品是否是上架状态</li>
+	 * <li>购买的bundle是否库存足够</li>
+	 * <li>购买的sku是否库存足够</li>
+	 * </ul>
+	 */
+	private BundleValidateResult validateBundle(BundleCommand bundleCommand, List<Long> skuIds, int quantity) {
+
+		BundleValidateResult result = new BundleValidateResult();
+		result.setType(BundleStatus.BUNDLE_CAN_SALE.getStatus());
+		
+		// 1 ,=============bundle验证是否上架校验================
+		if (!validateBundleLifecycle(bundleCommand, result)) {
+			return result;
+		}
+
+		// 根据bundleId查询所有的skuId
+		Long bundleId = bundleCommand.getId();
+		Long bundleItemId = bundleCommand.getItemId();
+		List<BundleSku> bundleSkus = bundleSkuDao.findByBundleId(bundleId);
+		Map<Long, BundleSku> bundleSkuMap = skuIdToBundleSku(bundleSkus);
+		for(Long skuId : skuIds) {
+			Sku sku = skuDao.findSkuById(skuId);
+			// 如果sku未上架
+			if(!Item.LIFECYCLE_ENABLE.equals(sku.getLifecycle())) {
+				LOG.debug("the sku lifecycle not equal '" + Item.LIFECYCLE_ENABLE + "': skuId={},lifecycle={} [{}]", skuId, sku.getLifecycle(), new Date());
+				buildValidateResult(result, BundleStatus.BUNDLE_SKU_CANNOT_SALE.getStatus(), bundleItemId, sku.getItemId(), skuId);
+				return result;
+			}
+			
+			// 如果sku没有参与捆绑装
+			if(!bundleSkuMap.containsKey(skuId)) {
+				LOG.debug("the sku is not in bundle: skuId={},bundleId={} [{}]", skuId, bundleId, new Date());
+				buildValidateResult(result, BundleStatus.BUNDLE_SKU_CANNOT_SALE.getStatus(), bundleItemId, sku.getItemId(), skuId);
+				return result;
+			}
+			
+			Item item = itemDao.findItemById(sku.getItemId());
+			// 如果商品未上架
+			if(!Item.LIFECYCLE_ENABLE.equals(item.getLifecycle())) {
+				LOG.debug("the item lifecycle not equal '" + Item.LIFECYCLE_ENABLE + "': itemId={},lifecycle={} [{}]", item.getId(), item.getLifecycle(), new Date());
+				buildValidateResult(result, BundleStatus.BUNDLE_SKU_CANNOT_SALE.getStatus(), bundleItemId, item.getId(), null);
+				return result;
+			}
+			
+			// 校验库存
+			if(!validateBundleInventory(bundleCommand, sku, quantity, result)) {
+				return result;
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * 校验bundle本身的lifecycle是否上架
+	 * 
 	 * @param command
-	 * @param bundleItem
 	 * @param result
 	 * @return
 	 */
-	private boolean validateBundleLifeCycle(BundleCommand command ,Item bundleItem ,BundleValidateResult result ){
-		if(bundleItem.getLifecycle().intValue() == 2){//bundle不存在
-			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_EXIST.getStatus() , command.getId(),null, null);
-			LOG.debug("***********************************");
-			LOG.debug("the bundle lifecycle equal '2' meanings bundle has deleted: [{}]" , "bundleItem.getLifecycle():"+bundleItem.getLifecycle());
-		   	LOG.debug("***********************************");
-			return false ;
+	private boolean validateBundleLifecycle(BundleCommand command, BundleValidateResult result) {
+		
+		Integer lifecycle = command.getLifecycle();
+		
+		if (Item.LIFECYCLE_DELETED.equals(lifecycle)) {// bundle不存在
+			buildValidateResult(result, BundleStatus.BUNDLE_NOT_EXIST.getStatus(), command.getId(), null, null);
+			LOG.debug("the bundle lifecycle equal '" + Item.LIFECYCLE_DELETED + "' meanings bundle has deleted: [{}]",
+					"bundleItem.getLifecycle():" + lifecycle);
+			return false;
 		}
-		if(bundleItem.getLifecycle().intValue() == 3){//bundle未上架
-			buildValidateResult( result ,BundleStatus.BUNDLE_NOT_PUTAWAY.getStatus() , command.getId(),null, null);
-			LOG.debug("***********************************");
-			LOG.debug("the bundle lifecycle equal '3' meanings bundle has not Putaway: [{}]" , "bundleItem.getLifecycle():"+bundleItem.getLifecycle());
-		   	LOG.debug("***********************************");
-			return false ;
+		if (Item.LIFECYCLE_UNACTIVE.equals(lifecycle)) {// bundle未上架
+			buildValidateResult(result, BundleStatus.BUNDLE_NOT_PUTAWAY.getStatus(), command.getId(), null, null);
+			LOG.debug("the bundle lifecycle equal '" + Item.LIFECYCLE_UNACTIVE + "' meanings bundle has not Putaway: [{}]",
+					"bundleItem.getLifecycle():" + lifecycle);
+			return false;
 		}
-		if(bundleItem.getLifecycle().intValue() == 0){//bundle已下架
-			buildValidateResult( result ,BundleStatus.BUNDLE_SOLD_OUT.getStatus() , command.getId(),null, null);
-			LOG.debug("***********************************");
-			LOG.debug("the bundle lifecycle equal '0' meanings bundle has sold out: [{}]" , "bundleItem.getLifecycle():"+bundleItem.getLifecycle());
-		   	LOG.debug("***********************************");
-			return false ;
+		if (Item.LIFECYCLE_DISABLE.equals(lifecycle)) {// bundle已下架
+			buildValidateResult(result, BundleStatus.BUNDLE_SOLD_OUT.getStatus(), command.getId(), null, null);
+			LOG.debug("the bundle lifecycle equal '" + Item.LIFECYCLE_DISABLE + "' meanings bundle has sold out: [{}]",
+					"bundleItem.getLifecycle():" + lifecycle);
+			return false;
 		}
+		
 		return true;
 	}
-	
-	/**
-	 * key : skuId ; value : itemId
-	 * @param bundleSkus
-	 * @param skuIds
-	 * @return
-	 */
-	private Map<Long,Long> skuIdToItemId(List<BundleSku> bundleSkus , List<Long> skuIds){
-		Map<Long,Long> skuIdToItemId = new HashMap<Long, Long>();
-		for (BundleSku sku : bundleSkus) {
-			if(!skuIdToItemId.containsKey(sku.getSkuId()) && skuIds.contains(sku.getSkuId())){
-				skuIdToItemId.put(sku.getSkuId(), sku.getItemId());
-			}
-		}
-		return skuIdToItemId;
-	}
+
 	/**
 	 * key : skuId , value : BundleSku
+	 * 
 	 * @param bundleSkus
 	 * @return
 	 */
-	private Map<Long,BundleSku> skuIdToBundleSku(List<BundleSku> bundleSkus){
-		Map<Long,BundleSku> skuIdToItemId = new HashMap<Long, BundleSku>();
+	private Map<Long, BundleSku> skuIdToBundleSku(List<BundleSku> bundleSkus) {
+		Map<Long, BundleSku> skuIdToItemId = new HashMap<Long, BundleSku>();
 		for (BundleSku sku : bundleSkus) {
-			if(!skuIdToItemId.containsKey(sku.getSkuId())){
+			if (!skuIdToItemId.containsKey(sku.getSkuId())) {
 				skuIdToItemId.put(sku.getSkuId(), sku);
 			}
 		}
 		return skuIdToItemId;
 	}
-	
-	/**
-	 * <li>bundle本身库存是否足够</li>
-	 * <li>校验单个sku的库存是否足够</li>
-	 * @param result
-	 * @param bundle
-	 * @param quantity
-	 * @param sku
-	 * @return
-	 */
-	private boolean validateBundleInventory(BundleCommand bundle , int quantity ,BundleSku bundleSku , Sku sku ,BundleValidateResult result ){
-		Integer availableQty = bundle.getAvailableQty();
-		// 如果捆绑装单独维护了库存
-		if(availableQty != null) {
-			// 如果不需要同步扣减单品库存 ,那么就以捆绑装设置的库存为准；否则取捆绑装库存与sku实际可用库存的最小值
-			if(!bundle.getSyncWithInv() && availableQty.intValue() < quantity){
-				buildValidateResult( result ,BundleStatus.BUNDLE_NO_INVENTORY.getStatus() , bundle.getId(),null, null);
-				LOG.debug("***********************************");
-				LOG.debug("the bundle is not syncWithInv and availableQty is not enough: [{}]" , "bundle.getSyncWithInv()"+bundle.getSyncWithInv(),"bundle.getAvailableQty()"+availableQty,"quantity"+quantity);
-			   	LOG.debug("***********************************");
-				return false;
-			}
-			if(bundle.getSyncWithInv()){
-				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
-				int qty = 0 ;
-				if(inventory != null && inventory.getAvailableQty() != null){
-					qty = inventory.getAvailableQty();
-				}
-				
-				if(availableQty <= qty && availableQty < quantity){
-					buildValidateResult( result ,BundleStatus.BUNDLE_NO_INVENTORY.getStatus() , bundle.getId(),null, null);
-					LOG.debug("***********************************");
-					LOG.debug("the bundle is syncWithInv and availableQty is not enough: [{}]" , "bundle.getSyncWithInv()"+bundle.getSyncWithInv(),"bundle.getAvailableQty()"+availableQty,"quantity"+quantity);
-				   	LOG.debug("***********************************");
-					return false;
-				}
-				
-				if(availableQty > qty && qty < quantity){
-					buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NO_INVENTORY.getStatus() , bundle.getId(),bundleSku.getItemId(), bundleSku.getSkuId());
-					LOG.debug("***********************************");
-					LOG.debug("the sku availableQty is not enough: [{}]" ,"inventory.getAvailableQty()"+inventory.getAvailableQty(),"quantity"+quantity);
-				   	LOG.debug("***********************************");
-					return false;
-				}
-			}
-		} 
-		
-		SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
-		if(inventory == null ||inventory.getAvailableQty().intValue() < quantity){
-			buildValidateResult( result ,BundleStatus.BUNDLE_ITEM_NO_INVENTORY.getStatus() , bundle.getId(),bundleSku.getItemId(), bundleSku.getSkuId());
-			LOG.debug("***********************************");
-			LOG.debug("the sku availableQty is null or not enough: [{}]" , "inventory.getAvailableQty()"+inventory.getAvailableQty(),"quantity"+quantity);
-		   	LOG.debug("***********************************");
-			return false;
-		}
-		
-	   return true;
-	}
-	
+
 	/**
 	 * 构建校验结果对象
-	 * @param result
-	 * @param type
-	 * @param bundleId
-	 * @param itemId
-	 * @param skuId
+	 * 
 	 * @return
 	 */
-	private void buildValidateResult(BundleValidateResult result ,int type , Long bundleId,Long itemId, Long skuId){
-		result.setBundleId(bundleId);
+	private void buildValidateResult(BundleValidateResult result, int type, Long bundleItemId, Long itemId, Long skuId) {
+		result.setBundleItemId(bundleItemId);
 		result.setItemId(itemId);
 		result.setSkuId(skuId);
 		result.setType(type);
@@ -415,115 +298,126 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		Iterator<BundleCommand> iterator = bundles.iterator();
 		while (iterator.hasNext()) {
 			BundleCommand bundle = iterator.next();
-			
+
 			if (needRemoveInvalidBundle(bundle)) {
 				LOG.debug("***********************************");
-				LOG.debug("current bundle invailed , bundleId [{}] current time : [{}]" , bundle.getId(), new Date());
+				LOG.debug("current bundle invailed , bundleId [{}] current time : [{}]", bundle.getId(), new Date());
 				LOG.debug("***********************************");
 				iterator.remove();
 			}
 		}
 	}
+
 	/**
 	 * <h3>校验是否需要删除bundle</h3>
-	 * <p>校验的范围如下 ： </p>
+	 * <p>
+	 * 校验的范围如下 ：
+	 * </p>
 	 * <ul>
-	 *   <ol>
-	 *   	<li>bundle本身的商品就失效</li>
-	 *   	<li>最少有一个element中的商品都失效了 ,bundle就失效</li>
-	 *   </ol>
+	 * <ol>
+	 * <li>bundle本身的商品就失效</li>
+	 * <li>最少有一个element中的商品都失效了 ,bundle就失效</li>
+	 * </ol>
 	 * </ul>
 	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
-	 * @return 　返回结果 布尔类型
-	 * <ul>
-	 *   <li>true : 需要删除 </li>
-	 *   <li>false : 不需要删除 </li>
-	 * </ul>
+	 * 
+	 * @return 返回结果 布尔类型
+	 *         <ul>
+	 *         <li>true : 需要删除</li>
+	 *         <li>false : 不需要删除</li>
+	 *         </ul>
 	 * @param bundle
 	 * @return
 	 */
-   private boolean needRemoveInvalidBundle(BundleCommand bundle){
-	   List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
-	   if (bundle.getLifeCycle() != 1 || !isEnabled(bundleElementCommands)){
-		   return true;
-	   }
-	  return false; 
-   }
+	private boolean needRemoveInvalidBundle(BundleCommand bundle) {
+		List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
+		if (!Item.LIFECYCLE_ENABLE.equals(bundle.getLifecycle()) || !isEnabled(bundleElementCommands)) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * <h3>校验bundle是否有效</h3>
-	 * <p>校验的范围如下 ： </p>
+	 * <p>
+	 * 校验的范围如下 ：
+	 * </p>
 	 * <ul>
-	 *   <ol>
-	 *   	<li>最少有一个element中的商品都失效了 ,bundle就失效</li>
-	 *   </ol>
+	 * <ol>
+	 * <li>只要有一个element中的商品都失效了 ,bundle就失效</li>
+	 * </ol>
 	 * </ul>
 	 * <h3>注意 ： 该方法不会校验库存的信息</h3>
-	 * @return 　返回结果 布尔类型
-	 * <ul>
-	 *   <li>true : 有效 </li>
-	 *   <li>false : 失效</li>
-	 * </ul>
+	 * 
+	 * @return 返回结果 布尔类型
+	 *         <ul>
+	 *         <li>true : 有效</li>
+	 *         <li>false : 失效</li>
+	 *         </ul>
 	 */
-	private boolean isEnabled(List<BundleElementCommand> bundleElementCommands){
+	private boolean isEnabled(List<BundleElementCommand> bundleElementCommands) {
 		Boolean removeFlag = Boolean.TRUE;
-		
+
 		for (BundleElementCommand bundleElementCommand : bundleElementCommands) {
-			removeFlag = validateBundleElement( bundleElementCommand);
-			if(!removeFlag){
+			removeFlag = validateBundleElement(bundleElementCommand);
+			if (!removeFlag) {
 				break;
 			}
 		}
 		return removeFlag;
 	}
-	
+
 	/**
-	 * <p>校验的步骤 ： </p>
+	 * <p>
+	 * 校验的步骤 ：
+	 * </p>
 	 * <ul>
-	 *   <ol>
-	 *   	<li>踢掉所有不是上架状态的商品</li>
-	 *      <li>踢掉商品中所有不是上架状态的sku</li>
-	 *      <li>如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉</li>
-	 *   </ol>
+	 * <ol>
+	 * <li>踢掉所有不是上架状态的商品</li>
+	 * <li>踢掉商品中所有不是上架状态的sku</li>
+	 * <li>如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉</li>
+	 * </ol>
 	 * </ul>
+	 * 
 	 * @param bundleElementCommand
 	 * @return
 	 */
-	private boolean validateBundleElement(BundleElementCommand bundleElementCommand){
+	private boolean validateBundleElement(BundleElementCommand bundleElementCommand) {
 
 		List<BundleItemCommand> bundleItem = bundleElementCommand.getItems();
-		
+
 		Iterator<BundleItemCommand> iterator = bundleItem.iterator();
 		while (iterator.hasNext()) {
 			BundleItemCommand bundleItemCommand = iterator.next();
-			//1 踢掉所有不是上架状态的商品
-			if (bundleItemCommand.getLifecycle().intValue() != 1) {
+			// 1 踢掉所有不是上架状态的商品
+			if (!Item.LIFECYCLE_ENABLE.equals(bundleItemCommand.getLifecycle())) {
 				iterator.remove();
 				continue;
 			}
-			//2 踢掉商品中所有不是上架状态的sku
+			// 2 踢掉商品中所有不是上架状态的sku
 			List<BundleSkuCommand> skus = bundleItemCommand.getBundleSkus();
 			Iterator<BundleSkuCommand> iterator2 = skus.iterator();
 			while (iterator2.hasNext()) {
 				BundleSkuCommand bundleSkuCommand = (BundleSkuCommand) iterator2.next();
-				if(bundleSkuCommand.getLifeCycle().intValue() != 1){
+				if (!Item.LIFECYCLE_ENABLE.equals(bundleSkuCommand.getLifeCycle())) {
 					iterator2.remove();
 					continue;
 				}
 			}
-			//3 如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉
-			if(Validator.isNullOrEmpty(bundleItemCommand.getBundleSkus())){
+			// 3 如果商品是上架状态,但是该商品没有一个上架的sku,那么该商品也需要踢掉
+			if (Validator.isNullOrEmpty(bundleItemCommand.getBundleSkus())) {
 				iterator.remove();
 				continue;
 			}
 		}
-		
-		if(Validator.isNullOrEmpty(bundleElementCommand.getItems())){
+
+		if (Validator.isNullOrEmpty(bundleElementCommand.getItems())) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * 分别给每个bundle填充其基本信息
 	 * 
@@ -568,15 +462,16 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 		fillBundleElementInfo(bundleElementList, map, bundle);
 		Item item = itemDao.findItemById(bundle.getItemId());
-		if(Validator.isNullOrEmpty(item)){
-			LOG.error("find item is null by itemId : [{}] , bundleId : [{}] {}. so set item lifecycle is 2" , bundle.getItemId() , bundle.getId() , new Date());
+		if (Validator.isNullOrEmpty(item)) {
+			LOG.error("find item is null by itemId : [{}] , bundleId : [{}] {}. so set item lifecycle is 2",
+					bundle.getItemId(), bundle.getId(), new Date());
 		}
-		//如果item == null 就设置为逻辑删除的状态 2
-        bundle.setLifeCycle(item == null ? 2 : item.getLifecycle());
-       
+		// 如果item == null 就设置为逻辑删除的状态 2
+		bundle.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
+
 		bundle.setBundleElementCommands(bundleElementList);
-    }
-   
+	}
+
 	/**
 	 * 分别给每个BundleElement填充信息
 	 * 
@@ -585,7 +480,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 * @param map
 	 *            ： BundleSku集合按照bundleElementId分组 . key : bundleElementId ;
 	 *            value : List<BundleSku>
-	 *           
+	 * 
 	 */
 	private void fillBundleElementInfo(List<BundleElementCommand> bundleElementList, Map<Long, List<BundleSku>> map,
 			BundleCommand bundle) {
@@ -667,7 +562,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		for (Long key : keys) {
 			items.add(packagingBundleItemCommandInfo(key, elementSkus.get(key), bundle));
 		}
-		if(Validator.isNotNullOrEmpty(bundleElementCommand)){
+		if (Validator.isNotNullOrEmpty(bundleElementCommand)) {
 			bundleElementCommand.setItems(items);
 		}
 	}
@@ -682,15 +577,15 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	private BundleItemCommand packagingBundleItemCommandInfo(Long itemId, List<BundleSku> skus, BundleCommand bundle) {
 
 		BundleItemCommand bundleItemCommand = new BundleItemCommand();
-        Item item = itemDao.findItemById(itemId);
-        if(Validator.isNullOrEmpty(item)){
-			LOG.error("get item is null by itemId : [{}] , bundleId : [{}] , {}. so set item lifecycle is 2" , itemId , bundle.getId() , new Date());
+		Item item = itemDao.findItemById(itemId);
+		if (Validator.isNullOrEmpty(item)) {
+			LOG.error("get item is null by itemId : [{}] , bundleId : [{}] , {}. so set item lifecycle is 2", itemId,
+					bundle.getId(), new Date());
 		}
-        bundleItemCommand.setLifecycle(item == null ? 2 : item.getLifecycle());
+		bundleItemCommand.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
 		bundleItemCommand.setItemId(itemId);
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
 		bundleItemCommand.setBundleSkus(skuCommands);
-		
 
 		return bundleItemCommand;
 	}
@@ -704,20 +599,21 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 */
 	private List<BundleSkuCommand> packagingBundleSkuCommands(List<BundleSku> skus, Bundle bundle) {
 		List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
-		LOG.debug("bundle price type is {} , availableQty is {}  , syncWithInv is {} , bundleId [{}] , {}" , bundle.getPriceType() , bundle.getAvailableQty() , bundle.getSyncWithInv() , bundle.getId() , new Date());
+		LOG.debug("bundle price type is {} , availableQty is {}  , syncWithInv is {} , bundleId [{}] , {}",
+				bundle.getPriceType(), bundle.getAvailableQty(), bundle.getSyncWithInv(), bundle.getId(), new Date());
 		for (BundleSku sku : skus) {
 			BundleSkuCommand skuCommand = new BundleSkuCommand();
 
 			ConvertUtils.convertTwoObject(skuCommand, sku);
 
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
-			if(Validator.isNullOrEmpty(skuu)){
-				LOG.error("get Sku is null by skuId : [{}] {}. so set sku lifecycle is 2" , sku.getSkuId() , new Date());
+			if (Validator.isNullOrEmpty(skuu)) {
+				LOG.error("get Sku is null by skuId : [{}] {}. so set sku lifecycle is " + Item.LIFECYCLE_DELETED, sku.getSkuId(), new Date());
 			}
 			skuCommand.setProperties(skuu == null ? "" : skuu.getProperties());
 			skuCommand.setExtentionCode(skuu == null ? "" : skuu.getOutid());
-			skuCommand.setLifeCycle(skuu == null ? 2 : skuu.getLifecycle());
-			
+			skuCommand.setLifeCycle(skuu == null ? Item.LIFECYCLE_DELETED : skuu.getLifecycle());
+
 			// 定制价格 一口价（）
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
 					|| bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
@@ -725,35 +621,144 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			}
 			// 按照实际价格
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
-				skuCommand.setSalesPrice(skuu == null ? BigDecimal.ZERO :skuu.getSalePrice());
+				skuCommand.setSalesPrice(skuu == null ? BigDecimal.ZERO : skuu.getSalePrice());
 			}
 			skuCommand.setOriginalSalesPrice(skuu == null ? BigDecimal.ZERO : skuu.getSalePrice());
 			skuCommand.setListPrice(skuu == null ? BigDecimal.ZERO : skuu.getListPrice());
-			
+
 			Integer availableQty = bundle.getAvailableQty();
 			// 如果捆绑装单独维护了库存
-			if(availableQty != null) {
+			if (availableQty != null) {
 				// 如果不需要同步扣减单品库存 ,那么就以捆绑装设置的库存为准；否则取捆绑装库存与sku实际可用库存的最小值
-				if(!bundle.getSyncWithInv()){
+				if (!bundle.getSyncWithInv()) {
 					skuCommand.setQuantity(availableQty);
-				}else{
+				} else {
 					SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
-					int qty = 0 ;
-					if(inventory != null && inventory.getAvailableQty() != null){
+					int qty = 0;
+					if (inventory != null && inventory.getAvailableQty() != null) {
 						qty = inventory.getAvailableQty();
 					}
-					LOG.debug("Math.min(availableQty, qty) : availableQty [{}] , qty [{}] ,  min : {} , skuId [{}] , bundleId [{}],{}" ,availableQty , qty, Math.min(availableQty, qty) , sku.getSkuId() ,bundle.getId(), new Date());
+					LOG.debug(
+							"Math.min(availableQty, qty) : availableQty [{}] , qty [{}] ,  min : {} , skuId [{}] , bundleId [{}],{}",
+							availableQty, qty, Math.min(availableQty, qty), sku.getSkuId(), bundle.getId(), new Date());
 					skuCommand.setQuantity(Math.min(availableQty, qty));
 				}
 			} else {
 				SkuInventory inventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuu.getOutid());
 				skuCommand.setQuantity(inventory == null ? 0 : inventory.getAvailableQty());
 			}
-			
+
 			bundleSkus.add(skuCommand);
 		}
 
 		return bundleSkus;
 	}
 
+	/**
+	 * 根据捆绑类商品的商品id查询捆绑装
+	 * @param bundleItemId 商品id
+	 * @param isValidate 是否校验捆绑类商品的可用性
+	 * @param isIgnoreCache 是否忽略缓存，为true时直接从数据库查询，false时将会尝试从缓存中加载数据
+	 * @return
+	 */
+	private BundleCommand getBundleByBundleItemId(Long bundleItemId, boolean isValidate, boolean isIgnoreCache) {
+		
+		LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] bundleItemId={}", bundleItemId);
+		
+		// 两种情况不从缓存中取数据也不更新缓存：
+		// 1.明确指定忽略缓存的
+		// 2.不校验捆绑类商品可用性的
+		if(!isIgnoreCache && isValidate){
+			// 如果缓存中存在，直接返回
+			try {
+				LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] get bundle from cache: cache-key=\"{}\"", CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)));
+				BundleCommand result = (BundleCommand) cacheManager.getMapObject(CacheKeyConstant.BUNDLE_CACHE_KEY,
+						String.valueOf(bundleItemId));
+				if (result != null) {
+					LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] found bundle in cache: bundle={}", JsonUtil.format(result));
+					return result;
+				} else {
+					LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] not found bundle in cache, will query from database.");
+				}
+			} catch (Exception e) {
+				LOG.error("get bundle from cache error: cache-key=\"" + CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)) + "\"", e);
+			}
+		}
+
+		BundleCommand bundle = bundleDao.findBundleByBundleItemId(bundleItemId);
+
+		if (Validator.isNullOrEmpty(bundle)) {
+			LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] bundle is null: bundleItemId={}", bundleItemId);
+			return bundle;
+		}
+		
+		fillBundleCommand(bundle);
+		
+		if (isValidate && needRemoveInvalidBundle(bundle)) {
+			// 如果bundle中的某个商品失效，那么就踢掉该bundle
+			LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] the bundle invalid, so it removed: bundleItemId={}", bundleItemId);
+			return null;
+		}
+		LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] found bundle in database: bundle={}", JsonUtil.format(bundle));
+
+		if(!isIgnoreCache && isValidate){
+			// 添加到缓存中
+			try {
+				LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] put bundle to cache: cache-key=\"{}\"", CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)));
+				cacheManager.setMapObject(CacheKeyConstant.BUNDLE_CACHE_KEY, String.valueOf(bundleItemId), bundle,
+						CacheKeyConstant.BUNDLE_CACHE_TIME);
+			} catch (Exception e) {
+				LOG.error("put bundle to cache error: cache-key=\"" + CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)) + "\"", e);
+			}
+		}
+
+		return bundle;
+	}
+	
+	/**
+	 * bundle库存校验
+	 */
+	private boolean validateBundleInventory(BundleCommand bundleCommand, Sku sku, int quantity, BundleValidateResult result) {
+		Long bundleItemId = bundleCommand.getItemId();
+		Integer bundleQty = bundleCommand.getAvailableQty();
+		// bundle设置了独立的库存
+		if(bundleQty != null) {
+			if(!bundleCommand.getSyncWithInv()){
+				if(bundleQty < quantity) { 
+					LOG.debug("[BUNDLE_INVENTORY_VALIDATE_FAILURE] the bundle inventory is not enough: bundleId={},bundleQty={},salesQuantity={}", bundleCommand.getId(), bundleQty, quantity);
+					buildValidateResult(result, BundleStatus.BUNDLE_NO_INVENTORY.getStatus(), bundleItemId, null, null);
+					return false;
+				}
+			} else {
+				if(bundleQty < quantity) {
+					LOG.debug("[BUNDLE_INVENTORY_VALIDATE_FAILURE] the bundle inventory is not enough: bundleId={},bundleQty={},salesQuantity={}", bundleCommand.getId(), bundleQty, quantity);
+					buildValidateResult(result, BundleStatus.BUNDLE_NO_INVENTORY.getStatus(), bundleItemId, null, null);
+					return false;
+				} else {
+					return validateSkuInventory(bundleItemId, sku, quantity, result);
+				}
+			}
+			
+		} else { 
+			return validateSkuInventory(bundleItemId, sku, quantity, result);
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * bundle sku库存校验
+	 */
+	private boolean validateSkuInventory(Long bundleItemId, Sku sku, int quantity, BundleValidateResult result) {
+		SkuInventory skuInventory = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(sku.getOutid());
+		// 如果sku不存在库存记录，则默认该sku实际可用库存为0
+		int inventory = skuInventory == null ? 0 : skuInventory.getAvailableQty();
+		if(inventory < quantity) {
+			LOG.debug("[BUNDLE_SKU_INVENTORY_VALIDATE_FAILURE] the sku inventory is not enough: skuId={},inventory={},salesQuantity={}", sku.getId(), inventory, quantity);
+			buildValidateResult(result, BundleStatus.BUNDLE_SKU_NO_INVENTORY.getStatus(), bundleItemId, sku.getItemId(), sku.getId());
+			return false;
+		}
+		
+		return true;
+	}
 }

@@ -556,4 +556,28 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	
+	<bean id="Category.findCategoryMetaDataByLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据语言，查询所有分类的数据(只有id、name、sortNo字段)</description>
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                select
+					cate.id as id,
+					cateLang.name as name,					
+					cate.sort_no as sortNo
+				from
+					t_pd_category cate,t_pd_category_lang cateLang
+				where
+					cate.lifecycle = 1
+					and cate.id=cateLang.category_id
+					and cateLang.lang=:lang
+					order by cate.sort_no
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
 </beans>

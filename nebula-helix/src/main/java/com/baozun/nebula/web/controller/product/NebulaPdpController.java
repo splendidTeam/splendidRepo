@@ -44,8 +44,6 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
@@ -56,14 +54,17 @@ import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 
 
 /**
  * 商品详情页controller
+ * 一般情况下商品详情页会包含两部分内容：
+ * 一、数据展示部分
+ * 二、操作部分
  * 
- * 
- * TODO 商品展示模式的说明和使用 -- 星语
  * 
  * 
  * @author yimin.qiao
@@ -109,8 +110,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			PdpViewCommand pdpViewCommand = buildPdpViewCommandWithCache(itemCode);
 			
-			constructBrowsingHistory(request, response, pdpViewCommand.getBaseInfo().getId());
-			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			return VIEW_PRODUCT_DETAIL;
@@ -126,7 +125,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	/**
 	 * 获取浏览历史记录
 	 * 
-	 * @RequestMapping(value = "/item/history/get", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/item/history.json", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId 商品Id
@@ -135,28 +134,17 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
+	public List<RelationItemViewCommand> getItemBrowsingHistory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		
-		 DefaultReturnResult result = new DefaultReturnResult();
-			try {
-				Map<String, Object> returnObject = new HashMap<String, Object>();
-		        returnObject.put(MODEL_KEY_BROWSING_HISTORY, buildItemBrowsingHistoryViewCommand(request, itemId));
-		        result.setReturnObject(returnObject);
-				
-			} catch (Exception e) {
-				LOG.error("[PDP_BROWSING_HISTORY] error itemId:{}", itemId );
-				
-				throw new BusinessException("get browsing history error.");
-			}
 			
-			return result;
+        return buildItemBrowsingHistoryViewCommand(itemId, request, response);
+	        
 	}
 	
 	/**
 	 * 获取推荐商品
 	 * 
-	 * @RequestMapping(value = "/item/recommend/get", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/item/recommend.json", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId
@@ -165,28 +153,17 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
+	public List<RelationItemViewCommand> getItemPdpRecommend(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-        DefaultReturnResult result = new DefaultReturnResult();
-		try {
-			Map<String, Object> returnObject = new HashMap<String, Object>();
-	        returnObject.put(MODEL_KEY_PDP_RECOMMEND, buildItemRecommendViewCommand(itemId));
-	        result.setReturnObject(returnObject);
-			
-		} catch (Exception e) {
-			LOG.error("[PDP_RECOMMEND] error itemId:{}", itemId );
-			
-			throw new BusinessException("get pdp recommend error.");
-		}
+	    return buildItemRecommendViewCommandWithCache(itemId);
 		
-		return result;
 	}
 	
 	/**
 	 * 加载商品库存
 	 * 
-	 * @RequestMapping(value = "/item/inventory/get", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/item/inventory.json", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * @param itemId
@@ -195,23 +172,21 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * @param model
 	 * @return
 	 */
-	public NebulaReturnResult getItemInventory(@PathVariable("itemId") Long itemId, 
+	public List<InventoryViewCommand> getItemInventory(@PathVariable("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		model.addAttribute(MODEL_KEY_INVENTORY, super.buildInventoryViewCommand(itemId));
-		
-		return DefaultReturnResult.SUCCESS;
+		return buildInventoryViewCommand(itemId);
 	}
 	
 	/**
 	 * 商品定义到色，需要到款汇聚显示，当切换颜色时，实际上是变更了商品，需要ajax加载该商品的信息
 	 * 
-	 * @RequestMapping(value = "/item/detail/get", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/item/colorSwatch.json", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
 	 * 
 	 */
-	public NebulaReturnResult switchColorForItem(@PathVariable("itemCode") String itemCode, 
+	public NebulaReturnResult getItemColorSwatch(@PathVariable("itemCode") String itemCode, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
 		DefaultReturnResult result = new DefaultReturnResult();
@@ -221,7 +196,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			Map<String, Object> returnObject = new HashMap<String, Object>();
 			
 			//商品信息
-			PdpViewCommand pdpViewCommand = buildSimplePdpViewCommand(itemCode);
+			PdpViewCommand pdpViewCommand = buildSimplePdpViewCommandWithCache(itemCode);
 			returnObject.put(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
 			//库存信息
@@ -237,28 +212,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		}
 		
 		return result;
-	}
-	
-	
-	/**
-	 * 加入收藏(这个功能应该在用户收藏的Controller中定义)
-	 * 
-	 * 如果收藏到商品，传入itemId；如果收藏到sku，传入skuId。
-	 * 如果itemId和skuId都传入，则以skuId为准
-	 * 
-	 * @RequestMapping(value = "/favorite/add", method = RequestMethod.POST)
-	 * @ResponseBody
-	 * 
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	public NebulaReturnResult addFavorite(@LoginMember MemberDetails memberDetails, 
-			@PathVariable("itemId") Long itemId, @PathVariable("skuId") Long skuId,
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-		//TODO
-		return new DefaultReturnResult();
 	}
 	
 	/**
@@ -351,12 +304,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
 	}
 
-
-	@Override
-	protected String buildMobileShareUrl(String itemCode) {
-		return null;
-	}
-
 	@Override
 	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
 		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
@@ -378,9 +325,15 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	}
 
 	@Override
-	protected Integer getPdpViewCommandExpireSeconds() {
+	protected Integer getPdpViewCommandCacheExpireSeconds() {
 		// 5分钟
-		return 5 * 60;
+		return 5 * TimeInterval.SECONDS_PER_MINUTE;
+	}
+	
+	@Override
+	protected Integer getItemRecommendCacheExpireSeconds() {
+		// 1天
+		return TimeInterval.SECONDS_PER_DAY;
 	}
 	
 	/**

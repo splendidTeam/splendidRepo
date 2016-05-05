@@ -15,6 +15,8 @@
  */
 package com.baozun.nebula.manager.baseinfo;
 
+import java.util.List;
+
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.manager.BaseManager;
 
@@ -37,5 +39,11 @@ public interface ShopManager extends BaseManager{
 	 */
 	ShopCommand findShopByOrgId(Long id);
 
-
+	/**
+	 * 根据shopIds查询店铺信息
+	 * 
+	 * @param shopIds
+	 * @return List<ShopCommand>
+	 */
+	List<ShopCommand> findByShopIds(List<Long> shopIds);
 }

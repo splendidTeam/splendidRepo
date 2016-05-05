@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +21,12 @@ import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.model.product.SearchConditionLang;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
+import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.utils.Validator;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 
@@ -239,6 +240,11 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 			 searchConditionCommand.setName(singleLang);
 		 }
 		return searchConditionCommand;
+	}
+
+	@Override
+	public List<SearchConditionCommand> findSearchConditionMetDataByLang(String lang){
+		return searchConditionDao.findSearchConditionMetDataByLang(lang);
 	}
 
 }

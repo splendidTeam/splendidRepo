@@ -20,6 +20,7 @@ import java.util.List;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
+import com.baozun.nebula.search.command.MetaDataCommand;
 
 /**
  * 商品分类sdkManager
@@ -43,4 +44,14 @@ public interface SdkCategoryManager extends BaseManager{
 	 * @return
 	 */
 	public ItemCategory saveItemCategory(ItemCategory itemCategory);
+	
+	
+	/**
+	 * 根据语言，查询所有分类的元数据数据(只有id、name、sortNo字段)
+	 * @return List<MetaDataCommand>
+	 * @param lang
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午3:06:34
+	 */
+	List<MetaDataCommand> findCategoryMetaDataByLang(String lang);
 }

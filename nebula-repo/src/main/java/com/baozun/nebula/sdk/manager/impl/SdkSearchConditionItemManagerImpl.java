@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +21,10 @@ import com.baozun.nebula.model.product.SearchConditionItemlang;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;
 import com.baozun.nebula.utils.Validator;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * 
@@ -119,19 +119,8 @@ public class SdkSearchConditionItemManagerImpl implements
 	 */
 	@Override
 	@Transactional(readOnly=true)
-	public List<SearchConditionItemCommand> findItemBySId(Long sId) {
-//		List<SearchConditionItem> cmdList = new ArrayList<SearchConditionItem>();//
-		List<SearchConditionItem> cmdList = searchConditionItemDao.findItemBySearchId(sId);
-		List<SearchConditionItemCommand> resultList = new ArrayList<SearchConditionItemCommand>();
-		
-		if(null!= cmdList){
-			for(SearchConditionItem s : cmdList){
-				SearchConditionItemCommand cmd = new SearchConditionItemCommand();
-				cmd =(SearchConditionItemCommand) ConvertUtils.convertFromTarget(cmd, s);
-				resultList.add(cmd);
-			}
-		}
-		return resultList;
+	public List<SearchConditionItemCommand> findItemBySId(Long sId,String lang) {
+		return searchConditionItemDao.findItemMetaBySIdAndLang(sId, lang);
 	}
 
 	/* (non-Javadoc)

@@ -115,4 +115,40 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Navigation.findNavigationMetaDataBylang" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						nav.id as id,
+					 	navLang.name as name,						
+						nav.sort as sortNo
+					from
+						t_base_navigation nav,t_base_navigation_lang navLang
+					WHERE
+						nav.lifecycle=1
+						and nav.id=navLang.navigation_id
+						and navLang.lang=:lang
+						order by nav.sort
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Navigation.findByItemCollectionId" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						*
+					from
+						t_base_navigation nav
+					WHERE
+						nav.collection_id=:itemCollectId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
 </beans>

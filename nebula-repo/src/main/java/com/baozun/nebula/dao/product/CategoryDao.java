@@ -18,15 +18,16 @@ package com.baozun.nebula.dao.product;
 import java.util.Collection;
 import java.util.List;
 
+import com.baozun.nebula.command.rule.MiniItemAtomCommand;
+import com.baozun.nebula.model.product.Category;
+import com.baozun.nebula.model.product.CategoryLang;
+import com.baozun.nebula.search.command.MetaDataCommand;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.command.rule.MiniItemAtomCommand;
-import com.baozun.nebula.model.product.Category;
-import com.baozun.nebula.model.product.CategoryLang;
 
 /**
  * 商品分类处理Dao.
@@ -324,4 +325,15 @@ public interface CategoryDao extends GenericEntityDao<Category, Long>{
 	
 	@NativeQuery(model = CategoryLang.class)
 	CategoryLang findCategoryLang(@QueryParam("id")Long id,@QueryParam("lang") String lang);
+	
+	
+	/**
+	 * 根据语言，查询所有分类的数据(只有id、name、sortNo字段)
+	 * @return List<MetaDataCommand>
+	 * @param lang
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午3:06:34
+	 */
+	@NativeQuery(model = MetaDataCommand.class)
+	List<MetaDataCommand> findCategoryMetaDataByLang(@QueryParam("lang") String lang);
 }

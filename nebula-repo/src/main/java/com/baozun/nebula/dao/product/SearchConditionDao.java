@@ -31,6 +31,7 @@ import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.model.product.SearchConditionLang;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
+import com.baozun.nebula.search.command.MetaDataCommand;
 
 /**
  * @author Tianlong.Zhang
@@ -123,4 +124,15 @@ public interface SearchConditionDao extends GenericEntityDao<SearchCondition, Lo
 	
 	@NativeQuery(model = SearchConditionLang.class)
 	SearchConditionLang findSearchConditionLang(@QueryParam("id")Long id,@QueryParam("lang") String lang);
+	
+	/**
+	 * 根据语言查询所有搜索条件的数据
+	 * @return List<MetaDataCommand>
+	 * @param lang
+	 * @return 
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午5:33:44
+	 */
+	@NativeQuery(model = SearchConditionCommand.class)
+	List<SearchConditionCommand> findSearchConditionMetDataByLang(@QueryParam("lang") String lang);
 }

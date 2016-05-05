@@ -72,7 +72,11 @@ public class ItemPropertyViewCommandResolverImpl implements
 			List<ItemImageViewCommand> imageViewCommands) {
 		
 		Map<String, Object> dynamicPropertyMap = itemDetailManager.gatherDynamicProperty(baseInfoViewCommand.getId());
-		if(Validator.isNullOrEmpty(dynamicPropertyMap)){
+		if(Validator.isNullOrEmpty(dynamicPropertyMap)||(Validator.isNullOrEmpty(dynamicPropertyMap
+                        .get(KEY_PROPS_SALE))&&Validator.isNullOrEmpty(dynamicPropertyMap
+                                .get(KEY_PROPS_GENERAL)))){
+			LOGGER.debug("[RESOLVER_PROPERTYVIEWCOMMAND] function resolve:[{}],code:[{}],the item hasn't any properties!",
+					baseInfoViewCommand.getId(), baseInfoViewCommand.getCode());
 			return new ItemPropertyViewCommand();
 		}
 		ItemPropertyViewCommand viewCommand =new ItemPropertyViewCommand();
@@ -99,13 +103,13 @@ public class ItemPropertyViewCommandResolverImpl implements
                         .get(KEY_PROPS_SALE);
 
         if (Validator.isNullOrEmpty(saleDynamicPropertyCommandList)) {
-            LOGGER.error("[RESOLVER_ITEMCOLORSWATCHVIEW] function constructSalesPropertiesMap:itemId:[{}],code:[{}],saleDynamicPropertyCommandList is null!",
+            LOGGER.debug("[RESOLVER_PROPERTYVIEWCOMMAND] function constructSalesPropertiesMap:itemId:[{}],code:[{}],saleDynamicPropertyCommandList is null!",
             		itemId, itemCode);
             return Collections.emptyList();
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("[RESOLVER_ITEMCOLORSWATCHVIEW] function constructSalesPropertiesMap:{}", JsonUtil.format(saleDynamicPropertyCommandList));
+            LOGGER.debug("[RESOLVER_PROPERTYVIEWCOMMAND] function constructSalesPropertiesMap:{}", JsonUtil.format(saleDynamicPropertyCommandList));
         }
         //获取颜色图片信息
         Map<Long, ImageViewCommand> itemPropertiesIdAndColorswatchMap = colorSwatchResolver.resolve(imageViewCommands);
@@ -128,7 +132,7 @@ public class ItemPropertyViewCommandResolverImpl implements
 		Map<String, List<DynamicPropertyCommand>> generalGroupPropMap =(Map<String, List<DynamicPropertyCommand>>)dynamicPropertyMap
 						.get(KEY_PROPS_GENERAL);
 		if (Validator.isNullOrEmpty(generalGroupPropMap)) {
-            LOGGER.error("[RESOLVER_ITEMCOLORSWATCHVIEW] function constructNonSalesProperties:itemId:[{}],code:[{}],nonSalesPropertiesMap is null!", itemId, itemCode);
+            LOGGER.debug("[RESOLVER_PROPERTYVIEWCOMMAND] function constructNonSalesProperties:itemId:[{}],code:[{}],nonSalesPropertiesMap is null!", itemId, itemCode);
             return Collections.emptyMap();
         }
 		Map<String, List<PropertyElementViewCommand>> resultMap =new HashMap<String, List<PropertyElementViewCommand>>();
@@ -141,12 +145,13 @@ public class ItemPropertyViewCommandResolverImpl implements
 						generalPropCommandList, null);
 				if(Validator.isNotNullOrEmpty(elementViewCommands)){
 					//放入结果集
-					resultMap.put(entry.getKey(), elementViewCommands);
+					resultMap.put(Validator.isNullOrEmpty(entry.getKey()) ? ItemPropertyViewCommand.NULL_GROUP
+							: entry.getKey(), elementViewCommands);
 				}
 			}
 		}
 		if (LOGGER.isDebugEnabled()) {
-		    LOGGER.debug("[RESOLVER_ITEMCOLORSWATCHVIEW] function constructNonSalesProperties:resultMap:[{}]", JsonUtil.format(resultMap));
+		    LOGGER.debug("[RESOLVER_PROPERTYVIEWCOMMAND] function constructNonSalesProperties:resultMap:[{}]", JsonUtil.format(resultMap));
 		}
 		return resultMap;
 	}

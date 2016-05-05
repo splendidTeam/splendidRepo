@@ -55,6 +55,7 @@ import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.manager.product.NebulaBundleManager;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -186,7 +187,7 @@ public class NebulaBundleController extends NebulaPdpController {
 		
 		try {
 			// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByItemId(itemId, Boolean.TRUE);
+			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByMainItemId(itemId, Boolean.TRUE);
 			if (Validator.isNotNullOrEmpty(bundleCommands)) {
 				result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
 			}
@@ -269,7 +270,7 @@ public class NebulaBundleController extends NebulaPdpController {
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand,String bundleItemCode) {
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
-		if(itemBaseInfoViewCommand.getLifecycle()!=1){
+		if(Item.LIFECYCLE_ENABLE != itemBaseInfoViewCommand.getLifecycle()){
 			LOG.info("Bundle error...bundleLifecycle is not active;Lifecycle:{} [{}]",itemBaseInfoViewCommand.getLifecycle(),new Date());
 			return null;
 		}
@@ -322,9 +323,11 @@ public class NebulaBundleController extends NebulaPdpController {
 				LinkedHashMap<Long, Object> properties = new LinkedHashMap<Long, Object>();
 				// 同一个捆绑类商品成员中的所有商品具有相同的销售属性，所以这里取第一个商品的销售属性即可。
 				List<PropertyElementViewCommand> propertyElementViewCommands = bundleItemViewCommands.get(0).getSalesProperties();
-				for(PropertyElementViewCommand p : propertyElementViewCommands) {
-					PropertyViewCommand propertyViewCommand = p.getProperty();
-					properties.put(propertyViewCommand.getId(), propertyViewCommand.getName());
+				if(propertyElementViewCommands != null) {
+					for(PropertyElementViewCommand p : propertyElementViewCommands) {
+						PropertyViewCommand propertyViewCommand = p.getProperty();
+						properties.put(propertyViewCommand.getId(), propertyViewCommand.getName());
+					}
 				}
 				command.setProperties(properties);
 			}

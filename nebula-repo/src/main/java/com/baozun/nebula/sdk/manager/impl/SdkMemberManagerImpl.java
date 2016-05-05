@@ -29,6 +29,7 @@ import com.baozun.nebula.command.product.ConsultantCommand;
 import com.baozun.nebula.command.product.ItemRateListCommand;
 import com.baozun.nebula.dao.coupon.CouponDao;
 import com.baozun.nebula.dao.member.ContactDao;
+import com.baozun.nebula.dao.member.MemberBehaviorStatusDao;
 import com.baozun.nebula.dao.member.MemberConductDao;
 import com.baozun.nebula.dao.member.MemberCryptoguardDao;
 import com.baozun.nebula.dao.member.MemberDao;
@@ -99,6 +100,9 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Autowired
 	private MemberPersonalDataDao	memberPersonalDataDao;
+	
+	@Autowired
+        private MemberBehaviorStatusDao   memberBehaviorStatusDao;
 
 	@Autowired
 	private ItemRateDao				itemRateDao;
@@ -1319,13 +1323,14 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	@Override
 	public int saveMemberBehaviorStatus(MemberBehaviorStatus memberBehaviorStatus) {
 		//return memberDao.saveMemberBehaviorStatus(memberBehaviorStatus);
+	       memberBehaviorStatusDao.save(memberBehaviorStatus);
 		return 0;
 	}
 
 	@Override
 	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type, Long memberId) {
 		// TODO 等dao好了之后在做
-		return null;
+		return memberBehaviorStatusDao.findMemberBehaviorStatusByTypeAndMemberId(type, memberId);
 	}
 
 	@Override

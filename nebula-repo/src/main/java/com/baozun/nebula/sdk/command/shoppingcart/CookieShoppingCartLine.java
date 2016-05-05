@@ -4,44 +4,49 @@ import java.util.Date;
 
 import com.baozun.nebula.command.Command;
 
-public class CookieShoppingCartLine  implements Command{
+public class CookieShoppingCartLine implements Command {
 
 	/**
 	 * 
 	 */
-	private static final long	serialVersionUID	= -6854832037537271539L;
+	private static final long serialVersionUID = -6854832037537271539L;
 
-	private String	extentionCode;
+	/**
+	 * add by feilong 2016年4月27日21:43:44
+	 */
+	private Long id;
+
+	private String extentionCode;
 
 	/** 商品id */
-	private Long	skuId;
+	private Long skuId;
 
 	/** 商品数量 */
-	private Integer	quantity;
+	private Integer quantity;
 
 	/** 会员id */
 	// private String guestIndentify;
 
 	/** 加入时间 */
-	private Date	createTime;
+	private Date createTime;
 	// extentionCode,itemId,quantity,createTime
 
 	/** 选中状态 **/
-	private Integer	settlementState;
+	private Integer settlementState;
 
 	/** 店铺id **/
-	private Long	shopId;
+	private Long shopId;
 
 	/**
 	 * 是否赠品
 	 */
-	private Boolean	isGift;
+	private Boolean isGift;
 
 	/** 促销号 */
-	private Long	promotionId;
+	private Long promotionId;
 
 	/** 行分组 **/
-	private Long	lineGroup;
+	private Long lineGroup;
 
 	public CookieShoppingCartLine(String extentionCode, Long skuId, Integer quantity, Date createTime,
 			Integer settlementState, Long shopId, Boolean isGift, Long promotionId, Long lineGroup) {
@@ -132,4 +137,13 @@ public class CookieShoppingCartLine  implements Command{
 	public void setLineGroup(Long lineGroup) {
 		this.lineGroup = lineGroup;
 	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 }

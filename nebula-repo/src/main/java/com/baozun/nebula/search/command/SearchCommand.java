@@ -36,9 +36,14 @@ public class SearchCommand{
 	/**
 	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用<br/>
 	 * 参数格式：c分类id,P属性id,P属性id,c分类id......
-	 * 
 	 */
 	private String					filterParamOrder;
+
+	/**
+	 * 价格范围的过滤条件：比如价格范围等<br/>
+	 * 参数格式：开始价格-结束价格
+	 */
+	private String					priceRangeConditionStr;
 
 	/**
 	 * 后端查询参数（solr.fq）,从这个值里面体现filterquery之间的关系
@@ -168,6 +173,24 @@ public class SearchCommand{
 	 */
 	public void setNavigationId(Long navigationId){
 		this.navigationId = navigationId;
+	}
+
+	/**
+	 * get priceRangeConditionStr
+	 * 
+	 * @return priceRangeConditionStr
+	 */
+	public String getPriceRangeConditionStr(){
+		return priceRangeConditionStr;
+	}
+
+	/**
+	 * set priceRangeConditionStr
+	 * 
+	 * @param priceRangeConditionStr
+	 */
+	public void setPriceRangeConditionStr(String priceRangeConditionStr){
+		this.priceRangeConditionStr = priceRangeConditionStr;
 	}
 
 }

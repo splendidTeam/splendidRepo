@@ -5,18 +5,16 @@ package com.baozun.nebula.sdk.manager.product;
 
 import java.util.List;
 
-import loxia.annotation.NativeUpdate;
-import loxia.annotation.QueryParam;
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
-import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.product.PropertyValueCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.PropertyValueGroup;
+import com.baozun.nebula.search.command.MetaDataCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * SdkPropertyManager；处理属性，属性值，属性值分组业务逻辑
@@ -137,4 +135,20 @@ public interface SdkPropertyManager extends BaseManager{
 
 
 	PropertyValue findCountByPVIdAndLangValue(Long propertyId,String langValue);
+	
+	/**
+	 * 根据语言，查询所有属性的数据(只有id、name、sortNo字段)
+	 * @return List<MetaDataCommand>
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午3:28:54
+	 */
+	List<MetaDataCommand> findPropertyMetaDataByLang(String lang);
+	
+	/**
+	 * 根据语言查询所有属性值的数据(只有id、value、sortNo字段)
+	 * @return List<MetaDataCommand>
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午3:28:54
+	 */
+	List<MetaDataCommand> findPropertyValueMetaDataByLang(String lang);
 }

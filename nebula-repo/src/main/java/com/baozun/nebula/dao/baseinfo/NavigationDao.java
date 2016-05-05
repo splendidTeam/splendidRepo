@@ -19,14 +19,14 @@ package com.baozun.nebula.dao.baseinfo;
 
 import java.util.List;
 
+import com.baozun.nebula.model.baseinfo.Navigation;
+import com.baozun.nebula.search.command.MetaDataCommand;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
-import loxia.annotation.Query;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.model.baseinfo.Navigation;
 
 /**
  * @author - 项硕
@@ -93,5 +93,22 @@ public interface NavigationDao extends GenericEntityDao<Navigation, Long> {
 	 */
 	@NativeQuery(model=Navigation.class)
 	Navigation findEffectNavigationByUrl(@QueryParam("url") String url);
+	
+	
+	/**
+	 * 根据语言查询所有导航的数据(只有id、name、sortNo字段)
+	 * @return List<Navigation>
+	 * @param lang
+	 * @author 冯明雷
+	 * @time 2016年4月28日下午4:29:08
+	 */
+	@NativeQuery(model = MetaDataCommand.class)
+	List<MetaDataCommand> findNavigationMetaDataBylang(@QueryParam("lang") String lang);
+	
+	/***通过商品集合ID找到对应的前台导航
+	 * @param itemCollectionId 商品集合ID
+	 */	
+	@NativeQuery(model = Navigation.class)
+	Navigation findByItemCollectionId(@QueryParam("itemCollectId")Long itemCollectId);
 	
 }
