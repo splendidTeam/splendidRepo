@@ -39,6 +39,7 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
@@ -46,6 +47,7 @@ import com.baozun.nebula.web.controller.product.converter.ShopdogItemPropertyCom
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopdogSkuViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
+import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
@@ -54,7 +56,6 @@ import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageView
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogResultCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -120,13 +121,23 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 			@RequestParam(value = "itemCode", required = false) String itemCode, 
 			@RequestParam(value = "extCode", required = false) String extCode,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
-		ShopdogResultCommand result = new ShopdogResultCommand();
+		try {
+				
+	        ShopdogResultCommand result = new ShopdogResultCommand();
+			
+			List<ShopdogItemViewCommand> items  =  buildPdpViewCommand(itemCode);
+			
+			result.setData(items);
+			
+			return result;
+				
+			} catch (IllegalItemStateException e) {
+				
+				LOG.error("[PDP_SHOW_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
+				
+				throw new BusinessException("Show pdp error.");
+			}
 		
-		List<ShopdogItemViewCommand> items = new ArrayList<ShopdogItemViewCommand>();
-		
-		result.setData(items);
-		
-		return result;
 	}
 	
 	/**
@@ -184,6 +195,10 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		return shopdogItemViewCommands;
 	}
 	
+	public String getMainPicType(){
+		return ItemImage.IMG_TYPE_LIST;
+	}
+	
 	protected ShopdogItemViewCommand buildShopdogItemViewCommand(String itemCode) throws IllegalItemStateException{
 		
 		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
@@ -191,34 +206,39 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		//商品基本信息
 		ShopdogItemViewCommand shopdogItemViewCommand =  shopdogItemViewCommandConverter.convert(itemBaseInfo);
 		
-		//图片
+		List<ItemImageViewCommand> images = buildItemImageViewCommand(itemBaseInfo.getId());
+	    //商品全部图
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId())));
 		
-		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
-		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
-			ItemImageViewCommand imageViewCommand =null;
-			for (ShopdogItemImageViewCommand shopdogItemImageViewCommand : shopdogItemImageViewCommands) {
-				imageViewCommand =new ItemImageViewCommand();
-				imageViewCommand.setItemId(itemBaseInfo.getId());
-				imageViewCommand.setColorItemPropertyId(shopdogItemImageViewCommand.getColorItemPropertyId());
-				imageViewCommand.setImages(shopdogItemImageViewCommand.getImages());
-				images.add(imageViewCommand);
-			}
-		}
+		//主图
+		shopdogItemViewCommand.setMainPicture(getMainUrls(shopdogItemImageViewCommands));
+		
+		//设置销售属性
 		ItemPropertyViewCommand itemPropertyViewCommand =itemPropertyViewCommandResolver.resolve(itemBaseInfo, images);
 		ShopdogItemPropertyViewCommand shopdogItemPropertyViewCommand =shopdogItemPropertyCommandConverter.convert(itemPropertyViewCommand);
 		
-		
-		//设置销售属性
 		if(Validator.isNotNullOrEmpty(shopdogItemPropertyViewCommand)){
 			shopdogItemViewCommand.setSalesProperties(shopdogItemPropertyViewCommand.getSalesProperties());
 		}
-		
 		//sku
 		shopdogItemViewCommand.setSkus(shopdogSkuViewCommandConverter.convert(buildSkuViewCommand(itemBaseInfo.getId())));
 	
 		return shopdogItemViewCommand;
 		
+	}
+
+	private List<String> getMainUrls(List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands) {
+		 List<String> urls = null;
+			
+		 if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
+			urls =  new ArrayList<String>();
+			List<ImageViewCommand> imageViewCommands = shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
+			for(ImageViewCommand imageViewCommand:imageViewCommands){
+				urls.add(imageViewCommand.getUrl());
+			}
+		 }
+		 return urls;
 	}
 
 	/**
