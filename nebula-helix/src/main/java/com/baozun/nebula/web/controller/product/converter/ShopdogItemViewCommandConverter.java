@@ -16,13 +16,15 @@
  */
 package com.baozun.nebula.web.controller.product.converter;
 
+import org.springframework.beans.BeanUtils;
+
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
 
 /**
- * 驻店宝PDP视图模型转换
+ * 驻店宝PDP-item视图模型转换
  * @author xingyu.liu
  *
  */
@@ -38,10 +40,7 @@ public class ShopdogItemViewCommandConverter extends BaseConverter<ShopdogItemVi
 			ShopdogItemViewCommand  shopdogItemViewCommand= new ShopdogItemViewCommand();
 			try{
 				ItemBaseInfoViewCommand itemBaseInfo = (ItemBaseInfoViewCommand) data;
-				shopdogItemViewCommand.setCode(itemBaseInfo.getCode());		
-				shopdogItemViewCommand.setTitle(itemBaseInfo.getTitle());
-				shopdogItemViewCommand.setSalesPrice(itemBaseInfo.getSalePrice());
-				shopdogItemViewCommand.setListPrice(itemBaseInfo.getListPrice());
+				BeanUtils.copyProperties(itemBaseInfo, shopdogItemViewCommand);
 				return shopdogItemViewCommand;
 			}catch(Exception e){
 				e.printStackTrace();

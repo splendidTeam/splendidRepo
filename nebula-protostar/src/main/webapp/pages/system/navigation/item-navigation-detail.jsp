@@ -37,15 +37,22 @@
 	<ul class="gbin1-list" id="sortTable">
 	<c:forEach items="${resultPage.items }" var="item" varStatus="index">
 		<li>
+		   <div style="min-height: 18px; overflow: hidden; margin: 10px 0px 0px; width: 100%;cursor: pointer;"></div>
+ 
 			<c:if test="${fn:length(item.imageUrl)>0 }">
 					<c:forEach items="${item.imageUrl}" var="imageUrl"  begin="0" end="0">
+						<span>
 						<c:if test="${! empty imageUrl}">
-							<span> 
-								<img id="${item.id }" src="${UPLOAD_IMG_DOMAIN}${imageUrl}" width="150px" height="200px"/>
-		                	</span>
+							 <img id="${item.id }" src="${UPLOAD_IMG_DOMAIN}${imageUrl}" width="150px" height="200px"/>
 	                	</c:if>
+	                	</span>
 	                </c:forEach>
 	        </c:if>
+			<c:if test="${fn:length(item.imageUrl)<=0 }">
+				<span></span>
+	        </c:if>      
+	        
+	        
 			<%-- 
 			<c:choose>
 				<c:when test="${fn:length(itemProties.colorCommandUAs.mainColorImageList)>=1 }">
@@ -158,7 +165,7 @@
                </ul>
                
                --%>
-               <div style="min-height: 18px; overflow: hidden; margin: 60px 0px 0px; width: 100%;cursor: pointer;" onclick="changeClass1(this);">${itemProties.title }</div>
+               <div style="min-height: 18px; overflow: hidden; margin: 30px 0px 0px; width: 100%;cursor: pointer;" onclick="changeClass1(this);">${item.title }</div>
                <div style="width:248px;cursor: pointer;"onclick="changeClass2(this);">
 	               <label class="check-txt" id="${item.code}" >
 	               	   <i class="check-input" ></i>

@@ -29,22 +29,37 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
+import com.baozun.nebula.manager.product.ItemDetailManager;
 import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ShopdogItemPropertyCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ShopdogSkuViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
-import com.baozun.nebula.web.controller.product.resolver.ShopDogSalePropertyViewCommandResolver;
+import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogResultCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogSkuViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -56,62 +71,100 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @author xingyu.liu
  *
  */
-public class ShopdogPdpController extends NebulaBasePdpController {
+public class ShopdogPdpController {
 	
 	/**
 	 * log定义
 	 */
 	private static final Logger	LOG										= LoggerFactory.getLogger(ShopdogPdpController.class);
 	
-	//model key的常量定义
-	/** 商品详情页 的相关展示数据 */
-	private static final String		MODEL_KEY_PRODUCT_DETAIL			= "product";
+	@Autowired
+	protected SdkItemManager sdkItemManager;
 	
-	//view的常量定义
-	/** 商品详情页 的默认定义 */
-	private static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
+	@Autowired
+	protected ItemDetailManager itemDetailManager;
 	
 	@Autowired
 	private ItemColorSwatchViewCommandResolver    colorSwatchViewCommandResolver;
 	
 	@Autowired
-	@Qualifier("shopDogItemViewCommandConverter")
-	private ShopdogItemViewCommandConverter    shopDogItemViewCommandConverter;
+	@Qualifier("shopdogItemViewCommandConverter")
+	private ShopdogItemViewCommandConverter    shopdogItemViewCommandConverter;
 	
 	@Autowired
-	@Qualifier("shopDogItemImageViewCommandConverter")
-	private ShopdogItemImageViewCommandConverter    shopDogItemImageViewCommandConverter;
+	@Qualifier("shopdogItemImageViewCommandConverter")
+	private ShopdogItemImageViewCommandConverter    shopdogItemImageViewCommandConverter;
+	
+	@Autowired
+	@Qualifier("shopdogSkuViewCommandConverter")
+	private ShopdogSkuViewCommandConverter shopdogSkuViewCommandConverter;
 
 	@Autowired
-	protected ShopDogSalePropertyViewCommandResolver		shopDogSalePropertyViewCommandResolver;
+	@Qualifier("shopdogItemPropertyCommandConverter")
+	private ShopdogItemPropertyCommandConverter		shopdogItemPropertyCommandConverter;
+	
+	@Autowired
+	@Qualifier("itemImageViewCommandConverter")
+	protected ItemImageViewCommandConverter itemImageViewCommandConverter;
+	
+	@Autowired
+	protected ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
+	
+	
+	@Autowired
+	private ItemDetailManager						detailManager;
 	
 	/**
-	 * 进入商品详情页 	
-	 * 
-	 * @RequestMapping(value = "/item/{itemCode}", method = RequestMethod.GET)
+	 * shopdog商品接口
+	 * <p>
+	 * 用于生成shopdog构造pdp页面所需要的数据。参数itemCode和barCode二选一, 如果从列表页面进入pdp，则需要传入itemCode, 如果扫码方式进入pdp，则会传入extCode。
+	 * 此处的extCode对应Nebula系统中的extentionCode。所以当shopdog传入extCode时，需要先转成itemCode（或itemId）再进行统一处理。
+	 * </p>
 	 * 
 	 * @param itemCode 商品编码
+	 * @param extCode 外部对接编码
 	 * @param request
 	 * @param response
 	 * @param model
+	 * @return
 	 */
-	public String showPdp(@PathVariable("itemCode") String itemCode, 
+	@RequestMapping(value = "/item.json", method = RequestMethod.GET)
+	@ResponseBody
+	public ShopdogResultCommand getItem(
+			@RequestParam(value = "itemCode", required = false) String itemCode, 
+			@RequestParam(value = "extCode", required = false) String extCode,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
+		ShopdogResultCommand result = new ShopdogResultCommand();
+		
 		try {
+	        List<ShopdogItemViewCommand> items =null;
+			if(Validator.isNotNullOrEmpty(itemCode)){
+				items=  buildPdpViewCommand(itemCode);
+			}else if(Validator.isNotNullOrEmpty(extCode)){
+				Item item =detailManager.findItemByExtentionCode(extCode);
+				if(Validator.isNotNullOrEmpty(item)){
+					items=  buildPdpViewCommand(item.getCode());
+				}else{
+					LOG.warn("[PDP_SHOW_PDP] can not find item by extCode. extCode:{}", extCode);
+				}
+			}else{
+				LOG.warn("[PDP_SHOW_PDP] itemCode and extCode shouldn't all be empty.");
+			}
 			
-			List<ShopdogItemViewCommand>  shopdogItemViewCommands =  buildPdpViewCommand(itemCode);
+			result.setData(items);
+			result.setResult(ShopdogResultCommand.RESULT_SUCCESS);
 			
-			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, shopdogItemViewCommands);
-			
-			return VIEW_PRODUCT_DETAIL;
-			
-		} catch (IllegalItemStateException e) {
-			
-			LOG.error("[PDP_SHOW_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
-			
-			throw new BusinessException("Show pdp error.");
-		}
+			return result;
+				
+			} catch (IllegalItemStateException e) {
+				
+				LOG.error("[PDP_SHOW_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
+				
+				result.setResult(ShopdogResultCommand.RESULT_FAIL);
+				return result;
+			}
+		
 	}
 	
 	
@@ -140,28 +193,42 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 		return shopdogItemViewCommands;
 	}
 	
+	public String getMainPicType(){
+		return ItemImage.IMG_TYPE_LIST;
+	}
+	
 	protected ShopdogItemViewCommand buildShopdogItemViewCommand(String itemCode) throws IllegalItemStateException{
 		
 		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
 		
 		//商品基本信息
-		ShopdogItemViewCommand shopdogItemViewCommand =  shopDogItemViewCommandConverter.convert(itemBaseInfo);
+		ShopdogItemViewCommand shopdogItemViewCommand =  shopdogItemViewCommandConverter.convert(itemBaseInfo);
 		
-		//图片
-		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopDogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
-		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
-			//shopdogItemViewCommand.setPicUrls(shopdogItemImageViewCommands);
-			//shopdogItemViewCommand.setMainPicUrl(shopdogItemImageViewCommands.get(0).getImages().get(0).getUrl());
+		List<ItemImageViewCommand> images = buildItemImageViewCommand(itemBaseInfo.getId());
+	    //商品全部图
+		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId())));
+		
+		//主图
+		shopdogItemViewCommand.setMainPicture(getMainUrls(shopdogItemImageViewCommands));
+		
+		//设置销售属性
+		ItemPropertyViewCommand itemPropertyViewCommand =itemPropertyViewCommandResolver.resolve(itemBaseInfo, images);
+		ShopdogItemPropertyViewCommand shopdogItemPropertyViewCommand =shopdogItemPropertyCommandConverter.convert(itemPropertyViewCommand);
+		
+		if(Validator.isNotNullOrEmpty(shopdogItemPropertyViewCommand)){
+			shopdogItemViewCommand.setSalesProperties(shopdogItemPropertyViewCommand.getSalesProperties());
 		}
-		
-		//设置销售属性之前先设置baseInfoViewCommand、picUrls
-		shopdogItemViewCommand.setSalesProperties(shopDogSalePropertyViewCommandResolver.resolve(itemBaseInfo, shopdogItemImageViewCommands));
-		
 		//sku
-		//shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
+		shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
 	
 		return shopdogItemViewCommand;
 		
+	}
+
+	private List<String> getMainUrls(List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands) {
+		
+		return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
 	}
 
 	/**
@@ -234,6 +301,43 @@ public class ShopdogPdpController extends NebulaBasePdpController {
 	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
 		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
+	}
+	
+	/**
+	 * 构造sku信息
+	 * @param itemId
+	 * @return List {@link SkuViewCommand}
+	 */
+	protected List<ShopdogSkuViewCommand> buildSkuViewCommand(Long itemId) {
+		assert itemId != null : "Please Check itemId!";
+		
+		//获取所有有效的sku信息
+		List<SkuCommand> commands = itemDetailManager.findEffectiveSkuInvByItemId(itemId);
+		
+		if(Validator.isNotNullOrEmpty(commands)){
+			//转换
+			List<ShopdogSkuViewCommand> skuViewCommands = shopdogSkuViewCommandConverter.convert(commands);
+			
+			return skuViewCommands;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * 构造商品的图片
+	 * @param itemId
+	 * @return List {@link ItemImageViewCommand}
+	 */
+	protected List<ItemImageViewCommand> buildItemImageViewCommand(Long itemId) {
+		// 查询结果
+		List<Long> itemIds = new ArrayList<Long>();
+		itemIds.add(itemId);
+		
+		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
+		
+		// 数据转换
+		return itemImageViewCommandConverter.convert(itemImageList);
 	}
     
 }

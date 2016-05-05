@@ -115,11 +115,23 @@ public class NebulaBundleControllerTest extends BaseControllerTest{
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testLoadBundleInfo(){
+	public void testLoadBundleInfoByMainItemId(){
 		EasyMock.expect(itemPropertyViewCommandResolver.resolve(EasyMock.anyObject(ItemBaseInfoViewCommand.class), EasyMock.anyObject(List.class))).andReturn(new ItemPropertyViewCommand()).times(1);
 		EasyMock.expect(nebulaBundleManager.findBundleCommandByMainItemId(4L, true)).andReturn(Arrays.asList(bundleCommand)).times(1);
 		control.replay();
-		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfo(4L, request, response, model);
+		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfoByMainItemId(4L, request, response, model);
+		System.out.println(JsonUtil.format(defaultReturnResult));
+		assertEquals(Long.valueOf(1), ((List<BundleViewCommand>)defaultReturnResult.getReturnObject()).get(0).getId());
+		control.verify();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLoadBundleInfoByMainStyle(){
+		EasyMock.expect(itemPropertyViewCommandResolver.resolve(EasyMock.anyObject(ItemBaseInfoViewCommand.class), EasyMock.anyObject(List.class))).andReturn(new ItemPropertyViewCommand()).times(1);
+		EasyMock.expect(nebulaBundleManager.findBundleCommandByMainStyle("1", true)).andReturn(Arrays.asList(bundleCommand)).times(1);
+		control.replay();
+		DefaultReturnResult defaultReturnResult = (DefaultReturnResult)bebulabundBundleController.loadBundleInfoByMainStyle("1", request, response, model);
 		System.out.println(JsonUtil.format(defaultReturnResult));
 		assertEquals(Long.valueOf(1), ((List<BundleViewCommand>)defaultReturnResult.getReturnObject()).get(0).getId());
 		control.verify();

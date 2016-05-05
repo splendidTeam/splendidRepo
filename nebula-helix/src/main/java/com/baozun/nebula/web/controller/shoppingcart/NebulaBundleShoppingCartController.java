@@ -53,7 +53,7 @@ public class NebulaBundleShoppingCartController extends BaseController{
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
 
     /**
-     * (立即购买)不走购物车直接走购物通道.
+     * (立即购买)不走普通购物车直接走购物通道.
      *
      * @param memberDetails
      *            某个用户
@@ -96,6 +96,8 @@ public class NebulaBundleShoppingCartController extends BaseController{
         //return toNebulaReturnResult(shoppingcartResult);
         return null;
     }
+
+    //TODO 进普通购物车
 
     /**
      * Builds the key.

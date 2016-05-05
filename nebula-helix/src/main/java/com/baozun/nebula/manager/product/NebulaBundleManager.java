@@ -40,7 +40,7 @@ public interface NebulaBundleManager extends BaseManager {
 	 *    <li>pdp入口 ： 可能会有多条记录</li>
 	 * </ul>
 	 * 
-	 * @param mainItemId : bundle捆绑类商品中主卖品的商品Id
+	 * @param itemId : bundle捆绑类商品中主卖品的商品Id
 	 * @param flag : 是否踢掉无效bundle的标记
 	 * <ul>
 	 *    <li> true :　踢掉无效的bundle</li>
@@ -49,6 +49,23 @@ public interface NebulaBundleManager extends BaseManager {
 	 * @return
 	 */
 	public List<BundleCommand> findBundleCommandByMainItemId(Long itemId , Boolean flag);
+	
+	/**
+	 * <h3>查询bundle信息</h3>
+	 * <ul>
+	 *    <li>pdp入口 ： 可能会有多条记录</li>
+	 * </ul>
+	 * 
+	 * @param style : bundle捆绑类商品中主卖品的款号
+	 * @param flag : 是否踢掉无效bundle的标记
+	 * <ul>
+	 *    <li> true :　踢掉无效的bundle</li>
+	 *    <li> false :　不会踢掉无效的bundle</li>
+	 * </ul>
+	 * @return
+	 */
+	public List<BundleCommand> findBundleCommandByMainStyle(String style, Boolean flag);
+	
 	/**
 	 * 
 	 * <h3>查询bundle信息</h3>

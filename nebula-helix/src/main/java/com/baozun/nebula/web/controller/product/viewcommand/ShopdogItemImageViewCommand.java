@@ -25,13 +25,11 @@ public class ShopdogItemImageViewCommand extends BaseViewCommand {
 	
 	private static final long serialVersionUID = 7522687758516133640L;
 	
-	/**
-	 * 商品颜色属性Id
-	 */
+	/** 商品颜色属性Id */
     private Long colorItemPropertyId;
 	
 	/** [type，图片列表] */
-	private Map<String, List<ImageViewCommand>> images;
+	private Map<String, List<String>> images;
 
 	public Long getColorItemPropertyId() {
 		return colorItemPropertyId;
@@ -41,11 +39,11 @@ public class ShopdogItemImageViewCommand extends BaseViewCommand {
 		this.colorItemPropertyId = colorItemPropertyId;
 	}
 
-	public Map<String, List<ImageViewCommand>> getImages() {
+	public Map<String, List<String>> getImages() {
 		return images;
 	}
 
-	public void setImages(Map<String, List<ImageViewCommand>> images) {
+	public void setImages(Map<String, List<String>> images) {
 		this.images = images;
 	}
 

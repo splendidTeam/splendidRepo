@@ -582,12 +582,15 @@ public class NavigationManagerImpl implements NavigationManager {
 			buffer.append(itemCommand.getId()+",");
 		}
 		
-		//删除最后一个逗号
-		buffer.deleteCharAt(buffer.length()-1);
-		if(itemCollection.getSequence()==null){
+		//非空判断
+		if(buffer.length()>0){
+			//删除最后一个逗号
+			buffer.deleteCharAt(buffer.length()-1);
+		}
+		if (itemCollection.getSequence() == null || itemCollection.getSequence().length() == 0) {
 			itemCollection.setSequence(buffer.toString());
 		}else{
-			itemCollection.setSequence(itemCollection.getSequence()+","+buffer.toString());
+			itemCollection.setSequence(itemCollection.getSequence() + "," + buffer.toString());
 		}
 		
 		itemCollection=  itemCollectionDao.save(itemCollection);
@@ -636,9 +639,15 @@ public class NavigationManagerImpl implements NavigationManager {
 			}
 		}
 		
-		//删除最后一个逗号
-		buffer.deleteCharAt(buffer.length()-1);
+		//非空判断
+		if(buffer.length()>0){
+			//删除最后一个逗号
+			buffer.deleteCharAt(buffer.length()-1);
+		}
+		
 		itemCollection.setSequence(buffer.toString());
+		
+		
 		itemCollection=  itemCollectionDao.save(itemCollection);
 		
 		return itemCollection!=null;

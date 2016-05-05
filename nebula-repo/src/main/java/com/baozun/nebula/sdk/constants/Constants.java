@@ -175,11 +175,17 @@ public class Constants {
 	/** 新密码与重复密码不匹配 **/
 	public static final int		RENEWPASSWORD_NOTSAMEAS_NEWPASSWORD_ERROR	= 90007;
 
-	/** 游客保存在cookie当中的购物车 **/
-	public static final String	GUEST_COOKIE_GC								= "g_c_s";
+	/** 游客保存在cookie当中的购物车 
+	 * @deprecated use helix com.baozun.nebula.web.constants.CookieKeyConstants.GUEST_COOKIE_GC update doc by feilong
+	 * **/
+	@Deprecated
+    public static final String	GUEST_COOKIE_GC								= "g_c_s";
 
-	/** 游客保存在cookie当中的购物车商品总数量 **/
-	public static final String	GUEST_COOKIE_GC_CNT							= "g_c_s_cnt";
+	/** 游客保存在cookie当中的购物车商品总数量
+	 * @deprecated use helix com.baozun.nebula.web.constants.CookieKeyConstants.GUEST_COOKIE_GC_CNT update doc by feilong
+	 *  **/
+	@Deprecated
+    public static final String	GUEST_COOKIE_GC_CNT							= "g_c_s_cnt";
 
 	/** 找不到用户. */
 	public static final Integer	USER_USER_NOTFOUND							= 1002;
