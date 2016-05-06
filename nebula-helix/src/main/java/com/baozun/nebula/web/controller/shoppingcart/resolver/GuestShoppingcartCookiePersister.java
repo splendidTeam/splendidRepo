@@ -28,8 +28,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.CookieGenerator;
-import org.springframework.web.util.WebUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -38,8 +36,10 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.constants.CookieKeyConstants;
+import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
+import com.feilong.servlet.http.CookieUtil;
 
 /**
  * 基于cookie的游客购物车持久化处理方式.
@@ -52,7 +52,21 @@ import com.feilong.core.bean.PropertyUtil;
 public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersister{
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GuestShoppingcartCookiePersister.class);
+    private static final Logger LOGGER                      = LoggerFactory.getLogger(GuestShoppingcartCookiePersister.class);
+
+    /** cookie的名称. */
+    private String              cookieNameGuestShoppingcart = CookieKeyConstants.GUEST_COOKIE_GC;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.GuestShoppingcartPersister#clear(javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public void clear(HttpServletRequest request,HttpServletResponse response){
+        CookieUtil.deleteCookie(cookieNameGuestShoppingcart, response);
+    }
 
     /*
      * (non-Javadoc)
@@ -94,15 +108,13 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
         List<CookieShoppingCartLine> cartLineList = toCookieShoppingCartLineList(needChangeCheckedCommandList);
 
         String json = JSON.toJSONString(cartLineList);
-        CookieGenerator cookieGenerator = new CookieGenerator();
-        cookieGenerator.setCookieName(CookieKeyConstants.GUEST_COOKIE_GC);
-        cookieGenerator.setCookieMaxAge(Integer.MAX_VALUE);
         try{
             String encrypt = EncryptUtil.getInstance().encrypt(json);
-            cookieGenerator.addCookie(response, encrypt);
+            CookieUtil.addCookie(cookieNameGuestShoppingcart, encrypt, TimeInterval.SECONDS_PER_YEAR, response);
         }catch (EncryptionException e){
             LOGGER.error("EncryptionException e:", e);
         }
+
     }
 
     //*******************************************************************************************
@@ -184,7 +196,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
      *             the encryption exception
      */
     private List<CookieShoppingCartLine> getCookieShoppingCartLines(HttpServletRequest request) throws EncryptionException{
-        Cookie cookie = WebUtils.getCookie(request, CookieKeyConstants.GUEST_COOKIE_GC);
+        Cookie cookie = CookieUtil.getCookie(request, cookieNameGuestShoppingcart);
 
         if (null == cookie){
             return null;
@@ -196,5 +208,15 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
 
         String decrypt = EncryptUtil.getInstance().decrypt(cookie.getValue());
         return JSON.parseObject(decrypt, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
+    }
+
+    /**
+     * 设置 cookie的名称.
+     *
+     * @param cookieNameGuestShoppingcart
+     *            the cookieNameGuestShoppingcart to set
+     */
+    public void setCookieNameGuestShoppingcart(String cookieNameGuestShoppingcart){
+        this.cookieNameGuestShoppingcart = cookieNameGuestShoppingcart;
     }
 }

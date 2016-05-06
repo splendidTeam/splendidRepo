@@ -535,17 +535,36 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the request
      * @param response
      *            the response
-     * @since 5.3.1
      */
     private void afterMergeShoppingCart(
                     MemberDetails memberDetails,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     HttpServletRequest request,
                     HttpServletResponse response){
+
+        addShoppingcartCountCookie(shoppingCartLineCommandList, response);
+    }
+
+    /**
+     * @param shoppingCartLineCommandList
+     * @param response
+     */
+    private void addShoppingcartCountCookie(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletResponse response){
+        CookieUtil.addCookie(CookieKeyConstants.SHOPPING_CART_COUNT, getTotalCount(shoppingCartLineCommandList), response);
+    }
+
+    /**
+     *
+     * @param totalCount
+     * @return
+     */
+    //TODO
+    protected String getTotalCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 将购物车数量塞到Cookie 里面去
         int totalCount = Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
                         : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
-        CookieUtil.addCookie(CookieKeyConstants.SHOPPING_CART_COUNT, "" + totalCount, response);
+        return "" + totalCount;
+
     }
 
     /**
