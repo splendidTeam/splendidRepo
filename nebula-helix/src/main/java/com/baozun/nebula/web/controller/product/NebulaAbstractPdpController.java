@@ -433,17 +433,21 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 		
 		if(itemExtraViewCommand == null) {
-			itemExtraViewCommand = new ItemExtraViewCommand();
-			itemExtraViewCommand.setSales(getItemSales(itemBaseInfo));
-			itemExtraViewCommand.setFavoriteCount(getItemFavoriteCount(itemBaseInfo));
-			itemExtraViewCommand.setReviewCount(getItemReviewCount(itemBaseInfo));
-			itemExtraViewCommand.setRate(getItemRate(itemBaseInfo));
+			itemExtraViewCommand = buildItemExtraViewCommandFromDB(itemBaseInfo);
 			cacheManager.setObject(key, itemExtraViewCommand, TimeInterval.SECONDS_PER_HOUR);
 		}
 		
 		return itemExtraViewCommand;
 	}
 	
+	/**
+	 * 
+	 * @param itemBaseInfo
+	 * @return
+	 */
+	protected abstract ItemExtraViewCommand buildItemExtraViewCommandFromDB(
+			ItemBaseInfoViewCommand itemBaseInfo);
+
 	/**
 	 * 构造推荐商品信息
 	 * <p>
