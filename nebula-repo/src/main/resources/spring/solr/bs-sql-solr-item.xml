@@ -55,33 +55,45 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		select 
+		       	select 
 					ip.id as item_properties_id,ip.item_id as itemId,ip.property_id,
-					ip.propertyvalue_id as propertyValue,case when pcp.editing_type=1 THEN ip.property_value ELSE ppv.value end as proValue,
-					ppv.sort_no as proSort,pcp.is_color_prop
-					from t_pd_item_properties ip 
+					ip.propertyvalue_id as propertyValue,
+					case when pp.editing_type=1 THEN ip.property_value ELSE ppv.value end as proValue,
+					ppv.sort_no as proSort,pp.is_color_prop
+				from 
+					t_pd_item_properties ip 
 					LEFT JOIN t_pd_property pp ON ip.property_id=pp.id 
-					LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID 
 					LEFT JOIN t_pd_property_value ppv ON ip.propertyvalue_id=ppv.id
-					where pcp.editing_type in (1,2,3,4) and pp.lifecycle=1 and pp.searchable=TRUE and ip.item_id in (#foreach($itemid in $itemIds)
-																$itemid,
-									#end
+					where pp.editing_type in (1,2,3,4) and pp.lifecycle=1 and pp.searchable=TRUE 
+						and ip.item_id in (
+								#foreach($itemid in $itemIds)
+									$itemid,
+								#end
 									-1)
-					UNION
-					select 
+				UNION
+					
+				select 
 					it.id as item_properties_id,it.item_id as itemId,sc.property_id as property_id,
 					sc.id as propertyValue,sc.name as proValue,
 					sc.sort as proSort,sc.is_color_prop
 					from 
-					(select tpsci.id,tpsci.name,tpsci.codition_id,tpsci.property_id,tpsci.sort,pcp.is_color_prop,
-					pcp.editing_type,pp.lifecycle,pp.searchable
-					from t_pd_search_con_item tpsci LEFT JOIN t_pd_property pp ON pp.id=tpsci.property_id LEFT JOIN t_pd_common_property pcp ON pp.common_property_id = pcp. ID)
-					sc LEFT JOIN (select ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id from t_pd_item_properties ip LEFT JOIN t_pd_item_reference tpir ON ip.id=tpir.item_property_id
-					GROUP BY ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id) it ON sc.property_id=it.property_id
-					where sc.editing_type=5 and sc.lifecycle=1 and sc.searchable=TRUE and it.item_id in (#foreach($itemid in $itemIds)
-																$itemid,
-									#end
-									-1)
+						(select tpsci.id,tpsci.name,tpsci.codition_id,tpsci.property_id,tpsci.sort,pp.is_color_prop,
+								pp.editing_type,pp.lifecycle,pp.searchable
+							from t_pd_search_con_item tpsci 
+							LEFT JOIN t_pd_property pp ON pp.id=tpsci.property_id 
+						)sc 
+					LEFT JOIN 
+							(select ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id 
+								from t_pd_item_properties ip 
+									LEFT JOIN t_pd_item_reference tpir ON ip.id=tpir.item_property_id
+									GROUP BY ip.id,ip.item_id,tpir.search_condition_item_id,ip.property_id
+							)it ON sc.property_id=it.property_id
+					where sc.editing_type=5 and sc.lifecycle=1 and sc.searchable=TRUE 
+					and it.item_id in (
+								#foreach($itemid in $itemIds)
+									$itemid,
+								#end
+								-1)
                  ]]>
 			</value>
 		</constructor-arg>
