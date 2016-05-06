@@ -52,4 +52,15 @@ public interface GuestShoppingcartPersister{
      *            the response
      */
     void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 清空.
+     *
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @since 5.3.1
+     */
+    void clear(HttpServletRequest request,HttpServletResponse response);
 }
