@@ -969,7 +969,6 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	/* 
 	 * @see com.baozun.nebula.manager.product.ItemDetailManager#findItemExtraViewCommand(java.lang.Long,java.lang.String)
 	 */
-	@Override
 	public ItemExtraDataCommand findItemExtraViewCommand(Long itemId, String itemCode) {
 		ItemSolrCommand itemSolrCommand =itemInfoManager.findItemExtraViewCommand(itemId);
 		ItemExtraDataCommand extraDataCommand =null;
