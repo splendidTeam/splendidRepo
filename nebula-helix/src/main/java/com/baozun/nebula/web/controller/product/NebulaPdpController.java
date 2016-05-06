@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import loxia.dao.Pagination;
 
@@ -35,8 +34,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.command.ItemSolrCommand;
 import com.baozun.nebula.command.RateCommand;
+import com.baozun.nebula.command.product.ItemExtraDataCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.model.product.ItemImage;
@@ -281,19 +280,19 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	protected ItemExtraViewCommand buildItemExtraViewCommandFromDB(
 			ItemBaseInfoViewCommand itemBaseInfo) {
 		ItemExtraViewCommand extraViewCommand =new ItemExtraViewCommand();
-		ItemSolrCommand itemSolrCommand = itemDetailManager.findItemExtraViewCommand(itemBaseInfo.getId());
-		if(Validator.isNotNullOrEmpty(itemSolrCommand)){
-			if(Validator.isNotNullOrEmpty(itemSolrCommand.getSalesCount())){
-				extraViewCommand.setSales(itemSolrCommand.getSalesCount().longValue());
+		ItemExtraDataCommand extraDataCommand = itemDetailManager.findItemExtraViewCommand(itemBaseInfo.getId());
+		if(Validator.isNotNullOrEmpty(extraDataCommand)){
+			if(Validator.isNotNullOrEmpty(extraDataCommand.getSalesCount())){
+				extraViewCommand.setSales(extraDataCommand.getSalesCount().longValue());
 			}
-			if(Validator.isNotNullOrEmpty(itemSolrCommand.getFavoredCount())){
-				extraViewCommand.setFavoriteCount(itemSolrCommand.getFavoredCount().longValue());
+			if(Validator.isNotNullOrEmpty(extraDataCommand.getFavoredCount())){
+				extraViewCommand.setFavoriteCount(extraDataCommand.getFavoredCount().longValue());
 			}
-			if(Validator.isNotNullOrEmpty(itemSolrCommand.getRankavg())){
-				extraViewCommand.setRate(itemSolrCommand.getRankavg());
+			if(Validator.isNotNullOrEmpty(extraDataCommand.getRankavg())){
+				extraViewCommand.setRate(extraDataCommand.getRankavg());
 			}
 			//评论数
-			//extraViewCommand.setReviewCount(reviewCount);
+			extraViewCommand.setReviewCount(extraDataCommand.getReviewCount());
 		}
 		return extraViewCommand;
 	}
