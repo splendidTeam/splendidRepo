@@ -49,6 +49,7 @@ import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.exception.ErrorCodesFoo;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemInfo;
@@ -559,7 +560,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 				salePropCommandList.add(salePropCommand);
 			} else {
 				// 一般属性
-				String groupName =property.getGroupName();
+				String groupName =property.getGroupName() == null ? "" : property.getGroupName();
 				generalPropCommand = new DynamicPropertyCommand();
 				itemPropertiesList = new ArrayList<ItemPropertiesCommand>();
 				for (ItemProperties itemProperties : dbItemPropertiesList) {
@@ -948,6 +949,14 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		 */
 		
 		return defaultValue;
+	}
+
+	/* 
+	 * @see com.baozun.nebula.manager.product.ItemDetailManager#findItemByExtentionCode(java.lang.String)
+	 */
+	@Override
+	public Item findItemByExtentionCode(String extentionCode) {
+		return sdkItemManager.findItemByExtentionCode(extentionCode);
 	}
 
 }

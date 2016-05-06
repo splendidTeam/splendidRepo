@@ -47,13 +47,10 @@ public class PdpViewCommand extends BaseViewCommand {
 	private PriceViewCommand price;
 	
 	/** 商品分类 */
-	private List<ItemCategoryViewCommand> categorys;
+	private List<ItemCategoryViewCommand> categories;
 
 	/** 尺码对照 */
     private String sizeCompareChart;
-    
-    /** 用于在移动端分享的 */
-    private String mobileShareUrl;
     
     /** 商品扩展信息 */
     private ItemExtraViewCommand extra;
@@ -120,12 +117,12 @@ public class PdpViewCommand extends BaseViewCommand {
 		this.price = price;
 	}
 
-	public List<ItemCategoryViewCommand> getCategorys() {
-		return categorys;
+	public List<ItemCategoryViewCommand> getCategories() {
+		return categories;
 	}
 
-	public void setCategorys(List<ItemCategoryViewCommand> categorys) {
-		this.categorys = categorys;
+	public void setCategories(List<ItemCategoryViewCommand> categories) {
+		this.categories = categories;
 	}
 
 	public String getSizeCompareChart() {
@@ -134,14 +131,6 @@ public class PdpViewCommand extends BaseViewCommand {
 
 	public void setSizeCompareChart(String sizeCompareChart) {
 		this.sizeCompareChart = sizeCompareChart;
-	}
-
-	public String getMobileShareUrl() {
-		return mobileShareUrl;
-	}
-
-	public void setMobileShareUrl(String mobileShareUrl) {
-		this.mobileShareUrl = mobileShareUrl;
 	}
 
 	public ItemExtraViewCommand getExtra() {

@@ -63,11 +63,11 @@
 				<![CDATA[ 
 					SELECT 
 						itemProperties.id,
-						itemProperties.item_id as itemId,
-						itemProperties.property_id as propertyId,
-						itemPropertiesLang.property_value as propertyValue,
-						itemProperties.propertyValue_id as propertyValueId,
-						itemProperties.modify_time as modifyTime
+						itemProperties.item_id as item_id,
+						itemProperties.property_id as property_id,
+						itemPropertiesLang.property_value as property_value,
+						itemProperties.propertyValue_id as propertyValue_id,
+						itemProperties.modify_time as modify_time
 					FROM T_PD_ITEM_PROPERTIES itemProperties
 					left join t_pd_item_properties_lang itemPropertiesLang on itemProperties.id = itemPropertiesLang.item_properties_id
 					WHERE 
@@ -185,13 +185,13 @@
 						tpip.item_id as itemId, 
 						tpip.property_value as propertyValue,
 						tppv.value as  proValue,
-						tpcp.editing_type as type
+						tpp.editing_type as type
 					from t_pd_item_properties tpip 
 					left join t_pd_item tpi on tpip.item_id = tpi.id
 					left join t_pd_property tpp on tpp.id = tpip.property_id
-					left join t_pd_common_property tpcp on tpp.common_property_id = tpcp.id 
 					left join t_pd_property_value tppv on tppv.id = tpip.propertyvalue_id
-					where tpcp.is_color_prop = true and tpi.code in (
+					where tpp.is_color_prop = true 
+						and tpi.code in (
 						#foreach($itemCode in $itemCodes)
 							'$itemCode',
 						#end

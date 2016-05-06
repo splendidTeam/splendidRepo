@@ -103,6 +103,23 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 		return result;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<BundleCommand> findBundleCommandByMainStyle(String style, Boolean flag) {
+		
+		List<BundleCommand> result = null;
+		
+		List<Long> bundleItemIds = bundleDao.findBundleItemIdByMainStyle(style);
+		if (Validator.isNotNullOrEmpty(bundleItemIds)) {
+			result = new ArrayList<BundleCommand>();
+			for (Long bundleItemId : bundleItemIds) {
+				result.add(getBundleByBundleItemId(bundleItemId, flag, false));
+			}
+		}
+
+		return result;
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -123,7 +140,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			// 2 填充bundleCommand的基本信息
 			fillBundleCommandList(bundles);
 			if (flag) {
-				// 3如果bundle中的某个商品失效，那么就踢掉该bundle
+				// 3如果bundle中的某个element失效，那么就踢掉该bundle
 				LOG.debug("start delete invalid bundled preparation. bundles size : [{}]", bundles.size());
 				removeInvalidBundleInfo(bundles);
 				LOG.debug("end remove invalid bundled . bundles size : [{}]", bundles == null ? 0 : bundles.size());
@@ -761,4 +778,5 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		
 		return true;
 	}
+
 }

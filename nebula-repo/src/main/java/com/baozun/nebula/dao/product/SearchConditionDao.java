@@ -126,13 +126,13 @@ public interface SearchConditionDao extends GenericEntityDao<SearchCondition, Lo
 	SearchConditionLang findSearchConditionLang(@QueryParam("id")Long id,@QueryParam("lang") String lang);
 	
 	/**
-	 * 根据语言查询所有搜索条件的数据(只有propertyId、name、sortNo字段)
+	 * 根据语言查询所有搜索条件的数据
 	 * @return List<MetaDataCommand>
 	 * @param lang
 	 * @return 
 	 * @author 冯明雷
 	 * @time 2016年4月28日下午5:33:44
 	 */
-	@NativeQuery(model = MetaDataCommand.class)
-	List<MetaDataCommand> findSearchConditionMetDataByLang(@QueryParam("lang") String lang);
+	@NativeQuery(model = SearchConditionCommand.class)
+	List<SearchConditionCommand> findSearchConditionMetDataByLang(@QueryParam("lang") String lang);
 }

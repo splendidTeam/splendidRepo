@@ -298,12 +298,12 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	
 	
 	/**
-	 * 查询单t_pd_property表 lifecycle = 1
+	 * 查询单t_pd_property表 lifecycle = 1 and searchable=true
 	 * @return List<Property>
 	 * @author 黄大辉
 	 */
 	@NativeQuery(model = Property.class)
-	List<Property> findWidthoutCommonPropertyId();
+	List<Property> findSearchableProperty();
 	
 	
 	/**

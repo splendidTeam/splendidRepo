@@ -48,11 +48,17 @@
 						item.lifecycle as lifecycle,
 						(case when favorites.sku_id is not null then sku.properties else '' end ) as properties,
 						(case when favorites.sku_id is not null then sku.out_id else '' end) as extentionCode,
-						(SELECT sum(available_qty) FROM t_pd_sku_inventory WHERE extention_code IN (SELECT out_id FROM t_pd_sku WHERE item_id=item.id)) as itemIvt
+						itemIvt.qty
 					from t_member_favorites favorites 
 						left join t_pd_item  item on  favorites.item_id = item.id
 						left join t_pd_iteminfo itemInfo on itemInfo.item_id = item.id
 						left join t_pd_sku sku on favorites.sku_id = sku.id
+						LEFT JOIN 
+							(
+								SELECT sum(ivt.available_qty)as qty,sku.item_id from t_pd_sku_inventory ivt
+								LEFT JOIN t_pd_sku sku ON ivt.extention_code = sku.out_id
+								WHERE sku.item_id =sku.item_id  GROUP BY sku.item_id
+								)itemIvt on itemIvt.item_id = item.id
 					where favorites.member_id = :memberId
 					#if($beginTime)
 						and favorite.create_time >= beginTime

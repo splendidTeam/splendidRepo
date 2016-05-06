@@ -1279,7 +1279,7 @@
 	</bean>
 	
 	
-		<bean id="Property.findWidthoutCommonPropertyId" class="loxia.dao.support.DynamicQueryHolder">
+		<bean id="Property.findSearchableProperty" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>
 		<constructor-arg>
 			<value>
@@ -1290,7 +1290,7 @@
 						tpp.create_time as create_time, tpp.editing_type as editing_type, tpp.is_color_prop as is_color_prop, tpp.is_salep_rop as is_salep_rop,
 						tpp.modify_time as modify_time, tpp.value_type as value_type, tpp. VERSION as version, tpp.common_property_id as common_property_id
 					FROM
-						t_pd_property tpp where tpp.lifecycle = 1
+						t_pd_property tpp where tpp.lifecycle = 1 and searchable=true
                  ]]>
 			</value>
 		</constructor-arg>

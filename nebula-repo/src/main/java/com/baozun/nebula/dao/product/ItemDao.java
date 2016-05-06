@@ -293,6 +293,9 @@ public interface ItemDao extends GenericEntityDao<Item, Long> {
 	List<ItemCommand> findItemCommandByQueryMapAndItemCodesI18n(@QueryParam Map<String, Object> paraMap, 
 			@QueryParam("itemCodeList") List<String> itemCodeList,
 			@QueryParam("langKey") String langKey);
+	
+	@NativeQuery(model = Item.class)
+	Item findItemByExtentionCode(@QueryParam("extentionCode") String extentionCode);
 
 	
 }

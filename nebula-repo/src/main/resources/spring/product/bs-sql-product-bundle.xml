@@ -33,7 +33,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="Bundle.findBundlesByStyle" class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="Bundle.findBundlesByMainStyle" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据款号查找捆绑类商品</description>
 		<constructor-arg>
 			<value>
@@ -140,6 +140,26 @@
 						t_pd_bundle_element be on be.id = bs.bundle_element_id and be.is_main_element = 't'
 					where 
 						bs.item_id = :mainItemId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.findBundleItemIdByMainStyle" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过主卖品的商品id查询bundle的商品id</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			distinct b.item_id
+					from 
+						t_pd_bundle b
+					inner join 
+						t_pd_bundle_sku bs on b.id = bs.bundle_id
+					inner join 
+						t_pd_bundle_element be on be.id = bs.bundle_element_id and be.is_main_element = 't'
+					where 
+						bs.style = :mainStyle
                  ]]>
 			</value>
 		</constructor-arg>

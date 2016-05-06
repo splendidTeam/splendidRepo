@@ -565,7 +565,7 @@
             <![CDATA[ 
                 select
 					cate.id as id,
-					cate.code as code,					
+					cateLang.name as name,					
 					cate.sort_no as sortNo
 				from
 					t_pd_category cate,t_pd_category_lang cateLang

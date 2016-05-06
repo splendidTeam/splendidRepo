@@ -34,14 +34,21 @@ public class NebulaBundleManagerTest {
 	
 	@Test
 	public void testFindBundleCommandByMainItemId(){
-		List<BundleCommand> bundles =	bundleManager.findBundleCommandByMainItemId(4L ,false);
+		List<BundleCommand> bundles = bundleManager.findBundleCommandByMainItemId(4L ,false);
+		
+		log.debug("result : {}" ,JsonUtil.format(bundles));
+	}
+	
+	@Test
+	public void testFindBundleCommandByMainStyle() {
+		List<BundleCommand> bundles = bundleManager.findBundleCommandByMainStyle("1" ,false);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundles));
 	}
 	
 	@Test
 	public void testFindBundleCommandByBundleItemCode(){
-		BundleCommand bundle =	bundleManager.findBundleCommandByBundleItemCode("111111114", true);
+		BundleCommand bundle = bundleManager.findBundleCommandByBundleItemCode("111111114", true);
 		
 		log.debug("result : {}" ,JsonUtil.format(bundle));
 	}

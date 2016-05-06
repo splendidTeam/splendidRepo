@@ -55,6 +55,7 @@ import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.manager.product.NebulaBundleManager;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -83,7 +84,7 @@ import loxia.dao.Pagination;
  * <ol>
  * <li>{@link #showBundleDetail(Long, HttpServletRequest, HttpServletResponse, Model)} Bundle详情页</li>
  * <li>{@link #showBundleList(PageForm, HttpServletRequest, HttpServletResponse, Model)} Bundle列表页</li>
- * <li>{@link #loadBundleInfo(Long, HttpServletRequest, HttpServletResponse, Model)} 异步加载Bundle信息</li>
+ * <li>{@link #loadBundleInfoByMainItemId(Long, HttpServletRequest, HttpServletResponse, Model)} 异步加载Bundle信息</li>
  * </ol>
  * 
  * @author yue.ch
@@ -136,7 +137,7 @@ public class NebulaBundleController extends NebulaPdpController {
 	public String showBundleDetail(@PathVariable("itemCode") String bundleItemCode, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
-		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleItemCode(bundleItemCode, true);
+		BundleCommand bundleCommand = nebulaBundleManager.findBundleCommandByBundleItemCode(bundleItemCode, isCheckBundleStatus());
 		if(Validator.isNotNullOrEmpty(bundleCommand)){
 			BundleDetailViewCommand bundleDetailViewCommand=buildBundleViewCommandForBundlePage(bundleCommand,bundleItemCode);
 			model.addAttribute(MODEL_KEY_BUNDLE,bundleDetailViewCommand);
@@ -161,32 +162,28 @@ public class NebulaBundleController extends NebulaPdpController {
 	public String showBundleList(@ModelAttribute("page") PageForm pageForm, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
-		Pagination<BundleCommand> bundleCommandPage = nebulaBundleManager.findBundleCommandByPage(pageForm.getPage(), pageForm.getSorts(), true);
+		Pagination<BundleCommand> bundleCommandPage = nebulaBundleManager.findBundleCommandByPage(pageForm.getPage(), pageForm.getSorts(), isCheckBundleStatus());
 		model.addAttribute(MODEL_KEY_BUNDLE_LIST, bundleViewCommandConverter.convert(bundleCommandPage));
 		
 		return VIEW_BUNDLE_LIST;
 	}
 
 	/**
-	 * 异步加载bundle信息
+	 * 异步加载bundle信息（根据主卖品商品ID）
 	 * 
-	 * @RequestMapping(value = "/bundle/loadBundles.json", method = RequestMethod.GET)
+	 * @RequestMapping(value = "/bundle/loadBundlesByMainItemId.json", method = RequestMethod.GET)
 	 * @ResponseBody
 	 * 
-	 * @param itemId
-	 * @param request
-	 * @param response
-	 * @param model
 	 * @return 封装捆绑类商品视图模型集合， 参考{@link com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand}
 	 */
-	public NebulaReturnResult loadBundleInfo(@RequestParam("itemId") Long itemId, HttpServletRequest request,
+	public NebulaReturnResult loadBundleInfoByMainItemId(@RequestParam("itemId") Long itemId, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 		
 		DefaultReturnResult result = new DefaultReturnResult();
 		
 		try {
 			// 根据当前的商品id查询针对该商品为主卖品配置的bundle
-			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByMainItemId(itemId, Boolean.TRUE);
+			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByMainItemId(itemId, isCheckBundleStatus());
 			if (Validator.isNotNullOrEmpty(bundleCommands)) {
 				result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
 			}
@@ -194,6 +191,36 @@ public class NebulaBundleController extends NebulaPdpController {
 			result.setStatusCode(String.valueOf(HttpStatus.OK));
 		} catch (Exception e) {
 			LOG.error("load bundle info error, itemId=" + itemId, e);
+			result.setResult(false);
+			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
+		}
+
+		return result;
+	}
+	
+	/**
+	 * 异步加载bundle信息（根据主卖品款号）
+	 * 
+	 * @RequestMapping(value = "/bundle/loadBundlesByMainStyle.json", method = RequestMethod.GET)
+	 * @ResponseBody
+	 * 
+	 * @return 封装捆绑类商品视图模型集合， 参考{@link com.baozun.nebula.web.controller.product.viewcommand.BundleViewCommand}
+	 */
+	public NebulaReturnResult loadBundleInfoByMainStyle(@RequestParam("style") String style, HttpServletRequest request,
+			HttpServletResponse response, Model model) {
+		
+		DefaultReturnResult result = new DefaultReturnResult();
+		
+		try {
+			// 根据当前的主卖品款号查询针对该款商品为主卖品配置的bundle
+			List<BundleCommand> bundleCommands = nebulaBundleManager.findBundleCommandByMainStyle(style, isCheckBundleStatus());
+			if (Validator.isNotNullOrEmpty(bundleCommands)) {
+				result.setReturnObject(buildBundleViewCommandForPDP(bundleCommands));
+			}
+			result.setResult(true);
+			result.setStatusCode(String.valueOf(HttpStatus.OK));
+		} catch (Exception e) {
+			LOG.error("load bundle info error, style=" + style, e);
 			result.setResult(false);
 			result.setStatusCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
 		}
@@ -269,7 +296,7 @@ public class NebulaBundleController extends NebulaPdpController {
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand,String bundleItemCode) {
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
-		if(itemBaseInfoViewCommand.getLifecycle()!=1){
+		if(Item.LIFECYCLE_ENABLE != itemBaseInfoViewCommand.getLifecycle()){
 			LOG.info("Bundle error...bundleLifecycle is not active;Lifecycle:{} [{}]",itemBaseInfoViewCommand.getLifecycle(),new Date());
 			return null;
 		}
@@ -322,9 +349,11 @@ public class NebulaBundleController extends NebulaPdpController {
 				LinkedHashMap<Long, Object> properties = new LinkedHashMap<Long, Object>();
 				// 同一个捆绑类商品成员中的所有商品具有相同的销售属性，所以这里取第一个商品的销售属性即可。
 				List<PropertyElementViewCommand> propertyElementViewCommands = bundleItemViewCommands.get(0).getSalesProperties();
-				for(PropertyElementViewCommand p : propertyElementViewCommands) {
-					PropertyViewCommand propertyViewCommand = p.getProperty();
-					properties.put(propertyViewCommand.getId(), propertyViewCommand.getName());
+				if(propertyElementViewCommands != null) {
+					for(PropertyElementViewCommand p : propertyElementViewCommands) {
+						PropertyViewCommand propertyViewCommand = p.getProperty();
+						properties.put(propertyViewCommand.getId(), propertyViewCommand.getName());
+					}
 				}
 				command.setProperties(properties);
 			}
@@ -398,5 +427,15 @@ public class NebulaBundleController extends NebulaPdpController {
 		}
 		
 		return bundleSkuViewCommandConvert.convert(bundleSkuCommands);
+	}
+	
+	/**
+	 * 是否校验bundle的状态
+	 * 
+	 * @return 	true: 不会加载未上架或者bundle中的任意商品未上架的bundle<br/>
+	 * 			false: 加载所有的bundle，忽略上架状态
+	 */
+	protected boolean isCheckBundleStatus(){
+		return Boolean.TRUE;
 	}
 }

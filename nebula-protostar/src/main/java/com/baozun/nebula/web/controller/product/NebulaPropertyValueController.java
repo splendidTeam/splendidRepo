@@ -151,19 +151,24 @@ public class NebulaPropertyValueController extends BaseController{
 			// 值
 			String[] values = lang.getValues();
 			Map<String, String> validateResult = new HashMap<String, String>();
+			/**
+			 * 判断值是否重复
+			 */
 			for (int i = 0; i < langs.length; i++){
 				PropertyValue propertyValue = sdkPropertyManager.findCountByPVIdAndLangValue(propertyId, values[i]);
-				boolean flag = Validator.isNullOrEmpty(propertyValue);
+				boolean existFlag = Validator.isNotNullOrEmpty(propertyValue);
+				
 				if (Validator.isNotNullOrEmpty(proValueId)){
 					// update ,count可以 == 1
-					Long existId = propertyValue.getId();
-					if (!proValueId.equals(existId)){
+					Long existId = existFlag ? propertyValue.getId() : null;
+					//如果存在相同的值，并且id和要操作的id不相等
+					if (existFlag && !proValueId.equals(existId)){
 						backWarnEntity.setIsSuccess(false);
 						validateResult.put(langs[i], "1004");
 					}
 				}else{
 					// 新增
-					if (!flag){
+					if (existFlag){
 						backWarnEntity.setIsSuccess(false);
 						validateResult.put(langs[i], "1004");
 					}
@@ -174,7 +179,7 @@ public class NebulaPropertyValueController extends BaseController{
 				backWarnEntity.setDescription(validateResult);
 				return backWarnEntity;
 			}
-
+			// 如果没有重复-->添加或修改属性值
 			sdkPropertyManager.addOrUpdatePropertyValue(groupId, propertyValues);
 		}catch (Exception e){
 			LOGGER.error("", e);
@@ -202,11 +207,8 @@ public class NebulaPropertyValueController extends BaseController{
 			@RequestParam(value = "proValueGroupId",required = false) Long proValueGroupId,
 			@QueryBeanParam QueryBean queryBean){
 
-		Pagination<PropertyValueCommand> result = sdkPropertyManager.findPropertyValueByPage(
-				queryBean.getPage(),
-				queryBean.getSorts(),
-				propertyId,
-				proValueGroupId);
+		Pagination<PropertyValueCommand> result = sdkPropertyManager
+				.findPropertyValueByPage(queryBean.getPage(), queryBean.getSorts(), propertyId, proValueGroupId);
 
 		return result;
 	}

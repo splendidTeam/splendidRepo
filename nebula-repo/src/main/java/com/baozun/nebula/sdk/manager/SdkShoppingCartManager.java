@@ -815,4 +815,8 @@ public interface SdkShoppingCartManager extends BaseManager{
 	public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCustomItemIds(List<ShoppingCartLineCommand> lines, List<Long> customItemIds, Integer factorMultiplication, List<PromotionBrief> briefListPrevious);
 	
 	public BigDecimal getNeedToPayAmountInShoppingCartByAll(List<ShoppingCartLineCommand> lines);
+	
+	public Integer doPromotionCheck(ShoppingCartCommand cart,Set<String> memboIds);
+	
+	public boolean merageShoppingCartLineById(Long userId, ShoppingCartLineCommand shoppingCartLine);
 }

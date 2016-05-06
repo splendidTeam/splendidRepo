@@ -603,4 +603,12 @@ public class SdkItemManagerImpl implements SdkItemManager {
 	public Integer findRateCountByItemCode(String itemCode){
 		return itemRateDao.findItemRateCountByItemCode(itemCode);
 	}
+
+	/* 
+	 * @see com.baozun.nebula.sdk.manager.SdkItemManager#findItemByExtentionCode(java.lang.String)
+	 */
+	@Override
+	public Item findItemByExtentionCode(String extentionCode) {
+		return itemDao.findItemByExtentionCode(extentionCode);
+	}
 }

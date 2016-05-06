@@ -158,7 +158,6 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
             //如果没有 添加一个
             linkedList.add(idStr);
         }else{
-            @SuppressWarnings("null")
             String first = linkedList.getFirst();
             //如果 list 里面的数据 第一个是当前item  那么一般表示刷新页面 或者重新打开新窗口
             //这种case 没有必要操作 cookie

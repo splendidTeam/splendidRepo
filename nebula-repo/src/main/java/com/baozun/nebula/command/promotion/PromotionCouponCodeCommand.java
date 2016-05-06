@@ -26,184 +26,211 @@ import com.baozun.nebula.command.Command;
 
 public class PromotionCouponCodeCommand implements Command {
 
-	private static final long serialVersionUID = 2899745531248094053L;
+    private static final long serialVersionUID = 2899745531248094053L;
 
-	/** PK */
-	private Long id;
+    /** PK */
+    private Long id;
 
-	private Long couponId;
+    private Long couponId;
 
-	private Long shopId;
+    private Long shopId;
 
-	/** 促销 */
-	private String couponCode;
+    /** 促销 */
+    private String couponCode;
 
-	/** 优惠券名 */
-	private String couponName;
+    /** 优惠券名 */
+    private String couponName;
 
-	/**
-	 * 金额：5元，10元，20元 折：百分比95'
-	 */
-	private BigDecimal discount;
+    /**
+     * 金额：5元，10元，20元 折：百分比95'
+     */
+    private BigDecimal discount;
 
-	/** 起始时间 */
-	private Date startTime;
+    /** 起始时间 */
+    private Date startTime;
 
-	/** 结束时间 */
-	private Date endTime;
+    /** 结束时间 */
+    private Date endTime;
 
-	/** 0未使用 1已使用 */
-	private Integer isused = 0;
+    /** 0未使用 1已使用 */
+    private Integer isused = 0;
 
-	/** 创建人 */
-	private Long createId;
+    /** 创建人 */
+    private Long createId;
 
-	private String createName;
+    private String createName;
 
-	/** 创建时间 */
-	private Date createTime;
+    /** 创建时间 */
+    private Date createTime;
 
-	/** 1有效 0无效 */
-	private Integer activeMark = 1;
+    /** 1有效 0无效 */
+    private Integer activeMark = 1;
 
-	/** 1有效 0无效 */
-	private Integer couponType = 1;// 常规的金额优惠券，0是折扣优惠券
+    /** 1有效 0无效 */
+    private Integer couponType = 1;// 常规的金额优惠券，0是折扣优惠券
 
-	/** version. */
-	private Date version;
-	
-	/**
-	 * 使用次数
-	 */
-	private Integer limitTimes;
+    /** version. */
+    private Date version;
+    
+    /**
+     * 是否过期 0未过期 1已过期
+     */
+    private Integer isExpired=0;
 
-	public Long getId() {
-		return id;
-	}
+    /**
+     * 适用范围
+     */
+    private String scopeRange;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    /**
+     * 使用次数
+     */
+    private Integer limitTimes;
 
-	public Long getCouponId() {
-		return couponId;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setCouponId(Long couponId) {
-		this.couponId = couponId;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Long getShopId() {
-		return shopId;
-	}
+    public Long getCouponId() {
+        return couponId;
+    }
 
-	public void setShopId(Long shopId) {
-		this.shopId = shopId;
-	}
+    public void setCouponId(Long couponId) {
+        this.couponId = couponId;
+    }
 
-	public String getCouponCode() {
-		return couponCode;
-	}
+    public Long getShopId() {
+        return shopId;
+    }
 
-	public void setCouponCode(String couponCode) {
-		this.couponCode = couponCode;
-	}
+    public void setShopId(Long shopId) {
+        this.shopId = shopId;
+    }
 
-	public String getCouponName() {
-		return couponName;
-	}
+    public String getCouponCode() {
+        return couponCode;
+    }
 
-	public void setCouponName(String couponName) {
-		this.couponName = couponName;
-	}
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
+    }
 
-	public BigDecimal getDiscount() {
-		return discount;
-	}
+    public String getCouponName() {
+        return couponName;
+    }
 
-	public void setDiscount(BigDecimal discount) {
-		this.discount = discount;
-	}
+    public void setCouponName(String couponName) {
+        this.couponName = couponName;
+    }
 
-	public Date getStartTime() {
-		return startTime;
-	}
+    public BigDecimal getDiscount() {
+        return discount;
+    }
 
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
-	}
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
 
-	public Date getEndTime() {
-		return endTime;
-	}
+    public Date getStartTime() {
+        return startTime;
+    }
 
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 
-	public Integer getIsused() {
-		return isused;
-	}
+    public Date getEndTime() {
+        return endTime;
+    }
 
-	public void setIsused(Integer isused) {
-		this.isused = isused;
-	}
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
 
-	public Long getCreateId() {
-		return createId;
-	}
+    public Integer getIsused() {
+        return isused;
+    }
 
-	public void setCreateId(Long createId) {
-		this.createId = createId;
-	}
+    public void setIsused(Integer isused) {
+        this.isused = isused;
+    }
 
-	public String getCreateName() {
-		return createName;
-	}
+    public Long getCreateId() {
+        return createId;
+    }
 
-	public void setCreateName(String createName) {
-		this.createName = createName;
-	}
+    public void setCreateId(Long createId) {
+        this.createId = createId;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public String getCreateName() {
+        return createName;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public void setCreateName(String createName) {
+        this.createName = createName;
+    }
 
-	public Integer getActiveMark() {
-		return activeMark;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public void setActiveMark(Integer activeMark) {
-		this.activeMark = activeMark;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	@Column(name = "VERSION")
-	public Date getVersion() {
-		return version;
-	}
+    public Integer getActiveMark() {
+        return activeMark;
+    }
 
-	public void setVersion(Date version) {
-		this.version = version;
-	}
+    public void setActiveMark(Integer activeMark) {
+        this.activeMark = activeMark;
+    }
 
-	public Integer getCouponType() {
-		return couponType;
-	}
+    public Date getVersion() {
+        return version;
+    }
 
-	public void setCouponType(Integer couponType) {
-		this.couponType = couponType;
-	}
+    public void setVersion(Date version) {
+        this.version = version;
+    }
 
-	public Integer getLimitTimes() {
-		return limitTimes;
-	}
+    public Integer getCouponType() {
+        return couponType;
+    }
 
-	public void setLimitTimes(Integer limitTimes) {
-		this.limitTimes = limitTimes;
-	}
-	
+    public void setCouponType(Integer couponType) {
+        this.couponType = couponType;
+    }
+
+    public Integer getLimitTimes() {
+        return limitTimes;
+    }
+
+    public void setLimitTimes(Integer limitTimes) {
+        this.limitTimes = limitTimes;
+    }
+
+    public String getScopeRange() {
+        return scopeRange;
+    }
+
+    public void setScopeRange(String scopeRange) {
+        this.scopeRange = scopeRange;
+    }
+
+    public Integer getIsExpired() {
+        return isExpired;
+    }
+
+    public void setIsExpired(Integer isExpired) {
+        this.isExpired = isExpired;
+    }
+
+    
+    
 }

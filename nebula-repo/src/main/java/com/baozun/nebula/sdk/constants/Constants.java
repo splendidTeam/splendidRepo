@@ -175,11 +175,17 @@ public class Constants {
 	/** 新密码与重复密码不匹配 **/
 	public static final int		RENEWPASSWORD_NOTSAMEAS_NEWPASSWORD_ERROR	= 90007;
 
-	/** 游客保存在cookie当中的购物车 **/
-	public static final String	GUEST_COOKIE_GC								= "g_c_s";
+	/** 游客保存在cookie当中的购物车 
+	 * @deprecated use helix com.baozun.nebula.web.constants.CookieKeyConstants.GUEST_COOKIE_GC update doc by feilong
+	 * **/
+	@Deprecated
+    public static final String	GUEST_COOKIE_GC								= "g_c_s";
 
-	/** 游客保存在cookie当中的购物车商品总数量 **/
-	public static final String	GUEST_COOKIE_GC_CNT							= "g_c_s_cnt";
+	/** 游客保存在cookie当中的购物车商品总数量
+	 * @deprecated use helix com.baozun.nebula.web.constants.CookieKeyConstants.GUEST_COOKIE_GC_CNT update doc by feilong
+	 *  **/
+	@Deprecated
+    public static final String	GUEST_COOKIE_GC_CNT							= "g_c_s_cnt";
 
 	/** 找不到用户. */
 	public static final Integer	USER_USER_NOTFOUND							= 1002;
@@ -344,4 +350,21 @@ public class Constants {
 	
 	/** qs 消息临时存储*/
 	public static final String	QS_ORDER_TEMP_POOL					        = "CACHE_QS_LIST";
+	
+	/********************************************** 购物车  start****************** /
+	/** 购物车商品数量不能小于1*/
+	public static final String SHOPPINGCART_ADD_OR_UPDATE_QUANTITY_LESSTHANONE="30001";
+	/** 该商品不存在*/
+	public static final String SHOPPINGCART_ADD_OR_UPDATE_SKU_NOTEXIST="30002";
+	/** 一次性最多可购买30款商品*/
+	public static final String SHOPPINGCART_ADD_QUANTITY_TOO_LARGE	=	"30003";
+	/** 操作失败*/
+	public static final String SHOPPINGCART_DO_OPREATE_FAIL	=	"30004";
+	/** 購物車不能為空*/
+	public static final String SHOPPINGCART_EMPTY	=	"30005";
+	/** [{0}] 已下架*/
+	public static final String SHOPPINGCART_SKU_ONLINE	=	"30006";
+	/** [{0}] 庫存不足*/
+	public static final String SHOPPINGCART_SKU_UNDERSTOCK	=	"30007";
+	/********************************************** 购物车  end******************/
 }

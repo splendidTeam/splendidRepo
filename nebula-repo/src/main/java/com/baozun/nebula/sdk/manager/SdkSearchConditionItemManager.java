@@ -3,14 +3,14 @@ package com.baozun.nebula.sdk.manager;
 import java.util.List;
 import java.util.Map;
 
+import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.model.product.SearchConditionItem;
+import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
+
 import loxia.annotation.QueryParam;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.model.product.SearchConditionItem;
-import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 
 /**
  * 筛选条件选项管理
@@ -85,5 +85,7 @@ public interface SdkSearchConditionItemManager extends BaseManager{
 	public SearchConditionItemCommand findItemById(Long id);
 	
 	public List<SearchConditionItemCommand> findItemByPropertyId(Long propertyId);
+	
+	public List<SearchConditionItemCommand> findItemBySIdAndLang(Long sId,String lang);
 	
 }

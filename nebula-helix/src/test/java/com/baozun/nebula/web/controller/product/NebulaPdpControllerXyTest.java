@@ -325,7 +325,7 @@ public class NebulaPdpControllerXyTest extends BaseControllerTest{
 		
 		control.replay();
 		
-		List<RelationItemViewCommand> actual = nebulaPdpController.buildItemBrowsingHistoryViewCommand(request, itemId);
+		List<RelationItemViewCommand> actual = nebulaPdpController.buildItemBrowsingHistoryViewCommand(itemId, request, response);
 		
         assertEquals(expected, actual);
 		

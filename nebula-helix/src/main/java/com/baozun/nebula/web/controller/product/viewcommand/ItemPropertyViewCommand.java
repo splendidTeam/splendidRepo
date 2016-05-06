@@ -31,6 +31,9 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 public class ItemPropertyViewCommand extends BaseViewCommand {
 	
 	private static final long serialVersionUID = 1077822621702435603L;
+	
+	/** 当属性分组为空时，非销售属性Map的Key */
+	public static final String NULL_GROUP = "NullGroup";
 
 	/**
 	 * 销售属性

@@ -235,12 +235,7 @@ function formatDate(val) {
 
 // 刷新表格数据
 function refreshData() {
-	
-	
 	$j("#sortedTable").loxiasimpletable("refresh");
-
-	
-	
 	$j("#unsortedTable").loxiasimpletable("refresh");
 }
 

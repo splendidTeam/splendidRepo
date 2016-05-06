@@ -254,7 +254,7 @@ public interface PropertyManager extends BaseManager{
 	void createOrUpdatePropertyValueByUpload(List<PropertyValueUploadCommand> propertyValueUploadCommandList,Long propertyId);
 	
 	/***
-	 * 查询全部有效并且有属性值的属性信息
+	 * 查询全部有效,有属性值，可真检索的属性信息
 	 */
 	List<DynamicPropertyCommand> findAllDynamicPropertyCommand();	
 	
