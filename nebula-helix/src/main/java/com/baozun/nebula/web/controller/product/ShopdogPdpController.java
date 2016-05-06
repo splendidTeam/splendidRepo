@@ -207,7 +207,7 @@ public class ShopdogPdpController {
 		List<ItemImageViewCommand> images = buildItemImageViewCommand(itemBaseInfo.getId());
 	    //商品全部图
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
-		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId())));
+		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommands);
 		
 		//主图
 		shopdogItemViewCommand.setMainPicture(getMainUrls(shopdogItemImageViewCommands));

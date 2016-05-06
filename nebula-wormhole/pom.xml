@@ -61,6 +61,10 @@
 			<artifactId>janino</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>c3p0</groupId>
+			<artifactId>c3p0</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
