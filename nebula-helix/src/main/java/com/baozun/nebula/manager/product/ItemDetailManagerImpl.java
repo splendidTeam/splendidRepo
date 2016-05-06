@@ -45,6 +45,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.ItemResultCommand;
+import com.baozun.nebula.command.ItemSolrCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
@@ -67,6 +68,7 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
+import com.baozun.nebula.solr.manager.ItemInfoManager;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.feilong.core.Validator;
 import com.google.gson.Gson;
@@ -91,6 +93,9 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 
 	@Autowired
 	private ItemListManager				itemListManager;
+	
+	@Autowired
+	private ItemInfoManager				itemInfoManager;
 
 	@Transactional(readOnly=true)
 	@Override
@@ -957,6 +962,15 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	@Override
 	public Item findItemByExtentionCode(String extentionCode) {
 		return sdkItemManager.findItemByExtentionCode(extentionCode);
+	}
+
+	/* 
+	 * @see com.baozun.nebula.manager.product.ItemDetailManager#findItemExtraViewCommand(java.lang.Long)
+	 */
+	@Override
+	public ItemSolrCommand findItemExtraViewCommand(Long itemId) {
+		ItemSolrCommand itemSolrCommand =itemInfoManager.findItemExtraViewCommand(itemId);
+		return itemSolrCommand;
 	}
 
 }

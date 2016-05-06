@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import loxia.dao.Pagination;
 
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ItemSolrCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
@@ -45,10 +47,12 @@ import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.TimeInterval;
+import com.feilong.core.Validator;
 
 
 /**
@@ -268,6 +272,30 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
 		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
+	}
+	
+	/* 
+	 * @see com.baozun.nebula.web.controller.product.NebulaAbstractPdpController#buildItemExtraViewCommandFromDB(com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand)
+	 */
+	@Override
+	protected ItemExtraViewCommand buildItemExtraViewCommandFromDB(
+			ItemBaseInfoViewCommand itemBaseInfo) {
+		ItemExtraViewCommand extraViewCommand =new ItemExtraViewCommand();
+		ItemSolrCommand itemSolrCommand = itemDetailManager.findItemExtraViewCommand(itemBaseInfo.getId());
+		if(Validator.isNotNullOrEmpty(itemSolrCommand)){
+			if(Validator.isNotNullOrEmpty(itemSolrCommand.getSalesCount())){
+				extraViewCommand.setSales(itemSolrCommand.getSalesCount().longValue());
+			}
+			if(Validator.isNotNullOrEmpty(itemSolrCommand.getFavoredCount())){
+				extraViewCommand.setFavoriteCount(itemSolrCommand.getFavoredCount().longValue());
+			}
+			if(Validator.isNotNullOrEmpty(itemSolrCommand.getRankavg())){
+				extraViewCommand.setRate(itemSolrCommand.getRankavg());
+			}
+			//评论数
+			//extraViewCommand.setReviewCount(reviewCount);
+		}
+		return extraViewCommand;
 	}
 
 	@Override
