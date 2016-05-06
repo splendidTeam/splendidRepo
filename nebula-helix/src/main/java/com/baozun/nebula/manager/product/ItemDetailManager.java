@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.baozun.nebula.command.ItemBuyLimitedBaseCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
-import com.baozun.nebula.command.ItemSolrCommand;
+import com.baozun.nebula.command.product.ItemExtraDataCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
@@ -226,9 +226,10 @@ public interface ItemDetailManager extends BaseManager{
 	Item findItemByExtentionCode(String extentionCode);
 	
 	/**
-	 * 根据itemId查找商品扩展信息
+	 * 根据itemId、itemCode查找商品扩展信息
 	 * @param itemId
+	 * @param itemCode
 	 * @return
 	 */
-	public ItemSolrCommand findItemExtraViewCommand(Long itemId);
+	public ItemExtraDataCommand findItemExtraViewCommand(Long itemId, String itemCode);
 }

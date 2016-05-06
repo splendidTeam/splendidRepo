@@ -46,6 +46,7 @@ import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.ItemResultCommand;
 import com.baozun.nebula.command.ItemSolrCommand;
+import com.baozun.nebula.command.product.ItemExtraDataCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
@@ -70,6 +71,7 @@ import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
 import com.baozun.nebula.solr.manager.ItemInfoManager;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
 import com.feilong.core.Validator;
 import com.google.gson.Gson;
 
@@ -965,12 +967,23 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	}
 
 	/* 
-	 * @see com.baozun.nebula.manager.product.ItemDetailManager#findItemExtraViewCommand(java.lang.Long)
+	 * @see com.baozun.nebula.manager.product.ItemDetailManager#findItemExtraViewCommand(java.lang.Long,java.lang.String)
 	 */
 	@Override
-	public ItemSolrCommand findItemExtraViewCommand(Long itemId) {
+	public ItemExtraDataCommand findItemExtraViewCommand(Long itemId, String itemCode) {
 		ItemSolrCommand itemSolrCommand =itemInfoManager.findItemExtraViewCommand(itemId);
-		return itemSolrCommand;
+		ItemExtraDataCommand extraDataCommand =null;
+		if(Validator.isNotNullOrEmpty(itemSolrCommand)){
+			extraDataCommand =(ItemExtraDataCommand) ConvertUtils
+					.convertTwoObject(new ItemExtraDataCommand(), itemSolrCommand);
+		}else{
+			extraDataCommand =new ItemExtraDataCommand();
+		}
+		Integer reviewCount =sdkItemManager.findRateCountByItemCode(itemCode);
+		if(Validator.isNotNullOrEmpty(reviewCount)){
+			extraDataCommand.setReviewCount(reviewCount.longValue());
+		}
+		return extraDataCommand;
 	}
 
 }
