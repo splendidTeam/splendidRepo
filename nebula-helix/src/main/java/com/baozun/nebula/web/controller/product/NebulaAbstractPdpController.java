@@ -37,6 +37,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
+import com.baozun.nebula.command.product.ItemExtraDataCommand;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.TimeInterval;
@@ -441,12 +442,30 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	/**
-	 * 
+	 * 从DB里获取扩展数据
 	 * @param itemBaseInfo
 	 * @return
 	 */
-	protected abstract ItemExtraViewCommand buildItemExtraViewCommandFromDB(
-			ItemBaseInfoViewCommand itemBaseInfo);
+	protected ItemExtraViewCommand buildItemExtraViewCommandFromDB(
+			ItemBaseInfoViewCommand itemBaseInfo){
+		ItemExtraViewCommand extraViewCommand =new ItemExtraViewCommand();
+		ItemExtraDataCommand extraDataCommand = itemDetailManager.findItemExtraViewCommand(itemBaseInfo.getId(),
+				itemBaseInfo.getCode());
+		if(Validator.isNotNullOrEmpty(extraDataCommand)){
+			if(Validator.isNotNullOrEmpty(extraDataCommand.getSalesCount())){
+				extraViewCommand.setSales(extraDataCommand.getSalesCount().longValue());
+			}
+			if(Validator.isNotNullOrEmpty(extraDataCommand.getFavoredCount())){
+				extraViewCommand.setFavoriteCount(extraDataCommand.getFavoredCount().longValue());
+			}
+			if(Validator.isNotNullOrEmpty(extraDataCommand.getRankavg())){
+				extraViewCommand.setRate(extraDataCommand.getRankavg());
+			}
+			//评论数
+			extraViewCommand.setReviewCount(extraDataCommand.getReviewCount());
+		}
+		return extraViewCommand;
+	};
 
 	/**
 	 * 构造推荐商品信息
@@ -568,14 +587,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 			}
 		}
 	}
-	
-	protected abstract Long getItemSales(ItemBaseInfoViewCommand itemBaseInfo);
-	
-	protected abstract Long getItemFavoriteCount(ItemBaseInfoViewCommand itemBaseInfo);
-	
-	protected abstract Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo);
-	
-	protected abstract Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo);
 	
 	protected abstract String buildSizeCompareChart(Long itemId);
 	

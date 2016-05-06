@@ -250,54 +250,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return DEFAULT_SKU_BUY_LIMIT;
 	}
 
-
-	@Override
-	protected Long getItemSales(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemDetailManager.findItemSalesCount(itemBaseInfo.getCode()).longValue();
-	}
-
-
-	@Override
-	protected Long getItemFavoriteCount(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemDetailManager.findItemFavCount(itemBaseInfo.getCode()).longValue();
-	}
-
-
-	@Override
-	protected Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
-	}
-
-	@Override
-	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
-	}
-	
-	/* 
-	 * @see com.baozun.nebula.web.controller.product.NebulaAbstractPdpController#buildItemExtraViewCommandFromDB(com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand)
-	 */
-	@Override
-	protected ItemExtraViewCommand buildItemExtraViewCommandFromDB(
-			ItemBaseInfoViewCommand itemBaseInfo) {
-		ItemExtraViewCommand extraViewCommand =new ItemExtraViewCommand();
-		ItemExtraDataCommand extraDataCommand = itemDetailManager.findItemExtraViewCommand(itemBaseInfo.getId(),
-				itemBaseInfo.getCode());
-		if(Validator.isNotNullOrEmpty(extraDataCommand)){
-			if(Validator.isNotNullOrEmpty(extraDataCommand.getSalesCount())){
-				extraViewCommand.setSales(extraDataCommand.getSalesCount().longValue());
-			}
-			if(Validator.isNotNullOrEmpty(extraDataCommand.getFavoredCount())){
-				extraViewCommand.setFavoriteCount(extraDataCommand.getFavoredCount().longValue());
-			}
-			if(Validator.isNotNullOrEmpty(extraDataCommand.getRankavg())){
-				extraViewCommand.setRate(extraDataCommand.getRankavg());
-			}
-			//评论数
-			extraViewCommand.setReviewCount(extraDataCommand.getReviewCount());
-		}
-		return extraViewCommand;
-	}
-
 	@Override
 	protected String getItemMainImageType() {
 		return ItemImage.IMG_TYPE_LIST;
