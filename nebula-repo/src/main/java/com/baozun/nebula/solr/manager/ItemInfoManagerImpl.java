@@ -1517,5 +1517,39 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 		}
 		return commands;
 	}
+
+	/* 
+	 * @see com.baozun.nebula.solr.manager.ItemInfoManager#findItemExtraViewCommand(java.lang.Long)
+	 */
+	@Override
+	public ItemSolrCommand findItemExtraViewCommand(Long itemId) {
+		ItemSolrCommand itemSolrCommand = new ItemSolrCommand();
+		List<Long> itemIds =new ArrayList<Long>();
+		itemIds.add(itemId);
+		List<ItemRateForSolrCommand> itemForSolrRateCommandList = itemForSolrRateCommandDao.findItemRateById(itemIds);
+		List<ItemSalesCountForSolrCommand> itemForSolrSalesCountCommandList = itemForSolrSalesCountCommandDao.findItemCountById(itemIds);
+		List<ItemFavouriteCountForSolrCommand> itemFavouriteCountForSolrCommandList = itemForSolrFavouritedCountCommandDao.findItemCountById(itemIds);
+		if(Validator.isNotNullOrEmpty(itemForSolrRateCommandList)){
+			ItemRateForSolrCommand itemRateForSolrCommand =itemForSolrRateCommandList.get(0);
+			if(null != itemRateForSolrCommand.getItemId() && itemRateForSolrCommand.getCount()>0 && null!=itemRateForSolrCommand.getCount()){
+				String parten = "#.#";
+				DecimalFormat decimal = new DecimalFormat(parten);
+				itemSolrCommand.setRankavg(Float.parseFloat(decimal.format(itemRateForSolrCommand.getSum()/itemRateForSolrCommand.getCount())));
+			}
+		}
+		if(Validator.isNotNullOrEmpty(itemForSolrSalesCountCommandList)){
+			ItemSalesCountForSolrCommand itemSalesCountForSolrCommand =itemForSolrSalesCountCommandList.get(0);
+			if(null != itemSalesCountForSolrCommand.getItemId()){
+				itemSolrCommand.setSalesCount(itemSalesCountForSolrCommand.getCount());
+			}
+		}
+		if(Validator.isNotNullOrEmpty(itemFavouriteCountForSolrCommandList)){
+			ItemFavouriteCountForSolrCommand favCountCommand =itemFavouriteCountForSolrCommandList.get(0);
+			if(null != favCountCommand.getItemId()){
+				itemSolrCommand.setFavoredCount(favCountCommand.getCount());
+			}
+		}
+		return itemSolrCommand;
+	}
 	
 }

@@ -59,6 +59,9 @@
 
 		<version.esapi>2.0GA</version.esapi>
 		<version.solr-solrj>4.7.0</version.solr-solrj>
+		<version.httpclient>4.4.1</version.httpclient>
+		<version.httpcore>4.4.1</version.httpcore>
+		<version.httpmime>4.4.1</version.httpmime>
 
 		<version.velocity>1.7</version.velocity>
 		<version.loxia>2.5.2</version.loxia>
@@ -336,6 +339,19 @@
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
 		</dependency>
+		
+		<dependency>
+	      <groupId>org.apache.httpcomponents</groupId>
+	      <artifactId>httpclient</artifactId>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.httpcomponents</groupId>
+	      <artifactId>httpcore</artifactId>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.httpcomponents</groupId>
+	      <artifactId>httpmime</artifactId>
+	    </dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -821,7 +837,37 @@
 				<groupId>org.apache.solr</groupId>
 				<artifactId>solr-solrj</artifactId>
 				<version>${version.solr-solrj}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>org.apache.httpcomponents</artifactId>
+						<groupId>httpclient</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>org.apache.httpcomponents</artifactId>
+						<groupId>httpcore</groupId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.httpcomponents</groupId>
+						<artifactId>httpmime</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
+			
+			<dependency>
+		      <groupId>org.apache.httpcomponents</groupId>
+		      <artifactId>httpclient</artifactId>
+		      <version>${version.httpclient}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.apache.httpcomponents</groupId>
+		      <artifactId>httpcore</artifactId>
+		      <version>${version.httpcore}</version>
+		    </dependency>
+		    <dependency>
+		      <groupId>org.apache.httpcomponents</groupId>
+		      <artifactId>httpmime</artifactId>
+		      <version>${version.httpmime}</version>
+		    </dependency>
 
 
 

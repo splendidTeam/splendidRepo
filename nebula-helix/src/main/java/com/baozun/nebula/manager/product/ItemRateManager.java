@@ -1,5 +1,7 @@
 package com.baozun.nebula.manager.product;
  
+import java.util.List;
+
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
@@ -40,9 +42,21 @@ public interface ItemRateManager extends BaseManager {
 	public Pagination<RateCommand> findItemRateListByItemId(Page page, Long itemId, Sort[] sorts);
 	
 	/**
+	 * 通过itemId查询商品的评价(根据itemIds查找)
+	 * @param page
+	 * @param itemIds
+	 * @param sorts
+	 * @return
+	 */
+	Pagination<RateCommand> findItemRateListByItemIds(Page page,
+			List<Long> itemIds, Sort[] sorts);
+	
+	/**
 	 * 根据itemCode查询评论数量
 	 * @param itemCode
 	 * @return
 	 */
 	public Integer findRateCountByItemCode(String itemCode);
+
+	
 }

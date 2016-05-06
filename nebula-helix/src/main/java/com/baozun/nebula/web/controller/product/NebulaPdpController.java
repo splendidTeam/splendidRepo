@@ -17,7 +17,6 @@
  */
 package com.baozun.nebula.web.controller.product;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,28 +29,24 @@ import loxia.dao.Pagination;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.RateCommand;
+import com.baozun.nebula.command.product.ItemExtraDataCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalItemStateException;
-import com.baozun.nebula.manager.member.MemberManager;
-import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
@@ -77,20 +72,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * log定义
 	 */
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaPdpController.class);
-
-	@Autowired
-	private ItemRateManager itemRateManager;
-	
-	@Autowired
-	private MemberManager memberManager;
-	
-	@Autowired
-	@Qualifier("itemReviewViewCommandConverter")
-	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
-	
-	@Autowired
-	@Qualifier("reviewMemberViewCommandConverter")
-	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
 	
 	/**
@@ -244,23 +225,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return DefaultReturnResult.SUCCESS;
 	}
 	
-	/**
-	 * 集中将rate 的memberId进行封装，然后批量查询提高效率
-	 * @param rates
-	 * @return
-	 */
-	private List<MemberCommand> getMemberCommandsByRates(List<RateCommand> rates){
-		if(Validator.isNullOrEmpty(rates)){
-			return new ArrayList<MemberCommand>();
-		}
-		
-		List<Long> memberIds = new ArrayList<Long>();
-		for(RateCommand rate : rates){
-			memberIds.add(rate.getMemberId());
-		}
-		return memberManager.findMembersByIds(memberIds);
-	}
-	
 	
 	/**
 	 * 获取面包屑的构建模式，默认根据分类构建
@@ -284,29 +248,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	@Override
 	protected Integer getBuyLimit(Long itemId) {
 		return DEFAULT_SKU_BUY_LIMIT;
-	}
-
-
-	@Override
-	protected Long getItemSales(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemDetailManager.findItemSalesCount(itemBaseInfo.getCode()).longValue();
-	}
-
-
-	@Override
-	protected Long getItemFavoriteCount(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemDetailManager.findItemFavCount(itemBaseInfo.getCode()).longValue();
-	}
-
-
-	@Override
-	protected Float getItemRate(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemDetailManager.findItemAvgReview(itemBaseInfo.getCode());
-	}
-
-	@Override
-	protected Long getItemReviewCount(ItemBaseInfoViewCommand itemBaseInfo) {
-		return itemRateManager.findRateCountByItemCode(itemBaseInfo.getCode()).longValue();
 	}
 
 	@Override
