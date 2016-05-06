@@ -606,6 +606,43 @@
                  ]]>
 			</value>
 		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="ItemRate.findItemRateListByItemIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+					     tmm.login_name as loginName,
+					     ti.id as itemId,
+					     ti.code as itemCode,
+						 tpir.id as id,
+						 tpir.order_line_id as orderLineId,
+						 tpir.score as score,
+						 tpir.content as content,
+						 tpir.reply as reply,
+						 tpir.member_id as memberId,
+						 tpir.lifecycle as lifecycle,
+						 tpir.operator_id as operatorId,
+						 tpir.replier_id as replierId,
+						 tpir.create_time as createTime,
+						 tpir.pass_time as passTime,
+						 tpir.disable_time as disableTime,
+						 tpir.reply_time as replyTime,
+						 tpir.last_reply_time as lastReplyTime 
+					from T_PD_ITEM_RATE tpir 
+					LEFT JOIN t_mem_member tmm on tmm.id = tpir.member_id
+					LEFT JOIN t_pd_item ti on tpir.item_id = ti.id
+					where tpir.lifecycle = 1 and tpir.item_id in (
+		       		#foreach( $itemId in $itemIds )
+    					$itemId,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
 	</bean>	
 
 	

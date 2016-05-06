@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.product;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,6 +26,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Pagination;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,18 +35,26 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
+import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.TimeInterval;
+import com.baozun.nebula.manager.member.MemberManager;
+import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.CurmbCommand;
+import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
+import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
@@ -53,6 +64,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ItemCategoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
 import com.feilong.core.Validator;
@@ -128,6 +140,12 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private ItemRecommandManager itemRecommandManager;
 	
 	@Autowired
+	protected ItemRateManager itemRateManager;
+	
+	@Autowired
+	protected MemberManager memberManager;
+	
+	@Autowired
 	@Qualifier("breadcrumbsViewCommandConverter")
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
@@ -142,6 +160,16 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
     @Autowired
     @Qualifier("browsingHistoryResolver")
     private BrowsingHistoryResolver browsingHistoryResolver;
+    
+    @Autowired
+	@Qualifier("itemReviewViewCommandConverter")
+    protected ItemReviewViewCommandConverter itemReviewViewCommandConverter;
+    
+    @Autowired
+	@Qualifier("reviewMemberViewCommandConverter")
+    protected ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
+    
+    
     
     /**
      * 构造PdpViewCommand
@@ -327,6 +355,66 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
 		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
+	}
+	
+	/**
+	 * 评论到款
+	 * @param itemId
+	 * @param pageForm
+	 * @return
+	 */
+	protected Pagination<ItemReviewViewCommand> buildStyleItemReviewCommandsWithPage(Long itemId,
+			PageForm pageForm){
+		LOG.debug("[PDP_BUILD_STYLEITEMREVIEWCOMMANDS]ItemId:{},CurrentPage:{},Sort:{} [{}] \"{}\"",itemId,pageForm.getCurrentPage(),pageForm.getSort(),new Date(),this.getClass().getSimpleName());
+		ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoLang(itemId);
+		if(Validator.isNullOrEmpty(itemBaseCommand)){
+			LOG.warn(
+                    "[PDP_BUILD_STYLEITEMREVIEWCOMMANDS] item doesn't exists:{},can not find item by itemid :[{}]",
+                    new Date(),
+                    itemId);
+			return null;
+		}
+		String style =itemBaseCommand.getStyle();
+		Pagination<RateCommand> rates =null;
+		if(Validator.isNullOrEmpty(style)){
+			LOG.warn(
+                    "[PDP_BUILD_STYLEITEMREVIEWCOMMANDS] style is null:{},can not find by itemid :[{}], itemCode =[{}]",
+                    new Date(),
+                    itemId,
+                    itemBaseCommand.getCode());
+			rates= itemRateManager.findItemRateListByItemId(pageForm.getPage(), itemId, pageForm.getSorts());
+		}else{
+			List<ItemCommand> itemCommands =itemDetailManager.findItemListByItemId(itemId, style);
+			List<Long> itemIds = new ArrayList<Long>();
+			for (ItemCommand itemCommand : itemCommands) {
+				itemIds.add(itemCommand.getId());
+			}
+			rates= itemRateManager.findItemRateListByItemIds(pageForm.getPage(), itemIds, pageForm.getSorts());
+		}
+		List<RateCommand> items  = rates.getItems();
+		List<MemberCommand> members = getMemberCommandsByRates(items);
+		
+		//convert to itemreviewViewCommand
+		Pagination<ItemReviewViewCommand> itemReviewViewCommands 
+					= itemReviewViewCommandConverter.convertFromTwoObjects(rates, reviewMemberViewCommandConverter.convert(members));
+		return itemReviewViewCommands;
+	}
+	
+	/**
+	 * 集中将rate 的memberId进行封装，然后批量查询提高效率
+	 * @param rates
+	 * @return
+	 */
+	protected List<MemberCommand> getMemberCommandsByRates(List<RateCommand> rates){
+		if(Validator.isNullOrEmpty(rates)){
+			return new ArrayList<MemberCommand>();
+		}
+		
+		List<Long> memberIds = new ArrayList<Long>();
+		for(RateCommand rate : rates){
+			memberIds.add(rate.getMemberId());
+		}
+		return memberManager.findMembersByIds(memberIds);
 	}
 	
 	/**
