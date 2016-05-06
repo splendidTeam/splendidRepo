@@ -28,4 +28,11 @@ public interface ItemInfoManager {
 	 * @return
 	 */	
 	public List<ItemSolrCommand> setItemSolrCommand(List<Long> itemIds);
+	
+	/**
+	 * 商品的一些扩展信息，比如销量、收藏量、评论量、评分等。
+	 * @param itemId
+	 * @return
+	 */
+	public ItemSolrCommand findItemExtraViewCommand(Long itemId);
 }
