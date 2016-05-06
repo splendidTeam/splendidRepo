@@ -81,9 +81,6 @@ public class Property extends BaseModel{
 	/** 名称 */
 	private String				name;
 
-	/** 顺序. */
-	private Integer				sortNo;
-
 	/** 创建时间. */
 	private Date				createTime;
 
@@ -92,11 +89,6 @@ public class Property extends BaseModel{
 
 	/** version. */
 	private Date				version;
-
-	/**
-	 * 是否行业公共属性
-	 */
-	private Boolean				isCommonIndustry;
 
 	/**
 	 * 生命周期
@@ -158,6 +150,20 @@ public class Property extends BaseModel{
 	 * @deprecated 骨架之后丢弃使用
 	 */
 	private Long				commonPropertyId;
+
+	/**
+	 * 是否行业公共属性
+	 * 
+	 * @deprecated 骨架之后丢弃使用
+	 */
+	private Boolean				isCommonIndustry;
+
+	/**
+	 * 顺序
+	 * 
+	 * @deprecated 一个属性属于多个行业，排序是在每个行业里面不一样的。 {@link IndustryPropertyRelation}
+	 */
+	private Integer				sortNo;
 
 	@Transient
 	public String getIndustryName(){

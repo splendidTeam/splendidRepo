@@ -88,14 +88,19 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		select  property_lang.name as name, property.id as id,  property.sort_no as sort_no,
-					 common_property.version as version,  property.industry_id as industry_id,  common_property.editing_type as editing_type,
-					 common_property.value_type as value_type,  common_property.create_time as create_time,  common_property.modify_time as modify_time,
-					 property.lifecycle as lifecycle,  common_property.is_salep_rop as is_salep_rop,  common_property.is_color_prop as is_color_prop,
-					 property.required as required,  property.searchable as searchable,  property.hasthumb as hasthumb,
-					 property.is_common_industry as is_common_industry,  property_lang.group_name as group_name 
-					 from t_pd_property property, t_pd_common_property common_property, t_pd_property_lang property_lang 
-					 where property_lang.lang =:lang and common_property.id = property.common_property_id and property.id = property_lang.property_id
+		       		select  
+		       			 property_lang.name as name, property.id as id,  property.sort_no as sort_no,
+						 property.version as version,  property.industry_id as industry_id,  property.editing_type as editing_type,
+						 property.value_type as value_type,  property.create_time as create_time,  property.modify_time as modify_time,
+						 property.lifecycle as lifecycle,  property.is_salep_rop as is_salep_rop,  property.is_color_prop as is_color_prop,
+						 property.required as required,  property.searchable as searchable,  property.hasthumb as hasthumb,
+						 property.is_common_industry as is_common_industry,  property_lang.group_name as group_name 
+					 from 
+					 	t_pd_property property, 
+					 	t_pd_property_lang property_lang 
+					 where 
+					 property_lang.lang =:lang 
+					 and property.id = property_lang.property_id
 					 and property.id  in (
 			       		#foreach( $id in $ids )
 	    					$id,
