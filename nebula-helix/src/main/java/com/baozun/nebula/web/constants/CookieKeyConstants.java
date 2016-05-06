@@ -49,8 +49,11 @@ public class CookieKeyConstants {
 	/** 购物车数量 add by feilong 2016年4月27日22:19:43 **/
 	public static final String SHOPPING_CART_COUNT = "s_c_c";
 
-	/** 游客保存在cookie当中的购物车商品总数量 **/
-	public static final String GUEST_COOKIE_GC_CNT = "g_c_s_cnt";
+	/** 游客保存在cookie当中的购物车商品总数量 .
+	 * @deprecated 通常用不到,直接使用  {@link #SHOPPING_CART_COUNT}
+	 * **/
+	@Deprecated
+    public static final String GUEST_COOKIE_GC_CNT = "g_c_s_cnt";
 
 	/** 用户性别 */
 	public static final String MEMBER_SEX = "u_s";
