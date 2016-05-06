@@ -202,6 +202,13 @@ public class SdkItemManagerImpl implements SdkItemManager {
 		Pagination<RateCommand> ItemRateCommandPage = itemRateDao.findItemRateListByItemId(page, sorts, itemId);
 		return ItemRateCommandPage;
 	}
+	
+	@Override
+	@Transactional(readOnly=true)
+	public Pagination<RateCommand> findItemRateListByItemIds(Page page, List<Long> itemIds, Sort[] sorts) {
+		Pagination<RateCommand> ItemRateCommandPage = itemRateDao.findItemRateListByItemIds(page, sorts, itemIds);
+		return ItemRateCommandPage;
+	}
 
 	@Override
 	@Transactional(readOnly=true)

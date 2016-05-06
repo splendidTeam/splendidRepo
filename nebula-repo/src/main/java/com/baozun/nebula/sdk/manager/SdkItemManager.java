@@ -123,6 +123,16 @@ public interface SdkItemManager extends BaseManager{
 	public Pagination<RateCommand> findItemRateListByItemId(Page page, Long itemId, Sort[] sorts);
 	
 	/**
+	 * 通过itemId查询商品的评价(根据itemIds)
+	 * @param page
+	 * @param itemIds
+	 * @param sorts
+	 * @return
+	 */
+	Pagination<RateCommand> findItemRateListByItemIds(Page page,
+			List<Long> itemIds, Sort[] sorts);
+	
+	/**
 	 * 通过商品Id查询商品的咨询
 	 *
 	 * @param page

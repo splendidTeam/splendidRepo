@@ -148,6 +148,16 @@ public interface ItemRateDao extends GenericEntityDao<ItemRate,Long>{
 	 */
 	@NativeQuery(model = RateCommand.class)
 	Pagination<RateCommand> findItemRateListByItemId(Page page, Sort[] sorts, @QueryParam("itemId") Long itemId);
+	
+	/**
+	 * 分页获取有效的ItemRate列表(根据itemIds)
+	 * @param page
+	 * @param sorts
+	 * @param itemIds
+	 * @return
+	 */
+	@NativeQuery(model = RateCommand.class)
+	Pagination<RateCommand> findItemRateListByItemIds(Page page, Sort[] sorts, @QueryParam("itemIds") List<Long> itemIds);
  
 	/**
 	 * 查询评论 

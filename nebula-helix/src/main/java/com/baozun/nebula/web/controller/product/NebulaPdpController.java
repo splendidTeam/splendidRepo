@@ -77,20 +77,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 	 * log定义
 	 */
 	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaPdpController.class);
-
-	@Autowired
-	private ItemRateManager itemRateManager;
-	
-	@Autowired
-	private MemberManager memberManager;
-	
-	@Autowired
-	@Qualifier("itemReviewViewCommandConverter")
-	private ItemReviewViewCommandConverter itemReviewViewCommandConverter;
-	
-	@Autowired
-	@Qualifier("reviewMemberViewCommandConverter")
-	private ReviewMemberViewCommandConverter reviewMemberViewCommandConverter;
 	
 	
 	/**
@@ -242,23 +228,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		model.addAttribute("itemReviewViewCommands", itemReviewViewCommands);
 		
 		return DefaultReturnResult.SUCCESS;
-	}
-	
-	/**
-	 * 集中将rate 的memberId进行封装，然后批量查询提高效率
-	 * @param rates
-	 * @return
-	 */
-	private List<MemberCommand> getMemberCommandsByRates(List<RateCommand> rates){
-		if(Validator.isNullOrEmpty(rates)){
-			return new ArrayList<MemberCommand>();
-		}
-		
-		List<Long> memberIds = new ArrayList<Long>();
-		for(RateCommand rate : rates){
-			memberIds.add(rate.getMemberId());
-		}
-		return memberManager.findMembersByIds(memberIds);
 	}
 	
 	

@@ -112,6 +112,13 @@ public class ItemRateManagerImpl implements ItemRateManager {
 		Pagination<RateCommand> itemRateCommandPage = sdkItemManager.findItemRateListByItemId(page, itemId, sorts);
 		return itemRateCommandPage;
 	}
+	
+	@Override
+	public Pagination<RateCommand> findItemRateListByItemIds(Page page,
+			List<Long> itemIds, Sort[] sorts) {
+		Pagination<RateCommand> itemRateCommandPage = sdkItemManager.findItemRateListByItemIds(page, itemIds, sorts);
+		return itemRateCommandPage;
+	}
 
 	@Override
 	public Integer findRateCountByItemCode(String itemCode) {
