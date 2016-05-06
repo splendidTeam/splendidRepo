@@ -5,6 +5,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import com.baozun.nebula.sdk.manager.impl.SdkCmsModuleInstanceManagerImpl;
+import com.feilong.core.Validator;
 
 public class ModuleTag extends TagSupport {
 
@@ -17,7 +18,9 @@ public class ModuleTag extends TagSupport {
 		JspWriter out = this.pageContext.getOut();
 		try {
 			String data = SdkCmsModuleInstanceManagerImpl.moduleMap.get(code);
-			out.println(data);
+			if(Validator.isNotNullOrEmpty(data)){
+				out.println(data);
+			}
 		} catch (Exception e) {
 		}
 		return SKIP_BODY;

@@ -16,19 +16,25 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.hub.sdk.api.SmsService;
+import com.baozun.hub.sdk.command.invoice2notice.SmsCommand;
 import com.baozun.nebula.command.SMSCommand;
-import com.baozun.nebula.dao.system.SMSTemplateDao;
-import com.baozun.nebula.manager.VelocityManager;
-import com.baozun.nebula.model.system.SMSTemplate;
+import com.baozun.nebula.dao.system.SmsSendLogDao;
+import com.baozun.nebula.model.system.SmsSendLog;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.feilong.core.Validator;
+import com.feilong.core.bean.PropertyUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * @author D.C
@@ -37,30 +43,97 @@ import com.baozun.nebula.sdk.manager.SdkSMSManager;
 @Transactional
 @Service("sdkSMSManager")
 public class SdkSMSManagerImpl implements SdkSMSManager {
-	@Autowired
-	SMSTemplateDao smsTemplateDao;
+	
+	private static final Logger	LOG= LoggerFactory.getLogger(SdkSMSManagerImpl.class);
 	
 	@Autowired
-	VelocityManager velocityManager;
+	private SmsSendLogDao smsSendLogDao;
 
 	@Override
 	public SendResult send(SMSCommand smsCommand){
-		Map<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("code", smsCommand.getTemplateCode());
-		//TODO cache & dao method
-		List<SMSTemplate> smsTemplateList = smsTemplateDao.findEffectSMSTemplateListByQueryMap(paramMap);
-		if (smsTemplateList != null && smsTemplateList.size() > 0) {
-			SMSTemplate et = smsTemplateList.get(0);
-			String content = velocityManager.parseVMContent(et.getBody(), smsCommand.getVars());
-			System.out.println("the message is being sended");
-			System.out.println("the mobileNumber is" + smsCommand.getMobile());
-			System.out.println("the message content is" + content);
-			System.out.println("the message is sended");
-			// 记录日志
-			//SMSSendLog sendLog = generateMailLog(et.getId(), receiverEmail);
-			//smsSendLogDao.save(sendLog);
-		}
-		return SendResult.SUCESS;
+		//构建hub接口需要的SmsCommand
+		SmsCommand sms=buildSmsCommand(smsCommand);
+		
+		//TODO mobile没有mask
+		LOG.info("[SEND_SMS_BEGIN]  param : {}" ,JsonUtil.format(sms));
+		String result=SmsService.send(sms);
+		LOG.info("[SEND_SMS_END]  result : {}" ,result);
+		
+		Map<String, String> resultMap=JsonUtil.toMap(result,String.class);
+		//记录日志
+		saveSmsSendLog(resultMap, sms);
+		
+		return getSendResult(resultMap);
 	}
-
+	
+	/**
+	 * 构建hub接口的入参SmsCommand
+	 * @param smsCommand
+	 * @return
+	 */
+	private SmsCommand buildSmsCommand(SMSCommand smsCommand){
+		SmsCommand sms=new SmsCommand();
+		PropertyUtil.copyProperties(sms, smsCommand, "mobile","templateCode");
+		sms.setDataMap(smsCommand.getVars());
+		// 客户编码，找hub要
+		sms.setCustomerCode(ProfileConfigUtil.findPro("config/metainfo.properties").getProperty("sms.customer.code"));
+		return sms;
+	}
+	
+	/**
+	 * 记录日志
+	 * @param resultMap
+	 * @param smsCommand
+	 */
+	private void saveSmsSendLog(Map<String, String> resultMap,SmsCommand smsCommand){
+		//记录日志
+		SmsSendLog sendLog=new SmsSendLog();
+		PropertyUtil.copyProperties(sendLog, smsCommand, "mobile","templateCode");
+		sendLog.setResultCode(resultMap.get("code"));
+		sendLog.setSendTime(new Date());
+		if(Validator.isNotNullOrEmpty(resultMap.get("logId"))){
+			sendLog.setLogId(Long.valueOf(resultMap.get("logId")));
+		}
+		smsSendLogDao.save(sendLog);
+	}
+	
+	/**
+	 * 构建返回值
+	 * @param resultMap
+	 *  {"code":,"msg":"","logId":""}
+		  	code可选值 
+		  	0（成功）    
+			1（失败或其它）   
+    		30001（输入参数不正确）
+     		30002 （没找到对应服务）
+     		30003 （没找到对应模板） 
+			30004 （无权访问）
+			30005 （发送超额）
+    		30006 （重复发送短信）
+	 * @return SendResult
+	 */
+	private SendResult getSendResult(Map<String, String> resultMap){
+		
+		SendResult sendResult;
+		if(Validator.isNullOrEmpty(resultMap)){
+			sendResult=SendResult.ERROR;
+		}else{
+			switch (resultMap.get("code")) {
+			case "0":
+				sendResult=SendResult.SUCESS;
+				break;
+			case "1":
+				sendResult=SendResult.FAILURE;
+				break;
+			case "30001":
+				sendResult=SendResult.INVALIDATE_PARAM;
+				break;
+			default:
+				sendResult=SendResult.FAILURE;
+				break;
+			}
+		}
+		
+		return sendResult;
+	}
 }
