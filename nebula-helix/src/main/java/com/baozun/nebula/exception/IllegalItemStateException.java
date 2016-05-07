@@ -61,7 +61,7 @@ public class IllegalItemStateException extends Exception {
 	    /** 商品新建状态. */
 	    ITEM_LIFECYCLE_NEW,
 
-	    /** 商品未到提前上架时间. */
+	    /** 商品未到上架时间. */
 	    ITEM_BEFORE_ACTIVE_TIME;
 	}
 }

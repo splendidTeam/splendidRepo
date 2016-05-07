@@ -54,6 +54,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewComm
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ShopdogErrorType;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
@@ -112,7 +113,7 @@ public class ShopdogPdpController {
 	
 	
 	@Autowired
-	private ItemDetailManager						detailManager;
+	private ItemDetailManager detailManager;
 	
 	/**
 	 * shopdog商品接口
@@ -128,42 +129,62 @@ public class ShopdogPdpController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/item.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/shopdog/product/detail.json", method = RequestMethod.GET)
 	@ResponseBody
 	public ShopdogResultCommand getItem(
 			@RequestParam(value = "itemCode", required = false) String itemCode, 
 			@RequestParam(value = "extCode", required = false) String extCode,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		
-		ShopdogResultCommand result = new ShopdogResultCommand();
+		// 如果是extCode，先转成itemCode
+		if(Validator.isNotNullOrEmpty(extCode)) {
+			Item item = detailManager.findItemByExtentionCode(extCode);
+			if(Validator.isNotNullOrEmpty(item)) {
+				itemCode = item.getCode();
+			}
+		}
+		
+		// 没有取到合适的参数
+		if(Validator.isNullOrEmpty(itemCode)) {
+			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_PARAMETER_ERROR);
+		}
 		
 		try {
-	        List<ShopdogItemViewCommand> items =null;
-			if(Validator.isNotNullOrEmpty(itemCode)){
-				items=  buildPdpViewCommand(itemCode);
-			}else if(Validator.isNotNullOrEmpty(extCode)){
-				Item item =detailManager.findItemByExtentionCode(extCode);
-				if(Validator.isNotNullOrEmpty(item)){
-					items=  buildPdpViewCommand(item.getCode());
-				}else{
-					LOG.warn("[PDP_SHOW_PDP] can not find item by extCode. extCode:{}", extCode);
-				}
-			}else{
-				LOG.warn("[PDP_SHOW_PDP] itemCode and extCode shouldn't all be empty.");
+			
+			List<ShopdogItemViewCommand> items = buildPdpViewCommand(itemCode);
+			return ShopdogResultCommand.getSuccessInstance(items);
+			
+		} catch (IllegalItemStateException ie) {
+			
+			LOG.error("[SHOPDOG_GET_PDP_DATA] Item state illegal. itemCode:{}, {}", itemCode, ie.getState().name());
+			
+			if(ie.getState().equals(IllegalItemState.ITEM_NOT_EXISTS)) {
+				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_NOT_EXISTS);
 			}
 			
-			result.setData(items);
-			result.setResult(ShopdogResultCommand.RESULT_SUCCESS);
-			
-			return result;
-				
-			} catch (IllegalItemStateException e) {
-				
-				LOG.error("[PDP_SHOW_PDP] Item state illegal. itemCode:{}, {}", itemCode, e.getState().name());
-				
-				result.setResult(ShopdogResultCommand.RESULT_FAIL);
-				return result;
+			if(ie.getState().equals(IllegalItemState.ITEM_LIFECYCLE_OFFSALE)) {
+				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_LIFECYCLE_OFFSALE);
 			}
+			
+			if(ie.getState().equals(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED)) {
+				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_LIFECYCLE_LOGICAL_DELETED);
+			}
+			
+			if(ie.getState().equals(IllegalItemState.ITEM_LIFECYCLE_NEW)) {
+				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_LIFECYCLE_NEW);
+			}
+			
+			if(ie.getState().equals(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME)) {
+				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_BEFORE_ACTIVE_TIME);
+			}
+			
+			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_ILLEGAL_STATE);
+			
+		} catch (Exception e) {
+			
+			LOG.error("[SHOPDOG_GET_PDP_DATA] " + e.getMessage(), e);
+			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_SYSTEM_ERROR);
+		}
 		
 	}
 	
@@ -205,6 +226,7 @@ public class ShopdogPdpController {
 		ShopdogItemViewCommand shopdogItemViewCommand =  shopdogItemViewCommandConverter.convert(itemBaseInfo);
 		
 		List<ItemImageViewCommand> images = buildItemImageViewCommand(itemBaseInfo.getId());
+		
 	    //商品全部图
 		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
 		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommands);
@@ -219,6 +241,7 @@ public class ShopdogPdpController {
 		if(Validator.isNotNullOrEmpty(shopdogItemPropertyViewCommand)){
 			shopdogItemViewCommand.setSalesProperties(shopdogItemPropertyViewCommand.getSalesProperties());
 		}
+		
 		//sku
 		shopdogItemViewCommand.setSkus(buildSkuViewCommand(itemBaseInfo.getId()));
 	
@@ -227,7 +250,6 @@ public class ShopdogPdpController {
 	}
 
 	private List<String> getMainUrls(List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands) {
-		
 		return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
 	}
 

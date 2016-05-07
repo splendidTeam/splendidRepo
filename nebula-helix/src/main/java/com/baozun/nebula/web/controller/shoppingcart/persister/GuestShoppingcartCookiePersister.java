@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver;
+package com.baozun.nebula.web.controller.shoppingcart.persister;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -42,7 +41,7 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.CookieUtil;
 
 /**
- * 基于cookie的游客购物车持久化处理方式.
+ * 基于 {@link Cookie}的游客购物车持久化处理方式.
  *
  * @author feilong
  * @version 5.3.1 2016年5月3日 下午4:20:24
@@ -60,8 +59,8 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.GuestShoppingcartPersister#clear(javax.servlet.http.HttpServletRequest,
-     * javax.servlet.http.HttpServletResponse)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.persister.GuestShoppingcartPersister#clear(javax.servlet.http.
+     * HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
     public void clear(HttpServletRequest request,HttpServletResponse response){
@@ -71,7 +70,8 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.GuestShoppingcartPersister#load(javax.servlet.http.HttpServletRequest)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.persister.GuestShoppingcartPersister#load(javax.servlet.http.
+     * HttpServletRequest)
      */
     @Override
     public List<ShoppingCartLineCommand> load(HttpServletRequest request){
@@ -202,7 +202,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
             return null;
         }
 
-        if (StringUtils.isBlank(cookie.getValue())){
+        if (Validator.isNullOrEmpty(cookie.getValue())){
             return null;
         }
 

@@ -39,10 +39,10 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
-import com.baozun.nebula.web.constants.CookieKeyConstants;
+import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
-import com.feilong.servlet.http.CookieUtil;
 
 /**
  * The Class AbstractShoppingcartResolver.
@@ -55,19 +55,22 @@ import com.feilong.servlet.http.CookieUtil;
 public abstract class AbstractShoppingcartResolver implements ShoppingcartResolver{
 
     /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractShoppingcartResolver.class);
+    private static final Logger        LOGGER = LoggerFactory.getLogger(AbstractShoppingcartResolver.class);
 
     /** The sdk sku manager. */
     @Autowired
-    private SdkSkuManager       sdkSkuManager;
+    private SdkSkuManager              sdkSkuManager;
 
     /** The sdk item manager. */
     @Autowired
-    private SdkItemManager      sdkItemManager;
+    private SdkItemManager             sdkItemManager;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager    sdkEngineManager;
+    private SdkEngineManager           sdkEngineManager;
+
+    @Autowired
+    private ShoppingcartCountPersister shoppingcartCountPersister;
 
     //**************************************************************************************
     /*
@@ -541,30 +544,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     HttpServletRequest request,
                     HttpServletResponse response){
-
-        addShoppingcartCountCookie(shoppingCartLineCommandList, response);
-    }
-
-    /**
-     * @param shoppingCartLineCommandList
-     * @param response
-     */
-    private void addShoppingcartCountCookie(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletResponse response){
-        CookieUtil.addCookie(CookieKeyConstants.SHOPPING_CART_COUNT, getTotalCount(shoppingCartLineCommandList), response);
-    }
-
-    /**
-     *
-     * @param totalCount
-     * @return
-     */
-    //TODO
-    protected String getTotalCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        // 将购物车数量塞到Cookie 里面去
-        int totalCount = Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
-                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
-        return "" + totalCount;
-
+        shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
     }
 
     /**

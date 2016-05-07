@@ -54,7 +54,18 @@ public class ShopdogResultCommand extends BaseViewCommand implements Serializabl
 	 * 返回数据
 	 */
 	private Object data;
+	
+	public ShopdogResultCommand() {
 
+	}
+	
+	public ShopdogResultCommand(Integer result, String errorCode, String message, Object data) {
+		super();
+		this.result = result;
+		this.errorCode = errorCode;
+		this.message = message;
+		this.data = data;
+	}
 
 	public Integer getResult() {
 		return result;
@@ -86,5 +97,17 @@ public class ShopdogResultCommand extends BaseViewCommand implements Serializabl
 
 	public void setData(Object data) {
 		this.data = data;
+	}
+	
+	public static ShopdogResultCommand getErrorInstance(String errorCode, String message) {
+		return new ShopdogResultCommand(RESULT_FAIL, errorCode, message, null);
+	}
+	
+	public static ShopdogResultCommand getErrorInstance(ShopdogErrorType error) {
+		return new ShopdogResultCommand(RESULT_FAIL, error.getErrorCode(), error.getMessage(), null);
+	}
+	
+	public static ShopdogResultCommand getSuccessInstance(Object data) {
+		return new ShopdogResultCommand(RESULT_SUCCESS, "", "", data);
 	}
 }
