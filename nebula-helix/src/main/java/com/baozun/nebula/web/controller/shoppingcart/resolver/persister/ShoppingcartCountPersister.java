@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver;
+package com.baozun.nebula.web.controller.shoppingcart.resolver.persister;
 
 import java.util.List;
 
@@ -24,22 +24,13 @@ import javax.servlet.http.HttpServletResponse;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
- * 游客购物车 持久化.
+ * 购物车数量 持久化.
  *
  * @author feilong
  * @version 5.3.1 2016年5月3日 下午4:32:39
  * @since 5.3.1
  */
-public interface GuestShoppingcartPersister{
-
-    /**
-     * 加载.
-     *
-     * @param request
-     *            the request
-     * @return the shopping cart line command list
-     */
-    List<ShoppingCartLineCommand> load(HttpServletRequest request);
+public interface ShoppingcartCountPersister{
 
     /**
      * 保存.
@@ -54,13 +45,12 @@ public interface GuestShoppingcartPersister{
     void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response);
 
     /**
-     * 清空.
+     * 清空(通常用在用户退出之后调用).
      *
      * @param request
      *            the request
      * @param response
      *            the response
-     * @since 5.3.1
      */
     void clear(HttpServletRequest request,HttpServletResponse response);
 }

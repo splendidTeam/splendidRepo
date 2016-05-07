@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver;
+package com.baozun.nebula.web.controller.shoppingcart.resolver.predicate;
 
 import org.apache.commons.collections4.Predicate;
 
