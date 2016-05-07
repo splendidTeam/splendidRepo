@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver.handler;
+package com.baozun.nebula.web.controller.shoppingcart.handler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.baozun.nebula.web.controller.shoppingcart.resolver.persister.ShoppingcartCountPersister;
+import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 
 /**
  * The Class DefaultShoppingcartLogoutSuccessHandler.

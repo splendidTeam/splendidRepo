@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver.persister;
+package com.baozun.nebula.web.controller.shoppingcart.persister;
 
 import java.util.List;
 

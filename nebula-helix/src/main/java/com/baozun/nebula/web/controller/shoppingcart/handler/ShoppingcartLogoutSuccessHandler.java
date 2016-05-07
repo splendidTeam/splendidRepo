@@ -14,43 +14,40 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver.persister;
-
-import java.util.List;
+package com.baozun.nebula.web.controller.shoppingcart.handler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-
 /**
- * 购物车数量 持久化.
+ * 退出成功之后,购物车相关处理.
  *
  * @author feilong
- * @version 5.3.1 2016年5月3日 下午4:32:39
+ * @version 5.3.1 2016年5月7日 上午12:02:18
  * @since 5.3.1
  */
-public interface ShoppingcartCountPersister{
+public interface ShoppingcartLogoutSuccessHandler{
 
     /**
-     * 保存.
+     * 退出成功之后,购物车相关处理.
+     * 
+     * <h3>流程:</h3>
+     * 
+     * <ol>
+     * <li>Cookie中购物车数量数据清空,
+     * {@link com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister#clear(HttpServletRequest, HttpServletResponse)}
+     * </li>
+     * </ol>
+     * 
+     * </blockquote>
      *
-     * @param shoppingCartLineCommandList
-     *            the need change checked command list
+     * @param memberDetails
+     *            the member details
      * @param request
      *            the request
      * @param response
      *            the response
      */
-    void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response);
+    void onLogoutSuccess(HttpServletRequest request,HttpServletResponse response);
 
-    /**
-     * 清空(通常用在用户退出之后调用).
-     *
-     * @param request
-     *            the request
-     * @param response
-     *            the response
-     */
-    void clear(HttpServletRequest request,HttpServletResponse response);
 }

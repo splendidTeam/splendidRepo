@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.persister.GuestShoppingcartPersister;
+import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 
 /**
  * 游客操作购物车.
