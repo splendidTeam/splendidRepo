@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.web.controller.order;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,12 +31,23 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
+import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * 订单确认控制器.
@@ -113,6 +127,31 @@ public class NebulaOrderConfirmController extends BaseController{
     @Qualifier("orderFormValidator")
     private OrderFormValidator  orderFormValidator;
 
+    
+	@Autowired
+	private SdkShoppingCartManager	sdkShoppingCartManager;
+
+	@Autowired
+	private SdkMemberManager		sdkMemberManager;
+
+	/** The guest shoppingcart resolver. */
+	@Autowired
+	@Qualifier("guestShoppingcartResolver")
+	private ShoppingcartResolver	guestShoppingcartResolver;
+
+	/** The member shoppingcart resolver. */
+	@Autowired
+	@Qualifier("memberShoppingcartResolver")
+	private ShoppingcartResolver	memberShoppingcartResolver;
+	
+    @Autowired
+    @Qualifier("shoppingcartViewCommandConverter")
+    private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
+    
+
+	private static final String		MODEL_KEY_ORDER_CONFIRM	= "orderConfirmViewCommand";
+	
+	
     /**
      * 显示订单结算页面.
      *
@@ -139,7 +178,20 @@ public class NebulaOrderConfirmController extends BaseController{
 
         //TODO 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
 
-        //TODO 收获地址信息 參見 addresscontroller
+        //收获地址信息 
+		List<ContactCommand>  addressList = null;
+        if(memberDetails!=null){
+        	 addressList =  sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId());
+        }
+        // 获取购物车信息
+        ShoppingCartCommand cartCommand = getChosenShoppingCartCommand(request, memberDetails);
+
+        // 封装viewCommand
+        OrderConfirmViewCommand OrderViewCommand = new OrderConfirmViewCommand();
+        OrderViewCommand.setShoppingCartViewCommand(shoppingcartViewCommandConverter.convert(cartCommand));
+        OrderViewCommand.setAddressList(addressList);
+
+        model.addAttribute(MODEL_KEY_ORDER_CONFIRM, OrderViewCommand);
 
         return "transaction.check";
     }
@@ -187,4 +239,39 @@ public class NebulaOrderConfirmController extends BaseController{
         //TODO
         return null;
     }
+    
+    
+	/**
+	 * Detect shoppingcart resolver.
+	 *
+	 * @param memberDetails
+	 *            the member details
+	 * @return the shoppingcart resolver
+	 */
+	private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
+		return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
+	}
+
+	/**
+	 * 获取选中的购物车信息.
+	 * 
+	 * @param request
+	 *            the request
+	 * @param memberDetails
+	 *            the member details
+	 * @return the cart info
+	 */
+	protected ShoppingCartCommand getChosenShoppingCartCommand(HttpServletRequest request,MemberDetails memberDetails){
+		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
+		
+		//过虑未选中的购物车行  过滤之后，金额是否需要重新计算？
+		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate()) ;
+		if (null == cartLines) {
+			return null;
+		}
+		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
+		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+	}
 }
