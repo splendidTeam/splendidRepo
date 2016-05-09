@@ -90,7 +90,7 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 			
 			model.addAttribute(MODEL_KEY_PRODUCT_DETAIL, pdpViewCommand);
 			
-			return VIEW_PRODUCT_DETAIL;
+			return getPdpView(pdpViewCommand.getBaseInfo().getId(), request, response, model);
 			
 		} catch (IllegalItemStateException e) {
 			
