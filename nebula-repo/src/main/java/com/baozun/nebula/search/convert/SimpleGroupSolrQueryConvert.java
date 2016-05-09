@@ -6,6 +6,7 @@ import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.solr.factory.NebulaSolrQueryFactory;
 import com.baozun.nebula.solr.factory.SortTypeEnum;
 import com.baozun.nebula.solr.utils.SolrOrderSort;
+import com.feilong.core.Validator;
 
 /**
  * 需要分组的solrquery转换器
@@ -23,11 +24,13 @@ public class SimpleGroupSolrQueryConvert implements SolrQueryConvert {
 		
 		//设置排序
 		SortTypeEnum sortTypeEnum=SortTypeEnum.getInstance(searchCommand.getSortStr());
-		SolrOrderSort[] orders=sortTypeEnum.getSolrOrderSort();
-		NebulaSolrQueryFactory.setSort(solrQuery, orders);
-		
-		//设置分组
-		NebulaSolrQueryFactory.setGroup(solrQuery, orders);
+		if(Validator.isNotNullOrEmpty(sortTypeEnum)){
+			SolrOrderSort[] orders=sortTypeEnum.getSolrOrderSort();
+			NebulaSolrQueryFactory.setSort(solrQuery, orders);
+			
+			//设置分组
+			NebulaSolrQueryFactory.setGroup(solrQuery, orders);
+		}
 		
 		return solrQuery;
 	}
