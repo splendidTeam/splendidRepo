@@ -51,6 +51,7 @@ import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.exception.ErrorCodesFoo;
+import com.baozun.nebula.model.product.IndustryPropertyRelation;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemImage;
@@ -65,6 +66,7 @@ import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.UserDetails;
+import com.baozun.nebula.sdk.manager.SdkIndustryManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
@@ -73,6 +75,7 @@ import com.baozun.nebula.solr.manager.ItemInfoManager;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.gson.Gson;
 
 /**
@@ -98,6 +101,9 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 	
 	@Autowired
 	private ItemInfoManager				itemInfoManager;
+	
+	@Autowired
+	private SdkIndustryManager			sdkIndustryManager;
 
 	@Transactional(readOnly=true)
 	@Override
@@ -519,11 +525,59 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		propertyIds.addAll(propertyIdSet);
 		propertyValueIds.addAll(propertyValueIdSet);
 		// 通过"属性id的集合"获得"属性集合"
+		List<Property> propertyList =null;
 		Sort[] sorts = Sort.parse("sort_no asc");
-		List<Property> propertyList = sdkItemManager.findPropertyListByIds(propertyIds, sorts);
+		List<Property> defaultPropertyList = sdkItemManager.findPropertyListByIds(propertyIds, sorts);
+		
+		
+		//获取行业属性联系，以便属性排序
+		Item item = sdkItemManager.findItemById(itemId);
+		if(Validator.isNullOrEmpty(item)||Validator.isNullOrEmpty(item.getIndustryId())){
+			if(log.isDebugEnabled()){
+				log.debug("itemId is {} , item's industry is null !", itemId);
+			}
+			return Collections.emptyMap();
+		}
+		List<IndustryPropertyRelation> industryPropertyRelationList = 
+				sdkIndustryManager.findIndustryPropertyRelationListByIndustryId(item.getIndustryId());
+		
+		if(Validator.isNullOrEmpty(industryPropertyRelationList)){
+			log.info("itemId is {} , item's industry-property relations are empty !", itemId);
+			propertyList =defaultPropertyList;
+		}else{
+			Map<Long, Property> propertyMap =new HashMap<Long, Property>();
+			for (Property property : defaultPropertyList) {
+				propertyMap.put(property.getId(), property);
+			}
+			propertyList =new ArrayList<Property>();
+			Property tempProperty=null;
+			int i =0;
+			List<Long> alreadySortIds =new ArrayList<Long>();
+			for (IndustryPropertyRelation industryPropertyRelation : industryPropertyRelationList) {
+				tempProperty =propertyMap.get(industryPropertyRelation.getPropertyId());
+				if(Validator.isNotNullOrEmpty(tempProperty)){
+					tempProperty.setSortNo(i);
+					propertyList.add(tempProperty);
+					alreadySortIds.add(tempProperty.getId());
+					i++;
+				}
+			}
+			if(Validator.isNotNullOrEmpty(alreadySortIds)){
+				for (Property property : defaultPropertyList) {
+					if(!alreadySortIds.contains(property.getId())){
+						property.setSortNo(i);
+						propertyList.add(property);
+						i++;
+					}
+				}	
+			}else propertyList =defaultPropertyList;
+			if(log.isDebugEnabled()){
+				log.debug("propertyList :[{}] !", JsonUtil.format(propertyList));
+			}
+		}
+		
 		// 通过"属性值id的集合"获得"属性值集合"
 		List<PropertyValue> propertyValueList = sdkItemManager.findPropertyValueListByIds(propertyValueIds);
-
 		Map<Long, String> propertyValueMap = new HashMap<Long, String>();
 		for (PropertyValue propertyValue : propertyValueList) {
 			propertyValueMap.put(propertyValue.getId(), propertyValue.getValue());

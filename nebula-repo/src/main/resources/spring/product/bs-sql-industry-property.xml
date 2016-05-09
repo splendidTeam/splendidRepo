@@ -88,6 +88,23 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="IndustryPropertyRelation.findIndustryPropertyRelationListByIndustryId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找出某个行业中行业属性关系</description>
+		<constructor-arg>
+			<value>
+			 <![CDATA[ 
+			 	select 
+			 		* 
+			 	from 
+			 		t_pd_industry_property_relation 
+			 	where 
+			 		industry_id = :industryId 
+			 	order by sort_no asc
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 </beans>
 
