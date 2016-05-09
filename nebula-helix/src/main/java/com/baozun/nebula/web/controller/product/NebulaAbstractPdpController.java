@@ -588,8 +588,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 	}
 	
-	protected abstract String buildSizeCompareChart(Long itemId);
-	
 	/**
 	 * 构造面包屑
 	 * @return
