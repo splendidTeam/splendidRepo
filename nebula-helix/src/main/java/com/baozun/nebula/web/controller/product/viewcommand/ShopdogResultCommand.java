@@ -18,13 +18,11 @@ package com.baozun.nebula.web.controller.product.viewcommand;
 
 import java.io.Serializable;
 
-import com.baozun.nebula.web.controller.BaseViewCommand;
-
 /**
  * Shopdog command的基类
  * 
  */
-public class ShopdogResultCommand extends BaseViewCommand implements Serializable {
+public class ShopdogResultCommand implements Serializable {
 	
 	private static final long serialVersionUID = 3702428534203898354L;
 	
