@@ -62,10 +62,10 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		//执行Processor
 		String url=memberStatusFlowProcessor.process(memberDetails,request);
 		
-		shoppingcartLoginSuccessHandler.onLoginSuccess(memberDetails, request, response);
-		
 		//如果url为空 获取from url 也可为空
 		if (Validator.isNullOrEmpty(url)){
+			shoppingcartLoginSuccessHandler.onLoginSuccess(memberDetails, request, response);
+			
 			url=loginForwardHandler.getForwardURL(request);
 		}
 		
