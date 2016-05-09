@@ -15,13 +15,18 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartLoginSuccessHandler;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.SessionUtil;
 
 public abstract class NebulaAbstractLoginController extends BaseController {
 	
 	@Autowired
-	private MemberStatusFlowProcessor memberStatusFlowProcessor;
+	private MemberStatusFlowProcessor 		memberStatusFlowProcessor;
+	
+	@Autowired
+	private ShoppingcartLoginSuccessHandler	shoppingcartLoginSuccessHandler;
 	
 	/**
 	 * 重置会话
@@ -50,6 +55,12 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();		
 		//执行Processor
 		String url=memberStatusFlowProcessor.process(memberDetails,request);
+		
+		//返回url如果为空，代表登录成功,合并游客购物车
+		if(Validator.isNotNullOrEmpty(url)){
+			shoppingcartLoginSuccessHandler.onLoginSuccess(memberDetails, request, response);
+		}
+		
 		
 		//返回链接
 		defaultReturnResult.setReturnObject(url);

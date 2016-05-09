@@ -49,6 +49,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberLoginViewCommand;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartLogoutSuccessHandler;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
 import com.feilong.servlet.http.RequestUtil;
@@ -142,6 +143,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	@Autowired
 	private MemberManager							memberManager;
+	
+	@Autowired
+	private ShoppingcartLogoutSuccessHandler		shoppingcartLogoutSuccessHandler;
 	
 
 	/**
@@ -341,7 +345,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 * @param response
 	 */
 	protected void onLogoutSuccess(HttpServletRequest request,HttpServletResponse response){
-
+		shoppingcartLogoutSuccessHandler.onLogoutSuccess(request, response);
 	}
 
 	/**
