@@ -542,7 +542,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 				sdkIndustryManager.findIndustryPropertyRelationListByIndustryId(item.getIndustryId());
 		
 		if(Validator.isNullOrEmpty(industryPropertyRelationList)){
-			log.info("itemId is {} , item's industry is null !", itemId);
+			log.info("itemId is {} , item's industry-property relations are empty !", itemId);
 			propertyList =defaultPropertyList;
 		}else{
 			Map<Long, Property> propertyMap =new HashMap<Long, Property>();
