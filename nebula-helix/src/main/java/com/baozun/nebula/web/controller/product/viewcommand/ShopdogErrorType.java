@@ -27,7 +27,7 @@ public class ShopdogErrorType implements Serializable {
 	private static final long serialVersionUID = -5230237621269913529L;
 	
 	// 通用异常
-	/** 通用异常, 900001:非法的参数 */
+	/** 通用异常, 900000:系统异常 */
 	public static final ShopdogErrorType COMMON_SYSTEM_ERROR = new ShopdogErrorType("900000", "系统异常");
 	/** 通用异常, 900001:非法的参数 */
 	public static final ShopdogErrorType COMMON_PARAMETER_ERROR = new ShopdogErrorType("900001", "非法的参数");
