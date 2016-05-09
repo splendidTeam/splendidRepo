@@ -22,15 +22,17 @@ public class SimpleGroupSolrQueryConvert implements SolrQueryConvert {
 		
 		solrQuery=NebulaSolrQueryFactory.createSolrQuery(searchCommand,solrQuery);
 		
+		SolrOrderSort[] orders = null;
 		//设置排序
 		SortTypeEnum sortTypeEnum=SortTypeEnum.getInstance(searchCommand.getSortStr());
 		if(Validator.isNotNullOrEmpty(sortTypeEnum)){
-			SolrOrderSort[] orders=sortTypeEnum.getSolrOrderSort();
+			orders=sortTypeEnum.getSolrOrderSort();
 			NebulaSolrQueryFactory.setSort(solrQuery, orders);
 			
-			//设置分组
-			NebulaSolrQueryFactory.setGroup(solrQuery, orders);
+			
 		}
+		//设置分组
+		NebulaSolrQueryFactory.setGroup(solrQuery, orders);
 		
 		return solrQuery;
 	}

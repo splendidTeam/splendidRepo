@@ -60,7 +60,10 @@ public class ItemBaseInfoViewCommand extends BaseViewCommand {
     /** 商品详细描述. */
     private String description;
     
-    /** 商品类型(0代表赠品, 1代表主卖品). */
+    /** 商品类型(Item上后增加的商品类型). {@link Item#type}*/
+    private Integer itemType;
+    
+    /** 商品类型(0代表赠品, 1代表主卖品). {@link ItemInfo#type}*/
 	private Integer type;
 	
 	/** 分组style */
@@ -252,7 +255,15 @@ public class ItemBaseInfoViewCommand extends BaseViewCommand {
         this.description = description;
     }
 
-    /**
+    public Integer getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(Integer itemType) {
+		this.itemType = itemType;
+	}
+
+	/**
      * 获得 seo搜索描述.
      *
      * @return the seoDescription
