@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.member.converter;
+package com.baozun.nebula.web.controller.shoppingcart.converter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
