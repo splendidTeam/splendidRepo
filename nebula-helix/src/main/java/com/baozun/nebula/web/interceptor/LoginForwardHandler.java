@@ -47,7 +47,7 @@ public class LoginForwardHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	public String getForwardURL(HttpServletRequest request) throws IOException{
+	public String getForwardURL(HttpServletRequest request){
 		String url = (String)request.getSession().getAttribute(SessionKeyConstants.MEMBER_IBACK_URL);
 		if(url != null){
 			request.getSession().removeAttribute(SessionKeyConstants.MEMBER_IBACK_URL);
