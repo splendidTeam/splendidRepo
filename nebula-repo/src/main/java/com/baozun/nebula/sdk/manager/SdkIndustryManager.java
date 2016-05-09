@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Industry;
+import com.baozun.nebula.model.product.IndustryPropertyRelation;
 
 /**
  * 
@@ -20,4 +21,12 @@ public interface SdkIndustryManager extends BaseManager{
 	 * @return
 	 */
 	public List<Industry> findIndustryListByNames(List<String> industryNames);
+	
+	/**
+	 * 根据行业id查询行业属性关系 
+	 * @param industryId
+	 * @author dongliang.ma
+	 * @return
+	 */
+	public List<IndustryPropertyRelation> findIndustryPropertyRelationListByIndustryId(Long industryId);
 }
