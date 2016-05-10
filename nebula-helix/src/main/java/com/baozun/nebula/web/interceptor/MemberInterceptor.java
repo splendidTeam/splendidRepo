@@ -28,7 +28,7 @@ import com.baozun.nebula.web.constants.ImgConstants;
 import com.baozun.nebula.web.constants.MemberCookieLoginTypeConstatns;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.feilong.servlet.http.CookieUtil;
-
+@Deprecated
 public class MemberInterceptor extends HandlerInterceptorAdapter implements
         ServletContextAware {
 

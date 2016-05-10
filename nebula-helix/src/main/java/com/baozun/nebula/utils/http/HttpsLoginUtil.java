@@ -7,6 +7,7 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
  * @author Justin Hu
  *
  */
+@Deprecated
 public class HttpsLoginUtil {
 
 	

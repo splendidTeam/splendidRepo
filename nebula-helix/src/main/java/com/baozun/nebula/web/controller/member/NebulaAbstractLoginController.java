@@ -1,11 +1,15 @@
 package com.baozun.nebula.web.controller.member;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.manager.member.MemberStatusFlowProcessor;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
@@ -15,13 +19,25 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.member.event.LoginSuccessEvent;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartLoginSuccessHandler;
+import com.baozun.nebula.web.interceptor.LoginForwardHandler;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.SessionUtil;
 
 public abstract class NebulaAbstractLoginController extends BaseController {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaAbstractLoginController.class);
+	
 	@Autowired
-	private MemberStatusFlowProcessor memberStatusFlowProcessor;
+	private MemberStatusFlowProcessor 		memberStatusFlowProcessor;
+	
+	@Autowired
+	private ShoppingcartLoginSuccessHandler	shoppingcartLoginSuccessHandler;
+	
+	@Autowired
+	@Qualifier("loginForwardHandler")
+	private LoginForwardHandler loginForwardHandler;
 	
 	/**
 	 * 重置会话
@@ -50,6 +66,17 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();		
 		//执行Processor
 		String url=memberStatusFlowProcessor.process(memberDetails,request);
+		
+		//如果url为空 获取from url 也可为空
+		if (Validator.isNullOrEmpty(url)){
+			shoppingcartLoginSuccessHandler.onLoginSuccess(memberDetails, request, response);
+			try {
+				url=loginForwardHandler.getForwardURL(request);
+			} catch (UnsupportedEncodingException e) {
+				LOG.error("Decode backUrl faild");
+			}
+		}
+		
 		
 		//返回链接
 		defaultReturnResult.setReturnObject(url);

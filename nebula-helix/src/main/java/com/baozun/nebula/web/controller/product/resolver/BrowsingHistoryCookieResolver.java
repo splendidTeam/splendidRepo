@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.utilities.common.EncryptUtil;
-import com.baozun.nebula.utils.date.TimeInterval;
 import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;

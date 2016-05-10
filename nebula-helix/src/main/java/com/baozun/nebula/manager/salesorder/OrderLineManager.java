@@ -17,13 +17,19 @@
 
 package com.baozun.nebula.manager.salesorder;
 
+import java.util.List;
+
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.salesorder.OrderLine;
+import com.baozun.nebula.sdk.command.OrderLineCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
 
 /**
  * @author - 项硕
  */
 public interface OrderLineManager extends BaseManager {
 
-	public OrderLine findByPk(Long id); 
+	public OrderLine findByPk(Long id);
+
+        public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId); 
 }

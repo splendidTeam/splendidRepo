@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.order.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.model.product.Sku;
@@ -66,6 +67,10 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
     /** The map. */
     private Map<String, SkuProperty> propertiesMap;
 
+   /**
+    * 销售属性 
+    */
+    private List<SkuProperty>                   skuPropertys;
     /** 数量几个. */
     private Integer                  quantity;
 
@@ -330,6 +335,14 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
      */
     public void setSubTotalAmt(BigDecimal subTotalAmt){
         this.subTotalAmt = subTotalAmt;
+    }
+
+    public List<SkuProperty> getSkuPropertys() {
+        return skuPropertys;
+    }
+
+    public void setSkuPropertys(List<SkuProperty> skuPropertys) {
+        this.skuPropertys = skuPropertys;
     }
 
 }

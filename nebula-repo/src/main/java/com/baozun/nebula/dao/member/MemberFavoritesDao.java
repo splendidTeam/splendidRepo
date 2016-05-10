@@ -45,7 +45,7 @@ public interface MemberFavoritesDao extends GenericEntityDao<MemberFavorites, Lo
 	 * 通过收藏Id和用户Id查询收藏信息
 	 * @param id
 	 * @param memberId
-	 * @return	:MemberFavorites
+	 * @return:MemberFavorites
 	 * @date 2014-2-12 下午05:38:40
 	 */
 	@NativeQuery(model = MemberFavorites.class)

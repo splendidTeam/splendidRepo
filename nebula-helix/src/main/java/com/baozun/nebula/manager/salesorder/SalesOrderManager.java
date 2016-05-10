@@ -2,11 +2,9 @@ package com.baozun.nebula.manager.salesorder;
 
 import java.util.List;
 import java.util.Set;
-
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
 import com.baozun.nebula.command.promotion.PromotionCouponInfoCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.coupon.CouponType;
@@ -16,7 +14,9 @@ import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.OrderPromotionCommand;
 import com.baozun.nebula.sdk.command.ReturnOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.web.command.OrderQueryCommand;
 
 public interface SalesOrderManager extends BaseManager {
 
@@ -64,4 +64,16 @@ public interface SalesOrderManager extends BaseManager {
 	 * @return
 	 */
 	public PromotionCouponInfoCommand findCouponInfoByCouponCode(String couponCode);
+        /**
+         * 
+         * 说明：根据orderQueryForm查询订单分页列表
+         * @param memberId
+         * @param orderQueryForm
+         * @param page
+         * @return
+         * @author 张乃骐
+         * @time：2016年5月9日 下午2:43:26
+         */
+        public Pagination<SimpleOrderCommand> findSimpleOrderCommandPagination(Long memberId, OrderQueryCommand orderQueryForm,
+            Page page);
 }

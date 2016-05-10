@@ -1,6 +1,8 @@
 package com.baozun.nebula.dao.industry;
 
 
+import java.util.List;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -22,5 +24,8 @@ public interface IndustryPropertyRelationDao extends GenericEntityDao<IndustryPr
 	
 	@NativeQuery(alias = "max",clazzes = Integer.class)
 	public Integer findMaxIndustryPropertySortId(@QueryParam("industryId") Long industryId);
+	
+	@NativeQuery(model =IndustryPropertyRelation.class)
+	public List<IndustryPropertyRelation> findIndustryPropertyRelationListByIndustryId(@QueryParam("industryId") Long industryId);
 	
 }

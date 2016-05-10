@@ -50,6 +50,8 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	private static final Logger			LOG						= LoggerFactory.getLogger(NebulaSearchController.class);
 
 	private static final String			ITEM_LIST				= "item.list";
+	
+	private static final String			SEARCH_NO_RESULT		= "item.search-no-result";
 
 	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommond";
 
@@ -103,9 +105,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 		// 查询
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);		
-		if(searchResultPage==null){
+		if(searchResultPage==null||searchResultPage.getItems()==null||searchResultPage.getItems().size()==0){
 			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
-			return ITEM_LIST;
+			return SEARCH_NO_RESULT;
 		}
 		LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]",searchResultPage.getCount(), new Date());
 

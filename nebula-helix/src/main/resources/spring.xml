@@ -14,7 +14,6 @@
 	
 	<import resource="spring/spring-dao.xml" />
 	<import resource="spring/spring-manager.xml" />
-	<import resource="spring/spring-resolver.xml" />
 	<import resource="spring/spring-message.xml" />
 	<import resource="spring/spring-mail.xml" />
 	<import resource="spring/spring-security.xml" />
