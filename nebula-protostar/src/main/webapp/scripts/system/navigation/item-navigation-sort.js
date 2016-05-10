@@ -77,8 +77,8 @@ var treeObj = null
 
 // 函数
 function onClick(event, treeId, treeNode) {
-	if(treeNode.diy_type=='1'){
-		nps.info(nps.i18n("ITEM_CATEGORY_OPERATE_INFO"),"只有分类类型导航才能进行商品排序");
+	if(treeNode.diy_type=='5'){
+		nps.info(nps.i18n("ITEM_CATEGORY_OPERATE_INFO"),"只有商品集合链接类型导航才能进行商品排序");
 		 return;
 	}
 	$j(".tag-change-in.sorted").html("");
