@@ -17,12 +17,18 @@
 
 package com.baozun.nebula.manager.salesorder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.model.salesorder.OrderLine;
+import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.manager.SdkOrderLineManager;
+import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
+import com.feilong.core.bean.BeanUtil;
 
 /**
  * @author - 项硕
@@ -38,5 +44,18 @@ public class OrderLineManagerImpl implements OrderLineManager {
 	public OrderLine findByPk(Long id) {
 		return lineManager.findByPk(id);
 	}
+
+    @Override
+    public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId) {
+        // TODO Auto-generated method stub
+        List<OrderLineCommand> findOrderLinesByOrderId = lineManager.findOrderLinesByOrderId(orderId);
+        List<SimpleOrderLineSubViewCommand> list=new ArrayList<SimpleOrderLineSubViewCommand>();
+        for (OrderLineCommand orderLineCommand : findOrderLinesByOrderId) {
+             SimpleOrderLineSubViewCommand slsv=new SimpleOrderLineSubViewCommand();
+             BeanUtil.copyProperties(slsv, orderLineCommand);
+             list.add(slsv);
+        }
+        return list;
+    }
 
 }

@@ -18,7 +18,6 @@
 package com.baozun.nebula.sdk.manager;
 
 import java.util.List;
-
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
@@ -31,6 +30,8 @@ public interface SdkOrderLineManager extends BaseManager{
 	public OrderLine findByPk(Long id);
 	
 	
-	public List<OrderLineCommand> findOrderLinesByOrderId(Long orderId);	
+	public List<OrderLineCommand> findOrderLinesByOrderId(Long orderId);
+
+
 	
 }

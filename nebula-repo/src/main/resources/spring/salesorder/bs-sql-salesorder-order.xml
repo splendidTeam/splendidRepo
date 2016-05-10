@@ -1136,4 +1136,54 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="SalesOrder.findSimpleOrderByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询订单列表</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					o.ID as orderId,
+					o.CODE as orderCode,
+					o.CREATE_TIME as createTime,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.TOTAL ,
+					o.DISCOUNT
+					from t_so_salesorder as o
+					where 1=1
+					#if($code)
+						and o.CODE like :orderCode
+					#end
+					#if($startDate)
+		       			and	o.CREATE_TIME>=:startDate
+		       		#end
+		       		#if($endDate)
+		       			and	o.CREATE_TIME<=:endDate
+		       		#end
+				 	#if($memberId)
+						and o.MEMBER_ID = :memberId
+					#end
+				    #if($logisticsStatusList)
+					and o.LOGISTICS_STATUS 
+					in (
+		       		#foreach( $ls in $logisticsStatusList )
+    					$ls,
+				    #end
+				     -1)
+					#end
+					 #if($financestatusList)
+					and o.financial_status 
+					in (
+		       		#foreach( $ls in $financestatusList )
+    					$ls,
+				    #end
+				     -1)
+					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>
