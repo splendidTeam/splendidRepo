@@ -109,7 +109,7 @@ $j(document).ready(function(){
 		}
 
 		var nodes = NAVI_TREE.getSelectedNodes();
-		if (type == "2") {
+		if (type == "5") {
 			if(!param) {
 				nps.info(nps.i18n("NAVIGATION_MESSAGE"),nps.i18n("NAVIGATION_EDIT_PARAM"));
 				$j("#update-parameter").addClass("ui-loxia-error");
@@ -404,7 +404,7 @@ $j(document).ready(function(){
 		var url = $j.trim($j("#add-url").val());
 		var param = $j("#add-parameter").data("category") +  $j("#add-parameter").data("property");
 		var isNewWin = $j("#add-newWindow").prop("checked");
-		if (type == "2") {
+		if (type == "5") {
 			if(!param) {
 				nps.info(nps.i18n("NAVIGATION_MESSAGE"),nps.i18n("NAVIGATION_EDIT_PARAM"));
 				$j("#add-parameter").addClass("ui-loxia-error");
@@ -636,7 +636,7 @@ $j(document).ready(function(){
 	
 	$j("#update-type,#add-type").change(function(){
 		var type = $j(this).val();
-		if (type == "1") {
+		if (type == "3") {
 			$j(this).parent().siblings(".navi-param").hide();
 			$j("#toItemSort").css('visibility','hidden');
 			
@@ -966,32 +966,31 @@ function onClick(event, treeId, treeNode)  {
 		}
 		
 		if (isParentNavigationURLType(treeNode)) {	// 父节点是URL类型，不能更改类型为分类类型的节点，或添加分类类型的子节点
-			$j("#update-type").val(1);
-			$j("#update-type option[value='2']").remove();
+			$j("#update-type").val(3);
+			$j("#update-type option[value='5']").remove();
 			$j("#update-type").parent().siblings(".navi-param").hide();
-			$j("#add-type").val(1);
-			$j("#add-type option[value='2']").remove();
+			$j("#add-type").val(3);
+			$j("#add-type option[value='5']").remove();
 			$j("#add-type").parent().siblings(".navi-param").hide();
 		} else {
-			if (treeNode.diy_type == 1) {	// 当前节点是URL类型，不能添加分类类型的子节点
-				$j("#add-type").val(1);
-				$j("#add-type option[value='2']").remove();
+			if (treeNode.diy_type == 3) {	// 当前节点是URL类型，不能添加分类类型的子节点
+				$j("#add-type").val(3);
+				$j("#add-type option[value='5']").remove();
 				$j("#add-type").parent().siblings(".navi-param").hide();
 			} else {
 				//新增导航初始化
 				var addFlag = false;
 				
 				$j("#add-type option").each(function(){
-					if ($j(this).val() == 2) {
+					if ($j(this).val() == 5) {
 						addFlag = true;
 					}
 				});
-				
 				if (!addFlag) {
-					$j("#add-type").prepend("<option value='2'>分类类型</option>");
+					$j("#add-type").prepend("<option value='5'>商品集合链接</option>");
 				}
 				
-				if ($j("#add-type").find("option:selected").val() == 2) {
+				if ($j("#add-type").find("option:selected").val() == 5) {
 					$j("#add-type").parent().siblings(".navi-param").show();
 				}
 				
@@ -1001,16 +1000,16 @@ function onClick(event, treeId, treeNode)  {
 			var updateFlag = false;
 			
 			$j("#update-type option").each(function(){
-				if ($j(this).val() == 2) {
+				if ($j(this).val() == 5) {
 					updateFlag = true;
 				}
 			});
 			
 			if (!updateFlag) {
-				$j("#update-type").prepend("<option value='2'>分类类型</option>");
+				$j("#update-type").prepend("<option value='5'>商品集合链接</option>");
 			}
 			
-			if ($j("#update-type").find("option:selected").val() == 2) {
+			if ($j("#update-type").find("option:selected").val() == 5) {
 				$j("#update-type").parent().siblings(".navi-param").show();
 				//重置排序链接
 				$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
@@ -1219,13 +1218,13 @@ function getFontCss(treeId, treeNode) {
 function reset(mode) {
 	//$j("#" + mode + "-name").val("");
 	$j("#tree_name_zh_cn").val("");
-	$j("#" + mode + "-type").val(2);	//类型默认为 分类类型
+	$j("#" + mode + "-type").val(5);	//类型默认为 分类类型
 	$j("#" + mode + "-url").val("");
 	$j("#" + mode + "-parameter").val("");
 	$j("#" + mode + "-newWindow").prop("checked", false);
 
 	if (mode === "update") {	//修改模块中 可以设置状态
-		$j("#" + mode + "-status").val(1);
+		$j("#" + mode + "-status").val(3);
 		$j(".navi-param:eq(0)").show();
 	} else {
 		$j(".navi-param:eq(1)").show();
@@ -1255,7 +1254,7 @@ function isParentNavigationURLType(treeNode){
 	
 	var parentNode = treeNode.getParentNode();
 	
-	if (parentNode.diy_type == 1) {
+	if (parentNode.diy_type == 3) {
 		return true;
 	} else {
 		if (parentNode.id != 0) {

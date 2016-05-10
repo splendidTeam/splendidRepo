@@ -105,11 +105,12 @@ public class NavigationController extends BaseController{
 	//protostar只提供默认转定，每个商城需要自定义转换类
 	private  SolrQueryConvert		solrQueryConvert =null;
 	
-	protected  String CONFIG = "config/metainfo.properties";
+//	protected  String CONFIG = "config/metainfo.properties";
+//	
+//	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
 	
-	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
-	
-	
+	@Value("#{meta['solrQueryConvert.class']}")
+	private String				SOL_RQUERY_CONVERT_STRING	= "";
 	/***
 	 * 未排序标志
 	 */
