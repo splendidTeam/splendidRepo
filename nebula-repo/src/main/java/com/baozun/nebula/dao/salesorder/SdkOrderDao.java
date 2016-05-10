@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -27,18 +26,19 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.CancelOrderCommand;
 import com.baozun.nebula.sdk.command.ItemSkuCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.ReturnOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 
 /**
  * Order dao
  * 
  * @author chuanyang.zheng
+ * @param <SimpleOrderCommand>
  */
 
 public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
@@ -199,7 +199,7 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
 	 * 
 	 * @param actualFreight
 	 * @param express
-	 * @param expressCode
+	 * @param expressCodes
 	 * @param date
 	 */
 	@NativeUpdate
@@ -207,4 +207,16 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
 			@QueryParam("logisticsProviderCode") String logisticsProviderCode,
 			@QueryParam("logisticsProviderName") String logisticsProviderName,
 			@QueryParam("transCode")String transCode, @QueryParam("modifyTime")Date modifyTime);
+	/**
+	 * 
+	 * 说明：根据order查询条件返回SimpleOrderCommand的分页
+	 * @param page
+	 * @param sorts
+	 * @param paraMap
+	 * @return
+	 * @author 张乃骐
+	 * @time：2016年5月9日 下午3:34:54
+	 */
+       @NativeQuery(model =SimpleOrderCommand.class)
+       Pagination<SimpleOrderCommand> findSimpleOrderByOrderQueryCommand(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap);
 }

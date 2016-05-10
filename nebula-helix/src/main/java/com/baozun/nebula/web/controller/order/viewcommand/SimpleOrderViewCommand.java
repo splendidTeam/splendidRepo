@@ -36,7 +36,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     private static final long                   serialVersionUID = -290693655189583423L;
 
     /** 订单id. */
-    private String                              orderId;
+    private Long                              orderId;
 
     /** 订单code. */
     private String                              orderCode;
@@ -197,7 +197,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the orderId
      */
-    public String getOrderId(){
+    public Long getOrderId(){
         return orderId;
     }
 
@@ -207,7 +207,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      * @param orderId
      *            the orderId to set
      */
-    public void setOrderId(String orderId){
+    public void setOrderId(Long orderId){
         this.orderId = orderId;
     }
 }
