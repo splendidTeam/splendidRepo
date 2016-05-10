@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.ui.Model;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemImageCommand;
@@ -123,6 +124,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品详情页 的默认定义 */
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
+	/** QuickView商品详情页 的定义 */
+	public static final String		VIEW_PRODUCT_DETAIL_QUICKVIEW		= "product.detail";
+	
 	//缓存key的定义
 	/** pdpViewCommand的缓存key */
 	public static final String 		CACHE_KEY_PDP_VIEW_COMMAND			= "nebula_cache_pdp_view_command";
@@ -151,6 +155,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
 	@Autowired
+	@Qualifier("colorSwatchViewCommandResolver")
 	protected ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
 	
 	@Autowired
@@ -423,21 +428,18 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	 * @param itemId
 	 * @return
 	 */
-	protected ItemExtraViewCommand buildItemExtraViewCommand(ItemBaseInfoViewCommand itemBaseInfo){
+	protected ItemExtraViewCommand buildItemExtraViewCommand(final ItemBaseInfoViewCommand itemBaseInfo){
 		String key = CACHE_KEY_ITEM_EXTRA + "-" + itemBaseInfo.getCode();
+		Integer expire = TimeInterval.SECONDS_PER_HOUR;
 		
-		ItemExtraViewCommand itemExtraViewCommand = null;
-		try {
-			itemExtraViewCommand = cacheManager.getObject(key);
-		} catch(Exception e) {
-			LOG.error("[PDP_BUILD_ITETM_EXTRA_VIEW_COMMAND] item extra view command cache exception.itemCode:{},exception:{} [{}] \"{}\"",itemBaseInfo.getCode(),e.getMessage(),new Date(),this.getClass().getSimpleName());
-		}
-		
-		if(itemExtraViewCommand == null) {
-			itemExtraViewCommand = buildItemExtraViewCommandFromDB(itemBaseInfo);
-			cacheManager.setObject(key, itemExtraViewCommand, TimeInterval.SECONDS_PER_HOUR);
-		}
-		
+		//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
+		ItemExtraViewCommand itemExtraViewCommand = new NebulaAbstractCacheBuilder<ItemExtraViewCommand, RuntimeException>(key, expire) {
+			@Override
+			protected ItemExtraViewCommand buildCachedObject() {
+				return buildItemExtraViewCommandFromDB(itemBaseInfo);
+			}
+    	}.getCachedObject();
+
 		return itemExtraViewCommand;
 	}
 	
@@ -586,6 +588,18 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 获得pdp的View
+	 * <p>如果是ajax请求，返回quickView的pdp，否则返回pdp页面。quickView的pdp一般用于在列表页或其他页面弹出一个pdp的快速查看层。</p>
+	 * @return pdp的view
+	 */
+	protected String getPdpView(Long itemId, HttpServletRequest request, HttpServletResponse response, Model model) {
+		if(request.getHeader("X-Requested-With") != null) {
+			return VIEW_PRODUCT_DETAIL_QUICKVIEW;
+		}
+		return VIEW_PRODUCT_DETAIL;
 	}
 	
 	/**

@@ -105,7 +105,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 		// 查询
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);		
-		if(searchResultPage==null||searchResultPage.getItems()==null||searchResultPage.getSize()==0){
+		if(searchResultPage==null||searchResultPage.getItems()==null||searchResultPage.getItems().size()==0){
 			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 			return SEARCH_NO_RESULT;
 		}

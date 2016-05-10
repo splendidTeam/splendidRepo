@@ -17,6 +17,8 @@
 package com.baozun.nebula.web.interceptor;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,13 +47,15 @@ public class LoginForwardHandler {
 	 * 获取跳转URL，默认实现是从Session中取出并删除Session中对应的值，可重载
 	 * @param request
 	 * @return
+	 * @throws UnsupportedEncodingException 
 	 * @throws IOException
 	 */
-	public String getForwardURL(HttpServletRequest request){
+	public String getForwardURL(HttpServletRequest request) throws UnsupportedEncodingException{
 		String url = (String)request.getSession().getAttribute(SessionKeyConstants.MEMBER_IBACK_URL);
 		if(url != null){
 			request.getSession().removeAttribute(SessionKeyConstants.MEMBER_IBACK_URL);
-			return url;
+			
+			return URLDecoder.decode(url, "UTF-8");
 		}else{
 			return null;
 		}

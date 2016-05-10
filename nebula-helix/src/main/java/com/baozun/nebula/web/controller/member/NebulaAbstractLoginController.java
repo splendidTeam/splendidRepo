@@ -1,10 +1,13 @@
 package com.baozun.nebula.web.controller.member;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -23,6 +26,8 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.SessionUtil;
 
 public abstract class NebulaAbstractLoginController extends BaseController {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(NebulaAbstractLoginController.class);
 	
 	@Autowired
 	private MemberStatusFlowProcessor 		memberStatusFlowProcessor;
@@ -62,11 +67,14 @@ public abstract class NebulaAbstractLoginController extends BaseController {
 		//执行Processor
 		String url=memberStatusFlowProcessor.process(memberDetails,request);
 		
-		shoppingcartLoginSuccessHandler.onLoginSuccess(memberDetails, request, response);
-		
 		//如果url为空 获取from url 也可为空
 		if (Validator.isNullOrEmpty(url)){
-			url=loginForwardHandler.getForwardURL(request);
+			shoppingcartLoginSuccessHandler.onLoginSuccess(memberDetails, request, response);
+			try {
+				url=loginForwardHandler.getForwardURL(request);
+			} catch (UnsupportedEncodingException e) {
+				LOG.error("Decode backUrl faild");
+			}
 		}
 		
 		

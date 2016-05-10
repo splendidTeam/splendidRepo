@@ -36,6 +36,9 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 	/** -分隔符 */
 	private final static String		SEPARATORCHARS_MINUS	= "-";
+	
+	/** 空格 */
+	private final static String		SEPARATORCHARS_SPACE	= " ";
 
 	@Autowired
 	private SearchManager			searchManager;
@@ -164,7 +167,10 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		setBoostBq(boost, searchCommand);
 
 		// 搜索搜索关键字不为空
-		setBoostPfAndbf(boost, searchCommand.getSearchWord());
+		setBoostQfAndPf(boost, searchCommand.getSearchWord());
+		
+		//用函数计算某个字段的权重
+		setBoostBf(boost, searchCommand);
 
 		return boost;
 	}
@@ -342,7 +348,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	 * @author 冯明雷
 	 * @time 2016年4月27日下午2:51:19
 	 */
-	protected void setBoostPfAndbf(Boost boost,String searchKeyWord){
+	protected void setBoostQfAndPf(Boost boost,String searchKeyWord){
 		if (Validator.isNullOrEmpty(searchKeyWord)) {
 			return;
 		}
@@ -353,25 +359,37 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		StringBuffer qf = new StringBuffer();
 
 		// 各个字段的分数加起来总共等于1
-		qf.append(SkuItemParam.style + ":" + searchKeyWord + "^0.3" + SEPARATORCHARS_COMMA);
-		qf.append(SkuItemParam.itemCode + ":" + searchKeyWord + "^0.25" + SEPARATORCHARS_COMMA);
-		qf.append(SkuItemParam.title + ":" + searchKeyWord + "^0.15" + SEPARATORCHARS_COMMA);
-		qf.append(SkuItemParam.subTitle + ":" + searchKeyWord + "^0.15" + SEPARATORCHARS_COMMA);
-		qf.append(SkuItemParam.allCategoryCodes + ":" + searchKeyWord + "^0.1" + SEPARATORCHARS_COMMA);
-		qf.append(SkuItemParam.categoryname + "*:" + searchKeyWord + "^0.05" + SEPARATORCHARS_COMMA);
+		qf.append(SkuItemParam.style + "^0.3" + SEPARATORCHARS_SPACE);
+		qf.append(SkuItemParam.itemCode + "^0.25" + SEPARATORCHARS_SPACE);
+		qf.append(SkuItemParam.title + "^0.15" + SEPARATORCHARS_SPACE);
+		qf.append(SkuItemParam.subTitle + "^0.15" + SEPARATORCHARS_SPACE);
+		qf.append(SkuItemParam.allCategoryCodes + "^0.1" + SEPARATORCHARS_SPACE);
+		qf.append(SkuItemParam.categoryname + "*^0.05");
 
 		boost.setQf(qf.toString());
 
 		// 需要匹配的字段,以逗号分隔
 		StringBuffer pf = new StringBuffer();
-		pf.append(SkuItemParam.style + SEPARATORCHARS_COMMA);// 款号
-		pf.append(SkuItemParam.itemCode + SEPARATORCHARS_COMMA);// 商品code
-		pf.append(SkuItemParam.title + SEPARATORCHARS_COMMA);// 商品名称
-		pf.append(SkuItemParam.subTitle + SEPARATORCHARS_COMMA);// 副标题
-		pf.append(SkuItemParam.allCategoryCodes + SEPARATORCHARS_COMMA);// 分类code
+		pf.append(SkuItemParam.style + SEPARATORCHARS_SPACE);// 款号
+		pf.append(SkuItemParam.itemCode + SEPARATORCHARS_SPACE);// 商品code
+		pf.append(SkuItemParam.title + SEPARATORCHARS_SPACE);// 商品名称
+		pf.append(SkuItemParam.subTitle + SEPARATORCHARS_SPACE);// 副标题
+		pf.append(SkuItemParam.allCategoryCodes + SEPARATORCHARS_SPACE);// 分类code
 		pf.append(SkuItemParam.categoryname + "*");// 分类名称
 
 		boost.setPf(pf.toString());
+	}
+	
+	/**
+	 * 用函数计算某个字段的权重(项目自己去实现)
+	 * @return void
+	 * @param boost
+	 * @param searchCommand 
+	 * @author 冯明雷
+	 * @time 2016年5月9日下午2:30:02
+	 */
+	protected void setBoostBf(Boost boost,SearchCommand searchCommand){
+		
 	}
 
 }
