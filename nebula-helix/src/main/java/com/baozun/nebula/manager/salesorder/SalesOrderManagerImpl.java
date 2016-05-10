@@ -11,13 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
+
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.baozun.nebula.command.promotion.PromotionCouponInfoCommand;
 import com.baozun.nebula.dao.coupon.CouponDao;
 import com.baozun.nebula.dao.coupon.CouponTypeDao;
@@ -54,45 +56,53 @@ import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.feilong.core.bean.BeanUtil;
+import com.feilong.core.util.MapUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
 @Transactional
 @Service("SalesOrderManager")
-public class SalesOrderManagerImpl implements SalesOrderManager {
+public class SalesOrderManagerImpl implements SalesOrderManager{
+
+    /** The Constant log. */
+    private static final Logger    LOGGER = LoggerFactory.getLogger(SalesOrderManagerImpl.class);
 
     @Autowired
-    private OrderManager sdkOrderService;
+    private OrderManager           sdkOrderService;
 
     @Autowired
-    private ItemDao itemDao;
+    private ItemDao                itemDao;
 
     @Autowired
-    private ItemInfoDao itemInfoDao;
+    private ItemInfoDao            itemInfoDao;
 
     @Autowired
-    private ItemCategoryDao itemCategoryDao;
+    private ItemCategoryDao        itemCategoryDao;
 
     @Autowired
-    private ItemTagRelationDao itemTagRelationDao;
+    private ItemTagRelationDao     itemTagRelationDao;
 
     @Autowired
-    private ItemPropertiesDao itemPropertiesDao;
+    private ItemPropertiesDao      itemPropertiesDao;
 
     @Autowired
-    private ShopDao shopDao;
+    private ShopDao                shopDao;
 
     @Autowired
-    private PropertyValueDao propertyValueDao;
+    private PropertyValueDao       propertyValueDao;
 
     @Autowired
-    private SkuDao skuDao;
+    private SkuDao                 skuDao;
 
     @Autowired
-    private CouponDao couponDao;
+    private CouponDao              couponDao;
 
     @Autowired
-    private CouponTypeDao couponTypeDao;
+    private CouponTypeDao          couponTypeDao;
 
     @Autowired
     private PromotionCouponCodeDao promotionCouponCodeDao;
@@ -104,14 +114,13 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
     private SdkShoppingCartManager sdkShoppingCartManager;
 
     @Autowired
-    private SdkOrderDao sdkOrderDao;
+    private SdkOrderDao            sdkOrderDao;
 
     @Autowired
-    private SdkOrderPromotionDao sdkOrderPromotionDao;
+    private SdkOrderPromotionDao   sdkOrderPromotionDao;
 
     @Override
-    public String createOrder(SalesOrderCommand salesOrderCommand, Set<String> memComboIds,
-            List<ShoppingCartLineCommand> lines) {
+    public String createOrder(SalesOrderCommand salesOrderCommand,Set<String> memComboIds,List<ShoppingCartLineCommand> lines){
 
         // 订单概要表
         ShoppingCartCommand shoppingCartCommand = null;
@@ -131,33 +140,32 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
     }
 
     @Override
-    public List<OrderPromotionCommand> findOrderPormots(String orderCode) {
+    public List<OrderPromotionCommand> findOrderPormots(String orderCode){
         return sdkOrderService.findOrderPormots(orderCode);
     }
 
     @Override
-    public PromotionCouponCode validCoupon(String couponCode) {
+    public PromotionCouponCode validCoupon(String couponCode){
         return sdkOrderService.validCoupon(couponCode);
     }
 
     @Override
-    public List<OrderLineCommand> findOrderLineList(String skuId, String count, String ids) {
+    public List<OrderLineCommand> findOrderLineList(String skuId,String count,String ids){
 
         List<OrderLineCommand> orderLineList = new ArrayList<OrderLineCommand>();
 
-        if (StringUtils.isNotBlank(skuId)) {
+        if (StringUtils.isNotBlank(skuId)){
             // 立即购买--一条清单
 
-            OrderLineCommand lineCommand = getOrderLineFromPruductDetail(Long.valueOf(skuId),
-                    Integer.valueOf(count));
+            OrderLineCommand lineCommand = getOrderLineFromPruductDetail(Long.valueOf(skuId), Integer.valueOf(count));
             orderLineList.add(lineCommand);
 
-        } else {
+        }else{
             // 购物车-去结算--多条清单
-            if (StringUtils.isNotBlank(ids)) {
+            if (StringUtils.isNotBlank(ids)){
                 String[] idArray = ids.split(",");
                 List<Long> idList = new ArrayList<Long>();
-                for (String sid : idArray) {
+                for (String sid : idArray){
                     idList.add(Long.parseLong(sid));
                 }
 
@@ -182,7 +190,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
      * @return
      */
 
-    public OrderLineCommand getOrderLineFromPruductDetail(Long skuId, Integer count) {
+    public OrderLineCommand getOrderLineFromPruductDetail(Long skuId,Integer count){
         // List<OrderLineCommand> orderLineList =new
         // ArrayList<OrderLineCommand>();
 
@@ -216,19 +224,18 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
         // itemCategory
 
         List<ItemCategory> categoryLists = itemCategoryDao.findItemCategoryListByItemId(sku.getItemId());
-        if (categoryLists != null && categoryLists.size() > 0) {
+        if (categoryLists != null && categoryLists.size() > 0){
             List<Long> categoryList = new ArrayList<Long>();
-            for (ItemCategory itemCategory : categoryLists) {
+            for (ItemCategory itemCategory : categoryLists){
                 categoryList.add(itemCategory.getCategoryId());
             }
             lineCommand.setCategoryList(categoryList);
         }
         // itemTag
-        List<ItemTagRelation> lableTagIds = itemTagRelationDao
-                .findItemTagRelationListByItemId(sku.getItemId());
-        if (lableTagIds != null && lableTagIds.size() > 0) {
+        List<ItemTagRelation> lableTagIds = itemTagRelationDao.findItemTagRelationListByItemId(sku.getItemId());
+        if (lableTagIds != null && lableTagIds.size() > 0){
             List<Long> lableIds = new ArrayList<Long>();
-            for (ItemTagRelation itemTagRelation : lableTagIds) {
+            for (ItemTagRelation itemTagRelation : lableTagIds){
                 lableIds.add(itemTagRelation.getTagId());
             }
             lineCommand.setLableIds(lableIds);
@@ -239,18 +246,16 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
         return lineCommand;
     }
 
-    public List<OrderLineCommand> getOrderLineListFromShoppingCart(List<Long> idList) {
+    public List<OrderLineCommand> getOrderLineListFromShoppingCart(List<Long> idList){
         List<OrderLineCommand> orderLineList = new ArrayList<OrderLineCommand>();
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommands = sdkShoppingCartLineDao
-                .findShopCartLineByIds(idList);
+        List<ShoppingCartLineCommand> shoppingCartLineCommands = sdkShoppingCartLineDao.findShopCartLineByIds(idList);
 
         OrderLineCommand orderLineCommand = null;
 
-        for (ShoppingCartLineCommand cartLineCommand : shoppingCartLineCommands) {
+        for (ShoppingCartLineCommand cartLineCommand : shoppingCartLineCommands){
             orderLineCommand = new OrderLineCommand();
-            orderLineCommand = getOrderLineFromPruductDetail(cartLineCommand.getSkuId(),
-                    cartLineCommand.getQuantity());
+            orderLineCommand = getOrderLineFromPruductDetail(cartLineCommand.getSkuId(), cartLineCommand.getQuantity());
 
             orderLineList.add(orderLineCommand);
         }
@@ -258,12 +263,11 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
         return orderLineList;
     }
 
-    public String convertSaleProp(String propertiesName) {
+    public String convertSaleProp(String propertiesName){
         String result = "";
         Gson gson = new Gson();
-        List<SkuProperty> pList = gson.fromJson(propertiesName, new TypeToken<List<SkuProperty>>() {
-        }.getType());
-        for (SkuProperty skuProperty : pList) {
+        List<SkuProperty> pList = gson.fromJson(propertiesName, new TypeToken<List<SkuProperty>>(){}.getType());
+        for (SkuProperty skuProperty : pList){
 
             result += "<span class='salePropNameStyle'>";
             result += skuProperty.getpName() + "</span>:";
@@ -275,62 +279,64 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
     }
 
     @Override
-    public CouponType findCouponTypeByCouponNo(String couponNo) {
+    public CouponType findCouponTypeByCouponNo(String couponNo){
 
         Coupon coupon = couponDao.findByCardNo(couponNo);
         CouponType couponType = null;
-        if (coupon != null) {
+        if (coupon != null){
             couponType = couponTypeDao.findById(coupon.getCardTypeId());
         }
         return couponType;
     }
 
     @Override
-    public Integer immediatelyBuy(Long userId, Set<String> membComboIds,
-            ShoppingCartLineCommand shoppingCartLineCommand, List<ShoppingCartLineCommand> lines) {
-        Integer result = sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand,
-                lines);
+    public Integer immediatelyBuy(
+                    Long userId,
+                    Set<String> membComboIds,
+                    ShoppingCartLineCommand shoppingCartLineCommand,
+                    List<ShoppingCartLineCommand> lines){
+        Integer result = sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand, lines);
         return result;
     }
 
     @Override
-    public Integer saveCancelOrder(CancelOrderCommand cancelOrderCommand) {
+    public Integer saveCancelOrder(CancelOrderCommand cancelOrderCommand){
         return sdkOrderService.saveCancelOrder(cancelOrderCommand);
     }
 
     @Override
-    public Pagination<CancelOrderCommand> findCanceledOrderList(Page page, Long memberId) {
+    public Pagination<CancelOrderCommand> findCanceledOrderList(Page page,Long memberId){
         return sdkOrderService.findCanceledOrderList(page, memberId);
     }
 
     @Override
-    public SalesOrderCommand findOrderByCode(String code, Integer type) {
+    public SalesOrderCommand findOrderByCode(String code,Integer type){
         return sdkOrderService.findOrderByCode(code, type);
     }
 
     @Override
-    public Pagination<ReturnOrderCommand> findReturnedOrderList(Page page, Long memberId) {
+    public Pagination<ReturnOrderCommand> findReturnedOrderList(Page page,Long memberId){
         return sdkOrderService.findReturnedOrderList(page, memberId);
     }
 
     @Override
-    public Integer saveReturnedOrder(ReturnOrderCommand returnOrderCommand) {
+    public Integer saveReturnedOrder(ReturnOrderCommand returnOrderCommand){
         return sdkOrderService.saveReturnedOrder(returnOrderCommand);
     }
 
     @Override
-    public SalesOrderCommand findOrderByLineId(Long orderLineId) {
+    public SalesOrderCommand findOrderByLineId(Long orderLineId){
         return sdkOrderService.findOrderByLineId(orderLineId);
     }
 
     @Override
-    public List<SalesOrderCommand> findNoPayOrders(Sort[] sorts, Long memberId) {
+    public List<SalesOrderCommand> findNoPayOrders(Sort[] sorts,Long memberId){
         List<SalesOrderCommand> salesOrderComList = sdkOrderService.findNoPayOrders(sorts, memberId);
         return salesOrderComList;
     }
 
     @Override
-    public PromotionCouponInfoCommand findCouponInfoByCouponCode(String couponCode) {
+    public PromotionCouponInfoCommand findCouponInfoByCouponCode(String couponCode){
         return promotionCouponCodeDao.findCouponInfoByCouponCode(couponCode);
     }
 
@@ -338,55 +344,53 @@ public class SalesOrderManagerImpl implements SalesOrderManager {
      * 根据orderQueryForm查询订单分页列表
      */
     @Override
-    public Pagination<SimpleOrderCommand> finorderByOrderQueryForm(Page page,
-            OrderQueryCommand orderQueryForm, Long memberId) {
-        // 将orderqueryform转换成map
-        Map<String,Object> paraMap;
-        try {
-            paraMap = convertBean(orderQueryForm);
-            Sort[] sorts = Sort.parse("o.create_Time desc");
+    public Pagination<SimpleOrderCommand> findSimpleOrderCommandPagination(Long memberId,OrderQueryCommand orderQueryCommand,Page page){
+        try{
+            // 将orderqueryform转换成map
+            Map<String, Object> paraMap = convertBean(orderQueryCommand);
             paraMap.put("memberId", memberId);
             // 后台查询
-             Pagination<SimpleOrderCommand> ordercommand = sdkOrderDao.findSimpleOrderByOrderQueryCommand(page,
-                    sorts, paraMap);
-           
-             return ordercommand;
-                    
-        } catch (IllegalAccessException | InvocationTargetException | IntrospectionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Sort[] sorts = Sort.parse("o.create_Time desc");
+            return sdkOrderDao.findSimpleOrderByOrderQueryCommand(page, sorts, paraMap);
+        }catch (IllegalAccessException | InvocationTargetException | IntrospectionException e){
+            LOGGER.error("", e);
             return null;
-        } 
+        }
 
     }
 
     /**
      * 将一个 JavaBean 对象转化为一个 Map
      * 
-     * @param bean 要转化的JavaBean 对象
+     * @param bean
+     *            要转化的JavaBean 对象
      * @return 转化出来的 Map 对象
-     * @throws IntrospectionException 如果分析类属性失败
-     * @throws IllegalAccessException 如果实例化 JavaBean 失败
-     * @throws InvocationTargetException 如果调用属性的 setter 方法失败
+     * @throws IntrospectionException
+     *             如果分析类属性失败
+     * @throws IllegalAccessException
+     *             如果实例化 JavaBean 失败
+     * @throws InvocationTargetException
+     *             如果调用属性的 setter 方法失败
      */
-    private Map convertBean(Object bean)
-            throws IntrospectionException, IllegalAccessException, InvocationTargetException {
+    private Map convertBean(Object bean) throws IntrospectionException,IllegalAccessException,InvocationTargetException{
         Class type = bean.getClass();
         Map returnMap = new HashMap();
         BeanInfo beanInfo = Introspector.getBeanInfo(type);
 
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-        for (int i = 0; i < propertyDescriptors.length; i++) {
+        for (int i = 0; i < propertyDescriptors.length; i++){
             PropertyDescriptor descriptor = propertyDescriptors[i];
             String propertyName = descriptor.getName();
-            if (!propertyName.equals("class")) {
+            if (!propertyName.equals("class")){
                 Method readMethod = descriptor.getReadMethod();
                 Object result = readMethod.invoke(bean, new Object[0]);
-                if (result != null) {
+                if (result != null){
                     returnMap.put(propertyName, result);
-                } /*else {
-                    returnMap.put(propertyName, "");
-                }*/
+                } /*
+                   * else {
+                   * returnMap.put(propertyName, "");
+                   * }
+                   */
             }
         }
         return returnMap;

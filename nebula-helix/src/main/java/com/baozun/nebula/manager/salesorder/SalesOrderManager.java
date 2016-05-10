@@ -67,13 +67,13 @@ public interface SalesOrderManager extends BaseManager {
         /**
          * 
          * 说明：根据orderQueryForm查询订单分页列表
-         * @param page
-         * @param orderQueryForm
          * @param memberId
+         * @param orderQueryForm
+         * @param page
          * @return
          * @author 张乃骐
          * @time：2016年5月9日 下午2:43:26
          */
-        public Pagination<SimpleOrderCommand> finorderByOrderQueryForm(Page page, OrderQueryCommand orderQueryForm,
-            Long memberId);
+        public Pagination<SimpleOrderCommand> findSimpleOrderCommandPagination(Long memberId, OrderQueryCommand orderQueryForm,
+            Page page);
 }
