@@ -39,10 +39,10 @@ public class RegisterFormNormalValidator implements Validator{
 		RegisterForm form = (RegisterForm) target;
 
 		// pc端注册：邮箱，密码，验证码必需
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "loginEmail", "field.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "field.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword", "field.required");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "randomCode", "field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "loginEmail", "loginEmail.field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword", "repassword.field.required");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "randomCode", "randomCode.field.required");
 
 		if (!errors.hasFieldErrors("loginEmail")){
 			if (!RegexUtil.matches(RegexPattern.EMAIL, form.getLoginEmail())){
