@@ -35,7 +35,9 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.cms.CmsModuleInstance;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
 import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
+import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceVersionManager;
 import com.baozun.nebula.sdk.manager.SdkCmsModuleTemplateManager;
+import com.baozun.nebula.sdk.manager.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
@@ -55,6 +57,12 @@ public class CmsModuleInstanceController extends BaseController {
 
 	@Autowired
 	private SdkCmsModuleTemplateManager cmsModuleTemplateManager;
+	
+	@Autowired
+	private SdkCmsModuleInstanceVersionManager cmsModuleInstanceVersionManager;
+	
+	@Autowired
+	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
 
 	@RequestMapping("/cmsModuleInstance/list.htm")
 	public String list(Model model, Long templateId) {
@@ -154,6 +162,7 @@ public class CmsModuleInstanceController extends BaseController {
 	public BackWarnEntity removeCmsModuleInstanceByIds(Long[] ids) {
 		cmsModuleInstanceManager.removeCmsModuleInstanceByIds(Arrays
 				.asList(ids));
+		cmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		return SUCCESS;
 	}
 
@@ -199,7 +208,8 @@ public class CmsModuleInstanceController extends BaseController {
 			@RequestParam(value="moduleId", required=false) Long moduleId,
 			@RequestParam("isEdit") Boolean isEdit){
 		/** 模板信息 */
-		String data = cmsModuleInstanceManager.findUpdatedCmsModuleInstance(templateId, moduleId, isEdit);
+		//String data = cmsModuleInstanceManager.findUpdatedCmsModuleInstance(templateId, moduleId, isEdit);
+		String data = sdkCmsParseHtmlContentManager.getTemplateModuleData(templateId, moduleId, null, isEdit);
 		model.addAttribute("data", data);
 		return "/cms/newpage/page-instance-iframe";
 	}
@@ -239,16 +249,17 @@ public class CmsModuleInstanceController extends BaseController {
 		}else{
 			cmsModuleInstanceManager.cancelPublishedModuleInstance(moduleId);
 		}
+		//cmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		return SUCCESS;
 	}
 	
 	
 	@RequestMapping("/module/recoverTemplateCodeArea.json")
 	@ResponseBody
-	public BackWarnEntity recoverTemplateCodeArea(Long templateId,String code) throws UnsupportedEncodingException {
+	public BackWarnEntity recoverTemplateCodeArea(Long templateId, Long versionId, String code) throws UnsupportedEncodingException {
 		BackWarnEntity back = new BackWarnEntity();
 		try {
-			String data = cmsModuleInstanceManager.recoverTemplateCodeArea(templateId, code);
+			String data = cmsModuleInstanceManager.recoverTemplateCodeArea(templateId, versionId, code);
 			back.setIsSuccess(true);
 			back.setDescription(data);
 			return back;
@@ -259,5 +270,7 @@ public class CmsModuleInstanceController extends BaseController {
 		}
 	
 	}
+	
+	
 	
 }
