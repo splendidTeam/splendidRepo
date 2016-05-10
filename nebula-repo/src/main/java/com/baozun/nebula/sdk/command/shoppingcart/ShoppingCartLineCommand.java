@@ -123,9 +123,7 @@ public class ShoppingCartLineCommand extends BaseModel {
 	/** PK **/
 	private Long id;
 
-	/**
-	 * 结算状态 0未选中结算 1选中结算
-	 */
+	/** 结算状态 0未选中结算 1选中结算*/
 	private Integer settlementState;
 
 	/**

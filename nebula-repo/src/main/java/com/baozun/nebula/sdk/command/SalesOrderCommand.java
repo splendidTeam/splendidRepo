@@ -70,6 +70,12 @@ public class SalesOrderCommand extends BaseModel {
 	/** 姓名 */
 	private String name;
 
+	/** 购买人姓名 */
+	private String buyerName;
+
+	/** 购买人电话 */
+	private String buyerTel;
+
 	/** 国 */
 	private String country;
 
@@ -246,9 +252,8 @@ public class SalesOrderCommand extends BaseModel {
 	 * 
 	 */
 	private List<String> soPayMentDetails;
-	/**是否qs**/
-	private Boolean                     isQs = false;
-	
+	/** 是否qs **/
+	private Boolean isQs = false;
 
 	/** 物流方式 **/
 	private Long distributionModeId;
@@ -724,8 +729,7 @@ public class SalesOrderCommand extends BaseModel {
 		return onLinePaymentCommand;
 	}
 
-	public void setOnLinePaymentCommand(
-			OnLinePaymentCommand onLinePaymentCommand) {
+	public void setOnLinePaymentCommand(OnLinePaymentCommand onLinePaymentCommand) {
 		this.onLinePaymentCommand = onLinePaymentCommand;
 	}
 
@@ -733,8 +737,7 @@ public class SalesOrderCommand extends BaseModel {
 		return onLinePaymentCancelCommand;
 	}
 
-	public void setOnLinePaymentCancelCommand(
-			OnLinePaymentCancelCommand onLinePaymentCancelCommand) {
+	public void setOnLinePaymentCancelCommand(OnLinePaymentCancelCommand onLinePaymentCancelCommand) {
 		this.onLinePaymentCancelCommand = onLinePaymentCancelCommand;
 	}
 
@@ -742,8 +745,7 @@ public class SalesOrderCommand extends BaseModel {
 		return wechatPayParamCommand;
 	}
 
-	public void setWechatPayParamCommand(
-			WechatPayParamCommand wechatPayParamCommand) {
+	public void setWechatPayParamCommand(WechatPayParamCommand wechatPayParamCommand) {
 		this.wechatPayParamCommand = wechatPayParamCommand;
 	}
 
@@ -825,6 +827,22 @@ public class SalesOrderCommand extends BaseModel {
 
 	public void setPeriods(Integer periods) {
 		this.periods = periods;
+	}
+
+	public String getBuyerName() {
+		return buyerName;
+	}
+
+	public void setBuyerName(String buyerName) {
+		this.buyerName = buyerName;
+	}
+
+	public String getBuyerTel() {
+		return buyerTel;
+	}
+
+	public void setBuyerTel(String buyerTel) {
+		this.buyerTel = buyerTel;
 	}
 
 }

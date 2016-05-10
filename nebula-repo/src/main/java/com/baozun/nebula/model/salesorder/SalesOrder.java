@@ -306,6 +306,9 @@ public class SalesOrder extends BaseModel{
 	/** 修改时间 */
 	private Date				modifyTime;
 	
+	/** 下单时的语言 由于用于wormhole发邮件时邮件模板的多语言，以及地址信息的多语言 */
+	private String 				lang;
+
 	/** version*/
 	private Date				version;
 	
@@ -617,6 +620,15 @@ public class SalesOrder extends BaseModel{
 
 	public void setCodPaymentType(Integer codPaymentType) {
 		this.codPaymentType = codPaymentType;
+	}
+	
+	@Column(name = "LANG")
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 
 }

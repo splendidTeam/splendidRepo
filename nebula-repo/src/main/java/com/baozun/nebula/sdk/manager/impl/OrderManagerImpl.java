@@ -101,6 +101,7 @@ import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.feilong.core.Validator;
 
@@ -808,6 +809,10 @@ public class OrderManagerImpl implements OrderManager {
 		if (orderCode == null) {
 			throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
 		}
+		
+		String lang = LangUtil.getCurrentLang();
+		order.setLang(Validator.isNullOrEmpty(lang) ? LangUtil.ZH_CN : lang);
+		
 		BigDecimal actualFreight = shopCartCommandByShop.getOriginShoppingFee().subtract(shopCartCommandByShop.getOffersShipping());
 		// 总价 不含运费最终货款
 		BigDecimal total = shopCartCommandByShop.getRealPayAmount().subtract(actualFreight);
