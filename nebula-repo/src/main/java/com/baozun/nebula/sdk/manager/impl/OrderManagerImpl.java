@@ -1046,7 +1046,7 @@ public class OrderManagerImpl implements OrderManager {
 	 * 
 	 * @param orderId
 	 * @param salesOrderCommand
-	 */
+	 *///FIXME PII数据加密
 	protected void saveConsignee(SalesOrder salesOrder, SalesOrderCommand salesOrderCommand) {
 		Consignee consignee = new Consignee();
 		ConvertUtils.convertFromTarget(consignee, salesOrderCommand);
