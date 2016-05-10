@@ -128,27 +128,34 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		}
 
 		for (SearchConditionCommand cmd : cmdList){
-			Long propertyId = cmd.getPropertyId();
-			if (propertyId != null) {
-				if (SearchCondition.NORMAL_TYPE.equals(cmd.getType())) {
-					facetFields.add(SkuItemParam.dynamicCondition + propertyId);
-				}else if (SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())) {
-					List<SearchConditionItemCommand> searchConditionItemCommands = searchManager
-							.findCoditionItemByCoditionIdWithCache(cmd.getId());
-					for (SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
-						if (null != scItemCmd) {
-							Integer min = scItemCmd.getAreaMin();
-							Integer max = scItemCmd.getAreaMax();
-							if (null != min && null != max && min <= max) {
-								String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
-								StringBuilder sb = new StringBuilder();
-								sb.append("{!ex=priceTag}" + SkuItemParam.sale_price).append(":").append(areaStr);
-								facetFields.add(sb.toString());
-							}
+			//如果筛选条件是常规类型
+			if (SearchCondition.NORMAL_TYPE.equals(cmd.getType())) {
+				//筛选条件对应的属性id
+				Long propertyId = cmd.getPropertyId();				
+				
+				facetFields.add(SkuItemParam.dynamicCondition + propertyId);
+			}else if (SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())) {
+				//如果筛选条件是价格区间类型
+				
+				//根据筛选条件查询筛选条件项
+				List<SearchConditionItemCommand> searchConditionItemCommands = searchManager.findCoditionItemByCoditionIdWithCache(cmd.getId());
+				
+				//循环各个筛选条件项，用facetQuery获得数量
+				for (SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
+					if (null != scItemCmd) {
+						Integer min = scItemCmd.getAreaMin();
+						Integer max = scItemCmd.getAreaMax();
+						if (null != min && null != max && min <= max) {
+							String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
+							StringBuilder sb = new StringBuilder();
+							sb.append("{!ex=priceTag}" + SkuItemParam.sale_price).append(":").append(areaStr);
+							facetFields.add(sb.toString());
 						}
 					}
 				}
+				
 			}
+			
 		}
 
 		// 设置solrQuery的facetFiled
