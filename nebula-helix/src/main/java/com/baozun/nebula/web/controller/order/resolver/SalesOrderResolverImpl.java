@@ -66,10 +66,10 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @version 5.3.1 2016年5月3日 下午1:35:48
  * @since 5.3.1
  */
-public class SalesorderResolverImpl implements SalesorderResolver {
+public class SalesOrderResolverImpl implements SalesOrderResolver {
 
 	/** The Constant log. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(SalesorderResolverImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
 
 	@Autowired
 	private MataInfoManager mataInfoManager;
@@ -90,21 +90,21 @@ public class SalesorderResolverImpl implements SalesorderResolver {
 	/** The sdk shopping cart manager. */
 	@Autowired
 	private SdkShoppingCartManager sdkShoppingCartManager;
-	
-	 @Autowired
-    private SdkPaymentManager sdkPaymentManager;
-	
+
+	@Autowired
+	private SdkPaymentManager sdkPaymentManager;
+
 	@Autowired
 	private OrderManager orderManager;
-	
-    @Autowired
-    private GuestShoppingcartPersister guestShoppingcartPersister;
-    
-    @Autowired
-    private ShoppingcartCountPersister shoppingcartCountPersister;
-	
+
+	@Autowired
+	private GuestShoppingcartPersister guestShoppingcartPersister;
+
+	@Autowired
+	private ShoppingcartCountPersister shoppingcartCountPersister;
+
 	@Override
-	public SalesOrderCommand buildeSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm,
+	public SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm,
 			HttpServletRequest request) {
 		// 需要封装的对象
 		SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
@@ -177,7 +177,8 @@ public class SalesorderResolverImpl implements SalesorderResolver {
 	}
 
 	@Override
-	public ShoppingCartCommand buildeShoppingCartForOrder(MemberDetails memberDetails,SalesOrderCommand salesOrderCommand, HttpServletRequest request) {
+	public ShoppingCartCommand buildShoppingCartForOrder(MemberDetails memberDetails,
+			SalesOrderCommand salesOrderCommand, HttpServletRequest request) {
 
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
@@ -192,24 +193,26 @@ public class SalesorderResolverImpl implements SalesorderResolver {
 		if (Validator.isNullOrEmpty(salesOrderCommand.getCouponCodes())) {
 			couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
 		}
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, couponList,salesOrderCommand.getCalcFreightCommand(), cartLines);
+		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, couponList,
+				salesOrderCommand.getCalcFreightCommand(), cartLines);
 
 	}
 
 	/**
 	 * 通過支付流水號查詢訂單
+	 * 
 	 * @param subOrdinate
 	 * @return
 	 */
 	@Override
-	public SalesOrderCommand getSalesOrderCommand(String subOrdinate){
+	public SalesOrderCommand getSalesOrderCommand(String subOrdinate) {
 		Map<String, Object> paraMap = new HashMap<String, Object>();
-		paraMap.put("subOrdinate",subOrdinate);
+		paraMap.put("subOrdinate", subOrdinate);
 		List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-		
+
 		return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
 	}
-	
+
 	/**
 	 * Detect shoppingcart resolver.
 	 *
@@ -222,18 +225,27 @@ public class SalesorderResolverImpl implements SalesorderResolver {
 	}
 
 	@Override
-	public void updateCookieShoppingcart(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request, HttpServletResponse response) {
+	public void updateCookieShoppingcart(List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+			HttpServletRequest request, HttpServletResponse response) {
 		// 取出所有选中结算的商品
 		// 结算状态 0未选中结算 1选中结算
-		List<Integer> valueList = new ArrayList<Integer>(); 
-		valueList.add(1);
-		List<ShoppingCartLineCommand> mainLines = CollectionsUtil.removeAll(shoppingCartLineCommandList, "settlementState", valueList);
-		
+		List<ShoppingCartLineCommand> mainLines = CollectionsUtil.removeAll(shoppingCartLineCommandList,
+				"settlementState", 1);
+
 		// 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        mainLines = CollectionsUtil.select(mainLines, new MainLinesPredicate());
-        guestShoppingcartPersister.save(mainLines, request, response);
-        // 修改cookie中的商品数量
-        shoppingcartCountPersister.save(mainLines, request, response);
-        
+		mainLines = CollectionsUtil.select(mainLines, new MainLinesPredicate());
+		guestShoppingcartPersister.save(mainLines, request, response);
+
+	}
+
+	@Override
+	public void updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+		List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
+				request);
+		shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
+
 	}
 }

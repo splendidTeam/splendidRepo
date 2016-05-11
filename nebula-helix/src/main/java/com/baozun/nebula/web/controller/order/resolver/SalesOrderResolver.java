@@ -39,14 +39,14 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * 
  * <tr valign="top">
  * <td>
- * {@link #buildeSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm, HttpServletRequest request)
+ * {@link #buildSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm, HttpServletRequest request)
  * buildeSalesOrderCommand}</td>
  * <td>封装订单信息</td>
  * </tr>
  * 
  * <tr valign="top">
  * <td>
- * {@link #buildeShoppingCartForOrder(MemberDetails memberDetails,SalesOrderCommand salesOrderCommand, HttpServletRequest request)
+ * {@link #buildShoppingCartForOrder(MemberDetails memberDetails,SalesOrderCommand salesOrderCommand, HttpServletRequest request)
  * buildeShoppingCartForOrder}</td>
  * <td>获得用户的购物车信息</td>
  * </tr>
@@ -59,9 +59,16 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * 
  * <tr valign="top">
  * <td>
- * {@link #updateCookieShoppingcart(List<ShoppingCartLineCommand> ShoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response)
- * updateCookieShoppingcart}</td>
+ * {@link #updateCookieShoppingcart(List, HttpServletRequest, HttpServletResponse) updateCookieShoppingcart}
+ * </td>
  * <td>游客下单成功后更新cookie中的购物车数据</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>
+ * {@link #updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request, HttpServletResponse response) updateCookieShoppingcartCount}
+ * </td>
+ * <td>游客下单成功后更新cookie中的购物车商品数量</td>
  * </tr>
  * 
  * </table>
@@ -72,7 +79,7 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * @version 5.3.1 2016年5月3日 下午1:35:48
  * @since 5.3.1
  */
-public interface SalesorderResolver {
+public interface SalesOrderResolver {
 
 	/**
 	 * 封装订单信息(所有的包括选中的及没有选中的).
@@ -86,7 +93,7 @@ public interface SalesorderResolver {
 	 *            the request
 	 * @return 返回封装之后的SalesOrderCommand
 	 */
-	SalesOrderCommand buildeSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm,
+	SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm,
 			HttpServletRequest request);
 
 	/**
@@ -97,7 +104,7 @@ public interface SalesorderResolver {
 	 * @param request
 	 * @return
 	 */
-	ShoppingCartCommand buildeShoppingCartForOrder(MemberDetails memberDetails, SalesOrderCommand salesOrderCommand,
+	ShoppingCartCommand buildShoppingCartForOrder(MemberDetails memberDetails, SalesOrderCommand salesOrderCommand,
 			HttpServletRequest request);
 
 	/**
@@ -110,10 +117,21 @@ public interface SalesorderResolver {
 
 	/**
 	 * 下单成功后更新cookie中的购物车数据
+	 * 
 	 * @param ShoppingCartLineCommandList
 	 * @param request
 	 * @param response
 	 */
-	void updateCookieShoppingcart(List<ShoppingCartLineCommand> ShoppingCartLineCommandList,HttpServletRequest request, HttpServletResponse response);
+	void updateCookieShoppingcart(List<ShoppingCartLineCommand> ShoppingCartLineCommandList, HttpServletRequest request,
+			HttpServletResponse response);
 
+	/**
+	 * 下单成功后更新cookie中的购物车商品的数量
+	 * 
+	 * @param ShoppingCartLineCommandList
+	 * @param request
+	 * @param response
+	 */
+	void updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request,
+			HttpServletResponse response);
 }

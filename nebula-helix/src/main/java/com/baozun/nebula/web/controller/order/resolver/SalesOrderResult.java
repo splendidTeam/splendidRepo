@@ -6,7 +6,7 @@ package com.baozun.nebula.web.controller.order.resolver;
  * @author jumbo
  *
  */
-public enum SalesorderResult {
+public enum SalesOrderResult {
 
 	/**
 	 * 成功
@@ -16,16 +16,11 @@ public enum SalesorderResult {
 	/**
 	 * 基于 shoppingcart line 查找SHOPPING_CART_LINE_COMMAND 可能已经被删掉了 （比如 打开了双窗口）
 	 */
-	SHOPPING_CART_LINE_COMMAND_NOT_FOUND,
+	ORDER_SHOPPING_CART_LINE_COMMAND_NOT_FOUND,
 	
 	/**
 	 * 优惠券不可用
 	 */
-	COUPON_NOT_AVALIBLE,
-	
-	/**
-	 * 数据库层操作失败
-	 */
-	OPERATE_ERROR
+	ORDER_COUPON_NOT_AVALIBLE
 
 }

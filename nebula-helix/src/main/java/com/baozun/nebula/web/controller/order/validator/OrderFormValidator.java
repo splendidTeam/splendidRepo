@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order.validator;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -28,7 +29,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
-import com.baozun.nebula.web.controller.order.resolver.SalesorderResult;
+import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
 
@@ -79,7 +80,7 @@ public class OrderFormValidator implements Validator{
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.email", "email.field.required");// 收货人邮箱
  		// 邮箱有效性检查
  		if (!errors.hasFieldErrors("shippingInfoSubForm.email")){
-			if (!RegexUtil.matches(RegexPattern.EMAIL,orderForm.getShippingInfoSubForm().getEmail())){
+			if (!EmailValidator.getInstance().isValid(orderForm.getShippingInfoSubForm().getEmail())){
 				errors.rejectValue("shippingInfoSubForm.email", "member.email.error");
 			}
 		}
@@ -118,75 +119,7 @@ public class OrderFormValidator implements Validator{
 		}
 
     }
-    
-    
-    /**
-     * 购物车和优惠券促销验证
-     * 
-     * @param cartCommand
-     * @return
-     */
-    public SalesorderResult validateWithShoppingCart(ShoppingCartCommand cartCommand,String coupon){
-    	/** 校驗購物車*/
-    	SalesorderResult salesorderResult = checkShoppingCart(cartCommand);
-    	if (null != salesorderResult) {
-    		return salesorderResult;
-    	}
-    	/** 校驗优惠券促销*/
-    	salesorderResult = checkCoupon(coupon, cartCommand);
-    	if (null != salesorderResult) {
-    		return salesorderResult;
-    	}
-    	return SalesorderResult.SUCCESS;
-    }
-    
-    
-    
-	/**
-	 *  校驗購物車
-	 *  失败返回错误，正确返回null
-	 **/
-	private SalesorderResult checkShoppingCart(ShoppingCartCommand cartCommand){
-		if(com.feilong.core.Validator.isNullOrEmpty(cartCommand) || com.feilong.core.Validator.isNullOrEmpty(cartCommand.getShoppingCartLineCommands())){//購物車不能為空
-			return SalesorderResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
-		}
-		return null;
-	}
-    
-	/** 
-	 * 校驗優惠券是否有效  success 有效，其他 無效
-	 * 失败返回错误，正确返回null
-	 **/
-	private SalesorderResult checkCoupon(String coupon,ShoppingCartCommand cartCommand){
-		if(com.feilong.core.Validator.isNullOrEmpty(cartCommand.getCartPromotionBriefList())){//無效
-			return SalesorderResult.COUPON_NOT_AVALIBLE;
-		}
-		for(PromotionBrief pro : cartCommand.getCartPromotionBriefList()){//從活動中取記錄校驗
-			if(com.feilong.core.Validator.isNotNullOrEmpty(pro.getDetails())){
-				for(PromotionSettingDetail settingDetail : pro.getDetails()){//遍曆活動詳情
-					if(com.feilong.core.Validator.isNullOrEmpty(settingDetail.getCouponCodes())){//先校驗整單優惠券有沒有
-						if(com.feilong.core.Validator.isNotNullOrEmpty(settingDetail.getAffectSKUDiscountAMTList())){
-							for(PromotionSKUDiscAMTBySetting skuSetting : settingDetail.getAffectSKUDiscountAMTList()){//遍曆商品行優惠記錄
-								if(com.feilong.core.Validator.isNullOrEmpty(skuSetting.getCouponCodes())){//如果整單優惠券沒有，校驗商品行優惠券
-									continue;
-								}
-								if(skuSetting.getCouponCodes().contains(coupon)){
-									return null;
-								}
-							}
-						}
-						continue;
-					}
-					if(settingDetail.getCouponCodes().contains(coupon)){
-						return null;
-					}
-				}
-			}
-		}
-		return SalesorderResult.COUPON_NOT_AVALIBLE;
-		
-	}
-	
+
 
     
 
