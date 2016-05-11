@@ -215,7 +215,6 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 				paymentResult.setMessage("sign not match");
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -308,7 +307,6 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 			paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request,resultMap);
 			paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -380,7 +378,6 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 
 	@Override
 	public boolean isSupportClosePaymentRequest() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 

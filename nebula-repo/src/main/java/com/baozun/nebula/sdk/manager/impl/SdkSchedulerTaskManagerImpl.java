@@ -26,26 +26,22 @@ public class SdkSchedulerTaskManagerImpl implements SdkSchedulerTaskManager {
 	@Override
 	@Transactional(readOnly=true)
 	public Pagination<SchedulerTask> findSchedulerTaskListByQueryMapWithPage(Page page, Sort[] sorts, Map<String, Object> paraMap) {
-		// TODO Auto-generated method stub
 		return schedulerTaskDao.findSchedulerTaskListByQueryMapWithPage(page, sorts, paraMap);
 	}
 
 	@Override
 	public void enableOrDisableSchedulerTaskByIds(List<Long> ids, Integer state) {
-		// TODO Auto-generated method stub
 		schedulerTaskDao.enableOrDisableSchedulerTaskByIds(ids, state);
 	}
 
 	@Override
 	public void removeSchedulerTaskByIds(List<Long> ids) {
-		// TODO Auto-generated method stub
 		schedulerTaskDao.removeSchedulerTaskByIds(ids);
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public List<SchedulerTask> findAllEffectSchedulerTaskList() {
-		// TODO Auto-generated method stub
 		return schedulerTaskDao.findAllEffectSchedulerTaskList();
 	}
 

@@ -18,7 +18,6 @@ public class SdkItemCollectionManagerImpl implements SdkItemCollectionManager {
 	@Override
 	@Transactional(readOnly=true)
 	public ItemCollection findItemCollectionById(Long id) {
-		// TODO Auto-generated method stub
 		return itemCollectionDao.findItemCollectionById(id);
 	}
 	

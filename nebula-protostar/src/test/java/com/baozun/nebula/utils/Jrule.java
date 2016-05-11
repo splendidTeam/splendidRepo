@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 public class Jrule {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		String json="[{'id':'637','pId':'539','value':'红','pName':'颜色'},"
 				+ "{'id':'683','pId':'572','value':'42','pName':'尺寸'}] ";
 		Gson gson =new Gson();

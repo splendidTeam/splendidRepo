@@ -457,7 +457,6 @@ public class CacheManagerImpl implements CacheManager {
 
 	@Override
 	public <T> void setObject(String key, T t) {
-		// TODO Auto-generated method stub
 		if (!useCache())
 			return;
 		key = processKey(key);
@@ -476,7 +475,6 @@ public class CacheManagerImpl implements CacheManager {
 
 	@Override
 	public <T> void setObject(String key, T t, Integer expireSeconds) {
-		// TODO Auto-generated method stub
 		if (!useCache())
 			return;
 		key = processKey(key);
@@ -500,7 +498,6 @@ public class CacheManagerImpl implements CacheManager {
 		if (!useCache())
 			return null;
 		key = processKey(key);
-		// TODO Auto-generated method stub
 		Jedis jredis = null;
 		try {
 			jredis = getJedis();
@@ -584,7 +581,6 @@ public class CacheManagerImpl implements CacheManager {
 
 	@Override
 	public void removeMapValue(String key, String field) {
-		// TODO Auto-generated method stub
 		if (!useCache())
 			return;
 		key = processKey(key);
@@ -651,7 +647,6 @@ public class CacheManagerImpl implements CacheManager {
 
 	@Override
 	public <T> void setMapObject(String key, String field, T t, int seconds) {
-		// TODO Auto-generated method stub
 		if (!useCache())
 			return;
 		key = processKey(key);
@@ -676,7 +671,6 @@ public class CacheManagerImpl implements CacheManager {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getMapObject(String key, String field) {
-		// TODO Auto-generated method stub
 		if (!useCache())
 			return null;
 		key = processKey(key);
@@ -702,7 +696,6 @@ public class CacheManagerImpl implements CacheManager {
 
 	@Override
 	public String generateMapFieldByDefault(Object... objArray) {
-		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
 
 		for (Object obj : objArray) {

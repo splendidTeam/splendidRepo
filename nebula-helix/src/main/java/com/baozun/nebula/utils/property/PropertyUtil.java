@@ -26,13 +26,10 @@ public class PropertyUtil{
 		try{
 			return propertyUtils.getProperty(bean, propertyName);
 		}catch (IllegalAccessException e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (InvocationTargetException e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (NoSuchMethodException e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

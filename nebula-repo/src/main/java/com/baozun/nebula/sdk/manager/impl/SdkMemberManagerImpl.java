@@ -782,7 +782,6 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	 */
 	@Override
 	public Integer removeFavoritesByIds(List<Long> itemIds,List<Long> skuIds,Long memberId){
-		// TODO Auto-generated method stub
 		return memberFavoritesDao.removeFavoritesByIds(itemIds, skuIds, memberId);
 	}
 
@@ -983,7 +982,6 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	public boolean checkEmailUrl(String code,Long memberId){
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -1120,7 +1118,6 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	public String sendBindMobileCode(String mobile,Long memberId){
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -1169,7 +1166,6 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	@Override
 	@Transactional(readOnly = true)
 	public MemberFavorites findMemberFavoritesByIdAndMemberId(Long id,Long memberId){
-		// TODO Auto-generated method stub
 		return memberFavoritesDao.findMemberFavoritesByIdAndMemberId(id, memberId);
 	}
 

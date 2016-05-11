@@ -250,7 +250,6 @@ public class CouponMessageImpl implements CouponMessage {
 				return sb;
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			sb = "保存出现异常";
 			return sb;

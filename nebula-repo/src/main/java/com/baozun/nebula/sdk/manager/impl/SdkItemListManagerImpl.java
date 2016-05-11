@@ -214,7 +214,6 @@ public class SdkItemListManagerImpl implements SdkItemListManager{
 	 */
 	@Override
 	public void contrastItem(Long categoryId, List<Long> itemIds) {
-		// TODO Auto-generated method stub
 		
 	}
 	@Transactional(readOnly=true)

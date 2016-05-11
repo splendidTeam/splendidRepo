@@ -69,7 +69,6 @@ public class MemberFrontendManagerImpl implements MemberFrontendManager {
 	@Override
 	@Transactional(readOnly = true)
 	public MemberCommand findMemberById(Long memberId) {
-		// TODO Auto-generated method stub
 		MemberCommand member = sdkMemberManager.findMemberById(memberId);
 
 		return member;

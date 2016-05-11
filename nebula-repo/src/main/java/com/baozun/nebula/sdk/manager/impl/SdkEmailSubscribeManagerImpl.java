@@ -24,35 +24,30 @@ public class SdkEmailSubscribeManagerImpl implements SdkEmailSubscribeManager {
 	
 	@Override
 	public EmailSubscribe saveEmailSubscribe(EmailSubscribe emailSubscribe) {
-		// TODO Auto-generated method stub
 		return emailSubscribeDao.save(emailSubscribe);
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public List<EmailSubscribe> findAllEmailSubscribeList() {
-		// TODO Auto-generated method stub
 		return emailSubscribeDao.findAllEmailSubscribeList();
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public List<EmailSubscribe> findEmailSubscribeListByIds(List<Long> ids) {
-		// TODO Auto-generated method stub
 		return emailSubscribeDao.findEmailSubscribeListByIds(ids);
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public List<EmailSubscribe> findEmailSubscribeListByQueryMap(Map<String, Object> paraMap) {
-		// TODO Auto-generated method stub
 		return emailSubscribeDao.findEmailSubscribeListByQueryMap(paraMap);
 	}
 
 	@Override
 	@Transactional(readOnly=true)
 	public Pagination<EmailSubscribe> findEmailSubscribeListByQueryMapWithPage(Page page, Sort[] sorts, Map<String, Object> paraMap) {
-		// TODO Auto-generated method stub
 		return emailSubscribeDao.findEmailSubscribeListByQueryMapWithPage(page, sorts, paraMap);
 	}
 

@@ -69,7 +69,6 @@ public class CheckboxTag extends BaseJspTag{
 			try {
 				optionCommands = optionManager.getOptionCommandsByExpression(expression);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -87,7 +87,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
 
         }catch (EncryptionException e){
             LOGGER.error("EncryptionException e :", e);
-            throw new IllegalArgumentException(e);// TODO 换成更好的 runtimeexception
+            throw new IllegalArgumentException(e);// TODO feilong 换成更好的 runtimeexception
         }
     }
 
@@ -146,7 +146,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
                             "promotionId",
                             "lineGroup");
             cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
-            // TODO bundle 以后再考虑 id
+            // TODO feilong bundle 以后再考虑 id
             cookieShoppingCartLine
                             .setId(null == shoppingCartLineCommand.getId() ? shoppingCartLines.size() : shoppingCartLineCommand.getId());
 

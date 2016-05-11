@@ -227,7 +227,6 @@ public class SdkCmsPageInstanceManagerImpl implements SdkCmsPageInstanceManager 
 
 	@Override
 	public Map<String, CmsPageInstance> findUrlMap() {
-		// TODO Auto-generated method stub
 		return urlMap;
 	}
 

@@ -756,7 +756,7 @@ public class OrderManagerImpl implements OrderManager {
 		return name;
 	}
 
-	//TODO 如果有bundle 逻辑处理
+	//TODO feilong 如果有bundle 逻辑处理
 	private void liquidateSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList) {
 		if (Validator.isNotNullOrEmpty(shoppingCartLineCommandList)) {
 			for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList) {
@@ -929,7 +929,7 @@ public class OrderManagerImpl implements OrderManager {
 	/**
 	 * 保存订单行
 	 */
-	//TODO bundle 下单要进行拆分
+	//TODO feilong bundle 下单要进行拆分
 	protected OrderLine saveOrderLine(Long orderId, ShoppingCartLineCommand shoppingCartLineCommand) {
 		OrderLine orderLine = new OrderLine();
 		// 商品数量
@@ -1046,7 +1046,7 @@ public class OrderManagerImpl implements OrderManager {
 	 * 
 	 * @param orderId
 	 * @param salesOrderCommand
-	 *///FIXME PII数据加密
+	 *///FIXME feilong PII数据加密
 	protected void saveConsignee(SalesOrder salesOrder, SalesOrderCommand salesOrderCommand) {
 		Consignee consignee = new Consignee();
 		ConvertUtils.convertFromTarget(consignee, salesOrderCommand);
