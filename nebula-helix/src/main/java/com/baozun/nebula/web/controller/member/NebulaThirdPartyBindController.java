@@ -40,6 +40,7 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.member.ThirdPartyMemberManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
+import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
@@ -107,10 +108,13 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	public static final String	VIEW_THIRDPARTY_MEMBER_BIND				= "member.thirdParty.bind";
 	
 	/* bindSuccess Page 的默认定义 */
-	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS		= "redirect:/index";
+	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS		= "member.thirdParty.bindSuccess";
 	
 	/* bindfailure Page 的默认定义 */
 	public static final String	VIEW_THIRDPARTY_MEMBER_BIND_FAILURE		= "member.thirdParty.bind";
+	
+	@Autowired
+	private SdkMemberManager	sdkMemberManager;
 
 	
 	/**
@@ -176,6 +180,8 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * @needLogin 需要第三方用户登录
 	 * 
 	 * @RequestMapping(value = "/member/bindThirdPartyMemberWithStoreMember", method = RequestMethod.POST)
+	 * @ResponseBody
+	 * 
 	 * 
 	 * @param type 页面传来的参数，表示是什么第三方绑定
 	 * @param memberDetails 第三方登录用户
@@ -206,7 +212,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			LOG.debug("loginForm validation error. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());
 			//getResultFromBindingResult(bindingResult);
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
+			defaultReturnResult.setStatusCode(bindingResult.getAllErrors().get(0)+"");
 		}
 		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
 		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
@@ -230,19 +236,16 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			String resultCode=thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(),type);
 			if(resultCode.equals(ThirdPartyLoginBindConstants.BIND_ACCOUNT_SUCCESS)){
 				 defaultReturnResult.setResult(true);
-				 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS);
 			}else{
 				 defaultReturnResult.setResult(false);
 				 defaultReturnResult.setStatusCode(resultCode);
-				 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 			}
 			return defaultReturnResult;
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
 			defaultReturnResult.setResult(false);
-			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
-			 defaultReturnResult.setStatusCode(ThirdPartyLoginBindConstants.LOGINNAME_PWD_ERROR);
+			defaultReturnResult.setStatusCode(ThirdPartyLoginBindConstants.LOGINNAME_PWD_ERROR);
 			return defaultReturnResult;
 		}
 		
@@ -262,7 +265,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * @needLogin 需要第三方用户登录
 	 * 
 	 * @RequestMapping(value = "/member/bindThirdPartyMemberWithOutStoreMember", method = RequestMethod.POST)
-	 * 
+	 * @ResponseBody
 	 * @param type 页面传来的参数，表示是什么第三方绑定
 	 * @param memberDetails 第三方登录用户
 	 * @param registerForm 页面传来的参数，主要有用户名、密码等
@@ -302,6 +305,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		defaultReturnResult = (DefaultReturnResult) memberManager.checkRegisterData(memberFrontendCommand);
 
 		if (!defaultReturnResult.isResult()) {
+			defaultReturnResult.setResult(false);
 			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 		}
 
@@ -310,6 +314,9 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 
 		/** 用户注册 */
 		Member member = memberManager.rewriteRegister(memberFrontendCommand);
+		
+		// 注册的时候 会员的GroupId默认为会员的ID
+		sdkMemberManager.updateMemberGroupIdById(member.getId(), member.getId());
 
 		// member convert to memberCommand
 		MemberCommand memberCommand = (MemberCommand) ConvertUtils.convertTwoObject(new MemberCommand(), member);
@@ -325,15 +332,13 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_REG_EMAIL_URL, storeMemberDetails.getLoginEmail());
 
 		LOG.debug("{} login success", memberCommand.getLoginName());
-	    super.onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
+		defaultReturnResult=(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
 	    String resultCode = thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(), type);
 		if(resultCode.equals(ThirdPartyLoginBindConstants.BIND_ACCOUNT_SUCCESS)){
 			 defaultReturnResult.setResult(true);
-			 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS);
 		}else{
 			 defaultReturnResult.setResult(false);
 			 defaultReturnResult.setStatusCode(resultCode);
-			 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 		}
 		return defaultReturnResult;
 	}

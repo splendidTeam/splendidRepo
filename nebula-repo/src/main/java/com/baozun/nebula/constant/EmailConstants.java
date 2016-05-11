@@ -28,6 +28,9 @@ public class EmailConstants {
     /**发送成功邮件模板 */
     public static final String EMAIL_SENDSUCCESS_TEMPLATE="EMAIL_SENDSUCCESS_TEMPLATE";
     
+    /**发送初始化密码邮件模板 */
+    public static final String INIT_PASSWORD_TEMPLATE="INIT_PASSWORD_TEMPLATE";
+    
 	/**郵件發送次數*/
 	public static final Integer SEND_EMAIL_NUMBER = 99999;
 	

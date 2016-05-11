@@ -392,8 +392,6 @@ public class MemberManagerImpl implements MemberManager{
 		Member targetMember = (Member) ConvertUtils.convertTwoObject(new Member(), memberCommand);
 		Member member = sdkMemberManager.rewriteRegister(targetMember);
 		Long memberId = member.getId();
-		// 注册的时候 会员的GroupId默认为会员的ID
-		sdkMemberManager.updateMemberGroupIdById(memberId, memberId);
 
 		LOGGER.info("[save Member entity suc!] [{}] ID:{} \"\"", new Date(), memberId);
 

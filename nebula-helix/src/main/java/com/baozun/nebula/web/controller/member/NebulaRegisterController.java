@@ -331,6 +331,9 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 			/** 用户注册 */
 			Member member = memberManager.rewriteRegister(memberFrontendCommand);
+			
+			// 注册的时候 会员的GroupId默认为会员的ID
+			sdkMemberManager.updateMemberGroupIdById(member.getId(), member.getId());
 
 			// member convert to memberCommand
 			MemberCommand memberCommand = (MemberCommand) ConvertUtils.convertTwoObject(new MemberCommand(), member);
