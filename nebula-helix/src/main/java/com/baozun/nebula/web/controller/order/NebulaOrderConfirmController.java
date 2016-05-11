@@ -295,7 +295,7 @@ public class NebulaOrderConfirmController extends BaseController {
 	 *            the member details
 	 * @return the shoppingcart resolver
 	 */
-	protected ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
+	private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
 		return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
 	}
 

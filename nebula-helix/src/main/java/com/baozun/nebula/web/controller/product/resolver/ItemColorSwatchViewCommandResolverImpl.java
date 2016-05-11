@@ -59,7 +59,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @date 2016年4月22日 下午4:00:31 
  * @version   
  */
-@Component
+@Component("itemColorSwatchViewCommandResolver")
 public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchViewCommandResolver{
 	
 	private static final Logger         LOGGER                        	= LoggerFactory.getLogger(ItemColorSwatchViewCommandResolverImpl.class);
