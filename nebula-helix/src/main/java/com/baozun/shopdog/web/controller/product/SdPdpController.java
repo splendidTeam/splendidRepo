@@ -112,7 +112,13 @@ public class SdPdpController implements AbstractSdPdpController {
 				itemCode = item.getCode();
 			}
 		}
-		
+		try {
+			return buildPdpViewCommand(itemCode);
+		} catch (IllegalItemStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 		/*// 没有取到合适的参数
 		if(Validator.isNullOrEmpty(itemCode)) {
 //					return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_PARAMETER_ERROR);
@@ -157,6 +163,7 @@ public class SdPdpController implements AbstractSdPdpController {
 			LOG.error("[SHOPDOG_GET_PDP_DATA] " + e.getMessage(), e);
 			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_SYSTEM_ERROR);
 		}*/
+		
 	}
 	
     /**
