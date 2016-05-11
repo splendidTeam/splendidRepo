@@ -12,7 +12,10 @@ import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.constants.Constants;
 
-
+/**
+ * @deprecated 没有使用这个类的必要 by feilong
+ */
+@Deprecated
 public class ShopCartUtil {
 	public static final String GUESTINDENTIFY="g_c";
 	/**
