@@ -6,20 +6,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import loxia.support.json.JSONArray;
 import loxia.support.json.JSONException;
 import loxia.support.json.JSONObject;
-
-import org.apache.velocity.texen.util.PropertiesUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 用来 快速的获得 json, 交由开发人员自己控制 log 输出级别
  * 
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 Sep 23, 2012 3:33:42 PM
+ * @deprecated 不再维护,pls use {@link com.feilong.tools.jsonlib.JsonUtil} by feilong
  */
+@Deprecated
 public final class JsonFormatUtil{
 
 	private static final Logger	log						= LoggerFactory.getLogger(JsonFormatUtil.class);

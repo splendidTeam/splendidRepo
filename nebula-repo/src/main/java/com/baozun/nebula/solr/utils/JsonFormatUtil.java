@@ -36,7 +36,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 Sep 23, 2012 3:33:42 PM
+ * @deprecated 不再维护,pls use {@link com.feilong.tools.jsonlib.JsonUtil} by feilong
  */
+@Deprecated
 public final class JsonFormatUtil{
 
 	private static final Logger	log						= LoggerFactory.getLogger(JsonFormatUtil.class);
