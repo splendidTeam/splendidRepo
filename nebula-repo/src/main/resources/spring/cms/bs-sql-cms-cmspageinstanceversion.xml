@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="CmsPageInstanceVersion.findCmsPageInstanceVersionListByParaMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION 
+		       		where lifecycle !=2
+		       			and type=1
+	       				#if($name)
+	       					and NAME=:name
+	       				#end
+	       				#if($nameForLike)
+	       					and NAME like :nameForLike
+	       				#end
+	       			
+	       				#if($instanceId)
+	       					and INSTANCE_ID=:instanceId
+	       				#end
+	       				#if($instanceIds)
+	       					and INSTANCE_ID in 	(
+							       		#foreach( $iid in $instanceIds )
+					    					$iid,
+										 #end
+							       		 -1)
+	       				#end
+
+	       				#if($createTime)
+	       					and CREATE_TIME >= :createTimeStart
+	       				#end
+	       				#if($createTime)
+	       					and CREATE_TIME <= :createTimeEnd
+	       				#end
+	       			
+	       				#if($modifyTime)
+	       					and MODIFY_TIME >= :modifyTimeStart
+	       				#end
+	       				#if($modifyTime)
+	       					and MODIFY_TIME <= :modifyTimeEnd
+	       				#end
+	       			
+	       				#if($startTime)
+	       					and START_TIME >= :startTimeStart
+	       				#end
+	       				#if($startTime)
+	       					and START_TIME <= :startTimeEnd
+	       				#end
+	       				
+	       				#if($endTime)
+	       					and END_TIME >= :endTimeStart
+	       				#end
+	       				#if($endTime)
+	       					and END_TIME <= :endTimeEnd
+	       				#end
+	       				
+	       				#if($lifecycle)
+	       					and LIFECYCLE = :lifecycle
+	       				#end
+
+	       				#if($ispublished)
+	       					and ISPUBLISHED = :ispublished
+	       				#end		       				
+		       		
+		       			#if($ispublished == false)
+	       					and ISPUBLISHED = :ispublished
+	       				#end	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="CmsPageInstanceVersion.findCmsPageInstanceVersionListByParaMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION 
+		       		where lifecycle !=2
+		       		
+	       				#if($name)
+	       					and NAME=:name
+	       				#end
+	       				#if($nameForLike)
+	       					and NAME like :nameForLike
+	       				#end
+       			
+	       				#if($instanceIds)
+	       					and INSTANCE_ID in 	(
+							       		#foreach( $iid in $instanceIds )
+					    					$iid,
+										 #end
+							       		 -1)
+	       				#end
+	       			    #if($instanceId)
+	       					and INSTANCE_ID =:$instanceId
+	       				#end
+	       				#if($createTime)
+	       					and CREATE_TIME >= :createTimeStart
+	       				#end
+	       				#if($createTime)
+	       					and CREATE_TIME <= :createTimeEnd
+	       				#end
+	       			
+	       				#if($modifyTime)
+	       					and MODIFY_TIME >= :modifyTimeStart
+	       				#end
+	       				#if($modifyTime)
+	       					and MODIFY_TIME <= :modifyTimeEnd
+	       				#end
+	       			
+	       				#if($startTime)
+	       					and START_TIME >= :startTimeStart
+	       				#end
+	       				#if($startTime)
+	       					and START_TIME <= :startTimeEnd
+	       				#end
+	       				
+	       				#if($endTime)
+	       					and END_TIME >= :endTimeStart
+	       				#end
+	       				#if($endTime)
+	       					and END_TIME <= :endTimeEnd
+	       				#end
+	       				
+	       				#if($lifecycle)
+	       					and LIFECYCLE = :lifecycle
+	       				#end
+
+	       				#if($ispublished)
+	       					and ispublished = :ispublished
+	       				#end
+	       				#if($ispublished == false)
+	       					and ispublished = :ispublished
+	       				#end		       				
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstanceVersion.getCmsPageInstanceBaseVersion" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where type=0 and instance_id = :instanceId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstanceVersion.findCmsPageInstanceVersionListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstanceVersion.removeCmsPageInstanceVersionByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_PAGE_INSTANCE_VERSION
+		       		set lifecycle=2,
+		       		ispublished=false
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="CmsPageInstanceVersion.findCmsPageInstanceVersionInStartTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where lifecycle !=2 and start_time = :startTime and ispublished = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="CmsPageInstanceVersion.findCmsPageInstanceVersionInEndTime" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where lifecycle !=2 and end_time = :endTime and ispublished = true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstanceVersion.findInstanceVersionInTimeQuantum" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where instance_id = :instanceId and id != :versionId and ispublished=true and start_time >= :startTime and end_time <= :endTime
+		       		union
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where instance_id = :instanceId and id != :versionId and ispublished=true and start_time <= :startTime and end_time >= :endTime
+		       		union
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where instance_id = :instanceId and id != :versionId and ispublished=true and start_time <= :startTime and end_time <= :endTime and end_time >= :startTime
+		       		union
+		       		select * from T_CMS_PAGE_INSTANCE_VERSION where instance_id = :instanceId and id != :versionId and ispublished=true and start_time >= :startTime and start_time <= :endTime and end_time >= :endTime 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstanceVersion.findPublishNotOverInstanceVersion" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select t1.*, t2.url, t2.code from t_cms_page_instance_version t1 left JOIN t_cms_page_instance t2 on t1.instance_id = t2.id where t1.ispublished=true and t1.lifecycle !=2 and t1.end_time>now()
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsPageInstanceVersion.getPublishedPageInstanceVersionsTimeRang" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select min(start_time) as firstTime, max(end_time) as lastTime from t_cms_page_instance_version where instance_id= :instanceId and lifecycle=1 and ispublished=true
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>		
+</beans>
