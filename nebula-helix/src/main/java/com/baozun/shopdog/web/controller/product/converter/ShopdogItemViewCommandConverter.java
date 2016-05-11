@@ -14,21 +14,21 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.converter;
+package com.baozun.shopdog.web.controller.product.converter;
 
 import org.springframework.beans.BeanUtils;
 
-import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
+import com.baozun.shopdog.web.controller.ShopdogBaseConverter;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogItemViewCommand;
 
 /**
  * 驻店宝PDP-item视图模型转换
  * @author xingyu.liu
  *
  */
-public class ShopdogItemViewCommandConverter extends BaseConverter<ShopdogItemViewCommand> {
+public class ShopdogItemViewCommandConverter extends ShopdogBaseConverter<ShopdogItemViewCommand> {
 
 	private static final long serialVersionUID = -1961008406160845011L;
 

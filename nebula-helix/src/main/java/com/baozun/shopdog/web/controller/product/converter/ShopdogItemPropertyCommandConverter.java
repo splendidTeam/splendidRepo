@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.converter;
+package com.baozun.shopdog.web.controller.product.converter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +23,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyElementViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogPropertyViewCommand;
+import com.baozun.shopdog.web.controller.ShopdogBaseConverter;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogPropertyViewCommand;
 import com.feilong.core.Validator;
 
 /** 
@@ -42,7 +42,7 @@ import com.feilong.core.Validator;
  * @version   
  */
 public class ShopdogItemPropertyCommandConverter extends
-		BaseConverter<ShopdogItemPropertyViewCommand> {
+	ShopdogBaseConverter<ShopdogItemPropertyViewCommand> {
 	
 	@Autowired
 	@Qualifier("shopdogPropertyViewCommandConverter")

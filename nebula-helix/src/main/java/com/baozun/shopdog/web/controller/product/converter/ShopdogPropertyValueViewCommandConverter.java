@@ -14,12 +14,12 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.converter;
+package com.baozun.shopdog.web.controller.product.converter;
 
-import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.PropertyValueViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogPropertyValueViewCommand;
+import com.baozun.shopdog.web.controller.ShopdogBaseConverter;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogPropertyValueViewCommand;
 
 /**   
  * shopdog的属性值转换器</br>
@@ -30,7 +30,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ShopdogPropertyValue
  * @version   
  */
 public class ShopdogPropertyValueViewCommandConverter extends
-		BaseConverter<ShopdogPropertyValueViewCommand>{
+		ShopdogBaseConverter<ShopdogPropertyValueViewCommand>{
 
 	/** */
 	private static final long serialVersionUID = -6440288042908793178L;

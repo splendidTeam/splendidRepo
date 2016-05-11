@@ -14,15 +14,15 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.converter;
+package com.baozun.shopdog.web.controller.product.converter;
 
 import loxia.utils.PropListCopyable;
 import loxia.utils.PropertyUtil;
 
 import com.baozun.nebula.sdk.command.SkuCommand;
-import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogSkuViewCommand;
+import com.baozun.shopdog.web.controller.ShopdogBaseConverter;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogSkuViewCommand;
 
 /** 
  * shopdog  sku信息的视图模型转换器
@@ -30,7 +30,7 @@ import com.baozun.nebula.web.controller.product.viewcommand.ShopdogSkuViewComman
  *
  */
 public class ShopdogSkuViewCommandConverter extends
-		BaseConverter<ShopdogSkuViewCommand> {
+		ShopdogBaseConverter<ShopdogSkuViewCommand> {
 	
 	private static final long serialVersionUID = 2122116108014878879L;
 

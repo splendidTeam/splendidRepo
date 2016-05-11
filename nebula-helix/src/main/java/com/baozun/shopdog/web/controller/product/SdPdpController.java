@@ -1,38 +1,30 @@
 /**
- * Copyright (c) 2016 Jumbomart All Rights Reserved.
+ * Copyright (c) 2015 Baozun All Rights Reserved.
  *
- * This software is the confidential and proprietary information of Jumbomart.
+ * This software is the confidential and proprietary information of Baozun.
  * You shall not disclose such Confidential Information and shall use it only in
  * accordance with the terms of the license agreement you entered into
- * with Jumbo.
+ * with Baozun.
  *
- * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * BAOZUN MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
  * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * PURPOSE, OR NON-INFRINGEMENT. BAOZUN SHALL NOT BE LIABLE FOR ANY DAMAGES
  * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product;
+package com.baozun.shopdog.web.controller.product;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
@@ -44,40 +36,35 @@ import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ShopdogItemPropertyCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ShopdogItemViewCommandConverter;
-import com.baozun.nebula.web.controller.product.converter.ShopdogSkuViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemPropertyViewCommandResolver;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogErrorType;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogResultCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogSkuViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
+import com.baozun.shopdog.exception.BusinessException;
+import com.baozun.shopdog.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
+import com.baozun.shopdog.web.controller.product.converter.ShopdogItemPropertyCommandConverter;
+import com.baozun.shopdog.web.controller.product.converter.ShopdogItemViewCommandConverter;
+import com.baozun.shopdog.web.controller.product.converter.ShopdogSkuViewCommandConverter;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogItemPropertyViewCommand;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogItemViewCommand;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogSkuViewCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
-
-
-/**
- * 驻店宝商品详情页controller
- * @author xingyu.liu
- *
+/**   
+ * @Description 
+ * @author dongliang ma
+ * @date 2016年5月11日 下午4:06:51 
+ * @version   
  */
-public class ShopdogPdpController {
+public class SdPdpController implements AbstractSdPdpController {
 	
-	/**
-	 * log定义
-	 */
-	private static final Logger	LOG										= LoggerFactory.getLogger(ShopdogPdpController.class);
+	private static final Logger	LOG										= LoggerFactory.getLogger(SdPdpController.class);
 	
 	@Autowired
 	protected SdkItemManager sdkItemManager;
@@ -110,32 +97,14 @@ public class ShopdogPdpController {
 	
 	@Autowired
 	protected ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
-	
-	
 	@Autowired
 	private ItemDetailManager detailManager;
-	
-	/**
-	 * shopdog商品接口
-	 * <p>
-	 * 用于生成shopdog构造pdp页面所需要的数据。参数itemCode和barCode二选一, 如果从列表页面进入pdp，则需要传入itemCode, 如果扫码方式进入pdp，则会传入extCode。
-	 * 此处的extCode对应Nebula系统中的extentionCode。所以当shopdog传入extCode时，需要先转成itemCode（或itemId）再进行统一处理。
-	 * </p>
-	 * 
-	 * @param itemCode 商品编码
-	 * @param extCode 外部对接编码
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
+	/* 
+	 * @see com.baozun.shopdog.web.controller.product.AbstractSdPdpController#getPdpItem(java.lang.String, java.lang.String)
 	 */
-	@RequestMapping(value = "/shopdog/product/detail.json", method = RequestMethod.GET)
-	@ResponseBody
-	public ShopdogResultCommand getItem(
-			@RequestParam(value = "itemCode", required = false) String itemCode, 
-			@RequestParam(value = "extCode", required = false) String extCode,
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-		
+	@Override
+	public List<ShopdogItemViewCommand> getPdpItem(String itemCode,
+			String extCode) throws BusinessException {
 		// 如果是extCode，先转成itemCode
 		if(Validator.isNotNullOrEmpty(extCode)) {
 			Item item = detailManager.findItemByExtentionCode(extCode);
@@ -144,15 +113,18 @@ public class ShopdogPdpController {
 			}
 		}
 		
-		// 没有取到合适的参数
+		/*// 没有取到合适的参数
 		if(Validator.isNullOrEmpty(itemCode)) {
-			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_PARAMETER_ERROR);
+//					return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_PARAMETER_ERROR);
+			throw new BusinessException(ShopdogErrorCodes(
+					ShopdogErrorType.COMMON_PARAMETER_ERROR.getErrorCode(),
+					ShopdogErrorType.COMMON_PARAMETER_ERROR.getMessage()));
 		}
 		
 		try {
 			
 			List<ShopdogItemViewCommand> items = buildPdpViewCommand(itemCode);
-			return ShopdogResultCommand.getSuccessInstance(items);
+			return items;
 			
 		} catch (IllegalItemStateException ie) {
 			
@@ -184,10 +156,8 @@ public class ShopdogPdpController {
 			
 			LOG.error("[SHOPDOG_GET_PDP_DATA] " + e.getMessage(), e);
 			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_SYSTEM_ERROR);
-		}
-		
+		}*/
 	}
-	
 	
     /**
 	 * 构造PdpViewCommand
@@ -361,5 +331,5 @@ public class ShopdogPdpController {
 		// 数据转换
 		return itemImageViewCommandConverter.convert(itemImageList);
 	}
-    
+
 }

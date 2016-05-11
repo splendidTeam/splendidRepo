@@ -14,17 +14,15 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.viewcommand;
+package com.baozun.shopdog.web.controller.product.viewcommand;
 
 import java.io.Serializable;
-
-import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
  * Shopdog command的基类
  * 
  */
-public class ShopdogBaseCommand extends BaseViewCommand implements Serializable {
+public class ShopdogResultCommand implements Serializable {
 	
 	private static final long serialVersionUID = 3702428534203898354L;
 	
@@ -49,7 +47,23 @@ public class ShopdogBaseCommand extends BaseViewCommand implements Serializable 
 	 * 错误信息
 	 */
 	private String message;
+	
+	/**
+	 * 返回数据
+	 */
+	private Object data;
+	
+	public ShopdogResultCommand() {
 
+	}
+	
+	public ShopdogResultCommand(Integer result, String errorCode, String message, Object data) {
+		super();
+		this.result = result;
+		this.errorCode = errorCode;
+		this.message = message;
+		this.data = data;
+	}
 
 	public Integer getResult() {
 		return result;
@@ -73,5 +87,25 @@ public class ShopdogBaseCommand extends BaseViewCommand implements Serializable 
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public Object getData() {
+		return data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
+	}
+	
+	public static ShopdogResultCommand getErrorInstance(String errorCode, String message) {
+		return new ShopdogResultCommand(RESULT_FAIL, errorCode, message, null);
+	}
+	
+	public static ShopdogResultCommand getErrorInstance(ShopdogErrorType error) {
+		return new ShopdogResultCommand(RESULT_FAIL, error.getErrorCode(), error.getMessage(), null);
+	}
+	
+	public static ShopdogResultCommand getSuccessInstance(Object data) {
+		return new ShopdogResultCommand(RESULT_SUCCESS, "", "", data);
 	}
 }

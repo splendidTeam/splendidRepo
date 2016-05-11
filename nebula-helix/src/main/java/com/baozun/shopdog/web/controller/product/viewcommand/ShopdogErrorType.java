@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.viewcommand;
+package com.baozun.shopdog.web.controller.product.viewcommand;
 
 import java.io.Serializable;
 

@@ -14,12 +14,12 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.viewcommand;
+package com.baozun.shopdog.web.controller.product.viewcommand;
 
 import java.util.List;
 import java.util.Map;
 
-import com.baozun.nebula.web.controller.BaseViewCommand;
+import com.baozun.shopdog.web.command.ShopdogBaseCommand;
 
 /**
  * 商品属性
@@ -28,7 +28,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * </p>
  *
  */
-public class ShopdogItemPropertyViewCommand extends BaseViewCommand {
+public class ShopdogItemPropertyViewCommand extends ShopdogBaseCommand {
 	
 	private static final long serialVersionUID = 1077822621702435603L;
 

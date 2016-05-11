@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.converter;
+package com.baozun.shopdog.web.controller.product.converter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.baozun.nebula.model.product.ItemImage;
-import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
-import com.baozun.nebula.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
+import com.baozun.shopdog.web.controller.ShopdogBaseConverter;
+import com.baozun.shopdog.web.controller.product.viewcommand.ShopdogItemImageViewCommand;
 import com.feilong.core.Validator;
 
 /**
@@ -35,7 +35,7 @@ import com.feilong.core.Validator;
  * @author xingyu.liu
  *
  */
-public class ShopdogItemImageViewCommandConverter extends BaseConverter<ShopdogItemImageViewCommand> {
+public class ShopdogItemImageViewCommandConverter extends ShopdogBaseConverter<ShopdogItemImageViewCommand> {
 
 	private static final long serialVersionUID = -127066731936568196L;
 
