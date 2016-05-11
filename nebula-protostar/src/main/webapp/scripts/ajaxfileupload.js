@@ -280,7 +280,7 @@ jQuery.extend({
 		var formId=element.attr("formId")?element.attr("formId"):"";
 		
     	var setting={
-				 url:  element.attr("url")!=undefined? element.attr("url"):'/demo/upload.json',  
+				 url:  element.attr("url")!=undefined? element.attr("url")+'?_csrf='+$j("meta[name='_csrf']").attr("content"):'/demo/upload.json?_csrf='+$j("meta[name='_csrf']").attr("content"),  
 		         secureuri: false,  
 		         fileElementId: id,
 		         formId: formId,

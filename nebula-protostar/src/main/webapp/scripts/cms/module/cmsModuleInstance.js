@@ -3,6 +3,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"TO_UPDATE":"修改",
 	"TO_ENABLE":"发布",
 	"TO_DEL":"删除",
+	"TO_VERSION":"版本管理",
 	"PROPERT_CONFIRM_DELETE_SEL_PROPERT":"确定要删除选定的模块实例么？",
 	"INFO_TITLE_DATA":"提示信息",
 	"INFO_DELETE_SUCCESS":"删除记录成功!",
@@ -24,7 +25,9 @@ $j.extend(loxia.regional['zh-CN'],{
 	"DIS_SUCCESS":"取消发布成功",
 	"SELECT_EMAIL":"请选择需要删除的模块实例",
 	"drawEditor":"操作",
-	"NO_DATA":"查询数据为空"
+	"NO_DATA":"查询数据为空",
+	"MODULE_PUBLISH":"发布",
+	"MODULE_REPUBLISH":"再次发布",
 });
 
 // 列表
@@ -33,23 +36,24 @@ var urlList = base+'/cmsModuleInstance/page.json';
 var PUBLISH_URL = base + "/module/publishModuleInstance.json";
 //删除
 var removeURl = base+ "/cmsModuleInstance/removeByIds.json";
-
+//模块版本管理
+moduleVersionByIdUrl = base + "/cmsModuleInstanceVersion/list.htm";
 /** 去新增页面 */
 var newPageUrl = base + '/cmsModuleInstance/addCmsModuleInstance.htm';
 function drawEditor(data){
 	var id=loxia.getObject("id", data);
-	var isPublished=loxia.getObject("isPublished",data);
-	var update="<a href='javascript:void(0);' val='"+id+"' class='func-button editor'>"+nps.i18n("TO_UPDATE")+"</a>";
-	var enable ;
-	if(isPublished==false || isPublished=="false"){
-		enable="<a href='javascript:void(0);' val='"+id+"' class='func-button enable'>"+nps.i18n("TO_ENABLE")+"</a>";
-	}else{
-		enable="<a href='javascript:void(0);' val='"+id+"' class='func-button enable'>再次发布</a>";
-		enable=enable+"<a href='javascript:void(0);' val='"+id+"' class='func-button disable'>"+nps.i18n("TO_CANCEL")+"</a>";
-	}
-    var del="<a href='javascript:void(0);' val='"+id+"' class='func-button delete'>"+nps.i18n("TO_DEL")+"</a>";
-	
-	return enable+update+del;
+//	var isPublished=loxia.getObject("isPublished",data);
+//	var update="<a href='javascript:void(0);' val='"+id+"' class='func-button editor'>"+nps.i18n("TO_UPDATE")+"</a>";
+//	var enable ;
+//	if(isPublished==false || isPublished=="false"){
+//		enable="<a href='javascript:void(0);' val='"+id+"' class='func-button enable'>"+nps.i18n("TO_ENABLE")+"</a>";
+//	}else{
+//		enable="<a href='javascript:void(0);' val='"+id+"' class='func-button enable'>再次发布</a>";
+//		enable=enable+"<a href='javascript:void(0);' val='"+id+"' class='func-button disable'>"+nps.i18n("TO_CANCEL")+"</a>";
+//	}
+//    var del="<a href='javascript:void(0);' val='"+id+"' class='func-button delete'>"+nps.i18n("TO_DEL")+"</a>";
+    var manage = "<a href='javascript:void(0);' val='"+id+"' class='func-button versionmanage'>"+nps.i18n("TO_VERSION")+"</a>";
+	return manage;
 }
 
 
@@ -142,6 +146,73 @@ function isPublished(data){
 		return "未发布";
 	}
 }
+
+function fnModulePublish(data, args, caller){
+	 updateActive(data.id,1);
+}
+
+function fnModuleCancel(data, args, caller){
+	updateActive(data.id,0); 
+};
+
+//禁用
+$j("#tableList").on("click",".func-button.disable",function(){
+	 var curObject=$j(this);
+	 updateActive(curObject.attr("val"),0);
+});
+//删除单行
+function fnDeleteModule(data, args, caller){
+	confirmDelete(data.id);
+}
+
+function drawEditOperatorItem(data) {
+
+	var moduleId = loxia.getObject("id", data);
+	var result = "";
+		result = [ {
+			label : nps.i18n("TO_UPDATE"),
+			type : "href",
+			content : base+"/cmsModuleInstance/updateModuleInstance.htm?moduleId="+moduleId
+		}, {
+			label : nps.i18n("TO_DEL"),
+			type : "jsfunc",
+			content : "fnDeleteModule"
+		}];
+
+	return result;
+
+}
+
+function drawEditPublishItem(data) {
+	var isPublished = loxia.getObject("isPublished", data);
+	var result = "";
+
+	//var state = loxia.getObject("lifecycle", data);
+	if(isPublished){
+		result = [ {
+			label : nps.i18n("MODULE_REPUBLISH"),
+			type : "jsfunc",
+			content : "fnModulePublish"
+		}, {
+			label : nps.i18n("TO_CANCEL"),
+			type : "jsfunc",
+			content : "fnModuleCancel"
+		}];
+	}else{
+		result = [ {
+			label : nps.i18n("TO_ENABLE"),
+			type : "jsfunc",
+			content : "fnModulePublish"
+		}, {
+			label : nps.i18n("TO_CANCEL"),
+			type : "jsfunc",
+			content : "fnModuleCancel"
+		}];
+	}
+	return result;
+
+}
+
 $j(document).ready(function() {
 	loxia.init({
 		debug : true,
@@ -162,12 +233,12 @@ $j(document).ready(function() {
 			{
 				name : "code",
 				label : "模块编码",
-				width : "10%"
+				width : "20%"
 			},
 			{
 				name : "name",
 				label : "模块名称",
-				width : "10%"
+				width : "50%"
 			},
 			{
 				name : "isPublished",
@@ -177,8 +248,16 @@ $j(document).ready(function() {
 			},
 			{
 				label :nps.i18n("drawEditor"),
-				width : "15%", 			 
+				width : "5%", 			 
 				template:"drawEditor" 
+			},{
+				width : "5%",
+				type : "oplist",
+				oplist : drawEditOperatorItem
+			},{
+				width : "5%",
+				type : "oplist",
+				oplist : drawEditPublishItem
 			}],
 		dataurl : urlList
 	});
@@ -195,24 +274,30 @@ $j(document).ready(function() {
 		 window.location.href =base+"/cmsModuleInstance/updateModuleInstance.htm?moduleId="+id;
 	 });
 	//执行批量删除
-	$j(".button.delete.batch").click(function() {
+	$j(".button.butch.delete").click(function() {
 		confirmDelete(null);
 	});
-     //启用
-	$j("#tableList").on("click",".func-button.enable",function(){
-		  var curObject=$j(this);
-		  updateActive(curObject.attr("val"),1);
+//     //启用
+//	$j("#tableList").on("click",".func-button.enable",function(){
+//		  var curObject=$j(this);
+//		  updateActive(curObject.attr("val"),1);
+//	 });
+//     //禁用
+//	 $j("#tableList").on("click",".func-button.disable",function(){
+//		 var curObject=$j(this);
+//		 updateActive(curObject.attr("val"),0);
+//	 });
+//     //删除
+//	 $j("#tableList").on("click",".func-button.delete",function(){
+//		 var curObject=$j(this);
+//		 confirmDelete(curObject.attr("val"));
+//	 });
+	 //版本管理
+	 $j("#tableList").on("click",".func-button.versionmanage",function(){
+		 var moduleId=$j(this).attr('val');
+		 window.location.href = moduleVersionByIdUrl+'?moduleId='+moduleId;
 	 });
-     //禁用
-	 $j("#tableList").on("click",".func-button.disable",function(){
-		 var curObject=$j(this);
-		 updateActive(curObject.attr("val"),0);
-	 });
-     //删除
-	 $j("#tableList").on("click",".func-button.delete",function(){
-		 var curObject=$j(this);
-		 confirmDelete(curObject.attr("val"));
-	 });
+	 
 	 /** 新增 */
 	$j('.add').click(function(){
 		window.location.href = newPageUrl+'?templateId='+$j('#templateId').val();

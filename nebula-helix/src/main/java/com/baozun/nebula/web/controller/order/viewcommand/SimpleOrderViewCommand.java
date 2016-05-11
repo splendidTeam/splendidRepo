@@ -56,7 +56,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     /** 每个订单行. */
     private List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList;
 
-    /** //TODO 总价. */
+    /** //TODO feilong 总价. */
     private BigDecimal                          total;
 
     /**
@@ -174,7 +174,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 获得 //TODO 总价.
+     * 获得总价.
      *
      * @return the total
      */
@@ -183,7 +183,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 设置 //TODO 总价.
+     * 设置总价.
      *
      * @param total
      *            the total to set

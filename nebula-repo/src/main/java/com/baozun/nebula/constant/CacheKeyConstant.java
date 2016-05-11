@@ -18,13 +18,27 @@ public class CacheKeyConstant{
 	/**
 	 * 获取页面的数据
 	 */
-	public final static String	CMS_PAGE_KEY						= "MC_CMS_CMSPAGEINSTANCEMANAGER_FINDPUBLISHPAGE";
-
+	public final static String CMS_PAGE_KEY="MC_CMS_CMSPAGEINSTANCEMANAGER_FINDPUBLISHPAGE";
+	
+	/**
+	 * 获取页面版本数据的数据
+	 */
+	public final static String CMS_PAGE_VERSION_KEY="MC_CMS_CMSPAGEINSTANCEVERSIONMANAGER_FINDPUBLISHPAGE";
+	
+	/**
+	 * 获取页面模块的数据
+	 */
+	public final static String CMS_MODULE_KEY="MC_CMS_CMSMODULEINSTANCEMANAGER_FINDPUBLISHMODULE";
+	
+	/**
+	 * 获取页面模块版本的数据
+	 */
+	public final static String CMS_MODULE_VERSION_KEY="MC_CMS_CMSMODULEINSTANCEVERSIONMANAGER_FINDPUBLISHMODULE";
+	
 	/**
 	 * 获取板块管理的数据
 	 */
-	public final static String	COLUMN_KEY							= "MC_COLUMN_COLUMNMANAGER_GETPUBLISHEDPAGEBYCODE";
-
+	public final static String COLUMN_KEY = "MC_COLUMN_COLUMNMANAGER_GETPUBLISHEDPAGEBYCODE";
 	/**
 	 * 促销活动自定义商品筛选器、自定义会员、自定义条件 缓存key的前缀
 	 */

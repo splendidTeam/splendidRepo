@@ -16,7 +16,6 @@ public class ActivityRuleManagerImpl implements ActivityRuleManager {
 	@Override
 	public List<PromotionCommand> getActivityRuleData(List<PromotionCommand> promotionCommandList) {
 	//	List<PromotionCommand> promotionCommandList = new ArrayList<PromotionCommand>();
-		// TODO Auto-generated method stub
 		return promotionCommandList;
 	}
 

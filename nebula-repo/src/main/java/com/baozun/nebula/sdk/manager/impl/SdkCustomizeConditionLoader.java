@@ -74,10 +74,8 @@ public class SdkCustomizeConditionLoader {
 		try {
 			methodInvoker.prepare();
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (NoSuchMethodException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -85,10 +83,8 @@ public class SdkCustomizeConditionLoader {
 		try {
 			listIdsLong = (List<Long>)methodInvoker.invoke();
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		*/

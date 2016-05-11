@@ -34,7 +34,9 @@ import org.springframework.web.util.UriTemplate;
  * 
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 2012-5-22 上午11:24:41
+ * @deprecated pls use {@link com.feilong.spring.web.util.UriTemplateUtil}
  */
+@Deprecated
 public class UriTemplateUtil{
 
 	/** The Constant log. */

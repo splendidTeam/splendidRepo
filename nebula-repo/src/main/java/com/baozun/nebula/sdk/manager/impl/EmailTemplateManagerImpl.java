@@ -86,7 +86,6 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
 	@Override
 	public void sendEmail(String receiverEmail,String code,Map<String,Object> dataMap,List<EmailAttachmentCommand> attachmentList)throws Exception{
 		
-		// TODO Auto-generated method stub
 		Map<String,Object> paramMap=new HashMap<String,Object>();
 		paramMap.put("code", code);
 		List<EmailTemplate> emailTemplateList=emailTemplateDao.findEmailTemplateListByQueryMap(paramMap);

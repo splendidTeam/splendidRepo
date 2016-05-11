@@ -197,6 +197,26 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<configuration>
+					<!-- http port -->
+					<port>${tomcat7.port}</port>
+					<path>${tomcat7.path}</path>
+					<uriEncoding>utf-8</uriEncoding>
+					<ignorePackaging>true</ignorePackaging>
+					<systemProperties>
+						<tomcatName>tomcat-nebula-protostar</tomcatName>
+						<JAVA_OPTS>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</JAVA_OPTS>
+					</systemProperties>
+					<warFile>${project.build.directory}/nebula-protostar.war</warFile>
+					<warDirectory>target/nebula-protostar</warDirectory>
+					<contextFile>src/main/resources/context.xml</contextFile>
+				</configuration>
+			</plugin>
+			
 		</plugins>
 	</build>
 </project>

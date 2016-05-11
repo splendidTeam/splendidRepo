@@ -249,7 +249,6 @@ public class CmsModuleInstanceController extends BaseController {
 		}else{
 			cmsModuleInstanceManager.cancelPublishedModuleInstance(moduleId);
 		}
-		//cmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		return SUCCESS;
 	}
 	

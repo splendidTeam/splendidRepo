@@ -155,8 +155,8 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
 	
 	@Autowired
-	@Qualifier("colorSwatchViewCommandResolver")
-	protected ItemColorSwatchViewCommandResolver colorSwatchViewCommandResolver;
+	@Qualifier("itemColorSwatchViewCommandResolver")
+	protected ItemColorSwatchViewCommandResolver itemColorSwatchViewCommandResolver;
 	
 	@Autowired
 	@Qualifier("relationItemViewCommandConverter")
@@ -360,7 +360,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
-		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
+		return itemColorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
 	}
 	
 	/**

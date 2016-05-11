@@ -26,7 +26,9 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 import loxia.dao.Page;
+
 import com.baozun.nebula.model.cms.CmsModuleInstance;
+import com.baozun.nebula.model.cms.CmsPageInstance;
 
 /**
  * CmsModuleInstanceDao
@@ -120,5 +122,8 @@ public interface CmsModuleInstanceDao extends GenericEntityDao<CmsModuleInstance
 	
 	@NativeQuery(model = CmsModuleInstance.class)
 	List<CmsModuleInstance> checkModuleInstanceCode(@QueryParam Map<String, Object> paraMap);
+
+	@NativeQuery(model = CmsModuleInstance.class)
+	List<CmsModuleInstance> findCmsModuleInstanceListByTemplateIds(@QueryParam("ids") List<Long> ids);
 	
 }

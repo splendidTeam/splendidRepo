@@ -55,7 +55,6 @@ public class ContactManagerTest {
 			log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@{}",
 					"++++++++++++++++++++++++++++sucess");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

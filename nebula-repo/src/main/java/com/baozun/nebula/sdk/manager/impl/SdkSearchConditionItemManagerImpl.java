@@ -46,7 +46,6 @@ public class SdkSearchConditionItemManagerImpl implements
 	@Transactional(readOnly=true)
 	public Pagination<SearchConditionItemCommand> findSearchConditionItemByQueryMapWithPage(
 			Page page, Sort[] sorts, Map<String, Object> paraMap) {
-		// TODO Auto-generated method stub
         if(paraMap.containsKey("type")){
             if(!paraMap.get("type").equals(1)){
                 paraMap.remove("type");

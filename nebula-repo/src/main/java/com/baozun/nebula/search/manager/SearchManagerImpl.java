@@ -255,45 +255,48 @@ public class SearchManagerImpl implements SearchManager{
 		List<FacetGroup> facetGroups = new ArrayList<FacetGroup>();
 
 		//****************************属性和分类的facet
-		for (Entry<String, Map<String, Long>> entry : facetMap.entrySet()){
-			String key = entry.getKey();
-			Map<String, Long> valueMap = entry.getValue();
+		if(Validator.isNotNullOrEmpty(facetMap)){
+			for (Entry<String, Map<String, Long>> entry : facetMap.entrySet()){
+				String key = entry.getKey();
+				Map<String, Long> valueMap = entry.getValue();
 
-			FacetGroup facetGroup = new FacetGroup();
-			// 如果key等于category_tree代表是分类的facet
-			if (SkuItemParam.category_tree.equals(key)) {
-				facetGroup = convertFacetGroup(valueMap);
-				facetGroup.setCategory(true);
-				facetGroup.setType(FacetType.CATEGORY.toString());
-			}else{
-				// 否则是属性的facet
-				facetGroup = convertFacetGroup(valueMap);
-				facetGroup.setCategory(false);
-				facetGroup.setType(FacetType.PROPERTY.toString());
-				facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
+				FacetGroup facetGroup = new FacetGroup();
+				// 如果key等于category_tree代表是分类的facet
+				if (SkuItemParam.category_tree.equals(key)) {
+					facetGroup = convertFacetGroup(valueMap);
+					facetGroup.setCategory(true);
+					facetGroup.setType(FacetType.CATEGORY.toString());
+				}else{
+					// 否则是属性的facet
+					facetGroup = convertFacetGroup(valueMap);
+					facetGroup.setCategory(false);
+					facetGroup.setType(FacetType.PROPERTY.toString());
+					facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
+				}
+				facetGroups.add(facetGroup);
 			}
-			facetGroups.add(facetGroup);
 		}
-		
 		
 		//**************************价格范围的facetGroup
-		FacetGroup priceGroup = new FacetGroup();
-		priceGroup.setCategory(false);
-		priceGroup.setType(FacetType.RANGE.toString());		
-		List<Facet> facets = new ArrayList<Facet>();
-		for (Entry<String, Integer> entry : facetQueryMap.entrySet()){
-			String key = entry.getKey();
-			Integer count = entry.getValue();
-			if(key.indexOf(SkuItemParam.sale_price)!=-1){
-				Facet facet=new Facet();
-				facet.setValue(key);
-				facet.setCount(count);
-				facets.add(facet);
+		if(Validator.isNotNullOrEmpty(facetQueryMap)){
+			FacetGroup priceGroup = new FacetGroup();
+			priceGroup.setCategory(false);
+			priceGroup.setType(FacetType.RANGE.toString());		
+			List<Facet> facets = new ArrayList<Facet>();
+			for (Entry<String, Integer> entry : facetQueryMap.entrySet()){
+				String key = entry.getKey();
+				Integer count = entry.getValue();
+				if(key.indexOf(SkuItemParam.sale_price)!=-1){
+					Facet facet=new Facet();
+					facet.setValue(key);
+					facet.setCount(count);
+					facets.add(facet);
+				}
 			}
-		}
-		if(facets.size()>0){
-			priceGroup.setFacets(facets);
-			facetGroups.add(priceGroup);
+			if(facets.size()>0){
+				priceGroup.setFacets(facets);
+				facetGroups.add(priceGroup);
+			}
 		}
 
 		searchResultPage.setFacetGroups(facetGroups);

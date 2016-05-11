@@ -5,7 +5,9 @@ package com.baozun.nebula.utils;
  * 
  * @author 金鑫 2010-3-11 下午02:58:49
  * @since 1.0
+ * @deprecated 目前没有使用,feilong已经移动到新的jar 通常不会单独使用这个类 by feilong
  */
+@Deprecated
 public final class ByteUtil{
 
 	/** Don't let anyone instantiate this class. */

@@ -57,24 +57,27 @@
 		       					and TEMPLATE_ID=:templateId
 		       				#end
 		       			
-		       				#if($createTime)
+		       				#if($createTimeStart)
 		       					and CREATE_TIME >= :createTimeStart
 		       				#end
 		       				
-		       				#if($createTime)
+		       				#if($createTimeEnd)
 		       					and CREATE_TIME <= :createTimeEnd
 		       				#end
 		       			
-		       				#if($modifyTime)
+		       				#if($modifyTimeStart)
 		       					and MODIFY_TIME >= :modifyTimeStart
 		       				#end
 		       				
-		       				#if($modifyTime)
+		       				#if($modifyTimeEnd)
 		       					and MODIFY_TIME <= :modifyTimeEnd
 		       				#end
 		       			
-		       				#if($isPublished)
+		       				#if($isPublished == true)
 		       					and ISPUBLISHED=:isPublished
+		       				#end
+		       				#if($ispublished == false)
+		       					and ISPUBLISHED=:ispublished
 		       				#end
 		       				#if($id)
 		       					and id=:id
@@ -126,7 +129,10 @@
 		       					and LIFECYCLE=:lifecycle
 		       				#end
 
-		       				#if($ispublished)
+		       				#if($ispublished == true)
+		       					and ISPUBLISHED=:ispublished
+		       				#end
+		       				#if($ispublished == false)
 		       					and ISPUBLISHED=:ispublished
 		       				#end
 				       		#if($lifecycle)
@@ -164,7 +170,7 @@
 			<value>
 				<![CDATA[  
 		       		update T_CMS_MODULE_INSTANCE
-		       		set lifecycle=2
+		       		set lifecycle=2, ispublished=false
 		       		 where 
 		       		id in (
 		       		#foreach( $id in $ids )
@@ -240,6 +246,9 @@
 		       				#if($isPublished)
 		       					and ISPUBLISHED=:isPublished
 		       				#end
+		       				#if($isPublished == false)
+		       					and ISPUBLISHED=:isPublished
+		       				#end
 		       		
                  ]]>
 			</value>
@@ -297,6 +306,9 @@
 		       				#if($isPublished)
 		       					and ISPUBLISHED=:isPublished
 		       				#end
+		       				#if($isPublished == false)
+		       					and ISPUBLISHED=:isPublished
+		       				#end
 		       		
                  ]]>
 			</value>
@@ -321,4 +333,21 @@
 			</value>
 		</constructor-arg>
 	</bean>	
+	
+	<bean id="CmsModuleInstance.findCmsModuleInstanceListByTemplateIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_MODULE_INSTANCE where lifecycle !=2
+		       		and TEMPLATE_ID in (
+		       		#foreach( $id in $ids)
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

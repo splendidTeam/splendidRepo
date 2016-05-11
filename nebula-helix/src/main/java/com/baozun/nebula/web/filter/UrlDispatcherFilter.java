@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.baozun.nebula.manager.cms.CmsPageInstanceManager;
+import com.baozun.nebula.manager.cms.PublishCmsPageInstanceManager;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.sdk.manager.impl.SdkCmsPageInstanceManagerImpl;
 
@@ -36,13 +36,14 @@ public class UrlDispatcherFilter implements Filter{
 	private WebApplicationContext webApplicationContext;
 
 	    
-	private CmsPageInstanceManager cmsPageInstanceManager;
+	private PublishCmsPageInstanceManager cmsPageInstanceManager;
 
 	private  Log  log = LogFactory.getLog(getClass());
 	/**
 	 *  支持的类型 0:综合 ,1:pc,2:mobile
 	 */
 	private  static String  supportType ;
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
@@ -50,7 +51,7 @@ public class UrlDispatcherFilter implements Filter{
 	public void init(FilterConfig filterConfig) throws ServletException{
 		 ServletContext servletContext = filterConfig.getServletContext(); 
 		 webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext); 
-		 cmsPageInstanceManager = (CmsPageInstanceManager) webApplicationContext.getBean(CmsPageInstanceManager.class);
+		 cmsPageInstanceManager = (PublishCmsPageInstanceManager) webApplicationContext.getBean(PublishCmsPageInstanceManager.class);
 		 supportType = filterConfig.getInitParameter("supportType");
 	}
 
@@ -85,16 +86,20 @@ public class UrlDispatcherFilter implements Filter{
         		chain.doFilter(httpServletRequest, httpServletResponse);
         	}else{
         		Map<String,String> result=cmsPageInstanceManager.findPublishPage(pageInstance);
-            	
+        		
             	request.setAttribute("page", pageInstance);
             	request.setAttribute("data", result.get("data"));
             	request.setAttribute("resource", result.get("resource"));
             	if(result.get("useCommonHeader").equals("true")){
             		log.debug("useCommonHeader:"+path);
             		request.getRequestDispatcher("/pages/commons/cms-page.jsp").forward(request, response);
+//            		System.out.println(result.get("data"));
+//            		System.out.println("==============================================");
             	}else{
             		log.debug("no-useCommonHeader:"+path);
             		request.getRequestDispatcher("/pages/commons/cms-page-nocommon.jsp").forward(request, response);
+//            		System.out.println(result.get("data"));
+//            		System.out.println("==============================================");
             	}
             		
         	}
@@ -103,8 +108,8 @@ public class UrlDispatcherFilter implements Filter{
         	chain.doFilter(httpServletRequest, httpServletResponse);
         }
 	}
+	
 	/**
-	 * 
 	* @author 何波
 	* @Description: 处理是否到正确的发布时间    
 	* void   

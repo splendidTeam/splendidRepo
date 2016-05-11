@@ -22,6 +22,9 @@ import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
@@ -35,9 +38,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.manager.cms.moduletemplate.ModuleTemplateManager;
 import com.baozun.nebula.manager.system.UploadManager;
+import com.baozun.nebula.model.cms.CmsModuleInstance;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
+import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.SdkCmsModuleTemplateManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
 import com.baozun.nebula.utils.image.ImageOpeartion;
@@ -45,6 +49,7 @@ import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
 
 /**
  * CmsModuleTemplateController
@@ -60,9 +65,6 @@ public class CmsModuleTemplateController extends BaseController {
 	private final static String			NOEDIT_END					= "<!--noedit-end-->";
 	@Autowired
 	private SdkCmsModuleTemplateManager cmsModuleTemplateManager;
-	
-	@Autowired
-	private ModuleTemplateManager moduleTemplateManager;
 
 	@Autowired
 	private UploadManager uploadManager;
@@ -70,6 +72,8 @@ public class CmsModuleTemplateController extends BaseController {
 	@Autowired
 	private SdkCmsPageTemplateManager sdkCmsPageTemplateManager;
 	
+	@Autowired
+	private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;
 
 	/** 上传图片的域名 */
 	@Value("#{meta['upload.img.domain.base']}")
@@ -99,7 +103,10 @@ public class CmsModuleTemplateController extends BaseController {
 	
 	@RequestMapping("/cmsModuleTemplate/view.htm")
 	public String view(Model model, Long id) {
-		String data = moduleTemplateManager.packModuleTemplateById(id);
+		CmsModuleTemplate cmt = cmsModuleTemplateManager
+				.findCmsModuleTemplateById(id);
+		String data = cmt.getData();
+		data = sdkCmsPageTemplateManager.processTemplateBase(data);
 		model.addAttribute("data", data);
 		return "/cms/module/cms-module-view";
 	}
@@ -122,7 +129,7 @@ public class CmsModuleTemplateController extends BaseController {
 	}
 
 	/**
-	 * 通过id获取CmsModuleTemplate //没用到，暂时不改--processTemplateBase
+	 * 通过id获取CmsModuleTemplate
 	 * 
 	 */
 	@RequestMapping("/cmsModuleTemplate/findByid.json")
@@ -203,11 +210,25 @@ public class CmsModuleTemplateController extends BaseController {
 		return SUCCESS;
 	}
 	
+	/**
+	 * 检查模板是否有管理页面
+	 * @return
+	 */
+	@RequestMapping("/cmsModuleTemplate/checkModuleUrl.json")
+	@ResponseBody
+	public Object checkModuleInstance(@RequestParam("ids") List<Long> ids, HttpServletRequest request, HttpServletResponse response) {
+		
+		List<CmsModuleInstance> instanceList = sdkCmsModuleInstanceManager.findCmsModuleInstanceListByTemplateIds(ids);
+		if(Validator.isNotNullOrEmpty(instanceList)){
+			return FAILTRUE;
+		}
+		return SUCCESS;
+	}
+	
 	@RequestMapping("/module/editCmsTemplate.htm")
 	public String toCmsTemplate(Model model,@RequestParam("id") Long id) throws UnsupportedEncodingException{
 		
-		String data = moduleTemplateManager.packModuleTemplateById(id);
-		
+		String data = cmsModuleTemplateManager.findCmsModuleTemplateById(id).getData();
 		StringBuilder repeat = new StringBuilder();
 		processNoEditData(data,repeat,0);
 		String repeatData = URLEncoder.encode(repeat.toString(),"UTF-8");
@@ -218,7 +239,7 @@ public class CmsModuleTemplateController extends BaseController {
 	
 	@RequestMapping("/module/findTemplateByTemplateId.htm")
 	public String findTemplateByTemplateId(Model model, Long templateId) throws UnsupportedEncodingException{
-		String data = moduleTemplateManager.packModuleTemplateById(templateId);
+		String data = cmsModuleTemplateManager.findCmsModuleTemplateById(templateId).getData();
 		StringBuilder repeat = new StringBuilder();
 		data = processNoEditData(data,repeat,0);
 		model.addAttribute("data", data);
@@ -264,7 +285,7 @@ public class CmsModuleTemplateController extends BaseController {
 	public BackWarnEntity editCmsPageTemplate(CmsModuleTemplate cmt,String repeatData) throws UnsupportedEncodingException {
 		try {
 			String data = cmt.getData();
-			if(data!=null && repeatData!=null && repeatData!=""){
+			if(Validator.isNotNullOrEmpty(data) && Validator.isNotNullOrEmpty(repeatData)){
 				String repeat =URLDecoder.decode(repeatData, "UTF-8");
 				String[] repeats =  repeat.split("repeat,");
 				if(repeats!=null && repeats.length>0){

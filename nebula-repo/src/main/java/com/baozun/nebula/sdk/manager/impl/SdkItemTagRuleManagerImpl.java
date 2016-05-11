@@ -346,7 +346,6 @@ public class SdkItemTagRuleManagerImpl implements SdkItemTagRuleManager {
 	@Override
 	@Transactional(readOnly=true)
 	public ProductComboDetailsCommand findItemComboListByExpression(String exp) {
-		// TODO Auto-generated method stub
 		ProductComboDetailsCommand cmd = new ProductComboDetailsCommand();
 		Pattern pattern = Pattern.compile(ItemTagRule.REGEX_IN_BRACKETS);
 		String[] expArr = exp.split(ItemTagRule.REGEX_AND);

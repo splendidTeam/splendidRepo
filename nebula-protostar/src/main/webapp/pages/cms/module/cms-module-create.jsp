@@ -54,7 +54,7 @@ width:80%;
 		    <div class="ui-block-line color-select-line">
 		         <label>模块截图</label>
 		         <div>
-        				<input loxiaType="input" name="img" value="${cmt.img}"  readonly="readonly" mandatory="true" id="template-img"/>
+        				<input loxiaType="input" name="img" value="${cmt.img}"  readonly="readonly" mandatory="false" id="template-img"/>
         				<a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>上传</span>
         					<input callback="fnCallback" class="imgUploadComponet fileupload" role="" model="C" hName="templateImageUrl"   type="file" url="/demo/upload.json"/>
         				</a>

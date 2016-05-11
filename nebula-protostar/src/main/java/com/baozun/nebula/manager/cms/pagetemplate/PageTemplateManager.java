@@ -69,6 +69,6 @@ public interface PageTemplateManager {
 	* String   
 	* @throws
 	 */
-	String recoverTemplateCodeArea(Long templateId,String code);
+	String recoverTemplateCodeArea(Long templateId,String code, Long versionId);
 
 }

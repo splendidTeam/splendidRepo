@@ -7,7 +7,6 @@ import com.baozun.nebula.calculateEngine.condition.AtomicCondition;
 public class PromotionConditionStepComparator implements Comparator<AtomicCondition>{
 	@Override
 	public int compare(AtomicCondition o1, AtomicCondition o2) {
-		// TODO Auto-generated method stub
 		AtomicCondition step0=(AtomicCondition)o1;
 		AtomicCondition step1=(AtomicCondition)o2;
 		

@@ -16,8 +16,11 @@
  */
 package com.baozun.nebula.sdk.manager;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+
 
 
 
@@ -187,5 +190,12 @@ public interface SdkCmsPageInstanceManager extends BaseManager{
 	* @throws
 	 */
 	String  setProductInfo(Element element,boolean isEdit);
+
+	/**
+	 * 统计页面中所有版本发布的时间区间（最小值，最大值）
+	 * @param pageId
+	 * @return
+	 */
+	Map<String, Date> getPublishedPageInstanceVersionsTimeRang(Long pageId);
 
 }

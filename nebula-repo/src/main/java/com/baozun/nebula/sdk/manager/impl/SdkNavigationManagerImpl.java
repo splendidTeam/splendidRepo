@@ -99,7 +99,6 @@ public class SdkNavigationManagerImpl implements SdkNavigationManager {
 	@Override
 	@Transactional(readOnly = true)
 	public Navigation findEffectNavigationByUrl(String url) {
-		// TODO Auto-generated method stub
 		return navigationDao.findEffectNavigationByUrl(url);
 	}
 

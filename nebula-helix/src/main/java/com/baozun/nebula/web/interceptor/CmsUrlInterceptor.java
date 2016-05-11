@@ -14,7 +14,7 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.baozun.nebula.manager.cms.CmsPageInstanceManager;
+import com.baozun.nebula.manager.cms.PublishCmsPageInstanceManagerImpl;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
 
@@ -29,7 +29,7 @@ public class CmsUrlInterceptor extends HandlerInterceptorAdapter implements
 	private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
     
     @Autowired
-    private CmsPageInstanceManager cmsPageInstanceManager;
+    private PublishCmsPageInstanceManagerImpl cmsPageInstanceManager;
 
     @Override
     public boolean preHandle(HttpServletRequest request,

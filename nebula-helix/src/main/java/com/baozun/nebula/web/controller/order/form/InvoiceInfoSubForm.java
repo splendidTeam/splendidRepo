@@ -39,7 +39,7 @@ public class InvoiceInfoSubForm implements Serializable{
     /** 发票内容,比如 明细 办公用品 电脑配件 耗材. */
     private String            invoiceContent;
 
-    //TODO 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
+    //TODO feilong 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
     /**
      * 获得 是否需要发票.
      *

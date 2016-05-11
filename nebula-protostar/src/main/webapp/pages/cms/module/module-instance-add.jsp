@@ -94,7 +94,7 @@ margin-top: 4px
     	<%-- 编辑页面区域 --%>
     	<script type="text/javascript" src="${base}/scripts/cms/cms-ztree.js" ></script>
     	<script type="text/javascript" src="${base}/scripts/z-model-product.js" ></script>
-		<script type="text/javascript" src="${base}/scripts/cms/module/z-model.js" ></script>
+		<script type="text/javascript" src="${base}/scripts/z-model.js" ></script>
 		<iframe src="${base}/page/findTemplateModuleAreaByTemplateId.htm?templateId=${cmt.id}&moduleId=${cmi.id}&isEdit=true" width="100%" class="web-update" frameborder="0"></iframe>
     </div>
     <div class="button-line">

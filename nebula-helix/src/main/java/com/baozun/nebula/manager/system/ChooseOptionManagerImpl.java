@@ -60,7 +60,6 @@ public class ChooseOptionManagerImpl implements ChooseOptionManager {
 	 */
 	@Override
 	public List<ChooseOption> findEffectChooseOptionListByGroupCode(String groupCode) {
-		// TODO Auto-generated method stub
 		return this.findEffectChooseOptionListByGroupCode(groupCode, LocaleContextHolder.getLocale().toString());
 	}
 	

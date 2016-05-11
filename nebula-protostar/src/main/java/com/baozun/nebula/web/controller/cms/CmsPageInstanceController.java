@@ -146,7 +146,6 @@ public class CmsPageInstanceController extends BaseController {
 	@ResponseBody
 	public Object savePageInstance(@ModelAttribute CmsPageInstance cmsPageInstance, 
 			@RequestParam("html") String html) {
-		//System.out.println(html);
 		CmsPageInstance pageInstance = cmsPageInstanceManager.createOrUpdateCmsPageInstance(cmsPageInstance, html);
 		return pageInstance;
 	}
@@ -163,7 +162,6 @@ public class CmsPageInstanceController extends BaseController {
 			@RequestParam(value="pageId", required=false) Long pageId,
 			@RequestParam("isEdit") Boolean isEdit){
 		/** 模板信息 */
-		//String data = cmsPageInstanceManager.findUpdatedCmsPageInstance(templateId, pageId, isEdit);
 		String data = sdkCmsParseHtmlContentManager.getTemplatePageData(templateId, pageId, null, isEdit);
 		model.addAttribute("data", data);
 		return "/cms/newpage/page-instance-iframe";
@@ -280,12 +278,6 @@ public class CmsPageInstanceController extends BaseController {
 	@ResponseBody
 	public Object publishPageInstance(@RequestParam("pageId") Long pageId,@RequestParam("startTime")Date startTime,@RequestParam("endTime")Date endTime){
 		BackWarnEntity back = new BackWarnEntity();
-//		if(startTime != null){
-//			if(startTime.compareTo(new Date())<=0){
-//				back.setDescription("开始时间应大于当前时间");
-//				return back;
-//			}
-//		}
 		if(startTime == null && endTime!=null){
 			if(endTime.compareTo(new Date())<=0){
 				back.setDescription("结束时间应大于当前时间");
@@ -354,7 +346,6 @@ public class CmsPageInstanceController extends BaseController {
 	public BackWarnEntity editCmsPageTemplate(CmsPageTemplate cmd,String repeatData) throws UnsupportedEncodingException {
 		try {
 			String data = cmd.getData();
-			System.out.println("================"+repeatData);
 			if(Validator.isNotNullOrEmpty(data) && Validator.isNotNullOrEmpty(repeatData)){
 				String repeat =URLDecoder.decode(repeatData, "UTF-8");
 				String[] repeats =  repeat.split("repeat,");
@@ -397,7 +388,6 @@ public class CmsPageInstanceController extends BaseController {
 		}
 	
 	}
-	
 	
 	@RequestMapping("/cms/editAreaHide.json")
 	@ResponseBody

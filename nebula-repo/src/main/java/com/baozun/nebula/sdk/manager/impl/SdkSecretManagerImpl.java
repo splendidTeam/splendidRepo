@@ -38,8 +38,6 @@ public class SdkSecretManagerImpl implements SdkSecretManager {
 	
 	@Override
 	public Object encrypt(Object source, String[] fields) {
-		// TODO Auto-generated method stub
-		
 		if(!needEncrypt()) return source;
 		
 		try{
@@ -63,7 +61,6 @@ public class SdkSecretManagerImpl implements SdkSecretManager {
 
 	@Override
 	public Object decrypt(Object source, String[] fields) {
-		// TODO Auto-generated method stub
 		if(!needEncrypt()) return source;
 		
 		try{

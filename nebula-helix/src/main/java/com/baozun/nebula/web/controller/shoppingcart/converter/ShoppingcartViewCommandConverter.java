@@ -106,7 +106,7 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
 		shoppingCartViewCommand
 				.setShopAndShoppingCartLineSubViewCommandListMap(shopAndShoppingCartLineSubViewCommandListMap);
 
-		// TODO 页面显示时候店铺和购物车行排序
+		// TODO feilong 页面显示时候店铺和购物车行排序
 
 		return shoppingCartViewCommand;
 	}

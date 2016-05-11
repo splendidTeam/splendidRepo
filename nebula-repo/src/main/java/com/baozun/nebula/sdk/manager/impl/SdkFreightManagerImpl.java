@@ -54,7 +54,6 @@ public class SdkFreightManagerImpl implements SdkFreightManager{
 	@Override
 	@Transactional(readOnly=true)
 	public List<DistributionMode> getAllDistributionMode() {
-		// TODO Auto-generated method stub
 		return distributionModeDao.getAllDistributionMode();
 	}
 

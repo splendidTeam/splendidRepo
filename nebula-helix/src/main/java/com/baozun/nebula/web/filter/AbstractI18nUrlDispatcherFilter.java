@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.baozun.nebula.manager.cms.CmsPageInstanceManager;
+import com.baozun.nebula.manager.cms.PublishCmsPageInstanceManager;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCmsPageInstanceManagerImpl;
@@ -46,7 +46,7 @@ public abstract class AbstractI18nUrlDispatcherFilter implements Filter{
 	
 	private WebApplicationContext webApplicationContext;
 	    
-	private CmsPageInstanceManager cmsPageInstanceManager;
+	private PublishCmsPageInstanceManager cmsPageInstanceManager;
 	
 	private SdkI18nLangManager sdkI18nLangManager;
 	
@@ -62,7 +62,7 @@ public abstract class AbstractI18nUrlDispatcherFilter implements Filter{
 		 
 		 webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext); 
 		
-		 cmsPageInstanceManager = (CmsPageInstanceManager)webApplicationContext.getBean(CmsPageInstanceManager.class);
+		 cmsPageInstanceManager = (PublishCmsPageInstanceManager)webApplicationContext.getBean(PublishCmsPageInstanceManager.class);
 		 sdkI18nLangManager = (SdkI18nLangManager)webApplicationContext.getBean(SdkI18nLangManager.class);
 	
 		 supportType = filterConfig.getInitParameter("supportType");

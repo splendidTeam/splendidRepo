@@ -21,7 +21,6 @@ public class SchedulerManagerImpl implements SchedulerManager {
 	
 	@Override
 	public void addTask(Object taskInstance, String taskMethod, Date date, String jobName)throws Exception {
-		// TODO Auto-generated method stub
 
 		SimpleDateFormat sdf=new SimpleDateFormat("s m H d M ? yyyy");
 		String strDate=sdf.format(date);
@@ -30,13 +29,11 @@ public class SchedulerManagerImpl implements SchedulerManager {
 
 	@Override
 	public void removeTask(String jobName)throws Exception {
-		// TODO Auto-generated method stub
 		scheduler.getScheduler().deleteJob(jobName, Scheduler.DEFAULT_GROUP);
 	}
 	
 	@Override
 	public void timerClean() throws Exception {
-		// TODO Auto-generated method stub
 		String[] triggerNames=scheduler.getScheduler().getTriggerNames(Scheduler.DEFAULT_GROUP);
 		
 		for(String name:triggerNames){
@@ -50,7 +47,6 @@ public class SchedulerManagerImpl implements SchedulerManager {
 
 	@Override
 	public void addTask(Object taskInstance, String taskMethod, String timeExp, String jobName) throws Exception {
-		// TODO Auto-generated method stub
 		MethodInvokingJobDetailFactoryBean mifb=new MethodInvokingJobDetailFactoryBean();
 		
 		mifb.setTargetObject(taskInstance);

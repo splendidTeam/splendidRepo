@@ -8,6 +8,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"OPERATE":"操作",
 	"CONFIRM_DELETE_PAGE":"确定删除该页面吗",
 	"CONFIRM_PUBLISH_PAGE":"确定要发布该页面吗",
+	"CONFIRM_CANCEL_PUBLISH_PAGE":"确定要取消发布该页面吗",
 	"DELETE_SUCCESS":"删除成功",
 	"DELETE_FAILURE":"删除失败",
 	"PUBLISH_SUCCESS":"发布成功",
@@ -16,7 +17,12 @@ $j.extend(loxia.regional['zh-CN'],{
 	"UNPUBLISH_SUCCESS":"取消发布成功",
 	"UNPUBLISH_FAILURE":"取消发布失败",
 	"SELECT_DELETE_PAGE_INSTANCE":"请选择要删除的页面实例",
-	
+	"OPERATOR_MODIFY":"修改",
+	"OPERATOR_DELETE":"删除",
+	"PAGE_PUBLISH":"发布",
+	"PAGE_REPUBLISH":"再次发布",
+	"PAGE_CANCEL":"取消发布",
+	"VERSION_MANAGE":"版本管理"
 });
 
 var findPagfeInstanceListByTemplateIdUrl = base+'/page/findPageInstanceListByTemplateId.json';
@@ -28,12 +34,16 @@ var updatePageInstanceUrl = base + '/page/updatePageInstance.htm';
 var removePageInstanceByIdUrl = base + '/page/removePageInstanceById.json';
 /** 删除页面实例(批量) */
 var removePageInstanceByIdsUrl = base + '/page/removePageInstanceByIds.json';
+/** 实例版本管理 **/
+var instanceVersionByIdUrl = base + '/page/findPageInstanceVersionListByInstanceId.htm'; 
 
 var publishPageInstanceUrl = base + '/page/publishPageInstance.json';
 
 var cancelPublishPageInstanceUrl = base + '/page/cancelPublishPageInstance.json';
 
 var pageTemplateListUrl = base + '/newcms/pageTemplateList.htm';
+
+
 
 
 /** 刷新数据 */
@@ -47,22 +57,9 @@ function drawCheckbox(data){
 }
 /** loxiasimpletable.operateTemplate */
 function operateTemplate(data){
-	var isPublished = loxia.getObject("isPublished", data);
 	var id = loxia.getObject("id", data);
-	var stime = formatDate(loxia.getObject("startTime", data));
-	var etime = formatDate(loxia.getObject("endTime", data));
-	var url = loxia.getObject("url", data);
-	var tmpid = loxia.getObject("templateId", data);
 	var html = '';
-	if(isPublished){
-		html += '<a href="javascript:void(0);" class="func-button publish" url="'+url+'" tmpid="'+tmpid+'" stime="'+stime+'" etime="'+etime+'" value="'+id+'" title="再次发布"><span>再次发布</span></a>';
-		html += '<a href="javascript:void(0);" class="func-button unpublish" value="'+id+'" title="取消发布"><span>取消发布</span></a>';
-	}else {
-		html += '<a href="javascript:void(0);" class="func-button publish"  url="'+url+'" tmpid="'+tmpid+'"  stime="'+stime+'" etime="'+etime+'" value="'+id+'" title="发布"><span>发布</span></a>';
-	}
-	html += '<a href="javascript:void(0);" class="func-button update" value="'+id+'" title="修改"><span>修改</span></a>';
-	html += '<a href="javascript:void(0);" class="func-button deleteOne" value="'+id+'" title="删除"><span>删除</span></a>';
-	
+	html += '<a href="javascript:void(0);" class="func-button versionmanage" value="'+id+'" title="版本管理"><span>版本管理</span></a>';
 	return html;
 }
 
@@ -124,7 +121,7 @@ function eformatDate(data){
 		var date=new Date(obj);
 		return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
 	}
-};
+}
 function formatDate(obj){
 	if(obj==null||obj==''){
 		return "";
@@ -133,7 +130,7 @@ function formatDate(obj){
 		var date=new Date(obj);
 		return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
 	}
-};
+}
 function parseDate(str){     
 	   if(typeof str == 'string'){     
 	     var results = str.match(/^ *(\d{4})-(\d{1,2})-(\d{1,2}) *$/);  
@@ -175,6 +172,99 @@ function supportType(type){
 	}
 	return html;
 };
+
+function drawEditOperatorItem(data) {
+
+	var pageId = loxia.getObject("id", data);
+	var result = "";
+		result = [ {
+			label : nps.i18n("OPERATOR_MODIFY"),
+			type : "href",
+			content : updatePageInstanceUrl+'?pageId='+pageId
+		}, {
+			label : nps.i18n("OPERATOR_DELETE"),
+			type : "jsfunc",
+			content : "fnDeletePage"
+		}];
+
+	return result;
+
+}
+
+function drawEditPublishItem(data) {
+	var isPublished = loxia.getObject("isPublished", data);
+	var result = "";
+
+	//var state = loxia.getObject("lifecycle", data);
+	if(isPublished){
+		result = [ {
+			label : nps.i18n("PAGE_REPUBLISH"),
+			type : "jsfunc",
+			content : "fnPagePublish"
+		}, {
+			label : nps.i18n("PAGE_CANCEL"),
+			type : "jsfunc",
+			content : "fnPageCancel"
+		}];
+	}else{
+		result = [ {
+			label : nps.i18n("PAGE_PUBLISH"),
+			type : "jsfunc",
+			content : "fnPagePublish"
+		}, {
+			label : nps.i18n("PAGE_CANCEL"),
+			type : "jsfunc",
+			content : "fnPageCancel"
+		}];
+	}
+	return result;
+
+}
+
+/** 删除(单个) */
+function fnDeletePage(data, args, caller){
+	var json = {"pageId":data.id};
+	nps.confirm(nps.i18n('PROMPT_INFO'), nps.i18n('CONFIRM_DELETE_PAGE'),function(){
+		var data = loxia.syncXhr(removePageInstanceByIdUrl, json, {type:'post'});
+		if(data.isSuccess){
+			nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('DELETE_SUCCESS'));
+			refreshData();
+		}else{
+			nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('DELETE_FAILURE'));	
+		}
+	});
+};
+
+/** 发布按钮 */
+function fnPagePublish(data, args, caller){
+//	alert(data.id);
+//	alert(data.startTime);
+//	var me = $j(this);
+//	var pageId = me.attr('value');
+	var dialog = $j(".cms-publish-dialog").attr("wid",data.id);
+	dialog.attr("url",data.url);
+	dialog.attr("tmpid",data.templateId);
+	dialog.find(".starttime").val(sformatDate(data));
+	dialog.find(".endtime").val(eformatDate(data));
+	dialog.dialogff({type:'open',close:'in',width:'450px', height:'350px'});
+
+};
+
+/** 取消发布 */
+function fnPageCancel(data, args, caller){
+	var pageId = data.id;
+	var json = {'pageId':pageId};
+	nps.confirm(nps.i18n('PROMPT_INFO'), nps.i18n('CONFIRM_CANCEL_PUBLISH_PAGE'), function(){
+		var data = loxia.syncXhr(cancelPublishPageInstanceUrl, json, {type:'post'});
+		if(data.isSuccess){
+			nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('UNPUBLISH_SUCCESS'));
+			refreshData();
+		}else{
+			nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('UNPUBLISH_FAILURE'));
+		}
+	});
+};
+
 $j(document).ready(function() {
 	
 	$j("#table1").loxiasimpletable({
@@ -194,7 +284,7 @@ $j(document).ready(function() {
 		}, {
 			name : "name",
 			label : nps.i18n("PAGE_INSTANCE_NAME"),
-			width : "20%",
+			width : "25%",
 			sort : [ "name asc", "name desc" ]
 		}, {
 			name : "url",
@@ -222,8 +312,16 @@ $j(document).ready(function() {
 
 		}, {
 			label : nps.i18n("OPERATE"),
-			width : "15%",
+			width : "5%",
 			template : "operateTemplate"
+		},{
+			width : "5%",
+			type : "oplist",
+			oplist : drawEditOperatorItem
+		},{
+			width : "5%",
+			type : "oplist",
+			oplist : drawEditPublishItem
 		}],
 		dataurl : findPagfeInstanceListByTemplateIdUrl
 	});
@@ -240,27 +338,13 @@ $j(document).ready(function() {
 		window.location.href = newPageUrl+'?templateId='+$j('#templateId').val();
 	});
 	
-	/**  修改 */
-	$j('#table1').on('click', '.update', function(){
+
+	/** 实例版本管理 */
+	$j('#table1').on('click','.versionmanage', function(){
 		var pageId = $j(this).attr('value');
-		window.location.href = updatePageInstanceUrl+'?pageId='+pageId;
+		window.location.href = instanceVersionByIdUrl+'?instanceId='+pageId;
 	});
 	
-	/** 删除(单个) */
-	$j('#table1').on('click','.deleteOne', function(){
-		var pageId = $j(this).attr('value');
-		var json = {"pageId":pageId};
-		nps.confirm(nps.i18n('PROMPT_INFO'), nps.i18n('CONFIRM_DELETE_PAGE'),function(){
-			var data = loxia.syncXhr(removePageInstanceByIdUrl, json, {type:'post'});
-			if(data.isSuccess){
-				nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('DELETE_SUCCESS'));
-				refreshData();
-			}else{
-				nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('DELETE_FAILURE'));	
-			}
-		});
-	});
-
 	/** 删除(批量) */
 	$j('.butch.delete').click(function(){
 		var pageIds = new Array();
@@ -286,18 +370,6 @@ $j(document).ready(function() {
 		});
 	});
 	
-	/** 发布按钮 */
-	$j('#table1').on('click', '.publish', function(){
-		var me = $j(this);
-		var pageId = me.attr('value');
-		var dialog = $j(".cms-publish-dialog").attr("wid",pageId);
-		dialog.attr("url",me.attr("url"));
-		dialog.attr("tmpid",me.attr("tmpid"));
-		dialog.find(".starttime").val(me.attr("stime"));
-		dialog.find(".endtime").val(me.attr("etime"));
-		dialog.dialogff({type:'open',close:'in',width:'450px', height:'350px'});
-
-	});
 	
 	/** 发布 */
 	$j('.cms-publish-dialog').on('click', '.confrim', function(){
@@ -310,13 +382,6 @@ $j(document).ready(function() {
 		}
 		var stime = dialog.find(".starttime").val();
 		var sdate;
-		if(stime!=""){
-			sdate=parseDate(stime);
-			if((sdate.getTime()-new Date().getTime()) <= 0){
-				nps.info(nps.i18n('PROMPT_INFO'), "开始时间应大于当前时间");
-				return;
-			}
-		}
 		
 		var etime=dialog.find(".endtime").val();
 		if(etime!=""){
@@ -352,21 +417,6 @@ $j(document).ready(function() {
 		$j('.dialog-close').click();
 	});
 	
-
-	/** 取消发布 */
-	$j('#table1').on('click', '.unpublish', function(){
-		var pageId = $j(this).attr('value');
-		var json = {'pageId':pageId};
-		nps.confirm(nps.i18n('PROMPT_INFO'), nps.i18n('CONFIRM_PUBLISH_PAGE'), function(){
-			var data = loxia.syncXhr(cancelPublishPageInstanceUrl, json, {type:'post'});
-			if(data.isSuccess){
-				nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('UNPUBLISH_SUCCESS'));
-				refreshData();
-			}else{
-				nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('UNPUBLISH_FAILURE'));
-			}
-		});
-	});
 	
 	/** 返回 */
 	$j('.return').click(function(){
