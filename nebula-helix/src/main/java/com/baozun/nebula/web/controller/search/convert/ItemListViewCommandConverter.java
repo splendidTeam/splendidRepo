@@ -55,7 +55,11 @@ public class ItemListViewCommandConverter extends BaseConverter<ItemListViewComm
 
 		ItemListViewCommand result = new ItemListViewCommand();
 		try{
-			PropertyUtil.copyProperties(result, pageData);
+			result.setCount(pageData.getCount());
+			result.setCurrentPage(result.getCurrentPage());
+			result.setSize(pageData.getSize());
+			result.setStart(pageData.getStart());
+			result.setTotalPages(pageData.getTotalPages());
 			result.setItemForSolrCommands(pageData.getItems());
 			result.setFacetGroups(pageData.getFacetGroups());
 		}catch (Exception e){

@@ -1,6 +1,7 @@
 package com.baozun.nebula.solr.factory;
 
 import com.baozun.nebula.solr.utils.SolrOrderSort;
+import com.feilong.core.lang.EnumUtil;
 
 /**
  * solr的排序枚举，商城可以重写
@@ -112,13 +113,13 @@ public enum SortTypeEnum{
 	 * @return single instance of SortTypeEnum
 	 */
 	public static SortTypeEnum getInstance(String order){
-		SortTypeEnum[] values = SortTypeEnum.values();
-		// SortTypeEnum.valueOf("ONSHELVESTIME_DESC") 这种是name
-		for (SortTypeEnum sortTypeEnum : values){
-			if (sortTypeEnum.getOrder().equals(order)){
-				return sortTypeEnum;
-			}
+		SortTypeEnum sortTypeEnum=EnumUtil.getEnumByPropertyValue(SortTypeEnum.class, "order", order);
+		if(sortTypeEnum==null){
+			return DEFAULT_ORDER;
 		}
-		return null;
+		return sortTypeEnum;
 	}
+	
+	
+	
 }

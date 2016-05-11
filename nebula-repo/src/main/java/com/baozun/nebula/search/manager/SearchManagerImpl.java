@@ -68,7 +68,9 @@ public class SearchManagerImpl implements SearchManager{
 		// 第几页
 		Integer currentPage = solrQuery.getStart();
 
+		//返回对象
 		SearchResultPage<ItemForSolrCommand> searchResultPage = null;
+		
 		SolrGroupData<ItemForSolrCommand> solrGroup = new SolrGroupData<ItemForSolrCommand>();
 
 		// 是否分组显示
@@ -76,12 +78,20 @@ public class SearchManagerImpl implements SearchManager{
 
 		// 如果需要分组显示
 		if (Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)) {
+			//分组查询
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithGroup(solrQuery);
+			
+			//将查询结果转换为searchResultPage对象
 			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, currentPage, rows);
 		}else{
+			//不分组查询
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithOutGroup(solrQuery);
+			
+			//将查询结果转换为searchResultPage对象
 			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, currentPage, rows);
 		}
+		
+		
 		return searchResultPage;
 
 	}
@@ -136,6 +146,7 @@ public class SearchManagerImpl implements SearchManager{
 		String lang = LangUtil.getCurrentLang();
 
 		String key = conditionItemCacheKey+coditionId+"-"+lang;
+		
 		try{
 			searchConditionItemCommands = cacheManager.getObject(key);
 		}catch (Exception e){
@@ -171,6 +182,7 @@ public class SearchManagerImpl implements SearchManager{
 			Integer size){
 
 		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
+		
 		Map<String, SolrGroupCommand<ItemForSolrCommand>> it = solrGroupData.getSolrGroupCommandMap();
 		for (String key : it.keySet()){
 			SolrGroupCommand<ItemForSolrCommand> solrGroupCommand = it.get(key);
@@ -182,13 +194,7 @@ public class SearchManagerImpl implements SearchManager{
 
 		Integer start = (currentPage - 1) * size;
 
-		return convertSearchPageFacet(
-				start,
-				size,
-				solrGroupData.getNumFound(),
-				list,
-				solrGroupData.getFacetQueryMap(),
-				solrGroupData.getFacetMap());
+		return convertSearchPageFacet(start,size,solrGroupData.getNumFound(),list,solrGroupData.getFacetQueryMap(),solrGroupData.getFacetMap());
 	}
 
 	/**
@@ -289,8 +295,6 @@ public class SearchManagerImpl implements SearchManager{
 			priceGroup.setFacets(facets);
 			facetGroups.add(priceGroup);
 		}
-		
-		
 
 		searchResultPage.setFacetGroups(facetGroups);
 

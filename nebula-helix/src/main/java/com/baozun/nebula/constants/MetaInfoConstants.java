@@ -31,4 +31,7 @@ public interface MetaInfoConstants {
 	
 	/** 菜单导航的URL拼接模板 */
 	public static final String MATA_KEY_NAVIGATION_URL_TEMPLATE = "cat_nav_template";
+	
+	/** 默认的物流方式 */
+	public static final String DISTRIBUTION_MODE_ID = "distributionModeId";
 }

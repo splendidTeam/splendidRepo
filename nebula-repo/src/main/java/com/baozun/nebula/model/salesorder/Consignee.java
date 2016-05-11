@@ -52,6 +52,9 @@ public class Consignee extends BaseModel{
 
     /** 姓名 */
     private String            name;
+    
+    /** 购买人姓名 */
+    private String            buyerName;
 
     //************************************************************************
     /**
@@ -98,8 +101,11 @@ public class Consignee extends BaseModel{
 
     /** 手机 */
     private String            mobile;
+    
+    /** 购买人电话 */
+    private String 			  buyerTel;
 
-    /** 固话 */
+	/** 固话 */
     private String            tel;
 
     /** email */
@@ -330,5 +336,23 @@ public class Consignee extends BaseModel{
     public void setVersion(Date version){
         this.version = version;
     }
+    
+    @Column(name = "BUYER_NAME",length = 100)
+    public String getBuyerName() {
+		return buyerName;
+	}
+
+	public void setBuyerName(String buyerName) {
+		this.buyerName = buyerName;
+	}
+
+	@Column(name = "BUYER_TEL",length = 50)
+	public String getBuyerTel() {
+		return buyerTel;
+	}
+
+	public void setBuyerTel(String buyerTel) {
+		this.buyerTel = buyerTel;
+	}
 
 }

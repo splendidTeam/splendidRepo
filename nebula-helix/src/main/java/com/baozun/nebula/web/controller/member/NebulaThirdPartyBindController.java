@@ -18,8 +18,6 @@
 package com.baozun.nebula.web.controller.member;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +40,6 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.member.ThirdPartyMemberManager;
 import com.baozun.nebula.model.member.Member;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
@@ -54,7 +51,6 @@ import com.baozun.nebula.web.controller.member.form.RegisterForm;
 import com.baozun.nebula.web.controller.member.validator.BindRegisterFormMobileValidator;
 import com.baozun.nebula.web.controller.member.validator.BindRegisterFormNormalValidator;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
-import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 
 
@@ -147,11 +143,6 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	@Autowired
 	private MemberManager		memberManager;
 	
-	/**
-	 * sdk会员业务管理类
-	 */
-	@Autowired
-	private SdkMemberManager	sdkMemberManager;
 	
 	/**
 	 * 第三方绑定业务类
@@ -195,7 +186,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * @param model
 	 * @return NebulaReturnResult 返回结果
 	 */
-	public String bindThirdPartyMemberWithStoreMember(
+	public NebulaReturnResult bindThirdPartyMemberWithStoreMember(
 			@RequestParam String type,
 			@LoginMember MemberDetails memberDetails,
 			@ModelAttribute LoginForm loginForm,
@@ -204,6 +195,8 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 			HttpServletResponse response,
 			Model model){
 		
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+		
 		//校验输入数据 
 		loginFormValidator.validate(loginForm, bindingResult);
 		
@@ -211,7 +204,9 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		if (bindingResult.hasErrors()) {
 			//因为目前都还是密文，所以可以直接Debug输出 
 			LOG.debug("loginForm validation error. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());
-			getResultFromBindingResult(bindingResult);
+			//getResultFromBindingResult(bindingResult);
+			defaultReturnResult.setResult(false);
+			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 		}
 		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
 		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
@@ -231,22 +226,26 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		if(memberCommand!= null){
 			//登录成功的处理
 			LOG.debug("{} login success", memberCommand.getLoginName());
+			defaultReturnResult =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
 			String resultCode=thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(),type);
-			model.addAttribute("resultCode", resultCode);
-			DefaultReturnResult result =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
-			//状态流转
-			Object returnObject = result.getReturnObject();
-			if(null !=returnObject){
-			    return "redirect:"+returnObject.toString();
+			if(resultCode.equals(ThirdPartyLoginBindConstants.BIND_ACCOUNT_SUCCESS)){
+				 defaultReturnResult.setResult(true);
+				 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS);
+			}else{
+				 defaultReturnResult.setResult(false);
+				 defaultReturnResult.setStatusCode(resultCode);
+				 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 			}
+			return defaultReturnResult;
 		}else{
 			//登录失败的处理 
 			LOG.debug("{} login failure", loginForm.getLoginName());
-			model.addAttribute("resultCode", ThirdPartyLoginBindConstants.LOGINNAME_PWD_ERROR);
-			return VIEW_THIRDPARTY_MEMBER_BIND_FAILURE;
+			defaultReturnResult.setResult(false);
+			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
+			 defaultReturnResult.setStatusCode(ThirdPartyLoginBindConstants.LOGINNAME_PWD_ERROR);
+			return defaultReturnResult;
 		}
 		
-		return VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS;
 	}
 	
 	
@@ -273,7 +272,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 	 * @param model
 	 * @return NebulaReturnResult 返回结果
 	 */
-	public String bindThirdPartyMemberWithOutStoreMember(
+	public NebulaReturnResult bindThirdPartyMemberWithOutStoreMember(
 			@RequestParam String type,
 			@LoginMember MemberDetails memberDetails,
 			@ModelAttribute RegisterForm registerForm,
@@ -289,7 +288,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 
 		if (!defaultReturnResult.isResult()){
 			defaultReturnResult.setStatusCode("reigster.validator.errors");
-			return VIEW_THIRDPARTY_MEMBER_BIND_FAILURE;
+			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 		}
 
 		// 密码解密，密码传输通过RSA做了加密，此处需要解密
@@ -303,7 +302,7 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		defaultReturnResult = (DefaultReturnResult) memberManager.checkRegisterData(memberFrontendCommand);
 
 		if (!defaultReturnResult.isResult()) {
-			return VIEW_THIRDPARTY_MEMBER_BIND_FAILURE;
+			defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
 		}
 
 		/** 设置注册会员附加信息 */
@@ -326,15 +325,17 @@ public class NebulaThirdPartyBindController extends NebulaAbstractLoginControlle
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_REG_EMAIL_URL, storeMemberDetails.getLoginEmail());
 
 		LOG.debug("{} login success", memberCommand.getLoginName());
-		String resultCode = thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(), type);
-		model.addAttribute("resultCode", resultCode);
-		DefaultReturnResult result =(DefaultReturnResult) onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
-                //状态流转
-		 Object returnObject = result.getReturnObject();
-	                if(null !=returnObject){
-	                    return "redirect:"+returnObject.toString();
-	                }
-		return VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS;
+	    super.onAuthenticationSuccess(constructMemberDetails(memberCommand,request), request, response); 
+	    String resultCode = thirdPartyMemberManager.bindThirdPartyLoginAccount(memberDetails.getMemberId(),memberCommand.getId(), type);
+		if(resultCode.equals(ThirdPartyLoginBindConstants.BIND_ACCOUNT_SUCCESS)){
+			 defaultReturnResult.setResult(true);
+			 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_SUCCESS);
+		}else{
+			 defaultReturnResult.setResult(false);
+			 defaultReturnResult.setStatusCode(resultCode);
+			 defaultReturnResult.setReturnObject(VIEW_THIRDPARTY_MEMBER_BIND_FAILURE);
+		}
+		return defaultReturnResult;
 	}
 	
 	

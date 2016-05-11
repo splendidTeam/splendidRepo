@@ -30,7 +30,12 @@ public class CouponInfoSubForm implements Serializable{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 7444454422577156141L;
 
-    /** 如果优惠券和用户绑定了， 那么此处的id 就是绑定的id. */
+    /** 如果优惠券和用户绑定了， 那么此处的id 就是绑定的id. 
+     *  nebula暂无用户绑定优惠券，这个id暂时不用。 
+     *  具体使用否，要看商城端需求。
+     *  比如speedo，用户绑定优惠券，是为了使用优惠券时，能够有下拉选项，用户用起来方便。
+     * 
+     */
     private Long              id;
 
     /** 单独发放的那种不和用户绑定的优惠码. */

@@ -35,13 +35,18 @@ import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
+import com.baozun.nebula.web.controller.order.resolver.SalesorderResolver;
+import com.baozun.nebula.web.controller.order.resolver.SalesorderResult;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
@@ -151,6 +156,12 @@ public class NebulaOrderConfirmController extends BaseController{
 
 	private static final String		MODEL_KEY_ORDER_CONFIRM	= "orderConfirmViewCommand";
 	
+	@Autowired
+	private SalesorderResolver salesorderResolver;
+
+	@Autowired
+	private OrderManager orderManager;
+	
 	
     /**
      * 显示订单结算页面.
@@ -230,15 +241,49 @@ public class NebulaOrderConfirmController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
+		String memberId = memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString();
+		// 校验表单数据
+		orderFormValidator.validate(orderForm, bindingResult);
+		// 如果校验失败，返回错误
+		if (bindingResult.hasErrors()) {
+			LOGGER.error("orderForm validation error. memberId is [{}]", memberId);
+			return getResultFromBindingResult(bindingResult);
+		}
 
-        //validator
-
-        //dosome logic
-
-        //取到支付地址
-        //TODO
-        return null;
-    }
+		// 封装订单信息
+		SalesOrderCommand salesOrderCommand = salesorderResolver.buildeSalesOrderCommand(memberDetails, orderForm,
+				request);
+		
+		// 获取购物车信息
+		ShoppingCartCommand shoppingCartCommand = salesorderResolver.buildeShoppingCartForOrder(memberDetails,
+				salesOrderCommand, request);
+		
+		// 校验购物车信息和促销
+		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
+		SalesorderResult salesorderResult = orderFormValidator.validateWithShoppingCart(shoppingCartCommand,
+				couponCode);
+		// 如果校验失败，返回错误
+		if (salesorderResult != SalesorderResult.SUCCESS) {
+			LOGGER.error("orderForm validation coupon error. memberId is [{}]", memberId,couponCode);
+			return toNebulaReturnResult(salesorderResult);
+		}
+		
+		// 新建订单
+		// code用於提交訂單後的跳轉參數 {支付流水号,訂單id,訂單code}
+		String code = orderManager.saveOrder(shoppingCartCommand, salesOrderCommand, null == memberDetails ? null : memberDetails.getMemComboList());
+		
+		//通過支付流水號查詢訂單
+		SalesOrderCommand newOrder= salesorderResolver.getSalesOrderCommand(code);
+		// 完善code后传到页面，用于支付跳转用
+		code=code+","+newOrder.getId()+","+newOrder.getCode();
+		
+		// 更新cookie中购物车信息，（购物车数据 和 购物车中商品数量，其中会员只更新商品数量）
+		salesorderResolver.updateCookieShoppingcart(shoppingCartCommand.getShoppingCartLineCommands(), request, response);
+		// 将订单创建成功后的信息
+		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+		result.setReturnObject(code);
+		return result;
+	}
     
     
 	/**
@@ -273,5 +318,27 @@ public class NebulaOrderConfirmController extends BaseController{
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
 		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+	}
+	
+	/**
+	 * 返回结果填充
+	 * 
+	 * @param shoppingcartResult
+	 * @return
+	 */
+	private NebulaReturnResult toNebulaReturnResult(SalesorderResult salesorderResult) {
+		if (SalesorderResult.SUCCESS != salesorderResult) {
+			DefaultReturnResult result = DefaultReturnResult.FAILURE;
+
+			String messageStr = getMessage(salesorderResult.toString());
+
+			DefaultResultMessage message = new DefaultResultMessage();
+			message.setMessage(messageStr);
+			result.setResultMessage(message);
+
+			LOGGER.error(messageStr);
+			return result;
+		}
+		return DefaultReturnResult.SUCCESS;
 	}
 }
