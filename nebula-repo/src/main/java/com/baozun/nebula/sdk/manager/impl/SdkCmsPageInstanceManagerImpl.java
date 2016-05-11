@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.cms.CmsPageInstanceDao;
+import com.baozun.nebula.dao.cms.CmsPageInstanceVersionDao;
 import com.baozun.nebula.dao.cms.CmsPageTemplateDao;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
@@ -60,6 +62,8 @@ public class SdkCmsPageInstanceManagerImpl implements SdkCmsPageInstanceManager 
 	private CmsPageInstanceDao cmsPageInstanceDao;
 	@Autowired
 	private CmsPageTemplateDao cmsPageTemplateDao;
+	@Autowired
+	private CmsPageInstanceVersionDao cmsPageInstanceVersionDao;
 	
 	public final static String	 p_title=".cms-show-product-title";
 	public final static String	 p_salesprice=".cms-show-product-salesprice";
@@ -429,5 +433,11 @@ public class SdkCmsPageInstanceManagerImpl implements SdkCmsPageInstanceManager 
 				}
 			}
 		}
+	}
+
+	@Override
+	public Map<String, Date> getPublishedPageInstanceVersionsTimeRang(Long pageId) {
+		// TODO Auto-generated method stub
+		return cmsPageInstanceVersionDao.getPublishedPageInstanceVersionsTimeRang(pageId);
 	}
 }
