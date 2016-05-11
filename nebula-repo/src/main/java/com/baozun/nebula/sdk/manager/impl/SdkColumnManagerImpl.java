@@ -159,7 +159,6 @@ public class SdkColumnManagerImpl implements SdkColumnManager {
 	@Override
 	@Transactional(readOnly=true)
 	public List<ColumnModule> findColumnModuleListByQueryMap(Map<String, Object> paraMap) {
-		// TODO Auto-generated method stub
 		return columnModuleDao.findColumnModuleListByQueryMap(paraMap);
 	}
 

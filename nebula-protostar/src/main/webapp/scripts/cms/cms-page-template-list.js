@@ -14,7 +14,8 @@ $j.extend(loxia.regional['zh-CN'],{
 	    "TEMPLATE_INFO_CONFIRM":"确认信息",
 	    "CONFIRM_DELETE" : "确认删除吗",
 	    "NPS_DELETE_SUCCESS" : "删除成功",
-		"NPS_DELETE_FAILURE" : "删除失败"
+		"NPS_DELETE_FAILURE" : "删除失败",
+		"EDIT_TEMPLATE":"编辑模板"
 	    
 });
 
@@ -35,6 +36,8 @@ var toDeleteUrl = base+'/cms/deletetemplate.htm';
 var butchDeleteUrl = base + '/cms/butchremove.json';
 //查看html
 var viewHtmlUrl = '/cms/viewhtml.htm';
+//更新缓存的数据到数据库
+var megerCacheUrl = '/cms/megerCacheUrl.json';
 
 function checkboxs(data, args, idx){
 	return "<input type='checkbox' name='id' class='checkId'  value='" + loxia.getObject("id", data)+"'/>";
@@ -42,12 +45,8 @@ function checkboxs(data, args, idx){
 function drawEditor(data, args, idx){
 	var result="";  
 	var id=loxia.getObject("id", data);
-	var state=loxia.getObject("lifecycle", data);
 	var tomanager="<a href='"+ toManagerUrl+"?templateId="+id+"' class='func-button '>"+nps.i18n("TO_MANAGER")+"</a>";
-	var tomodify ="<a href='"+ toUpdateUrl+"?id="+id+"' class='func-button modify'>"+nps.i18n("TO_UPDATE")+"</a>";
-	var editTmp ="<a href='"+ base+"/cms/editCmsTemplate.htm"+"?id="+id+"' class='func-button modify'>编辑模板</a>";
-	var todelete ="<a href='javascript:void(0);' val='"+id+"' class='func-button todelete'>"+nps.i18n("DELETE")+"</a>";
-	result +=editTmp+tomanager + tomodify + todelete;
+	result +=tomanager;
 	return result;
 } 
 
@@ -99,6 +98,52 @@ function refreshData() {
 	$j("#table1").loxiasimpletable("refresh");
 }
 
+function drawEditTemplateItem(data) {
+	var id = loxia.getObject("id", data);
+	var result = "";
+	//var state = loxia.getObject("lifecycle", data);
+		result = [ {
+			label : nps.i18n("EDIT_TEMPLATE"),
+			type : "href",
+			content : base+"/cms/editCmsTemplate.htm?id="+id
+		}, {
+			label : nps.i18n("TO_UPDATE"),
+			type : "href",
+			content : toUpdateUrl+"?id="+id
+		}, {
+			label : nps.i18n("DELETE"),
+			type : "jsfunc",
+			content : "fnDeleteTemplate"
+		}];
+	return result;
+
+}
+
+//删除单行
+function fnDeleteTemplate(data, args, caller){
+        //var curObject=$j(this);
+        var json = {
+        		"ids" : data.id
+        };
+        var data = nps.syncXhrPost(checkInstanceUrl, json);
+        if (! data.isSuccess) {
+        	nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("TEMPLATE_DELETE_CHECK_INFO"));
+        	return;
+        }
+        nps.confirm(nps.i18n("TEMPLATE_INFO_CONFIRM"),nps.i18n("CONFIRM_DELETE"), function(){
+            
+        	var _d = nps.syncXhr(toDeleteUrl, json,{type: "GET"});
+        	if(_d.isSuccess){
+        		nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("NPS_DELETE_SUCCESS")); 
+        		  refreshData(); 
+        	}
+        	else{
+        		nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("NPS_DELETE_FAILURE"));
+        	}
+            	
+        });
+}
+
 $j(document).ready(function() {
 	
 	loxia.init({
@@ -121,13 +166,13 @@ $j(document).ready(function() {
 		},{
 			name : "img",
 			label : nps.i18n("LABEL_TEMPLATE_PIC"),
-			width : "9%" ,
+			width : "15%" ,
 			template:"drawImg"
 			
 		},{
 			name : "name",
 			label : nps.i18n("LABEL_TEMPLATE_NAME"),
-			width : "10%",
+			width : "40%",
 			template:"nameToHtml"
 		},{
 			name : "supportType",
@@ -137,14 +182,18 @@ $j(document).ready(function() {
 		}, {
 			name : "useCommonHeader",
 			label : nps.i18n("LABEL_IS_PUBLIC"),
-			width : "5%" ,
+			width : "10%" ,
 			template:"drawCheckbox"
 		},{
 			name : nps.i18n("LABEL_TEMPLATE_OPERATE"),
 			label : nps.i18n("LABEL_TEMPLATE_OPERATE"),
 			width : "10%", 			 
 			template : "drawEditor"
-		} ],
+		},{
+			width : "10%", 			 
+			type : "oplist",
+			oplist : drawEditTemplateItem
+		}],
 		dataurl : pageTemplateListUrl
 	});
 	
@@ -154,33 +203,6 @@ $j(document).ready(function() {
 		 $j("#table1").data().uiLoxiasimpletable.options.currentPage=1;
 		 refreshData();
 	});
-	
-	 //删除单行
-	$j("#table1").on("click",".todelete",function(){
-	        var curObject=$j(this);
-	        var json = {
-	        		"ids" : curObject.attr("val")
-	        };
-	        var data = nps.syncXhrPost(checkInstanceUrl, json);
-	        if (! data.isSuccess) {
-	        	nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("TEMPLATE_DELETE_CHECK_INFO"));
-	        	return;
-	        }
-	        nps.confirm(nps.i18n("TEMPLATE_INFO_CONFIRM"),nps.i18n("CONFIRM_DELETE"), function(){
-
-//	            var json={"id":curObject.attr("val")};
-	            
-	        	var _d = nps.syncXhr(toDeleteUrl, json,{type: "GET"});
-	        	if(_d.isSuccess){
-	        		nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("NPS_DELETE_SUCCESS")); 
-	        		  refreshData(); 
-	        	}
-	        	else{
-	        		nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("NPS_DELETE_FAILURE"));
-	        	}
-	            	
-	        });
-	    });
 	
 	// 批量逻辑删除
 	$j(".button.butch.delete").click(function() {

@@ -180,7 +180,6 @@ public class MemberGroupControllerTest{
 		try{
 			assertEquals(mockResult,memberGroupController.unBindMemberGroup(memberIds, groupId, model, request, response));
 		}catch (Exception e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

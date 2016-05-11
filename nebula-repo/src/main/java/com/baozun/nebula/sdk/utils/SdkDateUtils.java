@@ -17,7 +17,6 @@ public class SdkDateUtils {
 		try {
 			date = sdf.parse(dateStr);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return  date;
 		}

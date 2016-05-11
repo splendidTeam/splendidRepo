@@ -5,12 +5,9 @@ $j.extend(loxia.regional['zh-CN'],{
 	"NO_SAVE_NOT_PREVIEW":"数据有改动,请先保存,再浏览"
 	
 });
-
 /**
- * 获取编辑对象 （标记有cms-xxx-edit CSS class）
- * 
- * 从obj往上查找，直到找到为止。
- * @param obj 查到起点
+ * 获取编辑对象
+ * @param editObj
  * @returns
  */
 function getEditWay(obj){
@@ -20,7 +17,6 @@ function getEditWay(obj){
 		return getEditWay(obj.parent());
 	}
 }
-
 /**
  * 验证输入是否为空
  * @param cls
@@ -48,13 +44,6 @@ function validateInput(cls){
 	return result; 
 };
 
-/**
- * 查找所选定dom区域的CMS编辑方式
- * 
- * 从当前dom开始查到cms-xxx-edit css class, 向父层逐层查找，直到找到或到的‘HTML’标签为止。
- * @param dom 当前鼠标选中的dom区域
- * @returns
- */
 function findEditMode(dom){
 	var tagName = dom.get(0).tagName;
 	var result={};
@@ -79,17 +68,9 @@ function findEditMode(dom){
 		return null;
 	}
 };
-
 var infoFlag = true;
-/**
- * 根据当前选定的dom所包含的内容，来决定这部分CMS template可以有哪些可编辑的内容
- * 
- * 比如：对于一个带图片的A标签，可以设置“编辑图片”，“编辑链接地址”。这样该模板的实例就可以进行这2项操作
- * @param dialog 弹出层，用于设置CMS template
- * @param dom 当前选定的dom区域
- */
 function  showHideTag(dialog,dom){
-	//dom为A标签时
+	//dom = dom.parent();
 	if(dom.get(0).tagName=="A" && dom.find("img").length==0){
 		if(dom.hasClass("cms-area-title")){
 			dialog.find(".title").hide();
@@ -105,6 +86,10 @@ function  showHideTag(dialog,dom){
 			dialog.find(".thref").show();
 			dialog.find(".rethref").hide();
 		}
+//		dialog.find(".title").show();
+//		dialog.find(".thref").show();
+//		dialog.find(".retitle").show();
+//		dialog.find(".rethref").show();
 	}else{
 		dialog.find(".title").hide();
 		dialog.find(".thref").hide();
@@ -112,10 +97,9 @@ function  showHideTag(dialog,dom){
 		dialog.find(".rethref").hide();
 		
 	}
-	
-	//dom为A标签且带图片时
-	if(dom.children().length>0 && 
-			dom.get(0).tagName=="A" && dom.find("img").length > 0){
+	if(dom.children().length>0 && dom.children().length>0 &&
+			dom.get(0).tagName=="A" && 
+			dom.find("img").length > 0){
 		if(dom.hasClass("cms-area-href")){
 			dialog.find(".ihref").hide();
 			dialog.find(".reihref").show();
@@ -131,14 +115,16 @@ function  showHideTag(dialog,dom){
 			dialog.find(".img").show();
 			dialog.find(".reimg").hide();
 		}
+//		dialog.find(".img").show();
+//		dialog.find(".ihref").show();
+//		dialog.find(".reimg").show();
+//		dialog.find(".reihref").show();
 	}else{
 		dialog.find(".img").hide();
 		dialog.find(".ihref").hide();
 		dialog.find(".reimg").hide();
 		dialog.find(".reihref").hide();
 	}
-	
-	//设置cms-area-desc功能按钮
 	if((!dom.hasClass(".cms-area-href") &&
 			!dom.hasClass(".cms-area-title")&&
 			!dom.hasClass(".cms-area-desc")&&
@@ -148,8 +134,7 @@ function  showHideTag(dialog,dom){
 			dom.find(".cms-area-desc").length==0&&
 			dom.find(".cms-area-img").length==0 &&
 			dom.children().length>0 &&
-			dom.children().get(0).tagName != "IMG") 
-		||(dom.children().length==0)){
+			dom.children().get(0).tagName != "IMG") ||(dom.children().length==0)){
 		
 		if(dom.children().length==0 && dom.children().children().length==0 && 
 				dom.get(0).tagName != "A" && dom.get(0).tagName!="IMG" && !dom.parent().hasClass("cms-imgarticle-edit")){
@@ -160,6 +145,8 @@ function  showHideTag(dialog,dom){
 				dialog.find(".desc").show();
 				dialog.find(".redesc").hide();
 			}
+//			dialog.find(".desc").show();
+//			dialog.find(".redesc").show();
 		}else{
 			if(dom.children().length==0 && dom.children().children().length==0 && 
 					dom.get(0).tagName != "A" && dom.get(0).tagName!="IMG" &&dom.hasClass("cms-area-desc")){
@@ -188,8 +175,22 @@ function  showHideTag(dialog,dom){
 			dialog.find(".redesc").hide();
 		}
 	}
-	
-	//有操作按钮时，infoFlag =false
+	//cms-area-href cms-area-title
+	//cms-area-desc cms-area-img
+//	if(dom.parent().hasClass("cms-imgarticle-edit")){
+//		if(dom.hasClass("cms-area-list-element")){
+//			dialog.find(".list").hide();
+//			dialog.find(".relist").show();
+//		}else{
+//			dialog.find(".list").show();
+//			dialog.find(".relist").hide();
+//		}
+////		dialog.find(".list").show();
+////		dialog.find(".relist").show();
+//	}else{
+//		dialog.find(".list").hide();
+//		dialog.find(".relist").hide();
+//	}
 	var btns =dialog.find(".proto-dialog-content").find("input[type='button']");
 	btns.each(function(i,dom){
 		var me =$j(dom);
@@ -199,7 +200,6 @@ function  showHideTag(dialog,dom){
 		}
 	});
 };
-
 var wapperRecord=new Array();
 var selectRecord=new Array();
 function setSelectArea(cls,cls_prefix){
@@ -377,15 +377,8 @@ function setSelectTool(){
 	});
 };
 
-
-
 /**
- * 检查当前编辑项是否已经被设置
- * 
- * 检查范围为editObj
- * @param cls 编辑项对应的 CSS class
- * @param type 用于if判断
- * @returns {Boolean}
+ * 检查当前编辑项是否已经设置
  */
 function checkExist(cls,type){
 	if(editObj.hasClass("cms-area-list-element")){
@@ -435,81 +428,6 @@ function checkExist(cls,type){
 	}
 	return false;
 }
-
-/**
- * 显示所选中的dom的可操作项
- * 
- * @param dialog 弹出层，用于设置CMS template的可编辑项
- * @param zNode dom树当前选中的节点
- */
-function showEditButton(dialog, zNode){
-	dialog.find("."+CSS_CLASS.BUTTON_HREF).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_REMOVE_HREF).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_COORDS).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_REMOVE_COORDS).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_IMG).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_REMOVE_IMG).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_TITLE).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_REMOVE_TITLE).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_DESC).hide();
-	dialog.find("."+CSS_CLASS.BUTTON_REMOVE_DESC).hide();
-	
-	if(!zNode){
-		return;
-	}
-	
-	//查找该tag的可编辑配置
-	var jDom = zDom[zNode.id];
-	var cssClasses = domConfigManager.getCssClass(jDom);
-	if(cssClasses.length == 0){
-		//无按钮时不显示lable
-		dialog.find(".editSetting").hide();
-		return;
-	}
-	
-	//如果当前dom可配置href
-	if(cssClasses.indexOf(CSS_CLASS.EDIT_HREF) != -1){
-		if(jDom.hasClass(CSS_CLASS.EDIT_HREF)){
-			dialog.find("."+CSS_CLASS.BUTTON_REMOVE_HREF).show();
-		}else{
-			dialog.find("."+CSS_CLASS.BUTTON_HREF).show();
-		}
-	}
-	//如果当前dom可配置coords
-	if(cssClasses.indexOf(CSS_CLASS.EDIT_COORDS) != -1){
-		if(jDom.hasClass(CSS_CLASS.EDIT_COORDS)){
-			dialog.find("."+CSS_CLASS.BUTTON_REMOVE_COORDS).show();
-		}else{
-			dialog.find("."+CSS_CLASS.BUTTON_COORDS).show();
-		}
-	}
-	//如果当前dom可配置img
-	if(cssClasses.indexOf(CSS_CLASS.EDIT_IMG) != -1){
-		if(jDom.hasClass(CSS_CLASS.EDIT_IMG)){
-			dialog.find("."+CSS_CLASS.BUTTON_REMOVE_IMG).show();
-		}else{
-			dialog.find("."+CSS_CLASS.BUTTON_IMG).show();
-		}
-	}
-	//如果当前dom可配置title
-	if(cssClasses.indexOf(CSS_CLASS.EDIT_TITLE) != -1){
-		if(jDom.hasClass(CSS_CLASS.EDIT_TITLE)){
-			dialog.find("."+CSS_CLASS.BUTTON_REMOVE_TITLE).show();
-		}else{
-			dialog.find("."+CSS_CLASS.BUTTON_TITLE).show();
-		}
-	}
-	//如果当前dom可配置desc
-	if(cssClasses.indexOf(CSS_CLASS.EDIT_DESC) != -1){
-		if(jDom.hasClass(CSS_CLASS.EDIT_DESC)){
-			dialog.find("."+CSS_CLASS.BUTTON_REMOVE_DESC).show();
-		}else{
-			dialog.find("."+CSS_CLASS.BUTTON_DESC).show();
-		}
-	}
-	
-}
-
 //编辑对象
 var editObj;
 var isSave= true;
@@ -575,7 +493,6 @@ $j(window).load(function(){
 			dialog_mode.find(".update").hide();
 			dialog_mode.find(".info").html("");
 		}
-		//当前选中dom本身不是编辑区域，而是编辑区域内部的元素
 		if(!me.hasClass("cms-html-edit") &&! me.hasClass("cms-product-edit")
 				&& !me.hasClass("cms-imgarticle-edit") && result != null){
 			mode = result.cls;
@@ -633,56 +550,34 @@ $j(window).load(function(){
 				setItemEidt(cobj,product_dialog);
 				product_dialog.dialogff({type:'open',close:'in',width:800, height:550});
 			}else if(mode=="cms-imgarticle-edit"){
+//				if(me.hasClass("cms-area-list-element") || me.find(".cms-area-list-element").length>0){
+//					nps.info(nps.i18n("INFO_TITLE_DATA"), "列表区域不能编辑");
+//					return;
+//				}
 				var dialog = $j(".cms-imgArticle-edit-dialog");
-//				$j(".subList").hide();
-//				$j(".resubList").hide();
-				
-				//showHideTag(dialog,me);
-				//--判断是否显示‘.setSame’按钮 START-----------------------
-				//标记有cms-xxx-edit的dom，即编辑区域
+				$j(".subList").hide();
+				$j(".resubList").hide();
+				showHideTag(dialog,me);
 				var modeObj = getEditWay(me);
 				if(modeObj.find(".cms-area-list-element").length>0){
 					dialog.find(".setSame").show();
 				}else{
 					dialog.find(".setSame").hide();
 				}
-				//--判断是否显示‘.setSame’按钮 END-----------------------
-				
-				//--画dom树 START-----------------------
-				var setting = {
-						view: {
-							showIcon: false,
-							fontCss: function(treeId, node){
-								return domTreeManager.getZnodeFont(node);
-							}
-						},
-						data: {
-							simpleData: {
-								enable: true
-							}
-						},
-						callback: {
-							onClick:  function (event, treeId, treeNode, clickFlag) {
-								showEditButton(dialog, treeNode);
-							}
-						}
-					};
-				var zNodes=domTreeManager.buildZnodes(me);
-				console.log(JSON.stringify(zNodes));
-				var zTree = $j.fn.zTree.init($j("#zTreeForDom"), setting, zNodes);
-				//展开dom树
-				zTree.expandAll(true);
-				
-				//找到第一个可编辑的dom元素
-				var zNode = domTreeManager.findFirstEditableDom(zTree);
-				if(zNode){
-					zTree.selectNode(zNode);
+				if(infoFlag){
+					dialog.find(".setSame").hide();
+					dialog.find(".editSetting").hide();
+				}else{
+					dialog.find(".setSame").show();
+					dialog.find(".editSetting").show();
 				}
-				
-				//显示第一个可编辑的dom对应的操作按钮
-				showEditButton(dialog, zNode);
-				//--画dom树 END-----------------------
-				
+				var peditObj =getEditWay(editObj);
+				if(peditObj.find(".cms-area-list-element").length==0){
+					dialog.find(".setSame").hide();
+				}else{
+					dialog.find(".setSame").show();
+				}
+				infoFlag = true;
 				dialog.find(".html").val(me.prop("outerHTML"));
 				dialog.dialogff({type:'open',close:'in',width:'800px', height:'550px'});
 			}else{
@@ -755,7 +650,9 @@ $j(window).load(function(){
 		if(editObj.hasClass("cms-imgarticle-edit")){
 			if(editObj.hasClass("cms-area-list-element") || editObj.children().hasClass("cms-area-list-element")){
 				dialog.find(".resubList").show();
+				dialog.find(".subList").hide();
 			}else{
+				dialog.find(".resubList").hide();
 				dialog.find(".subList").show();
 			}
 		}
@@ -996,8 +893,6 @@ $j(window).load(function(){
 	
 	//保存按钮
 	$j('.save-module').on("click",function(){
-		// 删除页面热点中的onclick事件
-		removeMapOnClick();
 		//还原链接
 		$j(".web-update").contents().find("a").each(function(i,dom){
 			var me = $j(this);
@@ -1044,11 +939,8 @@ $j(window).load(function(){
 	    	});
 	    }});
 	    isSave = true; 
-	    //设置选择工具
+	  //设置选择工具
 		setSelectTool();
-		
-		// 增加页面热点中的onclick事件
-		addMapOnClick();
 	});
 	//扩大范围
 	$j('.cms-tmp-edit-dialog').on("click",".expand",function(){
@@ -1092,171 +984,144 @@ $j(window).load(function(){
 		$j('.cms-tmp-edit-dialog').find(".html").val(editObj.prop("outerHTML"));
 	});
 	
-	//dialog设置标题
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_TITLE,function(){
+	//设置标题
+	$j('.cms-imgArticle-edit-dialog').on("click",".title",function(){
 		var me =$j(this);
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		if(domTreeManager.checkDomOperation(CSS_CLASS.EDIT_TITLE, zTree)){
+		if(checkExist(".cms-area-title","title")){
 			nps.info(nps.i18n("INFO_TITLE_DATA"), "标题已经设置");
 			return ;
 		}
-		
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.addClass(CSS_CLASS.EDIT_TITLE);
+		addSameSet("cms-area-title","t");
+		editObj.addClass("cms-area-title");
 		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_TITLE);
-		
-		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_REMOVE_TITLE).show();
 		isSave =false; 
+		me.hide();
+		me.parent().parent().find(".retitle").show();
 		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置标题成功");
 	});
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_REMOVE_TITLE,function(){
+	$j('.cms-imgArticle-edit-dialog').on("click",".retitle",function(){
 		var me =$j(this);
-
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.removeClass(CSS_CLASS.EDIT_TITLE);
+		editObj.removeClass("cms-area-title");
 		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_TITLE, true);
-		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_TITLE).show();
+		delSameSet("cms-area-title","t");
 		isSave =false; 
+		me.hide();
+		me.parent().parent().find(".title").show();
 		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除标题成功");
 	});
-	//dialog设置图片
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_IMG,function(){
+	
+	//设置标题链接
+	$j('.cms-imgArticle-edit-dialog').on("click",".thref",function(){
 		var me =$j(this);
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		if(domTreeManager.checkDomOperation(CSS_CLASS.EDIT_IMG, zTree)){
+		if(checkExist(".cms-area-href","htitle")){
+			nps.info(nps.i18n("INFO_TITLE_DATA"), "标题链接已经设置");
+			return ;
+		}
+		if(editObj.get(0).tagName=="A"){
+			editObj.addClass("cms-area-href");
+			me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
+		}
+		addSameSet("cms-area-href","th");
+		me.hide();
+		me.parent().parent().find(".rethref").show();
+		isSave =false; 
+		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置标题链接成功");
+	});
+	$j('.cms-imgArticle-edit-dialog').on("click",".rethref",function(){
+		var me =$j(this);
+		editObj.removeClass("cms-area-href");
+		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
+		delSameSet("cms-area-href","th");
+		me.hide();
+		me.parent().parent().find(".thref").show();
+		isSave =false; 
+		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除标题链接成功");
+	});
+	//设置图片
+	$j('.cms-imgArticle-edit-dialog').on("click",".img",function(){
+		var me =$j(this);
+		if(checkExist(".cms-area-img","img")){
 			nps.info(nps.i18n("INFO_TITLE_DATA"), "图片已经设置");
 			return ;
 		}
-
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.addClass(CSS_CLASS.EDIT_IMG);
-		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_IMG);
+		if(editObj.find("img").length>0){
+			editObj.find("img").addClass("cms-area-img");
+			me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
+		}
+		if(editObj.get(0).tagName=="IMG"){
+			editObj.addClass("cms-area-img");
+			me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
+		}
+		addSameSet("cms-area-img","img");
 		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_REMOVE_IMG).show();
+		me.parent().parent().find(".reimg").show();
 		isSave =false; 
 		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置图片成功");
 	});
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_REMOVE_IMG,function(){
+	$j('.cms-imgArticle-edit-dialog').on("click",".reimg",function(){
 		var me =$j(this);
-
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.removeClass(CSS_CLASS.EDIT_IMG);
+		editObj.find("img").removeClass("cms-area-img");
+		editObj.removeClass("cms-area-img");
 		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_IMG, true);
+		delSameSet("cms-area-img","img");
 		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_IMG).show();
+		me.parent().parent().find(".img").show();
 		isSave =false; 
 		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除图片成功");
 	});
-	//dialog设置超链接
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_HREF,function(){
+	//设置图片链接
+	$j('.cms-imgArticle-edit-dialog').on("click",".ihref",function(){
 		var me =$j(this);
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		if(domTreeManager.checkDomOperation(CSS_CLASS.EDIT_HREF, zTree)){
-			nps.info(nps.i18n("INFO_TITLE_DATA"), "超链接已经设置");
+		if(checkExist(".cms-area-href","himg")){
+			nps.info(nps.i18n("INFO_TITLE_DATA"), "图片链接已经设置");
 			return ;
 		}
-
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.addClass(CSS_CLASS.EDIT_HREF);
-		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_HREF);
+		if(editObj.find("img").length>0 && editObj.get(0).tagName=="A"){
+			editObj.addClass("cms-area-href");
+			me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
+		}
+		addSameSet("cms-area-href","imgh");
 		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_REMOVE_HREF).show();
+		me.parent().parent().find(".reihref").show();
 		isSave =false; 
-		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置超链接成功");
+		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置图片链接成功");
 	});
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_REMOVE_HREF,function(){
+	$j('.cms-imgArticle-edit-dialog').on("click",".reihref",function(){
 		var me =$j(this);
-
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.removeClass(CSS_CLASS.EDIT_HREF);
+		editObj.removeClass("cms-area-href");
 		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
 		me.hide();
-		doSameSet(jDom, CSS_CLASS.EDIT_HREF, true);
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_HREF).show();
+		delSameSet("cms-area-href","imgh");
+		me.parent().parent().find(".ihref").show();
 		isSave =false; 
-		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除超链接成功");
+		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除图片链接成功");
 	});
-	//dialog设置图片热点
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_COORDS,function(){
+	//设置描述
+	$j('.cms-imgArticle-edit-dialog').on("click",".desc",function(){
 		var me =$j(this);
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		if(domTreeManager.checkDomOperation(CSS_CLASS.EDIT_COORDS, zTree)){
-			nps.info(nps.i18n("INFO_TITLE_DATA"), "图片热点已经设置");
+		if(checkExist(".cms-area-desc","desc")){
+			nps.info(nps.i18n("INFO_TITLE_DATA"), "描述已经设置");
 			return ;
 		}
-
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.addClass(CSS_CLASS.EDIT_COORDS);
-		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_COORDS);
-		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_REMOVE_COORDS).show();
-		isSave =false; 
-		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置图片热点成功");
-	});
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_REMOVE_COORDS,function(){
-		var me =$j(this);
-
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.removeClass(CSS_CLASS.EDIT_COORDS);
-		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		me.hide();
-		doSameSet(jDom, CSS_CLASS.EDIT_COORDS, true);
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_COORDS).show();
-		isSave =false; 
-		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除图片热点成功");
-	});
-	//dialog设置描述
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_DESC,function(){
-		var me =$j(this);
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		if(domTreeManager.checkDomOperation(CSS_CLASS.EDIT_DESC, zTree)){
-			nps.info(nps.i18n("INFO_TITLE_DATA"), "标题已经设置");
-			return ;
+		if(editObj.find("a").length==0 && editObj.find("img").length==0){
+			editObj.addClass("cms-area-desc");
+			me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
 		}
-		
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.addClass(CSS_CLASS.EDIT_DESC);
-		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_DESC);
+		addSameSet("cms-area-desc","desc");
 		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_REMOVE_DESC).show();
+		me.parent().parent().find(".redesc").show();
 		isSave =false; 
-		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置标题成功");
+		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置描述成功");
 	});
-	$j('.cms-imgArticle-edit-dialog').on("click","."+CSS_CLASS.BUTTON_REMOVE_DESC,function(){
+	$j('.cms-imgArticle-edit-dialog').on("click",".redesc",function(){
 		var me =$j(this);
-
-		var zTree = $j.fn.zTree.getZTreeObj("zTreeForDom");
-		var selectedZnode = domTreeManager.getSelectedZnode(zTree);
-		var jDom = zDom[selectedZnode.id];
-		jDom.removeClass(CSS_CLASS.EDIT_DESC);
+		editObj.removeClass("cms-area-desc");
 		me.parent().parent().find(".html").val(editObj.prop("outerHTML"));
-		doSameSet(jDom, CSS_CLASS.EDIT_DESC, true);
 		me.hide();
-		me.parent().parent().find("."+CSS_CLASS.BUTTON_DESC).show();
+		delSameSet("cms-area-desc","desc");
+		me.parent().parent().find(".desc").show();
 		isSave =false; 
-		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除标题成功");
+		nps.info(nps.i18n("INFO_TITLE_DATA"), "删除描述成功");
 	});
 	
 	$j('.resubList').on("click",function(){
@@ -1329,37 +1194,32 @@ $j(window).load(function(){
 		loxia.openPage(url,null, null, [1000,600]);
 	});
 	
-	/**
-	 * 显示（删除）"设置子元素为列表"按钮
-	 */
-	function showSubListButton(){
-		$j(".subList").hide();
-		$j(".resubList").hide();
-		if(editObj.children().length == 0){
+	$j(".mode").change(function(){
+		var me = $j(this);
+		var type = me.val();
+		if(editObj.children().length<1){
+			$j(".subList").hide();
+			$j(".resubList").hide();
 			return;
 		}
-		
-		if(editObj.hasClass("cms-area-list-element") || editObj.children().hasClass("cms-area-list-element")){
-			$j(".resubList").show();
+		if(type==1){
+			$j(".subList").hide();
 		}else{
-			$j(".subList").show();
+			if(editObj.hasClass("cms-area-list-element") || editObj.children().hasClass("cms-area-list-element")){
+				$j(".subList").hide();
+				$j(".resubList").show();
+			}else{
+				$j(".subList").show();
+				$j(".resubList").hide();
+			}
 		}
-	}
-	
-	/**
-	 * 切换（删除）"设置子元素为列表"按钮
-	 */
-	function togglerSubListButton(button){
-		button.hide();
-		button.parent().parent().find(".resubList").show();
-	}
-	
-	$j(".mode").change(function(){
-		//var me = $j(this);
-		showSubListButton();
+		if(editObj.children().length==0){
+			$j(".resubList").hide();
+			$j(".subList").hide();
+		}
 	});
 	
-	//设置为列表模式"cms-area-list-element"
+	//设置列表
 	$j('.subList').on("click",function(){
 		var me =$j(this);
 		var areaList = editObj;
@@ -1369,16 +1229,16 @@ $j(window).load(function(){
 				me.addClass("cms-area-list-element");
 			}
 		});
-		//刷新代码显示
+		
 		$j('.cms-tmp-edit-dialog').find(".html").val(editObj.prop("outerHTML"));
-		togglerSubListButton(me);
+		me.hide();
+		me.parent().parent().find(".resubList").show();
 		//设置选择工具
 		setSelectTool();
 		isSave =false; 
 		nps.info(nps.i18n("INFO_TITLE_DATA"), "设置成功");
 		$j('.cms-tmp-edit-dialog').find(".confrim").trigger("click");
 	});
-	
 	//设置标题
 	$j('body').on("click",".removeEdit",function(){
 		editObj = getEditWay(editObj);
@@ -1395,45 +1255,109 @@ $j(window).load(function(){
 	
 });
 
-/**
- * 图文模式下，进行“将相同操作应用到列表的其余项”操作
- * 
- * 先判断是否勾选了该功能
- * @param jDom 当前正在操作的dom
- * @param cssClass 
- * @param isRemoveClass 是否删除该CSS class
- */
-function doSameSet(jDom, cssClass, isRemoveClass){
+function addSameSet(cls,type){
 	var checked = $j(".cms-imgArticle-edit-dialog .isSelect").attr("checked");
 	if(typeof(checked)=="undefined" ||  checked==null || checked==""){
 		return ;
 	}
+	var mode = getEditWay(editObj);
+	var children = mode.children();
+	var tag = editObj.get(0).tagName;
+	var ctag = null;
+	if(editObj.children().length>0){
+		ctag = editObj.children().get(0).tagName;
+	}
+	if(children.hasClass("cms-area-list-element")){
+		for (var i = 0; i < children.length; i++) {
+			var ch = children.eq(i);
+			if(ctag!=null && ctag!="" && ctag=="IMG"){
+				if(type=="img"){
+					if(ch.find(tag+" " +ctag).length==0){
+						ch.find(ctag).addClass(cls);
+					}else{
+						ch.find(tag+" " +ctag).addClass(cls);
+					}
+				}
+				if(type=="imgh"){
+					if(ch.find(tag+" " +ctag).length==0){
+						ch.addClass(cls);
+					}else{
+						ch.find(tag+" " +ctag).parent().addClass(cls);
+					}
+				}
+			}else{
+				if(type=="t"){
+					ch.find(tag).eq(0).addClass(cls);
+				}
+				if(type=="th"){
+					ch.find(tag).eq(0).addClass(cls);
+				}
+				if(type=="desc"){
+					ch.find(tag).eq(0).addClass(cls);
+				}
+			}
+		}
+	}
 	
-	var jEditWay = getEditWay(editObj);
-	domTreeManager.copyCssClassSetting(jEditWay, jDom, cssClass, isRemoveClass);
 }
 
-
-/**
- * 在页面中所有map中area中增加属性onclick='return false;'
- * 由于“编辑模块”中不允许热点可以点击跳转，所以写了如上代码
- */
-function addMapOnClick(){
-	$j(".web-update").contents().find("map").each(function(){
-		$j(this).find("area").each(function(){
-			$j(this).attr("onclick","return false;");
-		});
-	});
-}
-
-/**
- * 删除页面中所有map中area中的属性onclick='return false;'
- * 由于“编辑模块”中不允许热点可以点击跳转，所以写了如上代码，在点击保存按钮的时候要调用这里，把如上代码remove掉
- */
-function removeMapOnClick(){
-	$j(".web-update").contents().find("map").each(function(){
-    	$j(this).find("area").each(function(){
-    		$j(this).removeAttr("onclick");
-    	});
-    });
+function delSameSet(cls,type){
+	var checked = $j(".cms-imgArticle-edit-dialog .isSelect").attr("checked");
+	if(typeof(checked)=="undefined" ||  checked==null || checked==""){
+		return ;
+	}
+	var mode = getEditWay(editObj);
+	var children = mode.children();
+	var tag = editObj.get(0).tagName;
+	var ctag = null;
+	if(editObj.children().length>0){
+		ctag = editObj.children().get(0).tagName;
+	}
+	if(children.hasClass("cms-area-list-element")){
+		for (var i = 0; i < children.length; i++) {
+			var ch = children.eq(i);
+			if(ctag!=null && ctag!="" && ctag=="IMG"){
+				if(type=="img"){
+					if(ch.find(tag+" " +ctag).length==0){
+						ch.find(ctag).removeClass(cls);
+					}else{
+						ch.find(tag+" " +ctag).removeClass(cls);
+					}
+				}
+				if(type=="imgh"){
+					if(ch.find(tag+" " +ctag).length==0){
+						ch.removeClass(cls);
+					}else{
+						ch.find(tag+" " +ctag).parent().removeClass(cls);
+					}
+				}
+			}else{
+				if(type=="t"){
+					ch.find(tag).each(function(i,dom){
+						var me = $j(dom);
+						if(me.children().length==0){
+							me.removeClass(cls);
+						}
+					});
+				}
+				if(type=="th"){
+					ch.find(tag).each(function(i,dom){
+						var me = $j(dom);
+						if(me.children().length == 0){
+							me.removeClass(cls);
+						}
+					});
+				}
+				if(type=="desc"){
+					ch.find(tag).each(function(i,dom){
+						var me = $j(dom);
+						if(me.children().length == 0){
+							me.removeClass(cls);
+						}
+					});
+				}
+			}
+		}
+	}
+	
 }

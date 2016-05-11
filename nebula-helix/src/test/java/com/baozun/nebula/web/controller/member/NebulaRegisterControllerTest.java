@@ -129,7 +129,6 @@ public class NebulaRegisterControllerTest extends BaseControllerTest{
 
 	@Test
 	public void testSendRegisterMobileMessage(){
-		// TODO mock static method
 		// EasyMock.expect(RegulareExpUtils.isMobileNO(LoginMobile)).andReturn(true);
 		control.replay();
 

@@ -56,7 +56,6 @@ public class OptionManagerImpl implements OptionManager {
 	 */
 	@Override
 	public List<OptionCommand> getOptionCommandsByExpression(String expression){
-		// TODO Auto-generated method stub
 		//解析表达式，类型.code
 		String[] exp = expression.split("\\.");
 		String type = exp[0];
@@ -108,7 +107,6 @@ public class OptionManagerImpl implements OptionManager {
 			method = bean.getClass().getMethod(methodName);
 			invoke = (List<OptionCommand>)method.invoke(bean);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return invoke;
@@ -119,7 +117,6 @@ public class OptionManagerImpl implements OptionManager {
 	 */
 	@Override
 	public List<OptionCommand> convertCommonOptionFromList(List objects,String labelProperty,String valueProperty){
-		// TODO Auto-generated method stub
 		List<OptionCommand> optionCommands = new ArrayList<OptionCommand>();
 		for(Object o : objects){
 			try{
@@ -128,7 +125,6 @@ public class OptionManagerImpl implements OptionManager {
 				oc.setValue(propertyUtils.getProperty(o, valueProperty).toString());
 				optionCommands.add(oc);
 			}catch (Exception e){
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,30 +26,38 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
-import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.cms.CmsModuleInstanceDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.cms.CmsEditArea;
+import com.baozun.nebula.model.cms.CmsEditVersionArea;
 import com.baozun.nebula.model.cms.CmsModuleInstance;
-import com.baozun.nebula.model.cms.CmsModuleTemplate;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPublished;
+import com.baozun.nebula.model.cms.CmsTemplateHtml;
+import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
+import com.baozun.nebula.sdk.manager.SdkCmsEditVersionAreaManager;
 import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
+import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceVersionManager;
 import com.baozun.nebula.sdk.manager.SdkCmsModuleTemplateManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
+import com.baozun.nebula.sdk.manager.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPublishedManager;
+import com.baozun.nebula.sdk.manager.SdkCmsTemplateHtmlManager;
 import com.baozun.nebula.zk.ModuleMapWatchInvoke;
 import com.baozun.nebula.zk.ZooKeeperOperator;
+import com.feilong.core.Validator;
 
 /**
  * CmsModuleInstanceManager
@@ -71,21 +80,13 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	@Autowired
 	private SdkCmsPageTemplateManager sdkCmsPageTemplateManager;
 	
-	public final static String			CMS_HTML_EDIT_CLASS			= ".cms-html-edit";
-
-	public final static String			CMS_DIV_EDIT_BUTTON_CLASS	= ".wui-tips";
-
-	public final static String			NOEDIT_START				= "<!--noedit-start-->";
-
-	public final static String			NOEDIT_END					= "<!--noedit-end-->";
+	@Autowired
+	private SdkCmsEditVersionAreaManager sdkCmsEditVersionAreaManager;
 	
-	public final static String			ONLYEDIT_START				= "<!--onlyedit-start-->";
-	public final static String			ONLYEDIT_END				= "<!--onlyedit-end-->";
+	@Autowired
+	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
 	
 	public final static Integer			PULISHED					= 1;
-	public final static String			CMS_IMGARTICLE_EDIT_CLASS			= ".cms-imgarticle-edit";
-	
-	public final static String			CMS_PRODUCT_EDIT_CLASS			= ".cms-product-edit";
 	
 	@Autowired
 	private  SdkCmsPublishedManager sdkCmsPublishedManager;
@@ -96,12 +97,21 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	@Autowired
 	private CacheManager				cacheManager;
 	
-	public static Map<String,String> moduleMap=new HashMap<String,String>();
+	@Autowired
+	private SdkCmsModuleInstanceVersionManager  sdkCmsModuleInstanceVersionManager;
+	
+	@Autowired
+	private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
+	
+	public static Map<String,CmsTemplateHtml> moduleMap=new HashMap<String,CmsTemplateHtml>();
 
+	private static Logger	log	= LoggerFactory.getLogger(SdkCmsModuleInstanceManagerImpl.class);
+	
 	/**
 	 * 保存CmsModuleInstance
 	 * 
 	 */
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public CmsModuleInstance saveCmsModuleInstance(CmsModuleInstance model){
 	
 		return cmsModuleInstanceDao.save(model);
@@ -189,7 +199,19 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	 * @return
 	 */
 	public void removeCmsModuleInstanceByIds(List<Long> ids){
+		List<CmsModuleInstance> cmsModuleInstances = findCmsModuleInstanceListByIds(ids);
+		//List<String> removeCodes = new ArrayList<String>();
+		String removeids = "";
+		for(CmsModuleInstance cmsModuleInstance : cmsModuleInstances){
+			sdkCmsPublishedManager.removeCmsPubulishedByModuleCode(cmsModuleInstance.getCode());
+			sdkCmsTemplateHtmlManager.removeCmsTemplateHtmlByModuleCode(cmsModuleInstance.getCode());
+			removeids+=cmsModuleInstance.getId();
+		}
+		sdkCmsModuleInstanceVersionManager.removeModuleVersionByModuleIds(ids);
+		// 先删除, 再添加
 		cmsModuleInstanceDao.removeCmsModuleInstanceByIds(ids);
+		log.info("remove module Success, module's id is "+removeids);
+		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
 	}
 	
 	
@@ -233,111 +255,6 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	}
 
 	@Override
-	@Transactional(readOnly=true)
-	public String findUpdatedCmsModuleInstance(Long templateId, Long moduleId,
-			Boolean isEdit) {
-
-		CmsModuleTemplate template = sdkCmsModuleTemplateManager.findCmsModuleTemplateById(templateId);
-
-		String data = template.getData();
-		
-		if(StringUtils.isBlank(data)){
-			return "";
-		}
-
-		if (null != moduleId) {
-			Map<String, Object> paraMap = new HashMap<String, Object>();
-			paraMap.put("moduleId", moduleId);
-			List<CmsEditArea> editAreaList = sdkCmsEditAreaManager.findCmsEditAreaListByQueryMap(paraMap);
-
-			Document document = Jsoup.parse(data);
-			for (CmsEditArea area : editAreaList) {
-				String code = area.getModuleCode();
-				Elements elements = document.select(CMS_HTML_EDIT_CLASS);
-				if (null != elements && elements.size() > 0) {
-					for (Element element : elements) {
-						if (code.equals(element.attr("code"))) {
-							//预览，处理隐藏
-							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && !isEdit){
-								element.remove();
-							//修改，处理隐藏
-							}else if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && isEdit){
-								element.attr("hide", "0");
-								element.html(area.getData());
-							}else{
-								element.html(area.getData());
-							}
-						}
-					}
-
-				}
-				Elements imgArtiEles = document.select(CMS_IMGARTICLE_EDIT_CLASS);
-				if (null != imgArtiEles && imgArtiEles.size() > 0) {
-					for (Element element : imgArtiEles) {
-						if (code.equals(element.attr("code"))) {
-							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && !isEdit){
-								element.remove();
-							}else if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && isEdit){
-								element.attr("hide", "0");
-								element.html(area.getData());								
-							}else{
-								element.html(area.getData());
-							}
-						}
-					}
-
-				}
-				
-				Elements proArtiEles = document.select(CMS_PRODUCT_EDIT_CLASS);
-				if (null != proArtiEles && proArtiEles.size() > 0) {
-					for (Element element : proArtiEles) {
-						if (code.equals(element.attr("code"))) {
-							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && !isEdit){
-								element.remove();
-							}else if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && isEdit){
-								element.attr("hide", "0");
-								element.html(area.getData());								
-							}else{
-								element.html(area.getData());
-							}
-						}
-					}
-
-				}
-				
-			}
-			data = document.toString();
-		}
-		data = sdkCmsPageTemplateManager.processTemplateBase(data);
-		if (isEdit) {
-			data = processNoEditData(data);
-		}
-		return data;
-	
-	}
-	
-	/**
-	 * 去掉不要加载的数据, 如:不要加载的js 去掉<!--noedit-start-->到<!--noedit-end-->中间的数据
-	 * 
-	 * @param Data
-	 * @return
-	 */
-	private static String processNoEditData(String data) {
-		StringBuffer sb = new StringBuffer();
-		int indexStart = data.indexOf(NOEDIT_START);
-		int indexEnd = data.indexOf(NOEDIT_END);
-
-		if (indexStart != -1 && indexEnd != -1) {
-			sb.append(data.substring(0, indexStart));
-			sb.append(data.substring(indexEnd + NOEDIT_END.length(), data.length()));
-			data = sb.toString();
-			data = processNoEditData(data);
-		}
-		return data;
-	}
-	
-
-	@Override
 	public CmsModuleInstance createOrUpdateModuleInstance(CmsModuleInstance cmsModuleInstance, String html) {
 		/** 保存页面实例 */
 		CmsModuleInstance instance = null;
@@ -361,7 +278,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 			instance = cmsModuleInstanceDao.save(cmsModuleInstance);
 		}
 
-		Map<String, String> editAreaMap = processPageHtml(html);
+		Map<String, String> editAreaMap = sdkCmsParseHtmlContentManager.processPageHtml(html, Constants.CMS_MODULE);
 		Long moduleId = instance.getId();
 		// 保存页面编辑区域
 		CmsEditArea cmsEditArea = null;
@@ -391,6 +308,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 				sdkCmsEditAreaManager.saveCmsEditArea(cmsEditArea);
 			}
 		}
+		log.info("save Success, module's id is "+instance.getId()+", code is " + instance.getCode());
 		return instance;
 	}
 	
@@ -408,52 +326,20 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		}
 	
 	}
-	/**
-	 * 处理页面的html, 获取code与html
-	 * 
-	 * @param html
-	 * @return
-	 */
-	private Map<String, String> processPageHtml(String html) {
-		/** key:areaCode, value:html */
-		Map<String, String> pageAreaMap = new HashMap<String, String>();
-		Document document = Jsoup.parse(html);
-		// 去掉 "编辑"按钮的div
-		Elements editButtonElements = document.select(CMS_DIV_EDIT_BUTTON_CLASS);
-		editButtonElements.remove();
-		Elements editHideButtonElements = document.select(".wui-tips-shade");
-		editHideButtonElements.remove();
-		//编辑html模式
-		Elements elements = document.select(CMS_HTML_EDIT_CLASS);
-		dealHtml(pageAreaMap, elements);
-		//图文模式
-		Elements imgElements = document.select(CMS_IMGARTICLE_EDIT_CLASS);
-		dealHtml(pageAreaMap, imgElements);
-		
-		//商品模式
-		Elements proElements =document.select(CMS_PRODUCT_EDIT_CLASS);
-		dealHtml(pageAreaMap, proElements);
-		
-		return pageAreaMap;
-	}
-	private  void dealHtml(Map<String, String> pageAreaMap ,Elements elements){
-		Integer i = 1;
-		for (Element element : elements) {
-			String areaCode = element.attr("code");
-			if (StringUtils.isBlank(areaCode)) {
-				throw new BusinessException("模块编辑区域的code不存在 ");
-			}
-			String areaHtml = element.html();
-			//处理静态base信息
-			areaHtml = sdkCmsPageTemplateManager.addTemplateBase(areaHtml);
-			pageAreaMap.put(areaCode, areaHtml);
-			i++;
-		}
-	}
 
+	/**
+	 * 模块实例发布
+	 */
 	@Override
 	public void publishModuleInstance(Long moduleId) {
-		
+		/**
+		 * 模块实例发布步骤
+		 * 1、获取模块实例
+		 * 2、从发布信息表中删除已发布的该模块信息（根据code）
+		 * 3、将该模块的区域元素信息同步到发布信息表中
+		 * 4、更改模块的发布状态
+		 * 5、zk通知模块已被发布（这里是重新将发布模块的信息读取到缓存中）
+		 */
 		CmsModuleInstance moduleInstance = cmsModuleInstanceDao.getByPrimaryKey(moduleId);
 		String moduleCode = moduleInstance.getCode();
 		// 先删除, 再添加
@@ -462,6 +348,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		Map<String, Object> paraMap = new HashMap<String, Object>();
 		paraMap.put("moduleId", moduleInstance.getId());
 		List<CmsEditArea> editAreaList = sdkCmsEditAreaManager.findCmsEditAreaListByQueryMap(paraMap);
+		List<CmsPublished> CmsPublishedList = new ArrayList<CmsPublished>();
 		for (CmsEditArea cmsEditArea : editAreaList) {
 			CmsPublished cmsPublished = new CmsPublished();
 			cmsPublished.setAreaCode(cmsEditArea.getModuleCode());
@@ -469,17 +356,33 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 			cmsPublished.setHide(cmsEditArea.getHide());
 			cmsPublished.setData(cmsEditArea.getData());
 			cmsPublished.setPublishTime(new Date());
-			sdkCmsPublishedManager.saveCmsPublished(cmsPublished);
+			CmsPublished newCmsPublished = sdkCmsPublishedManager.saveCmsPublished(cmsPublished);
+			CmsPublishedList.add(newCmsPublished);
 		}
 		// 修改成已发布状态
 		moduleInstance.setIsPublished(true);
 		cmsModuleInstanceDao.save(moduleInstance);
-		
+
+		CmsTemplateHtml cmsTemplateHtml = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(moduleCode, -1L);
+		if(Validator.isNullOrEmpty(cmsTemplateHtml)){
+			cmsTemplateHtml = new CmsTemplateHtml();
+			cmsTemplateHtml.setCreateTime(new Date());	
+			cmsTemplateHtml.setModuleCode(moduleCode);
+			//基础版本的版本号设置为-1
+			cmsTemplateHtml.setVersionId(-1L);
+		}
+		cmsTemplateHtml.setLifecycle(1);
+		String data = sdkCmsParseHtmlContentManager.getParseModuleData(CmsPublishedList, moduleInstance.getTemplateId());
+		cmsTemplateHtml.setData(data);
+		sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
+		log.info("publishModuleInstance Success, module's id is "+moduleInstance.getId()+", code is " + moduleInstance.getCode());
 		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
-		//cacheManager.removeMapValue(CacheKeyConstant.CMS_PAGE_KEY, moduleInstance.getCode());
 		
 	}
-
+	
+	/**
+	 * 取消发布模块
+	 */
 	@Override
 	public void cancelPublishedModuleInstance(Long moduleId) {
 		CmsModuleInstance moduleInstance = cmsModuleInstanceDao.getByPrimaryKey(moduleId);
@@ -487,21 +390,32 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		sdkCmsPublishedManager.removeCmsPubulishedByModuleCode(moduleInstance.getCode());
 		moduleInstance.setIsPublished(false);
 		cmsModuleInstanceDao.save(moduleInstance);
+		sdkCmsModuleInstanceVersionManager.cancelInstanceVersionInModuleId(moduleInstance.getId());
+		sdkCmsTemplateHtmlManager.removeCmsTemplateHtmlByModuleCode(moduleInstance.getCode());
+		log.info("cancelpublishModuleInstance success, module's id is "+moduleId+", code is " + moduleInstance.getCode());
 		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
 	}
 
 	@Override
-	public String recoverTemplateCodeArea(Long templateId, String code) {
+	public String recoverTemplateCodeArea(Long templateId, Long versionId, String code) {
 		Map<String, Object> paraMap = new HashMap<String, Object>();
 		paraMap.put("moduleTemplateId", templateId);
 		paraMap.put("moduleCode", code);
-		List<CmsEditArea> cmsEditAreas = sdkCmsEditAreaManager.findCmsEditAreaListByQueryMap(paraMap);
-		if(cmsEditAreas == null || cmsEditAreas.size()==0){
-			throw new BusinessException("编辑部分无需重置");
+		paraMap.put("versionId", versionId);
+		if(Validator.isNotNullOrEmpty(versionId)){
+			List<CmsEditVersionArea> cmsEditVersionAreas = sdkCmsEditVersionAreaManager.findCmsEditVersionAreaListByQueryMap(paraMap);
+			if(cmsEditVersionAreas == null || cmsEditVersionAreas.size()==0){
+				throw new BusinessException("编辑部分无需重置");
+			}
+		}else{
+			List<CmsEditArea> cmsEditAreas = sdkCmsEditAreaManager.findCmsEditAreaListByQueryMap(paraMap);
+			if(cmsEditAreas == null || cmsEditAreas.size()==0){
+				throw new BusinessException("编辑部分无需重置");
+			}
 		}
 		//根据code在模板中找出需要还原的数据
 		String html = sdkCmsModuleTemplateManager.findCmsModuleTemplateById(templateId).getData();
-		Map<String, String> map = processResetPageHtml(html);
+		Map<String, String> map = sdkCmsParseHtmlContentManager.processResetPageHtml(html);
 		if(map.size()==0){
 			throw new BusinessException("编辑部分无需重置");
 		}
@@ -512,167 +426,63 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 			data =eles.get(0).html();
 		}
 		//根据模板id删除编辑区域数据
-		sdkCmsEditAreaManager.removeCmsModuleEditAreaByTemplateId(templateId,code);
+		if(Validator.isNotNullOrEmpty(versionId)){
+			sdkCmsEditVersionAreaManager.removeCmsEditVersionAreaByTemplateIdAndModuleCode(templateId, code, versionId);
+		}else{
+			sdkCmsEditAreaManager.removeCmsModuleEditAreaByTemplateId(templateId,code);	
+		}
 		data = sdkCmsPageTemplateManager.processTemplateBase(data);
 		return data;
 	}
 	
-	
-	/**
-	 * 处理页面的html, 获取code与html
-	 * 
-	 * @param html
-	 * @return
-	 */
-	private Map<String, String> processResetPageHtml(String html) {
-		/** key:areaCode, value:html */
-		Map<String, String> pageAreaMap = new HashMap<String, String>();
-		Document document = Jsoup.parse(html);
-		// 去掉 "编辑"按钮的div
-		Elements editButtonElements = document.select(CMS_DIV_EDIT_BUTTON_CLASS);
-		editButtonElements.remove();
-		//编辑html模式
-		Elements elements = document.select(CMS_HTML_EDIT_CLASS);
-		dealHtmlReset(pageAreaMap, elements,"cms-html-edit");
-		//图文模式
-		Elements imgElements = document.select(CMS_IMGARTICLE_EDIT_CLASS);
-		dealHtmlReset(pageAreaMap, imgElements,"cms-imgarticle-edit");
-		
-		return pageAreaMap;
-	}
-
-	private  void dealHtmlReset(Map<String, String> pageAreaMap ,Elements elements,String cls){
-		Integer i = 1;
-		for (Element element : elements) {
-			String areaCode = element.attr("code");
-			if (StringUtils.isBlank(areaCode)) {
-				throw new BusinessException("模块编辑区域的code不存在");
-			}
-			String areaHtml = element.html();
-			pageAreaMap.put(areaCode, cls+"EDIT_CLASS_SEP"+sdkCmsPageTemplateManager.addTemplateBase(areaHtml));
-			i++;
-		}
-	}
-
 	@Override
 	public void loadModuleMap() {
-		
+		/**
+		 * 1、获取所有的发布的模块
+		 * 2、将发布模块的版本放入到缓存中
+		 * 3、清空发布模块的缓存
+		 * 4、将当前发布模块的内容放入到缓存中
+		 */
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("isPublished", true);
+		List<CmsModuleInstance> moduleList= cmsModuleInstanceDao.findEffectCmsModuleInstanceListByQueryMap(param);
+		Map<String, Object> moduleparam = new HashMap<String, Object>();
 		moduleMap.clear();
-		
-		List<CmsModuleInstance> moduleList= cmsModuleInstanceDao.findAllCmsModuleInstanceList();
+		sdkCmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		for(CmsModuleInstance module:moduleList){
-			if(module.getIsPublished()!=null && module.getIsPublished()){
-				String moduleCode = module.getCode();
-				String data = getPublishData(moduleCode, module.getTemplateId());
-				moduleMap.put(moduleCode,data);
-			}
-		}
-		
-	}
-	
-	private String getPublishData(String moduleCode ,Long templateId){
-		CmsModuleTemplate template = sdkCmsModuleTemplateManager.findCmsModuleTemplateById(templateId);
-		String data = template.getData();
-		
-		if(StringUtils.isBlank(data)){
-			return "";
-		}
-		if (null != moduleCode) {
-			Map<String, Object> paraMap = new HashMap<String, Object>();
-			paraMap.put("moduleCode", moduleCode);
-			List<CmsPublished> editAreaList = sdkCmsPublishedManager.findCmsPublishedListByQueryMap(paraMap);
-
-			Document document = Jsoup.parse(data);
-			for (CmsPublished area : editAreaList) {
-				String code = area.getAreaCode();
-				Elements elements = document.select(CMS_HTML_EDIT_CLASS);
-				if (null != elements && elements.size() > 0) {
-					for (Element element : elements) {
-						if (code.equals(element.attr("code"))) {
-							element.html(area.getData());
-							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide())){
-								element.remove();
-							}else{
-								element.html(area.getData());
-							}
-						}
-					}
-
-				}
-				Elements imgArtiEles = document.select(CMS_IMGARTICLE_EDIT_CLASS);
-				if (null != imgArtiEles && imgArtiEles.size() > 0) {
-					for (Element element : imgArtiEles) {
-						if (code.equals(element.attr("code"))) {
-							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide())){
-								element.remove();
-							}else{
-								element.html(area.getData());
-							}
-						}
-					}
-
-				}
-				Elements product = document.select(CMS_PRODUCT_EDIT_CLASS);
-				if (null != product && product.size() > 0) {
-					for (Element element : product) {
-						if (code.equals(element.attr("code"))) {
-							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide())){
-								element.remove();
-							}else{
-								element.html(area.getData());
-							}
-						}
-					}
-
+			String moduleCode = module.getCode();
+			moduleparam.put("startTimeEnd", new Date());
+			moduleparam.put("endTimeStart", new Date());
+			moduleparam.put("moduleCode", moduleCode);
+			List<CmsTemplateHtml> publisingTemplate = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlListByQueryMap(moduleparam);
+			if(Validator.isNotNullOrEmpty(publisingTemplate) && publisingTemplate.size() == 1){
+				moduleMap.put(moduleCode,publisingTemplate.get(0)); 
+			}else{
+				HashMap<String, Object> baseParam = new HashMap<String, Object>();
+				baseParam.put("moduleCode", moduleCode);
+				baseParam.put("versionId", -1);
+				publisingTemplate = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlListByQueryMap(baseParam);
+				if(Validator.isNotNullOrEmpty(publisingTemplate) && publisingTemplate.size() == 1){
+					moduleMap.put(moduleCode,publisingTemplate.get(0)); 
 				}
 			}
-			data = document.toString();
 		}
-		data = sdkCmsPageTemplateManager.processTemplateBase(data);
-		data = processOnlyEditData(data);
-		data = processExtraHtmlTag(data);
-		return data;
-		
-	}
-	
-	/**
-	 * 去掉编辑时添加的内容, 如:不要加载的js 去掉<!--onlyedit-start-->到<!--onlyedit-start-->中间的数据
-	 * 
-	 * @param Data
-	 * @return
-	 */
-	private static String processOnlyEditData(String data) {
-		StringBuffer sb = new StringBuffer();
-		int indexStart = data.indexOf(ONLYEDIT_START);
-		int indexEnd = data.indexOf(ONLYEDIT_END);
-
-		if (indexStart != -1 && indexEnd != -1) {
-			sb.append(data.substring(0, indexStart));
-			sb.append(data.substring(indexEnd + ONLYEDIT_END.length(), data.length()));
-			data = sb.toString();
-			data = processOnlyEditData(data);
-		}
-		return data;
-	}
-	
-	/**
-	 * 对于模块，去掉jsoup自动添加的<html></html><body></body>标签
-	 * @param data
-	 * @return
-	 */
-	private String processExtraHtmlTag(String data) {
-		return data.replaceAll("<html [^>]*>", "").replace("</html>", "").replaceAll("<HTML [^>]*>", "").replace("</HTML>", "")
-				.replaceAll("<head [^>]*>", "").replace("</head>", "").replaceAll("<HEAD [^>]*>", "").replace("</HEAD>", "")
-				.replaceAll("<body [^>]*>", "").replace("</body>", "").replaceAll("<BODY [^>]*>", "").replace("</BODY>", "");
 	}
 	
 	@Override
-	public Map<String, String> getModuleMap() {
+	public Map<String, CmsTemplateHtml> getModuleMap() {
 		
 		if(moduleMap.size() == 0){
 			loadModuleMap();
 		}
 		return moduleMap;
 	}
+
+	@Override
+	public List<CmsModuleInstance> findCmsModuleInstanceListByTemplateIds(
+			List<Long> ids) {
+		return cmsModuleInstanceDao.findCmsModuleInstanceListByTemplateIds(ids);
+	}
+	
 	
 }

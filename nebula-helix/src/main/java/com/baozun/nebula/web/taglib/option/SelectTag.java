@@ -69,7 +69,6 @@ public class SelectTag extends BaseJspTag{
 			try {
 				optionCommands = optionManager.getOptionCommandsByExpression(expression);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -85,7 +84,6 @@ public class SelectTag extends BaseJspTag{
 	
 	@Override
 	public int doEndTag() throws JspException {
-		// TODO Auto-generated method stub
 		this.print("</select>");
 		return EVAL_PAGE;
 	}

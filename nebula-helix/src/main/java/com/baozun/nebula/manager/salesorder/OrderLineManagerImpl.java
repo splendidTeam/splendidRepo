@@ -47,7 +47,6 @@ public class OrderLineManagerImpl implements OrderLineManager {
 
     @Override
     public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId) {
-        // TODO Auto-generated method stub
         List<OrderLineCommand> findOrderLinesByOrderId = lineManager.findOrderLinesByOrderId(orderId);
         List<SimpleOrderLineSubViewCommand> list=new ArrayList<SimpleOrderLineSubViewCommand>();
         for (OrderLineCommand orderLineCommand : findOrderLinesByOrderId) {

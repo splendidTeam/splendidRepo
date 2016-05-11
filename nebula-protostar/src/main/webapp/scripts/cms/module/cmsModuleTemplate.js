@@ -25,7 +25,9 @@ $j.extend(loxia.regional['zh-CN'],{
 	"SELECT_EMAIL":"请选择需要删除的模块",
 	"drawEditor":"操作",
 	"NO_DATA":"查询数据为空",
-	"TO_MANAGER":"管理模块"
+	"TO_MANAGER":"管理模块",
+	"REMOVE_TEMPLATE_HAVE_INSTANCE":"删除模板包含实例，请先删除实例",
+	"EDIT_TEMPLATE":"编辑模板"
 });
 
 // 列表
@@ -37,14 +39,15 @@ var removeURl = base+ "/cmsModuleTemplate/removeByIds.json";
 
 var editUrl = base+ "/cmsModuleTemplate/edit.htm";
 var toManagerUrl=base+"/cmsModuleInstance/list.htm";
+var checkModuleUrl=base+"/cmsModuleTemplate/checkModuleUrl.json";
 function drawEditor(data){
 	var result="";  
 	var id=loxia.getObject("id", data);
 	var tomanager="<a href='"+ toManagerUrl+"?templateId="+id+"' class='func-button '>"+nps.i18n("TO_MANAGER")+"</a>";
-	var tomodify ="<a href='"+ editUrl+"?id="+id+"' class='func-button modify'>"+nps.i18n("TO_UPDATE")+"</a>";
-	var todelete ="<a href='javascript:void(0);' val='"+id+"' class='func-button delete'>"+nps.i18n("TO_DEL")+"</a>";
-	var editTemp ="<a href='javascript:void(0);' val='"+id+"' class='func-button editTemp'>编辑模块</a>";
-	result +=tomanager+editTemp + tomodify + todelete;
+//	var tomodify ="<a href='"+ editUrl+"?id="+id+"' class='func-button modify'>"+nps.i18n("TO_UPDATE")+"</a>";
+//	var todelete ="<a href='javascript:void(0);' val='"+id+"' class='func-button delete'>"+nps.i18n("TO_DEL")+"</a>";
+//	var editTemp ="<a href='javascript:void(0);' val='"+id+"' class='func-button editTemp'>编辑模块</a>";
+	result +=tomanager;
 	return result;
 }
 
@@ -118,15 +121,20 @@ function confirmDelete(id){
 			 json={"ids":data}; 
 			 
 		}
-	  	 nps.asyncXhrPost(removeURl, json,{successHandler:function(data, textStatus){
-			var backWarnEntity = data;
-				if (backWarnEntity.isSuccess) {
-					nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("INFO_DELETE_SUCCESS"));
-					refreshData();
-				} else {
-					nps.info(nps.i18n("INFO_TITLE_DATA"),backWarnEntity.description);
-				}
-		 }});
+		//检测模板里是否包含正在发布的模块页面
+		 var result = nps.syncXhrPost(checkModuleUrl, json);
+	        if (! result.isSuccess) {
+	        	nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("REMOVE_TEMPLATE_HAVE_INSTANCE"));
+	        	return;
+	        }
+
+	  	var d = nps.syncXhrPost(removeURl, json);
+	  	if(d.isSuccess){
+			nps.info(nps.i18n("INFO_TITLE_DATA"),nps.i18n("INFO_DELETE_SUCCESS"));
+			refreshData();
+	  	}else{
+	  		nps.info(nps.i18n("INFO_TITLE_DATA"),backWarnEntity.description);
+	  	}
 	});
 }
 //模板截图
@@ -137,6 +145,31 @@ function drawImg(data, args, idx){
 	html += "</a>";
 	return html;
 }
+//删除单行
+function fnDeleteTemplate(data, args, caller){
+	confirmDelete(data.id);
+}
+
+function drawEditTemplateItem(data) {
+	var id = loxia.getObject("id", data);
+	var result = "";
+	//var state = loxia.getObject("lifecycle", data);
+		result = [ {
+			label : nps.i18n("EDIT_TEMPLATE"),
+			type : "href",
+			content : base +"/module/editCmsTemplate.htm?id="+id
+		}, {
+			label : nps.i18n("TO_UPDATE"),
+			type : "href",
+			content : editUrl+"?id="+id
+		}, {
+			label : nps.i18n("TO_DEL"),
+			type : "jsfunc",
+			content : "fnDeleteTemplate"
+		}];
+	return result;
+}
+
 $j(document).ready(function() {
 	loxia.init({
 		debug : true,
@@ -157,18 +190,23 @@ $j(document).ready(function() {
 			{
 				name : "img",
 				label : "模块截图",
-				width : "10%",
+				width : "20%",
 				template:"drawImg"
 			},
 			{
 				name : "name",
 				label : "模块名称",
-				width : "10%"
+				width : "55%"
 			},
 			{
 				label :nps.i18n("drawEditor"),
-				width : "15%", 			 
+				width : "10%", 			 
 				template:"drawEditor" 
+			},
+			{
+				width : "10%", 			 
+				type : "oplist",
+				oplist : drawEditTemplateItem
 			}],
 		dataurl : urlList
 	});
@@ -199,9 +237,9 @@ $j(document).ready(function() {
 		 confirmDelete(curObject.attr("val"));
 	 });
 	 
-	 $j("#tableList").on("click",".func-button.editTemp",function(){
-		window.location.href=base +"/module/editCmsTemplate.htm?id="+$j(this).attr("val");
-	 });
+//	 $j("#tableList").on("click",".func-button.editTemp",function(){
+//		window.location.href=base +"/module/editCmsTemplate.htm?id="+$j(this).attr("val");
+//	 });
 	
 	 //新建
 	 $j(".addCmsModuleTemplate").on("click",function(){

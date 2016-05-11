@@ -73,8 +73,6 @@ public class ImgUrlTag extends TagSupport {
 	
 	@Override
 	public int doEndTag() throws JspException {
-		// TODO Auto-generated method stub
-		
 		return EVAL_PAGE;
 	}
 

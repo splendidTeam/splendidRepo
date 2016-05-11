@@ -69,15 +69,15 @@ public interface CmsPageInstanceManager extends BaseManager {
 	 */
 	public void removeCmsPageInstanceByIds(List<Long> ids);
 
-	/**
-	 * 查询模板与可编辑区域的数据
-	 * 
-	 * @param templateId
-	 * @param pageId
-	 * @param isEdit
-	 * @return
-	 */
-	public String findUpdatedCmsPageInstance(Long templateId, Long pageId, Boolean isEdit);
+//	/**
+//	 * 查询模板与可编辑区域的数据
+//	 * 
+//	 * @param templateId
+//	 * @param pageId
+//	 * @param isEdit
+//	 * @return
+//	 */
+//	public String findUpdatedCmsPageInstance(Long templateId, Long pageId, Boolean isEdit);
 
 	/**
 	 * 发布页面实例
@@ -110,5 +110,18 @@ public interface CmsPageInstanceManager extends BaseManager {
 	 * @param pageId
 	 */
 	public void cancelPublishedPageInstance(Long pageId);
+
+
+
+//	/**
+//	 * 获取发布的页面的html
+//	 * @param templateId
+//	 * @param pageId
+//	 * @return
+//	 */
+//	public String getPublicPageData(Long templateId, Long pageId);
+
+	
+	
 
 }

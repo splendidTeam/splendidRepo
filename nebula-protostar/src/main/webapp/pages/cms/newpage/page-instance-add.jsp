@@ -137,7 +137,7 @@ width: 97%;
      <h5>编辑区域—表单方式</h5>
      <div class="proto-dialog-content">
     
-	     <input type="hidden" value="" id="code"  class="areaCode" name="code">
+	     <input type="hidden" value="" id="areaCode"  class="areaCode" name="areaCode">
 	    <div class="ui-block-line area-list list-line" style="display: none;margin-bottom: 5px">
 	     <div class="zkss"><a href="javascript:void(0);" class="func-button select">收起-</a></div>
 	     <div class="slideToggle">

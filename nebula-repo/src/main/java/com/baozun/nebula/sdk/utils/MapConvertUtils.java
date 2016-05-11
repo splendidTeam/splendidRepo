@@ -102,7 +102,6 @@ public class MapConvertUtils {
 		try {
 			objectParesToString(person);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

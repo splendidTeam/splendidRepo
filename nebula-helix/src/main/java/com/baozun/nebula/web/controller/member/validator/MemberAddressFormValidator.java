@@ -34,10 +34,10 @@ public class MemberAddressFormValidator implements Validator {
 			MemberAddressForm memberAddressForm = (MemberAddressForm) target;
 
 			//验证必填字段
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "province", "field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "area", "field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "town", "field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "provinceId", "field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "cityId", "field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "areaId", "field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "townId", "field.required");
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", "field.required");				
 			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "field.required");	
 			

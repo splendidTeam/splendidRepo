@@ -223,9 +223,5 @@ public class ItemControllerTest {
 		control.verify();
 	}
 
-	/*@Test
-	public final void testDeleteRole() {
-		fail("Not yet implemented"); // TODO
-	}*/
 
 }

@@ -16,7 +16,16 @@
  */
 package com.baozun.nebula.web.controller.order.form;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.baozun.nebula.web.controller.BaseForm;
+import com.feilong.core.Validator;
+import com.feilong.core.bean.PropertyUtil;
 
 /**
  * The Class OrderQueryForm.
@@ -29,6 +38,11 @@ public class OrderQueryForm extends BaseForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 7412305764293905289L;
+    
+   /**
+    * 新建（未支付）
+    */
+    private static final String     orderStatus_new = "new";
 
     /** 商品名称. */
     private String            itemName;
@@ -147,4 +161,41 @@ public class OrderQueryForm extends BaseForm{
         this.orderTimeType = orderTimeType;
     }
 
+    
+    /**
+     * 
+     * 说明：转换为OrderQueryCommand，前台条件转换
+     * 
+     * @param orderqueryform
+     * @return
+     * @author 张乃骐
+     * @throws ParseException
+     * @time：2016年5月9日 下午5:01:05
+     */
+    public OrderQueryCommand convertToOrderQueryCommand(OrderQueryCommand orderQueryCommand){
+        PropertyUtil.copyProperties(orderQueryCommand, this, "itemName", "itemCode", "orderCode");
+        //订单的时间类型判断及转换
+        String orderTimeType = this.getOrderTimeType();
+        if (Validator.isNotNullOrEmpty(orderTimeType)){
+            OrderTimeType orderTimeTypeEnum = OrderTimeType.getInstance(orderTimeType);
+            Date[] beginAndEndDate = orderTimeTypeEnum.getBeginAndEndDate();
+            orderQueryCommand.setStartDate(beginAndEndDate[0]);
+            orderQueryCommand.setEndDate(beginAndEndDate[1]);
+        }
+        //订单类型（未支付，发货中，以完成，取消）
+        String orderStatus = this.getOrderStatus();
+        if (Validator.isNotNullOrEmpty(orderStatus)){
+            List<Integer> logisticsStatusList = new ArrayList<Integer>();
+            List<Integer> financestatusList = new ArrayList<Integer>();
+            //未支付(新建)
+            if (orderStatus.equals(orderStatus_new)){
+                logisticsStatusList.add(SalesOrder.SALES_ORDER_STATUS_NEW);//新建订单
+                financestatusList.add(SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT);//财务状态未支付
+                orderQueryCommand.setLogisticsStatusList(logisticsStatusList);
+                orderQueryCommand.setFinancestatusList(financestatusList);
+            }
+            //TODO 其他状态的判断
+        }
+        return orderQueryCommand;
+    }
 }

@@ -80,12 +80,12 @@ public class NebulaBundleShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        //TODO validator
+        //TODO feilong validator
 
-        //TODO 构造bundle购物车信息
+        //TODO feilong 构造bundle购物车信息
 
         //        //save in session
-        String key = buildKey();//TODO 构造key
+        String key = buildKey();//TODO feilong 构造key
         //        //value是商品list
         //        request.getSession().setAttribute(key, "");
 
@@ -97,7 +97,7 @@ public class NebulaBundleShoppingCartController extends BaseController{
         return null;
     }
 
-    //TODO 进普通购物车
+    //TODO feilong 进普通购物车
 
     /**
      * Builds the key.

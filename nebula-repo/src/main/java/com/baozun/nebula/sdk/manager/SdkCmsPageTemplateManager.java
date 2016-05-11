@@ -139,5 +139,7 @@ public interface SdkCmsPageTemplateManager extends BaseManager{
 	 */
 	@Deprecated
 	String processTemplateBase(String html);
+
+	
 	
 }

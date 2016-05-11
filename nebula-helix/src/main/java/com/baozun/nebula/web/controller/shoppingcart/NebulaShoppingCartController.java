@@ -89,7 +89,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * <td>修改购物车数量</td>
  * </tr>
  * <tr valign="top">
- * <td>//TODO</td>
+ * <td>//TODO feilong </td>
  * <td>修改商品销售属性</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
@@ -379,7 +379,7 @@ public class NebulaShoppingCartController extends BaseController{
         return toNebulaReturnResult(shoppingcartResult);
     }
 
-    // TODO 修改销售属性
+    // TODO feilong 修改销售属性
 
     //******************************************************************************************************
     /**

@@ -25,6 +25,7 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.cms.CmsEditArea;
+import com.baozun.nebula.model.cms.CmsEditVersionArea;
 
 /**
  * CmsEditAreaManager
@@ -143,7 +144,6 @@ public interface SdkCmsEditAreaManager extends BaseManager{
 	* @throws
 	 */
 	void removeCmsModuleEditAreaByTemplateId(Long templateId,String code);
-	
 
 	void editAreaHide(Map<String, Object> paraMap);
 	

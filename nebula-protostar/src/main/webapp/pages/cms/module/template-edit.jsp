@@ -6,8 +6,6 @@
 <title>无标题文档</title>
 <%@include file="/pages/commons/common-css.jsp" %>
 <%@include file="/pages/commons/common-javascript.jsp" %>
-<link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
-<script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
 <script type="text/javascript" src="${base }/scripts/main.js"></script>
 <script type="text/javascript" src="${base}/scripts/ajaxfileupload.js"></script>
 <script type="text/javascript" src="${base}/scripts/jquery.form.js"></script>
@@ -27,7 +25,6 @@
     <div class="ui-block">
     	<%-- 编辑页面区域 --%>
     	<div class="ui-block-title1">页面模块</div>
-    	<script type="text/javascript" src="${base}/scripts/cms/cms-ztree.js" ></script>
     	<script type="text/javascript" src="${base}/scripts/cms/edit-template-product.js" ></script>
 		<script type="text/javascript" src="${base}/scripts/cms/edit-template.js" ></script>
 		<iframe src="${base}/module/findTemplateByTemplateId.htm?templateId=${templateId}" width="100%" class="web-update" frameborder="0"></iframe>
@@ -78,22 +75,19 @@
 	     <div class="ui-block-line mt5" >
 			<label>预览代码(只读)</label>
 			<textarea class="html" placeholder="代码" readonly="readonly" style="width: 600px;height: 280px;resize:none;" loxiaType="input" mandatory="true"></textarea>
-		 	<div class="zTreeDemoBackground left">
-				<ul id="zTreeForDom" class="ztree"></ul>
-			</div>
 		 </div>
 		  <div class="ui-block-line mt5" >
 		  	<label class="editSetting">设置编辑选项</label>
-		  	<input type="button" value="添加标题编辑" class="button orange mr5 title" />
+			<input type="button" value="添加标题编辑" class="button orange mr5 title" />
 			<input type="button" value="删除标题编辑" class="button cancel mr5 retitle" />
+			<input type="button" value="添加标题链接编辑" class="button orange mr5 thref" />
+			<input type="button" value="删除标题链接编辑" class="button cancel mr5 rethref" />
 			<input type="button" value="添加图片编辑" class="button orange mr5 img" />
 			<input type="button" value="删除图片编辑" class="button cancel mr5 reimg" />
-			<input type="button" value="添加超链接编辑" class="button orange mr5 href" />
-			<input type="button" value="删除超链接编辑" class="button cancel mr5 rehref" />
+			<input type="button" value="添加图片链接编辑" class="button orange mr5 ihref" />
+			<input type="button" value="删除图片链接编辑" class="button cancel mr5 reihref" />
 			<input type="button" value="添加描述编辑" class="button orange mr5 desc" />
 			<input type="button" value="删除描述编辑" class="button cancel mr5 redesc" />
-			<input type="button" value="添加图片热点编辑" class="button orange mr5 coords" />
-			<input type="button" value="删除图片热点编辑" class="button cancel mr5 recoords" />
 		 </div>
 		 <div class="ui-block-line mt5 setSame" >
 			<label>同步设置其它列表元素</label>
@@ -147,10 +141,6 @@
           <input type="button" value="扩大选区" class="button cancel removeEdit"/>	
      </div>
 </div>
+
 </body>
-<script type="text/javascript">
-$j(window).load(function(){
-	addMapOnClick();
-});
-</script>
 </html>

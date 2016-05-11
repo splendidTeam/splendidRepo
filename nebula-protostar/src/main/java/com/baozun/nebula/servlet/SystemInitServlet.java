@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServlet;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.baozun.nebula.manager.cms.SdkCmsInitManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.zk.WatchControl;
 
@@ -30,6 +31,7 @@ public class SystemInitServlet extends HttpServlet{
 		initProfileUtil(config);
 		initEngine();
 		initZookeeper(config);
+		initCms(config);
 	}
 	
 	private void initProfileUtil(ServletConfig config){
@@ -47,6 +49,13 @@ public class SystemInitServlet extends HttpServlet{
 		
 		WatchControl zo=(WatchControl)applicationContext.getBean("watchControl");
 		zo.initWatch();
+	}
+	
+	private void initCms(ServletConfig config){
+		ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
+		
+		SdkCmsInitManager sim=(SdkCmsInitManager)applicationContext.getBean("sdkCmsInitManager");
+		sim.megerCacheUrl();
 	}
 	
 }

@@ -5,7 +5,6 @@ import java.util.Comparator;
 public class LinePromotionSizeComparator implements Comparator<LinePromotionSize>{
 	@Override
 	public int compare(LinePromotionSize o1, LinePromotionSize o2) {
-		// TODO Auto-generated method stub
 		LinePromotionSize step0=(LinePromotionSize)o1;
 		LinePromotionSize step1=(LinePromotionSize)o2;
 		

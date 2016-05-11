@@ -216,7 +216,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.MAX_THAN_INVENTORY;
         }
 
-        // FIXME
+        // FIXME feilong 
         ShoppingCartLineCommand currentLine = CollectionsUtil.find(
                         CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate()),
                         "extentionCode",
@@ -287,7 +287,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
         }else{// 存在
 
-            // FIXME 限购验证
+            //FIXME feilong 限购验证
             sameExtentionCodeInCartShoppingCartLineCommand
                             .setQuantity(sameExtentionCodeInCartShoppingCartLineCommand.getQuantity() + count);
         }
@@ -296,7 +296,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.MAX_THAN_INVENTORY;
         }
 
-        // FIXME
+        // FIXME feilong
         ShoppingCartLineCommand currentLine = CollectionsUtil.find(
                         CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate()),
                         "extentionCode",
@@ -456,7 +456,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.SKU_NOT_EXIST;
         }
 
-        // TODO
+        // TODO feilong 
         //===============③ 判断sku生命周期===============
         if (!sku.getLifecycle().equals(Sku.LIFE_CYCLE_ENABLE)){
             return ShoppingcartResult.SKU_NOT_ENABLE;
@@ -475,7 +475,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         // ********************************************************************************************
         //===============⑤  还没上架===============
         if (!checkActiveBeginTime(itemCommand)){
-            // TODO log
+            // TODO feilong log
             return ShoppingcartResult.ITEM_NOT_ACTIVE_TIME;
         }
 
@@ -576,7 +576,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        //TODO 这个目前会员购物车更新状态 需要这个参数
+        //TODO feilong 这个目前会员购物车更新状态 需要这个参数
         List<String> extentionCodeList = new ArrayList<String>();
 
         for (ShoppingCartLineCommand needChangeCheckedCommand : needChangeCheckedCommandList){

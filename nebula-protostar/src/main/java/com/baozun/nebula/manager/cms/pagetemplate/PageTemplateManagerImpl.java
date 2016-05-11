@@ -33,14 +33,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.cms.pageinstance.CmsPageInstanceManager;
-import com.baozun.nebula.manager.cms.pageinstance.CmsPageInstanceManagerImpl;
 import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.cms.CmsEditArea;
+import com.baozun.nebula.model.cms.CmsEditVersionArea;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
+import com.baozun.nebula.sdk.manager.SdkCmsEditVersionAreaManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
-import com.baozun.nebula.utilities.common.Validator;
+import com.baozun.nebula.sdk.manager.impl.SdkCmsParseHtmlContentManagerImpl;
 import com.baozun.nebula.utils.image.ImageOpeartion;
+import com.feilong.core.Validator;
 
 /**
  * @author jumbo
@@ -55,6 +57,10 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 	
 	@Autowired
 	private SdkCmsEditAreaManager		sdkCmsEditAreaManager;
+	
+	@Autowired
+	private SdkCmsEditVersionAreaManager		sdkCmsEditVersionAreaManager;
+	
 	@Autowired
 	private CmsPageInstanceManager cmsPageInstanceManager;
 
@@ -104,8 +110,6 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 				oldPage.setData(newData);
 			}
 			oldPage.setModifyTime(new Date());
-			//根据模板id删除编辑区域数据
-			//sdkCmsEditAreaManager.removeCmsEditAreaByTemplateId(templateId);
 			return oldPage;
 		}else{
 			throw new BusinessException("id is null");
@@ -117,8 +121,6 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 	@Override
 	public CmsPageTemplate findCmsPageTemplateById(Long templateId) {
 		CmsPageTemplate cmsPageTemplate = sdkCmsPageTemplateManager.findCmsPageTemplateById(templateId);
-		//String data = sdkCmsPageTemplateManager.processTemplateBase(cmsPageTemplate.getData());
-		//cmsPageTemplate.setData(data);
 		return cmsPageTemplate;
 	}
 	@Override
@@ -130,13 +132,24 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 	}
 
 	@Override
-	public String recoverTemplateCodeArea(Long templateId, String code) {
+	public String recoverTemplateCodeArea(Long templateId, String code, Long versionId) {
 		Map<String, Object> paraMap = new HashMap<String, Object>();
 		paraMap.put("templateId", templateId);
 		paraMap.put("code", code);
-		List<CmsEditArea> cmsEditAreas = sdkCmsEditAreaManager.findEffectCmsEditAreaListByQueryMap(paraMap);
-		if(cmsEditAreas == null || cmsEditAreas.size()==0){
-			throw new BusinessException("编辑部分无需重置");
+		String data = "";
+		if(Validator.isNotNullOrEmpty(versionId)){
+			List<CmsEditVersionArea> cmsEditVersionAreas = sdkCmsEditVersionAreaManager.findEffectCmsEditVersionAreaListByQueryMap(paraMap);
+			if(cmsEditVersionAreas == null || cmsEditVersionAreas.size()==0){
+				throw new BusinessException("编辑部分无需重置");
+			}
+			//删除编辑数据
+			//根据模板id删除编辑区域数据
+			sdkCmsEditAreaManager.removeCmsEditAreaByTemplateId(templateId,code);
+		}else{
+			List<CmsEditArea> cmsEditAreas = sdkCmsEditAreaManager.findEffectCmsEditAreaListByQueryMap(paraMap);
+			if(cmsEditAreas == null || cmsEditAreas.size()==0){
+				throw new BusinessException("编辑部分无需重置");
+			}
 		}
 		//根据code在模板中找出需要还原的数据
 		String html = findUpdatedCmsPageInstance(templateId);
@@ -144,7 +157,7 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 		if(map.size()==0){
 			throw new BusinessException("编辑部分无需重置");
 		}
-		String data = map.get(code);
+		data = map.get(code);
 		Document document = Jsoup.parse(data);
 		Elements eles =	document.getElementsByTag("body");
 		if(eles!=null&& eles.size()!=0){
@@ -152,10 +165,15 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 		}
 		//删除编辑数据
 		//根据模板id删除编辑区域数据
-		sdkCmsEditAreaManager.removeCmsEditAreaByTemplateId(templateId,code);
+		if(Validator.isNotNullOrEmpty(versionId)){
+			sdkCmsEditVersionAreaManager.removeCmsEditVersionAreaByTemplateIdAndPageCode(templateId,code, versionId);
+		}else{
+			sdkCmsEditAreaManager.removeCmsEditAreaByTemplateId(templateId,code);
+		}
 		data = sdkCmsPageTemplateManager.processTemplateBase(data);
 		return data;
 	}
+	
 	/**
 	 * 处理页面的html, 获取code与html
 	 * 
@@ -167,17 +185,17 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 		Map<String, String> pageAreaMap = new HashMap<String, String>();
 		Document document = Jsoup.parse(html);
 		// 去掉 "编辑"按钮的div
-		Elements editButtonElements = document.select(CmsPageInstanceManagerImpl.CMS_DIV_EDIT_BUTTON_CLASS);
+		Elements editButtonElements = document.select(SdkCmsParseHtmlContentManagerImpl.CMS_DIV_EDIT_BUTTON_CLASS);
 		editButtonElements.remove();
 		//编辑html模式
-		Elements elements = document.select(CmsPageInstanceManagerImpl.CMS_HTML_EDIT_CLASS);
+		Elements elements = document.select(SdkCmsParseHtmlContentManagerImpl.CMS_HTML_EDIT_CLASS);
 		dealHtml(pageAreaMap, elements,"cms-html-edit");
 		//图文模式
-		Elements imgElements = document.select(CmsPageInstanceManagerImpl.CMS_IMGARTICLE_EDIT_CLASS);
+		Elements imgElements = document.select(SdkCmsParseHtmlContentManagerImpl.CMS_IMGARTICLE_EDIT_CLASS);
 		dealHtml(pageAreaMap, imgElements,"cms-imgarticle-edit");
 		//商品模式
 		//"cms-product-edit";
-		Elements proElements = document.select(CmsPageInstanceManagerImpl.CMS_PRODUCT_EDIT_CLASS);
+		Elements proElements = document.select(SdkCmsParseHtmlContentManagerImpl.CMS_PRODUCT_EDIT_CLASS);
 		dealHtml(pageAreaMap, proElements,"cms-product-edit");
 		
 		return pageAreaMap;

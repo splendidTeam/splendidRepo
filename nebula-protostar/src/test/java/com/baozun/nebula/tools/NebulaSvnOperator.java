@@ -34,7 +34,6 @@ public class NebulaSvnOperator {
 			process = Runtime.getRuntime().exec(command);
 			process.waitFor();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -59,7 +58,6 @@ public class NebulaSvnOperator {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
