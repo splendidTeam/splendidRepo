@@ -66,7 +66,6 @@ import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderPromotionDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderStatusLogDao;
-import com.baozun.nebula.dao.salesorder.SdkPayNoDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnOrderDao;
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.event.EmailEvent;
@@ -107,7 +106,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.handler.SalesOrderHandler;
-import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkEffectiveManager;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
@@ -117,6 +115,7 @@ import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
@@ -189,9 +188,8 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SkuDao                                   skuDao;
 
-    /** The sdk sku inventory dao. */
     @Autowired
-    private SdkSkuInventoryDao                       sdkSkuInventoryDao;
+    private SdkSkuInventoryManager                   sdkSkuInventoryManager;
 
     /** The order code creator. */
     @Autowired(required = false)
@@ -951,11 +949,10 @@ public class OrderManagerImpl implements OrderManager{
      *            the shopping cart line command list
      */
     private void liquidateSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
+        Map<String, Integer> extentionCodeandCountMap = new HashMap<String, Integer>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-
             //如果直推礼品库存数小于购买量时，扣减现有库存
             Integer quantity = shoppingCartLineCommand.getQuantity();
             if (isNoNeedChoiceGift(shoppingCartLineCommand)){
@@ -970,15 +967,11 @@ public class OrderManagerImpl implements OrderManager{
                     shoppingCartLineCommand.setQuantity(stock);
                 }
             }
-
             //主卖品和赠品都扣库存
             String extentionCode = shoppingCartLineCommand.getExtentionCode();
-            int result = sdkSkuInventoryDao.liquidateSkuInventory(extentionCode, quantity);
-            // 返回的行数是否为 1 如果不是,说明库存不足 就抛出异常
-            if (result != 1){
-                throw new BusinessException(Constants.CHECK_INVENTORY_FAILURE, new Object[] { shoppingCartLineCommand.getItemName() });
-            }
+            extentionCodeandCountMap.put(extentionCode, quantity);
         }
+        sdkSkuInventoryManager.deductSkuInventory(extentionCodeandCountMap);
     }
 
     /**

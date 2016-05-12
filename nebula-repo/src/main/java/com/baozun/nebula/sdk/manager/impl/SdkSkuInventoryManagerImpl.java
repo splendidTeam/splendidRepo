@@ -19,8 +19,6 @@ package com.baozun.nebula.sdk.manager.impl;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,11 +38,9 @@ import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 @Service("sdkSkuInventoryManager")
 public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SdkSkuInventoryManagerImpl.class);
-
     /** The sdk sku inventory dao. */
     @Autowired
-    private SdkSkuInventoryDao  sdkSkuInventoryDao;
+    private SdkSkuInventoryDao sdkSkuInventoryDao;
 
     /*
      * (non-Javadoc)
@@ -53,19 +49,20 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
      */
     @Override
     public void deductSkuInventory(Map<String, Integer> extentionCodeandCountMap){
-
         Validate.notEmpty(extentionCodeandCountMap, "extentionCodeandCountMap can't be null/empty!");
 
         for (Map.Entry<String, Integer> entry : extentionCodeandCountMap.entrySet()){
             String extentionCode = entry.getKey();
             Integer count = entry.getValue();
+
+            Validate.notBlank(extentionCode, "extentionCode can't be blank!");
+            Validate.isTrue(count > 0, "count must > 0,extentionCode is %s", extentionCode);
+
             int result = sdkSkuInventoryDao.liquidateSkuInventory(extentionCode, count);
             // 返回的行数是否为 1 如果不是,说明库存不足 就抛出异常
             if (result != 1){
                 throw new BusinessException(Constants.CHECK_INVENTORY_FAILURE, new Object[] { extentionCode });
             }
         }
-
     }
-
 }

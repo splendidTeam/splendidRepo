@@ -32,6 +32,10 @@ public interface SdkSkuInventoryManager extends BaseManager{
     /**
      * 基于<code>extentionCodeandCountMap</code> 扣减商品库存.
      * 
+     * <p>
+     * 很多时候,同一笔订单可能出现两行相同的extentionCode,这是如果分两次去扣减库存,可能会出现死锁的情况,需要先合并再统一调用这个方法来一次性扣减库存
+     * </p>
+     * 
      * <h3>代码流程:</h3>
      * <blockquote>
      * <ol>
