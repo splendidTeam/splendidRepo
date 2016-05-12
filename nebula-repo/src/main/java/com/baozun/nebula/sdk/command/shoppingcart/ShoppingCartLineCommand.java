@@ -71,12 +71,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 销售属性 *. */
     private String                     saleProperty;
 
-    /** 库房id *. */
-    private Long                       wareHoseId;
-
-    /** 库房名称 *. */
-    private String                     wareHoseName;
-
     /** 是否可见 1可见 /0不可见 *. */
     private Integer                    visibleMark;
 
@@ -147,14 +141,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 0代表非买品 1代表主卖品 与itemInfo中的type一致. */
     private Integer                    type;
 
-    /** 购物车中商品经有效性检查引擎检查之后是否有效的字段 *. */
-    private boolean                    isValid;
-
-    /**
-     * 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
-     */
-    private Integer                    validType;
-
     /** 店铺id *. */
     private Long                       shopId;
 
@@ -190,6 +176,26 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /** 商城自定义参数，nebula不控制. */
     private Map<String, Object>        customParamMap;
+
+    //***************************************************************************************************
+
+    /** 购物车中商品经有效性检查引擎检查之后是否有效的字段 *. */
+    private boolean                    isValid;
+
+    /**
+     * 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
+     */
+    private Integer                    validType;
+
+    //***************************************************************************************************
+
+    /** 库房id *. */
+    private Long                       wareHoseId;
+
+    /** 库房名称 *. */
+    private String                     wareHoseName;
+
+    //***************************************************************************************************
 
     /**
      * 获得 promotion ids.

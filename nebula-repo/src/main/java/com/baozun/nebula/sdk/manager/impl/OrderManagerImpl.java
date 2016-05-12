@@ -134,37 +134,28 @@ import loxia.dao.Sort;
 public class OrderManagerImpl implements OrderManager{
 
     /** The Constant log. */
-    private static final Logger                      log                  = LoggerFactory.getLogger(OrderManagerImpl.class);
+    private static final Logger                      log             = LoggerFactory.getLogger(OrderManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer                     SUCCESS              = 1;
+    private static final Integer                     SUCCESS         = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer                     FAILURE              = 0;
-
-    /** The Constant CREATE_ORDER_TRIGGER. */
-    private static final String                      CREATE_ORDER_TRIGGER = Constants.ORDER_CONFIRM_TRIGGER;
-
-    /** The Constant ACTIVITY_RES. */
-    private static final String                      ACTIVITY_RES         = Constants.ACTIVITY_RES;
-
-    /** The Constant SHOPPINGCARTSUMMARY. */
-    private static final String                      SHOPPINGCARTSUMMARY  = Constants.SHOPPINGCARTSUMMARY;
+    private static final Integer                     FAILURE         = 0;
 
     /** The Constant SEPARATOR_FLAG. */
-    private static final String                      SEPARATOR_FLAG       = "\\|\\|";
+    private static final String                      SEPARATOR_FLAG  = "\\|\\|";
 
     /** The page url base. */
     @Value("#{meta['page.base']}")
-    private String                                   pageUrlBase          = "";
+    private String                                   pageUrlBase     = "";
 
     /** The img domain url. */
     @Value("#{meta['upload.img.domain.base']}")
-    private String                                   imgDomainUrl         = "";
+    private String                                   imgDomainUrl    = "";
 
     /** The frontend base url. */
     @Value("#{meta['frontend.url']}")
-    private String                                   frontendBaseUrl      = "";
+    private String                                   frontendBaseUrl = "";
 
     /** The sdk cancel order dao. */
     @Autowired
@@ -185,10 +176,6 @@ public class OrderManagerImpl implements OrderManager{
     /** The sdk pay info dao. */
     @Autowired
     private PayInfoDao                               sdkPayInfoDao;
-
-    /** The sdk pay no dao. */
-    @Autowired
-    private SdkPayNoDao                              sdkPayNoDao;
 
     /** The sdk return order dao. */
     @Autowired
@@ -250,17 +237,9 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkSkuManager                            sdkSkuManager;
 
-    /** The logistics manager. */
-    @Autowired
-    private LogisticsManager                         logisticsManager;
-
     /** The sdk promotion calculation share to sku manager. */
     @Autowired
     private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
-
-    // @Value("#{meta['orderCodeCreator']}")
-    // private String
-    // orderCodeCreatorPath="com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager";
 
     /** The sdk engine manager. */
     @Autowired
@@ -978,21 +957,23 @@ public class OrderManagerImpl implements OrderManager{
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
 
             //如果直推礼品库存数小于购买量时，扣减现有库存
+            Integer quantity = shoppingCartLineCommand.getQuantity();
             if (isNoNeedChoiceGift(shoppingCartLineCommand)){
                 //下架
                 if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
                     continue;
                 }
-                if (null == shoppingCartLineCommand.getStock() || shoppingCartLineCommand.getStock() <= 0){
+                Integer stock = shoppingCartLineCommand.getStock();
+                if (null == stock || stock <= 0){
                     continue;
-                }else if (shoppingCartLineCommand.getStock() < shoppingCartLineCommand.getQuantity()){
-                    shoppingCartLineCommand.setQuantity(shoppingCartLineCommand.getStock());
+                }else if (stock < quantity){
+                    shoppingCartLineCommand.setQuantity(stock);
                 }
             }
 
             //主卖品和赠品都扣库存
-            int result = sdkSkuInventoryDao
-                            .liquidateSkuInventory(shoppingCartLineCommand.getExtentionCode(), shoppingCartLineCommand.getQuantity());
+            String extentionCode = shoppingCartLineCommand.getExtentionCode();
+            int result = sdkSkuInventoryDao.liquidateSkuInventory(extentionCode, quantity);
             // 返回的行数是否为 1 如果不是,说明库存不足 就抛出异常
             if (result != 1){
                 throw new BusinessException(Constants.CHECK_INVENTORY_FAILURE, new Object[] { shoppingCartLineCommand.getItemName() });
