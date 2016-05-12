@@ -716,7 +716,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] the bundle invalid, so it removed: bundleItemId={}", bundleItemId);
 			return null;
 		}
-		LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] found bundle in database: bundle={}", JsonUtil.format(bundle));
+//		LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] found bundle in database: bundle={}", JsonUtil.format(bundle));
 
 		if(!isIgnoreCache && isValidate){
 			// 添加到缓存中
