@@ -211,7 +211,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		for (FacetGroup facetGroup : searchResultPage.getFacetGroups()){
 			if (facetGroup.isCategory()) {
 				// 如果是分类的facet
-				List<Facet> facets = FacetTreeUtil.createFacetTree(facetGroup);
+				List<Facet> facets = new FacetTreeUtil().createFacetTree(facetGroup);
 				facets = covertCategoryFacets(facets, facetFilterMetaData.getCategoryMetaMap(), facetParameters);
 				facetGroup.setFacets(facets);
 				facetGroups.add(facetGroup);
