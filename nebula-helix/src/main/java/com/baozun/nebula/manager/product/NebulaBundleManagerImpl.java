@@ -633,7 +633,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 			// 定制价格 一口价（）
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
-					|| bundle.getBundleType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
+					|| bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_FIXEDPRICE) {
 				skuCommand.setSalesPrice(sku.getSalesPrice());
 			}
 			// 按照实际价格

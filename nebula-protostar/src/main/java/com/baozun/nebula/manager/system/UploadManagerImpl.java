@@ -40,8 +40,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
-import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utils.image.ImageOpeartion;
+import com.feilong.core.Validator;
 
 /**
  * 图片上传的实现类

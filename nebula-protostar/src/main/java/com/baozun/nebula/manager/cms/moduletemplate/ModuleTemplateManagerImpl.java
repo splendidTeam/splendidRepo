@@ -1,8 +1,5 @@
 package com.baozun.nebula.manager.cms.moduletemplate;
 
-import java.util.Properties;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.cms.CmsModuleTemplateDao;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
 import com.baozun.nebula.sdk.manager.SdkCmsCommonManager;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 
 
 @Service("moduleTemplateManager")

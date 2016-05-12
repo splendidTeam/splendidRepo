@@ -72,11 +72,9 @@ public class NebulaOrderListController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderListController.class);
 
     @Autowired
-    @Qualifier("SalesOrderManager")
     private SalesOrderManager salesOrderManager;
 
     @Autowired
-    @Qualifier("OrderLineManager")
     private OrderLineManager orderLineManager;
 
     @Autowired

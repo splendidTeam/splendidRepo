@@ -54,7 +54,7 @@ function checkPageInstanceCode(){
  * 检察页面实例url是否可用
  */
 function checkPageInstanceUrl(){
-	$j('#isSaved').val(false);
+	//$j('#isSaved').val(false);
 	var pageId = $j('#pageId').val();
 	var url = $j('#url').val();
 	var json;
@@ -156,7 +156,7 @@ function parseDate(str){
 	       return new Date(parseInt(results[1],10),parseInt(results[2],10) -1,parseInt(results[3],10),parseInt(results[4],10),parseInt(results[5],10),parseInt(results[6],10),parseInt(results[7],10));      
 	   }     
 	   return null;     
-};
+}
 function supportType(type){
 	var html="";
 	if(type==0){
@@ -298,13 +298,6 @@ $j(document).ready(function() {
 		var pageId = dialog.attr('wid');
 		var stime = dialog.find(".starttime").val();
 		var sdate;
-		if(stime!=""){
-			sdate=parseDate(stime);
-			if((sdate.getTime()-new Date().getTime()) <= 0){
-				nps.info(nps.i18n('PROMPT_INFO'), "开始时间应大于当前时间");
-				return;
-			}
-		}
 		var etime=dialog.find(".endtime").val();
 		if(etime!=""){
 			var date=parseDate(etime);
@@ -359,12 +352,14 @@ $j(document).ready(function() {
 				addEditEvent(code,".cms-product-edit");
 				nps.info(nps.i18n('PROMPT_INFO'), "重置成功");
 				$j('.dialog-close').click();
+				window.location.reload();
 			}else{
 				nps.info(nps.i18n('PROMPT_INFO'), data.description);
 			}
 	
 		});
 	});
+	
 	$j('.cms-publish-dialog').on("click",".close",function(){
 		$j(this).parent().parent().dialogff({type : 'close'});
 	});

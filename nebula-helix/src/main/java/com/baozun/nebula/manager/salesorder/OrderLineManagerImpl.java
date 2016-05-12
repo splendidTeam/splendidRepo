@@ -26,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
+import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkOrderLineManager;
+import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
 import com.feilong.core.bean.BeanUtil;
 
@@ -39,6 +41,9 @@ public class OrderLineManagerImpl implements OrderLineManager {
 	
 	@Autowired
 	private SdkOrderLineManager lineManager;
+	
+	@Autowired
+        private SdkSkuManager sdkSkuManager;
 
 	@Override
 	public OrderLine findByPk(Long id) {
@@ -50,6 +55,9 @@ public class OrderLineManagerImpl implements OrderLineManager {
         List<OrderLineCommand> findOrderLinesByOrderId = lineManager.findOrderLinesByOrderId(orderId);
         List<SimpleOrderLineSubViewCommand> list=new ArrayList<SimpleOrderLineSubViewCommand>();
         for (OrderLineCommand orderLineCommand : findOrderLinesByOrderId) {
+            String properties = orderLineCommand.getSaleProperty();
+            List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+            orderLineCommand.setSkuPropertys(propList);
              SimpleOrderLineSubViewCommand slsv=new SimpleOrderLineSubViewCommand();
              BeanUtil.copyProperties(slsv, orderLineCommand);
              list.add(slsv);

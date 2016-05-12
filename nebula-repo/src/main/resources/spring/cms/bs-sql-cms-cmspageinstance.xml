@@ -117,9 +117,12 @@
 		       				#if($lifecycle)
 		       					and LIFECYCLE=:lifecycle
 		       				#end
-				       		#if($lifecycle)
-				       			and lifecycle =:lifecycle
-				       		#end
+		       				#if($isPublished)
+	       						and ISPUBLISHED = :isPublished
+	       					#end
+	       					#if($ispublished == false)
+		       					and ISPUBLISHED=:ispublished
+		       				#end
 		       				
                  ]]>
 			</value>
@@ -336,6 +339,27 @@
 		       				#if($lifecycle)
 		       					and LIFECYCLE=:lifecycle
 		       				#end
+		       				
+		       				#if($isPublished)
+	       						and ISPUBLISHED = :isPublished
+	       					#end
+	       					#if($isPublished == false)
+		       					and ISPUBLISHED=:isPublished
+		       				#end
+	       					
+		       				#if($startTimeStart)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTimeEnd)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+		       				
+		       				#if($endTimeStart)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTimeEnd)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
 		       		
                  ]]>
 			</value>
@@ -408,6 +432,12 @@
 		       				#if($lifecycle)
 		       					and LIFECYCLE=:lifecycle
 		       				#end
+		       				#if($isPublished)
+	       						and isPublished = :isPublished
+	       					#end
+	       					#if($isPublished == false)
+	       						and isPublished = :isPublished
+	       					#end
 		       		
                  ]]>
 			</value>

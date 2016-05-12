@@ -13,6 +13,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
+import com.baozun.nebula.command.i18n.LangProperty;
+import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.manager.product.ItemCollectionManager;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.SearchCondition;
@@ -359,6 +361,8 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		if (Validator.isNullOrEmpty(searchKeyWord)) {
 			return;
 		}
+		boolean i18n = LangProperty.getI18nOnOff();
+		
 		// 转义特殊字符
 		searchKeyWord = NebulaSolrQueryFactory.escape(searchKeyWord);
 
@@ -368,21 +372,51 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		// 各个字段的分数加起来总共等于1
 		qf.append(SkuItemParam.style + "^0.3" + SEPARATORCHARS_SPACE);
 		qf.append(SkuItemParam.itemCode + "^0.25" + SEPARATORCHARS_SPACE);
-		qf.append(SkuItemParam.title + "^0.15" + SEPARATORCHARS_SPACE);
-		qf.append(SkuItemParam.subTitle + "^0.15" + SEPARATORCHARS_SPACE);
-		qf.append(SkuItemParam.allCategoryCodes + "^0.1" + SEPARATORCHARS_SPACE);
-		qf.append(SkuItemParam.categoryname + "*^0.05");
+		qf.append(SkuItemParam.allCategoryCodes + "^0.15" + SEPARATORCHARS_SPACE);
+		if(i18n){
+			double titleScore=0.15;			
+			int langCount=MutlLang.i18nLangs().size();
+			double score=titleScore/langCount;
+			
+			for (int i = 0; i < langCount; i++){
+				String lang=MutlLang.i18nLangs().get(i);
+				qf.append(SkuItemParam.dynamic_title+lang + "^"+score + SEPARATORCHARS_SPACE);
+				if(i<langCount-1){
+					qf.append(SkuItemParam.dynamic_subTitle+lang + "^"+score + SEPARATORCHARS_SPACE);
+				}else{
+					qf.append(SkuItemParam.dynamic_subTitle+lang + "^"+score);
+				}
+			}
+		}else{
+			qf.append(SkuItemParam.title + "^0.15" + SEPARATORCHARS_SPACE);
+			qf.append(SkuItemParam.subTitle + "^0.15");
+		}
 
 		boost.setQf(qf.toString());
 
-		// 需要匹配的字段,以逗号分隔
+		// 需要匹配的字段,以空格分隔
 		StringBuffer pf = new StringBuffer();
 		pf.append(SkuItemParam.style + SEPARATORCHARS_SPACE);// 款号
 		pf.append(SkuItemParam.itemCode + SEPARATORCHARS_SPACE);// 商品code
-		pf.append(SkuItemParam.title + SEPARATORCHARS_SPACE);// 商品名称
-		pf.append(SkuItemParam.subTitle + SEPARATORCHARS_SPACE);// 副标题
 		pf.append(SkuItemParam.allCategoryCodes + SEPARATORCHARS_SPACE);// 分类code
-		pf.append(SkuItemParam.categoryname + "*");// 分类名称
+		if(i18n){
+			int langCount=MutlLang.i18nLangs().size();
+			for (int i = 0; i < langCount; i++){
+				String lang=MutlLang.i18nLangs().get(i);
+				
+				pf.append(SkuItemParam.dynamic_title+lang+ SEPARATORCHARS_SPACE);
+				if(i<langCount-1){
+					pf.append(SkuItemParam.dynamic_subTitle+lang+ SEPARATORCHARS_SPACE);
+				}else{
+					pf.append(SkuItemParam.dynamic_subTitle+lang);
+				}
+			}
+		}else{
+			pf.append(SkuItemParam.title + SEPARATORCHARS_SPACE);// 商品名称
+			pf.append(SkuItemParam.subTitle);// 副标题
+		}
+		
+		
 
 		boost.setPf(pf.toString());
 	}

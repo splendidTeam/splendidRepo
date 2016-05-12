@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<bean id="CmsModuleInstanceVersion.findAllCmsModuleInstanceVersionList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION 
+		       			 where lifecycle !=2
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsModuleInstanceVersion.findCmsModuleInstanceVersionListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="CmsModuleInstanceVersion.findCmsModuleInstanceListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+			       		select * from T_CMS_MODULE_INSTANCE_VERSION where 
+		       		
+		       			lifecycle !=2
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+		       			
+		       				#if($instanceId)
+		       					and INSTANCE_ID=:instanceId
+		       				#end
+		       				
+			       			#if($createTimeStart)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTimeEnd)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       			
+		       				#if($modifyTimeStart)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTimeEnd)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       			
+		       				#if($startTimeStart)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTimeEnd)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+		       				
+		       				#if($endTime)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTimeEnd)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       				#if($ispublished == true)
+		       					and ISPUBLISHED=:ispublished
+		       				#end
+		       				#if($ispublished == false)
+		       					and ISPUBLISHED=:ispublished
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsModuleInstanceVersion.findCmsModuleInstanceVersionListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION where 
+		       		
+		       			lifecycle !=2
+		       			
+		       				#if($name)
+		       					and NAME=:name
+		       				#end
+		       				#if($nameForLike)
+		       					and NAME like :nameForLike
+		       				#end
+
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+		       			
+		       				#if($instanceId)
+		       					and INSTANCE_ID=:instanceId
+		       				#end
+		       				
+			       			#if($createTimeStart)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTimeEnd)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       			
+		       				#if($modifyTimeStart)
+		       					and MODIFY_TIME >= :modifyTimeStart
+		       				#end
+		       				#if($modifyTimeEnd)
+		       					and MODIFY_TIME <= :modifyTimeEnd
+		       				#end
+		       			
+		       				#if($startTimeStart)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTimeEnd)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+		       				
+		       				#if($endTimeStart)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTimeEnd)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
+		       			
+		       				#if($lifecycle)
+		       					and LIFECYCLE=:lifecycle
+		       				#end
+
+		       				#if($ispublished)
+		       					and ISPUBLISHED=:ispublished
+		       				#end
+		       				#if($ispublished == false)
+		       					and ISPUBLISHED=:ispublished
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="CmsModuleInstanceVersion.findPublishNotOverModuleVersion" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select t1.*, t2.code from t_cms_module_instance_version t1 left JOIN t_cms_module_instance t2 on t1.instance_id = t2.id where t1.ispublished=true and t1.end_time>now()
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsModuleInstanceVersion.getPublishingModuleVersion" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_cms_module_instance_version t1 where t1.ispublished=true and t1.instance_id= :moduleId and t1.end_time>now()
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsModuleInstanceVersion.findModuleVersionInTimeQuantum" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION where instance_id = :moduleId and id != :versionId and ispublished=true and start_time >= :startTime and end_time <= :endTime
+		       		union
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION where instance_id = :moduleId and id != :versionId and ispublished=true and start_time <= :startTime and end_time >= :endTime
+		       		union
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION where instance_id = :moduleId and id != :versionId and ispublished=true and start_time <= :startTime and end_time <= :endTime and end_time >= :startTime
+		       		union
+		       		select * from T_CMS_MODULE_INSTANCE_VERSION where instance_id = :moduleId and id != :versionId and ispublished=true and start_time >= :startTime and start_time <= :endTime and end_time >= :endTime 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CmsModuleInstanceVersion.findPublishModuleVersion" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select * from t_cms_module_instance_version where lifecycle=1 and instance_id=:moduleId and ispublished=true and start_time <= :mtime and end_time >= :mtime
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsModuleInstanceVersion.removeCmsModuleInstanceVersionByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update T_CMS_MODULE_INSTANCE_VERSION
+		       		set lifecycle=2, ispublished=false
+		       		 where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+									   
+	<bean id="CmsModuleInstanceVersion.removeModuleVersionByModuleIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update T_CMS_MODULE_INSTANCE_VERSION
+		       		set lifecycle=2, ispublished=false
+		       		where instance_id
+		       		in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+
+	<bean id="CmsModuleInstanceVersion.cancelInstanceVersionInModuleId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+ 		       		update T_CMS_MODULE_INSTANCE_VERSION set ispublished=false where instance_id = :moduleId	
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+<!-- 	<bean id="CmsModuleInstance.removeCmsModuleInstanceByIds" class="loxia.dao.support.DynamicQueryHolder"> -->
+<!-- 		<description></description> -->
+<!-- 		<constructor-arg> -->
+<!-- 			<value> -->
+<!-- 				<![CDATA[   -->
+<!-- 		       		update T_CMS_MODULE_INSTANCE -->
+<!-- 		       		set lifecycle=2 -->
+<!-- 		       		 where  -->
+<!-- 		       		id in ( -->
+<!-- 		       		#foreach( $id in $ids ) -->
+<!--     					$id, -->
+<!-- 					 #end -->
+<!-- 		       		 -1) -->
+		       		 
+<!--                  ]]> -->
+<!-- 			</value> -->
+<!-- 		</constructor-arg> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id="CmsModuleInstance.findAllEffectCmsModuleInstanceList" class="loxia.dao.support.DynamicQueryHolder"> -->
+<!-- 		<description></description> -->
+<!-- 		<constructor-arg> -->
+<!-- 			<value> -->
+<!-- 				<![CDATA[   -->
+<!-- 		       		select * from T_CMS_MODULE_INSTANCE where lifecycle=1 -->
+		       		
+<!--                  ]]> -->
+<!-- 			</value> -->
+<!-- 		</constructor-arg> -->
+<!-- 	</bean> -->
+	
+<!-- 		<bean id="CmsModuleInstance.findEffectCmsModuleInstanceListByQueryMap" class="loxia.dao.support.DynamicQueryHolder"> -->
+<!-- 		<description></description> -->
+<!-- 		<constructor-arg> -->
+<!-- 			<value> -->
+<!-- 				<![CDATA[   -->
+<!-- 		       		select * from T_CMS_MODULE_INSTANCE where lifecycle=1 -->
+		       		
+					
+		       			
+<!-- 		       				#if($name) -->
+<!-- 		       					and NAME=:name -->
+<!-- 		       				#end -->
+<!-- 		       				#if($nameForLike) -->
+<!-- 		       					and NAME like :nameForLike -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($code) -->
+<!-- 		       					and CODE=:code -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($templateId) -->
+<!-- 		       					and TEMPLATE_ID=:templateId -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($createTime) -->
+<!-- 		       					and CREATE_TIME >= :createTimeStart -->
+<!-- 		       				#end -->
+<!-- 		       				#if($createTime) -->
+<!-- 		       					and CREATE_TIME <= :createTimeEnd -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($modifyTime) -->
+<!-- 		       					and MODIFY_TIME >= :modifyTimeStart -->
+<!-- 		       				#end -->
+<!-- 		       				#if($modifyTime) -->
+<!-- 		       					and MODIFY_TIME <= :modifyTimeEnd -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($lifecycle) -->
+<!-- 		       					and LIFECYCLE=:lifecycle -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($isPublished) -->
+<!-- 		       					and ISPUBLISHED=:isPublished -->
+<!-- 		       				#end -->
+		       		
+<!--                  ]]> -->
+<!-- 			</value> -->
+<!-- 		</constructor-arg> -->
+<!-- 	</bean>	 -->
+	
+<!-- 	<bean id="CmsModuleInstance.findEffectCmsModuleInstanceListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder"> -->
+<!-- 		<description></description> -->
+<!-- 		<constructor-arg> -->
+<!-- 			<value> -->
+<!-- 				<![CDATA[   -->
+<!-- 		       		select * from T_CMS_MODULE_INSTANCE where lifecycle=1 -->
+		       		
+					
+		       			
+<!-- 		       				#if($name) -->
+<!-- 		       					and NAME=:name -->
+<!-- 		       				#end -->
+<!-- 		       				#if($nameForLike) -->
+<!-- 		       					and NAME like :nameForLike -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($code) -->
+<!-- 		       					and CODE=:code -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($templateId) -->
+<!-- 		       					and TEMPLATE_ID=:templateId -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($createTime) -->
+<!-- 		       					and CREATE_TIME >= :createTimeStart -->
+<!-- 		       				#end -->
+<!-- 		       				#if($createTime) -->
+<!-- 		       					and CREATE_TIME <= :createTimeEnd -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($modifyTime) -->
+<!-- 		       					and MODIFY_TIME >= :modifyTimeStart -->
+<!-- 		       				#end -->
+<!-- 		       				#if($modifyTime) -->
+<!-- 		       					and MODIFY_TIME <= :modifyTimeEnd -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($lifecycle) -->
+<!-- 		       					and LIFECYCLE=:lifecycle -->
+<!-- 		       				#end -->
+
+		       			
+<!-- 		       				#if($isPublished) -->
+<!-- 		       					and ISPUBLISHED=:isPublished -->
+<!-- 		       				#end -->
+		       		
+<!--                  ]]> -->
+<!-- 			</value> -->
+<!-- 		</constructor-arg> -->
+<!-- 	</bean>	 -->
+<!-- 	<bean id="CmsModuleInstance.checkModuleInstanceCode" class="loxia.dao.support.DynamicQueryHolder"> -->
+<!-- 		<description></description> -->
+<!-- 		<constructor-arg> -->
+<!-- 			<value> -->
+<!-- 				<![CDATA[   -->
+<!-- 		       		select * from T_CMS_MODULE_INSTANCE where  -->
+<!-- 		       			lifecycle !=2 -->
+		       			
+<!-- 		       				#if($code) -->
+<!-- 		       					and CODE=:code -->
+<!-- 		       				#end -->
+		       			
+<!-- 		       				#if($id) -->
+<!-- 		       					and id !=:id -->
+<!-- 		       				#end -->
+<!--                  ]]> -->
+<!-- 			</value> -->
+<!-- 		</constructor-arg> -->
+<!-- 	</bean>	 -->
+	
+</beans>

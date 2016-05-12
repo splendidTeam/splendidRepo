@@ -58,10 +58,12 @@ public class SdkCmsModuleTemplateManagerImpl implements SdkCmsModuleTemplateMana
 			}
 			db.setImg(model.getImg());
 			db.setName(model.getName());
+			db.setVersion(new Date());
 			return cmsModuleTemplateDao.save(db);
 		}else{
 			model.setCreateTime(new Date());
 			model.setLifecycle(1);
+			model.setVersion(new Date());
 			return cmsModuleTemplateDao.save(model);
 		}
 	    

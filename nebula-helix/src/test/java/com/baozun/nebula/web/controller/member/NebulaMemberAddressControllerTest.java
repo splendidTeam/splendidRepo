@@ -226,10 +226,10 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 	public void testUpdateMemberAddress() {
 		// Record
 		MemberAddressForm memberAddressForm = new MemberAddressForm();
-		memberAddressForm.setProvince("上海市");
-		memberAddressForm.setCity("上海市");
-		memberAddressForm.setArea("静安区");
-		memberAddressForm.setTown("静安区");
+		memberAddressForm.setProvinceId(1L);
+		memberAddressForm.setCityId(1L);
+		memberAddressForm.setAreaId(1L);
+		memberAddressForm.setTownId(1L);
 		memberAddressForm.setAddress("上海市浦东新区川杨新苑三期");
 		memberAddressForm.setMobile("13023230767");
 		memberAddressForm.setName("wanghengheng");
@@ -271,10 +271,10 @@ public class NebulaMemberAddressControllerTest extends BaseControllerTest {
 		// Record
 		
 		MemberAddressForm memberAddressForm = new MemberAddressForm();
-		memberAddressForm.setProvince("上海市");
-		memberAddressForm.setCity("上海市");
-		memberAddressForm.setArea("静安区");
-		memberAddressForm.setTown("静安区");
+		memberAddressForm.setProvinceId(1L);
+		memberAddressForm.setCityId(1L);
+		memberAddressForm.setAreaId(1L);
+		memberAddressForm.setTownId(1L);
 		memberAddressForm.setAddress("上海市浦东新区川杨新苑三期");
 		memberAddressForm.setMobile("13023230767");
 		memberAddressForm.setName("wanghengheng");

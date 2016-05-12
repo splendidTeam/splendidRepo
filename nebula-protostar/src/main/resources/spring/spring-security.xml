@@ -88,4 +88,13 @@
 		<beans:property name="maxUploadSize" value="100000000" />
 	</beans:bean>
 	
+	<beans:bean class="com.baozun.nebula.security.SecurityConfig" >
+		<beans:property name="ignoreParameters">
+			<beans:set>
+				<beans:value>data</beans:value>
+				<beans:value>html</beans:value>
+			</beans:set>
+		</beans:property>
+	</beans:bean>
+	
 </beans:beans>  

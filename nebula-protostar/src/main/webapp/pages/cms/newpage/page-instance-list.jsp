@@ -39,7 +39,7 @@
 						<td><label>页面编码</label></td>
 						<td>
 							<span id="searchkeytext">
-								<input type="text" loxiaType="input" mandatory="false" id="code" name="q_sl_codeForLike" placeholder="页面编码" />
+								<input type="text" loxiaType="input" mandatory="false" id="code" name="q_string_code" placeholder="页面编码" />
 							</span>
 						</td>
 						<td><label>页面名称</label></td>

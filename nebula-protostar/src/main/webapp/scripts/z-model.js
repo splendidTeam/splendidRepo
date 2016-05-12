@@ -385,7 +385,7 @@ $j(window).load(function(){
 		}else{
 			$j(".cms-imgarticle-edit-dialog .imgarticle-info").hide();
 		}
-		$j('.cms-imgarticle-edit-dialog #code').val(areaCode);
+		$j('.cms-imgarticle-edit-dialog #areaCode').val(areaCode);
 		if(me.parent(".cms-imgarticle-edit").find(".cms-area-list-element").length>0){
 			//列表模式需要显示的内容
 			$j(".proto-dialog-button-line .add-tmp").show();
@@ -415,8 +415,8 @@ $j(window).load(function(){
 		$j('.dialog-close').click();
 	});
 	
-	/** dialog 确定*/
-	$j('.html-confrim').click(function(){
+	/** html编辑 dialog 确定*/
+	$j('.confrim-html').click(function(){
 		var areaCode = $j('.cms-html-edit-dialog #areaCode').val();
 		var areaHtml = $j('.cms-html-edit-dialog #areaHtml').val();
 		if($j.trim(areaCode) == ''){
@@ -436,7 +436,7 @@ $j(window).load(function(){
 				 areaHtml += editHtmlShade;
 			 }		 
 		});
-		
+		 
 		$j(".web-update").contents().find('[code="'+areaCode+'"]').empty();
 		$j(".web-update").contents().find('[code="'+areaCode+'"]').append(areaHtml);
 		addEditEvent(areaCode,".cms-html-edit");
@@ -446,9 +446,10 @@ $j(window).load(function(){
 //		alert($j("#isSaved").val());
 		$j('.dialog-close').click();
 	});
+	
 	/** 图文模式 dialog 确定*/
 	$j('.confrim-imgarticle').click(function(){
-		var areaCode = $j('.cms-imgarticle-edit-dialog #code').val();
+		var areaCode = $j('.cms-imgarticle-edit-dialog #areaCode').val();
 		if($j.trim(areaCode) == ''){
 			nps.info(nps.i18n('PROMPT_INFO'), nps.i18n('EDIT_AREA_CODE_NOT_EXISTS'));
 			return;
@@ -638,7 +639,7 @@ $j(window).load(function(){
 
 		$j(".cms-imgarticle-edit-dialog .proto-dialog-content").scrollTop(250*num);
 		//重新设置图文模式编辑事件
-		var areaCode = $j('.cms-imgarticle-edit-dialog #code').val();
+		var areaCode = $j('.cms-imgarticle-edit-dialog #areaCode').val();
 		addEditEvent(areaCode,".cms-imgarticle-edit");
 	});
 	
@@ -651,7 +652,7 @@ $j(window).load(function(){
 			if(num != null && num != ""){
 				removeTem(num);
 				//重新设置图文模式编辑事件
-				var areaCode = $j('.cms-imgarticle-edit-dialog #code').val();
+				var areaCode = $j('.cms-imgarticle-edit-dialog #areaCode').val();
 				addEditEvent(areaCode,".cms-imgarticle-edit");
 			}
 		});
@@ -691,7 +692,7 @@ $j(window).load(function(){
 	$j("body").on("click",".show-area",function(){
 		var me = $j(this);
 		var parent = me.parent();
-		var areaCode = parent.parent().find(".areaCode").val();
+		var areaCode = parent.parent().find("#areaCode").val();
 		nps.confirm("提示信息","确定要显示?",function(){
 			showOrHideEditArea("1",areaCode);
 			me.hide();
@@ -703,7 +704,7 @@ $j(window).load(function(){
 	$j("body").on("click",".hide-area",function(){
 		var me = $j(this);
 		var parent = me.parent();
-		var areaCode = parent.parent().find(".areaCode").val();
+		var areaCode = parent.parent().find("#areaCode").val();
 		nps.confirm("提示信息","确定要隐藏?",function(){
 			showOrHideEditArea("0",areaCode);
 			me.hide();
@@ -717,15 +718,27 @@ function  showOrHideEditArea(hide,areaCode){
 	var templateId;
 	var pageId;
 	var type =  $j('#type').val();
+	var versionId;
+	var json;
+	var editAreaHideUrl;
 	if(type=="page"){
 		 templateId =$j('#templateId').val();
 		 pageId = $j('#pageId').val();
+		 versionId = $j("#versionId").val();
 	}else{
 		 templateId =$j('#templateId').val();
 		 pageId = $j('#moduleId').val();
+		 versionId = $j("#versionId").val();
 	}
-	var json={"areaCode":areaCode,"templateId":templateId,"pageId":pageId ,"hide":hide,"type":"page"};
- 	nps.asyncXhrPost(base+"/cms/editAreaHide.json", json,{successHandler:function(data, textStatus){
+	if(versionId != null && versionId != ""){
+		json={"areaCode":areaCode,"templateId":templateId,"pageId":pageId , "versionId":versionId, "hide":hide,"type":type};
+		editAreaHideUrl = base+"/cms/editAreaVersionHide.json";
+	}else{
+		json={"areaCode":areaCode,"templateId":templateId,"pageId":pageId , "hide":hide,"type":type};
+		editAreaHideUrl = base+"/cms/editAreaHide.json";
+	}
+	
+ 	nps.asyncXhrPost(editAreaHideUrl, json,{successHandler:function(data, textStatus){
 			if (data.isSuccess) {
 				$j("#isSaved").val(false);
 				if(hide==1){

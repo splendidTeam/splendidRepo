@@ -1138,11 +1138,11 @@
 	</bean>
 	
 	<bean id="SalesOrder.findSimpleOrderByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询订单列表</description>
+		<description>查询订单分页列表</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-					select 
+				select 
 					o.ID as orderId,
 					o.CODE as orderCode,
 					o.CREATE_TIME as createTime,
@@ -1151,8 +1151,23 @@
 					o.FINANCIAL_STATUS as financialStatus,
 					o.PAYMENT,
 					o.TOTAL ,
-					o.DISCOUNT
+					o.DISCOUNT,
+					mytable2.isRate
 					from t_so_salesorder as o
+					inner join (
+							select DISTINCT line.order_id as id from t_so_orderline line 
+							) mytable on mytable.id = o.id
+					inner join(
+					        select id,
+                        CASE when id not in(select line.order_id 	
+						from t_pd_item_rate rate
+						inner join t_mem_member member on rate.member_id = member.id
+						inner join t_so_orderline line  on line.id = rate.order_line_id
+						where member.id = 17
+						group by line.order_id ) then 0
+                          else 1 end as isRate
+                        from t_so_salesorder
+					) mytable2 on mytable2.id=o.id
 					where 1=1
 					#if($code)
 						and o.CODE like :orderCode
@@ -1182,6 +1197,53 @@
 				    #end
 				     -1)
 					#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SalesOrder.findSimpleOrderListByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询订单list列表or</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+					o.ID as orderId,
+					o.CODE as orderCode,
+					o.CREATE_TIME as createTime,
+					o.LOGISTICS_STATUS as logisticsStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.FINANCIAL_STATUS as financialStatus,
+					o.PAYMENT,
+					o.TOTAL ,
+					o.DISCOUNT
+					from t_so_salesorder as o
+					inner join (
+							select line.order_id as id,string_agg(line.item_pic,',') as itemPics from t_so_orderline line group by line.order_id 
+							) mytable on mytable.id = o.id
+					where o.ID not in 
+						(
+						select line.order_id 	
+						from t_pd_item_rate rate
+						inner join t_mem_member member on rate.member_id = member.id
+						inner join t_so_orderline line  on line.id = rate.order_line_id
+						where member.id = :memberId
+						group by line.order_id
+						)
+						and o.MEMBER_ID = :memberId
+					or o.LOGISTICS_STATUS 
+					in (
+		       		#foreach( $ls in $logisticsStatusList )
+    					$ls,
+				    #end
+				     -1)
+					or o.financial_status 
+					in (
+		       		#foreach( $ls in $financestatusList )
+    					$ls,
+				    #end
+				     -1)
+					
                  ]]>
 			</value>
 		</constructor-arg>

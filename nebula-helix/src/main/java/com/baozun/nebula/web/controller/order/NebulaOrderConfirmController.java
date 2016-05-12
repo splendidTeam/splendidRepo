@@ -282,9 +282,9 @@ public class NebulaOrderConfirmController extends BaseController {
 		salesOrderResolver.updateCookieShoppingcartCount(memberDetails, request, response);
 
 		// 将订单创建成功后的信息返回给前端，创建支付链接用
-		SalesOrderReturnObject alesOrderReturnObject = createReturnObject(subOrdinate);
+		SalesOrderReturnObject salesOrderReturnObject = createReturnObject(subOrdinate);
 		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
-		result.setReturnObject(alesOrderReturnObject);
+		result.setReturnObject(salesOrderReturnObject);
 		return result;
 	}
 
@@ -295,7 +295,7 @@ public class NebulaOrderConfirmController extends BaseController {
 	 *            the member details
 	 * @return the shoppingcart resolver
 	 */
-	private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
+	protected ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
 		return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
 	}
 

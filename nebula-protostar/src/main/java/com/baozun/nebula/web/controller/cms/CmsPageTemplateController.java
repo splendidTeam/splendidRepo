@@ -35,17 +35,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import com.baozun.nebula.manager.CacheManager;
+import com.baozun.nebula.manager.cms.pageinstance.CmsPageInstanceManager;
 import com.baozun.nebula.manager.cms.pagetemplate.PageTemplateManager;
 import com.baozun.nebula.manager.system.UploadManager;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
+import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
+import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
-import com.baozun.nebula.utilities.common.Validator;
+import com.baozun.nebula.sdk.manager.SdkCmsTemplateHtmlManager;
 import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.zk.ZooKeeperOperator;
+import com.feilong.core.Validator;
 
 /**
  * @author jumbo
@@ -72,7 +78,25 @@ public class CmsPageTemplateController extends BaseController {
 
 	@Autowired
 	private PageTemplateManager			pageTemplateManager;
-
+	
+	@Autowired
+	private CacheManager cacheManager;
+	
+	@Autowired
+	private CmsPageInstanceManager cmsPageInstanceManager;
+	
+	@Autowired
+	private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
+	
+	@Autowired
+	private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;
+	
+	@Autowired
+	private SdkCmsEditAreaManager sdkCmsEditAreaManager;
+	
+	@Autowired
+	private ZooKeeperOperator zooKeeperOperator;
+	
 	/** 进去模板列表 */
 	@RequestMapping(value = "/newcms/pageTemplateList.htm")
 	public String entryTemplateList(Model model) {
@@ -113,7 +137,6 @@ public class CmsPageTemplateController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("/cms/savePageTemplate.json")
-	// @ResponseBody
 	public String saveTemplate(CmsPageTemplate cmd, @RequestParam("templateFile") CommonsMultipartFile templateFile,
 			HttpServletRequest request, HttpServletResponse response, Model model) {
 		if (templateFile.getSize() > 0) {
@@ -193,4 +216,6 @@ public class CmsPageTemplateController extends BaseController {
 		sdkCmsPageTemplateManager.removeCmsPageTemplateByIds(ids);
 		return "success";
 	}
+	
+	
 }

@@ -199,5 +199,7 @@ public class SdkCmsEditAreaManagerImpl implements SdkCmsEditAreaManager {
 		return cmsEditAreaDao.queryEditAreaHide(paraMap);
 	}
 
+
+
 	
 }

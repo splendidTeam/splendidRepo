@@ -25,6 +25,7 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.cms.CmsModuleInstance;
+import com.baozun.nebula.model.cms.CmsTemplateHtml;
 
 /**
  * CmsModuleInstanceManager
@@ -132,7 +133,7 @@ public interface SdkCmsModuleInstanceManager extends BaseManager{
 	* String   
 	* @throws
 	 */
-	String findUpdatedCmsModuleInstance(Long templateId, Long moduleId, Boolean isEdit) ;
+	//String findUpdatedCmsModuleInstance(Long templateId, Long moduleId, Boolean isEdit) ;
 	
 	/**
 	 * 保存模块实例
@@ -169,7 +170,7 @@ public interface SdkCmsModuleInstanceManager extends BaseManager{
 	* String   
 	* @throws
 	 */
-	String recoverTemplateCodeArea(Long templateId, String code);
+	String recoverTemplateCodeArea(Long templateId, Long versionId, String code);
 	/**
 	 * 
 	* @author 何波
@@ -186,5 +187,26 @@ public interface SdkCmsModuleInstanceManager extends BaseManager{
 	* Map<String,String>   
 	* @throws
 	 */
-	Map<String, String>  getModuleMap();
+	Map<String, CmsTemplateHtml>  getModuleMap();
+
+	//public String getPublishData(List<CmsPublished> editAreaList, Long templateId);
+
+//	public String getInstancePublishData(List<CmsEditArea> editAreaList,
+//			Long templateId);
+
+//	/**
+//	 * 获取页面内容
+//	 * @param editAreaList
+//	 * @param templateId
+//	 * @return
+//	 */
+//	public <T> String getHtmlDataByArea(List<T> editAreaList, Long templateId);
+
+	/**
+	 *根据templateId来获取module实例
+	 * @param ids
+	 * @return
+	 */
+	public List<CmsModuleInstance> findCmsModuleInstanceListByTemplateIds(List<Long> ids);
+
 }

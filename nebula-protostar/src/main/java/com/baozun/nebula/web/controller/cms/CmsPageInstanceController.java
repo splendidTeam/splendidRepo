@@ -52,11 +52,13 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
 import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
+import com.baozun.nebula.sdk.manager.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
 
 /**
  * 模板页面控制器
@@ -80,7 +82,9 @@ public class CmsPageInstanceController extends BaseController {
 	@Autowired
 	private SdkCmsEditAreaManager sdkCmsEditAreaManager;
 	@Autowired
-	private  SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
+	private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
+	@Autowired
+	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
 	/**
 	 * 通过模板ID查询对应管理页面
 	 * 
@@ -158,7 +162,7 @@ public class CmsPageInstanceController extends BaseController {
 			@RequestParam(value="pageId", required=false) Long pageId,
 			@RequestParam("isEdit") Boolean isEdit){
 		/** 模板信息 */
-		String data = cmsPageInstanceManager.findUpdatedCmsPageInstance(templateId, pageId, isEdit);
+		String data = sdkCmsParseHtmlContentManager.getTemplatePageData(templateId, pageId, null, isEdit);
 		model.addAttribute("data", data);
 		return "/cms/newpage/page-instance-iframe";
 	}
@@ -274,12 +278,6 @@ public class CmsPageInstanceController extends BaseController {
 	@ResponseBody
 	public Object publishPageInstance(@RequestParam("pageId") Long pageId,@RequestParam("startTime")Date startTime,@RequestParam("endTime")Date endTime){
 		BackWarnEntity back = new BackWarnEntity();
-		if(startTime != null){
-			if(startTime.compareTo(new Date())<=0){
-				back.setDescription("开始时间应大于当前时间");
-				return back;
-			}
-		}
 		if(startTime == null && endTime!=null){
 			if(endTime.compareTo(new Date())<=0){
 				back.setDescription("结束时间应大于当前时间");
@@ -291,6 +289,10 @@ public class CmsPageInstanceController extends BaseController {
 				back.setDescription("开始时应大于间结束时间");
 				return back;
 			}
+		}	
+		if(!checkPublishedPageInstance(pageId,startTime,endTime)){
+			back.setDescription("当前页面发布时间与其版本页面的发布时间有冲突");
+			return back;
 		}
 		cmsPageInstanceManager.publishPageInstance(pageId,startTime,endTime);
 		return SUCCESS;
@@ -344,7 +346,7 @@ public class CmsPageInstanceController extends BaseController {
 	public BackWarnEntity editCmsPageTemplate(CmsPageTemplate cmd,String repeatData) throws UnsupportedEncodingException {
 		try {
 			String data = cmd.getData();
-			if(data!=null && repeatData!=null && repeatData!=""){
+			if(Validator.isNotNullOrEmpty(data) && Validator.isNotNullOrEmpty(repeatData)){
 				String repeat =URLDecoder.decode(repeatData, "UTF-8");
 				String[] repeats =  repeat.split("repeat,");
 				if(repeats!=null && repeats.length>0){
@@ -372,10 +374,10 @@ public class CmsPageInstanceController extends BaseController {
 	
 	@RequestMapping("/cms/recoverTemplateCodeArea.json")
 	@ResponseBody
-	public BackWarnEntity recoverTemplateCodeArea(Long templateId,String code) throws UnsupportedEncodingException {
+	public BackWarnEntity recoverTemplateCodeArea(Long templateId,String code, Long versionId) throws UnsupportedEncodingException {
 		BackWarnEntity back = new BackWarnEntity();
 		try {
-			String data = pageTemplateManager.recoverTemplateCodeArea(templateId, code);
+			String data = pageTemplateManager.recoverTemplateCodeArea(templateId, code, versionId);
 			back.setIsSuccess(true);
 			back.setDescription(data);
 			return back;
@@ -387,30 +389,27 @@ public class CmsPageInstanceController extends BaseController {
 	
 	}
 	
-	
 	@RequestMapping("/cms/editAreaHide.json")
 	@ResponseBody
-	public BackWarnEntity editAreaHide(Long pageId,Long templateId,String areaCode,String type,int hide) throws UnsupportedEncodingException {
+	public BackWarnEntity editAreaHide(Long pageId,Long templateId,Long versionId,String areaCode,String type,int hide) throws UnsupportedEncodingException {
 		BackWarnEntity back = new BackWarnEntity();
 		try {
-			log.info("进入try  /cms/editAreaHide.json ,参数为pageId="+pageId+", templateId="+templateId+", areaCode="+areaCode+", type= "+type);
 			Map<String, Object> paraMap = new HashMap<String, Object>();
 			paraMap.put("pageId", pageId);
 			paraMap.put("templateId", templateId);
 			paraMap.put("areaCode", areaCode);
 			paraMap.put("type", type);
+			paraMap.put("version", versionId);
 			if(sdkCmsEditAreaManager.queryEditAreaHide(paraMap)== null){
 				back.setDescription("编辑区域尚未保存过,请先保存");
 				back.setIsSuccess(false);
 				return back;
 			}
 			paraMap.put("hide", hide);
-			log.info("准备查询paraMap="+paraMap.toString());
 			sdkCmsEditAreaManager.editAreaHide(paraMap);
 			back.setIsSuccess(true);
 			return back;
 		} catch (BusinessException e) {
-			log.info("进入catch message="+e.getMessage()+",  /cms/editAreaHide.json ,参数为pageId="+pageId+", templateId="+templateId+", areaCode="+areaCode+", type= "+type);
 			back.setDescription(e.getMessage());
 			back.setIsSuccess(false);
 			return back;
@@ -444,11 +443,10 @@ public class CmsPageInstanceController extends BaseController {
 	
 	@RequestMapping("/cms/getItemEditArea.json")
 	@ResponseBody
-	public BackWarnEntity getItemEditArea(@RequestParam("editArea")String editArea) throws UnsupportedEncodingException {
+	public BackWarnEntity getItemEditArea(String editArea) throws UnsupportedEncodingException {
 		BackWarnEntity back = new BackWarnEntity();
 		try {
-			String neweditArea = editArea.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;" ,"'" ).replaceAll("&quot;" ,"\"").replaceAll("&amp;", "&");
-			Document document = Jsoup.parse(neweditArea);
+			Document document = Jsoup.parse(editArea);
 			Elements eles = document.select(".cms-product-edit");
 			if(eles != null && eles.size()!=0){
 				String data = sdkCmsPageInstanceManager.setProductInfo(eles.get(0), true);
@@ -462,5 +460,25 @@ public class CmsPageInstanceController extends BaseController {
 			return back;
 		}
 	
+	}
+	
+	private boolean checkPublishedPageInstance(Long pageId, Date startTime, Date endTime){
+		Map<String, Date> timeRang = sdkCmsPageInstanceManager.getPublishedPageInstanceVersionsTimeRang(pageId);
+		if(Validator.isNotNullOrEmpty(timeRang)){
+			Date firstTime = timeRang.get("firstTime");
+			Date lastTime = timeRang.get("lastTime");
+			if(Validator.isNotNullOrEmpty(startTime) && startTime.compareTo(firstTime)<=0 && Validator.isNotNullOrEmpty(endTime) &&endTime.compareTo(lastTime) >=0){
+				return true;
+			}else if(Validator.isNullOrEmpty(startTime) && Validator.isNotNullOrEmpty(endTime) &&endTime.compareTo(lastTime) >=0){
+				return true;
+			}else if(Validator.isNotNullOrEmpty(startTime) && startTime.compareTo(firstTime)<=0 && Validator.isNullOrEmpty(endTime)){
+				return true;
+			}else if(Validator.isNullOrEmpty(startTime) && Validator.isNullOrEmpty(endTime)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		return true;
 	}
 }

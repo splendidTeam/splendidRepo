@@ -7,21 +7,21 @@ package com.baozun.nebula.constant;
  */
 public class ThirdPartyLoginBindConstants {
     /**用户不存在*/
-    public static final String MEMBER_NOT_EXIST_ERROR ="member_not_exist_error" ;
+    public static final String MEMBER_NOT_EXIST_ERROR ="message_member_not_exist_error" ;
     
     /**已绑定错误*/
-    public static final String MEMBER_HAS_BIND_ERROR ="member_has_bind_error" ;
+    public static final String MEMBER_HAS_BIND_ERROR ="message_member_has_bind_error" ;
     
     /**绑定失败*/
-    public static final String BIND_ACCOUNT_FAILED ="bind_account_failed" ;
+    public static final String BIND_ACCOUNT_FAILED ="message_bind_account_failed" ;
     
     /**绑定成功*/
-    public static final String BIND_ACCOUNT_SUCCESS ="bind_account_success" ;
+    public static final String BIND_ACCOUNT_SUCCESS ="message_bind_account_success" ;
     
     /**用户名密码不正确*/
-    public static final String LOGINNAME_PWD_ERROR ="loginname_pwd_errow" ;
+    public static final String LOGINNAME_PWD_ERROR ="message_loginname_pwd_errow" ;
     
     /**创建用户行为错误*/
-    public static final String CREATE_MEMBERBEHAVIORSTATUS_ERROR ="create_memberBehaviorStatus_error" ;
+    public static final String CREATE_MEMBERBEHAVIORSTATUS_ERROR ="message_create_memberBehaviorStatus_error" ;
 
 }

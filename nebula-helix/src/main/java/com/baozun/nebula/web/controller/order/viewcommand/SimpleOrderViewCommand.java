@@ -58,6 +58,10 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
 
     /** //TODO feilong 总价. */
     private BigDecimal                          total;
+    /**
+     * 是否评论 0 未评论 1位评论
+     */
+    private int                                  isRate;
 
     /**
      * 获得 订单code.
@@ -210,4 +214,14 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     public void setOrderId(Long orderId){
         this.orderId = orderId;
     }
+
+    public int getIsRate() {
+        return isRate;
+    }
+
+    public void setIsRate(int isRate) {
+        this.isRate = isRate;
+    }
+    
+    
 }

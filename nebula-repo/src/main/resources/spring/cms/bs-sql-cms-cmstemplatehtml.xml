@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="CmsTemplateHtml.findCmsTemplateHtmlByModuleCodeAndVersionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_TEMPLATE_HTML where MODULE_CODE = :moduleCode and VERSION_ID = :versionId   		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CmsTemplateHtml.findCmsTemplateHtmlListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_TEMPLATE_HTML where 
+		       		
+		       			lifecycle !=2
+		       			
+		       				#if($moduleCode)
+		       					and MODULE_CODE=:moduleCode
+		       				#end
+		       				#if($pageCode)
+		       					and PAGE_CODE =:pageCode
+		       				#end
+
+		       				#if($templateId)
+		       					and TEMPLATE_ID=:templateId
+		       				#end
+		       			
+		       				#if($instanceId)
+		       					and INSTANCE_ID=:instanceId
+		       				#end
+		       				
+			       			#if($createTimeStart)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTimeEnd)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       			
+		       				#if($startTimeStart)
+		       					and START_TIME >= :startTimeStart
+		       				#end
+		       				#if($startTimeEnd)
+		       					and START_TIME <= :startTimeEnd
+		       				#end
+		       				
+		       				#if($endTimeStart)
+		       					and END_TIME >= :endTimeStart
+		       				#end
+		       				#if($endTimeEnd)
+		       					and END_TIME <= :endTimeEnd
+		       				#end
+
+		       				#if($versionId)
+		       					and VERSION_ID=:versionId
+		       				#end
+		       					       				
+		       				#if($lifecycle)
+		       					and lifecycle = :lifecycle
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CmsTemplateHtml.removeCmsTemplateHtml" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_TEMPLATE_HTML set lifecycle = 2 where ID = :id   		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CmsTemplateHtml.removeCmsTemplateHtmlByModuleCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_TEMPLATE_HTML set lifecycle = 2 where MODULE_CODE = :moduleCode  		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	<bean id="CmsTemplateHtml.removeCmsTemplateHtmlByPageCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_CMS_TEMPLATE_HTML set lifecycle = 2 where PAGE_CODE = :pageCode  		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="CmsTemplateHtml.findCmsTemplateHtmlByPageCodeAndVersionId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_CMS_TEMPLATE_HTML where PAGE_CODE = :pageCode and VERSION_ID = :versionId  		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+			
+</beans>

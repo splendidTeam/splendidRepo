@@ -53,7 +53,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 	private static final String			SEARCH_NO_RESULT		= "item.search-no-result";
 
-	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommond";
+	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommand";
 
 	@Autowired
 	@Qualifier("solrQueryConvert")

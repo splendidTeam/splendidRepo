@@ -56,26 +56,22 @@ public class MemberAddressForm extends BaseForm {
 	 * 联系EMAIL
 	 */
 	private String email;
-
-	/**
-	 * 省
-	 */
-	private String province;
 	
-	/**
-	 * 市
-	 */
-	private String city;
+	
+	/** 国家 */
+	private Long 				countryId; 
 
-	/**
-	 * 区
-	 */
-	private String area;
-
-	/**
-	 * 镇
-	 */
-	private String town;
+	/** 省 */
+	private Long				provinceId;
+	
+	/** 市 */
+	private Long			    cityId;
+	
+	/** 区 */
+	private Long			    areaId;
+	
+	/** 镇*/
+	private Long				townId;
 
 	/**
 	 * 地址
@@ -97,61 +93,7 @@ public class MemberAddressForm extends BaseForm {
 	 */
 	private boolean isDefault;
 
-	/**
-	 * @return the province
-	 */
-	public String getProvince() {
-		return province;
-	}
-
-	/**
-	 * @param province the province to set
-	 */
-	public void setProvince(String province) {
-		this.province = province;
-	}
-
-	/**
-	 * @return the city
-	 */
-	public String getCity() {
-		return city;
-	}
-
-	/**
-	 * @param city the city to set
-	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	/**
-	 * @return the area
-	 */
-	public String getArea() {
-		return area;
-	}
-
-	/**
-	 * @param area the area to set
-	 */
-	public void setArea(String area) {
-		this.area = area;
-	}
-
-	/**
-	 * @return the town
-	 */
-	public String getTown() {
-		return town;
-	}
-
-	/**
-	 * @param town the town to set
-	 */
-	public void setTown(String town) {
-		this.town = town;
-	}
+	
 
 	/**
 	 * @return the id
@@ -309,6 +251,46 @@ public class MemberAddressForm extends BaseForm {
 	 */
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
+	}
+
+	public Long getProvinceId() {
+		return provinceId;
+	}
+
+	public void setProvinceId(Long provinceId) {
+		this.provinceId = provinceId;
+	}
+
+	public Long getCityId() {
+		return cityId;
+	}
+
+	public void setCityId(Long cityId) {
+		this.cityId = cityId;
+	}
+
+	public Long getAreaId() {
+		return areaId;
+	}
+
+	public void setAreaId(Long areaId) {
+		this.areaId = areaId;
+	}
+
+	public Long getTownId() {
+		return townId;
+	}
+
+	public void setTownId(Long townId) {
+		this.townId = townId;
+	}
+
+	public Long getCountryId() {
+		return countryId;
+	}
+
+	public void setCountryId(Long countryId) {
+		this.countryId = countryId;
 	}
 	
 }

@@ -223,7 +223,7 @@ public class SalesOrder extends BaseModel{
 	private Long				memberId;
 	
 	/** 店铺id*/
-	private Long                shopId;
+	private Long                             shopId;
 	
 	/** 会员名称*/
 	private String				memberName;

@@ -27,7 +27,6 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
-
 import com.baozun.nebula.model.cms.CmsEditArea;
 
 /**
@@ -162,4 +161,5 @@ public interface CmsEditAreaDao extends GenericEntityDao<CmsEditArea,Long>{
 	
 	@NativeQuery(model = CmsEditArea.class)
 	CmsEditArea queryEditAreaHide(@QueryParam Map<String, Object> paraMap);
+
 }

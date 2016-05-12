@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.cms.CmsPageTemplateDao;
 import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
+import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
 import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 
@@ -56,6 +57,8 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	@Autowired
 	private CmsPageTemplateDao cmsPageTemplateDao;
 
+	@Autowired
+	private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
 	/**
 	 * 静态base标识
 	 */
@@ -80,7 +83,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * 保存CmsPageTemplate
 	 * 
 	 */
-	@Override
 	public CmsPageTemplate saveCmsPageTemplate(CmsPageTemplate model){
 		model.setCreateTime(new Date());
 		model.setLifecycle(BaseModel.LIFECYCLE_ENABLE);
@@ -91,7 +93,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * 通过id获取CmsPageTemplate
 	 * 
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public CmsPageTemplate findCmsPageTemplateById(Long id){
 	
@@ -102,7 +103,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * 获取所有CmsPageTemplate列表
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public List<CmsPageTemplate> findAllCmsPageTemplateList(){
 		
@@ -114,7 +114,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param ids
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public List<CmsPageTemplate> findCmsPageTemplateListByIds(List<Long> ids){
 	
@@ -126,7 +125,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param paraMap
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public List<CmsPageTemplate> findCmsPageTemplateListByQueryMap(Map<String, Object> paraMap){
 	
@@ -141,7 +139,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param sorts 
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public Pagination<CmsPageTemplate> findCmsPageTemplateListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
 	
@@ -156,7 +153,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param ids
 	 * @return
 	 */
-	@Override
 	public void enableOrDisableCmsPageTemplateByIds(List<Long> ids,Integer state){
 		cmsPageTemplateDao.enableOrDisableCmsPageTemplateByIds(ids,state);
 	}
@@ -167,11 +163,41 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param ids
 	 * @return
 	 */
-	@Override
 	public void removeCmsPageTemplateByIds(List<Long> ids){
+//		for(Long tempid : ids){
+//			if(!CheckPublishedInstanceInTemplate(tempid)){
+//				HashMap<String, Object> param = new HashMap<String, Object>();
+//				param.put("templateId", tempid);
+//				param.put("isPublished", false);
+//				List<CmsPageInstance> cancelInstances = sdkCmsPageInstanceManager.findEffectCmsPageInstanceListByQueryMap(param);
+//				List<Long> instanceIds = new ArrayList<Long>();
+//				for(CmsPageInstance cancelInstance : cancelInstances){
+//					instanceIds.add(cancelInstance.getId());
+//				}
+//				sdkCmsPageInstanceManager.removeCmsPageInstanceByIds(instanceIds);
+//			}else{
+//				return PublishResult.REMOVETEMPLATEEXISTPUBLISHEDINSTANCE;				
+//			}
+//		}
+		
 		cmsPageTemplateDao.removeCmsPageTemplateByIds(ids);
+		//return PublishResult.SUCCESS;
 	}
 	
+//	/**
+//	 * 检测模板是否包含已发布的实例
+//	 * @param tempid 模板id
+//	 */
+//	private boolean CheckPublishedInstanceInTemplate(Long tempid){
+//		Map<String, Object> param = new HashMap<String, Object>();
+//		param.put("templateId", tempid);
+//		param.put("isPublished", true);
+//		List<CmsPageInstance> cmsPageInstances = sdkCmsPageInstanceManager.findEffectCmsPageInstanceListByQueryMap(param);
+//		if(Validator.isNotNullOrEmpty(cmsPageInstances) && cmsPageInstances.size()>0){
+//			return true;
+//		}
+//		return false;
+//	}
 	
 	/**
 	 * 获取有效的CmsPageTemplate列表
@@ -179,7 +205,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param ids
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public List<CmsPageTemplate> findAllEffectCmsPageTemplateList(){
 	
@@ -192,7 +217,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param paraMap
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public List<CmsPageTemplate> findEffectCmsPageTemplateListByQueryMap(Map<String, Object> paraMap){
 	
@@ -208,7 +232,6 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 	 * @param sorts 
 	 * @return
 	 */
-	@Override
 	@Transactional(readOnly=true)
 	public Pagination<CmsPageTemplate> findEffectCmsPageTemplateListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
 	
@@ -229,22 +252,16 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 		Elements imgs=doc.select("img");
 		for(Element ele:imgs){
 			String src=ele.attr("src");
-			if(StringUtils.isBlank(src)){
+			if(StringUtils.isBlank(src) || src.indexOf("version=") != -1){
 				continue;
+			}else if(src.startsWith("/")){
+				src=STATIC_BASE_CHAR+src+"?"+VERSION;
+			}else if(!src.startsWith("http")){
+				src=STATIC_BASE_CHAR+"/"+src+"?"+VERSION;
+			}else if(src.startsWith(imgbase)){
+				src=IMG_BASE_CHAR+"/"+src.replace(imgbase, "")+"?"+VERSION;
 			}
 			
-			if (!src.startsWith("http://") && !src.startsWith("https://")
-					&& !src.startsWith("//")) {
-				src = STATIC_BASE_CHAR.concat(src.startsWith("/") ? "" : "/")
-						.concat(src).concat("?").concat(VERSION);
-			}
-
-			// 这里做这一步是为了，假设有一天服务器搬迁了，那么只需要更改配置文件中的内容就可以了，而不需要修改数据库中的内容，更加灵活一点。
-			if (src.startsWith(imgbase)) {
-				src = IMG_BASE_CHAR + "/" + src.replace(imgbase, "") + "?"
-						+ VERSION;
-			}
-
 			ele.attr("src", src);
 		}
 		
@@ -352,5 +369,5 @@ public class SdkCmsPageTemplateManagerImpl implements SdkCmsPageTemplateManager 
 		html = html.replace(IMG_BASE_CHAR, imgbase);
 		
 		return html;
-	};
+	}
 }

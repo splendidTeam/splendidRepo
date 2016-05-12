@@ -367,4 +367,37 @@ public class Constants {
 	/** [{0}] 庫存不足*/
 	public static final String SHOPPINGCART_SKU_UNDERSTOCK	=	"30007";
 	/********************************************** 购物车  end******************/
+	
+	/********************************************** cms发布结果 ******************************************/
+	/* 实例发布成功 */
+	public static final String CMS_PUBLISH_SUCCESS = "实例发布成功";	
+	/* 实例发布失败 */
+	public static final String CMS_PUBLISH_ERROR = "实例发布失败，请重新发布";	
+	/* 已有页面模块在该时段发布 */
+	public static final String CMS_EXISTPUBLISHINSTANCE = "已有页面模块在该时段发布了，请重新调整时间";	
+	/* 页面已取消 */
+	public static final String CMS_INSTANCE_CANCELED = "页面已取消";	
+	/* 页面实例没有发布 */
+	public static final String CMS_INSTANCE_NOTPUBLISH = "页面实例没有发布";
+	/* 删除模板包含发布实例 */
+	public static final String CMS_REMOVE_TEMPLATEEXISTPUBLISHEDINSTANCE = "删除模板包含发布实例";
+	
+	/* 版本拷贝成功 */
+	public static final String CMS_COPY_SUCCESS = "版本拷贝成功";
+	/* 版本拷贝失败*/
+	public static final String CMS_COPY_ERROR = "版本拷贝失败";
+	/* 不存在拷贝的版本 */
+	public static final String CMS_COPY_NOEXISTVERSION = "不存在拷贝的版本";
+	
+	/********************************************** 默认排序设置end ******************/
+	
+	/**
+	 * CMS页面类型
+	 */
+	public static final int CMS_PAGE = 0;
+	/**
+	 * CMS模块类型
+	 */
+	public static final int CMS_MODULE = 1;
+	
 }

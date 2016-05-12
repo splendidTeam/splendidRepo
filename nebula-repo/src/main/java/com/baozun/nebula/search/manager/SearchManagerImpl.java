@@ -219,9 +219,7 @@ public class SearchManagerImpl implements SearchManager{
 		}
 
 		Integer start = (currentPage - 1) * size;
-		Long count = Long.parseLong(list.size() + "");
-
-		return convertSearchPageFacet(start, size, count, list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
+		return convertSearchPageFacet(start, size, solrGroupData.getNumFound(), list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
 	}
 
 	/**
