@@ -110,6 +110,7 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 				oldPage.setData(newData);
 			}
 			oldPage.setModifyTime(new Date());
+			
 			return oldPage;
 		}else{
 			throw new BusinessException("id is null");
@@ -121,8 +122,10 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 	@Override
 	public CmsPageTemplate findCmsPageTemplateById(Long templateId) {
 		CmsPageTemplate cmsPageTemplate = sdkCmsPageTemplateManager.findCmsPageTemplateById(templateId);
+		
 		return cmsPageTemplate;
 	}
+	@SuppressWarnings("deprecation")
 	@Override
 	public String findUpdatedCmsPageInstance(Long templateId) {
 		CmsPageTemplate template = sdkCmsPageTemplateManager.findCmsPageTemplateById(templateId);
@@ -131,6 +134,7 @@ public class PageTemplateManagerImpl implements PageTemplateManager{
 		return data;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public String recoverTemplateCodeArea(Long templateId, String code, Long versionId) {
 		Map<String, Object> paraMap = new HashMap<String, Object>();

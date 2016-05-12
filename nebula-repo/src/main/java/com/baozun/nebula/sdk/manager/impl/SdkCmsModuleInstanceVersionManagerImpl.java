@@ -120,7 +120,6 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	@Override
 	public Pagination<CmsModuleInstanceVersion> findCmsModuleInstanceVersionListByQueryMapWithPage(
 			Page page, Sort[] sorts, Map<String, Object> paraMap) {
-		// TODO Auto-generated method stub
 		if(paraMap.containsKey("ispublished")){
 			Integer isPublished = (Integer)paraMap.get("ispublished");
 			if(PULISHED.equals(isPublished)){
@@ -135,92 +134,12 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	@Override
 	public List<CmsModuleInstanceVersion> findCmsModuleInstanceVersionListByIds(
 			List<Long> ids) {
-		// TODO Auto-generated method stub
 		return cmsModuleInstanceVersionDao.findCmsModuleInstanceVersionListByIds(ids);
 	}
-	
-//	@Override
-//	@Transactional(readOnly=true)
-//	public String findUpdatedCmsModuleInstanceVersion(Long templateId, Long moduleId, Long versionId,
-//			Boolean isEdit) {
-//
-//		CmsModuleTemplate template = sdkCmsModuleTemplateManager.findCmsModuleTemplateById(templateId);
-//
-//		String data = template.getData();
-//		
-//		if(StringUtils.isBlank(data)){
-//			return "";
-//		}
-//
-//		if (null != versionId) {
-//			Map<String, Object> paraMap = new HashMap<String, Object>();
-//			paraMap.put("versionId", versionId);
-//			paraMap.put("moduleId", moduleId);
-//			List<CmsEditVersionArea> editAreaList = sdkCmsEditVersionAreaManager.findCmsEditVersionAreaListByQueryMap(paraMap);
-//
-//			Document document = Jsoup.parse(data);
-//			for (CmsEditVersionArea area : editAreaList) {
-//				String code = area.getModuleCode();
-//				Elements elements = document.select(CMS_HTML_EDIT_CLASS);
-//				if (null != elements && elements.size() > 0) {
-//					for (Element element : elements) {
-//						if (code.equals(element.attr("code"))) {
-//							//预览，处理隐藏
-//							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && !isEdit){
-//								element.remove();
-//							//修改，处理隐藏
-//							}else if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && isEdit){
-//								element.attr("hide", "0");
-//								element.html(area.getData());
-//							}else{
-//								element.html(area.getData());
-//							}
-//						}
-//					}
-//
-//				}
-//				Elements imgArtiEles = document.select(CMS_IMGARTICLE_EDIT_CLASS);
-//				if (null != imgArtiEles && imgArtiEles.size() > 0) {
-//					for (Element element : imgArtiEles) {
-//						if (code.equals(element.attr("code"))) {
-//							if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && !isEdit){
-//								element.remove();
-//							}else if(CmsEditArea.CMS_EDIT_AREA_HIDE.equals(area.getHide()) && isEdit){
-//								element.attr("hide", "0");
-//								element.html(area.getData());								
-//							}else{
-//								element.html(area.getData());
-//							}
-//						}
-//					}
-//
-//				}
-//				
-//				Elements proArtiEles = document.select(CMS_PRODUCT_EDIT_CLASS);
-//				if (null != proArtiEles && proArtiEles.size() > 0) {
-//					for (Element element : proArtiEles) {
-//						if (code.equals(element.attr("code"))) {
-//							element.html(area.getData());
-//						}
-//					}
-//
-//				}
-//				
-//			}
-//			data = document.toString();
-//		}
-//		data = sdkCmsPageTemplateManager.processTemplateBase(data);
-//		if (isEdit) {
-//			data = processNoEditData(data);
-//		}
-//		return data;
-//	
-//	}
 	
 	@Override
 	public CmsModuleInstanceVersion findCmsModuleInstanceVersionById(
 			Long versionId) {
-		// TODO Auto-generated method stub
 		return cmsModuleInstanceVersionDao.getByPrimaryKey(versionId);
 	}
 	
@@ -232,12 +151,9 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 		CmsModuleInstanceVersion version = null;
 		Long id = cmsModuleInstanceVersion.getId();
 		
-		//checkPageInstanceCode(cmsModuleInstanceVersion, id);
-		
 		if (null != id) {
 			// 修改
 			CmsModuleInstanceVersion dbModuleVersion = cmsModuleInstanceVersionDao.getByPrimaryKey(id);
-			//dbModuleVersion.setCode(cmsModuleInstanceVersion.getCode());
 			dbModuleVersion.setName(cmsModuleInstanceVersion.getName());
 			dbModuleVersion.setTemplateId(cmsModuleInstanceVersion.getTemplateId());
 			dbModuleVersion.setModifyTime(new Date());
@@ -285,92 +201,8 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 		return version;
 	}
 	
-	
-//	/**
-//	 * 去掉不要加载的数据, 如:不要加载的js 去掉<!--noedit-start-->到<!--noedit-end-->中间的数据
-//	 * 
-//	 * @param Data
-//	 * @return
-//	 */
-//	private static String processNoEditData(String data) {
-//		StringBuffer sb = new StringBuffer();
-//		int indexStart = data.indexOf(NOEDIT_START);
-//		int indexEnd = data.indexOf(NOEDIT_END);
-//
-//		if (indexStart != -1 && indexEnd != -1) {
-//			sb.append(data.substring(0, indexStart));
-//			sb.append(data.substring(indexEnd + NOEDIT_END.length(), data.length()));
-//			data = sb.toString();
-//			data = processNoEditData(data);
-//		}
-//		return data;
-//	}
-	
-//	/**
-//	 * 处理页面的html, 获取code与html
-//	 * 
-//	 * @param html
-//	 * @return
-//	 */
-//	private Map<String, String> processPageHtml(String html) {
-//		/** key:areaCode, value:html */
-//		Map<String, String> pageAreaMap = new HashMap<String, String>();
-//		Document document = Jsoup.parse(html);
-//		// 去掉 "编辑"按钮的div
-//		Elements editButtonElements = document.select(CMS_DIV_EDIT_BUTTON_CLASS);
-//		editButtonElements.remove();
-//		Elements editHideButtonElements = document.select(".wui-tips-shade");
-//		editHideButtonElements.remove();
-//		//编辑html模式
-//		Elements elements = document.select(CMS_HTML_EDIT_CLASS);
-//		dealHtml(pageAreaMap, elements);
-//		//图文模式
-//		Elements imgElements = document.select(CMS_IMGARTICLE_EDIT_CLASS);
-//		dealHtml(pageAreaMap, imgElements);
-//		
-//		//商品模式
-//		Elements proElements =document.select(CMS_PRODUCT_EDIT_CLASS);
-//		dealHtml(pageAreaMap, proElements);
-//		
-//		return pageAreaMap;
-//	}
-	
-//	private  void dealHtml(Map<String, String> pageAreaMap ,Elements elements){
-//		Integer i = 1;
-//		for (Element element : elements) {
-//			String areaCode = element.attr("code");
-//			if (StringUtils.isBlank(areaCode)) {
-//				throw new BusinessException("模块编辑区域的code不存在 ");
-//			}
-//			String areaHtml = element.html();
-//			//处理静态base信息
-//			areaHtml = sdkCmsPageTemplateManager.addTemplateBase(areaHtml);
-//			pageAreaMap.put(areaCode, areaHtml);
-//			i++;
-//		}
-//	}
-	
-//	@Override
-//	public void setPublishNotOverModuleVersionInMap(){
-//		List<CmsModuleInstanceVersionCommand> notOverModuleVersions = cmsModuleInstanceVersionDao.findPublishNotOverModuleVersion();
-//		for(CmsModuleInstanceVersionCommand cmsModuleInstanceVersionCommand : notOverModuleVersions){
-//			List<CmsModuleInstanceVersionCommand> groupVersionCommand = moduleVersionMap.get(cmsModuleInstanceVersionCommand.getCode());
-//			//cacheManager.get(CacheKeyConstant.CMS_PAGE_KEY, cmsPageInstanceVersionCommand.getCode());	
-//			if(Validator.isNullOrEmpty(groupVersionCommand)){
-//				groupVersionCommand = new ArrayList<CmsModuleInstanceVersionCommand>();
-//				groupVersionCommand.add(cmsModuleInstanceVersionCommand);
-//				moduleVersionMap.put(cmsModuleInstanceVersionCommand.getCode(), groupVersionCommand);
-//			}else{
-//				groupVersionCommand.add(cmsModuleInstanceVersionCommand);
-//				moduleVersionMap.put(cmsModuleInstanceVersionCommand.getCode(), groupVersionCommand);
-//			}
-//
-//		}
-//	}
-
 	@Override
 	public CmsModuleInstanceVersion getPublishingModuleVersion(Long id) {
-		// TODO Auto-generated method stub
 		return cmsModuleInstanceVersionDao.getPublishingModuleVersion(id);
 	}
 	
@@ -379,7 +211,6 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	 */
 	@Override
 	public void publishModuleInstanceVersion(Long versionId, Date startTime, Date endTime) {
-		// TODO Auto-generated method stub
 		/**
 		 * 发布模块版本步骤
 		 * 1、获取模块版本
@@ -416,21 +247,16 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 					zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
 					logger.info("publish moduleversion success : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
-					//return PublishResult.SUCCESS;
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					logger.error("publish moduleversion error : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
 					e.printStackTrace();
-					//return PublishResult.ERROR;
 					throw new BusinessException(Constants.CMS_PUBLISH_ERROR);
 				}
 			}else{
 				throw new BusinessException(Constants.CMS_INSTANCE_NOTPUBLISH);
-				//return PublishResult.INSTANCENOTPUBLISH;
 			}
 		}else{
 			throw new BusinessException(Constants.CMS_EXISTPUBLISHINSTANCE);
-			//return PublishResult.EXISTPUBLISHINSTANCE;
 		}
 	}
 	
@@ -480,7 +306,6 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	 * @return
 	 */
 	private boolean checkPublicCmsModuleVersionConfilct(Long moduleId, Long versionId, Date startTime, Date endTime) {
-		// TODO Auto-generated method stub
 		if(Validator.isNotNullOrEmpty(startTime) && Validator.isNotNullOrEmpty(endTime)){
 			List<CmsModuleInstanceVersion> versionList = cmsModuleInstanceVersionDao.findModuleVersionInTimeQuantum(moduleId, versionId, startTime, endTime);
 			if(Validator.isNullOrEmpty(versionList)){
@@ -533,33 +358,10 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	
 	@Override
 	public CmsModuleInstanceVersion findPublishModuleVersion(Long moduleid) {
-		// TODO Auto-generated method stub
 		return cmsModuleInstanceVersionDao.findPublishModuleVersion(moduleid, new Date());
 	}
 
 
-//	@Override
-//	public void loadModuleVersionMap() {
-//		// TODO Auto-generated method stub
-//		
-//		moduleVersionMap.clear();
-//		
-//		List<CmsModuleInstanceVersionCommand> notOverModuleVersions = cmsModuleInstanceVersionDao.findPublishNotOverModuleVersion();
-//		for(CmsModuleInstanceVersionCommand cmsModuleInstanceVersionCommand : notOverModuleVersions){
-//			List<CmsModuleInstanceVersionCommand> groupVersionCommand = moduleVersionMap.get(cmsModuleInstanceVersionCommand.getCode());
-//			//cacheManager.get(CacheKeyConstant.CMS_PAGE_KEY, cmsPageInstanceVersionCommand.getCode());	
-//			if(Validator.isNullOrEmpty(groupVersionCommand)){
-//				groupVersionCommand = new ArrayList<CmsModuleInstanceVersionCommand>();
-//				groupVersionCommand.add(cmsModuleInstanceVersionCommand);
-//				moduleVersionMap.put(cmsModuleInstanceVersionCommand.getCode(), groupVersionCommand);
-//			}else{
-//				groupVersionCommand.add(cmsModuleInstanceVersionCommand);
-//				moduleVersionMap.put(cmsModuleInstanceVersionCommand.getCode(), groupVersionCommand);
-//			}
-//
-//		}
-//	}
-	
 	@Override
 	public void setPublicModuleVersionCacheInfo(){
 		/**
@@ -587,13 +389,11 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 
 	@Override
 	public void removeCmsModuleInstanceVersionPublishByIds(List<Long> versionIds) {
-		// TODO Auto-generated method stub
-		//Set<Long> moduleIds = new HashSet<Long>();
+		
 		String ids="";
 		for(Long versionId : versionIds){
 			CmsModuleInstanceVersion version = findCmsModuleInstanceVersionById(versionId);
 			CmsModuleInstance module = sdkCmsModuleInstanceManager.findCmsModuleInstanceById(version.getInstanceId());
-			//moduleIds.add(version.getInstanceId());
 			//已发布状态
 			if(version.getIsPublished()){
 				CmsTemplateHtml cmsTemplateHtml = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(module.getCode(), version.getId());
@@ -601,10 +401,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 			}	
 			ids+=versionIds+",";
 		}
-		//CmsTemplateHtml cmsTemplateHtml = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(code, versionId)
-//		for(Long moduleId : moduleIds){
-//			sdkCmsModuleInstanceManager.publishModuleInstance(moduleId);
-//		}
+
 		removeModuleVersionByIds(versionIds);
 		logger.info("remove moduleVersion's ids is " + ids);
 		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
@@ -612,31 +409,26 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	
 	@Override
 	public void removeModuleVersionByIds(List<Long> versionIds) {
-		// TODO Auto-generated method stub
 		cmsModuleInstanceVersionDao.removeCmsModuleInstanceVersionByIds(versionIds);	
 	}
 
 	@Override
 	public CmsModuleInstanceVersion saveCmsModuleInstanceVersion(CmsModuleInstanceVersion version) {
-		// TODO Auto-generated method stub
 		return cmsModuleInstanceVersionDao.save(version);
 	}
 
 	@Override
 	public void removeModuleVersionByModuleIds(List<Long> moduleIds) {
-		// TODO Auto-generated method stub
 		cmsModuleInstanceVersionDao.removeModuleVersionByModuleIds(moduleIds);
 	}
 	
 	@Override
 	public void cancelInstanceVersionInModuleId(Long moduleId) {
-		// TODO Auto-generated method stub
 		cmsModuleInstanceVersionDao.cancelInstanceVersionInModuleId(moduleId);
 	}
 
 	@Override
 	public void copyModuleInstanceVersion(Long versionId, String name) {
-		// TODO Auto-generated method stub
 		CmsModuleInstanceVersion moduleVersion = findCmsModuleInstanceVersionById(versionId);
 		if(Validator.isNotNullOrEmpty(moduleVersion)){
 			try{
@@ -666,18 +458,13 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					copyEditVersionArea.setVersionId(copyVersionId);
 					sdkCmsEditVersionAreaManager.saveCmsEditVersionArea(copyEditVersionArea);
 				}
-				//result = CopyVersionResult.SUCCESS;
 			}catch(Exception e){
 				e.printStackTrace();
-				//result = CopyVersionResult.ERROR;
 				throw new BusinessException(Constants.CMS_COPY_ERROR);
 			}
 		}else{
-			//result = CopyVersionResult.NOEXISTVERSION;
 			throw new BusinessException(Constants.CMS_COPY_NOEXISTVERSION);
 		}
-		//return result;
-
 	}
 
 }
