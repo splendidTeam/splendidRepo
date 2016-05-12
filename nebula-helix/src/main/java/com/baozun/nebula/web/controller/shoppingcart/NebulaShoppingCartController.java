@@ -89,7 +89,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * <td>修改购物车数量</td>
  * </tr>
  * <tr valign="top">
- * <td>//TODO feilong </td>
+ * <td>//TODO feilong</td>
  * <td>修改商品销售属性</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
@@ -145,13 +145,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 public class NebulaShoppingCartController extends BaseController{
 
     /** The Constant log. */
-    private static final Logger              LOGGER                 = LoggerFactory.getLogger(NebulaShoppingCartController.class);
-
-    /** The Constant MODEL_KEY_SHOPPINGCART. */
-    private static final String              MODEL_KEY_SHOPPINGCART = "shoppingCartViewCommand";
-
-    /** The Constant VIEW_MEMBER_SHOPPINGCART_LIST. */
-    private static final String              VIEW_SHOPPINGCART      = "shoppingcart.shoppingcart";
+    private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
 
     /** The sdk shopping cart manager. */
     @Autowired
@@ -191,8 +185,8 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingCartCommand cartCommand = getShoppingCartCommand(request, memberDetails);
 
         // 封装viewCommand
-        model.addAttribute(MODEL_KEY_SHOPPINGCART, shoppingcartViewCommandConverter.convert(cartCommand));
-        return VIEW_SHOPPINGCART;
+        model.addAttribute("shoppingCartViewCommand", shoppingcartViewCommandConverter.convert(cartCommand));
+        return "shoppingcart.shoppingcart";
     }
 
     //**********************************addShoppingCart************************************************
