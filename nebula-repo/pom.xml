@@ -21,6 +21,12 @@
 		     <groupId>com.baozun.scm</groupId>
 		      <artifactId>bizhub-sdk-bs2notice</artifactId>
 		      <version>1.0.0</version>
-		  </dependency>
+		      <exclusions>
+		      	<exclusion>
+		      		<artifactId>slf4j-log4j12</artifactId>
+		      		<groupId>org.slf4j</groupId>
+		      	</exclusion>
+		      </exclusions>
+		</dependency>
 	</dependencies>
 </project>
