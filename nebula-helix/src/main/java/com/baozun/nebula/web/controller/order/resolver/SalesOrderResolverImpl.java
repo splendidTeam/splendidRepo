@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.constants.MetaInfoConstants;
 import com.baozun.nebula.manager.salesorder.SalesOrderManager;
@@ -66,6 +67,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @version 5.3.1 2016年5月3日 下午1:35:48
  * @since 5.3.1
  */
+@Component
 public class SalesOrderResolverImpl implements SalesOrderResolver {
 
 	/** The Constant log. */
