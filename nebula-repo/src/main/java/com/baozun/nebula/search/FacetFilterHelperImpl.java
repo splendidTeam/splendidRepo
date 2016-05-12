@@ -365,7 +365,16 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			List<FacetParameter> facetParameters){
 		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
 
-		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId().toString());
+		SearchConditionCommand searchObj=null;		
+		for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+			SearchConditionCommand searchConditionCommand=entry.getValue();
+			if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())){
+				searchObj=searchConditionCommand;
+				break;
+			}
+			
+		}
+		
 		if (searchObj != null) {
 			facetGroup.setTitle(searchObj.getName());
 		}else{
