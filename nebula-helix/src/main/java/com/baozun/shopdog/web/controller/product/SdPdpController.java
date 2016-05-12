@@ -58,6 +58,7 @@ import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
+ * 驻点宝pdp数据展示部分的封装、获取
  * @Description 
  * @author dongliang ma
  * @date 2016年5月11日 下午4:06:51 
