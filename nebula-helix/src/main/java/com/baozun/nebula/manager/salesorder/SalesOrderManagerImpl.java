@@ -358,6 +358,21 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
         }
 
     }
+    
+    @Override
+    public List<SimpleOrderCommand> findSimpleOrderCommandList(Long memberId,OrderQueryCommand orderQueryCommand){
+        try{
+            // 将orderqueryform转换成map
+            Map<String, Object> paraMap = convertBean(orderQueryCommand);
+            paraMap.put("memberId", memberId);
+            // 后台查询
+            return sdkOrderDao.findSimpleOrderListByOrderQueryCommand(paraMap);
+        }catch (IllegalAccessException | InvocationTargetException | IntrospectionException e){
+            LOGGER.error("", e);
+            return null;
+        }
+
+    }
 
     /**
      * 将一个 JavaBean 对象转化为一个 Map

@@ -15,16 +15,21 @@ public class SimpleOrderCommand {
     private Date                                createTime;
 
     /** 物流状态. */
-    private Integer                             logisticsstatus;
+    private Integer                             logisticsStatus;
 
     /** 财务状态. */
-    private Integer                             financialstatus;
+    private Integer                             financialStatus;
 
     /** 支付方式. */
     private Integer                             payment;
     
     /** 总价 */
     private BigDecimal total;
+    
+    /**
+     * 是否评论 0 未评论 1位评论
+     */
+    private int                                  isRate;
 
     /** 折扣 */
     private BigDecimal discount;
@@ -53,22 +58,6 @@ public class SimpleOrderCommand {
         this.createTime = createTime;
     }
 
-    public Integer getLogisticsStatus() {
-        return logisticsstatus;
-    }
-
-    public void setLogisticsStatus(Integer logisticsStatus) {
-        this.logisticsstatus = logisticsStatus;
-    }
-
-    public Integer getFinancialStatus() {
-        return financialstatus;
-    }
-
-    public void setFinancialStatus(Integer financialStatus) {
-        this.financialstatus = financialStatus;
-    }
-
     public Integer getPayment() {
         return payment;
     }
@@ -91,6 +80,31 @@ public class SimpleOrderCommand {
 
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
+    }
+
+
+    public int getIsRate() {
+        return isRate;
+    }
+
+    public void setIsRate(int isRate) {
+        this.isRate = isRate;
+    }
+
+    public Integer getLogisticsStatus() {
+        return logisticsStatus;
+    }
+
+    public void setLogisticsStatus(Integer logisticsStatus) {
+        this.logisticsStatus = logisticsStatus;
+    }
+
+    public Integer getFinancialStatus() {
+        return financialStatus;
+    }
+
+    public void setFinancialStatus(Integer financialStatus) {
+        this.financialStatus = financialStatus;
     }
     
     
