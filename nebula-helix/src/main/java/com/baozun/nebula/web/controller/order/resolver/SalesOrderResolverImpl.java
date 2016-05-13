@@ -190,8 +190,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		if (null == cartLines) {
 			return null;
 		}
-		// 过滤未勾选的商品
-		cartLines = CollectionsUtil.removeAll(cartLines, "settlementState", 1);
+		// 过滤未勾选的商品 1选中  0未选中
+		cartLines = CollectionsUtil.removeAll(cartLines, "settlementState", 0);
 		if (null == cartLines) {
 			return null;
 		}
