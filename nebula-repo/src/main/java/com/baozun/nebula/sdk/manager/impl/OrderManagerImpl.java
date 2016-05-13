@@ -70,7 +70,6 @@ import com.baozun.nebula.event.EmailEvent;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.freight.DistributionMode;
-import com.baozun.nebula.model.member.Contact;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.product.ItemInfo;
@@ -113,7 +112,6 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
-import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
@@ -270,9 +268,6 @@ public class OrderManagerImpl implements OrderManager{
     /** The sales order handler. */
     @Autowired(required = false)
     private SalesOrderHandler                        salesOrderHandler;
-    
-    @Autowired
-	private SdkSecretManager						 sdkSecretManager;
 
     /**
      * The Constructor.
@@ -1267,48 +1262,9 @@ public class OrderManagerImpl implements OrderManager{
                 }
             }
         }
-        encryptConsignee(consignee);
         consignee.setOrderId(salesOrder.getId());
         sdkConsigneeDao.save(consignee);
     }
-    
-    private void encryptConsignee(Consignee consignee){
-
-		sdkSecretManager.encrypt(consignee, new String[] {
-				"name",
-				"buyerName",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"tel",
-				"buyerTel",
-				"mobile",
-				"email" });
-	}
-    
-    private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
-
-		sdkSecretManager.decrypt(salesOrderCommand, new String[] {
-				"name",
-				"buyerName",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"tel",
-				"buyerTel",
-				"mobile",
-				"email" });
-	}
-    
-    
 
     /**
      * 检查优惠券是否有效.
@@ -1971,14 +1927,10 @@ public class OrderManagerImpl implements OrderManager{
     public SalesOrderCommand findOrderById(Long id,Integer type){
         // 包含订单基本信息和收货信息
         SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderById(id, type);
-        
 
         if (null == salesOrderCommand || null == type){
             return salesOrderCommand;
         }else{
-        	if(type.equals(1)){
-            	decryptSalesOrderCommand(salesOrderCommand);
-            }
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
             salesOrderCommand.setPayInfo(payInfos);
@@ -2053,9 +2005,7 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public SalesOrderCommand findOrderByLineId(Long orderLineId){
-    	SalesOrderCommand salesOrderCommand =sdkOrderDao.findOrderByLineId(orderLineId);
-    	decryptSalesOrderCommand(salesOrderCommand);
-        return salesOrderCommand;
+        return sdkOrderDao.findOrderByLineId(orderLineId);
     }
 
     /*

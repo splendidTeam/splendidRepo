@@ -68,7 +68,7 @@ public class OrderFormValidator implements Validator{
         
         // 地址信息数据
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.name", "name.field.required");// 收货人姓名
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.buyerName", "buyerName.field.required");// 收货人购买人姓名
+ 		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.buyerName", "buyerName.field.required");// 收货人购买人姓名
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.countryId", "countryId.field.required");// 国家
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.provinceId", "provinceId.field.required");// 省
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.cityId", "cityId.field.required");// 城市

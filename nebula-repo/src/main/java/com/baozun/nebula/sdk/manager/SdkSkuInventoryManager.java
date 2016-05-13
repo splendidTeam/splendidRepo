@@ -16,9 +16,11 @@
  */
 package com.baozun.nebula.sdk.manager;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
  * sku 库存manager.
@@ -28,6 +30,14 @@ import com.baozun.nebula.manager.BaseManager;
  * @since 5.3.1
  */
 public interface SdkSkuInventoryManager extends BaseManager{
+
+    /**
+     * 基于shoppingCartLineCommandList 来执行扣减库存的逻辑.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     */
+    void deductSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList);
 
     /**
      * 基于<code>extentionCodeandCountMap</code> 扣减商品库存.

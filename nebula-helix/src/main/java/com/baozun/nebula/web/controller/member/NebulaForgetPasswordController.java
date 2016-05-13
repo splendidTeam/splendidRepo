@@ -62,9 +62,6 @@ public class NebulaForgetPasswordController extends BaseController{
 	public static final String			BUSINESS_CODE				= "FORGET_PASSWORD_BUSINESS";
 
 	@Autowired
-	private SdkMemberManager			sdkMemberManager;
-
-	@Autowired
 	private TokenManager				tokenManager;
 
 	@Autowired
@@ -208,15 +205,18 @@ public class NebulaForgetPasswordController extends BaseController{
 	 * @param model
 	 * @return String 返回需要跳转到的页面
 	 */
-	public String resetPassword(HttpServletRequest request,HttpServletResponse response,Model model){
+	public NebulaReturnResult resetPassword(HttpServletRequest request,HttpServletResponse response,Model model){
 
+		
+		DefaultReturnResult defaultReturnResult=new DefaultReturnResult();
 		// 从session中获取到之前验证过的用户的信息
 		ForgetPasswordForm forgetPasswordForm = (ForgetPasswordForm) request.getSession().getAttribute(TOKEN);
 		// 判断session是否有值
 		if (forgetPasswordForm == null){
 			// 说明session中没有值，则不是同一个用户操作，需要他重新跳转到验证页面，重新验证信息
 			// 修改密码失败，可以重新跳转至验证页面
-			return VIEW_FORGET_PASSWORD;
+			defaultReturnResult.setResult(false);
+			defaultReturnResult.setReturnObject("/member/forgetpassword");
 		}
 
 		// session中有值，确认是同一用户操作，则进行修改密码的操作
@@ -231,15 +231,16 @@ public class NebulaForgetPasswordController extends BaseController{
 			if (flag){
 				LOG.info("[The member reset password success] {} [{}]", new Date());
 				request.getSession().removeAttribute(TOKEN);
-				return VIEW_RESET_PASSWORD_SUCCESS;
+				defaultReturnResult.setResult(true);
 			}
 			// 修改密码失败，（可以提示修改密码失败，几秒后跳转至重置密码页面）可重新跳转至验证页面
 			LOG.info("[The member reset password failed] {} [{}]", new Date());
-			return VIEW_RESET_PASSWORD;
+			return defaultReturnResult;
 		}else{
 			// 重置密码时，输入的密码为空，则重新跳转至重置密码页面
 			LOG.info("[The member reset password failed] {} [{}]", new Date());
-			return VIEW_RESET_PASSWORD;
+			defaultReturnResult.setResult(false);
+			return defaultReturnResult;
 		}
 	}
 }

@@ -29,14 +29,89 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 
 /**
  * The Class ShoppingCartLineCommand.
+ * 
+ * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand
+ * @see com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop
  */
 public class ShoppingCartLineCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
     private static final long          serialVersionUID = -5071101827860973497L;
 
+    //*********************************************************************************
+    /** PK *. */
+    private Long                       id;
+
+    /** 店铺id . */
+    private Long                       shopId;
+
+    /** 店铺名称 . */
+    private String                     shopName;
+
+    /** 会员id. */
+    private Long                       memberId;
+
+    //*********************************************************************************
+    /** skuId . */
+    private Long                       skuId;
+
     /** The extention code. */
     private String                     extentionCode;
+
+    /** 商品id . */
+    private Long                       itemId;
+
+    /** 商品code. */
+    private String                     productCode;
+
+    /** 商品名称 . */
+    private String                     itemName;
+
+    /** 购物数量 . */
+    private Integer                    quantity;
+
+    /** 商品图片 *. */
+    private String                     itemPic;
+
+    /** 结算状态 0未选中结算 1选中结算. */
+    private Integer                    settlementState;
+
+    /**
+     * 销售属性.
+     * 
+     * @see com.baozun.nebula.model.product.Sku#getProperties()
+     */
+    private String                     saleProperty;
+
+    /**
+     * 销售属性 .
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkSkuManager#getSkuPros(String)
+     */
+    private List<SkuProperty>          skuPropertys;
+
+    //*********************************************************************************
+
+    /** 吊牌价 *. */
+    private BigDecimal                 listPrice;
+
+    /** 商品单价. */
+    private BigDecimal                 salePrice;
+
+    /** 购物车行 金额小计 *. */
+    private BigDecimal                 subTotalAmt      = BigDecimal.ZERO;
+
+    /** 加入时间. */
+    private Date                       createTime;
+
+    /**
+     * 0代表非买品 1代表主卖品 与itemInfo中的type一致.
+     * 
+     * @see com.baozun.nebula.model.product.ItemInfo#getType()
+     */
+    private Integer                    type;
+
+    //*********************************************************************************
 
     /** 行分组 *. */
     private Long                       lineGroup;
@@ -53,25 +128,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 是套餐行 t是套餐行，f不是套餐行 *. */
     private boolean                    isSuitLine;
 
-    /** 商品款的id *. */
-    private Long                       skuId;
-
-    /** 商品id *. */
-    private Long                       itemId;
-
-    /** 购物数量 *. */
-    private Integer                    quantity;
-
-    /** 商品名称 *. */
-    private String                     itemName;
-
-    /** 商品图片 *. */
-    private String                     itemPic;
-
-    /** 销售属性 *. */
-    private String                     saleProperty;
-
-    /** 是否可见 1可见 /0不可见 *. */
+    /**
+     * 是否可见 1可见 /0不可见 *.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private Integer                    visibleMark;
 
     /** 是否限购 1限购 0不限购 *. */
@@ -80,42 +142,68 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 限购数量 *. */
     private Integer                    limit;
 
-    /** 是否有库存 1有库存 0无库存 *. */
+    /**
+     * 是否有库存 1有库存 0无库存 *.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private Integer                    stockMark;
 
-    /** 库存数量 *. */
+    /**
+     * 库存数量.
+     * 
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
+     */
     private Integer                    stock;
 
     /** ***** 扩展engine所需要的字段begin ******. */
 
-    private String                     productCode;                             // 商品code
-
-    /** The lable ids. */
+    /**
+     * The lable ids.
+     * 
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
+     */
+    @Deprecated
     private List<Long>                 lableIds;
-
-    /** The brand id. */
-    private String                     brandId;
 
     /** The category list. */
     private List<Long>                 categoryList;
 
-    /** The store id. */
+    /**
+     * The brand id.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
+    private String                     brandId;
+
+    /**
+     * The store id.
+     * 
+     * @deprecated 目前值就＝ {@link #shopId},重复了,而且没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private long                       storeId;
 
-    /** The indstry id. */
+    /**
+     * The indstry id.
+     * 
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
+     */
+    @Deprecated
     private Long                       indstryId;
 
     /** The state. */
     private String                     state;
 
-    /** 商品单价. */
-    private BigDecimal                 salePrice;
-
     /** 行促销(此商口多个数量的促销总和) 折扣-包含整单优惠分摊. */
     private BigDecimal                 discount         = BigDecimal.ZERO;
 
     /** 折扣单价-不包含整单优惠分摊. */
-    private BigDecimal                 discountPrice    = BigDecimal.ZERO;;
+    private BigDecimal                 discountPrice    = BigDecimal.ZERO;
 
     /** 套餐、行赠品类型，只有一个PromotionId 其他类型可能有多个活动 *. */
     private List<PromotionCommand>     promotionList;
@@ -126,38 +214,8 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 1是行赠品,0是整单赠品. */
     private int                        giftType;
 
-    /** 会员id. */
-    private Long                       memberId;
-
-    /** 加入时间. */
-    private Date                       createTime;
-
-    /** PK *. */
-    private Long                       id;
-
-    /** 结算状态 0未选中结算 1选中结算. */
-    private Integer                    settlementState;
-
-    /** 0代表非买品 1代表主卖品 与itemInfo中的type一致. */
-    private Integer                    type;
-
-    /** 店铺id *. */
-    private Long                       shopId;
-
-    /** 店铺名称 *. */
-    private String                     shopName;
-
-    /** 销售属性 *. */
-    private List<SkuProperty>          skuPropertys;
-
     /** 分组标签 *. */
     private Set<String>                comboIds;
-
-    /** 吊牌价 *. */
-    private BigDecimal                 listPrice;
-
-    /** 购物车行 金额小计 *. */
-    private BigDecimal                 subTotalAmt      = BigDecimal.ZERO;
 
     /** 行上的Coupon *. */
     private PromotionCouponCodeCommand couponCodeOnLine;
@@ -174,12 +232,9 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 用户不参与选择时，直接推送礼品的样数；用户参与选择时，直接推送礼品的样数. */
     private Integer                    giftCountLimited;
 
-    /** 商城自定义参数，nebula不控制. */
-    private Map<String, Object>        customParamMap;
-
     //***************************************************************************************************
 
-    /** 购物车中商品经有效性检查引擎检查之后是否有效的字段 *. */
+    /** 购物车中商品经有效性检查引擎检查之后是否有效的字段. */
     private boolean                    isValid;
 
     /**
@@ -196,6 +251,9 @@ public class ShoppingCartLineCommand extends BaseModel{
     private String                     wareHoseName;
 
     //***************************************************************************************************
+
+    /** 商城自定义参数，nebula不控制. */
+    private Map<String, Object>        customParamMap;
 
     /**
      * 获得 promotion ids.
@@ -425,47 +483,28 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 pK *.
+     * 获得 pK.
      *
-     * @return the pK *
+     * @return the pK
      */
     public Long getId(){
         return id;
     }
 
     /**
-     * 设置 pK *.
+     * 设置 pK.
      *
      * @param id
-     *            the new pK *
+     *            the new pK
      */
     public void setId(Long id){
         this.id = id;
     }
 
     /**
-     * 获得 商品款的id *.
+     * 获得 销售属性.
      *
-     * @return the 商品款的id *
-     */
-    public Long getSkuId(){
-        return skuId;
-    }
-
-    /**
-     * 设置 商品款的id *.
-     *
-     * @param skuId
-     *            the new 商品款的id *
-     */
-    public void setSkuId(Long skuId){
-        this.skuId = skuId;
-    }
-
-    /**
-     * 获得 销售属性 *.
-     *
-     * @return the 销售属性 *
+     * @return the 销售属性
      */
     public String getSaleProperty(){
         return saleProperty;
@@ -501,19 +540,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 ***** 扩展engine所需要的字段begin ******.
+     * 获得 商品code.
      *
-     * @return the ***** 扩展engine所需要的字段begin ******
+     * @return the 商品code
      */
     public String getProductCode(){
         return productCode;
     }
 
     /**
-     * 设置 ***** 扩展engine所需要的字段begin ******.
+     * 设置 商品code.
      *
      * @param productCode
-     *            the new ***** 扩展engine所需要的字段begin ******
+     *            the new 商品code
      */
     public void setProductCode(String productCode){
         this.productCode = productCode;
@@ -523,7 +562,11 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 lable ids.
      *
      * @return the lable ids
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
      */
+    @Deprecated
     public List<Long> getLableIds(){
         return lableIds;
     }
@@ -533,7 +576,11 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param lableIds
      *            the lable ids
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
      */
+    @Deprecated
     public void setLableIds(List<Long> lableIds){
         this.lableIds = lableIds;
     }
@@ -542,7 +589,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 brand id.
      *
      * @return the brand id
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public String getBrandId(){
         return brandId;
     }
@@ -552,7 +601,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param brandId
      *            the brand id
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setBrandId(String brandId){
         this.brandId = brandId;
     }
@@ -580,7 +631,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 store id.
      *
      * @return the store id
+     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public long getStoreId(){
         return storeId;
     }
@@ -590,7 +643,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param storeId
      *            the store id
+     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setStoreId(long storeId){
         this.storeId = storeId;
     }
@@ -599,7 +654,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 indstry id.
      *
      * @return the indstry id
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
      */
+    @Deprecated
     public Long getIndstryId(){
         return indstryId;
     }
@@ -609,7 +666,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param indstryId
      *            the indstry id
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
      */
+    @Deprecated
     public void setIndstryId(Long indstryId){
         this.indstryId = indstryId;
     }
@@ -634,7 +693,7 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 设置 valid.
+     * 购物车中商品经有效性检查引擎检查之后是否有效的字段.
      *
      * @param isValid
      *            the valid
@@ -644,7 +703,7 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * Checks if is valid.
+     * 购物车中商品经有效性检查引擎检查之后是否有效的字段.
      *
      * @return true, if checks if is valid
      */
@@ -653,19 +712,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 有效性检查类型：1.
+     * 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      *
-     * @return the 有效性检查类型：1
+     * @return the 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      */
     public Integer getValidType(){
         return validType;
     }
 
     /**
-     * 设置 有效性检查类型：1.
+     * 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      *
      * @param validType
-     *            the new 有效性检查类型：1
+     *            有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      */
     public void setValidType(Integer validType){
         this.validType = validType;
@@ -675,6 +734,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 0代表非买品 1代表主卖品 与itemInfo中的type一致.
      *
      * @return the 0代表非买品 1代表主卖品 与itemInfo中的type一致
+     * @see com.baozun.nebula.model.product.ItemInfo#getType()
      */
     public Integer getType(){
         return type;
@@ -685,15 +745,16 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param type
      *            the new 0代表非买品 1代表主卖品 与itemInfo中的type一致
+     * @see com.baozun.nebula.model.product.ItemInfo#getType()
      */
     public void setType(Integer type){
         this.type = type;
     }
 
     /**
-     * 获得 库房id *.
+     * 获得 库房id.
      *
-     * @return the 库房id *
+     * @return the 库房id
      */
     public Long getWareHoseId(){
         return wareHoseId;
@@ -732,7 +793,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 是否可见 1可见 /0不可见 *.
      *
      * @return the 是否可见 1可见 /0不可见 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public Integer getVisibleMark(){
         return visibleMark;
     }
@@ -742,7 +805,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param visibleMark
      *            the new 是否可见 1可见 /0不可见 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setVisibleMark(Integer visibleMark){
         this.visibleMark = visibleMark;
     }
@@ -770,7 +835,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 是否有库存 1有库存 0无库存 *.
      *
      * @return the 是否有库存 1有库存 0无库存 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public Integer getStockMark(){
         return stockMark;
     }
@@ -780,25 +847,29 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param stockMark
      *            the new 是否有库存 1有库存 0无库存 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setStockMark(Integer stockMark){
         this.stockMark = stockMark;
     }
 
     /**
-     * 获得 库存数量 *.
+     * 获得 库存数量.
      *
-     * @return the 库存数量 *
+     * @return the 库存数量
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
      */
     public Integer getStock(){
         return stock;
     }
 
     /**
-     * 设置 库存数量 *.
+     * 设置 库存数量 .
      *
      * @param stock
-     *            the new 库存数量 *
+     *            the new 库存数量
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
      */
     public void setStock(Integer stock){
         this.stock = stock;
@@ -1182,6 +1253,25 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     public void setPresale(boolean isPresale){
         this.isPresale = isPresale;
+    }
+
+    /**
+     * 获得 skuId .
+     *
+     * @return the skuId
+     */
+    public Long getSkuId(){
+        return skuId;
+    }
+
+    /**
+     * 设置 skuId .
+     *
+     * @param skuId
+     *            the skuId to set
+     */
+    public void setSkuId(Long skuId){
+        this.skuId = skuId;
     }
 
 }
