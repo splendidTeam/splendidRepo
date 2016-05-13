@@ -203,8 +203,7 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 封装viewCommand
 		OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
-		orderConfirmViewCommand
-				.setShoppingCartViewCommand(shoppingcartViewCommandConverter.convert(shoppingCartCommand));
+		orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
 		// 收获地址信息
 		orderConfirmViewCommand.setAddressList(memberDetails == null ? null
 				: sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId()));
@@ -324,8 +323,12 @@ public class NebulaOrderConfirmController extends BaseController {
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
 
-		// 过虑未选中的购物车行 过滤之后，金额是否需要重新计算？
+		//过滤赠品 
 		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
+		
+		//过滤未勾选的商品行
+		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 1);
+		
 		if (null == cartLines) {
 			return null;
 		}
