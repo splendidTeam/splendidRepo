@@ -110,6 +110,7 @@ import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.feilong.core.Validator;
+import com.feilong.core.util.MapUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -468,11 +469,8 @@ public class OrderManagerImpl implements OrderManager{
         Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
 
         // shoppingCartLineCommandMap
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = new HashMap<Long, List<ShoppingCartLineCommand>>();
-
-        for (Map.Entry<Long, ShoppingCartCommand> entry : shopIdAndShoppingCartCommandMap.entrySet()){
-            shopIdAndShoppingCartLineCommandListMap.put(entry.getKey(), entry.getValue().getShoppingCartLineCommands());
-        }
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
+                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
 
         // shoppingCartPromotionBriefMap
         List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
@@ -505,32 +503,36 @@ public class OrderManagerImpl implements OrderManager{
         if (subOrdinate == null){
             throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
         }
-        Iterator<Long> it = shopIdAndShoppingCartLineCommandListMap.keySet().iterator();
 
         String isSendEmail = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
 
         BigDecimal paySum = getPaySum(salesOrderCommand, shoppingCartCommand);
+
         List<Map<String, Object>> dataMapList = new ArrayList<Map<String, Object>>();
 
-        while (it.hasNext()){
-            Long shopId = it.next();
+        for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
+            Long shopId = entry.getKey();
             List<ShoppingCartLineCommand> shoppingCartLineCommandList = shopIdAndShoppingCartLineCommandListMap.get(shopId);
+
             List<PromotionSKUDiscAMTBySetting> psdabsList = promotionSKUDiscAMTBySettingMap.get(shopId);
             ShopCartCommandByShop shopCartCommandByShop = shopCartCommandByShopMap.get(shopId);
+
+            //***************************************************************************************
             // 根据shopId保存订单概要
             SalesOrder salesOrder = sdkOrderManager.savaOrder(shopId, salesOrderCommand, shopCartCommandByShop);
+            Long orderId = salesOrder.getId();
 
             // 保存订单行、订单行优惠
-            savaOrderLinesAndPromotions(salesOrderCommand, salesOrder.getId(), shoppingCartLineCommandList, psdabsList);
+            savaOrderLinesAndPromotions(salesOrderCommand, orderId, shoppingCartLineCommandList, psdabsList);
 
             // 保存支付详细
             savePayInfoAndPayInfoLog(salesOrderCommand, subOrdinate, salesOrder, shopId);
 
             // 保存收货人信息
-            sdkConsigneeManager.saveConsignee(salesOrder.getId(), shopId, salesOrderCommand);
+            sdkConsigneeManager.saveConsignee(orderId, shopId, salesOrderCommand);
 
             // 保存OMS消息发送记录(销售订单信息推送给SCM)
-            sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_ORDER_SEND, salesOrder.getId(), null);
+            sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_ORDER_SEND, orderId, null);
 
             // 封装发送邮件数据
             if (isSendEmail != null && isSendEmail.equals("true")){
@@ -547,7 +549,6 @@ public class OrderManagerImpl implements OrderManager{
 
             // 扣减库存
             sdkSkuInventoryManager.deductSkuInventory(shoppingCartLineCommandList);
-
         }
 
         // 保存支付流水
