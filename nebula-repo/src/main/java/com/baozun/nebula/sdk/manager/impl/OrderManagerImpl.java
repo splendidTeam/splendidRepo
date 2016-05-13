@@ -96,6 +96,7 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkOrderLineManager;
 import com.baozun.nebula.sdk.manager.SdkOrderManager;
+import com.baozun.nebula.sdk.manager.SdkOrderPromotionManager;
 import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
 import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
@@ -108,7 +109,6 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
-
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -160,6 +160,9 @@ public class OrderManagerImpl implements OrderManager{
     /** The sdk order promotion dao. */
     @Autowired
     private SdkOrderPromotionDao                     sdkOrderPromotionDao;
+
+    @Autowired
+    private SdkOrderPromotionManager                 sdkOrderPromotionManager;
 
     /** The sdk order line dao. */
     @Autowired
@@ -272,45 +275,45 @@ public class OrderManagerImpl implements OrderManager{
     /** The sales order handler. */
     @Autowired(required = false)
     private SalesOrderHandler                        salesOrderHandler;
-    
+
     @Autowired
-	private SdkSecretManager						 sdkSecretManager;
+    private SdkSecretManager                         sdkSecretManager;
 
     private void encryptConsignee(Consignee consignee){
 
-		sdkSecretManager.encrypt(consignee, new String[] {
-				"name",
-				"buyerName",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"tel",
-				"buyerTel",
-				"mobile", 
-				"email" });
-	}
-    
+        sdkSecretManager.encrypt(consignee, new String[] {
+                                                           "name",
+                                                           "buyerName",
+                                                           "country",
+                                                           "province",
+                                                           "city",
+                                                           "area",
+                                                           "town",
+                                                           "address",
+                                                           "postcode",
+                                                           "tel",
+                                                           "buyerTel",
+                                                           "mobile",
+                                                           "email" });
+    }
+
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
 
-		sdkSecretManager.decrypt(salesOrderCommand, new String[] {
-				"name",
-				"buyerName",
-				"country",
-				"province",
-				"city",
-				"area",
-				"town",
-				"address",
-				"postcode",
-				"tel",
-				"buyerTel",
-				"mobile", 
-				"email" });
-	}
+        sdkSecretManager.decrypt(salesOrderCommand, new String[] {
+                                                                   "name",
+                                                                   "buyerName",
+                                                                   "country",
+                                                                   "province",
+                                                                   "city",
+                                                                   "area",
+                                                                   "town",
+                                                                   "address",
+                                                                   "postcode",
+                                                                   "tel",
+                                                                   "buyerTel",
+                                                                   "mobile",
+                                                                   "email" });
+    }
 
     /*
      * (non-Javadoc)
@@ -326,7 +329,7 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderCommand)
             return null;
         if (type == 1){
-        	decryptSalesOrderCommand(salesOrderCommand);
+            decryptSalesOrderCommand(salesOrderCommand);
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
             // 订单行信息
@@ -900,97 +903,19 @@ public class OrderManagerImpl implements OrderManager{
                 if (!promotionSKUDiscAMTBySetting.getFreeShippingMark()
                                 && promotionSKUDiscAMTBySetting.getSkuId().equals(orderLine.getSkuId())
                                 && orderLine.getType().equals(type)){
-                    savaOrderPromotion(orderId, promotionSKUDiscAMTBySetting, orderLine, salesOrderCommand);
+                    sdkOrderPromotionManager
+                                    .savaOrderPromotion(orderId, promotionSKUDiscAMTBySetting, orderLine.getId(), salesOrderCommand);
                 }
             }
         }
         // 免运费
         if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            for (PromotionSKUDiscAMTBySetting promo : promotionSKUDiscAMTBySettingList){
-                if (promo.getFreeShippingMark()){
-                    OrderPromotion orderPromotionDetail = new OrderPromotion();
-                    // 订单id
-                    orderPromotionDetail.setOrderId(orderId);
-                    // 活动id
-                    orderPromotionDetail.setActivityId(promo.getPromotionId());
-                    // 促销码 (暂时没用)
-                    orderPromotionDetail.setPromotionNo(promo.getPromotionId().toString());
-                    // 促销类型
-                    orderPromotionDetail.setPromotionType(promo.getPromotionType());
-                    // 折扣金额
-                    orderPromotionDetail.setDiscountAmount(promo.getDiscountAmount());
-                    // 是否运费折扣
-                    orderPromotionDetail.setIsShipDiscount(true);
-                    // 优惠券
-                    if (promo.getCouponCodes() != null){
-                        orderPromotionDetail.setCoupon(promo.getCouponCodes().toString());
-                    }
-                    // 描述 ...name
-                    orderPromotionDetail.setDescribe(promo.getPromotionName());
-                    // 是否基于整单
-                    orderPromotionDetail.setBaseOrder(promo.getBaseOrder());
-                    sdkOrderPromotionDao.save(orderPromotionDetail);
+            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
+                if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
+                    sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
                 }
             }
         }
-    }
-
-    /**
-     * Sava order promotion.
-     *
-     * @param orderId
-     *            the order id
-     * @param promotionSKUDiscAMTBySetting
-     *            the promo
-     * @param orderLine
-     *            the res
-     * @param salesOrderCommand
-     *            the sales order command
-     */
-    protected void savaOrderPromotion(
-                    Long orderId,
-                    PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting,
-                    OrderLine orderLine,
-                    SalesOrderCommand salesOrderCommand){
-        OrderPromotion orderPromotion = new OrderPromotion();
-        // 订单id
-        orderPromotion.setOrderId(orderId);
-        // 订单行
-        orderPromotion.setOrderLineId(orderLine.getId());
-        // 活动id
-        orderPromotion.setActivityId(promotionSKUDiscAMTBySetting.getPromotionId());
-        // 促销码 (暂时没用)
-        orderPromotion.setPromotionNo(promotionSKUDiscAMTBySetting.getPromotionId().toString());
-        // 促销类型
-        orderPromotion.setPromotionType(promotionSKUDiscAMTBySetting.getPromotionType());
-        // 折扣金额
-        orderPromotion.setDiscountAmount(promotionSKUDiscAMTBySetting.getDiscountAmount());
-        // 是否运费折扣
-        orderPromotion.setIsShipDiscount(false);
-        // 优惠券
-        Set<String> couponCodesSet = promotionSKUDiscAMTBySetting.getCouponCodes();
-        Set<String> newSet = new HashSet<String>();
-        if (couponCodesSet != null){
-            List<String> list = new ArrayList<String>(couponCodesSet);
-            for (String couponcode : list){
-                if (couponcode.equals(CouponCodeCommand.BRUSHHEAD_COUPON)){
-                    for (CouponCodeCommand couponCodeCommand : salesOrderCommand.getCouponCodes()){
-                        if (couponCodeCommand.getIsOut()){
-                            newSet.add(couponCodeCommand.getCouponCode());
-                        }
-                    }
-                }else{
-                    newSet.add(couponcode);
-                }
-            }
-            orderPromotion.setCoupon(newSet.toString());
-        }
-
-        // 描述 ...name
-        orderPromotion.setDescribe(promotionSKUDiscAMTBySetting.getPromotionName());
-        // 是否基于整单
-        orderPromotion.setBaseOrder(promotionSKUDiscAMTBySetting.getBaseOrder());
-        sdkOrderPromotionDao.save(orderPromotion);
     }
 
     /**
@@ -1575,8 +1500,8 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderCommand || null == type){
             return salesOrderCommand;
         }else{
-        	if(type.equals(1)){
-            	decryptSalesOrderCommand(salesOrderCommand);
+            if (type.equals(1)){
+                decryptSalesOrderCommand(salesOrderCommand);
             }
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
@@ -1652,8 +1577,8 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public SalesOrderCommand findOrderByLineId(Long orderLineId){
-    	SalesOrderCommand salesOrderCommand =sdkOrderDao.findOrderByLineId(orderLineId);
-    	decryptSalesOrderCommand(salesOrderCommand);
+        SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderByLineId(orderLineId);
+        decryptSalesOrderCommand(salesOrderCommand);
         return salesOrderCommand;
     }
 
