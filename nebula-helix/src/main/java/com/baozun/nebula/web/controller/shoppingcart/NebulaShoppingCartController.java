@@ -415,7 +415,8 @@ public class NebulaShoppingCartController extends BaseController{
      */
     private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
         if (ShoppingcartResult.SUCCESS != shoppingcartResult){
-            DefaultReturnResult result = DefaultReturnResult.FAILURE;
+        	DefaultReturnResult result = new DefaultReturnResult();
+			result.setResult(false);
 
             String messageStr = getMessage(shoppingcartResult.toString());
 
