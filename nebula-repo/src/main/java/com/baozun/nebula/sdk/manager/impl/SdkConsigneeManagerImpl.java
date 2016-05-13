@@ -27,6 +27,7 @@ import com.baozun.nebula.dao.salesorder.SdkConsigneeDao;
 import com.baozun.nebula.model.salesorder.Consignee;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkConsigneeManager;
+import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.feilong.core.Validator;
 
 /**
@@ -45,6 +46,9 @@ public class SdkConsigneeManagerImpl implements SdkConsigneeManager{
     /** The sdk consignee dao. */
     @Autowired
     private SdkConsigneeDao     sdkConsigneeDao;
+    
+    @Autowired
+	private SdkSecretManager						 sdkSecretManager;
 
     /*
      * (non-Javadoc)
@@ -89,8 +93,26 @@ public class SdkConsigneeManagerImpl implements SdkConsigneeManager{
                 }
             }
         }
-
+        encryptConsignee(consignee);
         consignee.setOrderId(orderId);
         sdkConsigneeDao.save(consignee);
     }
+    
+    private void encryptConsignee(Consignee consignee){
+
+		sdkSecretManager.encrypt(consignee, new String[] {
+				"name",
+				"buyerName",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"tel",
+				"buyerTel",
+				"mobile", 
+				"email" });
+	}
 }

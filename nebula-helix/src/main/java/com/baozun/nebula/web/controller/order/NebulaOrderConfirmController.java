@@ -165,9 +165,9 @@ public class NebulaOrderConfirmController extends BaseController {
 
 	@Autowired
 	private OrderManager orderManager;
-	
+
 	/* 购物车为空返回的URL */
-	public static final String	CART_NULL_BACK_URL	= "/index";
+	public static final String CART_NULL_BACK_URL = "/index";
 
 	/**
 	 * 显示订单结算页面.
@@ -194,11 +194,11 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 获取购物车信息
 		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails);
-		
-		//购物车为空
-		if(shoppingCartCommand==null ||  shoppingCartCommand.getShoppingCartLineCommands()==null 
-				||shoppingCartCommand.getShoppingCartLineCommands().isEmpty()){
-			return "redirect:"+CART_NULL_BACK_URL;
+
+		// 购物车为空
+		if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
+				|| shoppingCartCommand.getShoppingCartLineCommands().isEmpty()) {
+			return "redirect:" + CART_NULL_BACK_URL;
 		}
 
 		// 封装viewCommand
@@ -264,7 +264,6 @@ public class NebulaOrderConfirmController extends BaseController {
 		ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(memberDetails,
 				salesOrderCommand, request);
 
-		
 		// 校验购物车信息和促销
 		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
 		SalesOrderResult salesorderResult = validateWithShoppingCart(shoppingCartCommand, couponCode);
@@ -274,7 +273,6 @@ public class NebulaOrderConfirmController extends BaseController {
 					memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(), new Date(), couponCode);
 			return toNebulaReturnResult(salesorderResult);
 		}
-		
 
 		// 新建订单
 		String subOrdinate = orderManager.saveOrder(shoppingCartCommand, salesOrderCommand,
@@ -327,7 +325,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
 		
 		//过滤未勾选的商品行
-		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 1);
+		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 0);
 		
 		if (null == cartLines) {
 			return null;
@@ -345,7 +343,8 @@ public class NebulaOrderConfirmController extends BaseController {
 	 */
 	private NebulaReturnResult toNebulaReturnResult(SalesOrderResult salesorderResult) {
 		if (SalesOrderResult.SUCCESS != salesorderResult) {
-			DefaultReturnResult result = DefaultReturnResult.FAILURE;
+			DefaultReturnResult result = new DefaultReturnResult();
+			result.setResult(false);
 
 			String messageStr = getMessage(salesorderResult.toString());
 
@@ -371,7 +370,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		if (null != salesOrderResult) {
 			return salesOrderResult;
 		}
-		
+
 		/** 如果输入了优惠券则要进行优惠券验证 */
 		if (Validator.isNotNullOrEmpty(coupon)) {
 			/** 校驗优惠券促销 */
@@ -380,7 +379,7 @@ public class NebulaOrderConfirmController extends BaseController {
 				return salesOrderResult;
 			}
 		}
-		
+
 		return SalesOrderResult.SUCCESS;
 	}
 
@@ -428,7 +427,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		return SalesOrderResult.ORDER_COUPON_NOT_AVALIBLE;
 
 	}
-	
+
 	private SalesOrderReturnObject createReturnObject(String subOrdinate) {
 		// 通過支付流水號查詢訂單
 		SalesOrderCommand newOrder = salesOrderResolver.getSalesOrderCommand(subOrdinate);
@@ -436,7 +435,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		salesOrderReturnObject.setCode(newOrder.getCode());
 		salesOrderReturnObject.setId(newOrder.getId());
 		salesOrderReturnObject.setSubOrdinate(subOrdinate);
-		
+
 		return salesOrderReturnObject;
 	}
 

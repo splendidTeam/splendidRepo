@@ -69,7 +69,7 @@ public class Facet {
 		return count;
 	}
 
-	public boolean isSelected() {
+	public boolean getSelected() {
 		return selected;
 	}
 

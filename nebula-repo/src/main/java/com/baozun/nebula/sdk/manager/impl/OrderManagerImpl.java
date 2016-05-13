@@ -114,7 +114,6 @@ import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
 
-
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
@@ -284,6 +283,27 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkSecretManager                         sdkSecretManager;
 
+<<<<<<< HEAD
+=======
+    private void encryptConsignee(Consignee consignee){
+
+        sdkSecretManager.encrypt(consignee, new String[] {
+                                                           "name",
+                                                           "buyerName",
+                                                           "country",
+                                                           "province",
+                                                           "city",
+                                                           "area",
+                                                           "town",
+                                                           "address",
+                                                           "postcode",
+                                                           "tel",
+                                                           "buyerTel",
+                                                           "mobile",
+                                                           "email" });
+    }
+
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
 
         sdkSecretManager.decrypt(salesOrderCommand, new String[] {
