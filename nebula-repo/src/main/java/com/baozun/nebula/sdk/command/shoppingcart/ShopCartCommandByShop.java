@@ -10,118 +10,116 @@ import com.baozun.nebula.command.Command;
  * @author 阳羽
  * @createtime 2014-4-1 下午01:15:08
  */
-public class ShopCartCommandByShop  implements Command{
+public class ShopCartCommandByShop implements Command{
 
-	/**
-	 * 
-	 */
-	private static final long	serialVersionUID	= -5235640413320319863L;
+    private static final long serialVersionUID         = -5235640413320319863L;
 
-	// 订单优惠
-	private BigDecimal disAmtOnOrder = BigDecimal.ZERO;
+    // 订单优惠
+    private BigDecimal        disAmtOnOrder            = BigDecimal.ZERO;
 
-	// 整单优惠
-	private BigDecimal disAmtSingleOrder = BigDecimal.ZERO;
-	// 应付小计
-	private BigDecimal subtotalCurrentPayAmount = BigDecimal.ZERO;
+    // 整单优惠
+    private BigDecimal        disAmtSingleOrder        = BigDecimal.ZERO;
 
-	// 商品数量
-	private Integer qty;
+    // 应付小计
+    private BigDecimal        subtotalCurrentPayAmount = BigDecimal.ZERO;
 
-	// 应付运费
-	private BigDecimal originShoppingFee = BigDecimal.ZERO;
+    // 商品数量
+    private Integer           qty;
 
-	// 应付合计
-	private BigDecimal sumCurrentPayAmount;
+    // 应付运费
+    private BigDecimal        originShoppingFee        = BigDecimal.ZERO;
 
-	// 优惠合计
-	private BigDecimal offersTotal = BigDecimal.ZERO;
+    // 应付合计
+    private BigDecimal        sumCurrentPayAmount;
 
-	// 实付合计
-	private BigDecimal realPayAmount;
+    // 优惠合计
+    private BigDecimal        offersTotal              = BigDecimal.ZERO;
 
-	// 运费优惠
-	private BigDecimal offersShipping = BigDecimal.ZERO;
+    // 实付合计
+    private BigDecimal        realPayAmount;
 
-	private Long shopId;
+    // 运费优惠
+    private BigDecimal        offersShipping           = BigDecimal.ZERO;
 
-	public Long getShopId() {
-		return shopId;
-	}
+    private Long              shopId;
 
-	public void setShopId(Long shopId) {
-		this.shopId = shopId;
-	}
+    public Long getShopId(){
+        return shopId;
+    }
 
-	public BigDecimal getOffersShipping() {
-		return offersShipping;
-	}
+    public void setShopId(Long shopId){
+        this.shopId = shopId;
+    }
 
-	public void setOffersShipping(BigDecimal offersShipping) {
-		this.offersShipping = offersShipping;
-	}
+    public BigDecimal getOffersShipping(){
+        return offersShipping;
+    }
 
-	public BigDecimal getDisAmtOnOrder() {
-		return disAmtOnOrder;
-	}
+    public void setOffersShipping(BigDecimal offersShipping){
+        this.offersShipping = offersShipping;
+    }
 
-	public void setDisAmtOnOrder(BigDecimal disAmtOnOrder) {
-		this.disAmtOnOrder = disAmtOnOrder;
-	}
+    public BigDecimal getDisAmtOnOrder(){
+        return disAmtOnOrder;
+    }
 
-	public BigDecimal getDisAmtSingleOrder() {
-		return disAmtSingleOrder;
-	}
+    public void setDisAmtOnOrder(BigDecimal disAmtOnOrder){
+        this.disAmtOnOrder = disAmtOnOrder;
+    }
 
-	public void setDisAmtSingleOrder(BigDecimal disAmtSingleOrder) {
-		this.disAmtSingleOrder = disAmtSingleOrder;
-	}
+    public BigDecimal getDisAmtSingleOrder(){
+        return disAmtSingleOrder;
+    }
 
-	public BigDecimal getSubtotalCurrentPayAmount() {
-		return subtotalCurrentPayAmount;
-	}
+    public void setDisAmtSingleOrder(BigDecimal disAmtSingleOrder){
+        this.disAmtSingleOrder = disAmtSingleOrder;
+    }
 
-	public void setSubtotalCurrentPayAmount(BigDecimal subtotalCurrentPayAmount) {
-		this.subtotalCurrentPayAmount = subtotalCurrentPayAmount;
-	}
+    public BigDecimal getSubtotalCurrentPayAmount(){
+        return subtotalCurrentPayAmount;
+    }
 
-	public Integer getQty() {
-		return qty;
-	}
+    public void setSubtotalCurrentPayAmount(BigDecimal subtotalCurrentPayAmount){
+        this.subtotalCurrentPayAmount = subtotalCurrentPayAmount;
+    }
 
-	public void setQty(Integer qty) {
-		this.qty = qty;
-	}
+    public Integer getQty(){
+        return qty;
+    }
 
-	public BigDecimal getOriginShoppingFee() {
-		return originShoppingFee;
-	}
+    public void setQty(Integer qty){
+        this.qty = qty;
+    }
 
-	public void setOriginShoppingFee(BigDecimal originShoppingFee) {
-		this.originShoppingFee = originShoppingFee;
-	}
+    public BigDecimal getOriginShoppingFee(){
+        return originShoppingFee;
+    }
 
-	public BigDecimal getSumCurrentPayAmount() {
-		return sumCurrentPayAmount;
-	}
+    public void setOriginShoppingFee(BigDecimal originShoppingFee){
+        this.originShoppingFee = originShoppingFee;
+    }
 
-	public void setSumCurrentPayAmount(BigDecimal sumCurrentPayAmount) {
-		this.sumCurrentPayAmount = sumCurrentPayAmount;
-	}
+    public BigDecimal getSumCurrentPayAmount(){
+        return sumCurrentPayAmount;
+    }
 
-	public BigDecimal getOffersTotal() {
-		return offersTotal;
-	}
+    public void setSumCurrentPayAmount(BigDecimal sumCurrentPayAmount){
+        this.sumCurrentPayAmount = sumCurrentPayAmount;
+    }
 
-	public void setOffersTotal(BigDecimal offersTotal) {
-		this.offersTotal = offersTotal;
-	}
+    public BigDecimal getOffersTotal(){
+        return offersTotal;
+    }
 
-	public BigDecimal getRealPayAmount() {
-		return realPayAmount;
-	}
+    public void setOffersTotal(BigDecimal offersTotal){
+        this.offersTotal = offersTotal;
+    }
 
-	public void setRealPayAmount(BigDecimal realPayAmount) {
-		this.realPayAmount = realPayAmount;
-	}
+    public BigDecimal getRealPayAmount(){
+        return realPayAmount;
+    }
+
+    public void setRealPayAmount(BigDecimal realPayAmount){
+        this.realPayAmount = realPayAmount;
+    }
 }

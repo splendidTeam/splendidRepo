@@ -941,7 +941,7 @@ public class OrderManagerImpl implements OrderManager{
         return name;
     }
 
-    //TODO feilong 如果有bundle 逻辑处理
+    //TODO feilong 扣减库存 如果有bundle 逻辑处理
     /**
      * Liquidate sku inventory.
      *
@@ -951,11 +951,21 @@ public class OrderManagerImpl implements OrderManager{
     private void liquidateSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
-        Map<String, Integer> extentionCodeandCountMap = new HashMap<String, Integer>();
+        Map<String, Integer> extentionCodeAndCountMap = buildExtentionCodeAndCountMap(shoppingCartLineCommandList);
+        sdkSkuInventoryManager.deductSkuInventory(extentionCodeAndCountMap);
+    }
+
+    /**
+     * @param shoppingCartLineCommandList
+     * @return
+     * @since 5.3.1
+     */
+    private Map<String, Integer> buildExtentionCodeAndCountMap(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        Map<String, Integer> extentionCodeAndCountMap = new HashMap<String, Integer>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
             //如果直推礼品库存数小于购买量时，扣减现有库存
             Integer quantity = shoppingCartLineCommand.getQuantity();
-            if (isNoNeedChoiceGift(shoppingCartLineCommand)){
+            if (isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
                 //下架
                 if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
                     continue;
@@ -969,9 +979,14 @@ public class OrderManagerImpl implements OrderManager{
             }
             //主卖品和赠品都扣库存
             String extentionCode = shoppingCartLineCommand.getExtentionCode();
-            extentionCodeandCountMap.put(extentionCode, quantity);
+
+            if (!extentionCodeAndCountMap.containsKey(extentionCode)){
+                extentionCodeAndCountMap.put(extentionCode, quantity);
+            }else{
+                extentionCodeAndCountMap.put(extentionCode, quantity + extentionCodeAndCountMap.get(extentionCode));
+            }
         }
-        sdkSkuInventoryManager.deductSkuInventory(extentionCodeandCountMap);
+        return extentionCodeAndCountMap;
     }
 
     /**

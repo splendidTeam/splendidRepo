@@ -29,14 +29,86 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 
 /**
  * The Class ShoppingCartLineCommand.
+ * 
+ * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand
+ * @see com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop
  */
 public class ShoppingCartLineCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
     private static final long          serialVersionUID = -5071101827860973497L;
 
+    //*********************************************************************************
+    /** PK *. */
+    private Long                       id;
+
+    /** 店铺id . */
+    private Long                       shopId;
+
+    /** 店铺名称 . */
+    private String                     shopName;
+
+    /** 会员id. */
+    private Long                       memberId;
+
+    //*********************************************************************************
+    /** skuId . */
+    private Long                       skuId;
+
     /** The extention code. */
     private String                     extentionCode;
+
+    /** 商品id . */
+    private Long                       itemId;
+
+    /** 商品名称 . */
+    private String                     itemName;
+
+    /** 购物数量 . */
+    private Integer                    quantity;
+
+    /** 商品图片 *. */
+    private String                     itemPic;
+
+    /** 结算状态 0未选中结算 1选中结算. */
+    private Integer                    settlementState;
+
+    /**
+     * 销售属性.
+     * 
+     * @see com.baozun.nebula.model.product.Sku#getProperties()
+     */
+    private String                     saleProperty;
+
+    /**
+     * 销售属性 .
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkSkuManager#getSkuPros(String)
+     */
+    private List<SkuProperty>          skuPropertys;
+
+    //*********************************************************************************
+
+    /** 吊牌价 *. */
+    private BigDecimal                 listPrice;
+
+    /** 商品单价. */
+    private BigDecimal                 salePrice;
+
+    /** 购物车行 金额小计 *. */
+    private BigDecimal                 subTotalAmt      = BigDecimal.ZERO;
+
+    /** 加入时间. */
+    private Date                       createTime;
+
+    /**
+     * 0代表非买品 1代表主卖品 与itemInfo中的type一致.
+     * 
+     * @see com.baozun.nebula.model.product.ItemInfo#getType()
+     */
+    private Integer                    type;
+
+    //*********************************************************************************
 
     /** 行分组 *. */
     private Long                       lineGroup;
@@ -52,24 +124,6 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /** 是套餐行 t是套餐行，f不是套餐行 *. */
     private boolean                    isSuitLine;
-
-    /** 商品款的id *. */
-    private Long                       skuId;
-
-    /** 商品id *. */
-    private Long                       itemId;
-
-    /** 购物数量 *. */
-    private Integer                    quantity;
-
-    /** 商品名称 *. */
-    private String                     itemName;
-
-    /** 商品图片 *. */
-    private String                     itemPic;
-
-    /** 销售属性 *. */
-    private String                     saleProperty;
 
     /** 是否可见 1可见 /0不可见 *. */
     private Integer                    visibleMark;
@@ -87,17 +141,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     private Integer                    stock;
 
     /** ***** 扩展engine所需要的字段begin ******. */
-
-    private String                     productCode;                             // 商品code
+    /**
+     * 商品code
+     */
+    private String                     productCode;
 
     /** The lable ids. */
     private List<Long>                 lableIds;
 
-    /** The brand id. */
-    private String                     brandId;
-
     /** The category list. */
     private List<Long>                 categoryList;
+
+    /** The brand id. */
+    private String                     brandId;
 
     /** The store id. */
     private long                       storeId;
@@ -108,14 +164,11 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** The state. */
     private String                     state;
 
-    /** 商品单价. */
-    private BigDecimal                 salePrice;
-
     /** 行促销(此商口多个数量的促销总和) 折扣-包含整单优惠分摊. */
     private BigDecimal                 discount         = BigDecimal.ZERO;
 
     /** 折扣单价-不包含整单优惠分摊. */
-    private BigDecimal                 discountPrice    = BigDecimal.ZERO;;
+    private BigDecimal                 discountPrice    = BigDecimal.ZERO;
 
     /** 套餐、行赠品类型，只有一个PromotionId 其他类型可能有多个活动 *. */
     private List<PromotionCommand>     promotionList;
@@ -126,38 +179,8 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 1是行赠品,0是整单赠品. */
     private int                        giftType;
 
-    /** 会员id. */
-    private Long                       memberId;
-
-    /** 加入时间. */
-    private Date                       createTime;
-
-    /** PK *. */
-    private Long                       id;
-
-    /** 结算状态 0未选中结算 1选中结算. */
-    private Integer                    settlementState;
-
-    /** 0代表非买品 1代表主卖品 与itemInfo中的type一致. */
-    private Integer                    type;
-
-    /** 店铺id *. */
-    private Long                       shopId;
-
-    /** 店铺名称 *. */
-    private String                     shopName;
-
-    /** 销售属性 *. */
-    private List<SkuProperty>          skuPropertys;
-
     /** 分组标签 *. */
     private Set<String>                comboIds;
-
-    /** 吊牌价 *. */
-    private BigDecimal                 listPrice;
-
-    /** 购物车行 金额小计 *. */
-    private BigDecimal                 subTotalAmt      = BigDecimal.ZERO;
 
     /** 行上的Coupon *. */
     private PromotionCouponCodeCommand couponCodeOnLine;
@@ -173,9 +196,6 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /** 用户不参与选择时，直接推送礼品的样数；用户参与选择时，直接推送礼品的样数. */
     private Integer                    giftCountLimited;
-
-    /** 商城自定义参数，nebula不控制. */
-    private Map<String, Object>        customParamMap;
 
     //***************************************************************************************************
 
@@ -196,6 +216,9 @@ public class ShoppingCartLineCommand extends BaseModel{
     private String                     wareHoseName;
 
     //***************************************************************************************************
+
+    /** 商城自定义参数，nebula不控制. */
+    private Map<String, Object>        customParamMap;
 
     /**
      * 获得 promotion ids.
@@ -444,25 +467,6 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 商品款的id *.
-     *
-     * @return the 商品款的id *
-     */
-    public Long getSkuId(){
-        return skuId;
-    }
-
-    /**
-     * 设置 商品款的id *.
-     *
-     * @param skuId
-     *            the new 商品款的id *
-     */
-    public void setSkuId(Long skuId){
-        this.skuId = skuId;
-    }
-
-    /**
      * 获得 销售属性 *.
      *
      * @return the 销售属性 *
@@ -675,6 +679,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 0代表非买品 1代表主卖品 与itemInfo中的type一致.
      *
      * @return the 0代表非买品 1代表主卖品 与itemInfo中的type一致
+     * @see com.baozun.nebula.model.product.ItemInfo#getType()
      */
     public Integer getType(){
         return type;
@@ -685,6 +690,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param type
      *            the new 0代表非买品 1代表主卖品 与itemInfo中的type一致
+     * @see com.baozun.nebula.model.product.ItemInfo#getType()
      */
     public void setType(Integer type){
         this.type = type;
@@ -1182,6 +1188,25 @@ public class ShoppingCartLineCommand extends BaseModel{
      */
     public void setPresale(boolean isPresale){
         this.isPresale = isPresale;
+    }
+
+    /**
+     * 获得 skuId .
+     *
+     * @return the skuId
+     */
+    public Long getSkuId(){
+        return skuId;
+    }
+
+    /**
+     * 设置 skuId .
+     *
+     * @param skuId
+     *            the skuId to set
+     */
+    public void setSkuId(Long skuId){
+        this.skuId = skuId;
     }
 
 }
