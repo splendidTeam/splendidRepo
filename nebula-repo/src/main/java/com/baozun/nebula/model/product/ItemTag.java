@@ -39,6 +39,7 @@ import com.baozun.nebula.model.BaseModel;
 @Entity
 @Table(name = "T_PD_ITEMTAG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
+@Deprecated
 public class ItemTag extends BaseModel{
 
 	/**

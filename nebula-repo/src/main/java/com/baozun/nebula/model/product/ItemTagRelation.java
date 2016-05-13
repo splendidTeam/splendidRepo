@@ -34,6 +34,7 @@ import com.baozun.nebula.model.BaseModel;
 
 @Entity
 @Table(name = "T_PD_ITEM_TAG_RELATION")
+@Deprecated
 public class ItemTagRelation extends BaseModel{
 
 	/**
