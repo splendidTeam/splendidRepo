@@ -118,14 +118,15 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		// 设置支付信息
 		PaymentInfoSubForm paymentInfoSubForm = orderForm.getPaymentInfoSubForm();
 		salesOrderCommand.setPayment(Integer.parseInt(paymentInfoSubForm.getPaymentType()));
-		salesOrderCommand.setPaymentStr(BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getPaymentType(),
+		salesOrderCommand.setPaymentStr(BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getBankcode(),
 				Integer.parseInt(paymentInfoSubForm.getPaymentType())));
 		// 设置运费
 		setFreghtCommand(salesOrderCommand);
 		// 设置优惠券信息
 		setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
 		// 用户信息
-		salesOrderCommand.setMemberName(memberDetails.getLoginName());
+		salesOrderCommand.setMemberName(memberDetails==null?"":memberDetails.getLoginName());
+		salesOrderCommand.setMemberId(memberDetails==null? null: memberDetails.getMemberId());
 		salesOrderCommand.setIp(RequestUtil.getClientIp(request));
 		// 发票信息
 		salesOrderCommand.setReceiptTitle(orderForm.getInvoiceInfoSubForm().getInvoiceTitle());
@@ -192,8 +193,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
 		List<String> couponList = new ArrayList<String>();
-		if (Validator.isNullOrEmpty(salesOrderCommand.getCouponCodes())) {
-			couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
+		if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())) {
+				couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
 		}
 		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, couponList,
 				salesOrderCommand.getCalcFreightCommand(), cartLines);
