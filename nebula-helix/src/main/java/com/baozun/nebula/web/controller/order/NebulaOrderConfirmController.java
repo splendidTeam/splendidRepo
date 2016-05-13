@@ -32,7 +32,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
@@ -191,9 +193,13 @@ public class NebulaOrderConfirmController extends BaseController {
 			HttpServletResponse response, Model model) {
 
 		// TODO feilong 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
-
+		List<ContactCommand> addressList = null;
+		if(memberDetails != null){
+			addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId());
+		}
+		
 		// 获取购物车信息
-		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails);
+		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails,addressList);
 
 		// 购物车为空
 		if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
@@ -205,8 +211,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
 		orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
 		// 收获地址信息
-		orderConfirmViewCommand.setAddressList(memberDetails == null ? null
-				: sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId()));
+		orderConfirmViewCommand.setAddressList(addressList);
 
 		model.addAttribute(MODEL_KEY_ORDER_CONFIRM, orderConfirmViewCommand);
 
@@ -316,7 +321,7 @@ public class NebulaOrderConfirmController extends BaseController {
 	 * @return the cart info
 	 */
 	protected ShoppingCartCommand getChosenShoppingCartCommand(HttpServletRequest request,
-			MemberDetails memberDetails) {
+			MemberDetails memberDetails,List<ContactCommand> addressList) {
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
@@ -332,7 +337,31 @@ public class NebulaOrderConfirmController extends BaseController {
 		}
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+		
+		
+		//地址
+		CalcFreightCommand  calcFreightCommand  = null;
+		if(addressList!=null && !addressList.isEmpty()){
+			ContactCommand contactCommand =null;
+			
+			//默认地址
+			for(ContactCommand curContactCommand:addressList){
+				if(curContactCommand.getIsDefault()){
+					contactCommand = curContactCommand;
+					break;
+				}
+			}
+			//无默认，取第一条
+			if(contactCommand==null){
+				contactCommand  = addressList.get(0);
+			}
+			calcFreightCommand = new CalcFreightCommand();
+			calcFreightCommand.setProvienceId(contactCommand.getProvinceId());
+			calcFreightCommand.setCityId(contactCommand.getCityId());
+			calcFreightCommand.setCountyId(contactCommand.getAreaId());
+		}
+		
+		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, calcFreightCommand, cartLines);
 	}
 
 	/**
