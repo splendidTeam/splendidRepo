@@ -27,10 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +64,6 @@ import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.model.salesorder.CancelOrderApp;
 import com.baozun.nebula.model.salesorder.Consignee;
 import com.baozun.nebula.model.salesorder.OrderLine;
-import com.baozun.nebula.model.salesorder.OrderPromotion;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.ReturnOrderApp;
@@ -208,10 +203,6 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkPayCodeManager                        sdkPayCodeManager;
 
-    /** The pay info dao. */
-    @Autowired
-    private PayInfoDao                               payInfoDao;
-
     /** The sdk pay info manager. */
     @Autowired
     private SdkPayInfoManager                        sdkPayInfoManager;
@@ -252,10 +243,6 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkMataInfoManager                       sdkMataInfoManager;
 
-    /** The event publisher. */
-    @Autowired
-    private EventPublisher                           eventPublisher;
-
     /** The sdk member manager. */
     @Autowired
     private SdkMemberManager                         sdkMemberManager;
@@ -283,8 +270,13 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkSecretManager                         sdkSecretManager;
 
+    /** The event publisher. */
+    @Autowired
+    private EventPublisher                           eventPublisher;
+
     /**
      * 解密订单中的收货人信息
+     * 
      * @param salesOrderCommand
      */
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
@@ -319,7 +311,7 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderCommand)
             return null;
         if (type == 1){
-        	//收货人信息解密
+            //收货人信息解密
             decryptSalesOrderCommand(salesOrderCommand);
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
@@ -649,38 +641,13 @@ public class OrderManagerImpl implements OrderManager{
                 // 支付方式 String格式：shopId||payMentType||金额
                 String[] strs = soPayMentDetail.split(SEPARATOR_FLAG);
                 if (shopId.toString().equals(strs[0]) && strs.length == 3){
-                    PayInfo res = savePayInfo(salesOrder, strs);
-                    payMainMoney = payMainMoney.subtract(res.getPayMoney());
+                    PayInfo payInfo = sdkPayInfoManager.savePayInfo(salesOrder.getId(), Integer.parseInt(strs[1]), new BigDecimal(strs[2]));
+                    payMainMoney = payMainMoney.subtract(payInfo.getPayMoney());
                 }
             }
         }
         PayInfo payInfo = sdkPayInfoManager.savePayInfoOfPayMain(salesOrderCommand, salesOrder.getId(), payMainMoney);
         sdkPayInfoLogManager.savePayInfoLogOfPayMain(salesOrderCommand, subOrdinate, payInfo);
-    }
-
-    /**
-     * Save pay info.
-     *
-     * @param salesOrder
-     *            the sales order
-     * @param strs
-     *            the strs
-     * @return the pay info
-     */
-    private PayInfo savePayInfo(SalesOrder salesOrder,String[] strs){
-        PayInfo payInfo = new PayInfo();
-
-        payInfo.setOrderId(salesOrder.getId());
-        payInfo.setPaySuccessStatus(true);
-        payInfo.setPayType(Integer.parseInt(strs[1]));
-        BigDecimal payMoney = new BigDecimal(strs[2]);
-        payInfo.setPayMoney(payMoney);
-        payInfo.setPayNumerical(payMoney);
-
-        payInfo.setCreateTime(new Date());
-        // 付款时间
-        payInfo.setModifyTime(new Date());
-        return payInfoDao.save(payInfo);
     }
 
     /**
@@ -692,7 +659,8 @@ public class OrderManagerImpl implements OrderManager{
     protected void sendEmailOfCreateOrder(List<Map<String, Object>> dataMapList){
         if (Validator.isNotNullOrEmpty(dataMapList)){
             for (Map<String, Object> dataMap : dataMapList){
-                EmailEvent emailEvent = new EmailEvent(this, dataMap.get("email").toString(), EmailConstants.CREATE_ORDER_SUCCESS, dataMap);
+                String email = dataMap.get("email").toString();
+                EmailEvent emailEvent = new EmailEvent(this, email, EmailConstants.CREATE_ORDER_SUCCESS, dataMap);
                 eventPublisher.publish(emailEvent);
             }
         }
@@ -1493,7 +1461,7 @@ public class OrderManagerImpl implements OrderManager{
             return salesOrderCommand;
         }else{
             if (type.equals(1)){
-            	//type为1时将查处收货人信息，此时解密
+                //type为1时将查处收货人信息，此时解密
                 decryptSalesOrderCommand(salesOrderCommand);
             }
             // 订单支付信息

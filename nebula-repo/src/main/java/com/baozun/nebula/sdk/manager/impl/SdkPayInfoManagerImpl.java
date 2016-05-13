@@ -32,6 +32,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
 
 /**
+ * The Class SdkPayInfoManagerImpl.
  *
  * @author feilong
  * @version 5.3.1 2016年5月13日 下午4:08:03
@@ -41,6 +42,7 @@ import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
 @Service("sdkPayInfoManager")
 public class SdkPayInfoManagerImpl implements SdkPayInfoManager{
 
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkPayInfoManagerImpl.class);
 
     /** The pay info dao. */
@@ -75,6 +77,27 @@ public class SdkPayInfoManagerImpl implements SdkPayInfoManager{
         // 分期期数
         payInfo.setPeriods(salesOrderCommand.getPeriods());
         payInfo.setCreateTime(new Date());
+        return payInfoDao.save(payInfo);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkPayInfoManager#savePayInfo(java.lang.Long, int, java.math.BigDecimal)
+     */
+    @Override
+    public PayInfo savePayInfo(Long orderId,int payType,BigDecimal payMoney){
+        PayInfo payInfo = new PayInfo();
+
+        payInfo.setOrderId(orderId);
+        payInfo.setPaySuccessStatus(true);
+        payInfo.setPayType(payType);
+        payInfo.setPayMoney(payMoney);
+        payInfo.setPayNumerical(payMoney);
+
+        payInfo.setCreateTime(new Date());
+        // 付款时间
+        payInfo.setModifyTime(new Date());
         return payInfoDao.save(payInfo);
     }
 }
