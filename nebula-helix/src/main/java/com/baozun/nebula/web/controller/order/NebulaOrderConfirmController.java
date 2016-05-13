@@ -256,9 +256,9 @@ public class NebulaOrderConfirmController extends BaseController {
 		ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(memberDetails,
 				salesOrderCommand, request);
 
+		
 		// 校验购物车信息和促销
 		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
-
 		SalesOrderResult salesorderResult = validateWithShoppingCart(shoppingCartCommand, couponCode);
 		// 如果校验失败，返回错误
 		if (salesorderResult != SalesOrderResult.SUCCESS) {
@@ -266,6 +266,7 @@ public class NebulaOrderConfirmController extends BaseController {
 					memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(), new Date(), couponCode);
 			return toNebulaReturnResult(salesorderResult);
 		}
+		
 
 		// 新建订单
 		String subOrdinate = orderManager.saveOrder(shoppingCartCommand, salesOrderCommand,
@@ -358,11 +359,16 @@ public class NebulaOrderConfirmController extends BaseController {
 		if (null != salesOrderResult) {
 			return salesOrderResult;
 		}
-		/** 校驗优惠券促销 */
-		salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
-		if (null != salesOrderResult) {
-			return salesOrderResult;
+		
+		/** 如果输入了优惠券则要进行优惠券验证 */
+		if (Validator.isNotNullOrEmpty(coupon)) {
+			/** 校驗优惠券促销 */
+			salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
+			if (null != salesOrderResult) {
+				return salesOrderResult;
+			}
 		}
+		
 		return SalesOrderResult.SUCCESS;
 	}
 
