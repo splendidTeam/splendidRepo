@@ -327,7 +327,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
 		
 		//过滤未勾选的商品行
-		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 1);
+		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 0);
 		
 		if (null == cartLines) {
 			return null;
