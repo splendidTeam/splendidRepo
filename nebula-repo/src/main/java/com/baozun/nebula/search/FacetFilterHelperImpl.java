@@ -209,7 +209,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 分类的facetGroup转换
 		for (FacetGroup facetGroup : searchResultPage.getFacetGroups()){
-			if (facetGroup.isCategory()) {
+			if (facetGroup.getIsCategory()) {
 				// 如果是分类的facet
 				List<Facet> facets = new FacetTreeUtil().createFacetTree(facetGroup);
 				facets = covertCategoryFacets(facets, facetFilterMetaData.getCategoryMetaMap(), facetParameters);
@@ -227,7 +227,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 			for (FacetGroup facetGroup : searchResultPage.getFacetGroups()){
 				boolean isBreak = false;
-				if (!facetGroup.isCategory()) {
+				if (!facetGroup.getIsCategory()) {
 					// 如果是属性
 					if (FacetType.PROPERTY.toString().equals(facetGroup.getType())) {
 						if (propertyId != null && propertyId.equals(facetGroup.getId())) {
@@ -320,14 +320,14 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		Map<Long, MetaDataCommand> propertyValueMetaMap = facetFilterMetaData.getPropertyValueMetaMap();
 		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
 
-		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId().toString());
+		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId());
 		if (searchObj != null)
 			facetGroup.setTitle(searchObj.getName());
 
 		List<Facet> facets = facetGroup.getFacets();
 		if (facets != null && facets.size() > 0) {
 			for (Facet facet : facets){
-				MetaDataCommand propertyValueObj = propertyValueMetaMap.get(facet.getId());
+				MetaDataCommand propertyValueObj = propertyValueMetaMap.get(Long.valueOf(facet.getValue()));
 				if (propertyValueObj != null) {
 					facet.setTitle(propertyValueObj.getName());
 					facet.setSortNo(propertyValueObj.getSortNo());
@@ -365,7 +365,16 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			List<FacetParameter> facetParameters){
 		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
 
-		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId().toString());
+		SearchConditionCommand searchObj=null;		
+		for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+			SearchConditionCommand searchConditionCommand=entry.getValue();
+			if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())){
+				searchObj=searchConditionCommand;
+				break;
+			}
+			
+		}
+		
 		if (searchObj != null) {
 			facetGroup.setTitle(searchObj.getName());
 		}else{
