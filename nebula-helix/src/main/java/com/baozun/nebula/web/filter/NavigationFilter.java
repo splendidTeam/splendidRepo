@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.baozun.nebula.model.baseinfo.Navigation;
+import com.baozun.nebula.command.product.FilterNavigationCommand;
+import com.baozun.nebula.manager.navigation.NavigationHelperManager;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
 import com.feilong.core.Validator;
 
@@ -30,6 +31,7 @@ public class NavigationFilter implements Filter{
 	
 	private SdkNavigationManager	sdkNavigationManager;
 	
+	private NavigationHelperManager		navigationHelperManager;
 	
 
 	@Override
@@ -40,6 +42,7 @@ public class NavigationFilter implements Filter{
 		 webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext); 
 		
 		sdkNavigationManager = webApplicationContext.getBean(SdkNavigationManager.class);
+		navigationHelperManager = webApplicationContext.getBean(NavigationHelperManager.class);
 		
 	}
 
@@ -50,10 +53,20 @@ public class NavigationFilter implements Filter{
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 		
 		String pathURI = request.getRequestURI();
-		Navigation navigation = sdkNavigationManager.findEffectNavigationByUrl(pathURI);
+		
+		pathURI = pathURI.endsWith("/") ? pathURI.substring(0, pathURI.length()-1) : pathURI;
+		
+		String	queryStr = request.getQueryString();
+		
+		FilterNavigationCommand filterNavigation = navigationHelperManager.matchNavigationByUrl(pathURI, queryStr);
+		
 		//如果导航是实际的商品列表导航页面，那需要跳转到导航的列表页，
-		if(Validator.isNotNullOrEmpty(navigation) && Navigation.TYPE_ITEM_LIST.equals(navigation.getType())){
-			request.getRequestDispatcher("/sys/navigation?navId="+navigation.getCollectionId()).forward(request, response);
+		if(Validator.isNotNullOrEmpty(filterNavigation)){
+			StringBuffer _urlBuff = new StringBuffer("/sys/navigation?nid="+filterNavigation.getNavId());
+			if(Validator.isNotNullOrEmpty(filterNavigation.getCollectionId())){
+				_urlBuff.append("&cid=").append(filterNavigation.getCollectionId());
+			}
+			request.getRequestDispatcher(_urlBuff.toString()).forward(request, response);
 		}else{
 			chain.doFilter(request, response);
 		}
