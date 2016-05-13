@@ -23,10 +23,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -46,9 +44,7 @@ import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.dao.coupon.CouponDao;
 import com.baozun.nebula.dao.freight.DistributionModeDao;
-import com.baozun.nebula.dao.payment.PayCodeDao;
 import com.baozun.nebula.dao.payment.PayInfoDao;
-import com.baozun.nebula.dao.payment.PayInfoLogDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.promotion.PromotionCouponCodeDao;
 import com.baozun.nebula.dao.salesorder.SdkCancelOrderDao;
@@ -58,13 +54,11 @@ import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderPromotionDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderStatusLogDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnOrderDao;
-import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.event.EmailEvent;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.freight.DistributionMode;
 import com.baozun.nebula.model.member.MemberPersonalData;
-import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.model.salesorder.CancelOrderApp;
@@ -73,7 +67,6 @@ import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.OrderPromotion;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
 import com.baozun.nebula.model.salesorder.PayInfo;
-import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.ReturnOrderApp;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
@@ -103,13 +96,16 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkOrderLineManager;
 import com.baozun.nebula.sdk.manager.SdkOrderManager;
+import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
+import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
+import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.feilong.core.Validator;
+import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
 
 import loxia.dao.Page;
@@ -155,6 +151,7 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkOrderDao                              sdkOrderDao;
 
+    /** The sdk order manager. */
     @Autowired
     private SdkOrderManager                          sdkOrderManager;
 
@@ -198,21 +195,21 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private CouponDao                                couponDao;
 
-    /** The sdk shopping cart line dao. */
+    /** The sdk pay code manager. */
     @Autowired
-    private SdkShoppingCartLineDao                   sdkShoppingCartLineDao;
-
-    /** The pay code dao. */
-    @Autowired
-    private PayCodeDao                               payCodeDao;
+    private SdkPayCodeManager                        sdkPayCodeManager;
 
     /** The pay info dao. */
     @Autowired
     private PayInfoDao                               payInfoDao;
 
-    /** The pay info log dao. */
+    /** The sdk pay info manager. */
     @Autowired
-    private PayInfoLogDao                            payInfoLogDao;
+    private SdkPayInfoManager                        sdkPayInfoManager;
+
+    /** The sdk pay info log manager. */
+    @Autowired
+    private SdkPayInfoLogManager                     sdkPayInfoLogManager;
 
     /** The distribution mode dao. */
     @Autowired
@@ -476,27 +473,14 @@ public class OrderManagerImpl implements OrderManager{
         List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
                         .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
 
-        Map<Long, List<PromotionSKUDiscAMTBySetting>> promotionSKUDiscAMTBySettingMap = new HashMap<Long, List<PromotionSKUDiscAMTBySetting>>();
-        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-                List<PromotionSKUDiscAMTBySetting> list = promotionSKUDiscAMTBySettingMap.get(promotionSKUDiscAMTBySetting.getShopId());
-                if (list == null){
-                    list = new ArrayList<PromotionSKUDiscAMTBySetting>();
-                    promotionSKUDiscAMTBySettingMap.put(promotionSKUDiscAMTBySetting.getShopId(), list);
-                }
-                list.add(promotionSKUDiscAMTBySetting);
-            }
-        }
+        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
+                        .group(promotionSKUDiscAMTBySettingList, "shopId");
 
         // shopCartCommandByShopMap
         List<ShopCartCommandByShop> shopCartCommandByShopList = shoppingCartCommand.getSummaryShopCartList();
+        Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = CollectionsUtil.groupOne(shopCartCommandByShopList, "shopId");
 
-        Map<Long, ShopCartCommandByShop> shopCartCommandByShopMap = new HashMap<Long, ShopCartCommandByShop>();
-        if (Validator.isNotNullOrEmpty(shopCartCommandByShopList)){
-            for (ShopCartCommandByShop shopCartCommandByShop : shopCartCommandByShopList){
-                shopCartCommandByShopMap.put(shopCartCommandByShop.getShopId(), shopCartCommandByShop);
-            }
-        }
+        //*****************************************************************************************
 
         // 合并付款
         String subOrdinate = orderCodeCreator.createOrderSerialNO();
@@ -505,7 +489,6 @@ public class OrderManagerImpl implements OrderManager{
         }
 
         String isSendEmail = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
-
         BigDecimal paySum = getPaySum(salesOrderCommand, shoppingCartCommand);
 
         List<Map<String, Object>> dataMapList = new ArrayList<Map<String, Object>>();
@@ -514,8 +497,8 @@ public class OrderManagerImpl implements OrderManager{
             Long shopId = entry.getKey();
             List<ShoppingCartLineCommand> shoppingCartLineCommandList = shopIdAndShoppingCartLineCommandListMap.get(shopId);
 
-            List<PromotionSKUDiscAMTBySetting> psdabsList = promotionSKUDiscAMTBySettingMap.get(shopId);
-            ShopCartCommandByShop shopCartCommandByShop = shopCartCommandByShopMap.get(shopId);
+            List<PromotionSKUDiscAMTBySetting> psdabsList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
+            ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
 
             //***************************************************************************************
             // 根据shopId保存订单概要
@@ -551,8 +534,12 @@ public class OrderManagerImpl implements OrderManager{
             sdkSkuInventoryManager.deductSkuInventory(shoppingCartLineCommandList);
         }
 
+        //*************************************************************************************
+
         // 保存支付流水
-        savaPayCode(paySum, subOrdinate);
+        sdkPayCodeManager.savaPayCode(paySum, subOrdinate);
+
+        //*************************************************************************************
         // 优惠券状体置为已使用 isUsed = 1
         if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
             for (CouponCodeCommand couponCodeCommand : salesOrderCommand.getCouponCodes()){
@@ -631,97 +618,8 @@ public class OrderManagerImpl implements OrderManager{
                 }
             }
         }
-        PayInfo payInfo = savePayInfoOfPayMain(salesOrderCommand, salesOrder, payMainMoney);
-
-        savePayInfoLogOfPayMain(salesOrderCommand, subOrdinate, salesOrder, payMainMoney, payInfo);
-    }
-
-    /**
-     * Save pay info log of pay main.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param subOrdinate
-     *            the sub ordinate
-     * @param salesOrder
-     *            the sales order
-     * @param payMainMoney
-     *            the pay main money
-     * @param payInfo
-     *            the pay info
-     */
-    private void savePayInfoLogOfPayMain(
-                    SalesOrderCommand salesOrderCommand,
-                    String subOrdinate,
-                    SalesOrder salesOrder,
-                    BigDecimal payMainMoney,
-                    PayInfo payInfo){
-        Boolean codFlag = false;
-        if (salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-            codFlag = true;
-        }
-        PayInfoLog payInfoLog = new PayInfoLog();
-        payInfoLog.setCreateTime(new Date());
-        payInfoLog.setOrderId(salesOrder.getId());
-        if (codFlag){
-            payInfoLog.setPaySuccessStatus(true);
-        }else{
-            payInfoLog.setPaySuccessStatus(false);
-        }
-        payInfoLog.setCallCloseStatus(false);
-        payInfoLog.setPayType(salesOrderCommand.getPayment());
-        payInfoLog.setPayMoney(payMainMoney);
-        payInfoLog.setPayNumerical(payMainMoney);
-        // 用于保存银行
-        payInfoLog.setPayInfo(salesOrderCommand.getPaymentStr());
-        payInfoLog.setSubOrdinate(subOrdinate);
-        payInfoLog.setPayInfoId(payInfo.getId());
-
-        Properties pro = ProfileConfigUtil.findCommonPro("config/payMentInfo.properties");
-        String payInfoStr = salesOrderCommand.getPaymentStr();
-        String payType = pro.getProperty(payInfoStr + ".payType").trim();
-
-        if (Validator.isNotNullOrEmpty(payType)){
-            payInfoLog.setThirdPayType(Integer.parseInt(payType));
-        }
-
-        payInfoLogDao.save(payInfoLog);
-    }
-
-    /**
-     * Save pay info of pay main.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param salesOrder
-     *            the sales order
-     * @param payMainMoney
-     *            the pay main money
-     * @return the pay info
-     */
-    private PayInfo savePayInfoOfPayMain(SalesOrderCommand salesOrderCommand,SalesOrder salesOrder,BigDecimal payMainMoney){
-        Boolean codFlag = false;
-        if (salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-            codFlag = true;
-        }
-        PayInfo payInfo = new PayInfo();
-        payInfo.setCreateTime(new Date());
-        payInfo.setOrderId(salesOrder.getId());
-        if (codFlag){
-            payInfo.setPaySuccessStatus(true);
-        }else{
-            payInfo.setPaySuccessStatus(false);
-        }
-        payInfo.setPayType(salesOrderCommand.getPayment());
-        payInfo.setPayMoney(payMainMoney);
-        payInfo.setPayNumerical(payMainMoney);
-        // 分期期数
-        payInfo.setPeriods(salesOrderCommand.getPeriods());
-        // 用于保存银行
-        payInfo.setPayInfo(salesOrderCommand.getPaymentStr());
-        payInfo = payInfoDao.save(payInfo);
-
-        return payInfo;
+        PayInfo payInfo = sdkPayInfoManager.savePayInfoOfPayMain(salesOrderCommand, salesOrder.getId(), payMainMoney);
+        sdkPayInfoLogManager.savePayInfoLogOfPayMain(salesOrderCommand, subOrdinate, payInfo);
     }
 
     /**
@@ -735,18 +633,18 @@ public class OrderManagerImpl implements OrderManager{
      */
     private PayInfo savePayInfo(SalesOrder salesOrder,String[] strs){
         PayInfo payInfo = new PayInfo();
-        payInfo.setCreateTime(new Date());
-        // 付款时间
-        payInfo.setModifyTime(new Date());
+
         payInfo.setOrderId(salesOrder.getId());
         payInfo.setPaySuccessStatus(true);
         payInfo.setPayType(Integer.parseInt(strs[1]));
         BigDecimal payMoney = new BigDecimal(strs[2]);
         payInfo.setPayMoney(payMoney);
         payInfo.setPayNumerical(payMoney);
-        payInfo = payInfoDao.save(payInfo);
 
-        return payInfo;
+        payInfo.setCreateTime(new Date());
+        // 付款时间
+        payInfo.setModifyTime(new Date());
+        return payInfoDao.save(payInfo);
     }
 
     /**
@@ -922,24 +820,6 @@ public class OrderManagerImpl implements OrderManager{
             name = "支付宝";
         }
         return name;
-    }
-
-    /**
-     * Sava pay code.
-     *
-     * @param payMoney
-     *            the pay money
-     * @param subOrdinate
-     *            the sub ordinate
-     */
-    protected void savaPayCode(BigDecimal payMoney,String subOrdinate){
-        PayCode payCode = new PayCode();
-        payCode.setCreateTime(new Date());
-        payCode.setPayMoney(payMoney);
-        payCode.setPayNumerical(payMoney);
-        payCode.setPaySuccessStatus(false);
-        payCode.setSubOrdinate(subOrdinate);
-        payCodeDao.save(payCode);
     }
 
     /**

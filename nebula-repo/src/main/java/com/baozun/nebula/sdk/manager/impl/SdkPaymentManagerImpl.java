@@ -28,6 +28,7 @@ import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.sdk.command.PayInfoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.Validator;
@@ -56,6 +57,10 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
 
     @Autowired
     private PayInfoLogDao           payInfoLogDao;
+
+    /** The sdk pay code manager. */
+    @Autowired
+    private SdkPayCodeManager       sdkPayCodeManager;
 
     @Value("#{meta['orderCodeCreator']}")
     private String                  orderCodeCreatorPath = "com.baozun.nebula.api.salesorder.DefaultOrderCodeCreatorManager";
@@ -126,19 +131,10 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
                     totalPayMoney = totalPayMoney.add(payInfo.getPayMoney());
                 }
             }
-
         }
 
         totalPayMoney = totalPayMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
-        PayCode payCode = new PayCode();
-        payCode.setCreateTime(new Date());
-        payCode.setSubOrdinate(subOrdinate);
-        payCode.setPayMoney(totalPayMoney);
-        payCode.setPayNumerical(totalPayMoney);
-        payCode.setPaySuccessStatus(false);
-
-        payCodeDao.save(payCode);
-
+        sdkPayCodeManager.savaPayCode(totalPayMoney, subOrdinate);
         return subOrdinate;
     }
 
