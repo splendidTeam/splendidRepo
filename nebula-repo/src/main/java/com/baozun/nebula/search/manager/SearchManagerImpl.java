@@ -66,7 +66,7 @@ public class SearchManagerImpl implements SearchManager{
 		// 多少行
 		Integer rows = solrQuery.getRows();
 		// 第几页
-		Integer currentPage = solrQuery.getStart();
+		Integer start = solrQuery.getStart();
 
 		//返回对象
 		SearchResultPage<ItemForSolrCommand> searchResultPage = null;
@@ -82,13 +82,13 @@ public class SearchManagerImpl implements SearchManager{
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithGroup(solrQuery);
 			
 			//将查询结果转换为searchResultPage对象
-			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, currentPage, rows);
+			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, start, rows);
 		}else{
 			//不分组查询
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithOutGroup(solrQuery);
 			
 			//将查询结果转换为searchResultPage对象
-			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, currentPage, rows);
+			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, start, rows);
 		}
 		
 		
@@ -178,7 +178,7 @@ public class SearchManagerImpl implements SearchManager{
 	 */
 	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithGroup(
 			SolrGroupData<ItemForSolrCommand> solrGroupData,
-			Integer currentPage,
+			Integer start,
 			Integer size){
 
 		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
@@ -191,8 +191,6 @@ public class SearchManagerImpl implements SearchManager{
 				list.addAll(solrGroup.getBeans());
 			}
 		}
-
-		Integer start = (currentPage - 1) * size;
 
 		return convertSearchPageFacet(start,size,solrGroupData.getNumFound(),list,solrGroupData.getFacetQueryMap(),solrGroupData.getFacetMap());
 	}
@@ -209,7 +207,7 @@ public class SearchManagerImpl implements SearchManager{
 	 */
 	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithOutGroup(
 			SolrGroupData<ItemForSolrCommand> solrGroupData,
-			Integer currentPage,
+			Integer start,
 			Integer size){
 		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
 
@@ -217,8 +215,6 @@ public class SearchManagerImpl implements SearchManager{
 		if (null != it && it.size() > 0) {
 			list.addAll(it);
 		}
-
-		Integer start = (currentPage - 1) * size;
 		return convertSearchPageFacet(start, size, solrGroupData.getNumFound(), list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
 	}
 
@@ -262,12 +258,12 @@ public class SearchManagerImpl implements SearchManager{
 				// 如果key等于category_tree代表是分类的facet
 				if (SkuItemParam.category_tree.equals(key)) {
 					facetGroup = convertFacetGroup(valueMap);
-					facetGroup.setCategory(true);
+					facetGroup.setIsCategory(true);
 					facetGroup.setType(FacetType.CATEGORY.toString());
 				}else{
 					// 否则是属性的facet
 					facetGroup = convertFacetGroup(valueMap);
-					facetGroup.setCategory(false);
+					facetGroup.setIsCategory(false);
 					facetGroup.setType(FacetType.PROPERTY.toString());
 					facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
 				}
@@ -278,7 +274,7 @@ public class SearchManagerImpl implements SearchManager{
 		//**************************价格范围的facetGroup
 		if(Validator.isNotNullOrEmpty(facetQueryMap)){
 			FacetGroup priceGroup = new FacetGroup();
-			priceGroup.setCategory(false);
+			priceGroup.setIsCategory(false);
 			priceGroup.setType(FacetType.RANGE.toString());		
 			List<Facet> facets = new ArrayList<Facet>();
 			for (Entry<String, Integer> entry : facetQueryMap.entrySet()){

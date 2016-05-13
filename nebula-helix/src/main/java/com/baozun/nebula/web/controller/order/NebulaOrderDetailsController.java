@@ -16,16 +16,40 @@
  */
 package com.baozun.nebula.web.controller.order;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import com.baozun.nebula.manager.salesorder.OrderLineManager;
+import com.baozun.nebula.sdk.command.CouponCodeCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
+import com.baozun.nebula.sdk.manager.LogisticsManager;
+import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.solr.utils.DatePattern;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.order.viewcommand.ConsigneeSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.CouponInfoSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.InvoiceInfoSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.LogisticsInfoBarRecordSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.LogisticsInfoSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderBaseInfoSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderLineSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.PaymentInfoSubViewCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
+import com.feilong.core.Validator;
+import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.date.DateUtil;
 
 /**
  * myaccount OrderList 相关方法controller
@@ -34,8 +58,7 @@ import com.baozun.nebula.web.controller.BaseController;
  * <li>{@link #showOrderDetails(MemberDetails, String, HttpServletRequest, Model)} 进入登录页面</li>
  * </ol>
  * 
- * <h3>showOrderList方法,主要有以下几点:</h3>
- * <blockquote>
+ * <h3>showOrderList方法,主要有以下几点:</h3> <blockquote>
  * <ol>
  * <li>设置查询的orderform;</li>
  * <li>通过pageform传入分页信息;</li>
@@ -46,7 +69,18 @@ import com.baozun.nebula.web.controller.BaseController;
  * @version 1.0
  * @date 2016年5月10日
  */
-public class NebulaOrderDetailsController extends BaseController{
+public class NebulaOrderDetailsController extends BaseController {
+
+    @Autowired
+    private OrderManager orderManager;
+
+    @Autowired
+    @Qualifier("OrderLineManager")
+    private OrderLineManager orderLineManager;
+
+    @Autowired
+    @Qualifier("logisticsManager")
+    private LogisticsManager logisticsManager;
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderDetailsController.class);
@@ -54,31 +88,106 @@ public class NebulaOrderDetailsController extends BaseController{
     /**
      * 显示订单明细.
      *
-     * @param memberDetails
-     *            the member details
-     * @param orderCode
-     *            the order code
-     * @param request
-     *            the request
-     * @param model
-     *            the model
+     * @param memberDetails the member details
+     * @param orderCode the order code
+     * @param request the request
+     * @param model the model
      * @return the string
      * @since 5.3.1
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "order/{orderCode}", method = RequestMethod.GET)
      */
-    public String showOrderDetails(
-                    @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "orderCode",required = true) String orderCode,
-                    HttpServletRequest request,
-                    Model model){
-        //通过orderCode查询 command
+    public String showOrderDetails(@LoginMember MemberDetails memberDetails,
+            @RequestParam(value = "orderCode", required = true) String orderCode, HttpServletRequest request,
+            Model model) {
+        // 通过orderCode查询 command
+        // 订单信息
+        SalesOrderCommand salesOrderCommand = orderManager.findOrderByCode(orderCode, 1);
+        OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
+        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime",
+                "logisticsStatus", "financialStatus", "total","discount","actualFreight");
+        orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
+        orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
+        // 收货地址信息
+        ConsigneeSubViewCommand consigneeSubViewCommand = new ConsigneeSubViewCommand();
+        PropertyUtil.copyProperties(consigneeSubViewCommand, salesOrderCommand, "name", "country", "province",
+                "city", "area", "address", "mobile", "tel", "email", "postcode");
+        // 支付信息
+        PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
+        PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
 
-        //command -->viewCommand
-
-        //model add attribute
-
+        // 优惠券信息
+        CouponInfoSubViewCommand couponInfoSubViewCommand = new CouponInfoSubViewCommand();
+        List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
+        if (null !=couponCodes&&couponCodes.size() != 0) {
+            couponInfoSubViewCommand.setCouponCode(couponCodes.get(0).getCouponCode());
+        }
+        // 发票信息
+        InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
+        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType",
+                "receiptTitle", "receiptContent", "receiptCode");
+        // ordline信息
+        List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager
+                .findByOrderID(salesOrderCommand.getId());
+         List<OrderLineSubViewCommand> orderLineSubViewCommandlist=new ArrayList<OrderLineSubViewCommand>();
+        for (SimpleOrderLineSubViewCommand simpleOrderLine : simpleOrderLineSubViewCommand) {
+            OrderLineSubViewCommand orderLineSubViewCommand = new OrderLineSubViewCommand();
+            PropertyUtil.copyProperties(orderLineSubViewCommand, simpleOrderLine, "id", "addTime", "itemId",
+                    "itemCode", "itemName", "skuId", "extentionCode", "propertiesMap", "skuPropertys",
+                    "quantity","itemPic","salePrice","listPrice","subTotalAmt");
+            orderLineSubViewCommandlist.add(orderLineSubViewCommand);
+        }
+        // 物流信息
+        LogisticsInfoSubViewCommand logisticsInfoSubViewCommand = new LogisticsInfoSubViewCommand();
+        LogisticsCommand logisticsCommand = logisticsManager
+                .findLogisticsByOrderId(salesOrderCommand.getId());
+        if(null !=logisticsCommand){
+            
+            String trackingDescription = logisticsCommand.getTrackingDescription();
+            PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
+                    "logisticsProviderName");
+            logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(
+                    transformTrackingDescription(trackingDescription));
+        }
+        OrderViewCommand orderViewCommand = new OrderViewCommand();
+        orderViewCommand.setConsigneeSubViewCommand(consigneeSubViewCommand);
+        orderViewCommand.setCouponInfoSubViewCommand(couponInfoSubViewCommand);
+        orderViewCommand.setInvoiceInfoSubViewCommand(invoiceInfoSubViewCommand);
+        orderViewCommand.setLogisticsInfoSubViewCommand(logisticsInfoSubViewCommand);
+        orderViewCommand.setOrderBaseInfoSubViewCommand(orderBaseInfoSubViewCommand);
+        orderViewCommand.setPaymentInfoSubViewCommand(paymentInfoSubViewCommand);
+        orderViewCommand.setOrderLineSubViewCommandList(orderLineSubViewCommandlist);
+        // model add attribute
+        model.addAttribute("orderViewCommand", orderViewCommand);
         return "order.orderdetails";
     }
 
+    /**
+     * 
+     * 说明：String物流信息转换为 List<LogisticsInfoBarRecordSubViewCommand>
+     * 
+     * @param TrackingDescription
+     * @return
+     * @author 张乃骐
+     * @time：2016年5月12日 下午8:28:56
+     */
+    private List<LogisticsInfoBarRecordSubViewCommand> transformTrackingDescription(
+            String TrackingDescription) {
+        if (Validator.isNullOrEmpty(TrackingDescription)) {
+            return null;
+        }
+        List<LogisticsInfoBarRecordSubViewCommand> list = new ArrayList<LogisticsInfoBarRecordSubViewCommand>();
+        // String[] split = StringUtils.split(TrackingDescription, "<br/>");
+        String[] split = TrackingDescription.split("<br/>");
+        for (String string : split) {
+            LogisticsInfoBarRecordSubViewCommand logisticsInfoBarRecordSubViewCommand = new LogisticsInfoBarRecordSubViewCommand();
+            String date = StringUtils.substring(string, 0, 17);
+            logisticsInfoBarRecordSubViewCommand
+                    .setBarScanDate(DateUtil.string2Date(date, DatePattern.commonWithoutSecond));
+            logisticsInfoBarRecordSubViewCommand.setRemark(StringUtils.substring(string, 17));
+            list.add(logisticsInfoBarRecordSubViewCommand);
+        }
+        Collections.reverse(list);
+        return list;
+    }
 }

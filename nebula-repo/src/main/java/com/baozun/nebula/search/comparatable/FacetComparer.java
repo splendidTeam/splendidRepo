@@ -15,7 +15,11 @@ public class FacetComparer implements Comparator<Facet>{
 
 	@Override
 	public int compare(Facet facet1,Facet facet2){
-		int flag = 0 - facet1.getSortNo().compareTo(facet2.getSortNo());
-		return flag;
+		if(facet1.getSortNo()!=null && facet2.getSortNo()!=null){
+			int flag = 0 - facet1.getSortNo().compareTo(facet2.getSortNo());
+			return flag;
+		}else{
+			return 0;
+		}
 	}
 }

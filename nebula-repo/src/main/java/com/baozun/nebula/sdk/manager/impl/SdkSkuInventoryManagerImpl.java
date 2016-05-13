@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
@@ -23,12 +25,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 
 /**
+ * The Class SdkSkuInventoryManagerImpl.
  *
  * @author feilong
  * @version 5.3.1 2016年5月12日 下午12:58:43
@@ -41,6 +46,19 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
     /** The sdk sku inventory dao. */
     @Autowired
     private SdkSkuInventoryDao sdkSkuInventoryDao;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkSkuInventoryManager#deductSkuInventory(java.util.List)
+     */
+    @Override
+    public void deductSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
+
+        Map<String, Integer> extentionCodeAndCountMap = buildExtentionCodeAndCountMap(shoppingCartLineCommandList);
+        deductSkuInventory(extentionCodeAndCountMap);
+    }
 
     /*
      * (non-Javadoc)
@@ -64,5 +82,53 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
                 throw new BusinessException(Constants.CHECK_INVENTORY_FAILURE, new Object[] { extentionCode });
             }
         }
+    }
+
+    /**
+     * Builds the extention code and count map.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @return the map< string, integer>
+     */
+    //TODO feilong 扣减库存 如果有bundle 逻辑处理
+    private Map<String, Integer> buildExtentionCodeAndCountMap(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        Map<String, Integer> extentionCodeAndCountMap = new HashMap<String, Integer>();
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            //如果直推礼品库存数小于购买量时，扣减现有库存
+            Integer quantity = shoppingCartLineCommand.getQuantity();
+            if (isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
+                //下架
+                if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
+                    continue;
+                }
+                Integer stock = shoppingCartLineCommand.getStock();
+                if (null == stock || stock <= 0){
+                    continue;
+                }else if (stock < quantity){
+                    shoppingCartLineCommand.setQuantity(stock);
+                }
+            }
+            //主卖品和赠品都扣库存
+            String extentionCode = shoppingCartLineCommand.getExtentionCode();
+
+            if (!extentionCodeAndCountMap.containsKey(extentionCode)){
+                extentionCodeAndCountMap.put(extentionCode, quantity);
+            }else{
+                extentionCodeAndCountMap.put(extentionCode, quantity + extentionCodeAndCountMap.get(extentionCode));
+            }
+        }
+        return extentionCodeAndCountMap;
+    }
+
+    /**
+     * 是否是不需要用户选择的礼品.
+     *
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @return true, if checks if is no need choice gift
+     */
+    private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
+        return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
     }
 }

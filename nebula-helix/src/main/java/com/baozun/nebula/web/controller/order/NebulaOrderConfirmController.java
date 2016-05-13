@@ -32,7 +32,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
@@ -166,6 +168,9 @@ public class NebulaOrderConfirmController extends BaseController {
 	@Autowired
 	private OrderManager orderManager;
 
+	/* 购物车为空返回的URL */
+	public static final String CART_NULL_BACK_URL = "/index";
+
 	/**
 	 * 显示订单结算页面.
 	 *
@@ -188,17 +193,25 @@ public class NebulaOrderConfirmController extends BaseController {
 			HttpServletResponse response, Model model) {
 
 		// TODO feilong 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
-
+		List<ContactCommand> addressList = null;
+		if(memberDetails != null){
+			addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId());
+		}
+		
 		// 获取购物车信息
-		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails);
+		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails,addressList);
+
+		// 购物车为空
+		if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
+				|| shoppingCartCommand.getShoppingCartLineCommands().isEmpty()) {
+			return "redirect:" + CART_NULL_BACK_URL;
+		}
 
 		// 封装viewCommand
 		OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
-		orderConfirmViewCommand
-				.setShoppingCartViewCommand(shoppingcartViewCommandConverter.convert(shoppingCartCommand));
+		orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
 		// 收获地址信息
-		orderConfirmViewCommand.setAddressList(memberDetails == null ? null
-				: sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId()));
+		orderConfirmViewCommand.setAddressList(addressList);
 
 		model.addAttribute(MODEL_KEY_ORDER_CONFIRM, orderConfirmViewCommand);
 
@@ -258,7 +271,6 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 校验购物车信息和促销
 		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
-
 		SalesOrderResult salesorderResult = validateWithShoppingCart(shoppingCartCommand, couponCode);
 		// 如果校验失败，返回错误
 		if (salesorderResult != SalesOrderResult.SUCCESS) {
@@ -309,19 +321,47 @@ public class NebulaOrderConfirmController extends BaseController {
 	 * @return the cart info
 	 */
 	protected ShoppingCartCommand getChosenShoppingCartCommand(HttpServletRequest request,
-			MemberDetails memberDetails) {
+			MemberDetails memberDetails,List<ContactCommand> addressList) {
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
 
-		// 过虑未选中的购物车行 过滤之后，金额是否需要重新计算？
+		//过滤赠品 
 		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
+		
+		//过滤未勾选的商品行
+		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 0);
+		
 		if (null == cartLines) {
 			return null;
 		}
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+		
+		
+		//地址
+		CalcFreightCommand  calcFreightCommand  = null;
+		if(addressList!=null && !addressList.isEmpty()){
+			ContactCommand contactCommand =null;
+			
+			//默认地址
+			for(ContactCommand curContactCommand:addressList){
+				if(curContactCommand.getIsDefault()){
+					contactCommand = curContactCommand;
+					break;
+				}
+			}
+			//无默认，取第一条
+			if(contactCommand==null){
+				contactCommand  = addressList.get(0);
+			}
+			calcFreightCommand = new CalcFreightCommand();
+			calcFreightCommand.setProvienceId(contactCommand.getProvinceId());
+			calcFreightCommand.setCityId(contactCommand.getCityId());
+			calcFreightCommand.setCountyId(contactCommand.getAreaId());
+		}
+		
+		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, calcFreightCommand, cartLines);
 	}
 
 	/**
@@ -332,7 +372,8 @@ public class NebulaOrderConfirmController extends BaseController {
 	 */
 	private NebulaReturnResult toNebulaReturnResult(SalesOrderResult salesorderResult) {
 		if (SalesOrderResult.SUCCESS != salesorderResult) {
-			DefaultReturnResult result = DefaultReturnResult.FAILURE;
+			DefaultReturnResult result = new DefaultReturnResult();
+			result.setResult(false);
 
 			String messageStr = getMessage(salesorderResult.toString());
 
@@ -358,11 +399,16 @@ public class NebulaOrderConfirmController extends BaseController {
 		if (null != salesOrderResult) {
 			return salesOrderResult;
 		}
-		/** 校驗优惠券促销 */
-		salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
-		if (null != salesOrderResult) {
-			return salesOrderResult;
+
+		/** 如果输入了优惠券则要进行优惠券验证 */
+		if (Validator.isNotNullOrEmpty(coupon)) {
+			/** 校驗优惠券促销 */
+			salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
+			if (null != salesOrderResult) {
+				return salesOrderResult;
+			}
 		}
+
 		return SalesOrderResult.SUCCESS;
 	}
 
@@ -410,7 +456,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		return SalesOrderResult.ORDER_COUPON_NOT_AVALIBLE;
 
 	}
-	
+
 	private SalesOrderReturnObject createReturnObject(String subOrdinate) {
 		// 通過支付流水號查詢訂單
 		SalesOrderCommand newOrder = salesOrderResolver.getSalesOrderCommand(subOrdinate);
@@ -418,7 +464,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		salesOrderReturnObject.setCode(newOrder.getCode());
 		salesOrderReturnObject.setId(newOrder.getId());
 		salesOrderReturnObject.setSubOrdinate(subOrdinate);
-		
+
 		return salesOrderReturnObject;
 	}
 

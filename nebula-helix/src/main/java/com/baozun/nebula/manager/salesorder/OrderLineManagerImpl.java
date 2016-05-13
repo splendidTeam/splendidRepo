@@ -60,6 +60,9 @@ public class OrderLineManagerImpl implements OrderLineManager {
             orderLineCommand.setSkuPropertys(propList);
              SimpleOrderLineSubViewCommand slsv=new SimpleOrderLineSubViewCommand();
              BeanUtil.copyProperties(slsv, orderLineCommand);
+             slsv.setListPrice(orderLineCommand.getMSRP());
+             slsv.setQuantity(orderLineCommand.getCount());
+             slsv.setSubTotalAmt(orderLineCommand.getSubtotal());
              list.add(slsv);
         }
         return list;
