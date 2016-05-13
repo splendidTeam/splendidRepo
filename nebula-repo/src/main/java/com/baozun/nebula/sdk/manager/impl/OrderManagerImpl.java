@@ -560,7 +560,7 @@ public class OrderManagerImpl implements OrderManager{
                 }
 
                 // 扣减库存
-                liquidateSkuInventory(sccList);
+                sdkSkuInventoryManager.deductSkuInventory(sccList);
 
             }
 
@@ -939,66 +939,6 @@ public class OrderManagerImpl implements OrderManager{
             name = "支付宝";
         }
         return name;
-    }
-
-    //TODO feilong 扣减库存 如果有bundle 逻辑处理
-    /**
-     * Liquidate sku inventory.
-     *
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     */
-    private void liquidateSkuInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
-
-        Map<String, Integer> extentionCodeAndCountMap = buildExtentionCodeAndCountMap(shoppingCartLineCommandList);
-        sdkSkuInventoryManager.deductSkuInventory(extentionCodeAndCountMap);
-    }
-
-    /**
-     * @param shoppingCartLineCommandList
-     * @return
-     * @since 5.3.1
-     */
-    private Map<String, Integer> buildExtentionCodeAndCountMap(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        Map<String, Integer> extentionCodeAndCountMap = new HashMap<String, Integer>();
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            //如果直推礼品库存数小于购买量时，扣减现有库存
-            Integer quantity = shoppingCartLineCommand.getQuantity();
-            if (isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
-                //下架
-                if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
-                    continue;
-                }
-                Integer stock = shoppingCartLineCommand.getStock();
-                if (null == stock || stock <= 0){
-                    continue;
-                }else if (stock < quantity){
-                    shoppingCartLineCommand.setQuantity(stock);
-                }
-            }
-            //主卖品和赠品都扣库存
-            String extentionCode = shoppingCartLineCommand.getExtentionCode();
-
-            if (!extentionCodeAndCountMap.containsKey(extentionCode)){
-                extentionCodeAndCountMap.put(extentionCode, quantity);
-            }else{
-                extentionCodeAndCountMap.put(extentionCode, quantity + extentionCodeAndCountMap.get(extentionCode));
-            }
-        }
-        return extentionCodeAndCountMap;
-    }
-
-    /**
-     * 是否是不需要用户选择的礼品.
-     *
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @return true, if checks if is no need choice gift
-     * @since 5.3.1
-     */
-    private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
-        return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
     }
 
     /**
@@ -2340,6 +2280,18 @@ public class OrderManagerImpl implements OrderManager{
     public List<DistributionMode> getAllDistributionMode(){
         List<DistributionMode> distributionModeList = distributionModeDao.getAllDistributionMode();
         return distributionModeList;
+    }
+    
+    /**
+     * 是否是不需要用户选择的礼品.
+     *
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @return true, if checks if is no need choice gift
+     * @since 5.3.1
+     */
+    private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
+        return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
     }
 
 }

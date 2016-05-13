@@ -61,6 +61,9 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 商品id . */
     private Long                       itemId;
 
+    /** 商品code. */
+    private String                     productCode;
+
     /** 商品名称 . */
     private String                     itemName;
 
@@ -137,16 +140,23 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 是否有库存 1有库存 0无库存 *. */
     private Integer                    stockMark;
 
-    /** 库存数量 *. */
+    /**
+     * 库存数量.
+     * 
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
+     */
     private Integer                    stock;
 
     /** ***** 扩展engine所需要的字段begin ******. */
-    /**
-     * 商品code
-     */
-    private String                     productCode;
 
-    /** The lable ids. */
+    /**
+     * The lable ids.
+     * 
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
+     */
+    @Deprecated
     private List<Long>                 lableIds;
 
     /** The category list. */
@@ -155,10 +165,20 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** The brand id. */
     private String                     brandId;
 
-    /** The store id. */
+    /**
+     * The store id.
+     * 
+     * @deprecated 目前值就＝ {@link #shopId},重复了,而且没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private long                       storeId;
 
-    /** The indstry id. */
+    /**
+     * The indstry id.
+     * 
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
+     */
+    @Deprecated
     private Long                       indstryId;
 
     /** The state. */
@@ -199,7 +219,7 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     //***************************************************************************************************
 
-    /** 购物车中商品经有效性检查引擎检查之后是否有效的字段 *. */
+    /** 购物车中商品经有效性检查引擎检查之后是否有效的字段. */
     private boolean                    isValid;
 
     /**
@@ -505,19 +525,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 ***** 扩展engine所需要的字段begin ******.
+     * 获得 商品code.
      *
-     * @return the ***** 扩展engine所需要的字段begin ******
+     * @return the 商品code
      */
     public String getProductCode(){
         return productCode;
     }
 
     /**
-     * 设置 ***** 扩展engine所需要的字段begin ******.
+     * 设置 商品code.
      *
      * @param productCode
-     *            the new ***** 扩展engine所需要的字段begin ******
+     *            the new 商品code
      */
     public void setProductCode(String productCode){
         this.productCode = productCode;
@@ -527,7 +547,11 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 lable ids.
      *
      * @return the lable ids
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
      */
+    @Deprecated
     public List<Long> getLableIds(){
         return lableIds;
     }
@@ -537,7 +561,11 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param lableIds
      *            the lable ids
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
      */
+    @Deprecated
     public void setLableIds(List<Long> lableIds){
         this.lableIds = lableIds;
     }
@@ -584,7 +612,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 store id.
      *
      * @return the store id
+     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public long getStoreId(){
         return storeId;
     }
@@ -594,7 +624,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param storeId
      *            the store id
+     * @deprecated 目前值就＝ {@link #getShopId()},重复了,而且没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setStoreId(long storeId){
         this.storeId = storeId;
     }
@@ -603,7 +635,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 indstry id.
      *
      * @return the indstry id
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
      */
+    @Deprecated
     public Long getIndstryId(){
         return indstryId;
     }
@@ -613,7 +647,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param indstryId
      *            the indstry id
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
      */
+    @Deprecated
     public void setIndstryId(Long indstryId){
         this.indstryId = indstryId;
     }
@@ -638,7 +674,7 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 设置 valid.
+     * 购物车中商品经有效性检查引擎检查之后是否有效的字段.
      *
      * @param isValid
      *            the valid
@@ -648,7 +684,7 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * Checks if is valid.
+     * 购物车中商品经有效性检查引擎检查之后是否有效的字段.
      *
      * @return true, if checks if is valid
      */
@@ -657,19 +693,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 有效性检查类型：1.
+     * 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      *
-     * @return the 有效性检查类型：1
+     * @return the 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      */
     public Integer getValidType(){
         return validType;
     }
 
     /**
-     * 设置 有效性检查类型：1.
+     * 有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      *
      * @param validType
-     *            the new 有效性检查类型：1
+     *            有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      */
     public void setValidType(Integer validType){
         this.validType = validType;
@@ -697,9 +733,9 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 库房id *.
+     * 获得 库房id.
      *
-     * @return the 库房id *
+     * @return the 库房id
      */
     public Long getWareHoseId(){
         return wareHoseId;
@@ -792,19 +828,21 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 库存数量 *.
+     * 获得 库存数量.
      *
-     * @return the 库存数量 *
+     * @return the 库存数量
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
      */
     public Integer getStock(){
         return stock;
     }
 
     /**
-     * 设置 库存数量 *.
+     * 设置 库存数量 .
      *
      * @param stock
-     *            the new 库存数量 *
+     *            the new 库存数量
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
      */
     public void setStock(Integer stock){
         this.stock = stock;
