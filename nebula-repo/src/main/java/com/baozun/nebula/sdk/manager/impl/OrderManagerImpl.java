@@ -101,12 +101,14 @@ import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
 import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
+import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
+
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -270,6 +272,45 @@ public class OrderManagerImpl implements OrderManager{
     /** The sales order handler. */
     @Autowired(required = false)
     private SalesOrderHandler                        salesOrderHandler;
+    
+    @Autowired
+	private SdkSecretManager						 sdkSecretManager;
+
+    private void encryptConsignee(Consignee consignee){
+
+		sdkSecretManager.encrypt(consignee, new String[] {
+				"name",
+				"buyerName",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"tel",
+				"buyerTel",
+				"mobile", 
+				"email" });
+	}
+    
+    private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
+
+		sdkSecretManager.decrypt(salesOrderCommand, new String[] {
+				"name",
+				"buyerName",
+				"country",
+				"province",
+				"city",
+				"area",
+				"town",
+				"address",
+				"postcode",
+				"tel",
+				"buyerTel",
+				"mobile", 
+				"email" });
+	}
 
     /*
      * (non-Javadoc)
@@ -285,6 +326,7 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderCommand)
             return null;
         if (type == 1){
+        	decryptSalesOrderCommand(salesOrderCommand);
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
             // 订单行信息
@@ -952,6 +994,55 @@ public class OrderManagerImpl implements OrderManager{
     }
 
     /**
+     * 保存收货人信息.
+     *
+     * @param salesOrder
+     *            the sales order
+     * @param salesOrderCommand
+     *            the sales order command
+     *///FIXME feilong PII数据加密
+    protected void saveConsignee(SalesOrder salesOrder,SalesOrderCommand salesOrderCommand){
+        Consignee consignee = new Consignee();
+        ConvertUtils.convertFromTarget(consignee, salesOrderCommand);
+        List<String> appointTimeQuantums = salesOrderCommand.getAppointTimeQuantums();
+        // 设置指定时间段
+        if (Validator.isNotNullOrEmpty(appointTimeQuantums)){
+            for (String appointTimeQuantum : appointTimeQuantums){
+                // String a = "shopid||value"
+                String[] strs = appointTimeQuantum.split(SEPARATOR_FLAG);
+                if (salesOrder.getShopId().toString().equals(strs[0]) && strs.length == 2){
+                    consignee.setAppointTimeQuantum(strs[1]);
+                }
+            }
+        }
+        // 设置指定日期
+        List<String> appointTimes = salesOrderCommand.getAppointTimes();
+        if (Validator.isNotNullOrEmpty(appointTimes)){
+            for (String appointTime : appointTimes){
+                // String a = "shopid||value"
+                String[] strs = appointTime.split(SEPARATOR_FLAG);
+                if (salesOrder.getShopId().toString().equals(strs[0]) && strs.length == 2){
+                    consignee.setAppointTime(strs[1]);
+                }
+            }
+        }
+        // 设置指定类型
+        List<String> appointTypes = salesOrderCommand.getAppointTypes();
+        if (Validator.isNotNullOrEmpty(appointTypes)){
+            for (String appointType : appointTypes){
+                // String a = "shopid||value"
+                String[] strs = appointType.split(SEPARATOR_FLAG);
+                if (salesOrder.getShopId().toString().equals(strs[0]) && strs.length == 2){
+                    consignee.setAppointType(strs[1]);
+                }
+            }
+        }
+        encryptConsignee(consignee);
+        consignee.setOrderId(salesOrder.getId());
+        sdkConsigneeDao.save(consignee);
+    }
+
+    /**
      * 检查优惠券是否有效.
      *
      * @param memberId
@@ -1484,6 +1575,9 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderCommand || null == type){
             return salesOrderCommand;
         }else{
+        	if(type.equals(1)){
+            	decryptSalesOrderCommand(salesOrderCommand);
+            }
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
             salesOrderCommand.setPayInfo(payInfos);
@@ -1558,7 +1652,9 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public SalesOrderCommand findOrderByLineId(Long orderLineId){
-        return sdkOrderDao.findOrderByLineId(orderLineId);
+    	SalesOrderCommand salesOrderCommand =sdkOrderDao.findOrderByLineId(orderLineId);
+    	decryptSalesOrderCommand(salesOrderCommand);
+        return salesOrderCommand;
     }
 
     /*
