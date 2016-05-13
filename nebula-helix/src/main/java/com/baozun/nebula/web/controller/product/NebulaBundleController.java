@@ -296,7 +296,7 @@ public class NebulaBundleController extends NebulaPdpController {
 	protected BundleDetailViewCommand buildBundleViewCommandForBundlePage(BundleCommand bundleCommand,String bundleItemCode) {
 		//bundle 商品的lifecycle状态
 		ItemBaseInfoViewCommand itemBaseInfoViewCommand = buildItemBaseInfoViewCommand(bundleCommand.getItemId());
-		if(Item.LIFECYCLE_ENABLE != itemBaseInfoViewCommand.getLifecycle()){
+		if(!Item.LIFECYCLE_ENABLE.equals(itemBaseInfoViewCommand.getLifecycle())){
 			LOG.info("Bundle error...bundleLifecycle is not active;Lifecycle:{} [{}]",itemBaseInfoViewCommand.getLifecycle(),new Date());
 			return null;
 		}

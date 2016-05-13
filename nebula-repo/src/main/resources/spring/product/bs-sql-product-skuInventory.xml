@@ -11,7 +11,8 @@
 				<![CDATA[ 
 					update t_pd_sku_inventory 
 					set available_qty= available_qty - :count
-					where extention_code = :extentionCode and available_qty >= :count
+					where extention_code = :extentionCode 
+					and available_qty >= :count
                  ]]>
 			</value>
 		</constructor-arg>

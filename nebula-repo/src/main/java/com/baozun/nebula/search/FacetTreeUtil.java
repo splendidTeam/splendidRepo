@@ -17,26 +17,28 @@ import java.util.Map;
 public class FacetTreeUtil {
 
 	private static final String TREE_LEVEL_SEPARATOR = "-";
+	
+	// 所有节点数据
+	private List<Facet> allNodeData = new ArrayList<Facet>();
+	private Map<Long, List<Long>> childrenMapping = null;
+	private Facet rootNode;
 
 	/**
 	 * 创建facet树，为navigation和category服务
 	 * @param facetGroup
 	 * @return
 	 */
-	public static List<Facet> createFacetTree(FacetGroup facetGroup) {
+	public List<Facet> createFacetTree(FacetGroup facetGroup) {
 		// 一级节点
 		List<Long> lv1Nodes = new ArrayList<Long>();
-		// 所有节点数据
-		List<Facet> allNodeData = new ArrayList<Facet>();
-		Map<Long, List<Long>> childrenMapping = null;
+		
 		// 根节点
-		Facet rootNode = null;
 		
-		formatData(facetGroup, lv1Nodes, allNodeData);
+		formatData(facetGroup,lv1Nodes);
 		
-		initMenuData(allNodeData, childrenMapping, rootNode);
+		initMenuData();
 		
-		List<Facet> result = constructTree(lv1Nodes, allNodeData, childrenMapping);
+		List<Facet> result = constructTree(lv1Nodes);
 		
 		return result;
 	}
@@ -44,7 +46,7 @@ public class FacetTreeUtil {
 	/**
 	 * 格式化List<FacetField>数据,取的所有的一级节点和所有的节点，为后面生成树状结构准备
 	 */
-	private static void formatData(FacetGroup facetGroup, List<Long> lv1Nodes, List<Facet> allNodeData) {
+	private void formatData(FacetGroup facetGroup,List<Long> lv1Nodes) {
 
 		List<Facet> facets = facetGroup.getFacets();
 		
@@ -73,18 +75,18 @@ public class FacetTreeUtil {
 		}
 	}
 	
-	private static void initMenuData(List<Facet> allNodeData,Map<Long, List<Long>> childrenMapping,Facet rootNode ) {
+	private void initMenuData () {
 		Collections.sort(allNodeData, new Comparator<Facet>() {
 			@Override
 			public int compare(Facet o1, Facet o2) {
 				return (int) (o1.getId() - o2.getId());
 			};
 		});
-		childrenMapping = constructMapping(allNodeData, rootNode);
+		childrenMapping = constructMapping();
 	}
 	
 	
-	private static Map<Long, List<Long>> constructMapping(List<Facet> allNodeData,Facet rootNode) {
+	private Map<Long, List<Long>> constructMapping() {
 		Map<Long, List<Long>> result = new HashMap<Long, List<Long>>();
 		List<Long> childrenIds = null;
 		Long parentId = null, childId = null;
@@ -114,7 +116,7 @@ public class FacetTreeUtil {
 		return result;
 	}
 	
-	private static List<Facet> constructTree(List<Long> children,List<Facet> allNodeData,Map<Long, List<Long>> childrenMapping) {
+	private List<Facet> constructTree(List<Long> children) {
 
 		List<Facet> result = new ArrayList<Facet>();
 		Facet dto = null;
@@ -128,7 +130,7 @@ public class FacetTreeUtil {
 			if(childrenMapping!=null){
 				if (childrenMapping.containsKey(dto.getId())) {
 					List<Long> temp = childrenMapping.get(dto.getId());
-					dto.getChildrens().addAll(constructTree(temp,allNodeData,childrenMapping));
+					dto.getChildrens().addAll(constructTree(temp));
 				}
 			}
 			

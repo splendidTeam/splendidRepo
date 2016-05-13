@@ -43,7 +43,8 @@ import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewC
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
-import com.baozun.shopdog.exception.BusinessException;
+import com.baozun.shopdog.exception.ShopdogBusinessException;
+import com.baozun.shopdog.exception.ShopdogErrorCodes;
 import com.baozun.shopdog.web.controller.product.converter.ShopdogItemImageViewCommandConverter;
 import com.baozun.shopdog.web.controller.product.converter.ShopdogItemPropertyCommandConverter;
 import com.baozun.shopdog.web.controller.product.converter.ShopdogItemViewCommandConverter;
@@ -57,6 +58,7 @@ import com.feilong.core.date.DateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**   
+ * 驻点宝pdp数据展示部分的封装、获取
  * @Description 
  * @author dongliang ma
  * @date 2016年5月11日 下午4:06:51 
@@ -99,12 +101,13 @@ public class SdPdpController implements AbstractSdPdpController {
 	protected ItemPropertyViewCommandResolver itemPropertyViewCommandResolver;
 	@Autowired
 	private ItemDetailManager detailManager;
+
 	/* 
 	 * @see com.baozun.shopdog.web.controller.product.AbstractSdPdpController#getPdpItem(java.lang.String, java.lang.String)
 	 */
 	@Override
 	public List<ShopdogItemViewCommand> getPdpItem(String itemCode,
-			String extCode) throws BusinessException {
+			String extCode) throws ShopdogBusinessException {
 		// 如果是extCode，先转成itemCode
 		if(Validator.isNotNullOrEmpty(extCode)) {
 			Item item = detailManager.findItemByExtentionCode(extCode);
@@ -112,23 +115,12 @@ public class SdPdpController implements AbstractSdPdpController {
 				itemCode = item.getCode();
 			}
 		}
-		try {
-			return buildPdpViewCommand(itemCode);
-		} catch (IllegalItemStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-		/*// 没有取到合适的参数
+		// 没有取到合适的参数
 		if(Validator.isNullOrEmpty(itemCode)) {
-//					return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_PARAMETER_ERROR);
-			throw new BusinessException(ShopdogErrorCodes(
-					ShopdogErrorType.COMMON_PARAMETER_ERROR.getErrorCode(),
-					ShopdogErrorType.COMMON_PARAMETER_ERROR.getMessage()));
+			throw new ShopdogBusinessException(ShopdogErrorCodes.PARAM_NULL);
 		}
 		
 		try {
-			
 			List<ShopdogItemViewCommand> items = buildPdpViewCommand(itemCode);
 			return items;
 			
@@ -137,32 +129,39 @@ public class SdPdpController implements AbstractSdPdpController {
 			LOG.error("[SHOPDOG_GET_PDP_DATA] Item state illegal. itemCode:{}, {}", itemCode, ie.getState().name());
 			
 			if(ie.getState().equals(IllegalItemState.ITEM_NOT_EXISTS)) {
-				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_NOT_EXISTS);
+				//商品不存在
+				throw new ShopdogBusinessException(ShopdogErrorCodes.ITEM_NOT_EXISTS);
 			}
 			
 			if(ie.getState().equals(IllegalItemState.ITEM_LIFECYCLE_OFFSALE)) {
-				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_LIFECYCLE_OFFSALE);
+				//商品已下架
+				throw new ShopdogBusinessException(ShopdogErrorCodes.ITEM_LIFECYCLE_OFFSALE);
 			}
 			
 			if(ie.getState().equals(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED)) {
-				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_LIFECYCLE_LOGICAL_DELETED);
+				//商品已删除
+				throw new ShopdogBusinessException(ShopdogErrorCodes.ITEM_LIFECYCLE_LOGICAL_DELETED);
 			}
 			
 			if(ie.getState().equals(IllegalItemState.ITEM_LIFECYCLE_NEW)) {
-				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_LIFECYCLE_NEW);
+				//商品未上架
+				throw new ShopdogBusinessException(ShopdogErrorCodes.ITEM_LIFECYCLE_NEW);
 			}
 			
 			if(ie.getState().equals(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME)) {
-				return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_BEFORE_ACTIVE_TIME);
+				//商品未到上架时间
+				throw new ShopdogBusinessException(ShopdogErrorCodes.ITEM_BEFORE_ACTIVE_TIME);
 			}
 			
-			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.ITEM_ILLEGAL_STATE);
+			//商品状态异常
+			throw new ShopdogBusinessException(ShopdogErrorCodes.ITEM_ILLEGAL_STATE);
 			
 		} catch (Exception e) {
 			
 			LOG.error("[SHOPDOG_GET_PDP_DATA] " + e.getMessage(), e);
-			return ShopdogResultCommand.getErrorInstance(ShopdogErrorType.COMMON_SYSTEM_ERROR);
-		}*/
+			//系统异常
+			throw new ShopdogBusinessException(ShopdogErrorCodes.SYSTEM_ERROR);
+		}
 		
 	}
 	

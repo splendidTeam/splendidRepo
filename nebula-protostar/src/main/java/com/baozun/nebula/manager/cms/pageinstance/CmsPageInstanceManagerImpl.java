@@ -25,10 +25,6 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
-import org.apache.commons.lang.StringUtils;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,29 +92,8 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 	@Autowired
 	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
 	
-//	public final static String			CMS_HTML_EDIT_CLASS			= ".cms-html-edit";
-//
-//	public final static String			CMS_DIV_EDIT_BUTTON_CLASS	= ".wui-tips";
-//
-//	public final static String			NOEDIT_START				= "<!--noedit-start-->";
-//	
-//	public final static String			NOEDIT_END					= "<!--noedit-end-->";
-	
 	public final static Integer			PULISHED					= 1;
 	
-//	public final static String			CMS_IMGARTICLE_EDIT_CLASS			= ".cms-imgarticle-edit";
-//	
-//	public final static String			CMS_PRODUCT_EDIT_CLASS			= ".cms-product-edit";
-
-
-//	private final static String			BODY_START			= "<!--body-start-->";
-//
-//	private final static String			BODY_END			= "<!--body-end-->";
-//
-//	private final static String			RESOURCE_START		= "<!--resources-start-->";
-//
-//	private final static String			RESOURCE_END		= "<!--resources-end-->";
-
 	@Override
 	public CmsPageInstance findCmsPageInstanceById(Long id) {
 		CmsPageInstance cmsPageInstance = sdkCmsPageInstanceManager.findCmsPageInstanceById(id);
@@ -177,9 +152,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 
 		Map<String, String> editAreaMap = sdkCmsParseHtmlContentManager.processPageHtml(html, Constants.CMS_PAGE);
 		Long pageId = pageInstance.getId();
-		// 通过pageId删除所有的editArea 
-		//不需要再删除
-		//sdkCmsEditAreaManager.removeCmsEditAreaByPageId(pageId);
+		
 		// 保存页面编辑区域
 		CmsEditArea cmsEditArea = null;
 		for (Map.Entry<String, String> entry : editAreaMap.entrySet()) {
@@ -249,8 +222,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			cacheManager.removeMapValue(CacheKeyConstant.CMS_PAGE_KEY, pageCode);
 			//删除版本实例
 			cmsPageInstanceVersionList.remove(pageCode);
-			//CmsPageCacheConstant.PUBLIC_VERSION_CACHE.remove(pageCode);
-			//cacheManager.removeMapValue(CacheKeyConstant.CMS_PAGE_KEY, cmsPageInstance.getCode());
+		
 			sdkCmsTemplateHtmlManager.removeCmsTemplateHtmlByPageCode(pageCode);
 			instanceIds += cmsPageInstance.getId()+",";
 		}
@@ -384,5 +356,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 		zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH,"#"+cmsPageInstance.getCode());
 		
 	}
+
+
 	
 }

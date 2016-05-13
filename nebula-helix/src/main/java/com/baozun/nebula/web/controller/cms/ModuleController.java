@@ -24,8 +24,14 @@ public class ModuleController extends BaseController {
 	@Autowired
 	private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;
 	
+	/**
+	 * 查询模块
+	 * @param code ： 模块code
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/cms/module/{code}.htm")
-	public String geModuleData(@PathVariable String code , HttpServletResponse response) {
+	public String geModuleData(@PathVariable("code") String code , HttpServletResponse response) {
 		CmsTemplateHtml moduleMap = sdkCmsModuleInstanceManager.getModuleMap().get(code);
 		String data = "";
 		if(Validator.isNotNullOrEmpty(moduleMap)){

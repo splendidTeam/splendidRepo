@@ -56,7 +56,7 @@ public class ItemListViewCommandConverter extends BaseConverter<ItemListViewComm
 		ItemListViewCommand result = new ItemListViewCommand();
 		try{
 			result.setCount(pageData.getCount());
-			result.setCurrentPage(result.getCurrentPage());
+			result.setCurrentPage(pageData.getCurrentPage());
 			result.setSize(pageData.getSize());
 			result.setStart(pageData.getStart());
 			result.setTotalPages(pageData.getTotalPages());

@@ -66,7 +66,7 @@ public class SearchManagerImpl implements SearchManager{
 		// 多少行
 		Integer rows = solrQuery.getRows();
 		// 第几页
-		Integer currentPage = solrQuery.getStart();
+		Integer start = solrQuery.getStart();
 
 		//返回对象
 		SearchResultPage<ItemForSolrCommand> searchResultPage = null;
@@ -82,13 +82,13 @@ public class SearchManagerImpl implements SearchManager{
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithGroup(solrQuery);
 			
 			//将查询结果转换为searchResultPage对象
-			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, currentPage, rows);
+			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, start, rows);
 		}else{
 			//不分组查询
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithOutGroup(solrQuery);
 			
 			//将查询结果转换为searchResultPage对象
-			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, currentPage, rows);
+			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, start, rows);
 		}
 		
 		
@@ -178,7 +178,7 @@ public class SearchManagerImpl implements SearchManager{
 	 */
 	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithGroup(
 			SolrGroupData<ItemForSolrCommand> solrGroupData,
-			Integer currentPage,
+			Integer start,
 			Integer size){
 
 		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
@@ -191,8 +191,6 @@ public class SearchManagerImpl implements SearchManager{
 				list.addAll(solrGroup.getBeans());
 			}
 		}
-
-		Integer start = (currentPage - 1) * size;
 
 		return convertSearchPageFacet(start,size,solrGroupData.getNumFound(),list,solrGroupData.getFacetQueryMap(),solrGroupData.getFacetMap());
 	}
@@ -209,7 +207,7 @@ public class SearchManagerImpl implements SearchManager{
 	 */
 	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithOutGroup(
 			SolrGroupData<ItemForSolrCommand> solrGroupData,
-			Integer currentPage,
+			Integer start,
 			Integer size){
 		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
 
@@ -217,11 +215,7 @@ public class SearchManagerImpl implements SearchManager{
 		if (null != it && it.size() > 0) {
 			list.addAll(it);
 		}
-
-		Integer start = (currentPage - 1) * size;
-		Long count = Long.parseLong(list.size() + "");
-
-		return convertSearchPageFacet(start, size, count, list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
+		return convertSearchPageFacet(start, size, solrGroupData.getNumFound(), list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
 	}
 
 	/**

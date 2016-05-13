@@ -165,6 +165,9 @@ public class NebulaOrderConfirmController extends BaseController {
 
 	@Autowired
 	private OrderManager orderManager;
+	
+	/* 购物车为空返回的URL */
+	public static final String	CART_NULL_BACK_URL	= "/index";
 
 	/**
 	 * 显示订单结算页面.
@@ -191,6 +194,12 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 获取购物车信息
 		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails);
+		
+		//购物车为空
+		if(shoppingCartCommand==null ||  shoppingCartCommand.getShoppingCartLineCommands()==null 
+				||shoppingCartCommand.getShoppingCartLineCommands().isEmpty()){
+			return "redirect:"+CART_NULL_BACK_URL;
+		}
 
 		// 封装viewCommand
 		OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();

@@ -22,7 +22,7 @@ import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCmsModuleInstanceManagerImpl;
-import com.baozun.nebula.utilities.common.Validator;
+import com.feilong.core.Validator;
 
 @Component
 public class ModuleTag extends TagSupport {
@@ -78,17 +78,10 @@ public class ModuleTag extends TagSupport {
 							if(now.compareTo(version.getStart_time()) >= 0 && now.compareTo(version.getEnd_time()) <= 0){
 								//在发布队列外中，基础模块或者版本模块切换到下一个版本模块
 								if(!version.getId().equals(currentVerison)){
-									//CmsTemplateHtml publishModuleTemplate = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(code, version.getId());
-									//SdkCmsModuleInstanceManagerImpl.moduleMap.put(code, publishModuleTemplate);
-									//sdkCmsModuleInstanceManager.loadModuleMap();
-									//sdkCmsModuleInstan.ceVersionManager.setPublicModuleVersionCacheInfo();
 									//因为zk的通知是不能当次请求，所以当前的这次请求,不会页面改变造成页面,造成了脏页面
 									sdkCmsModuleInstanceManager.loadModuleMap();
 									CmsTemplateHtml templatehtml = SdkCmsModuleInstanceManagerImpl.moduleMap.get(code);
 									data = templatehtml.getData();
-									//									if(Validator.isNotNullOrEmpty(moduleInfo)){
-									//										data = (String)moduleInfo[0];
-									//									}					
 								}
 								isBase = false;
 							}

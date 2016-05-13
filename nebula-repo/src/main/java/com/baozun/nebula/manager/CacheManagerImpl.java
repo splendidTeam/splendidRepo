@@ -8,6 +8,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
@@ -27,6 +29,8 @@ import com.baozun.nebula.utilities.common.SerializableUtil;
 
 @Service("dataCacheManager")
 public class CacheManagerImpl implements CacheManager {
+	
+	protected Log				log					= LogFactory.getLog(getClass());
 
 	/**
 	 * 默认情况下返回的filedName
@@ -142,7 +146,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.scard(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -174,7 +181,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.del(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -190,7 +200,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.get(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -207,7 +220,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.hgetAll(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -287,7 +303,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.lpop(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -303,7 +322,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.rpop(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -319,7 +341,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.lindex(key, index);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -335,7 +360,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.lrange(key, start, end);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -352,7 +380,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.llen(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return 0;
 		} finally {
 			returnResource(jredis);
 		}
@@ -384,7 +415,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.spop(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -400,7 +434,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.sismember(key, member);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return false;
 		} finally {
 			returnResource(jredis);
 		}
@@ -416,7 +453,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.srem(key, values);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -432,7 +472,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.smembers(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -448,7 +491,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.scard(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return 0;
 		} finally {
 			returnResource(jredis);
 		}
@@ -508,7 +554,10 @@ public class CacheManagerImpl implements CacheManager {
 			return (T) SerializableUtil.convert2Object(value);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -541,7 +590,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.zrange(key, start, end);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -557,7 +609,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.zcard(key);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return 0;
 		} finally {
 			returnResource(jredis);
 		}
@@ -573,7 +628,10 @@ public class CacheManagerImpl implements CacheManager {
 			return jredis.zcount(key, min, max);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return 0;
 		} finally {
 			returnResource(jredis);
 		}
@@ -639,7 +697,10 @@ public class CacheManagerImpl implements CacheManager {
 				return null;
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -688,7 +749,10 @@ public class CacheManagerImpl implements CacheManager {
 				return null;
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -725,7 +789,10 @@ public class CacheManagerImpl implements CacheManager {
 			valueCurr = jredis.decrBy(key, value);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -747,7 +814,10 @@ public class CacheManagerImpl implements CacheManager {
 			valueCurr = jredis.incrBy(key, value);
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}
@@ -769,7 +839,10 @@ public class CacheManagerImpl implements CacheManager {
 			return valueCurr;
 		} catch (Exception e) {
 			jedisPool.returnBrokenResource(jredis);
-			throw new CacheException(e);
+			if(log.isDebugEnabled()){
+				log.debug("Call Redis Error");
+			}
+			return null;
 		} finally {
 			returnResource(jredis);
 		}

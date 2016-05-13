@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +27,7 @@ import com.baozun.nebula.event.EmailEvent;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
-import com.baozun.nebula.exception.ErrorCodesFoo;
 import com.baozun.nebula.exception.PasswordNotMatchException;
-import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
 import com.baozun.nebula.manager.email.EmailCheckManager;
@@ -58,7 +54,6 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
 import com.feilong.core.util.RegexUtil;
-import com.feilong.servlet.http.RequestUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -474,11 +469,6 @@ public class MemberManagerImpl implements MemberManager{
 		if (res == null){
 			throw new BusinessException(Constants.BINDEMAIL_ERROR);
 		}
-	}
-
-	@Override
-	public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines) throws SynchronousShoppingCartException{
-		sdkShoppingCartManager.synchronousShoppingCart(memberId, shoppingLines);
 	}
 
 	/*

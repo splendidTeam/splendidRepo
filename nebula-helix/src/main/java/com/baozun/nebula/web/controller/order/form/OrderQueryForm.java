@@ -185,14 +185,10 @@ public class OrderQueryForm extends BaseForm{
         //订单类型（未支付，发货中，以完成，取消）
         String orderStatus = this.getOrderStatus();
         if (Validator.isNotNullOrEmpty(orderStatus)){
-            List<Integer> logisticsStatusList = new ArrayList<Integer>();
             List<Integer> financestatusList = new ArrayList<Integer>();
-            //未支付(新建)
+            //未完成的订单
             if (orderStatus.equals(orderStatus_new)){
-                logisticsStatusList.add(SalesOrder.SALES_ORDER_STATUS_NEW);//新建订单
-                financestatusList.add(SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT);//财务状态未支付
-                orderQueryCommand.setLogisticsStatusList(logisticsStatusList);
-                orderQueryCommand.setFinancestatusList(financestatusList);
+                financestatusList.add(SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT);
             }
             //TODO 其他状态的判断
         }

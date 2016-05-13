@@ -18,50 +18,57 @@ package com.baozun.nebula.web.controller.order.viewcommand;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
- * The Class SimpleOrderViewCommand.
+ * 订单的基本信息.
  *
  * @author feilong
- * @version 5.3.1 2016年5月6日 下午5:48:06
- * @see com.baozun.nebula.model.salesorder.SalesOrder
+ * @version 5.3.1 2016年5月12日 下午3:16:25
  * @since 5.3.1
  */
-public class SimpleOrderViewCommand extends BaseViewCommand{
+public class OrderBaseInfoSubViewCommand extends BaseViewCommand{
 
     /** The Constant serialVersionUID. */
-    private static final long                   serialVersionUID = -290693655189583423L;
+    private static final long serialVersionUID = -6400008677521495969L;
 
     /** 订单id. */
-    private Long                              orderId;
+    private Long              orderId;
 
     /** 订单code. */
-    private String                              orderCode;
+    private String            orderCode;
 
     /** 创建时间. */
-    private Date                                createTime;
+    private Date              createTime;
 
     /** 物流状态. */
-    private Integer                             logisticsStatus;
+    private Integer           logisticsStatus;
 
     /** 财务状态. */
-    private Integer                             financialStatus;
-
-    /** 支付方式. */
-    private Integer                             payment;
-
-    /** 每个订单行. */
-    private List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList;
+    private Integer           financialStatus;
 
     /** //TODO feilong 总价. */
-    private BigDecimal                          total;
+    private BigDecimal        total;
+
     /**
-     * 是否评论 0 未评论 1位评论
+     * 获得 订单id.
+     *
+     * @return the orderId
      */
-    private int                                  isRate;
+    public Long getOrderId(){
+        return orderId;
+    }
+
+    /**
+     * 设置 订单id.
+     *
+     * @param orderId
+     *            the orderId to set
+     */
+    public void setOrderId(Long orderId){
+        this.orderId = orderId;
+    }
 
     /**
      * 获得 订单code.
@@ -140,45 +147,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 获得 支付方式.
-     *
-     * @return the payment
-     */
-    public Integer getPayment(){
-        return payment;
-    }
-
-    /**
-     * 设置 支付方式.
-     *
-     * @param payment
-     *            the payment to set
-     */
-    public void setPayment(Integer payment){
-        this.payment = payment;
-    }
-
-    /**
-     * 获得 每个订单行.
-     *
-     * @return the simpleOrderLineSubViewCommandList
-     */
-    public List<SimpleOrderLineSubViewCommand> getSimpleOrderLineSubViewCommandList(){
-        return simpleOrderLineSubViewCommandList;
-    }
-
-    /**
-     * 设置 每个订单行.
-     *
-     * @param simpleOrderLineSubViewCommandList
-     *            the simpleOrderLineSubViewCommandList to set
-     */
-    public void setSimpleOrderLineSubViewCommandList(List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList){
-        this.simpleOrderLineSubViewCommandList = simpleOrderLineSubViewCommandList;
-    }
-
-    /**
-     * 获得总价.
+     * 获得 //TODO feilong 总价.
      *
      * @return the total
      */
@@ -187,7 +156,7 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     }
 
     /**
-     * 设置总价.
+     * 设置 //TODO feilong 总价.
      *
      * @param total
      *            the total to set
@@ -196,32 +165,4 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
         this.total = total;
     }
 
-    /**
-     * 获得 订单id.
-     *
-     * @return the orderId
-     */
-    public Long getOrderId(){
-        return orderId;
-    }
-
-    /**
-     * 设置 订单id.
-     *
-     * @param orderId
-     *            the orderId to set
-     */
-    public void setOrderId(Long orderId){
-        this.orderId = orderId;
-    }
-
-    public int getIsRate() {
-        return isRate;
-    }
-
-    public void setIsRate(int isRate) {
-        this.isRate = isRate;
-    }
-    
-    
 }

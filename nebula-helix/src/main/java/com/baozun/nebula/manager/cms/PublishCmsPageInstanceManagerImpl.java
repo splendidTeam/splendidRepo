@@ -63,18 +63,15 @@ public class PublishCmsPageInstanceManagerImpl implements PublishCmsPageInstance
 	@Autowired
 	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
 	
+	/**
+	 * 获取cms页面缓存数据步骤
+	 * 1、获取页面未发布版本的缓存的，得到得到版本id
+	 * 2、根据页面code获取发布页面缓存对象
+	 * 3、存在缓存，在redis缓存中根据map字段中的"versionId"来判断当前需要发布的版本号是否是缓存中页面发布版本(基础版本)，如果不是就重新更新需要发布的缓存，
+	 * 4、不存在缓存，重新更新需要发布的缓存
+	 */
 	@Override
-		// TODO 1.还需要处理 使用公共头尾，也就是去掉body之外的内容
 	public Map<String, String> findPublishPage(CmsPageInstance pageInstance) {
-		// 2.公共资源的处理方法 <resource></resource>之间的内容
-		
-		/**
-		 * 获取cms页面缓存数据步骤
-		 * 1、获取页面未发布版本的缓存的，得到得到版本id
-		 * 2、根据页面code获取发布页面缓存对象
-		 * 3、存在缓存，在redis缓存中根据map字段中的"versionId"来判断当前需要发布的版本号是否是缓存中页面发布版本(基础版本)，如果不是就重新更新需要发布的缓存，
-		 * 4、不存在缓存，重新更新需要发布的缓存
-		 */
 
 		Map<String, List<CmsPageInstanceVersionCommand>> versionCommand = cacheManager.getMapObject(CacheKeyConstant.CMS_PAGE_KEY, CacheKeyConstant.CMS_PAGE_VERSION_KEY);
 		List<CmsPageInstanceVersionCommand> cmsPageInstanceVersionCommandList = new ArrayList<CmsPageInstanceVersionCommand>();

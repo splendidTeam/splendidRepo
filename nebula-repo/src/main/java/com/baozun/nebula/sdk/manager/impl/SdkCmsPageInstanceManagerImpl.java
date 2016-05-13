@@ -231,7 +231,6 @@ public class SdkCmsPageInstanceManagerImpl implements SdkCmsPageInstanceManager 
 
 	@Override
 	public Map<String, CmsPageInstance> findUrlMap() {
-		// TODO Auto-generated method stub
 		return urlMap;
 	}
 
@@ -437,7 +436,6 @@ public class SdkCmsPageInstanceManagerImpl implements SdkCmsPageInstanceManager 
 
 	@Override
 	public Map<String, Date> getPublishedPageInstanceVersionsTimeRang(Long pageId) {
-		// TODO Auto-generated method stub
 		return cmsPageInstanceVersionDao.getPublishedPageInstanceVersionsTimeRang(pageId);
 	}
 }
