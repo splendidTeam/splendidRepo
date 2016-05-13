@@ -17,80 +17,92 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
  * @createtime 2014-3-7 上午10:16:48
  */
 public interface SdkPaymentManager extends BaseManager{
-	/**
-	 * 保存支付日志
-	 * @param createTime
-	 * @param message
-	 * @param operator
-	 * @param returnVal
-	 */
-	public void savePaymentLog(Date createTime, String message, String operator,String returnVal);
-	
-	/**
-	 * 根据订单号修改支付信息中的调用关闭交易的状态
-	 * @param orderId
-	 * @param callCloseStatus
-	 * @param modifyTime
-	 * @return
-	 */
-	public void upPayInfoCallCloseStaBySubOrdinate(Long orderId,Boolean callCloseStatus,Date modifyTime);
-	
-	/**
-	 * 保存支付订单号信息(t_so_paycode)以及订单支付信息(t_so_payinfo)
-	 * @param sos
-	 * @return
-	 */
-	public String savePayCodeInfo(List<SalesOrderCommand> sos);
-	
-	/**
-	 * 根据支付订单号(t_so_paycode subordinate)更改支付类型
-	 * @param subinateCode
-	 * @param payType
-	 */
-	public void updatePayCodeBySubOrdinate(String subinateCode,Integer payType);
-	
-	/**
-	 * 根据支付订单号(t_so_paycode subordinate)更改支付成功状态
-	 * @param subinateCode
-	 * @param modifyTime
-	 * @param paySuccessStatus
-	 */
-	public void updatePayCodePayStatus(String subinateCode,Date modifyTime,Boolean paySuccessStatus);
-	
-	/**
-	 * 根据支付订单号查询支付订单号信息
-	 * @param subOrdinate
-	 * @return
-	 */
-	public PayCode findPayCodeBySubOrdinate(String subOrdinate);
-	
-	/**
-	 * 根据支付订单号、支付类型、是否支付成功查询支付订单信息
-	 * @param code
-	 * @param payType
-	 * @param flag
-	 * @return
-	 */
-	public PayCode findPayCodeByCodeAndPayTypeAndPayStatus(String code,Integer payType,boolean flag);
-	
-	/**
-	 * 根据支付订单号、支付类型查询支付订单信息
-	 * @param code
-	 * @param payType
-	 * @return
-	 */
-	public PayCode findPayCodeByCodeAndPayType(String code,Integer payType);
-	/**
-	 * 根据订单id查询支付信息
-	 * @param orderId
-	 * @return
-	 */
-	public List<PayInfoCommand> findPayInfoCommandByOrderId(Long orderId);
-	 
-	/**
-	 * 查询付款日志
-	 * @param paraMap
-	 * @return
-	 */
-	public List<PayInfoLog> findPayInfoLogListByQueryMap(Map<String, Object> paraMap);
+
+    /**
+     * 保存支付日志
+     * 
+     * @param createTime
+     * @param message
+     * @param operator
+     * @param returnVal
+     */
+    public void savePaymentLog(Date createTime,String message,String operator,String returnVal);
+
+    /**
+     * 根据订单号修改支付信息中的调用关闭交易的状态
+     * 
+     * @param orderId
+     * @param callCloseStatus
+     * @param modifyTime
+     * @return
+     */
+    public void upPayInfoCallCloseStaBySubOrdinate(Long orderId,Boolean callCloseStatus,Date modifyTime);
+
+    /**
+     * 保存支付订单号信息(t_so_paycode)以及订单支付信息(t_so_payinfo)
+     * 
+     * @param sos
+     * @return
+     */
+    public String savePayCodeInfo(List<SalesOrderCommand> sos);
+
+    /**
+     * 根据支付订单号(t_so_paycode subordinate)更改支付类型
+     * 
+     * @param subinateCode
+     * @param payType
+     */
+    public void updatePayCodeBySubOrdinate(String subinateCode,Integer payType);
+
+    /**
+     * 根据支付订单号(t_so_paycode subordinate)更改支付成功状态
+     * 
+     * @param subinateCode
+     * @param modifyTime
+     * @param paySuccessStatus
+     */
+    public void updatePayCodePayStatus(String subinateCode,Date modifyTime,Boolean paySuccessStatus);
+
+    /**
+     * 根据支付订单号查询支付订单号信息
+     * 
+     * @param subOrdinate
+     * @return
+     */
+    public PayCode findPayCodeBySubOrdinate(String subOrdinate);
+
+    /**
+     * 根据支付订单号、支付类型、是否支付成功查询支付订单信息
+     * 
+     * @param code
+     * @param payType
+     * @param flag
+     * @return
+     */
+    public PayCode findPayCodeByCodeAndPayTypeAndPayStatus(String code,Integer payType,boolean flag);
+
+    /**
+     * 根据支付订单号、支付类型查询支付订单信息
+     * 
+     * @param code
+     * @param payType
+     * @return
+     */
+    public PayCode findPayCodeByCodeAndPayType(String code,Integer payType);
+
+    /**
+     * 根据订单id查询支付信息
+     * 
+     * @param orderId
+     * @return
+     */
+    public List<PayInfoCommand> findPayInfoCommandByOrderId(Long orderId);
+
+    /**
+     * 查询付款日志
+     * 
+     * @param paraMap
+     * @return
+     */
+    public List<PayInfoLog> findPayInfoLogListByQueryMap(Map<String, Object> paraMap);
 }

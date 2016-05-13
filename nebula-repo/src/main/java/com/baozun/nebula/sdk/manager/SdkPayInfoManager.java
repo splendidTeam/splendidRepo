@@ -14,8 +14,23 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
+package com.baozun.nebula.sdk.manager;
+
+import java.math.BigDecimal;
+
+import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.model.salesorder.PayInfo;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
+
 /**
- * @author jumbo
+ * 
  *
+ * @author feilong
+ * @version 5.3.1 2016年5月13日 下午4:07:32
+ * @since 5.3.1
  */
-package com.baozun.nebula.api.salesorder;
+public interface SdkPayInfoManager extends BaseManager{
+
+    PayInfo savePayInfoOfPayMain(SalesOrderCommand salesOrderCommand,Long orderId,BigDecimal payMainMoney);
+
+}
