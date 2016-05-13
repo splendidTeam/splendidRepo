@@ -18,7 +18,6 @@ package com.baozun.nebula.sdk.manager.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,8 +27,6 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,10 +75,6 @@ import com.feilong.core.util.CollectionsUtil;
 @Transactional
 @Service("sdkEngineService")
 public class SdkEngineManagerImpl implements SdkEngineManager{
-
-    /** The Constant log. */
-    @SuppressWarnings("unused")
-    private final static Logger          log = LoggerFactory.getLogger(SdkEngineManagerImpl.class);
 
     /** The item dao. */
     @Autowired
@@ -162,18 +155,15 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         if (Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(item.getLifecycle()))){
             shoppingCartLineCommand.setValid(true); // 上架状态
             if (!checkActiveBeginTime(skuId)){
-                shoppingCartLineCommand.setValid(false);
-                shoppingCartLineCommand.setValidType(1);
+                setValid(shoppingCartLineCommand, 1);
             }else{
                 Integer stock = shoppingCartLineCommand.getStock();
                 if (stock <= 0 || stock < shoppingCartLineCommand.getQuantity()){
-                    shoppingCartLineCommand.setValid(false);
-                    shoppingCartLineCommand.setValidType(2);
+                    setValid(shoppingCartLineCommand, 2);
                 }
             }
         }else{
-            shoppingCartLineCommand.setValid(false);// 下架状态
-            shoppingCartLineCommand.setValidType(1);
+            setValid(shoppingCartLineCommand, 1);
         }
 
         if (shoppingCartLineCommand.isGift()){
@@ -224,6 +214,20 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         if (Validator.isNotNullOrEmpty(skuPros)){
             shoppingCartLineCommand.setSkuPropertys(skuPros);
         }
+    }
+
+    /**
+     * 设置 valid.
+     *
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @param validType
+     *            有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
+     * @since 5.3.1
+     */
+    private void setValid(ShoppingCartLineCommand shoppingCartLineCommand,Integer validType){
+        shoppingCartLineCommand.setValid(false);// 下架状态
+        shoppingCartLineCommand.setValidType(validType);
     }
 
     /**

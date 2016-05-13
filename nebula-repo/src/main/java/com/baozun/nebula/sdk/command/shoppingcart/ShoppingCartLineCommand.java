@@ -128,7 +128,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 是套餐行 t是套餐行，f不是套餐行 *. */
     private boolean                    isSuitLine;
 
-    /** 是否可见 1可见 /0不可见 *. */
+    /**
+     * 是否可见 1可见 /0不可见 *.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private Integer                    visibleMark;
 
     /** 是否限购 1限购 0不限购 *. */
@@ -137,7 +142,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 限购数量 *. */
     private Integer                    limit;
 
-    /** 是否有库存 1有库存 0无库存 *. */
+    /**
+     * 是否有库存 1有库存 0无库存 *.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private Integer                    stockMark;
 
     /**
@@ -162,7 +172,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** The category list. */
     private List<Long>                 categoryList;
 
-    /** The brand id. */
+    /**
+     * The brand id.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
     private String                     brandId;
 
     /**
@@ -468,28 +483,28 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 pK *.
+     * 获得 pK.
      *
-     * @return the pK *
+     * @return the pK
      */
     public Long getId(){
         return id;
     }
 
     /**
-     * 设置 pK *.
+     * 设置 pK.
      *
      * @param id
-     *            the new pK *
+     *            the new pK
      */
     public void setId(Long id){
         this.id = id;
     }
 
     /**
-     * 获得 销售属性 *.
+     * 获得 销售属性.
      *
-     * @return the 销售属性 *
+     * @return the 销售属性
      */
     public String getSaleProperty(){
         return saleProperty;
@@ -574,7 +589,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 brand id.
      *
      * @return the brand id
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public String getBrandId(){
         return brandId;
     }
@@ -584,7 +601,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param brandId
      *            the brand id
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setBrandId(String brandId){
         this.brandId = brandId;
     }
@@ -774,7 +793,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 是否可见 1可见 /0不可见 *.
      *
      * @return the 是否可见 1可见 /0不可见 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public Integer getVisibleMark(){
         return visibleMark;
     }
@@ -784,7 +805,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param visibleMark
      *            the new 是否可见 1可见 /0不可见 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setVisibleMark(Integer visibleMark){
         this.visibleMark = visibleMark;
     }
@@ -812,7 +835,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 是否有库存 1有库存 0无库存 *.
      *
      * @return the 是否有库存 1有库存 0无库存 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public Integer getStockMark(){
         return stockMark;
     }
@@ -822,7 +847,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param stockMark
      *            the new 是否有库存 1有库存 0无库存 *
+     * @deprecated 没有引用, by feilong 2016-05-13
      */
+    @Deprecated
     public void setStockMark(Integer stockMark){
         this.stockMark = stockMark;
     }
