@@ -14,32 +14,21 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-
 package com.baozun.nebula.sdk.manager;
 
-import java.util.List;
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.model.salesorder.OrderLine;
-import com.baozun.nebula.sdk.command.OrderLineCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.model.salesorder.PayInfo;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 /**
- * @author - 项硕
+ * 
+ *
+ * @author feilong
+ * @version 5.3.1 2016年5月13日 下午4:07:32
+ * @since 5.3.1
  */
-public interface SdkOrderLineManager extends BaseManager{
+public interface SdkPayInfoLogManager extends BaseManager{
 
-    public OrderLine findByPk(Long id);
-
-    public List<OrderLineCommand> findOrderLinesByOrderId(Long orderId);
-
-    /**
-     * 保存orderLine
-     * 
-     * @param orderId
-     * @param shoppingCartLineCommand
-     * @return
-     * @since 5.3.1
-     */
-    OrderLine saveOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand);
+    void savePayInfoLogOfPayMain(SalesOrderCommand salesOrderCommand,String subOrdinate,PayInfo payInfo);
 
 }

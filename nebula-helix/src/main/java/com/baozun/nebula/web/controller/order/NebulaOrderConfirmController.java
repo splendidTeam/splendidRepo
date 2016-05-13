@@ -165,6 +165,9 @@ public class NebulaOrderConfirmController extends BaseController {
 
 	@Autowired
 	private OrderManager orderManager;
+	
+	/* 购物车为空返回的URL */
+	public static final String	CART_NULL_BACK_URL	= "/index";
 
 	/**
 	 * 显示订单结算页面.
@@ -191,11 +194,16 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 获取购物车信息
 		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails);
+		
+		//购物车为空
+		if(shoppingCartCommand==null ||  shoppingCartCommand.getShoppingCartLineCommands()==null 
+				||shoppingCartCommand.getShoppingCartLineCommands().isEmpty()){
+			return "redirect:"+CART_NULL_BACK_URL;
+		}
 
 		// 封装viewCommand
 		OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
-		orderConfirmViewCommand
-				.setShoppingCartViewCommand(shoppingcartViewCommandConverter.convert(shoppingCartCommand));
+		orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
 		// 收获地址信息
 		orderConfirmViewCommand.setAddressList(memberDetails == null ? null
 				: sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId()));
@@ -256,9 +264,9 @@ public class NebulaOrderConfirmController extends BaseController {
 		ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(memberDetails,
 				salesOrderCommand, request);
 
+		
 		// 校验购物车信息和促销
 		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
-
 		SalesOrderResult salesorderResult = validateWithShoppingCart(shoppingCartCommand, couponCode);
 		// 如果校验失败，返回错误
 		if (salesorderResult != SalesOrderResult.SUCCESS) {
@@ -266,6 +274,7 @@ public class NebulaOrderConfirmController extends BaseController {
 					memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(), new Date(), couponCode);
 			return toNebulaReturnResult(salesorderResult);
 		}
+		
 
 		// 新建订单
 		String subOrdinate = orderManager.saveOrder(shoppingCartCommand, salesOrderCommand,
@@ -314,8 +323,12 @@ public class NebulaOrderConfirmController extends BaseController {
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
 
-		// 过虑未选中的购物车行 过滤之后，金额是否需要重新计算？
+		//过滤赠品 
 		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
+		
+		//过滤未勾选的商品行
+		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 1);
+		
 		if (null == cartLines) {
 			return null;
 		}
@@ -358,11 +371,16 @@ public class NebulaOrderConfirmController extends BaseController {
 		if (null != salesOrderResult) {
 			return salesOrderResult;
 		}
-		/** 校驗优惠券促销 */
-		salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
-		if (null != salesOrderResult) {
-			return salesOrderResult;
+		
+		/** 如果输入了优惠券则要进行优惠券验证 */
+		if (Validator.isNotNullOrEmpty(coupon)) {
+			/** 校驗优惠券促销 */
+			salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
+			if (null != salesOrderResult) {
+				return salesOrderResult;
+			}
 		}
+		
 		return SalesOrderResult.SUCCESS;
 	}
 

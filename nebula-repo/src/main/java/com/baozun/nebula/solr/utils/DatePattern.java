@@ -16,49 +16,51 @@
 package com.baozun.nebula.solr.utils;
 
 /**
- * date pattern. 
+ * date pattern.
  * 
  * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
  * @version 1.0 2012 1 21 04:18:00
+ * @deprecated pls use {@link com.feilong.core.DatePattern}
  */
+@Deprecated
 public final class DatePattern{
 
-	/** <code>{@value}</code> 年月 带水平线,一般用于分类日志,将众多日志按月分类 example:2012-01. */
-	public static final String	yearAndMonth				= "yyyy-MM";
+    /** <code>{@value}</code> 年月 带水平线,一般用于分类日志,将众多日志按月分类 example:2012-01. */
+    public static final String yearAndMonth               = "yyyy-MM";
 
-	/** <code>{@value}</code> 只有日期 年月日 example:2012-01-22. */
-	public static final String	onlyDate					= "yyyy-MM-dd";
+    /** <code>{@value}</code> 只有日期 年月日 example:2012-01-22. */
+    public static final String onlyDate                   = "yyyy-MM-dd";
 
-	/** <code>{@value}</code> 月日 example:01-22. */
-	public static final String	monthAndDay					= "MM-dd";
+    /** <code>{@value}</code> 月日 example:01-22. */
+    public static final String monthAndDay                = "MM-dd";
 
-	/** <code>{@value}</code> 月日带星期 example:01-22(星期四). */
-	public static final String	monthAndDayWithWeek			= "MM-dd(E)";
+    /** <code>{@value}</code> 月日带星期 example:01-22(星期四). */
+    public static final String monthAndDayWithWeek        = "MM-dd(E)";
 
-	/** <code>{@value}</code> 不带秒. */
-	public static final String	commonWithoutSecond			= "yyyy-MM-dd HH:mm";
+    /** <code>{@value}</code> 不带秒. */
+    public static final String commonWithoutSecond        = "yyyy-MM-dd HH:mm";
 
-	/** <code>{@value}</code>. */
-	public static final String	commonWithTime				= "yyyy-MM-dd HH:mm:ss";
+    /** <code>{@value}</code>. */
+    public static final String commonWithTime             = "yyyy-MM-dd HH:mm:ss";
 
-	/** <code>{@value}</code>. */
-	public static final String	yyyyMMdd					= "yyyyMMdd";
+    /** <code>{@value}</code>. */
+    public static final String yyyyMMdd                   = "yyyyMMdd";
 
-	/** <code>{@value}</code> 带毫秒的时间格式. */
-	public static final String	commonWithMillisecond		= "yyyy-MM-dd HH:mm:ss.SSS";
+    /** <code>{@value}</code> 带毫秒的时间格式. */
+    public static final String commonWithMillisecond      = "yyyy-MM-dd HH:mm:ss.SSS";
 
-	/** <code>{@value}</code> 不带年 不带秒. */
-	public static final String	commonWithoutAndYearSecond	= "MM-dd HH:mm";
+    /** <code>{@value}</code> 不带年 不带秒. */
+    public static final String commonWithoutAndYearSecond = "MM-dd HH:mm";
 
-	/** <code>{@value}</code> 只有时间且不带秒. */
-	public static final String	onlyTime_withoutSecond		= "HH:mm";
+    /** <code>{@value}</code> 只有时间且不带秒. */
+    public static final String onlyTime_withoutSecond     = "HH:mm";
 
-	/** <code>{@value}</code> 只有时间. */
-	public static final String	onlyTime					= "HH:mm:ss";
+    /** <code>{@value}</code> 只有时间. */
+    public static final String onlyTime                   = "HH:mm:ss";
 
-	/** 时间戳,<code>{@value}</code>,一般用于拼接文件名称. */
-	public static final String	timestamp					= "yyyyMMddHHmmss";
+    /** 时间戳,<code>{@value}</code>,一般用于拼接文件名称. */
+    public static final String timestamp                  = "yyyyMMddHHmmss";
 
-	/** 带毫秒的时间戳,<code>{@value}</code> . */
-	public static final String	timestampWithMillisecond	= "yyyyMMddHHmmssSSS";
+    /** 带毫秒的时间戳,<code>{@value}</code> . */
+    public static final String timestampWithMillisecond   = "yyyyMMddHHmmssSSS";
 }
