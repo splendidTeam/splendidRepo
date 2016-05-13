@@ -47,7 +47,7 @@ public class Logistics extends BaseModel{
 	private Long				id;
 	
 	/** 订单id */
-	private Long           orderId;
+	private Long                         orderId;
 	
 	/** 订单是否完成 */
 	private Boolean				isFinish;
