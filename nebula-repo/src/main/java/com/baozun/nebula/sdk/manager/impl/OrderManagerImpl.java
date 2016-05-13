@@ -112,6 +112,13 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.util.MapUtil;
+<<<<<<< HEAD
+=======
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 /**
  * The Class OrderManagerImpl.
@@ -270,6 +277,7 @@ public class OrderManagerImpl implements OrderManager{
     /** The sales order handler. */
     @Autowired(required = false)
     private SalesOrderHandler                        salesOrderHandler;
+<<<<<<< HEAD
     
     @Autowired
 	private SdkSecretManager						 sdkSecretManager;
@@ -309,6 +317,8 @@ public class OrderManagerImpl implements OrderManager{
 //				"mobile", 该字段数据库里最大长度为20,加密后保存失败
 				"email" });
 	}
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
     /*
      * (non-Javadoc)
@@ -1106,6 +1116,7 @@ public class OrderManagerImpl implements OrderManager{
         // 是否基于整单
         orderPromotion.setBaseOrder(promotionSKUDiscAMTBySetting.getBaseOrder());
         sdkOrderPromotionDao.save(orderPromotion);
+<<<<<<< HEAD
     }
 
     /**
@@ -1155,6 +1166,8 @@ public class OrderManagerImpl implements OrderManager{
         encryptConsignee(consignee);
         consignee.setOrderId(salesOrder.getId());
         sdkConsigneeDao.save(consignee);
+=======
+>>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
     }
 
     /**
