@@ -283,27 +283,10 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkSecretManager                         sdkSecretManager;
 
-<<<<<<< HEAD
-=======
-    private void encryptConsignee(Consignee consignee){
-
-        sdkSecretManager.encrypt(consignee, new String[] {
-                                                           "name",
-                                                           "buyerName",
-                                                           "country",
-                                                           "province",
-                                                           "city",
-                                                           "area",
-                                                           "town",
-                                                           "address",
-                                                           "postcode",
-                                                           "tel",
-                                                           "buyerTel",
-                                                           "mobile",
-                                                           "email" });
-    }
-
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
+    /**
+     * 解密订单中的收货人信息
+     * @param salesOrderCommand
+     */
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
 
         sdkSecretManager.decrypt(salesOrderCommand, new String[] {
@@ -336,6 +319,7 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderCommand)
             return null;
         if (type == 1){
+        	//收货人信息解密
             decryptSalesOrderCommand(salesOrderCommand);
             // 订单支付信息
             List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
@@ -1509,6 +1493,7 @@ public class OrderManagerImpl implements OrderManager{
             return salesOrderCommand;
         }else{
             if (type.equals(1)){
+            	//type为1时将查处收货人信息，此时解密
                 decryptSalesOrderCommand(salesOrderCommand);
             }
             // 订单支付信息
@@ -1586,6 +1571,7 @@ public class OrderManagerImpl implements OrderManager{
     @Transactional(readOnly = true)
     public SalesOrderCommand findOrderByLineId(Long orderLineId){
         SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderByLineId(orderLineId);
+        //收货人信息解密
         decryptSalesOrderCommand(salesOrderCommand);
         return salesOrderCommand;
     }
