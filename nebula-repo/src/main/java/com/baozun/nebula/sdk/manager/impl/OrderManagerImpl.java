@@ -17,9 +17,7 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +37,6 @@ import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.command.coupon.CouponCommand;
 import com.baozun.nebula.command.limit.LimitCommand;
-import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.dao.coupon.CouponDao;
 import com.baozun.nebula.dao.freight.DistributionModeDao;
@@ -54,8 +50,6 @@ import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderPromotionDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderStatusLogDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnOrderDao;
-import com.baozun.nebula.event.EmailEvent;
-import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.freight.DistributionMode;
 import com.baozun.nebula.model.member.MemberPersonalData;
@@ -85,7 +79,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.handler.SalesOrderHandler;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkConsigneeManager;
 import com.baozun.nebula.sdk.manager.SdkEffectiveManager;
@@ -93,6 +86,7 @@ import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
+import com.baozun.nebula.sdk.manager.SdkOrderEmailManager;
 import com.baozun.nebula.sdk.manager.SdkOrderLineManager;
 import com.baozun.nebula.sdk.manager.SdkOrderManager;
 import com.baozun.nebula.sdk.manager.SdkOrderPromotionManager;
@@ -121,28 +115,20 @@ import loxia.dao.Sort;
 public class OrderManagerImpl implements OrderManager{
 
     /** The Constant log. */
-    private static final Logger                      log             = LoggerFactory.getLogger(OrderManagerImpl.class);
+    private static final Logger                      log            = LoggerFactory.getLogger(OrderManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer                     SUCCESS         = 1;
+    private static final Integer                     SUCCESS        = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer                     FAILURE         = 0;
+    private static final Integer                     FAILURE        = 0;
 
     /** The Constant SEPARATOR_FLAG. */
-    private static final String                      SEPARATOR_FLAG  = "\\|\\|";
+    private static final String                      SEPARATOR_FLAG = "\\|\\|";
 
-    /** The page url base. */
-    @Value("#{meta['page.base']}")
-    private String                                   pageUrlBase     = "";
-
-    /** The img domain url. */
-    @Value("#{meta['upload.img.domain.base']}")
-    private String                                   imgDomainUrl    = "";
-
-    /** The frontend base url. */
-    @Value("#{meta['frontend.url']}")
-    private String                                   frontendBaseUrl = "";
+    /** The sdk order email manager. */
+    @Autowired
+    private SdkOrderEmailManager                     sdkOrderEmailManager;
 
     /** The sdk cancel order dao. */
     @Autowired
@@ -160,6 +146,7 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkOrderPromotionDao                     sdkOrderPromotionDao;
 
+    /** The sdk order promotion manager. */
     @Autowired
     private SdkOrderPromotionManager                 sdkOrderPromotionManager;
 
@@ -263,24 +250,17 @@ public class OrderManagerImpl implements OrderManager{
     @Autowired
     private SdkConsigneeManager                      sdkConsigneeManager;
 
-    /** The sales order handler. */
-    @Autowired(required = false)
-    private SalesOrderHandler                        salesOrderHandler;
-
+    /** The sdk secret manager. */
     @Autowired
     private SdkSecretManager                         sdkSecretManager;
 
-    /** The event publisher. */
-    @Autowired
-    private EventPublisher                           eventPublisher;
-
     /**
-     * 解密订单中的收货人信息
-     * 
+     * 解密订单中的收货人信息.
+     *
      * @param salesOrderCommand
+     *            the sales order command
      */
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
-
         sdkSecretManager.decrypt(salesOrderCommand, new String[] {
                                                                    "name",
                                                                    "buyerName",
@@ -444,7 +424,11 @@ public class OrderManagerImpl implements OrderManager{
         }else{
             memboIds = memCombos;
         }
-        List<Long> shopIds = getShopIds(shoppingCartCommand.getShoppingCartLineCommands());
+
+        //获取购物车中的所有店铺id.
+        Set<Long> ids = CollectionsUtil.getPropertyValueSet(shoppingCartCommand.getShoppingCartLineCommands(), "shopId");
+        List<Long> shopIds = new ArrayList<Long>(ids);
+
         Set<String> itemComboIds = getItemComboIds(shoppingCartCommand.getShoppingCartLineCommands());
         List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
                         .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
@@ -547,7 +531,7 @@ public class OrderManagerImpl implements OrderManager{
 
             // 封装发送邮件数据
             if (isSendEmail != null && isSendEmail.equals("true")){
-                Map<String, Object> dataMap = getDataMap(
+                Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(
                                 subOrdinate,
                                 salesOrder,
                                 salesOrderCommand,
@@ -588,12 +572,12 @@ public class OrderManagerImpl implements OrderManager{
             }
         }
         // 清空购物车
-        if (salesOrderCommand.getIsImmediatelyBuy() == null || salesOrderCommand.getIsImmediatelyBuy() == false)
+        if (salesOrderCommand.getIsImmediatelyBuy() == null || salesOrderCommand.getIsImmediatelyBuy() == false){
             sdkShoppingCartManager.emptyShoppingCart(salesOrderCommand.getMemberId());
+        }
 
         // 发邮件
-        sendEmailOfCreateOrder(dataMapList);
-
+        sdkOrderEmailManager.sendEmailOfCreateOrder(dataMapList);
         return subOrdinate;
     }
 
@@ -632,7 +616,7 @@ public class OrderManagerImpl implements OrderManager{
      * @param shopId
      *            the shop id
      */
-    protected void savePayInfoAndPayInfoLog(SalesOrderCommand salesOrderCommand,String subOrdinate,SalesOrder salesOrder,Long shopId){
+    private void savePayInfoAndPayInfoLog(SalesOrderCommand salesOrderCommand,String subOrdinate,SalesOrder salesOrder,Long shopId){
         List<String> soPayMentDetails = salesOrderCommand.getSoPayMentDetails();
         BigDecimal payMainMoney = salesOrder.getTotal().add(salesOrder.getActualFreight());
         // 除主支付方式之外的付款
@@ -648,182 +632,6 @@ public class OrderManagerImpl implements OrderManager{
         }
         PayInfo payInfo = sdkPayInfoManager.savePayInfoOfPayMain(salesOrderCommand, salesOrder.getId(), payMainMoney);
         sdkPayInfoLogManager.savePayInfoLogOfPayMain(salesOrderCommand, subOrdinate, payInfo);
-    }
-
-    /**
-     * Send email of create order.
-     *
-     * @param dataMapList
-     *            the data map list
-     */
-    protected void sendEmailOfCreateOrder(List<Map<String, Object>> dataMapList){
-        if (Validator.isNotNullOrEmpty(dataMapList)){
-            for (Map<String, Object> dataMap : dataMapList){
-                String email = dataMap.get("email").toString();
-                EmailEvent emailEvent = new EmailEvent(this, email, EmailConstants.CREATE_ORDER_SUCCESS, dataMap);
-                eventPublisher.publish(emailEvent);
-            }
-        }
-    }
-
-    /**
-     * 获得 data map.
-     *
-     * @param subOrdinate
-     *            the sub ordinate
-     * @param salesOrder
-     *            the sales order
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param sccList
-     *            the scc list
-     * @param shopCartCommandByShop
-     *            the shop cart command by shop
-     * @param psdabsList
-     *            the psdabs list
-     * @return the data map
-     */
-    protected Map<String, Object> getDataMap(
-                    String subOrdinate,
-                    SalesOrder salesOrder,
-                    SalesOrderCommand salesOrderCommand,
-                    List<ShoppingCartLineCommand> sccList,
-                    ShopCartCommandByShop shopCartCommandByShop,
-                    List<PromotionSKUDiscAMTBySetting> psdabsList){
-        Map<String, Object> dataMap = new HashMap<String, Object>();
-        // 后台下单 并且填写了 邮件地址
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getMemberId())){
-            MemberPersonalData memberPersonalData = sdkMemberManager.findMemberPersonData(salesOrder.getMemberId());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
-
-            String nickName = "";
-
-            String email = salesOrderCommand.getEmail();
-
-            if (Validator.isNotNullOrEmpty(memberPersonalData)){
-                nickName = memberPersonalData.getNickname();
-                if (Validator.isNullOrEmpty(email)){
-                    email = memberPersonalData.getEmail();
-                }
-            }
-
-            if (Validator.isNullOrEmpty(nickName))
-                nickName = salesOrderCommand.getName();
-
-            if (Validator.isNullOrEmpty(email))
-                return null;
-
-            // 获取付款地址
-            if (salesOrderCommand.getIsBackCreateOrder()
-                            && !salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-                String payUrlPrefix = sdkMataInfoManager.findValue(MataInfo.PAY_URL_PREFIX);
-                String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
-                dataMap.put("isShowPayButton", true);
-                dataMap.put("payUrl", payUrl);
-            }else{
-                dataMap.put("isShowPayButton", false);
-                dataMap.put("payUrl", "#");
-            }
-
-            dataMap.put("nickName", nickName);
-            dataMap.put("createDateOfAll", sdf.format(salesOrder.getCreateTime()));
-            dataMap.put("createDateOfSfm", sdf1.format(salesOrder.getCreateTime()));
-            dataMap.put("orderCode", salesOrder.getCode());
-            dataMap.put("receiveName", salesOrderCommand.getName());
-            dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-            dataMap.put("address", salesOrderCommand.getAddress());
-
-            dataMap.put(
-                            "mobile",
-                            Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile()
-                                            : salesOrderCommand.getTel());
-
-            dataMap.put("sumItemFee", salesOrder.getTotal().add(salesOrder.getDiscount()));
-            dataMap.put("shipFee", salesOrder.getActualFreight());
-            dataMap.put("offersTotal", salesOrder.getDiscount());
-            dataMap.put("sumPay", salesOrder.getTotal().add(salesOrder.getActualFreight()));
-            dataMap.put("itemLines", sccList);
-            dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
-            dataMap.put("pageUrlBase", pageUrlBase);
-            dataMap.put("imgDomainUrl", imgDomainUrl);
-            dataMap.put("email", email);
-        }else{
-            if (Validator.isNullOrEmpty(salesOrderCommand.getEmail())){
-                return null;
-            }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
-
-            // 获取付款地址
-            if (salesOrderCommand.getIsBackCreateOrder()
-                            && !salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-                String payUrlPrefix = sdkMataInfoManager.findValue(MataInfo.PAY_URL_PREFIX);
-                String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
-                dataMap.put("isShowPayButton", true);
-                dataMap.put("payUrl", payUrl);
-            }else{
-                dataMap.put("isShowPayButton", false);
-                dataMap.put("payUrl", "#");
-            }
-
-            dataMap.put("nickName", salesOrderCommand.getName());
-            dataMap.put("createDateOfAll", sdf.format(salesOrder.getCreateTime()));
-            dataMap.put("createDateOfSfm", sdf1.format(salesOrder.getCreateTime()));
-            dataMap.put("orderCode", salesOrder.getCode());
-            dataMap.put("receiveName", salesOrderCommand.getName());
-            dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-            dataMap.put("address", salesOrderCommand.getAddress());
-
-            dataMap.put(
-                            "mobile",
-                            Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile()
-                                            : salesOrderCommand.getTel());
-
-            dataMap.put("sumItemFee", salesOrder.getTotal().add(salesOrder.getDiscount()));
-            dataMap.put("shipFee", salesOrder.getActualFreight());
-            dataMap.put("offersTotal", salesOrder.getDiscount());
-            dataMap.put("sumPay", salesOrder.getTotal().add(salesOrder.getActualFreight()));
-            dataMap.put("itemLines", sccList);
-            dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
-            dataMap.put("pageUrlBase", pageUrlBase);
-            dataMap.put("imgDomainUrl", imgDomainUrl);
-            dataMap.put("email", salesOrderCommand.getEmail());
-        }
-
-        /** 扩展点 如商城需要需要加入特殊字段 各自实现 **/
-        if (null != salesOrderHandler){
-            dataMap = salesOrderHandler.getEmailDataOfCreateOrder(
-                            subOrdinate,
-                            salesOrder,
-                            salesOrderCommand,
-                            sccList,
-                            shopCartCommandByShop,
-                            psdabsList,
-                            dataMap);
-        }
-
-        return dataMap;
-
-    }
-
-    /**
-     * 返回支付方式.
-     *
-     * @param payment
-     *            the payment
-     * @return the payment name
-     */
-    private String getPaymentName(Integer payment){
-        String name = "支付宝";
-        if (payment == Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_COD)){
-            name = "货到付款";
-        }else if (payment == Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_NETPAY)){
-            name = "网银在线";
-        }else if (payment == Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY)){
-            name = "支付宝";
-        }
-        return name;
     }
 
     /**
@@ -878,56 +686,6 @@ public class OrderManagerImpl implements OrderManager{
     }
 
     /**
-     * 保存收货人信息.
-     *
-     * @param salesOrder
-     *            the sales order
-     * @param salesOrderCommand
-     *            the sales order command
-     *///FIXME feilong PII数据加密
-    @Deprecated
-    protected void saveConsignee(SalesOrder salesOrder,SalesOrderCommand salesOrderCommand){
-        Consignee consignee = new Consignee();
-        ConvertUtils.convertFromTarget(consignee, salesOrderCommand);
-        List<String> appointTimeQuantums = salesOrderCommand.getAppointTimeQuantums();
-        // 设置指定时间段
-        if (Validator.isNotNullOrEmpty(appointTimeQuantums)){
-            for (String appointTimeQuantum : appointTimeQuantums){
-                // String a = "shopid||value"
-                String[] strs = appointTimeQuantum.split(SEPARATOR_FLAG);
-                if (salesOrder.getShopId().toString().equals(strs[0]) && strs.length == 2){
-                    consignee.setAppointTimeQuantum(strs[1]);
-                }
-            }
-        }
-        // 设置指定日期
-        List<String> appointTimes = salesOrderCommand.getAppointTimes();
-        if (Validator.isNotNullOrEmpty(appointTimes)){
-            for (String appointTime : appointTimes){
-                // String a = "shopid||value"
-                String[] strs = appointTime.split(SEPARATOR_FLAG);
-                if (salesOrder.getShopId().toString().equals(strs[0]) && strs.length == 2){
-                    consignee.setAppointTime(strs[1]);
-                }
-            }
-        }
-        // 设置指定类型
-        List<String> appointTypes = salesOrderCommand.getAppointTypes();
-        if (Validator.isNotNullOrEmpty(appointTypes)){
-            for (String appointType : appointTypes){
-                // String a = "shopid||value"
-                String[] strs = appointType.split(SEPARATOR_FLAG);
-                if (salesOrder.getShopId().toString().equals(strs[0]) && strs.length == 2){
-                    consignee.setAppointType(strs[1]);
-                }
-            }
-        }
-        //encryptConsignee(consignee);
-        consignee.setOrderId(salesOrder.getId());
-        sdkConsigneeDao.save(consignee);
-    }
-
-    /**
      * 检查优惠券是否有效.
      *
      * @param memberId
@@ -957,27 +715,27 @@ public class OrderManagerImpl implements OrderManager{
 
         if (null == salesOrderPage){
             return null;
-        }else{
-            List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
-            for (SalesOrderCommand cmd : salesOrderPage){
-                idList.add(cmd.getId());
-            }
+        }
 
-            List<OrderLineCommand> allLineList = sdkOrderLineDao.findOrderDetailListByOrderIds(idList);
-            for (SalesOrderCommand order : salesOrderPage){
-                Long orderId = order.getId();
-                List<OrderLineCommand> orderLineList = new ArrayList<OrderLineCommand>();
-                for (OrderLineCommand line : allLineList){
-                    if (line.getOrderId().equals(orderId)){
-                        orderLineList.add(line);
-                        // 属性list
-                        String properties = line.getSaleProperty();
-                        List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-                        line.setSkuPropertys(propList);
-                    }
+        List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
+        for (SalesOrderCommand cmd : salesOrderPage){
+            idList.add(cmd.getId());
+        }
+
+        List<OrderLineCommand> allLineList = sdkOrderLineDao.findOrderDetailListByOrderIds(idList);
+        for (SalesOrderCommand order : salesOrderPage){
+            Long orderId = order.getId();
+            List<OrderLineCommand> orderLineList = new ArrayList<OrderLineCommand>();
+            for (OrderLineCommand line : allLineList){
+                if (line.getOrderId().equals(orderId)){
+                    orderLineList.add(line);
+                    // 属性list
+                    String properties = line.getSaleProperty();
+                    List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+                    line.setSkuPropertys(propList);
                 }
-                order.setOrderLines(orderLineList);
             }
+            order.setOrderLines(orderLineList);
         }
         return salesOrderPage;
     }
@@ -992,14 +750,15 @@ public class OrderManagerImpl implements OrderManager{
     public Pagination<SalesOrderCommand> findOrders(Page page,Sort[] sorts,Map<String, Object> searchParam){
         Pagination<SalesOrderCommand> salesOrderPage = sdkOrderDao.findOrders(page, sorts, searchParam);
 
-        if (null != salesOrderPage.getItems()){
-            List<Long> idList = new ArrayList<Long>(salesOrderPage.getItems().size());
-            for (SalesOrderCommand cmd : salesOrderPage.getItems()){
+        List<SalesOrderCommand> salesOrderCommandList = salesOrderPage.getItems();
+        if (null != salesOrderCommandList){
+            List<Long> idList = new ArrayList<Long>(salesOrderCommandList.size());
+            for (SalesOrderCommand cmd : salesOrderCommandList){
                 idList.add(cmd.getId());
             }
 
             List<OrderLineCommand> allLineList = sdkOrderLineDao.findOrderDetailListByOrderIds(idList);
-            for (SalesOrderCommand order : salesOrderPage.getItems()){
+            for (SalesOrderCommand order : salesOrderCommandList){
                 Long orderId = order.getId();
                 List<OrderLineCommand> orderLineList = new ArrayList<OrderLineCommand>();
                 for (OrderLineCommand line : allLineList){
@@ -1014,7 +773,6 @@ public class OrderManagerImpl implements OrderManager{
                 order.setOrderLines(orderLineList);
             }
         }
-
         return salesOrderPage;
     }
 
@@ -1026,7 +784,6 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     public PayInfoCommand savePayOrder(String code,PayInfoCommand payInfoCommand){
         // 先根据订单code查询订单是否存在
-
         SalesOrderCommand salesOrder = judgeOrderIfExist(code);
 
         PayInfo payInfo = (PayInfo) ConvertUtils.convertFromTarget(new PayInfo(), payInfoCommand);
@@ -1209,9 +966,7 @@ public class OrderManagerImpl implements OrderManager{
      * @param emailTemplete
      *            the email templete
      */
-    @Transactional(readOnly = true)
     private void sendEmail(String code,String emailTemplete){
-        Map<String, Object> dataMap = new HashMap<String, Object>();
 
         SalesOrderCommand salesOrderCommand = findOrderByCode(code, 1);
 
@@ -1224,62 +979,27 @@ public class OrderManagerImpl implements OrderManager{
 
         String email = salesOrderCommand.getEmail();
 
-        if (Validator.isNotNullOrEmpty(memberPersonalData)){
+        if (null != memberPersonalData){
             nickName = memberPersonalData.getNickname();
             if (Validator.isNullOrEmpty(email)){
                 email = memberPersonalData.getEmail();
             }
         }
 
+        if (Validator.isNullOrEmpty(email)){
+            return;
+        }
+
         if (Validator.isNullOrEmpty(nickName))
             nickName = salesOrderCommand.getMemberName();
 
         // 游客用收货人
-        if (Validator.isNullOrEmpty(nickName))
+        if (Validator.isNullOrEmpty(nickName)){
             nickName = salesOrderCommand.getName();
-
-        if (Validator.isNullOrEmpty(email))
-            return;
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
-        Calendar calendar = Calendar.getInstance();
-
-        dataMap.put("nickName", nickName);
-        dataMap.put("createDateOfAll", sdf.format(salesOrderCommand.getCreateTime()));
-        dataMap.put("createDateOfSfm", sdf1.format(salesOrderCommand.getCreateTime()));
-        dataMap.put("orderCode", salesOrderCommand.getCode());
-        dataMap.put("receiveName", salesOrderCommand.getName());
-        dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-        dataMap.put("address", salesOrderCommand.getAddress());
-
-        dataMap.put(
-                        "mobile",
-                        Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile()
-                                        : salesOrderCommand.getTel());
-
-        dataMap.put("sumItemFee", salesOrderCommand.getTotal().add(salesOrderCommand.getDiscount()));
-        dataMap.put("shipFee", salesOrderCommand.getActualFreight());
-        dataMap.put("offersTotal", salesOrderCommand.getDiscount());
-        dataMap.put("sumPay", salesOrderCommand.getTotal().add(salesOrderCommand.getActualFreight()));
-        dataMap.put("itemLines", salesOrderCommand.getOrderLines());
-        dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
-
-        dataMap.put("pageUrlBase", pageUrlBase);
-        dataMap.put("imgDomainUrl", imgDomainUrl);
-        dataMap.put("logisticsProvider", salesOrderCommand.getLogisticsProviderName());
-        dataMap.put("transCode", salesOrderCommand.getTransCode());
-        dataMap.put("nowDay", sdf1.format(calendar.getTime()));
-
-        /** 扩展点 如 商城需要需要加入特殊字段 各自实现 **/
-        if (null != salesOrderHandler){
-            dataMap = salesOrderHandler.getEmailData(salesOrderCommand, dataMap, emailTemplete);
         }
 
-        EmailEvent emailEvent = new EmailEvent(this, email, emailTemplete, dataMap);
-
-        eventPublisher.publish(emailEvent);
-
+        Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMap(emailTemplete, salesOrderCommand, nickName);
+        sdkOrderEmailManager.sendEmail(emailTemplete, email, dataMap);
     }
 
     /*
@@ -1290,7 +1010,6 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public Pagination<ReturnOrderCommand> findReturnOrdersByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam){
-
         return sdkReturnOrderDao.findReturnOrdersByQueryMapWithPage(page, sorts, searchParam);
     }
 
@@ -1391,8 +1110,7 @@ public class OrderManagerImpl implements OrderManager{
         orderStatusLog.setBeforeStatus(beforeStatus);
         orderStatusLog.setOperatorId(String.valueOf(handleId));
         orderStatusLog.setOrderId(orderId);
-        OrderStatusLog res = sdkOrderStatusLogDao.save(orderStatusLog);
-        return res;
+        return sdkOrderStatusLogDao.save(orderStatusLog);
     }
 
     /**
@@ -1402,7 +1120,6 @@ public class OrderManagerImpl implements OrderManager{
      *            the order code
      * @return the sales order command
      */
-    @Transactional(readOnly = true)
     private SalesOrderCommand judgeOrderIfExist(String orderCode){
         if (null == orderCode || orderCode.length() == 0 || "".equals(orderCode))
             throw new BusinessException(Constants.ORDERCODE_NOT_NULL);
@@ -1420,7 +1137,6 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public Pagination<ItemSkuCommand> findItemSkuListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
-
         return sdkOrderDao.findItemSkuListByQueryMapWithPage(page, sorts, paraMap);
     }
 
@@ -1590,31 +1306,13 @@ public class OrderManagerImpl implements OrderManager{
     }
 
     /**
-     * 获取购物车中的所有店铺id.
-     *
-     * @param lines
-     *            the lines
-     * @return the shop ids
-     */
-    public List<Long> getShopIds(List<ShoppingCartLineCommand> lines){
-        if (null == lines || lines.size() == 0)
-            return null;
-        Set<Long> ids = new HashSet<Long>();
-        for (ShoppingCartLineCommand line : lines){
-            ids.add(line.getShopId());
-        }
-        List<Long> shopIds = new ArrayList<Long>(ids);
-        return shopIds;
-    }
-
-    /**
      * 根据购物车行获取ItemForCheckCommand集合.
      *
      * @param lines
      *            the lines
      * @return the item combo ids
      */
-    protected Set<String> getItemComboIds(List<ShoppingCartLineCommand> lines){
+    private Set<String> getItemComboIds(List<ShoppingCartLineCommand> lines){
         Set<String> set = new HashSet<String>();
         if (null != lines && lines.size() > 0){
             for (ShoppingCartLineCommand line : lines){
@@ -1664,8 +1362,7 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public List<SalesOrderCommand> findToBeCancelOrders(Sort[] sorts,Map<String, Object> searchParam){
-        List<SalesOrderCommand> list = sdkOrderDao.findToBeCancelOrders(sorts, searchParam);
-        return list;
+        return sdkOrderDao.findToBeCancelOrders(sorts, searchParam);
     }
 
     /*
@@ -1677,11 +1374,7 @@ public class OrderManagerImpl implements OrderManager{
     @Transactional(readOnly = true)
     public List<OrderPromotionCommand> findOrderPormots(String orderCode){
         SalesOrderCommand so = sdkOrderDao.findOrderByCode(orderCode, null);
-        List<OrderPromotionCommand> orderPromots = null;
-        if (so != null){
-            orderPromots = sdkOrderPromotionDao.findOrderProsInfoByOrderId(so.getId());
-        }
-        return orderPromots;
+        return sdkOrderPromotionDao.findOrderProsInfoByOrderId(so.getId());
     }
 
     /*
@@ -1694,8 +1387,7 @@ public class OrderManagerImpl implements OrderManager{
     public PromotionCouponCode validCoupon(String couponCode){
         if (StringUtils.isNotBlank(couponCode)){
             PromotionCouponCode promotionCouponCode = promotionCouponCodeDao.findPromotionCouponCodeBycoupon(couponCode);
-            if (promotionCouponCode != null)
-                return promotionCouponCode;
+            return promotionCouponCode;
         }
         return null;
     }
@@ -1780,8 +1472,7 @@ public class OrderManagerImpl implements OrderManager{
     @Override
     @Transactional(readOnly = true)
     public List<DistributionMode> getAllDistributionMode(){
-        List<DistributionMode> distributionModeList = distributionModeDao.getAllDistributionMode();
-        return distributionModeList;
+        return distributionModeDao.getAllDistributionMode();
     }
 
     /**
@@ -1795,5 +1486,4 @@ public class OrderManagerImpl implements OrderManager{
     private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
         return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
     }
-
 }
