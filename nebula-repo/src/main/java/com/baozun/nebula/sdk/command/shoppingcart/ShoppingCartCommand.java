@@ -36,7 +36,12 @@ public class ShoppingCartCommand extends BaseModel{
     /** The Constant serialVersionUID. */
     private static final long                serialVersionUID = 7847538393318014437L;
 
-    /** The id. */
+    /**
+     * The id.
+     * 
+     * @deprecated 感觉没有被引用啊 by feilong 2016-05-14
+     */
+    @Deprecated
     private Long                             id;
 
     /** 购物车行信息 *. */
@@ -70,12 +75,6 @@ public class ShoppingCartCommand extends BaseModel{
     /** 优惠券code *. */
     private List<PromotionCouponCodeCommand> couponCodeCommands;
 
-    /** 当前时间 *. */
-    private Date                             currentTime;
-
-    /** 会员信息 *. */
-    private UserDetails                      userDetails;
-
     /** 整单商品数量. */
     private Integer                          orderQuantity;
 
@@ -84,6 +83,8 @@ public class ShoppingCartCommand extends BaseModel{
 
     /** 购物车促销简介信息. */
     private List<PromotionBrief>             cartPromotionBriefList;
+
+    //*****************************************************************************************************
 
     /** 会员下单时使用的积分. */
     private BigDecimal                       points;
@@ -96,6 +97,14 @@ public class ShoppingCartCommand extends BaseModel{
 
     /** 整单合计优惠金额（优惠券 + 促销活动等）. */
     private BigDecimal                       couponPayAmount;
+
+    //*****************************************************************************************************
+
+    /** 当前时间 *. */
+    private Date                             currentTime;
+
+    /** 会员信息 *. */
+    private UserDetails                      userDetails;
 
     //*****************************************************************************************************
     /**
@@ -160,7 +169,9 @@ public class ShoppingCartCommand extends BaseModel{
      *
      * @param id
      *            the id
+     * @deprecated 感觉没有被引用啊 by feilong 2016-05-14
      */
+    @Deprecated
     public void setId(Long id){
         this.id = id;
     }
@@ -169,7 +180,9 @@ public class ShoppingCartCommand extends BaseModel{
      * 获得 id.
      *
      * @return the id
+     * @deprecated 感觉没有被引用啊 by feilong 2016-05-14
      */
+    @Deprecated
     public Long getId(){
         return id;
     }

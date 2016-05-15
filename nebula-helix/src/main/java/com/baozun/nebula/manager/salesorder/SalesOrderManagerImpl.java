@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +25,10 @@ import com.baozun.nebula.dao.coupon.CouponTypeDao;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
-import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemTagRelationDao;
-import com.baozun.nebula.dao.product.PropertyValueDao;
-import com.baozun.nebula.dao.product.ShopDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.promotion.PromotionCouponCodeDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
-import com.baozun.nebula.dao.salesorder.SdkOrderPromotionDao;
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.model.coupon.Coupon;
 import com.baozun.nebula.model.coupon.CouponType;
@@ -53,10 +48,9 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.command.OrderQueryCommand;
-import com.feilong.core.bean.BeanUtil;
-import com.feilong.core.util.MapUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -87,15 +81,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
     private ItemTagRelationDao     itemTagRelationDao;
 
     @Autowired
-    private ItemPropertiesDao      itemPropertiesDao;
-
-    @Autowired
-    private ShopDao                shopDao;
-
-    @Autowired
-    private PropertyValueDao       propertyValueDao;
-
-    @Autowired
     private SkuDao                 skuDao;
 
     @Autowired
@@ -117,11 +102,10 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
     private SdkOrderDao            sdkOrderDao;
 
     @Autowired
-    private SdkOrderPromotionDao   sdkOrderPromotionDao;
+    private SdkOrderCreateManager  sdkOrderCreateManager;
 
     @Override
     public String createOrder(SalesOrderCommand salesOrderCommand,Set<String> memComboIds,List<ShoppingCartLineCommand> lines){
-
         // 订单概要表
         ShoppingCartCommand shoppingCartCommand = null;
         // if(salesOrderCommand.getIsImmediatelyBuy()){
@@ -134,8 +118,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
         // salesOrderCommand.getCouponCodes(),salesOrderCommand.getCalcFreightCommand(),lines);
         // }
 
-        String orderCode = sdkOrderService.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
-
+        String orderCode = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
         return orderCode;
     }
 
@@ -358,7 +341,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
         }
 
     }
-    
+
     @Override
     public List<SimpleOrderCommand> findSimpleOrderCommandList(Long memberId,OrderQueryCommand orderQueryCommand){
         try{

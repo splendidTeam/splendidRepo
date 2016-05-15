@@ -7,6 +7,7 @@ import java.util.Date;
 /**
  * @author xianze.zhang
  * @creattime 2013-1-3
+ * @deprecated pls use {@link com.feilong.core.date.DateUtil}
  */
 @Deprecated
 public class DateUtil {

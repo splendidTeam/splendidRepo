@@ -12,6 +12,16 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 public interface SdkEngineManager extends BaseManager{
 
     /**
+     * 创建订单的引擎检查.
+     * 
+     * @param memberId
+     * @param memCombos
+     * @param shoppingCartCommand
+     * @since 5.3.1
+     */
+    void createOrderDoEngineChck(Long memberId,Set<String> memCombos,ShoppingCartCommand shoppingCartCommand);
+
+    /**
      * 封装购物车行数据
      * 
      * @param shoppingCartLineCommand

@@ -19,11 +19,8 @@ package com.baozun.nebula.sdk.manager.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -32,13 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
 import com.baozun.nebula.api.utils.ConvertUtils;
-import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
-import com.baozun.nebula.command.coupon.CouponCommand;
-import com.baozun.nebula.command.limit.LimitCommand;
 import com.baozun.nebula.constant.IfIdentifyConstants;
-import com.baozun.nebula.dao.coupon.CouponDao;
 import com.baozun.nebula.dao.freight.DistributionModeDao;
 import com.baozun.nebula.dao.payment.PayInfoDao;
 import com.baozun.nebula.dao.product.SkuDao;
@@ -57,15 +49,12 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.model.salesorder.CancelOrderApp;
 import com.baozun.nebula.model.salesorder.Consignee;
-import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.ReturnOrderApp;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.CancelOrderCommand;
 import com.baozun.nebula.sdk.command.ConsigneeCommand;
-import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.ItemSkuCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.OrderPromotionCommand;
@@ -74,34 +63,15 @@ import com.baozun.nebula.sdk.command.PayInfoCommand;
 import com.baozun.nebula.sdk.command.ReturnOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
-import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.OrderManager;
-import com.baozun.nebula.sdk.manager.SdkConsigneeManager;
-import com.baozun.nebula.sdk.manager.SdkEffectiveManager;
-import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.SdkOrderEmailManager;
-import com.baozun.nebula.sdk.manager.SdkOrderLineManager;
-import com.baozun.nebula.sdk.manager.SdkOrderManager;
-import com.baozun.nebula.sdk.manager.SdkOrderPromotionManager;
-import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
-import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
-import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
-import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkSecretManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
-import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
-import com.feilong.core.util.MapUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -115,167 +85,81 @@ import loxia.dao.Sort;
 public class OrderManagerImpl implements OrderManager{
 
     /** The Constant log. */
-    private static final Logger                      log            = LoggerFactory.getLogger(OrderManagerImpl.class);
+    private static final Logger    LOGGER  = LoggerFactory.getLogger(OrderManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer                     SUCCESS        = 1;
+    private static final Integer   SUCCESS = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer                     FAILURE        = 0;
-
-    /** The Constant SEPARATOR_FLAG. */
-    private static final String                      SEPARATOR_FLAG = "\\|\\|";
+    private static final Integer   FAILURE = 0;
 
     /** The sdk order email manager. */
     @Autowired
-    private SdkOrderEmailManager                     sdkOrderEmailManager;
+    private SdkOrderEmailManager   sdkOrderEmailManager;
 
     /** The sdk cancel order dao. */
     @Autowired
-    private SdkCancelOrderDao                        sdkCancelOrderDao;
+    private SdkCancelOrderDao      sdkCancelOrderDao;
 
     /** The sdk order dao. */
     @Autowired
-    private SdkOrderDao                              sdkOrderDao;
-
-    /** The sdk order manager. */
-    @Autowired
-    private SdkOrderManager                          sdkOrderManager;
+    private SdkOrderDao            sdkOrderDao;
 
     /** The sdk order promotion dao. */
     @Autowired
-    private SdkOrderPromotionDao                     sdkOrderPromotionDao;
-
-    /** The sdk order promotion manager. */
-    @Autowired
-    private SdkOrderPromotionManager                 sdkOrderPromotionManager;
+    private SdkOrderPromotionDao   sdkOrderPromotionDao;
 
     /** The sdk order line dao. */
     @Autowired
-    private SdkOrderLineDao                          sdkOrderLineDao;
+    private SdkOrderLineDao        sdkOrderLineDao;
 
     /** The sdk pay info dao. */
     @Autowired
-    private PayInfoDao                               sdkPayInfoDao;
+    private PayInfoDao             sdkPayInfoDao;
 
     /** The sdk return order dao. */
     @Autowired
-    private SdkReturnOrderDao                        sdkReturnOrderDao;
+    private SdkReturnOrderDao      sdkReturnOrderDao;
 
     /** The sdk order status log dao. */
     @Autowired
-    private SdkOrderStatusLogDao                     sdkOrderStatusLogDao;
+    private SdkOrderStatusLogDao   sdkOrderStatusLogDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao                                   skuDao;
-
-    /** The sdk sku inventory manager. */
-    @Autowired
-    private SdkSkuInventoryManager                   sdkSkuInventoryManager;
-
-    /** The order code creator. */
-    @Autowired(required = false)
-    private OrderCodeCreatorManager                  orderCodeCreator;
+    private SkuDao                 skuDao;
 
     /** The sdk consignee dao. */
     @Autowired
-    private SdkConsigneeDao                          sdkConsigneeDao;
-
-    /** The coupon dao. */
-    @Autowired
-    private CouponDao                                couponDao;
-
-    /** The sdk pay code manager. */
-    @Autowired
-    private SdkPayCodeManager                        sdkPayCodeManager;
-
-    /** The sdk pay info manager. */
-    @Autowired
-    private SdkPayInfoManager                        sdkPayInfoManager;
-
-    /** The sdk pay info log manager. */
-    @Autowired
-    private SdkPayInfoLogManager                     sdkPayInfoLogManager;
+    private SdkConsigneeDao        sdkConsigneeDao;
 
     /** The distribution mode dao. */
     @Autowired
-    private DistributionModeDao                      distributionModeDao;
-
-    /** The sdk shopping cart manager. */
-    @Autowired
-    private SdkShoppingCartManager                   sdkShoppingCartManager;
+    private DistributionModeDao    distributionModeDao;
 
     /** The promotion coupon code dao. */
     @Autowired
-    private PromotionCouponCodeDao                   promotionCouponCodeDao;
+    private PromotionCouponCodeDao promotionCouponCodeDao;
 
     /** The sdk sku manager. */
     @Autowired
-    private SdkSkuManager                            sdkSkuManager;
-
-    /** The sdk promotion calculation share to sku manager. */
-    @Autowired
-    private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
-
-    /** The sdk engine manager. */
-    @Autowired
-    private SdkEngineManager                         sdkEngineManager;
-
-    /** The sdk purchase rule filter manager. */
-    @Autowired
-    private SdkPurchaseLimitRuleFilterManager        sdkPurchaseRuleFilterManager;
+    private SdkSkuManager          sdkSkuManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager                       sdkMataInfoManager;
+    private SdkMataInfoManager     sdkMataInfoManager;
 
     /** The sdk member manager. */
     @Autowired
-    private SdkMemberManager                         sdkMemberManager;
-
-    /** The sdk effective manager. */
-    @Autowired
-    private SdkEffectiveManager                      sdkEffectiveManager;
+    private SdkMemberManager       sdkMemberManager;
 
     /** The sdk msg manager. */
     @Autowired
-    private SdkMsgManager                            sdkMsgManager;
-
-    /** The sdk order line manager. */
-    @Autowired
-    private SdkOrderLineManager                      sdkOrderLineManager;
-
-    /** The sdk order line manager. */
-    @Autowired
-    private SdkConsigneeManager                      sdkConsigneeManager;
+    private SdkMsgManager          sdkMsgManager;
 
     /** The sdk secret manager. */
     @Autowired
-    private SdkSecretManager                         sdkSecretManager;
-
-    /**
-     * 解密订单中的收货人信息.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     */
-    private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
-        sdkSecretManager.decrypt(salesOrderCommand, new String[] {
-                                                                   "name",
-                                                                   "buyerName",
-                                                                   "country",
-                                                                   "province",
-                                                                   "city",
-                                                                   "area",
-                                                                   "town",
-                                                                   "address",
-                                                                   "postcode",
-                                                                   "tel",
-                                                                   "buyerTel",
-                                                                   "mobile",
-                                                                   "email" });
-    }
+    private SdkSecretManager       sdkSecretManager;
 
     /*
      * (non-Javadoc)
@@ -313,394 +197,6 @@ public class OrderManagerImpl implements OrderManager{
         }
 
         return salesOrderCommand;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.OrderManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
-     * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
-     */
-    @Override
-    public String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
-        if (salesOrderCommand == null || shoppingCartCommand == null){
-            throw new BusinessException(Constants.SHOPCART_IS_NULL);
-        }
-
-        //去除抬头和未选中的商品
-        refactoringShoppingCartCommand(shoppingCartCommand);
-
-        // 下单之前的引擎检查
-        createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, shoppingCartCommand);
-
-        String order = saveOrderInfo(salesOrderCommand, shoppingCartCommand);
-        // 没有成功保存订单
-        if (order == null){
-            log.warn("savedOrder returns null!");
-            throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
-        }
-        return order;
-    }
-
-    /**
-     * Refactoring shopping cart command.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     */
-    protected void refactoringShoppingCartCommand(ShoppingCartCommand shoppingCartCommand){
-        Map<Long, ShoppingCartCommand> shoppingCartByShopIdMap = shoppingCartCommand.getShoppingCartByShopIdMap();
-
-        Map<Long, ShoppingCartCommand> newShoppingCartByShopIdMap = new HashMap<Long, ShoppingCartCommand>();
-        List<ShoppingCartLineCommand> newAllShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
-
-        for (Map.Entry<Long, ShoppingCartCommand> entry : shoppingCartByShopIdMap.entrySet()){
-            ShoppingCartCommand shopShoppingCartCommand = entry.getValue();
-            List<ShoppingCartLineCommand> lines = new ArrayList<ShoppingCartLineCommand>();
-            for (ShoppingCartLineCommand shoppingCartLineCommand : shopShoppingCartCommand.getShoppingCartLineCommands()){
-                // 排除是标题行 或者（是赠品 1需要用户选择 0未选中） 
-                if (!(shoppingCartLineCommand.isCaptionLine() || (shoppingCartLineCommand.isGift()
-                                && shoppingCartLineCommand.getGiftChoiceType() == 1 && (shoppingCartLineCommand.getSettlementState() == null
-                                                || shoppingCartLineCommand.getSettlementState() == 0)))){
-                    lines.add(shoppingCartLineCommand);
-                    newAllShoppingCartLineCommandList.add(shoppingCartLineCommand);
-                }
-            }
-            shopShoppingCartCommand.setShoppingCartLineCommands(lines);
-            newShoppingCartByShopIdMap.put(entry.getKey(), shopShoppingCartCommand);
-        }
-
-        shoppingCartCommand.setShoppingCartByShopIdMap(newShoppingCartByShopIdMap);
-        shoppingCartCommand.setShoppingCartLineCommands(newAllShoppingCartLineCommandList);
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.OrderManager#saveManualOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
-     * com.baozun.nebula.sdk.command.SalesOrderCommand)
-     */
-    @Override
-    public String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand){
-        if (salesOrderCommand == null || shoppingCartCommand == null){
-            throw new BusinessException(Constants.SHOPCART_IS_NULL);
-        }
-        // 下单之前的库存检查
-        for (ShoppingCartLineCommand shoppingCartLine : shoppingCartCommand.getShoppingCartLineCommands()){
-            Boolean retflag = sdkEffectiveManager.chckInventory(shoppingCartLine.getExtentionCode(), shoppingCartLine.getQuantity());
-            if (!retflag){
-                // 库存不足
-                throw new BusinessException(
-                                Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM,
-                                new Object[] { shoppingCartLine.getItemName() });
-            }
-        }
-        String subOrdinate = saveOrderInfo(salesOrderCommand, shoppingCartCommand);
-        // 没有成功保存订单
-        if (subOrdinate == null){
-            log.warn("savedOrder returns null!");
-            throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
-        }
-        return subOrdinate;
-    }
-
-    /**
-     * 创建订单的引擎检查.
-     *
-     * @param memberId
-     *            the member id
-     * @param memCombos
-     *            the mem combos
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     */
-    private void createOrderDoEngineChck(Long memberId,Set<String> memCombos,ShoppingCartCommand shoppingCartCommand){
-        // 引擎检查(限购、有效性检查、库存)
-        Set<String> memboIds = null;
-        if (null == memberId){
-            // 游客
-            memboIds = getMemboIds();
-        }else{
-            memboIds = memCombos;
-        }
-
-        //获取购物车中的所有店铺id.
-        Set<Long> ids = CollectionsUtil.getPropertyValueSet(shoppingCartCommand.getShoppingCartLineCommands(), "shopId");
-        List<Long> shopIds = new ArrayList<Long>(ids);
-
-        Set<String> itemComboIds = getItemComboIds(shoppingCartCommand.getShoppingCartLineCommands());
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
-                        .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
-        if (null == purchaseLimitationList || purchaseLimitationList.size() == 0)
-            purchaseLimitationList = new ArrayList<LimitCommand>();
-
-        for (Map.Entry<Long, ShoppingCartCommand> entry : shoppingCartCommand.getShoppingCartByShopIdMap().entrySet()){
-            for (ShoppingCartLineCommand shoppingCartLine : entry.getValue().getShoppingCartLineCommands()){
-                //直推礼品不做校验
-                if (!isNoNeedChoiceGift(shoppingCartLine)){
-                    sdkEngineManager.doEngineCheck(shoppingCartLine, false, shoppingCartCommand, purchaseLimitationList);
-                }
-            }
-        }
-
-        //限购校验失败
-        List<ShoppingCartLineCommand> errorLineList = sdkEngineManager.doEngineCheckLimit(shoppingCartCommand, purchaseLimitationList);
-        if (null != errorLineList && errorLineList.size() > 0){
-            StringBuffer errorItemName = new StringBuffer();
-            List<Long> itemList = new ArrayList<Long>();
-            for (ShoppingCartLineCommand cartLine : errorLineList){
-                if ("".equals(errorItemName.toString())){
-                    errorItemName.append(cartLine.getItemName());
-                    itemList.add(cartLine.getItemId());
-                }else{
-                    if (!itemList.contains(cartLine.getItemId())){
-                        errorItemName.append(",").append(cartLine.getItemName());
-                        itemList.add(cartLine.getSkuId());
-                    }
-                }
-            }
-            throw new BusinessException(Constants.THE_ORDER_CONTAINS_LIMIT_ITEM, new Object[] { errorItemName.toString() });
-        }
-    }
-
-    /**
-     * 保存订单信息.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @return the string
-     */
-    private String saveOrderInfo(SalesOrderCommand salesOrderCommand,ShoppingCartCommand shoppingCartCommand){
-        // 购物车行
-        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
-
-        // shoppingCartLineCommandMap
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
-                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
-
-        // shoppingCartPromotionBriefMap
-        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
-
-        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
-                        .group(promotionSKUDiscAMTBySettingList, "shopId");
-
-        // shopCartCommandByShopMap
-        List<ShopCartCommandByShop> shopCartCommandByShopList = shoppingCartCommand.getSummaryShopCartList();
-        Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = CollectionsUtil.groupOne(shopCartCommandByShopList, "shopId");
-
-        //*****************************************************************************************
-
-        // 合并付款
-        String subOrdinate = orderCodeCreator.createOrderSerialNO();
-        if (subOrdinate == null){
-            throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
-        }
-
-        String isSendEmail = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
-        BigDecimal paySum = getPaySum(salesOrderCommand, shoppingCartCommand);
-
-        List<Map<String, Object>> dataMapList = new ArrayList<Map<String, Object>>();
-
-        for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
-            Long shopId = entry.getKey();
-            List<ShoppingCartLineCommand> shoppingCartLineCommandList = shopIdAndShoppingCartLineCommandListMap.get(shopId);
-
-            List<PromotionSKUDiscAMTBySetting> psdabsList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
-            ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
-
-            //***************************************************************************************
-            // 根据shopId保存订单概要
-            SalesOrder salesOrder = sdkOrderManager.savaOrder(shopId, salesOrderCommand, shopCartCommandByShop);
-            Long orderId = salesOrder.getId();
-
-            // 保存订单行、订单行优惠
-            savaOrderLinesAndPromotions(salesOrderCommand, orderId, shoppingCartLineCommandList, psdabsList);
-
-            // 保存支付详细
-            savePayInfoAndPayInfoLog(salesOrderCommand, subOrdinate, salesOrder, shopId);
-
-            // 保存收货人信息
-            sdkConsigneeManager.saveConsignee(orderId, shopId, salesOrderCommand);
-
-            // 保存OMS消息发送记录(销售订单信息推送给SCM)
-            sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_ORDER_SEND, orderId, null);
-
-            // 封装发送邮件数据
-            if (isSendEmail != null && isSendEmail.equals("true")){
-                Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(
-                                subOrdinate,
-                                salesOrder,
-                                salesOrderCommand,
-                                shoppingCartLineCommandList,
-                                shopCartCommandByShop,
-                                psdabsList);
-                if (dataMap != null)
-                    dataMapList.add(dataMap);
-            }
-
-            // 扣减库存
-            sdkSkuInventoryManager.deductSkuInventory(shoppingCartLineCommandList);
-        }
-
-        //*************************************************************************************
-
-        // 保存支付流水
-        sdkPayCodeManager.savaPayCode(paySum, subOrdinate);
-
-        //*************************************************************************************
-        // 优惠券状体置为已使用 isUsed = 1
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
-            for (CouponCodeCommand couponCodeCommand : salesOrderCommand.getCouponCodes()){
-                List<String> list = new ArrayList<String>();
-
-                if (!couponCodeCommand.getIsOut()){
-                    list.add(couponCodeCommand.getCouponCode());
-                }
-
-                int res = promotionCouponCodeDao.comsumePromotionCouponCodeByCouponCodes(list);
-                if (res != list.size()){
-                    if (res < list.size()){
-                        throw new BusinessException(Constants.COUPON_IS_USED);
-                    }else{
-                        throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
-                    }
-                }
-            }
-        }
-        // 清空购物车
-        if (salesOrderCommand.getIsImmediatelyBuy() == null || salesOrderCommand.getIsImmediatelyBuy() == false){
-            sdkShoppingCartManager.emptyShoppingCart(salesOrderCommand.getMemberId());
-        }
-
-        // 发邮件
-        sdkOrderEmailManager.sendEmailOfCreateOrder(dataMapList);
-        return subOrdinate;
-    }
-
-    /**
-     * 获得 pay sum.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @return the pay sum
-     */
-    private BigDecimal getPaySum(SalesOrderCommand salesOrderCommand,ShoppingCartCommand shoppingCartCommand){
-        BigDecimal paySum = shoppingCartCommand.getCurrentPayAmount();
-        List<String> soPayMentDetails = salesOrderCommand.getSoPayMentDetails();
-        if (soPayMentDetails != null){
-            for (String soPayMentDetail : soPayMentDetails){
-                // 支付方式 String格式：shopId||payMentType||金额
-                String[] strs = soPayMentDetail.split(SEPARATOR_FLAG);
-                BigDecimal payMoney = new BigDecimal(strs[2]);
-                paySum = paySum.subtract(payMoney);
-            }
-        }
-        return paySum;
-    }
-
-    /**
-     * Save pay info and pay info log.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param subOrdinate
-     *            the sub ordinate
-     * @param salesOrder
-     *            the sales order
-     * @param shopId
-     *            the shop id
-     */
-    private void savePayInfoAndPayInfoLog(SalesOrderCommand salesOrderCommand,String subOrdinate,SalesOrder salesOrder,Long shopId){
-        List<String> soPayMentDetails = salesOrderCommand.getSoPayMentDetails();
-        BigDecimal payMainMoney = salesOrder.getTotal().add(salesOrder.getActualFreight());
-        // 除主支付方式之外的付款
-        if (soPayMentDetails != null){
-            for (String soPayMentDetail : soPayMentDetails){
-                // 支付方式 String格式：shopId||payMentType||金额
-                String[] strs = soPayMentDetail.split(SEPARATOR_FLAG);
-                if (shopId.toString().equals(strs[0]) && strs.length == 3){
-                    PayInfo payInfo = sdkPayInfoManager.savePayInfo(salesOrder.getId(), Integer.parseInt(strs[1]), new BigDecimal(strs[2]));
-                    payMainMoney = payMainMoney.subtract(payInfo.getPayMoney());
-                }
-            }
-        }
-        PayInfo payInfo = sdkPayInfoManager.savePayInfoOfPayMain(salesOrderCommand, salesOrder.getId(), payMainMoney);
-        sdkPayInfoLogManager.savePayInfoLogOfPayMain(salesOrderCommand, subOrdinate, payInfo);
-    }
-
-    /**
-     * 保存订单行.
-     *
-     * @param salesOrderCommand
-     *            the sales order command
-     * @param orderId
-     *            the order id
-     * @param shoppingCartLineCommandList
-     *            the scc list
-     * @param promotionSKUDiscAMTBySettingList
-     *            the psdabs list
-     */
-    protected void savaOrderLinesAndPromotions(
-                    SalesOrderCommand salesOrderCommand,
-                    Long orderId,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            OrderLine orderLine = sdkOrderLineManager.saveOrderLine(orderId, shoppingCartLineCommand);
-            if (orderLine == null){
-                continue;
-            }
-
-            if (Validator.isNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-                continue;
-            }
-
-            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-                boolean giftMark = promotionSKUDiscAMTBySetting.getGiftMark();
-                //0代表赠品 1代表主卖品
-                Integer type = !giftMark ? 1 : 0;
-
-                // 非免运费
-                if (!promotionSKUDiscAMTBySetting.getFreeShippingMark()
-                                && promotionSKUDiscAMTBySetting.getSkuId().equals(orderLine.getSkuId())
-                                && orderLine.getType().equals(type)){
-                    sdkOrderPromotionManager
-                                    .savaOrderPromotion(orderId, promotionSKUDiscAMTBySetting, orderLine.getId(), salesOrderCommand);
-                }
-            }
-        }
-        // 免运费
-        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-                if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
-                    sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
-                }
-            }
-        }
-    }
-
-    /**
-     * 检查优惠券是否有效.
-     *
-     * @param memberId
-     *            the member id
-     * @param couponNo
-     *            the coupon no
-     */
-    @Transactional(readOnly = true)
-    private void chckCouponNo(Long memberId,String couponNo){
-        if (StringUtils.isNotBlank(couponNo)){
-            CouponCommand couponCommand = couponDao.findCouponCommandByMemberIdAndCardNo(memberId, couponNo);
-            if (null == couponCommand){
-                throw new BusinessException(Constants.COUPON_IS_NOT_VALID);
-            }
-        }
     }
 
     /*
@@ -793,7 +289,7 @@ public class OrderManagerImpl implements OrderManager{
         payInfo = sdkPayInfoDao.save(payInfo);
 
         if (null == payInfo){
-            log.warn(" payInfoDao.save(payInfo) returns null");
+            LOGGER.warn(" payInfoDao.save(payInfo) returns null");
             return null;
         }
 
@@ -1296,33 +792,6 @@ public class OrderManagerImpl implements OrderManager{
         return sdkOrderLineDao.findOrderDetailList(orderId);
     }
 
-    /**
-     * 游客的memboIds.
-     *
-     * @return the membo ids
-     */
-    private Set<String> getMemboIds(){
-        return sdkEngineManager.getCrowdScopeListByMemberAndGroup(null, null);
-    }
-
-    /**
-     * 根据购物车行获取ItemForCheckCommand集合.
-     *
-     * @param lines
-     *            the lines
-     * @return the item combo ids
-     */
-    private Set<String> getItemComboIds(List<ShoppingCartLineCommand> lines){
-        Set<String> set = new HashSet<String>();
-        if (null != lines && lines.size() > 0){
-            for (ShoppingCartLineCommand line : lines){
-                if (line.getComboIds() != null)
-                    set.addAll(line.getComboIds());
-            }
-        }
-        return set;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -1476,14 +945,25 @@ public class OrderManagerImpl implements OrderManager{
     }
 
     /**
-     * 是否是不需要用户选择的礼品.
+     * 解密订单中的收货人信息.
      *
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @return true, if checks if is no need choice gift
-     * @since 5.3.1
+     * @param salesOrderCommand
+     *            the sales order command
      */
-    private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
-        return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
+    private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
+        sdkSecretManager.decrypt(salesOrderCommand, new String[] {
+                                                                   "name",
+                                                                   "buyerName",
+                                                                   "country",
+                                                                   "province",
+                                                                   "city",
+                                                                   "area",
+                                                                   "town",
+                                                                   "address",
+                                                                   "postcode",
+                                                                   "tel",
+                                                                   "buyerTel",
+                                                                   "mobile",
+                                                                   "email" });
     }
 }

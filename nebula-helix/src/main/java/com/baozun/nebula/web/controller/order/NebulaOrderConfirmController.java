@@ -40,8 +40,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -166,7 +166,7 @@ public class NebulaOrderConfirmController extends BaseController {
 	private SalesOrderResolver salesOrderResolver;
 
 	@Autowired
-	private OrderManager orderManager;
+	private SdkOrderCreateManager sdkOrderCreateManager;
 
 	/* 购物车为空返回的URL */
 	public static final String CART_NULL_BACK_URL = "/index";
@@ -280,7 +280,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		}
 
 		// 新建订单
-		String subOrdinate = orderManager.saveOrder(shoppingCartCommand, salesOrderCommand,
+		String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand,
 				null == memberDetails ? null : memberDetails.getMemComboList());
 
 		// 游客需要更新cookie中的购物车信息
