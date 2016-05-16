@@ -134,11 +134,12 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * @return
 	 */
 	public String navigationPage(
-			@RequestParam(value = "navId") Long navId,
+			@RequestParam(value = "nid") Long nid,
+			@RequestParam(value = "cid") Long cid,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Model model){
-		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if (Validator.isNotNullOrEmpty(collection)) {
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
 

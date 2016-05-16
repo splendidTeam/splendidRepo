@@ -77,10 +77,6 @@ import com.feilong.tools.jsonlib.JsonUtil;
 /**
  * 商品详情页controller
  * 
- * 
- * TODO 商品展示模式的说明和使用 -- 星语
- * 
- * 
  * @author yimin.qiao
  * @version 1.0
  * @time 2016年4月14日  上午10:15:30

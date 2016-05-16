@@ -11,15 +11,17 @@ import com.baozun.nebula.solr.utils.DatePattern;
 /**
  * 
  * @author 项硕
+ * @deprecated pls use {@link com.feilong.core.date.DateUtil}
  */
-public class DateUtilsForProtostar {
+@Deprecated
+public class DateUtilsForProtostar{
 
-	public static Date parse(String source) {
-		try {
-			return new SimpleDateFormat(DatePattern.commonWithTime).parse(source);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			throw new BusinessException(ErrorCodes.DATE_FORMAT_FAIL);
-		}
-	}
+    public static Date parse(String source){
+        try{
+            return new SimpleDateFormat(DatePattern.commonWithTime).parse(source);
+        }catch (ParseException e){
+            e.printStackTrace();
+            throw new BusinessException(ErrorCodes.DATE_FORMAT_FAIL);
+        }
+    }
 }
