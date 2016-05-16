@@ -34,6 +34,9 @@ public class FacetGroup {
 	
 	private String 	type;
 	
+	/** 是否显示 */
+	private Boolean isShow = true;
+	
 	/**筛选项的值*/
 	private List<Facet>	facets = new ArrayList<Facet>();
 	
@@ -78,6 +81,23 @@ public class FacetGroup {
 
 	public void setIsCategory(Boolean isCategory) {
 		this.isCategory = isCategory;
+	}
+
+	
+	/**   
+	 * get isShow  
+	 * @return isShow  
+	 */
+	public Boolean getIsShow(){
+		return isShow;
+	}
+	
+	/**
+	 * set isShow 
+	 * @param isShow
+	 */
+	public void setIsShow(Boolean isShow){
+		this.isShow = isShow;
 	}
 	
 	

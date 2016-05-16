@@ -361,6 +361,7 @@ public class ShoppingCartLine extends BaseModel{
      * @return the relatedItemId
      * @since 5.3.1
      */
+    @Column(name = "RELATED_ITEM_ID")
     public Long getRelatedItemId(){
         return relatedItemId;
     }
