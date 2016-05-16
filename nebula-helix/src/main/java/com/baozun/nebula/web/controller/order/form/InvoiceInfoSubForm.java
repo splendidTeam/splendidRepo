@@ -42,7 +42,11 @@ public class InvoiceInfoSubForm implements Serializable{
     //TODO feilong 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
     
     
-    /** * 寄送类型 同收货地址，单独寄送** */
+    
+    /******  1:个人    2:公司    ****/
+    private String invoiceType;
+    
+    /** * 寄送类型   1：同收货地址，  2：单独寄送** */
     private String deliveryType;
     
     /** * 收取人姓名** */
@@ -143,12 +147,22 @@ public class InvoiceInfoSubForm implements Serializable{
 	}
 
 	
+	public String getInvoiceType(){
+		return invoiceType;
+	}
+
+	
+	public void setInvoiceType(String invoiceType){
+		this.invoiceType = invoiceType;
+	}
+
+	
 	public String getAddress(){
 		return address;
 	}
 
 	
-	public void setAddess(String address){
+	public void setAddress(String address){
 		this.address = address;
 	}
 
@@ -156,6 +170,11 @@ public class InvoiceInfoSubForm implements Serializable{
 	public void setNeedInvoice(boolean isNeedInvoice){
 		this.isNeedInvoice = isNeedInvoice;
 	}
+
+	
+
+	
+	
     
 
 }

@@ -15,12 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
-import com.baozun.nebula.manager.product.ItemCollectionManager;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.search.Boost;
+import com.baozun.nebula.search.FacetGroup;
 import com.baozun.nebula.search.FacetParameter;
 import com.baozun.nebula.search.FacetType;
 import com.baozun.nebula.search.command.SearchCommand;
@@ -34,38 +34,36 @@ import com.feilong.core.Validator;
 public abstract class NebulaAbstractSearchController extends BaseController{
 
 	/** 逗号分隔符 */
-	private final static String		SEPARATORCHARS_COMMA	= ",";
+	private final static String	SEPARATORCHARS_COMMA	= ",";
 
 	/** -分隔符 */
-	private final static String		SEPARATORCHARS_MINUS	= "-";
-	
+	private final static String	SEPARATORCHARS_MINUS	= "-";
+
 	/** 空格 */
-	private final static String		SEPARATORCHARS_SPACE	= " ";
+	private final static String	SEPARATORCHARS_SPACE	= " ";
+
+	/** 属性 */
+	private static final String	PROPERTY_VARIABLE		= "p";
+
+	/** 分类 */
+	private static final String	CATEGORY_VARIABLE		= "c";
 
 	@Autowired
-	private SearchManager			searchManager;
-
-	@Autowired
-	private ItemCollectionManager	itemCollectionManager;
+	private SearchManager		searchManager;
 
 	/**
 	 * 将 searchCommand 里面的filterConditionStr 转成 FacetParameter 用做后面solr查询
 	 * 
 	 * @param searchCommand
 	 */
-	protected void searchParamProcess(SearchCommand searchCommand){
+	protected void searchParamProcess(SearchCommand searchCommand,ItemCollection collection){
 		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
 
 		// ***************************************导航部分
-		Long navigationId = searchCommand.getNavigationId();
-		if (Validator.isNotNullOrEmpty(navigationId)) {
-			ItemCollection collection = itemCollectionManager.findItemCollectionByNavigationId(Long.valueOf(navigationId));
-
-			if (collection != null) {
-				SearchCommand temp = collectionToSearchCommand(collection);
-				if (temp != null && temp.getFacetParameters() != null) {
-					facetParameters.addAll(temp.getFacetParameters());
-				}
+		if (Validator.isNotNullOrEmpty(collection)) {
+			SearchCommand temp = collectionToSearchCommand(collection);
+			if (temp != null && temp.getFacetParameters() != null) {
+				facetParameters.addAll(temp.getFacetParameters());
 			}
 		}
 
@@ -115,12 +113,36 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	 * @author 冯明雷
 	 * @time 2016年4月25日下午6:18:02
 	 */
-	protected void setFacet(SolrQuery solrQuery){
+	protected void setFacet(SolrQuery solrQuery,SearchCommand searchCommand){
 		// facetFileds，set防止重复数据
 		Set<String> facetFields = new HashSet<String>();
 
+		// 最后一个点击的过滤条件
+		String lastFilerStr = "";
+		// 点击顺序
+		String filterParamOrder = searchCommand.getFilterParamOrder();
+		if (filterParamOrder != null) {
+			String[] strs = filterParamOrder.split(",");
+			lastFilerStr = strs[strs.length - 1];
+		}
+
+		String variable = "";
+		if (Validator.isNotNullOrEmpty(lastFilerStr)) {
+			if (lastFilerStr.indexOf(CATEGORY_VARIABLE) > -1) {
+				variable = CATEGORY_VARIABLE;
+			}
+			if (lastFilerStr.indexOf(PROPERTY_VARIABLE) > -1) {
+				variable = PROPERTY_VARIABLE;
+			}
+		}
+
 		// ***************************************************设置分类的facet
-		facetFields.add(SkuItemParam.category_tree);
+		// 如果最后点击的是分类
+		if (CATEGORY_VARIABLE.equals(variable)) {
+			facetFields.add("{!ex=lastFilterTag}" + SkuItemParam.category_tree);
+		}else{
+			facetFields.add(SkuItemParam.category_tree);
+		}
 
 		// **************************************************设置属性的facet
 		List<SearchConditionCommand> cmdList = searchManager.findConditionByCategoryIdsWithCache(new ArrayList<Long>());
@@ -130,19 +152,30 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		}
 
 		for (SearchConditionCommand cmd : cmdList){
-			//如果筛选条件是常规类型
+			// 如果筛选条件是常规类型
 			if (SearchCondition.NORMAL_TYPE.equals(cmd.getType())) {
-				//筛选条件对应的属性id
-				Long propertyId = cmd.getPropertyId();				
-				
-				facetFields.add(SkuItemParam.dynamicCondition + propertyId);
+				// 筛选条件对应的属性id
+				Long propertyId = cmd.getPropertyId();
+
+				// 如果最后点击的是属性
+				if (PROPERTY_VARIABLE.equals(variable)) {
+					String filter = PROPERTY_VARIABLE + propertyId;
+					if (lastFilerStr.equals(filter)) {
+						facetFields.add("{!ex=lastFilterTag}" + SkuItemParam.dynamicCondition + propertyId);
+					}else{
+						facetFields.add(SkuItemParam.dynamicCondition + propertyId);
+					}
+				}else{
+					facetFields.add(SkuItemParam.dynamicCondition + propertyId);
+				}
 			}else if (SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())) {
-				//如果筛选条件是价格区间类型
-				
-				//根据筛选条件查询筛选条件项
-				List<SearchConditionItemCommand> searchConditionItemCommands = searchManager.findCoditionItemByCoditionIdWithCache(cmd.getId());
-				
-				//循环各个筛选条件项，用facetQuery获得数量
+				// 如果筛选条件是价格区间类型
+
+				// 根据筛选条件查询筛选条件项
+				List<SearchConditionItemCommand> searchConditionItemCommands = searchManager
+						.findCoditionItemByCoditionIdWithCache(cmd.getId());
+
+				// 循环各个筛选条件项，用facetQuery获得数量
 				for (SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
 					if (null != scItemCmd) {
 						Integer min = scItemCmd.getAreaMin();
@@ -155,9 +188,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 						}
 					}
 				}
-				
 			}
-			
 		}
 
 		// 设置solrQuery的facetFiled
@@ -169,16 +200,20 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	 * 
 	 * @return
 	 */
-	protected Boost createBoost(SearchCommand searchCommand){
+	protected Boost createBoost(SearchCommand searchCommand,ItemCollection collection){
 		Boost boost = new Boost();
 
+		if (Validator.isNotNullOrEmpty(searchCommand.getSortStr())) {
+			return boost;
+		}
+
 		// 设置商品置顶
-		setBoostBq(boost, searchCommand);
+		setBoostBq(boost, collection);
 
 		// 搜索搜索关键字不为空
 		setBoostQfAndPf(boost, searchCommand.getSearchWord());
-		
-		//用函数计算某个字段的权重
+
+		// 用函数计算某个字段的权重
 		setBoostBf(boost, searchCommand);
 
 		return boost;
@@ -313,12 +348,10 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	 * @author 冯明雷
 	 * @time 2016年4月27日下午2:46:24
 	 */
-	protected void setBoostBq(Boost boost,SearchCommand searchCommand){
+	protected void setBoostBq(Boost boost,ItemCollection collection){
 		// 根据商品指定排序表中的数据，将商品置顶
-		ItemCollection itemCollection = itemCollectionManager.findItemCollectionByNavigationId(searchCommand.getNavigationId());
-
-		if (itemCollection != null) {
-			String sequence = itemCollection.getSequence();
+		if (collection != null) {
+			String sequence = collection.getSequence();
 			if (Validator.isNotNullOrEmpty(sequence)) {
 				String[] itemIdStrs = sequence.split(SEPARATORCHARS_COMMA);
 				if (itemIdStrs != null && itemIdStrs.length > 0) {
@@ -329,8 +362,8 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 						// 商品id
 						String itemId = itemIdStrs[i];
-						
-						if (Validator.isNotNullOrEmpty(itemId)){
+
+						if (Validator.isNotNullOrEmpty(itemId)) {
 							// 计算得分
 							score = score - i * 10;
 
@@ -362,7 +395,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 			return;
 		}
 		boolean i18n = LangProperty.getI18nOnOff();
-		
+
 		// 转义特殊字符
 		searchKeyWord = NebulaSolrQueryFactory.escape(searchKeyWord);
 
@@ -373,18 +406,18 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		qf.append(SkuItemParam.style + "^0.3" + SEPARATORCHARS_SPACE);
 		qf.append(SkuItemParam.itemCode + "^0.25" + SEPARATORCHARS_SPACE);
 		qf.append(SkuItemParam.allCategoryCodes + "^0.15" + SEPARATORCHARS_SPACE);
-		if(i18n){
-			double titleScore=0.15;			
-			int langCount=MutlLang.i18nLangs().size();
-			double score=titleScore/langCount;
-			
+		if (i18n) {
+			double titleScore = 0.15;
+			int langCount = MutlLang.i18nLangs().size();
+			double score = titleScore / langCount;
+
 			for (int i = 0; i < langCount; i++){
-				String lang=MutlLang.i18nLangs().get(i);
-				qf.append(SkuItemParam.dynamic_title+lang + "^"+score + SEPARATORCHARS_SPACE);
-				if(i<langCount-1){
-					qf.append(SkuItemParam.dynamic_subTitle+lang + "^"+score + SEPARATORCHARS_SPACE);
+				String lang = MutlLang.i18nLangs().get(i);
+				qf.append(SkuItemParam.dynamic_title + lang + "^" + score + SEPARATORCHARS_SPACE);
+				if (i < langCount - 1) {
+					qf.append(SkuItemParam.dynamic_subTitle + lang + "^" + score + SEPARATORCHARS_SPACE);
 				}else{
-					qf.append(SkuItemParam.dynamic_subTitle+lang + "^"+score);
+					qf.append(SkuItemParam.dynamic_subTitle + lang + "^" + score);
 				}
 			}
 		}else{
@@ -399,38 +432,67 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		pf.append(SkuItemParam.style + SEPARATORCHARS_SPACE);// 款号
 		pf.append(SkuItemParam.itemCode + SEPARATORCHARS_SPACE);// 商品code
 		pf.append(SkuItemParam.allCategoryCodes + SEPARATORCHARS_SPACE);// 分类code
-		if(i18n){
-			int langCount=MutlLang.i18nLangs().size();
+		if (i18n) {
+			int langCount = MutlLang.i18nLangs().size();
 			for (int i = 0; i < langCount; i++){
-				String lang=MutlLang.i18nLangs().get(i);
-				
-				pf.append(SkuItemParam.dynamic_title+lang+ SEPARATORCHARS_SPACE);
-				if(i<langCount-1){
-					pf.append(SkuItemParam.dynamic_subTitle+lang+ SEPARATORCHARS_SPACE);
+				String lang = MutlLang.i18nLangs().get(i);
+
+				pf.append(SkuItemParam.dynamic_title + lang + SEPARATORCHARS_SPACE);
+				if (i < langCount - 1) {
+					pf.append(SkuItemParam.dynamic_subTitle + lang + SEPARATORCHARS_SPACE);
 				}else{
-					pf.append(SkuItemParam.dynamic_subTitle+lang);
+					pf.append(SkuItemParam.dynamic_subTitle + lang);
 				}
 			}
 		}else{
 			pf.append(SkuItemParam.title + SEPARATORCHARS_SPACE);// 商品名称
 			pf.append(SkuItemParam.subTitle);// 副标题
 		}
-		
-		
 
 		boost.setPf(pf.toString());
 	}
-	
+
 	/**
 	 * 用函数计算某个字段的权重(项目自己去实现)
+	 * 
 	 * @return void
 	 * @param boost
-	 * @param searchCommand 
+	 * @param searchCommand
 	 * @author 冯明雷
 	 * @time 2016年5月9日下午2:30:02
 	 */
 	protected void setBoostBf(Boost boost,SearchCommand searchCommand){
-		
+
+	}
+
+	/**
+	 * 设置排除显示的facetGroup
+	 * 
+	 * @return void
+	 * @param collection
+	 * @param facetGroups
+	 * @author 冯明雷
+	 * @time 2016年5月16日下午3:22:30
+	 */
+	protected void setExcludeFacetGroup(ItemCollection collection,List<FacetGroup> facetGroups){
+		if (collection != null) {
+			String facetParameters = collection.getFacetParameters();
+			List<FacetParameter> params = JSON.parseArray(facetParameters, FacetParameter.class);
+			if (params != null) {
+				for (FacetParameter facetParameter : params){
+					if (FacetType.PROPERTY.equals(facetParameter.getFacetType())) {
+						for (FacetGroup facetGroup : facetGroups){
+							Long id = facetGroup.getId();
+							if (id != null && facetParameter.getName().equals(SkuItemParam.dynamicCondition + id.intValue())
+									&& !facetGroup.getIsCategory()) {
+								facetGroup.setIsShow(false);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

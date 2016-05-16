@@ -70,46 +70,51 @@ public class NebulaSolrQueryFactory{
 			for (int i = 0; i < facetParameters.size(); i++){
 				FacetParameter facetParameter = facetParameters.get(i);
 				List<String> values = facetParameter.getValues();
+				String name = facetParameter.getName();
+				FacetType facetType = facetParameter.getFacetType();
 
 				// 如果是价格范围的条件
-				if (FacetType.RANGE.equals(facetParameter.getFacetType())) {
-					addFqForPriceArea(solrQuery, facetParameter.getValues(), facetParameter.getName());
-				}else{
-					// 分类、属性、导航的条件
-					for (String value : values){
-						String[] strs = value.split("-");
-						variable = variable + strs[strs.length - 1];
-
-						if (variable.equals(lastFilerStr)) {
-							addFqAccurateForStringListWithTag(solrQuery, facetParameter.getValues(), facetParameter.getName());
-							break;
-						}else{
-							addFqAccurateForStringList(solrQuery, facetParameter.getValues(), facetParameter.getName());
-							break;
-						}
+				if (FacetType.RANGE.equals(facetType)) {
+					addFqForPriceArea(solrQuery, values, name);
+				}else if (FacetType.CATEGORY.equals(facetType)) {
+					// 如果是分类
+					if (CATEGORY_VARIABLE.equals(variable)) {
+						addFqAccurateForStringListWithTag(solrQuery, values, name);
+					}else{
+						addFqAccurateForStringList(solrQuery, values, name);
 					}
+				}else if (FacetType.PROPERTY.equals(facetType)) {
+					// 如果是属性
+					String filter = variable + name.replace(SkuItemParam.dynamicCondition, "");
+					if (filter.equals(filterParamOrder)) {
+						addFqAccurateForStringListWithTag(solrQuery, values, name);
+					}else{
+						addFqAccurateForStringList(solrQuery, values, name);
+					}
+				}else{
+					addFqAccurateForStringList(solrQuery, values, name);
 				}
 			}
 		}
-		
-		//排除字段列表，设置排除字段的查询
+
+		// 排除字段列表，设置排除字段的查询
 		List<ExcludeSearchCommand> excludeList = searchCommand.getExcludeList();
-		if(Validator.isNotNullOrEmpty(excludeList)){
-			for(ExcludeSearchCommand excludeCommand : excludeList){
+		if (Validator.isNotNullOrEmpty(excludeList)) {
+			for (ExcludeSearchCommand excludeCommand : excludeList){
 				StringBuilder fqStrBuilder = new StringBuilder();
-				if(Validator.isNotNullOrEmpty(excludeCommand.getFieldName()) && Validator.isNotNullOrEmpty(excludeCommand.getValues())){
+				if (Validator.isNotNullOrEmpty(excludeCommand.getFieldName()) && Validator.isNotNullOrEmpty(excludeCommand.getValues())) {
 					fqStrBuilder.append("-").append(excludeCommand.getFieldName()).append(":(");
 					List<String> values = excludeCommand.getValues();
-					for(int i=0;i<values.size();i++){
+					for (int i = 0; i < values.size(); i++){
 						fqStrBuilder.append(values.get(i));
-						if(i < values.size()-1){
+						if (i < values.size() - 1) {
 							fqStrBuilder.append(" OR ");
 						}
-						if(i == values.size()-1){
+						if (i == values.size() - 1) {
 							fqStrBuilder.append(")");
 						}
 					}
-					
+
 					solrQuery.addFilterQuery(fqStrBuilder.toString());
 				}
 			}
@@ -261,8 +266,7 @@ public class NebulaSolrQueryFactory{
 				}
 			}
 			fq_keyword += ")";
-			solrQuery.addFilterQuery("{!tag=tag1}" + type + ":" + fq_keyword);
-			solrQuery.addFacetField("{!ex=tag1}" + type);
+			solrQuery.addFilterQuery("{!tag=lastFilterTag}" + type + ":" + fq_keyword);
 		}
 	}
 

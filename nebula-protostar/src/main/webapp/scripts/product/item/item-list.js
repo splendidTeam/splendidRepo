@@ -301,7 +301,7 @@ function formatCategoryNames(data, args, idx) {
    
    if(name!=null && name.trim()!=''){
 	   propertyNameArray.remove(name);
-	   propertyNameArray += "<font  color='red'>"+name+"</font>";
+	   propertyNameArray += "&nbsp;<font  color='red'>"+name+"</font>";
    }
    
 	return propertyNameArray;
