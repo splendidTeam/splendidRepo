@@ -62,6 +62,7 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -284,7 +285,7 @@ public class ItemManagerImpl implements ItemManager{
 	// 用于属性多个
 	private static final String			DOUBLE_SLASH_SEPARATOR						= "\\|\\|";
 
-	// 分类 筛选条件
+	// 分类 筛选条件 如果有||首先以||分割，如果没有以/分割
 	private static final String			BACK_SLANT_SEPARATOR						= "/";
 
 	/** windows, mac系统查看缩略图所产生的缓存文件, 在导入商品图片是过滤掉这个文件 **/
@@ -2414,10 +2415,18 @@ public class ItemManagerImpl implements ItemManager{
 				String categoryCodes = itemCommand.getCategoryCodes();
 				if (Validator.isNotNullOrEmpty(categoryCodes)){
 					List<ItemCategory> itemCategoryList = itemCommand.getItemCategoryList();
-					// 反斜杠“/”
-					String[] strs = categoryCodes.split(BACK_SLANT_SEPARATOR);
+					//反斜杠“/”
+					String[] strs = null;
+					if(categoryCodes.contains("||")){
+						strs = categoryCodes.split(DOUBLE_SLASH_SEPARATOR);
+					}else{
+						strs = categoryCodes.split(BACK_SLANT_SEPARATOR);
+					}
 					if (Validator.isNotNullOrEmpty(strs)){
 						for (String str : strs){
+							if(StringUtils.isBlank(str)){
+								continue;
+							}
 							if (Validator.isNullOrEmpty(leafNodeCategoryMap.get(str))){// 增加判断逻辑：如果不是叶子节点，也提示错误信息！产品挂分类必须挂在叶子节点。
 								if (++counter < 50){
 									BusinessException e = new BusinessException(ErrorCodes.PRODUCT_CATEGORY_NOT_LEAFNODE, new Object[] {
@@ -2594,9 +2603,17 @@ public class ItemManagerImpl implements ItemManager{
 						String value = scs.get(key);
 						if (Validator.isNotNullOrEmpty(value)){
 							// 反斜杠“/”
-							String[] strs = value.split(BACK_SLANT_SEPARATOR);
+							String[] strs = null;
+							if(value.contains("||")){
+								strs = value.split(DOUBLE_SLASH_SEPARATOR);
+							}else{
+								strs = value.split(BACK_SLANT_SEPARATOR);
+							}
 							if (Validator.isNotNullOrEmpty(strs)){
 								for (String str : strs){
+									if(StringUtils.isBlank(str)){
+										continue;
+									}
 									if (null == conItemMap.get(propId) || null == conItemMap.get(propId).get(str)){
 										if (++counter < 50){
 											BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] {
@@ -2975,9 +2992,19 @@ public class ItemManagerImpl implements ItemManager{
 				if (Validator.isNotNullOrEmpty(categoryCodes)){
 					List<ItemCategory> itemCategoryList = itemCommand.getItemCategoryList();
 					// 反斜杠“/”
-					String[] strs = categoryCodes.split(BACK_SLANT_SEPARATOR);
+					String[] strs = null;
+					
+					if(categoryCodes.contains("||")){
+						strs = categoryCodes.split(DOUBLE_SLASH_SEPARATOR);
+					}else{
+						strs = categoryCodes.split(BACK_SLANT_SEPARATOR);
+					}
 					if (Validator.isNotNullOrEmpty(strs)){
 						for (String str : strs){
+							if(StringUtils.isBlank(str)){
+								continue;
+							}
+							
 							if (Validator.isNullOrEmpty(leafNodeCategoryMap.get(str))){// 增加判断逻辑：如果不是叶子节点，也提示错误信息！产品挂分类必须挂在叶子节点。
 								BusinessException e = new BusinessException(ErrorCodes.PRODUCT_CATEGORY_NOT_LEAFNODE, new Object[] {
 										1,
@@ -3139,9 +3166,18 @@ public class ItemManagerImpl implements ItemManager{
 						String value = scs.get(key);
 						if (Validator.isNotNullOrEmpty(value)){
 							// 反斜杠“/”
-							String[] strs = value.split(BACK_SLANT_SEPARATOR);
+							String[] strs = null;
+							
+							if(value.contains("||")){
+								strs = value.split(DOUBLE_SLASH_SEPARATOR);
+							}else{
+								strs = value.split(BACK_SLANT_SEPARATOR);
+							}
 							if (Validator.isNotNullOrEmpty(strs)){
 								for (String str : strs){
+									if(StringUtils.isBlank(str)){
+										continue;
+									}
 									if (null == conItemMap.get(propId) || null == conItemMap.get(propId).get(str)){
 										BusinessException e = new BusinessException(ErrorCodes.CELL_ERROR, new Object[] {
 												2,
@@ -5213,32 +5249,34 @@ public class ItemManagerImpl implements ItemManager{
 						String ru = roles[roles.length - 1];
 						String imgUrl = tmpImgFilePathMap.get(ru + picName);
 
-						/** 保存商品图片 */
-						itemImage = new ItemImage();
-						itemImage.setItemId(itemMap.get(itemCode));
-						itemImage.setItemProperties(itemPropId);
-						itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
-						itemImage.setCreateTime(new Date());
-						itemImage.setVersion(new Date());
-						itemImage.setDescription("");
-						itemImage.setType(StringUtils.trim(type));
-						itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
-						itemImage = itemImageDao.save(itemImage);
+						if(Validator.isNullOrEmpty(itemImage)){
+							/** 保存商品图片 */
+							itemImage = new ItemImage();
+							itemImage.setItemId(itemMap.get(itemCode));
+							itemImage.setItemProperties(itemPropId);
+							itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
+							itemImage.setCreateTime(new Date());
+							itemImage.setVersion(new Date());
+							itemImage.setDescription("");
+							itemImage.setType(StringUtils.trim(type));
+							itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
+							itemImage = itemImageDao.save(itemImage);
 
-						itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
+							itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
 
-						// 国际化
-						boolean i18n = LangProperty.getI18nOnOff();
-						if (i18n){
-							List<String> languages = MutlLang.i18nLangs();
-							for (String language : languages){
-								ItemImageLang itemImageLang = new ItemImageLang();
-								itemImageLang.setItemImageId(itemImage.getId());
-								itemImageLang.setLang(language);
-								itemImageLang.setPicUrl(itemImage.getPicUrl());
-								itemImageLang.setDescription(itemImage.getDescription());
-								itemImageLang = itemImageLangDao.save(itemImageLang);
-								itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
+							// 国际化
+							boolean i18n = LangProperty.getI18nOnOff();
+							if (i18n){
+								List<String> languages = MutlLang.i18nLangs();
+								for (String language : languages){
+									ItemImageLang itemImageLang = new ItemImageLang();
+									itemImageLang.setItemImageId(itemImage.getId());
+									itemImageLang.setLang(language);
+									itemImageLang.setPicUrl(itemImage.getPicUrl());
+									itemImageLang.setDescription(itemImage.getDescription());
+									itemImageLang = itemImageLangDao.save(itemImageLang);
+									itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
+								}
 							}
 						}
 					}
@@ -6196,4 +6234,5 @@ public class ItemManagerImpl implements ItemManager{
 		Integer count = itemPropertiesDao.findItemCountByPropertyId(propertyId);
 		return count == null ? 0 : count;
 	}
+	
 }
