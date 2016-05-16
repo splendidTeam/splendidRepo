@@ -277,14 +277,7 @@ public class ItemSolrSettingManagerImpl implements ItemSolrSettingManager{
      * @return
      */
     private List<Long> findItemIdsByShopId(Long shopId){
-        List<Item> itemList=itemDao.findItemListByShopId(shopId); 
-        List<Long> ids=new ArrayList<Long>();
-        for(Item item:itemList){
-            if(item.getId()!=null){
-                ids.add(item.getId());
-            }
-        }
-        return ids;
+        return itemDao.findItemIdsByShopId(shopId);
     }
     
     private Boolean getCanDo(Long shopId){

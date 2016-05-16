@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
@@ -199,7 +201,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		}
 		
 		// 获取购物车信息
-		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails,addressList);
+		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails,addressList,null);
 
 		// 购物车为空
 		if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
@@ -295,12 +297,58 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 将订单创建成功后的信息返回给前端，创建支付链接用
 		SalesOrderReturnObject salesOrderReturnObject = createReturnObject(subOrdinate);
-		DefaultReturnResult result = new DefaultReturnResult();
-		result.setResult(true);
+		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
 		result.setReturnObject(salesOrderReturnObject);
 		return result;
 	}
 
+	
+	/**
+	 * 再次计算金额   使用情景：使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验)
+	 * @param memberDetails
+	 *            the member details
+	 * @param orderForm
+	 *            the order form
+	 * @param bindingResult
+	 *            the binding result
+	 * @param request
+	 *            the request
+	 * @param response
+	 *            the response
+	 * @param model
+	 *            the model
+	 * @return the string
+	 * @NeedLogin (guest=true)
+	 * @RequestMapping(value = "/transaction/recalc", method = RequestMethod.POST)
+	 */
+	public ShoppingCartCommand recalc(@LoginMember MemberDetails memberDetails,@ModelAttribute("orderForm") OrderForm orderForm, BindingResult bindingResult, HttpServletRequest request,
+			HttpServletResponse response, Model model) {
+		// 优惠券
+		String couponCode = null;
+		if(orderForm!=null && orderForm.getCouponInfoSubForm()!=null){
+			couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
+		}
+		
+        //地址
+		List<ContactCommand> addressList= null;
+		if (orderForm != null && orderForm.getShippingInfoSubForm() != null && orderForm.getShippingInfoSubForm().getProvinceId() != null
+				&& orderForm.getShippingInfoSubForm().getCityId() != null && orderForm.getShippingInfoSubForm().getAreaId() != null) {
+			ContactCommand contactCommand = new ContactCommand();
+			contactCommand.setProvinceId(orderForm.getShippingInfoSubForm().getProvinceId());
+			contactCommand.setCityId(orderForm.getShippingInfoSubForm().getCityId());
+			contactCommand.setAreaId(orderForm.getShippingInfoSubForm().getAreaId());
+			contactCommand.setIsDefault(true);
+			
+			addressList = new ArrayList<ContactCommand>();
+			addressList.add(contactCommand);
+		}
+		return getChosenShoppingCartCommand(request, memberDetails,addressList,couponCode); 
+	}
+
+	
+	
+	
+	
 	/**
 	 * Detect shoppingcart resolver.
 	 *
@@ -322,7 +370,7 @@ public class NebulaOrderConfirmController extends BaseController {
 	 * @return the cart info
 	 */
 	protected ShoppingCartCommand getChosenShoppingCartCommand(HttpServletRequest request,
-			MemberDetails memberDetails,List<ContactCommand> addressList) {
+			MemberDetails memberDetails,List<ContactCommand> addressList,String couponCode) {
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
@@ -360,12 +408,24 @@ public class NebulaOrderConfirmController extends BaseController {
 			calcFreightCommand.setProvienceId(contactCommand.getProvinceId());
 			calcFreightCommand.setCityId(contactCommand.getCityId());
 			calcFreightCommand.setCountyId(contactCommand.getAreaId());
-			
-			
-			
+		}else{
+			//在未选择地址的情况下   为了显示默认运费，初始设置一个临时地址，上海市黄浦区()
+			calcFreightCommand = new CalcFreightCommand();
+			calcFreightCommand.setProvienceId(310000L);
+			calcFreightCommand.setCityId(310100L);
+			calcFreightCommand.setCountyId(310101L);
 		}
 		
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, calcFreightCommand, cartLines);
+		
+		
+		//优惠券
+		List<String> coupons= null;
+		if(Validator.isNotNullOrEmpty(couponCode)){
+			coupons = new ArrayList<String>();
+			coupons.add(couponCode);
+		}
+		
+		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, coupons, calcFreightCommand, cartLines);
 	}
 
 	/**
@@ -471,5 +531,7 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		return salesOrderReturnObject;
 	}
+	
+	
 
 }
