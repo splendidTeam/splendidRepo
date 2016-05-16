@@ -5213,32 +5213,34 @@ public class ItemManagerImpl implements ItemManager{
 						String ru = roles[roles.length - 1];
 						String imgUrl = tmpImgFilePathMap.get(ru + picName);
 
-						/** 保存商品图片 */
-						itemImage = new ItemImage();
-						itemImage.setItemId(itemMap.get(itemCode));
-						itemImage.setItemProperties(itemPropId);
-						itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
-						itemImage.setCreateTime(new Date());
-						itemImage.setVersion(new Date());
-						itemImage.setDescription("");
-						itemImage.setType(StringUtils.trim(type));
-						itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
-						itemImage = itemImageDao.save(itemImage);
+						if(Validator.isNullOrEmpty(itemImage)){
+							/** 保存商品图片 */
+							itemImage = new ItemImage();
+							itemImage.setItemId(itemMap.get(itemCode));
+							itemImage.setItemProperties(itemPropId);
+							itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
+							itemImage.setCreateTime(new Date());
+							itemImage.setVersion(new Date());
+							itemImage.setDescription("");
+							itemImage.setType(StringUtils.trim(type));
+							itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
+							itemImage = itemImageDao.save(itemImage);
 
-						itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
+							itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
 
-						// 国际化
-						boolean i18n = LangProperty.getI18nOnOff();
-						if (i18n){
-							List<String> languages = MutlLang.i18nLangs();
-							for (String language : languages){
-								ItemImageLang itemImageLang = new ItemImageLang();
-								itemImageLang.setItemImageId(itemImage.getId());
-								itemImageLang.setLang(language);
-								itemImageLang.setPicUrl(itemImage.getPicUrl());
-								itemImageLang.setDescription(itemImage.getDescription());
-								itemImageLang = itemImageLangDao.save(itemImageLang);
-								itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
+							// 国际化
+							boolean i18n = LangProperty.getI18nOnOff();
+							if (i18n){
+								List<String> languages = MutlLang.i18nLangs();
+								for (String language : languages){
+									ItemImageLang itemImageLang = new ItemImageLang();
+									itemImageLang.setItemImageId(itemImage.getId());
+									itemImageLang.setLang(language);
+									itemImageLang.setPicUrl(itemImage.getPicUrl());
+									itemImageLang.setDescription(itemImage.getDescription());
+									itemImageLang = itemImageLangDao.save(itemImageLang);
+									itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
+								}
 							}
 						}
 					}
