@@ -56,8 +56,11 @@
 							tpifo.title as title,
 							tpifo.active_begin_time as activeBeginTime,
 							tpifo.type,
+							tpi.type itemType,
+							coalesce(skuInventory.aty,0) as inventory,
 							coalesce(image.imageCount,0) as imageCount
-						from t_pd_item tpi left join (select item_id, count(*) as imageCount from t_pd_item_image GROUP BY item_id) image on tpi.id = image.item_id,
+						from t_pd_item tpi left join (select item_id, count(*) as imageCount from t_pd_item_image GROUP BY item_id) image on tpi.id = image.item_id
+						    left join (select sku.item_id item_id , sum(inventory.available_qty) aty from t_pd_sku sku,t_pd_sku_inventory inventory where sku.out_id = inventory.extention_code GROUP BY sku.item_id) skuInventory on tpi.id = skuInventory.item_id,
 						    t_pd_iteminfo tpifo,
 							t_pd_industry tpid 
 							#if($categoryId)
@@ -291,6 +294,17 @@
 			<value>
 				<![CDATA[ 
 					SELECT * FROM t_pd_item WHERE shop_id =:shopId and lifecycle!=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findItemIdsByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shopId查询相关Items的ids</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT id FROM t_pd_item WHERE shop_id =:shopId and lifecycle!=2
                  ]]>
 			</value>
 		</constructor-arg>

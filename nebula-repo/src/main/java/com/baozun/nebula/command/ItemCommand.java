@@ -192,6 +192,35 @@ public class ItemCommand implements Command {
 	private String				defCategory;
 	
 	private Long				defCategroyId;
+	
+	/**
+	 * 商品库存（该商品下所有UPC的累加可用库存）
+	 */
+	private Integer   inventory;
+	
+	/** 商品类型：普通商品  1;
+	  * 商品类型：捆绑类商品  3;
+	  * 商品类型：组商品  5;
+	  * 商品类型：虚拟商品  7;
+	  */
+	private Integer	  itemType;
+	
+
+	public Integer getInventory() {
+		return inventory;
+	}
+
+	public void setInventory(Integer inventory) {
+		this.inventory = inventory;
+	}
+
+	public Integer getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(Integer itemType) {
+		this.itemType = itemType;
+	}
 
 	public BigDecimal getSalePrice() {
 		return salePrice;

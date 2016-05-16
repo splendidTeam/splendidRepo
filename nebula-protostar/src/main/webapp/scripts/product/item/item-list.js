@@ -2,8 +2,7 @@ $j.extend(loxia.regional['zh-CN'], {
 	"PROPERT_OPERATOR_TIP" : "属性提示信息",
 	"LABEL_ITEM_CODE" : "商品编码",
 	"LABEL_ITEM_TITLE" : "商品名称",
-	"LABEL_ITEM_INDUSTRYNAME" : "所属行业",
-	"LABEL_ITEM_CATEGORYNAMES" : "分类",
+	"LABEL_ITEM_CATEGORYNAMES" : "分类（默认分类用红色标注）",
 	"LABEL_ITEM_LIFECYCLE" : "状态",
 	"LABEL_ITEM_CREATETIME" : "创建时间",
 	"LABEL_ITEM_MODIFYTIME" : "修改时间",
@@ -20,7 +19,7 @@ $j.extend(loxia.regional['zh-CN'], {
 	"INFO_START_SUCCESS" : "上架成功!",
 	"INFO_TITLE_DATA" : "提示信息",
 	"INFO_STOP_FAIL" : "下架失败!",
-	"INFO_START_FAILURE" : "上加失败!",
+	"INFO_START_FAILURE" : "上架失败!",
 	"NO_CATEGORY" : "无",
 	"VALUE_SOURCE_1" : "QQ登录",
 	"VALUE_SOURCE_2" : "自注册",
@@ -40,12 +39,14 @@ $j.extend(loxia.regional['zh-CN'], {
 	"ACTIVE_FAIL":"定时发布失败",
 	"ACTIVE_TIME":"定时上架时间",
 	"STORE_MANAGER" : "库存管理",// add by hr 20140417
-	"IMAGE_COUNT" : "商品图片个数",// add by hr 20140708
+	"IMAGE_COUNT" : "图片数",// add by hr 20140708
 	"ITEM_TYPE" : "商品类型",
+	"IS_PRESENT":"是否赠品",
 	"ITEM_TYPE_MAIN" : "主商品",
 	"ITEM_TYPE_GIFT" : "非卖品",
-	"LABEL_ITEM_DEFCATEGORY":"默认分类",
-	"ITEM_TYPE_PRESALE":"预售编辑"
+	"ITEM_TYPE_PRESALE":"预售编辑",
+	"ITEM_INVENTORY":"商品库存"
+	
 });
 // Json格式动态获取数据库商品信息
 var itemListUrl = base + '/item/itemList.json';
@@ -60,6 +61,13 @@ var enableOrDisableItemsUrl = base + '/item/enableOrDisableItems.json';
 
 //商品导出和导入URL
 var itemExportImportUrl = base + '/item/itemExportImport.htm';
+
+Array.prototype.remove = function(val) {
+    var index = this.indexOf(val);
+    if (index > -1) {
+        this.splice(index, 1);
+    }
+};
 
 // 分类列表
 var categorySetting = {
@@ -288,16 +296,15 @@ function formatCategoryNames(data, args, idx) {
 	if (propertyNameArray == null || propertyNameArray == '') {
 		return nps.i18n("NO_CATEGORY");
 	}
-	return propertyNameArray;
-}
-
-function formatDefCategoryNames(data, args, idx){
-	var name =loxia.getObject("defCategory", data);
 	
-	if(name==null||name==''){
-		return nps.i18n("NO_CATEGORY");
-	}
-	return name;
+   var name =loxia.getObject("defCategory", data);
+   
+   if(name!=null && name.trim()!=''){
+	   propertyNameArray.remove(name);
+	   propertyNameArray += "<font  color='red'>"+name+"</font>";
+   }
+   
+	return propertyNameArray;
 }
 
 // 操作函数 change by hr 20140428
@@ -408,10 +415,13 @@ function itemImageTemplate(data){
 function itemTypeTemplate(data){
 	var type = loxia.getObject("type", data);
 	if(type == null || type == 1){
-		return nps.i18n("ITEM_TYPE_MAIN");
-	}
-	else if(type == 0){
-		return nps.i18n("ITEM_TYPE_GIFT");
+		return "普通商品";
+	}else if(type == 3){
+		return "捆绑类商品 ";
+	}else if(type == 5){
+		return "组商品";
+	}else if(type == 7){
+		return "虚拟商品";
 	}
 	return "";
 }
@@ -526,6 +536,23 @@ $j(document).ready(function() {
 			// do nothing
 		}
 	};
+	
+	// 商品状态
+	$j.ui.loxiasimpletable().typepainter.twoState = {
+		getContent : function(data) {
+			if(data == null || data == 1){
+				return "<span class='ui-pyesno ui-pyesno-no' title='否'></span>";
+			}
+			else if(data == 0){
+				return "<span class='ui-pyesno ui-pyesno-yes' title='是'></span>";
+			}
+			return "";
+			
+		},
+		postHandle : function(context) {
+			// do nothing
+		}
+	};
 	// 动态获取数据库商品信息表
 	$j("#table1").loxiasimpletable({
 		page : true,
@@ -539,29 +566,19 @@ $j(document).ready(function() {
 		}, {
 			name : "code",
 			label : nps.i18n("LABEL_ITEM_CODE"),
-			width : "5%",
+			width : "7%",
 			sort : [ "tpit.code asc", "tpit.code desc" ]
 		}, {
 			name : "title",
 			label : nps.i18n("LABEL_ITEM_TITLE"),
-			width : "7%",
+			width : "10%",
 			sort : [ "tpit.title asc", "tpit.title desc" ]
-		}, {
-			name : "industryName",
-			label : nps.i18n("LABEL_ITEM_INDUSTRYNAME"),
-			width : "5%",
-			sort : [ "tpit.industryName asc", "tpit.industryName desc" ]
 		}, {
 			name : "categoryNames",
 			label : nps.i18n("LABEL_ITEM_CATEGORYNAMES"),
 			width : "10%",
 			template : "formatCategoryNames"
 
-		},  {
-			name : "defCategory",
-			label : nps.i18n("LABEL_ITEM_DEFCATEGORY"),
-			width : "5%",
-			template : "formatDefCategoryNames"
 		}, {
 			name : "lifecycle",
 			label : nps.i18n("LABEL_ITEM_LIFECYCLE"),
@@ -576,33 +593,42 @@ $j(document).ready(function() {
 		}, {
 			name : "modifyTime",
 			label : nps.i18n("LABEL_ITEM_MODIFYTIME"),
-			width : "10%",
+			width : "8%",
 			formatter : "formatDate",
 			sort : [ "tpit.modifyTime asc", "tpit.modifyTime desc" ]
 		}, {
 			name : "listTime",
 			label : updateListTimeFlag == "false" ? nps.i18n("LABEL_INIT_LISTTIME") : nps.i18n("LABEL_ITEM_LISTTIME"),
-			width : "10%",
+			width : "8%",
 			formatter : "formatDate",
 			sort : [ "tpit.listTime asc", "tpit.listTime desc" ]
 		}, {
 			name : "activeBeginTime",
 			label : nps.i18n("ACTIVE_TIME"),
-			width : "10%",
+			width : "8%",
 			formatter : "formatDate",
 			sort : [ "tpit.activeBeginTime asc", "tpit.activeBeginTime desc" ]
 		}, {
 			name : "type",
-			label : nps.i18n("ITEM_TYPE"),
+			label : nps.i18n("IS_PRESENT"),
 			width : "5%",
-			template : "itemTypeTemplate",
-			sort : [ "tpit.type asc", "tpit.type desc" ]
+			type : "twoState"
 		}, {
 			name : "imageCount",
 			label : nps.i18n("IMAGE_COUNT"),
-			width : "7%",
+			width : "5%",
 			template : "itemImageTemplate",
 			sort : [ "tpit.imageCount asc", "tpit.imageCount desc" ]
+		}, {
+			name : "itemType",
+			label : nps.i18n("ITEM_TYPE"),
+			width : "7%",
+			template : "itemTypeTemplate",
+		}, {
+			name : "inventory",
+			label : nps.i18n("ITEM_INVENTORY"),
+			width : "5%",
+			sort : [ "tpit.inventory asc", "tpit.inventory desc" ]
 		}, {
 			label : nps.i18n("LBAEL_ITEM_OPERATE"),
 			width : "5%",
