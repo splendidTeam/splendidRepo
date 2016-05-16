@@ -57,8 +57,8 @@ public class NebulaBundleShoppingCartController extends BaseController{
      *
      * @param memberDetails
      *            某个用户
-     * @param itemId
-     *            买的哪个bundle
+     * @param relatedItemId
+     *            买的哪个bundle,本来想用 bundleId的,后来听程哥说 他们定义的很多接口都是用的itemId
      * @param skuIds
      *            里面有哪些skuid 的组合
      * @param count
@@ -74,7 +74,7 @@ public class NebulaBundleShoppingCartController extends BaseController{
      */
     public NebulaReturnResult immediatelyBuyBundle(
                     @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "itemId",required = true) Long itemId,//听说bundle目前封装的 都是使用itemId做参数
+                    @RequestParam(value = "relatedItemId",required = true) Long relatedItemId,//听说bundle目前封装的 都是使用itemId做参数
                     @RequestParam(value = "skuIds",required = true) Long[] skuIds,
                     @RequestParam(value = "count",required = true) Integer count,
                     HttpServletRequest request,
