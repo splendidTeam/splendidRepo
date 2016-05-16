@@ -297,7 +297,8 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 将订单创建成功后的信息返回给前端，创建支付链接用
 		SalesOrderReturnObject salesOrderReturnObject = createReturnObject(subOrdinate);
-		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+		DefaultReturnResult result = new DefaultReturnResult();
+		result.setResult(true);
 		result.setReturnObject(salesOrderReturnObject);
 		return result;
 	}
