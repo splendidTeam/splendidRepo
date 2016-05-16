@@ -296,6 +296,17 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Item.findItemIdsByShopId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据shopId查询相关Items的ids</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT id FROM t_pd_item WHERE shop_id =:shopId and lifecycle!=2
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 	<bean id="Item.updateItemIsAddCategory" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemIds,更新是否加入分类状态为state</description>
 		<constructor-arg>
