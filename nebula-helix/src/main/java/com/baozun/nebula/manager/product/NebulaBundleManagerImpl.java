@@ -601,6 +601,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		}
 		bundleItemCommand.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
 		bundleItemCommand.setItemId(itemId);
+		bundleItemCommand.setItemCode(item.getCode());
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
 		bundleItemCommand.setBundleSkus(skuCommands);
 
