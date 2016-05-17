@@ -75,6 +75,7 @@ import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
 
+import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
 /**
@@ -437,7 +438,7 @@ public class NavigationController extends BaseController{
 			}
 			if (code != null && code.length() > 0) {
 				boolean haveFlg = false;
-				for(ItemForSolrCommand command :searchResultPage.getItems()){
+				for(ItemForSolrCommand command :searchResultPage.getItemsListWithOutGroup().getItems()){
 					if (code.equals(command.getCode())) {
 						haveFlg = true;
 						break;
@@ -519,7 +520,7 @@ public class NavigationController extends BaseController{
 			boolean sureFlg=false;
 			ItemForSolrCommand command = null;
 			if(itemId!=null && itemId.length()>0){
-				for(ItemForSolrCommand curCommand:searchResultPage.getItems()){
+				for(ItemForSolrCommand curCommand:searchResultPage.getItemsListWithOutGroup().getItems()){
 					if(itemId.equals(curCommand.getId().toString())){
 						command = curCommand;
 						sureFlg = true;
@@ -533,7 +534,10 @@ public class NavigationController extends BaseController{
 			}
 		}
 		
-		sortList.setItems(commands);
+		Pagination<ItemForSolrCommand> pagination=new Pagination<ItemForSolrCommand>();
+		pagination.setItems(commands);
+		
+		sortList.setItemsListWithOutGroup(pagination);
 		return sortList;
 	}
 	
