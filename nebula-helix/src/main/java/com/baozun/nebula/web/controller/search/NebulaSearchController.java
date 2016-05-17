@@ -118,20 +118,16 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		String isGroup = solrQuery.get(GroupParams.GROUP);
 		//如果是分组
 		if(Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)){
-			long count = searchResultPage.getItemsListWithGroup().getCount();
-			if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| count==0l) {
+			if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| searchResultPage.getItemsListWithGroup().getCount()==0l) {
 				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 				return SEARCH_NO_RESULT;
 			}
-			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", count, new Date());
 		}else{
 			//如果不是分组
-			long count = searchResultPage.getItemsListWithOutGroup().getCount();
-			if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || count==0l) {
+			if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || searchResultPage.getItemsListWithOutGroup().getCount()==0l) {
 				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 				return SEARCH_NO_RESULT;
 			}
-			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", count, new Date());
 		}
 
 		// 页面左侧筛选项
@@ -193,20 +189,16 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			String isGroup = solrQuery.get(GroupParams.GROUP);
 			//如果是分组
 			if(Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)){
-				long count = searchResultPage.getItemsListWithGroup().getCount();
-				if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| count==0l) {
+				if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| searchResultPage.getItemsListWithGroup().getCount()==0l) {
 					LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 					return SEARCH_NO_RESULT;
 				}
-				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", count, new Date());
 			}else{
 				//如果不是分组
-				long count = searchResultPage.getItemsListWithOutGroup().getCount();
-				if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || count==0l) {
+				if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || searchResultPage.getItemsListWithOutGroup().getCount()==0l) {
 					LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 					return SEARCH_NO_RESULT;
 				}
-				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", count, new Date());
 			}
 			
 			// 页面左侧筛选项
@@ -276,20 +268,16 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		String isGroup = solrQuery.get(GroupParams.GROUP);
 		//如果是分组
 		if(Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)){
-			long count = searchResultPage.getItemsListWithGroup().getCount();
-			if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| count==0l) {
+			if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| searchResultPage.getItemsListWithGroup().getCount()==0l) {
 				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 				return null;
 			}
-			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", count, new Date());
 		}else{
 			//如果不是分组
-			long count = searchResultPage.getItemsListWithOutGroup().getCount();
-			if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || count==0l) {
+			if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || searchResultPage.getItemsListWithOutGroup().getCount()==0l) {
 				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
 				return null;
 			}
-			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", count, new Date());
 		}
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象

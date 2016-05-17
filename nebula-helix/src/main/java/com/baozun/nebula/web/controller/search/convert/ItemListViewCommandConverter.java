@@ -58,7 +58,7 @@ public class ItemListViewCommandConverter extends BaseConverter<ItemListViewComm
 					&& Validator.isNotNullOrEmpty(pageData.getItemsListWithOutGroup().getItems())) {
 				//不分组
 				result.setItemsListWithOutGroup(pageData.getItemsListWithOutGroup().getItems());
-				result.setCount(pageData.getItemsListWithGroup().getCount());
+				result.setCount(pageData.getItemsListWithOutGroup().getCount());
 				result.setCurrentPage(pageData.getItemsListWithOutGroup().getCurrentPage());
 				result.setSize(pageData.getItemsListWithOutGroup().getSize());
 				result.setStart(pageData.getItemsListWithOutGroup().getStart());
