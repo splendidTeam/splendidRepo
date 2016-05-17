@@ -223,8 +223,8 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
             setValid(shoppingCartLineCommand, 1);
         }
 
-        if (shoppingCartLineCommand.isGift()){
-            shoppingCartLineCommand.setExtentionCode(sku.getOutid());// 赠品
+        if (Validator.isNullOrEmpty(shoppingCartLineCommand.getExtentionCode())){
+            shoppingCartLineCommand.setExtentionCode(sku.getOutid());
         }
 
         String itemCode = item.getCode();
