@@ -123,61 +123,53 @@ margin-top: 4px
 </div>
 
 <div class="cms-imgarticle-edit-dialog proto-dialog">
-     <h5>编辑区域—表单方式</h5>
+      <h5>编辑区域—表单方式</h5>
      <div class="proto-dialog-content">
     
 	     <input type="hidden" value="" id="areaCode" name="areaCode">
-	     <ul id="element-list">
-	    	<li class="li-area-list">
-			    <div class="ui-block-line area-list list-line" style="display: none;margin-bottom: 5px">
-			     <div class="zkss"><a href="javascript:void(0);" class="func-button select">收起-</a></div>
-			     <div class="slideToggle">
-			     	  <div class="zTreeDemoBackground left">
-						<ul class="ztree"></ul>
-					  </div>
-				      <div class="ui-block-line mt5 title" style="display: none;" >
-						<label>标题</label>
-						<input  class="ismandatory" placeHolder="标题" loxiaType="input" mandatory="true" />
-					  </div>
-					  <div class="ui-block-line mt5 href" style="display: none;">
-						<label>超链接</label>
-						<input  class="ismandatory" placeHolder="链接" loxiaType="input" mandatory="true"  />
-					  </div>
-					  
-					  <div class="ui-block-line mt5 coords" style="display: none;" >
-						<label>图片热点</label>
-						<input  class="ismandatory" placeHolder="图片热点" loxiaType="input" mandatory="true" />
-					  </div>
-					  
-					  <div class="ui-block-line mt5 img" style="display: none;">
-						<label>图片</label>
-					 	<input  class="img-url ismandatory"  placeHolder="图片" loxiaType="input" mandatory="true" />
-						<a  class="func-button ml5 uploadlink color-select-line" href="javascript:void(0);"><span>上传</span>
-		           			<input style="width: 40px;margin-left: 360px;" callback="fnCallback" class="imgUploadComponet fileupload"  role="" model="C" hName="templateImageUrl"  type="file" url="/demo/upload.json"/>
-		           		</a>
-					  </div>
-					  
-					  <div class="ui-block-line mt5 img-alt" style="display: none;">
-						<label>图片alt</label>
-					 	<input  placeHolder="图片alt" loxiaType="input" />
-					  </div>
-					  
-					  <div class="ui-block-line mt5 desc" style="display: none;">
-							<label>描述</label>
-							<textarea class="ismandatory" placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input" mandatory="true"></textarea>
-					  </div>
-					  
-					  <div class="ui-block-line mt5 " >
-							<input num="" style="width: 44px;height: 33px;margin-left: 250px; margin-bottom: 10px" type="button" value="删除" class="button remove"/>	
-					  </div>
-				  </div>
-				</div>
-			</li>
-		</ul>
+	    <div class="ui-block-line area-list list-line" style="display: none;margin-bottom: 5px">
+	     <div class="zkss"><a href="javascript:void(0);" class="func-button select">收起-</a></div>
+	     <div class="slideToggle">
+		      <div class="ui-block-line mt5 title" style="display: none;" >
+				<label>标题</label>
+				<input  class="ismandatory" placeHolder="标题" loxiaType="input" mandatory="true" />
+			  </div>
+			  <div class="ui-block-line mt5 href-title" style="display: none;">
+				<label>标题链接</label>
+				<input  class="ismandatory" placeHolder="链接" loxiaType="input" mandatory="true"  />
+			  </div>
+			  <div class="ui-block-line mt5 img" style="display: none;">
+				<label>图片</label>
+			 	<input  class="img-url ismandatory"  placeHolder="图片" loxiaType="input" mandatory="true" />
+				<a  class="func-button ml5 uploadlink color-select-line" href="javascript:void(0);"><span>上传</span>
+           			<input style="width: 40px;margin-left: 360px;" callback="fnCallback" class="imgUploadComponet fileupload"  role="" model="C" hName="templateImageUrl"  type="file" url="/demo/upload.json"/>
+           		</a>
+			  </div>
+			  
+			  <div class="ui-block-line mt5 img-alt" style="display: none;">
+				<label>图片alt</label>
+			 	<input  placeHolder="图片alt" loxiaType="input" />
+			  </div>
+			  
+			  <div class="ui-block-line mt5 href-img" style="display: none;">
+				<label>图片链接</label>
+				<input class="ismandatory" placeHolder="链接" loxiaType="input" mandatory="true"  />
+			  </div>
+			  <div class="ui-block-line mt5 desc" style="display: none;">
+					<label>描述</label>
+					<textarea class="ismandatory" placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input" mandatory="true"></textarea>
+			  </div>
+			  
+			  <div class="ui-block-line mt5 " >
+					<input num="" style="width: 44px;height: 33px;margin-left: 250px; margin-bottom: 10px" type="button" value="删除" class="button remove"/>	
+			  </div>
+		  </div>
+		</div>
 		  <div class="ui-block-line mt5 imgarticle-info center" style="display: none;">
 				<span>该区域下没有设置任何编辑项</span>
 		  </div>
      </div>
+
      <div class="proto-dialog-button-line">
           <input type="button" value="确定" class="button orange mr5 confrim-imgarticle" />
           <input type="button" value="添加"  class="button orange mr5 add-tmp" />
