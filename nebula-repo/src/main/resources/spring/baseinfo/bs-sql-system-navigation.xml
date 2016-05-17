@@ -122,7 +122,8 @@
 					select
 						nav.id as id,
 					 	navLang.name as name,						
-						nav.sort as sortNo
+						nav.sort as sortNo,
+						nav.url as url
 					from
 						t_base_navigation nav,t_base_navigation_lang navLang
 					WHERE
