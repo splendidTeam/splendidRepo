@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.model.product.SearchCondition;
@@ -67,9 +68,6 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 	/** 属性值元数据在缓存中的key，完整的key还要加上语言 */
 	private final static String			propertyValueMetaCacheKey	= "propertyValueMetaCacheKey_";
 
-	/** 导航元数据在缓存中的key，完整的key还要加上语言 */
-	private final static String			navigationMetaCacheKey		= "navigationMetaCacheKey_";
-
 	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 */
 	private final static String			searchConditionMetaCacheKey	= "searchConditionMetaCacheKey_";
 
@@ -95,21 +93,68 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 	public FacetFilterMetaData loadFacetFilterMetaData(){
 		FacetFilterMetaData facetFilterMetaData = new FacetFilterMetaData();
 
-		Map<Long, MetaDataCommand> categoryMetaMap = null;
-		Map<Long, MetaDataCommand> propertyMetaMap = null;
-		Map<Long, MetaDataCommand> propertyValueMetaMap = null;
+		Map<Long, MetaDataCommand> categoryMetaMap = this.loadCategoryMetaData();
+		Map<Long, MetaDataCommand> propertyMetaMap = this.loadPropertyMetaData();
+		Map<Long, MetaDataCommand> propertyValueMetaMap = this.loadPropertyValueMetaData();
+		Map<Long, MetaDataCommand> navigationMetaMap = this.loadNavigationMetaData();
+		
+		Map<Long, SearchConditionCommand> searchConditionMetaMap = this.loadSearchConditionMetaData();
+
+		if (categoryMetaMap != null)
+			facetFilterMetaData.setCategoryMetaMap(categoryMetaMap);
+		if (navigationMetaMap != null)
+			facetFilterMetaData.setNavigationMetaMap(navigationMetaMap);
+		if (propertyMetaMap != null)
+			facetFilterMetaData.setPropertyMetaMap(propertyMetaMap);
+		if (propertyValueMetaMap != null)
+			facetFilterMetaData.setPropertyValueMetaMap(propertyValueMetaMap);
+		if (searchConditionMetaMap != null)
+			facetFilterMetaData.setSearchConditionMetaMap(searchConditionMetaMap);
+
+		return facetFilterMetaData;
+	}
+	
+	@Override
+	public Map<Long, MetaDataCommand> loadNavigationMetaData(){
 		Map<Long, MetaDataCommand> navigationMetaMap = null;
-		Map<Long, SearchConditionCommand> searchConditionMetaMap = null;
+		String lang = LangUtil.getCurrentLang();
+		// 先从缓存中获取数据
+		try{
+			navigationMetaMap = cacheManager.getObject(CacheKeyConstant.NAVIGATIONMETACACHEKEY + lang);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
+		}
+		
+		// 如果导航的元数据为空
+		if (navigationMetaMap == null) {
+			// 查询所有导航
+			List<MetaDataCommand> navigations = sdkNavigationManager.findNavigationMetaDataBylang(lang);
+			if (Validator.isNotNullOrEmpty(navigations)) {
+				navigationMetaMap = new LinkedHashMap<Long, MetaDataCommand>();
+				for (MetaDataCommand metaDataCommand : navigations){
+					navigationMetaMap.put(metaDataCommand.getId(), metaDataCommand);
+				}
+			}
+		}
+		// 把值重新设置到缓存当中
+		try{
+			cacheManager.setObject(CacheKeyConstant.NAVIGATIONMETACACHEKEY+ lang, navigationMetaMap, TimeInterval.SECONDS_PER_DAY);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
+		}
+		
+		return navigationMetaMap;
+	}
+	
+	@Override
+	public Map<Long, MetaDataCommand> loadCategoryMetaData() {
+		Map<Long, MetaDataCommand> categoryMetaMap = null;
 
 		String lang = LangUtil.getCurrentLang();
 
 		// 先从缓存中获取数据
 		try{
 			categoryMetaMap = cacheManager.getObject(categoryMetaCacheKey + lang);
-			propertyMetaMap = cacheManager.getObject(propertyMetaCacheKey + lang);
-			propertyValueMetaMap = cacheManager.getObject(propertyValueMetaCacheKey + lang);
-			navigationMetaMap = cacheManager.getObject(navigationMetaCacheKey + lang);
-			searchConditionMetaMap = cacheManager.getObject(searchConditionMetaCacheKey + lang);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
 		}
@@ -128,6 +173,30 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			}
 		}
 
+
+		// 把值重新设置到缓存当中
+		try{
+			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_DAY);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
+		}
+		
+		return categoryMetaMap;
+	}
+
+	@Override
+	public Map<Long, MetaDataCommand> loadPropertyMetaData() {
+		Map<Long, MetaDataCommand> propertyMetaMap = null;
+
+		String lang = LangUtil.getCurrentLang();
+
+		// 先从缓存中获取数据
+		try{
+			propertyMetaMap = cacheManager.getObject(propertyMetaCacheKey + lang);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
+		}
+
 		// 如果属性的元数据为空
 		if (propertyMetaMap == null) {
 			// 查询所有属性
@@ -141,6 +210,30 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			}
 		}
 
+
+		// 把值重新设置到缓存当中
+		try{
+			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_DAY);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
+		}
+		return propertyMetaMap;
+	}
+
+	@Override
+	public Map<Long, MetaDataCommand> loadPropertyValueMetaData() {
+		Map<Long, MetaDataCommand> propertyValueMetaMap = null;
+
+		String lang = LangUtil.getCurrentLang();
+
+		// 先从缓存中获取数据
+		try{
+			propertyValueMetaMap = cacheManager.getObject(propertyValueMetaCacheKey + lang);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
+		}
+
+
 		// 如果属性值的元数据为空
 		if (propertyValueMetaMap == null) {
 			// 查询所有属性值
@@ -153,17 +246,31 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			}
 		}
 
-		// 如果导航的元数据为空
-		if (navigationMetaMap == null) {
-			// 查询所有导航
-			List<MetaDataCommand> navigations = sdkNavigationManager.findNavigationMetaDataBylang(lang);
-			if (Validator.isNotNullOrEmpty(navigations)) {
-				navigationMetaMap = new LinkedHashMap<Long, MetaDataCommand>();
-				for (MetaDataCommand metaDataCommand : navigations){
-					navigationMetaMap.put(metaDataCommand.getId(), metaDataCommand);
-				}
-			}
+
+		// 把值重新设置到缓存当中
+		try{
+			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_DAY);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
+		return propertyValueMetaMap;
+	}
+
+	@Override
+	public Map<Long, SearchConditionCommand> loadSearchConditionMetaData() {
+		Map<Long, SearchConditionCommand> searchConditionMetaMap = null;
+
+		String lang = LangUtil.getCurrentLang();
+
+		// 先从缓存中获取数据
+		try{
+			searchConditionMetaMap = cacheManager.getObject(searchConditionMetaCacheKey + lang);
+		}catch (Exception e){
+			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
+		}
+
+
+		
 
 		// 如果筛选条件为空
 		if (searchConditionMetaMap == null) {
@@ -179,28 +286,14 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_DAY);
-			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_DAY);
-			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_DAY);
-			cacheManager.setObject(navigationMetaCacheKey + lang, navigationMetaMap, TimeInterval.SECONDS_PER_DAY);
 			cacheManager.setObject(searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_DAY);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
-
-		if (categoryMetaMap != null)
-			facetFilterMetaData.setCategoryMetaMap(categoryMetaMap);
-		if (navigationMetaMap != null)
-			facetFilterMetaData.setNavigationMetaMap(navigationMetaMap);
-		if (propertyMetaMap != null)
-			facetFilterMetaData.setPropertyMetaMap(propertyMetaMap);
-		if (propertyValueMetaMap != null)
-			facetFilterMetaData.setPropertyValueMetaMap(propertyValueMetaMap);
-		if (searchConditionMetaMap != null)
-			facetFilterMetaData.setSearchConditionMetaMap(searchConditionMetaMap);
-
-		return facetFilterMetaData;
+		
+		return searchConditionMetaMap;
 	}
+	
 
 	@Override
 	public List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrCommand> searchResultPage,List<FacetParameter> facetParameters){

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.product.FilterNavigationCommand;
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.baseinfo.NavigationDao;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.baseinfo.Navigation;
@@ -26,10 +27,6 @@ public class NavigationHelperManagerImpl implements NavigationHelperManager {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(NavigationHelperManagerImpl.class);
 
-	private static final  String	CACHE_KEY_FILTER_NAV = "cache_key_filter_nav";
-	
-	private static final  String	CACHE_FIELD_FILTER_NAV = "cache_field_filter_nav";
-	
 	@Autowired
 	private NavigationDao				navigationDao;
 	
@@ -39,9 +36,6 @@ public class NavigationHelperManagerImpl implements NavigationHelperManager {
 	
 	@Override
 	public FilterNavigationCommand matchNavigationByUrl(String uri, String queryStr) {
-		// TODO Auto-generated method stub
-		
-//		Map<Long, MetaDataCommand> navMetaMap = facetFilterHelper.getNavigationMetaMap(lang);
 		
 		Map<String,List<FilterNavigationCommand>> resultMap = this.getAllNavigationMap();
 		
@@ -113,7 +107,7 @@ public class NavigationHelperManagerImpl implements NavigationHelperManager {
 		
 		Map<String,List<FilterNavigationCommand>> resultMap = null;
 		try{
-			resultMap = cacheManager.getMapObject(CACHE_KEY_FILTER_NAV, CACHE_FIELD_FILTER_NAV);
+			resultMap = cacheManager.getMapObject(CacheKeyConstant.CACHE_KEY_FILTER_NAV, CacheKeyConstant.CACHE_FIELD_FILTER_NAV);
 		}catch(Exception e){
 			LOG.error("get cache error : ",e);
 		}
@@ -147,7 +141,7 @@ public class NavigationHelperManagerImpl implements NavigationHelperManager {
 			}
 			
 			try{
-				cacheManager.setMapObject(CACHE_KEY_FILTER_NAV,CACHE_FIELD_FILTER_NAV, resultMap, 60*5);
+				cacheManager.setMapObject(CacheKeyConstant.CACHE_KEY_FILTER_NAV, CacheKeyConstant.CACHE_FIELD_FILTER_NAV, resultMap, 60*5);
 			}catch(Exception e){
 				LOG.error("set cache error : ",e);
 			}
