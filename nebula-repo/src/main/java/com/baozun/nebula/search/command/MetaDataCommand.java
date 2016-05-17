@@ -40,6 +40,9 @@ public class MetaDataCommand implements Serializable{
 	
 	/**父节点id，分类和导航使用到，属性不需要使用*/
 	private Long				parentId;
+	
+	/** 导航可能用到url*/
+	private String				url;
 
 	/**
 	 * get id
@@ -103,4 +106,19 @@ public class MetaDataCommand implements Serializable{
 		this.parentId = parentId;
 	}
 
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
+	}
+
+	/**
+	 * @param url the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	
 }
