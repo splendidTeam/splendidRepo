@@ -171,7 +171,12 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			searchManager.setSolrBoost(solrQuery, boost);
 
 			// 查询
-			SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
+			SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);			
+			if (searchResultPage == null || searchResultPage.getItems() == null || searchResultPage.getItems().size() == 0) {
+				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+				return SEARCH_NO_RESULT;
+			}
+			
 
 			// 页面左侧筛选项
 			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());			
