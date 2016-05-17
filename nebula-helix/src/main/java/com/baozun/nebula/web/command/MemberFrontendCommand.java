@@ -90,6 +90,11 @@ public class MemberFrontendCommand {
 	 * 记住用户名
 	 */
 	private String						chkRememberMe;
+	
+	/**
+	 * 姓名
+	 */
+	private String							nickname;
 
 	// /**
 	// * 登录次数
@@ -319,6 +324,15 @@ public class MemberFrontendCommand {
 	public void setChkRememberMe(String chkRememberMe) {
 		this.chkRememberMe = chkRememberMe;
 	}
+	
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
 
 	@Override
 	public String toString() {
@@ -326,7 +340,7 @@ public class MemberFrontendCommand {
 				+ ", loginMobile=" + loginMobile + ", password=" + password + ", thirdPartyIdentify="
 				+ thirdPartyIdentify + ", source=" + source + ", type=" + type /*+ ", isaddgroup=" + isaddgroup*/
 				+ ", sex=" + sex + ", birthday=" + birthday + ", repassword=" + repassword + ", lifecycle=" + lifecycle
-				+ ", realName=" + realName + ", receiveMail=" + receiveMail + ", newPassword=" + newPassword
+				+ ", realName=" + realName + ", receiveMail=" + receiveMail+ ", nickname=" + nickname + ", newPassword=" + newPassword
 				+ ", randomCode=" + randomCode + ", chkRememberMe=" + chkRememberMe + ", memberPersonalDataCommand="
 				+ memberPersonalDataCommand + ", memberConductCommand=" + memberConductCommand + "]";
 	}

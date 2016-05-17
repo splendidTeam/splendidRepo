@@ -23,6 +23,7 @@ import java.util.Date;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.controller.BaseForm;
+import com.feilong.core.Validator;
 
 public class MemberProfileForm extends BaseForm {
 
@@ -105,9 +106,80 @@ public class MemberProfileForm extends BaseForm {
 	private Integer receiveMail;
 
 	private String newPassword;
+	
+	/*******************************************/
+	/** 省 */
+	private String				province;
+
+	/** 市 */
+	private String				city;
+
+	/** 区 */
+	private String				area;
+
+	/** 省 id */
+	private Long				provinceId;
+
+	/** 市id */
+	private Long				cityId;
+
+	/** 区 id */
+	private Long				areaId;
+
+	/*******************************************/
+	
+	
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
+	}
+
+	public Long getProvinceId() {
+		return provinceId;
+	}
+
+	public void setProvinceId(Long provinceId) {
+		this.provinceId = provinceId;
+	}
+
+	public Long getCityId() {
+		return cityId;
+	}
+
+	public void setCityId(Long cityId) {
+		this.cityId = cityId;
+	}
+
+	public Long getAreaId() {
+		return areaId;
+	}
+
+	public void setAreaId(Long areaId) {
+		this.areaId = areaId;
 	}
 
 	public void setId(Long id) {
@@ -240,7 +312,9 @@ public class MemberProfileForm extends BaseForm {
 			memberPersonalData.setVersion(new Date());
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			try {
-				memberPersonalData.setBirthday(sdf.parse(this.birthday));
+				if(Validator.isNotNullOrEmpty(this.birthday)){
+					memberPersonalData.setBirthday(sdf.parse(this.birthday));
+				}
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -248,6 +322,13 @@ public class MemberProfileForm extends BaseForm {
 			memberPersonalData.setMobile(this.loginMobile);
 			memberPersonalData.setNickname(this.loginName);
 			memberPersonalData.setSex(this.sex);
+			memberPersonalData.setCity(this.city);
+			memberPersonalData.setCityId(this.cityId);
+			memberPersonalData.setProvince(this.province);
+			memberPersonalData.setProvinceId(this.provinceId);
+			memberPersonalData.setArea(this.area);
+			memberPersonalData.setAreaId(this.areaId);
+			
 		}
 		return memberPersonalData;
 	}

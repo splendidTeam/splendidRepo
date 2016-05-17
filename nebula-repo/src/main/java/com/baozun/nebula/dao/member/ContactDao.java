@@ -30,7 +30,7 @@ public interface ContactDao extends GenericEntityDao<Contact,Long>{
 	 * @param memberId
 	 * @return
 	 */
-	@NativeQuery(model = Contact.class, value="findAllContactListByMemberId")
+	@NativeQuery(model = Contact.class)
 	Pagination<Contact> findContactsByMemberId(Page page,Sort[] sorts, @QueryParam("memberId") Long memberId);
 	
 	/**

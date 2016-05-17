@@ -700,4 +700,26 @@
 			</value>
 		</constructor-arg>
 	</bean>	
+	
+	
+	<bean id="Member.findMembersByGroupId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+						id,
+						group_id,
+		       			lifecycle,
+		       			login_name,
+		       			source,
+		       			third_party_identify,
+		       			login_email,
+		       			login_mobile
+					from T_MEM_MEMBER 
+	       			where lifecycle !=2 and group_id=$groupId and id!=group_id
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 </beans>

@@ -624,4 +624,19 @@ public interface SdkMemberManager extends BaseManager{
 	 * @return
 	 */
 	List<MemberCommand> findMembersByIds(List<Long> ids);
+	
+	/**
+	 * 根据groupId 获取第三方用户list
+	 * @param groupId
+	 * @return
+	 */
+	List<Member> findMemberListByGroupId(Long groupId);
+	
+	/**
+	 * 根据memberId和type删除对应的数据
+	 * @param memberId
+	 * @param type
+	 * @return
+	 */
+	void deleteMemberBehaviorByMemberIdAndType(Long memberId,Long thirdPartyId,String type);
 }
