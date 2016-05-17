@@ -3,8 +3,8 @@ package com.baozun.nebula.web.controller.order.viewcommand;
 import java.util.List;
 
 import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
-import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
 /**
  * 订单
  * @author dahui.huang
@@ -17,19 +17,21 @@ public class OrderConfirmViewCommand extends BaseViewCommand{
 	/**
 	 * 购物车
 	 */
-	private ShoppingCartViewCommand	shoppingCartViewCommand;
+	private ShoppingCartCommand shoppingCartCommand;
 
 	/**
 	 * 会员收货地址
 	 */
 	private List<ContactCommand>	addressList;
 
-	public ShoppingCartViewCommand getShoppingCartViewCommand(){
-		return shoppingCartViewCommand;
+	
+	public ShoppingCartCommand getShoppingCartCommand(){
+		return shoppingCartCommand;
 	}
 
-	public void setShoppingCartViewCommand(ShoppingCartViewCommand shoppingCartViewCommand){
-		this.shoppingCartViewCommand = shoppingCartViewCommand;
+	
+	public void setShoppingCartCommand(ShoppingCartCommand shoppingCartCommand){
+		this.shoppingCartCommand = shoppingCartCommand;
 	}
 
 	public List<ContactCommand> getAddressList(){

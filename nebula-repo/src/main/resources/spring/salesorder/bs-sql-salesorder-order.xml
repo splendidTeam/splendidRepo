@@ -1203,7 +1203,7 @@
 	</bean>
 	
 	<bean id="SalesOrder.findSimpleOrderListByOrderQueryCommand" class="loxia.dao.support.DynamicQueryHolder">
-		<description>查询订单list列表or</description>
+		<description>查询未完成的订单list列表or</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
@@ -1231,18 +1231,19 @@
 						group by line.order_id
 						)
 						and o.MEMBER_ID = :memberId
-					or o.LOGISTICS_STATUS 
+						and o.LOGISTICS_STATUS not in(9,10)
+					or (o.LOGISTICS_STATUS 
 					in (
 		       		#foreach( $ls in $logisticsStatusList )
     					$ls,
 				    #end
 				     -1)
-					or o.financial_status 
+					and o.financial_status 
 					in (
 		       		#foreach( $ls in $financestatusList )
     					$ls,
 				    #end
-				     -1)
+				     -1))
 					
                  ]]>
 			</value>

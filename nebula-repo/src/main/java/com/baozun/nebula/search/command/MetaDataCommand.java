@@ -37,6 +37,9 @@ public class MetaDataCommand implements Serializable{
 
 	/** 排序字段 */
 	private Integer				sortNo;
+	
+	/**父节点id，分类和导航使用到，属性不需要使用*/
+	private Long				parentId;
 
 	/**
 	 * get id
@@ -90,6 +93,14 @@ public class MetaDataCommand implements Serializable{
 	 */
 	public void setSortNo(Integer sortNo){
 		this.sortNo = sortNo;
+	}
+
+	public Long getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Long parentId) {
+		this.parentId = parentId;
 	}
 
 }

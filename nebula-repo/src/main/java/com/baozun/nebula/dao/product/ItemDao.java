@@ -90,6 +90,9 @@ public interface ItemDao extends GenericEntityDao<Item, Long> {
 	 */
 	@NativeQuery(model = Item.class)
 	List<Item> findItemListByShopId(@QueryParam("shopId") Long shopId);
+	
+	@NativeQuery(model = Item.class)
+	List<Long> findItemIdsByShopId(@QueryParam("shopId") Long shopId);
 
 	/**
 	 * 根据itemIds,更新是否加入分类状态为state

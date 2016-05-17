@@ -118,18 +118,23 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		// 设置支付信息
 		PaymentInfoSubForm paymentInfoSubForm = orderForm.getPaymentInfoSubForm();
 		salesOrderCommand.setPayment(Integer.parseInt(paymentInfoSubForm.getPaymentType()));
-		salesOrderCommand.setPaymentStr(BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getPaymentType(),
+		salesOrderCommand.setPaymentStr(BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getBankcode(),
 				Integer.parseInt(paymentInfoSubForm.getPaymentType())));
 		// 设置运费
 		setFreghtCommand(salesOrderCommand);
 		// 设置优惠券信息
 		setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
 		// 用户信息
-		salesOrderCommand.setMemberName(memberDetails.getLoginName());
+		salesOrderCommand.setMemberName(memberDetails == null ? "" : memberDetails.getLoginName());
+		salesOrderCommand.setMemberId(memberDetails == null ? null : memberDetails.getMemberId());
 		salesOrderCommand.setIp(RequestUtil.getClientIp(request));
 		// 发票信息
 		salesOrderCommand.setReceiptTitle(orderForm.getInvoiceInfoSubForm().getInvoiceTitle());
 		salesOrderCommand.setReceiptContent(orderForm.getInvoiceInfoSubForm().getInvoiceContent());
+		salesOrderCommand.setReceiptType(orderForm.getInvoiceInfoSubForm().getInvoiceType());
+		salesOrderCommand.setReceiptConsignee(orderForm.getInvoiceInfoSubForm().getConsignee());
+		salesOrderCommand.setReceiptAddress(orderForm.getInvoiceInfoSubForm().getAddress());
+		salesOrderCommand.setReceiptTelphone(orderForm.getInvoiceInfoSubForm().getTelphone());
 		// 订单来源
 		salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
 
@@ -182,17 +187,23 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 	public ShoppingCartCommand buildShoppingCartForOrder(MemberDetails memberDetails,
 			SalesOrderCommand salesOrderCommand, HttpServletRequest request) {
 
+		// 获取购物车行信息
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
 		if (null == cartLines) {
 			return null;
 		}
-
+		// 过滤未勾选的商品 1选中  0未选中
+		cartLines = CollectionsUtil.removeAll(cartLines, "settlementState", 0);
+		if (null == cartLines) {
+			return null;
+		}
+		
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
 		List<String> couponList = new ArrayList<String>();
-		if (Validator.isNullOrEmpty(salesOrderCommand.getCouponCodes())) {
+		if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())) {
 			couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
 		}
 		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, couponList,
@@ -245,8 +256,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 			HttpServletResponse response) {
 
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-		List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
-				request);
+		List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartResolver
+				.getShoppingCartLineCommandList(memberDetails, request);
 		shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
 
 	}

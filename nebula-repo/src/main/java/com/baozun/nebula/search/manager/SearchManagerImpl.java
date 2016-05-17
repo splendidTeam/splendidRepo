@@ -258,12 +258,12 @@ public class SearchManagerImpl implements SearchManager{
 				// 如果key等于category_tree代表是分类的facet
 				if (SkuItemParam.category_tree.equals(key)) {
 					facetGroup = convertFacetGroup(valueMap);
-					facetGroup.setCategory(true);
+					facetGroup.setIsCategory(true);
 					facetGroup.setType(FacetType.CATEGORY.toString());
 				}else{
 					// 否则是属性的facet
 					facetGroup = convertFacetGroup(valueMap);
-					facetGroup.setCategory(false);
+					facetGroup.setIsCategory(false);
 					facetGroup.setType(FacetType.PROPERTY.toString());
 					facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
 				}
@@ -274,7 +274,7 @@ public class SearchManagerImpl implements SearchManager{
 		//**************************价格范围的facetGroup
 		if(Validator.isNotNullOrEmpty(facetQueryMap)){
 			FacetGroup priceGroup = new FacetGroup();
-			priceGroup.setCategory(false);
+			priceGroup.setIsCategory(false);
 			priceGroup.setType(FacetType.RANGE.toString());		
 			List<Facet> facets = new ArrayList<Facet>();
 			for (Entry<String, Integer> entry : facetQueryMap.entrySet()){

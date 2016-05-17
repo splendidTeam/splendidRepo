@@ -131,9 +131,6 @@ public class NebulaOrderListController extends BaseController{
         // 获取数据
         Pagination<SimpleOrderCommand> simpleOrderCommandPagination = salesOrderManager
                         .findSimpleOrderCommandPagination(memberDetails.getMemberId(), orderQueryCommand, page);
-        // Pagination <SimpleOrderViewCommand> in builder
-        //        Pagination<SimpleOrderViewCommand> simpleOrderViewCommandPagination = convertToSimpleOrderViewCommandPagination(
-        //                simpleOrderCommandPagination);
         Pagination<SimpleOrderViewCommand> simpleOrderViewCommandPagination = simpleOrderViewCommandConverter
                         .convert(simpleOrderCommandPagination);
         model.addAttribute("currentSimpleOrderViewCommandPagination", simpleOrderViewCommandPagination);
@@ -141,30 +138,5 @@ public class NebulaOrderListController extends BaseController{
         return "order.orderlist";
     }
 
-    /**
-     * 
-     * 说明：后台SimpleOrderCommand转换为SimpleOrderViewCommand，SimpleOrderViewCommand添加订单行的的信息
-     * 
-     * @param ordercommand
-     * @return
-     * @author 张乃骐
-     * @time：2016年5月9日 下午7:12:26
-     */
-    @Deprecated
-    private Pagination<SimpleOrderViewCommand> convertToSimpleOrderViewCommandPagination(Pagination<SimpleOrderCommand> ordercommand){
-        Pagination<SimpleOrderViewCommand> simpleorderviewcommand = new Pagination<SimpleOrderViewCommand>();
-        List<SimpleOrderViewCommand> itemsview = new ArrayList<SimpleOrderViewCommand>();
-        BeanUtil.copyProperties(simpleorderviewcommand, ordercommand);
-        List<SimpleOrderCommand> items = ordercommand.getItems();
-        for (SimpleOrderCommand simpleOrderCommand : items){
-            SimpleOrderViewCommand svc = new SimpleOrderViewCommand();
-            BeanUtil.copyProperties(svc, simpleOrderCommand);
-            List<SimpleOrderLineSubViewCommand> list = orderLineManager.findByOrderID(svc.getOrderId());
-            svc.setSimpleOrderLineSubViewCommandList(list);
-            itemsview.add(svc);
-        }
-        simpleorderviewcommand.setItems(itemsview);
-        return simpleorderviewcommand;
-    }
 
 }

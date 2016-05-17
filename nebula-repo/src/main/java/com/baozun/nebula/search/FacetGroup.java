@@ -34,11 +34,14 @@ public class FacetGroup {
 	
 	private String 	type;
 	
+	/** 是否显示 */
+	private Boolean isShow = true;
+	
 	/**筛选项的值*/
 	private List<Facet>	facets = new ArrayList<Facet>();
 	
 	/**是否是分类*/
-	private	Boolean category=false;
+	private	Boolean isCategory=false;
 
 	public Long getId() {
 		return id;
@@ -56,8 +59,8 @@ public class FacetGroup {
 		return facets;
 	}
 
-	public Boolean isCategory() {
-		return category;
+	public Boolean getIsCategory() {
+		return isCategory;
 	}
 
 	public void setId(Long id) {
@@ -76,8 +79,25 @@ public class FacetGroup {
 		this.facets = facets;
 	}
 
-	public void setCategory(Boolean category) {
-		this.category = category;
+	public void setIsCategory(Boolean isCategory) {
+		this.isCategory = isCategory;
+	}
+
+	
+	/**   
+	 * get isShow  
+	 * @return isShow  
+	 */
+	public Boolean getIsShow(){
+		return isShow;
+	}
+	
+	/**
+	 * set isShow 
+	 * @param isShow
+	 */
+	public void setIsShow(Boolean isShow){
+		this.isShow = isShow;
 	}
 	
 	

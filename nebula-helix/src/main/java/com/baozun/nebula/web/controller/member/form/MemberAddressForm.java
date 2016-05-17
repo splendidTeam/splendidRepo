@@ -185,21 +185,13 @@ public class MemberAddressForm extends BaseForm {
 		this.postcode = postcode;
 	}
 
-	/**
-	 * @return the isDefault
-	 */
-	public boolean isDefault() {
+	public boolean getIsDefault() {
 		return isDefault;
 	}
 
-	/**
-	 * @param isDefault
-	 *            the isDefault to set
-	 */
-	public void setDefault(boolean isDefault) {
+	public void setIsDefault(boolean isDefault) {
 		this.isDefault = isDefault;
 	}
-
 	/**
 	 * 将memberAddressForm转成ContactCommand
 	 * @param memberAddressForm
