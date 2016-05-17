@@ -31,6 +31,7 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
+import com.feilong.core.util.MapUtil;
 
 /**
  * The Class SdkSkuInventoryManagerImpl.
@@ -112,11 +113,7 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
             //主卖品和赠品都扣库存
             String extentionCode = shoppingCartLineCommand.getExtentionCode();
 
-            if (!extentionCodeAndCountMap.containsKey(extentionCode)){
-                extentionCodeAndCountMap.put(extentionCode, quantity);
-            }else{
-                extentionCodeAndCountMap.put(extentionCode, quantity + extentionCodeAndCountMap.get(extentionCode));
-            }
+            MapUtil.putSumValue(extentionCodeAndCountMap, extentionCode, quantity);
         }
         return extentionCodeAndCountMap;
     }
