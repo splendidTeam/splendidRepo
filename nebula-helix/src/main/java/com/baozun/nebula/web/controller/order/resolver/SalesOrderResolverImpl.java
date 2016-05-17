@@ -131,6 +131,10 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		// 发票信息
 		salesOrderCommand.setReceiptTitle(orderForm.getInvoiceInfoSubForm().getInvoiceTitle());
 		salesOrderCommand.setReceiptContent(orderForm.getInvoiceInfoSubForm().getInvoiceContent());
+		salesOrderCommand.setReceiptType(orderForm.getInvoiceInfoSubForm().getInvoiceType());
+		salesOrderCommand.setReceiptConsignee(orderForm.getInvoiceInfoSubForm().getConsignee());
+		salesOrderCommand.setReceiptAddress(orderForm.getInvoiceInfoSubForm().getAddress());
+		salesOrderCommand.setReceiptTelphone(orderForm.getInvoiceInfoSubForm().getTelphone());
 		// 订单来源
 		salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
 

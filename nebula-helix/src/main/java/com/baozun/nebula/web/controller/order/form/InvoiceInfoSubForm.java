@@ -25,156 +25,129 @@ import java.io.Serializable;
  * @version 5.3.1 2016年4月28日 下午1:17:04
  * @since 5.3.1
  */
-public class InvoiceInfoSubForm implements Serializable{
+public class InvoiceInfoSubForm implements Serializable {
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = -7282842164155121566L;
+	public final static String INVOICE_TYPE_PRIVATE = "1";
 
-    /** 是否需要发票. */
-    private boolean           isNeedInvoice;
+	public final static String INVOICE_TYPE_COMPANY = "2";
 
-    /** 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司. */
-    private String            invoiceTitle;
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = -7282842164155121566L;
 
-    /** 发票内容,比如 明细 办公用品 电脑配件 耗材. */
-    private String            invoiceContent;
+	/** 是否需要发票. */
+	private boolean isNeedInvoice;
 
-    //TODO feilong 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
-    
-    
-    
-    /******  1:个人    2:公司    ****/
-    private String invoiceType;
-    
-    /** * 寄送类型   1：同收货地址，  2：单独寄送** */
-    private String deliveryType;
-    
-    /** * 收取人姓名** */
-    private String consignee ;
-    
-    /** * 联系方式** */
-    private String telphone ;
-    
-    /** * 收取地址** */
-    private String address ;
-    
-    
-    /**
-     * 获得 是否需要发票.
-     *
-     * @return the isNeedInvoice
-     */
-    public boolean getIsNeedInvoice(){
-        return isNeedInvoice;
-    }
+	/****** 1:个人 2:公司 ****/
+	private Integer invoiceType;
 
-    /**
-     * 设置 是否需要发票.
-     *
-     * @param isNeedInvoice
-     *            the isNeedInvoice to set
-     */
-    public void setIsNeedInvoice(boolean isNeedInvoice){
-        this.isNeedInvoice = isNeedInvoice;
-    }
+	/** 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司. */
+	private String invoiceTitle;
 
-    /**
-     * 获得 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司.
-     *
-     * @return the invoiceTitle
-     */
-    public String getInvoiceTitle(){
-        return invoiceTitle;
-    }
+	/** * 收取人姓名** */
+	private String consignee;
 
-    /**
-     * 设置 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司.
-     *
-     * @param invoiceTitle
-     *            the invoiceTitle to set
-     */
-    public void setInvoiceTitle(String invoiceTitle){
-        this.invoiceTitle = invoiceTitle;
-    }
+	/** * 联系方式** */
+	private String telphone;
 
-    /**
-     * 获得 发票内容,比如 明细 办公用品 电脑配件 耗材.
-     *
-     * @return the invoiceContent
-     */
-    public String getInvoiceContent(){
-        return invoiceContent;
-    }
+	/** * 收取地址** */
+	private String address;
 
-    /**
-     * 设置 发票内容,比如 明细 办公用品 电脑配件 耗材.
-     *
-     * @param invoiceContent
-     *            the invoiceContent to set
-     */
-    public void setInvoiceContent(String invoiceContent){
-        this.invoiceContent = invoiceContent;
-    }
+	/** 发票内容,比如 明细 办公用品 电脑配件 耗材. */
+	private String invoiceContent;
 
-	
-	public String getDeliveryType(){
-		return deliveryType;
+	// TODO feilong 将来扩展发票类型， 比如 普通发票 增值税发票 电子发票等等
+
+	/**
+	 * 获得 是否需要发票.
+	 *
+	 * @return the isNeedInvoice
+	 */
+	public boolean getIsNeedInvoice() {
+		return isNeedInvoice;
 	}
 
-	
-	public void setDeliveryType(String deliveryType){
-		this.deliveryType = deliveryType;
-	}
-
-	
-	public String getConsignee(){
-		return consignee;
-	}
-
-	
-	public void setConsignee(String consignee){
-		this.consignee = consignee;
-	}
-
-	
-	public String getTelphone(){
-		return telphone;
-	}
-
-	
-	public void setTelphone(String telphone){
-		this.telphone = telphone;
-	}
-
-	
-	public String getInvoiceType(){
-		return invoiceType;
-	}
-
-	
-	public void setInvoiceType(String invoiceType){
-		this.invoiceType = invoiceType;
-	}
-
-	
-	public String getAddress(){
-		return address;
-	}
-
-	
-	public void setAddress(String address){
-		this.address = address;
-	}
-
-	
-	public void setNeedInvoice(boolean isNeedInvoice){
+	/**
+	 * 设置 是否需要发票.
+	 *
+	 * @param isNeedInvoice
+	 *            the isNeedInvoice to set
+	 */
+	public void setIsNeedInvoice(boolean isNeedInvoice) {
 		this.isNeedInvoice = isNeedInvoice;
 	}
 
-	
+	/**
+	 * 获得 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司.
+	 *
+	 * @return the invoiceTitle
+	 */
+	public String getInvoiceTitle() {
+		return invoiceTitle;
+	}
 
-	
-	
-    
+	/**
+	 * 设置 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司.
+	 *
+	 * @param invoiceTitle
+	 *            the invoiceTitle to set
+	 */
+	public void setInvoiceTitle(String invoiceTitle) {
+		this.invoiceTitle = invoiceTitle;
+	}
+
+	/**
+	 * 获得 发票内容,比如 明细 办公用品 电脑配件 耗材.
+	 *
+	 * @return the invoiceContent
+	 */
+	public String getInvoiceContent() {
+		return invoiceContent;
+	}
+
+	/**
+	 * 设置 发票内容,比如 明细 办公用品 电脑配件 耗材.
+	 *
+	 * @param invoiceContent
+	 *            the invoiceContent to set
+	 */
+	public void setInvoiceContent(String invoiceContent) {
+		this.invoiceContent = invoiceContent;
+	}
+
+	public String getConsignee() {
+		return consignee;
+	}
+
+	public void setConsignee(String consignee) {
+		this.consignee = consignee;
+	}
+
+	public String getTelphone() {
+		return telphone;
+	}
+
+	public void setTelphone(String telphone) {
+		this.telphone = telphone;
+	}
+
+	public Integer getInvoiceType() {
+		return invoiceType;
+	}
+
+	public void setInvoiceType(Integer invoiceType) {
+		this.invoiceType = invoiceType;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public void setNeedInvoice(boolean isNeedInvoice) {
+		this.isNeedInvoice = isNeedInvoice;
+	}
 
 }

@@ -193,8 +193,17 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 发票抬头. */
     private String                      receiptTitle;
+    
+    /** 发票收货人. */
+    private String                      receiptConsignee;
+    
+    /** 发票收货人联系方式. */
+    private String                      receiptTelphone;
+    
+    /** 发票收货地址. */
+    private String                      receiptAddress;
 
-    /** 发票内容. */
+	/** 发票内容. */
     private String                      receiptContent;
 
     /** 备注. */
@@ -1645,5 +1654,30 @@ public class SalesOrderCommand extends BaseModel{
     public void setBuyerTel(String buyerTel){
         this.buyerTel = buyerTel;
     }
+
+
+	public String getReceiptConsignee() {
+		return receiptConsignee;
+	}
+
+	public void setReceiptConsignee(String receiptConsignee) {
+		this.receiptConsignee = receiptConsignee;
+	}
+
+	public String getReceiptTelphone() {
+		return receiptTelphone;
+	}
+
+	public void setReceiptTelphone(String receiptTelphone) {
+		this.receiptTelphone = receiptTelphone;
+	}
+
+	public String getReceiptAddress() {
+		return receiptAddress;
+	}
+
+	public void setReceiptAddress(String receiptAddress) {
+		this.receiptAddress = receiptAddress;
+	}
 
 }

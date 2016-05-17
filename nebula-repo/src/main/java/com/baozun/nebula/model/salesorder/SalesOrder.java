@@ -249,9 +249,20 @@ public class SalesOrder extends BaseModel{
 
     /** 发票抬头. */
     private String              receiptTitle;
+    
+    /** 发票收货人. */
+    private String              receiptConsignee;
+    
+    /** 发票收货人联系方式. */
+    private String              receiptTelphone;
+    
+    /** 发票收货地址. */
+    private String              receiptAddress;
 
     /** 发票内容. */
     private String              receiptContent;
+    
+    
 
     //**********************************************************************
     /** 下单时的语言 由于用于wormhole发邮件时邮件模板的多语言，以及地址信息的多语言. */
@@ -963,5 +974,32 @@ public class SalesOrder extends BaseModel{
     public void setLang(String lang){
         this.lang = lang;
     }
+
+    @Column(name = "RECEIPT_CONSIGNEE")
+	public String getReceiptConsignee() {
+		return receiptConsignee;
+	}
+
+	public void setReceiptConsignee(String receiptConsignee) {
+		this.receiptConsignee = receiptConsignee;
+	}
+
+	@Column(name = "RECEIPT_TELPHONE")
+	public String getReceiptTelphone() {
+		return receiptTelphone;
+	}
+
+	public void setReceiptTelphone(String receiptTelphone) {
+		this.receiptTelphone = receiptTelphone;
+	}
+
+	@Column(name = "RECEIPT_ADDRESS")
+	public String getReceiptAddress() {
+		return receiptAddress;
+	}
+
+	public void setReceiptAddress(String receiptAddress) {
+		this.receiptAddress = receiptAddress;
+	}
 
 }
