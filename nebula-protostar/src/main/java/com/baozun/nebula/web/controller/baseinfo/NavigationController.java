@@ -310,7 +310,7 @@ public class NavigationController extends BaseController{
 		model.addAttribute("navigationList", naviList);
 		
 		//已排序商品集合
-		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
+		Pagination<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		
 		//导航ID
@@ -325,7 +325,7 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemUnsortedList.json")
 	@ResponseBody
-	public SearchResultPage<ItemForSolrCommand> findItemCtListJson(@PathVariable Long navigationId){
+	public Pagination<ItemForSolrCommand> findItemCtListJson(@PathVariable Long navigationId){
 		return  getUnsortedList(navigationId);
 	}
 
@@ -334,7 +334,7 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemSortedList.htm")
 	public String findSortedItem(@PathVariable Long navigationId,Model model){
-		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
+		Pagination<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		model.addAttribute("isSuccess", "success");
 		model.addAttribute("UPLOAD_IMG_DOMAIN", UPLOAD_IMG_DOMAIN);
@@ -493,17 +493,17 @@ public class NavigationController extends BaseController{
 	}
 
 	
-	public SearchResultPage<ItemForSolrCommand> getUnsortedList(Long navigationId){
+	public Pagination<ItemForSolrCommand> getUnsortedList(Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		if(itemCollection==null ){
 			return null;
 		}
 		SearchCommand SearchCommand = buildSearchCommand(itemCollection,UNSORT_FLG);
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(SearchCommand);
-		return searchResultPage;
+		return searchResultPage.getItemsListWithOutGroup();
 	}
 	
-	public  SearchResultPage<ItemForSolrCommand> getSortedList(Long navigationId){
+	public  Pagination<ItemForSolrCommand> getSortedList(Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		//商品集合不存在
 		if(itemCollection==null || itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
@@ -537,8 +537,7 @@ public class NavigationController extends BaseController{
 		Pagination<ItemForSolrCommand> pagination=new Pagination<ItemForSolrCommand>();
 		pagination.setItems(commands);
 		
-		sortList.setItemsListWithOutGroup(pagination);
-		return sortList;
+		return pagination;
 	}
 	
 	protected SearchResultPage<ItemForSolrCommand>  searchNavigation(SearchCommand searchCommand){
@@ -594,6 +593,9 @@ public class NavigationController extends BaseController{
 				searchCommand.setExcludeList(excludeList);
 			}
 		}
+		
+		searchCommand.setPageSize(Integer.MAX_VALUE);
+		
 		return searchCommand;
 	}
 	
