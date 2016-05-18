@@ -47,6 +47,7 @@ import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.solr.utils.FilterUtil;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
+import com.feilong.core.util.comparator.PropertyComparator;
 
 /**
  * FacetFilterHelper的默认实现
@@ -342,7 +343,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 						List<Facet> facets = facetGroup.getFacets();
 						Facet[] inputs = new Facet[facets.size()];
 						facets.toArray(inputs);
-						Arrays.sort(inputs, new FacetComparer());
+						Arrays.sort(inputs, new PropertyComparator<Facet>("sortNo"));
 
 						facetGroup.setFacets(Arrays.asList(inputs));
 						break;
