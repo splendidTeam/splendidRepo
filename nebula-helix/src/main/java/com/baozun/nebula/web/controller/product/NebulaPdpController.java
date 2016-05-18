@@ -42,12 +42,17 @@ import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.InventoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemExtraViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.ItemPropertyViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemReviewViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.PdpViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.PriceViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.RelationItemViewCommand;
+import com.baozun.nebula.web.controller.product.viewcommand.SkuViewCommand;
 import com.feilong.core.TimeInterval;
 
 
@@ -263,20 +268,6 @@ public class NebulaPdpController extends NebulaAbstractPdpController {
 		return DefaultReturnResult.SUCCESS;
 	}
 	
-	
-	/**
-	 * 获取面包屑的构建模式，默认根据分类构建
-	 */
-	@Override
-	protected String getBreadcrumbsMode() {
-		return BREADCRUMBS_MODE_CATEGORY;
-	}
-	
-	@Override
-	protected List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId) {
-		return null;
-	}
-
 	@Override
 	protected Integer getBuyLimit(Long itemId) {
 		return DEFAULT_SKU_BUY_LIMIT;
