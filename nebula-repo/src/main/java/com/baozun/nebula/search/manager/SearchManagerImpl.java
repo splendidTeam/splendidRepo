@@ -282,24 +282,30 @@ public class SearchManagerImpl implements SearchManager{
 					facetGroup.setIsCategory(true);
 					facetGroup.setType(FacetType.CATEGORY.toString());
 				}else if(key.indexOf(SkuItemParam.dynamicCondition)!=-1){
+					boolean isProperty=false;
 					
 					//所有属性
 					Map<Long, MetaDataCommand> propertyMap=facetFilterHelper.loadPropertyMetaData();
-					if(Validator.isNotNullOrEmpty(propertyMap)){						
+					if(Validator.isNotNullOrEmpty(propertyMap)){
 						for (Long id : propertyMap.keySet()){
 							String str=SkuItemParam.dynamicCondition+id.toString();
 							//属性
 							if(key.equals(str)){
-								// 属性的facet
-								facetGroup = convertFacetGroup(valueMap);
-								facetGroup.setIsCategory(false);
-								facetGroup.setType(FacetType.PROPERTY.toString());
-								facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
-							}else{
-								facetGroup = convertFacetGroup(valueMap);
-								facetGroup.setIsCategory(false);
+								isProperty=true;
+								break;
 							}
 						}
+					}
+					
+					if(isProperty){
+						// 属性的facet
+						facetGroup = convertFacetGroup(valueMap);
+						facetGroup.setIsCategory(false);
+						facetGroup.setType(FacetType.PROPERTY.toString());
+						facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
+					}else{
+						facetGroup = convertFacetGroup(valueMap);
+						facetGroup.setIsCategory(false);
 					}
 				}else{
 					facetGroup = convertFacetGroup(valueMap);
