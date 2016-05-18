@@ -17,7 +17,7 @@
 package com.baozun.nebula.search;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,7 +40,6 @@ import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
 import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
-import com.baozun.nebula.search.comparatable.FacetComparer;
 import com.baozun.nebula.search.manager.SearchManager;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
@@ -308,8 +307,11 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 				List<Facet> facets = new FacetTreeUtil().createFacetTree(facetGroup);
 				facets = covertCategoryFacets(facets, facetFilterMetaData.getCategoryMetaMap(), facetParameters);
 				facetGroup.setFacets(facets);
-				facetGroups.add(facetGroup);
-				break;
+				facetGroups.add(facetGroup);				
+			}else{
+				if(facetGroup.getType()==null){
+					facetGroups.add(facetGroup);
+				}
 			}
 		}
 
@@ -341,11 +343,11 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 					if (isBreak) {
 						// facet的排序
 						List<Facet> facets = facetGroup.getFacets();
-						Facet[] inputs = new Facet[facets.size()];
-						facets.toArray(inputs);
-						Arrays.sort(inputs, new PropertyComparator<Facet>("sortNo"));
-
-						facetGroup.setFacets(Arrays.asList(inputs));
+						
+						if(facets!=null){
+							Collections.sort(facets, new PropertyComparator<Facet>("sortNo"));
+							facetGroup.setFacets(facets);
+						}
 						break;
 					}
 				}

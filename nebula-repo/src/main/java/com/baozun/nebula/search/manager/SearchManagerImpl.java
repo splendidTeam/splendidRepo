@@ -12,6 +12,7 @@ import org.apache.solr.common.params.GroupParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,10 @@ import com.baozun.nebula.sdk.manager.SdkSearchConditionItemManager;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.Facet;
+import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.FacetGroup;
 import com.baozun.nebula.search.FacetType;
+import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
@@ -59,6 +62,10 @@ public class SearchManagerImpl implements SearchManager{
 
 	@Autowired
 	private SolrManager						solrManager;
+	
+	@Autowired
+	@Qualifier("facetFilterHelper")
+	private FacetFilterHelper				facetFilterHelper;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -274,12 +281,29 @@ public class SearchManagerImpl implements SearchManager{
 					facetGroup = convertFacetGroup(valueMap);
 					facetGroup.setIsCategory(true);
 					facetGroup.setType(FacetType.CATEGORY.toString());
+				}else if(key.indexOf(SkuItemParam.dynamicCondition)!=-1){
+					
+					//所有属性
+					Map<Long, MetaDataCommand> propertyMap=facetFilterHelper.loadPropertyMetaData();
+					if(Validator.isNotNullOrEmpty(propertyMap)){						
+						for (Long id : propertyMap.keySet()){
+							String str=SkuItemParam.dynamicCondition+id.toString();
+							//属性
+							if(key.equals(str)){
+								// 属性的facet
+								facetGroup = convertFacetGroup(valueMap);
+								facetGroup.setIsCategory(false);
+								facetGroup.setType(FacetType.PROPERTY.toString());
+								facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
+							}else{
+								facetGroup = convertFacetGroup(valueMap);
+								facetGroup.setIsCategory(false);
+							}
+						}
+					}
 				}else{
-					// 否则是属性的facet
 					facetGroup = convertFacetGroup(valueMap);
 					facetGroup.setIsCategory(false);
-					facetGroup.setType(FacetType.PROPERTY.toString());
-					facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
 				}
 				facetGroups.add(facetGroup);
 			}
