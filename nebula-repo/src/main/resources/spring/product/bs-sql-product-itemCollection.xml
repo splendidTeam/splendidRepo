@@ -37,4 +37,18 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="ItemCollection.findAll" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select
+						*
+					from
+						t_pd_item_collection			
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

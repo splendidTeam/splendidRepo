@@ -204,7 +204,7 @@ public class SdPdpController implements AbstractSdPdpController {
 		List<ItemImageViewCommand> images = buildItemImageViewCommand(itemBaseInfo.getId());
 		
 	    //商品全部图
-		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(images);
 		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommands);
 		
 		//主图
