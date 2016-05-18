@@ -1,5 +1,7 @@
 package com.baozun.nebula.sdk.manager;
 
+import java.util.List;
+
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.ItemCollection;
 
@@ -15,4 +17,10 @@ public interface SdkItemCollectionManager extends BaseManager{
 	 * @time 2016年4月27日下午3:33:30
 	 */
 	ItemCollection findItemCollectionByNavigationId(Long navigationId);
+	
+	/**
+	 * 查询所有
+	 * @return
+	 */
+	List<ItemCollection> findAll();
 }

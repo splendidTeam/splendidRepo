@@ -32,8 +32,12 @@ public class ItemCollectionContext {
 	 * Doc #2: /etc, /etc/apache2 Doc #3: /etc, /etc/apache2,
 	 * /etc/apache2/conf.d
 	 */
+	/**
+	 * ["1-2"]
+	 * */
 	private List<String> categories;
 	private List<String> tags;
+	/** */
 	private List<String> properties;
 
 	public Long getItemId() {
