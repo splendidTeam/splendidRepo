@@ -104,8 +104,7 @@ public interface SalesOrderResolver {
 	 * @param request
 	 * @return
 	 */
-	ShoppingCartCommand buildShoppingCartForOrder(MemberDetails memberDetails, SalesOrderCommand salesOrderCommand,
-			HttpServletRequest request);
+	ShoppingCartCommand buildShoppingCartForOrder(List<ShoppingCartLineCommand> cartLines,MemberDetails memberDetails, SalesOrderCommand salesOrderCommand);
 
 	/**
 	 * 通过支付流水号查询订单
