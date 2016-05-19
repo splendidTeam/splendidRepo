@@ -75,7 +75,7 @@ public class SdPdpController implements AbstractSdPdpController {
 	protected ItemDetailManager itemDetailManager;
 	
 	@Autowired
-	private ItemColorSwatchViewCommandResolver    colorSwatchViewCommandResolver;
+	private ItemColorSwatchViewCommandResolver    itemColorSwatchViewCommandResolver;
 	
 	@Autowired
 	@Qualifier("shopdogItemViewCommandConverter")
@@ -298,7 +298,7 @@ public class SdPdpController implements AbstractSdPdpController {
 	}
 	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
-		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
+		return itemColorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
 	}
 	
 	/**
