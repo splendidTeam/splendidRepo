@@ -36,6 +36,8 @@ import com.baozun.nebula.solr.manager.SolrManagerImpl;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
 
+import loxia.dao.Pagination;
+
 @Transactional
 @Service("searchManager")
 public class SearchManagerImpl implements SearchManager{
@@ -56,7 +58,7 @@ public class SearchManagerImpl implements SearchManager{
 	private CacheManager					cacheManager;
 
 	@Autowired
-	private SolrManager						solrManager;
+	private SolrManager						solrManager;	
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -68,9 +70,9 @@ public class SearchManagerImpl implements SearchManager{
 		// 第几页
 		Integer start = solrQuery.getStart();
 
-		//返回对象
+		// 返回对象
 		SearchResultPage<ItemForSolrCommand> searchResultPage = null;
-		
+
 		SolrGroupData<ItemForSolrCommand> solrGroup = new SolrGroupData<ItemForSolrCommand>();
 
 		// 是否分组显示
@@ -78,20 +80,19 @@ public class SearchManagerImpl implements SearchManager{
 
 		// 如果需要分组显示
 		if (Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)) {
-			//分组查询
+			// 分组查询
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithGroup(solrQuery);
-			
-			//将查询结果转换为searchResultPage对象
+
+			// 将查询结果转换为searchResultPage对象
 			searchResultPage = solrGroupConverterSearchResultPageWithGroup(solrGroup, start, rows);
 		}else{
-			//不分组查询
+			// 不分组查询
 			solrGroup = solrManager.findItemCommandFormSolrBySolrQueryWithOutGroup(solrQuery);
-			
-			//将查询结果转换为searchResultPage对象
+
+			// 将查询结果转换为searchResultPage对象
 			searchResultPage = solrGroupConverterSearchResultPageWithOutGroup(solrGroup, start, rows);
 		}
-		
-		
+
 		return searchResultPage;
 
 	}
@@ -142,11 +143,11 @@ public class SearchManagerImpl implements SearchManager{
 	@Override
 	public List<SearchConditionItemCommand> findCoditionItemByCoditionIdWithCache(Long coditionId){
 		List<SearchConditionItemCommand> searchConditionItemCommands = null;
-		
+
 		String lang = LangUtil.getCurrentLang();
 
-		String key = conditionItemCacheKey+coditionId+"-"+lang;
-		
+		String key = conditionItemCacheKey + coditionId + "-" + lang;
+
 		try{
 			searchConditionItemCommands = cacheManager.getObject(key);
 		}catch (Exception e){
@@ -154,7 +155,7 @@ public class SearchManagerImpl implements SearchManager{
 		}
 
 		if (Validator.isNullOrEmpty(searchConditionItemCommands)) {
-			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySIdAndLang(coditionId,lang);
+			searchConditionItemCommands = sdkSearchConditionItemManager.findItemBySIdAndLang(coditionId, lang);
 
 			try{
 				cacheManager.setObject(key, searchConditionItemCommands, TimeInterval.SECONDS_PER_DAY);
@@ -179,20 +180,34 @@ public class SearchManagerImpl implements SearchManager{
 	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithGroup(
 			SolrGroupData<ItemForSolrCommand> solrGroupData,
 			Integer start,
-			Integer size){
+			Integer rows){
+		Long numFound = solrGroupData.getNumFound();
 
-		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
-		
+		Pagination<List<ItemForSolrCommand>> pagination = new Pagination<List<ItemForSolrCommand>>();
+		List<List<ItemForSolrCommand>> items = new ArrayList<List<ItemForSolrCommand>>();
+
 		Map<String, SolrGroupCommand<ItemForSolrCommand>> it = solrGroupData.getSolrGroupCommandMap();
 		for (String key : it.keySet()){
 			SolrGroupCommand<ItemForSolrCommand> solrGroupCommand = it.get(key);
 			List<SolrGroup<ItemForSolrCommand>> solrGroupList = solrGroupCommand.getItemForSolrCommandList();
 			for (SolrGroup<ItemForSolrCommand> solrGroup : solrGroupList){
-				list.addAll(solrGroup.getBeans());
+				items.add(solrGroup.getBeans());
 			}
 		}
+		pagination.setItems(items);
+		pagination.setCurrentPage(rows == 0 ? 1 : (start / rows + 1));
+		pagination.setCount(numFound);
+		pagination.setSize(rows);
+		pagination.setStart(start);
+		pagination.setTotalPages(rows == 0 ? 0 : numFound.intValue() / rows + (numFound.intValue() % rows == 0 ? 0 : 1));
+		List<FacetGroup> facetGroups = getFacetGroups(solrGroupData);
 
-		return convertSearchPageFacet(start,size,solrGroupData.getNumFound(),list,solrGroupData.getFacetQueryMap(),solrGroupData.getFacetMap());
+		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<ItemForSolrCommand>();
+		searchResultPage.setItemsListWithGroup(pagination);
+		searchResultPage.setFacetGroups(facetGroups);
+
+		return searchResultPage;
+
 	}
 
 	/**
@@ -208,48 +223,47 @@ public class SearchManagerImpl implements SearchManager{
 	private SearchResultPage<ItemForSolrCommand> solrGroupConverterSearchResultPageWithOutGroup(
 			SolrGroupData<ItemForSolrCommand> solrGroupData,
 			Integer start,
-			Integer size){
-		List<ItemForSolrCommand> list = new ArrayList<ItemForSolrCommand>();
+			Integer rows){
+		Long numFound = solrGroupData.getNumFound();
 
+		Pagination<ItemForSolrCommand> pagination = new Pagination<ItemForSolrCommand>();
+		List<ItemForSolrCommand> items = new ArrayList<ItemForSolrCommand>();
 		List<ItemForSolrCommand> it = solrGroupData.getSolrCommandMap();
 		if (null != it && it.size() > 0) {
-			list.addAll(it);
+			items.addAll(it);
 		}
-		return convertSearchPageFacet(start, size, solrGroupData.getNumFound(), list, solrGroupData.getFacetQueryMap(), solrGroupData.getFacetMap());
+		pagination.setItems(items);
+		pagination.setCurrentPage(rows == 0 ? 1 : (start / rows + 1));
+		pagination.setCount(numFound);
+		pagination.setSize(rows);
+		pagination.setStart(start);
+		pagination.setTotalPages(rows == 0 ? 0 : numFound.intValue() / rows + (numFound.intValue() % rows == 0 ? 0 : 1));
+
+		List<FacetGroup> facetGroups = getFacetGroups(solrGroupData);
+
+		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<ItemForSolrCommand>();
+		searchResultPage.setItemsListWithOutGroup(pagination);
+		searchResultPage.setFacetGroups(facetGroups);
+
+		return searchResultPage;
 	}
 
 	/**
-	 * 转换facetMap
+	 * 转换facetGroup
 	 * 
-	 * @return searchResultPage
+	 * @return List<FacetGroup>
 	 * @param solrGroupData
-	 * @param size
-	 * @param searchResultPage
-	 * @param start
-	 * @param pagination
 	 * @author 冯明雷
-	 * @time 2016年4月28日上午11:02:29
+	 * @time 2016年5月17日下午6:30:13
 	 */
-	private SearchResultPage<ItemForSolrCommand> convertSearchPageFacet(
-			Integer start,
-			Integer rows,
-			Long numFound,
-			List<ItemForSolrCommand> items,
-			Map<String, Integer> facetQueryMap,
-			Map<String, Map<String, Long>> facetMap){
-
-		SearchResultPage<ItemForSolrCommand> searchResultPage = new SearchResultPage<ItemForSolrCommand>();
-		searchResultPage.setItems(items);
-		searchResultPage.setCurrentPage(rows == 0 ? 1 : (start / rows + 1));
-		searchResultPage.setCount(numFound);
-		searchResultPage.setSize(rows);
-		searchResultPage.setStart(start);
-		searchResultPage.setTotalPages(rows == 0 ? 0 : numFound.intValue() / rows + (numFound.intValue() % rows == 0 ? 0 : 1));
+	private List<FacetGroup> getFacetGroups(SolrGroupData<ItemForSolrCommand> solrGroupData){
+		Map<String, Integer> facetQueryMap = solrGroupData.getFacetQueryMap();
+		Map<String, Map<String, Long>> facetMap = solrGroupData.getFacetMap();
 
 		List<FacetGroup> facetGroups = new ArrayList<FacetGroup>();
 
-		//****************************属性和分类的facet
-		if(Validator.isNotNullOrEmpty(facetMap)){
+		// ****************************属性和分类的facet
+		if (Validator.isNotNullOrEmpty(facetMap)) {
 			for (Entry<String, Map<String, Long>> entry : facetMap.entrySet()){
 				String key = entry.getKey();
 				Map<String, Long> valueMap = entry.getValue();
@@ -260,42 +274,42 @@ public class SearchManagerImpl implements SearchManager{
 					facetGroup = convertFacetGroup(valueMap);
 					facetGroup.setIsCategory(true);
 					facetGroup.setType(FacetType.CATEGORY.toString());
-				}else{
-					// 否则是属性的facet
+				}else if(key.indexOf(SkuItemParam.dynamicCondition)!=-1){
+					// 属性的facet
 					facetGroup = convertFacetGroup(valueMap);
 					facetGroup.setIsCategory(false);
 					facetGroup.setType(FacetType.PROPERTY.toString());
 					facetGroup.setId(Long.valueOf(key.replace(SkuItemParam.dynamicCondition, "")));
+				}else{
+					facetGroup = convertFacetGroup(valueMap);
+					facetGroup.setIsCategory(false);
 				}
 				facetGroups.add(facetGroup);
 			}
 		}
-		
-		//**************************价格范围的facetGroup
-		if(Validator.isNotNullOrEmpty(facetQueryMap)){
+
+		// **************************价格范围的facetGroup
+		if (Validator.isNotNullOrEmpty(facetQueryMap)) {
 			FacetGroup priceGroup = new FacetGroup();
 			priceGroup.setIsCategory(false);
-			priceGroup.setType(FacetType.RANGE.toString());		
+			priceGroup.setType(FacetType.RANGE.toString());
 			List<Facet> facets = new ArrayList<Facet>();
 			for (Entry<String, Integer> entry : facetQueryMap.entrySet()){
 				String key = entry.getKey();
 				Integer count = entry.getValue();
-				if(key.indexOf(SkuItemParam.sale_price)!=-1){
-					Facet facet=new Facet();
+				if (key.indexOf(SkuItemParam.sale_price) != -1) {
+					Facet facet = new Facet();
 					facet.setValue(key);
 					facet.setCount(count);
 					facets.add(facet);
 				}
 			}
-			if(facets.size()>0){
+			if (facets.size() > 0) {
 				priceGroup.setFacets(facets);
 				facetGroups.add(priceGroup);
 			}
 		}
-
-		searchResultPage.setFacetGroups(facetGroups);
-
-		return searchResultPage;
+		return facetGroups;
 	}
 
 	/**

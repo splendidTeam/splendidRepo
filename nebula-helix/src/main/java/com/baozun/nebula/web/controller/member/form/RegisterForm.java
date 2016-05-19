@@ -70,7 +70,7 @@ public class RegisterForm extends BaseForm{
 
 	/*******************************************/
 
-	private String				nickName;
+	private String				nickname;
 
 	/**
 	 * 是否愿意接收推送信息 可选值：1.接受，2.不接受
@@ -117,12 +117,13 @@ public class RegisterForm extends BaseForm{
 		this.birthday = birthday;
 	}
 
-	public String getNickName(){
-		return nickName;
+	
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setNickName(String nickName){
-		this.nickName = nickName;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 	public String getReceiveMessage(){

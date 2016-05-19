@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.ImageViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemImageViewCommand;
@@ -43,7 +42,7 @@ public class ShopdogItemImageViewCommandConverter extends ShopdogBaseConverter<S
 		if(null == data){
 			return null;
 		}
-		if(data instanceof ItemImage){
+		if(data instanceof ItemImageViewCommand){
 			ShopdogItemImageViewCommand  shopdogItemImageViewCommand= null;
 			try{
 				ItemImageViewCommand itemImageViewCommand = (ItemImageViewCommand) data;
@@ -71,7 +70,7 @@ public class ShopdogItemImageViewCommandConverter extends ShopdogBaseConverter<S
 			}
 		}else{
 			throw new UnsupportDataTypeException(data.getClass()
-					+ " cannot convert to " + ShopdogItemImageViewCommandConverter.class + "yet.");
+					+ " cannot convert to " + ShopdogItemImageViewCommandConverter.class + " yet.");
 		}
 		return null;
 	}

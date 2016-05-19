@@ -14,19 +14,19 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product.converter;
+package com.baozun.nebula.web.controller.breadcrumb.converter;
 
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
+import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCommand;
 
 /** 
  * 
  *   面包屑信息的视图模型转换器
  * @Description 
  * @author dongliang ma
- * @date 2016年4月19日 下午4:45:34 
+ * @date 2016年5月18日 下午3:14:40 
  * @version   
  */
 public class BreadcrumbsViewCommandConverter extends

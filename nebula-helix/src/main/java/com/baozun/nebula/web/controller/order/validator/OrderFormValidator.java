@@ -108,9 +108,9 @@ public class OrderFormValidator implements Validator{
  		if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())) {
  			if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm().getIsNeedInvoice())) {
  				if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()) {// 是否需要发票
- 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.consignee", "consignee.field.required");// 发票收货人
- 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.telphone", "telphone.field.required");// 发票联系方式
- 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.address", "address.field.required");// 发票地址
+// 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.consignee", "consignee.field.required");// 发票收货人
+// 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.telphone", "telphone.field.required");// 发票联系方式
+// 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.address", "address.field.required");// 发票地址
  					//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.invoiceContent", "invoiceContent.field.required");// 发票内容
  					
  					if (InvoiceInfoSubForm.INVOICE_TYPE_COMPANY.equals(orderForm.getInvoiceInfoSubForm().getInvoiceTitle())) {// 发票类型  个人还是公司  公司要判断抬头

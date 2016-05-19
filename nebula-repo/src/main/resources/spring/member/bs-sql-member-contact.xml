@@ -15,6 +15,20 @@
 		</constructor-arg>
 	</bean>	
 	
+	
+	<bean id="Contact.findContactsByMemberId" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_MEM_CONTACT 
+		       			 where member_id =:memberId order by id asc
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
 		<bean id="Contact.findContactById" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>
 		<constructor-arg>

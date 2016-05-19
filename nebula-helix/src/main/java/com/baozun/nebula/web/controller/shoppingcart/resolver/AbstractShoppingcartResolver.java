@@ -512,9 +512,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     private ShoppingCartLineCommand buildShoppingCartLineCommand(Long skuId,Integer quantity,String extensionCode){
         ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
+        shoppingCartLineCommand.setSkuId(skuId);
         shoppingCartLineCommand.setExtentionCode(extensionCode);
         shoppingCartLineCommand.setQuantity(quantity);
-        shoppingCartLineCommand.setSkuId(skuId);
         shoppingCartLineCommand.setCreateTime(new Date());
         shoppingCartLineCommand.setSettlementState(Constants.CHECKED_CHOOSE_STATE);
         return shoppingCartLineCommand;

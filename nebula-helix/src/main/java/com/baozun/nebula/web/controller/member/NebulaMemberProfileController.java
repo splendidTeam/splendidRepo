@@ -66,7 +66,7 @@ public class NebulaMemberProfileController extends BaseController {
 	public static final String MODEL_KEY_MEMBER_PROFILE = "memberDetail";
 
 	/* View 的默认定义 */
-	public static final String VIEW_MEMBER_PROFILE = "member.profile";
+	public static final String VIEW_MEMBER_PROFILE = "myAccount.profile";
 
 	/* 配置用户头像上传配置文件路径 */
 	protected String CONFIG = "config/metainfo.properties";
@@ -117,15 +117,16 @@ public class NebulaMemberProfileController extends BaseController {
 				memberDetails.getLoginName(), new Date());
 
 		// 获取会员信息
-		MemberCommand memberCommand = memberManager
-				.findMemberById(memberDetails.getMemberId());
+		MemberCommand memberCommand = memberManager.findMemberById(memberDetails.getMemberId());
 
 		// 将MemberCommand对象数据全部转入MemberViewCommand中
 		MemberViewCommand memberViewCommand = memberViewCommandConverter.convert(memberCommand);
 
-		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"copy MemberCommand Properties to MemberViewCommand\"",
-				memberViewCommand, new Date());
+		LOG.info("[MEM_VIEW_PROFILE] {} [{}] \"copy MemberCommand Properties to MemberViewCommand\"",memberViewCommand, new Date());
 
+		MemberPersonalData findMemberPersonData = sdkMemberManager.findMemberPersonData(memberDetails.getMemberId());
+	    memberViewCommand.setRealName(findMemberPersonData.getNickname());
+	    memberViewCommand.setSex(findMemberPersonData.getSex());
 		model.addAttribute(MODEL_KEY_MEMBER_PROFILE, memberViewCommand);
 
 		return VIEW_MEMBER_PROFILE;

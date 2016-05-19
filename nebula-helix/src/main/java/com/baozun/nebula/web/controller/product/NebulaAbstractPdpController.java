@@ -47,19 +47,16 @@ import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
-import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.web.controller.PageForm;
-import com.baozun.nebula.web.controller.product.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ItemReviewViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.RelationItemViewCommandConverter;
 import com.baozun.nebula.web.controller.product.converter.ReviewMemberViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.BrowsingHistoryResolver;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
-import com.baozun.nebula.web.controller.product.viewcommand.BreadcrumbsViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.BrowsingHistoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.DefaultBrowsingHistoryViewCommand;
 import com.baozun.nebula.web.controller.product.viewcommand.ItemBaseInfoViewCommand;
@@ -97,13 +94,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
 	/** PDP的展示模式 模式三， 商品到色，PDP不需要聚合（到色显示）. [value: pdp_mode_color_uncombine] */
 	public static final String 		PDP_MODE_COLOR_UNCOMBINE 			= "pdp_mode_color_uncombine";
-	
-	//面包屑的模式
-	/** 面包屑的模式  模式一, 基于前端导航构建. [value: breadcrumbs_mode_navigation] */
-	public static final String 		BREADCRUMBS_MODE_NAVIGATION 		= "breadcrumbs_mode_navigation";
-	
-	/** 面包屑的模式  模式二, 基于后端分类构建. [value: breadcrumbs_mode_category] */
-	public static final String 		BREADCRUMBS_MODE_CATEGORY 			= "breadcrumbs_mode_category";
 	
 	// 每个sku默认最大购买的数量
 	/** 每个sku默认最大购买的数量. [value: 6] */
@@ -147,11 +137,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	protected MemberManager memberManager;
 	
 	@Autowired
-	@Qualifier("breadcrumbsViewCommandConverter")
-	private BreadcrumbsViewCommandConverter breadcrumbsViewCommandConverter;
-	
-	@Autowired
-	@Qualifier("itemColorSwatchViewCommandResolver")
 	protected ItemColorSwatchViewCommandResolver itemColorSwatchViewCommandResolver;
 	
 	@Autowired
@@ -160,7 +145,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	
     /** The browsing history resolver. */
     @Autowired
-    @Qualifier("browsingHistoryResolver")
     private BrowsingHistoryResolver browsingHistoryResolver;
     
     @Autowired
@@ -212,9 +196,6 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		//商品基本信息
 		ItemBaseInfoViewCommand itemBaseInfo = getAndValidateItemBaseInfo(itemCode);
 		pdpViewCommand.setBaseInfo(itemBaseInfo);
-		
-		//面包屑
-		pdpViewCommand.setBreadcrumbs(buildBreadcrumbsViewCommand(itemBaseInfo.getId()));
 		
 		//商品图片
 		pdpViewCommand.setImages(buildItemImageViewCommand(itemBaseInfo.getId()));
@@ -599,44 +580,9 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	/**
-	 * 构造面包屑
-	 * @return
-	 */
-	protected List<BreadcrumbsViewCommand> buildBreadcrumbsViewCommand(Long itemId) {
-		
-		List<BreadcrumbsViewCommand> breadcrumbsViewCommandList = null;
-		
-		String breadcrumbsMode = getBreadcrumbsMode();
-		
-		switch (breadcrumbsMode) {
-			case BREADCRUMBS_MODE_NAVIGATION:
-				//TODO 
-				//基于导航
-				break;
-			case BREADCRUMBS_MODE_CATEGORY:
-				//基于分类
-				List<CurmbCommand> curmbCommandList = itemDetailManager.findCurmbList(itemId);
-				breadcrumbsViewCommandList =breadcrumbsViewCommandConverter.convert(curmbCommandList);
-				break;
-			default:
-				breadcrumbsViewCommandList = customBuildBreadcrumbsViewCommand(itemId);
-				break;
-		}
-		
-		return breadcrumbsViewCommandList;
-	}
-	
-	protected abstract List<BreadcrumbsViewCommand> customBuildBreadcrumbsViewCommand(Long itemId);
-	
-	/**
 	 * 商品主图的图片类型，主要用于推荐商品等的图片显示
 	 */
 	protected abstract String getItemMainImageType();
-	
-	/**
-	 * 面包屑的模式
-	 */
-	protected abstract String getBreadcrumbsMode();
 	
 	/**
 	 * sku最大可购买的数量
