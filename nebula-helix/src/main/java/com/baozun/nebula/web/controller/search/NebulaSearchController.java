@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.params.GroupParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,9 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 
 	private static final String			SEARCH_NO_RESULT		= "item.search-no-result";
 
-	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommond";
+	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommand";
+
+	private static final String			ITEM_LIST_SEARCH_TITLE	= "keyword";
 
 	@Autowired
 	@Qualifier("solrQueryConvert")
@@ -86,39 +89,64 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		SearchCommand searchCommand = new SearchCommand();
 		PropertyUtil.copyProperties(searchCommand, searchForm);
 
+		ItemCollection collection = null;
+		Long navigationId = searchCommand.getNavigationId();
+		if (Validator.isNotNullOrEmpty(navigationId)) {
+			collection = sdkItemCollectionManager.findItemCollectionByNavigationId(Long.valueOf(navigationId));
+		}
+
 		// 将 searchCommand 中 filterConditionStr,categoryConditionStr 转成FacetParameter
-		searchParamProcess(searchCommand);
+		searchParamProcess(searchCommand, collection);
 
 		// 创建solrquery对象
 		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 		LOG.debug("solr solrQuery before setFacet:" + solrQuery.toString());
 
 		// set facet相关信息
-		setFacet(solrQuery);
+		setFacet(solrQuery, searchCommand);
 		LOG.debug("solr solrQuery after setFacet:" + solrQuery.toString());
 
 		// 设置权重信息
-		Boost boost = createBoost(searchCommand);
+		Boost boost = createBoost(searchCommand, collection);
 		searchManager.setSolrBoost(solrQuery, boost);
 		LOG.debug("solr solrQuery after setSolrBoost:" + solrQuery.toString());
 
 		// 查询
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
-		if (searchResultPage == null || searchResultPage.getItems() == null || searchResultPage.getItems().size() == 0) {
-			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
-			return SEARCH_NO_RESULT;
+		
+		// 是否分组显示
+		String isGroup = solrQuery.get(GroupParams.GROUP);
+		//如果是分组
+		if(Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)){
+			if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| searchResultPage.getItemsListWithGroup().getCount()==0l) {
+				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+				return SEARCH_NO_RESULT;
+			}
+		}else{
+			//如果不是分组
+			if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || searchResultPage.getItemsListWithOutGroup().getCount()==0l) {
+				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+				return SEARCH_NO_RESULT;
+			}
 		}
-		LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", searchResultPage.getCount(), new Date());
 
 		// 页面左侧筛选项
 		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());
+
+		// 设置facetGroup是否显示
+		setExcludeFacetGroup(collection, facetGroups);
+
 		searchResultPage.setFacetGroups(facetGroups);
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 		ItemListViewCommandConverter listViewCommandConverter = new ItemListViewCommandConverter();
-		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convertViewCommand(searchResultPage);
+		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convert(searchResultPage);
 
 		model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
+
+		if (Validator.isNotNullOrEmpty(searchCommand.getSearchWord())) {
+			model.addAttribute(ITEM_LIST_SEARCH_TITLE, searchCommand.getSearchWord());
+		}
 
 		return ITEM_LIST;
 	}
@@ -134,11 +162,12 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	 * @return
 	 */
 	public String navigationPage(
-			@RequestParam(value = "navId") Long navId,
+			@RequestParam(value = "nid") Long nid,
+			@RequestParam(value = "cid") Long cid,
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Model model){
-		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(navId);
+		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if (Validator.isNotNullOrEmpty(collection)) {
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
 
@@ -147,24 +176,48 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
 			// set facet相关信息
-			setFacet(solrQuery);
+			setFacet(solrQuery, searchCommand);
 
 			// 设置权重信息
-			Boost boost = createBoost(searchCommand);
+			Boost boost = createBoost(searchCommand, collection);
 			searchManager.setSolrBoost(solrQuery, boost);
 
 			// 查询
 			SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
-
+			
+			// 是否分组显示
+			String isGroup = solrQuery.get(GroupParams.GROUP);
+			//如果是分组
+			if(Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)){
+				if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| searchResultPage.getItemsListWithGroup().getCount()==0l) {
+					LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+					return SEARCH_NO_RESULT;
+				}
+			}else{
+				//如果不是分组
+				if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || searchResultPage.getItemsListWithOutGroup().getCount()==0l) {
+					LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+					return SEARCH_NO_RESULT;
+				}
+			}
+			
 			// 页面左侧筛选项
 			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());
+			// 设置facetGroup是否显示
+			setExcludeFacetGroup(collection, facetGroups);
+
 			searchResultPage.setFacetGroups(facetGroups);
 
 			// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 			ItemListViewCommandConverter listViewCommandConverter = new ItemListViewCommandConverter();
-			ItemListViewCommand itemListViewCommand = listViewCommandConverter.convertViewCommand(searchResultPage);
+			ItemListViewCommand itemListViewCommand = listViewCommandConverter.convert(searchResultPage);
 
 			model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
+
+			if (Validator.isNotNullOrEmpty(searchCommand.getSearchWord())) {
+				model.addAttribute(ITEM_LIST_SEARCH_TITLE, searchCommand.getSearchWord());
+			}
+
 		}
 		return ITEM_LIST;
 	}
@@ -190,34 +243,49 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		SearchCommand searchCommand = new SearchCommand();
 		PropertyUtil.copyProperties(searchCommand, searchForm);
 
+		ItemCollection collection = null;
+		Long navigationId = searchCommand.getNavigationId();
+		if (Validator.isNotNullOrEmpty(navigationId)) {
+			collection = sdkItemCollectionManager.findItemCollectionByNavigationId(Long.valueOf(navigationId));
+		}
+
 		// 将 searchCommand 中 filterConditionStr,categoryConditionStr 转成FacetParameter
-		searchParamProcess(searchCommand);
+		searchParamProcess(searchCommand, collection);
 
 		// 创建solrquery对象
 		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 		LOG.debug("solr solrQuery before setFacet:" + solrQuery.toString());
 
 		// 设置权重信息
-		Boost boost = createBoost(searchCommand);
+		Boost boost = createBoost(searchCommand, collection);
 		searchManager.setSolrBoost(solrQuery, boost);
 		LOG.debug("solr solrQuery after setSolrBoost:" + solrQuery.toString());
 
 		// 查询
-		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
-		if (searchResultPage == null || searchResultPage.getItems() == null || searchResultPage.getItems().size() == 0) {
-			LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
-			return null;
+		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);		
+		
+		// 是否分组显示
+		String isGroup = solrQuery.get(GroupParams.GROUP);
+		//如果是分组
+		if(Validator.isNotNullOrEmpty(isGroup) && Boolean.parseBoolean(isGroup)){
+			if (searchResultPage == null || searchResultPage.getItemsListWithGroup() == null|| searchResultPage.getItemsListWithGroup().getCount()==0l) {
+				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+				return null;
+			}
+		}else{
+			//如果不是分组
+			if (searchResultPage == null || searchResultPage.getItemsListWithOutGroup() == null || searchResultPage.getItemsListWithOutGroup().getCount()==0l) {
+				LOG.info("[SOLR_SEARCH_RESULT] Solr query result is empty. time:[{}]", new Date());
+				return null;
+			}
 		}
-		LOG.info("[SOLR_SEARCH_RESULT] Solr query result is {}. time:[{}]", searchResultPage.getCount(), new Date());
 
 		// 将SearchResultPage<ItemForSolrCommand> 转换成页面需要的itemListView对象
 		ItemListViewCommandConverter listViewCommandConverter = new ItemListViewCommandConverter();
-		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convertViewCommand(searchResultPage);
+		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convert(searchResultPage);
 
 		model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
-
 		return itemListViewCommand;
 
 	}
-
 }

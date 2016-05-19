@@ -17,7 +17,10 @@
 package com.baozun.nebula.search;
 
 import java.util.List;
+import java.util.Map;
 
+import com.baozun.nebula.sdk.command.SearchConditionCommand;
+import com.baozun.nebula.search.command.MetaDataCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
 
@@ -37,6 +40,36 @@ public interface FacetFilterHelper{
 	 * @time 2016年4月28日下午2:35:45
 	 */
 	FacetFilterMetaData loadFacetFilterMetaData();
+	
+	/**
+	 * 加载导航的元数据，从loadFacetFilterMetaData 方法中分离出来，方便其他地方调用
+	 * @return
+	 */
+	Map<Long, MetaDataCommand> loadNavigationMetaData();
+	
+	/**
+	 * 加载分类的元数据，从loadFacetFilterMetaData 方法中分离出来，方便其他地方调用
+	 * @return
+	 */
+	Map<Long, MetaDataCommand> loadCategoryMetaData();
+	
+	/**
+	 * 加载属性的元数据，从loadFacetFilterMetaData 方法中分离出来，方便其他地方调用
+	 * @return
+	 */
+	Map<Long, MetaDataCommand> loadPropertyMetaData();
+	
+	/**
+	 * 加载属性值的源数据，从loadFacetFilterMetaData 方法中分离出来，方便其他地方调用
+	 * @return
+	 */
+	Map<Long, MetaDataCommand> loadPropertyValueMetaData();
+	
+	/**
+	 * 加载筛选项的源数据，从loadFacetFilterMetaData 方法中分离出来，方便其他地方调用
+	 * @return
+	 */
+	Map<Long, SearchConditionCommand> loadSearchConditionMetaData();
 
 	/**
 	 * 

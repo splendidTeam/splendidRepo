@@ -31,45 +31,66 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  */
 public class ItemListViewCommand extends BaseViewCommand{
 
-	private static final long			serialVersionUID	= -7224847778759734419L;
+	private static final long				serialVersionUID	= -7224847778759734419L;
 
-	/** 商品列表 */
-	private List<ItemForSolrCommand>	itemForSolrCommands;
+	/** 商品列表(无分组)*/
+	private List<ItemForSolrCommand>		itemsListWithOutGroup;
+
+	/** 商品列表(有分组)*/
+	private List<List<ItemForSolrCommand>>	itemsListWithGroup;
 
 	/** 数量 */
-	private long						count;
+	private long							count;
 
 	/** 当前页码 */
-	private int							currentPage;
+	private int								currentPage;
 
 	/** 总页数 */
-	private int							totalPages;
+	private int								totalPages;
 
 	/** 从第几条开始 */
-	private int							start;
+	private int								start;
 
 	/** 每页多少条 */
-	private int							size;
+	private int								size;
 
 	/** 筛选 */
-	private List<FacetGroup>			facetGroups;
+	private List<FacetGroup>				facetGroups;
 
 	/**
-	 * get itemForSolrCommands
+	 * get itemsListWithOutGroup
 	 * 
-	 * @return itemForSolrCommands
+	 * @return itemsListWithOutGroup
 	 */
-	public List<ItemForSolrCommand> getItemForSolrCommands(){
-		return itemForSolrCommands;
+	public List<ItemForSolrCommand> getItemsListWithOutGroup(){
+		return itemsListWithOutGroup;
 	}
 
 	/**
-	 * set itemForSolrCommands
+	 * set itemsListWithOutGroup
 	 * 
-	 * @param itemForSolrCommands
+	 * @param itemsListWithOutGroup
 	 */
-	public void setItemForSolrCommands(List<ItemForSolrCommand> itemForSolrCommands){
-		this.itemForSolrCommands = itemForSolrCommands;
+	public void setItemsListWithOutGroup(List<ItemForSolrCommand> itemsListWithOutGroup){
+		this.itemsListWithOutGroup = itemsListWithOutGroup;
+	}
+
+	/**
+	 * get itemsListWithGroup
+	 * 
+	 * @return itemsListWithGroup
+	 */
+	public List<List<ItemForSolrCommand>> getItemsListWithGroup(){
+		return itemsListWithGroup;
+	}
+
+	/**
+	 * set itemsListWithGroup
+	 * 
+	 * @param itemsListWithGroup
+	 */
+	public void setItemsListWithGroup(List<List<ItemForSolrCommand>> itemsListWithGroup){
+		this.itemsListWithGroup = itemsListWithGroup;
 	}
 
 	/**

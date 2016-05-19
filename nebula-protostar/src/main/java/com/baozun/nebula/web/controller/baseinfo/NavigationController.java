@@ -42,7 +42,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.command.baseinfo.NavigationCommand;
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.baseinfo.NavigationManager;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.PropertyManager;
@@ -73,6 +75,7 @@ import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
 
+import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
 /**
@@ -83,7 +86,7 @@ import loxia.dao.Sort;
 @Controller
 public class NavigationController extends BaseController{
 
-	private static final Logger			log	= LoggerFactory.getLogger(NavigationController.class);
+	private static final Logger			LOG	= LoggerFactory.getLogger(NavigationController.class);
 	/** 逗号分隔符 */
 	private final static String		SEPARATORCHARS_COMMA	= ",";
 
@@ -129,6 +132,9 @@ public class NavigationController extends BaseController{
 	@Value("#{meta['upload.img.domain.base']}")
 	private String				UPLOAD_IMG_DOMAIN	= "";
 	
+	
+	@Autowired
+	private CacheManager	cacheManager;
 		
 	/**
 	 * 前往页面 将 分类列表 与 导航列表 传给页面
@@ -141,7 +147,7 @@ public class NavigationController extends BaseController{
 		Sort[] sorts = Sort.parse("parent_id asc,sort_no asc");
 		List<Category> cateList = categoryManager.findEnableCategoryList(sorts);
 		model.addAttribute("categoryList", cateList);
-		log.debug(JsonFormatUtil.format(cateList));
+		LOG.debug(JsonFormatUtil.format(cateList));
 
 		List<DynamicPropertyCommand> dynamicPropertyCommand = propertyManager.findAllDynamicPropertyCommand();
 		model.addAttribute("dynamicPropertyCommand", dynamicPropertyCommand);
@@ -149,7 +155,7 @@ public class NavigationController extends BaseController{
 		List<Navigation> naviList = navigationManager.findAllNavigationList(Navigation.COMMOM_SORTS);
 		model.addAttribute("navigationList", naviList);
 		model.addAttribute("navigationId", navigationId);
-		log.debug(JsonFormatUtil.format(naviList));
+		LOG.debug(JsonFormatUtil.format(naviList));
 		return "system/navigation/navigation";
 	}
 
@@ -191,7 +197,7 @@ public class NavigationController extends BaseController{
 			nodeList.add(node);
 		}
 		map.put("tree", JsonFormatUtil.format(nodeList));
-		log.debug(JsonFormatUtil.format(nodeList));
+		LOG.debug(JsonFormatUtil.format(nodeList));
 		return map;
 	}
 
@@ -213,7 +219,9 @@ public class NavigationController extends BaseController{
 			e.printStackTrace();
 			rs.put("isSuccess", false);
 		}
-		log.debug(JsonFormatUtil.format(rs));
+		
+		this.cleanCache();
+		LOG.debug(JsonFormatUtil.format(rs));
 		return rs;
 	}
 
@@ -239,7 +247,10 @@ public class NavigationController extends BaseController{
 			rs.put("errMsg", errMsg);
 			return rs;
 		}
-		log.debug(JsonFormatUtil.format(rs));
+		
+		this.cleanCache();
+		
+		LOG.debug(JsonFormatUtil.format(rs));
 		return rs;
 	}
 
@@ -259,6 +270,7 @@ public class NavigationController extends BaseController{
 	public BackWarnEntity removeNavigation(@RequestParam Long id){
 		try{
 			navigationManager.removeNavigationById(id);
+			this.cleanCache();
 			return SUCCESS;
 		}catch (Exception e){
 			e.printStackTrace();
@@ -274,9 +286,10 @@ public class NavigationController extends BaseController{
 	@RequestMapping(value = "/base/sortNavigation.json",method = RequestMethod.POST)
 	@ResponseBody
 	public BackWarnEntity sortNavigation(@RequestParam String ids){
-		log.debug("ids:  " + ids);
+		LOG.debug("ids:  " + ids);
 		try{
 			navigationManager.sortNavigationsByIds(ids, getUserDetails().getUserId());
+			this.cleanCache();
 			return SUCCESS;
 		}catch (Exception e){
 			e.printStackTrace();
@@ -297,7 +310,7 @@ public class NavigationController extends BaseController{
 		model.addAttribute("navigationList", naviList);
 		
 		//已排序商品集合
-		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
+		Pagination<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		
 		//导航ID
@@ -312,7 +325,7 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemUnsortedList.json")
 	@ResponseBody
-	public SearchResultPage<ItemForSolrCommand> findItemCtListJson(@PathVariable Long navigationId){
+	public Pagination<ItemForSolrCommand> findItemCtListJson(@PathVariable Long navigationId){
 		return  getUnsortedList(navigationId);
 	}
 
@@ -321,7 +334,7 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemSortedList.htm")
 	public String findSortedItem(@PathVariable Long navigationId,Model model){
-		SearchResultPage<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
+		Pagination<ItemForSolrCommand>  resultPage =  getSortedList(navigationId);
 		model.addAttribute("resultPage", resultPage);
 		model.addAttribute("isSuccess", "success");
 		model.addAttribute("UPLOAD_IMG_DOMAIN", UPLOAD_IMG_DOMAIN);
@@ -425,7 +438,7 @@ public class NavigationController extends BaseController{
 			}
 			if (code != null && code.length() > 0) {
 				boolean haveFlg = false;
-				for(ItemForSolrCommand command :searchResultPage.getItems()){
+				for(ItemForSolrCommand command :searchResultPage.getItemsListWithOutGroup().getItems()){
 					if (code.equals(command.getCode())) {
 						haveFlg = true;
 						break;
@@ -480,17 +493,17 @@ public class NavigationController extends BaseController{
 	}
 
 	
-	public SearchResultPage<ItemForSolrCommand> getUnsortedList(Long navigationId){
+	public Pagination<ItemForSolrCommand> getUnsortedList(Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		if(itemCollection==null ){
 			return null;
 		}
 		SearchCommand SearchCommand = buildSearchCommand(itemCollection,UNSORT_FLG);
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(SearchCommand);
-		return searchResultPage;
+		return searchResultPage.getItemsListWithOutGroup();
 	}
 	
-	public  SearchResultPage<ItemForSolrCommand> getSortedList(Long navigationId){
+	public  Pagination<ItemForSolrCommand> getSortedList(Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		//商品集合不存在
 		if(itemCollection==null || itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
@@ -507,7 +520,7 @@ public class NavigationController extends BaseController{
 			boolean sureFlg=false;
 			ItemForSolrCommand command = null;
 			if(itemId!=null && itemId.length()>0){
-				for(ItemForSolrCommand curCommand:searchResultPage.getItems()){
+				for(ItemForSolrCommand curCommand:searchResultPage.getItemsListWithOutGroup().getItems()){
 					if(itemId.equals(curCommand.getId().toString())){
 						command = curCommand;
 						sureFlg = true;
@@ -521,8 +534,10 @@ public class NavigationController extends BaseController{
 			}
 		}
 		
-		sortList.setItems(commands);
-		return sortList;
+		Pagination<ItemForSolrCommand> pagination=new Pagination<ItemForSolrCommand>();
+		pagination.setItems(commands);
+		
+		return pagination;
 	}
 	
 	protected SearchResultPage<ItemForSolrCommand>  searchNavigation(SearchCommand searchCommand){
@@ -531,7 +546,7 @@ public class NavigationController extends BaseController{
 			try{
 				solrQueryConvert = (SolrQueryConvert) Class.forName(SOL_RQUERY_CONVERT_STRING).newInstance();
 			}catch (Exception e){
-				log.error(e.getMessage());
+				LOG.error(e.getMessage());
 			}
 		}
 		// ***************** 下面这些查询和searchPage是一致的
@@ -539,7 +554,7 @@ public class NavigationController extends BaseController{
 		SolrQuery solrQuery = solrQueryConvert.convert(searchCommand);
 
 		// set facet相关信息
-		setFacet(solrQuery);
+//		setFacet(solrQuery);
 
 		// 设置权重信息
 		Boost boost = createBoost(searchCommand);
@@ -578,6 +593,9 @@ public class NavigationController extends BaseController{
 				searchCommand.setExcludeList(excludeList);
 			}
 		}
+		
+		searchCommand.setPageSize(Integer.MAX_VALUE);
+		
 		return searchCommand;
 	}
 	
@@ -724,5 +742,14 @@ public class NavigationController extends BaseController{
 		pf.append(SkuItemParam.categoryname + "*");// 分类名称
 
 		boost.setPf(pf.toString());
+	}
+	
+	private void cleanCache(){
+		try{
+			//清除navigationFilter 中cache的navigation数据
+			cacheManager.removeMapValue(CacheKeyConstant.CACHE_KEY_FILTER_NAV, CacheKeyConstant.CACHE_FIELD_FILTER_NAV);
+		}catch(Exception e){
+			LOG.error("clean cache error:"+CacheKeyConstant.CACHE_KEY_FILTER_NAV,e);
+		}
 	}
 }

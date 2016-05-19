@@ -31,6 +31,11 @@ public class BundleItemCommand implements Serializable{
 	private long itemId;
 	
 	/**
+	 * 商品编码
+	 */
+	private String itemCode;
+	
+	/**
 	 * 生命周期
 	 */
 	private Integer lifecycle;
@@ -113,6 +118,15 @@ public class BundleItemCommand implements Serializable{
 	public void setItemId(long itemId) {
 		this.itemId = itemId;
 	}
+	
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
 	/**
 	 * 
 	 * 查找商品中sku的最小原销售价格

@@ -1,5 +1,7 @@
 package com.baozun.nebula.sdk.manager.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,14 @@ public class SdkItemCollectionManagerImpl implements SdkItemCollectionManager {
 	@Transactional(readOnly = true)
 	public ItemCollection findItemCollectionByNavigationId(Long navigationId){
 		return itemCollectionDao.findItemCollectionByNavigationId(navigationId);
+	}
+
+	/* 
+	 * @see com.baozun.nebula.sdk.manager.SdkItemCollectionManager#findAll()
+	 */
+	@Override
+	public List<ItemCollection> findAll() {
+		return itemCollectionDao.findAll();
 	}
 
 }

@@ -219,4 +219,17 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
 	 */
        @NativeQuery(model =SimpleOrderCommand.class)
        Pagination<SimpleOrderCommand> findSimpleOrderByOrderQueryCommand(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap);
+       
+       /**
+        * 
+        * 说明：根据order查询条件返回SimpleOrderCommand的List 状态码判断为or
+        * @param page
+        * @param sorts
+        * @param paraMap
+        * @return
+        * @author 张乃骐
+        * @time：2016年5月9日 下午3:34:54
+        */
+      @NativeQuery(model =SimpleOrderCommand.class)
+      List<SimpleOrderCommand> findSimpleOrderListByOrderQueryCommand(@QueryParam Map<String, Object> paraMap);
 }

@@ -54,6 +54,11 @@ public class BundleItemViewCommand extends BaseViewCommand {
 	private Long itemId;
 	
 	/**
+	 * 商品编码
+	 */
+	private String itemCode;
+	
+	/**
 	 * 商品标题
 	 */
 	private String title;
@@ -114,6 +119,14 @@ public class BundleItemViewCommand extends BaseViewCommand {
 
 	public void setItemId(Long itemId) {
 		this.itemId = itemId;
+	}
+
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
 	}
 
 	public String getTitle() {

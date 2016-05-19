@@ -1,11 +1,18 @@
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
+import java.io.Serializable;
+
 /**
  * 订单生成成功后返回给前端的信息
  * 
  * @author weihui.tang
  */
-public class SalesOrderReturnObject {
+public class SalesOrderReturnObject implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -752189810870844194L;
 
 	/** 交易流水号 */
 	private String subOrdinate;
@@ -39,7 +46,5 @@ public class SalesOrderReturnObject {
 	public void setCode(String code) {
 		this.code = code;
 	}
-
-
 
 }

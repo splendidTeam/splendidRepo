@@ -66,7 +66,7 @@ public interface SalesOrderManager extends BaseManager {
 	public PromotionCouponInfoCommand findCouponInfoByCouponCode(String couponCode);
         /**
          * 
-         * 说明：根据orderQueryForm查询订单分页列表
+         * 说明：根据orderQueryCommand查询订单分页列表
          * @param memberId
          * @param orderQueryForm
          * @param page
@@ -76,4 +76,15 @@ public interface SalesOrderManager extends BaseManager {
          */
         public Pagination<SimpleOrderCommand> findSimpleOrderCommandPagination(Long memberId, OrderQueryCommand orderQueryForm,
             Page page);
+        /**
+         * 
+         * 说明：根据orderQueryCommand查询订单list(或条件)
+         * @param memberId
+         * @param orderQueryCommand
+         * @param page
+         * @return
+         * @author 张乃骐
+         * @time：2016年5月12日 上午11:09:04
+         */
+        public List<SimpleOrderCommand> findSimpleOrderCommandList(Long memberId,OrderQueryCommand orderQueryCommand);
 }

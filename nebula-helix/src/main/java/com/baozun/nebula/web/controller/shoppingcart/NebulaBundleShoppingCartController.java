@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -47,7 +50,7 @@ import com.feilong.core.util.RandomUtil;
  * @see com.baozun.nebula.model.bundle.BundleSku
  * @since 5.3.1
  */
-public class NebulaBundleShoppingCartController extends BaseController{
+public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatelyBuyShoppingCartController{
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
@@ -57,8 +60,8 @@ public class NebulaBundleShoppingCartController extends BaseController{
      *
      * @param memberDetails
      *            某个用户
-     * @param itemId
-     *            买的哪个bundle
+     * @param relatedItemId
+     *            买的哪个bundle,本来想用 bundleId的,后来听程哥说 他们定义的很多接口都是用的itemId
      * @param skuIds
      *            里面有哪些skuid 的组合
      * @param count
@@ -74,7 +77,7 @@ public class NebulaBundleShoppingCartController extends BaseController{
      */
     public NebulaReturnResult immediatelyBuyBundle(
                     @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "itemId",required = true) Long itemId,//听说bundle目前封装的 都是使用itemId做参数
+                    @RequestParam(value = "relatedItemId",required = true) Long relatedItemId,//听说bundle目前封装的 都是使用itemId做参数
                     @RequestParam(value = "skuIds",required = true) Long[] skuIds,
                     @RequestParam(value = "count",required = true) Integer count,
                     HttpServletRequest request,
@@ -83,13 +86,10 @@ public class NebulaBundleShoppingCartController extends BaseController{
         //TODO feilong validator
 
         //TODO feilong 构造bundle购物车信息
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = null;
+        String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
 
-        //        //save in session
-        String key = buildKey();//TODO feilong 构造key
-        //        //value是商品list
-        //        request.getSession().setAttribute(key, "");
-
-        //url info /transaction/check?key=xxxx
+        String checkoutUrl = buildCheckoutUrl(key, request);
 
         //成功需要返回 跳转到订单确认页面的地址
         //失败就直接返回失败的信息
@@ -99,12 +99,4 @@ public class NebulaBundleShoppingCartController extends BaseController{
 
     //TODO feilong 进普通购物车
 
-    /**
-     * Builds the key.
-     *
-     * @return the string
-     */
-    private String buildKey(){
-        return UUID.randomUUID().toString() + RandomUtil.createRandomWithLength(2);
-    }
 }

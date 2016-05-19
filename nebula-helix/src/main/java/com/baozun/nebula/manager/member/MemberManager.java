@@ -2,13 +2,9 @@ package com.baozun.nebula.manager.member;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.baozun.nebula.command.MemberConductCommand;
 import com.baozun.nebula.command.RateCommand;
 import com.baozun.nebula.exception.PasswordNotMatchException;
-import com.baozun.nebula.exception.SynchronousShoppingCartException;
 import com.baozun.nebula.exception.UserExpiredException;
 import com.baozun.nebula.exception.UserNotExistsException;
 import com.baozun.nebula.manager.BaseManager;
@@ -248,14 +244,6 @@ public interface MemberManager extends BaseManager{
 	 * @author 何波 @Description: 绑定用户邮箱 @param memberId void @throws
 	 */
 	void bindMemberEmail(Long memberId,String email);
-
-	/**
-	 * 同步购物车信息
-	 * 
-	 * @author 冯明雷
-	 * @time 2016-3-23下午4:19:35
-	 */
-	void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines) throws SynchronousShoppingCartException;
 
 	/**
 	 * 检查email，mobile等是否合法,重复问题

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
 import com.baozun.nebula.command.MemberConductCommand;
+import com.baozun.nebula.command.MemberPersonalDataCommand;
 import com.baozun.nebula.command.member.ThirdPartyMemberCommand;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.Member;
@@ -171,7 +172,13 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 		MemberConductCommand conductCommand = new MemberConductCommand(loginCount, registerTime, clientIp);
 
 		frontendCommand.setMemberConductCommand(conductCommand);
+		
+		//memberPersonalDataCommand
+		MemberPersonalDataCommand	memberPersonalDataCommand = new MemberPersonalDataCommand();
+		memberPersonalDataCommand.setNickname(thirdPartyMember.getNickName());
 
+		frontendCommand.setMemberPersonalDataCommand(memberPersonalDataCommand);
+		
 		return frontendCommand;
 	}
 

@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -32,14 +33,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -164,7 +168,10 @@ public class NebulaOrderConfirmController extends BaseController {
 	private SalesOrderResolver salesOrderResolver;
 
 	@Autowired
-	private OrderManager orderManager;
+	private SdkOrderCreateManager sdkOrderCreateManager;
+
+	/* 购物车为空返回的URL */
+	public static final String CART_NULL_BACK_URL = "/index";
 
 	/**
 	 * 显示订单结算页面.
@@ -188,17 +195,25 @@ public class NebulaOrderConfirmController extends BaseController {
 			HttpServletResponse response, Model model) {
 
 		// TODO feilong 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
-
+		List<ContactCommand> addressList = null;
+		if(memberDetails != null){
+			addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId());
+		}
+		
 		// 获取购物车信息
-		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails);
+		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails,addressList,null);
+
+		// 购物车为空
+		if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
+				|| shoppingCartCommand.getShoppingCartLineCommands().isEmpty()) {
+			return "redirect:" + CART_NULL_BACK_URL;
+		}
 
 		// 封装viewCommand
 		OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
-		orderConfirmViewCommand
-				.setShoppingCartViewCommand(shoppingcartViewCommandConverter.convert(shoppingCartCommand));
+		orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
 		// 收获地址信息
-		orderConfirmViewCommand.setAddressList(memberDetails == null ? null
-				: sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId()));
+		orderConfirmViewCommand.setAddressList(addressList);
 
 		model.addAttribute(MODEL_KEY_ORDER_CONFIRM, orderConfirmViewCommand);
 
@@ -258,7 +273,6 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 校验购物车信息和促销
 		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
-
 		SalesOrderResult salesorderResult = validateWithShoppingCart(shoppingCartCommand, couponCode);
 		// 如果校验失败，返回错误
 		if (salesorderResult != SalesOrderResult.SUCCESS) {
@@ -268,7 +282,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		}
 
 		// 新建订单
-		String subOrdinate = orderManager.saveOrder(shoppingCartCommand, salesOrderCommand,
+		String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand,
 				null == memberDetails ? null : memberDetails.getMemComboList());
 
 		// 游客需要更新cookie中的购物车信息
@@ -283,11 +297,59 @@ public class NebulaOrderConfirmController extends BaseController {
 
 		// 将订单创建成功后的信息返回给前端，创建支付链接用
 		SalesOrderReturnObject salesOrderReturnObject = createReturnObject(subOrdinate);
-		DefaultReturnResult result = DefaultReturnResult.SUCCESS;
+		DefaultReturnResult result = new DefaultReturnResult();
+		result.setResult(true);
 		result.setReturnObject(salesOrderReturnObject);
 		return result;
 	}
 
+	
+	/**
+	 * 再次计算金额   使用情景：使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验)
+	 * @param memberDetails
+	 *            the member details
+	 * @param orderForm
+	 *            the order form
+	 * @param bindingResult
+	 *            the binding result
+	 * @param request
+	 *            the request
+	 * @param response
+	 *            the response
+	 * @param model
+	 *            the model
+	 * @return the string
+	 * @NeedLogin (guest=true)
+	 * @RequestMapping(value = "/transaction/recalc", method = RequestMethod.POST)
+	 */
+	public ShoppingCartCommand recalc(@LoginMember MemberDetails memberDetails,@ModelAttribute("orderForm") OrderForm orderForm, BindingResult bindingResult, HttpServletRequest request,
+			HttpServletResponse response, Model model) {
+		// 优惠券
+		String couponCode = null;
+		if(orderForm!=null && orderForm.getCouponInfoSubForm()!=null){
+			couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
+		}
+		
+        //地址
+		List<ContactCommand> addressList= null;
+		if (orderForm != null && orderForm.getShippingInfoSubForm() != null && orderForm.getShippingInfoSubForm().getProvinceId() != null
+				&& orderForm.getShippingInfoSubForm().getCityId() != null && orderForm.getShippingInfoSubForm().getAreaId() != null) {
+			ContactCommand contactCommand = new ContactCommand();
+			contactCommand.setProvinceId(orderForm.getShippingInfoSubForm().getProvinceId());
+			contactCommand.setCityId(orderForm.getShippingInfoSubForm().getCityId());
+			contactCommand.setAreaId(orderForm.getShippingInfoSubForm().getAreaId());
+			contactCommand.setIsDefault(true);
+			
+			addressList = new ArrayList<ContactCommand>();
+			addressList.add(contactCommand);
+		}
+		return getChosenShoppingCartCommand(request, memberDetails,addressList,couponCode); 
+	}
+
+	
+	
+	
+	
 	/**
 	 * Detect shoppingcart resolver.
 	 *
@@ -309,19 +371,62 @@ public class NebulaOrderConfirmController extends BaseController {
 	 * @return the cart info
 	 */
 	protected ShoppingCartCommand getChosenShoppingCartCommand(HttpServletRequest request,
-			MemberDetails memberDetails) {
+			MemberDetails memberDetails,List<ContactCommand> addressList,String couponCode) {
 		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
 		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
 				request);
 
-		// 过虑未选中的购物车行 过滤之后，金额是否需要重新计算？
+		//过滤赠品 
 		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
+		
+		//过滤未勾选的商品行
+		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 0);
+		
 		if (null == cartLines) {
 			return null;
 		}
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+		
+		
+		//地址
+		CalcFreightCommand  calcFreightCommand  = null;
+		if(addressList!=null && !addressList.isEmpty()){
+			ContactCommand contactCommand =null;
+			
+			//默认地址
+			for(ContactCommand curContactCommand:addressList){
+				if(curContactCommand.getIsDefault()){
+					contactCommand = curContactCommand;
+					break;
+				}
+			}
+			//无默认，取第一条
+			if(contactCommand==null){
+				contactCommand  = addressList.get(0);
+			}
+			calcFreightCommand = new CalcFreightCommand();
+			calcFreightCommand.setProvienceId(contactCommand.getProvinceId());
+			calcFreightCommand.setCityId(contactCommand.getCityId());
+			calcFreightCommand.setCountyId(contactCommand.getAreaId());
+		}else{
+			//在未选择地址的情况下   为了显示默认运费，初始设置一个临时地址，上海市黄浦区()
+			calcFreightCommand = new CalcFreightCommand();
+			calcFreightCommand.setProvienceId(310000L);
+			calcFreightCommand.setCityId(310100L);
+			calcFreightCommand.setCountyId(310101L);
+		}
+		
+		
+		
+		//优惠券
+		List<String> coupons= null;
+		if(Validator.isNotNullOrEmpty(couponCode)){
+			coupons = new ArrayList<String>();
+			coupons.add(couponCode);
+		}
+		
+		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, coupons, calcFreightCommand, cartLines);
 	}
 
 	/**
@@ -332,7 +437,8 @@ public class NebulaOrderConfirmController extends BaseController {
 	 */
 	private NebulaReturnResult toNebulaReturnResult(SalesOrderResult salesorderResult) {
 		if (SalesOrderResult.SUCCESS != salesorderResult) {
-			DefaultReturnResult result = DefaultReturnResult.FAILURE;
+			DefaultReturnResult result = new DefaultReturnResult();
+			result.setResult(false);
 
 			String messageStr = getMessage(salesorderResult.toString());
 
@@ -358,11 +464,16 @@ public class NebulaOrderConfirmController extends BaseController {
 		if (null != salesOrderResult) {
 			return salesOrderResult;
 		}
-		/** 校驗优惠券促销 */
-		salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
-		if (null != salesOrderResult) {
-			return salesOrderResult;
+
+		/** 如果输入了优惠券则要进行优惠券验证 */
+		if (Validator.isNotNullOrEmpty(coupon)) {
+			/** 校驗优惠券促销 */
+			salesOrderResult = checkCoupon(coupon, shoppingCartCommand);
+			if (null != salesOrderResult) {
+				return salesOrderResult;
+			}
 		}
+
 		return SalesOrderResult.SUCCESS;
 	}
 
@@ -410,7 +521,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		return SalesOrderResult.ORDER_COUPON_NOT_AVALIBLE;
 
 	}
-	
+
 	private SalesOrderReturnObject createReturnObject(String subOrdinate) {
 		// 通過支付流水號查詢訂單
 		SalesOrderCommand newOrder = salesOrderResolver.getSalesOrderCommand(subOrdinate);
@@ -418,8 +529,10 @@ public class NebulaOrderConfirmController extends BaseController {
 		salesOrderReturnObject.setCode(newOrder.getCode());
 		salesOrderReturnObject.setId(newOrder.getId());
 		salesOrderReturnObject.setSubOrdinate(subOrdinate);
-		
+
 		return salesOrderReturnObject;
 	}
+	
+	
 
 }

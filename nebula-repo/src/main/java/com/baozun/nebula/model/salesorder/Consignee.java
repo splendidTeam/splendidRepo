@@ -255,7 +255,7 @@ public class Consignee extends BaseModel{
         this.address = address;
     }
 
-    @Column(name = "MOBILE",length = 20)
+    @Column(name = "MOBILE",length = 100)
     public String getMobile(){
         return mobile;
     }

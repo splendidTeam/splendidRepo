@@ -56,4 +56,21 @@ public class CacheKeyConstant{
 	/** bundle缓存时间 */
 	public static final Integer	BUNDLE_CACHE_TIME					= 60 * 60;
 	
+	/**
+	 *  navigation filter 中导航 map cache key
+	 *  @see nebula helix com.baozun.nebula.manager.navigation.NavigationHelperManagerImpl.getAllNavigationMap()
+	 */
+	public static final  String	CACHE_KEY_FILTER_NAV = "cache_key_filter_nav";
+	
+	/**
+	 *  navigation filter 中导航 map cache field
+	 *  @see nebula helix com.baozun.nebula.manager.navigation.NavigationHelperManagerImpl.getAllNavigationMap()
+	 */
+	public static final  String	CACHE_FIELD_FILTER_NAV = "cache_field_filter_nav";
+	
+	/**
+	 * 导航元数据在缓存中的key，完整的key还要加上语言
+	 * @see com.baozun.nebula.search.FacetFilterHelperImpl.loadFacetFilterMetaData()
+	 */
+	public final static String			NAVIGATIONMETACACHEKEY		= "navigationMetaCacheKey_";
 }

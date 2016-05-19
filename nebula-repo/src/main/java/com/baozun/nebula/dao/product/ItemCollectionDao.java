@@ -16,11 +16,13 @@
  */
 package com.baozun.nebula.dao.product;
 
-import com.baozun.nebula.model.product.ItemCollection;
+import java.util.List;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
+
+import com.baozun.nebula.model.product.ItemCollection;
 
 /**
  * IndustryDao
@@ -41,4 +43,12 @@ public interface ItemCollectionDao extends GenericEntityDao<ItemCollection, Long
 	 */
 	@NativeQuery(model = ItemCollection.class)
 	ItemCollection findItemCollectionByNavigationId(@QueryParam("navigationId") Long navigationId);
+	
+	/**
+	 * 查询所有
+	 * @return List<ItemCollection>
+	 * @author dongliang.ma
+	 */
+	@NativeQuery(model = ItemCollection.class)
+	List<ItemCollection> findAll();
 }
