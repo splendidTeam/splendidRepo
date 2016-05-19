@@ -184,21 +184,11 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 	}
 
 	@Override
-	public ShoppingCartCommand buildShoppingCartForOrder(MemberDetails memberDetails,
-			SalesOrderCommand salesOrderCommand, HttpServletRequest request) {
+	public ShoppingCartCommand buildShoppingCartForOrder(List<ShoppingCartLineCommand> cartLines,MemberDetails memberDetails,
+			SalesOrderCommand salesOrderCommand) {
 
 		// 获取购物车行信息
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
-				request);
-		if (null == cartLines) {
-			return null;
-		}
-		// 过滤未勾选的商品 1选中  0未选中
-		cartLines = CollectionsUtil.removeAll(cartLines, "settlementState", 0);
-		if (null == cartLines) {
-			return null;
-		}
+
 		
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
