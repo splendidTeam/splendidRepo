@@ -52,6 +52,7 @@ import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
+import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.promotion.PromotionCoupon;
@@ -6840,11 +6841,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             Integer quantity = shoppingCartLineCommand.getQuantity();
             ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
 
+            int result = 0;
             if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                sdkShoppingCartLineDao
+                result = sdkShoppingCartLineDao
                                 .updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
             }else{
-                sdkShoppingCartLineDao.addCartLineQuantity(memberId, extentionCode, quantity);
+                result = sdkShoppingCartLineDao.addCartLineQuantity(memberId, extentionCode, quantity);
+            }
+
+            if (1 != result){
+                throw new NativeUpdateRowCountNotEqualException(1, result);
             }
         }
     }
