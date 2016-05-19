@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="OfflineStore.findOfflineStoreListByPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				select * from t_store_offlineStore
+				where 1=1
+				#if($province && $province != "")
+					and province=:province
+				#end
+				#if($city && $city != "")
+					and city = :city
+				#end
+				#if($name && $name != "")
+					and name like '%$name%'
+				#end
+				order BY province,city,id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="OfflineStore.findOfflineStoreProvince" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询店铺所有的省</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				select distinct(rtrim(province)) as province from t_store_offlineStore order by province
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.findOfflineStoreCity" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询省对应的市</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				select distinct(city) from t_store_offlineStore where province=:province order by city
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.findAllOfflineStoreCity" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询店铺所有的市</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				select distinct(rtrim(city)) as city from t_store_offlineStore order by city
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.findOfflineStoreById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据id查询一个店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				select * from t_store_offlineStore where id=:id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.findOfflineStoreList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询所有店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+				select * from t_store_offlineStore
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.insertStore" class="loxia.dao.support.DynamicQueryHolder">
+		<description>新增店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[				  
+					insert into t_store_offlineStore (id,address,city,district,ename1,ename2,extension,full_address,hours,storeImage,mapImage,name,phone,province,ename)
+						values (nextval('S_t_store_offlineStore'),:address,:city,:district,:ename1,:ename2,:extension,:full_address,:hours,:storeImage,:mapImage,:name,:phone,:province,:ename)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.updateStore" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[				  
+					update t_store_offlineStore set address=:address,city=:city,district=:district,ename1=:ename1,ename2=:ename2,extension=:extension,
+					full_address=:full_address,hours=:hours,storeImage=:storeImage,mapImage=:mapImage,name=:name,phone=:phone,province=:province,ename=:ename
+					where id=:id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="OfflineStore.deleteStore" class="loxia.dao.support.DynamicQueryHolder">
+		<description>删除店铺</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[				  
+					delete from t_store_offlineStore where id=:id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>
