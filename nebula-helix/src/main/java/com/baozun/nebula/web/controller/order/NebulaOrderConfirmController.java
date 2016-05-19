@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
@@ -43,6 +44,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
@@ -401,7 +403,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		if(Validator.isNotNullOrEmpty(key)){
 			cartLines = autoKeyAccessor.get(key, request);
 			if(cartLines==null || cartLines.isEmpty()){
-				
+				 throw new BusinessException(Constants.SHOPCART_IS_NULL);
 			}
 			
 		}else{
