@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,89 +88,119 @@ import com.baozun.nebula.sdk.manager.SdkShoppingCartGroupManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartLinesManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 
+/**
+ * The Class SdkShoppingCartManagerImpl.
+ */
 @Transactional
 @Service("sdkShoppingCartService")
 public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
+    /** The Constant log. */
     private static final Logger                      log             = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
 
-    /** 程序返回结果 **/
+    /** 程序返回结果 *. */
     private static final Integer                     SUCCESS         = 1;
 
+    /** The Constant FAILURE. */
     private static final Integer                     FAILURE         = 0;
 
+    /** The Constant CHECKED_STATE. */
     private static final int                         CHECKED_STATE   = 1;
 
-    /** 优惠设置是否按单件计算，是指按Qty计算，还是Qty为1来计算 **/
+    /** 优惠设置是否按单件计算，是指按Qty计算，还是Qty为1来计算 *. */
     private static final BigDecimal                  ONE_PIECE_QTY   = new BigDecimal(1);
 
-    /** 百分百 **/
+    /** 百分百 *. */
     private static final BigDecimal                  HUNDRED_PERCENT = new BigDecimal(1);
 
+    /** The sdk shopping cart line dao. */
     @Autowired
     private SdkShoppingCartLineDao                   sdkShoppingCartLineDao;
 
+    /** The item info dao. */
     @Autowired
     private ItemInfoDao                              itemInfoDao;
 
+    /** The sku dao. */
     @Autowired
     private SkuDao                                   skuDao;
 
+    /** The item category dao. */
     @Autowired
     private ItemCategoryDao                          itemCategoryDao;
 
+    /** The sdk filter manager. */
     @Autowired
     private SdkFilterManager                         sdkFilterManager;
 
+    /** The sdk engine manager. */
     @Autowired
     private SdkEngineManager                         sdkEngineManager;
 
+    /** The sdk promotion calculation manager. */
     @Autowired
     private SdkPromotionCalculationManager           sdkPromotionCalculationManager;
 
+    /** The sdk promotion rule filter manager. */
     @Autowired
     private SdkPromotionRuleFilterManager            sdkPromotionRuleFilterManager;
 
+    /** The logistics manager. */
     @Autowired
     private LogisticsManager                         logisticsManager;
 
+    /** The sdk order line dao. */
     @Autowired
     private SdkOrderLineDao                          sdkOrderLineDao;
 
+    /** The sdk purchase rule filter manager. */
     @Autowired
     private SdkPurchaseLimitRuleFilterManager        sdkPurchaseRuleFilterManager;
 
+    /** The sdk effective manager. */
     @Autowired
     private SdkEffectiveManager                      sdkEffectiveManager;
 
+    /** The sdk promotion coupon manager. */
     @Autowired
     private SdkPromotionCouponManager                sdkPromotionCouponManager;
 
+    /** The sdk promotion calculation share to sku manager. */
     @Autowired
     private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
 
+    /** The sdk promotion setting manager. */
     @Autowired
     private SdkPromotionCalculationSettingManager    sdkPromotionSettingManager;
 
+    /** The sdk shopping cart group manager. */
     @Autowired
     private SdkShoppingCartGroupManager              sdkShoppingCartGroupManager;
 
+    /** The sdk promotion guide manager. */
     @Autowired
     private SdkPromotionGuideManager                 sdkPromotionGuideManager;
 
+    /** The sdk mata info manager. */
     @Autowired
     private SdkMataInfoManager                       sdkMataInfoManager;
 
+    /** The sdk shopping cart lines manager. */
     @Autowired
     private SdkShoppingCartLinesManager              sdkShoppingCartLinesManager;
 
+    /** The sdk promotion manager. */
     @Autowired
     private SdkPromotionManager                      sdkPromotionManager;
 
     /**
-     * 是否包含此行进行计算
-     * 
-     * @return
+     * 是否包含此行进行计算.
+     *
+     * @param SettlementState
+     *            the Settlement state
+     * @param isValid
+     *            the is valid
+     * @return true, if need contains line calc
      */
     private boolean needContainsLineCalc(Integer SettlementState,boolean isValid){
         /**
@@ -209,12 +240,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 通过系统配置的计算级别选出参与促销计算以及不参与促销计算的购物车行
-     * 
+     * 通过系统配置的计算级别选出参与促销计算以及不参与促销计算的购物车行.
+     *
      * @param allLines
+     *            the all lines
      * @param chooseLines
+     *            the choose lines
      * @param notChooseLines
-     * @return
+     *            the not choose lines
+     * @return the list< shopping cart line command>
      */
     private List<ShoppingCartLineCommand> splitByCalcLevel(
                     List<ShoppingCartLineCommand> allLines,
@@ -233,6 +267,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return allLines;
     }
 
+    /**
+     * Need contains line calc2.
+     *
+     * @param SettlementState
+     *            the Settlement state
+     * @param isValid
+     *            the is valid
+     * @return true, if need contains line calc2
+     */
     private boolean needContainsLineCalc2(Integer SettlementState,boolean isValid){
 
         return false;
@@ -240,15 +283,20 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
+     * Find shopping cart.
+     *
      * @param userId
+     *            the user id
      * @param memComIds
      *            组合id
      * @param coupons
      *            优惠券
-     * @param calFreightCommand
+     * @param calcFreightCommand
+     *            the calc freight command
      * @param shoppingCartLines
      *            获取购物车列表时候要经过 有效性引擎和促销引擎。 不走限购检查引擎 callType==1是为点结算按钮提供的判断条件 callType==2是为点立即购买按钮提供的判断条件
      *            CalcFreightCommand 不为空时计算运费 为空不计算运费
+     * @return the shopping cart command
      */
     @Override
     @Transactional(readOnly = true)
@@ -266,13 +314,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取购物车对象
-     * 
-     * @param validedLines
-     * @param userDetails
+     * 获取购物车对象.
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param coupons
-     * @return
+     *            the coupons
+     * @param memberId
+     *            the member id
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @param memComIds
+     *            the mem com ids
+     * @return the shopping cart
      */
     private ShoppingCartCommand getShoppingCart(
                     List<ShoppingCartLineCommand> shoppingCartLines,
@@ -448,6 +502,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return shoppingCart;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#findShoppingCartLinesByMemberId(java.lang.Long, java.lang.Integer)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ShoppingCartLineCommand> findShoppingCartLinesByMemberId(Long memberId,Integer callType){
@@ -462,11 +521,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取当前人员的选择的赠品行
-     * 
+     * 获取当前人员的选择的赠品行.
+     *
      * @param memberId
+     *            the member id
      * @param callType
-     * @return
+     *            the call type
+     * @return the list< shopping cart line command>
      */
     @Override
     @Transactional(readOnly = true)
@@ -484,12 +545,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 封装购物车的基本信息
-     * 
+     * 封装购物车的基本信息.
+     *
      * @param shoppingCart
+     *            the shopping cart
      * @param userDetails
+     *            the user details
      * @param coupons
+     *            the coupons
      * @param validedLines
+     *            the valided lines
      */
     private void packShopBaseInfo(
                     ShoppingCartCommand shoppingCart,
@@ -521,12 +586,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 无促销情况下计算运费
-     * 
+     * 无促销情况下计算运费.
+     *
      * @param calcFreightCommand
-     * @param cartByShop
-     * @param cart
+     *            the calc freight command
+     * @param validLines
+     *            the valid lines
      * @param shopId
+     *            the shop id
+     * @return the freight fee
      */
     private BigDecimal getFreightFee(CalcFreightCommand calcFreightCommand,List<ShoppingCartLineCommand> validLines,Long shopId){
         BigDecimal originShippingFee = BigDecimal.ZERO;
@@ -556,10 +624,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取购物车的促销信息
-     * 
+     * 获取购物车的促销信息.
+     *
      * @param shoppingCart
+     *            the shopping cart
      * @param calcFreightCommand
+     *            the calc freight command
      */
     private void getShopCartPromotionInfos(ShoppingCartCommand shoppingCart,CalcFreightCommand calcFreightCommand){
         // 获取促销数据.需要调用促销引擎计算优惠价格
@@ -660,12 +730,14 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 更新购物车中相关的促销信息
-     * 
+     * 更新购物车中相关的促销信息.
+     *
      * @param promotionLines
+     *            the promotion lines
      * @param lines
-     * 
      *            更新的内容有 lineGroup ,promotionId,isGift
+     * @param memberId
+     *            the member id
      */
     private void updateShoppingCartPromotinInfo(
                     List<ShoppingCartLineCommand> promotionLines,
@@ -722,11 +794,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 执行购物车更新
-     * 
+     * 执行购物车更新.
+     *
      * @param needDelLineList
+     *            the need del line list
      * @param needAdd
+     *            the need add
      * @param needUpdate
+     *            the need update
+     * @param memberId
+     *            the member id
      */
     private void execShoppingCartUpdate(
                     List<Long> needDelLineList,
@@ -768,21 +845,25 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 比较两个字符串
-     * 
+     * 比较两个字符串.
+     *
      * @param str1
+     *            the str1
      * @param str2
-     * @return
+     *            the str2
+     * @return true, if compare string
      */
     private boolean compareString(String str1,String str2){
         return (null == str1 && null == str2) || (null != str1 && str1.equals(str2));
     }
 
     /**
-     * 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值
-     * 
+     * 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值.
+     *
      * @param shoppingCart
+     *            the shopping cart
      * @param promotionBriefList
+     *            the promotion brief list
      */
     private void shareDiscountToLine(ShoppingCartCommand shoppingCart,List<PromotionBrief> promotionBriefList){
         // 分摊结果
@@ -816,10 +897,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 返回整个购物车数据
-     * 
-     * @param summaryShopCartList
-     * @return
+     * 返回整个购物车数据.
+     *
+     * @param shopCartMap
+     *            the shop cart map
+     * @return the all shopping cart lines
      */
     private List<ShoppingCartLineCommand> getAllShoppingCartLines(Map<Long, ShoppingCartCommand> shopCartMap){
         List<ShoppingCartLineCommand> allLines = new ArrayList<ShoppingCartLineCommand>();
@@ -834,10 +916,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取非礼品购物车行
-     * 
+     * 获取非礼品购物车行.
+     *
      * @param shopCartMap
-     * @return
+     *            the shop cart map
+     * @return the no gift shopping cart lines
      */
     private List<ShoppingCartLineCommand> getNoGiftShoppingCartLines(Map<Long, ShoppingCartCommand> shopCartMap){
         List<ShoppingCartLineCommand> noGiftLines = new ArrayList<ShoppingCartLineCommand>();
@@ -859,15 +942,18 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 构造用于购物车页面促销信息显示的数据
-     * 
-     * @deprecated
-     * 
+     * 构造用于购物车页面促销信息显示的数据.
+     *
      * @param promotionBriefList
+     *            the promotion brief list
      * @param shopCart
+     *            the shop cart
      * @param calcFreightCommand
-     * @return
+     *            the calc freight command
+     * @return the promotion discount amt summary sku list
+     * @deprecated
      */
+    @Deprecated
     private ShopCartCommandByShop getPromotionDiscountAmtSummarySkuList(
                     List<PromotionBrief> promotionBriefList,
                     ShoppingCartCommand shopCart,
@@ -987,12 +1073,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 构造用于购物车页面促销信息显示的数据
-     * 
+     * 构造用于购物车页面促销信息显示的数据.
+     *
      * @param promotionBriefList
+     *            the promotion brief list
      * @param shopCart
+     *            the shop cart
      * @param calcFreightCommand
-     * @return
+     *            the calc freight command
+     * @return the promotion discount amt summary sku list group
      */
     private ShopCartCommandByShop getPromotionDiscountAmtSummarySkuListGroup(
                     List<PromotionBrief> promotionBriefList,
@@ -1116,9 +1205,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 封装礼品购物车行
-     * 
-     * @return
+     * 封装礼品购物车行.
+     *
+     * @param proSku
+     *            the pro sku
+     * @return the gift shopping cart line command
      */
     private ShoppingCartLineCommand getGiftShoppingCartLineCommand(PromotionSKUDiscAMTBySetting proSku){
         ShoppingCartLineCommand giftLine = new ShoppingCartLineCommand();
@@ -1145,9 +1236,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据店铺封装shopCart对象
-     * 
+     * 根据店铺封装shopCart对象.
+     *
      * @param shopCart
+     *            the shop cart
+     * @return the shop cart by shop id
      */
     private Map<Long, ShoppingCartCommand> getShopCartByShopId(ShoppingCartCommand shopCart){
         // 获取区分了店铺的购物车对象
@@ -1168,10 +1261,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算应付金额
-     * 
+     * 计算应付金额.
+     *
      * @param shoppingCartLines
-     * @return
+     *            the shopping cart lines
+     * @return the origin pay amount
      */
     private BigDecimal getOriginPayAmount(List<ShoppingCartLineCommand> shoppingCartLines){
         BigDecimal originPayAmount = new BigDecimal(0);
@@ -1186,10 +1280,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算整单商品数量
-     * 
+     * 计算整单商品数量.
+     *
      * @param shoppingCartLines
-     * @return
+     *            the shopping cart lines
+     * @return the order quantity
      */
     private int getOrderQuantity(List<ShoppingCartLineCommand> shoppingCartLines){
         int qtyAll = 0;
@@ -1202,10 +1297,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算促销金额
-     * 
-     * @param promotionBriefList
-     * @return
+     * 计算促销金额.
+     *
+     * @param summaryShopCart
+     *            the summary shop cart
+     * @return the real pay amount by shop cart
      */
     private BigDecimal getRealPayAmountByShopCart(List<ShopCartCommandByShop> summaryShopCart){
         BigDecimal cartPromotionAmount = BigDecimal.ZERO;
@@ -1218,10 +1314,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算应付运费
-     * 
-     * @param promotionBriefList
-     * @return
+     * 计算应付运费.
+     *
+     * @param summaryShopCart
+     *            the summary shop cart
+     * @return the orgin shipping amount by shop cart
      */
     private BigDecimal getOrginShippingAmountByShopCart(List<ShopCartCommandByShop> summaryShopCart){
         BigDecimal orginShippingAmount = BigDecimal.ZERO;
@@ -1234,10 +1331,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算实付运费
-     * 
-     * @param promotionBriefList
-     * @return
+     * 计算实付运费.
+     *
+     * @param summaryShopCart
+     *            the summary shop cart
+     * @param orginShippingAmount
+     *            the orgin shipping amount
+     * @return the current shipping amount by shop cart
      */
     private BigDecimal getCurrentShippingAmountByShopCart(List<ShopCartCommandByShop> summaryShopCart,BigDecimal orginShippingAmount){
         // 运费优惠
@@ -1255,12 +1355,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 引擎检查(限购、有效、库存)
-     * 
+     * 引擎检查(限购、有效、库存).
+     *
      * @param cart
+     *            the cart
      * @param shoppingCartLine
+     *            the shopping cart line
      * @param memboIds
-     * @return
+     *            the membo ids
+     * @param flag
+     *            the flag
+     * @return the integer
      */
     private Integer doEngineChck(ShoppingCartCommand cart,ShoppingCartLineCommand shoppingCartLine,Set<String> memboIds,boolean flag){
         // 购物车的所属店铺
@@ -1312,13 +1417,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 限购检查
-     * 
+     * 限购检查.
+     *
      * @param cart
-     * @param shoppingCartLine
+     *            the cart
      * @param memboIds
-     * @return
+     *            the membo ids
+     * @return the integer
      */
+    @Override
     public Integer doPromotionCheck(ShoppingCartCommand cart,Set<String> memboIds){
         // 购物车的所属店铺
         List<Long> shopIds = getShopIds(cart.getShoppingCartLineCommands());
@@ -1366,13 +1473,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 移除购物车行
-     * 
+     * 移除购物车行.
+     *
      * @param memberId
-     * @param guestIndentify
+     *            the member id
      * @param extentionCode
-     * @param request
-     * @param response
+     *            the extention code
      * @return 移除购物车行是否成功 success表示成功 failure表示失败
      */
     @Override
@@ -1391,10 +1497,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据购物车id移除购物车行
-     * 
+     * 根据购物车id移除购物车行.
+     *
      * @param memberId
+     *            the member id
      * @param shoppingCartLineId
+     *            the shopping cart line id
      * @return 移除购物车行是否成功 success表示成功 failure表示失败
      */
     @Override
@@ -1413,17 +1521,14 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 清空购物车
-     * 
+     * 清空购物车.
+     *
      * @param memberId
-     * @param guestIndentify
-     * @param request
-     * @param response
+     *            the member id
      * @return 清空购物车是否成功 success表示成功 failure表示失败
      */
     @Override
     public Integer emptyShoppingCart(Long memberId){
-
         if (null != memberId){
             // 会员
             try{
@@ -1432,38 +1537,21 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 if (retval < 1){
                     return FAILURE;
                 }
-                // 设置cookie中的头部购物车商品数量
-                // CookieUtil.setCookie(request, response,
-                // Constants.GUEST_COOKIE_GC_CNT,null);
             }catch (Exception e){
                 log.error("emptyShoppingCart member error");
                 return FAILURE;
             }
         }
-        // else {
-        // //游客
-        // try {
-        // //重新设置cookie中的购物车值
-        // CookieUtil.deleteCookie(request, response, new
-        // Cookie(Constants.GUEST_COOKIE_GC,null));
-        // CookieUtil.setCookie(request, response,
-        // Constants.GUEST_COOKIE_GC_CNT,null);
-        // } catch (Exception e) {
-        // log.error("emptyShoppingCart cookie error");
-        // return FAILURE;
-        // }
-        // }
         return SUCCESS;
     }
 
     /**
-     * 保存或更新购物行信息
-     * 
+     * 保存或更新购物行信息.
+     *
      * @param shoppingCartLine
-     * @return
+     *            the shopping cart line
      */
     private void saveCartLine(ShoppingCartLineCommand shoppingCartLine){
-
         if (null == shoppingCartLine){
             return;
         }
@@ -1497,13 +1585,18 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 新增或者修改购物车行
-     * 
+     * 新增或者修改购物车行.
+     *
      * @param userId
+     *            the user id
      * @param shoppingCartLine
+     *            the shopping cart line
      * @param saveFlage
-     * @return
+     *            the save flage
+     * @return the integer
+     * @deprecated 乱七八糟
      */
+    @Deprecated
     private Integer merageShoppingCartLine(Long userId,ShoppingCartLineCommand shoppingCartLine,boolean saveFlage){
 
         String extentionCode = shoppingCartLine.getExtentionCode();
@@ -1533,17 +1626,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                         curQuantity = shoppingCartLine.getQuantity();
                         effectedRows = sdkShoppingCartLineDao.updateCartLineQuantity(userId, line.getExtentionCode(), curQuantity);
                     }
-                    // Integer effectedRows =
-                    // sdkShoppingCartLineDao.updateCartLineQuantity(userId,
-                    // line.getExtentionCode(), curQuantity);
-
                     if (1 == effectedRows){
                         updateResultFlag = true;
                         line.setQuantity(curQuantity);
                     }else{
                         updateResultFlag = false;
                     }
-
                     break;
                 }
             }
@@ -1554,29 +1642,31 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }else{
                     return SUCCESS;
                 }
-            }else{// 不存在
-                      // 添加
+            }else{// 不存在 添加
                 saveCartLine(shoppingCartLine);
             }
 
         }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
-
-            // 保存 shoppingCartLine
+                  // 保存 shoppingCartLine
             saveCartLine(shoppingCartLine);
         }
         return SUCCESS;
     }
 
     /**
-     * 新增或者修改购物车行
-     * 
+     * 新增或者修改购物车行.
+     *
      * @param userId
+     *            the user id
      * @param shoppingCartLine
+     *            the shopping cart line
      * @param saveFlage
-     * @return
+     *            the save flage
+     * @return the integer
+     * @deprecated 乱七八糟的
      */
+    @Deprecated
     private Integer merageShoppingCartLineById(Long userId,ShoppingCartLineCommand shoppingCartLine,boolean saveFlage){
-
         String extentionCode = shoppingCartLine.getExtentionCode();
         if (null == extentionCode){
             return FAILURE;
@@ -1604,17 +1694,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                         curQuantity = shoppingCartLine.getQuantity();
                         effectedRows = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(userId, line.getId(), curQuantity);
                     }
-                    // Integer effectedRows =
-                    // sdkShoppingCartLineDao.updateCartLineQuantity(userId,
-                    // line.getExtentionCode(), curQuantity);
-
                     if (1 == effectedRows){
                         updateResultFlag = true;
                         line.setQuantity(curQuantity);
                     }else{
                         updateResultFlag = false;
                     }
-
                     break;
                 }
             }
@@ -1625,27 +1710,28 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }else{
                     return SUCCESS;
                 }
-            }else{// 不存在
-                      // 添加
+            }else{// 不存在 添加
                 saveCartLine(shoppingCartLine);
             }
-
         }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
-
-            // 保存 shoppingCartLine
+                  // 保存 shoppingCartLine
             saveCartLine(shoppingCartLine);
         }
         return SUCCESS;
     }
 
     /**
-     * 新增或者修改购物车行
-     * 
+     * 新增或者修改购物车行.
+     *
      * @param userId
+     *            the user id
      * @param shoppingCartLine
-     * @param saveFlage
-     * @return
+     *            the shopping cart line
+     * @return true, if merage shopping cart line by id
+     * @deprecated 乱七八糟的
      */
+    @Override
+    @Deprecated
     public boolean merageShoppingCartLineById(Long userId,ShoppingCartLineCommand shoppingCartLine){
 
         String extentionCode = shoppingCartLine.getExtentionCode();
@@ -1695,14 +1781,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 修改购物车的选中状态(之前的功能，暂时不用)
-     * 
+     * 修改购物车的选中状态(之前的功能，暂时不用).
+     *
      * @param userId
-     * @param guestIndentify
+     *            the user id
      * @param extentionCodes
+     *            the extention codes
      * @param settleState
-     * @param request
-     * @param response
+     *            the settle state
+     * @return the integer
      */
     @Override
     public Integer updateCartLineSettlementState(Long userId,List<String> extentionCodes,Integer settleState){
@@ -1719,14 +1806,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 立即购买
-     * 
+     * 立即购买.
+     *
      * @param memberId
+     *            the member id
      * @param memCombos
+     *            the mem combos
      * @param shoppingCartLine
      *            操作的line
      * @param lines
-     * @return
+     *            the lines
+     * @return the integer
      */
     @Override
     public Integer immediatelyBuy(
@@ -1784,11 +1874,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取购物车中的所有店铺id
-     * 
+     * 获取购物车中的所有店铺id.
+     *
      * @param lines
-     * @return
+     *            the lines
+     * @return the shop ids
      */
+    @Override
     public List<Long> getShopIds(List<ShoppingCartLineCommand> lines){
         List<Long> shopIds = new ArrayList<Long>();
         if (null == lines || lines.size() == 0)
@@ -1802,10 +1894,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据购物车行获取ItemForCheckCommand集合
-     * 
+     * 根据购物车行获取ItemForCheckCommand集合.
+     *
      * @param lines
-     * @return
+     *            the lines
+     * @return the item combo ids
      */
     private Set<String> getItemComboIds(List<ShoppingCartLineCommand> lines){
         Set<String> set = new HashSet<String>();
@@ -1818,19 +1911,20 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 游客的memboIds
-     * 
-     * @return
+     * 游客的memboIds.
+     *
+     * @return the membo ids
      */
     private Set<String> getMemboIds(){
         return sdkEngineManager.getCrowdScopeListByMemberAndGroup(null, null);
     }
 
     /**
-     * 用于计算获取促销数据
-     * 
-     * @param shoppingCartLines
-     * @return
+     * 用于计算获取促销数据.
+     *
+     * @param shopCart
+     *            the shop cart
+     * @return the list< promotion brief>
      */
     @Override
     @Transactional(readOnly = true)
@@ -1850,12 +1944,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取每款商品总金额
-     * 
+     * 获取每款商品总金额.
+     *
      * @param itemId
      *            商品id
      * @param shoppingLines
-     * @return
+     *            the shopping lines
+     * @return the product amount
      */
     @Override
     public BigDecimal getProductAmount(Long itemId,List<ShoppingCartLineCommand> shoppingLines){
@@ -1875,7 +1970,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取购物车应付金额，除去礼品以外
+     * 获取购物车应付金额，除去礼品以外.
+     *
+     * @param shoppingLines
+     *            the shopping lines
+     * @return the all amount
      */
     @Override
     public BigDecimal getAllAmount(List<ShoppingCartLineCommand> shoppingLines){
@@ -1894,11 +1993,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取每款商品购买数量
-     * 
+     * 获取每款商品购买数量.
+     *
      * @param itemId
+     *            the item id
      * @param shoppingLines
-     * @return
+     *            the shopping lines
+     * @return the product quantity
      */
     @Override
     public Integer getProductQuantity(Long itemId,List<ShoppingCartLineCommand> shoppingLines){
@@ -1918,11 +2019,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取某个分类下商品的金额
-     * 
+     * 获取某个分类下商品的金额.
+     *
      * @param categoryId
+     *            the category id
      * @param shoppingLines
-     * @return
+     *            the shopping lines
+     * @return the category amount
      */
     @Override
     public BigDecimal getCategoryAmount(Long categoryId,List<ShoppingCartLineCommand> shoppingLines){
@@ -1938,12 +2041,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算分类金额
-     * 
+     * 计算分类金额.
+     *
      * @param categoryId
-     * @param categoryAmount
+     *            the category id
      * @param shoppingLine
-     * @return
+     *            the shopping line
+     * @return the big decimal
      */
     private BigDecimal calcCategoryAmount(Long categoryId,ShoppingCartLineCommand shoppingLine){
         BigDecimal categoryAmount = new BigDecimal(0.0);
@@ -1958,11 +2062,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取某个分类下商品的数量
-     * 
+     * 获取某个分类下商品的数量.
+     *
      * @param categoryId
+     *            the category id
      * @param shoppingLines
-     * @return
+     *            the shopping lines
+     * @return the category quantity
      */
     @Override
     public Integer getCategoryQuantity(Long categoryId,List<ShoppingCartLineCommand> shoppingLines){
@@ -1982,9 +2088,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
+     * 获得 combo amount.
+     *
      * @param comboId
+     *            the combo id
      * @param shoppingLines
      *            获取组合金额
+     * @return the combo amount
      */
     @Override
     public BigDecimal getComboAmount(Long comboId,List<ShoppingCartLineCommand> shoppingLines){
@@ -2006,9 +2116,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
+     * 获得 combo quantity.
+     *
      * @param comboId
+     *            the combo id
      * @param shoppingLines
      *            获取组合数量
+     * @return the combo quantity
      */
     @Override
     public Integer getComboQuantity(Long comboId,List<ShoppingCartLineCommand> shoppingLines){
@@ -2030,10 +2144,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 统计各个分类下SKU、QTY*SalesPrice
-     * 
+     * 统计各个分类下SKU、QTY*SalesPrice.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
      * @return Map<Long, BigDecimal> long 代表skuId，BigDecimal代表sku总计金额
      */
     @Override
@@ -2069,10 +2185,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 统计每个item的总金额
-     * 
+     * 统计每个item的总金额.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
+     * @return the item amount
      */
     @Override
     public BigDecimal getItemAmount(ShoppingCartCommand shopCart,Long itemId){
@@ -2094,10 +2213,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 统计每个item下的sku的金额
-     * 
+     * 统计每个item下的sku的金额.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
+     * @return the SKU sales info by item
      */
     @Override
     public Map<Long, BigDecimal> getSKUSalesInfoByItem(ShoppingCartCommand shopCart,Long itemId){
@@ -2130,9 +2252,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据会员统计购物车中的商品数量
-     * 
+     * 根据会员统计购物车中的商品数量.
+     *
      * @param memberId
+     *            the member id
+     * @return the shop cart item qty
      */
     @Override
     @Transactional(readOnly = true)
@@ -2144,7 +2268,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按整单折扣率，计算累计折扣金额
+     * 按整单折扣率，计算累计折扣金额.
+     *
+     * @param shopCart
+     *            the shop cart
+     * @param discountRate
+     *            the discount rate
+     * @param previousDiscAMTAll
+     *            the previous disc amt all
+     * @return the discount amt order discount rate by rate
      */
     @Override
     public BigDecimal getDiscountAMTOrderDiscountRateByRate(
@@ -2167,11 +2299,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算礼品的累计金额,按ItemID。一个item下多个SKU，按不定顺序取足QTY返回优惠金额
-     * 
-     * @param lines
+     * 计算礼品的累计金额,按ItemID。一个item下多个SKU，按不定顺序取足QTY返回优惠金额.
+     *
+     * @param shopId
+     *            the shop id
+     * @param setting
+     *            the setting
      * @param itemId
+     *            the item id
      * @param qty
+     *            the qty
+     * @param displayCountLimited
+     *            the display count limited
+     * @return the discount amt gift by item id
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemID(
@@ -2193,11 +2333,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算礼品的累计金额,按CategoryID。一个CategoryID下多个SKU，按不定顺序取足QTY返回优惠金额
-     * 
-     * @param lines
-     * @param categoryId
+     * 计算礼品的累计金额,按CategoryID。一个CategoryID下多个SKU，按不定顺序取足QTY返回优惠金额.
+     *
+     * @param shopId
+     *            the shop id
+     * @param setting
+     *            the setting
      * @param qty
+     *            the qty
+     * @param displayCountLimited
+     *            the display count limited
+     * @return the discount amt gift by category id
      */
     @Override
     @Transactional(readOnly = true)
@@ -2221,6 +2367,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getDiscountAMTGiftByItemList(java.util.List, long,
+     * com.baozun.nebula.calculateEngine.condition.AtomicSetting, java.lang.Integer, java.lang.Integer)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemList(
@@ -2284,11 +2436,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算礼品的累计金额,按ComboID。一个cmbId下多个SKU，按不定顺序取足QTY返回优惠金额
-     * 
-     * @param lines
-     * @param itemId
+     * 计算礼品的累计金额,按ComboID。一个cmbId下多个SKU，按不定顺序取足QTY返回优惠金额.
+     *
+     * @param shopId
+     *            the shop id
+     * @param setting
+     *            the setting
      * @param qty
+     *            the qty
+     * @param displayCountLimited
+     *            the display count limited
+     * @return the discount amt gift by combo id
      */
     @Override
     @Transactional(readOnly = true)
@@ -2319,6 +2477,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /**
+     * 获得 item ids from combo id.
+     *
+     * @param comboId
+     *            the combo id
+     * @param shopId
+     *            the shop id
+     * @return the item ids from combo id
+     */
     private String getItemIdsFromComboId(long comboId,long shopId){
         List<ItemTagRuleCommand> scopList = EngineManager.getInstance().getItemScopeList();
         for (ItemTagRuleCommand tag : scopList){
@@ -2330,11 +2497,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 整单按Item，计算Item下的累计金额
-     * 
+     * 整单按Item，计算Item下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param itemId
-     * @param disAmount
+     *            the item id
+     * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt item per order by amt
      */
     @Override
     @Transactional(readOnly = true)
@@ -2376,11 +2551,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 整单按Item，计算Item下的累计金额
-     * 
+     * 整单按Item，计算Item下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param itemId
+     *            the item id
      * @param rate
+     *            the rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt item per order by rate
      */
     @Override
     @Transactional(readOnly = true)
@@ -2436,11 +2619,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按Item，计算Item下的累计金额
-     * 
+     * 按Item，计算Item下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param itemId
+     *            the item id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt item per item by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByAMT(
@@ -2482,6 +2673,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTItemPerItemByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -2532,11 +2729,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 封装PromotionSKUDiscAMTBySetting对象信息
-     * 
+     * 封装PromotionSKUDiscAMTBySetting对象信息.
+     *
      * @param line
+     *            the line
      * @param disAmt
-     * @return
+     *            the dis amt
+     * @return the promotion sku amt setting
      */
     @Override
     public PromotionSKUDiscAMTBySetting getPromotionSkuAMTSetting(ShoppingCartLineCommand line,BigDecimal disAmt){
@@ -2558,11 +2757,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按Item，计算Item下的累计金额
-     * 
+     * 按Item，计算Item下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param itemId
+     *            the item id
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt item per item by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByRate(
@@ -2617,6 +2824,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTItemPerItemByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -2680,11 +2893,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按件，计算Item下的累计金额
-     * 
+     * 按件，计算Item下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param itemId
+     *            the item id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt item per pcs by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByAMT(
@@ -2722,6 +2943,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTItemPerPCSByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
+    @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByAMT(
                     List<ShoppingCartLineCommand> lines,
                     long itemId,
@@ -2764,11 +2992,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按件，计算Item下的累计金额
-     * 
+     * 按件，计算Item下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param itemId
+     *            the item id
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt item per pcs by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByRate(
@@ -2824,6 +3060,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTItemPerPCSByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -2890,11 +3132,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 整单按Category，计算Category下的累计金额
-     * 
+     * 整单按Category，计算Category下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
+     *            the category id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt category per order by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByAMT(
@@ -2940,11 +3190,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 整单按Category，计算Category下的累计金额
-     * 
+     * 整单按Category，计算Category下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
+     *            the category id
      * @param rate
+     *            the rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt category per order by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByRate(
@@ -3009,11 +3267,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 单品按Category，计算Category下的累计金额
-     * 
+     * 单品按Category，计算Category下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
+     *            the category id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt category per item by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByAMT(
@@ -3038,6 +3304,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCategoryPerItemByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerItemByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -3067,11 +3339,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 单品按Category，计算Category下的累计金额
-     * 
+     * 单品按Category，计算Category下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
+     *            the category id
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt category per item by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByRate(
@@ -3142,6 +3422,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCategoryPerItemByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerItemByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -3173,11 +3459,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 单件按Category，计算Category下的累计金额
-     * 
+     * 单件按Category，计算Category下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
+     *            the category id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt category per pcs by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByAMT(
@@ -3216,6 +3510,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCategoryPerPCSByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerPCSByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -3245,11 +3545,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 单件按Category，计算Category下的累计金额
-     * 
+     * 单件按Category，计算Category下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
+     *            the category id
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt category per pcs by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByRate(
@@ -3275,6 +3583,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCategoryPerPCSByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -3307,10 +3621,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场优惠，计算全场下的累计金额
-     * 
+     * 全场优惠，计算全场下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amtcall per order by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(
@@ -3348,10 +3669,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场折扣，计算全场下的累计金额
-     * 
+     * 全场折扣，计算全场下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amtcall per order by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByRate(
@@ -3402,10 +3730,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场按Item优惠，计算全场下的累计金额
-     * 
+     * 全场按Item优惠，计算全场下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amtcall per item by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByAMT(
@@ -3432,6 +3767,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCALLPerItemByAMT(java.util.List,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -3460,10 +3801,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场按Item优惠，计算全场下的累计金额
-     * 
+     * 全场按Item优惠，计算全场下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amtcall per item by rate
      */
     @Override
     @Transactional(readOnly = true)
@@ -3518,6 +3866,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCALLPerItemByRate(java.util.List,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByRate(
@@ -3549,10 +3903,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场按件优惠，计算全场下的累计金额
-     * 
+     * 全场按件优惠，计算全场下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amtcall per pcs by amt
      */
     @Override
     @Transactional(readOnly = true)
@@ -3588,6 +3949,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCALLPerPCSByAMT(java.util.List,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByAMT(
@@ -3617,10 +3984,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场按件优惠，计算全场下的累计金额
-     * 
+     * 全场按件优惠，计算全场下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amtcall per pcs by rate
      */
     @Override
     @Transactional(readOnly = true)
@@ -3649,6 +4023,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCALLPerPCSByRate(java.util.List,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -3679,11 +4059,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 组合优惠，计算该组合下的累计金额
-     * 
+     * 组合优惠，计算该组合下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param comboId
+     *            the combo id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt combo per order by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByAMT(
@@ -3736,11 +4124,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 组合折扣，计算该组合下的累计金额
-     * 
+     * 组合折扣，计算该组合下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param comboId
+     *            the combo id
      * @param discRate
+     *            the disc rate
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt combo per order by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByRate(
@@ -3803,6 +4197,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getItemIdsFromShoppingCartByComboId(java.util.List, long)
+     */
     @Override
     public Set<Long> getItemIdsFromShoppingCartByComboId(List<ShoppingCartLineCommand> lines,long comboId){
         Set<Long> itemIds = new HashSet<Long>();
@@ -3820,6 +4219,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return itemIds;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getItemIdsFromShoppingCartByCategoryId(java.util.List, long)
+     */
     @Override
     public Set<Long> getItemIdsFromShoppingCartByCategoryId(List<ShoppingCartLineCommand> lines,long categoryId){
         Set<Long> itemIds = new HashSet<Long>();
@@ -3837,6 +4241,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return itemIds;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getItemIdsFromShoppingCartByCustomItemIds(java.util.List, java.util.List)
+     */
     @Override
     public Set<Long> getItemIdsFromShoppingCartByCustomItemIds(List<ShoppingCartLineCommand> lines,List<Long> itemIdList){
         Set<Long> itemIds = new HashSet<Long>();
@@ -3854,6 +4263,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return itemIds;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getItemIdsFromShoppingCartByCall(java.util.List)
+     */
     @Override
     public Set<Long> getItemIdsFromShoppingCartByCall(List<ShoppingCartLineCommand> lines){
         Set<Long> itemIds = new HashSet<Long>();
@@ -3869,11 +4283,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 组合按Item优惠，计算该comboId下的累计金额
-     * 
+     * 组合按Item优惠，计算该comboId下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param comboId
+     *            the combo id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt combo per item by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByAMT(
@@ -3900,6 +4322,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTComboPerItemByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerItemByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -3929,11 +4357,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 组合按Item折扣，计算该Item下的累计金额
-     * 
+     * 组合按Item折扣，计算该Item下的累计金额.
+     *
      * @param lines
-     * @param itemid
-     * @param discAmount
+     *            the lines
+     * @param comboId
+     *            the combo id
+     * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt combo per item by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByRate(
@@ -4004,11 +4440,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按组合按件优惠，计算该Combo下的累计金额
-     * 
+     * 按组合按件优惠，计算该Combo下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param comboId
+     *            the combo id
      * @param discAmount
+     *            the disc amount
+     * @param factor
+     *            the factor
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt combo per pcs by amt
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByAMT(
@@ -4052,6 +4496,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTComboPerPCSByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -4081,11 +4531,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 按组合按件折扣，计算该Combo下的累计金额
-     * 
+     * 按组合按件折扣，计算该Combo下的累计金额.
+     *
      * @param lines
+     *            the lines
      * @param comboId
-     * @param discAmount
+     *            the combo id
+     * @param discRate
+     *            the disc rate
+     * @param onePieceMark
+     *            the one piece mark
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt combo per pcs by rate
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByRate(
@@ -4111,6 +4569,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTComboPerPCSByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -4143,10 +4607,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查整单Coupon
-     * 
-     * @param couponTypeToCheck
+     * 检查整单Coupon.
+     *
+     * @param couponTypeID
+     *            the coupon type id
      * @param couponCodes
+     *            the coupon codes
+     * @param shopID
+     *            the shop id
+     * @return true, if check coupon by call
      */
     @Override
     public boolean checkCouponByCALL(long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopID){
@@ -4157,11 +4626,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查ItemCoupon
-     * 
+     * 检查ItemCoupon.
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param itemId
-     * @param couponCodes
+     *            the item id
+     * @param couponTypeID
+     *            the coupon type id
+     * @param shopId
+     *            the shop id
+     * @return true, if check on line coupon by item id
      */
     @Override
     public boolean checkOnLineCouponByItemId(List<ShoppingCartLineCommand> shoppingCartLines,long itemId,long couponTypeID,long shopId){
@@ -4177,7 +4652,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 行Coupon优先。行优惠在Line上 List<PromotionCouponCodeCommand> couponCodes,整单上的优惠
+     * 行Coupon优先。行优惠在Line上 List<PromotionCouponCodeCommand> couponCodes,整单上的优惠.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param itemId
+     *            the item id
+     * @param couponTypeID
+     *            the coupon type id
+     * @param couponCodes
+     *            the coupon codes
+     * @param shopId
+     *            the shop id
+     * @return true, if check coupon by item id
      */
     @Override
     public boolean checkCouponByItemId(
@@ -4202,12 +4689,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查分类Coupon
-     * 
+     * 检查分类Coupon.
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param categoryId
-     * @param couponTypeToCheck
-     * @param couponCodes
+     *            the category id
+     * @param couponTypeID
+     *            the coupon type id
+     * @param shopId
+     *            the shop id
+     * @return true, if check on line coupon by category id
      */
     @Override
     public boolean checkOnLineCouponByCategoryId(
@@ -4225,6 +4717,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkCouponByCategoryId(java.util.List, long, long, java.util.List, long)
+     */
     @Override
     public boolean checkCouponByCategoryId(
                     List<ShoppingCartLineCommand> shoppingCartLines,
@@ -4248,12 +4745,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查ComboCoupon
-     * 
+     * 检查ComboCoupon.
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param comboId
-     * @param couponTypeToCheck
-     * @param couponCodes
+     *            the combo id
+     * @param couponTypeID
+     *            the coupon type id
+     * @param shopId
+     *            the shop id
+     * @return true, if check on line coupon by combo id
      */
     @Override
     public boolean checkOnLineCouponByComboId(List<ShoppingCartLineCommand> shoppingCartLines,long comboId,long couponTypeID,long shopId){
@@ -4267,6 +4769,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkCouponByComboId(java.util.List, long, long, java.util.List, long)
+     */
     @Override
     public boolean checkCouponByComboId(
                     List<ShoppingCartLineCommand> shoppingCartLines,
@@ -4288,6 +4795,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return checkCouponWithCouponTypeIdShopId(couponCodes, couponTypeID, shopId);
     }
 
+    /**
+     * 获得 max line need to pay by call.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @return the max line need to pay by call
+     */
     private ShoppingCartLineCommand getMaxLineNeedToPayByCall(List<ShoppingCartLineCommand> shoppingCartLines){
         BigDecimal lineNeedToPay = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4302,6 +4816,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return maxLine;
     }
 
+    /**
+     * 获得 max price line by call.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @return the max price line by call
+     */
     private ShoppingCartLineCommand getMaxPriceLineByCall(List<ShoppingCartLineCommand> shoppingCartLines){
         BigDecimal maxPrice = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4317,7 +4838,21 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取整单Coupon金额。根据CouponCodes List，检查当前Type的优惠券，计算出该Type的优惠金额
+     * 获取整单Coupon金额。根据CouponCodes List，检查当前Type的优惠券，计算出该Type的优惠金额.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param couponTypeID
+     *            the coupon type id
+     * @param couponCodes
+     *            the coupon codes
+     * @param onePieceMark
+     *            the one piece mark
+     * @param shopId
+     *            the shop id
+     * @param previousDiscAMTAll
+     *            the previous disc amt all
+     * @return the discount amt by call coupon
      */
     @Override
     public Map<String, BigDecimal> getDiscountAMTByCALLCoupon(
@@ -4351,6 +4886,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return usedCouponList;
     }
 
+    /**
+     * 获得 max line need to pay by item id.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param itemId
+     *            the item id
+     * @return the max line need to pay by item id
+     */
     private ShoppingCartLineCommand getMaxLineNeedToPayByItemId(List<ShoppingCartLineCommand> shoppingCartLines,long itemId){
         BigDecimal lineNeedToPay = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4367,6 +4911,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return maxLine;
     }
 
+    /**
+     * 获得 max price line by item id.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param itemId
+     *            the item id
+     * @return the max price line by item id
+     */
     private ShoppingCartLineCommand getMaxPriceLineByItemId(List<ShoppingCartLineCommand> shoppingCartLines,long itemId){
         BigDecimal maxPrice = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4384,12 +4937,23 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取ItemCoupon金额。根据CouponCodes List，检查当前Type的优惠券，计算出该Type下itemId的优惠金额
-     * 
+     * 获取ItemCoupon金额。根据CouponCodes List，检查当前Type的优惠券，计算出该Type下itemId的优惠金额.
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param itemId
-     * @param couponTypeToCheck
+     *            the item id
+     * @param couponTypeId
+     *            the coupon type id
      * @param couponCodes
+     *            the coupon codes
+     * @param onePieceMark
+     *            the one piece mark
+     * @param shopId
+     *            the shop id
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt by item id coupon
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTByItemIdCoupon(
@@ -4468,6 +5032,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /**
+     * 获得 max price line by category id.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param categoryId
+     *            the category id
+     * @return the max price line by category id
+     */
     private ShoppingCartLineCommand getMaxPriceLineByCategoryId(List<ShoppingCartLineCommand> shoppingCartLines,long categoryId){
         BigDecimal maxPrice = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4484,6 +5057,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return maxLine;
     }
 
+    /**
+     * 获得 max line need to pay by category id.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param categoryId
+     *            the category id
+     * @return the max line need to pay by category id
+     */
     private ShoppingCartLineCommand getMaxLineNeedToPayByCategoryId(List<ShoppingCartLineCommand> shoppingCartLines,long categoryId){
         BigDecimal lineNeedToPay = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4502,10 +5084,22 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
     /**
      * 获取分类Coupon金额.根据CouponCodes List，检查当前Type的优惠券，计算出该Type下categoryId的优惠金额
-     * 
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param categoryId
+     *            the category id
+     * @param couponTypeId
+     *            the coupon type id
      * @param couponCodes
+     *            the coupon codes
+     * @param onePieceMark
+     *            the one piece mark
+     * @param shopId
+     *            the shop id
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt by category id coupon
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTByCategoryIdCoupon(
@@ -4586,6 +5180,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /**
+     * 获得 max line need to pay by combo id.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param comboId
+     *            the combo id
+     * @return the max line need to pay by combo id
+     */
     private ShoppingCartLineCommand getMaxLineNeedToPayByComboId(List<ShoppingCartLineCommand> shoppingCartLines,long comboId){
         BigDecimal lineNeedToPay = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4605,6 +5208,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return maxLine;
     }
 
+    /**
+     * 获得 max price line by combo id.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param comboId
+     *            the combo id
+     * @return the max price line by combo id
+     */
     private ShoppingCartLineCommand getMaxPriceLineByComboId(List<ShoppingCartLineCommand> shoppingCartLines,long comboId){
         BigDecimal maxPrice = BigDecimal.ZERO;
         ShoppingCartLineCommand maxLine = null;
@@ -4626,10 +5238,22 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
     /**
      * 获取ComboCoupon金额.根据CouponCodes List，检查当前Type的优惠券，计算出该Type下comboId的优惠金额
-     * 
+     *
      * @param shoppingCartLines
+     *            the shopping cart lines
      * @param comboId
+     *            the combo id
+     * @param couponTypeId
+     *            the coupon type id
      * @param couponCodes
+     *            the coupon codes
+     * @param onePieceMark
+     *            the one piece mark
+     * @param shopId
+     *            the shop id
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the discount amt by combo id coupon
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> getDiscountAMTByComboIdCoupon(
@@ -4710,10 +5334,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 累计优惠券金额
-     * 
+     * 累计优惠券金额.
+     *
      * @param usedCouponList
-     * @return
+     *            the used coupon list
+     * @return the coupon amt from used list
      */
     @Override
     public BigDecimal getCouponAmtFromUsedList(Map<String, BigDecimal> usedCouponList){
@@ -4730,10 +5355,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查购物车行的商品是否有在itemId下的
-     * 
+     * 检查购物车行的商品是否有在itemId下的.
+     *
      * @param lines
-     * @return
+     *            the lines
+     * @param itemId
+     *            the item id
+     * @return true, if check item in shopping cart lines
      */
     private boolean checkItemInShoppingCartLines(List<ShoppingCartLineCommand> lines,Long itemId){
         for (ShoppingCartLineCommand line : lines){
@@ -4745,10 +5373,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查购物车行的商品是否有在categoryId下的
-     * 
+     * 检查购物车行的商品是否有在categoryId下的.
+     *
      * @param lines
-     * @return
+     *            the lines
+     * @param categoryId
+     *            the category id
+     * @return true, if check category in shopping cart lines
      */
     private boolean checkCategoryInShoppingCartLines(List<ShoppingCartLineCommand> lines,Long categoryId){
         for (ShoppingCartLineCommand line : lines){
@@ -4760,10 +5391,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查购物车行的商品是否有在comboId下的
-     * 
+     * 检查购物车行的商品是否有在comboId下的.
+     *
      * @param lines
-     * @return
+     *            the lines
+     * @param comboId
+     *            the combo id
+     * @return true, if check combo in shopping cart lines
      */
     private boolean checkComboInShoppingCartLines(List<ShoppingCartLineCommand> lines,Long comboId){
         for (ShoppingCartLineCommand line : lines){
@@ -4778,11 +5412,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 检查coupon是否符合条件
-     * 
-     * @param couponTypeID
+     * 检查coupon是否符合条件.
+     *
      * @param couponCodes
-     * @return
+     *            the coupon codes
+     * @param couponTypeID
+     *            the coupon type id
+     * @param shopID
+     *            the shop id
+     * @return true, if check coupon with coupon type id shop id
      */
     private boolean checkCouponWithCouponTypeIdShopId(List<PromotionCouponCodeCommand> couponCodes,long couponTypeID,long shopID){
         // 根据couponType获取所有的促销coupon
@@ -4797,13 +5435,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据couponCodes、couponTypeToCheck获取金额
-     * 
+     * 根据couponCodes、couponTypeToCheck获取金额.
+     *
      * @param couponCodes
+     *            the coupon codes
      * @param couponTypeId
+     *            the coupon type id
      * @param totalPrice
+     *            the total price
      * @param shopID
-     * @return
+     *            the shop id
+     * @return the coupon total amount
      */
     @Override
     public Map<String, BigDecimal> getCouponTotalAmount(
@@ -4843,10 +5485,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内单品件数，都有三种范围类型，PID 订单内单款件数: sku级别的限购
-     * 
+     * 订单内单品件数，都有三种范围类型，PID 订单内单款件数: sku级别的限购.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
+     * @param qtyLimited
+     *            the qty limited
+     * @return the order sku qty by item id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderSKUQtyByItemId(ShoppingCartCommand shopCart,long itemId,Integer qtyLimited){
@@ -4894,10 +5541,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内单品件数，都有三种范围类型CID 订单内单款件数: sku级别的限购
-     * 
+     * 订单内单品件数，都有三种范围类型CID 订单内单款件数: sku级别的限购.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
+     * @param qtyLimited
+     *            the qty limited
+     * @return the order sku qty by category id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderSKUQtyByCategoryId(ShoppingCartCommand shopCart,long categoryId,Integer qtyLimited){
@@ -4942,6 +5594,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getOrderSKUQtyByCustomId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, long, java.lang.Integer)
+     */
     @Override
     public List<ShoppingCartLineCommand> getOrderSKUQtyByCustomId(ShoppingCartCommand shopCart,long customId,Integer qtyLimited){
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
@@ -4990,10 +5648,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内单品件数，都有三种范围类型CMBID 订单内单款件数: sku级别的限购
-     * 
+     * 订单内单品件数，都有三种范围类型CMBID 订单内单款件数: sku级别的限购.
+     *
      * @param shopCart
+     *            the shop cart
      * @param comboId
+     *            the combo id
+     * @param qtyLimited
+     *            the qty limited
+     * @return the order sku qty by combo id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderSKUQtyByComboId(ShoppingCartCommand shopCart,long comboId,Integer qtyLimited){
@@ -5039,10 +5702,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内商品数，都有三种范围类型，PID 商品的样数,
-     * 
+     * 订单内商品数，都有三种范围类型，PID 商品的样数,.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
+     * @param qtyLimited
+     *            the qty limited
+     * @return the order item qty by item id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderItemQtyByItemId(ShoppingCartCommand shopCart,long itemId,Integer qtyLimited){
@@ -5066,6 +5734,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getOrderItemQtyByCustomId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, long, java.lang.Integer)
+     */
     @Override
     public List<ShoppingCartLineCommand> getOrderItemQtyByCustomId(ShoppingCartCommand shopCart,long customId,Integer qtyLimited){
         Integer qty = 0;
@@ -5093,14 +5767,18 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内商品数，都有三种范围类型，CID
-     * 
+     * 订单内商品数，都有三种范围类型，CID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
+     * @param qtyLimited
+     *            the qty limited
+     * @return the order item qty by category id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderItemQtyByCategoryId(ShoppingCartCommand shopCart,long categoryId,Integer qtyLimited){
-        Integer qty = 0;
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
             return null;
         List<ShoppingCartLineCommand> lines = shopCart.getShoppingCartLineCommands();
@@ -5122,14 +5800,18 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内商品数，都有三种范围类型CMBID 订单内商品数:可以说是商品的样数, 商品筛选器中出现的商品集合中的任选几样
-     * 
+     * 订单内商品数，都有三种范围类型CMBID 订单内商品数:可以说是商品的样数, 商品筛选器中出现的商品集合中的任选几样.
+     *
      * @param shopCart
+     *            the shop cart
      * @param comboId
+     *            the combo id
+     * @param qtyLimited
+     *            the qty limited
+     * @return the order item qty by combo id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderItemQtyByComboId(ShoppingCartCommand shopCart,long comboId,Integer qtyLimited){
-        Integer qty = 0;
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
             return null;
         List<ShoppingCartLineCommand> lines = shopCart.getShoppingCartLineCommands();
@@ -5152,11 +5834,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内件数，都有三种范围类型，PID
-     * 
+     * 订单内件数，都有三种范围类型，PID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
      * @param qtyLimited
+     *            the qty limited
+     * @return the order qty by item id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderQtyByItemId(ShoppingCartCommand shopCart,long itemId,Integer qtyLimited){
@@ -5181,11 +5867,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内件数，都有三种范围类型，CID
-     * 
+     * 订单内件数，都有三种范围类型，CID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
      * @param qtyLimited
+     *            the qty limited
+     * @return the order qty by category id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderQtyByCategoryId(ShoppingCartCommand shopCart,long categoryId,Integer qtyLimited){
@@ -5209,6 +5899,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getOrderQtyByCustomId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, long, java.lang.Integer)
+     */
     @Override
     public List<ShoppingCartLineCommand> getOrderQtyByCustomId(ShoppingCartCommand shopCart,long customId,Integer qtyLimited){
         Integer qty = 0;
@@ -5236,11 +5932,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 订单内件数，都有三种范围类型，CMBID
-     * 
+     * 订单内件数，都有三种范围类型，CMBID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param comboId
+     *            the combo id
      * @param qtyLimited
+     *            the qty limited
+     * @return the order qty by combo id
      */
     @Override
     public List<ShoppingCartLineCommand> getOrderQtyByComboId(ShoppingCartCommand shopCart,long comboId,Integer qtyLimited){
@@ -5266,11 +5966,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买件数，都有三种范围类型，PID
-     * 
+     * 历史购买件数，都有三种范围类型，PID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
      * @param qtyLimited
+     *            the qty limited
+     * @return the history order sku qty by item id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5339,11 +6043,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买件数，都有三种范围类型，CID
-     * 
+     * 历史购买件数，都有三种范围类型，CID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
      * @param qtyLimited
+     *            the qty limited
+     * @return the history order sku qty by category id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5411,6 +6119,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getHistoryOrderSKUQtyByCustomId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, long, java.lang.Integer)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ShoppingCartLineCommand> getHistoryOrderSKUQtyByCustomId(ShoppingCartCommand shopCart,long categoryId,Integer qtyLimited){
@@ -5478,11 +6192,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买件数，都有三种范围类型，CMBID
-     * 
+     * 历史购买件数，都有三种范围类型，CMBID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param comboId
+     *            the combo id
      * @param qtyLimited
+     *            the qty limited
+     * @return the history order sku qty by combo id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5551,6 +6269,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /**
+     * 获得 member id.
+     *
+     * @param shopCart
+     *            the shop cart
+     * @return the member id
+     */
     private Long getMemberId(ShoppingCartCommand shopCart){
         Long memberId = null;
         if (null != shopCart.getUserDetails())
@@ -5559,11 +6284,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买商品数，都有三种范围类型，PID
-     * 
+     * 历史购买商品数，都有三种范围类型，PID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
      * @param qtyLimited
+     *            the qty limited
+     * @return the history order item qty by item id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5608,11 +6337,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买商品数，都有三种范围类型，CID
-     * 
+     * 历史购买商品数，都有三种范围类型，CID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
      * @param qtyLimited
+     *            the qty limited
+     * @return the history order item qty by category id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5655,6 +6388,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getHistoryOrderItemQtyByCustomId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, long, java.lang.Integer)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByCustomId(ShoppingCartCommand shopCart,long customId,Integer qtyLimited){
@@ -5698,11 +6438,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买商品数，都有三种范围类型，CMBID 历史购买商品样数
-     * 
+     * 历史购买商品数，都有三种范围类型，CMBID 历史购买商品样数.
+     *
      * @param shopCart
-     * @param categoryId
+     *            the shop cart
+     * @param comboId
+     *            the combo id
      * @param qtyLimited
+     *            the qty limited
+     * @return the history order item qty by combo id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5827,12 +6571,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买订单数，都有三种范围类型，PID
-     * 
+     * 历史购买订单数，都有三种范围类型，PID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param itemId
+     *            the item id
      * @param qtyLimited
      *            限制购买的次数
+     * @return the history order qty by item id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5871,12 +6618,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买订单数，都有三种范围类型CID
-     * 
+     * 历史购买订单数，都有三种范围类型CID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param categoryId
+     *            the category id
      * @param qtyLimited
      *            限制购买的次数
+     * @return the history order qty by category id
      */
     @Override
     @Transactional(readOnly = true)
@@ -5913,12 +6663,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 历史购买订单数，都有三种范围类型CMBID
-     * 
+     * 历史购买订单数，都有三种范围类型CMBID.
+     *
      * @param shopCart
+     *            the shop cart
      * @param comboId
+     *            the combo id
      * @param qtyLimited
      *            限制购买的次数
+     * @return the history order qty by combo id
      */
     @Override
     @Transactional(readOnly = true)
@@ -6032,10 +6785,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 将购物车行进行区分店铺
-     * 
+     * 将购物车行进行区分店铺.
+     *
      * @param shoppingCartLineCommandList
-     * @return
+     *            the shopping cart line command list
+     * @return the shopping cart map by shop
      */
     @Override
     public Map<Long, ShoppingCartCommand> getShoppingCartMapByShop(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
@@ -6065,61 +6819,42 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 同步购物车
-     * 
+     * 同步购物车.
+     *
      * @param memberId
-     * @param lines
+     *            the member id
+     * @param shoppingLines
+     *            the shopping lines
      */
     @Override
-    public void synchronousShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines){
-        if (null != shoppingLines && shoppingLines.size() > 0){
-            for (ShoppingCartLineCommand line : shoppingLines){
-                // 不同步赠品数据
-                if (line.isGift()){
-                    continue;
-                }
-                ShoppingCartLineCommand cartLine = sdkShoppingCartLineDao.findShopCartLine(memberId, line.getExtentionCode());
-                if (null != cartLine){
-                    // 如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                    Integer qty = cartLine.getQuantity() + line.getQuantity();
-                    cartLine.setQuantity(qty);
-                    merageShoppingCartLine(memberId, cartLine, false);
-                }else{
-                    line.setMemberId(memberId);
-                    merageShoppingCartLine(memberId, line, true);
-                }
+    public void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notEmpty(shoppingLines, "shoppingLines can't be null!");
+
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingLines){
+            if (shoppingCartLineCommand.isGift()){ // 不同步赠品数据
+                continue;
+            }
+
+            String extentionCode = shoppingCartLineCommand.getExtentionCode();
+            Integer quantity = shoppingCartLineCommand.getQuantity();
+            ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
+
+            if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
+                sdkShoppingCartLineDao
+                                .updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
+            }else{
+                sdkShoppingCartLineDao.addCartLineQuantity(memberId, extentionCode, quantity);
             }
         }
     }
 
-    /**
-     * 同步购物车
+    /*
+     * (non-Javadoc)
      * 
-     * @param memberId
-     * @param lines
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#addOrUpdateShoppingCart(java.lang.Long, java.lang.String, java.util.List,
+     * java.util.Set, boolean, boolean)
      */
-    @Override
-    public void synchronousShoppingCartById(Long memberId,List<ShoppingCartLineCommand> shoppingLines){
-        if (null != shoppingLines && shoppingLines.size() > 0){
-            for (ShoppingCartLineCommand line : shoppingLines){
-                // 不同步赠品数据
-                if (line.isGift()){
-                    continue;
-                }
-                ShoppingCartLineCommand cartLine = sdkShoppingCartLineDao.findShopCartLine(memberId, line.getExtentionCode());
-                if (null != cartLine){
-                    // 如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                    Integer qty = cartLine.getQuantity() + line.getQuantity();
-                    cartLine.setQuantity(qty);
-                    merageShoppingCartLineById(memberId, cartLine, false);
-                }else{
-                    line.setMemberId(memberId);
-                    merageShoppingCartLineById(memberId, line, true);
-                }
-            }
-        }
-    }
-
     @Override
     public Integer addOrUpdateShoppingCart(
                     Long memberId,
@@ -6203,6 +6938,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return retval;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#addOrUpdateShoppingCart(java.lang.Long, java.lang.Long, java.util.List,
+     * java.util.Set, boolean, boolean)
+     */
+    @Deprecated
     @Override
     public Integer addOrUpdateShoppingCart(
                     Long memberId,
@@ -6276,6 +7018,14 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return retval;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#addOrUpdateShoppingCartById(java.lang.Long, java.lang.String,
+     * java.util.List, java.util.Set, boolean, boolean)
+     * 
+     */
+    @Deprecated
     @Override
     public Integer addOrUpdateShoppingCartById(
                     Long memberId,
@@ -6353,6 +7103,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return retval;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkShoppingCartOnCalc(java.lang.Long, java.util.List, java.util.Set)
+     */
     @Override
     @Transactional(readOnly = true)
     public void checkShoppingCartOnCalc(Long memberId,List<ShoppingCartLineCommand> lines,Set<String> memCombos){
@@ -6432,6 +7187,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getMiniSKUQTYInShoppingCartByAll(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer getMiniSKUQTYInShoppingCartByAll(ShoppingCartCommand shopCart){
@@ -6449,6 +7211,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return 0;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getMiniSKUQTYInShoppingCartByItemId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer getMiniSKUQTYInShoppingCartByItemId(ShoppingCartCommand shopCart,Long itemId){
@@ -6461,13 +7230,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 qtys.add(line.getQuantity());
             }
         }
-        if (null != qtys && qtys.size() > 0){
+        if (qtys.size() > 0){
             // 返回集合中最小值
             return Collections.min(qtys);
         }
         return 0;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getMiniSKUQTYInShoppingCartByCategoryId(com.baozun.nebula.sdk.command.
+     * shoppingcart.ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer getMiniSKUQTYInShoppingCartByCategoryId(ShoppingCartCommand shopCart,Long categoryId){
@@ -6486,13 +7261,20 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 qtys.add(line.getQuantity());
             }
         }
-        if (null != qtys && qtys.size() > 0){
+        if (qtys.size() > 0){
             // 返回集合中最小值
             return Collections.min(qtys);
         }
         return 0;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getMiniSKUQTYInShoppingCartByComboId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer getMiniSKUQTYInShoppingCartByComboId(ShoppingCartCommand shopCart,Long comboId){
@@ -6510,13 +7292,20 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 qtys.add(line.getQuantity());
             }
         }
-        if (null != qtys && qtys.size() > 0){
+        if (qtys.size() > 0){
             // 返回集合中最小值
             return Collections.min(qtys);
         }
         return 0;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getNeedToPayAmountInShoppingCartByAll(com.baozun.nebula.sdk.command.shoppingcart
+     * .ShoppingCartCommand)
+     */
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getNeedToPayAmountInShoppingCartByAll(ShoppingCartCommand shopCart){
@@ -6525,6 +7314,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return getNeedToPayAmountInShoppingCartByAll(shopCart.getShoppingCartLineCommands());
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getNeedToPayAmountInShoppingCartByAll(java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getNeedToPayAmountInShoppingCartByAll(List<ShoppingCartLineCommand> lines){
@@ -6541,6 +7335,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalAmt;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getNeedToPayAmountInShoppingCartByItemId(com.baozun.nebula.sdk.command.
+     * shoppingcart.ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getNeedToPayAmountInShoppingCartByItemId(ShoppingCartCommand shopCart,Long itemId){
@@ -6549,6 +7349,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return getNeedToPayAmountInShoppingCartByItemId(shopCart.getShoppingCartLineCommands(), itemId);
     }
 
+    /**
+     * 获得 need to pay amount in shopping cart by item id.
+     *
+     * @param lines
+     *            the lines
+     * @param itemId
+     *            the item id
+     * @return the need to pay amount in shopping cart by item id
+     */
     @Transactional(readOnly = true)
     public BigDecimal getNeedToPayAmountInShoppingCartByItemId(List<ShoppingCartLineCommand> lines,Long itemId){
         if (null == lines || lines.size() == 0)
@@ -6565,6 +7374,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalAmt;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getNeedToPayAmountInShoppingCartByCategoryId(com.baozun.nebula.sdk.command.
+     * shoppingcart.ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getNeedToPayAmountInShoppingCartByCategoryId(ShoppingCartCommand shopCart,Long categoryId){
@@ -6573,6 +7388,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return getNeedToPayAmountInShoppingCartByCategoryId(shopCart.getShoppingCartLineCommands(), categoryId);
     }
 
+    /**
+     * 获得 need to pay amount in shopping cart by category id.
+     *
+     * @param lines
+     *            the lines
+     * @param categoryId
+     *            the category id
+     * @return the need to pay amount in shopping cart by category id
+     */
     public BigDecimal getNeedToPayAmountInShoppingCartByCategoryId(List<ShoppingCartLineCommand> lines,Long categoryId){
         if (null == lines || lines.size() == 0)
             return BigDecimal.ZERO;
@@ -6590,6 +7414,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalAmt;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getNeedToPayAmountInShoppingCartByComboId(com.baozun.nebula.sdk.command.
+     * shoppingcart.ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getNeedToPayAmountInShoppingCartByComboId(ShoppingCartCommand shopCart,Long comboId){
@@ -6599,6 +7429,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return getNeedToPayAmountInShoppingCartByComboId(shopCart.getShoppingCartLineCommands(), comboId);
     }
 
+    /**
+     * 获得 need to pay amount in shopping cart by combo id.
+     *
+     * @param lines
+     *            the lines
+     * @param comboId
+     *            the combo id
+     * @return the need to pay amount in shopping cart by combo id
+     */
     public BigDecimal getNeedToPayAmountInShoppingCartByComboId(List<ShoppingCartLineCommand> lines,Long comboId){
         if (null == lines || lines.size() == 0)
             return BigDecimal.ZERO;
@@ -6617,6 +7456,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalAmt;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getQuantityInShoppingCartByAll(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand)
+     */
     @Override
     public Integer getQuantityInShoppingCartByAll(ShoppingCartCommand shopCart){
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
@@ -6632,6 +7477,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalQty;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getQuantityInShoppingCartByItemId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     public Integer getQuantityInShoppingCartByItemId(ShoppingCartCommand shopCart,Long itemId){
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
@@ -6649,6 +7501,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalQty;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getQuantityInShoppingCartByCategoryId(com.baozun.nebula.sdk.command.shoppingcart
+     * .ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     public Integer getQuantityInShoppingCartByCategoryId(ShoppingCartCommand shopCart,Long categoryId){
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
@@ -6668,6 +7527,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalQty;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getQuantityInShoppingCartByComboId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, java.lang.Long)
+     */
     @Override
     public Integer getQuantityInShoppingCartByComboId(ShoppingCartCommand shopCart,Long comboId){
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
@@ -6687,12 +7553,26 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalQty;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getCouponTypeByCouponTypeID(long)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer getCouponTypeByCouponTypeID(long couponTypeId){
         return sdkPromotionCouponManager.findPromotionCouponCommandById(couponTypeId).getType();
     }
 
+    /**
+     * 获得 item in factor list.
+     *
+     * @param itemFactorList
+     *            the item factor list
+     * @param itemId
+     *            the item id
+     * @return the item in factor list
+     */
     private ItemFactor getItemInFactorList(List<ItemFactor> itemFactorList,long itemId){
         ItemFactor returnFactor = null;
         if (itemFactorList == null || itemFactorList.size() == 0)
@@ -6704,6 +7584,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return returnFactor;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTComboPerItemByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerItemByRate(
@@ -6735,6 +7621,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#manualBuy(java.math.BigDecimal,
+     * com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer manualBuy(BigDecimal buyPrice,ShoppingCartLineCommand shoppingCartLine,List<ShoppingCartLineCommand> lines){
@@ -6776,6 +7668,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return SUCCESS;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#findManualShoppingCart(java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public ShoppingCartCommand findManualShoppingCart(List<ShoppingCartLineCommand> shoppingCartLines){
@@ -6890,8 +7787,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 更新购物车礼品行的信息
-     * 
+     * 更新购物车礼品行的信息.
+     *
+     * @param skuIds
+     *            the sku ids
+     * @param lineGroups
+     *            the line groups
+     * @param memberId
+     *            the member id
+     * @param promotionId
+     *            the promotion id
      */
     @Override
     public void updateShoppingCartlineGift(Long[] skuIds,String[] lineGroups,Long memberId,Long promotionId){
@@ -6931,6 +7836,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#removeShoppingCartGiftByIdAndMemberId(java.lang.Long, java.lang.Long)
+     */
     @Override
     public Integer removeShoppingCartGiftByIdAndMemberId(Long lineId,Long memberId){
         List<Long> ids = new ArrayList<Long>();
@@ -6944,11 +7854,22 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#removeShoppingCartLineByIdAndMemberId(java.lang.Long, java.lang.Long)
+     */
     @Override
     public Integer removeShoppingCartLineByIdAndMemberId(Long lineId,Long memberId){
         return sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, lineId);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkGiftEffective(java.util.List, java.util.Set, java.lang.Long,
+     * java.util.List, com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand)
+     */
     @Override
     @Transactional(readOnly = true)
     public Map<Integer, List<ShoppingCartLineCommand>> checkGiftEffective(
@@ -6980,6 +7901,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return ForceSendGiftMap;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkSelectedGiftLimit(java.lang.Long[], java.lang.String[],
+     * java.lang.Long, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public boolean checkSelectedGiftLimit(
@@ -7016,12 +7943,23 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#findShopCartGiftLineByMemberId(java.lang.Long)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ShoppingCartLineCommand> findShopCartGiftLineByMemberId(Long memberId){
         return sdkShoppingCartLineDao.findShopCartGiftLineByMemberId(memberId, Constants.CHECKED_CHOOSE_STATE);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCustomPerItemByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByAMT(
@@ -7052,6 +7990,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCustomPerItemByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByRate(
@@ -7084,6 +8028,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCustomPerPCSByAMT(java.util.List, long,
+     * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByAMT(
@@ -7114,6 +8064,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getSinglePrdDiscountAMTCustomPerPCSByRate(java.util.List, long,
+     * java.math.BigDecimal, boolean, java.lang.Integer, java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByRate(
@@ -7147,6 +8103,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return settingList;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getHistoryOrderQtyByCustomId(com.baozun.nebula.sdk.command.shoppingcart.
+     * ShoppingCartCommand, long, java.lang.Integer)
+     */
     @Override
     @Transactional(readOnly = true)
     public List<ShoppingCartLineCommand> getHistoryOrderQtyByCustomId(ShoppingCartCommand shopCart,long customId,Integer qtyLimited){
@@ -7187,20 +8149,34 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getCustomAmount(java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getCustomAmount(List<Long> customItemIds,List<ShoppingCartLineCommand> shoppingLines){
-        // TODO Auto-generated method stub
         return getNeedToPayAmountInShoppingCartByCustomItemIds(shoppingLines, customItemIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getCustomQuantity(java.util.List, java.util.List)
+     */
     @Override
     @Transactional(readOnly = true)
     public Integer getCustomQuantity(List<Long> customItemIds,List<ShoppingCartLineCommand> shoppingLines){
-        // TODO Auto-generated method stub
         return getQuantityInShoppingCartLinesByCustomItemIds(shoppingLines, customItemIds);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkCouponByCustomItemIds(java.util.List, java.util.List, long,
+     * java.util.List, long)
+     */
     @Override
     @Transactional(readOnly = true)
     public boolean checkCouponByCustomItemIds(
@@ -7224,6 +8200,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return checkCouponWithCouponTypeIdShopId(couponCodes, couponTypeID, shopId);
     }
 
+    /**
+     * Check custom item ids in shopping cart lines.
+     *
+     * @param lines
+     *            the lines
+     * @param itemIdList
+     *            the item id list
+     * @return true, if check custom item ids in shopping cart lines
+     */
     private boolean checkCustomItemIdsInShoppingCartLines(List<ShoppingCartLineCommand> lines,List<Long> itemIdList){
         if (null == itemIdList || itemIdList.size() == 0)
             return false;
@@ -7237,6 +8222,19 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return false;
     }
 
+    /**
+     * Check on line coupon by custom item ids.
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @param itemIdList
+     *            the item id list
+     * @param couponTypeID
+     *            the coupon type id
+     * @param shopId
+     *            the shop id
+     * @return true, if check on line coupon by custom item ids
+     */
     private boolean checkOnLineCouponByCustomItemIds(
                     List<ShoppingCartLineCommand> shoppingCartLines,
                     List<Long> itemIdList,
@@ -7254,6 +8252,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getNeedToPayAmountInShoppingCartByCustomItemIds(java.util.List,
+     * java.util.List)
+     */
     @Override
     public BigDecimal getNeedToPayAmountInShoppingCartByCustomItemIds(List<ShoppingCartLineCommand> lines,List<Long> customItemIdList){
         if (null == lines || lines.size() == 0)
@@ -7272,6 +8276,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return totalAmt;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#getQuantityInShoppingCartByCustomItemIds(com.baozun.nebula.sdk.command.
+     * shoppingcart.ShoppingCartCommand, java.util.List)
+     */
     @Override
     public Integer getQuantityInShoppingCartByCustomItemIds(ShoppingCartCommand shopCart,List<Long> customItemIds){
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
@@ -7279,6 +8289,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return getQuantityInShoppingCartLinesByCustomItemIds(shopCart.getShoppingCartLineCommands(), customItemIds);
     }
 
+    /**
+     * 获得 quantity in shopping cart lines by custom item ids.
+     *
+     * @param lines
+     *            the lines
+     * @param customItemIds
+     *            the custom item ids
+     * @return the quantity in shopping cart lines by custom item ids
+     */
     private Integer getQuantityInShoppingCartLinesByCustomItemIds(List<ShoppingCartLineCommand> lines,List<Long> customItemIds){
         if (null == lines || lines.size() == 0)
             return 0;
@@ -7387,11 +8406,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据Markdownprice生成优惠设置
-     * 
+     * 根据Markdownprice生成优惠设置.
+     *
      * @param lines
+     *            the lines
      * @param markdownPriceList
-     * @return
+     *            the markdown price list
+     * @param briefListPrevious
+     *            the brief list previous
+     * @return the list< promotion sku disc amt by setting>
      */
     private List<PromotionSKUDiscAMTBySetting> generatePromotionSKUDiscAMTBySettingByMarkdownPrice(
                     List<ShoppingCartLineCommand> lines,
@@ -7435,11 +8458,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取当前购车中，属于CategoryId下的商品Id List
-     * 
+     * 获取当前购车中，属于CategoryId下的商品Id List.
+     *
      * @param lines
+     *            the lines
      * @param categoryId
-     * @return
+     *            the category id
+     * @return the item id list from shopping cart lines by category
      */
     private List<Long> getItemIdListFromShoppingCartLinesByCategory(List<ShoppingCartLineCommand> lines,Long categoryId){
 
@@ -7456,11 +8481,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取当前购物车中，属于该组合的商品Id List
-     * 
+     * 获取当前购物车中，属于该组合的商品Id List.
+     *
      * @param lines
+     *            the lines
      * @param comboId
-     * @return
+     *            the combo id
+     * @return the item id list from shopping cart lines by combo
      */
     private List<Long> getItemIdListFromShoppingCartLinesByCombo(List<ShoppingCartLineCommand> lines,Long comboId){
         List<Long> itemIdList = new ArrayList<Long>();
@@ -7476,10 +8503,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 获取购物车中所有商品Id List
-     * 
+     * 获取购物车中所有商品Id List.
+     *
      * @param lines
-     * @return
+     *            the lines
+     * @return the item id list from shopping cart lines by call
      */
     private List<Long> getItemIdListFromShoppingCartLinesByCall(List<ShoppingCartLineCommand> lines){
         List<Long> itemIdList = new ArrayList<Long>();

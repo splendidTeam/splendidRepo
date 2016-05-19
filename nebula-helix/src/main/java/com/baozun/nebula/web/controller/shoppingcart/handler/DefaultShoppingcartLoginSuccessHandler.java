@@ -79,7 +79,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         boolean hasGuestShoppingcart = Validator.isNotNullOrEmpty(guestShoppingCartLineCommandList);
         if (hasGuestShoppingcart){
             //同步
-            sdkShoppingCartManager.synchronousShoppingCartById(memberId, guestShoppingCartLineCommandList);
+            sdkShoppingCartManager.syncShoppingCart(memberId, guestShoppingCartLineCommandList);
             //清空游客购物车
             guestShoppingcartPersister.clear(request, response);
         }
