@@ -226,7 +226,10 @@ public class SdPdpController implements AbstractSdPdpController {
 	}
 
 	private List<String> getMainUrls(List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands) {
-		return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
+		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
+			return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
+		}
+		return null;
 	}
 
 	/**
