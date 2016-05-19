@@ -90,6 +90,7 @@ import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemImageDao;
 import com.baozun.nebula.dao.product.ItemImageLangDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
+import com.baozun.nebula.dao.product.ItemOperateLogDao;
 import com.baozun.nebula.dao.product.ItemProValGroupRelationDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemPropertiesLangDao;
@@ -117,6 +118,7 @@ import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemImageLang;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemInfoLang;
+import com.baozun.nebula.model.product.ItemOperateLog;
 import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
@@ -239,6 +241,9 @@ public class ItemManagerImpl implements ItemManager{
 
 	@Autowired(required = false)
 	private ItemExtendManager			itemExtendManager;
+	
+	@Autowired
+	private ItemOperateLogDao itemOperateLogDao;
 
 	private ByteArrayOutputStream		byteArrayOutputStream						= null;
 
@@ -685,10 +690,13 @@ public class ItemManagerImpl implements ItemManager{
 	}
 
 	@Override
-	public Integer enableOrDisableItemByIds(List<Long> ids,Integer state){
+	public Integer enableOrDisableItemByIds(List<Long> ids,Integer state,String userName){
 		String updateListTimeFlag = sdkMataInfoManager.findValue(MataInfo.UPDATE_ITEM_LISTTIME);
 		Integer result = itemDao.enableOrDisableItemByIds(ids, state, updateListTimeFlag);
+		//添加上下架日志
+		addItemOperateLog(ids,state,userName);
 		boolean solrFlag = false;
+		// state : 0==下架， 1=上架
 		if (state == 1){
 			// 刷新索引
 			boolean i18n = LangProperty.getI18nOnOff();
@@ -708,7 +716,72 @@ public class ItemManagerImpl implements ItemManager{
 
 		return result;
 	}
+	
+	/**
+	 * 添加上下架日志
+	 * state : 0==下架， 1=上架
+	 * @param itemIds
+	 * @param state
+	 * @param userName
+	 */
+	private void addItemOperateLog(List<Long> itemIds,Integer state,String userName){
+		for(Long itemId : itemIds){
+			//按createTime来排序
+			List<Long> itemOperateLogIds = itemOperateLogDao.findByItemId(itemId);
+			
+			if (Validator.isNotNullOrEmpty(itemOperateLogIds)){
+				ItemOperateLog itemOperateLog;
+				itemOperateLog = itemOperateLogDao.getByPrimaryKey(itemOperateLogIds.get(0));
+				if( Validator.isNullOrEmpty(itemOperateLog.getPushTime()) &&  state == 1 ){//上架
+					itemOperateLog.setPushOperatorName(userName);
+					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
+					itemOperateLogDao.save(itemOperateLog);
+				}else if( Validator.isNullOrEmpty(itemOperateLog.getSoldOutTime()) &&  state == 0 ){//下架
+					itemOperateLog.setSoldOutOperatorName(userName);
+					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
+					itemOperateLogDao.save(itemOperateLog);
+				}else{
+					saveItemOperateLog(itemId,state,userName);
+				}
+			}else{
+				saveItemOperateLog(itemId,state,userName);
+			}
+			
+			
+		}
+	}
+	
+	/**
+	 * 计算时间差（精确到秒）
+	 * @param pushTime
+	 * @param soldOutTime
+	 * @return
+	 */
+	private Long countActiveTime(Date pushTime,Date soldOutTime){
+		return (soldOutTime.getTime() - pushTime.getTime())/1000;
+	}
 
+	/**
+	 * 保存ItemOperateLog
+	 * @param itemId
+	 * @param state
+	 * @param userName
+	 */
+	private void saveItemOperateLog(Long itemId,Integer state,String userName){
+		ItemOperateLog itemOperateLog = new ItemOperateLog();
+		itemOperateLog.setItemId(itemId);
+		itemOperateLog.setCreateTime(new Date());
+		itemOperateLog.setUpdateTime(new Date());
+		if(state == 1){//上架
+			itemOperateLog.setPushOperatorName(userName);
+			itemOperateLog.setPushTime(new Date());
+		}else if(state == 0){//下架
+			itemOperateLog.setSoldOutOperatorName(userName);
+			itemOperateLog.setSoldOutTime(new Date());
+		}
+		itemOperateLogDao.save(itemOperateLog);
+	}
+	
 	@Override
 	public void removeItemByIds(List<Long> ids){
 		// 下架的商品是不存在solr中, 如果商品是上架商品,才删除solr中的索引

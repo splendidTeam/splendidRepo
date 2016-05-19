@@ -193,7 +193,7 @@ public class ItemManagerTest{
 				ids.add(1L);
 				ids.add(2L);
 				try {
-					itemManager.enableOrDisableItemByIds(ids, 1);
+					itemManager.enableOrDisableItemByIds(ids, 1,"xxx");
 				} catch (Exception e) {
 					log.info("必须确保有效的用户名不允许重复!");
 					return;

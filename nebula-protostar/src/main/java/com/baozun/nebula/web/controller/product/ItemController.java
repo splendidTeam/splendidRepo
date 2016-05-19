@@ -1853,7 +1853,8 @@ public class ItemController extends BaseController{
 		List<Long> ids = new ArrayList<Long>();
 		ids.add(itemId);
 
-		Integer result = itemManager.enableOrDisableItemByIds(ids, state);
+		UserDetails userDetails = this.getUserDetails();
+		Integer result = itemManager.enableOrDisableItemByIds(ids, state,userDetails.getUsername());
 		if (result < 1){
 			if (state != 1){
 				throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_FAIL);
@@ -1880,8 +1881,8 @@ public class ItemController extends BaseController{
 		for (String str : array){
 			ids.add(Long.parseLong(str));
 		}
-
-		Integer result = itemManager.enableOrDisableItemByIds(ids, state);
+		UserDetails userDetails = this.getUserDetails();
+		Integer result = itemManager.enableOrDisableItemByIds(ids, state, userDetails.getUsername());
 		if (result < 1){
 			if (state != 1){
 				throw new BusinessException(ErrorCodes.PRODUCT_PROPERTY_DISABLED_FAIL);
