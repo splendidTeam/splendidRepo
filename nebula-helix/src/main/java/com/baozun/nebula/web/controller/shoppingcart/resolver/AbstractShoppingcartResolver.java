@@ -222,9 +222,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                         "extentionCode",
                         sku.getOutid());
 
-        // FIXME feilong  封装购物车行数据 貌似这里可以删掉,因为com.baozun.nebula.sdk.manager.impl.SdkShoppingCartManagerImpl.getShoppingCart(List<ShoppingCartLineCommand>, List<String>, Long, CalcFreightCommand, Set<String>)
-        sdkEngineManager.packShoppingCartLine(currentLine);
-
         ShoppingcartResult updateShoppingcartResult = doUpdateShoppingCart(
                         memberDetails,
                         shoppingCartLineCommandList,
@@ -301,9 +298,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                         CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate()),
                         "extentionCode",
                         sku.getOutid());
-
-        // FIXME feilong  封装购物车行数据 貌似这里可以删掉,因为com.baozun.nebula.sdk.manager.impl.SdkShoppingCartManagerImpl.getShoppingCart(List<ShoppingCartLineCommand>, List<String>, Long, CalcFreightCommand, Set<String>)
-        sdkEngineManager.packShoppingCartLine(currentLine);
 
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(
                         memberDetails,

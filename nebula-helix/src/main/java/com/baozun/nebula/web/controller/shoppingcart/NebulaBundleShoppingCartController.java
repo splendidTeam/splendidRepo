@@ -82,11 +82,11 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
                     HttpServletRequest request,
                     Model model){
         //TODO feilong validator
-//        ShoppingcartResult shoppingcartResult = null;
-//
-//        if (null != shoppingcartResult){
-//            return toNebulaReturnResult(shoppingcartResult);
-//        }
+        //        ShoppingcartResult shoppingcartResult = null;
+        //
+        //        if (null != shoppingcartResult){
+        //            return toNebulaReturnResult(shoppingcartResult);
+        //        }
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(relatedItemId, skuIds, count);
         String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
@@ -108,8 +108,10 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         shoppingCartLineCommand.setSkuIds(skuIds);
         shoppingCartLineCommand.setQuantity(count);
 
-        //选中
+        //这里有促销判断逻辑
+        //see com.baozun.nebula.sdk.manager.impl.SdkShoppingCartManagerImpl.needContainsLineCalc(Integer, boolean)
         shoppingCartLineCommand.setSettlementState(1);
+        shoppingCartLineCommand.setValid(true);
 
         shoppingCartLineCommandList.add(shoppingCartLineCommand);
         return shoppingCartLineCommandList;
