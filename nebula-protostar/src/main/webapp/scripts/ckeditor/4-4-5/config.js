@@ -10,4 +10,5 @@ CKEDITOR.editorConfig = function( config ) {
 	config.language	= 'zh-cn' ;
 	config.width = '600px'; // 高度   
 	config.height = '300px'; // 高度   
+	config.allowedContent = true;
 };
