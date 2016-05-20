@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -85,6 +86,7 @@ public class ItemOperateLog extends BaseModel{
 	}
 
 	@Column(name="ITEM_ID")
+	@Index(name = "IDX_ITEM_OPLOG_ITEMID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -94,6 +96,7 @@ public class ItemOperateLog extends BaseModel{
 	}
 
 	@Column(name="PUSH_TIME")
+	@Index(name = "IDX_ITEM_OPLOG_PUSHTIME")
 	public Date getPushTime() {
 		return pushTime;
 	}
@@ -103,6 +106,7 @@ public class ItemOperateLog extends BaseModel{
 	}
 
 	@Column(name="SOLD_OUT_TIME")
+	@Index(name = "IDX_ITEM_OPLOG_SOLDOUTTIME")
 	public Date getSoldOutTime() {
 		return soldOutTime;
 	}
