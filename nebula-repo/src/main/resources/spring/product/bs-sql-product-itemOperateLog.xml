@@ -5,53 +5,14 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<bean id="ItemOperateLog.findByItemId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据itemId查询ItemOperateLog的ids</description>
+		<description>根据itemId查询ItemOperateLog的最新的一条记录</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[ 
-					select id from t_pd_item_operate_log where item_id = :itemId order by create_time desc
+					select id from t_pd_item_operate_log where item_id = :itemId order by create_time desc limit 1
                  ]]>
 			</value>
 		</constructor-arg>
 	</bean>
 	
-	<bean id="ItemOperateLog.updateItemOperateLog" class="loxia.dao.support.DynamicQueryHolder">
-		<description>更新日志信息</description>
-		<constructor-arg>
-			<value>
-				<![CDATA[ 
-					UPDATE 
-					
-						t_pd_item_operate_log
-						
-					SET
-					
-						#if($soldOutOperatorName)
-			       			 sold_out_operator_name=:soldOutOperatorName,
-			       			 sold_out_time = now(),
-			       		#end
-			       		
-			       		
-			       		
-			       		#if($pushOperatorName)
-			       			 push_operator_name=:pushOperatorName,
-			       			 push_time = now(),
-			       		#end
-			       		
-			       		
-			       		
-			       		#if($activeTime)
-			       			 active_time=:activeTime,
-			       		#end
-		       		
-		       		
-		       				update_time = now();
-		       				
-		       		WHERE
-		       		 
-		       			id=:id
-                 ]]>
-			</value>
-		</constructor-arg>
-	</bean>
 </beans>

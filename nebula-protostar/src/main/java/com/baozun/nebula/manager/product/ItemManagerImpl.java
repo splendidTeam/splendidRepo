@@ -726,18 +726,19 @@ public class ItemManagerImpl implements ItemManager{
 	 */
 	private void addItemOperateLog(List<Long> itemIds,Integer state,String userName){
 		for(Long itemId : itemIds){
-			//按createTime来排序
-			List<Long> itemOperateLogIds = itemOperateLogDao.findByItemId(itemId);
+			//按createTime来排序,取最新的一条记录
+			Long lastLogId = itemOperateLogDao.findByItemId(itemId);
 			
-			if (Validator.isNotNullOrEmpty(itemOperateLogIds)){
-				ItemOperateLog itemOperateLog;
-				itemOperateLog = itemOperateLogDao.getByPrimaryKey(itemOperateLogIds.get(0));
+			if (Validator.isNotNullOrEmpty(lastLogId)){
+				ItemOperateLog itemOperateLog = itemOperateLogDao.getByPrimaryKey(lastLogId);
 				if( Validator.isNullOrEmpty(itemOperateLog.getPushTime()) &&  state == 1 ){//上架
 					itemOperateLog.setPushOperatorName(userName);
+					itemOperateLog.setPushTime(new Date());
 					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
 					itemOperateLogDao.save(itemOperateLog);
 				}else if( Validator.isNullOrEmpty(itemOperateLog.getSoldOutTime()) &&  state == 0 ){//下架
 					itemOperateLog.setSoldOutOperatorName(userName);
+					itemOperateLog.setSoldOutTime(new Date());
 					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
 					itemOperateLogDao.save(itemOperateLog);
 				}else{
@@ -758,7 +759,7 @@ public class ItemManagerImpl implements ItemManager{
 	 * @return
 	 */
 	private Long countActiveTime(Date pushTime,Date soldOutTime){
-		return (soldOutTime.getTime() - pushTime.getTime())/1000;
+		return Math.abs((soldOutTime.getTime() - pushTime.getTime()))/1000;
 	}
 
 	/**
