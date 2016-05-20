@@ -729,22 +729,29 @@ public class ItemManagerImpl implements ItemManager{
 			//按createTime来排序,取最新的一条记录
 			Long lastLogId = itemOperateLogDao.findByItemId(itemId);
 			
+			/*
+			 * 1、如果存在：
+			 * 			a、当state=1时（上架）,最新的一条记录中没有上架信息（包含上架时间和上架操作人）时才update
+			 * 			b、当state=0时（下架）,最新的一条记录中没有下架信息（包含下架时间和下架操作人）时才update
+			 * 			c、不符合上面两种情况是只能再新建一条记录
+			 * 2、如果不存在： 新建一条记录
+			 */
 			if (Validator.isNotNullOrEmpty(lastLogId)){
 				ItemOperateLog itemOperateLog = itemOperateLogDao.getByPrimaryKey(lastLogId);
-				if( Validator.isNullOrEmpty(itemOperateLog.getPushTime()) &&  state == 1 ){//上架
+				if( Validator.isNullOrEmpty(itemOperateLog.getPushTime()) &&  state == 1 ){//1、a、
 					itemOperateLog.setPushOperatorName(userName);
 					itemOperateLog.setPushTime(new Date());
 					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
 					itemOperateLogDao.save(itemOperateLog);
-				}else if( Validator.isNullOrEmpty(itemOperateLog.getSoldOutTime()) &&  state == 0 ){//下架
+				}else if( Validator.isNullOrEmpty(itemOperateLog.getSoldOutTime()) &&  state == 0 ){//1、b、
 					itemOperateLog.setSoldOutOperatorName(userName);
 					itemOperateLog.setSoldOutTime(new Date());
 					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
 					itemOperateLogDao.save(itemOperateLog);
-				}else{
+				}else{//1、c、
 					saveItemOperateLog(itemId,state,userName);
 				}
-			}else{
+			}else{//2、
 				saveItemOperateLog(itemId,state,userName);
 			}
 			
