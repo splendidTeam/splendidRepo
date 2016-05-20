@@ -95,9 +95,9 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	
 	private static final Logger	LOG									= LoggerFactory.getLogger(BreadcrumbManagerImpl.class);
 	
-	private static final String	header_referer						="referer";
+	private static final String	HEADER_REFERER						="referer";
 	
-	private final static String			navItemCollectionCacheKey	= "navItemCollectionCacheKey_";
+	private final static String	NAV_ITEMCOLLECTION_CACHEKEY			= "navItemCollectionCacheKey_";
 	
 	@Autowired
 	private NavigationHelperManager									navigationHelperManager;
@@ -130,7 +130,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		Map<Long, ItemCollection> resultMap = null;
 		String lang = LangUtil.getCurrentLang();
 		try {
-			resultMap = cacheManager.getObject(navItemCollectionCacheKey + lang);
+			resultMap = cacheManager.getObject(NAV_ITEMCOLLECTION_CACHEKEY + lang);
 			// 如果导航的元数据为空
 			if (resultMap == null) {
 				//查询所有ItemCollection
@@ -154,7 +154,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 								collectionsMap.get(navigation.getCollectionId()));
 					}
 				}
-				cacheManager.setObject(navItemCollectionCacheKey + lang, resultMap, TimeInterval.SECONDS_PER_DAY);
+				cacheManager.setObject(NAV_ITEMCOLLECTION_CACHEKEY + lang, resultMap, TimeInterval.SECONDS_PER_DAY);
 			}
 		} catch (Exception e) {
 			LOG.error("[LOAD_NAVIGATION_META] cacheManager error. time:{}", new Date());
@@ -204,7 +204,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		}else{
 			//PDP
 			//获取当前导航id
-			String refer =request.getHeader(header_referer);
+			String refer =request.getHeader(HEADER_REFERER);
 			if(LOG.isDebugEnabled()){
 				LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
 			}

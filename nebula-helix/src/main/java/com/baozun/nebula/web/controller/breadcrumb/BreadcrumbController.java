@@ -36,14 +36,20 @@ import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCo
 
 /**   
  * 面包屑
- * <h3>获取页面的面包(分为plp、pdp两种场景)</h3>
+ * <h3>获取页面的面包屑(分为plp、pdp两种场景)</h3>
+ * <p>一、用法实例:</p>
+ * <ul>
+ * 		<li>PLP:<jsp:include page="/item/breadcrumb.htm?navId =1" /></li>
+ * 		<li>PDP:<jsp:include page="/item/breadcrumb.htm?itemId =2" /></li>
+ * </ul>
+ * <p>二、具体实现:</p>
  * <p>
- * 		1. 导航navId不为空,</br>
+ * 		<h2>1. 导航navId不为空,</h2>
  * 			<li>itemId不为空时，可构造[导航树结构+商品名称]作为面包屑</li>
  * 			<li>itemId为空时，可构造[导航树结构]作为面包屑</li>
  * </p>
  * <p>
- * 		2. 导航navId为空时,</br>
+ * 		<h2>2. 导航navId为空时,</h2>
  * 			<li>itemId不为空时,</br>
  * 				<p style="padding-left:10px;">
  * 					a.获取所有的itemCollection集合,构造该itemId对应的ItemCollectionContext
