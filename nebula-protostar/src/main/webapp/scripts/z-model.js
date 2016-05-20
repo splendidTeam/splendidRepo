@@ -192,10 +192,31 @@ function addImgarticle(me,num){
 	if(me.find(".cms-area-desc").length>0){
 		var desc= me.find(".cms-area-desc");
 		//desc.parent().show();
-		if(desc.val()==null || desc.val()==""){
-			areaList.find(".desc textarea").val(desc.html());
-		}else{
-			areaList.find(".desc textarea").val(desc.val());
+		var descarea = areaList.find(".desc");
+		for(var i=0; i<desc.length; i++){
+			if($j(desc[i]).val()==null || $j(desc[i]).val()==""){
+				if(i>0){
+					var appenddescarea = descarea.clone();
+					appenddescarea.attr('num', i);
+					$j(appenddescarea).find('textarea').val($j(desc[i]).html());
+					$j(areaList.find('.desc').last().after(appenddescarea));
+				}else{
+					areaList.find(".desc").attr('num', i);
+					areaList.find(".desc textarea").val($j(desc[i]).html());
+				}				
+			}else{
+				if($j(desc[i]).val()==null || $j(desc[i]).val()==""){
+					if(i>0){
+						var appenddescarea = descarea.clone();
+						appenddescarea.attr('num', i);
+						$j(appenddescarea).find('textarea').val($j(desc[i]).html());
+						$j(areaList.find('.desc').last().after(appenddescarea));
+					}else{
+						areaList.find(".desc").attr('num', i);
+						areaList.find(".desc textarea").val($j(desc[i]).val());
+					}	
+			}
+		}
 		}
 		areaList.find(".desc textarea").parent().show();
 	}
@@ -480,18 +501,22 @@ $j(window).load(function(){
 			//图片链接
 			var imgh = me.find(".href-img input").val();
 			//描述
-			var desc = me.find(".desc textarea").val();
+			var desc = me.find(".desc textarea");
 			ts.push(t);
 			ths.push(th);
 			imgs.push(img);
 			imgalts.push(imgalt);
 			imghrefs.push(imgh);
-			descs.push(desc);
+			for(var i=0; i<desc.length; i++){	
+				descs.push($j(desc[num=i]).val());
+			}
+			//descs.push(desc);
 		});
 		
 		if(imgarticle.find(".cms-area-list-element").length>0){
 			//列表模式
 			var list = imgarticle.find(".cms-area-list-element");
+			var sum = 0 ;
 			list.each(function(i,dom){
 				//循环设置数据
 				var me = $j(dom);
@@ -520,10 +545,14 @@ $j(window).load(function(){
 					me.attr("src",imgs[i]);
 				}
 				if(me.find(".cms-area-desc").length>0){
-					me.find(".cms-area-desc").html(descs[i]);
+					me.find(".cms-area-desc").each(function(i){
+						$j(this).html(descs[sum]);
+						sum++;
+					});
 				}
 				if(me.hasClass("cms-area-desc")){
-					me.html(descs[i]);
+					me.html(descs[sum]);
+					sum++;
 				}
 				
 			});
@@ -549,7 +578,9 @@ $j(window).load(function(){
 				}
 			}
 			if(imgarticle.find(".cms-area-desc").length>0){
-				imgarticle.find(".cms-area-desc").html(descs[0]);
+				imgarticle.find(".cms-area-desc").each(function(i){
+					$j(this).html(descs[i]);
+				});
 			}
 			if(imgarticle.hasClass("cms-area-desc")){
 				imgarticle.html(descs[0]);

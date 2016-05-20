@@ -9,25 +9,6 @@
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <style type="text/css">
-*{margin:0;padding:0;list-style-type:none;}
-body{font-family:Arial;font-size:12pt;color:#333;}
-h1{font-size:16pt;}
-h2{font-size:13pt;}
-/* demo */
-.demo{padding:20px;width:800px;margin:20px auto;border:solid 1px black;}
-.demo h2{margin:30px 0 20px 0;color:#3366cc;}
-/* dragfunction */
-.dragfunction{margin:40px 0 0 0;}
-.dragfunction dt{height:30px;font-weight:800;}
-.dragfunction dd{line-height:22px;padding:0 0 20px 0;color:#5e5e5e;}
-/* dragsort */
-.dragsort-ver li{height:30px;line-height:30px;}
-.dragsort{width:350px;list-style-type:none;margin:0px;}
-.dragsort li{float:left;padding:5px;width:100px;height:100px;}
-.dragsort div{width:90px;height:50px;border:solid 1px black;background-color:#E0E0E0;text-align:center;padding-top:40px;}
-.placeHolder div{background-color:white!important;border:dashed 1px gray!important;}
-</style>
-<style type="text/css">
 .cms-imgarticle-edit-dialog .proto-dialog-content input{
 width: 400px;
 }
@@ -48,7 +29,6 @@ margin-bottom: 12px;
 margin-top: 4px
 }
 </style>
-<style type="text/css">#element-list div { cursor: pointer; }</style>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
 <script type="text/javascript" src="${base}/scripts/cms/module/module-instance-add.js"></script>
 <script type="text/javascript" src="${base}/scripts/search-filter.js"></script>
@@ -92,7 +72,6 @@ margin-top: 4px
 		
     <div class="ui-block">
     	<%-- 编辑页面区域 --%>
-    	<script type="text/javascript" src="${base}/scripts/cms/cms-ztree.js" ></script>
     	<script type="text/javascript" src="${base}/scripts/z-model-product.js" ></script>
 		<script type="text/javascript" src="${base}/scripts/z-model.js" ></script>
 		<iframe src="${base}/page/findTemplateModuleAreaByTemplateId.htm?templateId=${cmt.id}&moduleId=${cmi.id}&isEdit=true" width="100%" class="web-update" frameborder="0"></iframe>
@@ -157,7 +136,7 @@ margin-top: 4px
 			  </div>
 			  <div class="ui-block-line mt5 desc" style="display: none;">
 					<label>描述</label>
-					<textarea class="ismandatory" placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input" mandatory="true"></textarea>
+					<textarea  placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input" ></textarea>
 			  </div>
 			  
 			  <div class="ui-block-line mt5 " >
@@ -184,8 +163,6 @@ margin-top: 4px
      <h5>编辑区域—商品方式</h5>
      <div class="proto-dialog-content">
      <input type="hidden" value="" id="areaCode"  class="areaCode" name="areaCode">
-     <ul id="item-element-list">
-	    <li class="li-area-list">
 	      <div class="ui-block-line area-list list-line" style="display: none;margin-bottom: 5px">
 		     <div class="zkss"><a href="javascript:void(0);" class="func-button select">收起-</a></div>
 		     <div class="slideToggle">
@@ -200,8 +177,6 @@ margin-top: 4px
 				</div>
 	       </div>   
 	      </div>
-     	</li>
-     </ul>
 	 </div>
      <div class="proto-dialog-button-line">
           <input type="button" value="确定" class="button orange mr5 product-confrim" />

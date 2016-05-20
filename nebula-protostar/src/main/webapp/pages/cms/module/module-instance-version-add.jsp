@@ -135,7 +135,7 @@ margin-top: 4px
 			  </div>
 			  <div class="ui-block-line mt5 desc" style="display: none;">
 					<label>描述</label>
-					<textarea class="ismandatory" placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input" mandatory="true"></textarea>
+					<textarea  placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input"></textarea>
 			  </div>
 			  
 			  <div class="ui-block-line mt5 " >
