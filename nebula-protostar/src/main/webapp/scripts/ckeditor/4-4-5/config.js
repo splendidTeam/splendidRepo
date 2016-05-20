@@ -10,5 +10,13 @@ CKEDITOR.editorConfig = function( config ) {
 	config.language	= 'zh-cn' ;
 	config.width = '600px'; // 高度   
 	config.height = '300px'; // 高度   
+	
+	//保留i标签
+	config.protectedSource.push(/<i[^>]><\/i>/g);
+	CKEDITOR.dtd.$removeEmpty['i'] = false;
+	//删除自动添加的p标签
+	config.shiftEnterMode = CKEDITOR.ENTER_P;
+	config.enterMode = CKEDITOR.ENTER_BR;
+
 	config.allowedContent = true;
 };
