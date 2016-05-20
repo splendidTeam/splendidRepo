@@ -18,7 +18,6 @@ package com.baozun.nebula.web.controller.shoppingcart;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,9 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.feilong.core.util.RandomUtil;
 
 /**
  * 基于bundle购物车控制器.

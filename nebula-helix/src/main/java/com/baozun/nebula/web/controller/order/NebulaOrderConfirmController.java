@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
@@ -43,6 +44,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
@@ -304,20 +306,18 @@ public class NebulaOrderConfirmController extends BaseController {
 		String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand,
 				null == memberDetails ? null : memberDetails.getMemComboList());
 
-		// 游客需要更新cookie中的购物车信息
-		if (null == memberDetails) {
-			// 更新cookie中购物车信息
-			salesOrderResolver.updateCookieShoppingcart(shoppingCartCommand.getShoppingCartLineCommands(), request,
-					response);
-		}
-
-		// 修改cookie中的商品数量
-		salesOrderResolver.updateCookieShoppingcartCount(memberDetails, request, response);
-		
-		
-		//  清空立即购买信息
+		//购物车信息重置
 		if(Validator.isNotNullOrEmpty(key)){
+			//  清空立即购买信息
 			autoKeyAccessor.remove(key, request);
+		}else{
+			// 游客需要更新cookie中的购物车信息
+			if (null == memberDetails) {
+				// 更新cookie中购物车信息
+				salesOrderResolver.updateCookieShoppingcart(shoppingCartCommand.getShoppingCartLineCommands(), request,response);
+			}
+			// 修改cookie中的商品数量
+			salesOrderResolver.updateCookieShoppingcartCount(memberDetails, request, response);
 		}
 
 		// 将订单创建成功后的信息返回给前端，创建支付链接用
@@ -400,10 +400,6 @@ public class NebulaOrderConfirmController extends BaseController {
 		//立即购买
 		if(Validator.isNotNullOrEmpty(key)){
 			cartLines = autoKeyAccessor.get(key, request);
-			if(cartLines==null || cartLines.isEmpty()){
-				
-			}
-			
 		}else{
 			ShoppingcartResolver shoppingcartResolver = null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
 			cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,request);
