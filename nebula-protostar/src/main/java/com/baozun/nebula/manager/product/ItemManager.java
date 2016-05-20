@@ -190,12 +190,12 @@ public interface ItemManager extends BaseManager {
 
 	/**
 	 * 启用禁用商品
-	 * 
 	 * @param ids
 	 * @param state
+	 * @param userName
 	 * @return
 	 */
-	Integer enableOrDisableItemByIds(List<Long> ids, Integer state);
+	Integer enableOrDisableItemByIds(List<Long> ids, Integer state,String userName);
 
 	/**
 	 * 定时上架商品

@@ -213,7 +213,7 @@ public class ItemControllerTest {
 		list.add(itemId);
 		Integer state=2;
 		Integer mockResult = 1;
-		EasyMock.expect(itemManager.enableOrDisableItemByIds(list, state)).andReturn(mockResult);
+		EasyMock.expect(itemManager.enableOrDisableItemByIds(list, state,"xxx")).andReturn(mockResult);
 		control.replay();
 		try {
 			assertEquals(map, itemController.enableOrDisableItemById(itemId, state));

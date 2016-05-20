@@ -36,6 +36,7 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.captcha.CaptchaUtil;
 import com.baozun.nebula.manager.captcha.CaptchaValidate;
 import com.baozun.nebula.manager.captcha.entity.CaptchaContainerAndValidateConfig;
+import com.baozun.nebula.manager.captcha.entity.CaptchaValidateConfig;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.system.SMSCaptchaValidate;
 import com.baozun.nebula.manager.system.SMSManager;
@@ -365,9 +366,10 @@ public class NebulaRegisterController extends NebulaLoginController{
 		Device device = getDevice(request);
 		boolean result = false;
 		if (device.isMobile()){
-			result = CaptchaUtil.validate(registerCaptchaContainerAndValidateConfig, request);
-		}else{
 			result = CaptchaUtil.validate(registerSMSCaptchaContainerAndValidateConfig, request);
+		}else{
+		        CaptchaValidateConfig captchaValidateConfig = registerCaptchaContainerAndValidateConfig.getCaptchaValidateConfig();
+			result = CaptchaUtil.validate(captchaValidateConfig, request);
 		}
 
 		return result;

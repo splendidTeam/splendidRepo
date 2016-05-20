@@ -38,6 +38,7 @@ public class AutoCollection {
 	 */
 	public static boolean apply(ItemCollection collection, ItemCollectionContext context) {
 		List<FacetParameter> facetParameters = JSON.parseArray(collection.getFacetParameters(), FacetParameter.class);
+		boolean isApplied =false;
 		for (FacetParameter fp : facetParameters) {
 			List<String> values = new ArrayList<String>();
 			switch (fp.getFacetType()) {
@@ -56,11 +57,19 @@ public class AutoCollection {
 			default:
 				break;
 			}
-			values.retainAll(fp.getValues());
-			if (values.isEmpty()) {
-				return false;
+			if(fp.getFacetType().equals(FacetType.PROPERTY)){
+				if(values.contains(JSON.toJSONString(fp.getValues()))){
+					isApplied =true;
+					break ;
+				}
+			}else{
+				values.retainAll(fp.getValues());
+				if (!values.isEmpty()) {
+					isApplied =true;
+					break ;
+				}
 			}
 		}
-		return true;
+		return isApplied;
 	}
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,6 @@ import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.ItemProperties;
-import com.baozun.nebula.sdk.command.CategoryCommand;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
@@ -178,7 +176,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		}
 		List<CurmbCommand> results =new LinkedList<CurmbCommand>();
 		Long tempId =navId;
-		while(tempId != null && tempId >0){
+		while(tempId != null && tempId >= 0){
 			MetaDataCommand current =navigationMetaMap.get(tempId);
 			if(Validator.isNullOrEmpty(current)){
 				break;
@@ -247,7 +245,6 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 								tempTreeSize =Validator.isNotNullOrEmpty(resultCurmbCommands)?
 										resultCurmbCommands.size(): 0;
 							}else{
-								idx++;
 								currentCurmbCommands =buildCurmbCommand(navigationId, itemId);
 								int currentTreeSize =Validator.isNotNullOrEmpty(currentCurmbCommands)?
 										currentCurmbCommands.size(): 0;
@@ -261,6 +258,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 									}
 								}
 							}
+							idx++;
 						}
 					}
 					results =resultCurmbCommands;
@@ -279,7 +277,10 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	private List<CurmbCommand> buildCurmbCommand(Long navId, Long itemId)
 			throws IllegalItemStateException {
 		//根据navId找出导航树，即为面包屑
-		List<CurmbCommand> results=createCurmbCommandsByNavId(navId);
+		List<CurmbCommand> results =createCurmbCommandsByNavId(navId);
+		if(Validator.isNullOrEmpty(results)){
+			results =new ArrayList<CurmbCommand>();
+		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("[BUILD_BREADCRUMB]get curmbs by navigations. curmbs:{}", JsonUtil.format(results));
 		}
@@ -289,6 +290,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			if(Validator.isNotNullOrEmpty(baseCommand)){
 				CurmbCommand childCommand =new CurmbCommand();
 				childCommand.setName(baseCommand.getTitle());
+				childCommand.setUrl("");
 				//后添一个商品名称
 				results.add(childCommand);
 			}else{
@@ -346,7 +348,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		ItemCategory itemCategory = sdkItemManager.findDefaultCateoryByItemId(itemId);
 		List<Category> categories = new LinkedList<Category>();
 
-		Long pid = itemCategory.getId();
+		Long pid = itemCategory.getCategoryId();
 		do{
 			Category category = null;
 			
@@ -417,7 +419,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			itemPropertiesList.add(itemProperties);
 			itemPropertiesMap.put(itemProperties.getPropertyId(), itemPropertiesList);
 		}
-		//每一个属性下的itemProperties
+		//每一个属性下的itemProperties (用String类型为了以后可能会加自定义多选)
 		List<String> pvIds =null;
 		for(Map.Entry<Long, List<ItemProperties>> entry :itemPropertiesMap.entrySet()){
 			pvIds =null;

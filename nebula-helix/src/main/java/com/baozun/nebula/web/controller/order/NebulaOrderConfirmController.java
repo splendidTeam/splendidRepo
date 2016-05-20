@@ -34,6 +34,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
+import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
@@ -41,6 +44,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.constants.Constants;
+import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
@@ -61,6 +66,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolv
 import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
+import com.feilong.framework.accessor.AutoKeyAccessor;
 
 /**
  * 订单确认控制器.
@@ -160,18 +166,32 @@ public class NebulaOrderConfirmController extends BaseController {
 	@Autowired
 	@Qualifier("shoppingcartViewCommandConverter")
 	private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
-
-	private static final String MODEL_KEY_ORDER_CONFIRM = "orderConfirmViewCommand";
-
+	
+	
 	@Autowired
 	private SalesOrderResolver salesOrderResolver;
 
 	@Autowired
 	private SdkOrderCreateManager sdkOrderCreateManager;
+	
+	
+    @Autowired
+    @Qualifier("immediatelyBuyAutoKeyAccessor")
+    protected AutoKeyAccessor autoKeyAccessor;
+    
+    
+	@Autowired
+	private OrderManager orderManager;
+	
+	private static final String MODEL_KEY_ORDER_CONFIRM = "orderConfirmViewCommand";
+    
 
-	/* 购物车为空返回的URL */
+	/** 购物车为空返回的URL */
 	public static final String CART_NULL_BACK_URL = "/index";
 
+
+    
+    
 	/**
 	 * 显示订单结算页面.
 	 *
@@ -200,7 +220,8 @@ public class NebulaOrderConfirmController extends BaseController {
 		}
 		
 		// 获取购物车信息
-		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(request, memberDetails,addressList,null);
+		List<ShoppingCartLineCommand> cartLines = getCartLines(request,memberDetails,key);
+		ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(cartLines, memberDetails,addressList,null);
 
 		// 购物车为空
 		if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
@@ -213,6 +234,8 @@ public class NebulaOrderConfirmController extends BaseController {
 		orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
 		// 收获地址信息
 		orderConfirmViewCommand.setAddressList(addressList);
+		
+		orderConfirmViewCommand.setKey(key);
 
 		model.addAttribute(MODEL_KEY_ORDER_CONFIRM, orderConfirmViewCommand);
 
@@ -263,12 +286,11 @@ public class NebulaOrderConfirmController extends BaseController {
 		}
 
 		// 封装订单信息
-		SalesOrderCommand salesOrderCommand = salesOrderResolver.buildSalesOrderCommand(memberDetails, orderForm,
-				request);
+		SalesOrderCommand salesOrderCommand = salesOrderResolver.buildSalesOrderCommand(memberDetails, orderForm,request);
 
 		// 获取购物车信息
-		ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(memberDetails,
-				salesOrderCommand, request);
+		List<ShoppingCartLineCommand> cartLines = getCartLines(request,memberDetails,key);
+		ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(cartLines,memberDetails,salesOrderCommand);
 
 		// 校验购物车信息和促销
 		String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
@@ -284,15 +306,19 @@ public class NebulaOrderConfirmController extends BaseController {
 		String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand,
 				null == memberDetails ? null : memberDetails.getMemComboList());
 
-		// 游客需要更新cookie中的购物车信息
-		if (null == memberDetails) {
-			// 更新cookie中购物车信息
-			salesOrderResolver.updateCookieShoppingcart(shoppingCartCommand.getShoppingCartLineCommands(), request,
-					response);
+		//购物车信息重置
+		if(Validator.isNotNullOrEmpty(key)){
+			//  清空立即购买信息
+			autoKeyAccessor.remove(key, request);
+		}else{
+			// 游客需要更新cookie中的购物车信息
+			if (null == memberDetails) {
+				// 更新cookie中购物车信息
+				salesOrderResolver.updateCookieShoppingcart(shoppingCartCommand.getShoppingCartLineCommands(), request,response);
+			}
+			// 修改cookie中的商品数量
+			salesOrderResolver.updateCookieShoppingcartCount(memberDetails, request, response);
 		}
-
-		// 修改cookie中的商品数量
-		salesOrderResolver.updateCookieShoppingcartCount(memberDetails, request, response);
 
 		// 将订单创建成功后的信息返回给前端，创建支付链接用
 		SalesOrderReturnObject salesOrderReturnObject = createReturnObject(subOrdinate);
@@ -321,12 +347,26 @@ public class NebulaOrderConfirmController extends BaseController {
 	 * @NeedLogin (guest=true)
 	 * @RequestMapping(value = "/transaction/recalc", method = RequestMethod.POST)
 	 */
-	public ShoppingCartCommand recalc(@LoginMember MemberDetails memberDetails,@ModelAttribute("orderForm") OrderForm orderForm, BindingResult bindingResult, HttpServletRequest request,
+	public NebulaReturnResult recalc(@LoginMember MemberDetails memberDetails,
+			@RequestParam(value = "key", required = false) String key, // 隐藏域中传递
+			@ModelAttribute("orderForm") OrderForm orderForm, BindingResult bindingResult, HttpServletRequest request,
 			HttpServletResponse response, Model model) {
+		
+		DefaultReturnResult result = new DefaultReturnResult();
+		
 		// 优惠券
 		String couponCode = null;
 		if(orderForm!=null && orderForm.getCouponInfoSubForm()!=null){
 			couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
+			//非用户绑定优惠券
+			if(orderForm.getCouponInfoSubForm().getId()==null){
+				PromotionCouponCode promotionCouponCode=orderManager.validCoupon(orderForm.getCouponInfoSubForm().getCouponCode());
+				if(promotionCouponCode==null){
+					result.setResult(false);
+					result.setReturnObject(getMessage(SalesOrderResult.ORDER_COUPON_NOT_AVALIBLE.toString()));
+					return result;
+				}
+			}
 		}
 		
         //地址
@@ -342,23 +382,37 @@ public class NebulaOrderConfirmController extends BaseController {
 			addressList = new ArrayList<ContactCommand>();
 			addressList.add(contactCommand);
 		}
-		return getChosenShoppingCartCommand(request, memberDetails,addressList,couponCode); 
-	}
+		
+		List<ShoppingCartLineCommand> cartLines = getCartLines(request,memberDetails,key);
+		
+		ShoppingCartCommand shoppingCartCommand =  getChosenShoppingCartCommand(cartLines, memberDetails,addressList,couponCode); 
+		
 
-	
-	
-	
-	
-	/**
-	 * Detect shoppingcart resolver.
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @return the shoppingcart resolver
-	 */
-	protected ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
-		return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
+		result.setResult(true);
+		result.setReturnObject(shoppingCartCommand);
+		return result;
+		
+		
 	}
+	
+	protected List<ShoppingCartLineCommand> getCartLines(HttpServletRequest request,MemberDetails memberDetails,String key){
+		List<ShoppingCartLineCommand> cartLines = null;
+		//立即购买
+		if(Validator.isNotNullOrEmpty(key)){
+			cartLines = autoKeyAccessor.get(key, request);
+		}else{
+			ShoppingcartResolver shoppingcartResolver = null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
+			cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,request);
+			
+			//过滤赠品 
+			cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
+			
+			//过滤未勾选的商品行
+			cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 0);
+		}
+		return cartLines;
+	}
+	
 
 	/**
 	 * 获取选中的购物车信息.
@@ -369,24 +423,13 @@ public class NebulaOrderConfirmController extends BaseController {
 	 *            the member details
 	 * @return the cart info
 	 */
-	protected ShoppingCartCommand getChosenShoppingCartCommand(HttpServletRequest request,
+	protected ShoppingCartCommand getChosenShoppingCartCommand(List<ShoppingCartLineCommand> cartLines,
 			MemberDetails memberDetails,List<ContactCommand> addressList,String couponCode) {
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
-				request);
-
-		//过滤赠品 
-		cartLines = CollectionsUtil.select(cartLines, new MainLinesPredicate());
-		
-		//过滤未勾选的商品行
-		cartLines = CollectionsUtil.removeAll(cartLines,"settlementState", 0);
-		
-		if (null == cartLines) {
+		if(cartLines==null){
 			return null;
 		}
 		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
 		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-		
 		
 		//地址
 		CalcFreightCommand  calcFreightCommand  = null;
@@ -415,8 +458,6 @@ public class NebulaOrderConfirmController extends BaseController {
 			calcFreightCommand.setCityId(310100L);
 			calcFreightCommand.setCountyId(310101L);
 		}
-		
-		
 		
 		//优惠券
 		List<String> coupons= null;
@@ -527,7 +568,6 @@ public class NebulaOrderConfirmController extends BaseController {
 		SalesOrderReturnObject salesOrderReturnObject = new SalesOrderReturnObject();
 		salesOrderReturnObject.setCode(newOrder.getCode());
 		salesOrderReturnObject.setId(newOrder.getId());
-		salesOrderReturnObject.setPayType(newOrder.getPayType());
 		salesOrderReturnObject.setSubOrdinate(subOrdinate);
 
 		return salesOrderReturnObject;

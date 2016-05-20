@@ -5,10 +5,11 @@ import java.util.List;
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.web.controller.BaseViewCommand;
+
 /**
  * 订单
+ * 
  * @author dahui.huang
- *
  */
 public class OrderConfirmViewCommand extends BaseViewCommand{
 
@@ -17,19 +18,22 @@ public class OrderConfirmViewCommand extends BaseViewCommand{
 	/**
 	 * 购物车
 	 */
-	private ShoppingCartCommand shoppingCartCommand;
+	private ShoppingCartCommand		shoppingCartCommand;
 
 	/**
 	 * 会员收货地址
 	 */
 	private List<ContactCommand>	addressList;
-
 	
+	/***
+	 * 立即购买的key
+	 */
+	private String					key;
+
 	public ShoppingCartCommand getShoppingCartCommand(){
 		return shoppingCartCommand;
 	}
 
-	
 	public void setShoppingCartCommand(ShoppingCartCommand shoppingCartCommand){
 		this.shoppingCartCommand = shoppingCartCommand;
 	}
@@ -40,6 +44,14 @@ public class OrderConfirmViewCommand extends BaseViewCommand{
 
 	public void setAddressList(List<ContactCommand> addressList){
 		this.addressList = addressList;
+	}
+
+	public String getKey(){
+		return key;
+	}
+
+	public void setKey(String key){
+		this.key = key;
 	}
 
 }
