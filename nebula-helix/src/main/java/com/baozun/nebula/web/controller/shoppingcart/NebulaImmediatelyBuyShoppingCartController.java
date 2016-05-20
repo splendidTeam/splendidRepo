@@ -35,6 +35,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.web.MemberDetails;
@@ -93,8 +94,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        //TODO feilong validator
-    	
+        // feilong validator
         Sku sku = sdkSkuManager.findSkuById(skuId);
         ShoppingcartResult  shoppingcartResult = null;
         
@@ -106,7 +106,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
         	shoppingcartResult =  ShoppingcartResult.SKU_NOT_EXIST;
         }
 
-        // TODO feilong 
+        // feilong 
         //===============③ 判断sku生命周期===============
         if (!sku.getLifecycle().equals(Sku.LIFE_CYCLE_ENABLE)){
         	shoppingcartResult =  ShoppingcartResult.SKU_NOT_ENABLE;
@@ -117,7 +117,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
         Integer lifecycle = itemCommand.getLifecycle();
 
         //===============④  判断item的生命周期===============
-        if (!com.baozun.nebula.sdk.constants.Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
+        if (!Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
             LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", itemCommand.getId(), lifecycle);
             shoppingcartResult =  ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
         }
@@ -134,45 +134,36 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
         	shoppingcartResult = ShoppingcartResult.ITEM_IS_GIFT;
         }
         
-        //TODO feilong 构造购物车信息
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(skuId, count);
-        String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
-        
-        String checkoutUrl = buildCheckoutUrl(key, request);
-
-        //成功需要返回 跳转到订单确认页面的地址
-        //失败就直接返回失败的信息
-        return toNebulaReturnResult(shoppingcartResult,checkoutUrl);
+    	DefaultReturnResult result = new DefaultReturnResult();
+        if ( shoppingcartResult==null) {
+        	//	feilong 构造购物车信息
+            List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(skuId, count);
+            String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
+            
+            // 跳转到订单确认页面的地址
+            String checkoutUrl = buildCheckoutUrl(key, request);
+        	
+			result.setResult(true);
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(checkoutUrl);
+            result.setResultMessage(message);
+        }else{
+        	//  失败就直接返回失败的信息
+			result.setResult(false);
+            String messageStr = getMessage(shoppingcartResult.toString());
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(messageStr);
+            result.setResultMessage(message);
+            LOGGER.error(messageStr);
+        }
+        return result;
     }
-    
     
     private Boolean checkActiveBeginTime(ItemCommand item){
         Date activeBeginTime = item.getActiveBeginTime();
         return null == activeBeginTime ? true : activeBeginTime.before(new Date());
     }
     
-    private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult,String checkoutUrl){
-    	DefaultReturnResult result = new DefaultReturnResult();
-        if ( shoppingcartResult!=null) {
-			result.setResult(false);
-
-            String messageStr = getMessage(shoppingcartResult.toString());
-
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(messageStr);
-            result.setResultMessage(message);
-
-            LOGGER.error(messageStr);
-        }else{
-			result.setResult(true);
-            DefaultResultMessage message = new DefaultResultMessage();
-            message.setMessage(checkoutUrl);
-            result.setResultMessage(message);
-        }
-        return result;
-    }
-    
-
     private List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(Long skuId,Integer count){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
 
