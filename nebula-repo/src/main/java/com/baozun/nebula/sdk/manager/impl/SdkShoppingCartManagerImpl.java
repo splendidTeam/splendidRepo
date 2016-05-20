@@ -278,22 +278,20 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return true, if need contains line calc2
      */
     private boolean needContainsLineCalc2(Integer SettlementState,boolean isValid){
-
         return false;
-
     }
 
     /**
      * Find shopping cart.
      *
-     * @param userId
+     * @param memberId
      *            the user id
-     * @param memComIds
-     *            组合id
-     * @param coupons
-     *            优惠券
      * @param calcFreightCommand
      *            the calc freight command
+     * @param coupons
+     *            优惠券
+     * @param memberComIds
+     *            组合id
      * @param shoppingCartLines
      *            获取购物车列表时候要经过 有效性引擎和促销引擎。 不走限购检查引擎 callType==1是为点结算按钮提供的判断条件 callType==2是为点立即购买按钮提供的判断条件
      *            CalcFreightCommand 不为空时计算运费 为空不计算运费
@@ -301,40 +299,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public ShoppingCartCommand findShoppingCart(
-                    Long userId,
-                    Set<String> memComIds,
-                    List<String> coupons,
-                    CalcFreightCommand calcFreightCommand,
-                    List<ShoppingCartLineCommand> shoppingCartLines){
-        if (null == shoppingCartLines || shoppingCartLines.size() == 0)
-            return null;
-        // 返回购物车对象
-        ShoppingCartCommand shopCart = getShoppingCart(shoppingCartLines, coupons, userId, calcFreightCommand, memComIds);
-        return shopCart;
-    }
-
-    /**
-     * 获取购物车对象.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @param coupons
-     *            the coupons
-     * @param memberId
-     *            the member id
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param memComIds
-     *            the mem com ids
-     * @return the shopping cart
-     */
-    private ShoppingCartCommand getShoppingCart(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    List<String> coupons,
+    public ShoppingCartCommand buildShoppingCartCommand(
                     Long memberId,
+                    List<ShoppingCartLineCommand> shoppingCartLines,
                     CalcFreightCommand calcFreightCommand,
-                    Set<String> memComIds){
+                    List<String> coupons,
+                    Set<String> memberComIds){
+        Validate.notEmpty(shoppingCartLines, "shoppingCartLines can't be null/empty!");
 
         ShoppingCartCommand shoppingCart = new ShoppingCartCommand();// 购物车对象
         List<ShoppingCartLineCommand> chooseLines = new ArrayList<ShoppingCartLineCommand>();// 被选中的购物车行
@@ -366,7 +337,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         UserDetails userDetails = new UserDetails();
         userDetails.setMemberId(memberId);
         if (null != memberId){
-            userDetails.setMemComboList(memComIds);
+            userDetails.setMemComboList(memberComIds);
         }else{
             userDetails.setMemComboList(getMemboIds());
         }
@@ -1374,10 +1345,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 获取购物车行的itemComboIds
         Set<String> itemComboIds = getItemComboIds(cart.getShoppingCartLineCommands());
 
-        cart = getShoppingCart(
+        cart = buildShoppingCartCommand(
+                        cart.getUserDetails().getMemberId(),
                         cart.getShoppingCartLineCommands(),
                         null,
-                        cart.getUserDetails().getMemberId(),
                         null,
                         cart.getUserDetails().getMemComboList());
 
@@ -1433,10 +1404,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 获取购物车行的itemComboIds
         Set<String> itemComboIds = getItemComboIds(cart.getShoppingCartLineCommands());
 
-        cart = getShoppingCart(
+        cart = buildShoppingCartCommand(
+                        cart.getUserDetails().getMemberId(),
                         cart.getShoppingCartLineCommands(),
                         null,
-                        cart.getUserDetails().getMemberId(),
                         null,
                         cart.getUserDetails().getMemComboList());
 
@@ -7149,7 +7120,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 设置用户信息
         cart.setUserDetails(userDetails);
 
-        cart = getShoppingCart(lines, null, memberId, null, userDetails.getMemComboList());
+        cart = buildShoppingCartCommand(memberId, lines, null, null, userDetails.getMemComboList());
 
         Map<Long, ShoppingCartCommand> shoppingCartCommandByShopIdMap = cart.getShoppingCartByShopIdMap();
 
@@ -7884,7 +7855,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     Long memberId,
                     List<String> coupons,
                     CalcFreightCommand calcFreightCommand){
-        ShoppingCartCommand shoppingCartCommand = getShoppingCart(lines, coupons, memberId, calcFreightCommand, memComIds);
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberId, lines, calcFreightCommand, coupons, memComIds);
         if (null == shoppingCartCommand){
             return null;
         }

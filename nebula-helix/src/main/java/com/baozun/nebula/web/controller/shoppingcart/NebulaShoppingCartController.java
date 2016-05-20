@@ -393,7 +393,7 @@ public class NebulaShoppingCartController extends BaseController{
         }
         Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+        return sdkShoppingCartManager.buildShoppingCartCommand(memberId, cartLines, null, null, memComboList);
     }
 
     /**

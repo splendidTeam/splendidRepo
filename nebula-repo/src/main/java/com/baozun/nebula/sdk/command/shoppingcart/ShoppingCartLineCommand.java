@@ -42,14 +42,16 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** PK *. */
     private Long                       id;
 
+    /** 会员id. */
+    private Long                       memberId;
+
+    //*********************************************************************************
+
     /** 店铺id . */
     private Long                       shopId;
 
     /** 店铺名称 . */
     private String                     shopName;
-
-    /** 会员id. */
-    private Long                       memberId;
 
     //*********************************************************************************
     /** skuId . */
@@ -57,6 +59,10 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /** The extention code. */
     private String                     extentionCode;
+
+    /** 购物数量 . */
+    private Integer                    quantity;
+    //*********************************************************************************
 
     /** 商品id . */
     private Long                       itemId;
@@ -67,12 +73,35 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 商品名称 . */
     private String                     itemName;
 
-    /** 购物数量 . */
-    private Integer                    quantity;
-
     /** 商品图片 *. */
     private String                     itemPic;
 
+    /**
+     * 对应关联关系的商品id.
+     * 
+     * <p>
+     * 普通商品下单,这个属性是没有值,<br>
+     * 如果商品是bundle商品,比如3个不同的item 的不同sku 进行下单,那么会有3条 soline记录,在需要显示订单行的场合,比如订单明细页面,下单之后的邮件模板,<br>
+     * 为了和以往的数据兼容(尽量不更改或者少更改以往的SQL),那么soline里面的 itemId,存放这个sku原本的itemId,而relatedItemId存放的是衍生的itemId
+     * </p>
+     * 
+     * @since 5.3.1
+     */
+    private Long                       relatedItemId;
+
+    /**
+     * skuIds.
+     * 
+     * <p>
+     * 普通商品下单,这个属性是没有值,<br>
+     * 如果商品是bundle商品,比如3个不同的item 的不同sku 进行下单,那么skuids会有3个值
+     * </p>
+     * 
+     * @since 5.3.1
+     */
+    private Long[]                     skuIds;
+
+    //*********************************************************************************
     /** 结算状态 0未选中结算 1选中结算. */
     private Integer                    settlementState;
 
@@ -1274,4 +1303,61 @@ public class ShoppingCartLineCommand extends BaseModel{
         this.skuId = skuId;
     }
 
+    /**
+     * 对应关联关系的商品id.
+     * 
+     * <p>
+     * 普通商品下单,这个属性是没有值,<br>
+     * 如果商品是bundle商品,比如3个不同的item 的不同sku 进行下单,那么会有3条 soline记录,在需要显示订单行的场合,比如订单明细页面,下单之后的邮件模板,<br>
+     * 为了和以往的数据兼容(尽量不更改或者少更改以往的SQL),那么soline里面的 itemId,存放这个sku原本的itemId,而relatedItemId存放的是衍生的itemId
+     * </p>
+     * 
+     * @return the relatedItemId
+     */
+    public Long getRelatedItemId(){
+        return relatedItemId;
+    }
+
+    /**
+     * 对应关联关系的商品id.
+     * 
+     * <p>
+     * 普通商品下单,这个属性是没有值,<br>
+     * 如果商品是bundle商品,比如3个不同的item 的不同sku 进行下单,那么会有3条 soline记录,在需要显示订单行的场合,比如订单明细页面,下单之后的邮件模板,<br>
+     * 为了和以往的数据兼容(尽量不更改或者少更改以往的SQL),那么soline里面的 itemId,存放这个sku原本的itemId,而relatedItemId存放的是衍生的itemId
+     * </p>
+     * 
+     * @param relatedItemId
+     *            the relatedItemId to set
+     */
+    public void setRelatedItemId(Long relatedItemId){
+        this.relatedItemId = relatedItemId;
+    }
+
+    /**
+     * 获得 skuIds .
+     * <p>
+     * 普通商品下单,这个属性是没有值,<br>
+     * 如果商品是bundle商品,比如3个不同的item 的不同sku 进行下单,那么skuids会有3个值
+     * </p>
+     * 
+     * @return the skuIds
+     */
+    public Long[] getSkuIds(){
+        return skuIds;
+    }
+
+    /**
+     * 设置 skuIds .
+     * <p>
+     * 普通商品下单,这个属性是没有值,<br>
+     * 如果商品是bundle商品,比如3个不同的item 的不同sku 进行下单,那么skuids会有3个值
+     * </p>
+     * 
+     * @param skuIds
+     *            the skuIds to set
+     */
+    public void setSkuIds(Long[] skuIds){
+        this.skuIds = skuIds;
+    }
 }

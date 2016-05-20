@@ -20,22 +20,22 @@ public interface SdkShoppingCartManager extends BaseManager{
     public List<PromotionBrief> calcuPromoBriefs(ShoppingCartCommand shopCart);
 
     /**
-     * @param userId
-     * @param memComIds
-     *            组合id
+     * @param memberId
      * @param coupons
      *            优惠券
+     * @param memberComIds
+     *            组合id
      * @param calFreightCommand
      * @param shoppingCartLines
      *            获取购物车列表时候要经过 有效性引擎和促销引擎。 不走限购检查引擎 CalcFreightCommand 不为空时计算运费
      *            为空不计算运费
      */
-    public ShoppingCartCommand findShoppingCart(
-                    Long userId,
-                    Set<String> memComIds,
-                    List<String> coupons,
+    public ShoppingCartCommand buildShoppingCartCommand(
+                    Long memberId,
+                    List<ShoppingCartLineCommand> lines,
                     CalcFreightCommand calcFreightCommand,
-                    List<ShoppingCartLineCommand> lines);
+                    List<String> coupons,
+                    Set<String> memberComIds);
 
     /**
      * 获取当前人员的选择的赠品行

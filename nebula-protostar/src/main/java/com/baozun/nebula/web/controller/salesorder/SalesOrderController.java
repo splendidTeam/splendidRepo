@@ -482,7 +482,7 @@ public class SalesOrderController extends BaseController{
                     // 不清除购物车
                     salesOrderCommand.setIsImmediatelyBuy(true);
                 }
-                shoppingCartCommand = sdkShoppingCartManager.findShoppingCart(memberId, memComboIds, codes, calcFreightCommand, lines);
+                shoppingCartCommand = sdkShoppingCartManager.buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
                 subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
             }
 
@@ -799,7 +799,7 @@ public class SalesOrderController extends BaseController{
                     }
                 }
             }
-            shoppingCartCommand = sdkShoppingCartManager.findShoppingCart(memberId, memComboIds, codes, calcFreightCommand, lines);
+            shoppingCartCommand = sdkShoppingCartManager.buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
         }
 
         boolean isCouponBindActive = false;

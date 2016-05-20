@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.shoppingcart;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
  * 基于bundle购物车控制器.
@@ -65,8 +69,6 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
      *            买几套bundle
      * @param request
      *            the request
-     * @param response
-     *            the response
      * @param model
      *            the model
      * @return the nebula return result
@@ -78,22 +80,64 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
                     @RequestParam(value = "skuIds",required = true) Long[] skuIds,
                     @RequestParam(value = "count",required = true) Integer count,
                     HttpServletRequest request,
-                    HttpServletResponse response,
                     Model model){
         //TODO feilong validator
+//        ShoppingcartResult shoppingcartResult = null;
+//
+//        if (null != shoppingcartResult){
+//            return toNebulaReturnResult(shoppingcartResult);
+//        }
 
-        //TODO feilong 构造bundle购物车信息
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = null;
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(relatedItemId, skuIds, count);
         String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
 
         String checkoutUrl = buildCheckoutUrl(key, request);
 
         //成功需要返回 跳转到订单确认页面的地址
         //失败就直接返回失败的信息
-        //return toNebulaReturnResult(shoppingcartResult);
-        return null;
+        return toNebulaReturnResult(checkoutUrl);
     }
 
-    //TODO feilong 进普通购物车
+    //TODO feilong 构造bundle购物车信息
+    private List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(Long relatedItemId,Long[] skuIds,Integer count){
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
+
+        ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
+
+        shoppingCartLineCommand.setRelatedItemId(relatedItemId);
+        shoppingCartLineCommand.setSkuIds(skuIds);
+        shoppingCartLineCommand.setQuantity(count);
+
+        //选中
+        shoppingCartLineCommand.setSettlementState(1);
+
+        shoppingCartLineCommandList.add(shoppingCartLineCommand);
+        return shoppingCartLineCommandList;
+    }
+
+    private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
+        DefaultReturnResult result = new DefaultReturnResult();
+        if (shoppingcartResult != null){
+            result.setResult(false);
+
+            String messageStr = getMessage(shoppingcartResult.toString());
+
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(messageStr);
+            result.setResultMessage(message);
+
+            LOGGER.error(messageStr);
+        }
+        return result;
+    }
+
+    private NebulaReturnResult toNebulaReturnResult(String checkoutUrl){
+        DefaultReturnResult result = new DefaultReturnResult();
+        result.setResult(true);
+        DefaultResultMessage message = new DefaultResultMessage();
+        message.setMessage(checkoutUrl);
+        result.setResultMessage(message);
+        return result;
+    }
 
 }

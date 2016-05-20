@@ -466,7 +466,7 @@ public class NebulaOrderConfirmController extends BaseController {
 			coupons.add(couponCode);
 		}
 		
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, coupons, calcFreightCommand, cartLines);
+		return sdkShoppingCartManager.buildShoppingCartCommand(memberId, cartLines, calcFreightCommand, coupons, memComboList);
 	}
 
 	/**

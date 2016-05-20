@@ -196,8 +196,8 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())) {
 			couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
 		}
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, couponList,
-				salesOrderCommand.getCalcFreightCommand(), cartLines);
+		return sdkShoppingCartManager.buildShoppingCartCommand(memberId, cartLines, salesOrderCommand.getCalcFreightCommand(),
+				couponList, memComboList);
 
 	}
 
