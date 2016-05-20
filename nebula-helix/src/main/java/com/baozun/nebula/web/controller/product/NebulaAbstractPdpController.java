@@ -111,7 +111,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	/** QuickView商品详情页 的定义 */
-	public static final String		VIEW_PRODUCT_DETAIL_QUICKVIEW		= "product.detail";
+	public static final String		VIEW_PRODUCT_DETAIL_QUICKVIEW		= "product.detail.quickview";
 	
 	//缓存key的定义
 	/** pdpViewCommand的缓存key */
