@@ -33,6 +33,7 @@ import com.baozun.nebula.manager.breadcrumb.BreadcrumbManager;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.web.controller.breadcrumb.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCommand;
+import com.feilong.core.Validator;
 
 /**   
  * 面包屑
@@ -72,7 +73,11 @@ public class BreadcrumbController {
 	
 	private static final Logger	LOG									= LoggerFactory.getLogger(BreadcrumbController.class);
 	
-	private static final String VIEW_PRODUCT_BREADCRUMB 			="product.breadcrumb";
+	/** 列表页*/
+	private static final String VIEW_BREADCRUMB_PLP 				="breadcrumb.plp";
+	
+	/** 详情页*/
+	private static final String VIEW_BREADCRUMB_PDP 				="breadcrumb.pdp";
 	
 	private static final String	MODEL_KEY_BREADCRUMB				="breadcrumb";
 	
@@ -100,6 +105,7 @@ public class BreadcrumbController {
 	public String showBreadcrumb(@RequestParam("navId") Long navId,
 			@RequestParam("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model){
+		
 		try {
 			List<CurmbCommand> curmbCommands = breadcrumbManager.findCurmbCommands(navId, itemId, request);
 			List<BreadcrumbsViewCommand> breadcrumbsViewCommands = breadcrumbsViewCommandConverter.convert(curmbCommands);
@@ -107,9 +113,26 @@ public class BreadcrumbController {
 		} catch (IllegalItemStateException e) {
 			LOG.error("[PDP_BUILD_BREADCRUMB] breadcrumb state illegal. itemId:{}, {}",itemId, e.getState().name());
 			//异常也不能影响pdp页面的渲染,面包屑地方显示空白即可
-			return VIEW_PRODUCT_BREADCRUMB;
+			return getView(navId,itemId);
 		}
-		return VIEW_PRODUCT_BREADCRUMB;
+		return getView(navId,itemId);
+	}
+
+
+
+
+	/**
+	 * 导航不为空->列表页面包屑，
+	 * 其他，商品详情页
+	 * @param navId
+	 * @param itemId
+	 * @return
+	 */
+	private String getView(Long navId, Long itemId) {
+		if(Validator.isNotNullOrEmpty(navId)){
+			return VIEW_BREADCRUMB_PLP;
+		}
+		return VIEW_BREADCRUMB_PDP;
 	}
 	
 	
