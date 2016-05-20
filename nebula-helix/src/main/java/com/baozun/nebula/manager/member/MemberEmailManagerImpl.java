@@ -170,14 +170,14 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 			}else{
 				memberBehaviorStatus=new MemberBehaviorStatus();
 				memberBehaviorStatus.setMemberId(memberId);
-				memberBehaviorStatus.setType("1");
+				memberBehaviorStatus.setType(MemberBehaviorStatus.BEHAVIOR_TYPE_EMAIL_ACTIVY);
 				memberBehaviorStatus.setLifecycle(1);
 				sdkMemberManager.saveMemberBehaviorStatus(memberBehaviorStatus);
 			}
 		}else{
 			memberBehaviorStatus=new MemberBehaviorStatus();
 			memberBehaviorStatus.setMemberId(memberId);
-			memberBehaviorStatus.setType("1");
+			memberBehaviorStatus.setType(MemberBehaviorStatus.BEHAVIOR_TYPE_EMAIL_ACTIVY);
 			memberBehaviorStatus.setLifecycle(1);
 			sdkMemberManager.saveMemberBehaviorStatus(memberBehaviorStatus);
 		}

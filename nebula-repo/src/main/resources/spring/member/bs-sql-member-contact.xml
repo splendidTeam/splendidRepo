@@ -22,7 +22,7 @@
 			<value>
 				<![CDATA[  
 		       		select * from T_MEM_CONTACT 
-		       			 where member_id =:memberId order by id asc
+		       			 where member_id =:memberId order by is_default desc,id desc
                  ]]>
 			</value>
 		</constructor-arg>
