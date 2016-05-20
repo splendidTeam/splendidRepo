@@ -22,6 +22,8 @@ public class SalesOrderReturnObject implements Serializable {
 
 	/** 订单编号 */
 	private String code;
+	
+	private Integer payType;
 
 	public String getSubOrdinate() {
 		return subOrdinate;
@@ -45,6 +47,14 @@ public class SalesOrderReturnObject implements Serializable {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public Integer getPayType() {
+		return payType;
+	}
+
+	public void setPayType(Integer payType) {
+		this.payType = payType;
 	}
 
 }

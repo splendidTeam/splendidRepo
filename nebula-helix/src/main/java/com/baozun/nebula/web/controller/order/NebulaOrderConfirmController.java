@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
-import com.baozun.nebula.command.promotion.PromotionCouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
@@ -528,6 +527,7 @@ public class NebulaOrderConfirmController extends BaseController {
 		SalesOrderReturnObject salesOrderReturnObject = new SalesOrderReturnObject();
 		salesOrderReturnObject.setCode(newOrder.getCode());
 		salesOrderReturnObject.setId(newOrder.getId());
+		salesOrderReturnObject.setPayType(newOrder.getPayType());
 		salesOrderReturnObject.setSubOrdinate(subOrdinate);
 
 		return salesOrderReturnObject;
