@@ -258,11 +258,7 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
         shoppingCartLineCommand.setListPrice(sku.getListPrice());
 
-        if (null == itemBaseCommand.getType()){
-            shoppingCartLineCommand.setType(ItemInfo.TYPE_MAIN);
-        }else{
-            shoppingCartLineCommand.setType(itemBaseCommand.getType());
-        }
+        shoppingCartLineCommand.setType(null == itemBaseCommand.getType() ? ItemInfo.TYPE_MAIN : itemBaseCommand.getType());
 
         // 销售属性
         String skuProperties = sku.getProperties();
