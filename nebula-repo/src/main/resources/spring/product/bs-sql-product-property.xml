@@ -1310,7 +1310,8 @@
 		       		select
 						property.id as id,
 					  	propertyLang.name as name,
-						property.sort_No as sortNo
+					  	property.editing_type as editingType,
+						property.sort_no as sortNo
 					from
 						t_pd_property property,t_pd_property_lang propertyLang
 					WHERE
