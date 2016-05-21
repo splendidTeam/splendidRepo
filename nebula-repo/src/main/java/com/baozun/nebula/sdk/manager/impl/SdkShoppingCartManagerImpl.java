@@ -198,43 +198,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     private SdkPromotionManager                      sdkPromotionManager;
 
     /**
-     * 通过系统配置的计算级别选出参与促销计算以及不参与促销计算的购物车行.
-     *
-     * @param allLines
-     *            the all lines
-     * @param chooseLines
-     *            the choose lines
-     * @param notChooseLines
-     *            the not choose lines
-     */
-    private void splitByCalcLevel(
-                    List<ShoppingCartLineCommand> allLines,
-                    List<ShoppingCartLineCommand> chooseLines,
-                    List<ShoppingCartLineCommand> notChooseLines){
-        for (ShoppingCartLineCommand shoppingCartLine : allLines){
-            // 判断有效.促销计算时只计算有效的、被选中的购物车行
-            if (needContainsLineCalc(shoppingCartLine.getSettlementState(), shoppingCartLine.isValid())){
-                chooseLines.add(shoppingCartLine);
-            }else{
-                notChooseLines.add(shoppingCartLine);
-            }
-        }
-    }
-
-    /**
-     * Need contains line calc2.
-     *
-     * @param SettlementState
-     *            the Settlement state
-     * @param isValid
-     *            the is valid
-     * @return true, if need contains line calc2
-     */
-    private boolean needContainsLineCalc2(Integer SettlementState,boolean isValid){
-        return false;
-    }
-
-    /**
      * Find shopping cart.
      *
      * @param memberId
@@ -260,11 +223,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     Set<String> memberComIds){
         Validate.notEmpty(shoppingCartLines, "shoppingCartLines can't be null/empty!");
 
-        List<ShoppingCartLineCommand> chooseLines = new ArrayList<ShoppingCartLineCommand>();// 被选中的购物车行
-        List<ShoppingCartLineCommand> notChooseLines = new ArrayList<ShoppingCartLineCommand>();// 未选中的购物车行
-
-        List<String> lineSortIds = new ArrayList<String>();// 给每一条购物记录添加唯一值
-
+        //*******************************************************************************************************
         int i = 0;
         for (ShoppingCartLineCommand shoppingCartLine : shoppingCartLines){
             if (shoppingCartLine.getId() == null){
@@ -274,11 +233,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             sdkEngineManager.packShoppingCartLine(shoppingCartLine); // 封装购物车行信息
             shoppingCartLine.setType(Constants.ITEM_TYPE_SALE);// 主卖品
 
-            lineSortIds.add(shoppingCartLine.getId() + "," + shoppingCartLine.getShopId());
             // 购物车行 金额小计
             shoppingCartLine.setSubTotalAmt(NumberUtil.getMultiplyValue(shoppingCartLine.getQuantity(), shoppingCartLine.getSalePrice()));
         }
+        //*******************************************************************************************************
 
+        Map<Long, Long> lineIdAndShopIdMapList = CollectionsUtil.getPropertyValueMap(shoppingCartLines, "id", "shopId");
+
+        //*******************************************************************************************************
+        List<ShoppingCartLineCommand> chooseLines = new ArrayList<ShoppingCartLineCommand>();// 被选中的购物车行
+        List<ShoppingCartLineCommand> notChooseLines = new ArrayList<ShoppingCartLineCommand>();// 未选中的购物车行
         // 判断是否是被选中的购物车行
         splitByCalcLevel(shoppingCartLines, chooseLines, notChooseLines);
 
@@ -326,11 +290,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         Map<Long, List<ShoppingCartLineCommand>> shopCommandMap = new HashMap<Long, List<ShoppingCartLineCommand>>();
 
         List<ShoppingCartLineCommand> newLines = new ArrayList<ShoppingCartLineCommand>();// 所有商品行数据包括选中和不选中的
-        for (String lineSortIdAndShop : lineSortIds){
 
-            String[] idAndShop = lineSortIdAndShop.split(",");
-            Long id = Long.parseLong(idAndShop[0]);
-            Long shopId = Long.parseLong(idAndShop[1]);
+        //************************************************************************************************
+
+        for (Map.Entry<Long, Long> entry : lineIdAndShopIdMapList.entrySet()){
+            Long id = entry.getKey();
+            Long shopId = entry.getValue();
 
             // 循环所有原始记录行 开始
             for (ShoppingCartLineCommand chooseLine : shoppingCartCommand.getShoppingCartLineCommands()){
@@ -350,7 +315,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // 循环添加门店所有行
             for (Entry<Long, ShoppingCartCommand> shopCommand : buildShopCartByShopIdMap.entrySet()){
                 Long shopIdKey = shopCommand.getKey();// 店铺ID
-                List<ShoppingCartLineCommand> shopLineValues = shopCommand.getValue().getShoppingCartLineCommands();// 店铺的商品行数据
+                List<ShoppingCartLineCommand> shopShoppingCartLineList = shopCommand.getValue().getShoppingCartLineCommands();// 店铺的商品行数据
 
                 if (!shopId.equals(shopIdKey)){
                     continue;
@@ -358,7 +323,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
                 ShoppingCartLineCommand tempShopLine = null;
 
-                for (ShoppingCartLineCommand shopLine : shopLineValues){
+                for (ShoppingCartLineCommand shopLine : shopShoppingCartLineList){
                     if (id.equals(shopLine.getId())){
                         tempShopLine = shopLine;
                         break;
@@ -769,19 +734,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                                 cartLine.getPromotionId());
             }
         }
-    }
-
-    /**
-     * 比较两个字符串.
-     *
-     * @param str1
-     *            the str1
-     * @param str2
-     *            the str2
-     * @return true, if compare string
-     */
-    private boolean compareString(String str1,String str2){
-        return (null == str1 && null == str2) || (null != str1 && str1.equals(str2));
     }
 
     /**
@@ -8461,5 +8413,42 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         else{
             return true;
         }
+    }
+
+    /**
+     * 通过系统配置的计算级别选出参与促销计算以及不参与促销计算的购物车行.
+     *
+     * @param allLines
+     *            the all lines
+     * @param chooseLines
+     *            the choose lines
+     * @param notChooseLines
+     *            the not choose lines
+     */
+    private void splitByCalcLevel(
+                    List<ShoppingCartLineCommand> allLines,
+                    List<ShoppingCartLineCommand> chooseLines,
+                    List<ShoppingCartLineCommand> notChooseLines){
+        for (ShoppingCartLineCommand shoppingCartLine : allLines){
+            // 判断有效.促销计算时只计算有效的、被选中的购物车行
+            if (needContainsLineCalc(shoppingCartLine.getSettlementState(), shoppingCartLine.isValid())){
+                chooseLines.add(shoppingCartLine);
+            }else{
+                notChooseLines.add(shoppingCartLine);
+            }
+        }
+    }
+
+    /**
+     * 比较两个字符串.
+     *
+     * @param str1
+     *            the str1
+     * @param str2
+     *            the str2
+     * @return true, if compare string
+     */
+    private boolean compareString(String str1,String str2){
+        return (null == str1 && null == str2) || (null != str1 && str1.equals(str2));
     }
 }
