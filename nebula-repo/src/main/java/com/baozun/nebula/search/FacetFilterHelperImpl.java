@@ -139,7 +139,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		}
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(CacheKeyConstant.NAVIGATIONMETACACHEKEY+ lang, navigationMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(CacheKeyConstant.NAVIGATIONMETACACHEKEY+ lang, navigationMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -177,7 +177,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -214,7 +214,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -250,7 +250,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -284,7 +284,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
