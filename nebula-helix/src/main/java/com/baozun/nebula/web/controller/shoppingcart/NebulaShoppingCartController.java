@@ -41,6 +41,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.feilong.core.Validator;
 
 /**
  * 购物车控制器.
@@ -388,7 +389,7 @@ public class NebulaShoppingCartController extends BaseController{
     protected ShoppingCartCommand getShoppingCartCommand(HttpServletRequest request,MemberDetails memberDetails){
         ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
         List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
-        if (null == cartLines){
+        if (Validator.isNullOrEmpty(cartLines)){
             return null;
         }
         Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
