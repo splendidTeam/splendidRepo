@@ -112,7 +112,10 @@ public class SalesOrderResolverImpl implements SalesOrderResolver {
 		SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
 		// 设置收货地址信息
 		PropertyUtil.copyProperties(salesOrderCommand, orderForm.getShippingInfoSubForm(), "countryId", "provinceId",
-				"cityId", "areaId", "townId");
+				"cityId", "areaId", "townId","address","postcode","mobile","tel","email");
+		
+		salesOrderCommand.setName(Validator.isNullOrEmpty(memberDetails)?"":memberDetails.getNickName());
+		salesOrderCommand.setMemberId(Validator.isNullOrEmpty(memberDetails)?null:memberDetails.getMemberId());
 		salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
 		salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
 		// 设置支付信息
