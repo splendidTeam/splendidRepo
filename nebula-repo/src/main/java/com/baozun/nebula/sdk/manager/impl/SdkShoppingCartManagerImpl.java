@@ -6698,7 +6698,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     public Map<Long, ShoppingCartCommand> getShoppingCartMapByShop(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
         Map<Long, ShoppingCartCommand> shopCartByShopIdMap = new HashMap<Long, ShoppingCartCommand>();
         List<ShoppingCartLineCommand> newLines = null;
         for (ShoppingCartLineCommand line : shoppingCartLineCommandList){
