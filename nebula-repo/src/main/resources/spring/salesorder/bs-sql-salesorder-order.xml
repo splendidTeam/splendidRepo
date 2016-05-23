@@ -39,6 +39,8 @@
 						o.TRANS_CODE as transCode,
 					    o.LOGISTICS_PROVIDER_NAME as logisticsProviderName,
 						sc.NAME,
+						sc.buyer_name as buyerName,
+						sc.buyer_tel as buyerTel,
 						sc.ORDER_ID,
 						sc.COUNTRY,
 						sc.PROVINCE,
