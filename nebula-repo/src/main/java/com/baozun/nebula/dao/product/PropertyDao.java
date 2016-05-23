@@ -41,6 +41,21 @@ import loxia.dao.Sort;
 public interface PropertyDao extends GenericEntityDao<Property, Long>{
 
 	/**
+	 * <p>
+	 * 根据‘属性分组’查询
+	 * </p>
+	 * <p>
+	 * 逻辑上‘groupName’可以当做唯一的code使用
+	 * </p>
+	 * 
+	 * @param groupName
+	 * @param lang
+	 * @return
+	 */
+	@NativeQuery(model = Property.class)
+	Property findPropertyByGroupNameI18N(@QueryParam("groupName") String groupName,@QueryParam("lang") String lang);
+
+	/**
 	 * 获取所有Property列表
 	 * 
 	 * @return
@@ -217,7 +232,9 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 * @return
 	 */
 	@NativeQuery(model = Property.class)
-	List<Property> findPropertyByCategoryIdAndIndustryId(@QueryParam("categoryId") Long categoryId,@QueryParam("industryId") Long industryId);
+	List<Property> findPropertyByCategoryIdAndIndustryId(
+			@QueryParam("categoryId") Long categoryId,
+			@QueryParam("industryId") Long industryId);
 
 	/**
 	 * 根据行业id查询 属性
@@ -231,11 +248,7 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	Integer updateSortById(@QueryParam("propertyId") Long propertyId,@QueryParam("sortNo") Integer sortNo);
 
 	/**
-	 * @author 何波
-	 * @Description:修改属性国际化信息
-	 * @param params
-	 * @return int
-	 * @throws
+	 * @author 何波 @Description:修改属性国际化信息 @param params @return int @throws
 	 */
 	@NativeUpdate
 	int updatePropertyLang(@QueryParam Map<String, Object> params);
@@ -295,19 +308,19 @@ public interface PropertyDao extends GenericEntityDao<Property, Long>{
 	 */
 	@NativeQuery(model = PropertyLang.class)
 	List<PropertyLang> findPropertyLangByPropertyId(@QueryParam("propertyId") Long propertyId);
-	
-	
+
 	/**
 	 * 查询单t_pd_property表 lifecycle = 1 and searchable=true
+	 * 
 	 * @return List<Property>
 	 * @author 黄大辉
 	 */
 	@NativeQuery(model = Property.class)
 	List<Property> findSearchableProperty();
-	
-	
+
 	/**
 	 * 根据语言，查询所有属性的数据(只有id、name、sortNo字段)
+	 * 
 	 * @return List<MetaDataCommand>
 	 * @author 冯明雷
 	 * @time 2016年4月28日下午3:28:54
