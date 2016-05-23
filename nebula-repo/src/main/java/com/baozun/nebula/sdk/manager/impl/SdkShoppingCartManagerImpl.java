@@ -669,7 +669,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      *
      * @param shoppingCartLine
      *            the shopping cart line
+     * @deprecated
      */
+    @Deprecated
     private void saveCartLine(ShoppingCartLineCommand shoppingCartLine){
         if (null == shoppingCartLine){
             return;

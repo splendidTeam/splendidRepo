@@ -255,8 +255,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
                     Set<String> membComboIds,
                     ShoppingCartLineCommand shoppingCartLineCommand,
                     List<ShoppingCartLineCommand> lines){
-        Integer result = sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand, lines);
-        return result;
+        return sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand, lines);
     }
 
     @Override

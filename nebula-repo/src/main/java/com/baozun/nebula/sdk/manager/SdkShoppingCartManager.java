@@ -96,6 +96,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      *             boolean exist, boolean isReduce)
      * 
      */
+    @Deprecated
     Integer addOrUpdateShoppingCart(
                     Long memberId,
                     String extentionCode,
@@ -138,6 +139,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @param memberId
      * @param extentionCode
      */
+    @Deprecated
     Integer removeShoppingCartLine(Long memberId,String extentionCode);
 
     /**
