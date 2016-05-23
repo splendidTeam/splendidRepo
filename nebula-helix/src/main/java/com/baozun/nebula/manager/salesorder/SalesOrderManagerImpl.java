@@ -45,10 +45,8 @@ import com.baozun.nebula.sdk.command.ReturnOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
-import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.google.gson.Gson;
@@ -100,9 +98,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
     @Autowired
     private SdkOrderDao            sdkOrderDao;
-
-    @Autowired
-    private SdkOrderCreateManager  sdkOrderCreateManager;
 
     @Override
     public List<OrderPromotionCommand> findOrderPormots(String orderCode){

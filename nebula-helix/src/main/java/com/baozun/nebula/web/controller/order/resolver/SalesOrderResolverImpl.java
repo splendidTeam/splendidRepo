@@ -44,7 +44,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
@@ -52,7 +51,6 @@ import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
 import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
@@ -79,10 +77,6 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
 
     @Autowired
     private SalesOrderManager             salesOrderManager;
-
-    /** The sdk shopping cart manager. */
-    @Autowired
-    private SdkShoppingCartManager        sdkShoppingCartManager;
 
     @Autowired
     private SdkPaymentManager             sdkPaymentManager;
@@ -122,10 +116,11 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "email");
 
         // 用户信息
-        salesOrderCommand.setName(Validator.isNullOrEmpty(memberDetails) ? "" : memberDetails.getNickName());
-        salesOrderCommand.setMemberName(memberDetails == null ? "" : memberDetails.getLoginName());
+        boolean isGuest = Validator.isNullOrEmpty(memberDetails);
+        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
+        salesOrderCommand.setMemberName(isGuest ? "" : memberDetails.getLoginName());
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
-        salesOrderCommand.setMemberId(Validator.isNullOrEmpty(memberDetails) ? null : memberDetails.getGroupId());
+        salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
         salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
         salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
         // 设置支付信息

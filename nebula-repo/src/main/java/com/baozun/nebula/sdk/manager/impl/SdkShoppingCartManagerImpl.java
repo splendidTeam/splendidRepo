@@ -102,104 +102,96 @@ import com.feilong.core.util.CollectionsUtil;
 public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
     /** The Constant log. */
-    private static final Logger                      log             = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
+    private static final Logger                   log             = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer                     SUCCESS         = 1;
+    private static final Integer                  SUCCESS         = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer                     FAILURE         = 0;
+    private static final Integer                  FAILURE         = 0;
 
     /** The Constant CHECKED_STATE. */
-    private static final int                         CHECKED_STATE   = 1;
+    private static final int                      CHECKED_STATE   = 1;
 
     /** 优惠设置是否按单件计算，是指按Qty计算，还是Qty为1来计算 *. */
-    private static final BigDecimal                  ONE_PIECE_QTY   = new BigDecimal(1);
+    private static final BigDecimal               ONE_PIECE_QTY   = new BigDecimal(1);
 
     /** 百分百 *. */
-    private static final BigDecimal                  HUNDRED_PERCENT = new BigDecimal(1);
+    private static final BigDecimal               HUNDRED_PERCENT = new BigDecimal(1);
 
     /** The sdk shopping cart line dao. */
     @Autowired
-    private SdkShoppingCartLineDao                   sdkShoppingCartLineDao;
+    private SdkShoppingCartLineDao                sdkShoppingCartLineDao;
 
     /** The item info dao. */
     @Autowired
-    private ItemInfoDao                              itemInfoDao;
+    private ItemInfoDao                           itemInfoDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao                                   skuDao;
+    private SkuDao                                skuDao;
 
     /** The item category dao. */
     @Autowired
-    private ItemCategoryDao                          itemCategoryDao;
+    private ItemCategoryDao                       itemCategoryDao;
 
     /** The sdk filter manager. */
     @Autowired
-    private SdkFilterManager                         sdkFilterManager;
+    private SdkFilterManager                      sdkFilterManager;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager                         sdkEngineManager;
+    private SdkEngineManager                      sdkEngineManager;
 
     /** The sdk promotion calculation manager. */
     @Autowired
-    private SdkPromotionCalculationManager           sdkPromotionCalculationManager;
+    private SdkPromotionCalculationManager        sdkPromotionCalculationManager;
 
     /** The sdk promotion rule filter manager. */
     @Autowired
-    private SdkPromotionRuleFilterManager            sdkPromotionRuleFilterManager;
-
-    /** The logistics manager. */
-    @Autowired
-    private LogisticsManager                         logisticsManager;
+    private SdkPromotionRuleFilterManager         sdkPromotionRuleFilterManager;
 
     /** The sdk order line dao. */
     @Autowired
-    private SdkOrderLineDao                          sdkOrderLineDao;
+    private SdkOrderLineDao                       sdkOrderLineDao;
 
     /** The sdk purchase rule filter manager. */
     @Autowired
-    private SdkPurchaseLimitRuleFilterManager        sdkPurchaseRuleFilterManager;
+    private SdkPurchaseLimitRuleFilterManager     sdkPurchaseRuleFilterManager;
 
     /** The sdk effective manager. */
     @Autowired
-    private SdkEffectiveManager                      sdkEffectiveManager;
+    private SdkEffectiveManager                   sdkEffectiveManager;
 
     /** The sdk promotion coupon manager. */
     @Autowired
-    private SdkPromotionCouponManager                sdkPromotionCouponManager;
-
-    /** The sdk promotion calculation share to sku manager. */
-    @Autowired
-    private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
+    private SdkPromotionCouponManager             sdkPromotionCouponManager;
 
     /** The sdk promotion setting manager. */
     @Autowired
-    private SdkPromotionCalculationSettingManager    sdkPromotionSettingManager;
+    private SdkPromotionCalculationSettingManager sdkPromotionSettingManager;
 
     /** The sdk promotion guide manager. */
     @Autowired
-    private SdkPromotionGuideManager                 sdkPromotionGuideManager;
+    private SdkPromotionGuideManager              sdkPromotionGuideManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager                       sdkMataInfoManager;
+    private SdkMataInfoManager                    sdkMataInfoManager;
 
     /** The sdk shopping cart lines manager. */
     @Autowired
-    private SdkShoppingCartLinesManager              sdkShoppingCartLinesManager;
+    private SdkShoppingCartLinesManager           sdkShoppingCartLinesManager;
 
     /** The sdk promotion manager. */
     @Autowired
-    private SdkPromotionManager                      sdkPromotionManager;
+    private SdkPromotionManager                   sdkPromotionManager;
 
     @Autowired
-    private SdkShoppingCartLinePackManager           sdkShoppingCartLinePackManager;
+    private SdkShoppingCartLinePackManager        sdkShoppingCartLinePackManager;
 
     @Autowired
-    private SdkShoppingCartCommandBuilder            sdkShoppingCartCommandBuilder;
+    private SdkShoppingCartCommandBuilder         sdkShoppingCartCommandBuilder;
 
     /**
      * @param memberId
@@ -297,83 +289,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         shoppingCartCommand.setCoupons(coupons);
         // 会员信息
         shoppingCartCommand.setUserDetails(userDetails);
-    }
-
-    /**
-     * 无促销情况下计算运费.
-     *
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param validLines
-     *            the valid lines
-     * @param shopId
-     *            the shop id
-     * @return the freight fee
-     */
-    private BigDecimal getFreightFee(CalcFreightCommand calcFreightCommand,List<ShoppingCartLineCommand> validLines,Long shopId){
-        BigDecimal originShippingFee = BigDecimal.ZERO;
-        if (null != calcFreightCommand){
-            Boolean flag = logisticsManager.hasDistributionMode(calcFreightCommand, shopId);
-            if (flag){
-                // 无促销情况下统计金额小计
-                List<ItemFreightInfoCommand> itemList = new ArrayList<ItemFreightInfoCommand>();
-                for (ShoppingCartLineCommand line : validLines){
-                    ItemFreightInfoCommand itemInfo = new ItemFreightInfoCommand();
-                    itemInfo.setItemId(line.getItemId());
-                    itemInfo.setCount(line.getQuantity());
-                    itemList.add(itemInfo);
-                }
-                originShippingFee = logisticsManager.findFreight(
-                                itemList,
-                                calcFreightCommand.getDistributionModeId(),
-                                shopId,
-                                calcFreightCommand.getProvienceId(),
-                                calcFreightCommand.getCityId(),
-                                calcFreightCommand.getCountyId(),
-                                calcFreightCommand.getTownId());
-            }
-
-        }
-        return originShippingFee;
-    }
-
-    /**
-     * 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值.
-     *
-     * @param shoppingCart
-     *            the shopping cart
-     * @param promotionBriefList
-     *            the promotion brief list
-     */
-    private void shareDiscountToLine(ShoppingCartCommand shoppingCart,List<PromotionBrief> promotionBriefList){
-        // 分摊结果
-        List<PromotionSKUDiscAMTBySetting> shareList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCart, promotionBriefList);
-        if (null == shareList || shareList.size() == 0 || shoppingCart.getShoppingCartLineCommands() == null
-                        || shoppingCart.getShoppingCartLineCommands().size() == 0)
-            return;
-
-        for (ShoppingCartLineCommand shoppingCartLine : shoppingCart.getShoppingCartLineCommands()){
-            BigDecimal curSKUDiscount = BigDecimal.ZERO;
-            if (shoppingCartLine.isGift())
-                continue;
-            for (PromotionSKUDiscAMTBySetting skuSetting : shareList){
-                if (skuSetting.getFreeShippingMark() || skuSetting.getGiftMark())
-                    continue;
-                // 行优惠
-                if (String.valueOf(shoppingCartLine.getSkuId()).equals(String.valueOf(skuSetting.getSkuId()))){
-                    curSKUDiscount = curSKUDiscount.add(skuSetting.getDiscountAmount());
-                }
-            }
-            shoppingCartLine.setDiscount(curSKUDiscount);
-            // 购物车行小计
-            BigDecimal lineSubTotalAmt = new BigDecimal(shoppingCartLine.getQuantity()).multiply(shoppingCartLine.getSalePrice())
-                            .subtract(curSKUDiscount);
-            if (lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0){
-                lineSubTotalAmt = BigDecimal.ZERO;
-            }
-            shoppingCartLine.setSubTotalAmt(lineSubTotalAmt);
-        }
     }
 
     /**
@@ -1579,7 +1494,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         PromotionSKUDiscAMTBySetting proSkuSetting = null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
 
-        List<ItemCommand> itemList = itemInfoDao.findItemCommandListByItemIds((List<Long>) itemIdsLong);
+        List<ItemCommand> itemList = itemInfoDao.findItemCommandListByItemIds(itemIdsLong);
         if (itemList == null)
             return null;
         for (ItemCommand item : itemList){
@@ -6011,42 +5926,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return shopCartByShopIdMap;
     }
 
-    /**
-     * 同步购物车.
-     *
-     * @param memberId
-     *            the member id
-     * @param shoppingLines
-     *            the shopping lines
-     */
-    @Override
-    public void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines){
-        Validate.notNull(memberId, "memberId can't be null!");
-        Validate.notEmpty(shoppingLines, "shoppingLines can't be null!");
-
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingLines){
-            if (shoppingCartLineCommand.isGift()){ // 不同步赠品数据
-                continue;
-            }
-
-            String extentionCode = shoppingCartLineCommand.getExtentionCode();
-            Integer quantity = shoppingCartLineCommand.getQuantity();
-            ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
-
-            int result = 0;
-            if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                result = sdkShoppingCartLineDao
-                                .updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
-            }else{
-                result = sdkShoppingCartLineDao.addCartLineQuantity(memberId, extentionCode, quantity);
-            }
-
-            if (1 != result){
-                throw new NativeUpdateRowCountNotEqualException(1, result);
-            }
-        }
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -6399,7 +6278,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         for (ShoppingCartLineCommand line : lines){
             qtys.add(line.getQuantity());
         }
-        if (null != qtys && qtys.size() > 0){
+        if (qtys.size() > 0){
             // 返回集合中最小值
             return Collections.min(qtys);
         }

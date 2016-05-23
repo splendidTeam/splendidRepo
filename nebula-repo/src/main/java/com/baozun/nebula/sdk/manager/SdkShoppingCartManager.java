@@ -231,15 +231,6 @@ public interface SdkShoppingCartManager extends BaseManager{
     Integer getCustomQuantity(List<Long> customItemIds,List<ShoppingCartLineCommand> shoppingLines);
 
     /**
-     * 会员登录后同步购物车数据
-     * 
-     * @param memberId
-     * @param shoppingLines
-     *            cookie中的购物车数据
-     */
-    void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines);
-
-    /**
      * 获取购物车该组合下商品的金额
      * 
      * @param comboId
