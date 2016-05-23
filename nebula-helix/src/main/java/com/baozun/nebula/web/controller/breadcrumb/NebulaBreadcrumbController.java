@@ -23,16 +23,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.exception.IllegalItemStateException;
-import com.baozun.nebula.manager.breadcrumb.BreadcrumbManager;
-import com.baozun.nebula.sdk.command.CurmbCommand;
-import com.baozun.nebula.web.controller.breadcrumb.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCommand;
+import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 
 /**   
@@ -69,28 +65,20 @@ import com.feilong.core.Validator;
  * @date 2016年5月13日 下午6:14:47 
  * @version   
  */
-public class BreadcrumbController {
+public class NebulaBreadcrumbController extends NebulaAbstractBreadcrumbController{
 	
-	private static final Logger	LOG									= LoggerFactory.getLogger(BreadcrumbController.class);
+	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaBreadcrumbController.class);
 	
+	//面包屑对应的jsp
 	/** 列表页*/
 	private static final String VIEW_BREADCRUMB_PLP 				="breadcrumb.plp";
 	
 	/** 详情页*/
 	private static final String VIEW_BREADCRUMB_PDP 				="breadcrumb.pdp";
 	
+	//Model key的定义
+	/** 面包屑的model key*/
 	private static final String	MODEL_KEY_BREADCRUMB				="breadcrumb";
-	
-	@Autowired
-	private BreadcrumbManager										breadcrumbManager;
-	
-	@Autowired
-	@Qualifier("breadcrumbsViewCommandConverter")
-	private BreadcrumbsViewCommandConverter 						breadcrumbsViewCommandConverter;
-	
-	
-	
-	
 	/**
 	 * 获取页面的面包
 	 * 
@@ -105,10 +93,8 @@ public class BreadcrumbController {
 	public String showBreadcrumb(@RequestParam("navId") Long navId,
 			@RequestParam("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model){
-		
 		try {
-			List<CurmbCommand> curmbCommands = breadcrumbManager.findCurmbCommands(navId, itemId, request);
-			List<BreadcrumbsViewCommand> breadcrumbsViewCommands = breadcrumbsViewCommandConverter.convert(curmbCommands);
+			List<BreadcrumbsViewCommand> breadcrumbsViewCommands = bulidCurmbViewCommandsWithCache(navId, itemId, request);
 			model.addAttribute(MODEL_KEY_BREADCRUMB, breadcrumbsViewCommands);
 		} catch (IllegalItemStateException e) {
 			LOG.error("[PDP_BUILD_BREADCRUMB] breadcrumb state illegal. itemId:{}, {}",itemId, e.getState().name());
@@ -133,6 +119,15 @@ public class BreadcrumbController {
 			return VIEW_BREADCRUMB_PLP;
 		}
 		return VIEW_BREADCRUMB_PDP;
+	}
+	
+	/* 
+	 * @see com.baozun.nebula.web.controller.breadcrumb.NebulaAbstractBreadcrumbController#getBreadcrumbCacheExpireSeconds()
+	 */
+	@Override
+	protected Integer getBreadcrumbCacheExpireSeconds() {
+		// 1天
+		return TimeInterval.SECONDS_PER_DAY;
 	}
 	
 	
