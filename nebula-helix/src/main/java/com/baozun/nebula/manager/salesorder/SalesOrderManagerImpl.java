@@ -105,24 +105,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
     private SdkOrderCreateManager  sdkOrderCreateManager;
 
     @Override
-    public String createOrder(SalesOrderCommand salesOrderCommand,Set<String> memComboIds,List<ShoppingCartLineCommand> lines){
-        // 订单概要表
-        ShoppingCartCommand shoppingCartCommand = null;
-        // if(salesOrderCommand.getIsImmediatelyBuy()){
-        // shoppingCartCommand
-        // =sdkShoppingCartManager.findShoppingCart(salesOrderCommand.getMemberId(),memComboIds,
-        // salesOrderCommand.getCouponCodes(),salesOrderCommand.getCalcFreightCommand(),lines);
-        // }else{
-        // shoppingCartCommand =
-        // sdkShoppingCartManager.findShoppingCart(salesOrderCommand.getMemberId(),memComboIds,
-        // salesOrderCommand.getCouponCodes(),salesOrderCommand.getCalcFreightCommand(),lines);
-        // }
-
-        String orderCode = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
-        return orderCode;
-    }
-
-    @Override
     public List<OrderPromotionCommand> findOrderPormots(String orderCode){
         return sdkOrderService.findOrderPormots(orderCode);
     }
