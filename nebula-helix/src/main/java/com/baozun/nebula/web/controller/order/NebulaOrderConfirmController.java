@@ -45,7 +45,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -145,9 +145,6 @@ public class NebulaOrderConfirmController extends BaseController{
     private OrderFormValidator               orderFormValidator;
 
     @Autowired
-    private SdkShoppingCartManager           sdkShoppingCartManager;
-
-    @Autowired
     private SdkMemberManager                 sdkMemberManager;
 
     @Autowired
@@ -174,6 +171,9 @@ public class NebulaOrderConfirmController extends BaseController{
 
     /** 购物车为空返回的URL */
     public static final String               CART_NULL_BACK_URL      = "/index";
+
+    @Autowired
+    private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
 
     /**
      * 显示订单结算页面.
@@ -458,7 +458,7 @@ public class NebulaOrderConfirmController extends BaseController{
             coupons.add(couponCode);
         }
 
-        return sdkShoppingCartManager.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
     }
 
     /**

@@ -54,6 +54,7 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.solr.utils.JsonFormatUtil;
 import com.baozun.nebula.utilities.library.address.Address;
@@ -82,6 +83,9 @@ public class SalesOrderController extends BaseController{
 
     @Autowired
     private SdkShoppingCartManager                   sdkShoppingCartManager;
+
+    @Autowired
+    private SdkShoppingCartCommandBuilder            sdkShoppingCartCommandBuilder;
 
     @Autowired
     private OrderManager                             sdkOrderService;
@@ -482,7 +486,8 @@ public class SalesOrderController extends BaseController{
                     // 不清除购物车
                     salesOrderCommand.setIsImmediatelyBuy(true);
                 }
-                shoppingCartCommand = sdkShoppingCartManager.buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
+                shoppingCartCommand = sdkShoppingCartCommandBuilder
+                                .buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
                 subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
             }
 
@@ -799,7 +804,8 @@ public class SalesOrderController extends BaseController{
                     }
                 }
             }
-            shoppingCartCommand = sdkShoppingCartManager.buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
+            shoppingCartCommand = sdkShoppingCartCommandBuilder
+                            .buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
         }
 
         boolean isCouponBindActive = false;
