@@ -86,6 +86,7 @@ import com.baozun.nebula.sdk.manager.SdkPromotionManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartGroupManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartLinePackManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartLinesManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.feilong.core.Validator;
@@ -197,6 +198,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     @Autowired
     private SdkPromotionManager                      sdkPromotionManager;
 
+    @Autowired
+    private SdkShoppingCartLinePackManager           sdkShoppingCartLinePackManager;
+
     /**
      * Find shopping cart.
      *
@@ -230,7 +234,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 shoppingCartLine.setId(new Long(--i));
             }
             //TODO feilong bundle不是这么玩的
-            sdkEngineManager.packShoppingCartLine(shoppingCartLine); // 封装购物车行信息
+            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLine); // 封装购物车行信息
             shoppingCartLine.setType(Constants.ITEM_TYPE_SALE);// 主卖品
 
             // 购物车行 金额小计
@@ -1104,7 +1108,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         giftLine.setStock(proSku.getQty());
         // 赠品都设置为有效
         giftLine.setValid(true);
-        sdkEngineManager.packShoppingCartLine(giftLine);
+        sdkShoppingCartLinePackManager.packShoppingCartLine(giftLine);
 
         giftLine.setPromotionId(proSku.getPromotionId());
         giftLine.setSettingId(proSku.getSettingId());
@@ -1694,7 +1698,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         try{
             Integer retval = SUCCESS;
             ShoppingCartCommand cart = new ShoppingCartCommand();
-            sdkEngineManager.packShoppingCartLine(shoppingCartLine);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLine);
             // 检查商品有效性
             retval = sdkEffectiveManager.checkItemIsValid(shoppingCartLine.isValid());
             if (SUCCESS != retval){
@@ -6716,6 +6720,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * java.util.Set, boolean, boolean)
      */
     @Override
+    @Deprecated
     public Integer addOrUpdateShoppingCart(
                     Long memberId,
                     String extentionCode,
@@ -6738,7 +6743,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             }
 
             // 封装购物车行数据
-            sdkEngineManager.packShoppingCartLine(line);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
             if (extentionCode.equals(line.getExtentionCode())){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
@@ -6819,7 +6824,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         for (ShoppingCartLineCommand line : lines){
             // 封装购物车行数据
-            sdkEngineManager.packShoppingCartLine(line);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
             if (line.getId().equals(lineId)){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
@@ -6900,7 +6905,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         for (ShoppingCartLineCommand line : lines){
             // 封装购物车行数据
-            sdkEngineManager.packShoppingCartLine(line);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
             if (line.getExtentionCode().equals(extentionCode)){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
@@ -6986,7 +6991,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         // 封装购物车行数据
         for (ShoppingCartLineCommand line : lines){
-            sdkEngineManager.packShoppingCartLine(line);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
         }
 
         // 获取限购规则
@@ -7488,7 +7493,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     public Integer manualBuy(BigDecimal buyPrice,ShoppingCartLineCommand shoppingCartLine,List<ShoppingCartLineCommand> lines){
         try{
             Integer retval = SUCCESS;
-            sdkEngineManager.packShoppingCartLine(shoppingCartLine);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLine);
             shoppingCartLine.setSalePrice(buyPrice);
             // 检查商品有效性
             retval = sdkEffectiveManager.checkItemIsValid(shoppingCartLine.isValid());
@@ -7676,7 +7681,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             command.setQuantity(1);
             command.setGift(true);
             command.setPromotionId(promotionId);
-            sdkEngineManager.packShoppingCartLine(command);
+            sdkShoppingCartLinePackManager.packShoppingCartLine(command);
             /** 添加赠品行 */
             sdkShoppingCartLineDao.insertShoppingCartLineWithLineGroup(
                             command.getExtentionCode(),
