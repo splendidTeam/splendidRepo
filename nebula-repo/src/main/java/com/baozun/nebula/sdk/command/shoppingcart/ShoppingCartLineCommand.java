@@ -238,6 +238,7 @@ public class ShoppingCartLineCommand extends BaseModel{
     private List<PromotionCommand>     promotionList;
 
     /** 是否赠品. */
+    //TODO 赠品不是不进购物车的吗 by feilong
     private boolean                    isGift;
 
     /** 1是行赠品,0是整单赠品. */

@@ -64,20 +64,60 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
             }
 
             String extentionCode = shoppingCartLineCommand.getExtentionCode();
+            Validate.notEmpty(extentionCode, "extentionCode can't be null/empty!");
+
             Integer quantity = shoppingCartLineCommand.getQuantity();
+            Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);
+
             ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
 
-            int result = 0;
             if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                result = sdkShoppingCartLineDao
-                                .updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
+                updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
             }else{
-                result = sdkShoppingCartLineDao.addCartLineQuantity(memberId, extentionCode, quantity);
+                saveCartLine(memberId, shoppingCartLineCommand);
             }
+        }
+    }
 
-            if (1 != result){
-                throw new NativeUpdateRowCountNotEqualException(1, result);
-            }
+    /**
+     * Update cart line quantity by line id.
+     *
+     * @param memberId
+     *            the member id
+     * @param quantity
+     *            the quantity
+     * @param cartLineInDb
+     *            the cart line in db
+     */
+    private void updateCartLineQuantityByLineId(Long memberId,Long lineId,Integer quantity){
+        int result = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(memberId, lineId, quantity);
+        if (1 != result){
+            throw new NativeUpdateRowCountNotEqualException(1, result);
+        }
+    }
+
+    /**
+     * 保存或更新购物行信息.
+     *
+     * @param shoppingCartLine
+     *            the shopping cart line
+     */
+    private void saveCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLine){
+        // 保存
+        int result = sdkShoppingCartLineDao.insertShoppingCartLine(
+                        shoppingCartLine.getExtentionCode(),
+                        shoppingCartLine.getSkuId(),
+                        shoppingCartLine.getQuantity(),
+                        memberId,
+                        shoppingCartLine.getCreateTime(),
+                        shoppingCartLine.getSettlementState(),
+                        shoppingCartLine.getShopId(),
+                        shoppingCartLine.isGift(),
+                        shoppingCartLine.getPromotionId(),
+                        shoppingCartLine.getLineGroup());
+
+        if (1 != result){
+            throw new NativeUpdateRowCountNotEqualException(1, result);
         }
     }
 }

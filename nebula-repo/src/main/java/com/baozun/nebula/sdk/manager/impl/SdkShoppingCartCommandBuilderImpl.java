@@ -23,20 +23,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.promotion.PromotionCommand;
-import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.command.logistics.ItemFreightInfoCommand;
@@ -72,9 +67,6 @@ import com.feilong.core.util.CollectionsUtil;
 @Service("sdkShoppingCartCommandBuilder")
 public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommandBuilder{
 
-    /** The Constant LOGGER. */
-    private static final Logger                      LOGGER        = LoggerFactory.getLogger(SdkShoppingCartCommandBuilderImpl.class);
-
     @Autowired
     private SdkShoppingCartLinePackManager           sdkShoppingCartLinePackManager;
 
@@ -84,10 +76,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     /** The sdk engine manager. */
     @Autowired
     private SdkEngineManager                         sdkEngineManager;
-
-    /** The sdk shopping cart line dao. */
-    @Autowired
-    private SdkShoppingCartLineDao                   sdkShoppingCartLineDao;
 
     /** The sdk shopping cart group manager. */
     @Autowired
@@ -528,57 +516,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     }
 
     /**
-     * 执行购物车更新.
-     *
-     * @param needDelLineList
-     *            the need del line list
-     * @param needAdd
-     *            the need add
-     * @param needUpdate
-     *            the need update
-     * @param memberId
-     *            the member id
-     */
-    private void execShoppingCartUpdate(
-                    List<Long> needDelLineList,
-                    List<ShoppingCartLineCommand> needAdd,
-                    List<ShoppingCartLineCommand> needUpdate,
-                    Long memberId){
-        // 1 搞掉要删除的
-        if (null != needDelLineList && needDelLineList.size() > 0){
-            for (Long cartLineId : needDelLineList){
-                sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, cartLineId);
-            }
-        }
-        // 2更新改更新的
-        if (null != needUpdate && needUpdate.size() > 0){
-            for (ShoppingCartLineCommand cartLine : needUpdate){
-                sdkShoppingCartLineDao.updateCartLinePromotionInfo(
-                                cartLine.getId(),
-                                cartLine.getLineGroup(),
-                                cartLine.isGift(),
-                                cartLine.getPromotionId());
-            }
-        }
-        // 3添加该添加的
-        if (null != needAdd && needAdd.size() > 0){
-            for (ShoppingCartLineCommand cartLine : needAdd){
-                sdkShoppingCartLineDao.insertShoppingCartLineWithLineGroup(
-                                cartLine.getExtentionCode(),
-                                cartLine.getSkuId(),
-                                cartLine.getQuantity(),
-                                memberId,
-                                new Date(),
-                                cartLine.getSettlementState(),
-                                cartLine.getShopId(),
-                                cartLine.getLineGroup() + "",
-                                cartLine.isGift(),
-                                cartLine.getPromotionId());
-            }
-        }
-    }
-
-    /**
      * 根据店铺封装shopCart对象.
      *
      * @param shoppingCartCommand
@@ -815,19 +752,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         giftLine.setGiftCountLimited(proSku.getGiftCountLimited());
 
         return giftLine;
-    }
-
-    /**
-     * 比较两个字符串.
-     *
-     * @param str1
-     *            the str1
-     * @param str2
-     *            the str2
-     * @return true, if compare string
-     */
-    private boolean compareString(String str1,String str2){
-        return (null == str1 && null == str2) || (null != str1 && str1.equals(str2));
     }
 
     /**
