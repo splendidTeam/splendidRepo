@@ -123,7 +123,7 @@ public class NebulaOrderDetailsController extends BaseController {
         // 收货地址信息
         ConsigneeSubViewCommand consigneeSubViewCommand = new ConsigneeSubViewCommand();
         PropertyUtil.copyProperties(consigneeSubViewCommand, salesOrderCommand, "name", "country", "province",
-                "city", "area", "address", "mobile", "tel", "email", "postcode");
+                "city", "area", "address", "mobile", "tel", "email", "postcode","buyerTel","buyerName");
         // 支付信息
         PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
         PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
