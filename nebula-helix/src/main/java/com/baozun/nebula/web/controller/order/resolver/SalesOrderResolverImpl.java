@@ -117,8 +117,11 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "tel",
                         "email");
 
+        // 用户信息
         salesOrderCommand.setName(Validator.isNullOrEmpty(memberDetails) ? "" : memberDetails.getNickName());
-        salesOrderCommand.setMemberId(Validator.isNullOrEmpty(memberDetails) ? null : memberDetails.getMemberId());
+        salesOrderCommand.setMemberName(memberDetails == null ? "" : memberDetails.getLoginName());
+        salesOrderCommand.setIp(RequestUtil.getClientIp(request));
+        salesOrderCommand.setMemberId(Validator.isNullOrEmpty(memberDetails) ? null : memberDetails.getGroupId());
         salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
         salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
         // 设置支付信息
@@ -132,10 +135,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         setFreghtCommand(salesOrderCommand);
         // 设置优惠券信息
         setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
-        // 用户信息
-        salesOrderCommand.setMemberName(memberDetails == null ? "" : memberDetails.getLoginName());
-        salesOrderCommand.setMemberId(memberDetails == null ? null : memberDetails.getMemberId());
-        salesOrderCommand.setIp(RequestUtil.getClientIp(request));
+       
         // 发票信息
         if (Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())){
             if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()){
@@ -204,14 +204,14 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
 
         // 获取购物车行信息
 
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
         List<String> couponList = new ArrayList<String>();
         if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
             couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
         }
         return sdkShoppingCartManager
-                        .buildShoppingCartCommand(memberId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
+                        .buildShoppingCartCommand(groupId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
 
     }
 

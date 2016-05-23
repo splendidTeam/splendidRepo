@@ -229,7 +229,7 @@ public class NebulaShoppingCartController extends BaseController{
      * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
      * 
      * <br>
-     * <span style="color:red">服务端必须同时拿shoppingcartLineId和memberId做参数,
+     * <span style="color:red">服务端必须同时拿shoppingcartLineId和groupId做参数,
      * 否则可能会出现安全漏洞</span>
      * </p>
      *
@@ -385,9 +385,9 @@ public class NebulaShoppingCartController extends BaseController{
         if (Validator.isNullOrEmpty(cartLines)){
             return null;
         }
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartManager.buildShoppingCartCommand(memberId, cartLines, null, null, memComboList);
+        return sdkShoppingCartManager.buildShoppingCartCommand(groupId, cartLines, null, null, memComboList);
     }
 
     /**

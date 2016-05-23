@@ -52,7 +52,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
-        return sdkShoppingCartManager.findShoppingCartLinesByMemberId(memberDetails.getMemberId(), null);
+        return sdkShoppingCartManager.findShoppingCartLinesByMemberId(memberDetails.getGroupId(), null);
     }
 
     /*
@@ -69,9 +69,9 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     ShoppingCartLineCommand currentLine,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        currentLine.setMemberId(memberDetails.getMemberId());
+        currentLine.setMemberId(memberDetails.getGroupId());
 
-        boolean result = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getMemberId(), currentLine);
+        boolean result = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
         if (!result){
             return ShoppingcartResult.OPERATE_ERROR;
         }
@@ -92,9 +92,9 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     ShoppingCartLineCommand currentLine,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        currentLine.setMemberId(memberDetails.getMemberId());
+        currentLine.setMemberId(memberDetails.getGroupId());
 
-        boolean result = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getMemberId(), currentLine);
+        boolean result = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
         if (!result){
             return ShoppingcartResult.OPERATE_ERROR;
         }
@@ -116,7 +116,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     ShoppingCartLineCommand currentLine,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        Integer result = sdkShoppingCartManager.removeShoppingCartLineById(memberDetails.getMemberId(), currentLine.getId());
+        Integer result = sdkShoppingCartManager.removeShoppingCartLineById(memberDetails.getGroupId(), currentLine.getId());
         if (com.baozun.nebula.sdk.constants.Constants.FAILURE.equals(result)){
             return ShoppingcartResult.OPERATE_ERROR;
         }
@@ -140,7 +140,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        sdkShoppingCartManager.updateCartLineSettlementState(memberDetails.getMemberId(), extentionCodeList, checkStatus ? 1 : 0);
+        sdkShoppingCartManager.updateCartLineSettlementState(memberDetails.getGroupId(), extentionCodeList, checkStatus ? 1 : 0);
         return null;
     }
 }
