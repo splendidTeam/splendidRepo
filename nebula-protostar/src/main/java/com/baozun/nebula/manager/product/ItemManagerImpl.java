@@ -693,8 +693,13 @@ public class ItemManagerImpl implements ItemManager{
 	public Integer enableOrDisableItemByIds(List<Long> ids,Integer state,String userName){
 		String updateListTimeFlag = sdkMataInfoManager.findValue(MataInfo.UPDATE_ITEM_LISTTIME);
 		Integer result = itemDao.enableOrDisableItemByIds(ids, state, updateListTimeFlag);
-		//添加上下架日志
-		addItemOperateLog(ids,state,userName);
+		
+		//无异常时才添加日志
+		if(result >= 1){
+			//添加上下架日志
+			addItemOperateLog(ids,state,userName);
+		}
+		
 		boolean solrFlag = false;
 		// state : 0==下架， 1=上架
 		if (state == 1){
@@ -730,24 +735,30 @@ public class ItemManagerImpl implements ItemManager{
 			Long lastLogId = itemOperateLogDao.findByItemId(itemId);
 			
 			/*
+			 * 一条日志记录包含：（必须先）上架--->下架
+			 * 
 			 * 1、如果存在：
-			 * 			a、当state=1时（上架）,最新的一条记录中没有上架信息（包含上架时间和上架操作人）时才update
-			 * 			b、当state=0时（下架）,最新的一条记录中没有下架信息（包含下架时间和下架操作人）时才update
+			 * 			a、当state=1时（上架）,新建一条记录
+			 * 			b、当state=0时（下架）,
+			 * 				若最新的一条记录中没有下架信息（包含下架时间和下架操作人）时才update
+			 * 				若有则新建一条记录
 			 * 			c、不符合上面两种情况是只能再新建一条记录
 			 * 2、如果不存在： 新建一条记录
 			 */
+			
 			if (Validator.isNotNullOrEmpty(lastLogId)){
-				ItemOperateLog itemOperateLog = itemOperateLogDao.getByPrimaryKey(lastLogId);
-				if( Validator.isNullOrEmpty(itemOperateLog.getPushTime()) &&  state == 1 ){//1、a、
-					itemOperateLog.setPushOperatorName(userName);
-					itemOperateLog.setPushTime(new Date());
-					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
-					itemOperateLogDao.save(itemOperateLog);
-				}else if( Validator.isNullOrEmpty(itemOperateLog.getSoldOutTime()) &&  state == 0 ){//1、b、
-					itemOperateLog.setSoldOutOperatorName(userName);
-					itemOperateLog.setSoldOutTime(new Date());
-					itemOperateLog.setActiveTime(countActiveTime(new Date(),itemOperateLog.getSoldOutTime()));
-					itemOperateLogDao.save(itemOperateLog);
+				if(state == 1){//1、a、
+					saveItemOperateLog(itemId,state,userName);
+				}else if(state == 0){//1、b、
+					ItemOperateLog itemOperateLog = itemOperateLogDao.getByPrimaryKey(lastLogId);
+					if( itemOperateLog.getSoldOutTime().getTime() == new Date(70,0,1).getTime() ){
+						itemOperateLog.setSoldOutOperatorName(userName);
+						itemOperateLog.setSoldOutTime(new Date());
+						itemOperateLog.setActiveTime(countActiveTime(itemOperateLog.getPushTime(),itemOperateLog.getSoldOutTime()));
+						itemOperateLogDao.save(itemOperateLog);
+					}else{
+						saveItemOperateLog(itemId,state,userName);
+					}
 				}else{//1、c、
 					saveItemOperateLog(itemId,state,userName);
 				}
@@ -783,9 +794,11 @@ public class ItemManagerImpl implements ItemManager{
 		if(state == 1){//上架
 			itemOperateLog.setPushOperatorName(userName);
 			itemOperateLog.setPushTime(new Date());
+			itemOperateLog.setSoldOutTime(new Date(70,0,1));
 		}else if(state == 0){//下架
 			itemOperateLog.setSoldOutOperatorName(userName);
 			itemOperateLog.setSoldOutTime(new Date());
+			itemOperateLog.setPushTime(new Date(70,0,1));
 		}
 		itemOperateLogDao.save(itemOperateLog);
 	}
