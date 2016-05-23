@@ -27,71 +27,76 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * @see com.baozun.nebula.sdk.command.ConsigneeCommand
  * @since 5.3.1
  */
-public class ConsigneeSubViewCommand extends BaseViewCommand{
+public class ConsigneeSubViewCommand extends BaseViewCommand {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -6400008677521495969L;
 
     /** The id. */
-    private Long              id;
+    private Long id;
 
     /** 姓名. */
-    private String            name;
+    private String name;
+
+    /** 购买人姓名. */
+    private String buyerName;
+
+    /** 购买人电话. */
+    private String buyerTel;
 
     /** 国. */
-    private String            country;
+    private String country;
 
     /** 省. */
-    private String            province;
+    private String province;
 
     /** 市. */
-    private String            city;
+    private String city;
 
     /** 区. */
-    private String            area;
+    private String area;
 
     /** 地址. */
-    private String            address;
+    private String address;
 
     /** 手机. */
-    private String            mobile;
+    private String mobile;
 
     /** 固话. */
-    private String            tel;
+    private String tel;
 
     /** email. */
-    private String            email;
+    private String email;
 
     /** 邮编. */
-    private String            postcode;
+    private String postcode;
 
-    //****************************************************************
+    // ****************************************************************
 
     /** 指定时间段. */
-    private String            appointTimeQuantum;
+    private String appointTimeQuantum;
 
     /** 指定日期. */
-    private String            appointTime;
+    private String appointTime;
 
     /** 指定类型. */
-    private String            appointType;
+    private String appointType;
 
     /**
      * 获得 id.
      *
      * @return the id
      */
-    public Long getId(){
+    public Long getId() {
         return id;
     }
 
     /**
      * 设置 id.
      *
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -100,17 +105,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the name
      */
-    public String getName(){
+    public String getName() {
         return name;
     }
 
     /**
      * 设置 姓名.
      *
-     * @param name
-     *            the name to set
+     * @param name the name to set
      */
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -119,17 +123,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the country
      */
-    public String getCountry(){
+    public String getCountry() {
         return country;
     }
 
     /**
      * 设置 国.
      *
-     * @param country
-     *            the country to set
+     * @param country the country to set
      */
-    public void setCountry(String country){
+    public void setCountry(String country) {
         this.country = country;
     }
 
@@ -138,17 +141,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the province
      */
-    public String getProvince(){
+    public String getProvince() {
         return province;
     }
 
     /**
      * 设置 省.
      *
-     * @param province
-     *            the province to set
+     * @param province the province to set
      */
-    public void setProvince(String province){
+    public void setProvince(String province) {
         this.province = province;
     }
 
@@ -157,17 +159,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the city
      */
-    public String getCity(){
+    public String getCity() {
         return city;
     }
 
     /**
      * 设置 市.
      *
-     * @param city
-     *            the city to set
+     * @param city the city to set
      */
-    public void setCity(String city){
+    public void setCity(String city) {
         this.city = city;
     }
 
@@ -176,17 +177,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the area
      */
-    public String getArea(){
+    public String getArea() {
         return area;
     }
 
     /**
      * 设置 区.
      *
-     * @param area
-     *            the area to set
+     * @param area the area to set
      */
-    public void setArea(String area){
+    public void setArea(String area) {
         this.area = area;
     }
 
@@ -195,17 +195,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the address
      */
-    public String getAddress(){
+    public String getAddress() {
         return address;
     }
 
     /**
      * 设置 地址.
      *
-     * @param address
-     *            the address to set
+     * @param address the address to set
      */
-    public void setAddress(String address){
+    public void setAddress(String address) {
         this.address = address;
     }
 
@@ -214,17 +213,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the mobile
      */
-    public String getMobile(){
+    public String getMobile() {
         return mobile;
     }
 
     /**
      * 设置 手机.
      *
-     * @param mobile
-     *            the mobile to set
+     * @param mobile the mobile to set
      */
-    public void setMobile(String mobile){
+    public void setMobile(String mobile) {
         this.mobile = mobile;
     }
 
@@ -233,17 +231,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the tel
      */
-    public String getTel(){
+    public String getTel() {
         return tel;
     }
 
     /**
      * 设置 固话.
      *
-     * @param tel
-     *            the tel to set
+     * @param tel the tel to set
      */
-    public void setTel(String tel){
+    public void setTel(String tel) {
         this.tel = tel;
     }
 
@@ -252,17 +249,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the email
      */
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
     /**
      * 设置 email.
      *
-     * @param email
-     *            the email to set
+     * @param email the email to set
      */
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -271,17 +267,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the postcode
      */
-    public String getPostcode(){
+    public String getPostcode() {
         return postcode;
     }
 
     /**
      * 设置 邮编.
      *
-     * @param postcode
-     *            the postcode to set
+     * @param postcode the postcode to set
      */
-    public void setPostcode(String postcode){
+    public void setPostcode(String postcode) {
         this.postcode = postcode;
     }
 
@@ -290,17 +285,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the appointTimeQuantum
      */
-    public String getAppointTimeQuantum(){
+    public String getAppointTimeQuantum() {
         return appointTimeQuantum;
     }
 
     /**
      * 设置 指定时间段.
      *
-     * @param appointTimeQuantum
-     *            the appointTimeQuantum to set
+     * @param appointTimeQuantum the appointTimeQuantum to set
      */
-    public void setAppointTimeQuantum(String appointTimeQuantum){
+    public void setAppointTimeQuantum(String appointTimeQuantum) {
         this.appointTimeQuantum = appointTimeQuantum;
     }
 
@@ -309,17 +303,16 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the appointTime
      */
-    public String getAppointTime(){
+    public String getAppointTime() {
         return appointTime;
     }
 
     /**
      * 设置 指定日期.
      *
-     * @param appointTime
-     *            the appointTime to set
+     * @param appointTime the appointTime to set
      */
-    public void setAppointTime(String appointTime){
+    public void setAppointTime(String appointTime) {
         this.appointTime = appointTime;
     }
 
@@ -328,18 +321,33 @@ public class ConsigneeSubViewCommand extends BaseViewCommand{
      *
      * @return the appointType
      */
-    public String getAppointType(){
+    public String getAppointType() {
         return appointType;
     }
 
     /**
      * 设置 指定类型.
      *
-     * @param appointType
-     *            the appointType to set
+     * @param appointType the appointType to set
      */
-    public void setAppointType(String appointType){
+    public void setAppointType(String appointType) {
         this.appointType = appointType;
+    }
+
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName) {
+        this.buyerName = buyerName;
+    }
+
+    public String getBuyerTel() {
+        return buyerTel;
+    }
+
+    public void setBuyerTel(String buyerTel) {
+        this.buyerTel = buyerTel;
     }
 
 }
