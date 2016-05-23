@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.NeedLogin;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -72,6 +73,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
      * @param model
      *            the model
      * @return the nebula return result
+     * @NeedLogin(guest = true)
      * @RequestMapping(value = "/transaction/immediatelybuybundle", method = RequestMethod.POST)
      */
     public NebulaReturnResult immediatelyBuyBundle(

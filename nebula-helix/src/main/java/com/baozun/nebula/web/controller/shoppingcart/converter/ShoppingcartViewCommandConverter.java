@@ -34,6 +34,7 @@ import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShopSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.util.CollectionsUtil;
 
@@ -138,7 +139,10 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
 		List<ShoppingCartLineSubViewCommand> result = new ArrayList<ShoppingCartLineSubViewCommand>();
 
 		for (ShoppingCartLineCommand command : lineList) {
-
+			// 过滤赠品标题行
+			if(Validator.isNotNullOrEmpty(command.getLineCaption())) {
+				continue;
+			}
 			ShoppingCartLineSubViewCommand viewCommand = new ShoppingCartLineSubViewCommand();
 			viewCommand.setChecked(command.getSettlementState() == 0 ? false : true);
 			viewCommand.setIsGift(command.isGift());

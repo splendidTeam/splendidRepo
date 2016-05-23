@@ -44,6 +44,7 @@ import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
+import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
@@ -128,34 +129,43 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	@Override
 	public Map<Long, ItemCollection> loadNavItemCollectionMap() {
 		Map<Long, ItemCollection> resultMap = null;
-		String lang = LangUtil.getCurrentLang();
+		String key =NAV_ITEMCOLLECTION_CACHEKEY;
+		boolean i18n = LangProperty.getI18nOnOff();
+		if(i18n){
+			String lang = LangUtil.getCurrentLang();
+			key =key.concat("_").concat(lang);
+		}
+		Integer expireSeconds =TimeInterval.SECONDS_PER_DAY;
 		try {
-			resultMap = cacheManager.getObject(NAV_ITEMCOLLECTION_CACHEKEY + lang);
-			// 如果导航的元数据为空
-			if (resultMap == null) {
-				//查询所有ItemCollection
-				List<ItemCollection> collections =sdkItemCollectionManager.findAll();
-				if(Validator.isNullOrEmpty(collections)){
-					return Collections.emptyMap();
-				}
-				Map<Long, ItemCollection> collectionsMap =new HashMap<Long, ItemCollection>();
-				for (ItemCollection itemCollection : collections) {
-					collectionsMap.put(itemCollection.getId(), itemCollection);
-				}
-				//查询所有导航
-				List<Navigation> navigations = sdkNavigationManager.findNavigationList(Sort.parse("parent_id asc,sort asc"));
-				if(Validator.isNullOrEmpty(navigations)){
-					return Collections.emptyMap();
-				}
-				resultMap =new HashMap<Long, ItemCollection>();
-				for (Navigation navigation : navigations) {
-					if(Validator.isNotNullOrEmpty(collectionsMap.get(navigation.getCollectionId()))){
-						resultMap.put(navigation.getId(),
-								collectionsMap.get(navigation.getCollectionId()));
+			resultMap =new AbstractCacheBuilder<Map<Long, ItemCollection>, Exception>(key,expireSeconds){
+				@Override
+				protected Map<Long, ItemCollection> buildCachedObject()
+						throws Exception {
+					//查询所有ItemCollection
+					List<ItemCollection> collections =sdkItemCollectionManager.findAll();
+					if(Validator.isNullOrEmpty(collections)){
+						return Collections.emptyMap();
 					}
+					Map<Long, ItemCollection> collectionsMap =new HashMap<Long, ItemCollection>();
+					for (ItemCollection itemCollection : collections) {
+						collectionsMap.put(itemCollection.getId(), itemCollection);
+					}
+					//查询所有导航
+					List<Navigation> navigations = sdkNavigationManager.findNavigationList(Sort.parse("parent_id asc,sort asc"));
+					if(Validator.isNullOrEmpty(navigations)){
+						return Collections.emptyMap();
+					}
+					Map<Long, ItemCollection> dbMap=new HashMap<Long, ItemCollection>();
+					for (Navigation navigation : navigations) {
+						if(Validator.isNotNullOrEmpty(collectionsMap.get(navigation.getCollectionId()))){
+							dbMap.put(navigation.getId(),
+									collectionsMap.get(navigation.getCollectionId()));
+						}
+					}
+					return dbMap;
 				}
-				cacheManager.setObject(NAV_ITEMCOLLECTION_CACHEKEY + lang, resultMap, TimeInterval.SECONDS_PER_DAY);
-			}
+				
+			}.getCachedObject();
 		} catch (Exception e) {
 			LOG.error("[LOAD_NAVIGATION_META] cacheManager error. time:{}", new Date());
 		}

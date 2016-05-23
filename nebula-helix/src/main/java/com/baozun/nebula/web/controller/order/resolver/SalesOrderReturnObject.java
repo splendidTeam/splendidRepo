@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.shoppingcart.resolver;
+package com.baozun.nebula.web.controller.order.resolver;
 
 import java.io.Serializable;
 
