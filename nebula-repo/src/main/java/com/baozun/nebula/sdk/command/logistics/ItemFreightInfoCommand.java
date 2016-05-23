@@ -23,63 +23,61 @@ import com.baozun.nebula.model.BaseModel;
  * @author Tianlong.Zhang
  *
  */
-public class ItemFreightInfoCommand  extends BaseModel implements Command{
+public class ItemFreightInfoCommand extends BaseModel implements Command{
 
-	/**
-	 * 
-	 */
-	private static final long	serialVersionUID	= -5355240422147586451L;
+    private static final long serialVersionUID = -5355240422147586451L;
 
-	/**
-	 * 商品Id
-	 */
-	private Long itemId;
-	
-	/**
-	 * 该商品的数量（如果是按件计费的话）
-	 */
-	private Integer count;
-	
-	/**
-	 * 单个商品重量（如果是按照重量计费）
-	 */
-	private Double weight;
+    /**
+     * 商品Id
+     */
+    private Long              itemId;
 
-	/**
-	 * @return the itemId
-	 */
-	public Long getItemId() {
-		return itemId;
-	}
+    /**
+     * 该商品的数量（如果是按件计费的话）
+     */
+    private Integer           count;
 
-	/**
-	 * @param itemId the itemId to set
-	 */
-	public void setItemId(Long itemId) {
-		this.itemId = itemId;
-	}
+    /**
+     * 单个商品重量（如果是按照重量计费）
+     */
+    private Double            weight;
 
-	/**
-	 * @return the count
-	 */
-	public Integer getCount() {
-		return count;
-	}
+    /**
+     * @return the itemId
+     */
+    public Long getItemId(){
+        return itemId;
+    }
 
-	/**
-	 * @param count the count to set
-	 */
-	public void setCount(Integer count) {
-		this.count = count;
-	}
+    /**
+     * @param itemId
+     *            the itemId to set
+     */
+    public void setItemId(Long itemId){
+        this.itemId = itemId;
+    }
 
-	public void setWeight(Double weight) {
-		this.weight = weight;
-	}
+    /**
+     * @return the count
+     */
+    public Integer getCount(){
+        return count;
+    }
 
-	public Double getWeight() {
-		return weight;
-	}
-	
-	
+    /**
+     * @param count
+     *            the count to set
+     */
+    public void setCount(Integer count){
+        this.count = count;
+    }
+
+    public void setWeight(Double weight){
+        this.weight = weight;
+    }
+
+    public Double getWeight(){
+        return weight;
+    }
+
 }
