@@ -37,12 +37,15 @@ public class MetaDataCommand implements Serializable{
 
 	/** 排序字段 */
 	private Integer				sortNo;
-	
-	/**父节点id，分类和导航使用到，属性不需要使用*/
+
+	/** 父节点id，分类和导航使用到，属性不需要使用 */
 	private Long				parentId;
-	
-	/** 导航可能用到url*/
+
+	/** 导航可能用到url */
 	private String				url;
+
+	/** 值类型,只有属性使用 */
+	private Integer				editingType;
 
 	/**
 	 * get id
@@ -98,27 +101,45 @@ public class MetaDataCommand implements Serializable{
 		this.sortNo = sortNo;
 	}
 
-	public Long getParentId() {
+	public Long getParentId(){
 		return parentId;
 	}
 
-	public void setParentId(Long parentId) {
+	public void setParentId(Long parentId){
 		this.parentId = parentId;
 	}
 
 	/**
 	 * @return the url
 	 */
-	public String getUrl() {
+	public String getUrl(){
 		return url;
 	}
 
 	/**
-	 * @param url the url to set
+	 * @param url
+	 *            the url to set
 	 */
-	public void setUrl(String url) {
+	public void setUrl(String url){
 		this.url = url;
 	}
 
-	
+	/**
+	 * get editingType
+	 * 
+	 * @return editingType
+	 */
+	public Integer getEditingType(){
+		return editingType;
+	}
+
+	/**
+	 * set editingType
+	 * 
+	 * @param editingType
+	 */
+	public void setEditingType(Integer editingType){
+		this.editingType = editingType;
+	}
+
 }

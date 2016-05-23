@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -31,14 +32,9 @@ public class ItemOperateLog extends BaseModel{
 	private Long id;
 	
 	/**
-	 * 商品
+	 * 商品Id
 	 */
 	private Long itemId;
-	
-	/**
-	 * 商品编码
-	 */
-	private String code;
 	
 	/**
 	 * 上架时间
@@ -53,17 +49,17 @@ public class ItemOperateLog extends BaseModel{
 	/**
 	 * 上架操作人员
 	 */
-	private Long pushOperatorId;
+	private String pushOperatorName;
 	
 	/**
 	 * 下架操作人员
 	 */
-	private Long soldOutOperatorId;
+	private String soldOutOperatorName;
 	
 	/**
-	 * 在架时长
+	 * 在架时长(按秒存)
 	 */
-	private Date activeTime;
+	private Long activeTime;
 	
 	/**
 	 * 创建时间
@@ -90,6 +86,7 @@ public class ItemOperateLog extends BaseModel{
 	}
 
 	@Column(name="ITEM_ID")
+	@Index(name = "IDX_ITEM_OPLOG_ITEMID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -98,16 +95,8 @@ public class ItemOperateLog extends BaseModel{
 		this.itemId = itemId;
 	}
 
-	@Column(name="CODE")
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	@Column(name="PUSH_TIME")
+	@Index(name = "IDX_ITEM_OPLOG_PUSHTIME")
 	public Date getPushTime() {
 		return pushTime;
 	}
@@ -117,6 +106,7 @@ public class ItemOperateLog extends BaseModel{
 	}
 
 	@Column(name="SOLD_OUT_TIME")
+	@Index(name = "IDX_ITEM_OPLOG_SOLDOUTTIME")
 	public Date getSoldOutTime() {
 		return soldOutTime;
 	}
@@ -125,30 +115,30 @@ public class ItemOperateLog extends BaseModel{
 		this.soldOutTime = soldOutTime;
 	}
 
-	@Column(name="PUSH_OPERATOR_ID")
-	public Long getPushOperatorId() {
-		return pushOperatorId;
+	@Column(name="PUSH_OPERATOR_NAME")
+	public String getPushOperatorName() {
+		return pushOperatorName;
 	}
 
-	public void setPushOperatorId(Long pushOperatorId) {
-		this.pushOperatorId = pushOperatorId;
+	public void setPushOperatorName(String pushOperatorName) {
+		this.pushOperatorName = pushOperatorName;
 	}
 
-	@Column(name="SOLD_OUT_OPERATOR_ID")
-	public Long getSoldOutOperatorId() {
-		return soldOutOperatorId;
+	@Column(name="SOLD_OUT_OPERATOR_NAME")
+	public String getSoldOutOperatorName() {
+		return soldOutOperatorName;
 	}
 
-	public void setSoldOutOperatorId(Long soldOutOperatorId) {
-		this.soldOutOperatorId = soldOutOperatorId;
+	public void setSoldOutOperatorName(String soldOutOperatorName) {
+		this.soldOutOperatorName = soldOutOperatorName;
 	}
 
 	@Column(name="ACTIVE_TIME")
-	public Date getActiveTime() {
+	public Long getActiveTime() {
 		return activeTime;
 	}
 
-	public void setActiveTime(Date activeTime) {
+	public void setActiveTime(Long activeTime) {
 		this.activeTime = activeTime;
 	}
 

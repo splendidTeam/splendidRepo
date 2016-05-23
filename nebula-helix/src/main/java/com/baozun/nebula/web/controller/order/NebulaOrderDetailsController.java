@@ -52,16 +52,16 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.date.DateUtil;
 
 /**
- * myaccount OrderList 相关方法controller
+ * myaccount Orderdetail 相关方法controller
  * 
  * <ol>
- * <li>{@link #showOrderDetails(MemberDetails, String, HttpServletRequest, Model)} 进入登录页面</li>
+ * <li>{@link #showOrderDetails(MemberDetails, String, HttpServletRequest, Model)} 进入订单详情页</li>
  * </ol>
  * 
- * <h3>showOrderList方法,主要有以下几点:</h3> <blockquote>
+ * <h3>showOrderDetails方法,主要有以下几点:</h3> <blockquote>
  * <ol>
- * <li>设置查询的orderform;</li>
- * <li>通过pageform传入分页信息;</li>
+ * <li>当会员查询时传入MemberDetails MemberDetails必须有memberid</li>
+ * <li>当游客查询是构造MemberDetails,并将收货人姓名setRealName()中便可进行查询</li>
  * </ol>
  * </blockquote>.
  *
@@ -86,7 +86,15 @@ public class NebulaOrderDetailsController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderDetailsController.class);
 
     /**
-     * 显示订单明细.
+     * 显示订单明细.当memberid和后台查出的memberid相同或者收货人名字和查处的收货人名字相同才进行显示
+     * 
+     * 当会员查询时传入memberid
+     * 
+     * 当游客查询是构造MemberDetails,并将收货人姓名setRealName()中便可进行查询
+     * 
+     * 成功则构造返回订单详情页面
+     * 
+     * 失败返回空的字符串,商城端去进行判断
      *
      * @param memberDetails the member details
      * @param orderCode the order code
@@ -103,6 +111,10 @@ public class NebulaOrderDetailsController extends BaseController {
         // 通过orderCode查询 command
         // 订单信息
         SalesOrderCommand salesOrderCommand = orderManager.findOrderByCode(orderCode, 1);
+        Long memberId = salesOrderCommand.getMemberId();
+        String name = salesOrderCommand.getName();
+        //判断是否为本人进行操作
+        if(validateOrder(memberDetails,memberId,name)){
         OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
         PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime",
                 "logisticsStatus", "financialStatus", "total","discount","actualFreight");
@@ -111,7 +123,7 @@ public class NebulaOrderDetailsController extends BaseController {
         // 收货地址信息
         ConsigneeSubViewCommand consigneeSubViewCommand = new ConsigneeSubViewCommand();
         PropertyUtil.copyProperties(consigneeSubViewCommand, salesOrderCommand, "name", "country", "province",
-                "city", "area", "address", "mobile", "tel", "email", "postcode");
+                "city", "area", "address", "mobile", "tel", "email", "postcode","buyerTel","buyerName");
         // 支付信息
         PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
         PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
@@ -160,6 +172,32 @@ public class NebulaOrderDetailsController extends BaseController {
         // model add attribute
         model.addAttribute("orderViewCommand", orderViewCommand);
         return "order.orderdetails";
+        }
+        //TODO 返回非法查询页面
+        return "";
+    }
+
+    /**
+     * 
+     * 说明：判断是否可以查询订单
+     * 
+     * memberid相同 or 收货人姓名相同
+     *
+     * @param memberDetails
+     * @param memberId
+     * @param name
+     * @return
+     * @author 张乃骐
+     * @time：2016年5月23日 下午2:56:06
+     */
+    private boolean validateOrder(MemberDetails memberDetails, Long memberId, String name) {
+        if(null!=memberDetails.getMemberId()){
+            return memberDetails.getMemberId().longValue()== memberId.longValue();
+        }
+        if(Validator.isNotNullOrEmpty(memberDetails.getRealName())){
+            return memberDetails.getRealName().equals(name);
+         }
+        return false;
     }
 
     /**

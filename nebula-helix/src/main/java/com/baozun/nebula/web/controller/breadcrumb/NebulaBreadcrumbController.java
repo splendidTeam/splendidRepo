@@ -23,27 +23,30 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.exception.IllegalItemStateException;
-import com.baozun.nebula.manager.breadcrumb.BreadcrumbManager;
-import com.baozun.nebula.sdk.command.CurmbCommand;
-import com.baozun.nebula.web.controller.breadcrumb.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCommand;
+import com.feilong.core.TimeInterval;
+import com.feilong.core.Validator;
 
 /**   
  * 面包屑
- * <h3>获取页面的面包(分为plp、pdp两种场景)</h3>
+ * <h3>获取页面的面包屑(分为plp、pdp两种场景)</h3>
+ * <p>一、用法实例:</p>
+ * <ul>
+ * 		<li>PLP:<jsp:include page="/item/breadcrumb.htm?navId =1" /></li>
+ * 		<li>PDP:<jsp:include page="/item/breadcrumb.htm?itemId =2" /></li>
+ * </ul>
+ * <p>二、具体实现:</p>
  * <p>
- * 		1. 导航navId不为空,</br>
+ * 		<h2>1. 导航navId不为空,</h2>
  * 			<li>itemId不为空时，可构造[导航树结构+商品名称]作为面包屑</li>
  * 			<li>itemId为空时，可构造[导航树结构]作为面包屑</li>
  * </p>
  * <p>
- * 		2. 导航navId为空时,</br>
+ * 		<h2>2. 导航navId为空时,</h2>
  * 			<li>itemId不为空时,</br>
  * 				<p style="padding-left:10px;">
  * 					a.获取所有的itemCollection集合,构造该itemId对应的ItemCollectionContext
@@ -62,24 +65,20 @@ import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCo
  * @date 2016年5月13日 下午6:14:47 
  * @version   
  */
-public class BreadcrumbController {
+public class NebulaBreadcrumbController extends NebulaAbstractBreadcrumbController{
 	
-	private static final Logger	LOG									= LoggerFactory.getLogger(BreadcrumbController.class);
+	private static final Logger	LOG									= LoggerFactory.getLogger(NebulaBreadcrumbController.class);
 	
-	private static final String VIEW_PRODUCT_BREADCRUMB 			="product.breadcrumb";
+	//面包屑对应的jsp
+	/** 列表页*/
+	private static final String VIEW_BREADCRUMB_PLP 				="breadcrumb.plp";
 	
+	/** 详情页*/
+	private static final String VIEW_BREADCRUMB_PDP 				="breadcrumb.pdp";
+	
+	//Model key的定义
+	/** 面包屑的model key*/
 	private static final String	MODEL_KEY_BREADCRUMB				="breadcrumb";
-	
-	@Autowired
-	private BreadcrumbManager										breadcrumbManager;
-	
-	@Autowired
-	@Qualifier("breadcrumbsViewCommandConverter")
-	private BreadcrumbsViewCommandConverter 						breadcrumbsViewCommandConverter;
-	
-	
-	
-	
 	/**
 	 * 获取页面的面包
 	 * 
@@ -95,15 +94,40 @@ public class BreadcrumbController {
 			@RequestParam("itemId") Long itemId, 
 			HttpServletRequest request, HttpServletResponse response, Model model){
 		try {
-			List<CurmbCommand> curmbCommands = breadcrumbManager.findCurmbCommands(navId, itemId, request);
-			List<BreadcrumbsViewCommand> breadcrumbsViewCommands = breadcrumbsViewCommandConverter.convert(curmbCommands);
+			List<BreadcrumbsViewCommand> breadcrumbsViewCommands = bulidCurmbViewCommandsWithCache(navId, itemId, request);
 			model.addAttribute(MODEL_KEY_BREADCRUMB, breadcrumbsViewCommands);
 		} catch (IllegalItemStateException e) {
 			LOG.error("[PDP_BUILD_BREADCRUMB] breadcrumb state illegal. itemId:{}, {}",itemId, e.getState().name());
 			//异常也不能影响pdp页面的渲染,面包屑地方显示空白即可
-			return VIEW_PRODUCT_BREADCRUMB;
+			return getView(navId,itemId);
 		}
-		return VIEW_PRODUCT_BREADCRUMB;
+		return getView(navId,itemId);
+	}
+
+
+
+
+	/**
+	 * 导航不为空->列表页面包屑，
+	 * 其他，商品详情页
+	 * @param navId
+	 * @param itemId
+	 * @return
+	 */
+	private String getView(Long navId, Long itemId) {
+		if(Validator.isNotNullOrEmpty(navId)){
+			return VIEW_BREADCRUMB_PLP;
+		}
+		return VIEW_BREADCRUMB_PDP;
+	}
+	
+	/* 
+	 * @see com.baozun.nebula.web.controller.breadcrumb.NebulaAbstractBreadcrumbController#getBreadcrumbCacheExpireSeconds()
+	 */
+	@Override
+	protected Integer getBreadcrumbCacheExpireSeconds() {
+		// 1天
+		return TimeInterval.SECONDS_PER_DAY;
 	}
 	
 	

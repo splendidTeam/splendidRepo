@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,12 +44,12 @@ import com.baozun.nebula.exception.IllegalItemStateException.IllegalItemState;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.manager.navigation.NavigationHelperManager;
+import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.ItemProperties;
-import com.baozun.nebula.sdk.command.CategoryCommand;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
@@ -97,9 +96,9 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	
 	private static final Logger	LOG									= LoggerFactory.getLogger(BreadcrumbManagerImpl.class);
 	
-	private static final String	header_referer						="referer";
+	private static final String	HEADER_REFERER						="referer";
 	
-	private final static String			navItemCollectionCacheKey	= "navItemCollectionCacheKey_";
+	private final static String	NAV_ITEMCOLLECTION_CACHEKEY			= "navItemCollectionCacheKey_";
 	
 	@Autowired
 	private NavigationHelperManager									navigationHelperManager;
@@ -130,34 +129,43 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	@Override
 	public Map<Long, ItemCollection> loadNavItemCollectionMap() {
 		Map<Long, ItemCollection> resultMap = null;
-		String lang = LangUtil.getCurrentLang();
+		String key =NAV_ITEMCOLLECTION_CACHEKEY;
+		boolean i18n = LangProperty.getI18nOnOff();
+		if(i18n){
+			String lang = LangUtil.getCurrentLang();
+			key =key.concat("_").concat(lang);
+		}
+		Integer expireSeconds =TimeInterval.SECONDS_PER_DAY;
 		try {
-			resultMap = cacheManager.getObject(navItemCollectionCacheKey + lang);
-			// 如果导航的元数据为空
-			if (resultMap == null) {
-				//查询所有ItemCollection
-				List<ItemCollection> collections =sdkItemCollectionManager.findAll();
-				if(Validator.isNullOrEmpty(collections)){
-					return Collections.emptyMap();
-				}
-				Map<Long, ItemCollection> collectionsMap =new HashMap<Long, ItemCollection>();
-				for (ItemCollection itemCollection : collections) {
-					collectionsMap.put(itemCollection.getId(), itemCollection);
-				}
-				//查询所有导航
-				List<Navigation> navigations = sdkNavigationManager.findNavigationList(Sort.parse("parent_id asc,sort asc"));
-				if(Validator.isNullOrEmpty(navigations)){
-					return Collections.emptyMap();
-				}
-				resultMap =new HashMap<Long, ItemCollection>();
-				for (Navigation navigation : navigations) {
-					if(Validator.isNotNullOrEmpty(collectionsMap.get(navigation.getCollectionId()))){
-						resultMap.put(navigation.getId(),
-								collectionsMap.get(navigation.getCollectionId()));
+			resultMap =new AbstractCacheBuilder<Map<Long, ItemCollection>, Exception>(key,expireSeconds){
+				@Override
+				protected Map<Long, ItemCollection> buildCachedObject()
+						throws Exception {
+					//查询所有ItemCollection
+					List<ItemCollection> collections =sdkItemCollectionManager.findAll();
+					if(Validator.isNullOrEmpty(collections)){
+						return Collections.emptyMap();
 					}
+					Map<Long, ItemCollection> collectionsMap =new HashMap<Long, ItemCollection>();
+					for (ItemCollection itemCollection : collections) {
+						collectionsMap.put(itemCollection.getId(), itemCollection);
+					}
+					//查询所有导航
+					List<Navigation> navigations = sdkNavigationManager.findNavigationList(Sort.parse("parent_id asc,sort asc"));
+					if(Validator.isNullOrEmpty(navigations)){
+						return Collections.emptyMap();
+					}
+					Map<Long, ItemCollection> dbMap=new HashMap<Long, ItemCollection>();
+					for (Navigation navigation : navigations) {
+						if(Validator.isNotNullOrEmpty(collectionsMap.get(navigation.getCollectionId()))){
+							dbMap.put(navigation.getId(),
+									collectionsMap.get(navigation.getCollectionId()));
+						}
+					}
+					return dbMap;
 				}
-				cacheManager.setObject(navItemCollectionCacheKey + lang, resultMap, TimeInterval.SECONDS_PER_DAY);
-			}
+				
+			}.getCachedObject();
 		} catch (Exception e) {
 			LOG.error("[LOAD_NAVIGATION_META] cacheManager error. time:{}", new Date());
 		}
@@ -178,7 +186,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		}
 		List<CurmbCommand> results =new LinkedList<CurmbCommand>();
 		Long tempId =navId;
-		while(tempId != null && tempId >0){
+		while(tempId != null && tempId >= 0){
 			MetaDataCommand current =navigationMetaMap.get(tempId);
 			if(Validator.isNullOrEmpty(current)){
 				break;
@@ -206,7 +214,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		}else{
 			//PDP
 			//获取当前导航id
-			String refer =request.getHeader(header_referer);
+			String refer =request.getHeader(HEADER_REFERER);
 			if(LOG.isDebugEnabled()){
 				LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
 			}
@@ -247,7 +255,6 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 								tempTreeSize =Validator.isNotNullOrEmpty(resultCurmbCommands)?
 										resultCurmbCommands.size(): 0;
 							}else{
-								idx++;
 								currentCurmbCommands =buildCurmbCommand(navigationId, itemId);
 								int currentTreeSize =Validator.isNotNullOrEmpty(currentCurmbCommands)?
 										currentCurmbCommands.size(): 0;
@@ -261,6 +268,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 									}
 								}
 							}
+							idx++;
 						}
 					}
 					results =resultCurmbCommands;
@@ -279,7 +287,10 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	private List<CurmbCommand> buildCurmbCommand(Long navId, Long itemId)
 			throws IllegalItemStateException {
 		//根据navId找出导航树，即为面包屑
-		List<CurmbCommand> results=createCurmbCommandsByNavId(navId);
+		List<CurmbCommand> results =createCurmbCommandsByNavId(navId);
+		if(Validator.isNullOrEmpty(results)){
+			results =new ArrayList<CurmbCommand>();
+		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("[BUILD_BREADCRUMB]get curmbs by navigations. curmbs:{}", JsonUtil.format(results));
 		}
@@ -289,6 +300,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			if(Validator.isNotNullOrEmpty(baseCommand)){
 				CurmbCommand childCommand =new CurmbCommand();
 				childCommand.setName(baseCommand.getTitle());
+				childCommand.setUrl("");
 				//后添一个商品名称
 				results.add(childCommand);
 			}else{
@@ -346,7 +358,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		ItemCategory itemCategory = sdkItemManager.findDefaultCateoryByItemId(itemId);
 		List<Category> categories = new LinkedList<Category>();
 
-		Long pid = itemCategory.getId();
+		Long pid = itemCategory.getCategoryId();
 		do{
 			Category category = null;
 			
@@ -417,7 +429,7 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			itemPropertiesList.add(itemProperties);
 			itemPropertiesMap.put(itemProperties.getPropertyId(), itemPropertiesList);
 		}
-		//每一个属性下的itemProperties
+		//每一个属性下的itemProperties (用String类型为了以后可能会加自定义多选)
 		List<String> pvIds =null;
 		for(Map.Entry<Long, List<ItemProperties>> entry :itemPropertiesMap.entrySet()){
 			pvIds =null;

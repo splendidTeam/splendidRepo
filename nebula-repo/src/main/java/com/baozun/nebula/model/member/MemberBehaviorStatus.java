@@ -34,7 +34,7 @@ import com.baozun.nebula.model.BaseModel;
 /**
  * 用户行为状态登记表 用于记录用户行为状态，比如： 1.邮箱已激活 2.手机已激活 3.信息已完善 4.XX已绑定 诸如此类，此表中只记录完成的状态
  * 
- * @author D.C
+ * @author
  * @since 2016/4/1 11:16 AM
  */
 @Entity
@@ -45,25 +45,25 @@ public class MemberBehaviorStatus extends BaseModel {
 	private static final long serialVersionUID = -2228442057462141217L;
 
 	/** 邮箱激活 **/
-	public static int BEHAVIOR_TYPE_EMAIL_ACTIVY = 1;
+	public static String BEHAVIOR_TYPE_EMAIL_ACTIVY = "1";
 	/** 手机激活 **/
-	public static int BEHAVIOR_TYPE_MOBILE_ACTIVY = 2;
+	public static String BEHAVIOR_TYPE_MOBILE_ACTIVY = "2";
 	/** 完善个人信息 **/
-	public static int BEHAVIOR_TYPE_FINISH_PROFILE = 3;
+	public static String BEHAVIOR_TYPE_FINISH_PROFILE = "3";
 	/** 绑定QQ **/
-	public static int BEHAVIOR_TYPE_BINDING_QQ = 4;
+	public static String BEHAVIOR_TYPE_BINDING_QQ = "4";
 	/** 绑定WeChat **/
-	public static int BEHAVIOR_TYPE_BINDING_WECHAT = 5;
+	public static String BEHAVIOR_TYPE_BINDING_WECHAT = "5";
 	/** 绑定sina **/
-	public static int BEHAVIOR_TYPE_BINDING_SINA = 6;
+	public static String BEHAVIOR_TYPE_BINDING_SINA = "6";
 	/** 绑定alipay **/
-	public static int BEHAVIOR_TYPE_BINDING_ALIPAY = 7;
+	public static String BEHAVIOR_TYPE_BINDING_ALIPAY = "7";
 	/** 绑定facebook **/
-	public static int BEHAVIOR_TYPE_BINDING_FACEBOOK = 8;
+	public static String BEHAVIOR_TYPE_BINDING_FACEBOOK = "8";
 	/** 绑定liveid **/
-	public static int BEHAVIOR_TYPE_BINDING_LIVEID = 9;
+	public static String BEHAVIOR_TYPE_BINDING_LIVEID = "9";
 	/** 绑定品牌用户 **/
-	public static int BEHAVIOR_TYPE_BINDING_VIP = 10;
+	public static String BEHAVIOR_TYPE_BINDING_VIP = "10";
 
 	/**
 	 * id

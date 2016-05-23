@@ -45,6 +45,7 @@ import com.baozun.nebula.manager.TimeInterval;
 import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.manager.product.ItemRateManager;
 import com.baozun.nebula.manager.product.ItemRecommandManager;
+import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
@@ -111,7 +112,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	public static final String		VIEW_PRODUCT_DETAIL					= "product.detail";
 	
 	/** QuickView商品详情页 的定义 */
-	public static final String		VIEW_PRODUCT_DETAIL_QUICKVIEW		= "product.detail";
+	public static final String		VIEW_PRODUCT_DETAIL_QUICKVIEW		= "product.detail.quickview";
 	
 	//缓存key的定义
 	/** pdpViewCommand的缓存key */
@@ -175,7 +176,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
     	Integer pdpViewCommandExpireSeconds = getPdpViewCommandCacheExpireSeconds();
     	
     	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
-    	PdpViewCommand pdpViewCommand = new NebulaAbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(pdpViewCommandCachekey, pdpViewCommandExpireSeconds) {
+    	PdpViewCommand pdpViewCommand = new AbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(pdpViewCommandCachekey, pdpViewCommandExpireSeconds) {
 			@Override
 			protected PdpViewCommand buildCachedObject() throws IllegalItemStateException {
 				return buildPdpViewCommand(itemCode);
@@ -247,7 +248,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
     	Integer simplePdpViewCommandExpireSeconds = getPdpViewCommandCacheExpireSeconds();
     	
     	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
-    	PdpViewCommand pdpViewCommand = new NebulaAbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(simplePdpViewCommandCachekey, simplePdpViewCommandExpireSeconds) {
+    	PdpViewCommand pdpViewCommand = new AbstractCacheBuilder<PdpViewCommand, IllegalItemStateException>(simplePdpViewCommandCachekey, simplePdpViewCommandExpireSeconds) {
 			@Override
 			protected PdpViewCommand buildCachedObject() throws IllegalItemStateException {
 				return buildSimplePdpViewCommand(itemCode);
@@ -410,7 +411,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		Integer expire = TimeInterval.SECONDS_PER_HOUR;
 		
 		//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
-		ItemExtraViewCommand itemExtraViewCommand = new NebulaAbstractCacheBuilder<ItemExtraViewCommand, RuntimeException>(key, expire) {
+		ItemExtraViewCommand itemExtraViewCommand = new AbstractCacheBuilder<ItemExtraViewCommand, RuntimeException>(key, expire) {
 			@Override
 			protected ItemExtraViewCommand buildCachedObject() {
 				return buildItemExtraViewCommandFromDB(itemBaseInfo);
@@ -463,7 +464,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
     	Integer itemRecommendExpireSeconds = getItemRecommendCacheExpireSeconds();
     	
     	//先从缓存中获取，如果缓存中没有则重新生成，并设置入缓存
-    	List<RelationItemViewCommand> itemRecommendList = new NebulaAbstractCacheBuilder<List<RelationItemViewCommand>, RuntimeException>(itemRecommendCachekey, itemRecommendExpireSeconds) {
+    	List<RelationItemViewCommand> itemRecommendList = new AbstractCacheBuilder<List<RelationItemViewCommand>, RuntimeException>(itemRecommendCachekey, itemRecommendExpireSeconds) {
 			@Override
 			protected List<RelationItemViewCommand> buildCachedObject() {
 				return buildItemRecommendViewCommand(itemId);

@@ -15,7 +15,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.product;
+package com.baozun.nebula.manager.system;
 
 import java.util.Date;
 
@@ -26,12 +26,12 @@ import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.utils.spring.SpringUtil;
 
 
-public abstract class NebulaAbstractCacheBuilder<T, EX extends Exception> {
+public abstract class AbstractCacheBuilder<T, EX extends Exception> {
 
 	/**
 	 * log定义
 	 */
-	private static final Logger	LOG = LoggerFactory.getLogger(NebulaAbstractCacheBuilder.class);
+	private static final Logger	LOG = LoggerFactory.getLogger(AbstractCacheBuilder.class);
 	
 	private String key;
 	
@@ -40,7 +40,7 @@ public abstract class NebulaAbstractCacheBuilder<T, EX extends Exception> {
 	protected CacheManager cacheManager;
 	
 	
-	public NebulaAbstractCacheBuilder(String key, int expire) {
+	public AbstractCacheBuilder(String key, int expire) {
 		super();
 		this.key = key;
 		this.expire = expire;

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
+import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
@@ -57,19 +58,19 @@ import com.feilong.core.util.comparator.PropertyComparator;
  */
 public class FacetFilterHelperImpl implements FacetFilterHelper{
 
-	private static final Logger			LOG							= LoggerFactory.getLogger(FacetFilterHelperImpl.class);
+	private static final Logger			LOG								= LoggerFactory.getLogger(FacetFilterHelperImpl.class);
 
 	/** 分类元数据在缓存中的key，完整的key还要加上语言 */
-	private final static String			categoryMetaCacheKey		= "categoryMetaCacheKey_";
+	private final static String			categoryMetaCacheKey			= "categoryMetaCacheKey_";
 
 	/** 属性元数据在缓存中的key，完整的key还要加上语言 */
-	private final static String			propertyMetaCacheKey		= "propertyMetaCacheKey_";
+	private final static String			propertyMetaCacheKey			= "propertyMetaCacheKey_";
 
 	/** 属性值元数据在缓存中的key，完整的key还要加上语言 */
-	private final static String			propertyValueMetaCacheKey	= "propertyValueMetaCacheKey_";
+	private final static String			propertyValueMetaCacheKey		= "propertyValueMetaCacheKey_";
 
 	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 */
-	private final static String			searchConditionMetaCacheKey	= "searchConditionMetaCacheKey_";
+	private final static String			searchConditionMetaCacheKey		= "searchConditionMetaCacheKey_";
 
 	@Autowired
 	private CacheManager				cacheManager;
@@ -138,7 +139,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		}
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(CacheKeyConstant.NAVIGATIONMETACACHEKEY+ lang, navigationMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(CacheKeyConstant.NAVIGATIONMETACACHEKEY+ lang, navigationMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -176,7 +177,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -213,7 +214,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -249,7 +250,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -269,9 +270,6 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
 		}
 
-
-		
-
 		// 如果筛选条件为空
 		if (searchConditionMetaMap == null) {
 			// 查询所有筛选条件
@@ -286,7 +284,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_DAY);
+			cacheManager.setObject(searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -314,9 +312,12 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 				}
 			}
 		}
+		
+		//属性
+		Map<Long, MetaDataCommand> propertyMetaMap = facetFilterMetaData.getPropertyMetaMap();
 
 		// 属性和价格范围
-		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
+		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();		
 		for (Entry<Long, SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
 			SearchConditionCommand searchConditionCommand = entry.getValue();
 			Long propertyId = searchConditionCommand.getPropertyId();
@@ -327,9 +328,19 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 					// 如果是属性
 					if (FacetType.PROPERTY.toString().equals(facetGroup.getType())) {
 						if (propertyId != null && propertyId.equals(facetGroup.getId())) {
-							facetGroup = covertPropertyFacetGroup(facetGroup, facetFilterMetaData, facetParameters);
+							
+							MetaDataCommand metaDataCommand=propertyMetaMap.get(propertyId);
+							//如果是多选或单选
+							if(Property.EDITING_TYPE_MULTI_SELECT.equals(metaDataCommand.getEditingType())
+									||Property.EDITING_TYPE_RADIA.equals(metaDataCommand.getEditingType())){
+								facetGroup = covertPropertyFacetGroup(facetGroup, facetFilterMetaData, facetParameters);
+							}else{
+								//其他类型的
+								facetGroup=covertCustomPropertyFacetGroup(facetGroup, facetFilterMetaData, facetParameters);
+							}
 							facetGroups.add(facetGroup);
 							isBreak = true;
+							
 						}
 					}else if (FacetType.RANGE.toString().equals(facetGroup.getType())) {
 						// 价格范围
@@ -382,7 +393,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 				// 判断是否选中
 				for (FacetParameter facetParameter : facetParameters){
 					if (FacetType.CATEGORY.equals(facetParameter.getFacetType())) {
-						if (facetParameter.containsValue(facet.getValue())) {
+						if (facetParameter.containsValue(facet.getId().toString())) {
 							facet.setSelected(true);
 							break;
 						}
@@ -445,6 +456,47 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		return facetGroup;
 	}
+	
+	/**
+	 * 转换自定义属性值的facetGroup
+	 * @return FacetGroup
+	 * @param facetGroup
+	 * @param facetFilterMetaData
+	 * @param facetParameters
+	 * @author 冯明雷
+	 * @time 2016年5月20日下午3:56:44
+	 */
+	private FacetGroup covertCustomPropertyFacetGroup(
+			FacetGroup facetGroup,
+			FacetFilterMetaData facetFilterMetaData,
+			List<FacetParameter> facetParameters){
+		
+		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
+
+		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId());
+		if (searchObj != null)
+			facetGroup.setTitle(searchObj.getName());
+
+		List<Facet> facets = facetGroup.getFacets();
+		if (facets != null && facets.size() > 0) {
+			for (Facet facet : facets){
+				facet.setTitle(facet.getValue());
+				// 判断是否选中
+				for (FacetParameter facetParameter : facetParameters){
+					if (FacetType.PROPERTY.equals(facetParameter.getFacetType())) {
+						if (facetParameter.containsValue(facet.getValue())) {
+							facet.setSelected(true);
+							break;
+						}
+					}
+				}
+			}
+		}
+		facetGroup.setFacets(facets);
+		return facetGroup;
+	}
+	
+	
 
 	/**
 	 * 转换价格范围的facetGroup

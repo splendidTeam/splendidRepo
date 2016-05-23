@@ -50,13 +50,13 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 	/** log定义 */
 	private static final Logger			LOG						= LoggerFactory.getLogger(NebulaSearchController.class);
 
-	private static final String			ITEM_LIST				= "item.list";
+	public static final String			ITEM_LIST				= "item.list";
 
-	private static final String			SEARCH_NO_RESULT		= "item.search-no-result";
+	public static final String			SEARCH_NO_RESULT		= "item.search-no-result";
 
-	private static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommand";
+	public static final String			ITEM_LIST_VIEW_COMMOND	= "itemListViewCommand";
 
-	private static final String			ITEM_LIST_SEARCH_TITLE	= "keyword";
+	public static final String			ITEM_LIST_SEARCH_TITLE	= "keyword";
 
 	@Autowired
 	@Qualifier("solrQueryConvert")
@@ -170,6 +170,12 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if (Validator.isNotNullOrEmpty(collection)) {
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
+			
+			
+			searchCommand.setFilterConditionStr(request.getParameter("filterConditionStr"));
+			searchCommand.setCategoryConditionStr(request.getParameter("categoryConditionStr"));
+			searchCommand.setNavigationConditionStr(request.getParameter("navigationConditionStr"));
+			searchCommand.setFilterParamOrder(request.getParameter("filterParamOrder"));
 
 			// ***************** 下面这些查询和searchPage是一致的
 			// 创建solrquery对象
