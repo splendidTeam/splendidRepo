@@ -170,6 +170,12 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		ItemCollection collection = sdkItemCollectionManager.findItemCollectionById(cid);
 		if (Validator.isNotNullOrEmpty(collection)) {
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
+			
+			
+			searchCommand.setFilterConditionStr(request.getParameter("filterConditionStr"));
+			searchCommand.setCategoryConditionStr(request.getParameter("categoryConditionStr"));
+			searchCommand.setNavigationConditionStr(request.getParameter("navigationConditionStr"));
+			searchCommand.setFilterParamOrder(request.getParameter("filterParamOrder"));
 
 			// ***************** 下面这些查询和searchPage是一致的
 			// 创建solrquery对象
