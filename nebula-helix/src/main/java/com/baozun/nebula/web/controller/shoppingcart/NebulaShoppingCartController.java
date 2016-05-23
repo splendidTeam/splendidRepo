@@ -152,15 +152,9 @@ public class NebulaShoppingCartController extends BaseController{
     @Autowired
     private SdkShoppingCartManager           sdkShoppingCartManager;
 
-    /** The guest shoppingcart resolver. */
+    /** The shoppingcart factory. */
     @Autowired
-    @Qualifier("guestShoppingcartResolver")
-    private ShoppingcartResolver             guestShoppingcartResolver;
-
-    /** The member shoppingcart resolver. */
-    @Autowired
-    @Qualifier("memberShoppingcartResolver")
-    private ShoppingcartResolver             memberShoppingcartResolver;
+    private ShoppingcartFactory              shoppingcartFactory;
 
     /** The shoppingcart view command converter. */
     @Autowired
@@ -220,7 +214,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
@@ -259,7 +253,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -299,7 +293,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -339,7 +333,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -368,7 +362,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -387,8 +381,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @return the cart info
      */
     protected ShoppingCartCommand getShoppingCartCommand(HttpServletRequest request,MemberDetails memberDetails){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-        List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
+        List<ShoppingCartLineCommand> cartLines = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, request);
         if (Validator.isNullOrEmpty(cartLines)){
             return null;
         }
@@ -398,26 +391,16 @@ public class NebulaShoppingCartController extends BaseController{
     }
 
     /**
-     * Detect shoppingcart resolver.
+     * 返回结果填充.
      *
-     * @param memberDetails
-     *            the member details
-     * @return the shoppingcart resolver
-     */
-    private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
-        return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
-    }
-
-    /**
-     * 返回结果填充
-     * 
      * @param shoppingcartResult
-     * @return
+     *            the shoppingcart result
+     * @return the nebula return result
      */
     private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
         if (ShoppingcartResult.SUCCESS != shoppingcartResult){
-        	DefaultReturnResult result = new DefaultReturnResult();
-			result.setResult(false);
+            DefaultReturnResult result = new DefaultReturnResult();
+            result.setResult(false);
 
             String messageStr = getMessage(shoppingcartResult.toString());
 
