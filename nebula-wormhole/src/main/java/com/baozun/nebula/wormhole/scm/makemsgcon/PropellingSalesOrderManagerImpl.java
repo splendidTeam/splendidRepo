@@ -24,6 +24,8 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
+import com.baozun.nebula.utilities.library.address.Address;
+import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.wormhole.constants.OrderStatusV5Constants;
 import com.baozun.nebula.wormhole.constants.PromotionTypeConstants;
 import com.baozun.nebula.wormhole.mq.entity.order.DeliveryInfoV5;
@@ -193,9 +195,18 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
     private DeliveryInfoV5 getDeliveryInfoV5(SalesOrderCommand salesOrderCommand){
         DeliveryInfoV5 deliveryInfoV5 = new DeliveryInfoV5();
         deliveryInfoV5.setCountry(null);
-        deliveryInfoV5.setProvince(salesOrderCommand.getProvince());
-        deliveryInfoV5.setCity(salesOrderCommand.getCity());
-        deliveryInfoV5.setDistrict(salesOrderCommand.getArea());
+        
+//        deliveryInfoV5.setProvince(salesOrderCommand.getProvince());
+//        deliveryInfoV5.setCity(salesOrderCommand.getCity());
+//        deliveryInfoV5.setDistrict(salesOrderCommand.getArea());
+        // 订单表不存省市区文字，只存ID 
+    	Address province=AddressUtil.getAddressById(salesOrderCommand.getProvinceId());
+    	Address city=AddressUtil.getAddressById(salesOrderCommand.getCityId());
+    	Address area=AddressUtil.getAddressById(salesOrderCommand.getAreaId());
+        deliveryInfoV5.setProvince(province.getName());
+        deliveryInfoV5.setCity(city.getName());
+        deliveryInfoV5.setDistrict(area.getName());
+        
         deliveryInfoV5.setTown(null);
         deliveryInfoV5.setAddress(salesOrderCommand.getAddress());
         deliveryInfoV5.setZipCode(salesOrderCommand.getPostcode());

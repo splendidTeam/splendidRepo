@@ -202,7 +202,7 @@ public class NebulaOrderConfirmController extends BaseController{
         // TODO feilong 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
         List<ContactCommand> addressList = null;
         if (memberDetails != null){
-            addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId());
+            addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
         }
 
         // 获取购物车信息
@@ -272,7 +272,7 @@ public class NebulaOrderConfirmController extends BaseController{
         if (bindingResult.hasErrors()){
             LOGGER.error(
                             "[ORDER_CREATEORDER] {} [{}] orderForm validation error. \"\"",
-                            memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(),
+                            memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
                             new Date());
             return getResultFromBindingResult(bindingResult);
         }
@@ -291,7 +291,7 @@ public class NebulaOrderConfirmController extends BaseController{
         if (salesorderResult != SalesOrderResult.SUCCESS){
             LOGGER.error(
                             "[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"",
-                            memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(),
+                            memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
                             new Date(),
                             couponCode);
             return toNebulaReturnResult(salesorderResult);
@@ -420,7 +420,7 @@ public class NebulaOrderConfirmController extends BaseController{
         if (cartLines == null){
             return null;
         }
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
 
         //地址
@@ -458,7 +458,7 @@ public class NebulaOrderConfirmController extends BaseController{
             coupons.add(couponCode);
         }
 
-        return sdkShoppingCartManager.buildShoppingCartCommand(memberId, cartLines, calcFreightCommand, coupons, memComboList);
+        return sdkShoppingCartManager.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
     }
 
     /**
