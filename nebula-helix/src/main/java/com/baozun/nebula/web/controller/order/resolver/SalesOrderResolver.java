@@ -66,7 +66,8 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * 
  * <tr valign="top">
  * <td>
- * {@link #updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request, HttpServletResponse response) updateCookieShoppingcartCount}
+ * {@link #updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request, HttpServletResponse response)
+ * updateCookieShoppingcartCount}
  * </td>
  * <td>游客下单成功后更新cookie中的购物车商品数量</td>
  * </tr>
@@ -79,58 +80,48 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * @version 5.3.1 2016年5月3日 下午1:35:48
  * @since 5.3.1
  */
-public interface SalesOrderResolver {
+public interface SalesOrderResolver{
 
-	/**
-	 * 封装订单信息(所有的包括选中的及没有选中的).
-	 *
-	 * @param memberDetails
-	 *            memberDetails,通常实现只需要使用memberid,
-	 *            传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
-	 * @param orderForm
-	 *            orderForm,页面上传过来的表单对象，数据的来源
-	 * @param request
-	 *            the request
-	 * @return 返回封装之后的SalesOrderCommand
-	 */
-	SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm,
-			HttpServletRequest request);
+    /**
+     * 封装订单信息(所有的包括选中的及没有选中的).
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,
+     *            传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param orderForm
+     *            orderForm,页面上传过来的表单对象，数据的来源
+     * @param request
+     *            the request
+     * @return 返回封装之后的SalesOrderCommand
+     */
+    SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request);
 
-	/**
-	 * 获取订单所需购物车信息
-	 * 
-	 * @param memberDetails
-	 * @param salesOrderCommand
-	 * @param request
-	 * @return
-	 */
-	ShoppingCartCommand buildShoppingCartForOrder(List<ShoppingCartLineCommand> cartLines,MemberDetails memberDetails, SalesOrderCommand salesOrderCommand);
+    /**
+     * 通过支付流水号查询订单
+     * 
+     * @param subOrdinate
+     * @return
+     */
+    SalesOrderCommand getSalesOrderCommand(String subOrdinate);
 
-	/**
-	 * 通过支付流水号查询订单
-	 * 
-	 * @param subOrdinate
-	 * @return
-	 */
-	SalesOrderCommand getSalesOrderCommand(String subOrdinate);
+    /**
+     * 下单成功后更新cookie中的购物车数据
+     * 
+     * @param ShoppingCartLineCommandList
+     * @param request
+     * @param response
+     */
+    void updateCookieShoppingcart(
+                    List<ShoppingCartLineCommand> ShoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
 
-	/**
-	 * 下单成功后更新cookie中的购物车数据
-	 * 
-	 * @param ShoppingCartLineCommandList
-	 * @param request
-	 * @param response
-	 */
-	void updateCookieShoppingcart(List<ShoppingCartLineCommand> ShoppingCartLineCommandList, HttpServletRequest request,
-			HttpServletResponse response);
-
-	/**
-	 * 下单成功后更新cookie中的购物车商品的数量
-	 * 
-	 * @param ShoppingCartLineCommandList
-	 * @param request
-	 * @param response
-	 */
-	void updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request,
-			HttpServletResponse response);
+    /**
+     * 下单成功后更新cookie中的购物车商品的数量
+     * 
+     * @param ShoppingCartLineCommandList
+     * @param request
+     * @param response
+     */
+    void updateCookieShoppingcartCount(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
 }

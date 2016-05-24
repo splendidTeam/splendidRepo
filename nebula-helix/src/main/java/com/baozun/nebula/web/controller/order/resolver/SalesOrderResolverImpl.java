@@ -195,25 +195,6 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         salesOrderCommand.setCalcFreightCommand(calcFreightCommand);
     }
 
-    @Override
-    public ShoppingCartCommand buildShoppingCartForOrder(
-                    List<ShoppingCartLineCommand> cartLines,
-                    MemberDetails memberDetails,
-                    SalesOrderCommand salesOrderCommand){
-
-        // 获取购物车行信息
-
-        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
-        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        List<String> couponList = new ArrayList<String>();
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
-            couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
-        }
-        return sdkShoppingCartCommandBuilder
-                        .buildShoppingCartCommand(groupId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
-
-    }
-
     /**
      * 通過支付流水號查詢訂單
      * 

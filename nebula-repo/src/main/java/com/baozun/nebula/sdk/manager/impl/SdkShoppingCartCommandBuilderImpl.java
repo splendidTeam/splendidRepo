@@ -27,7 +27,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -176,8 +178,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long shopId = entry.getValue();
 
             //TODO feilong 这是什么鬼逻辑?
-            newLineList.add(CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
-            newLineList.add(CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
+            CollectionUtils.addIgnoreNull(
+                            newLineList,
+                            CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
+            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
@@ -466,7 +470,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
 
         // 设置应付金额
-        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.selectRejected(allShoppingCartLines, "isGift", false);
+        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.select(allShoppingCartLines, "gift", false);
         shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(noGiftShoppingCartLines));
 
         // 实际支付金额
