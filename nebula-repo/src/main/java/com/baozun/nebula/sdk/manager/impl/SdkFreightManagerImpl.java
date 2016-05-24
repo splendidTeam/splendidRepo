@@ -38,42 +38,47 @@ import com.baozun.nebula.sdk.manager.SdkFreightManager;
  *
  */
 @Transactional
-@Service("sdkFreightManager") 
+@Service("sdkFreightManager")
 public class SdkFreightManagerImpl implements SdkFreightManager{
 
-	
-	@Autowired
-	private DistributionModeDao distributionModeDao;
-	
-	@Autowired
-	private SupportedAreaDao  supportedAreaDao;
-	
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkFreightManager#getAllDistributionMode()
-	 */
-	@Override
-	@Transactional(readOnly=true)
-	public List<DistributionMode> getAllDistributionMode() {
-		return distributionModeDao.getAllDistributionMode();
-	}
+    @Autowired
+    private DistributionModeDao distributionModeDao;
 
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkFreightManager#findSupportedAreaByQueryMapWithPage(loxia.dao.Page, loxia.dao.Sort[], java.util.Map)
-	 */
-	@Override
-	@Transactional(readOnly=true)
-	public Pagination<SupportedAreaCommand> findSupportedAreaByQueryMapWithPage(
-			Page page, Sort[] sorts, Map<String, Object> searchParam) {
-		return supportedAreaDao.findSupportedAreaByQueryMapWithPage(page, sorts, searchParam);
-	}
+    @Autowired
+    private SupportedAreaDao    supportedAreaDao;
 
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkFreightManager#findDistributionModeById(java.lang.Long)
-	 */
-	@Override
-	@Transactional(readOnly=true)
-	public DistributionMode findDistributionModeById(Long id) {
-		return distributionModeDao.findDistributionModeById(id);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkFreightManager#getAllDistributionMode()
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<DistributionMode> getAllDistributionMode(){
+        return distributionModeDao.getAllDistributionMode();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkFreightManager#findSupportedAreaByQueryMapWithPage(loxia.dao.Page, loxia.dao.Sort[],
+     * java.util.Map)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<SupportedAreaCommand> findSupportedAreaByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam){
+        return supportedAreaDao.findSupportedAreaByQueryMapWithPage(page, sorts, searchParam);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkFreightManager#findDistributionModeById(java.lang.Long)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public DistributionMode findDistributionModeById(Long id){
+        return distributionModeDao.findDistributionModeById(id);
+    }
 
 }

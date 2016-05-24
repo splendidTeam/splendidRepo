@@ -45,7 +45,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -145,9 +145,6 @@ public class NebulaOrderConfirmController extends BaseController{
     private OrderFormValidator               orderFormValidator;
 
     @Autowired
-    private SdkShoppingCartManager           sdkShoppingCartManager;
-
-    @Autowired
     private SdkMemberManager                 sdkMemberManager;
 
     @Autowired
@@ -174,6 +171,9 @@ public class NebulaOrderConfirmController extends BaseController{
 
     /** 购物车为空返回的URL */
     public static final String               CART_NULL_BACK_URL      = "/index";
+
+    @Autowired
+    private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
 
     /**
      * 显示订单结算页面.
@@ -202,7 +202,7 @@ public class NebulaOrderConfirmController extends BaseController{
         // TODO feilong 获得购物车数据 (如果没有传入key 那么就是普通的购物车购买情况)
         List<ContactCommand> addressList = null;
         if (memberDetails != null){
-            addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getMemberId());
+            addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
         }
 
         // 获取购物车信息
@@ -249,7 +249,7 @@ public class NebulaOrderConfirmController extends BaseController{
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/create", method =
      *                       RequestMethod.POST)
-     * @see com.baozun.nebula.sdk.manager.OrderManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
+     * @see com.baozun.nebula.sdk.manager.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
      *      com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
      * @see com.baozun.nebula.sdk.manager.impl.OrderManagerImpl#saveOrderInfo(SalesOrderCommand,
      *      ShoppingCartCommand)
@@ -272,7 +272,7 @@ public class NebulaOrderConfirmController extends BaseController{
         if (bindingResult.hasErrors()){
             LOGGER.error(
                             "[ORDER_CREATEORDER] {} [{}] orderForm validation error. \"\"",
-                            memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(),
+                            memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
                             new Date());
             return getResultFromBindingResult(bindingResult);
         }
@@ -291,7 +291,7 @@ public class NebulaOrderConfirmController extends BaseController{
         if (salesorderResult != SalesOrderResult.SUCCESS){
             LOGGER.error(
                             "[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"",
-                            memberDetails == null ? "Gueset" : memberDetails.getMemberId().toString(),
+                            memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
                             new Date(),
                             couponCode);
             return toNebulaReturnResult(salesorderResult);
@@ -420,7 +420,7 @@ public class NebulaOrderConfirmController extends BaseController{
         if (cartLines == null){
             return null;
         }
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
 
         //地址
@@ -458,7 +458,7 @@ public class NebulaOrderConfirmController extends BaseController{
             coupons.add(couponCode);
         }
 
-        return sdkShoppingCartManager.buildShoppingCartCommand(memberId, cartLines, calcFreightCommand, coupons, memComboList);
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
     }
 
     /**

@@ -43,7 +43,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
@@ -51,7 +51,6 @@ import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
 import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
@@ -71,32 +70,31 @@ import com.feilong.tools.jsonlib.JsonUtil;
 public class SalesOrderResolverImpl implements SalesOrderResolver{
 
     /** The Constant log. */
-    private static final Logger        LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
+    private static final Logger           LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
 
     @Autowired
-    private MataInfoManager            mataInfoManager;
+    private MataInfoManager               mataInfoManager;
 
     @Autowired
-    private SalesOrderManager          salesOrderManager;
-
-    /** The sdk shopping cart manager. */
-    @Autowired
-    private SdkShoppingCartManager     sdkShoppingCartManager;
+    private SalesOrderManager             salesOrderManager;
 
     @Autowired
-    private SdkPaymentManager          sdkPaymentManager;
+    private SdkPaymentManager             sdkPaymentManager;
 
     @Autowired
-    private OrderManager               orderManager;
+    private OrderManager                  orderManager;
 
     @Autowired
-    private ShoppingcartFactory        shoppingcartFactory;
+    private ShoppingcartFactory           shoppingcartFactory;
 
     @Autowired
-    private GuestShoppingcartPersister guestShoppingcartPersister;
+    private GuestShoppingcartPersister    guestShoppingcartPersister;
 
     @Autowired
-    private ShoppingcartCountPersister shoppingcartCountPersister;
+    private ShoppingcartCountPersister    shoppingcartCountPersister;
+
+    @Autowired
+    private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
 
     @Override
     public SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request){
@@ -117,8 +115,12 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "tel",
                         "email");
 
-        salesOrderCommand.setName(Validator.isNullOrEmpty(memberDetails) ? "" : memberDetails.getNickName());
-        salesOrderCommand.setMemberId(Validator.isNullOrEmpty(memberDetails) ? null : memberDetails.getMemberId());
+        // 用户信息
+        boolean isGuest = Validator.isNullOrEmpty(memberDetails);
+        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
+        salesOrderCommand.setMemberName(isGuest ? "" : memberDetails.getLoginName());
+        salesOrderCommand.setIp(RequestUtil.getClientIp(request));
+        salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
         salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
         salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
         // 设置支付信息
@@ -132,10 +134,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         setFreghtCommand(salesOrderCommand);
         // 设置优惠券信息
         setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
-        // 用户信息
-        salesOrderCommand.setMemberName(memberDetails == null ? "" : memberDetails.getLoginName());
-        salesOrderCommand.setMemberId(memberDetails == null ? null : memberDetails.getMemberId());
-        salesOrderCommand.setIp(RequestUtil.getClientIp(request));
+
         // 发票信息
         if (Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())){
             if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()){
@@ -204,14 +203,14 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
 
         // 获取购物车行信息
 
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
         List<String> couponList = new ArrayList<String>();
         if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
             couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
         }
-        return sdkShoppingCartManager
-                        .buildShoppingCartCommand(memberId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
+        return sdkShoppingCartCommandBuilder
+                        .buildShoppingCartCommand(groupId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
 
     }
 

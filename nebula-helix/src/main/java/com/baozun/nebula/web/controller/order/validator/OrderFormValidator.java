@@ -73,7 +73,7 @@ public class OrderFormValidator implements Validator{
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.address", "address.field.required");// 地址
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.postcode", "postcode.field.required");// 邮编
  		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.mobile", "mobile.field.required");// 收货人手机
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.email", "email.field.required");// 收货人邮箱
+ 		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.email", "email.field.required");// 收货人邮箱
  		// 邮箱有效性检查
  		if (!errors.hasFieldErrors("shippingInfoSubForm.email")){
 			if (!EmailValidator.getInstance().isValid(orderForm.getShippingInfoSubForm().getEmail())){

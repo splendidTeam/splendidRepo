@@ -27,11 +27,9 @@ import java.util.regex.Pattern;
  * Facet Parameter.
  * Is used for representing a user facing facet.
  *
- * @author nic
+ * @author D.C
  */
 public class FacetParameter {
-
-    // TODO: Optimize the implementation to minimize the parsing of the facet values
 
     /**
      * Parameter type

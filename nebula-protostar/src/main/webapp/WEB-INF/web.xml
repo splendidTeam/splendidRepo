@@ -119,7 +119,7 @@
 	
 	<servlet>
 		<servlet-name>systemServlet</servlet-name>
-		<servlet-class>com.baozun.nebula.servlet.SystemInitServlet</servlet-class>
+		<servlet-class>com.baozun.nebula.web.servlet.SystemInitServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 
