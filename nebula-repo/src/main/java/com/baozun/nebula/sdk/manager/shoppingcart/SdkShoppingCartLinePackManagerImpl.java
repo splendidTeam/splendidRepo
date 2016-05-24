@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,7 +46,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartLinePackManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;

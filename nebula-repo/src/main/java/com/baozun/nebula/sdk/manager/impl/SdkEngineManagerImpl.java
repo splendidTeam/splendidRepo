@@ -49,7 +49,7 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitationManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
@@ -109,10 +109,13 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         Set<Long> ids = CollectionsUtil.getPropertyValueSet(shoppingCartCommand.getShoppingCartLineCommands(), "shopId");
         List<Long> shopIds = new ArrayList<Long>(ids);
         Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(shoppingCartCommand.getShoppingCartLineCommands());
+
         List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
                         .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
-        if (null == purchaseLimitationList || purchaseLimitationList.size() == 0)
+
+        if (null == purchaseLimitationList || purchaseLimitationList.size() == 0){
             purchaseLimitationList = new ArrayList<LimitCommand>();
+        }
 
         for (Map.Entry<Long, ShoppingCartCommand> entry : shoppingCartCommand.getShoppingCartByShopIdMap().entrySet()){
             for (ShoppingCartLineCommand shoppingCartLine : entry.getValue().getShoppingCartLineCommands()){

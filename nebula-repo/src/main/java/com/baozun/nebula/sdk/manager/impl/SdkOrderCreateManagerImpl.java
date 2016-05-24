@@ -58,8 +58,8 @@ import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
 import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
@@ -151,6 +151,27 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     /*
      * (non-Javadoc)
      * 
+     * @see com.baozun.nebula.sdk.manager.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
+     * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
+     */
+    @Override
+    public String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
+        if (salesOrderCommand == null || shoppingCartCommand == null){
+            throw new BusinessException(Constants.SHOPCART_IS_NULL);
+        }
+
+        //去除抬头和未选中的商品
+        refactoringShoppingCartCommand(shoppingCartCommand);
+
+        // 下单之前的引擎检查
+        sdkEngineManager.createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, shoppingCartCommand);
+
+        return saveOrderInfo(salesOrderCommand, shoppingCartCommand);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baozun.nebula.sdk.manager.OrderManager#saveManualOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
      * com.baozun.nebula.sdk.command.SalesOrderCommand)
      */
@@ -176,27 +197,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
             throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
         }
         return subOrdinate;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
-     * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
-     */
-    @Override
-    public String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
-        if (salesOrderCommand == null || shoppingCartCommand == null){
-            throw new BusinessException(Constants.SHOPCART_IS_NULL);
-        }
-
-        //去除抬头和未选中的商品
-        refactoringShoppingCartCommand(shoppingCartCommand);
-
-        // 下单之前的引擎检查
-        sdkEngineManager.createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, shoppingCartCommand);
-
-        return saveOrderInfo(salesOrderCommand, shoppingCartCommand);
     }
 
     /**
