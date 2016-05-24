@@ -19,15 +19,13 @@ package com.baozun.nebula.sdk.manager;
 import java.util.List;
 import java.util.Map;
 
-import loxia.annotation.QueryParam;
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
-
 import com.baozun.nebula.freight.memory.SupportedAreaCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.freight.DistributionMode;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * @author jumbo
@@ -35,26 +33,24 @@ import com.baozun.nebula.model.freight.DistributionMode;
  */
 public interface SdkFreightManager extends BaseManager{
 
-	/** --------------- 物流方式 -----------------*/
-	/**
-	 * 获取所有的 物流方式
-	 * @return
-	 */
-	public List<DistributionMode> getAllDistributionMode();
-	
-	
-	/**
-	 * 分页查询SupportedAreaCommand
-	 * @param page
-	 * @param sorts
-	 * @param searchParam
-	 * @return
-	 */
-	public Pagination<SupportedAreaCommand> findSupportedAreaByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> searchParam);
-	
-	/** 通过id查找物流方式*/
-	public DistributionMode findDistributionModeById(Long id);
+    /** --------------- 物流方式 ----------------- */
+    /**
+     * 获取所有的 物流方式
+     * 
+     * @return
+     */
+    List<DistributionMode> getAllDistributionMode();
 
-	
+    /**
+     * 分页查询SupportedAreaCommand
+     * 
+     * @param page
+     * @param sorts
+     * @param searchParam
+     * @return
+     */
+    Pagination<SupportedAreaCommand> findSupportedAreaByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> searchParam);
 
+    /** 通过id查找物流方式 */
+    DistributionMode findDistributionModeById(Long id);
 }

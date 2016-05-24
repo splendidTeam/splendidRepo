@@ -62,6 +62,8 @@ public interface SdkOrderCreateManager extends BaseManager{
      *            the mem combos
      * @return the string
      */
+    //TODO 参数支持memberId 不支持memCombos
+    //创建订单的核心思想是  ,某某人 要买什么什么东西, 收货地址 支付方式 等等是什么
     String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
 
     /**

@@ -22,13 +22,6 @@ public interface SdkEngineManager extends BaseManager{
     void createOrderDoEngineChck(Long memberId,Set<String> memCombos,ShoppingCartCommand shoppingCartCommand);
 
     /**
-     * 封装购物车行数据
-     * 
-     * @param shoppingCartLineCommand
-     */
-    void packShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand);
-
-    /**
      * 引擎检查, 不对赠品检查
      * 
      * @param skuId
