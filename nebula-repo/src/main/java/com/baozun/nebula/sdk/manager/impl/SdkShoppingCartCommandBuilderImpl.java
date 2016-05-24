@@ -466,7 +466,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
 
         // 设置应付金额
-        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.selectRejected(allShoppingCartLines, "isGift", false);
+        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.select(allShoppingCartLines, "gift", false);
         shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(noGiftShoppingCartLines));
 
         // 实际支付金额
