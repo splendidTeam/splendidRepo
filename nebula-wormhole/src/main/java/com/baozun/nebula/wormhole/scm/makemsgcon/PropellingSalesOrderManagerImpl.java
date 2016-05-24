@@ -200,12 +200,12 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 //        deliveryInfoV5.setCity(salesOrderCommand.getCity());
 //        deliveryInfoV5.setDistrict(salesOrderCommand.getArea());
         // 订单表不存省市区文字，只存ID 
-    	Address province=AddressUtil.getAddressById(salesOrderCommand.getProvinceId());
-    	Address city=AddressUtil.getAddressById(salesOrderCommand.getCityId());
-    	Address area=AddressUtil.getAddressById(salesOrderCommand.getAreaId());
-        deliveryInfoV5.setProvince(province.getName());
-        deliveryInfoV5.setCity(city.getName());
-        deliveryInfoV5.setDistrict(area.getName());
+    	Address province=AddressUtil.getAddressById(salesOrderCommand.getProvinceId(),salesOrderCommand.getLang());
+    	Address city=AddressUtil.getAddressById(salesOrderCommand.getCityId(),salesOrderCommand.getLang());
+    	Address area=AddressUtil.getAddressById(salesOrderCommand.getAreaId(),salesOrderCommand.getLang());
+        deliveryInfoV5.setProvince(province==null ? "" :province.getName());
+        deliveryInfoV5.setCity(city==null ? "" :city.getName());
+        deliveryInfoV5.setDistrict(area==null ? "":area.getName());
         
         deliveryInfoV5.setTown(null);
         deliveryInfoV5.setAddress(salesOrderCommand.getAddress());

@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartSyncManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartSyncManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;

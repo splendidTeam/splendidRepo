@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.util.List;
 
@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartSyncManager;
 
 /**
  * The Class SdkShoppingCartSyncManagerImpl.

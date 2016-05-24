@@ -265,6 +265,9 @@ public interface ErrorCodes {
 	// *********************** item image manager *****************************
 	/** 商品图片类型不存在 */
 	public static final Integer	ITEM_IMAGE_TYPE_NOT_EXISTS					= 3412;
+	
+	/** 无法定位颜色*/
+	public static final Integer	IMPORT_IMAGE_CAN_NOT_FIX_COLOR				= 3413;
 
 	// ****************** sales
 	// 3000区间*********************************************************************

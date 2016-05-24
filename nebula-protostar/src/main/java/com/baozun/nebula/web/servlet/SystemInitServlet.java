@@ -1,4 +1,4 @@
-package com.baozun.nebula.servlet;
+package com.baozun.nebula.web.servlet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

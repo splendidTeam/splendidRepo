@@ -51,7 +51,7 @@ public interface ShoppingcartLoginSuccessHandler{
      * 
      * <ol>
      * <li>获得游客购物车数据</li>
-     * <li>如果游客购物车数据不是空,那么和DB购物车 同步 {@link com.baozun.nebula.sdk.manager.SdkShoppingCartSyncManager#syncShoppingCart(Long, List)},并清空游客购物车
+     * <li>如果游客购物车数据不是空,那么和DB购物车 同步 {@link com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartSyncManager#syncShoppingCart(Long, List)},并清空游客购物车
      * see
      * {@link GuestShoppingcartPersister#clear(HttpServletRequest, HttpServletResponse)}</li>
      * <li>获得会员购物车,并设置cookie count购物车数量,

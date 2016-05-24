@@ -20,8 +20,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionConditionSKU;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkPromotionManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartGroupManager;
-import com.baozun.nebula.sdk.manager.impl.SdkShoppingCartGroupManagerImpl;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartGroupManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartGroupManagerImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath*:loxia-hibernate-context.xml",

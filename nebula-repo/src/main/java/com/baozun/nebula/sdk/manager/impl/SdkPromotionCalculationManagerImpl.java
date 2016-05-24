@@ -57,7 +57,7 @@ import com.baozun.nebula.sdk.manager.SdkPromotionCalculationConditionManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationSettingManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.calculateEngine.param.PromotionExclusiveGroupType;
 
 @Transactional

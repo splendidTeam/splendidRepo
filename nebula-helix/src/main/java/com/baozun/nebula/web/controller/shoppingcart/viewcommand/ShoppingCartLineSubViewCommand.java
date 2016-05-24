@@ -33,7 +33,7 @@ import com.baozun.nebula.sdk.command.SkuProperty;
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand
  * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine
  * @see com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao
- * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#findShoppingCartLinesByMemberId(Long, Integer)
+ * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager#findShoppingCartLinesByMemberId(Long, Integer)
  * @since 5.3.1
  */
 public class ShoppingCartLineSubViewCommand implements Serializable{

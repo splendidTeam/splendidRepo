@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016 Baozun All Rights Reserved.
+ * Copyright (c) 2012 Baozun All Rights Reserved.
  *
  * This software is the confidential and proprietary information of Baozun.
  * You shall not disclose such Confidential Information and shall use it only in
@@ -14,14 +14,9 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.search;
-
-import java.util.List;
-
 /**
- * @author D.C
- * @since 2016年4月13日 下午5:58:14
+ * 基于Apache Curator封装的zookeeper工具类
+ * @author Justin Hu
+ * 
  */
-public interface SolrQueryConvertor {
-	//SolrQuery convert(List<FacetParameter> facetParameters);
-}
+package com.baozun.nebula.curator;

@@ -43,7 +43,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
@@ -193,25 +193,6 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         LOGGER.info("calcFreightCommand is {}", JsonUtil.format(calcFreightCommand));
 
         salesOrderCommand.setCalcFreightCommand(calcFreightCommand);
-    }
-
-    @Override
-    public ShoppingCartCommand buildShoppingCartForOrder(
-                    List<ShoppingCartLineCommand> cartLines,
-                    MemberDetails memberDetails,
-                    SalesOrderCommand salesOrderCommand){
-
-        // 获取购物车行信息
-
-        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
-        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        List<String> couponList = new ArrayList<String>();
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
-            couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
-        }
-        return sdkShoppingCartCommandBuilder
-                        .buildShoppingCartCommand(groupId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
-
     }
 
     /**

@@ -14,19 +14,20 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -51,9 +52,7 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartGroupManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartLinePackManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -175,8 +174,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long shopId = entry.getValue();
 
             //TODO feilong 这是什么鬼逻辑?
-            newLineList.add(CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
-            newLineList.add(CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
+            CollectionUtils.addIgnoreNull(
+                            newLineList,
+                            CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
+            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
@@ -252,7 +253,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         ShoppingCartLineCommand tempShopLine = CollectionsUtil.find(shopShoppingCartLineList, "id", lineId);
         if (null == tempShopLine){
-            tempShopLine = IterableUtils.find(
+            tempShopLine = CollectionsUtil.find(
                             newLines,
                             PredicateUtils.andPredicate(
                                             new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("id", lineId),
@@ -465,7 +466,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
 
         // 设置应付金额
-        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.selectRejected(allShoppingCartLines, "isGift", false);
+        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.select(allShoppingCartLines, "gift", false);
         shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(noGiftShoppingCartLines));
 
         // 实际支付金额
@@ -819,12 +820,12 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         // 获取人群和商品促销的交集
         Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
-        Set<String> propertyValueSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "comboIds");
+        Set<String> itemComboIdsSet = ShoppingCartUtil.getItemComboIds(shoppingCartLineCommandList);
 
         List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
                         new ArrayList<Long>(shopIdSet),
                         memboSet,
-                        propertyValueSet,
+                        itemComboIdsSet,
                         shoppingCartCommand.getCurrentTime());
 
         if (Validator.isNotNullOrEmpty(promotionList)){
