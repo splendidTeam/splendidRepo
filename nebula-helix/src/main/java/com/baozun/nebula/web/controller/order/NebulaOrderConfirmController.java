@@ -288,11 +288,7 @@ public class NebulaOrderConfirmController extends BaseController{
         List<ShoppingCartLineCommand> cartLines = getCartLines(request, memberDetails, key);
 
         // 获取购物车行信息
-        List<String> couponList = new ArrayList<String>();
-
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
-            couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
-        }
+        List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
 
         ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
                         .buildShoppingCartCommand(memberDetails, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList);
