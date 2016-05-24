@@ -305,7 +305,12 @@ public class NebulaOrderConfirmController extends BaseController{
                             couponCode);
             return toNebulaReturnResult(salesorderResult);
         }
-
+        
+        //设置立即购买标志
+        if (Validator.isNotNullOrEmpty(key)){
+        	salesOrderCommand.setIsImmediatelyBuy(true);
+        }
+        
         // 新建订单
         String subOrdinate = sdkOrderCreateManager
                         .saveOrder(shoppingCartCommand, salesOrderCommand, null == memberDetails ? null : memberDetails.getMemComboList());
