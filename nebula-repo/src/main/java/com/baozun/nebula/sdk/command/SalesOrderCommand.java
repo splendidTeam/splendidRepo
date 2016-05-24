@@ -266,8 +266,13 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 银行分期付款的期数. */
     private Integer                     periods;
-
+    
     //*********************************************************************************************
+    
+    /** 多语言 */
+    private String 						lang;
+    
+    
     /**
      * 获得 物流方式 *.
      *
@@ -1678,6 +1683,14 @@ public class SalesOrderCommand extends BaseModel{
 
 	public void setReceiptAddress(String receiptAddress) {
 		this.receiptAddress = receiptAddress;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 
 }

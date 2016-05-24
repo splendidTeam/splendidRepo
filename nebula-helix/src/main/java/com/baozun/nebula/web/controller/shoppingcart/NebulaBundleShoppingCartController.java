@@ -16,21 +16,24 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
-import java.util.UUID;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.feilong.core.util.RandomUtil;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
  * 基于bundle购物车控制器.
@@ -47,7 +50,7 @@ import com.feilong.core.util.RandomUtil;
  * @see com.baozun.nebula.model.bundle.BundleSku
  * @since 5.3.1
  */
-public class NebulaBundleShoppingCartController extends BaseController{
+public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatelyBuyShoppingCartController{
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
@@ -65,11 +68,10 @@ public class NebulaBundleShoppingCartController extends BaseController{
      *            买几套bundle
      * @param request
      *            the request
-     * @param response
-     *            the response
      * @param model
      *            the model
      * @return the nebula return result
+     * @NeedLogin(guest = true)
      * @RequestMapping(value = "/transaction/immediatelybuybundle", method = RequestMethod.POST)
      */
     public NebulaReturnResult immediatelyBuyBundle(
@@ -78,33 +80,66 @@ public class NebulaBundleShoppingCartController extends BaseController{
                     @RequestParam(value = "skuIds",required = true) Long[] skuIds,
                     @RequestParam(value = "count",required = true) Integer count,
                     HttpServletRequest request,
-                    HttpServletResponse response,
                     Model model){
         //TODO feilong validator
+        //        ShoppingcartResult shoppingcartResult = null;
+        //
+        //        if (null != shoppingcartResult){
+        //            return toNebulaReturnResult(shoppingcartResult);
+        //        }
 
-        //TODO feilong 构造bundle购物车信息
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(relatedItemId, skuIds, count);
+        String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
 
-        //        //save in session
-        String key = buildKey();//TODO feilong 构造key
-        //        //value是商品list
-        //        request.getSession().setAttribute(key, "");
-
-        //url info /transaction/check?key=xxxx
+        String checkoutUrl = buildCheckoutUrl(key, request);
 
         //成功需要返回 跳转到订单确认页面的地址
         //失败就直接返回失败的信息
-        //return toNebulaReturnResult(shoppingcartResult);
-        return null;
+        return toNebulaReturnResult(checkoutUrl);
     }
 
-    //TODO feilong 进普通购物车
+    //TODO feilong 构造bundle购物车信息
+    private List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(Long relatedItemId,Long[] skuIds,Integer count){
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
 
-    /**
-     * Builds the key.
-     *
-     * @return the string
-     */
-    private String buildKey(){
-        return UUID.randomUUID().toString() + RandomUtil.createRandomWithLength(2);
+        ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
+
+        shoppingCartLineCommand.setRelatedItemId(relatedItemId);
+        shoppingCartLineCommand.setSkuIds(skuIds);
+        shoppingCartLineCommand.setQuantity(count);
+
+        //这里有促销判断逻辑
+        //see com.baozun.nebula.sdk.manager.impl.SdkShoppingCartManagerImpl.needContainsLineCalc(Integer, boolean)
+        shoppingCartLineCommand.setSettlementState(1);
+        shoppingCartLineCommand.setValid(true);
+
+        shoppingCartLineCommandList.add(shoppingCartLineCommand);
+        return shoppingCartLineCommandList;
     }
+
+    private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
+        DefaultReturnResult result = new DefaultReturnResult();
+        if (shoppingcartResult != null){
+            result.setResult(false);
+
+            String messageStr = getMessage(shoppingcartResult.toString());
+
+            DefaultResultMessage message = new DefaultResultMessage();
+            message.setMessage(messageStr);
+            result.setResultMessage(message);
+
+            LOGGER.error(messageStr);
+        }
+        return result;
+    }
+
+    private NebulaReturnResult toNebulaReturnResult(String checkoutUrl){
+        DefaultReturnResult result = new DefaultReturnResult();
+        result.setResult(true);
+        DefaultResultMessage message = new DefaultResultMessage();
+        message.setMessage(checkoutUrl);
+        result.setResultMessage(message);
+        return result;
+    }
+
 }

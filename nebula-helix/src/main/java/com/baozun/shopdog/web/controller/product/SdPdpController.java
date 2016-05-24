@@ -75,7 +75,7 @@ public class SdPdpController implements AbstractSdPdpController {
 	protected ItemDetailManager itemDetailManager;
 	
 	@Autowired
-	private ItemColorSwatchViewCommandResolver    colorSwatchViewCommandResolver;
+	private ItemColorSwatchViewCommandResolver    itemColorSwatchViewCommandResolver;
 	
 	@Autowired
 	@Qualifier("shopdogItemViewCommandConverter")
@@ -204,7 +204,7 @@ public class SdPdpController implements AbstractSdPdpController {
 		List<ItemImageViewCommand> images = buildItemImageViewCommand(itemBaseInfo.getId());
 		
 	    //商品全部图
-		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(buildItemImageViewCommand(itemBaseInfo.getId()));
+		List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands = shopdogItemImageViewCommandConverter.convert(images);
 		shopdogItemViewCommand.setAllPictures(shopdogItemImageViewCommands);
 		
 		//主图
@@ -226,7 +226,10 @@ public class SdPdpController implements AbstractSdPdpController {
 	}
 
 	private List<String> getMainUrls(List<ShopdogItemImageViewCommand> shopdogItemImageViewCommands) {
-		return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
+		if(Validator.isNotNullOrEmpty(shopdogItemImageViewCommands)){
+			return shopdogItemImageViewCommands.get(0).getImages().get(getMainPicType());
+		}
+		return null;
 	}
 
 	/**
@@ -298,7 +301,7 @@ public class SdPdpController implements AbstractSdPdpController {
 	}
 	
 	protected List<ItemColorSwatchViewCommand> buildItemColorSwatchViewCommands(ItemBaseInfoViewCommand baseInfoViewCommand){
-		return colorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
+		return itemColorSwatchViewCommandResolver.resolve(baseInfoViewCommand, itemImageViewCommandConverter);
 	}
 	
 	/**

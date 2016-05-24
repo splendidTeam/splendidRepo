@@ -54,6 +54,7 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.solr.utils.JsonFormatUtil;
 import com.baozun.nebula.utilities.library.address.Address;
@@ -82,6 +83,9 @@ public class SalesOrderController extends BaseController{
 
     @Autowired
     private SdkShoppingCartManager                   sdkShoppingCartManager;
+
+    @Autowired
+    private SdkShoppingCartCommandBuilder            sdkShoppingCartCommandBuilder;
 
     @Autowired
     private OrderManager                             sdkOrderService;
@@ -207,8 +211,19 @@ public class SalesOrderController extends BaseController{
 
         if (orderCommand == null){
             throw new BusinessException(ErrorCodes.ORDER_NOT_EXIST, new Object[] { orderCode });
-
         }
+        
+        Address country=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCountryId());
+    	Address province=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getProvinceId());
+    	Address city=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCityId());
+    	Address area=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getAreaId());
+    	Address town=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getTownId());
+    	orderCommand.getSalesOrderCommand().setCountry(country==null ? "" : country.getName());
+    	orderCommand.getSalesOrderCommand().setProvince(province==null ? "" :province.getName());
+    	orderCommand.getSalesOrderCommand().setCity(city==null ? "" :city.getName());
+    	orderCommand.getSalesOrderCommand().setArea(area==null ? "":area.getName());
+    	orderCommand.getSalesOrderCommand().setTown(town==null ? "":town.getName());
+        
         model.addAttribute("orderCommand", orderCommand);
         model.addAttribute("customBaseUrl", customBaseUrl);
         model.addAttribute("frontendBaseUrl", frontendBaseUrl);
@@ -482,7 +497,8 @@ public class SalesOrderController extends BaseController{
                     // 不清除购物车
                     salesOrderCommand.setIsImmediatelyBuy(true);
                 }
-                shoppingCartCommand = sdkShoppingCartManager.findShoppingCart(memberId, memComboIds, codes, calcFreightCommand, lines);
+                shoppingCartCommand = sdkShoppingCartCommandBuilder
+                                .buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
                 subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
             }
 
@@ -799,7 +815,8 @@ public class SalesOrderController extends BaseController{
                     }
                 }
             }
-            shoppingCartCommand = sdkShoppingCartManager.findShoppingCart(memberId, memComboIds, codes, calcFreightCommand, lines);
+            shoppingCartCommand = sdkShoppingCartCommandBuilder
+                            .buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
         }
 
         boolean isCouponBindActive = false;

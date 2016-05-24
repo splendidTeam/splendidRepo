@@ -20,8 +20,7 @@ import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.search.viewcommand.ItemListViewCommand;
-
-import loxia.utils.PropertyUtil;
+import com.feilong.core.Validator;
 
 /**
  * 商品列表模型转换
@@ -38,34 +37,39 @@ public class ItemListViewCommandConverter extends BaseConverter<ItemListViewComm
 	 * 这个方法暂时没有用
 	 */
 	public ItemListViewCommand convert(Object data){
-		return null;
-	}
-
-	/**
-	 * 转换viewCommand
-	 * 
-	 * @return ItemListViewCommand
-	 * @param searchResultPage
-	 * @author 冯明雷
-	 * @time 2016年5月3日下午2:29:01
-	 */
-	public ItemListViewCommand convertViewCommand(SearchResultPage<ItemForSolrCommand> pageData){
-		if (pageData == null)
+		if (data == null) {
 			return null;
-
-		ItemListViewCommand result = new ItemListViewCommand();
-		try{
-			result.setCount(pageData.getCount());
-			result.setCurrentPage(pageData.getCurrentPage());
-			result.setSize(pageData.getSize());
-			result.setStart(pageData.getStart());
-			result.setTotalPages(pageData.getTotalPages());
-			result.setItemForSolrCommands(pageData.getItems());
-			result.setFacetGroups(pageData.getFacetGroups());
-		}catch (Exception e){
-			e.printStackTrace();
 		}
 
-		return result;
+		if (data instanceof SearchResultPage) {
+			ItemListViewCommand result = new ItemListViewCommand();
+
+			SearchResultPage<ItemForSolrCommand> pageData = (SearchResultPage<ItemForSolrCommand>) data;			
+			//分组
+			if (Validator.isNotNullOrEmpty(pageData.getItemsListWithGroup())
+					&& Validator.isNotNullOrEmpty(pageData.getItemsListWithGroup().getItems())) {
+				result.setItemsListWithGroup(pageData.getItemsListWithGroup().getItems());
+				result.setCount(pageData.getItemsListWithGroup().getCount());
+				result.setCurrentPage(pageData.getItemsListWithGroup().getCurrentPage());
+				result.setSize(pageData.getItemsListWithGroup().getSize());
+				result.setStart(pageData.getItemsListWithGroup().getStart());
+				result.setTotalPages(pageData.getItemsListWithGroup().getTotalPages());
+			}else if (Validator.isNotNullOrEmpty(pageData.getItemsListWithOutGroup())
+					&& Validator.isNotNullOrEmpty(pageData.getItemsListWithOutGroup().getItems())) {
+				//不分组
+				result.setItemsListWithOutGroup(pageData.getItemsListWithOutGroup().getItems());
+				result.setCount(pageData.getItemsListWithOutGroup().getCount());
+				result.setCurrentPage(pageData.getItemsListWithOutGroup().getCurrentPage());
+				result.setSize(pageData.getItemsListWithOutGroup().getSize());
+				result.setStart(pageData.getItemsListWithOutGroup().getStart());
+				result.setTotalPages(pageData.getItemsListWithOutGroup().getTotalPages());
+			}
+			
+			result.setFacetGroups(pageData.getFacetGroups());
+			
+			return result;
+
+		}
+		return null;
 	}
 }

@@ -44,7 +44,7 @@
 	<!-- **************************feilong****************************************** -->
 	<logger name="com.feilong.core.lang.ClassLoaderUtil" level="info" />
 	<logger name="com.feilong.core.util.comparator.PropertyComparator" level="info" />
-	<logger name="com.feilong.servlet.http.CookieUtil" level="info" />
+	<logger name="com.feilong.servlet.http.CookieUtil" level="debug" />
 	<logger name="com.feilong.servlet.http.RequestUtil" level="info" />
 	<logger name="com.feilong.tools.security.symmetric.SymmetricEncryption" level="info" />
 	<logger name="com.feilong.spring.web.servlet.interceptor.seo.SeoInterceptor" level="info" />

@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.constants.MetaInfoConstants;
@@ -44,14 +43,14 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
+import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
@@ -68,197 +67,187 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @since 5.3.1
  */
 @Component
-public class SalesOrderResolverImpl implements SalesOrderResolver {
+public class SalesOrderResolverImpl implements SalesOrderResolver{
 
-	/** The Constant log. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
+    /** The Constant log. */
+    private static final Logger           LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
 
-	@Autowired
-	private MataInfoManager mataInfoManager;
+    @Autowired
+    private MataInfoManager               mataInfoManager;
 
-	@Autowired
-	private SalesOrderManager salesOrderManager;
+    @Autowired
+    private SalesOrderManager             salesOrderManager;
 
-	/** The guest shoppingcart resolver. */
-	@Autowired
-	@Qualifier("guestShoppingcartResolver")
-	private ShoppingcartResolver guestShoppingcartResolver;
+    @Autowired
+    private SdkPaymentManager             sdkPaymentManager;
 
-	/** The member shoppingcart resolver. */
-	@Autowired
-	@Qualifier("memberShoppingcartResolver")
-	private ShoppingcartResolver memberShoppingcartResolver;
+    @Autowired
+    private OrderManager                  orderManager;
 
-	/** The sdk shopping cart manager. */
-	@Autowired
-	private SdkShoppingCartManager sdkShoppingCartManager;
+    @Autowired
+    private ShoppingcartFactory           shoppingcartFactory;
 
-	@Autowired
-	private SdkPaymentManager sdkPaymentManager;
+    @Autowired
+    private GuestShoppingcartPersister    guestShoppingcartPersister;
 
-	@Autowired
-	private OrderManager orderManager;
+    @Autowired
+    private ShoppingcartCountPersister    shoppingcartCountPersister;
 
-	@Autowired
-	private GuestShoppingcartPersister guestShoppingcartPersister;
+    @Autowired
+    private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
 
-	@Autowired
-	private ShoppingcartCountPersister shoppingcartCountPersister;
+    @Override
+    public SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request){
+        // 需要封装的对象
+        SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
+        // 设置收货地址信息
+        PropertyUtil.copyProperties(
+                        salesOrderCommand,
+                        orderForm.getShippingInfoSubForm(),
+                        "countryId",
+                        "provinceId",
+                        "cityId",
+                        "areaId",
+                        "townId",
+                        "address",
+                        "postcode",
+                        "mobile",
+                        "tel",
+                        "email");
 
-	@Override
-	public SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm,
-			HttpServletRequest request) {
-		// 需要封装的对象
-		SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
-		// 设置收货地址信息
-		PropertyUtil.copyProperties(salesOrderCommand, orderForm.getShippingInfoSubForm(), "countryId", "provinceId",
-				"cityId", "areaId", "townId");
-		salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
-		salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
-		// 设置支付信息
-		PaymentInfoSubForm paymentInfoSubForm = orderForm.getPaymentInfoSubForm();
-		salesOrderCommand.setPayment(Integer.parseInt(paymentInfoSubForm.getPaymentType()));
-		salesOrderCommand.setPaymentStr(BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getBankcode(),
-				Integer.parseInt(paymentInfoSubForm.getPaymentType())));
-		// 设置运费
-		setFreghtCommand(salesOrderCommand);
-		// 设置优惠券信息
-		setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
-		// 用户信息
-		salesOrderCommand.setMemberName(memberDetails == null ? "" : memberDetails.getLoginName());
-		salesOrderCommand.setMemberId(memberDetails == null ? null : memberDetails.getMemberId());
-		salesOrderCommand.setIp(RequestUtil.getClientIp(request));
-		// 发票信息
-		salesOrderCommand.setReceiptTitle(orderForm.getInvoiceInfoSubForm().getInvoiceTitle());
-		salesOrderCommand.setReceiptContent(orderForm.getInvoiceInfoSubForm().getInvoiceContent());
-		salesOrderCommand.setReceiptType(orderForm.getInvoiceInfoSubForm().getInvoiceType());
-		salesOrderCommand.setReceiptConsignee(orderForm.getInvoiceInfoSubForm().getConsignee());
-		salesOrderCommand.setReceiptAddress(orderForm.getInvoiceInfoSubForm().getAddress());
-		salesOrderCommand.setReceiptTelphone(orderForm.getInvoiceInfoSubForm().getTelphone());
-		// 订单来源
-		salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
+        // 用户信息
+        boolean isGuest = Validator.isNullOrEmpty(memberDetails);
+        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
+        salesOrderCommand.setMemberName(isGuest ? "" : memberDetails.getLoginName());
+        salesOrderCommand.setIp(RequestUtil.getClientIp(request));
+        salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
+        salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
+        salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
+        // 设置支付信息
+        PaymentInfoSubForm paymentInfoSubForm = orderForm.getPaymentInfoSubForm();
+        salesOrderCommand.setPayment(Integer.parseInt(paymentInfoSubForm.getPaymentType()));
+        salesOrderCommand.setPaymentStr(
+                        BankCodeConvertUtil.getPayTypeDetail(
+                                        paymentInfoSubForm.getBankcode(),
+                                        Integer.parseInt(paymentInfoSubForm.getPaymentType())));
+        // 设置运费
+        setFreghtCommand(salesOrderCommand);
+        // 设置优惠券信息
+        setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
 
-		return salesOrderCommand;
-	}
+        // 发票信息
+        if (Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())){
+            if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()){
+                salesOrderCommand.setReceiptTitle(orderForm.getInvoiceInfoSubForm().getInvoiceTitle());
+                salesOrderCommand.setReceiptContent(orderForm.getInvoiceInfoSubForm().getInvoiceContent());
+                salesOrderCommand.setReceiptType(orderForm.getInvoiceInfoSubForm().getInvoiceType());
+                salesOrderCommand.setReceiptConsignee(orderForm.getInvoiceInfoSubForm().getConsignee());
+                salesOrderCommand.setReceiptAddress(orderForm.getInvoiceInfoSubForm().getAddress());
+                salesOrderCommand.setReceiptTelphone(orderForm.getInvoiceInfoSubForm().getTelphone());
+            }
+        }
 
-	/**
-	 * 设置优惠券
-	 * 
-	 * @param salesOrderCommand
-	 * @param coupon
-	 */
-	private void setCoupon(SalesOrderCommand salesOrderCommand, String coupon) {
-		if (Validator.isNotNullOrEmpty(coupon)) {
-			// 校验优惠券
-			PromotionCouponCode promotionCouponCode = salesOrderManager.validCoupon(coupon);
-			if (Validator.isNotNullOrEmpty(promotionCouponCode)) {
-				List<CouponCodeCommand> coupons = new ArrayList<CouponCodeCommand>();
-				CouponCodeCommand couponCode = new CouponCodeCommand();
-				couponCode.setCouponCode(coupon);
-				coupons.add(couponCode);
-				salesOrderCommand.setCouponCodes(coupons);
-			}
-		}
-	}
+        // 订单来源
+        salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
 
-	/**
-	 * 设置运费
-	 * 
-	 * @param salesOrderCommand
-	 */
-	private void setFreghtCommand(SalesOrderCommand salesOrderCommand) {
-		CalcFreightCommand calcFreightCommand = new CalcFreightCommand();
-		calcFreightCommand.setProvienceId(salesOrderCommand.getProvinceId());
-		calcFreightCommand.setCityId(salesOrderCommand.getCityId());
-		calcFreightCommand.setCountyId(salesOrderCommand.getAreaId());
-		calcFreightCommand.setTownId(salesOrderCommand.getTownId());
-		// 设置默认的物流方式
-		String modeId = mataInfoManager.findValue(MetaInfoConstants.DISTRIBUTION_MODE_ID);
-		if (modeId != null) {
-			calcFreightCommand.setDistributionModeId(Long.parseLong(modeId));
-		}
+        return salesOrderCommand;
+    }
 
-		LOGGER.info("calcFreightCommand is {}", JsonUtil.format(calcFreightCommand));
+    /**
+     * 设置优惠券
+     * 
+     * @param salesOrderCommand
+     * @param coupon
+     */
+    private void setCoupon(SalesOrderCommand salesOrderCommand,String coupon){
+        if (Validator.isNotNullOrEmpty(coupon)){
+            // 校验优惠券
+            PromotionCouponCode promotionCouponCode = salesOrderManager.validCoupon(coupon);
+            if (Validator.isNotNullOrEmpty(promotionCouponCode)){
+                List<CouponCodeCommand> coupons = new ArrayList<CouponCodeCommand>();
+                CouponCodeCommand couponCode = new CouponCodeCommand();
+                couponCode.setCouponCode(coupon);
+                coupons.add(couponCode);
+                salesOrderCommand.setCouponCodes(coupons);
+            }
+        }
+    }
 
-		salesOrderCommand.setCalcFreightCommand(calcFreightCommand);
-	}
+    /**
+     * 设置运费
+     * 
+     * @param salesOrderCommand
+     */
+    private void setFreghtCommand(SalesOrderCommand salesOrderCommand){
+        CalcFreightCommand calcFreightCommand = new CalcFreightCommand();
+        calcFreightCommand.setProvienceId(salesOrderCommand.getProvinceId());
+        calcFreightCommand.setCityId(salesOrderCommand.getCityId());
+        calcFreightCommand.setCountyId(salesOrderCommand.getAreaId());
+        calcFreightCommand.setTownId(salesOrderCommand.getTownId());
+        // 设置默认的物流方式
+        String modeId = mataInfoManager.findValue(MetaInfoConstants.DISTRIBUTION_MODE_ID);
+        if (modeId != null){
+            calcFreightCommand.setDistributionModeId(Long.parseLong(modeId));
+        }
 
-	@Override
-	public ShoppingCartCommand buildShoppingCartForOrder(MemberDetails memberDetails,
-			SalesOrderCommand salesOrderCommand, HttpServletRequest request) {
+        LOGGER.info("calcFreightCommand is {}", JsonUtil.format(calcFreightCommand));
 
-		// 获取购物车行信息
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-		List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails,
-				request);
-		if (null == cartLines) {
-			return null;
-		}
-		// 过滤未勾选的商品 1选中  0未选中
-		cartLines = CollectionsUtil.removeAll(cartLines, "settlementState", 0);
-		if (null == cartLines) {
-			return null;
-		}
-		
-		Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
-		Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-		List<String> couponList = new ArrayList<String>();
-		if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())) {
-			couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
-		}
-		return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, couponList,
-				salesOrderCommand.getCalcFreightCommand(), cartLines);
+        salesOrderCommand.setCalcFreightCommand(calcFreightCommand);
+    }
 
-	}
+    @Override
+    public ShoppingCartCommand buildShoppingCartForOrder(
+                    List<ShoppingCartLineCommand> cartLines,
+                    MemberDetails memberDetails,
+                    SalesOrderCommand salesOrderCommand){
 
-	/**
-	 * 通過支付流水號查詢訂單
-	 * 
-	 * @param subOrdinate
-	 * @return
-	 */
-	@Override
-	public SalesOrderCommand getSalesOrderCommand(String subOrdinate) {
-		Map<String, Object> paraMap = new HashMap<String, Object>();
-		paraMap.put("subOrdinate", subOrdinate);
-		List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+        // 获取购物车行信息
 
-		return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
-	}
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
+        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
+        List<String> couponList = new ArrayList<String>();
+        if (Validator.isNotNullOrEmpty(salesOrderCommand.getCouponCodes())){
+            couponList.add(salesOrderCommand.getCouponCodes().get(0).getCouponCode());
+        }
+        return sdkShoppingCartCommandBuilder
+                        .buildShoppingCartCommand(groupId, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList, memComboList);
 
-	/**
-	 * Detect shoppingcart resolver.
-	 *
-	 * @param memberDetails
-	 *            the member details
-	 * @return the shoppingcart resolver
-	 */
-	private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails) {
-		return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
-	}
+    }
 
-	@Override
-	public void updateCookieShoppingcart(List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-			HttpServletRequest request, HttpServletResponse response) {
-		// 取出所有选中结算的商品
-		// 结算状态 0未选中结算 1选中结算
-		List<ShoppingCartLineCommand> mainLines = CollectionsUtil.removeAll(shoppingCartLineCommandList,
-				"settlementState", 1);
+    /**
+     * 通過支付流水號查詢訂單
+     * 
+     * @param subOrdinate
+     * @return
+     */
+    @Override
+    public SalesOrderCommand getSalesOrderCommand(String subOrdinate){
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("subOrdinate", subOrdinate);
+        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
 
-		// 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-		mainLines = CollectionsUtil.select(mainLines, new MainLinesPredicate());
-		guestShoppingcartPersister.save(mainLines, request, response);
+        return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
+    }
 
-	}
+    @Override
+    public void updateCookieShoppingcart(
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    HttpServletRequest request,
+                    HttpServletResponse response){
+        // 取出所有选中结算的商品
+        // 结算状态 0未选中结算 1选中结算
+        List<ShoppingCartLineCommand> mainLines = CollectionsUtil.removeAll(shoppingCartLineCommandList, "settlementState", 1);
 
-	@Override
-	public void updateCookieShoppingcartCount(MemberDetails memberDetails, HttpServletRequest request,
-			HttpServletResponse response) {
+        // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
+        mainLines = CollectionsUtil.select(mainLines, new MainLinesPredicate());
+        guestShoppingcartPersister.save(mainLines, request, response);
 
-		ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-		List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartResolver
-				.getShoppingCartLineCommandList(memberDetails, request);
-		shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
+    }
 
-	}
+    @Override
+    public void updateCookieShoppingcartCount(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory
+                        .getShoppingCartLineCommandList(memberDetails, request);
+        shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
+    }
 }

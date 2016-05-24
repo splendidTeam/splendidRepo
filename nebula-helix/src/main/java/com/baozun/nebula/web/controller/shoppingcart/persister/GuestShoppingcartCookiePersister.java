@@ -137,13 +137,10 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
             PropertyUtil.copyProperties(
                             cookieShoppingCartLine,
                             shoppingCartLineCommand,
-                            "extentionCode",
                             "skuId",
                             "quantity",
                             "createTime",
                             "settlementState",
-                            "shopId",
-                            "promotionId",
                             "lineGroup");
             cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
             // TODO feilong bundle 以后再考虑 id
@@ -174,10 +171,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
                             "createTime",
                             "skuId",
                             "quantity",
-                            "extentionCode",
                             "settlementState",
-                            "shopId",
-                            "promotionId",
                             "lineGroup",
                             "id");
             shoppingLineCommand.setGift(null == cookieShoppingCartLine.getIsGift() ? false : cookieShoppingCartLine.getIsGift());

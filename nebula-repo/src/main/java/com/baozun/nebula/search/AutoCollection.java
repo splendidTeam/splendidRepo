@@ -38,6 +38,7 @@ public class AutoCollection {
 	 */
 	public static boolean apply(ItemCollection collection, ItemCollectionContext context) {
 		List<FacetParameter> facetParameters = JSON.parseArray(collection.getFacetParameters(), FacetParameter.class);
+		boolean isApplied =false;
 		for (FacetParameter fp : facetParameters) {
 			List<String> values = new ArrayList<String>();
 			switch (fp.getFacetType()) {
@@ -56,61 +57,19 @@ public class AutoCollection {
 			default:
 				break;
 			}
-			values.retainAll(fp.getValues());
-			if (values.isEmpty()) {
-				return false;
+			if(fp.getFacetType().equals(FacetType.PROPERTY)){
+				if(values.contains(JSON.toJSONString(fp.getValues()))){
+					isApplied =true;
+					break ;
+				}
+			}else{
+				values.retainAll(fp.getValues());
+				if (!values.isEmpty()) {
+					isApplied =true;
+					break ;
+				}
 			}
 		}
-		return true;
-	}
-}
-
-/**
- * 打表器，上下文
- * 
- * @author D.C
- * @since 2016年4月14日 下午2:41:56
- */
-class ItemCollectionContext {
-	private Long itemId;
-	/**
-	 * solr中存储的结构, /也可以使用-等其他字符标识 Doc #1: /usr, /usr/local, /usr/local/apache
-	 * Doc #2: /etc, /etc/apache2 Doc #3: /etc, /etc/apache2,
-	 * /etc/apache2/conf.d
-	 */
-	private List<String> categories;
-	private List<String> tags;
-	private List<String> properties;
-
-	public Long getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(Long itemId) {
-		this.itemId = itemId;
-	}
-
-	public List<String> getCategories() {
-		return categories;
-	}
-
-	public void setCategories(List<String> categories) {
-		this.categories = categories;
-	}
-
-	public List<String> getTags() {
-		return tags;
-	}
-
-	public void setTags(List<String> tags) {
-		this.tags = tags;
-	}
-
-	public List<String> getProperties() {
-		return properties;
-	}
-
-	public void setProperties(List<String> properties) {
-		this.properties = properties;
+		return isApplied;
 	}
 }

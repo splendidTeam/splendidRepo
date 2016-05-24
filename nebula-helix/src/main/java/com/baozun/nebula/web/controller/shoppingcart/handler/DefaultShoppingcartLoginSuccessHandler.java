@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartSyncManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
@@ -48,9 +48,8 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
 
-    /** The sdk shopping cart manager. */
     @Autowired
-    private SdkShoppingCartManager     sdkShoppingCartManager;
+    private SdkShoppingCartSyncManager sdkShoppingCartSyncManager;
 
     /** The member shoppingcart resolver. */
     @Autowired
@@ -79,7 +78,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         boolean hasGuestShoppingcart = Validator.isNotNullOrEmpty(guestShoppingCartLineCommandList);
         if (hasGuestShoppingcart){
             //同步
-            sdkShoppingCartManager.synchronousShoppingCartById(memberId, guestShoppingCartLineCommandList);
+            sdkShoppingCartSyncManager.syncShoppingCart(memberId, guestShoppingCartLineCommandList);
             //清空游客购物车
             guestShoppingcartPersister.clear(request, response);
         }

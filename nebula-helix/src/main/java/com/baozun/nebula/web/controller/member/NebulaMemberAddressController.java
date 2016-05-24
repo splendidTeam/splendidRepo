@@ -45,6 +45,7 @@ import com.baozun.nebula.web.controller.member.converter.MemberAddressViewComman
 import com.baozun.nebula.web.controller.member.form.MemberAddressForm;
 import com.baozun.nebula.web.controller.member.validator.MemberAddressFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberAddressViewCommand;
+import com.feilong.core.Validator;
 
 import loxia.dao.Pagination;
 
@@ -123,10 +124,9 @@ public class NebulaMemberAddressController extends BaseController {
 		// 因此MemberContactManager中相关方法应该被标注为过期。另外要注意这里的方法调用会员Id应该是默认值，因此不能使用后端查询用的方法
 		
 		// 疑问：pageForm是否需要判断空？
-		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(
-				pageForm.getPage(), pageForm.getSorts(),memberDetails.getMemberId());
+		Pagination<ContactCommand> contacts = sdkMemberManager.findContactsByMemberId(pageForm.getPage(), pageForm.getSorts(),memberDetails.getMemberId());
 
-		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST, memberAddressViewCommandConverter.convert(contacts));
+		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS_LIST, contacts);
 
 		return VIEW_MEMBER_ADDRESS_LIST;
 	}	
@@ -151,7 +151,7 @@ public class NebulaMemberAddressController extends BaseController {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
 
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
 		
 		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"地址信息\"", memberDetails.getLoginName(), new Date());
 		
@@ -168,9 +168,11 @@ public class NebulaMemberAddressController extends BaseController {
 		ContactCommand contact = memberAddressForm.toContactCommand();
 		contact.setMemberId(memberDetails.getMemberId());
 		ContactCommand contactCommand = sdkMemberManager.createOrUpdateContact(contact);
-		// 这里将编辑好的Address作为返回值放入返回对象的returnObject中	
-		MemberAddressViewCommand memberAddressViewCommand = memberAddressViewCommandConverter.convert(contactCommand);
-		model.addAttribute(MODEL_KEY_MEMBER_ADDRESS,memberAddressViewCommand);		
+		if(Validator.isNotNullOrEmpty(contactCommand)){
+			defaultReturnResult.setResult(true);
+		}else{
+			defaultReturnResult.setResult(false);
+		}
 		return defaultReturnResult;		
 	}
 	
@@ -289,16 +291,15 @@ public class NebulaMemberAddressController extends BaseController {
 			HttpServletResponse httpResponse, Model model) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
-
+		
 		//校验addressId有效，验证方法是直接删除对应会员的地址，如果删除成功说明地址Id有效，否则无效
 		LOG.debug("Try to delete address[{}] for member{}", addressId, memberDetails.getLoginName());
 		
 		Integer result = sdkMemberManager.removeContactById(addressId,memberDetails.getMemberId());
-		if(1 == result) {
-			LOG.debug("Delete address[{}] for member{} success", addressId, memberDetails.getLoginName());
+		if(result==1) {
 			LOG.info("[MEM_ADDRESS_DELETE] {} [{}] \"Address[{}] is deleted.\"", memberDetails.getLoginName(), new Date(), addressId);
 			return DefaultReturnResult.SUCCESS;
-		}else if(0 == result){
+		}else{
 			LOG.debug("Delete address[{}] for member{} failed. no record found", addressId, memberDetails.getLoginName());
 			DefaultReturnResult returnResult= new DefaultReturnResult();
 			DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
@@ -306,8 +307,6 @@ public class NebulaMemberAddressController extends BaseController {
 			defaultResultMessage.setMessage(getMessage("memberaddress.emptyaddress"));
 			returnResult.setResultMessage(defaultResultMessage);
 			return returnResult;
-		}else{
-			throw new RuntimeException("Should not happen");
-		}		
+		}	
 	}
 }

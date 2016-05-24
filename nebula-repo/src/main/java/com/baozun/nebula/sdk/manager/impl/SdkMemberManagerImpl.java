@@ -67,6 +67,7 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
+import com.feilong.core.Validator;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -102,7 +103,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	private MemberPersonalDataDao	memberPersonalDataDao;
 	
 	@Autowired
-        private MemberBehaviorStatusDao   memberBehaviorStatusDao;
+    private MemberBehaviorStatusDao   memberBehaviorStatusDao;
 
 	@Autowired
 	private ItemRateDao				itemRateDao;
@@ -1319,13 +1320,12 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	@Override
 	public int saveMemberBehaviorStatus(MemberBehaviorStatus memberBehaviorStatus) {
 		//return memberDao.saveMemberBehaviorStatus(memberBehaviorStatus);
-	       memberBehaviorStatusDao.save(memberBehaviorStatus);
+	      memberBehaviorStatusDao.save(memberBehaviorStatus);
 		return 0;
 	}
 
 	@Override
 	public MemberBehaviorStatus findMemberBehaviorStatusByTypeAndMemberId(String type, Long memberId) {
-		// TODO 等dao好了之后在做
 		return memberBehaviorStatusDao.findMemberBehaviorStatusByTypeAndMemberId(type, memberId);
 	}
 
@@ -1334,6 +1334,13 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	public List<MemberCommand> findMembersByIds(List<Long> ids){
 		List<Member> members= memberDao.findMembersByIds(ids);
 		return convertMembersToMemberCommands(members);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<Member> findMemberListByGroupId(Long groupId){
+		List<Member> members= memberDao.findMembersByGroupId(groupId);
+		return members;
 	}
 	
 	private List<MemberCommand> convertMembersToMemberCommands(List<Member> members){
@@ -1352,5 +1359,14 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			}
 		}
 		return memberCommands;
+	}
+
+	@Override
+	public void deleteMemberBehaviorByMemberIdAndType(Long memberId,Long thirdPartyId,String type){
+		MemberBehaviorStatus mbs=findMemberBehaviorStatusByTypeAndMemberId(type, thirdPartyId);
+		if(Validator.isNotNullOrEmpty(mbs)){
+			updateMemberGroupIdById(memberId,null);
+			memberBehaviorStatusDao.deleteByPrimaryKey(mbs.getId());
+		}
 	}
 }

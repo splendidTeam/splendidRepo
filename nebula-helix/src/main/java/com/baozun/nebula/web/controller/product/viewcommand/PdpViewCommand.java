@@ -24,10 +24,6 @@ public class PdpViewCommand extends BaseViewCommand {
 
 	private static final long serialVersionUID = -521994888015333539L;
 
-	//TODO 先放在这,后边决定在什么时机获取
-	/** 面包屑 */
-	private List<BreadcrumbsViewCommand> breadcrumbs;
-	
 	/** 商品基本信息 */
 	private ItemBaseInfoViewCommand baseInfo;
 	
@@ -60,14 +56,6 @@ public class PdpViewCommand extends BaseViewCommand {
     
     /** 每个商品限制的购买数量 */
     private Integer buyLimit;
-
-	public List<BreadcrumbsViewCommand> getBreadcrumbs() {
-		return breadcrumbs;
-	}
-
-	public void setBreadcrumbs(List<BreadcrumbsViewCommand> breadcrumbs) {
-		this.breadcrumbs = breadcrumbs;
-	}
 
 	public ItemBaseInfoViewCommand getBaseInfo() {
 		return baseInfo;

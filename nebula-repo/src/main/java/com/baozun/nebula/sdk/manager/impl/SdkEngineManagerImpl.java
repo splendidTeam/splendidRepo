@@ -33,37 +33,23 @@ import com.baozun.nebula.calculateEngine.condition.AbstractScopeConditionResult;
 import com.baozun.nebula.calculateEngine.condition.CrowdScopeConditionResult;
 import com.baozun.nebula.calculateEngine.condition.ItemScopeConditionResult;
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
-import com.baozun.nebula.command.ItemImageCommand;
-import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.limit.LimitCommand;
-import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.dao.member.MemberGroupRelationDao;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
-import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
-import com.baozun.nebula.dao.product.ItemTagRelationDao;
-import com.baozun.nebula.dao.product.ShopDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.member.MemberGroupRelation;
-import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
-import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemInfo;
-import com.baozun.nebula.model.product.ItemTagRelation;
 import com.baozun.nebula.model.product.Sku;
-import com.baozun.nebula.sdk.command.ItemBaseCommand;
-import com.baozun.nebula.sdk.command.SkuCommand;
-import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
-import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitationManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
-import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -75,17 +61,9 @@ import com.feilong.core.util.CollectionsUtil;
 @Service("sdkEngineService")
 public class SdkEngineManagerImpl implements SdkEngineManager{
 
-    /** The item dao. */
-    @Autowired
-    private ItemDao                           itemDao;
-
     /** The item category dao. */
     @Autowired
     private ItemCategoryDao                   itemCategoryDao;
-
-    /** The item tag relation dao. */
-    @Autowired
-    private ItemTagRelationDao                itemTagRelationDao;
 
     /** The sku dao. */
     @Autowired
@@ -94,18 +72,6 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
     /** The item info dao. */
     @Autowired
     private ItemInfoDao                       itemInfoDao;
-
-    /** The sdk item manager. */
-    @Autowired
-    private SdkItemManager                    sdkItemManager;
-
-    /** The shop dao. */
-    @Autowired
-    private ShopDao                           shopDao;
-
-    /** The sdk sku manager. */
-    @Autowired
-    private SdkSkuManager                     sdkSkuManager;
 
     /** The sdk purchase limitation manager. */
     @Autowired
@@ -177,116 +143,6 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.SdkEngineManager#packShoppingCartLine(com.baozun.nebula.sdk.command.shoppingcart.
-     * ShoppingCartLineCommand)
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public void packShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand){
-        Long skuId = shoppingCartLineCommand.getSkuId();
-        Sku sku = skuDao.findSkuById(skuId);
-        if (sku == null){
-            shoppingCartLineCommand.setValid(false);
-            return;
-        }
-        Long itemId = sku.getItemId();
-        Item item = itemDao.findItemById(itemId);
-
-        // 购物车行有活动时, 同一个sku可以出现在多行中(可以是多个赠品), 库存数应为总库存数减去每个行中的qty
-        List<PromotionCommand> promotionCommandList = shoppingCartLineCommand.getPromotionList();
-
-        if (Validator.isNullOrEmpty(promotionCommandList)){
-            SkuCommand skuCommand = sdkSkuManager.findSkuQSVirtualInventoryById(skuId, shoppingCartLineCommand.getExtentionCode());
-            if (null != skuCommand){
-                shoppingCartLineCommand.setStock(skuCommand.getAvailableQty());
-            }else{
-                shoppingCartLineCommand.setStock(0);
-            }
-        }
-
-        //*************************************************************************************
-
-        if (Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(item.getLifecycle()))){
-            shoppingCartLineCommand.setValid(true); // 上架状态
-            if (!checkActiveBeginTime(skuId)){
-                setValid(shoppingCartLineCommand, 1);
-            }else{
-                Integer stock = shoppingCartLineCommand.getStock();
-                if (stock <= 0 || stock < shoppingCartLineCommand.getQuantity()){
-                    setValid(shoppingCartLineCommand, 2);
-                }
-            }
-        }else{
-            setValid(shoppingCartLineCommand, 1);
-        }
-
-        if (shoppingCartLineCommand.isGift()){
-            shoppingCartLineCommand.setExtentionCode(sku.getOutid());// 赠品
-        }
-
-        String itemCode = item.getCode();
-        Long shopId = item.getShopId();
-
-        ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoByCode(itemCode);
-        ShopCommand shopCommand = shopDao.findShopById(shopId);
-        // 店铺信息
-        shoppingCartLineCommand.setShopId(shopId);
-        shoppingCartLineCommand.setShopName(shopCommand.getShopname());
-        shoppingCartLineCommand.setStoreId(shopId);
-
-        List<ItemCategory> itemCategoryList = itemCategoryDao.findItemCategoryListByItemId(itemId);
-        List<ItemTagRelation> itemTagRelationList = itemTagRelationDao.findItemTagRelationListByItemId(itemId);
-
-        shoppingCartLineCommand.setComboIds(getItemScopeListByItemAndCategory(itemId.toString(), itemCategoryList));
-
-        shoppingCartLineCommand.setIndstryId(item.getIndustryId());
-
-        shoppingCartLineCommand.setItemId(item.getId());
-        shoppingCartLineCommand.setProductCode(itemCode);
-        shoppingCartLineCommand.setItemName(itemBaseCommand.getTitle());
-        shoppingCartLineCommand.setItemPic(getItemPicUrl(itemId));
-
-        List<Long> categoryList = CollectionsUtil.getPropertyValueList(itemCategoryList, "categoryId");
-        shoppingCartLineCommand.setCategoryList(categoryList);
-
-        List<Long> lableIds = CollectionsUtil.getPropertyValueList(itemTagRelationList, "tagId");
-        shoppingCartLineCommand.setLableIds(lableIds);
-
-        shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
-        shoppingCartLineCommand.setListPrice(sku.getListPrice());
-
-        if (null == itemBaseCommand.getType()){
-            shoppingCartLineCommand.setType(ItemInfo.TYPE_MAIN);
-        }else{
-            shoppingCartLineCommand.setType(itemBaseCommand.getType());
-        }
-
-        // 销售属性
-        String skuProperties = sku.getProperties();
-        shoppingCartLineCommand.setSaleProperty(skuProperties);
-        List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
-        if (Validator.isNotNullOrEmpty(skuPros)){
-            shoppingCartLineCommand.setSkuPropertys(skuPros);
-        }
-    }
-
-    /**
-     * 设置 valid.
-     *
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @param validType
-     *            有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
-     * @since 5.3.1
-     */
-    private void setValid(ShoppingCartLineCommand shoppingCartLineCommand,Integer validType){
-        shoppingCartLineCommand.setValid(false);// 下架状态
-        shoppingCartLineCommand.setValidType(validType);
-    }
-
     /**
      * Check active begin time.
      *
@@ -296,7 +152,7 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      * @return Boolean
      * @Description: 检查商品是否上架
      */
-    @Transactional(readOnly = true)
+    //TODO feilong 重复了
     private Boolean checkActiveBeginTime(Long skuId){
 
         List<Long> skuids = new ArrayList<Long>();
@@ -580,31 +436,6 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
             }
         }
         return cids;
-    }
-
-    /**
-     * 获得 item pic url.
-     *
-     * @param itemId
-     *            the item id
-     * @return the item pic url
-     */
-    private String getItemPicUrl(Long itemId){
-        List<Long> itemIds = new ArrayList<Long>(1);
-        itemIds.add(itemId);
-
-        List<ItemImageCommand> itemImageCommandList = sdkItemManager.findItemImagesByItemIds(itemIds, ItemImage.IMG_TYPE_LIST);
-        if (Validator.isNotNullOrEmpty(itemImageCommandList)){
-            ItemImageCommand itemImageCommand = itemImageCommandList.get(0);
-            if (Validator.isNotNullOrEmpty(itemImageCommand)){
-                List<ItemImage> imgList = itemImageCommand.getItemIamgeList();
-
-                if (Validator.isNotNullOrEmpty(imgList)){
-                    return imgList.get(0).getPicUrl();
-                }
-            }
-        }
-        return null;
     }
 
     /**

@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -41,6 +41,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.feilong.core.Validator;
 
 /**
  * 购物车控制器.
@@ -147,19 +148,12 @@ public class NebulaShoppingCartController extends BaseController{
     /** The Constant log. */
     private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
 
-    /** The sdk shopping cart manager. */
     @Autowired
-    private SdkShoppingCartManager           sdkShoppingCartManager;
+    private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
 
-    /** The guest shoppingcart resolver. */
+    /** The shoppingcart factory. */
     @Autowired
-    @Qualifier("guestShoppingcartResolver")
-    private ShoppingcartResolver             guestShoppingcartResolver;
-
-    /** The member shoppingcart resolver. */
-    @Autowired
-    @Qualifier("memberShoppingcartResolver")
-    private ShoppingcartResolver             memberShoppingcartResolver;
+    private ShoppingcartFactory              shoppingcartFactory;
 
     /** The shoppingcart view command converter. */
     @Autowired
@@ -219,7 +213,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
@@ -234,7 +228,7 @@ public class NebulaShoppingCartController extends BaseController{
      * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
      * 
      * <br>
-     * <span style="color:red">服务端必须同时拿shoppingcartLineId和memberId做参数,
+     * <span style="color:red">服务端必须同时拿shoppingcartLineId和groupId做参数,
      * 否则可能会出现安全漏洞</span>
      * </p>
      *
@@ -258,7 +252,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -298,7 +292,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -338,7 +332,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -367,7 +361,7 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver
                         .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -386,37 +380,26 @@ public class NebulaShoppingCartController extends BaseController{
      * @return the cart info
      */
     protected ShoppingCartCommand getShoppingCartCommand(HttpServletRequest request,MemberDetails memberDetails){
-        ShoppingcartResolver shoppingcartResolver = detectShoppingcartResolver(memberDetails);
-        List<ShoppingCartLineCommand> cartLines = shoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
-        if (null == cartLines){
+        List<ShoppingCartLineCommand> cartLines = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, request);
+        if (Validator.isNullOrEmpty(cartLines)){
             return null;
         }
-        Long memberId = null == memberDetails ? null : memberDetails.getMemberId();
+        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartManager.findShoppingCart(memberId, memComboList, null, null, cartLines);
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, null, null, memComboList);
     }
 
     /**
-     * Detect shoppingcart resolver.
+     * 返回结果填充.
      *
-     * @param memberDetails
-     *            the member details
-     * @return the shoppingcart resolver
-     */
-    private ShoppingcartResolver detectShoppingcartResolver(MemberDetails memberDetails){
-        return null == memberDetails ? guestShoppingcartResolver : memberShoppingcartResolver;
-    }
-
-    /**
-     * 返回结果填充
-     * 
      * @param shoppingcartResult
-     * @return
+     *            the shoppingcart result
+     * @return the nebula return result
      */
     private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
         if (ShoppingcartResult.SUCCESS != shoppingcartResult){
-        	DefaultReturnResult result = new DefaultReturnResult();
-			result.setResult(false);
+            DefaultReturnResult result = new DefaultReturnResult();
+            result.setResult(false);
 
             String messageStr = getMessage(shoppingcartResult.toString());
 

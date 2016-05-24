@@ -90,6 +90,7 @@ import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.ItemImageDao;
 import com.baozun.nebula.dao.product.ItemImageLangDao;
 import com.baozun.nebula.dao.product.ItemInfoDao;
+import com.baozun.nebula.dao.product.ItemOperateLogDao;
 import com.baozun.nebula.dao.product.ItemProValGroupRelationDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.ItemPropertiesLangDao;
@@ -117,6 +118,7 @@ import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemImageLang;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemInfoLang;
+import com.baozun.nebula.model.product.ItemOperateLog;
 import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
@@ -239,6 +241,9 @@ public class ItemManagerImpl implements ItemManager{
 
 	@Autowired(required = false)
 	private ItemExtendManager			itemExtendManager;
+	
+	@Autowired
+	private ItemOperateLogDao itemOperateLogDao;
 
 	private ByteArrayOutputStream		byteArrayOutputStream						= null;
 
@@ -685,10 +690,18 @@ public class ItemManagerImpl implements ItemManager{
 	}
 
 	@Override
-	public Integer enableOrDisableItemByIds(List<Long> ids,Integer state){
+	public Integer enableOrDisableItemByIds(List<Long> ids,Integer state,String userName){
 		String updateListTimeFlag = sdkMataInfoManager.findValue(MataInfo.UPDATE_ITEM_LISTTIME);
 		Integer result = itemDao.enableOrDisableItemByIds(ids, state, updateListTimeFlag);
+		
+		//无异常时才添加日志
+		if(result >= 1){
+			//添加上下架日志
+			addItemOperateLog(ids,state,userName);
+		}
+		
 		boolean solrFlag = false;
+		// state : 0==下架， 1=上架
 		if (state == 1){
 			// 刷新索引
 			boolean i18n = LangProperty.getI18nOnOff();
@@ -708,7 +721,88 @@ public class ItemManagerImpl implements ItemManager{
 
 		return result;
 	}
+	
+	/**
+	 * 添加上下架日志
+	 * state : 0==下架， 1=上架
+	 * @param itemIds
+	 * @param state
+	 * @param userName
+	 */
+	private void addItemOperateLog(List<Long> itemIds,Integer state,String userName){
+		for(Long itemId : itemIds){
+			//按createTime来排序,取最新的一条记录
+			Long lastLogId = itemOperateLogDao.findByItemId(itemId);
+			
+			/*
+			 * 一条日志记录包含：（必须先）上架--->下架
+			 * 
+			 * 1、如果存在：
+			 * 			a、当state=1时（上架）,新建一条记录
+			 * 			b、当state=0时（下架）,
+			 * 				若最新的一条记录中没有下架信息（包含下架时间和下架操作人）时才update
+			 * 				若有则新建一条记录
+			 * 			c、不符合上面两种情况是只能再新建一条记录
+			 * 2、如果不存在： 新建一条记录
+			 */
+			
+			if (Validator.isNotNullOrEmpty(lastLogId)){
+				if(state == 1){//1、a、
+					saveItemOperateLog(itemId,state,userName);
+				}else if(state == 0){//1、b、
+					ItemOperateLog itemOperateLog = itemOperateLogDao.getByPrimaryKey(lastLogId);
+					if( itemOperateLog.getSoldOutTime().getTime() == new Date(70,0,1).getTime() ){
+						itemOperateLog.setSoldOutOperatorName(userName);
+						itemOperateLog.setSoldOutTime(new Date());
+						itemOperateLog.setActiveTime(countActiveTime(itemOperateLog.getPushTime(),itemOperateLog.getSoldOutTime()));
+						itemOperateLogDao.save(itemOperateLog);
+					}else{
+						saveItemOperateLog(itemId,state,userName);
+					}
+				}else{//1、c、
+					saveItemOperateLog(itemId,state,userName);
+				}
+			}else{//2、
+				saveItemOperateLog(itemId,state,userName);
+			}
+			
+			
+		}
+	}
+	
+	/**
+	 * 计算时间差（精确到秒）
+	 * @param pushTime
+	 * @param soldOutTime
+	 * @return
+	 */
+	private Long countActiveTime(Date pushTime,Date soldOutTime){
+		return Math.abs((soldOutTime.getTime() - pushTime.getTime()))/1000;
+	}
 
+	/**
+	 * 保存ItemOperateLog
+	 * @param itemId
+	 * @param state
+	 * @param userName
+	 */
+	private void saveItemOperateLog(Long itemId,Integer state,String userName){
+		ItemOperateLog itemOperateLog = new ItemOperateLog();
+		itemOperateLog.setItemId(itemId);
+		itemOperateLog.setCreateTime(new Date());
+		itemOperateLog.setUpdateTime(new Date());
+		if(state == 1){//上架
+			itemOperateLog.setPushOperatorName(userName);
+			itemOperateLog.setPushTime(new Date());
+			itemOperateLog.setSoldOutTime(new Date(70,0,1));
+		}else if(state == 0){//下架
+			itemOperateLog.setSoldOutOperatorName(userName);
+			itemOperateLog.setSoldOutTime(new Date());
+			itemOperateLog.setPushTime(new Date(70,0,1));
+		}
+		itemOperateLogDao.save(itemOperateLog);
+	}
+	
 	@Override
 	public void removeItemByIds(List<Long> ids){
 		// 下架的商品是不存在solr中, 如果商品是上架商品,才删除solr中的索引
@@ -5249,34 +5343,32 @@ public class ItemManagerImpl implements ItemManager{
 						String ru = roles[roles.length - 1];
 						String imgUrl = tmpImgFilePathMap.get(ru + picName);
 
-						if(Validator.isNullOrEmpty(itemImage)){
-							/** 保存商品图片 */
-							itemImage = new ItemImage();
-							itemImage.setItemId(itemMap.get(itemCode));
-							itemImage.setItemProperties(itemPropId);
-							itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
-							itemImage.setCreateTime(new Date());
-							itemImage.setVersion(new Date());
-							itemImage.setDescription("");
-							itemImage.setType(StringUtils.trim(type));
-							itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
-							itemImage = itemImageDao.save(itemImage);
+						/** 保存商品图片 */
+						itemImage = new ItemImage();
+						itemImage.setItemId(itemMap.get(itemCode));
+						itemImage.setItemProperties(itemPropId);
+						itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
+						itemImage.setCreateTime(new Date());
+						itemImage.setVersion(new Date());
+						itemImage.setDescription("");
+						itemImage.setType(StringUtils.trim(type));
+						itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
+						itemImage = itemImageDao.save(itemImage);
 
-							itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
+						itemImageMap.put(itemImgFileName.replace(imgExp, ""), itemImage);
 
-							// 国际化
-							boolean i18n = LangProperty.getI18nOnOff();
-							if (i18n){
-								List<String> languages = MutlLang.i18nLangs();
-								for (String language : languages){
-									ItemImageLang itemImageLang = new ItemImageLang();
-									itemImageLang.setItemImageId(itemImage.getId());
-									itemImageLang.setLang(language);
-									itemImageLang.setPicUrl(itemImage.getPicUrl());
-									itemImageLang.setDescription(itemImage.getDescription());
-									itemImageLang = itemImageLangDao.save(itemImageLang);
-									itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
-								}
+						// 国际化
+						boolean i18n = LangProperty.getI18nOnOff();
+						if (i18n){
+							List<String> languages = MutlLang.i18nLangs();
+							for (String language : languages){
+								ItemImageLang itemImageLang = new ItemImageLang();
+								itemImageLang.setItemImageId(itemImage.getId());
+								itemImageLang.setLang(language);
+								itemImageLang.setPicUrl(itemImage.getPicUrl());
+								itemImageLang.setDescription(itemImage.getDescription());
+								itemImageLang = itemImageLangDao.save(itemImageLang);
+								itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
 							}
 						}
 					}
@@ -5358,6 +5450,35 @@ public class ItemManagerImpl implements ItemManager{
 								/** 保存商品图片 */
 								itemImage = itemImageMap.get(itemImgFileName.replace(imgExp, ""));
 
+								if(com.feilong.core.Validator.isNullOrEmpty(itemImage)){
+									/** 保存商品图片 */
+									itemImage = new ItemImage();
+									itemImage.setItemId(itemMap.get(itemCode));
+									itemImage.setItemProperties(itemPropId);
+									itemImage.setPicUrl(userDefinedPath + "/" + imgUrl);
+									itemImage.setCreateTime(new Date());
+									itemImage.setVersion(new Date());
+									itemImage.setDescription("");
+									itemImage.setType(StringUtils.trim(type));
+									itemImage.setPosition(Integer.valueOf(StringUtils.trim(position)));
+									itemImage = itemImageDao.save(itemImage);
+
+									if (i18n){
+										for (String language : languages){
+											if(!directoryName.equalsIgnoreCase(language)){
+												continue;
+											}
+											ItemImageLang itemImageLang = new ItemImageLang();
+											itemImageLang.setItemImageId(itemImage.getId());
+											itemImageLang.setLang(language);
+											itemImageLang.setPicUrl(itemImage.getPicUrl());
+											itemImageLang.setDescription(itemImage.getDescription());
+											itemImageLang = itemImageLangDao.save(itemImageLang);
+											itemImageLangMap.put(itemImageLang.getItemImageId() + "_" + itemImageLang.getLang(), itemImageLang);
+										}
+									}
+								}
+								
 								ItemImageLang itemImageLang = itemImageLangMap.get(itemImage.getId() + "_" + directoryName);
 
 								itemImageLang = itemImageLangDao.getByPrimaryKey(itemImageLang.getId());

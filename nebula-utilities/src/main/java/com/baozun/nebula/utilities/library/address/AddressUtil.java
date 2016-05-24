@@ -44,60 +44,60 @@ import com.baozun.nebula.utilities.common.ResourceUtil;
  * 
  * 国际化文件名:address_zh_CN.json
  * 
- * 通过zookeeper服务加载地址信息
- * 当pts添加一种语言时, zookeeper服务通过watch重新加载地址信息到内存中.此时系统会读取并解析configurations/address/下对应的address_语言标识.json文件
+ * 通过zookeeper服务加载地址信息 当pts添加一种语言时,
+ * zookeeper服务通过watch重新加载地址信息到内存中.此时系统会读取并解析configurations/address/
+ * 下对应的address_语言标识.json文件
  * 
  * @author Tianlong.Zhang
  * 
  */
 public class AddressUtil {
-	private final static Logger								log							= LoggerFactory
-																								.getLogger(AddressUtil.class);
+	private final static Logger log = LoggerFactory.getLogger(AddressUtil.class);
 
 	/** 子区域Map key为父区域的Id ,value 为父区域下所有的子区域的列表 **/
-	private static Map<Long, List<Address>>					subAddressMap				= new HashMap<Long, List<Address>>();
+	private static Map<Long, List<Address>> subAddressMap = new HashMap<Long, List<Address>>();
 
 	/** 区域Map key为Id , value 为该 Id 代表的区域信息 **/
-	private static Map<Long, Address>						addressMap					= new HashMap<Long, Address>();
+	private static Map<Long, Address> addressMap = new HashMap<Long, Address>();
 
 	/** 用于保存地址的信息,名称以及idList **/
-	private static Map<String, List<Address>>				addressNameMap				= new HashMap<String, List<Address>>();
+	private static Map<String, List<Address>> addressNameMap = new HashMap<String, List<Address>>();
 
 	/** 包含 省市县，乡镇（街道） 的信息的文件 **/
-	private static final String								CONFIG_PATH_FULL			= "configurations/address/full-address.json";
+	private static final String CONFIG_PATH_FULL = "configurations/address/full-address.json";
 
 	/** 包含 省市县 的信息的文件 **/
-	private static final String								CONFIG_PATH					= "configurations/address/address.json";
+	private static final String CONFIG_PATH = "configurations/address/address.json";
 
 	/** 精简后的地址JSON 字符串 **/
-	//private static String									addressJson					= null;
+	// private static String addressJson = null;
 
-	private static final Long								ROOT_ID						= 1L;
+	private static final Long ROOT_ID = 1L;
 
 	/*********************************** 国际化 ***********************************/
 	/** 多语言地址信息文件存放的目录 **/
-	private static final String								LANGUAGE_CONFIG_PATH		= "configurations/address/";
+	private static final String LANGUAGE_CONFIG_PATH = "configurations/address/";
 
 	/** 多语言地址信息的文件前缀 **/
-	private static final String								LANGUAGE_CONFIG_FILE_PREFIX	= "address_";
-	
-	/** 多语言地址信息的文件后缀 **/
-	private static final String 							LANGUAGE_CONFIG_FILE_SUFFIX	= ".json";
+	private static final String LANGUAGE_CONFIG_FILE_PREFIX = "address_";
 
-	/** 多语言开关, 默认为不开启国际化, 设置为false时, languageList无效**/
-	private static Boolean									i18nOffOn					= false;
+	/** 多语言地址信息的文件后缀 **/
+	private static final String LANGUAGE_CONFIG_FILE_SUFFIX = ".json";
+
+	/** 多语言开关, 默认为不开启国际化, 设置为false时, languageList无效 **/
+	private static Boolean i18nOffOn = false;
 
 	/** 语言集合 **/
-	private static List<String>								languageList				= null;
+	private static List<String> languageList = null;
 
 	/** 子区域Map key:language ,value:key为父区域的Id ,value 为父区域下所有的子区域的列表 **/
-	private static Map<String, Map<Long, List<Address>>>	subAddressLangMap			= new HashMap<String, Map<Long, List<Address>>>();
+	private static Map<String, Map<Long, List<Address>>> subAddressLangMap = new HashMap<String, Map<Long, List<Address>>>();
 
 	/** 区域Map key: language , value: key为Id , value 为该 Id 代表的区域信息 **/
-	private static Map<String, Map<Long, Address>>			addressLangMap				= new HashMap<String, Map<Long, Address>>();
+	private static Map<String, Map<Long, Address>> addressLangMap = new HashMap<String, Map<Long, Address>>();
 
 	/** 用于保存地址的信息,名称以及idList **/
-	private static Map<String, Map<String, List<Address>>>	addressNameLangMap			= new HashMap<String, Map<String, List<Address>>>();
+	private static Map<String, Map<String, List<Address>>> addressNameLangMap = new HashMap<String, Map<String, List<Address>>>();
 
 	// static {
 	// init();
@@ -112,7 +112,7 @@ public class AddressUtil {
 	public static List<Address> getSubAddressByPid(Long pid) {
 		if (i18nOffOn) {
 			Map<Long, List<Address>> subAddressMap = subAddressLangMap.get(LangUtil.getCurrentLang());
-			if(subAddressMap != null){
+			if (subAddressMap != null) {
 				return subAddressMap.get(pid);
 			}
 			return null;
@@ -130,7 +130,7 @@ public class AddressUtil {
 	public static List<Address> getAddressesByName(String name) {
 		if (i18nOffOn) {
 			Map<String, List<Address>> addressNameMap = addressNameLangMap.get(LangUtil.getCurrentLang());
-			if(addressNameMap != null){
+			if (addressNameMap != null) {
 				return addressNameMap.get(name);
 			}
 			return null;
@@ -140,15 +140,32 @@ public class AddressUtil {
 	}
 
 	/**
-	 * 根据id来获取改id代表的区域信息 eg : id 为310000 ，返回上海的信息 多语言时使用
+	 * 根据id来获取该id代表的区域信息 eg : id 为310000 ，返回上海的信息 多语言时使用
 	 * 
 	 * @param id
 	 * @return
 	 */
 	public static Address getAddressById(Long id) {
+		return getAddressById(id, LangUtil.getCurrentLang());
+	}
+
+	/**
+	 * 根据id和 currentLang 来获取该id代表的区域信息.
+	 * <p>
+	 * eg : id 为310000 ，返回上海的信息 多语言时使用
+	 * </p>
+	 * <p>
+	 * 该方法适用于 wormhole这种没有request语言环境的节点
+	 * </p>
+	 * 
+	 * @param id
+	 * @return
+	 * @since 5.3.1
+	 */
+	public static Address getAddressById(Long id, String currentLang) {
 		if (i18nOffOn) {
-			Map<Long, Address> addressMap = addressLangMap.get(LangUtil.getCurrentLang());
-			if(addressMap != null){
+			Map<Long, Address> addressMap = addressLangMap.get(currentLang);
+			if (addressMap != null) {
 				return addressMap.get(id);
 			}
 			return null;
@@ -195,19 +212,21 @@ public class AddressUtil {
 	 * 生成包含省市区的json字符串（不含乡镇）
 	 * 
 	 * @param language
-	 * 			当前语言
+	 *            当前语言
 	 * @return
 	 * @throws JsonGenerationException
 	 * @throws JsonMappingException
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	private static String generateAddressJson(String language) throws JsonGenerationException, JsonMappingException, IOException {
+	private static String generateAddressJson(String language)
+			throws JsonGenerationException, JsonMappingException, IOException {
 
 		String json = "";
-		if(i18nOffOn){
-			json = getFileContent(LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
-		}else{
+		if (i18nOffOn) {
+			json = getFileContent(
+					LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
+		} else {
 			json = getFileContent(CONFIG_PATH);
 		}
 		ObjectMapper mapper = new ObjectMapper();
@@ -217,9 +236,9 @@ public class AddressUtil {
 			Address address = string2Address(Long.parseLong(key), map.get(key));
 			gatherSubAddressMap(genSubAddressMap, address);
 		}
-		
+
 		Map<Long, Map<Long, String>> outmap = new HashMap<Long, Map<Long, String>>();
-		
+
 		for (Long pid : genSubAddressMap.keySet()) {
 			Map<Long, String> addressMap = new HashMap<Long, String>();
 
@@ -235,76 +254,79 @@ public class AddressUtil {
 
 	/**
 	 * 生成js文件
+	 * 
 	 * @param jsPath
 	 * @throws JsonGenerationException
 	 * @throws JsonMappingException
 	 * @throws IOException
 	 */
-	public static void generateJsFile(String jsPath, Boolean i18nOffOn, List<String> languageList) throws JsonGenerationException, JsonMappingException, IOException {
-		if(i18nOffOn == null){
+	public static void generateJsFile(String jsPath, Boolean i18nOffOn, List<String> languageList)
+			throws JsonGenerationException, JsonMappingException, IOException {
+		if (i18nOffOn == null) {
 			throw new IllegalArgumentException("i18nOnOff must be not null");
 		}
 
-		if(i18nOffOn && languageList == null){
+		if (i18nOffOn && languageList == null) {
 			throw new IllegalArgumentException("languageList must be not null");
 		}
-		
+
 		setI18nOffOn(i18nOffOn);
 		setLanguageList(languageList);
 		init();
-		if(i18nOffOn){
-			for(String language : languageList){
+		if (i18nOffOn) {
+			for (String language : languageList) {
 				StringBuilder content = new StringBuilder(generateAddressJson(language));
 				content.insert(0, "var districtJson = ");
 				FileWriter f = new FileWriter(jsPath.split("\\.")[0] + "_" + language + "." + jsPath.split("\\.")[1]);
 				f.write(content.toString());
 				f.close();
 			}
-		}else{
+		} else {
 			StringBuilder content = new StringBuilder(generateAddressJson(null));
 			content.insert(0, "var districtJson = ");
 			FileWriter f = new FileWriter(jsPath);
 			f.write(content.toString());
 			f.close();
 		}
-		
+
 	}
 
 	/**
 	 * 初始化地址数据
 	 */
 	public static void init() {
-		
+
 		String json = "";
-		
-		//加载多语言的地址信息
-		if(i18nOffOn){
-			if(languageList == null || languageList.isEmpty()){
+
+		// 加载多语言的地址信息
+		if (i18nOffOn) {
+			if (languageList == null || languageList.isEmpty()) {
 				log.error("languageList is not set");
 				throw new RuntimeException("languageList is not set");
 			}
-			
-			for(String language : languageList){
-				json = getFileContent(LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
+
+			for (String language : languageList) {
+				json = getFileContent(
+						LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
 				loadI18n(json, language);
 			}
-		}else{
+		} else {
 			json = getFileContent(CONFIG_PATH_FULL);
 			load(json);
 		}
-		
-		if(log.isDebugEnabled()){
+
+		if (log.isDebugEnabled()) {
 			log.debug("Address util initialization is completed!");
 		}
 	}
-	
+
 	/**
-	 * 加载地址数据
-	 * 系统为单语言时使用
+	 * 加载地址数据 系统为单语言时使用
+	 * 
 	 * @param data
 	 */
 	@SuppressWarnings("unchecked")
-	private static void load(String data){
+	private static void load(String data) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			Map<String, List<String>> map = (Map<String, List<String>>) mapper.readValue(data, Map.class);
@@ -333,26 +355,26 @@ public class AddressUtil {
 			log.error(e.getMessage());
 		}
 	}
-	
+
 	/**
-	 * 加载地址数据
-	 * 系统为多语言时使用
+	 * 加载地址数据 系统为多语言时使用
+	 * 
 	 * @param data
 	 */
 	@SuppressWarnings("unchecked")
-	private static void loadI18n(String data, String language){
+	private static void loadI18n(String data, String language) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			Map<String, List<String>> map = (Map<String, List<String>>)mapper.readValue(data, Map.class);
+			Map<String, List<String>> map = (Map<String, List<String>>) mapper.readValue(data, Map.class);
 			Map<Long, List<Address>> tmpSubAddressMap = new HashMap<Long, List<Address>>();
 			Map<Long, Address> tmpAddressMap = new HashMap<Long, Address>();
 			Map<String, List<Address>> tmpAddressNameMap = new HashMap<String, List<Address>>();
 			for (String key : map.keySet()) {
 				Address address = string2Address(Long.parseLong(key), map.get(key));
 				gatherSubAddressMap(tmpSubAddressMap, address);
-				
+
 				tmpAddressMap.put(address.getId(), address);
-				
+
 				List<Address> addressList = tmpAddressNameMap.get(address.getName());
 				// 如果找不到，则新增
 				if (addressList == null) {
@@ -379,17 +401,18 @@ public class AddressUtil {
 
 	/**
 	 * 获取文件内容
+	 * 
 	 * @param filePath
 	 * @return
 	 */
 	private static String getFileContent(String filePath) {
-		
+
 		BufferedReader br = null;
 		InputStream in = null;
 		try {
 
 			in = ResourceUtil.getResourceAsStream(filePath);
-			if(in == null){
+			if (in == null) {
 				log.error("{} file is not find.", filePath);
 				throw new RuntimeException(filePath + " file is not find.");
 			}
@@ -454,9 +477,9 @@ public class AddressUtil {
 	public static void setLanguageList(List<String> languageList) {
 		AddressUtil.languageList = languageList;
 	}
-	
-	public static void main(String[] args)throws Exception {
-		
+
+	public static void main(String[] args) throws Exception {
+
 		List<String> langList = new ArrayList<String>();
 		langList.add("zh_CN");
 		langList.add("en_US");
