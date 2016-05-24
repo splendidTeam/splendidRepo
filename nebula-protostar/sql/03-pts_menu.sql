@@ -44,6 +44,12 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (510, 1, 1, '/product/itemEvaluateListe.htm', now(), 5, null, '评价管理');
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (511, 1, 2, '/consultant/consultantList.htm', now(), 5, null, '咨询管理');
 
+--线下店铺管理
+insert into t_au_menu(id, label, lifecycle, sort_no, url, version, parent_id) values(nextval('s_t_au_menu'), '线下店铺管理', 1, 1, '/offlineStore/store.htm', now(), 5);
+insert into t_au_privilege(id, acl, description, group_name, lifecycle, name, version, org_type_id) values(nextval('s_t_au_privilege'), 'ACL_SYS_OFFLINE-SHOP_MANAGE', '线下店铺管理', '运营管理', 1, '线下店铺管理', now(), 2);
+insert into t_au_privilege_url(id, description, url, pri_id) values(nextval('s_t_au_privilege_url'), '线下店铺管理', '/offlineStore/store.htm', (SELECT MAX(id) FROM t_au_privilege));
+insert into t_au_role_privilege(id, pri_id, role_id, version) values(nextval('s_t_au_role_privilege'), (SELECT MAX(id) FROM t_au_privilege), 2, now());
+
 
 -- 基础信息管理
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (610, 1, 1, '/industry/industryList.htm', now(), 6, null, '行业管理');
