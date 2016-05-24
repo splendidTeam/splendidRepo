@@ -25,7 +25,7 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
-		<version.feilong-platform>1.5.4</version.feilong-platform>
+		<version.feilong-platform>1.5.5-SNAPSHOT</version.feilong-platform>
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
@@ -109,6 +109,8 @@
 		<version.testng>6.9.10</version.testng>
 		<version.easymock>3.4</version.easymock>
 
+		<!-- apache curator(zookeeper client) -->
+		<version.curator>2.10.0</version.curator>
 	</properties>
 
 	<dependencies>
@@ -146,6 +148,11 @@
 			<version>${version.feilong-platform}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.feilong.platform.framework</groupId>
+			<artifactId>feilong-framework-accessor</artifactId>
+			<version>${version.feilong-platform}</version>
+		</dependency>
 
 
 		<dependency>
@@ -313,6 +320,20 @@
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>
 			<artifactId>zookeeper</artifactId>
+		</dependency>
+		
+		<!-- apache curator(zk client) -->
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-test</artifactId>
 		</dependency>
 
 		<!-- servlet-api -->
@@ -970,6 +991,23 @@
 				<groupId>dom4j</groupId>
 				<artifactId>dom4j</artifactId>
 				<version>${version.dom4j}</version>
+			</dependency>
+			
+			<!-- apache curator(zk client) -->
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-framework</artifactId>
+				<version>${version.curator}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-recipes</artifactId>
+				<version>${version.curator}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-test</artifactId>
+				<version>${version.curator}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
