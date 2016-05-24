@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -819,7 +820,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         // 获取人群和商品促销的交集
         Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
-        Set<String> propertyValueSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "comboIds");
+        Set<Set<String>> comboIds = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "comboIds");
+        Set<String> propertyValueSet = toPropertyValueSet(comboIds);
 
         List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
                         new ArrayList<Long>(shopIdSet),
@@ -832,6 +834,23 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionList);
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * @param comboIds
+     * @return
+     */
+    //TODO feilong 提取
+    private Set<String> toPropertyValueSet(Set<Set<String>> comboIds){
+        if (Validator.isNullOrEmpty(comboIds)){
+            return Collections.emptySet();
+        }
+
+        Set<String> propertyValueSet = new HashSet<>();
+        for (Set<String> set : comboIds){
+            propertyValueSet.addAll(set);
+        }
+        return propertyValueSet;
     }
 
     /**
