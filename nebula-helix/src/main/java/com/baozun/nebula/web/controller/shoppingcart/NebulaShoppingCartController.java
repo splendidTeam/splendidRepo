@@ -31,16 +31,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
 import com.feilong.core.Validator;
 
 /**
@@ -149,7 +150,7 @@ public class NebulaShoppingCartController extends BaseController{
     private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
 
     @Autowired
-    private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
+    private ShoppingCartCommandBuilder       shoppingCartCommandBuilder;
 
     /** The shoppingcart factory. */
     @Autowired
@@ -176,10 +177,12 @@ public class NebulaShoppingCartController extends BaseController{
      */
     public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,Model model){
         // 获取购物车信息
-        ShoppingCartCommand cartCommand = getShoppingCartCommand(request, memberDetails);
+        List<ShoppingCartLineCommand> shoppingCartLines = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, request);
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLines);
 
         // 封装viewCommand
-        model.addAttribute("shoppingCartViewCommand", shoppingcartViewCommandConverter.convert(cartCommand));
+        ShoppingCartViewCommand shoppingCartViewCommand = shoppingcartViewCommandConverter.convert(shoppingCartCommand);
+        model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
         return "shoppingcart.shoppingcart";
     }
 
@@ -368,26 +371,6 @@ public class NebulaShoppingCartController extends BaseController{
     }
 
     // TODO feilong 修改销售属性
-
-    //******************************************************************************************************
-    /**
-     * 获取购物车信息.
-     *
-     * @param request
-     *            the request
-     * @param memberDetails
-     *            the member details
-     * @return the cart info
-     */
-    protected ShoppingCartCommand getShoppingCartCommand(HttpServletRequest request,MemberDetails memberDetails){
-        List<ShoppingCartLineCommand> cartLines = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, request);
-        if (Validator.isNullOrEmpty(cartLines)){
-            return null;
-        }
-        Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
-        Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, null, null, memComboList);
-    }
 
     /**
      * 返回结果填充.
