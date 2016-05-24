@@ -112,19 +112,21 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
             shoppingCartLineCommand.setValid(false);
             return;
         }
+
         Long itemId = sku.getItemId();
         Item item = itemDao.findItemById(itemId);
+
+        String outid = sku.getOutid();
+        if (Validator.isNullOrEmpty(shoppingCartLineCommand.getExtentionCode())){
+            shoppingCartLineCommand.setExtentionCode(outid);
+        }
 
         // 购物车行有活动时, 同一个sku可以出现在多行中(可以是多个赠品), 库存数应为总库存数减去每个行中的qty
         List<PromotionCommand> promotionCommandList = shoppingCartLineCommand.getPromotionList();
 
         if (Validator.isNullOrEmpty(promotionCommandList)){
-            SkuCommand skuCommand = sdkSkuManager.findSkuQSVirtualInventoryById(skuId, shoppingCartLineCommand.getExtentionCode());
-            if (null != skuCommand){
-                shoppingCartLineCommand.setStock(skuCommand.getAvailableQty());
-            }else{
-                shoppingCartLineCommand.setStock(0);
-            }
+            SkuCommand skuCommand = sdkSkuManager.findSkuQSVirtualInventoryById(skuId, outid);
+            shoppingCartLineCommand.setStock(null != skuCommand ? skuCommand.getAvailableQty() : 0);
         }
 
         //*************************************************************************************
@@ -132,19 +134,15 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
         if (Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(item.getLifecycle()))){
             shoppingCartLineCommand.setValid(true); // 上架状态
             if (!checkActiveBeginTime(skuId)){
-                setValid(shoppingCartLineCommand, 1);
+                setInValid(shoppingCartLineCommand, 1);
             }else{
                 Integer stock = shoppingCartLineCommand.getStock();
                 if (stock <= 0 || stock < shoppingCartLineCommand.getQuantity()){
-                    setValid(shoppingCartLineCommand, 2);
+                    setInValid(shoppingCartLineCommand, 2);
                 }
             }
         }else{
-            setValid(shoppingCartLineCommand, 1);
-        }
-
-        if (Validator.isNullOrEmpty(shoppingCartLineCommand.getExtentionCode())){
-            shoppingCartLineCommand.setExtentionCode(sku.getOutid());
+            setInValid(shoppingCartLineCommand, 1);
         }
 
         String itemCode = item.getCode();
@@ -190,7 +188,7 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
     }
 
     /**
-     * 设置 valid.
+     * 设置 无效.
      *
      * @param shoppingCartLineCommand
      *            the shopping cart line command
@@ -198,7 +196,7 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
      *            有效性检查类型：1.代表下架 2.代表没有库存 这个字段是结合isValid=false来使用的
      * @since 5.3.1
      */
-    private void setValid(ShoppingCartLineCommand shoppingCartLineCommand,Integer validType){
+    private void setInValid(ShoppingCartLineCommand shoppingCartLineCommand,Integer validType){
         shoppingCartLineCommand.setValid(false);// 下架状态
         shoppingCartLineCommand.setValidType(validType);
     }

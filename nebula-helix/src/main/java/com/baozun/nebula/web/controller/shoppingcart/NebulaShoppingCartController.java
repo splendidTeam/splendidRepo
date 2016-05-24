@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -148,9 +148,8 @@ public class NebulaShoppingCartController extends BaseController{
     /** The Constant log. */
     private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
 
-    /** The sdk shopping cart manager. */
     @Autowired
-    private SdkShoppingCartManager           sdkShoppingCartManager;
+    private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
 
     /** The shoppingcart factory. */
     @Autowired
@@ -387,7 +386,7 @@ public class NebulaShoppingCartController extends BaseController{
         }
         Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
-        return sdkShoppingCartManager.buildShoppingCartCommand(groupId, cartLines, null, null, memComboList);
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, null, null, memComboList);
     }
 
     /**

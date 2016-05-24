@@ -37,11 +37,9 @@ import com.baozun.nebula.model.member.MemberCryptoguard;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.utils.RegulareExpUtils;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
@@ -63,31 +61,28 @@ import loxia.dao.Sort;
 @Service("membManager")
 public class MemberManagerImpl implements MemberManager{
 
-    private static final Logger    LOGGER      = LoggerFactory.getLogger(MemberManagerImpl.class);
+    private static final Logger   LOGGER      = LoggerFactory.getLogger(MemberManagerImpl.class);
 
     @Autowired
-    private SdkMemberManager       sdkMemberManager;
+    private SdkMemberManager      sdkMemberManager;
 
     @Autowired
-    private SdkShoppingCartManager sdkShoppingCartManager;
+    private SdkItemManager        sdkItemManager;
 
     @Autowired
-    private SdkItemManager         sdkItemManager;
+    private EmailCheckManager     emailCheckManager;
 
     @Autowired
-    private EmailCheckManager      emailCheckManager;
+    private MemberPersonalDataDao memberPersonalDataDao;
 
     @Autowired
-    private MemberPersonalDataDao  memberPersonalDataDao;
+    private EventPublisher        eventPublisher;
 
     @Autowired
-    private EventPublisher         eventPublisher;
-
-    @Autowired
-    private MemberDao              memberDao;
+    private MemberDao             memberDao;
 
     @Value("#{meta['page.base']}")
-    private String                 pageUrlBase = "";
+    private String                pageUrlBase = "";
 
     @Override
     public MemberPersonalData findMemberPersonData(Long memberId){
