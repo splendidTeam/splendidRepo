@@ -24,7 +24,8 @@ import java.util.List;
  * Facet Group.
  * Represents a set of facets (e.g. brand, color, size etc).
  *
- * @author nic
+ * @author D.C
+ * @since 2016年4月13日 下午6:51:24
  */
 public class FacetGroup {
 
