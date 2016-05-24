@@ -28,8 +28,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -257,7 +255,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         ShoppingCartLineCommand tempShopLine = CollectionsUtil.find(shopShoppingCartLineList, "id", lineId);
         if (null == tempShopLine){
-            tempShopLine = IterableUtils.find(
+            tempShopLine = CollectionsUtil.find(
                             newLines,
                             PredicateUtils.andPredicate(
                                             new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("id", lineId),
