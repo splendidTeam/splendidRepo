@@ -27,7 +27,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -176,16 +178,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long shopId = entry.getValue();
 
             //TODO feilong 这是什么鬼逻辑?
-            ShoppingCartLineCommand shoppingCartLineCommandTemp = CollectionsUtil
-                            .find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId);
-            if (null != shoppingCartLineCommandTemp){
-                newLineList.add(shoppingCartLineCommandTemp);
-            }
-
-            ShoppingCartLineCommand noChooseShoppingCartLine = CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId);
-            if (null != noChooseShoppingCartLine){
-                newLineList.add(noChooseShoppingCartLine);
-            }
+            CollectionUtils.addIgnoreNull(
+                            newLineList,
+                            CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
+            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
