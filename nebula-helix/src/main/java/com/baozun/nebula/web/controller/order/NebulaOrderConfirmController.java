@@ -86,7 +86,7 @@ import com.feilong.framework.accessor.AutoKeyAccessor;
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>创建订单</td>
  * <td>
- * 参见 {@link #createOrder(MemberDetails, OrderForm, String, BindingResult, HttpServletRequest, HttpServletResponse, Model)}
+ * 参见 {@link #createOrder(MemberDetails, String, OrderForm, BindingResult, HttpServletRequest, HttpServletResponse, Model)}
  * </td>
  * </tr>
  * <tr valign="top">
