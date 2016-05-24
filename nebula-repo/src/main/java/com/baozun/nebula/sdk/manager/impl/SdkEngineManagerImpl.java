@@ -50,6 +50,7 @@ import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitationManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -107,8 +108,7 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         //获取购物车中的所有店铺id.
         Set<Long> ids = CollectionsUtil.getPropertyValueSet(shoppingCartCommand.getShoppingCartLineCommands(), "shopId");
         List<Long> shopIds = new ArrayList<Long>(ids);
-
-        Set<String> itemComboIds = getItemComboIds(shoppingCartCommand.getShoppingCartLineCommands());
+        Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(shoppingCartCommand.getShoppingCartLineCommands());
         List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
                         .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
         if (null == purchaseLimitationList || purchaseLimitationList.size() == 0)
@@ -448,23 +448,5 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      */
     private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
         return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
-    }
-
-    /**
-     * 根据购物车行获取ItemForCheckCommand集合.
-     *
-     * @param lines
-     *            the lines
-     * @return the item combo ids
-     */
-    private Set<String> getItemComboIds(List<ShoppingCartLineCommand> lines){
-        Set<String> set = new HashSet<String>();
-        if (null != lines && lines.size() > 0){
-            for (ShoppingCartLineCommand line : lines){
-                if (line.getComboIds() != null)
-                    set.addAll(line.getComboIds());
-            }
-        }
-        return set;
     }
 }

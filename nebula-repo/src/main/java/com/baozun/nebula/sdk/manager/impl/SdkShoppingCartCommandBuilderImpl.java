@@ -55,6 +55,7 @@ import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartGroupManager;
 import com.baozun.nebula.sdk.manager.SdkShoppingCartLinePackManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -822,13 +823,12 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         // 获取人群和商品促销的交集
         Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
-        Set<Set<String>> comboIds = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "comboIds");
-        Set<String> propertyValueSet = toPropertyValueSet(comboIds);
+        Set<String> itemComboIdsSet = ShoppingCartUtil.getItemComboIds(shoppingCartLineCommandList);
 
         List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
                         new ArrayList<Long>(shopIdSet),
                         memboSet,
-                        propertyValueSet,
+                        itemComboIdsSet,
                         shoppingCartCommand.getCurrentTime());
 
         if (Validator.isNotNullOrEmpty(promotionList)){
@@ -836,23 +836,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionList);
         }
         return Collections.emptyList();
-    }
-
-    /**
-     * @param comboIds
-     * @return
-     */
-    //TODO feilong 提取
-    private Set<String> toPropertyValueSet(Set<Set<String>> comboIds){
-        if (Validator.isNullOrEmpty(comboIds)){
-            return Collections.emptySet();
-        }
-
-        Set<String> propertyValueSet = new HashSet<>();
-        for (Set<String> set : comboIds){
-            propertyValueSet.addAll(set);
-        }
-        return propertyValueSet;
     }
 
     /**

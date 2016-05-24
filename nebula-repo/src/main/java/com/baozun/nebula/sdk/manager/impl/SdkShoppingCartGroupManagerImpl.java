@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1473,14 +1474,15 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         PromotionConditionSKU sku = null;
         if (null != shoppingLines && shoppingLines.size() > 0){
             for (ShoppingCartLineCommand shoppingLine : shoppingLines){
-                if (shoppingLine.getComboIds() == null || shoppingLine.getComboIds().size() == 0){
+                Set<String> comboIds = shoppingLine.getComboIds();
+                if (comboIds == null || comboIds.size() == 0){
                     continue;
                 }
                 if (shoppingLine.isGift() == true){
                     continue;
                 }
                 // 计算该combo下的商品总金额
-                if (shoppingLine.getComboIds().contains(String.valueOf(comboId))){
+                if (comboIds.contains(String.valueOf(comboId))){
                     sku = new PromotionConditionSKU();
                     sku.setShopId(shoppingLine.getShopId());
                     sku.setPromotionId(condition.getPromotionId());
@@ -1725,14 +1727,15 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         PromotionConditionSKU sku = null;
         if (null != shoppingLines && shoppingLines.size() > 0){
             for (ShoppingCartLineCommand shoppingLine : shoppingLines){
-                if (shoppingLine.getComboIds() == null || shoppingLine.getComboIds().size() == 0){
+                Set<String> comboIds = shoppingLine.getComboIds();
+                if (comboIds == null || comboIds.size() == 0){
                     continue;
                 }
                 if (shoppingLine.isGift() == true){
                     continue;
                 }
                 // 计算该combo下的商品总金额
-                if (shoppingLine.getComboIds().contains(String.valueOf(comboId))){
+                if (comboIds.contains(String.valueOf(comboId))){
                     sku = new PromotionConditionSKU();
                     sku.setShopId(shoppingLine.getShopId());
                     sku.setPromotionId(condition.getPromotionId());
