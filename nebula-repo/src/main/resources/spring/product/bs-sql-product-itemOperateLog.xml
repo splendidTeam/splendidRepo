@@ -15,4 +15,88 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean id="ItemOperateLog.findItemByconditions" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+							tpii.code as code,
+							tpiil.title as title,
+							tpi.id as id,
+							tpi.item_id as itemId,
+							tpi.push_time as pushTime,
+							tpi.sold_out_time as soldOutTime,
+							tpi.push_operator_name as pushOperatorName,
+							tpi.sold_out_operator_name as soldOutOperatorName,
+							tpi.active_time as activeTime,
+							tpi.create_time as createTime,
+							tpi.update_time as updateTime
+					  from 
+					  		t_pd_item_operate_log tpi,t_pd_item tpii,t_pd_iteminfo tpiil
+					  			
+		 			  where 
+		 			  	
+		 			  		tpi.item_id = tpii.id 
+		 			  	and 
+		 			  		tpii.id = tpiil.item_id 
+		 			  
+		 			  		#if($code)
+		 			  			and tpii.code LIKE :code  
+		 			  		#end
+		 			  		
+		 			  		#if($title)
+		 			  			and tpiil.title LIKE :title  
+		 			  		#end
+		 			  		
+		 			  		#if($operateType == 1)
+		 			  			#if($operateBeginTime)
+		 			  				and tpi.push_time >= :operateBeginTime
+		 			  			#end
+		 			  			
+		 			  			#if($operateEndTime)
+		 			  				and tpi.push_time <= :operateEndTime
+		 			  			#end
+		 			  			
+		 			  			#if($operatorName)
+		 			  				and tpi.push_operator_name LIKE :operatorName
+		 			  			#end
+		 			  		#end
+		 			  		
+		 			  		#if($operateType == 2)
+		 			  			#if($operateBeginTime)
+		 			  				and tpi.sold_out_time >= :operateBeginTime
+		 			  			#end
+		 			  			
+		 			  			#if($operateEndTime)
+		 			  				and tpi.sold_out_time <= :operateEndTime
+		 			  			#end
+		 			  			
+		 			  			#if($operatorName)
+		 			  				and tpi.sold_out_operator_name LIKE :operatorName
+		 			  			#end
+		 			  		#end
+		 			  		
+		 			  		#if($operateType == 3)
+		 			  			#if($operateBeginTime)
+		 			  				and  (tpi.push_time >= :operateBeginTime or tpi.sold_out_time >= :operateBeginTime)
+		 			  			#end
+		 			  			
+		 			  			#if($operateEndTime)
+		 			  				and  (tpi.push_time <= :operateEndTime or tpi.sold_out_time <= :operateEndTime)
+		 			  			#end
+		 			  			
+		 			  			#if($operatorName)
+		 			  				and  (tpi.push_operator_name LIKE :operatorName or tpi.sold_out_operator_name LIKE :operatorName)
+		 			  			#end
+		 			  		#end
+
+							#if($activeTime)
+		 			  				and tpi.active_time >= :activeTime
+		 			  		#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>
