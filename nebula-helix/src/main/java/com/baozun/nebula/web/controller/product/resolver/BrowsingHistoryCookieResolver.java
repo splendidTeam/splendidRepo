@@ -224,7 +224,7 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
 
             if (Validator.isNotNullOrEmpty(value)){
                 try{
-                    String decryptHex = EncryptUtil.getInstance().encrypt(value);
+                    String decryptHex = EncryptUtil.getInstance().decrypt(value);
                     String[] tokenizeToStringArray = StringUtil.tokenizeToStringArray(decryptHex, DEFAULT_CONNECTOR);
                     for (String string : tokenizeToStringArray){
                         linkedList.add(ConvertUtil.convert(string, klass));
