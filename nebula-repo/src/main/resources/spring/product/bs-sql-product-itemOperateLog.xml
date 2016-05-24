@@ -56,7 +56,8 @@
 		 			  			#end
 		 			  			
 		 			  			#if($operateEndTime)
-		 			  				and tpi.push_time <= :operateEndTime
+		 			  					and tpi.push_time <= :operateEndTime
+		 			  					and tpi.push_time > '1970-01-01'
 		 			  			#end
 		 			  			
 		 			  			#if($operatorName)
@@ -70,7 +71,8 @@
 		 			  			#end
 		 			  			
 		 			  			#if($operateEndTime)
-		 			  				and tpi.sold_out_time <= :operateEndTime
+		 			  					and tpi.sold_out_time <= :operateEndTime
+		 			  					and tpi.sold_out_time > '1970-01-01'
 		 			  			#end
 		 			  			
 		 			  			#if($operatorName)
@@ -84,7 +86,8 @@
 		 			  			#end
 		 			  			
 		 			  			#if($operateEndTime)
-		 			  				and  (tpi.push_time <= :operateEndTime or tpi.sold_out_time <= :operateEndTime)
+		 			  					and  ((tpi.push_time <= :operateEndTime and tpi.push_time > '1970-01-01')
+		 			  					or (tpi.sold_out_time <= :operateEndTime and tpi.sold_out_time > '1970-01-01'))
 		 			  			#end
 		 			  			
 		 			  			#if($operatorName)
