@@ -176,8 +176,16 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long shopId = entry.getValue();
 
             //TODO feilong 这是什么鬼逻辑?
-            newLineList.add(CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
-            newLineList.add(CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
+            ShoppingCartLineCommand shoppingCartLineCommandTemp = CollectionsUtil
+                            .find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId);
+            if (null != shoppingCartLineCommandTemp){
+                newLineList.add(shoppingCartLineCommandTemp);
+            }
+
+            ShoppingCartLineCommand noChooseShoppingCartLine = CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId);
+            if (null != noChooseShoppingCartLine){
+                newLineList.add(noChooseShoppingCartLine);
+            }
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
