@@ -159,9 +159,11 @@
 					so.TYPE,
 					so.GROUP_ID as groupId,
 					so.EVALUATION_STATUS as evaluationStatus,
-					so.SNAPSHOT
+					so.SNAPSHOT,
+					item.code as productCode
 					from 
 					t_so_orderline as so 
+					inner join t_pd_item item on so.ITEM_ID=item.id
 					where 
 					 so.ORDER_ID = :orderId 
                  ]]>
