@@ -59,6 +59,7 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
@@ -85,7 +86,7 @@ import com.feilong.framework.accessor.AutoKeyAccessor;
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>创建订单</td>
  * <td>
- * 参见 {@link #createOrder(MemberDetails, OrderForm, String, BindingResult, HttpServletRequest, HttpServletResponse, Model)}
+ * 参见 {@link #createOrder(MemberDetails, String, OrderForm, BindingResult, HttpServletRequest, HttpServletResponse, Model)}
  * </td>
  * </tr>
  * <tr valign="top">
@@ -174,6 +175,9 @@ public class NebulaOrderConfirmController extends BaseController{
 
     @Autowired
     private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
+
+    @Autowired
+    private ShoppingCartCommandBuilder       shoppingCartCommandBuilder;
 
     /**
      * 显示订单结算页面.
@@ -282,7 +286,12 @@ public class NebulaOrderConfirmController extends BaseController{
 
         // 获取购物车信息
         List<ShoppingCartLineCommand> cartLines = getCartLines(request, memberDetails, key);
-        ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(cartLines, memberDetails, salesOrderCommand);
+
+        // 获取购物车行信息
+        List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
+
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
+                        .buildShoppingCartCommand(memberDetails, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList);
 
         // 校验购物车信息和促销
         String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();

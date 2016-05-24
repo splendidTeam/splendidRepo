@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -176,8 +176,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long shopId = entry.getValue();
 
             //TODO feilong 这是什么鬼逻辑?
-            newLineList.add(CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
-            newLineList.add(CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
+            CollectionUtils.addIgnoreNull(
+                            newLineList,
+                            CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
+            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
@@ -253,7 +255,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         ShoppingCartLineCommand tempShopLine = CollectionsUtil.find(shopShoppingCartLineList, "id", lineId);
         if (null == tempShopLine){
-            tempShopLine = IterableUtils.find(
+            tempShopLine = CollectionsUtil.find(
                             newLines,
                             PredicateUtils.andPredicate(
                                             new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("id", lineId),
