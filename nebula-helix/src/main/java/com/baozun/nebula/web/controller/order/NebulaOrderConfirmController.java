@@ -426,7 +426,7 @@ public class NebulaOrderConfirmController extends BaseController{
                     MemberDetails memberDetails,
                     List<ContactCommand> addressList,
                     String couponCode){
-        if (cartLines == null){
+        if (cartLines == null || cartLines.isEmpty()){
             return null;
         }
         Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
