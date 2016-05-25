@@ -26,6 +26,7 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 import loxia.dao.Page;
+
 import com.baozun.nebula.model.system.SysAuditLogHistory;
 
 /**
@@ -69,6 +70,11 @@ public interface SysAuditLogHistoryDao extends GenericEntityDao<SysAuditLogHisto
 	@NativeQuery(model = SysAuditLogHistory.class)
 	Pagination<SysAuditLogHistory> findSysAuditLogHistoryListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
-	
+	/**
+	 * 归档
+	 * @param paraMap
+	 */
+	@NativeUpdate
+	void archiveSysAuditLogToHistoryByQueryMap(@QueryParam Map<String, Object> paraMap);
 	
 }
