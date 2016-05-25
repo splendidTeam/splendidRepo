@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver;
+package com.baozun.nebula.web.controller.shoppingcart.validator;
 
 import java.util.Date;
 
@@ -28,6 +28,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.feilong.core.Validator;
 
 /**
