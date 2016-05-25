@@ -132,6 +132,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
         // 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象
         List<CookieShoppingCartLine> cookieLines = new ArrayList<CookieShoppingCartLine>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLines){
+
             CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
 
             PropertyUtil.copyProperties(

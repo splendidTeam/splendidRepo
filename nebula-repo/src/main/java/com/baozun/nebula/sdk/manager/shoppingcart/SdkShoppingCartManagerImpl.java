@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -83,10 +83,8 @@ import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartLinePackManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartLinesManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -283,7 +281,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         shoppingCartCommand.setShoppingCartLineCommands(validedLines);
 
         // 商品数量
-        shoppingCartCommand.setOrderQuantity(getOrderQuantity(validedLines));
+        shoppingCartCommand.setOrderQuantity(ShoppingCartUtil.getSumQuantity(validedLines));
 
         // 优惠券编码
         shoppingCartCommand.setCoupons(coupons);
@@ -405,17 +403,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 计算整单商品数量.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the order quantity
-     */
-    private int getOrderQuantity(List<ShoppingCartLineCommand> shoppingCartLines){
-        return Validator.isNullOrEmpty(shoppingCartLines) ? 0 : CollectionsUtil.sum(shoppingCartLines, "quantity").intValue();
-    }
-
-    /**
      * 计算促销金额.
      *
      * @param summaryShopCart
@@ -490,7 +477,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 购物车的所属店铺
         List<Long> shopIds = getShopIds(cart.getShoppingCartLineCommands());
         // 获取购物车行的itemComboIds
-        Set<String> itemComboIds = getItemComboIds(cart.getShoppingCartLineCommands());
+        Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(cart.getShoppingCartLineCommands());
 
         cart = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(
                         cart.getUserDetails().getMemberId(),
@@ -549,7 +536,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 购物车的所属店铺
         List<Long> shopIds = getShopIds(cart.getShoppingCartLineCommands());
         // 获取购物车行的itemComboIds
-        Set<String> itemComboIds = getItemComboIds(cart.getShoppingCartLineCommands());
+        Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(cart.getShoppingCartLineCommands());
 
         cart = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(
                         cart.getUserDetails().getMemberId(),
@@ -615,28 +602,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return retval;
     }
 
-    /**
-     * 根据购物车id移除购物车行.
-     *
-     * @param memberId
-     *            the member id
-     * @param shoppingCartLineId
-     *            the shopping cart line id
-     * @return 移除购物车行是否成功 success表示成功 failure表示失败
-     */
     @Override
-    public Integer removeShoppingCartLineById(Long memberId,Long shoppingCartLineId){
-        Integer retval = 0;
-        if (null != memberId){
-            try{
-                // 根据memberId和购物车行删除购物车行
-                retval = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, shoppingCartLineId);
-            }catch (Exception e){
-                log.error("removeShoppingCartLineById error: " + e);
-                return FAILURE;
-            }
-        }
-        return retval;
+    public boolean removeShoppingCartLineById(Long memberId,Long shoppingCartLineId){
+        return 1 == sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, shoppingCartLineId);
     }
 
     /**
@@ -901,29 +869,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return true;
     }
 
-    /**
-     * 修改购物车的选中状态(之前的功能，暂时不用).
-     *
-     * @param userId
-     *            the user id
-     * @param extentionCodes
-     *            the extention codes
-     * @param settleState
-     *            the settle state
-     * @return the integer
-     */
     @Override
-    public Integer updateCartLineSettlementState(Long userId,List<String> extentionCodes,Integer settleState){
-        Integer updateCount = 0;
-        if (null != userId){
-            // 会员
-            updateCount = sdkShoppingCartLineDao.updateCartLineSettleState(userId, extentionCodes, settleState);
-            if (updateCount != extentionCodes.size()){
-                Object[] args = { 0, 1 };
-                throw new BusinessException(Constants.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, args);
-            }
+    public boolean updateCartLineSettlementState(Long memberId,List<String> extentionCodes,Integer settleState){
+        // 会员
+        Integer updateCount = sdkShoppingCartLineDao.updateCartLineSettleState(memberId, extentionCodes, settleState);
+        if (updateCount != extentionCodes.size()){
+            Object[] args = { 0, 1 };
+            throw new BusinessException(Constants.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, args);
         }
-        return SUCCESS;
+        return true;
     }
 
     /**
@@ -1006,23 +960,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 根据购物车行获取ItemForCheckCommand集合.
-     *
-     * @param lines
-     *            the lines
-     * @return the item combo ids
-     */
-    private Set<String> getItemComboIds(List<ShoppingCartLineCommand> lines){
-        Set<String> set = new HashSet<String>();
-        if (null != lines && lines.size() > 0){
-            for (ShoppingCartLineCommand line : lines){
-                set.addAll(line.getComboIds());
-            }
-        }
-        return set;
-    }
-
-    /**
      * 游客的memboIds.
      *
      * @return the membo ids
@@ -1045,8 +982,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<ShoppingCartLineCommand> lines = shopCart.getShoppingCartLineCommands();
         Set<String> memboSet = shopCart.getUserDetails().getMemComboList();
         // 获取人群和商品促销的交集
-        List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager
-                        .getIntersectActivityRuleData(getShopIds(lines), memboSet, getItemComboIds(lines), shopCart.getCurrentTime());
+        List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
+                        getShopIds(lines),
+                        memboSet,
+                        ShoppingCartUtil.getItemComboIds(lines),
+                        shopCart.getCurrentTime());
 
         if (null != promotionList && promotionList.size() > 0){
             // 通过购物车和促销集合计算商品促销
@@ -1216,11 +1156,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return scopeAMT;
         for (ShoppingCartLineCommand line : shoppingLines){
             // 变量安全
-            if (line.getComboIds() == null || line.getComboIds().size() == 0 || line.isGift()){
+            Set<String> comboIds = line.getComboIds();
+            if (comboIds == null || comboIds.size() == 0 || line.isGift()){
                 continue;
             }
             // 计算该combo下的商品总金额
-            if (line.getComboIds().contains(String.valueOf(comboId))){
+            if (comboIds.contains(String.valueOf(comboId))){
                 scopeAMT = scopeAMT.add(new BigDecimal(line.getQuantity()).multiply(line.getSalePrice()));
             }
         }
@@ -1244,11 +1185,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return count;
         for (ShoppingCartLineCommand line : shoppingLines){
             // 变量安全
-            if (line.getComboIds() == null || line.getComboIds().size() == 0 || line.isGift()){
+            Set<String> comboIds = line.getComboIds();
+            if (comboIds == null || comboIds.size() == 0 || line.isGift()){
                 continue;
             }
             // 计算该combo下的商品总数量
-            if (line.getComboIds().contains(String.valueOf(comboId))){
+            if (comboIds.contains(String.valueOf(comboId))){
                 count += line.getQuantity();
             }
         }
@@ -3287,11 +3229,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (ShoppingCartLineCommand line : lines){
             // 判断line是否在该combo下
-            if (line.isGift() || null == line.getComboIds() || line.getComboIds().size() == 0){
+            Set<String> comboIds = line.getComboIds();
+            if (line.isGift() || null == comboIds || comboIds.size() == 0){
                 continue;
             }
 
-            if (line.getComboIds().contains(Long.toString(comboId))){
+            if (comboIds.contains(Long.toString(comboId))){
                 lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
 
                 previousDiscAMTSKU = sdkPromotionSettingManager
@@ -3318,14 +3261,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     public Set<Long> getItemIdsFromShoppingCartByComboId(List<ShoppingCartLineCommand> lines,long comboId){
         Set<Long> itemIds = new HashSet<Long>();
         for (ShoppingCartLineCommand line : lines){
-            if (null == line.getComboIds() || line.getComboIds().size() == 0){
+            Set<String> comboIds = line.getComboIds();
+            if (null == comboIds || comboIds.size() == 0){
                 continue;
             }
             // 计算该combo下的金额优惠,By Item。落在第一个该Item的SKU上
-            if (line.getComboIds().contains(String.valueOf(comboId))){
-                if (itemIds.contains(line.getItemId()))
+            if (comboIds.contains(String.valueOf(comboId))){
+                Long itemId = line.getItemId();
+                if (itemIds.contains(itemId)){
                     continue;
-                itemIds.add(line.getItemId());
+                }
+                itemIds.add(itemId);
             }
         }
         return itemIds;
@@ -3522,11 +3468,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (ShoppingCartLineCommand line : lines){
             // 判断line是否在该combo下
-            if (line.isGift() || null == line.getComboIds() || line.getComboIds().size() == 0){
+            Set<String> comboIds = line.getComboIds();
+            if (line.isGift() || null == comboIds || comboIds.size() == 0){
                 continue;
             }
 
-            if (line.getComboIds().contains(Long.toString(comboId))){
+            if (comboIds.contains(Long.toString(comboId))){
                 if (itemIds.contains(line.getItemId()))
                     continue;
                 itemIds.add(line.getItemId());
@@ -3582,11 +3529,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (ShoppingCartLineCommand line : lines){
             // 判断line是否在该combo下
-            if (null == line.getComboIds() || line.getComboIds().size() == 0){
+            Set<String> comboIds = line.getComboIds();
+            if (null == comboIds || comboIds.size() == 0){
                 continue;
             }
             // 计算该combo下的金额优惠,By PCS
-            if (line.getComboIds().contains(String.valueOf(comboId))){
+            if (comboIds.contains(String.valueOf(comboId))){
                 BigDecimal curLineDiscAmount = BigDecimal.valueOf(line.getQuantity()).multiply(discAmount);
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
                 skuPreviousDiscAMT = sdkPromotionSettingManager
@@ -6210,8 +6158,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         }
 
         // 获取限购规则
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
-                        .getIntersectPurchaseLimitRuleData(getShopIds(lines), memboIds, getItemComboIds(lines), new Date());
+        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(
+                        getShopIds(lines),
+                        memboIds,
+                        ShoppingCartUtil.getItemComboIds(lines),
+                        new Date());
 
         ShoppingCartCommand cart = new ShoppingCartCommand();
         // 设置购物车行
@@ -6823,7 +6774,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             cart.setCurrentPayAmount(cartByShop.getRealPayAmount());
 
             // 该店铺的商品数量
-            cartByShop.setQty(getOrderQuantity(chooseLines));
+            cartByShop.setQty(ShoppingCartUtil.getSumQuantity(chooseLines));
 
             cartByShop.setShopId(shopId);
             summaryShopCartList.add(cartByShop);
@@ -6966,8 +6917,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         }
 
         // 获取限购规则
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
-                        .getIntersectPurchaseLimitRuleData(getShopIds(lines), memComIds, getItemComboIds(lines), new Date());
+        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(
+                        getShopIds(lines),
+                        memComIds,
+                        ShoppingCartUtil.getItemComboIds(lines),
+                        new Date());
 
         Map<Integer, List<ShoppingCartLineCommand>> ForceSendGiftMap = sdkShoppingCartLinesManager
                         .getShoppingCartForceSendGiftLines(allShoppingCartLineList, purchaseLimitationList, shoppingCartCommand);

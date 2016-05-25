@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -52,9 +52,7 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartGroupManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartLinePackManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -176,8 +174,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long shopId = entry.getValue();
 
             //TODO feilong 这是什么鬼逻辑?
-            newLineList.add(CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
-            newLineList.add(CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
+            CollectionUtils.addIgnoreNull(
+                            newLineList,
+                            CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
+            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
@@ -253,7 +253,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         ShoppingCartLineCommand tempShopLine = CollectionsUtil.find(shopShoppingCartLineList, "id", lineId);
         if (null == tempShopLine){
-            tempShopLine = IterableUtils.find(
+            tempShopLine = CollectionsUtil.find(
                             newLines,
                             PredicateUtils.andPredicate(
                                             new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("id", lineId),
@@ -399,7 +399,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(validedLines);
 
         // 商品数量
-        shoppingCartCommand.setOrderQuantity(getOrderQuantity(validedLines));
+        shoppingCartCommand.setOrderQuantity(ShoppingCartUtil.getSumQuantity(validedLines));
 
         // 优惠券编码
         shoppingCartCommand.setCoupons(coupons);
@@ -466,7 +466,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
 
         // 设置应付金额
-        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.selectRejected(allShoppingCartLines, "isGift", false);
+        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.select(allShoppingCartLines, "gift", false);
         shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(noGiftShoppingCartLines));
 
         // 实际支付金额
@@ -576,7 +576,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount());
 
         // 该店铺的商品数量
-        shopCartCommandByShop.setQty(getOrderQuantity(shoppingCartLineCommandList));
+        shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));
         shopCartCommandByShop.setShopId(shopId);
         return shopCartCommandByShop;
     }
@@ -644,7 +644,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
 
-        shopCartCommandByShop.setQty(getOrderQuantity(shoppingCartLineCommandList));// 商品数量
+        shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
 
         BigDecimal originPayAmount = getOriginPayAmount(shoppingCartLineCommandList);
         shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount); // 应付小计
@@ -820,13 +820,12 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         // 获取人群和商品促销的交集
         Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
-        Set<Set<String>> comboIds = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "comboIds");
-        Set<String> propertyValueSet = toPropertyValueSet(comboIds);
+        Set<String> itemComboIdsSet = ShoppingCartUtil.getItemComboIds(shoppingCartLineCommandList);
 
         List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
                         new ArrayList<Long>(shopIdSet),
                         memboSet,
-                        propertyValueSet,
+                        itemComboIdsSet,
                         shoppingCartCommand.getCurrentTime());
 
         if (Validator.isNotNullOrEmpty(promotionList)){
@@ -834,23 +833,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionList);
         }
         return Collections.emptyList();
-    }
-
-    /**
-     * @param comboIds
-     * @return
-     */
-    //TODO feilong 提取
-    private Set<String> toPropertyValueSet(Set<Set<String>> comboIds){
-        if (Validator.isNullOrEmpty(comboIds)){
-            return Collections.emptySet();
-        }
-
-        Set<String> propertyValueSet = new HashSet<>();
-        for (Set<String> set : comboIds){
-            propertyValueSet.addAll(set);
-        }
-        return propertyValueSet;
     }
 
     /**
@@ -900,26 +882,19 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     private BigDecimal getCurSKUDiscount(
                     List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
                     final ShoppingCartLineCommand shoppingCartLineCommand){
+        final Long skuId = shoppingCartLineCommand.getSkuId();
         //TODO feilong 提取
-        return CollectionsUtil.sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
+        BigDecimal discountAmountSum = CollectionsUtil
+                        .sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
 
-            @Override
-            public boolean evaluate(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
-                boolean freeShipOrGiftMark = promotionSKUDiscAMTBySetting.getFreeShippingMark()
-                                || promotionSKUDiscAMTBySetting.getGiftMark();
-                return !freeShipOrGiftMark && shoppingCartLineCommand.getSkuId().equals(promotionSKUDiscAMTBySetting.getSkuId());
-            }
-        });
+                            @Override
+                            public boolean evaluate(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
+                                boolean freeShipOrGiftMark = promotionSKUDiscAMTBySetting.getFreeShippingMark()
+                                                || promotionSKUDiscAMTBySetting.getGiftMark();
+                                return !freeShipOrGiftMark && skuId.equals(promotionSKUDiscAMTBySetting.getSkuId());
+                            }
+                        });
+        return null == discountAmountSum ? BigDecimal.ZERO : discountAmountSum;
     }
 
-    /**
-     * 计算整单商品数量.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the order quantity
-     */
-    private int getOrderQuantity(List<ShoppingCartLineCommand> shoppingCartLines){
-        return Validator.isNullOrEmpty(shoppingCartLines) ? 0 : CollectionsUtil.sum(shoppingCartLines, "quantity").intValue();
-    }
 }

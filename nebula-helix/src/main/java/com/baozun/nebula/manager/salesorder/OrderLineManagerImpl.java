@@ -63,6 +63,7 @@ public class OrderLineManagerImpl implements OrderLineManager {
              slsv.setListPrice(orderLineCommand.getMSRP());
              slsv.setQuantity(orderLineCommand.getCount());
              slsv.setSubTotalAmt(orderLineCommand.getSubtotal());
+             slsv.setItemCode(orderLineCommand.getProductCode());
              list.add(slsv);
         }
         return list;

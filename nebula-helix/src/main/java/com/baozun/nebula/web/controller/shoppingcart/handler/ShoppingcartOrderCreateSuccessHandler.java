@@ -14,29 +14,32 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.resolver.predicate;
+package com.baozun.nebula.web.controller.shoppingcart.handler;
 
-import org.apache.commons.collections4.Predicate;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.web.MemberDetails;
 
 /**
- * 主卖品行的选择器.
+ * 订单创建成功之后,购物车相关处理.
  *
  * @author feilong
- * @version 5.3.1 2016年5月3日 下午3:16:19
+ * @version 5.3.1 2016年5月25日 下午3:41:15
  * @since 5.3.1
  */
-public class MainLinesPredicate implements Predicate<ShoppingCartLineCommand>{
+public interface ShoppingcartOrderCreateSuccessHandler{
 
-    /*
-     * (non-Javadoc)
+    /**
+     * 订单创建成功之后,购物车相关处理.
      * 
-     * @see org.apache.commons.collections4.Predicate#evaluate(java.lang.Object)
+     * @param memberDetails
+     *            the member details
+     * @param request
+     *            the request
+     * @param response
+     *            the response
      */
-    @Override
-    public boolean evaluate(ShoppingCartLineCommand shoppingCartLineCommand){
-        // 促銷行 & 贈品 不參與遍曆
-        return !shoppingCartLineCommand.isCaptionLine() && !shoppingCartLineCommand.isGift();
-    }
+    void onOrderCreateSuccess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
+
 }

@@ -212,8 +212,8 @@ function eformatDate(data){
 function fnModuleVersionPublish(data, args, caller){
 	var versionId = data.id;
 	var dialog = $j(".cms-publish-dialog").attr("wid",versionId);
-	dialog.find(".starttime").val(sformatDate(data.stime));
-	dialog.find(".endtime").val(eformatDate(data.etime));
+	dialog.find(".starttime").val(sformatDate(data));
+	dialog.find(".endtime").val(eformatDate(data));
 	dialog.dialogff({type:'open',close:'in',width:'450px', height:'350px'});
 
 }

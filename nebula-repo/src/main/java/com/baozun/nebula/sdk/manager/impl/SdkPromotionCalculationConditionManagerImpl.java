@@ -45,7 +45,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationConditionManager;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationSettingManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 
 @Transactional
 @Service("sdkPromotionCalculationConditionManager")

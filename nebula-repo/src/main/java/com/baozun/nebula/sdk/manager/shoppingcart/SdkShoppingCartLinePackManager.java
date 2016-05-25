@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;

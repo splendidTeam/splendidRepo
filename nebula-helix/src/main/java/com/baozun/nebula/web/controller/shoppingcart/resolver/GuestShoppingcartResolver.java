@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 
@@ -70,7 +71,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         guestShoppingcartPersister.save(mainLines, request, response);
         return null;
     }
@@ -90,7 +91,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         guestShoppingcartPersister.save(mainLines, request, response);
         return null;
     }
@@ -110,7 +111,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     ShoppingCartLineCommand currentLine,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 将修改后的购物车保存cookie
         guestShoppingcartPersister.save(mainLines, request, response);
         return null;

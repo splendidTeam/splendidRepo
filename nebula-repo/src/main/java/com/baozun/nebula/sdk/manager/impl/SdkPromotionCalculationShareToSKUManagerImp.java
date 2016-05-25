@@ -19,7 +19,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 
 @Transactional
 @Service("sdkPromotionCalculationShareToSKUManager")
@@ -30,7 +30,10 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
 
     /**
      * 获取整单优惠在行上的分摊
+     * @deprecated see {@link com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilderImpl#getCurSKUDiscount(List
+     *             <PromotionSKUDiscAMTBySetting>, ShoppingCartLineCommand)} since 5.3.1
      */
+    @Deprecated
     @Override
     public BigDecimal getLineDiscAMTShareOnOrderBaseByShopIdAndSKUId(List<PromotionSKUDiscAMTBySetting> shareList,Long shopId,Long skuId){
         BigDecimal discAMT = BigDecimal.ZERO;
