@@ -280,6 +280,9 @@ $j(document).ready(function(){
 		$j('.p10 .propertyValues').each(function(index,data){
 			var pvId = $j(this).attr('proValId');
 			var sortNo = $j(this).attr('sortNo');
+			if(sortNo == "" || null == sortNo || 'null' == sortNo || undefined == sortNo){
+				sortNo = 1;
+			}
 			var newSortNo = index + 1;
 			result += pvId + "," + sortNo + "," + newSortNo;
 			if(length > index +1){

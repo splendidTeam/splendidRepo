@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SysAuditLogHistory.findAllSysAuditLogHistoryList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_AUDITLOG_HISTORY 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SysAuditLogHistory.findSysAuditLogHistoryListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_AUDITLOG_HISTORY where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="SysAuditLogHistory.findSysAuditLogHistoryListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_AUDITLOG_HISTORY where 
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($uri)
+		       					and URI=:uri
+		       				#end
+
+		       			
+		       				#if($parameters)
+		       					and PARAMETERS=:parameters
+		       				#end
+
+		       			
+		       				#if($method)
+		       					and METHOD=:method
+		       				#end
+
+		       			
+		       				#if($ip)
+		       					and IP=:ip
+		       				#end
+
+		       			
+		       				#if($responseCode)
+		       					and RESPONSE_CODE=:responseCode
+		       				#end
+
+		       			
+		       				#if($exception)
+		       					and EXCEPTION=:exception
+		       				#end
+
+		       			
+		       				#if($operaterId)
+		       					and OPERATER_ID=:operaterId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($archiveTime)
+		       					and ARCHIVE_TIME >= :archiveTimeStart
+		       				#end
+		       				#if($archiveTime)
+		       					and ARCHIVE_TIME <= :archiveTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SysAuditLogHistory.findSysAuditLogHistoryListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_AUDITLOG_HISTORY where 
+		       		
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($uri)
+		       					and URI=:uri
+		       				#end
+
+		       			
+		       				#if($parameters)
+		       					and PARAMETERS=:parameters
+		       				#end
+
+		       			
+		       				#if($method)
+		       					and METHOD=:method
+		       				#end
+
+		       			
+		       				#if($ip)
+		       					and IP=:ip
+		       				#end
+
+		       			
+		       				#if($responseCode)
+		       					and RESPONSE_CODE=:responseCode
+		       				#end
+
+		       			
+		       				#if($exception)
+		       					and EXCEPTION=:exception
+		       				#end
+
+		       			
+		       				#if($operaterId)
+		       					and OPERATER_ID=:operaterId
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+
+		       			
+		       				#if($archiveTime)
+		       					and ARCHIVE_TIME >= :archiveTimeStart
+		       				#end
+		       				#if($archiveTime)
+		       					and ARCHIVE_TIME <= :archiveTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

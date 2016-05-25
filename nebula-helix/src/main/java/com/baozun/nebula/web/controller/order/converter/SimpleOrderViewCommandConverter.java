@@ -4,17 +4,20 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
 import com.baozun.nebula.manager.salesorder.OrderLineManager;
+import com.baozun.nebula.sdk.command.PayInfoCommand;
 import com.baozun.nebula.sdk.command.SimpleOrderCommand;
+import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
-import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderViewCommand;
 import com.feilong.core.bean.PropertyUtil;
 
 /**
  * 
  * 说明：SimpleOrderCommand convert to SimpleOrderViewCommand
+ * 
  * @author 张乃骐
  * @version 1.0
  * @date 2016年5月10日
@@ -30,6 +33,9 @@ public class SimpleOrderViewCommandConverter extends BaseConverter<SimpleOrderVi
     @Qualifier("OrderLineManager")
     private OrderLineManager orderLineManager;
 
+    @Autowired
+    private SdkPaymentManager sdkPaymentManager;
+
     @Override
     public SimpleOrderViewCommand convert(Object data) {
 
@@ -42,6 +48,10 @@ public class SimpleOrderViewCommandConverter extends BaseConverter<SimpleOrderVi
                     "createTime", "logisticsStatus", "financialStatus", "payment", "total");
             simpleOrderViewCommand.setSimpleOrderLineSubViewCommandList(
                     orderLineManager.findByOrderID(simpleOrderCommand.getOrderId()));
+            if(simpleOrderCommand.getFinancialStatus()==1){
+              List<PayInfoCommand> findPayInfoCommandByOrderId = sdkPaymentManager.findPayInfoCommandByOrderId(simpleOrderCommand.getOrderId());
+              simpleOrderViewCommand.setSubOrdinate(findPayInfoCommandByOrderId.get(0).getSubOrdinate());  
+            }
             return simpleOrderViewCommand;
         } else {
             throw new UnsupportDataTypeException(

@@ -34,6 +34,8 @@ import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.solr.utils.DatePattern;
+import com.baozun.nebula.utilities.library.address.Address;
+import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -61,7 +63,7 @@ import com.feilong.core.date.DateUtil;
  * <h3>showOrderDetails方法,主要有以下几点:</h3> <blockquote>
  * <ol>
  * <li>当会员查询时传入MemberDetails MemberDetails必须有memberid</li>
- * <li>当游客查询是构造MemberDetails,并将收货人姓名setRealName()中便可进行查询</li>
+ * <li>当游客查询时构造MemberDetails,并将收货人姓名setRealName()中便可进行查询</li>
  * </ol>
  * </blockquote>.
  *
@@ -109,71 +111,84 @@ public class NebulaOrderDetailsController extends BaseController {
             @RequestParam(value = "orderCode", required = true) String orderCode, HttpServletRequest request,
             Model model) {
         // 通过orderCode查询 command
-        // 订单信息
         SalesOrderCommand salesOrderCommand = orderManager.findOrderByCode(orderCode, 1);
+        if (null == salesOrderCommand) {
+            return "";
+        }
         Long memberId = salesOrderCommand.getMemberId();
         String name = salesOrderCommand.getName();
-        //判断是否为本人进行操作
-        if(validateOrder(memberDetails,memberId,name)){
-        OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
-        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime",
-                "logisticsStatus", "financialStatus", "total","discount","actualFreight");
-        orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
-        orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
-        // 收货地址信息
-        ConsigneeSubViewCommand consigneeSubViewCommand = new ConsigneeSubViewCommand();
-        PropertyUtil.copyProperties(consigneeSubViewCommand, salesOrderCommand, "name", "country", "province",
-                "city", "area", "address", "mobile", "tel", "email", "postcode");
-        // 支付信息
-        PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
-        PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
+        // 判断是否为本人进行操作
+        if (validateOrder(memberDetails, memberId, name)) {
+            // 订单信息
+            OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
+            PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime",
+                    "logisticsStatus", "financialStatus", "total", "discount", "actualFreight");
+            orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
+            orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
+            // 收货地址信息
+            ConsigneeSubViewCommand consigneeSubViewCommand = new ConsigneeSubViewCommand();
+            PropertyUtil.copyProperties(consigneeSubViewCommand, salesOrderCommand, "name", "address",
+                    "mobile", "tel", "email", "postcode", "buyerTel", "buyerName");
+            Address country= AddressUtil.getAddressById(salesOrderCommand.getCountryId());
+            Address province = AddressUtil.getAddressById(salesOrderCommand.getProvinceId());
+            Address city = AddressUtil.getAddressById(salesOrderCommand.getCityId());
+            Address area = AddressUtil.getAddressById(salesOrderCommand.getAreaId());
+            consigneeSubViewCommand.setCountry(country==null?null:country.getName());
+            consigneeSubViewCommand.setProvince(province==null?null:province.getName());
+            consigneeSubViewCommand.setCity(city==null?null:city.getName());
+            consigneeSubViewCommand.setArea(area==null?null:area.getName());
+            // 支付信息
+            PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
+            PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
+            if(orderBaseInfoSubViewCommand.getFinancialStatus()==1){
+                paymentInfoSubViewCommand.setSubOrdinate(salesOrderCommand.getPayInfo().get(0).getSubOrdinate());
+            } 
+            // 优惠券信息
+            CouponInfoSubViewCommand couponInfoSubViewCommand = new CouponInfoSubViewCommand();
+            List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
+            if (null != couponCodes && couponCodes.size() != 0) {
+                couponInfoSubViewCommand.setCouponCode(couponCodes.get(0).getCouponCode());
+            }
+            // 发票信息
+            InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
+            PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType",
+                    "receiptTitle", "receiptContent", "receiptCode");
+            // ordline信息
+            List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager
+                    .findByOrderID(salesOrderCommand.getId());
+            List<OrderLineSubViewCommand> orderLineSubViewCommandlist = new ArrayList<OrderLineSubViewCommand>();
+            for (SimpleOrderLineSubViewCommand simpleOrderLine : simpleOrderLineSubViewCommand) {
+                OrderLineSubViewCommand orderLineSubViewCommand = new OrderLineSubViewCommand();
+                PropertyUtil.copyProperties(orderLineSubViewCommand, simpleOrderLine, "id", "addTime",
+                        "itemId", "itemCode", "itemName", "skuId", "extentionCode", "propertiesMap",
+                        "skuPropertys", "quantity", "itemPic", "salePrice", "listPrice", "subTotalAmt");
+                orderLineSubViewCommandlist.add(orderLineSubViewCommand);
+            }
+            // 物流信息
+            LogisticsInfoSubViewCommand logisticsInfoSubViewCommand = new LogisticsInfoSubViewCommand();
+            LogisticsCommand logisticsCommand = logisticsManager
+                    .findLogisticsByOrderId(salesOrderCommand.getId());
+            if (null != logisticsCommand) {
 
-        // 优惠券信息
-        CouponInfoSubViewCommand couponInfoSubViewCommand = new CouponInfoSubViewCommand();
-        List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
-        if (null !=couponCodes&&couponCodes.size() != 0) {
-            couponInfoSubViewCommand.setCouponCode(couponCodes.get(0).getCouponCode());
+                String trackingDescription = logisticsCommand.getTrackingDescription();
+                PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
+                        "logisticsProviderName");
+                logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(
+                        transformTrackingDescription(trackingDescription));
+            }
+            OrderViewCommand orderViewCommand = new OrderViewCommand();
+            orderViewCommand.setConsigneeSubViewCommand(consigneeSubViewCommand);
+            orderViewCommand.setCouponInfoSubViewCommand(couponInfoSubViewCommand);
+            orderViewCommand.setInvoiceInfoSubViewCommand(invoiceInfoSubViewCommand);
+            orderViewCommand.setLogisticsInfoSubViewCommand(logisticsInfoSubViewCommand);
+            orderViewCommand.setOrderBaseInfoSubViewCommand(orderBaseInfoSubViewCommand);
+            orderViewCommand.setPaymentInfoSubViewCommand(paymentInfoSubViewCommand);
+            orderViewCommand.setOrderLineSubViewCommandList(orderLineSubViewCommandlist);
+            // model add attribute
+            model.addAttribute("orderViewCommand", orderViewCommand);
+            return "order.orderdetails";
         }
-        // 发票信息
-        InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
-        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType",
-                "receiptTitle", "receiptContent", "receiptCode");
-        // ordline信息
-        List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager
-                .findByOrderID(salesOrderCommand.getId());
-         List<OrderLineSubViewCommand> orderLineSubViewCommandlist=new ArrayList<OrderLineSubViewCommand>();
-        for (SimpleOrderLineSubViewCommand simpleOrderLine : simpleOrderLineSubViewCommand) {
-            OrderLineSubViewCommand orderLineSubViewCommand = new OrderLineSubViewCommand();
-            PropertyUtil.copyProperties(orderLineSubViewCommand, simpleOrderLine, "id", "addTime", "itemId",
-                    "itemCode", "itemName", "skuId", "extentionCode", "propertiesMap", "skuPropertys",
-                    "quantity","itemPic","salePrice","listPrice","subTotalAmt");
-            orderLineSubViewCommandlist.add(orderLineSubViewCommand);
-        }
-        // 物流信息
-        LogisticsInfoSubViewCommand logisticsInfoSubViewCommand = new LogisticsInfoSubViewCommand();
-        LogisticsCommand logisticsCommand = logisticsManager
-                .findLogisticsByOrderId(salesOrderCommand.getId());
-        if(null !=logisticsCommand){
-            
-            String trackingDescription = logisticsCommand.getTrackingDescription();
-            PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
-                    "logisticsProviderName");
-            logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(
-                    transformTrackingDescription(trackingDescription));
-        }
-        OrderViewCommand orderViewCommand = new OrderViewCommand();
-        orderViewCommand.setConsigneeSubViewCommand(consigneeSubViewCommand);
-        orderViewCommand.setCouponInfoSubViewCommand(couponInfoSubViewCommand);
-        orderViewCommand.setInvoiceInfoSubViewCommand(invoiceInfoSubViewCommand);
-        orderViewCommand.setLogisticsInfoSubViewCommand(logisticsInfoSubViewCommand);
-        orderViewCommand.setOrderBaseInfoSubViewCommand(orderBaseInfoSubViewCommand);
-        orderViewCommand.setPaymentInfoSubViewCommand(paymentInfoSubViewCommand);
-        orderViewCommand.setOrderLineSubViewCommandList(orderLineSubViewCommandlist);
-        // model add attribute
-        model.addAttribute("orderViewCommand", orderViewCommand);
-        return "order.orderdetails";
-        }
-        //TODO 返回非法查询页面
+        // TODO 返回非法查询页面
         return "";
     }
 
@@ -191,12 +206,12 @@ public class NebulaOrderDetailsController extends BaseController {
      * @time：2016年5月23日 下午2:56:06
      */
     private boolean validateOrder(MemberDetails memberDetails, Long memberId, String name) {
-        if(null!=memberDetails.getMemberId()){
-            return memberDetails.getMemberId().longValue()== memberId.longValue();
+        if (null != memberDetails.getMemberId()) {
+            return memberDetails.getMemberId().longValue() == memberId.longValue();
         }
-        if(Validator.isNotNullOrEmpty(memberDetails.getRealName())){
+        if (Validator.isNotNullOrEmpty(memberDetails.getRealName())) {
             return memberDetails.getRealName().equals(name);
-         }
+        }
         return false;
     }
 

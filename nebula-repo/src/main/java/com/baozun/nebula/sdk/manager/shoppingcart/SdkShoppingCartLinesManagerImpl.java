@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.impl;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +19,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartLinesManager;
 
 @Transactional
 @Service("sdkShoppingCartLinesManager")

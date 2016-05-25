@@ -30,7 +30,7 @@ public class SimpleOrderCommand {
      * 是否评论 0 未评论 1位评论
      */
     private int                                  isRate;
-
+    
     /** 折扣 */
     private BigDecimal discount;
 

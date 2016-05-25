@@ -45,7 +45,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
@@ -59,6 +59,7 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
@@ -85,7 +86,7 @@ import com.feilong.framework.accessor.AutoKeyAccessor;
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>创建订单</td>
  * <td>
- * 参见 {@link #createOrder(MemberDetails, OrderForm, String, BindingResult, HttpServletRequest, HttpServletResponse, Model)}
+ * 参见 {@link #createOrder(MemberDetails, String, OrderForm, BindingResult, HttpServletRequest, HttpServletResponse, Model)}
  * </td>
  * </tr>
  * <tr valign="top">
@@ -145,9 +146,6 @@ public class NebulaOrderConfirmController extends BaseController{
     private OrderFormValidator               orderFormValidator;
 
     @Autowired
-    private SdkShoppingCartManager           sdkShoppingCartManager;
-
-    @Autowired
     private SdkMemberManager                 sdkMemberManager;
 
     @Autowired
@@ -174,6 +172,12 @@ public class NebulaOrderConfirmController extends BaseController{
 
     /** 购物车为空返回的URL */
     public static final String               CART_NULL_BACK_URL      = "/index";
+
+    @Autowired
+    private SdkShoppingCartCommandBuilder    sdkShoppingCartCommandBuilder;
+
+    @Autowired
+    private ShoppingCartCommandBuilder       shoppingCartCommandBuilder;
 
     /**
      * 显示订单结算页面.
@@ -249,7 +253,7 @@ public class NebulaOrderConfirmController extends BaseController{
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/create", method =
      *                       RequestMethod.POST)
-     * @see com.baozun.nebula.sdk.manager.OrderManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
+     * @see com.baozun.nebula.sdk.manager.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
      *      com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
      * @see com.baozun.nebula.sdk.manager.impl.OrderManagerImpl#saveOrderInfo(SalesOrderCommand,
      *      ShoppingCartCommand)
@@ -282,7 +286,12 @@ public class NebulaOrderConfirmController extends BaseController{
 
         // 获取购物车信息
         List<ShoppingCartLineCommand> cartLines = getCartLines(request, memberDetails, key);
-        ShoppingCartCommand shoppingCartCommand = salesOrderResolver.buildShoppingCartForOrder(cartLines, memberDetails, salesOrderCommand);
+
+        // 获取购物车行信息
+        List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
+
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
+                        .buildShoppingCartCommand(memberDetails, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList);
 
         // 校验购物车信息和促销
         String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
@@ -296,7 +305,12 @@ public class NebulaOrderConfirmController extends BaseController{
                             couponCode);
             return toNebulaReturnResult(salesorderResult);
         }
-
+        
+        //设置立即购买标志
+        if (Validator.isNotNullOrEmpty(key)){
+        	salesOrderCommand.setIsImmediatelyBuy(true);
+        }
+        
         // 新建订单
         String subOrdinate = sdkOrderCreateManager
                         .saveOrder(shoppingCartCommand, salesOrderCommand, null == memberDetails ? null : memberDetails.getMemComboList());
@@ -417,7 +431,7 @@ public class NebulaOrderConfirmController extends BaseController{
                     MemberDetails memberDetails,
                     List<ContactCommand> addressList,
                     String couponCode){
-        if (cartLines == null){
+        if (cartLines == null || cartLines.isEmpty()){
             return null;
         }
         Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
@@ -458,7 +472,7 @@ public class NebulaOrderConfirmController extends BaseController{
             coupons.add(couponCode);
         }
 
-        return sdkShoppingCartManager.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
     }
 
     /**

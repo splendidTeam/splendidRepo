@@ -56,12 +56,15 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     /** 每个订单行. */
     private List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList;
 
-    /** //TODO feilong 总价. */
+    /** 总价. */
     private BigDecimal                          total;
     /**
      * 是否评论 0 未评论 1位评论
      */
     private int                                  isRate;
+    
+    /** 拆单号 **/
+    private String                          subOrdinate;
 
     /**
      * 获得 订单code.
@@ -221,6 +224,14 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
 
     public void setIsRate(int isRate) {
         this.isRate = isRate;
+    }
+
+    public String getSubOrdinate() {
+        return subOrdinate;
+    }
+
+    public void setSubOrdinate(String subOrdinate) {
+        this.subOrdinate = subOrdinate;
     }
     
     

@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager;
+package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,27 +15,14 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
+/**
+ * 
+ * @deprecated since5.3.1 这个类太巨无霸了 十分难以维护,违背了太多的原则,许出不许进,不要再加什么的方法了 --by feilong
+ */
+@Deprecated
 public interface SdkShoppingCartManager extends BaseManager{
 
     public List<PromotionBrief> calcuPromoBriefs(ShoppingCartCommand shopCart);
-
-    /**
-     * @param memberId
-     * @param coupons
-     *            优惠券
-     * @param memberComIds
-     *            组合id
-     * @param calFreightCommand
-     * @param shoppingCartLines
-     *            获取购物车列表时候要经过 有效性引擎和促销引擎。 不走限购检查引擎 CalcFreightCommand 不为空时计算运费
-     *            为空不计算运费
-     */
-    public ShoppingCartCommand buildShoppingCartCommand(
-                    Long memberId,
-                    List<ShoppingCartLineCommand> lines,
-                    CalcFreightCommand calcFreightCommand,
-                    List<String> coupons,
-                    Set<String> memberComIds);
 
     /**
      * 获取当前人员的选择的赠品行
@@ -109,6 +96,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      *             boolean exist, boolean isReduce)
      * 
      */
+    @Deprecated
     Integer addOrUpdateShoppingCart(
                     Long memberId,
                     String extentionCode,
@@ -151,6 +139,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @param memberId
      * @param extentionCode
      */
+    @Deprecated
     Integer removeShoppingCartLine(Long memberId,String extentionCode);
 
     /**
@@ -242,15 +231,6 @@ public interface SdkShoppingCartManager extends BaseManager{
     Integer getCategoryQuantity(Long categoryId,List<ShoppingCartLineCommand> shoppingLines);
 
     Integer getCustomQuantity(List<Long> customItemIds,List<ShoppingCartLineCommand> shoppingLines);
-
-    /**
-     * 会员登录后同步购物车数据
-     * 
-     * @param memberId
-     * @param shoppingLines
-     *            cookie中的购物车数据
-     */
-    void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines);
 
     /**
      * 获取购物车该组合下商品的金额

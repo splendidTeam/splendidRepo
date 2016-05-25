@@ -2,7 +2,7 @@ package com.baozun.nebula.search;
 
 /**
  * solr权重打分相关参数
- * @author jumbo
+ * @author long.xia
  *
  */
 public class Boost {

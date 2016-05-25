@@ -160,7 +160,7 @@ public class SkuImportController extends BaseController{
 	 * @return
 	 */
 	private List<Map<String, Object>> processIndusgtryList(List<Industry> industryList,Long shopId){
-		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+	/*	List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 		List<ShopProperty> shopPropertyList = new ArrayList<ShopProperty>();
 		if (shopId != null){
 			shopPropertyList = shopManager.findShopPropertyByshopId(shopId);
@@ -205,7 +205,30 @@ public class SkuImportController extends BaseController{
 			}
 		}
 
+		return resultList;*/
+		
+		//目前的行业是独立的。店铺关联行业，和店铺的属性没有半毛钱关系了。
+		//下载商品导入模板的时候，只需要将DB中的行业全部加载出来，让用户选就可以了
+		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+		for (Industry indu : industryList){
+			Map<String, Object> map = new HashMap<String, Object>();
+
+			map.put("id", indu.getId());
+			map.put("pId", null == indu.getParentId() ? 0 : indu.getParentId());
+			map.put("indu_name", indu.getName());
+			map.put("open", null == indu.getParentId() ? true : false);
+			map.put("isShow", true);
+			for (Industry sec_indu : industryList){
+				if ((sec_indu.getParentId()).equals(indu.getId())){
+					map.put("noCheck", true);
+					break;
+				}
+
+			}
+			resultList.add(map);
+		}
 		return resultList;
+		
 	}
 
 	// 递归用于筛选checked

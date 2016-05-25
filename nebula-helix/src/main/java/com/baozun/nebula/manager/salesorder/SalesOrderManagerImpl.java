@@ -45,11 +45,9 @@ import com.baozun.nebula.sdk.command.ReturnOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.OrderManager;
-import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -100,27 +98,6 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
 
     @Autowired
     private SdkOrderDao            sdkOrderDao;
-
-    @Autowired
-    private SdkOrderCreateManager  sdkOrderCreateManager;
-
-    @Override
-    public String createOrder(SalesOrderCommand salesOrderCommand,Set<String> memComboIds,List<ShoppingCartLineCommand> lines){
-        // 订单概要表
-        ShoppingCartCommand shoppingCartCommand = null;
-        // if(salesOrderCommand.getIsImmediatelyBuy()){
-        // shoppingCartCommand
-        // =sdkShoppingCartManager.findShoppingCart(salesOrderCommand.getMemberId(),memComboIds,
-        // salesOrderCommand.getCouponCodes(),salesOrderCommand.getCalcFreightCommand(),lines);
-        // }else{
-        // shoppingCartCommand =
-        // sdkShoppingCartManager.findShoppingCart(salesOrderCommand.getMemberId(),memComboIds,
-        // salesOrderCommand.getCouponCodes(),salesOrderCommand.getCalcFreightCommand(),lines);
-        // }
-
-        String orderCode = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
-        return orderCode;
-    }
 
     @Override
     public List<OrderPromotionCommand> findOrderPormots(String orderCode){
@@ -278,8 +255,7 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
                     Set<String> membComboIds,
                     ShoppingCartLineCommand shoppingCartLineCommand,
                     List<ShoppingCartLineCommand> lines){
-        Integer result = sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand, lines);
-        return result;
+        return sdkShoppingCartManager.immediatelyBuy(userId, membComboIds, shoppingCartLineCommand, lines);
     }
 
     @Override
