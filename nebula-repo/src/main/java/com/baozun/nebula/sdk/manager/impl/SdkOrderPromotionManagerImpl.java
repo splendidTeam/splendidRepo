@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.salesorder.SdkOrderPromotionDao;
 import com.baozun.nebula.model.salesorder.OrderPromotion;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
-import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.manager.SdkOrderPromotionManager;
 
@@ -89,9 +88,10 @@ public class SdkOrderPromotionManagerImpl implements SdkOrderPromotionManager{
     @Override
     public void savaOrderPromotion(
                     Long orderId,
-                    PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting,
                     Long orderLineId,
-                    SalesOrderCommand salesOrderCommand){
+                    PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting,
+                    List<CouponCodeCommand> couponCodes){
+
         OrderPromotion orderPromotion = new OrderPromotion();
         // 订单id
         orderPromotion.setOrderId(orderId);
@@ -114,7 +114,8 @@ public class SdkOrderPromotionManagerImpl implements SdkOrderPromotionManager{
             List<String> list = new ArrayList<String>(couponCodesSet);
             for (String couponcode : list){
                 if (couponcode.equals(CouponCodeCommand.BRUSHHEAD_COUPON)){
-                    for (CouponCodeCommand couponCodeCommand : salesOrderCommand.getCouponCodes()){
+
+                    for (CouponCodeCommand couponCodeCommand : couponCodes){
                         if (couponCodeCommand.getIsOut()){
                             newSet.add(couponCodeCommand.getCouponCode());
                         }

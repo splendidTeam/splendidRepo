@@ -61,11 +61,13 @@ public class SdkOrderLineManagerImpl implements SdkOrderLineManager{
      * com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand)
      */
     @Override
-    //TODO feilong bundle 下单要进行拆分
     public OrderLine saveOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
         OrderLine orderLine = new OrderLine();
+        // 订单id
+        orderLine.setOrderId(orderId);
         // 商品数量
-        orderLine.setCount(shoppingCartLineCommand.getQuantity());
+        Integer quantity = shoppingCartLineCommand.getQuantity();
+        orderLine.setCount(quantity);
 
         //直推赠品(送完即止) 1：如果数量为零 该行不存入数据库 :2：如果库存量小于购买量时 存入库存量
         if (isNoNeedChoiceGift(shoppingCartLineCommand)){
@@ -74,22 +76,27 @@ public class SdkOrderLineManagerImpl implements SdkOrderLineManager{
                 return null;
             }
             // 无库存
-            if (null == shoppingCartLineCommand.getStock() || shoppingCartLineCommand.getStock() <= 0){
+            Integer stock = shoppingCartLineCommand.getStock();
+            if (null == stock || stock <= 0){
                 return null;
-            }else if (shoppingCartLineCommand.getStock() < shoppingCartLineCommand.getQuantity()){
-                // 库存不足
-                orderLine.setCount(shoppingCartLineCommand.getStock());
+            }else if (stock < quantity){
+                orderLine.setCount(stock);// 库存不足
             }
         }
 
-        // 订单id
-        orderLine.setOrderId(orderId);
-        // UPC
-        orderLine.setExtentionCode(shoppingCartLineCommand.getExtentionCode());
         // skuId
         orderLine.setSkuId(shoppingCartLineCommand.getSkuId());
+        // UPC
+        orderLine.setExtentionCode(shoppingCartLineCommand.getExtentionCode());
         // 商品id
         orderLine.setItemId(shoppingCartLineCommand.getItemId());
+        //对应关联关系的商品id.
+        orderLine.setRelatedItemId(shoppingCartLineCommand.getRelatedItemId());
+        // 商品名称
+        orderLine.setItemName(shoppingCartLineCommand.getItemName());
+        // 商品主图
+        orderLine.setItemPic(shoppingCartLineCommand.getItemPic());
+        //******************************************************************************************
         // 原销售单价
         orderLine.setMSRP(shoppingCartLineCommand.getListPrice());
         // 现销售单价
@@ -105,17 +112,14 @@ public class SdkOrderLineManagerImpl implements SdkOrderLineManager{
             orderLine.setType(ItemInfo.TYPE_MAIN);
         }
 
-        // 商品名称
-        orderLine.setItemName(shoppingCartLineCommand.getItemName());
-        // 商品主图
-        orderLine.setItemPic(shoppingCartLineCommand.getItemPic());
         // 销售属性信息
         orderLine.setSaleProperty(shoppingCartLineCommand.getSaleProperty());
         // 行类型
         orderLine.setType(shoppingCartLineCommand.getType());
         // 分组号
-        if (Validator.isNotNullOrEmpty(shoppingCartLineCommand.getLineGroup())){
-            orderLine.setGroupId(Integer.valueOf(shoppingCartLineCommand.getLineGroup().toString()));
+        Long lineGroup = shoppingCartLineCommand.getLineGroup();
+        if (Validator.isNotNullOrEmpty(lineGroup)){
+            orderLine.setGroupId(lineGroup.intValue());
         }
         // 评价状态
         orderLine.setEvaluationStatus(null);
@@ -131,7 +135,6 @@ public class SdkOrderLineManagerImpl implements SdkOrderLineManager{
      * @param shoppingCartLineCommand
      *            the shopping cart line command
      * @return true, if checks if is no need choice gift
-     * @since 5.3.1
      */
     private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
         return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());

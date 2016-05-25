@@ -16,7 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager;
 
-import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import java.util.List;
+
+import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 
 /**
@@ -44,17 +46,17 @@ public interface SdkOrderPromotionManager{
      *
      * @param orderId
      *            the order id
-     * @param promotionSKUDiscAMTBySetting
-     *            the promotion sku disc amt by setting
      * @param orderLineId
      *            the order line id
-     * @param salesOrderCommand
+     * @param promotionSKUDiscAMTBySetting
+     *            the promotion sku disc amt by setting
+     * @param couponCodes
      *            the sales order command
      */
     void savaOrderPromotion(
                     Long orderId,
-                    PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting,
                     Long orderLineId,
-                    SalesOrderCommand salesOrderCommand);
+                    PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting,
+                    List<CouponCodeCommand> couponCodes);
 
 }
