@@ -147,9 +147,9 @@ public interface SdkShoppingCartManager extends BaseManager{
      * 
      * @param memberId
      * @param shoppingCartLineId
-     * @return
+     * @return true表示成功 false标识失败
      */
-    Integer removeShoppingCartLineById(Long memberId,Long shoppingCartLineId);
+    boolean removeShoppingCartLineById(Long memberId,Long shoppingCartLineId);
 
     /**
      * 清空该会员的购物车
@@ -164,8 +164,9 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @param memberId
      * @param extentionCodes
      * @param settleState
+     * @return true标识成功 false标识失败
      */
-    Integer updateCartLineSettlementState(Long memberId,List<String> extentionCodes,Integer settleState);
+    boolean updateCartLineSettlementState(Long memberId,List<String> extentionCodes,Integer settleState);
 
     /**
      * 立即购买

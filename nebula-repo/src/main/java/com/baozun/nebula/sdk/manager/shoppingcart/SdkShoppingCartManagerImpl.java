@@ -602,28 +602,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return retval;
     }
 
-    /**
-     * 根据购物车id移除购物车行.
-     *
-     * @param memberId
-     *            the member id
-     * @param shoppingCartLineId
-     *            the shopping cart line id
-     * @return 移除购物车行是否成功 success表示成功 failure表示失败
-     */
     @Override
-    public Integer removeShoppingCartLineById(Long memberId,Long shoppingCartLineId){
-        Integer retval = 0;
-        if (null != memberId){
-            try{
-                // 根据memberId和购物车行删除购物车行
-                retval = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, shoppingCartLineId);
-            }catch (Exception e){
-                log.error("removeShoppingCartLineById error: " + e);
-                return FAILURE;
-            }
-        }
-        return retval;
+    public boolean removeShoppingCartLineById(Long memberId,Long shoppingCartLineId){
+        return 1 == sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, shoppingCartLineId);
     }
 
     /**
@@ -888,29 +869,15 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return true;
     }
 
-    /**
-     * 修改购物车的选中状态(之前的功能，暂时不用).
-     *
-     * @param userId
-     *            the user id
-     * @param extentionCodes
-     *            the extention codes
-     * @param settleState
-     *            the settle state
-     * @return the integer
-     */
     @Override
-    public Integer updateCartLineSettlementState(Long userId,List<String> extentionCodes,Integer settleState){
-        Integer updateCount = 0;
-        if (null != userId){
-            // 会员
-            updateCount = sdkShoppingCartLineDao.updateCartLineSettleState(userId, extentionCodes, settleState);
-            if (updateCount != extentionCodes.size()){
-                Object[] args = { 0, 1 };
-                throw new BusinessException(Constants.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, args);
-            }
+    public boolean updateCartLineSettlementState(Long memberId,List<String> extentionCodes,Integer settleState){
+        // 会员
+        Integer updateCount = sdkShoppingCartLineDao.updateCartLineSettleState(memberId, extentionCodes, settleState);
+        if (updateCount != extentionCodes.size()){
+            Object[] args = { 0, 1 };
+            throw new BusinessException(Constants.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, args);
         }
-        return SUCCESS;
+        return true;
     }
 
     /**

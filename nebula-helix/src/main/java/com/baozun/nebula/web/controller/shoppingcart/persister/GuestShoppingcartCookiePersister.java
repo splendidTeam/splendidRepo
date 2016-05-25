@@ -24,7 +24,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -133,10 +132,6 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
         // 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象
         List<CookieShoppingCartLine> cookieLines = new ArrayList<CookieShoppingCartLine>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLines){
-
-            //TODO feilong 坑爹啊  老的代码 有一部分是基于 extentionCode走的
-            String extentionCode = shoppingCartLineCommand.getExtentionCode();
-            Validate.notBlank(extentionCode, "extentionCode can't be blank!");
 
             CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
 
