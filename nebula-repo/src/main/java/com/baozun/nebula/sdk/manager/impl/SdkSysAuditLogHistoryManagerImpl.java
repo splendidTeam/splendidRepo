@@ -17,7 +17,9 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +40,7 @@ import com.baozun.nebula.model.system.SysAuditLog;
 import com.baozun.nebula.model.system.SysAuditLogHistory;
 import com.baozun.nebula.sdk.manager.SdkSysAuditLogHistoryManager;
 import com.feilong.core.Validator;
+import com.feilong.core.date.CalendarUtil;
 
 /**
  * SysAuditLogHistoryManager
@@ -120,27 +123,21 @@ public class SdkSysAuditLogHistoryManagerImpl implements SdkSysAuditLogHistoryMa
      */
 	@Override
 	public void archive() {
-		List<SysAuditLog> sysAuditLogs = sysAuditLogDao.findAllSysAuditLogList();
-		if(Validator.isNotNullOrEmpty(sysAuditLogs)){
-			try {
-				for(SysAuditLog sysAuditLog :sysAuditLogs){
-					SysAuditLogHistory sysAuditLogHistory = new SysAuditLogHistory();
-					PropertyUtil.copyProperties(sysAuditLog, sysAuditLogHistory);
-					sysAuditLogHistory.setArchiveTime(new Date());
-					sysAuditLogHistoryDao.save(sysAuditLogHistory);
-				}
-				sysAuditLogDao.deleteSysAuditLogListByQueryMap(null);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-				throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-				throw new BusinessException(ErrorCodes.SYSTEM_ERROR);
-			}
-		}
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("createTimeStart", getCreateTimeStart());
+        
+        sysAuditLogHistoryDao.archiveSysAuditLogToHistoryByQueryMap(paraMap);
+		sysAuditLogDao.deleteSysAuditLogListByQueryMap(paraMap);
+	}
+
+	/**
+	 * 当前日期的前一个月
+	 * @return
+	 */
+	private Date getCreateTimeStart() {
+		Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONTH, -1);
+		return CalendarUtil.toDate(c);
 	};
 	
 }
