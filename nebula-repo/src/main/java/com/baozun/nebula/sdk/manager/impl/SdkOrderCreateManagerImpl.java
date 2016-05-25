@@ -161,13 +161,22 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
             throw new BusinessException(Constants.SHOPCART_IS_NULL);
         }
 
+        preCreateOrder(shoppingCartCommand, salesOrderCommand, memCombos);
+
+        return saveOrderInfo(salesOrderCommand, shoppingCartCommand);
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @param salesOrderCommand
+     * @param memCombos
+     */
+    private void preCreateOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
         //去除抬头和未选中的商品
         refactoringShoppingCartCommand(shoppingCartCommand);
 
         // 下单之前的引擎检查
         sdkEngineManager.createOrderDoEngineChck(salesOrderCommand.getMemberId(), memCombos, shoppingCartCommand);
-
-        return saveOrderInfo(salesOrderCommand, shoppingCartCommand);
     }
 
     /*
