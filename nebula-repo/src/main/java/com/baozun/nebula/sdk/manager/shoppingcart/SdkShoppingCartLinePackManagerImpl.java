@@ -209,6 +209,7 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
      * @return Boolean
      * @Description: 检查商品是否上架
      */
+    //TODO feilong 重复了
     private Boolean checkActiveBeginTime(Long skuId){
 
         List<Long> skuids = new ArrayList<Long>();

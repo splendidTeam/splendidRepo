@@ -24,29 +24,15 @@ public interface SdkEngineManager extends BaseManager{
     /**
      * 引擎检查, 不对赠品检查
      * 
+     * @param flag
+     *            添加或减少
      * @param skuId
      * @param extentionCode
      * @param qty
      *            数量
-     * @param flag
-     *            添加或减少
-     * @param cart
-     *            购物车
-     * @param purchaseLimitationList
-     *            限购规则
-     *            检察
-     *            1, iteminfo.type != 0
-     *            1, sku.lifecycle != 1
-     *            2, active begin time 是否大于 now()
-     *            3, chck inventory.
-     *            4, 检查限购
-     * 
-     *            常规商品的有效性库存时, 用到line中的stock,
-     *            1, 主买品line中的stock是商品的库存数
-     *            2, 赠品line中的stock是商品的库存数-主买品的qty
-     * 
+     * @since 5.3.1
      */
-    Integer doEngineCheck(ShoppingCartLineCommand line,boolean flag,ShoppingCartCommand cart,List<LimitCommand> purchaseLimitationList);
+    Integer doEngineCheck(ShoppingCartLineCommand line,boolean flag);
 
     /**
      * 引擎检查, 只对赠品而言

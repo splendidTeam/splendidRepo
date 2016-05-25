@@ -493,7 +493,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             purchaseLimitationList = new ArrayList<LimitCommand>();
 
         // 商品的有效性检查
-        sdkEngineManager.doEngineCheck(shoppingCartLine, flag, cart, purchaseLimitationList);
+        sdkEngineManager.doEngineCheck(shoppingCartLine, flag);
 
         // 限购检查
         List<ShoppingCartLineCommand> errorLineList = sdkEngineManager.doEngineCheckLimit(cart, purchaseLimitationList);
@@ -6187,7 +6187,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
                 if (new Integer(CHECKED_STATE).equals(line.getSettlementState())){
                     // 检查商品有效性
-                    sdkEngineManager.doEngineCheck(line, false, cart, purchaseLimitationList);
+                    sdkEngineManager.doEngineCheck(line, false);
                 }
 
             }

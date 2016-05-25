@@ -217,9 +217,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
             List<ShoppingCartLineCommand> lines = new ArrayList<ShoppingCartLineCommand>();
             for (ShoppingCartLineCommand shoppingCartLineCommand : shopShoppingCartCommand.getShoppingCartLineCommands()){
                 // 排除是标题行 或者（是赠品 1需要用户选择 0未选中） 
-                if (!(shoppingCartLineCommand.isCaptionLine() || (shoppingCartLineCommand.isGift()
-                                && shoppingCartLineCommand.getGiftChoiceType() == 1 && (shoppingCartLineCommand.getSettlementState() == null
-                                                || shoppingCartLineCommand.getSettlementState() == 0)))){
+                boolean noCheck = shoppingCartLineCommand.getSettlementState() == null || shoppingCartLineCommand.getSettlementState() == 0;
+                if (!(shoppingCartLineCommand.isCaptionLine()
+                                || (shoppingCartLineCommand.isGift() && shoppingCartLineCommand.getGiftChoiceType() == 1 && noCheck))){
                     lines.add(shoppingCartLineCommand);
                     newAllShoppingCartLineCommandList.add(shoppingCartLineCommand);
                 }

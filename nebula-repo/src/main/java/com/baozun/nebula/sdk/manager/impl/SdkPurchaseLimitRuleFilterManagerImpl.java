@@ -116,7 +116,7 @@ public class SdkPurchaseLimitRuleFilterManagerImpl implements SdkPurchaseLimitRu
 	 * @return
 	 */
 	@Override
-	public List<LimitCommand> getIntersectPurchaseLimitRuleData(List<Long> shopIds, Set<String> crowdComboIds, Set<String> itemComboIds, Date currentTime) {
+    public List<LimitCommand> getIntersectPurchaseLimitRuleData(List<Long> shopIds, Set<String> crowdComboIds, Set<String> itemComboIds, Date currentTime) {
 
 		limits = EngineManager.getInstance().getLimitCommandList();
 
