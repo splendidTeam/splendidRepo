@@ -96,7 +96,7 @@
 							       		 -1)
 	       				#end
 	       			    #if($instanceId)
-	       					and INSTANCE_ID =:$instanceId
+	       					and INSTANCE_ID =:instanceId
 	       				#end
 	       				#if($createTime)
 	       					and CREATE_TIME >= :createTimeStart

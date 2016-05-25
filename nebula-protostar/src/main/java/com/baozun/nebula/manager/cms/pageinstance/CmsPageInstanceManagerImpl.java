@@ -296,10 +296,25 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			log.info("PublishPage Success, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode());
 		}catch(Exception e){
 			log.info("PublishPage Error, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode()+", error cause is "+e.getMessage());
+			e.printStackTrace();
 		}
 		
 	}
-
+	
+	@Override
+	public void cancelExpireVersion(Long pageId){
+		//校验该模块下的版本是否有发布到期没有取消掉的
+		Map<String, Object> expire = new HashMap<String, Object>();
+		expire.put("instanceId", pageId);
+		expire.put("endTimeEnd", new Date());
+		expire.put("lifecycle", 1);
+		expire.put("ispublished", true);
+		List<CmsPageInstanceVersion> expireVersions = cmsPageInstanceVersionManager.findCmsPageInstanceVersionListByParaMap(expire);
+		for(CmsPageInstanceVersion expireVersion : expireVersions){
+			log.info("publish page's id is " + pageId + "it's expired version's id is " + expireVersion.getId());
+			cmsPageInstanceVersionManager.cancelPublishedPageInstanceVersion(expireVersion.getId());	
+		}
+	}
 
 	@Override
 	public CmsPageInstance checkPageInstanceCode(String code, Long pageId) {
@@ -357,6 +372,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 		
 	}
 
+	
 
 	
 }
