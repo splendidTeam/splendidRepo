@@ -30,58 +30,64 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * @see com.baozun.nebula.model.salesorder.SalesOrder
  * @since 5.3.1
  */
-public class SimpleOrderViewCommand extends BaseViewCommand{
+public class SimpleOrderViewCommand extends BaseViewCommand {
 
     /** The Constant serialVersionUID. */
-    private static final long                   serialVersionUID = -290693655189583423L;
+    private static final long serialVersionUID = -290693655189583423L;
 
     /** 订单id. */
-    private Long                              orderId;
+    private Long orderId;
 
     /** 订单code. */
-    private String                              orderCode;
+    private String orderCode;
 
     /** 创建时间. */
-    private Date                                createTime;
+    private Date createTime;
 
     /** 物流状态. */
-    private Integer                             logisticsStatus;
+    private Integer logisticsStatus;
 
     /** 财务状态. */
-    private Integer                             financialStatus;
+    private Integer financialStatus;
 
     /** 支付方式. */
-    private Integer                             payment;
+    private Integer payment;
 
     /** 每个订单行. */
     private List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList;
 
     /** 总价. */
-    private BigDecimal                          total;
+    private BigDecimal total;
+
     /**
      * 是否评论 0 未评论 1位评论
      */
-    private int                                  isRate;
-    
+    private int isRate;
+
     /** 拆单号 **/
-    private String                          subOrdinate;
+    private String subOrdinate;
+
+    /** 实付运费. */
+    private BigDecimal actualFreight;
+
+    /** 折扣 */
+    private BigDecimal discount;
 
     /**
      * 获得 订单code.
      *
      * @return the orderCode
      */
-    public String getOrderCode(){
+    public String getOrderCode() {
         return orderCode;
     }
 
     /**
      * 设置 订单code.
      *
-     * @param orderCode
-     *            the orderCode to set
+     * @param orderCode the orderCode to set
      */
-    public void setOrderCode(String orderCode){
+    public void setOrderCode(String orderCode) {
         this.orderCode = orderCode;
     }
 
@@ -90,17 +96,16 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the createTime
      */
-    public Date getCreateTime(){
+    public Date getCreateTime() {
         return createTime;
     }
 
     /**
      * 设置 创建时间.
      *
-     * @param createTime
-     *            the createTime to set
+     * @param createTime the createTime to set
      */
-    public void setCreateTime(Date createTime){
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
@@ -109,17 +114,16 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the logisticsStatus
      */
-    public Integer getLogisticsStatus(){
+    public Integer getLogisticsStatus() {
         return logisticsStatus;
     }
 
     /**
      * 设置 物流状态.
      *
-     * @param logisticsStatus
-     *            the logisticsStatus to set
+     * @param logisticsStatus the logisticsStatus to set
      */
-    public void setLogisticsStatus(Integer logisticsStatus){
+    public void setLogisticsStatus(Integer logisticsStatus) {
         this.logisticsStatus = logisticsStatus;
     }
 
@@ -128,17 +132,16 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the financialStatus
      */
-    public Integer getFinancialStatus(){
+    public Integer getFinancialStatus() {
         return financialStatus;
     }
 
     /**
      * 设置 财务状态.
      *
-     * @param financialStatus
-     *            the financialStatus to set
+     * @param financialStatus the financialStatus to set
      */
-    public void setFinancialStatus(Integer financialStatus){
+    public void setFinancialStatus(Integer financialStatus) {
         this.financialStatus = financialStatus;
     }
 
@@ -147,17 +150,16 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the payment
      */
-    public Integer getPayment(){
+    public Integer getPayment() {
         return payment;
     }
 
     /**
      * 设置 支付方式.
      *
-     * @param payment
-     *            the payment to set
+     * @param payment the payment to set
      */
-    public void setPayment(Integer payment){
+    public void setPayment(Integer payment) {
         this.payment = payment;
     }
 
@@ -166,17 +168,17 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the simpleOrderLineSubViewCommandList
      */
-    public List<SimpleOrderLineSubViewCommand> getSimpleOrderLineSubViewCommandList(){
+    public List<SimpleOrderLineSubViewCommand> getSimpleOrderLineSubViewCommandList() {
         return simpleOrderLineSubViewCommandList;
     }
 
     /**
      * 设置 每个订单行.
      *
-     * @param simpleOrderLineSubViewCommandList
-     *            the simpleOrderLineSubViewCommandList to set
+     * @param simpleOrderLineSubViewCommandList the simpleOrderLineSubViewCommandList to set
      */
-    public void setSimpleOrderLineSubViewCommandList(List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList){
+    public void setSimpleOrderLineSubViewCommandList(
+            List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList) {
         this.simpleOrderLineSubViewCommandList = simpleOrderLineSubViewCommandList;
     }
 
@@ -185,17 +187,16 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the total
      */
-    public BigDecimal getTotal(){
+    public BigDecimal getTotal() {
         return total;
     }
 
     /**
      * 设置总价.
      *
-     * @param total
-     *            the total to set
+     * @param total the total to set
      */
-    public void setTotal(BigDecimal total){
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
@@ -204,17 +205,16 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
      *
      * @return the orderId
      */
-    public Long getOrderId(){
+    public Long getOrderId() {
         return orderId;
     }
 
     /**
      * 设置 订单id.
      *
-     * @param orderId
-     *            the orderId to set
+     * @param orderId the orderId to set
      */
-    public void setOrderId(Long orderId){
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 
@@ -233,6 +233,21 @@ public class SimpleOrderViewCommand extends BaseViewCommand{
     public void setSubOrdinate(String subOrdinate) {
         this.subOrdinate = subOrdinate;
     }
-    
-    
+
+    public BigDecimal getActualFreight() {
+        return actualFreight;
+    }
+
+    public void setActualFreight(BigDecimal actualFreight) {
+        this.actualFreight = actualFreight;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
 }

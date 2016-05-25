@@ -27,41 +27,49 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * @see com.baozun.nebula.model.salesorder.SalesOrder
  * @since 5.3.1
  */
-public class InvoiceInfoSubViewCommand extends BaseViewCommand{
+public class InvoiceInfoSubViewCommand extends BaseViewCommand {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -6400008677521495969L;
 
     /** 发票类型. */
-    private Integer           receiptType;
+    private Integer receiptType;
 
     /** 发票抬头 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司. */
-    private String            receiptTitle;
+    private String receiptTitle;
 
     /** 发票内容 发票内容,比如 明细 办公用品 电脑配件 耗材. */
-    private String            receiptContent;
+    private String receiptContent;
 
     /** 发票号. */
-    private String            receiptCode;
+    private String receiptCode;
 
-    //TODO feilong 缺少属性
+    /** 发票收货人. */
+    private String receiptConsignee;
+
+    /** 发票收货人联系方式. */
+    private String receiptTelphone;
+
+    /** 发票收货地址. */
+    private String receiptAddress;
+
+    // TODO feilong 缺少属性
 
     /**
      * 获得 发票类型.
      *
      * @return the receiptType
      */
-    public Integer getReceiptType(){
+    public Integer getReceiptType() {
         return receiptType;
     }
 
     /**
      * 设置 发票类型.
      *
-     * @param receiptType
-     *            the receiptType to set
+     * @param receiptType the receiptType to set
      */
-    public void setReceiptType(Integer receiptType){
+    public void setReceiptType(Integer receiptType) {
         this.receiptType = receiptType;
     }
 
@@ -70,17 +78,16 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand{
      *
      * @return the receiptTitle
      */
-    public String getReceiptTitle(){
+    public String getReceiptTitle() {
         return receiptTitle;
     }
 
     /**
      * 设置 发票抬头 发票抬头,比如 个人 还是 上海宝尊电子商务有限公司.
      *
-     * @param receiptTitle
-     *            the receiptTitle to set
+     * @param receiptTitle the receiptTitle to set
      */
-    public void setReceiptTitle(String receiptTitle){
+    public void setReceiptTitle(String receiptTitle) {
         this.receiptTitle = receiptTitle;
     }
 
@@ -89,17 +96,16 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand{
      *
      * @return the receiptContent
      */
-    public String getReceiptContent(){
+    public String getReceiptContent() {
         return receiptContent;
     }
 
     /**
      * 设置 发票内容 发票内容,比如 明细 办公用品 电脑配件 耗材.
      *
-     * @param receiptContent
-     *            the receiptContent to set
+     * @param receiptContent the receiptContent to set
      */
-    public void setReceiptContent(String receiptContent){
+    public void setReceiptContent(String receiptContent) {
         this.receiptContent = receiptContent;
     }
 
@@ -108,18 +114,41 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand{
      *
      * @return the receiptCode
      */
-    public String getReceiptCode(){
+    public String getReceiptCode() {
         return receiptCode;
     }
 
     /**
      * 设置 发票号.
      *
-     * @param receiptCode
-     *            the receiptCode to set
+     * @param receiptCode the receiptCode to set
      */
-    public void setReceiptCode(String receiptCode){
+    public void setReceiptCode(String receiptCode) {
         this.receiptCode = receiptCode;
     }
 
+    
+    public String getReceiptConsignee() {
+        return receiptConsignee;
+    }
+
+    public void setReceiptConsignee(String receiptConsignee) {
+        this.receiptConsignee = receiptConsignee;
+    }
+
+    public String getReceiptTelphone() {
+        return receiptTelphone;
+    }
+
+    public void setReceiptTelphone(String receiptTelphone) {
+        this.receiptTelphone = receiptTelphone;
+    }
+
+    public String getReceiptAddress() {
+        return receiptAddress;
+    }
+
+    public void setReceiptAddress(String receiptAddress) {
+        this.receiptAddress = receiptAddress;
+    }
 }

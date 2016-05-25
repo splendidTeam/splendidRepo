@@ -45,7 +45,7 @@ public class SimpleOrderViewCommandConverter extends BaseConverter<SimpleOrderVi
             SimpleOrderCommand simpleOrderCommand = (SimpleOrderCommand) data;
             SimpleOrderViewCommand simpleOrderViewCommand = new SimpleOrderViewCommand();
             PropertyUtil.copyProperties(simpleOrderViewCommand, simpleOrderCommand, "orderId", "orderCode",
-                    "createTime", "logisticsStatus", "financialStatus", "payment", "total");
+                    "createTime", "logisticsStatus", "financialStatus", "payment", "total","discount","actualFreight","isRate");
             simpleOrderViewCommand.setSimpleOrderLineSubViewCommandList(
                     orderLineManager.findByOrderID(simpleOrderCommand.getOrderId()));
             if(simpleOrderCommand.getFinancialStatus()==1){
