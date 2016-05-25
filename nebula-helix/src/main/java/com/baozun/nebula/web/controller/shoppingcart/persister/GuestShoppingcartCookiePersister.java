@@ -17,14 +17,12 @@
 package com.baozun.nebula.web.controller.shoppingcart.persister;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,6 +142,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
             public CookieShoppingCartLine transform(ShoppingCartLineCommand shoppingCartLineCommand){
                 CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
                 PropertyUtil.copyProperties(cookieShoppingCartLine, shoppingCartLineCommand, COPY_PROPERTY_NAMES);
+
                 cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
                 // TODO feilong bundle 以后再考虑 id
                 cookieShoppingCartLine.setId(
