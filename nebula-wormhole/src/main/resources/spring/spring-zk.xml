@@ -11,12 +11,14 @@
 		">
 <bean id="systemConfigWatchInvoke" class="com.baozun.nebula.zk.SystemConfigWatchInvoke"></bean>
 <bean id="scheduleTaskWatchInvoker" class ="com.baozun.nebula.zk.ScheduleTaskWatchInvoker"></bean>
-
+<bean id="i18nLangWatchInvoke"  class="com.baozun.nebula.zk.I18nLangWatchInvoke"></bean>
+	
 <bean id="watchControl" class="com.baozun.nebula.zk.WatchControl">
 		<constructor-arg>
 			<list>
 			 	<ref bean="scheduleTaskWatchInvoker" />
 				 <ref bean="systemConfigWatchInvoke"/>
+				 <ref bean="i18nLangWatchInvoke"/>
 			</list>
 		</constructor-arg>
 	</bean>

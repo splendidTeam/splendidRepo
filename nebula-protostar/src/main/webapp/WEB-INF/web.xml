@@ -27,7 +27,6 @@
 		</init-param>
 	</filter>
 
-
 	<!-- Spring Security -->
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
@@ -42,6 +41,16 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
+	<filter>
+		<filter-name>auditLogFilter</filter-name>
+		<filter-class>com.baozun.nebula.web.filter.AuditLogFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>auditLogFilter</filter-name>
+		<url-pattern>*.json</url-pattern>
+        <url-pattern>*.htm</url-pattern>
+	</filter-mapping>
 	<!-- 用于防范XSS -->
 	<filter>
 		<filter-name>securityFilter</filter-name>
@@ -59,6 +68,17 @@
 	<filter-mapping>
 		<filter-name>csrfFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		<filter-name>auditLogFilter</filter-name>
+		<filter-class>com.baozun.nebula.web.filter.AuditLogFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>auditLogFilter</filter-name>
+		<url-pattern>*.json</url-pattern>
+        <url-pattern>*.htm</url-pattern>
 	</filter-mapping>
 	
 <!-- 	<filter> -->
@@ -119,7 +139,7 @@
 	
 	<servlet>
 		<servlet-name>systemServlet</servlet-name>
-		<servlet-class>com.baozun.nebula.servlet.SystemInitServlet</servlet-class>
+		<servlet-class>com.baozun.nebula.web.servlet.SystemInitServlet</servlet-class>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 

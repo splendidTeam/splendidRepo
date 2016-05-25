@@ -53,16 +53,11 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
 
     @Override
     public void savePayInfoLogOfPayMain(SalesOrderCommand salesOrderCommand,String subOrdinate,PayInfo payInfo){
-        Boolean codFlag = salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD);
 
         PayInfoLog payInfoLog = new PayInfoLog();
 
         payInfoLog.setOrderId(payInfo.getOrderId());
-        if (codFlag){
-            payInfoLog.setPaySuccessStatus(true);
-        }else{
-            payInfoLog.setPaySuccessStatus(false);
-        }
+        payInfoLog.setPaySuccessStatus(salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD));
         payInfoLog.setCallCloseStatus(false);
         payInfoLog.setPayType(salesOrderCommand.getPayment());
         payInfoLog.setPayMoney(payInfo.getPayMoney());

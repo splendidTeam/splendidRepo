@@ -388,6 +388,8 @@ public class Constants {
 	public static final String CMS_COPY_ERROR = "版本拷贝失败";
 	/* 不存在拷贝的版本 */
 	public static final String CMS_COPY_NOEXISTVERSION = "不存在拷贝的版本";
+	/* 当前页面发布时间与其版本页面的发布时间有冲突 */
+	public static final String CMS_PUBLISH_PAGE_CONFLICT_VERSION = "当前页面发布时间与其版本页面的发布时间有冲突";
 	
 	/********************************************** 默认排序设置end ******************/
 	

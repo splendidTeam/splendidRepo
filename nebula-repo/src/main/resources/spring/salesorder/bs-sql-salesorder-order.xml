@@ -143,7 +143,8 @@
 						o.MODIFY_TIME as modifyTime,
 						o.CREATE_TIME as createTime,
 						o.logistics_provider_code as logisticsProviderCode,
-                        o.logistics_provider_name as logisticsProviderName,  
+                        o.logistics_provider_name as logisticsProviderName,
+                        o.lang as lang,  
 						
 						sc.NAME,
 						sc.COUNTRY,
@@ -1154,6 +1155,7 @@
 					o.PAYMENT,
 					o.TOTAL ,
 					o.DISCOUNT,
+					o. actual_freight as actualFreight,
 					mytable2.isRate
 					from t_so_salesorder as o
 					inner join (
@@ -1218,7 +1220,8 @@
 					o.FINANCIAL_STATUS as financialStatus,
 					o.PAYMENT,
 					o.TOTAL ,
-					o.DISCOUNT
+					o.DISCOUNT,
+					o. actual_freight as actualFreight
 					from t_so_salesorder as o
 					inner join (
 							select line.order_id as id,string_agg(line.item_pic,',') as itemPics from t_so_orderline line group by line.order_id 

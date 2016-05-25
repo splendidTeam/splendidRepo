@@ -270,7 +270,7 @@ public class CmsModuleInstanceVersionController extends BaseController {
 			cmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		}catch(BusinessException e){
 			bwe.setIsSuccess(false);
-			bwe.setDescription(Constants.CMS_PUBLISH_SUCCESS);
+			bwe.setDescription(e.getMessage());
 		}
 
 		return bwe;

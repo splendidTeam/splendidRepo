@@ -29,6 +29,5 @@
             <property name="paramName" value="siteLanguage"/>
         </bean>
         <bean class="com.baozun.nebula.web.interceptor.LangInterceptor"/>
-        <bean class="com.baozun.nebula.web.interceptor.AuditLogInterceptor"/>
     </mvc:interceptors>
 </beans>

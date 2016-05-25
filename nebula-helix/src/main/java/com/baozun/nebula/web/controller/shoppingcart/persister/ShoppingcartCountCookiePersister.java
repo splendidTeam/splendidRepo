@@ -24,9 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.constants.CookieKeyConstants;
-import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
 import com.feilong.servlet.http.CookieUtil;
 
 /**
@@ -79,8 +78,7 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     //TODO feilong 
     protected int getTotalCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 将购物车数量塞到Cookie 里面去
-        return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
-                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
+        return ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
     }
 
     /**

@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.web.MemberDetails;
 
 /**
@@ -71,11 +71,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
 
-        boolean result = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
-        if (!result){
-            return ShoppingcartResult.OPERATE_ERROR;
-        }
-        return null;
+        boolean success = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
+        return success ? null : ShoppingcartResult.OPERATE_ERROR;
     }
 
     /*
@@ -94,11 +91,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
 
-        boolean result = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
-        if (!result){
-            return ShoppingcartResult.OPERATE_ERROR;
-        }
-        return null;
+        boolean success = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
+        return success ? null : ShoppingcartResult.OPERATE_ERROR;
     }
 
     /*
@@ -116,11 +110,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     ShoppingCartLineCommand currentLine,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        Integer result = sdkShoppingCartManager.removeShoppingCartLineById(memberDetails.getGroupId(), currentLine.getId());
-        if (com.baozun.nebula.sdk.constants.Constants.FAILURE.equals(result)){
-            return ShoppingcartResult.OPERATE_ERROR;
-        }
-        return null;
+        boolean success = sdkShoppingCartManager.removeShoppingCartLineById(memberDetails.getGroupId(), currentLine.getId());
+        return success ? null : ShoppingcartResult.OPERATE_ERROR;
 
     }
 
