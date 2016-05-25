@@ -58,7 +58,7 @@ public class OrderLineCommand extends BaseModel{
 	private String						itemName;
 
 	/** 商品标签名称 */
-	private List<String>			propertyName;
+	private List<String>			                propertyName;
 
 	/** 商品主图 */
 	private String						itemPic;
