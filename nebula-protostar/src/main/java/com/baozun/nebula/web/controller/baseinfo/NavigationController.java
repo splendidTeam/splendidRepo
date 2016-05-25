@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,15 +71,13 @@ import com.baozun.nebula.solr.command.ItemForSolrCommand;
 import com.baozun.nebula.solr.factory.NebulaSolrQueryFactory;
 import com.baozun.nebula.solr.utils.FilterUtil;
 import com.baozun.nebula.solr.utils.JsonFormatUtil;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.I18nCommand;
+import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
-
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 /**
  * 菜单导航管理
@@ -123,6 +124,11 @@ public class NavigationController extends BaseController{
 	 * 已排序标志
 	 */
 	private final String SORT_FLG="SORT";
+	
+	/***
+	 * 非排序商品一页数量
+	 */
+	private final Integer PAGE_SIZE=15;
 	
 	
 	
@@ -325,8 +331,8 @@ public class NavigationController extends BaseController{
 	 */
 	@RequestMapping(value = "/navigation/{navigationId}/itemUnsortedList.json")
 	@ResponseBody
-	public Pagination<ItemForSolrCommand> findItemCtListJson(@PathVariable Long navigationId){
-		return  getUnsortedList(navigationId);
+	public Pagination<ItemForSolrCommand> findItemCtListJson(@QueryBeanParam QueryBean queryBean, @PathVariable Long navigationId){
+		return  getUnsortedList(queryBean,navigationId);
 	}
 
 	/**
@@ -430,7 +436,7 @@ public class NavigationController extends BaseController{
 	
 	private boolean allInNavigationSolr(String[] codes,Long navigationId ){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
-		SearchCommand SearchCommand = buildSearchCommand(itemCollection,null);
+		SearchCommand SearchCommand = buildSearchCommand(itemCollection,null,null);
 		 SearchResultPage<ItemForSolrCommand> searchResultPage= searchNavigation(SearchCommand);
 		for (String code : codes){
 			if(code.length()==0){
@@ -493,12 +499,12 @@ public class NavigationController extends BaseController{
 	}
 
 	
-	public Pagination<ItemForSolrCommand> getUnsortedList(Long navigationId){
+	public Pagination<ItemForSolrCommand> getUnsortedList(QueryBean queryBean,Long navigationId){
 		ItemCollection itemCollection = sdkItemCollectionManager.findItemCollectionByNavigationId(navigationId);
 		if(itemCollection==null ){
 			return null;
 		}
-		SearchCommand SearchCommand = buildSearchCommand(itemCollection,UNSORT_FLG);
+		SearchCommand SearchCommand = buildSearchCommand(itemCollection,UNSORT_FLG,queryBean);
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(SearchCommand);
 		return searchResultPage.getItemsListWithOutGroup();
 	}
@@ -509,7 +515,7 @@ public class NavigationController extends BaseController{
 		if(itemCollection==null || itemCollection.getSequence()==null||itemCollection.getSequence().length()==0){
 			return null;
 		}
-		SearchCommand SearchCommand = buildSearchCommand(itemCollection,SORT_FLG);
+		SearchCommand SearchCommand = buildSearchCommand(itemCollection,SORT_FLG,null);
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchNavigation(SearchCommand);
 		
 		SearchResultPage<ItemForSolrCommand>  sortList = new  SearchResultPage<ItemForSolrCommand>();
@@ -571,7 +577,7 @@ public class NavigationController extends BaseController{
 	 * @param type  类型  unsort：未排序; sort:已排序
 	 * @return
 	 */
-	protected SearchCommand buildSearchCommand(ItemCollection collection,String type) {
+	protected SearchCommand buildSearchCommand(ItemCollection collection,String type,QueryBean queryBean) {
 		SearchCommand searchCommand = new SearchCommand();
 		String facetParameters = collection.getFacetParameters();
 		List<FacetParameter> params =JSON.parseArray(facetParameters,FacetParameter.class);
@@ -594,7 +600,12 @@ public class NavigationController extends BaseController{
 			}
 		}
 		
-		searchCommand.setPageSize(Integer.MAX_VALUE);
+		if(queryBean!=null){
+			searchCommand.setPageSize(PAGE_SIZE);
+			searchCommand.setPageNumber(queryBean.getPage().getStartPage());
+		}else{
+			searchCommand.setPageSize(Integer.MAX_VALUE);
+		}
 		
 		return searchCommand;
 	}

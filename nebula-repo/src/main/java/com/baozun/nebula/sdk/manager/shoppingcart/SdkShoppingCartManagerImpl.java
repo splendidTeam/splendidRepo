@@ -281,7 +281,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         shoppingCartCommand.setShoppingCartLineCommands(validedLines);
 
         // 商品数量
-        shoppingCartCommand.setOrderQuantity(getOrderQuantity(validedLines));
+        shoppingCartCommand.setOrderQuantity(ShoppingCartUtil.getSumQuantity(validedLines));
 
         // 优惠券编码
         shoppingCartCommand.setCoupons(coupons);
@@ -400,17 +400,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice()));
         }
         return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-
-    /**
-     * 计算整单商品数量.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the order quantity
-     */
-    private int getOrderQuantity(List<ShoppingCartLineCommand> shoppingCartLines){
-        return Validator.isNullOrEmpty(shoppingCartLines) ? 0 : CollectionsUtil.sum(shoppingCartLines, "quantity").intValue();
     }
 
     /**
@@ -6818,7 +6807,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             cart.setCurrentPayAmount(cartByShop.getRealPayAmount());
 
             // 该店铺的商品数量
-            cartByShop.setQty(getOrderQuantity(chooseLines));
+            cartByShop.setQty(ShoppingCartUtil.getSumQuantity(chooseLines));
 
             cartByShop.setShopId(shopId);
             summaryShopCartList.add(cartByShop);

@@ -399,7 +399,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(validedLines);
 
         // 商品数量
-        shoppingCartCommand.setOrderQuantity(getOrderQuantity(validedLines));
+        shoppingCartCommand.setOrderQuantity(ShoppingCartUtil.getSumQuantity(validedLines));
 
         // 优惠券编码
         shoppingCartCommand.setCoupons(coupons);
@@ -576,7 +576,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount());
 
         // 该店铺的商品数量
-        shopCartCommandByShop.setQty(getOrderQuantity(shoppingCartLineCommandList));
+        shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));
         shopCartCommandByShop.setShopId(shopId);
         return shopCartCommandByShop;
     }
@@ -644,7 +644,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
 
-        shopCartCommandByShop.setQty(getOrderQuantity(shoppingCartLineCommandList));// 商品数量
+        shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
 
         BigDecimal originPayAmount = getOriginPayAmount(shoppingCartLineCommandList);
         shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount); // 应付小计
@@ -882,26 +882,19 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     private BigDecimal getCurSKUDiscount(
                     List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
                     final ShoppingCartLineCommand shoppingCartLineCommand){
+        final Long skuId = shoppingCartLineCommand.getSkuId();
         //TODO feilong 提取
-        return CollectionsUtil.sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
+        BigDecimal discountAmountSum = CollectionsUtil
+                        .sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
 
-            @Override
-            public boolean evaluate(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
-                boolean freeShipOrGiftMark = promotionSKUDiscAMTBySetting.getFreeShippingMark()
-                                || promotionSKUDiscAMTBySetting.getGiftMark();
-                return !freeShipOrGiftMark && shoppingCartLineCommand.getSkuId().equals(promotionSKUDiscAMTBySetting.getSkuId());
-            }
-        });
+                            @Override
+                            public boolean evaluate(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
+                                boolean freeShipOrGiftMark = promotionSKUDiscAMTBySetting.getFreeShippingMark()
+                                                || promotionSKUDiscAMTBySetting.getGiftMark();
+                                return !freeShipOrGiftMark && skuId.equals(promotionSKUDiscAMTBySetting.getSkuId());
+                            }
+                        });
+        return null == discountAmountSum ? BigDecimal.ZERO : discountAmountSum;
     }
 
-    /**
-     * 计算整单商品数量.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the order quantity
-     */
-    private int getOrderQuantity(List<ShoppingCartLineCommand> shoppingCartLines){
-        return Validator.isNullOrEmpty(shoppingCartLines) ? 0 : CollectionsUtil.sum(shoppingCartLines, "quantity").intValue();
-    }
 }

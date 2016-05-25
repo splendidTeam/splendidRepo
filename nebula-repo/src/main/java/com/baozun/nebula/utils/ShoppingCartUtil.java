@@ -48,6 +48,18 @@ public final class ShoppingCartUtil{
     }
 
     /**
+     * 计算整单商品数量.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart lines
+     * @return the order quantity
+     */
+    public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
+                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
+    }
+
+    /**
      * 根据购物车行获取ItemForCheckCommand集合.
      *
      * @param shoppingCartLineCommandList
