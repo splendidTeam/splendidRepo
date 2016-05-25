@@ -155,7 +155,7 @@ public class NebulaOrderDetailsController extends BaseController {
             // 发票信息
             InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
             PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType",
-                    "receiptTitle", "receiptContent", "receiptCode");
+                    "receiptTitle", "receiptContent", "receiptCode","receiptConsignee","receiptTelphone","receiptAddress");
             // ordline信息
             List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager
                     .findByOrderID(salesOrderCommand.getId());
@@ -169,13 +169,11 @@ public class NebulaOrderDetailsController extends BaseController {
             }
             // 物流信息
             LogisticsInfoSubViewCommand logisticsInfoSubViewCommand = new LogisticsInfoSubViewCommand();
-            LogisticsCommand logisticsCommand = logisticsManager
-                    .findLogisticsByOrderId(salesOrderCommand.getId());
+            LogisticsCommand logisticsCommand = logisticsManager.findLogisticsByOrderId(salesOrderCommand.getId());
+            PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
+                    "logisticsProviderName");
             if (null != logisticsCommand) {
-
                 String trackingDescription = logisticsCommand.getTrackingDescription();
-                PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
-                        "logisticsProviderName");
                 logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(
                         transformTrackingDescription(trackingDescription));
             }

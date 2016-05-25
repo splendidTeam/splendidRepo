@@ -29,7 +29,10 @@ public class SimpleOrderCommand {
     /**
      * 是否评论 0 未评论 1位评论
      */
-    private int                                  isRate;
+    private int  isRate;
+    
+    /** 实付运费. */
+    private BigDecimal          actualFreight;
     
     /** 折扣 */
     private BigDecimal discount;
@@ -105,6 +108,14 @@ public class SimpleOrderCommand {
 
     public void setFinancialStatus(Integer financialStatus) {
         this.financialStatus = financialStatus;
+    }
+
+    public BigDecimal getActualFreight() {
+        return actualFreight;
+    }
+
+    public void setActualFreight(BigDecimal actualFreight) {
+        this.actualFreight = actualFreight;
     }
     
     
