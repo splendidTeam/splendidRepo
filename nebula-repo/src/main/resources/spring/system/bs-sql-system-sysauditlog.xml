@@ -156,13 +156,9 @@
 				<![CDATA[  
 		       		delete from  T_SYS_AUDITLOG
 		       		where 1 = 1
-			       		#if($createTime)
+			       		#if($createTimeStart)
 	       					and CREATE_TIME >= :createTimeStart
 	       				#end
-	       				#if($createTime)
-	       					and CREATE_TIME <= :createTimeEnd
-	       				#end
-		       		 
                  ]]>
 			</value>
 		</constructor-arg>
