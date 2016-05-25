@@ -23,12 +23,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.exception.IllegalItemStateException;
 import com.baozun.nebula.manager.breadcrumb.BreadcrumbManager;
 import com.baozun.nebula.manager.system.AbstractCacheBuilder;
 import com.baozun.nebula.sdk.command.CurmbCommand;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.web.controller.breadcrumb.converter.BreadcrumbsViewCommandConverter;
 import com.baozun.nebula.web.controller.breadcrumb.viewcommand.BreadcrumbsViewCommand;
+import com.feilong.core.Validator;
 
 /**  
  * 面包屑 
@@ -54,9 +57,23 @@ public abstract class NebulaAbstractBreadcrumbController {
 	protected List<BreadcrumbsViewCommand> bulidCurmbViewCommandsWithCache(final Long navId,
 			final Long itemId,
 			final HttpServletRequest request)throws IllegalItemStateException{
+		//构造缓存key [cache_key_breadcrumb_navId_5_zh_CN]
+		String concat ="";
+		if(Validator.isNotNullOrEmpty(navId)){
+			concat +="_navId_"+navId;
+		}
+		if(Validator.isNotNullOrEmpty(itemId)){
+			concat +="_itemId_"+itemId;
+		}
+		String key =CACHE_KEY_BREADCRUMB +concat;
+		boolean i18n = LangProperty.getI18nOnOff();
+		if(i18n){
+			String lang = LangUtil.getCurrentLang();
+			key =key.concat("_").concat(lang);
+		}
 		Integer expireSeconds =getBreadcrumbCacheExpireSeconds();
 		List<CurmbCommand> curmbCommands =new AbstractCacheBuilder<List<CurmbCommand>, 
-				IllegalItemStateException>(CACHE_KEY_BREADCRUMB, expireSeconds){
+				IllegalItemStateException>(key, expireSeconds){
 			@Override
 			protected List<CurmbCommand> buildCachedObject()
 					throws IllegalItemStateException {
