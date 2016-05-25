@@ -34,13 +34,12 @@ import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 
@@ -65,10 +64,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Autowired
     private SdkItemManager             sdkItemManager;
 
-    /** The sdk engine manager. */
-    @Autowired
-    private SdkEngineManager           sdkEngineManager;
-
     @Autowired
     private ShoppingcartCountPersister shoppingcartCountPersister;
 
@@ -88,7 +83,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         // 获取购物车行信息
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         ShoppingCartLineCommand shoppingCartLineCommand = CollectionsUtil.find(mainlines, "id", shoppingcartLineId);
         if (Validator.isNullOrEmpty(shoppingCartLineCommand)){
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
@@ -130,7 +125,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletResponse response){
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         if (Validator.isNullOrEmpty(mainlines)){
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
@@ -161,7 +156,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletResponse response){
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        List<ShoppingCartLineCommand> mainlines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+        List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 找不到 就抛
         if (Validator.isNullOrEmpty(mainlines)){
             return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
@@ -218,7 +213,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         // FIXME feilong 
         ShoppingCartLineCommand currentLine = CollectionsUtil.find(
-                        CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate()),
+                        ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList),
                         "extentionCode",
                         sku.getOutid());
 
@@ -265,7 +260,8 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         if (null == shoppingCartLineCommandList){
             shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
         }
-        List<ShoppingCartLineCommand> mainLines = getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
 
         // 购物车里面相同的 extentionCode 从main 里面找
         ShoppingCartLineCommand sameExtentionCodeInCartShoppingCartLineCommand = CollectionsUtil
@@ -295,7 +291,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         // FIXME feilong
         ShoppingCartLineCommand currentLine = CollectionsUtil.find(
-                        CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate()),
+                        ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList),
                         "extentionCode",
                         sku.getOutid());
 
@@ -406,18 +402,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletResponse response);
 
     //**************************************************************************************
-    /**
-     * 获得主卖品(剔除 促銷行 贈品),通常我们只操作主卖品.
-     *
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @return the main shopping cart line command list
-     * @since 5.3.1
-     */
-    protected List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        // 主賣品(剔除 促銷行 贈品)
-        return CollectionsUtil.select(shoppingCartLineCommandList, new MainLinesPredicate());
-    }
 
     /**
      * 公共的校验.

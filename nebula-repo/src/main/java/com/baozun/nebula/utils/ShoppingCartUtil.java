@@ -21,18 +21,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.PredicateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
+import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 
 /**
  * 购物车工具类.
+ * 
+ * <p>
+ * 主要是计算 {@link ShoppingCartLineCommand} {@link ShoppingCartCommand} 等常用方法
+ * </p>
  *
  * @author feilong
  * @version 5.3.1 2016年5月24日 下午6:17:20
+ * @see ShoppingCartLineCommand
+ * @see ShoppingCartCommand
  * @since 5.3.1
  */
 public final class ShoppingCartUtil{
@@ -48,11 +58,48 @@ public final class ShoppingCartUtil{
     }
 
     /**
+     * 获得主卖品(剔除 促銷行 贈品),通常我们只操作主卖品.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @return the main shopping cart line command list
+     */
+    public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        // 主賣品(剔除 促銷行 贈品)
+        Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(
+                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false),
+                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("gift", false));
+        return CollectionsUtil.select(shoppingCartLineCommandList, andPredicate);
+    }
+
+    /**
+     * 获得 main shopping cart line command list with check status.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param checkStatus
+     *            true表示 从中获取选中的, false 表示不选中
+     * @return the main shopping cart line command list with check status
+     */
+    public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandListWithCheckStatus(
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    boolean checkStatus){
+        // 主賣品(剔除 促銷行 贈品)
+        Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils.allPredicate(
+                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false),
+                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("gift", false),
+                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("settlementState", checkStatus ? 1 : 0));
+        return CollectionsUtil.select(shoppingCartLineCommandList, allPredicate);
+    }
+
+    /**
      * 计算整单商品数量.
      *
      * @param shoppingCartLineCommandList
      *            the shopping cart lines
-     * @return the order quantity
+     * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回0<br>
+     *         否则累加 每个元素的 quantity属性之和
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0

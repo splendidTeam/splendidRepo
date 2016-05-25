@@ -63,7 +63,7 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
             }
 
             String extentionCode = shoppingCartLineCommand.getExtentionCode();
-            Validate.notEmpty(extentionCode, "extentionCode can't be null/empty!");
+            Validate.notBlank(extentionCode, "extentionCode can't be null/empty!");
 
             Integer quantity = shoppingCartLineCommand.getQuantity();
             Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);

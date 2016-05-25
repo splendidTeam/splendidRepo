@@ -26,8 +26,6 @@ import org.springframework.stereotype.Component;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.constants.CookieKeyConstants;
-import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
 import com.feilong.servlet.http.CookieUtil;
 
 /**

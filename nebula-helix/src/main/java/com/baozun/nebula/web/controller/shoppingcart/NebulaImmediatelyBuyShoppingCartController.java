@@ -39,7 +39,6 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.NeedLogin;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
