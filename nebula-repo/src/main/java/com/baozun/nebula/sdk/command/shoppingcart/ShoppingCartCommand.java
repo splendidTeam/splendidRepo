@@ -78,25 +78,8 @@ public class ShoppingCartCommand extends BaseModel{
     /** 整单商品数量. */
     private Integer                          orderQuantity;
 
-    /** 判断购物车是否需要更新持久化到行表 当原购物车中的行，由于促销活动的变化， 只导致合并行。不存在拆行。. */
-    private Boolean                          needPersistence;
-
     /** 购物车促销简介信息. */
     private List<PromotionBrief>             cartPromotionBriefList;
-
-    //*****************************************************************************************************
-
-    /** 会员下单时使用的积分. */
-    private BigDecimal                       points;
-
-    /** 会员可获得的积分. */
-    private BigDecimal                       earnPoints;
-
-    /** 来自PTS配置的展示在购物车页的促销活动描述文字. */
-    private String                           promotionMsg;
-
-    /** 整单合计优惠金额（优惠券 + 促销活动等）. */
-    private BigDecimal                       couponPayAmount;
 
     //*****************************************************************************************************
 
@@ -107,6 +90,48 @@ public class ShoppingCartCommand extends BaseModel{
     private UserDetails                      userDetails;
 
     //*****************************************************************************************************
+    /**
+     * 判断购物车是否需要更新持久化到行表 当原购物车中的行，由于促销活动的变化， 只导致合并行。不存在拆行。.
+     * 
+     * @deprecated 没有用到
+     */
+    @Deprecated
+    private Boolean                          needPersistence;
+
+    /**
+     * 来自PTS配置的展示在购物车页的促销活动描述文字.
+     * 
+     * @deprecated 没有用到
+     */
+    @Deprecated
+    private String                           promotionMsg;
+
+    /**
+     * 整单合计优惠金额（优惠券 + 促销活动等）.
+     * 
+     * @deprecated 没有用到
+     */
+    @Deprecated
+    private BigDecimal                       couponPayAmount;
+
+    //*****************************************************************************************************
+
+    /**
+     * 会员下单时使用的积分.
+     * 
+     * @deprecated 没有用到
+     */
+    @Deprecated
+    private BigDecimal                       points;
+
+    /**
+     * 会员可获得的积分.
+     * 
+     * @deprecated 没有用到
+     */
+    @Deprecated
+    private BigDecimal                       earnPoints;
+
     /**
      * 获得 基于店铺统计.
      *
@@ -379,95 +404,115 @@ public class ShoppingCartCommand extends BaseModel{
 
     /**
      * 获得 判断购物车是否需要更新持久化到行表 当原购物车中的行，由于促销活动的变化， 只导致合并行。不存在拆行。.
-     *
+     * 
+     * @deprecated 没有用到
      * @return the 判断购物车是否需要更新持久化到行表 当原购物车中的行，由于促销活动的变化， 只导致合并行。不存在拆行。
      */
+    @Deprecated
     public Boolean getNeedPersistence(){
         return needPersistence;
     }
 
     /**
      * 设置 判断购物车是否需要更新持久化到行表 当原购物车中的行，由于促销活动的变化， 只导致合并行。不存在拆行。.
-     *
+     * 
+     * @deprecated 没有用到
      * @param needPersistence
      *            the new 判断购物车是否需要更新持久化到行表 当原购物车中的行，由于促销活动的变化， 只导致合并行。不存在拆行。
      */
+    @Deprecated
     public void setNeedPersistence(Boolean needPersistence){
         this.needPersistence = needPersistence;
     }
 
     /**
      * 获得 来自PTS配置的展示在购物车页的促销活动描述文字.
-     *
+     * 
+     * @deprecated 没有用到
      * @return the 来自PTS配置的展示在购物车页的促销活动描述文字
      */
+    @Deprecated
     public String getPromotionMsg(){
         return promotionMsg;
     }
 
     /**
      * 设置 来自PTS配置的展示在购物车页的促销活动描述文字.
-     *
+     * 
+     * @deprecated 没有用到
      * @param promotionMsg
      *            the new 来自PTS配置的展示在购物车页的促销活动描述文字
      */
+    @Deprecated
     public void setPromotionMsg(String promotionMsg){
         this.promotionMsg = promotionMsg;
     }
 
     /**
      * 获得 会员下单时使用的积分.
-     *
+     * 
+     * @deprecated 没有用到
      * @return the 会员下单时使用的积分
      */
+    @Deprecated
     public BigDecimal getPoints(){
         return points;
     }
 
     /**
      * 设置 会员下单时使用的积分.
-     *
+     * 
+     * @deprecated 没有用到
      * @param points
      *            the new 会员下单时使用的积分
      */
+    @Deprecated
     public void setPoints(BigDecimal points){
         this.points = points;
     }
 
     /**
      * 获得 会员可获得的积分.
-     *
+     * 
+     * @deprecated 没有用到
      * @return the 会员可获得的积分
      */
+    @Deprecated
     public BigDecimal getEarnPoints(){
         return earnPoints;
     }
 
     /**
      * 设置 会员可获得的积分.
-     *
+     * 
+     * @deprecated 没有用到
      * @param earnPoints
      *            the new 会员可获得的积分
      */
+    @Deprecated
     public void setEarnPoints(BigDecimal earnPoints){
         this.earnPoints = earnPoints;
     }
 
     /**
      * 获得 整单合计优惠金额（优惠券 + 促销活动等）.
-     *
+     * 
+     * @deprecated 没有用到
      * @return the 整单合计优惠金额（优惠券 + 促销活动等）
      */
+    @Deprecated
     public BigDecimal getCouponPayAmount(){
         return couponPayAmount;
     }
 
     /**
      * 设置 整单合计优惠金额（优惠券 + 促销活动等）.
-     *
+     * 
+     * @deprecated 没有用到
      * @param couponPayAmount
      *            the new 整单合计优惠金额（优惠券 + 促销活动等）
      */
+    @Deprecated
     public void setCouponPayAmount(BigDecimal couponPayAmount){
         this.couponPayAmount = couponPayAmount;
     }
