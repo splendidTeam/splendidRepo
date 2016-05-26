@@ -20,8 +20,8 @@ import com.baozun.nebula.command.cms.CmsModuleInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
-import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
-import com.baozun.nebula.sdk.manager.impl.SdkCmsModuleInstanceManagerImpl;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManagerImpl;
 import com.feilong.core.Validator;
 
 @Component

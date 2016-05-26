@@ -49,7 +49,7 @@ import com.baozun.nebula.model.rule.CustomScopeType;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkCustomizeFilterClassManager;
 import com.baozun.nebula.sdk.manager.SdkMemberTagRuleManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 import com.baozun.nebula.solr.utils.DatePattern;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;

@@ -30,8 +30,8 @@ import com.baozun.nebula.model.system.WarningConfig;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
-import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkWarningConfigManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.wormhole.scm.manager.WarningPartManager;
 

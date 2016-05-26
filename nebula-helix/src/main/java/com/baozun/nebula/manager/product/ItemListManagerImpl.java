@@ -57,7 +57,7 @@ import com.baozun.nebula.sdk.command.SearchConditionResultCommand;
 import com.baozun.nebula.sdk.command.SearchItemResultCommand;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.Param.SkuItemParam;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;

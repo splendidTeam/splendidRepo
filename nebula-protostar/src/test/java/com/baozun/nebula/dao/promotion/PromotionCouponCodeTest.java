@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.AbstractTransactionalJUnit4Spring
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
-import com.baozun.nebula.sdk.manager.SdkPromotionCouponCodeManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath*:loxia-hibernate-context.xml",

@@ -68,7 +68,7 @@ import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.manager.SdkIndustryManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
 import com.baozun.nebula.solr.manager.ItemInfoManager;

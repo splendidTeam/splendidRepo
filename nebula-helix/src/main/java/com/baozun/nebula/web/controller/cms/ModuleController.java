@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
-import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
 

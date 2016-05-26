@@ -39,7 +39,7 @@ import com.baozun.nebula.model.rule.MemberTagRule;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkFilterManager;
 import com.baozun.nebula.sdk.manager.SdkLimitManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCalculationConditionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationConditionManager;
 import com.baozun.nebula.utilities.common.Validator;
 
 /**

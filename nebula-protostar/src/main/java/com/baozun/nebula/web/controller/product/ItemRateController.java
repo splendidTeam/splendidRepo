@@ -42,7 +42,7 @@ import com.baozun.nebula.model.member.MemberGroup;
 import com.baozun.nebula.model.system.InstationMessageTemplate;
 import com.baozun.nebula.sdk.manager.EmailTemplateManager;
 import com.baozun.nebula.sdk.manager.ItemColorValueRefManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCouponManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.bind.ArrayCommand;

@@ -28,7 +28,7 @@ import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.IndustryManager;
 import com.baozun.nebula.manager.product.ItemTagManager;
 import com.baozun.nebula.manager.salesorder.CancelOrderAppManager;
-import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.command.CancelApplicationCommand;
 import com.baozun.nebula.web.controller.BaseController;
