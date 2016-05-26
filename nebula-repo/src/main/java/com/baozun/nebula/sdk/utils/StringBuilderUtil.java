@@ -19,14 +19,13 @@ import org.apache.commons.lang.SystemUtils;
 
 import com.baozun.nebula.utilities.common.Validator;
 
-
 /**
  * StringBuilder工具类,可以用来快速的拼接字符串.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
- * @version 1.0 2012-7-11 下午5:05:56
  * @since 1.0.0
+ * @deprecated 不再维护 没有使用的必要
  */
+@Deprecated
 public final class StringBuilderUtil{
 
     /** Don't let anyone instantiate this class. */

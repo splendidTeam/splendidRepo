@@ -430,16 +430,33 @@ public class NebulaOrderConfirmController extends BaseController{
      * @return the cart info
      */
     protected ShoppingCartCommand getChosenShoppingCartCommand(
-                    List<ShoppingCartLineCommand> cartLines,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     MemberDetails memberDetails,
                     List<ContactCommand> addressList,
                     String couponCode){
-        if (cartLines == null || cartLines.isEmpty()){
+        if (shoppingCartLineCommandList == null || shoppingCartLineCommandList.isEmpty()){
             return null;
         }
         Long groupId = null == memberDetails ? null : memberDetails.getGroupId();
         Set<String> memComboList = null == memberDetails ? null : memberDetails.getMemComboList();
 
+        CalcFreightCommand calcFreightCommand = buildCalcFreightCommand(addressList);
+
+        //优惠券
+        List<String> coupons = null;
+        if (Validator.isNotNullOrEmpty(couponCode)){
+            coupons = new ArrayList<String>();
+            coupons.add(couponCode);
+        }
+
+        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, shoppingCartLineCommandList, calcFreightCommand, coupons, memComboList);
+    }
+
+    /**
+     * @param addressList
+     * @return
+     */
+    private CalcFreightCommand buildCalcFreightCommand(List<ContactCommand> addressList){
         //地址
         CalcFreightCommand calcFreightCommand = null;
         if (addressList != null && !addressList.isEmpty()){
@@ -467,15 +484,7 @@ public class NebulaOrderConfirmController extends BaseController{
             calcFreightCommand.setCityId(310100L);
             calcFreightCommand.setCountyId(310101L);
         }
-
-        //优惠券
-        List<String> coupons = null;
-        if (Validator.isNotNullOrEmpty(couponCode)){
-            coupons = new ArrayList<String>();
-            coupons.add(couponCode);
-        }
-
-        return sdkShoppingCartCommandBuilder.buildShoppingCartCommand(groupId, cartLines, calcFreightCommand, coupons, memComboList);
+        return calcFreightCommand;
     }
 
     /**
