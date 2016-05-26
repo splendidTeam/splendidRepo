@@ -145,7 +145,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		}
 
 		// **************************************************设置属性的facet
-		List<SearchConditionCommand> cmdList = searchManager.findConditionByNavigationWithCache(searchCommand.getNavigationId());
+		List<SearchConditionCommand> cmdList = searchManager.findConditionByCategoryIdsWithCache(new ArrayList<Long>());
 		// 如果为null或数量小于1
 		if (null == cmdList || cmdList.size() < 1) {
 			return;
@@ -183,7 +183,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 						if (null != min && null != max && min <= max) {
 							String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
 							StringBuilder sb = new StringBuilder();
-							sb.append("{!ex=priceTag}" + SkuItemParam.sale_price).append(":").append(areaStr);
+							sb.append(SkuItemParam.sale_price).append(":").append(areaStr);
 							facetFields.add(sb.toString());
 						}
 					}
@@ -323,17 +323,22 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		String rangeConditionStr = searchCommand.getPriceRangeConditionStr();
 		// 如果范围筛选条件不为空
 		if (Validator.isNotNullOrEmpty(rangeConditionStr)) {
-			if (StringUtils.contains(rangeConditionStr, SEPARATORCHARS_MINUS)) {
-				List<String> values = new ArrayList<String>();
-				values.add(StringUtils.substringBeforeLast(rangeConditionStr, SEPARATORCHARS_MINUS));
-				values.add(StringUtils.substringAfterLast(rangeConditionStr, SEPARATORCHARS_MINUS));
-
-				FacetParameter facetParameter = new FacetParameter(SkuItemParam.sale_price);
-				facetParameter.setValues(values);
-				facetParameter.setFacetType(FacetType.RANGE);
-
-				facetParameters.add(facetParameter);
+			List<String> values = new ArrayList<String>();
+			
+			String[] strs=rangeConditionStr.split(SEPARATORCHARS_COMMA);
+			for (String rangeStr : strs){
+				String min=StringUtils.substringBeforeLast(rangeStr, SEPARATORCHARS_MINUS);
+				String max=StringUtils.substringAfterLast(rangeStr, SEPARATORCHARS_MINUS);
+				String areaStr = FilterUtil.paramConverToArea(min, max);
+				
+				values.add(areaStr);
 			}
+			
+			FacetParameter facetParameter = new FacetParameter(SkuItemParam.sale_price);
+			facetParameter.setValues(values);
+			facetParameter.setFacetType(FacetType.RANGE);
+
+			facetParameters.add(facetParameter);			
 		}
 
 		return facetParameters;
