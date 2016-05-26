@@ -83,18 +83,16 @@ display: none;
 				 <%-- 基本信息 --%>
 			   	 <%@include file="/pages/product/item/update-item-baseInfo.jsp"%>
 			   	 <div style="margin-top: 10px"></div>
-			   	 <%-- 一般属性信息 --%>
-			   	 <%@include file="/pages/product/item/update-item-commonPropertyInfo.jsp"%>
-				 <div style="margin-top: 10px"></div>
 				 <%-- 商品价格 --%>
 			     <%@include file="/pages/product/item/update-item-price.jsp"%>
 				 <div style="margin-top: 10px"></div>
-				 <%-- 销售属性信息 --%>
-				 <%@include file="/pages/product/item/update-item-salePropertyInfo.jsp"%>
+				 <%-- 一般属性信息  销售属性信息 --%>
+				 <%@include file="/pages/product/item/update-item-propertyInfo.jsp"%>
 			     <div style="margin-top: 10px"></div>
 			 	 <%-- SEO --%>
 			     <%@include file="/pages/product/item/update-item-seo.jsp"%>
 			     <div style="margin-top: 10px"></div>
+			     <%-- 商品描述 --%>
 			     <%@include file="/pages/product/item/update-item-description.jsp"%>
 		
 			  
