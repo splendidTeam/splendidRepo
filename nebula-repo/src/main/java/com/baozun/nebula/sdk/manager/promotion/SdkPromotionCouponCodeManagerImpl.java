@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,7 +37,6 @@ import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.model.system.PromotionAllCodeCommand;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 import com.feilong.core.Validator;
 
 import loxia.dao.Page;

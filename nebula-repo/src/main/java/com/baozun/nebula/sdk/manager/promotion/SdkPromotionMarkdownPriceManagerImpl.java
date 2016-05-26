@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.promotion.PromotionMarkdownPriceDao;
 import com.baozun.nebula.model.promotion.PromotionMarkdownPrice;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionMarkdownPriceManager;
 @Transactional
 @Service("sdkPromotionMarkdownPriceManager")
 public class SdkPromotionMarkdownPriceManagerImpl implements SdkPromotionMarkdownPriceManager{

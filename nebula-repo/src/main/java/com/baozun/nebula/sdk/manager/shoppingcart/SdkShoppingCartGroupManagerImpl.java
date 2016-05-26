@@ -52,7 +52,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
-import com.baozun.nebula.sdk.manager.order.SdkPromotionCalculationManagerImpl;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManagerImpl;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 
 @Transactional

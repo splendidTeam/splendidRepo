@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.ArrayList;
 import java.util.HashSet;

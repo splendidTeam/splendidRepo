@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.calculateEngine.common.EngineManager;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.sdk.manager.SdkPriorityAdjustManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 
 @Service("sdkPromotionRuleFilterManager")
 @Transactional

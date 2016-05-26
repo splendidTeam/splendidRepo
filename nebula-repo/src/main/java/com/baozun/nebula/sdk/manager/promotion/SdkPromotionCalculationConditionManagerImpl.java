@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -45,8 +45,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeConditionLoader;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationConditionManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationSettingManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 
 @Transactional

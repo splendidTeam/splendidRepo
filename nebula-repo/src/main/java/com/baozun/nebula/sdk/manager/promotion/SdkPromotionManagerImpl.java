@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,10 +45,6 @@ import com.baozun.nebula.sdk.manager.SdkFilterManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkItemTagRuleManager;
 import com.baozun.nebula.sdk.manager.SdkMemberTagRuleManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationConditionManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationSettingManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionMarkdownPriceManager;
 
 @Transactional
 @Service("sdkPromotionManager")

@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,7 +17,6 @@ import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderPromotionDao;
 import com.baozun.nebula.sdk.command.OrderPromotionCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

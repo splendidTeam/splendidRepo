@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,9 +32,7 @@ import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.OrderPromotionCommand;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionGuideManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
+import com.baozun.nebula.sdk.manager.order.SdkOrderLineManager;
 
 /*
  * 促销导购。PDP页面，列表页，Landing Page页

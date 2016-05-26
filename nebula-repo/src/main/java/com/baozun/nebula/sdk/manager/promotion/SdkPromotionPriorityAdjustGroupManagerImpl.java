@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,6 @@ import loxia.dao.Sort;
 import loxia.dao.Page;
 
 import com.baozun.nebula.model.promotion.PromotionPriorityAdjustGroup;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionPriorityAdjustGroupManager;
 import com.baozun.nebula.dao.promotion.PromotionPriorityAdjustGroupDao;
 
 /**
