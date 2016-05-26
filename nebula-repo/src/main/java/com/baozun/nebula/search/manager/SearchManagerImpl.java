@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.TimeInterval;
@@ -49,7 +50,7 @@ public class SearchManagerImpl implements SearchManager{
 	private static final Logger				LOG						= LoggerFactory.getLogger(SolrManagerImpl.class);
 
 	private final static String				conditionCacheKey		= "findConditionByCategoryIdListKey";
-
+	
 	private final static String				conditionItemCacheKey	= "findCoditionItemByCoditionIdtKey";
 
 	@Autowired
@@ -364,6 +365,33 @@ public class SearchManagerImpl implements SearchManager{
 		}
 		facetGroup.setFacets(facets);
 		return facetGroup;
+	}
+
+	@Override
+	public List<SearchConditionCommand> findConditionByNavigationWithCache(Long navigationId) {
+		List<SearchConditionCommand> searchConditionCommands = null;
+
+		navigationId = Validator.isNullOrEmpty(navigationId)?-1L:navigationId;
+		
+		try{
+			searchConditionCommands = cacheManager.getObject(CacheKeyConstant.CONDITION_NAV_CACHEKEY+navigationId);
+		}catch (Exception e){
+			LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager getObect() error. time:{}", new Date());
+		}
+
+		if (Validator.isNullOrEmpty(searchConditionCommands)) {
+			
+			
+			searchConditionCommands = sdkSearchConditionManager.findConditionByNavigation(navigationId);
+
+			try{
+				cacheManager.setObject(CacheKeyConstant.CONDITION_NAV_CACHEKEY+navigationId, searchConditionCommands, TimeInterval.SECONDS_PER_DAY);
+			}catch (Exception e){
+				LOG.error("[SOLR_SEARCH_SEARCHCONDITION] cacheManager setObject() error. time:{}", new Date());
+			}
+
+		}
+		return searchConditionCommands;
 	}
 
 }
