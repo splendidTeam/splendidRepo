@@ -41,11 +41,13 @@ import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
+import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
@@ -212,18 +214,18 @@ public class SalesOrderController extends BaseController{
         if (orderCommand == null){
             throw new BusinessException(ErrorCodes.ORDER_NOT_EXIST, new Object[] { orderCode });
         }
-        
-        Address country=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCountryId());
-    	Address province=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getProvinceId());
-    	Address city=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCityId());
-    	Address area=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getAreaId());
-    	Address town=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getTownId());
-    	orderCommand.getSalesOrderCommand().setCountry(country==null ? "" : country.getName());
-    	orderCommand.getSalesOrderCommand().setProvince(province==null ? "" :province.getName());
-    	orderCommand.getSalesOrderCommand().setCity(city==null ? "" :city.getName());
-    	orderCommand.getSalesOrderCommand().setArea(area==null ? "":area.getName());
-    	orderCommand.getSalesOrderCommand().setTown(town==null ? "":town.getName());
-        
+
+        Address country = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCountryId());
+        Address province = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getProvinceId());
+        Address city = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCityId());
+        Address area = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getAreaId());
+        Address town = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getTownId());
+        orderCommand.getSalesOrderCommand().setCountry(country == null ? "" : country.getName());
+        orderCommand.getSalesOrderCommand().setProvince(province == null ? "" : province.getName());
+        orderCommand.getSalesOrderCommand().setCity(city == null ? "" : city.getName());
+        orderCommand.getSalesOrderCommand().setArea(area == null ? "" : area.getName());
+        orderCommand.getSalesOrderCommand().setTown(town == null ? "" : town.getName());
+
         model.addAttribute("orderCommand", orderCommand);
         model.addAttribute("customBaseUrl", customBaseUrl);
         model.addAttribute("frontendBaseUrl", frontendBaseUrl);
@@ -387,7 +389,6 @@ public class SalesOrderController extends BaseController{
     /**
      * 提交订单
      * 
-     * @param OrderCommand
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -420,8 +421,7 @@ public class SalesOrderController extends BaseController{
         salesOrderCommand.setCity(city == null ? "" : city.getName());
         salesOrderCommand.setArea(area == null ? "" : area.getName());
 
-        /** 后台下单 **/
-        salesOrderCommand.setIsBackCreateOrder(true);
+        SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
 
         Long memberId = salesOrderCommand.getMemberId();
 
@@ -470,23 +470,26 @@ public class SalesOrderController extends BaseController{
 
             ShoppingCartCommand shoppingCartCommand = null;
             if (manualFlag != null && manualFlag){
-                // salesOrderCommand.setMemberId(null);
+
+                /** 后台下单 **/
+                salesOrderCreateOptions.setIsBackCreateOrder(true);
+
                 lines = (List<ShoppingCartLineCommand>) request.getSession().getAttribute(Constants.MANUALBUY_SESSION_SHOPCART);
                 shoppingCartCommand = sdkShoppingCartManager.findManualShoppingCart(lines);
 
                 // 手工下单填写运费
-                shoppingCartCommand.getSummaryShopCartList().get(0).setOriginShoppingFee(salesOrderCommand.getActualFreight());
-                shoppingCartCommand.getSummaryShopCartList().get(0).setRealPayAmount(
-                                shoppingCartCommand.getSummaryShopCartList().get(0).getRealPayAmount()
-                                                .add(salesOrderCommand.getActualFreight()));
+                List<ShopCartCommandByShop> summaryShopCartList = shoppingCartCommand.getSummaryShopCartList();
+                ShopCartCommandByShop shopCartCommandByShop = summaryShopCartList.get(0);
+                shopCartCommandByShop.setOriginShoppingFee(salesOrderCommand.getActualFreight());
+                shopCartCommandByShop.setRealPayAmount(shopCartCommandByShop.getRealPayAmount().add(salesOrderCommand.getActualFreight()));
 
                 shoppingCartCommand.setOriginShoppingFee(salesOrderCommand.getActualFreight());
                 shoppingCartCommand.setCurrentShippingFee(salesOrderCommand.getActualFreight());
                 shoppingCartCommand.setCurrentPayAmount(shoppingCartCommand.getOriginPayAmount().add(salesOrderCommand.getActualFreight()));
 
                 // 不清除购物车
-                salesOrderCommand.setIsImmediatelyBuy(true);
-                subOrdinate = sdkOrderCreateManager.saveManualOrder(shoppingCartCommand, salesOrderCommand);
+                salesOrderCreateOptions.setIsImmediatelyBuy(true);
+                subOrdinate = sdkOrderCreateManager.saveManualOrder(shoppingCartCommand, salesOrderCommand, salesOrderCreateOptions);
             }else{
                 if (Validator.isNotNullOrEmpty(memberId)){
                     lines = sdkShoppingCartManager.findShoppingCartLinesByMemberId(memberId, 1);
@@ -495,11 +498,11 @@ public class SalesOrderController extends BaseController{
                     memberId = null;
                     lines = (List<ShoppingCartLineCommand>) request.getSession().getAttribute(Constants.IMMEDIATELYBUY_SESSION_SHOPCART);
                     // 不清除购物车
-                    salesOrderCommand.setIsImmediatelyBuy(true);
+                    salesOrderCreateOptions.setIsImmediatelyBuy(true);
                 }
                 shoppingCartCommand = sdkShoppingCartCommandBuilder
                                 .buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
-                subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
+                subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds, salesOrderCreateOptions);
             }
 
             // 清空session

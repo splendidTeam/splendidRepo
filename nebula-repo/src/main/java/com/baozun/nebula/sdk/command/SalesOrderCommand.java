@@ -32,7 +32,7 @@ import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 public class SalesOrderCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
-    private static final long           serialVersionUID  = 4539781027280506601L;
+    private static final long           serialVersionUID = 4539781027280506601L;
 
     /** PK. */
     private Long                        id;
@@ -215,15 +215,6 @@ public class SalesOrderCommand extends BaseModel{
     /** 创建时间. */
     private Date                        createTime;
 
-    /** 是否是立即购买的订单 *. */
-    private Boolean                     isImmediatelyBuy;
-
-    /** 是否是后台下单 *. */
-    private Boolean                     isBackCreateOrder = false;
-
-    /** 邮件模板 *. */
-    private String                      emailTemplete;
-
     /** 在线支付信息 *. */
     private OnLinePaymentCommand        onLinePaymentCommand;
 
@@ -259,12 +250,11 @@ public class SalesOrderCommand extends BaseModel{
     //*********************************************************************************************
 
     /**
-     * 是否qs.
+     * 邮件模板.
      * 
      * @deprecated 没有用到
      */
-    @Deprecated
-    private Boolean                     isQs              = false;
+    private String                      emailTemplete;
 
     /** 物流方式 *. */
     private Long                        distributionModeId;
@@ -376,6 +366,7 @@ public class SalesOrderCommand extends BaseModel{
      * 获得 邮件模板 *.
      *
      * @return the 邮件模板 *
+     * @deprecated 没有用到
      */
     public String getEmailTemplete(){
         return emailTemplete;
@@ -386,6 +377,7 @@ public class SalesOrderCommand extends BaseModel{
      *
      * @param emailTemplete
      *            the new 邮件模板 *
+     * @deprecated 没有用到
      */
     public void setEmailTemplete(String emailTemplete){
         this.emailTemplete = emailTemplete;
@@ -1342,44 +1334,6 @@ public class SalesOrderCommand extends BaseModel{
     }
 
     /**
-     * 获得 是否是立即购买的订单 *.
-     *
-     * @return the 是否是立即购买的订单 *
-     */
-    public Boolean getIsImmediatelyBuy(){
-        return isImmediatelyBuy;
-    }
-
-    /**
-     * 设置 是否是立即购买的订单 *.
-     *
-     * @param isImmediatelyBuy
-     *            the new 是否是立即购买的订单 *
-     */
-    public void setIsImmediatelyBuy(Boolean isImmediatelyBuy){
-        this.isImmediatelyBuy = isImmediatelyBuy;
-    }
-
-    /**
-     * 获得 是否是后台下单 *.
-     *
-     * @return the 是否是后台下单 *
-     */
-    public Boolean getIsBackCreateOrder(){
-        return isBackCreateOrder;
-    }
-
-    /**
-     * 设置 是否是后台下单 *.
-     *
-     * @param isBackCreateOrder
-     *            the new 是否是后台下单 *
-     */
-    public void setIsBackCreateOrder(Boolean isBackCreateOrder){
-        this.isBackCreateOrder = isBackCreateOrder;
-    }
-
-    /**
      * 获得 在线支付信息 *.
      *
      * @return the 在线支付信息 *
@@ -1529,29 +1483,6 @@ public class SalesOrderCommand extends BaseModel{
      */
     public void setTownId(Long townId){
         this.townId = townId;
-    }
-
-    /**
-     * 获得 是否qs.
-     *
-     * @return the 是否qs
-     * @deprecated 没有用到
-     */
-    @Deprecated
-    public Boolean getIsQs(){
-        return isQs;
-    }
-
-    /**
-     * 设置 是否qs.
-     *
-     * @param isQs
-     *            the new 是否qs
-     * @deprecated 没有用到
-     */
-    @Deprecated
-    public void setIsQs(Boolean isQs){
-        this.isQs = isQs;
     }
 
     /**

@@ -16,8 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -128,108 +131,79 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
                     SalesOrderCommand salesOrderCommand,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     ShopCartCommandByShop shopCartCommandByShop,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
+                    SalesOrderCreateOptions salesOrderCreateOptions){
+
+        // 后台下单 并且填写了 邮件地址
+        Long memberId = salesOrderCommand.getMemberId();
+        boolean isGuest = Validator.isNullOrEmpty(memberId);
+
+        String email = salesOrderCommand.getEmail();
+        String nickName = salesOrderCommand.getName();
+        if (!isGuest){
+            MemberPersonalData memberPersonalData = sdkMemberManager.findMemberPersonData(salesOrder.getMemberId());
+
+            if (Validator.isNullOrEmpty(email)){
+                email = memberPersonalData.getEmail();
+            }
+
+            nickName = memberPersonalData.getNickname();
+            if (Validator.isNullOrEmpty(nickName)){
+                nickName = salesOrderCommand.getName();
+            }
+        }
+
+        if (Validator.isNullOrEmpty(email)){
+            return null;
+        }
+
+        //***************************************************************************************
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
 
         Map<String, Object> dataMap = new HashMap<String, Object>();
-        // 后台下单 并且填写了 邮件地址
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getMemberId())){
-            MemberPersonalData memberPersonalData = sdkMemberManager.findMemberPersonData(salesOrder.getMemberId());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
+        dataMap.put("nickName", nickName);
+        dataMap.put("email", email);
 
-            String nickName = "";
-
-            String email = salesOrderCommand.getEmail();
-
-            if (Validator.isNotNullOrEmpty(memberPersonalData)){
-                nickName = memberPersonalData.getNickname();
-                if (Validator.isNullOrEmpty(email)){
-                    email = memberPersonalData.getEmail();
-                }
-            }
-
-            if (Validator.isNullOrEmpty(nickName))
-                nickName = salesOrderCommand.getName();
-
-            if (Validator.isNullOrEmpty(email))
-                return null;
-
-            // 获取付款地址
-            if (salesOrderCommand.getIsBackCreateOrder()
-                            && !salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-                String payUrlPrefix = sdkMataInfoManager.findValue(MataInfo.PAY_URL_PREFIX);
-                String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
-                dataMap.put("isShowPayButton", true);
-                dataMap.put("payUrl", payUrl);
-            }else{
-                dataMap.put("isShowPayButton", false);
-                dataMap.put("payUrl", "#");
-            }
-
-            dataMap.put("nickName", nickName);
-            dataMap.put("createDateOfAll", sdf.format(salesOrder.getCreateTime()));
-            dataMap.put("createDateOfSfm", sdf1.format(salesOrder.getCreateTime()));
-            dataMap.put("orderCode", salesOrder.getCode());
-            dataMap.put("receiveName", salesOrderCommand.getName());
-            dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-            dataMap.put("address", salesOrderCommand.getAddress());
-
-            dataMap.put(
-                            "mobile",
-                            Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile()
-                                            : salesOrderCommand.getTel());
-
-            dataMap.put("sumItemFee", salesOrder.getTotal().add(salesOrder.getDiscount()));
-            dataMap.put("shipFee", salesOrder.getActualFreight());
-            dataMap.put("offersTotal", salesOrder.getDiscount());
-            dataMap.put("sumPay", salesOrder.getTotal().add(salesOrder.getActualFreight()));
-            dataMap.put("itemLines", shoppingCartLineCommandList);
-            dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
-            dataMap.put("pageUrlBase", pageUrlBase);
-            dataMap.put("imgDomainUrl", imgDomainUrl);
-            dataMap.put("email", email);
+        // 获取付款地址
+        if (salesOrderCreateOptions.getIsBackCreateOrder()
+                        && !salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
+            String payUrlPrefix = sdkMataInfoManager.findValue(MataInfo.PAY_URL_PREFIX);
+            String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
+            dataMap.put("isShowPayButton", true);
+            dataMap.put("payUrl", payUrl);
         }else{
-            if (Validator.isNullOrEmpty(salesOrderCommand.getEmail())){
-                return null;
-            }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
-            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
-
-            // 获取付款地址
-            if (salesOrderCommand.getIsBackCreateOrder()
-                            && !salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-                String payUrlPrefix = sdkMataInfoManager.findValue(MataInfo.PAY_URL_PREFIX);
-                String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
-                dataMap.put("isShowPayButton", true);
-                dataMap.put("payUrl", payUrl);
-            }else{
-                dataMap.put("isShowPayButton", false);
-                dataMap.put("payUrl", "#");
-            }
-
-            dataMap.put("nickName", salesOrderCommand.getName());
-            dataMap.put("createDateOfAll", sdf.format(salesOrder.getCreateTime()));
-            dataMap.put("createDateOfSfm", sdf1.format(salesOrder.getCreateTime()));
-            dataMap.put("orderCode", salesOrder.getCode());
-            dataMap.put("receiveName", salesOrderCommand.getName());
-            dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
-            dataMap.put("address", salesOrderCommand.getAddress());
-
-            dataMap.put(
-                            "mobile",
-                            Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile()
-                                            : salesOrderCommand.getTel());
-
-            dataMap.put("sumItemFee", salesOrder.getTotal().add(salesOrder.getDiscount()));
-            dataMap.put("shipFee", salesOrder.getActualFreight());
-            dataMap.put("offersTotal", salesOrder.getDiscount());
-            dataMap.put("sumPay", salesOrder.getTotal().add(salesOrder.getActualFreight()));
-            dataMap.put("itemLines", shoppingCartLineCommandList);
-            dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
-            dataMap.put("pageUrlBase", pageUrlBase);
-            dataMap.put("imgDomainUrl", imgDomainUrl);
-            dataMap.put("email", salesOrderCommand.getEmail());
+            dataMap.put("isShowPayButton", false);
+            dataMap.put("payUrl", "#");
         }
+        Date createTime = salesOrder.getCreateTime();
+        dataMap.put("createDateOfAll", sdf.format(createTime));
+        dataMap.put("createDateOfSfm", sdf1.format(createTime));
+
+        dataMap.put("receiveName", salesOrderCommand.getName());
+        dataMap.put("orderCode", salesOrder.getCode());
+        dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
+
+        dataMap.put("address", salesOrderCommand.getAddress());
+        String mobile = salesOrderCommand.getMobile();
+        dataMap.put(
+                        "mobile",
+                        Validator.isNotNullOrEmpty(mobile) ? mobile
+                                        : salesOrderCommand.getTel());
+
+        dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
+
+        BigDecimal total = salesOrder.getTotal();
+        dataMap.put("sumItemFee", total.add(salesOrder.getDiscount()));
+        dataMap.put("sumPay", total.add(salesOrder.getActualFreight()));
+
+        dataMap.put("shipFee", salesOrder.getActualFreight());
+        dataMap.put("offersTotal", salesOrder.getDiscount());
+
+        dataMap.put("itemLines", shoppingCartLineCommandList);
+        dataMap.put("pageUrlBase", pageUrlBase);
+        dataMap.put("imgDomainUrl", imgDomainUrl);
 
         /** 扩展点 如商城需要需要加入特殊字段 各自实现 **/
         if (null != salesOrderHandler){
