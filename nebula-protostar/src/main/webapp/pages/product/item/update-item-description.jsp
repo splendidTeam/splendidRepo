@@ -1,5 +1,5 @@
 
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.description" />
 </div>
 
