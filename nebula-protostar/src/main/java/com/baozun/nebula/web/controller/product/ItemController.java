@@ -1443,30 +1443,22 @@ public class ItemController extends BaseController{
 
 	@RequestMapping("/item/validateUpdateSkuCodes.json")
 	@ResponseBody
-	public Object validateUpdateSkuCodes(@RequestParam(value = "skuInfos") String skuInfosJsonStr){
-		List<String> invalidCodes = new ArrayList<String>();
-
-		List<SkuPropertyCommand> skuInfoList = null;
-		ObjectMapper om = new ObjectMapper();
-		om.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-
-		TypeReference<List<SkuPropertyCommand>> valueTypeRef = new TypeReference<List<SkuPropertyCommand>>(){};
-
-		if (!"".equals(skuInfosJsonStr)){
-			try{
-				skuInfoList = om.readValue(skuInfosJsonStr, valueTypeRef);
-			}catch (Exception e){
-				log.error(e.getMessage());
-				BackWarnEntity backWarnEntity = new BackWarnEntity(false, null);
-
-				return backWarnEntity;
-			}
-		}
-
-		invalidCodes = itemManager.validateUpdateSkuCode(skuInfoList);
-
-		StringBuilder sb = new StringBuilder();
+	public Object validateUpdateSkuCodes(@ArrayCommand(dataBind =true) Long[] skuIds,
+			@ArrayCommand(dataBind =true) String[] skuCodes){
 		boolean flag = true;
+		List<String> invalidCodes = new ArrayList<String>();
+		
+		List<SkuPropertyCommand> skuInfoList = new ArrayList<SkuPropertyCommand>();
+		SkuPropertyCommand skuPropertyCommand =null;
+		for (int i =0 ; i < skuIds.length ;i++) {
+			skuPropertyCommand =new SkuPropertyCommand();
+			skuPropertyCommand.setId(skuIds[i]);
+			skuPropertyCommand.setCode(skuCodes[i]);
+			skuInfoList.add(skuPropertyCommand);
+		}
+		invalidCodes = itemManager.validateUpdateSkuCode(skuInfoList);
+		StringBuilder sb = new StringBuilder();
+		
 		if (invalidCodes.size() > 0){
 			flag = false;
 			for (int i = 0; i < invalidCodes.size(); i++){
@@ -1476,7 +1468,6 @@ public class ItemController extends BaseController{
 				}
 			}
 		}
-
 		BackWarnEntity backWarnEntity = new BackWarnEntity(flag, null);
 		if (!flag){
 			backWarnEntity.setDescription(sb.toString());

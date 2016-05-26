@@ -1,5 +1,5 @@
 <!-- 销售属性信息 多语言 -->
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.sales" />
 </div>
 <c:if test="${i18nOnOff == true}">

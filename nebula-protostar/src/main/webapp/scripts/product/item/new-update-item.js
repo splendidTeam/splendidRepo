@@ -1450,4 +1450,9 @@ $j(document).ready(function(){
 	}
 	
 	selectcheck(itemcolorrefcheckURL);
+	
+	/*toggle div*/
+	$j(".ui-block-title").on("click",function(){
+		$j(this).next(".ui-block-content").slideToggle();
+	})
 });

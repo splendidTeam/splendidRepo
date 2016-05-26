@@ -45,7 +45,7 @@ padding:0;
 border:1px solid #ccc;
 box-sizing:border-box;
 -moz-box-sizing:border-box;
-/* background:#fff!important;      */ /* 为什么要加这个，加了后到处都没法控制了*/
+/* background:#fff!important;      */ /* 涓轰粈涔堣鍔犺繖涓紝鍔犱簡鍚庡埌澶勯兘娌℃硶鎺у埗浜�*/
 }
 em
 {
@@ -2856,3 +2856,22 @@ height: 370px;
 {
 	margin: 0 20px 0 4px;
 }
+
+
+/*add-item && update-item style*/
+.ui-block-title{
+	background: #fff;
+    color: #000;
+}
+.baseInfo input, .baseInfo textarea{
+	width: 600px;
+}
+.baseInfo .none{
+	display:none;
+}
+.baseInfo .codetip{
+	padding: .3em .7em; 
+	width: auto;
+}
+
+
