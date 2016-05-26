@@ -145,7 +145,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		}
 
 		// **************************************************设置属性的facet
-		List<SearchConditionCommand> cmdList = searchManager.findConditionByCategoryIdsWithCache(new ArrayList<Long>());
+		List<SearchConditionCommand> cmdList = searchManager.findConditionByNavigationWithCache(searchCommand.getNavigationId());
 		// 如果为null或数量小于1
 		if (null == cmdList || cmdList.size() < 1) {
 			return;
