@@ -34,7 +34,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
  * The Class SdkOrderPromotionManagerImpl.
  *
  * @author feilong
- * @version 5.3.1 2016年5月13日 下午5:16:41
  * @since 5.3.1
  */
 @Transactional
@@ -53,22 +52,27 @@ public class SdkOrderPromotionManagerImpl implements SdkOrderPromotionManager{
      */
     @Override
     public void saveOrderShipPromotion(Long orderId,PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
+        Long promotionId = promotionSKUDiscAMTBySetting.getPromotionId();
+
         OrderPromotion orderPromotion = new OrderPromotion();
+        // 是否运费折扣
+        orderPromotion.setIsShipDiscount(true);
+
         // 订单id
         orderPromotion.setOrderId(orderId);
         // 活动id
-        orderPromotion.setActivityId(promotionSKUDiscAMTBySetting.getPromotionId());
+        orderPromotion.setActivityId(promotionId);
         // 促销码 (暂时没用)
-        orderPromotion.setPromotionNo(promotionSKUDiscAMTBySetting.getPromotionId().toString());
+        orderPromotion.setPromotionNo(promotionId.toString());
         // 促销类型
         orderPromotion.setPromotionType(promotionSKUDiscAMTBySetting.getPromotionType());
         // 折扣金额
         orderPromotion.setDiscountAmount(promotionSKUDiscAMTBySetting.getDiscountAmount());
-        // 是否运费折扣
-        orderPromotion.setIsShipDiscount(true);
+
         // 优惠券
-        if (promotionSKUDiscAMTBySetting.getCouponCodes() != null){
-            orderPromotion.setCoupon(promotionSKUDiscAMTBySetting.getCouponCodes().toString());
+        Set<String> couponCodes = promotionSKUDiscAMTBySetting.getCouponCodes();
+        if (couponCodes != null){
+            orderPromotion.setCoupon(couponCodes.toString());
         }
         // 描述 ...name
         orderPromotion.setDescribe(promotionSKUDiscAMTBySetting.getPromotionName());
@@ -92,20 +96,26 @@ public class SdkOrderPromotionManagerImpl implements SdkOrderPromotionManager{
                     List<CouponCodeCommand> couponCodes){
 
         OrderPromotion orderPromotion = new OrderPromotion();
+
+        // 是否运费折扣
+        orderPromotion.setIsShipDiscount(false);
+
         // 订单id
         orderPromotion.setOrderId(orderId);
-        // 订单行
-        orderPromotion.setOrderLineId(orderLineId);
+
         // 活动id
         orderPromotion.setActivityId(promotionSKUDiscAMTBySetting.getPromotionId());
+
+        // 订单行
+        orderPromotion.setOrderLineId(orderLineId);
+
         // 促销码 (暂时没用)
         orderPromotion.setPromotionNo(promotionSKUDiscAMTBySetting.getPromotionId().toString());
         // 促销类型
         orderPromotion.setPromotionType(promotionSKUDiscAMTBySetting.getPromotionType());
         // 折扣金额
         orderPromotion.setDiscountAmount(promotionSKUDiscAMTBySetting.getDiscountAmount());
-        // 是否运费折扣
-        orderPromotion.setIsShipDiscount(false);
+
         // 优惠券
         Set<String> couponCodesSet = promotionSKUDiscAMTBySetting.getCouponCodes();
         Set<String> newSet = new HashSet<String>();
