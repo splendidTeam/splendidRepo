@@ -166,11 +166,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         return saveOrderInfo(salesOrderCommand, shoppingCartCommand);
     }
 
-    /**
-     * @param shoppingCartCommand
-     * @param salesOrderCommand
-     * @param memCombos
-     */
     private void preCreateOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
         //去除抬头和未选中的商品
         refactoringShoppingCartCommand(shoppingCartCommand);
@@ -332,7 +327,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      *            the sales order command
      * @param shopCartCommandByShop
      *            the shop cart command by shop
-     * @param psdabsList
+     * @param promotionSKUDiscAMTBySettingList
      *            the psdabs list
      * @param isSendEmail
      *            the is send email
@@ -345,7 +340,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     SalesOrderCommand salesOrderCommand,
                     ShopCartCommandByShop shopCartCommandByShop,
-                    List<PromotionSKUDiscAMTBySetting> psdabsList,
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
                     boolean isSendEmail,
                     List<Map<String, Object>> dataMapList){
 
@@ -354,10 +349,16 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         // 保存订单行、订单行优惠
         //TODO feilong 如果是bundle的话 这里多条
-        savaOrderLinesAndPromotions(orderId, salesOrderCommand, shoppingCartLineCommandList, psdabsList);
+        savaOrderLinesAndPromotions(
+                        orderId,
+                        shoppingCartLineCommandList,
+                        salesOrderCommand.getCouponCodes(),
+                        promotionSKUDiscAMTBySettingList);
 
         // 保存支付详细
-        savePayInfoAndPayInfoLog(shopId, subOrdinate, salesOrderCommand, salesOrder);
+        BigDecimal payMainMoney = getPayMainMoney(shopId, salesOrder, salesOrderCommand.getSoPayMentDetails());
+        PayInfo payInfo = sdkPayInfoManager.savePayInfoOfPayMain(salesOrderCommand, orderId, payMainMoney);
+        sdkPayInfoLogManager.savePayInfoLogOfPayMain(subOrdinate, salesOrderCommand, payInfo);
 
         // 保存收货人信息
         sdkConsigneeManager.saveConsignee(orderId, shopId, salesOrderCommand);
@@ -368,13 +369,14 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         // 封装发送邮件数据
         if (isSendEmail){
+            //TODO feilong 待重构
             Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(
                             subOrdinate,
                             salesOrder,
                             salesOrderCommand,
                             shoppingCartLineCommandList,
                             shopCartCommandByShop,
-                            psdabsList);
+                            promotionSKUDiscAMTBySettingList);
             dataMapList.add(dataMap);
         }
 
@@ -404,34 +406,29 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     }
 
     /**
-     * Save pay info and pay info log.
-     * 
      * @param shopId
-     *            the shop id
-     * @param subOrdinate
-     *            the sub ordinate
-     * @param salesOrderCommand
-     *            the sales order command
      * @param salesOrder
-     *            the sales order
+     * @param salesOrderCommand
+     * @return
      */
-    private void savePayInfoAndPayInfoLog(Long shopId,String subOrdinate,SalesOrderCommand salesOrderCommand,SalesOrder salesOrder){
-        List<String> soPayMentDetails = salesOrderCommand.getSoPayMentDetails();
+    private BigDecimal getPayMainMoney(Long shopId,SalesOrder salesOrder,List<String> soPayMentDetails){
+        Long orderId = salesOrder.getId();
         BigDecimal payMainMoney = salesOrder.getTotal().add(salesOrder.getActualFreight());
         // 除主支付方式之外的付款
-        Long orderId = salesOrder.getId();
+
         if (soPayMentDetails != null){
             for (String soPayMentDetail : soPayMentDetails){
                 // 支付方式 String格式：shopId||payMentType||金额
                 String[] strs = soPayMentDetail.split(SEPARATOR_FLAG);
                 if (shopId.toString().equals(strs[0]) && strs.length == 3){
-                    PayInfo payInfo = sdkPayInfoManager.savePayInfo(orderId, Integer.parseInt(strs[1]), new BigDecimal(strs[2]));
-                    payMainMoney = payMainMoney.subtract(payInfo.getPayMoney());
+                    int payType = Integer.parseInt(strs[1]);
+                    BigDecimal payMoney = new BigDecimal(strs[2]);
+                    PayInfo payInfo = sdkPayInfoManager.savePayInfo(orderId, payType, payMoney);
+                    payMainMoney = payMainMoney.subtract(payMoney);
                 }
             }
         }
-        PayInfo payInfo = sdkPayInfoManager.savePayInfoOfPayMain(salesOrderCommand, orderId, payMainMoney);
-        sdkPayInfoLogManager.savePayInfoLogOfPayMain(salesOrderCommand, subOrdinate, payInfo);
+        return payMainMoney;
     }
 
     /**
@@ -439,17 +436,17 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * 
      * @param orderId
      *            the order id
-     * @param salesOrderCommand
-     *            the sales order command
      * @param shoppingCartLineCommandList
      *            the scc list
      * @param promotionSKUDiscAMTBySettingList
      *            the psdabs list
+     * @param salesOrderCommand
+     *            the sales order command
      */
     private void savaOrderLinesAndPromotions(
                     Long orderId,
-                    SalesOrderCommand salesOrderCommand,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<CouponCodeCommand> couponCodes,
                     List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
             //TODO feilong bundle 下单要进行拆分
@@ -458,27 +455,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                 continue;
             }
 
-            if (Validator.isNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-                continue;
-            }
-
-            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-                boolean giftMark = promotionSKUDiscAMTBySetting.getGiftMark();
-                //0代表赠品 1代表主卖品
-                Integer type = !giftMark ? 1 : 0;
-
-                // 非免运费
-                if (!promotionSKUDiscAMTBySetting.getFreeShippingMark()
-                                && promotionSKUDiscAMTBySetting.getSkuId().equals(orderLine.getSkuId())
-                                && orderLine.getType().equals(type)){
-
-                    sdkOrderPromotionManager.savaOrderPromotion(
-                                    orderId,
-                                    orderLine.getId(),
-                                    promotionSKUDiscAMTBySetting,
-                                    salesOrderCommand.getCouponCodes());
-                }
-            }
+            savaOrderLinePromotions(orderId, couponCodes, promotionSKUDiscAMTBySettingList, orderLine);
         }
         // 免运费
         if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
@@ -486,6 +463,29 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                 if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
                     sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
                 }
+            }
+        }
+    }
+
+    private void savaOrderLinePromotions(
+                    Long orderId,
+                    List<CouponCodeCommand> couponCodes,
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
+                    OrderLine orderLine){
+        if (Validator.isNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+            return;
+        }
+
+        for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
+            boolean giftMark = promotionSKUDiscAMTBySetting.getGiftMark();
+            //0代表赠品 1代表主卖品
+            Integer type = !giftMark ? 1 : 0;
+
+            // 非免运费
+            if (!promotionSKUDiscAMTBySetting.getFreeShippingMark() && promotionSKUDiscAMTBySetting.getSkuId().equals(orderLine.getSkuId())
+                            && orderLine.getType().equals(type)){
+
+                sdkOrderPromotionManager.savaOrderPromotion(orderId, orderLine.getId(), promotionSKUDiscAMTBySetting, couponCodes);
             }
         }
     }

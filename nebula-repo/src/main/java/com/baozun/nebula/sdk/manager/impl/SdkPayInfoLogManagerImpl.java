@@ -52,8 +52,7 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
     private PayInfoLogDao payInfoLogDao;
 
     @Override
-    public void savePayInfoLogOfPayMain(SalesOrderCommand salesOrderCommand,String subOrdinate,PayInfo payInfo){
-
+    public void savePayInfoLogOfPayMain(String subOrdinate,SalesOrderCommand salesOrderCommand,PayInfo payInfo){
         PayInfoLog payInfoLog = new PayInfoLog();
 
         payInfoLog.setOrderId(payInfo.getOrderId());

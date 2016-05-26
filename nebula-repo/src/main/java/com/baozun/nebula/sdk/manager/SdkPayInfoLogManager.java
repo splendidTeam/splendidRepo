@@ -29,6 +29,6 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
  */
 public interface SdkPayInfoLogManager extends BaseManager{
 
-    void savePayInfoLogOfPayMain(SalesOrderCommand salesOrderCommand,String subOrdinate,PayInfo payInfo);
+    void savePayInfoLogOfPayMain(String subOrdinate,SalesOrderCommand salesOrderCommand,PayInfo payInfo);
 
 }

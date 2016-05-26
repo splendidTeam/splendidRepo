@@ -127,9 +127,9 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
                     String subOrdinate,
                     SalesOrder salesOrder,
                     SalesOrderCommand salesOrderCommand,
-                    List<ShoppingCartLineCommand> sccList,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     ShopCartCommandByShop shopCartCommandByShop,
-                    List<PromotionSKUDiscAMTBySetting> psdabsList){
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
 
         Map<String, Object> dataMap = new HashMap<String, Object>();
         // 后台下单 并且填写了 邮件地址
@@ -184,7 +184,7 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
             dataMap.put("shipFee", salesOrder.getActualFreight());
             dataMap.put("offersTotal", salesOrder.getDiscount());
             dataMap.put("sumPay", salesOrder.getTotal().add(salesOrder.getActualFreight()));
-            dataMap.put("itemLines", sccList);
+            dataMap.put("itemLines", shoppingCartLineCommandList);
             dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
             dataMap.put("pageUrlBase", pageUrlBase);
             dataMap.put("imgDomainUrl", imgDomainUrl);
@@ -225,7 +225,7 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
             dataMap.put("shipFee", salesOrder.getActualFreight());
             dataMap.put("offersTotal", salesOrder.getDiscount());
             dataMap.put("sumPay", salesOrder.getTotal().add(salesOrder.getActualFreight()));
-            dataMap.put("itemLines", sccList);
+            dataMap.put("itemLines", shoppingCartLineCommandList);
             dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
             dataMap.put("pageUrlBase", pageUrlBase);
             dataMap.put("imgDomainUrl", imgDomainUrl);
@@ -238,9 +238,9 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
                             subOrdinate,
                             salesOrder,
                             salesOrderCommand,
-                            sccList,
+                            shoppingCartLineCommandList,
                             shopCartCommandByShop,
-                            psdabsList,
+                            promotionSKUDiscAMTBySettingList,
                             dataMap);
         }
         return dataMap;

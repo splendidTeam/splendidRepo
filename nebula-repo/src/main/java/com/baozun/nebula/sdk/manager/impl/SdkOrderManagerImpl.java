@@ -18,6 +18,7 @@ package com.baozun.nebula.sdk.manager.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,44 +66,58 @@ public class SdkOrderManagerImpl implements SdkOrderManager{
     @Override
     public SalesOrder savaOrder(Long shopId,SalesOrderCommand salesOrderCommand,ShopCartCommandByShop shopCartCommandByShop){
         SalesOrder salesOrder = new SalesOrder();
+
         ConvertUtils.convertTwoObject(salesOrder, salesOrderCommand);
         // 生成订单号
         String orderCode = orderCodeCreatorManager.createOrderCodeBySource(salesOrderCommand.getSource());
         if (orderCode == null){
             throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
         }
+        salesOrder.setCode(orderCode);
+        salesOrder.setCreateTime(new Date());
+        salesOrder.setShopId(shopId);
 
-        String lang = LangUtil.getCurrentLang();
-        salesOrder.setLang(Validator.isNullOrEmpty(lang) ? LangUtil.ZH_CN : lang);
-
-        BigDecimal actualFreight = shopCartCommandByShop.getOriginShoppingFee().subtract(shopCartCommandByShop.getOffersShipping());
+        //*******************************************************************************
+        //应付运费
+        BigDecimal originShoppingFee = shopCartCommandByShop.getOriginShoppingFee();
+        BigDecimal actualFreight = originShoppingFee.subtract(shopCartCommandByShop.getOffersShipping());
         // 总价 不含运费最终货款
         BigDecimal total = shopCartCommandByShop.getRealPayAmount().subtract(actualFreight);
+
+        salesOrder.setTotal(total);
+        salesOrder.setDiscount(shopCartCommandByShop.getOffersTotal());//设置 整单折扣 整单折扣-sum（行折扣）= 由于整单促销/商城积分形成的未分摊到行上的折扣总额.
+        salesOrder.setPayableFreight(originShoppingFee);
+        salesOrder.setActualFreight(actualFreight);
+
+        //*******************************************************************************
+
+        salesOrder.setQuantity(shopCartCommandByShop.getQty());
+
         // 财务状态
         salesOrder.setFinancialStatus(SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT);
         // 物流状态
         salesOrder.setLogisticsStatus(SalesOrder.SALES_ORDER_STATUS_NEW);
-        salesOrder.setCode(orderCode);
-        salesOrder.setCreateTime(new Date());
-        salesOrder.setShopId(shopId);
-        salesOrder.setQuantity(shopCartCommandByShop.getQty());
-        salesOrder.setTotal(total);
-        salesOrder.setDiscount(shopCartCommandByShop.getOffersTotal());
-        salesOrder.setPayableFreight(shopCartCommandByShop.getOriginShoppingFee());
-        salesOrder.setActualFreight(actualFreight);
-        // 设置买家留言 格式一定要shopId_value 不留言就是shopid_
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getRemarks())){
-            for (String remark : salesOrderCommand.getRemarks()){
-                // String a = "shopid||value"
-                String[] strs = remark.split(SEPARATOR_FLAG);
-                if (strs[0].equals(shopId.toString()) && strs.length == 2){
-                    salesOrder.setRemark(strs[1]);
-                }
-            }
-        }
+
+        setRemark(shopId, salesOrderCommand, salesOrder);
+        setLogisticsProviderInfo(shopId, salesOrderCommand, salesOrder);
+        setLang(salesOrder);
+
+        return sdkOrderDao.save(salesOrder);
+    }
+
+    /**
+     * @param salesOrder
+     */
+    private void setLang(SalesOrder salesOrder){
+        String lang = LangUtil.getCurrentLang();
+        salesOrder.setLang(Validator.isNullOrEmpty(lang) ? LangUtil.ZH_CN : lang);
+    }
+
+    private void setLogisticsProviderInfo(Long shopId,SalesOrderCommand salesOrderCommand,SalesOrder salesOrder){
         // 快递
-        if (Validator.isNotNullOrEmpty(salesOrderCommand.getLogisticsProvider())){
-            for (String logisticsProvider : salesOrderCommand.getLogisticsProvider()){
+        List<String> logisticsProviders = salesOrderCommand.getLogisticsProvider();
+        if (Validator.isNotNullOrEmpty(logisticsProviders)){
+            for (String logisticsProvider : logisticsProviders){
                 // String a = "shopid_code||value"
                 String[] strs = logisticsProvider.split(SEPARATOR_FLAG);
                 if (strs[0].equals(shopId.toString()) && strs.length == 3){
@@ -111,7 +126,20 @@ public class SdkOrderManagerImpl implements SdkOrderManager{
                 }
             }
         }
+    }
 
-        return sdkOrderDao.save(salesOrder);
+    private void setRemark(Long shopId,SalesOrderCommand salesOrderCommand,SalesOrder salesOrder){
+        // 设置买家留言 格式一定要shopId_value 不留言就是shopid_
+        //TODO feilong 上样子这里的注释有误 分隔符描述不对
+        List<String> remarks = salesOrderCommand.getRemarks();
+        if (Validator.isNotNullOrEmpty(remarks)){
+            for (String remark : remarks){
+                // String a = "shopid||value"
+                String[] strs = remark.split(SEPARATOR_FLAG);
+                if (strs[0].equals(shopId.toString()) && strs.length == 2){
+                    salesOrder.setRemark(strs[1]);
+                }
+            }
+        }
     }
 }
