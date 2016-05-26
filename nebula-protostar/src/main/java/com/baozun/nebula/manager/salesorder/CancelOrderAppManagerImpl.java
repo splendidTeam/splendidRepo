@@ -19,7 +19,7 @@ import com.baozun.nebula.dao.member.MemberDao;
 import com.baozun.nebula.dao.system.ChooseOptionDao;
 import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.sdk.command.CancelOrderCommand;
-import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.command.CancelApplicationCommand;
 @Transactional
 @Service

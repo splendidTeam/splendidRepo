@@ -441,17 +441,22 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-					update t_prm_promotioncouponcode
-
-					set limit_times = limit_times-1
-					Where active_mark = 1 AND limit_times > 0 AND
-
-					start_time <= now() and now() <= end_time AND
-					coupon_code in (
-		       		#foreach( $couponCode in $couponCodes )
-    				'$couponCode',
-					 #end
-		       		 '-1')
+					update 
+						t_prm_promotioncouponcode
+					set 
+						limit_times =limit_times-1
+					
+					Where active_mark = 1 
+						AND limit_times > 0 
+						AND	start_time <= now() 
+						and now() <= end_time 
+						AND coupon_code in 
+						(
+				       		#foreach( $couponCode in $couponCodes )
+		    					'$couponCode',
+							 #end
+				       		 '-1'
+			       		 )
                  ]]>
 			</value>
 		</constructor-arg>

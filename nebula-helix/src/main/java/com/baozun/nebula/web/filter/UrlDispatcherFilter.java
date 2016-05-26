@@ -24,7 +24,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.baozun.nebula.manager.cms.PublishCmsPageInstanceManager;
 import com.baozun.nebula.model.cms.CmsPageInstance;
-import com.baozun.nebula.sdk.manager.impl.SdkCmsPageInstanceManagerImpl;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManagerImpl;
 
 
 

@@ -92,7 +92,7 @@ public class NebulaOrderListController extends BaseController{
      * @return
      * @NeedLogin (guest=false)
      * @RequestMapping(value = "/order/orderlist", method = RequestMethod.GET)
-     * @see com.baozun.nebula.sdk.manager.OrderManager#findOrders(loxia.dao.Page, loxia.dao.Sort[],
+     * @see com.baozun.nebula.sdk.manager.order.OrderManager#findOrders(loxia.dao.Page, loxia.dao.Sort[],
      *      java.util.Map)
      * @see com.baozun.nebula.dao.salesorder.SdkOrderDao#findOrders(loxia.dao.Page,
      *      loxia.dao.Sort[], java.util.Map)

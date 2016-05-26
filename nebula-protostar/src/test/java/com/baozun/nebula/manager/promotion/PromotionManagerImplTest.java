@@ -43,7 +43,7 @@ import com.baozun.nebula.command.promotion.ScopeCommand;
 import com.baozun.nebula.command.promotion.SettingNormalCommand;
 import com.baozun.nebula.dao.promotion.PromotionAudiencesDao;
 import com.baozun.nebula.model.promotion.PromotionAudiences;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 
 /**
  * @author - 项硕

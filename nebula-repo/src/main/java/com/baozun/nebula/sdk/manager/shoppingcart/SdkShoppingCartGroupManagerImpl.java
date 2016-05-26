@@ -50,10 +50,10 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
-import com.baozun.nebula.sdk.manager.impl.SdkPromotionCalculationManagerImpl;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManagerImpl;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 
 @Transactional
 @Service("sdkShoppingCartGroupManager")

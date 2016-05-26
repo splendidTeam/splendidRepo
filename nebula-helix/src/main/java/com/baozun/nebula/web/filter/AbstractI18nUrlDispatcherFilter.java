@@ -26,7 +26,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.baozun.nebula.manager.cms.PublishCmsPageInstanceManager;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
-import com.baozun.nebula.sdk.manager.impl.SdkCmsPageInstanceManagerImpl;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManagerImpl;
 import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 

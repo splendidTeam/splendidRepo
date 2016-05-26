@@ -75,15 +75,15 @@ import com.baozun.nebula.sdk.manager.SdkEffectiveManager;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkFilterManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCalculationManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCalculationSettingManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCalculationShareToSKUManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionCouponManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionGuideManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationSettingManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionGuideManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
@@ -493,7 +493,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             purchaseLimitationList = new ArrayList<LimitCommand>();
 
         // 商品的有效性检查
-        sdkEngineManager.doEngineCheck(shoppingCartLine, flag, cart, purchaseLimitationList);
+        sdkEngineManager.doEngineCheck(shoppingCartLine, flag);
 
         // 限购检查
         List<ShoppingCartLineCommand> errorLineList = sdkEngineManager.doEngineCheckLimit(cart, purchaseLimitationList);
@@ -6187,7 +6187,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
                 if (new Integer(CHECKED_STATE).equals(line.getSettlementState())){
                     // 检查商品有效性
-                    sdkEngineManager.doEngineCheck(line, false, cart, purchaseLimitationList);
+                    sdkEngineManager.doEngineCheck(line, false);
                 }
 
             }

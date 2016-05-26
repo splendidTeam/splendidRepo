@@ -37,8 +37,8 @@ import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 
 /**
  * 

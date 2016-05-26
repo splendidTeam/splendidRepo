@@ -73,7 +73,7 @@ import com.baozun.nebula.model.promotion.PromotionOperationLog;
 import com.baozun.nebula.model.promotion.PromotionScope;
 import com.baozun.nebula.model.promotion.PromotionSettingComplex;
 import com.baozun.nebula.model.promotion.PromotionSettingNormal;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 import com.baozun.nebula.solr.utils.JsonFormatUtil;
 
 /**

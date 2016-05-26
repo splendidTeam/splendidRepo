@@ -42,10 +42,10 @@ import com.feilong.tools.jsonlib.JsonUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
 
 /**
- * 需要注意ROOT WebApplicationContext 和 sub WebApplicationContext的问题，当使用sub WebApplicationContext时需要在web.xml中配置
- * init-param,name为contextAttribute，value为DispatcherServlet的servletName
- * @author D.C
- * @date 2015年10月9日 下午2:54:49
+ * 系统审计日志，用于追踪用户操作记录
+ * 
+ * @author xingyu
+ * 
  */
 public class AuditLogFilter extends OncePerRequestFilter {
 
@@ -68,8 +68,8 @@ public class AuditLogFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		
 		 try{
+			    filterChain.doFilter(request, response);
 	        	createSysAuditLog(request,response);
-	        	filterChain.doFilter(request, response);
 	        	if (LOGGER.isDebugEnabled()){
 		            LOGGER.debug(
 		                            "[AUDIT_LOG_INFO] RequestInfoMapForLog:{}",

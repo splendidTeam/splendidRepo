@@ -39,7 +39,9 @@ public interface SearchManager extends BaseManager{
 	 * @param categoryIds
 	 * @author 冯明雷
 	 * @time 2016年4月26日上午10:23:10
+	 * @see com.baozun.nebula.search.manager.SearchManager.findConditionByNavigationWithCache(Long)
 	 */
+	@Deprecated
 	List<SearchConditionCommand> findConditionByCategoryIdsWithCache(List<Long> categoryIds);
 	
 	
@@ -51,5 +53,16 @@ public interface SearchManager extends BaseManager{
 	 * @time 2016年4月29日下午5:03:18
 	 */
 	List<SearchConditionItemCommand> findCoditionItemByCoditionIdWithCache(Long coditionId);
+	
+	
+	
+	/**
+	 * 根据导航id查询筛选条件(加缓存)
+	 * @return List<SearchConditionCommand>
+	 * @param navigationId
+	 * @author johnny xia
+	 */
+	List<SearchConditionCommand> findConditionByNavigationWithCache(Long navigationId);
+	
 	
 }

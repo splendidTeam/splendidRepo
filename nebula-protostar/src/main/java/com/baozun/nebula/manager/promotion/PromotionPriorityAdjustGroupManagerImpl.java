@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.model.promotion.PromotionPriorityAdjustGroup;
-import com.baozun.nebula.sdk.manager.SdkPromotionPriorityAdjustGroupManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionPriorityAdjustGroupManager;
 
 /**
  * PromotionPriorityAdjustGroupManager

@@ -379,8 +379,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			HttpServletResponse response,
 			Model model){
 
-		// 如果支持记住用户名
-		if (isSupportRemeberMe()) {
 			// 从cookie中获取解密后的loginName
 			String loginName = getRememberedLogin(request);
 
@@ -390,14 +388,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 				memberLoginViewCommand.setIsRememberMe(true);
 				memberLoginViewCommand.setLoginName(loginName);
 			}
-		}
+		
 
 		// 如果支持自动登录或记住用户名
-		if (isSupportAutoLogin()) {
-			// 如果支持记自动登录的话，必须要支持记住用户名
-			assert isSupportRemeberMe() : "SupportAutoLogin can only be actived when SupportRemeberMe";
-
-			// cookie中用户名不能为空，然后才会去获取cookie中的密码的hash
+	        // cookie中用户名不能为空，然后才会去获取cookie中的密码的hash
 			if (memberLoginViewCommand.getLoginName() != null) {
 				LOG.debug("User Login Name exists. Try to get Auto Login password.");
 				String password = getAutoLoginPassword(request);
@@ -408,7 +402,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			}else{
 				LOG.debug("No Auto Login informaton exists.");
 			}
-		}
+		
 
 	}
 
@@ -508,7 +502,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		if (pwd == null)
 			throw new RuntimeException("generateAutoLoginPassword Encrypt hash fail.");
 
-		return pwd.substring(0, 6);
+		return pwd.substring(0, 8);
 	}
 
 	/**
@@ -523,7 +517,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	private String getEncryptedInformationFromCookie(HttpServletRequest request,String name) throws EncryptionException{
 		String encValue = CookieUtil.getCookieValue(request, name);
 		if (encValue != null) {
-			return EncryptUtil.getInstance().decrypt(name);
+			return EncryptUtil.getInstance().decrypt(encValue);
 		}
 		return null;
 	}

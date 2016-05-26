@@ -36,15 +36,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.sdk.manager.SdkOrderCreateManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
@@ -281,13 +282,15 @@ public class NebulaOrderConfirmController extends BaseController{
         SalesOrderCommand salesOrderCommand = salesOrderResolver.buildSalesOrderCommand(memberDetails, orderForm, request);
 
         // 获取购物车信息
-        List<ShoppingCartLineCommand> cartLines = getCartLines(request, memberDetails, key);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = getCartLines(request, memberDetails, key);
 
         // 获取购物车行信息
         List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
 
+        CalcFreightCommand calcFreightCommand = salesOrderCommand.getCalcFreightCommand();
+
         ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
-                        .buildShoppingCartCommand(memberDetails, cartLines, salesOrderCommand.getCalcFreightCommand(), couponList);
+                        .buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
 
         // 校验购物车信息和促销
         String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
@@ -303,14 +306,19 @@ public class NebulaOrderConfirmController extends BaseController{
             return toNebulaReturnResult(salesorderResult);
         }
 
+        SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
+
         //设置立即购买标志
         if (Validator.isNotNullOrEmpty(key)){
-            salesOrderCommand.setIsImmediatelyBuy(true);
+            salesOrderCreateOptions.setIsImmediatelyBuy(true);
         }
 
         // 新建订单
-        String subOrdinate = sdkOrderCreateManager
-                        .saveOrder(shoppingCartCommand, salesOrderCommand, null == memberDetails ? null : memberDetails.getMemComboList());
+        String subOrdinate = sdkOrderCreateManager.saveOrder(
+                        shoppingCartCommand,
+                        salesOrderCommand,
+                        null == memberDetails ? null : memberDetails.getMemComboList(),
+                        salesOrderCreateOptions);
 
         //购物车信息重置
         if (Validator.isNotNullOrEmpty(key)){

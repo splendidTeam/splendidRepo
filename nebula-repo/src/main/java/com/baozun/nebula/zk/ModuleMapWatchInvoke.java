@@ -4,7 +4,7 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 
 public class ModuleMapWatchInvoke extends WatchInvoke {
 
