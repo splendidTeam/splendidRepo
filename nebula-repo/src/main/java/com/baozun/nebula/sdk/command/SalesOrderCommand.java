@@ -193,17 +193,17 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 发票抬头. */
     private String                      receiptTitle;
-    
+
     /** 发票收货人. */
     private String                      receiptConsignee;
-    
+
     /** 发票收货人联系方式. */
     private String                      receiptTelphone;
-    
+
     /** 发票收货地址. */
     private String                      receiptAddress;
 
-	/** 发票内容. */
+    /** 发票内容. */
     private String                      receiptContent;
 
     /** 备注. */
@@ -258,7 +258,12 @@ public class SalesOrderCommand extends BaseModel{
 
     //*********************************************************************************************
 
-    /** 是否qs *. */
+    /**
+     * 是否qs.
+     * 
+     * @deprecated 没有用到
+     */
+    @Deprecated
     private Boolean                     isQs              = false;
 
     /** 物流方式 *. */
@@ -266,13 +271,12 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 银行分期付款的期数. */
     private Integer                     periods;
-    
+
     //*********************************************************************************************
-    
+
     /** 多语言 */
-    private String 						lang;
-    
-    
+    private String                      lang;
+
     /**
      * 获得 物流方式 *.
      *
@@ -1528,20 +1532,24 @@ public class SalesOrderCommand extends BaseModel{
     }
 
     /**
-     * 获得 是否qs *.
+     * 获得 是否qs.
      *
-     * @return the 是否qs *
+     * @return the 是否qs
+     * @deprecated 没有用到
      */
+    @Deprecated
     public Boolean getIsQs(){
         return isQs;
     }
 
     /**
-     * 设置 是否qs *.
+     * 设置 是否qs.
      *
      * @param isQs
-     *            the new 是否qs *
+     *            the new 是否qs
+     * @deprecated 没有用到
      */
+    @Deprecated
     public void setIsQs(Boolean isQs){
         this.isQs = isQs;
     }
@@ -1660,37 +1668,36 @@ public class SalesOrderCommand extends BaseModel{
         this.buyerTel = buyerTel;
     }
 
+    public String getReceiptConsignee(){
+        return receiptConsignee;
+    }
 
-	public String getReceiptConsignee() {
-		return receiptConsignee;
-	}
+    public void setReceiptConsignee(String receiptConsignee){
+        this.receiptConsignee = receiptConsignee;
+    }
 
-	public void setReceiptConsignee(String receiptConsignee) {
-		this.receiptConsignee = receiptConsignee;
-	}
+    public String getReceiptTelphone(){
+        return receiptTelphone;
+    }
 
-	public String getReceiptTelphone() {
-		return receiptTelphone;
-	}
+    public void setReceiptTelphone(String receiptTelphone){
+        this.receiptTelphone = receiptTelphone;
+    }
 
-	public void setReceiptTelphone(String receiptTelphone) {
-		this.receiptTelphone = receiptTelphone;
-	}
+    public String getReceiptAddress(){
+        return receiptAddress;
+    }
 
-	public String getReceiptAddress() {
-		return receiptAddress;
-	}
+    public void setReceiptAddress(String receiptAddress){
+        this.receiptAddress = receiptAddress;
+    }
 
-	public void setReceiptAddress(String receiptAddress) {
-		this.receiptAddress = receiptAddress;
-	}
+    public String getLang(){
+        return lang;
+    }
 
-	public String getLang() {
-		return lang;
-	}
-
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
+    public void setLang(String lang){
+        this.lang = lang;
+    }
 
 }
