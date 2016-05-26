@@ -58,23 +58,23 @@ public final class ImageUrlUtil{
      * @return the string
      * @see com.baozun.nebula.web.taglib.ImgUrlTag#doStartTag()
      */
-    public static String formatImage(String imgBase, String imgUrl, String size, String defaultImgUrl){
+    public static String formatImage(String imgBase,String imgUrl,String size,String defaultImgUrl){
         StringBuffer sb = new StringBuffer();
 
         //为null使用默认图片
-        if (StringUtils.isBlank(imgUrl)) {
-        	if(Validator.isNotNullOrEmpty(defaultImgUrl)) {
-        		sb.append(defaultImgUrl);
-        	}
-        } else {
-        	 if(Validator.isNotNullOrEmpty(imgBase)) {
-        		 sb.append(imgBase);
-        	 }
+        if (StringUtils.isBlank(imgUrl)){
+            if (Validator.isNotNullOrEmpty(defaultImgUrl)){
+                sb.append(defaultImgUrl);
+            }
+        }else{
+            if (Validator.isNotNullOrEmpty(imgBase)){
+                sb.append(imgBase);
+            }
             int index = imgUrl.lastIndexOf(".");
             int index2 = imgUrl.lastIndexOf("_");
 
             //如果找到了下划线 "_",截取下划线及之前的部分
-            if (index2 != -1) {
+            if (index2 != -1){
                 sb.append(imgUrl.substring(0, index2));
             }
             //如果找不到下划线 "_",截取.之前的部分
@@ -82,7 +82,7 @@ public final class ImageUrlUtil{
                 sb.append(imgUrl.substring(0, index));
             }
 
-            if (!SOURCE.equals(size)) {
+            if (!SOURCE.equals(size)){
                 sb.append("_");
                 sb.append(size);
             }
@@ -90,17 +90,16 @@ public final class ImageUrlUtil{
         }
         return sb.toString();
     }
-    
-    
+
     /**
      * 
      * @param imgUrl
-     *           图片原始url
+     *            图片原始url
      * @param size
-     *           需要拼接的规格
+     *            需要拼接的规格
      * @return imgUrl拼接上size之后的url，size会加上下划线拼在imgUrl的扩展名和.之前
      */
-    public static String formatImage(String imgUrl, String size){
+    public static String formatImage(String imgUrl,String size){
         return formatImage(null, imgUrl, size, null);
     }
 }
