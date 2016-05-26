@@ -1,6 +1,12 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/pages/commons/common.jsp"%>
+
+<script type="text/javascript" src="${base}/scripts/product/item/add-item-price.js"></script>
+
 <div class="ui-block-title1" style="background: #fff; color: #000;">
 	<spring:message code="item.update.itemprice" />
 </div>
+
 <div class="ui-block-content border-grey">
 	<div class="ui-block-line ">
 		<label><spring:message code="item.update.salesprice" /></label>

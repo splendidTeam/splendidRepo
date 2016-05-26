@@ -1,3 +1,55 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/pages/commons/common.jsp"%>
+
+<script type="text/javascript" src="${base}/scripts/product/item/add-item-description.js"></script>
+
+<script type="text/javascript">
+		
+		<c:if test="${param.imageUpload==1}">
+		editor1.on( 'pluginsLoaded', function(ev)
+			{
+				if ( !CKEDITOR.dialog.exists( 'myDialog' ) )
+				{
+					CKEDITOR.dialog.add( 'myDialog', function( editor )
+							{
+								return {
+									title : '图片上传',
+									minWidth : 450,
+									minHeight : 200,
+									contents : [
+										{
+											id : 'tab1',
+											label : 'First Tab',
+											title : 'First Tab',
+											elements :
+											[
+												{
+													type:'vbox',
+													height:'250px',
+													children:[
+																{	type:'html',
+																	style:'width:95%;',
+																	html:'<iframe id ="uploadIfr" frameborder="0" name="uploadIfr" width="300" height="100" src="/common/upload.jsp"></iframe>'
+																}
+															]
+												}
+											]
+										}
+									]
+								};
+							} );
+				}
+				editor1.addCommand( 'myDialogCmd', new CKEDITOR.dialogCommand( 'myDialog' ) );
+				editor1.ui.addButton( 'MyButton',
+					{
+						label : '图片上传',
+						title : '图片上传',
+						command : 'myDialogCmd'
+					} );
+			});
+		</c:if>
+</script>
+
 <div class="ui-block-title1" style="background: #fff; color: #000;">
 	<spring:message code="item.add.description" />
 </div>
