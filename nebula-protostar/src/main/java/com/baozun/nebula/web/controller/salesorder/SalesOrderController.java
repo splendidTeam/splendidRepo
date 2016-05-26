@@ -41,6 +41,7 @@ import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.PayNoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
@@ -388,7 +389,6 @@ public class SalesOrderController extends BaseController{
     /**
      * 提交订单
      * 
-     * @param OrderCommand
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -421,8 +421,7 @@ public class SalesOrderController extends BaseController{
         salesOrderCommand.setCity(city == null ? "" : city.getName());
         salesOrderCommand.setArea(area == null ? "" : area.getName());
 
-        /** 后台下单 **/
-        salesOrderCommand.setIsBackCreateOrder(true);
+        SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
 
         Long memberId = salesOrderCommand.getMemberId();
 
@@ -471,7 +470,10 @@ public class SalesOrderController extends BaseController{
 
             ShoppingCartCommand shoppingCartCommand = null;
             if (manualFlag != null && manualFlag){
-                // salesOrderCommand.setMemberId(null);
+
+                /** 后台下单 **/
+                salesOrderCreateOptions.setIsBackCreateOrder(true);
+
                 lines = (List<ShoppingCartLineCommand>) request.getSession().getAttribute(Constants.MANUALBUY_SESSION_SHOPCART);
                 shoppingCartCommand = sdkShoppingCartManager.findManualShoppingCart(lines);
 
@@ -486,8 +488,8 @@ public class SalesOrderController extends BaseController{
                 shoppingCartCommand.setCurrentPayAmount(shoppingCartCommand.getOriginPayAmount().add(salesOrderCommand.getActualFreight()));
 
                 // 不清除购物车
-                salesOrderCommand.setIsImmediatelyBuy(true);
-                subOrdinate = sdkOrderCreateManager.saveManualOrder(shoppingCartCommand, salesOrderCommand);
+                salesOrderCreateOptions.setIsImmediatelyBuy(true);
+                subOrdinate = sdkOrderCreateManager.saveManualOrder(shoppingCartCommand, salesOrderCommand, salesOrderCreateOptions);
             }else{
                 if (Validator.isNotNullOrEmpty(memberId)){
                     lines = sdkShoppingCartManager.findShoppingCartLinesByMemberId(memberId, 1);
@@ -496,11 +498,11 @@ public class SalesOrderController extends BaseController{
                     memberId = null;
                     lines = (List<ShoppingCartLineCommand>) request.getSession().getAttribute(Constants.IMMEDIATELYBUY_SESSION_SHOPCART);
                     // 不清除购物车
-                    salesOrderCommand.setIsImmediatelyBuy(true);
+                    salesOrderCreateOptions.setIsImmediatelyBuy(true);
                 }
                 shoppingCartCommand = sdkShoppingCartCommandBuilder
                                 .buildShoppingCartCommand(memberId, lines, calcFreightCommand, codes, memComboIds);
-                subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds);
+                subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memComboIds, salesOrderCreateOptions);
             }
 
             // 清空session

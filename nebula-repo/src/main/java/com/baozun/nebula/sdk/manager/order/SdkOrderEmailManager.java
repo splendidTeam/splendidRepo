@@ -22,6 +22,7 @@ import java.util.Map;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -47,5 +48,6 @@ public interface SdkOrderEmailManager extends BaseManager{
                     SalesOrderCommand salesOrderCommand,
                     List<ShoppingCartLineCommand> sccList,
                     ShopCartCommandByShop shopCartCommandByShop,
-                    List<PromotionSKUDiscAMTBySetting> psdabsList);
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
+                    SalesOrderCreateOptions salesOrderCreateOptions);
 }

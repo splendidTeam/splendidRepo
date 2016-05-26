@@ -20,6 +20,7 @@ import java.util.Set;
 
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
 /**
@@ -51,6 +52,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
  */
 public interface SdkOrderCreateManager extends BaseManager{
 
+    String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
+
     /**
      * 通过商品清单下订单.
      *
@@ -64,7 +67,11 @@ public interface SdkOrderCreateManager extends BaseManager{
      */
     //TODO 参数支持memberId 不支持memCombos
     //创建订单的核心思想是  ,某某人 要买什么什么东西, 收货地址 支付方式 等等是什么
-    String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos);
+    String saveOrder(
+                    ShoppingCartCommand shoppingCartCommand,
+                    SalesOrderCommand salesOrderCommand,
+                    Set<String> memCombos,
+                    SalesOrderCreateOptions salesOrderCreateOptions);
 
     /**
      * 手工下订单.
@@ -77,5 +84,8 @@ public interface SdkOrderCreateManager extends BaseManager{
      * @deprecated 感觉应该可以和 {@link #saveOrder(ShoppingCartCommand, SalesOrderCommand, Set)}进行某种合并,暂时时间关系不动
      */
     @Deprecated
-    String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand);
+    String saveManualOrder(
+                    ShoppingCartCommand shoppingCartCommand,
+                    SalesOrderCommand salesOrderCommand,
+                    SalesOrderCreateOptions salesOrderCreateOptions);
 }

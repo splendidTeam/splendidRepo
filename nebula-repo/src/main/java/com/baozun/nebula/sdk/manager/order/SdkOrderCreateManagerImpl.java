@@ -38,6 +38,7 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
@@ -145,21 +146,23 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     @Autowired
     private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
-     * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
-     */
     @Override
     public String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
+        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, null);
+    }
+
+    @Override
+    public String saveOrder(
+                    ShoppingCartCommand shoppingCartCommand,
+                    SalesOrderCommand salesOrderCommand,
+                    Set<String> memCombos,
+                    SalesOrderCreateOptions salesOrderCreateOptions){
         if (salesOrderCommand == null || shoppingCartCommand == null){
             throw new BusinessException(Constants.SHOPCART_IS_NULL);
         }
-
+        salesOrderCreateOptions = null == salesOrderCreateOptions ? new SalesOrderCreateOptions() : salesOrderCreateOptions;
         preCreateOrder(shoppingCartCommand, salesOrderCommand, memCombos);
-
-        return saveOrderInfo(salesOrderCommand, shoppingCartCommand);
+        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, salesOrderCreateOptions);
     }
 
     private void preCreateOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
@@ -177,7 +180,10 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * com.baozun.nebula.sdk.command.SalesOrderCommand)
      */
     @Override
-    public String saveManualOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand){
+    public String saveManualOrder(
+                    ShoppingCartCommand shoppingCartCommand,
+                    SalesOrderCommand salesOrderCommand,
+                    SalesOrderCreateOptions salesOrderCreateOptions){
         if (salesOrderCommand == null || shoppingCartCommand == null){
             throw new BusinessException(Constants.SHOPCART_IS_NULL);
         }
@@ -191,13 +197,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                                 new Object[] { shoppingCartLine.getItemName() });
             }
         }
-        String subOrdinate = saveOrderInfo(salesOrderCommand, shoppingCartCommand);
-        // 没有成功保存订单
-        if (subOrdinate == null){
-            LOGGER.warn("savedOrder returns null!");
-            throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
-        }
-        return subOrdinate;
+        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, salesOrderCreateOptions);
     }
 
     /**
@@ -239,9 +239,14 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      *            the sales order command
      * @param shoppingCartCommand
      *            the shopping cart command
+     * @param salesOrderCreateOptions
+     *            TODO
      * @return the string
      */
-    private String saveOrderInfo(SalesOrderCommand salesOrderCommand,ShoppingCartCommand shoppingCartCommand){
+    private String saveOrderInfo(
+                    SalesOrderCommand salesOrderCommand,
+                    ShoppingCartCommand shoppingCartCommand,
+                    SalesOrderCreateOptions salesOrderCreateOptions){
         // 合并付款
         String subOrdinate = orderCodeCreator.createOrderSerialNO();
         if (subOrdinate == null){
@@ -285,7 +290,8 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                             shopIdAndShopCartCommandByShopMap.get(shopId),
                             shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId),
                             isSendEmail,
-                            dataMapList);
+                            dataMapList,
+                            salesOrderCreateOptions);
         }
 
         //*************************************************************************************
@@ -301,7 +307,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         }
 
         // 如果不是立即购买 清空购物车
-        if (salesOrderCommand.getIsImmediatelyBuy() == null || salesOrderCommand.getIsImmediatelyBuy() == false){
+        if (!salesOrderCreateOptions.getIsImmediatelyBuy()){
             sdkShoppingCartManager.emptyShoppingCart(salesOrderCommand.getMemberId());
         }
 
@@ -329,7 +335,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      *            the is send email
      * @param dataMapList
      *            the data map list
+     * @param salesOrderCreateOptions
      */
+    //TODO feilong 参数太多 必须重构
     private void doWithPerShop(
                     Long shopId,
                     String subOrdinate,
@@ -338,7 +346,8 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                     ShopCartCommandByShop shopCartCommandByShop,
                     List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
                     boolean isSendEmail,
-                    List<Map<String, Object>> dataMapList){
+                    List<Map<String, Object>> dataMapList,
+                    SalesOrderCreateOptions salesOrderCreateOptions){
 
         SalesOrder salesOrder = sdkOrderManager.savaOrder(shopId, salesOrderCommand, shopCartCommandByShop);
         Long orderId = salesOrder.getId();
@@ -372,7 +381,8 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                             salesOrderCommand,
                             shoppingCartLineCommandList,
                             shopCartCommandByShop,
-                            promotionSKUDiscAMTBySettingList);
+                            promotionSKUDiscAMTBySettingList,
+                            salesOrderCreateOptions);
             dataMapList.add(dataMap);
         }
 
