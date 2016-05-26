@@ -146,11 +146,25 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     @Autowired
     private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
+     * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set)
+     */
     @Override
     public String saveOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
         return saveOrderInfo(salesOrderCommand, shoppingCartCommand, null);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager#saveOrder(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand,
+     * com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Set, com.baozun.nebula.sdk.command.SalesOrderCreateOptions)
+     */
     @Override
     public String saveOrder(
                     ShoppingCartCommand shoppingCartCommand,
@@ -165,6 +179,16 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         return saveOrderInfo(salesOrderCommand, shoppingCartCommand, salesOrderCreateOptions);
     }
 
+    /**
+     * Pre create order.
+     *
+     * @param shoppingCartCommand
+     *            the shopping cart command
+     * @param salesOrderCommand
+     *            the sales order command
+     * @param memCombos
+     *            the mem combos
+     */
     private void preCreateOrder(ShoppingCartCommand shoppingCartCommand,SalesOrderCommand salesOrderCommand,Set<String> memCombos){
         //去除抬头和未选中的商品
         refactoringShoppingCartCommand(shoppingCartCommand);
@@ -240,7 +264,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * @param shoppingCartCommand
      *            the shopping cart command
      * @param salesOrderCreateOptions
-     *            TODO
+     *            the sales order create options
      * @return the string
      */
     private String saveOrderInfo(
@@ -336,6 +360,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * @param dataMapList
      *            the data map list
      * @param salesOrderCreateOptions
+     *            the sales order create options
      */
     //TODO feilong 参数太多 必须重构
     private void doWithPerShop(
@@ -393,8 +418,8 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     /**
      * 获得 pay sum.
      *
-     * @param shoppingCartCommand
-     *            the shopping cart command
+     * @param paySum
+     *            the pay sum
      * @param soPayMentDetails
      *            the so pay ment details
      * @return the pay sum
@@ -412,10 +437,15 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     }
 
     /**
+     * 获得 pay main money.
+     *
      * @param shopId
+     *            the shop id
      * @param salesOrder
-     * @param salesOrderCommand
-     * @return
+     *            the sales order
+     * @param soPayMentDetails
+     *            the so pay ment details
+     * @return the pay main money
      */
     private BigDecimal getPayMainMoney(Long shopId,SalesOrder salesOrder,List<String> soPayMentDetails){
         Long orderId = salesOrder.getId();
@@ -439,15 +469,15 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     /**
      * 保存订单行.
-     * 
+     *
      * @param orderId
      *            the order id
      * @param shoppingCartLineCommandList
      *            the scc list
+     * @param couponCodes
+     *            the coupon codes
      * @param promotionSKUDiscAMTBySettingList
      *            the psdabs list
-     * @param salesOrderCommand
-     *            the sales order command
      */
     private void savaOrderLinesAndPromotions(
                     Long orderId,
@@ -473,6 +503,18 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         }
     }
 
+    /**
+     * Sava order line promotions.
+     *
+     * @param orderId
+     *            the order id
+     * @param couponCodes
+     *            the coupon codes
+     * @param promotionSKUDiscAMTBySettingList
+     *            the promotion sku disc amt by setting list
+     * @param orderLine
+     *            the order line
+     */
     private void savaOrderLinePromotions(
                     Long orderId,
                     List<CouponCodeCommand> couponCodes,

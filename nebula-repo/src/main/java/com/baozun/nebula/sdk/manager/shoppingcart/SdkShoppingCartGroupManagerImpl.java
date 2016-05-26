@@ -306,9 +306,6 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                         else
                             lineGift = lineGift + ",整单赠品";
                     }
-                    /*
-                     * if (line.getType()==0) lineGift = lineGift + ",非卖赠品"; else lineGift = lineGift + ",主卖赠品";
-                     */
                     log.info(lineGift);
                 }
             }

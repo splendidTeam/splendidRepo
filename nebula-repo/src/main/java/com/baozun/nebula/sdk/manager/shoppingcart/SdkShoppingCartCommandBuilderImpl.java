@@ -146,23 +146,39 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         //*************************************************************************************************
 
         // 封装购物车的基本信息
-        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(
-                        buildUserDetails(memberId, memberComIds),
-                        coupons,
-                        chooseLinesShoppingCartLineCommandList);
+        UserDetails userDetails = buildUserDetails(memberId, memberComIds);
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(userDetails, coupons, chooseLinesShoppingCartLineCommandList);
 
         // 设置分店铺的购物车
         Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = buildShopCartByShopIdMap(shoppingCartCommand);
         shoppingCartCommand.setShoppingCartByShopIdMap(shopIdAndShoppingCartCommandMap);
 
-        // 设置购物车促销信息
-        setShopCartPromotionInfos(shoppingCartCommand, calcFreightCommand);
+        //TODO feilong 全不选的情况
+        if (Validator.isNotNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){
+            // 设置购物车促销信息
+            setShopCartPromotionInfos(shoppingCartCommand, calcFreightCommand);
+        }
 
         //***************************************************************************************
         //TODO feilong 
         doWithNoChoose(noChooseShoppingCartLineCommandList, shoppingCartCommand, shopIdAndShoppingCartCommandMap);
 
         //************************************************************************************************
+        doWithRebuildShoppingCartLineCommands(
+                        shoppingCartCommand,
+                        noChooseShoppingCartLineCommandList,
+                        lineIdAndShopIdMapList,
+                        shopIdAndShoppingCartCommandMap);
+
+        return shoppingCartCommand;
+    }
+
+    //TODO feilong 这是什么鬼逻辑?
+    private void doWithRebuildShoppingCartLineCommands(
+                    ShoppingCartCommand shoppingCartCommand,
+                    List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,
+                    Map<Long, Long> lineIdAndShopIdMapList,
+                    Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
         // 所有门店商品行数据包括选中和不选中的
         Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = new HashMap<Long, List<ShoppingCartLineCommand>>();
 
@@ -173,7 +189,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long lineId = entry.getKey();
             Long shopId = entry.getValue();
 
-            //TODO feilong 这是什么鬼逻辑?
             CollectionUtils.addIgnoreNull(
                             newLineList,
                             CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
@@ -207,9 +222,9 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         // 循环添加店铺所有增品记录行
         for (Entry<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandEntry : shopIdAndShoppingCartCommandMap.entrySet()){
             Long shopIdKey = shopIdAndShoppingCartCommandEntry.getKey();// 店铺ID
-            ShoppingCartCommand value = shopIdAndShoppingCartCommandEntry.getValue();
+            ShoppingCartCommand shpShoppingCartCommand = shopIdAndShoppingCartCommandEntry.getValue();
 
-            List<ShoppingCartLineCommand> shoppingCartLineCommandList = value.getShoppingCartLineCommands();// 店铺的商品行数据
+            List<ShoppingCartLineCommand> shoppingCartLineCommandList = shpShoppingCartCommand.getShoppingCartLineCommands();// 店铺的商品行数据
 
             for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
                 if (shoppingCartLineCommand.isGift() || shoppingCartLineCommand.isCaptionLine()){
@@ -225,8 +240,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             ShoppingCartCommand shopShoppingCartCommand = shopIdAndShoppingCartCommandMap.get(key);
             shopShoppingCartCommand.setShoppingCartLineCommands(value);
         }
-
-        return shoppingCartCommand;
     }
 
     /**
@@ -469,19 +482,21 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.select(allShoppingCartLines, "gift", false);
         shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(noGiftShoppingCartLines));
 
+        Map<String, BigDecimal> priceMap = CollectionsUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
+
         // 实际支付金额
-        shoppingCartCommand.setCurrentPayAmount(
-                        CollectionsUtil.sum(summaryShopCartList, "realPayAmount").setScale(2, BigDecimal.ROUND_HALF_UP));
+        shoppingCartCommand.setCurrentPayAmount(priceMap.get("realPayAmount").setScale(2, BigDecimal.ROUND_HALF_UP));
 
         // 应付运费
-        shoppingCartCommand.setOriginShoppingFee(
-                        CollectionsUtil.sum(summaryShopCartList, "originShoppingFee").setScale(2, BigDecimal.ROUND_HALF_UP));
+        shoppingCartCommand.setOriginShoppingFee(priceMap.get("originShoppingFee").setScale(2, BigDecimal.ROUND_HALF_UP));
 
         // 运费优惠
-        BigDecimal offersShippingAmount = CollectionsUtil.sum(summaryShopCartList, "offersShipping");
+        BigDecimal offersShippingAmount = priceMap.get("offersShipping");
+
         // 计算实付运费
-        BigDecimal currentShippingAmountByShopCart = shoppingCartCommand.getOriginShoppingFee().compareTo(offersShippingAmount) >= 0
-                        ? shoppingCartCommand.getOriginShoppingFee().subtract(offersShippingAmount) : BigDecimal.ZERO;
+        BigDecimal originShoppingFee = shoppingCartCommand.getOriginShoppingFee();
+        BigDecimal currentShippingAmountByShopCart = originShoppingFee.compareTo(offersShippingAmount) >= 0
+                        ? originShoppingFee.subtract(offersShippingAmount) : BigDecimal.ZERO;
         // 实付运费
         shoppingCartCommand.setCurrentShippingFee(currentShippingAmountByShopCart);
     }
