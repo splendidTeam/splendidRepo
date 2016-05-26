@@ -934,7 +934,7 @@ public class ItemController extends BaseController{
 			}
 
 		}else if (Validator.isNotNullOrEmpty(propertyValueInputs) && Validator.isNotNullOrEmpty(propertyValueInputIds)
-				&& propertyValueInputIds.length == 1 && propertyValueInputs.length >= 4){
+				&& propertyValueInputIds.length == 1 && propertyValueInputs.length >= 2 * langSize){
 			// 一个自定义多选、一个多选
 			Set<Long> set = new LinkedHashSet<Long>();
 			for (Long l : propertyIds){
