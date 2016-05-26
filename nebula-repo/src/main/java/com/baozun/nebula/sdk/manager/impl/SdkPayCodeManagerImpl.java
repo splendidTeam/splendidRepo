@@ -49,7 +49,7 @@ public class SdkPayCodeManagerImpl implements SdkPayCodeManager{
      * @see com.baozun.nebula.sdk.manager.SdkPayCodeManager#savaPayCode(java.math.BigDecimal, java.lang.String)
      */
     @Override
-    public void savaPayCode(BigDecimal payMoney,String subOrdinate){
+    public void savaPayCode(String subOrdinate,BigDecimal payMoney){
         PayCode payCode = new PayCode();
         payCode.setPayMoney(payMoney);
         payCode.setPayNumerical(payMoney);

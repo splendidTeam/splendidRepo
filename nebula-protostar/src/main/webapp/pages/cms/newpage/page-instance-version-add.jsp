@@ -52,7 +52,9 @@ width: 97%;
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png">新建页面实例版本
 		<input type="button" value="返回" class="button butch return" title="返回"/>
 		<input type="button" value="发布" class="button orange publish" title="发布"/>
+		<c:if test="${cmsPageInstanceVersion.id !=null}">
 		<input type="button" value="预览" class="button orange preview" title="预览"/>
+		</c:if>
 		<input type="button" value="保存" class="button orange save" title="保存"/>
 	</div>
 	<div class="ui-block">
@@ -151,7 +153,7 @@ width: 97%;
 			  </div>
 			  <div class="ui-block-line mt5 desc" style="display: none;">
 					<label>描述</label>
-					<textarea placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input"></textarea>
+					<textarea placeholder="描述" style="width: 400px;height: 100px;resize:none;" loxiaType="input" ></textarea>
 				  </div>
 			  <div class="ui-block-line mt5 " >
 					<input num="" style="width: 44px;height: 33px;margin-left: 250px; margin-bottom: 10px" type="button" value="删除" class="button remove"/>	

@@ -20,10 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,22 +37,14 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.OrderManager;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
-import com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
-import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
-import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
-import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.predicate.MainLinesPredicate;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.util.CollectionsUtil;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
@@ -70,31 +60,19 @@ import com.feilong.tools.jsonlib.JsonUtil;
 public class SalesOrderResolverImpl implements SalesOrderResolver{
 
     /** The Constant log. */
-    private static final Logger           LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
 
     @Autowired
-    private MataInfoManager               mataInfoManager;
+    private MataInfoManager     mataInfoManager;
 
     @Autowired
-    private SalesOrderManager             salesOrderManager;
+    private SalesOrderManager   salesOrderManager;
 
     @Autowired
-    private SdkPaymentManager             sdkPaymentManager;
+    private SdkPaymentManager   sdkPaymentManager;
 
     @Autowired
-    private OrderManager                  orderManager;
-
-    @Autowired
-    private ShoppingcartFactory           shoppingcartFactory;
-
-    @Autowired
-    private GuestShoppingcartPersister    guestShoppingcartPersister;
-
-    @Autowired
-    private ShoppingcartCountPersister    shoppingcartCountPersister;
-
-    @Autowired
-    private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
+    private OrderManager        orderManager;
 
     @Override
     public SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request){
@@ -210,25 +188,4 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
     }
 
-    @Override
-    public void updateCookieShoppingcart(
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-        // 取出所有选中结算的商品
-        // 结算状态 0未选中结算 1选中结算
-        List<ShoppingCartLineCommand> mainLines = CollectionsUtil.removeAll(shoppingCartLineCommandList, "settlementState", 1);
-
-        // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        mainLines = CollectionsUtil.select(mainLines, new MainLinesPredicate());
-        guestShoppingcartPersister.save(mainLines, request, response);
-
-    }
-
-    @Override
-    public void updateCookieShoppingcartCount(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory
-                        .getShoppingCartLineCommandList(memberDetails, request);
-        shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
-    }
 }

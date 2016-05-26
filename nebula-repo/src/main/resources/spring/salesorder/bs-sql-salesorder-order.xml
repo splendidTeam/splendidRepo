@@ -1155,6 +1155,7 @@
 					o.PAYMENT,
 					o.TOTAL ,
 					o.DISCOUNT,
+					o. actual_freight as actualFreight,
 					mytable2.isRate
 					from t_so_salesorder as o
 					inner join (
@@ -1219,7 +1220,8 @@
 					o.FINANCIAL_STATUS as financialStatus,
 					o.PAYMENT,
 					o.TOTAL ,
-					o.DISCOUNT
+					o.DISCOUNT,
+					o. actual_freight as actualFreight
 					from t_so_salesorder as o
 					inner join (
 							select line.order_id as id,string_agg(line.item_pic,',') as itemPics from t_so_orderline line group by line.order_id 
@@ -1247,6 +1249,7 @@
     					$ls,
 				    #end
 				     -1))
+				     order by  o.CREATE_TIME
 					
                  ]]>
 			</value>

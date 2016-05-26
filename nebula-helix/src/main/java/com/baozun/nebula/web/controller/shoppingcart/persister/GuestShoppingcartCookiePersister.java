@@ -17,13 +17,13 @@
 package com.baozun.nebula.web.controller.shoppingcart.persister;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -38,6 +38,7 @@ import com.baozun.nebula.web.constants.CookieKeyConstants;
 import com.feilong.core.TimeInterval;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.util.CollectionsUtil;
 import com.feilong.servlet.http.CookieUtil;
 
 /**
@@ -51,10 +52,18 @@ import com.feilong.servlet.http.CookieUtil;
 public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersister{
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER                      = LoggerFactory.getLogger(GuestShoppingcartCookiePersister.class);
+    private static final Logger   LOGGER                      = LoggerFactory.getLogger(GuestShoppingcartCookiePersister.class);
 
     /** cookie的名称. */
-    private String              cookieNameGuestShoppingcart = CookieKeyConstants.GUEST_COOKIE_GC;
+    private String                cookieNameGuestShoppingcart = CookieKeyConstants.GUEST_COOKIE_GC;
+
+    private static final String[] COPY_PROPERTY_NAMES         = {
+                                                                  "skuId",
+                                                                  "extentionCode",
+                                                                  "quantity",
+                                                                  "createTime",
+                                                                  "settlementState",
+                                                                  "lineGroup" };
 
     /*
      * (non-Javadoc)
@@ -125,31 +134,23 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
      *            the shopping cart lines
      * @return the list< cookie shopping cart line>
      */
-    private List<CookieShoppingCartLine> toCookieShoppingCartLineList(List<ShoppingCartLineCommand> shoppingCartLines){
-        if (Validator.isNullOrEmpty(shoppingCartLines)){
-            return Collections.emptyList();
-        }
+    private List<CookieShoppingCartLine> toCookieShoppingCartLineList(final List<ShoppingCartLineCommand> shoppingCartLines){
         // 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象
-        List<CookieShoppingCartLine> cookieLines = new ArrayList<CookieShoppingCartLine>();
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLines){
-            CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
+        Transformer<ShoppingCartLineCommand, CookieShoppingCartLine> transformer = new Transformer<ShoppingCartLineCommand, CookieShoppingCartLine>(){
 
-            PropertyUtil.copyProperties(
-                            cookieShoppingCartLine,
-                            shoppingCartLineCommand,
-                            "skuId",
-                            "quantity",
-                            "createTime",
-                            "settlementState",
-                            "lineGroup");
-            cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
-            // TODO feilong bundle 以后再考虑 id
-            cookieShoppingCartLine
-                            .setId(null == shoppingCartLineCommand.getId() ? shoppingCartLines.size() : shoppingCartLineCommand.getId());
+            @Override
+            public CookieShoppingCartLine transform(ShoppingCartLineCommand shoppingCartLineCommand){
+                CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
+                PropertyUtil.copyProperties(cookieShoppingCartLine, shoppingCartLineCommand, COPY_PROPERTY_NAMES);
 
-            cookieLines.add(cookieShoppingCartLine);
-        }
-        return cookieLines;
+                cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
+                // TODO feilong bundle 以后再考虑 id
+                cookieShoppingCartLine.setId(
+                                null == shoppingCartLineCommand.getId() ? shoppingCartLines.size() : shoppingCartLineCommand.getId());
+                return cookieShoppingCartLine;
+            }
+        };
+        return CollectionsUtil.collect(shoppingCartLines, transformer);
     }
 
     /**
@@ -160,24 +161,21 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
      * @return the list< shopping cart line command>
      */
     private List<ShoppingCartLineCommand> toShoppingCartLineCommandList(List<CookieShoppingCartLine> cookieShoppingCartLineList){
-        List<ShoppingCartLineCommand> shoppingCartLines = new ArrayList<ShoppingCartLineCommand>();
-        for (CookieShoppingCartLine cookieShoppingCartLine : cookieShoppingCartLineList){
+        Transformer<CookieShoppingCartLine, ShoppingCartLineCommand> transformer = new Transformer<CookieShoppingCartLine, ShoppingCartLineCommand>(){
 
-            // 将cookie中的购物车 转换为 shoppingCartLineCommand
-            ShoppingCartLineCommand shoppingLineCommand = new ShoppingCartLineCommand();
-            PropertyUtil.copyProperties(
-                            shoppingLineCommand,
-                            cookieShoppingCartLine,
-                            "createTime",
-                            "skuId",
-                            "quantity",
-                            "settlementState",
-                            "lineGroup",
-                            "id");
-            shoppingLineCommand.setGift(null == cookieShoppingCartLine.getIsGift() ? false : cookieShoppingCartLine.getIsGift());
-            shoppingCartLines.add(shoppingLineCommand);
-        }
-        return shoppingCartLines;
+            @Override
+            public ShoppingCartLineCommand transform(CookieShoppingCartLine cookieShoppingCartLine){
+                // 将cookie中的购物车 转换为 shoppingCartLineCommand
+                ShoppingCartLineCommand shoppingLineCommand = new ShoppingCartLineCommand();
+                PropertyUtil.copyProperties(shoppingLineCommand, cookieShoppingCartLine, COPY_PROPERTY_NAMES);
+
+                shoppingLineCommand.setId(cookieShoppingCartLine.getId());
+                shoppingLineCommand.setGift(null == cookieShoppingCartLine.getIsGift() ? false : cookieShoppingCartLine.getIsGift());
+
+                return shoppingLineCommand;
+            }
+        };
+        return CollectionsUtil.collect(cookieShoppingCartLineList, transformer);
     }
 
     /**

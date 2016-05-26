@@ -133,7 +133,7 @@ public class SysAuditLogHistory extends BaseModel{
 		this.responseCode = responseCode;
 	}
 
-	@Column(name = "EXCEPTION")
+	@Column(name = "EXCEPTION",length=1000)
 	public String getException() {
 		return exception;
 	}

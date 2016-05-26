@@ -13,5 +13,5 @@ import com.baozun.nebula.manager.BaseManager;
  */
 public interface SdkPayCodeManager extends BaseManager{
 
-    void savaPayCode(BigDecimal payMoney,String subOrdinate);
+    void savaPayCode(String subOrdinate,BigDecimal payMoney);
 }

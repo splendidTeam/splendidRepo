@@ -42,6 +42,18 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+import loxia.support.excel.ExcelKit;
+import loxia.support.excel.ExcelManipulatorFactory;
+import loxia.support.excel.ExcelReader;
+import loxia.support.excel.ExcelUtil;
+import loxia.support.excel.ReadStatus;
+import loxia.support.excel.definition.ExcelBlock;
+import loxia.support.excel.definition.ExcelCell;
+import loxia.support.excel.definition.ExcelSheet;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -62,7 +74,6 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.ss.util.CellReference;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +110,6 @@ import com.baozun.nebula.dao.product.ItemTagRelationDao;
 import com.baozun.nebula.dao.product.PropertyDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
 import com.baozun.nebula.dao.product.PropertyValueGroupDao;
-import com.baozun.nebula.dao.product.SearchConditionDao;
 import com.baozun.nebula.dao.product.SearchConditionItemDao;
 import com.baozun.nebula.dao.product.ShopDao;
 import com.baozun.nebula.dao.product.SkuDao;
@@ -119,7 +129,6 @@ import com.baozun.nebula.model.product.ItemImageLang;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemInfoLang;
 import com.baozun.nebula.model.product.ItemOperateLog;
-import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
 import com.baozun.nebula.model.product.ItemReference;
@@ -141,18 +150,6 @@ import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.support.excel.ExcelKit;
-import loxia.support.excel.ExcelManipulatorFactory;
-import loxia.support.excel.ExcelReader;
-import loxia.support.excel.ExcelUtil;
-import loxia.support.excel.ReadStatus;
-import loxia.support.excel.definition.ExcelBlock;
-import loxia.support.excel.definition.ExcelCell;
-import loxia.support.excel.definition.ExcelSheet;
 
 /**
  * @author yi.huang
@@ -5271,6 +5268,23 @@ public class ItemManagerImpl implements ItemManager{
 					itemImageDao.removeItemImageByItemIds(itemIds);
 				}
 
+				//找出每一个item所选择的颜色个数
+				Map<Long, Integer> itemPropSum =new HashMap<Long, Integer>();
+				if(com.feilong.core.Validator.isNotNullOrEmpty(itemPropMap)){
+					int current =0;
+					for(Map.Entry<String, Long> entry : itemPropMap.entrySet()){
+						String temp[] =entry.getKey().split("\\|");
+						Long itemId =Long.valueOf(temp[0]);
+						if(com.feilong.core.Validator.isNotNullOrEmpty(itemPropSum)&&
+								com.feilong.core.Validator.isNotNullOrEmpty(itemPropSum.get(itemId))){
+							current =itemPropSum.get(itemId);
+							itemPropSum.put(itemId, current + 1);
+						}else{
+							itemPropSum.put(itemId, 1);
+						}
+					}
+				}
+				
 				for (File itemFile : itemFiles){
 
 					Boolean isHaveColorProp = false;
@@ -5301,10 +5315,24 @@ public class ItemManagerImpl implements ItemManager{
 						String position = null;
 						if (isHaveColorProp){
 							/** 商品有颜色属性 */
-							String color = strs[1];
-							itemPropId = itemPropMap.get(itemId + "|" + color);
-							type = itemImgTypeMap.get(strs[2]);
-							position = strs[3];
+							if(strs.length == 4){
+								String color = strs[1];
+								itemPropId = itemPropMap.get(itemId + "|" + color);
+								type = itemImgTypeMap.get(strs[2]);
+								position = strs[3];
+							}else if(strs.length == 3){
+								type = itemImgTypeMap.get(strs[1]);
+								position = strs[2];
+								if(com.feilong.core.Validator.isNotNullOrEmpty(itemPropSum)&&
+										com.feilong.core.Validator.isNotNullOrEmpty(itemPropSum.get(itemId))&&
+										itemPropSum.get(itemId) == 1){
+									itemPropId = itemPropMap.get(itemId + "|" + isHaveColorPropMap.get(itemId));
+								}else{
+									log.error("batch import item image : item code is {} and type is {},"
+											+ "cann't fix color value", itemCode, type);
+									throw new BusinessException(ErrorCodes.IMPORT_IMAGE_CAN_NOT_FIX_COLOR, new Object[] { itemCode, type });
+								}
+							}
 						}else{
 							/** 商品没有颜色属性 */
 							type = itemImgTypeMap.get(strs[1]);
@@ -5405,10 +5433,24 @@ public class ItemManagerImpl implements ItemManager{
 								String position = null;
 								if (isHaveColorProp){
 									/** 商品有颜色属性 */
-									String color = strs[1];
-									itemPropId = itemPropMap.get(itemId + "|" + color);
-									type = itemImgTypeMap.get(strs[2]);
-									position = strs[3];
+									if(strs.length == 4){
+										String color = strs[1];
+										itemPropId = itemPropMap.get(itemId + "|" + color);
+										type = itemImgTypeMap.get(strs[2]);
+										position = strs[3];
+									}else if(strs.length == 3){
+										type = itemImgTypeMap.get(strs[1]);
+										position = strs[2];
+										if(com.feilong.core.Validator.isNotNullOrEmpty(itemPropSum)&&
+												com.feilong.core.Validator.isNotNullOrEmpty(itemPropSum.get(itemId))&&
+												itemPropSum.get(itemId) == 1){
+											itemPropId = itemPropMap.get(itemId + "|" + isHaveColorPropMap.get(itemId));
+										}else{
+											log.error("batch import item image : item code is {} and type is {},"
+													+ "cann't fix color value", itemCode, type);
+											throw new BusinessException(ErrorCodes.IMPORT_IMAGE_CAN_NOT_FIX_COLOR, new Object[] { itemCode, type });
+										}
+									}
 								}else{
 									/** 商品没有颜色属性 */
 									type = itemImgTypeMap.get(strs[1]);
@@ -5525,7 +5567,8 @@ public class ItemManagerImpl implements ItemManager{
 	}
 
 	/**
-	 * 验证上传的zip中的文件名是否规定规格 : 图片名字规格 : 1, 有颜色属性: ${商品编码}-${颜色}-${类型}-${position}.jpg 2,没有颜色属性:${商品编码}-${类型}-${position}.jpg 1: 商品是否有颜色属性 2:
+	 * 验证上传的zip中的文件名是否规定规格 : 图片名字规格 : 1, 有颜色属性: ${商品编码}-${颜色}-${类型}-${position}.jpg (颜色只有一个的话可以不传)
+	 * 2,没有颜色属性:${商品编码}-${类型}-${position}.jpg 1: 商品是否有颜色属性 2:
 	 * 商品的类型是否存在
 	 * 
 	 * @param itemImgFileName
@@ -5559,10 +5602,14 @@ public class ItemManagerImpl implements ItemManager{
 		/** 有无颜色属性 时, 文件名的规格 */
 		String type = "";
 		if (isHaveColorProp){
-			String color = strs[1];
-			type = strs[2];
-			if (itemPropMap.get(itemId + "|" + color) == null){
-				throw new BusinessException(ErrorCodes.IMPORT_FILE_COLOR_PROP_NOT_EXIST, new Object[] { itemImgFileName, color });
+			if(strs.length == 4){
+				String color = strs[1];
+				type = strs[2];
+				if (itemPropMap.get(itemId + "|" + color) == null){
+					throw new BusinessException(ErrorCodes.IMPORT_FILE_COLOR_PROP_NOT_EXIST, new Object[] { itemImgFileName, color });
+				}
+			}else{
+				type = strs[1];
 			}
 		}else{
 			type = strs[1];

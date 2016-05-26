@@ -61,12 +61,7 @@ public class SdkPayInfoManagerImpl implements SdkPayInfoManager{
 
         PayInfo payInfo = new PayInfo();
         payInfo.setOrderId(orderId);
-        Boolean codFlag = payment.toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD);
-        if (codFlag){
-            payInfo.setPaySuccessStatus(true);
-        }else{
-            payInfo.setPaySuccessStatus(false);
-        }
+        payInfo.setPaySuccessStatus(payment.toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD));
         payInfo.setPayType(payment);
         // 用于保存银行
         payInfo.setPayInfo(salesOrderCommand.getPaymentStr());

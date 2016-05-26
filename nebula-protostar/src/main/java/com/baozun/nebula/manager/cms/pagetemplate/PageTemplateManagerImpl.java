@@ -37,10 +37,10 @@ import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.cms.CmsEditArea;
 import com.baozun.nebula.model.cms.CmsEditVersionArea;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
-import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
-import com.baozun.nebula.sdk.manager.SdkCmsEditVersionAreaManager;
-import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
-import com.baozun.nebula.sdk.manager.impl.SdkCmsParseHtmlContentManagerImpl;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsEditAreaManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsEditVersionAreaManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManagerImpl;
 import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.feilong.core.Validator;
 

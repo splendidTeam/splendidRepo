@@ -19,7 +19,9 @@ package com.baozun.nebula.web.controller.order;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import com.baozun.nebula.manager.salesorder.OrderLineManager;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
-import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.solr.utils.DatePattern;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
@@ -63,7 +66,7 @@ import com.feilong.core.date.DateUtil;
  * <h3>showOrderDetails方法,主要有以下几点:</h3> <blockquote>
  * <ol>
  * <li>当会员查询时传入MemberDetails MemberDetails必须有memberid</li>
- * <li>当游客查询是构造MemberDetails,并将收货人姓名setRealName()中便可进行查询</li>
+ * <li>当游客查询时构造MemberDetails,并将收货人姓名setRealName()中便可进行查询</li>
  * </ol>
  * </blockquote>.
  *
@@ -111,7 +114,6 @@ public class NebulaOrderDetailsController extends BaseController {
             @RequestParam(value = "orderCode", required = true) String orderCode, HttpServletRequest request,
             Model model) {
         // 通过orderCode查询 command
-        // 订单信息
         SalesOrderCommand salesOrderCommand = orderManager.findOrderByCode(orderCode, 1);
         if (null == salesOrderCommand) {
             return "";
@@ -120,6 +122,7 @@ public class NebulaOrderDetailsController extends BaseController {
         String name = salesOrderCommand.getName();
         // 判断是否为本人进行操作
         if (validateOrder(memberDetails, memberId, name)) {
+            // 订单信息
             OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
             PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime",
                     "logisticsStatus", "financialStatus", "total", "discount", "actualFreight");
@@ -140,7 +143,9 @@ public class NebulaOrderDetailsController extends BaseController {
             // 支付信息
             PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
             PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
-
+            if(orderBaseInfoSubViewCommand.getFinancialStatus()==1){
+                paymentInfoSubViewCommand.setSubOrdinate(salesOrderCommand.getPayInfo().get(0).getSubOrdinate());
+            } 
             // 优惠券信息
             CouponInfoSubViewCommand couponInfoSubViewCommand = new CouponInfoSubViewCommand();
             List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
@@ -150,7 +155,7 @@ public class NebulaOrderDetailsController extends BaseController {
             // 发票信息
             InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
             PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType",
-                    "receiptTitle", "receiptContent", "receiptCode");
+                    "receiptTitle", "receiptContent", "receiptCode","receiptConsignee","receiptTelphone","receiptAddress");
             // ordline信息
             List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager
                     .findByOrderID(salesOrderCommand.getId());
@@ -164,13 +169,11 @@ public class NebulaOrderDetailsController extends BaseController {
             }
             // 物流信息
             LogisticsInfoSubViewCommand logisticsInfoSubViewCommand = new LogisticsInfoSubViewCommand();
-            LogisticsCommand logisticsCommand = logisticsManager
-                    .findLogisticsByOrderId(salesOrderCommand.getId());
+            LogisticsCommand logisticsCommand = logisticsManager.findLogisticsByOrderId(salesOrderCommand.getId());
+            PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
+                    "logisticsProviderName");
             if (null != logisticsCommand) {
-
                 String trackingDescription = logisticsCommand.getTrackingDescription();
-                PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
-                        "logisticsProviderName");
                 logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(
                         transformTrackingDescription(trackingDescription));
             }

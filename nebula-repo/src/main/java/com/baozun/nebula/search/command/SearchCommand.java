@@ -1,6 +1,8 @@
 package com.baozun.nebula.search.command;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.baozun.nebula.search.FacetParameter;
 
@@ -70,6 +72,13 @@ public class SearchCommand{
 	 */
 	private List<ExcludeSearchCommand>		excludeList;
 
+	
+	/**
+	 * 自定义数据，未来某些简单或者过于定制的数据扩展可以直接在这里处理。
+	 */
+	private Map<String, Object> extraData = new HashMap<String, Object>(0);
+	
+	
 	public String getFilterParamOrder(){
 		return filterParamOrder;
 	}
@@ -204,6 +213,22 @@ public class SearchCommand{
 
 	public void setExcludeList(List<ExcludeSearchCommand> excludeList) {
 		this.excludeList = excludeList;
+	}
+
+	
+	/**
+	 * @return the extraData
+	 */
+	public Map<String, Object> getExtraData(){
+		return extraData;
+	}
+
+	
+	/**
+	 * @param extraData the extraData to set
+	 */
+	public void setExtraData(Map<String, Object> extraData){
+		this.extraData = extraData;
 	}
 	
 	

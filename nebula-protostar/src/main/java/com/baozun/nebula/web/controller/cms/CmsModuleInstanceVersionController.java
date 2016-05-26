@@ -42,10 +42,10 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.cms.CmsModuleInstance;
 import com.baozun.nebula.model.cms.CmsModuleInstanceVersion;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceManager;
-import com.baozun.nebula.sdk.manager.SdkCmsModuleInstanceVersionManager;
-import com.baozun.nebula.sdk.manager.SdkCmsModuleTemplateManager;
-import com.baozun.nebula.sdk.manager.SdkCmsParseHtmlContentManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceVersionManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleTemplateManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
@@ -270,7 +270,7 @@ public class CmsModuleInstanceVersionController extends BaseController {
 			cmsModuleInstanceVersionManager.setPublicModuleVersionCacheInfo();
 		}catch(BusinessException e){
 			bwe.setIsSuccess(false);
-			bwe.setDescription(Constants.CMS_PUBLISH_SUCCESS);
+			bwe.setDescription(e.getMessage());
 		}
 
 		return bwe;

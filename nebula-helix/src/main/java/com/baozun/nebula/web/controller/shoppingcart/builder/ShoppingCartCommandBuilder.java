@@ -40,7 +40,7 @@ public interface ShoppingCartCommandBuilder{
      * @param shoppingCartLines
      *            the shopping cart lines
      * @return 如果 shoppingCartLines 是null或者 empty,返回 null
-     * @see com.baozun.nebula.sdk.manager.SdkShoppingCartCommandBuilder#buildShoppingCartCommand(Long, List,
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder#buildShoppingCartCommand(Long, List,
      *      com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand, List, java.util.Set)
      */
     ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLines);

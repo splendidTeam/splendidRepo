@@ -21,7 +21,7 @@
 	<import resource="spring/spring-redis.xml" />
 	<import resource="spring/spring-zk.xml" />
 	<!-- Apache Curator Zookeeper Client -->
-	<import resource="spring/spring-curator-zk.xml" />
+	<!-- <import resource="spring/spring-curator-zk.xml" /> -->
 	
 	<!-- 配置文件加密工具 start -->
 	<bean id="environmentVariablesConfiguration"

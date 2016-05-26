@@ -44,12 +44,12 @@ import com.baozun.nebula.model.cms.CmsPageInstanceVersion;
 import com.baozun.nebula.model.cms.CmsPublished;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
-import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
-import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
-import com.baozun.nebula.sdk.manager.SdkCmsParseHtmlContentManager;
-import com.baozun.nebula.sdk.manager.SdkCmsPublishedManager;
-import com.baozun.nebula.sdk.manager.SdkCmsTemplateHtmlManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsEditAreaManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPublishedManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsTemplateHtmlManager;
 import com.baozun.nebula.zk.UrlMapWatchInvoke;
 import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
@@ -296,10 +296,25 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			log.info("PublishPage Success, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode());
 		}catch(Exception e){
 			log.info("PublishPage Error, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode()+", error cause is "+e.getMessage());
+			e.printStackTrace();
 		}
 		
 	}
-
+	
+	@Override
+	public void cancelExpireVersion(Long pageId){
+		//校验该模块下的版本是否有发布到期没有取消掉的
+		Map<String, Object> expire = new HashMap<String, Object>();
+		expire.put("instanceId", pageId);
+		expire.put("endTimeEnd", new Date());
+		expire.put("lifecycle", 1);
+		expire.put("ispublished", true);
+		List<CmsPageInstanceVersion> expireVersions = cmsPageInstanceVersionManager.findCmsPageInstanceVersionListByParaMap(expire);
+		for(CmsPageInstanceVersion expireVersion : expireVersions){
+			log.info("publish page's id is " + pageId + "it's expired version's id is " + expireVersion.getId());
+			cmsPageInstanceVersionManager.cancelPublishedPageInstanceVersion(expireVersion.getId());	
+		}
+	}
 
 	@Override
 	public CmsPageInstance checkPageInstanceCode(String code, Long pageId) {
@@ -357,6 +372,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 		
 	}
 
+	
 
 	
 }

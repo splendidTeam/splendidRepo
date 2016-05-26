@@ -34,6 +34,9 @@ public class PaymentInfoSubViewCommand extends BaseViewCommand{
 
     /** 支付方式. */
     private Integer           payment;
+    
+    /** 支付流水号 **/
+    private String           subOrdinate;
 
     /**
      * 获得 支付方式.
@@ -53,4 +56,14 @@ public class PaymentInfoSubViewCommand extends BaseViewCommand{
     public void setPayment(Integer payment){
         this.payment = payment;
     }
+
+    public String getSubOrdinate() {
+        return subOrdinate;
+    }
+
+    public void setSubOrdinate(String subOrdinate) {
+        this.subOrdinate = subOrdinate;
+    }
+    
+    
 }

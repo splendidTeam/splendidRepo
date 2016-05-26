@@ -22,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 
@@ -104,24 +102,4 @@ public interface SalesOrderResolver{
      */
     SalesOrderCommand getSalesOrderCommand(String subOrdinate);
 
-    /**
-     * 下单成功后更新cookie中的购物车数据
-     * 
-     * @param ShoppingCartLineCommandList
-     * @param request
-     * @param response
-     */
-    void updateCookieShoppingcart(
-                    List<ShoppingCartLineCommand> ShoppingCartLineCommandList,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
-
-    /**
-     * 下单成功后更新cookie中的购物车商品的数量
-     * 
-     * @param ShoppingCartLineCommandList
-     * @param request
-     * @param response
-     */
-    void updateCookieShoppingcartCount(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
 }

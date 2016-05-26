@@ -50,9 +50,9 @@ import com.baozun.nebula.manager.cms.pageinstance.CmsPageInstanceManager;
 import com.baozun.nebula.manager.cms.pagetemplate.PageTemplateManager;
 import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPageTemplate;
-import com.baozun.nebula.sdk.manager.SdkCmsEditAreaManager;
-import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
-import com.baozun.nebula.sdk.manager.SdkCmsParseHtmlContentManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsEditAreaManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
@@ -290,6 +290,7 @@ public class CmsPageInstanceController extends BaseController {
 				return back;
 			}
 		}	
+		cmsPageInstanceManager.cancelExpireVersion(pageId);
 		if(!checkPublishedPageInstance(pageId,startTime,endTime)){
 			back.setDescription("当前页面发布时间与其版本页面的发布时间有冲突");
 			return back;
@@ -464,7 +465,7 @@ public class CmsPageInstanceController extends BaseController {
 	
 	private boolean checkPublishedPageInstance(Long pageId, Date startTime, Date endTime){
 		Map<String, Date> timeRang = sdkCmsPageInstanceManager.getPublishedPageInstanceVersionsTimeRang(pageId);
-		if(Validator.isNotNullOrEmpty(timeRang)){
+		if(Validator.isNotNullOrEmpty(timeRang)&& Validator.isNotNullOrEmpty(timeRang.get("firstTime")) &&   Validator.isNotNullOrEmpty(timeRang.get("lastTime"))){
 			Date firstTime = timeRang.get("firstTime");
 			Date lastTime = timeRang.get("lastTime");
 			if(Validator.isNotNullOrEmpty(startTime) && startTime.compareTo(firstTime)<=0 && Validator.isNotNullOrEmpty(endTime) &&endTime.compareTo(lastTime) >=0){

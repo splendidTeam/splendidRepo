@@ -7,7 +7,7 @@ import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.sdk.manager.SdkLimitManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 
 /**
  * 引擎相关的Watch,在invoke方法中用于调用引擎初始化方法

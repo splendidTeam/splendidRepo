@@ -16,9 +16,6 @@
  */
 package com.baozun.nebula.web.controller.order;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,7 +27,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.baozun.nebula.manager.salesorder.OrderLineManager;
 import com.baozun.nebula.manager.salesorder.SalesOrderManager;
 import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 import com.baozun.nebula.web.MemberDetails;
@@ -42,9 +38,7 @@ import com.baozun.nebula.web.controller.PageForm;
 import com.baozun.nebula.web.controller.order.converter.SimpleOrderViewCommandConverter;
 import com.baozun.nebula.web.controller.order.form.OrderQueryForm;
 import com.baozun.nebula.web.controller.order.validator.OrderQueryFormValidator;
-import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderViewCommand;
-import com.feilong.core.bean.BeanUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -78,9 +72,6 @@ public class NebulaOrderListController extends BaseController{
     private SalesOrderManager               salesOrderManager;
 
     @Autowired
-    private OrderLineManager                orderLineManager;
-
-    @Autowired
     @Qualifier("orderQueryFormValidator")
     private OrderQueryFormValidator         orderQueryFormValidator;
 
@@ -101,7 +92,7 @@ public class NebulaOrderListController extends BaseController{
      * @return
      * @NeedLogin (guest=false)
      * @RequestMapping(value = "/order/orderlist", method = RequestMethod.GET)
-     * @see com.baozun.nebula.sdk.manager.OrderManager#findOrders(loxia.dao.Page, loxia.dao.Sort[],
+     * @see com.baozun.nebula.sdk.manager.order.OrderManager#findOrders(loxia.dao.Page, loxia.dao.Sort[],
      *      java.util.Map)
      * @see com.baozun.nebula.dao.salesorder.SdkOrderDao#findOrders(loxia.dao.Page,
      *      loxia.dao.Sort[], java.util.Map)

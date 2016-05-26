@@ -110,6 +110,12 @@ public interface CmsPageInstanceManager extends BaseManager {
 	 * @param pageId
 	 */
 	public void cancelPublishedPageInstance(Long pageId);
+	
+	/**
+	 * 取消已过期的页面版本
+	 * @param pageId
+	 */
+	public void cancelExpireVersion(Long pageId);
 
 
 
