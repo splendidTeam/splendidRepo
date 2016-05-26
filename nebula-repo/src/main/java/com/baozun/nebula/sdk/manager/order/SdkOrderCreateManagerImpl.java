@@ -138,6 +138,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     @Autowired
     private SdkOrderEmailManager                     sdkOrderEmailManager;
 
+    @Autowired
+    private SdkOrderLineCreateManager                sdkOrderLineCreateManager;
+
     /** The order code creator. */
     @Autowired(required = false)
     private OrderCodeCreatorManager                  orderCodeCreator;
@@ -377,13 +380,21 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         SalesOrder salesOrder = sdkOrderManager.savaOrder(shopId, salesOrderCommand, shopCartCommandByShop);
         Long orderId = salesOrder.getId();
 
+        List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
+
         // 保存订单行、订单行优惠
-        //TODO feilong 如果是bundle的话 这里多条
-        savaOrderLinesAndPromotions(
-                        orderId,
-                        shoppingCartLineCommandList,
-                        salesOrderCommand.getCouponCodes(),
-                        promotionSKUDiscAMTBySettingList);
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            sdkOrderLineCreateManager.saveOrderLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
+        }
+
+        // 免运费
+        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
+                if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
+                    sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
+                }
+            }
+        }
 
         // 保存支付详细
         BigDecimal payMainMoney = getPayMainMoney(shopId, salesOrder, salesOrderCommand.getSoPayMentDetails());
@@ -394,7 +405,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         sdkConsigneeManager.saveConsignee(orderId, shopId, salesOrderCommand);
 
         // 保存OMS消息发送记录(销售订单信息推送给SCM)
-        //TODO feilong 如果是bundle的话 这里多条
         sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_ORDER_SEND, orderId, null);
 
         // 封装发送邮件数据
@@ -467,74 +477,4 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         return payMainMoney;
     }
 
-    /**
-     * 保存订单行.
-     *
-     * @param orderId
-     *            the order id
-     * @param shoppingCartLineCommandList
-     *            the scc list
-     * @param couponCodes
-     *            the coupon codes
-     * @param promotionSKUDiscAMTBySettingList
-     *            the psdabs list
-     */
-    private void savaOrderLinesAndPromotions(
-                    Long orderId,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            //TODO feilong bundle 下单要进行拆分
-            OrderLine orderLine = sdkOrderLineManager.saveOrderLine(orderId, shoppingCartLineCommand);
-            if (orderLine == null){
-                continue;
-            }
-
-            savaOrderLinePromotions(orderId, couponCodes, promotionSKUDiscAMTBySettingList, orderLine);
-        }
-        // 免运费
-        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-                if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
-                    sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sava order line promotions.
-     *
-     * @param orderId
-     *            the order id
-     * @param couponCodes
-     *            the coupon codes
-     * @param promotionSKUDiscAMTBySettingList
-     *            the promotion sku disc amt by setting list
-     * @param orderLine
-     *            the order line
-     */
-    private void savaOrderLinePromotions(
-                    Long orderId,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    OrderLine orderLine){
-        if (Validator.isNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            return;
-        }
-
-        for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-            boolean giftMark = promotionSKUDiscAMTBySetting.getGiftMark();
-            //0代表赠品 1代表主卖品
-            Integer type = !giftMark ? 1 : 0;
-
-            // 非免运费
-            if (!promotionSKUDiscAMTBySetting.getFreeShippingMark() && promotionSKUDiscAMTBySetting.getSkuId().equals(orderLine.getSkuId())
-                            && orderLine.getType().equals(type)){
-
-                sdkOrderPromotionManager.savaOrderPromotion(orderId, orderLine.getId(), promotionSKUDiscAMTBySetting, couponCodes);
-            }
-        }
-    }
 }

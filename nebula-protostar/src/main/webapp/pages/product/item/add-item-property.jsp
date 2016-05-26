@@ -1,4 +1,8 @@
-<%-- 一般属性信息  --%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/pages/commons/common.jsp"%>
+
+<script type="text/javascript" src="${base}/scripts/product/item/add-item-property.js"></script>
+
 <div class="ui-block-title1" style="background: #fff; color: #000;">
 	<spring:message code="item.add.generalProperty" />
 </div>
@@ -9,7 +13,6 @@
 
 <div style="margin-top: 10px"></div>
 
-<%-- 销售属性信息 --%>
 <div class="ui-block-title1" style="background: #fff; color: #000;">
 	<spring:message code="item.add.sales" />
 </div>

@@ -1,20 +1,16 @@
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.info" />
 </div>
 
-<div class="ui-block-content border-grey">
+<div class="ui-block-content border-grey baseInfo">
 	<div class="ui-block-line ">
 		<label><spring:message code="item.update.code" /></label>
 		<div>
-			<input type="text" class="fLeft" id="code" name="itemCommand.code"
-				style='width: 600px' loxiaType="input" value="${code}"
-				mandatory="true"
-				placeholder="<spring:message code='item.update.code'/>" />
+			<input type="text" class="fLeft" id="code" name="itemCommand.code"  loxiaType="input" value="${code}" mandatory="true" placeholder="<spring:message code='item.update.code'/>" />
 		</div>
-		<div id="loxiaTip-r" class="loxiaTip-r" style="display: none">
+		<div id="loxiaTip-r" class="loxiaTip-r none">
 			<div class="arrow"></div>
-			<div class="inner ui-corner-all codetip"
-				style="padding: .3em .7em; width: auto;"></div>
+			<div class="inner ui-corner-all codetip"></div>
 		</div>
 	</div>
 
@@ -26,14 +22,14 @@
 				<c:if test="${not empty title }">
 					<input type="text" id="title"
 						name="itemCommand.title.values[${status.index}]"
-						style='width: 600px' loxiaType="input"
+					    loxiaType="input"
 						value="${title.langValues[i18nLang.key]}" mandatory="true"
 						placeholder="<spring:message code='item.update.name'/>" />
 				</c:if>
 				<c:if test="${empty title }">
 					<input type="text" id="title"
 						name="itemCommand.title.values[${status.index}]"
-						style='width: 600px' loxiaType="input" value="" mandatory="true"
+						loxiaType="input" value="" mandatory="true"
 						placeholder="<spring:message code='item.update.name'/>" />
 				</c:if>
 				<input class="i18n-lang" type="text"
@@ -48,14 +44,14 @@
 				<c:if test="${not empty subTilte }">
 					<input type="text" id="subTitle"
 						name="itemCommand.subTitle.values[${status.index}]"
-						style='width: 600px' loxiaType="input"
+						loxiaType="input"
 						value="${ subTilte.langValues[i18nLang.key] }" mandatory="false"
 						placeholder="商品副标题" />
 				</c:if>
 				<c:if test="${empty subTilte }">
 					<input type="text" id="subTitle"
 						name="itemCommand.subTitle.values[${status.index}]"
-						style='width: 600px' loxiaType="input" value="" mandatory="false"
+						loxiaType="input" value="" mandatory="false"
 						placeholder="商品副标题" />
 				</c:if>
 				<input class="i18n-lang" type="text"
@@ -69,14 +65,14 @@
 		<div class="ui-block-line ">
 			<label><spring:message code="item.update.name" /></label> <input
 				type="text" id="title" name="itemCommand.title.value"
-				style='width: 600px' loxiaType="input" value="${title.value}"
+				loxiaType="input" value="${title.value}"
 				mandatory="true"
 				placeholder="<spring:message code='item.update.name'/>" />
 		</div>
 		<div class="ui-block-line ">
 			<label>商品副标题</label>
 			<textarea id="subTitle" name="itemCommand.subTitle.value" rows="10"
-				style="width: 600px;" class="ui-loxia-default ui-corner-all"><c:out
+				class="ui-loxia-default ui-corner-all"><c:out
 					value='${subTilte.value}' escapeXml="false"></c:out></textarea>
 
 		</div>
@@ -87,7 +83,7 @@
 			<label><spring:message code='item.styleName' /></label>
 			<div>
 				<input type="text" id="style" name="itemCommand.style"
-					style="width: 600px" loxiaType="input" value="${style }"
+					loxiaType="input" value="${style }"
 					mandatory="true" placeholder="" />
 			</div>
 		</div>

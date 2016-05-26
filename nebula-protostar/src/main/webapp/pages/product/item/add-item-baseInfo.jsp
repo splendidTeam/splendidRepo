@@ -1,3 +1,23 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@include file="/pages/commons/common.jsp"%>
+
+<script type="text/javascript" src="${base}/scripts/product/item/add-item-baseinfo.js"></script>
+
+<script type="text/javascript">
+var categoryzNodes  = [
+	{id:0, pId:-1, name:"ROOT",	  code:"ROOT", sortNo:1,	  open:true, lifecycle:1},  
+    <c:forEach var="category" items="${categoryList}" varStatus="status">
+		{id:${category.id}, pId:${category.parentId}, 
+			name:"${category.name}",
+			code:"${category.code}", sortNo:${category.sortNo}, 
+			drag:false, open:false,
+			lifecycle:${category.lifecycle} 
+		} 
+		<c:if test="${!status.last}">,</c:if>
+	</c:forEach>
+];
+</script>
+
 <div class="ui-block-title1" style="background: #fff; color: #000;">
 	<spring:message code="item.add.info" />
 </div>
@@ -35,7 +55,7 @@
 				<label>商品副标题</label> <input type="text" id="subTitle"
 					name="itemCommand.subTitle.values[${status.index}]"
 					style='width: 600px' loxiaType="input" value="${ subTilte }"
-					mandatory="false" placeholder="商品副标题" /> <input class="i18n-lang"
+					mandatory="false" placeholder="商品副标题" /> <input class="i18n-lang"
 					type="text" name="itemCommand.subTitle.langs[${status.index}]"
 					value="${i18nLang.key}" /> <span>${i18nLang.value}</span>
 			</div>
@@ -50,7 +70,7 @@
 				placeholder="<spring:message code='item.update.name'/>" />
 		</div>
 		<div class="ui-block-line ">
-			<label>商品副标题</label> <input type="text" id="subTitle"
+			<label>商品副标题</label> <input type="text" id="subTitle"
 				name="itemCommand.subTitle.value" style='width: 600px'
 				loxiaType="input" value="${ subTilte }" mandatory="false"
 				placeholder="商品副标题" />
@@ -114,11 +134,11 @@
 	</div>
 	<div style="margin-top: 10px"></div>
 	<div class="ui-block-line ">
-		<label>商品类型</label>
+		<label>商品类型</label>
 		<div>
 			<select loxiaType="select" name="itemCommand.type">
-				<option value="1">主卖品</option>
-				<option value="0">非卖品</option>
+				<option value="1">主卖品</option>
+				<option value="0">非卖品</option>
 			</select>
 		</div>
 	</div>

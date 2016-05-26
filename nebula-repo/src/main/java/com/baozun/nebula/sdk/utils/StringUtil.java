@@ -8,31 +8,32 @@ import com.baozun.nebula.utilities.common.Validator;
 /**
  * @author jun.lu
  * @creattime 2013-11-20
+ * @deprecated pls use {@link com.feilong.core.lang.StringUtil}
  */
-public class StringUtil {
-	
-	private static final Logger log = LoggerFactory.getLogger(StringUtil.class);
+@Deprecated
+public class StringUtil{
 
-	public static boolean isNull(String str) {
-		boolean flag = false;
-		if (null == str) {
-			flag = true;
-		} else if (str.trim().length() <= 0) {
-			flag = true;
-		}
+    private static final Logger log = LoggerFactory.getLogger(StringUtil.class);
 
-		return flag;
-	}
+    public static boolean isNull(String str){
+        boolean flag = false;
+        if (null == str){
+            flag = true;
+        }else if (str.trim().length() <= 0){
+            flag = true;
+        }
 
-	public static boolean isNotNull(String str) {
-		boolean flag = false;
-		if (null != str && str.trim().length() > 0) {
-			flag = true;
-		}
+        return flag;
+    }
 
-		return flag;
-	}
-	
+    public static boolean isNotNull(String str){
+        boolean flag = false;
+        if (null != str && str.trim().length() > 0){
+            flag = true;
+        }
+
+        return flag;
+    }
 
     /**
      * [截取]:从第一次出现字符串位置开始(包含)截取到最后,shift表示向前或者向后挪动位数,<br>
@@ -50,7 +51,8 @@ public class StringUtil {
      *            beginString
      * @param shift
      *            负数表示向前,整数表示向后,0表示依旧从自己的位置开始算起
-     * @return <ul>
+     * @return
+     *         <ul>
      *         <li>if isNullOrEmpty(text),return null</li>
      *         <li>if isNullOrEmpty(beginString),return null</li>
      *         <li>if text.indexOf(beginString)==-1,return null</li>
@@ -76,15 +78,27 @@ public class StringUtil {
         //****************************************************
         int startIndex = beginIndex + shift;
         if (startIndex < 0){
-            String logInfo = StringBuilderUtil.append("beginIndex + shift <0,", "beginIndex:", beginIndex, ",shift:" + shift, ",text:"
-                            + text, ",text.length:", text.length());
+            String logInfo = StringBuilderUtil.append(
+                            "beginIndex + shift <0,",
+                            "beginIndex:",
+                            beginIndex,
+                            ",shift:" + shift,
+                            ",text:" + text,
+                            ",text.length:",
+                            text.length());
 
             throw new IllegalArgumentException(logInfo);
         }else if (startIndex > text.length()){
 
             if (log.isInfoEnabled()){
-                String logInfo = StringBuilderUtil.append("beginIndex + shift > text.length(),", "beginIndex:", beginIndex, ",shift:"
-                                + shift, ",text:" + text, ",text.length:", text.length());
+                String logInfo = StringBuilderUtil.append(
+                                "beginIndex + shift > text.length(),",
+                                "beginIndex:",
+                                beginIndex,
+                                ",shift:" + shift,
+                                ",text:" + text,
+                                ",text.length:",
+                                text.length());
                 log.info(logInfo);
             }
 

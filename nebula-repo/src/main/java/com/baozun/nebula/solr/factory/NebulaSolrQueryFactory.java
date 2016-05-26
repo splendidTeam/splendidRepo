@@ -303,21 +303,31 @@ public class NebulaSolrQueryFactory{
 	 * @time 2016年4月29日下午4:29:55
 	 */
 	public static void addFqForPriceArea(SolrQuery solrQuery,List<String> priceAreaWords,String type){
-		String fq_keyword = "{!tag=priceTag}" + type;
-		try{
-			Integer max_price = null;
-			Integer min_price = null;
-			min_price = Integer.parseInt(priceAreaWords.get(0));
-			max_price = Integer.parseInt(priceAreaWords.get(1));
-			if (min_price < 1) {
-				min_price = 1;
+//		String fq_keyword = type;
+//		try{
+//			Integer max_price = null;
+//			Integer min_price = null;
+//			min_price = Integer.parseInt(priceAreaWords.get(0));
+//			max_price = Integer.parseInt(priceAreaWords.get(1));
+//			if (min_price < 1) {
+//				min_price = 1;
+//			}
+//			fq_keyword += ":[" + min_price + " TO " + max_price + "]";
+//		}catch (Exception e){
+//			LOG.error(e.getMessage());
+//			fq_keyword += ":[0 TO *]";
+//		}
+		
+		StringBuffer sb=new StringBuffer();		
+		for (int i = 0; i < priceAreaWords.size(); i++){
+			if(i==priceAreaWords.size()-1){
+				sb.append(type+":"+priceAreaWords.get(i));
+			}else{
+				sb.append(type+":"+priceAreaWords.get(i)+" OR ");
 			}
-			fq_keyword += ":[" + min_price + " TO " + max_price + "]";
-		}catch (Exception e){
-			LOG.error(e.getMessage());
-			fq_keyword += ":[0 TO *]";
 		}
-
+		
+		String fq_keyword=sb.toString();
 		if (Validator.isNotNullOrEmpty(fq_keyword))
 			solrQuery.addFilterQuery(fq_keyword);
 

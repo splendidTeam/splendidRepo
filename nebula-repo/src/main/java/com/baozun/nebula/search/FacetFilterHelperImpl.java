@@ -529,8 +529,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			return facetGroup;
 		}
 
-		List<SearchConditionItemCommand> searchConditionItemCommands = searchManager
-				.findCoditionItemByCoditionIdWithCache(searchObj.getId());
+		List<SearchConditionItemCommand> searchConditionItemCommands = searchManager.findCoditionItemByCoditionIdWithCache(searchObj.getId());
 		if (Validator.isNullOrEmpty(searchConditionItemCommands)) {
 			return facetGroup;
 		}
@@ -538,6 +537,9 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		List<Facet> facets = facetGroup.getFacets();
 		if (facets != null && facets.size() > 0) {
 			for (Facet facet : facets){
+				String value = facet.getValue();
+				
+				//设置顺序和名称
 				for (SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
 					StringBuilder sb = new StringBuilder();
 
@@ -547,24 +549,32 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 						String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
 						sb.append(SkuItemParam.sale_price).append(":").append(areaStr);
 					}
-
-					String value = facet.getValue();
+					
 					if (sb.toString().equals(value)) {
 						facet.setTitle(scItemCmd.getName());
 						facet.setSortNo(scItemCmd.getSort());
-						// 判断是否选中
-						for (FacetParameter facetParameter : facetParameters){
-							if (FacetType.RANGE.equals(facetParameter.getFacetType())) {
-								value = value.replace(SkuItemParam.sale_price + ":", "");
-								if (facetParameter.containsValue(value)) {
-									facet.setSelected(true);
-									break;
-								}
-							}
-						}
-
 					}
 				}
+				
+				// 判断是否选中
+				for (FacetParameter facetParameter : facetParameters){
+					if (FacetType.RANGE.equals(facetParameter.getFacetType())) {
+						//页面传来的删选的值
+						List<String> paramValues=facetParameter.getValues();						
+						for (String paramValue : paramValues){							
+							String param=SkuItemParam.sale_price + ":"+paramValue;
+							if(value.equals(param)){
+								facet.setSelected(true);
+								break;
+							}
+							
+						}
+					}
+				}
+				
+				
+				
+				
 			}
 		}
 

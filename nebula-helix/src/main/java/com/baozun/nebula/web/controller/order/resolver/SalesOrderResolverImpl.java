@@ -40,6 +40,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
+import com.baozun.nebula.utilities.library.address.Address;
+import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
@@ -92,10 +94,23 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "mobile",
                         "tel",
                         "email");
-
+        
+        //地址名称
+		Address country = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getCountryId());
+		Address province = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getProvinceId());
+		Address city = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getCityId());
+		Address area = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getAreaId());
+		Address town = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getTownId());
+		salesOrderCommand.setCountry(country==null?"": country.getName());
+		salesOrderCommand.setProvince(province==null?"": province.getName());
+		salesOrderCommand.setCity(city==null?"": city.getName());
+		salesOrderCommand.setArea(area==null?"": area.getName());
+		salesOrderCommand.setTown(town==null?"": town.getName());
+		
         // 用户信息
         boolean isGuest = Validator.isNullOrEmpty(memberDetails);
-        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
+//        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
+        salesOrderCommand.setName(orderForm.getShippingInfoSubForm().getName());
         salesOrderCommand.setMemberName(isGuest ? "" : memberDetails.getLoginName());
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
         salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
