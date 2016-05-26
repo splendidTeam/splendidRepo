@@ -46,6 +46,7 @@ import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
+import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
@@ -212,18 +213,18 @@ public class SalesOrderController extends BaseController{
         if (orderCommand == null){
             throw new BusinessException(ErrorCodes.ORDER_NOT_EXIST, new Object[] { orderCode });
         }
-        
-        Address country=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCountryId());
-    	Address province=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getProvinceId());
-    	Address city=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCityId());
-    	Address area=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getAreaId());
-    	Address town=AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getTownId());
-    	orderCommand.getSalesOrderCommand().setCountry(country==null ? "" : country.getName());
-    	orderCommand.getSalesOrderCommand().setProvince(province==null ? "" :province.getName());
-    	orderCommand.getSalesOrderCommand().setCity(city==null ? "" :city.getName());
-    	orderCommand.getSalesOrderCommand().setArea(area==null ? "":area.getName());
-    	orderCommand.getSalesOrderCommand().setTown(town==null ? "":town.getName());
-        
+
+        Address country = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCountryId());
+        Address province = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getProvinceId());
+        Address city = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getCityId());
+        Address area = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getAreaId());
+        Address town = AddressUtil.getAddressById(orderCommand.getSalesOrderCommand().getTownId());
+        orderCommand.getSalesOrderCommand().setCountry(country == null ? "" : country.getName());
+        orderCommand.getSalesOrderCommand().setProvince(province == null ? "" : province.getName());
+        orderCommand.getSalesOrderCommand().setCity(city == null ? "" : city.getName());
+        orderCommand.getSalesOrderCommand().setArea(area == null ? "" : area.getName());
+        orderCommand.getSalesOrderCommand().setTown(town == null ? "" : town.getName());
+
         model.addAttribute("orderCommand", orderCommand);
         model.addAttribute("customBaseUrl", customBaseUrl);
         model.addAttribute("frontendBaseUrl", frontendBaseUrl);
@@ -475,10 +476,10 @@ public class SalesOrderController extends BaseController{
                 shoppingCartCommand = sdkShoppingCartManager.findManualShoppingCart(lines);
 
                 // 手工下单填写运费
-                shoppingCartCommand.getSummaryShopCartList().get(0).setOriginShoppingFee(salesOrderCommand.getActualFreight());
-                shoppingCartCommand.getSummaryShopCartList().get(0).setRealPayAmount(
-                                shoppingCartCommand.getSummaryShopCartList().get(0).getRealPayAmount()
-                                                .add(salesOrderCommand.getActualFreight()));
+                List<ShopCartCommandByShop> summaryShopCartList = shoppingCartCommand.getSummaryShopCartList();
+                ShopCartCommandByShop shopCartCommandByShop = summaryShopCartList.get(0);
+                shopCartCommandByShop.setOriginShoppingFee(salesOrderCommand.getActualFreight());
+                shopCartCommandByShop.setRealPayAmount(shopCartCommandByShop.getRealPayAmount().add(salesOrderCommand.getActualFreight()));
 
                 shoppingCartCommand.setOriginShoppingFee(salesOrderCommand.getActualFreight());
                 shoppingCartCommand.setCurrentShippingFee(salesOrderCommand.getActualFreight());

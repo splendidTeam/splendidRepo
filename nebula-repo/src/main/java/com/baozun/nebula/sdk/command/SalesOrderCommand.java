@@ -215,15 +215,6 @@ public class SalesOrderCommand extends BaseModel{
     /** 创建时间. */
     private Date                        createTime;
 
-    /** 是否是立即购买的订单 *. */
-    private Boolean                     isImmediatelyBuy;
-
-    /** 是否是后台下单 *. */
-    private Boolean                     isBackCreateOrder = false;
-
-    /** 邮件模板 *. */
-    private String                      emailTemplete;
-
     /** 在线支付信息 *. */
     private OnLinePaymentCommand        onLinePaymentCommand;
 
@@ -257,6 +248,18 @@ public class SalesOrderCommand extends BaseModel{
     private List<String>                soPayMentDetails;
 
     //*********************************************************************************************
+    /** 是否是立即购买的订单 *. */
+    private Boolean                     isImmediatelyBuy;
+
+    /** 是否是后台下单 *. */
+    private Boolean                     isBackCreateOrder = false;
+
+    /**
+     * 邮件模板.
+     * 
+     * @deprecated 没有用到
+     */
+    private String                      emailTemplete;
 
     /**
      * 是否qs.
@@ -376,6 +379,7 @@ public class SalesOrderCommand extends BaseModel{
      * 获得 邮件模板 *.
      *
      * @return the 邮件模板 *
+     * @deprecated 没有用到
      */
     public String getEmailTemplete(){
         return emailTemplete;
@@ -386,6 +390,7 @@ public class SalesOrderCommand extends BaseModel{
      *
      * @param emailTemplete
      *            the new 邮件模板 *
+     * @deprecated 没有用到
      */
     public void setEmailTemplete(String emailTemplete){
         this.emailTemplete = emailTemplete;
