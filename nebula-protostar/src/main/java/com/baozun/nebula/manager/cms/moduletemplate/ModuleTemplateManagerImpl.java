@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.cms.CmsModuleTemplateDao;
 import com.baozun.nebula.model.cms.CmsModuleTemplate;
-import com.baozun.nebula.sdk.manager.SdkCmsCommonManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsCommonManager;
 
 
 @Service("moduleTemplateManager")

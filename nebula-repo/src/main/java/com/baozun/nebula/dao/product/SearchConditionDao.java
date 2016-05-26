@@ -108,6 +108,15 @@ public interface SearchConditionDao extends GenericEntityDao<SearchCondition, Lo
 	List<SearchCondition> findConditionByCategoryIds(@QueryParam("cids")List<Long> cids);
 	
 	/**
+	 * 查找导航下有效的搜索条件，将本导航和平台导航的搜索条件查询出来，
+	 * 如果本导航中已经有的筛选条件，平台级别的不需要查询出来，是通过name来判断的
+	 * @param navId
+	 * @return
+	 */
+	@NativeQuery(model =SearchCondition.class )
+	List<SearchCondition> findConditionByNavigaion(@QueryParam("navId")Long navId);
+	
+	/**
 	 * 
 	* @author 何波
 	* @Description: 修改搜索条件国际化

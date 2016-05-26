@@ -86,6 +86,17 @@ public interface SdkSearchConditionManager extends BaseManager{
 	 */
 	public List<SearchConditionCommand> findConditionByCategoryIdList(List<Long> cids);
 	
+	
+	
+	/**
+	 * 根据导航查找 SearchCondition
+	 * 
+	 * from searchCondition where navigationId = navigationId or navigationId is null
+	 * @param navigationId
+	 * @return
+	 */
+	public List<SearchConditionCommand> findConditionByNavigation(Long navigationId);
+	
 	/**
 	 * 根据语言查询所有搜索条件的数据
 	 * @return List<MetaDataCommand>

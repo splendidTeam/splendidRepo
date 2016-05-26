@@ -164,4 +164,26 @@
 		</constructor-arg>
 	</bean>	
 	
+	
+	<bean id="SysAuditLogHistory.archiveSysAuditLogToHistoryByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		INSERT INTO t_sys_auditlog_history (id, archive_time, create_time, exception, ip
+						, method, operater_id, parameters, response_code, uri)
+					SELECT id, now(), create_time, exception, ip
+						, method, operater_id, parameters, response_code, uri
+					FROM t_sys_auditlog auditlog
+					WHERE 1= 1
+			         	#if($createTimeStart)
+	       					and CREATE_TIME <= :createTimeStart
+	       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	
 </beans>

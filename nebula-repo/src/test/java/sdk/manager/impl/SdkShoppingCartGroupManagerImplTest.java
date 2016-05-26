@@ -19,7 +19,7 @@ import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionConditionSKU;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartGroupManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartGroupManagerImpl;
 

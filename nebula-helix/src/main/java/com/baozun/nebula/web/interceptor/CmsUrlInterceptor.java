@@ -16,7 +16,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.baozun.nebula.manager.cms.PublishCmsPageInstanceManagerImpl;
 import com.baozun.nebula.model.cms.CmsPageInstance;
-import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
 
 public class CmsUrlInterceptor extends HandlerInterceptorAdapter implements
         ServletContextAware {

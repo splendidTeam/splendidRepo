@@ -53,7 +53,7 @@ import com.baozun.nebula.model.rule.ItemTagRule;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkCustomizeFilterClassManager;
 import com.baozun.nebula.sdk.manager.SdkItemTagRuleManager;
-import com.baozun.nebula.sdk.manager.SdkPromotionManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utils.property.PropertyUtil;
 import com.baozun.nebula.utils.query.bean.QueryBean;
