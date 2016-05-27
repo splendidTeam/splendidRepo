@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.constant.EmailConstants;
-import com.baozun.nebula.constant.SMSTemplateConstants;
 import com.baozun.nebula.manager.member.CommonEmailManager.SendEmailResultCode;
 import com.baozun.nebula.manager.system.SMSManager;
 import com.baozun.nebula.manager.system.SMSManager.CaptchaType;
@@ -21,6 +20,7 @@ import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
+import com.baozun.nebula.web.constants.ForgetPasswordSendVCodeConstant;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.feilong.core.Alphabet;
 import com.feilong.core.util.RandomUtil;
@@ -44,13 +44,13 @@ import com.feilong.core.util.RandomUtil;
 @Service("memberPasswordManager")
 public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
-	private static final Logger	LOG						= LoggerFactory.getLogger(MemberPasswordManagerImpl.class);
+	private static final Logger	LOG				= LoggerFactory.getLogger(MemberPasswordManagerImpl.class);
 
-	/* 验证码的生存时间 */
-	private static final int	MAX_EXIST_TIME			= 60;
-
-	/* 验证码的位数 */
-	private static final int	VALIDATE_CODE_LENGTH	= 4;
+	// /* 验证码的生存时间 */
+	// protected Integer MAX_EXIST_TIME;
+	//
+	// /* 验证码的位数 */
+	// protected Integer VALIDATE_CODE_LENGTH;
 
 	@Autowired
 	private SdkMemberManager	sdkMemberManager;
@@ -59,12 +59,12 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 	private CommonEmailManager	commonEmailManager;
 
 	@Autowired
-	private SMSManager		smsManager;
+	private SMSManager			smsManager;
 
 	@Autowired
 	private TokenManager		tokenManager;
 
-	public static final String	BUSINESS_CODE			= "FORGET_PASSWORD_BUSINESS";
+	public static final String	BUSINESS_CODE	= "FORGET_PASSWORD_BUSINESS";
 
 	/**
 	 * 发送验证码的方法
@@ -130,10 +130,10 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 所有数字和大小写字母的组合
 			String str = Alphabet.DECIMAL_AND_LETTERS;
 			// 生成验证码
-			String code = RandomUtil.createRandomFromString(str, VALIDATE_CODE_LENGTH);
+			String code = RandomUtil.createRandomFromString(str, ForgetPasswordSendVCodeConstant.VALIDATE_CODE_LENGTH);
 
 			// 保存发送的验证码到redis中
-			tokenManager.saveToken(BUSINESS_CODE, email, MAX_EXIST_TIME, code);
+			tokenManager.saveToken(BUSINESS_CODE, email, ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME, code);
 
 			// 则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
 			Map<String, Object> dataMap = new HashMap<String, Object>();
@@ -167,11 +167,15 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 
 			// 调用发送手机验证码的方法，发送相应的验证码到邮箱中
 			SMSCommand smsCommand = new SMSCommand();
-			smsCommand.setTemplateCode(SMSTemplateConstants.SMS_FORGET_PASSWORD_CAPTCHA);
+			smsCommand.setTemplateCode(ForgetPasswordSendVCodeConstant.SMS_FORGET_PASSWORD_CAPTCHA);
 			smsCommand.setMobile(mobile);
 
 			// 发送验证码结束
-			boolean sendFailOrSuccess = smsManager.send(smsCommand, CaptchaType.MIXED, VALIDATE_CODE_LENGTH, MAX_EXIST_TIME);
+			boolean sendFailOrSuccess = smsManager.send(
+					smsCommand,
+					CaptchaType.MIXED,
+					ForgetPasswordSendVCodeConstant.VALIDATE_CODE_LENGTH,
+					ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME);
 			flag = sendFailOrSuccess;
 		}
 		return flag;
