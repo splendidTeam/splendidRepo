@@ -138,6 +138,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 则调用发送邮件的方法，发送相应的修改密码的链接和验证码到邮箱中
 			Map<String, Object> dataMap = new HashMap<String, Object>();
 			dataMap.put("code", code);
+			dataMap.put("email", email);
 			SendEmailResultCode sendEmail = commonEmailManager.sendEmail(email, EmailConstants.FORGET_PASSWORD, dataMap);
 			if (sendEmail == SendEmailResultCode.SUCESS){
 				// 发送成功，flag设置为true

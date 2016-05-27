@@ -1,5 +1,5 @@
-
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<link rel="stylesheet" type="text/css" href="/css/update-item-seo.css">
+<div class="ui-block-title1 ui-block-title">
 	seo
 	<spring:message code="product.property.lable.search" />
 </div>

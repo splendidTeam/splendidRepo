@@ -335,37 +335,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 封装礼品购物车行.
-     *
-     * @param proSku
-     *            the pro sku
-     * @return the gift shopping cart line command
-     */
-    private ShoppingCartLineCommand getGiftShoppingCartLineCommand(PromotionSKUDiscAMTBySetting proSku){
-        ShoppingCartLineCommand giftLine = new ShoppingCartLineCommand();
-        giftLine.setItemId(proSku.getItemId());
-        giftLine.setItemName(proSku.getItemName());
-        giftLine.setQuantity(proSku.getQty());
-        giftLine.setGift(proSku.getGiftMark());
-        giftLine.setShopId(proSku.getShopId());
-        giftLine.setType(Constants.ITEM_TYPE_PREMIUMS);
-        giftLine.setSkuId(proSku.getSkuId());
-        if (proSku.getSettingId() != null)
-            giftLine.setLineGroup(proSku.getSettingId());
-        giftLine.setStock(proSku.getQty());
-        // 赠品都设置为有效
-        giftLine.setValid(true);
-        sdkShoppingCartLinePackManager.packShoppingCartLine(giftLine);
-
-        giftLine.setPromotionId(proSku.getPromotionId());
-        giftLine.setSettingId(proSku.getSettingId());
-        giftLine.setGiftChoiceType(proSku.getGiftChoiceType());
-        giftLine.setGiftCountLimited(proSku.getGiftCountLimited());
-
-        return giftLine;
-    }
-
-    /**
      * 根据店铺封装shopCart对象.
      *
      * @param shoppingCartCommand

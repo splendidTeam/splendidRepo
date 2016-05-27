@@ -62,38 +62,41 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
 
     /** The item dao. */
     @Autowired
-    private ItemDao            itemDao;
+    private ItemDao                         itemDao;
 
     /** The item tag relation dao. */
     @Autowired
-    private ItemTagRelationDao itemTagRelationDao;
+    private ItemTagRelationDao              itemTagRelationDao;
 
     /** The shop dao. */
     @Autowired
-    private ShopDao            shopDao;
+    private ShopDao                         shopDao;
 
     /** The sdk sku manager. */
     @Autowired
-    private SdkSkuManager      sdkSkuManager;
+    private SdkSkuManager                   sdkSkuManager;
 
     /** The sdk item manager. */
     @Autowired
-    private SdkItemManager     sdkItemManager;
+    private SdkItemManager                  sdkItemManager;
 
     /** The item category dao. */
     @Autowired
-    private ItemCategoryDao    itemCategoryDao;
+    private ItemCategoryDao                 itemCategoryDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao             skuDao;
+    private SkuDao                          skuDao;
 
     @Autowired
-    private SdkEngineManager   sdkEngineManager;
+    private SdkEngineManager                sdkEngineManager;
 
     /** The item info dao. */
     @Autowired
-    private ItemInfoDao        itemInfoDao;
+    private ItemInfoDao                     itemInfoDao;
+
+    @Autowired
+    private SdkShoppingCartLineImageManager sdkShoppingCartLineImageManager;
 
     /*
      * (non-Javadoc)
@@ -164,7 +167,7 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
         shoppingCartLineCommand.setItemId(item.getId());
         shoppingCartLineCommand.setProductCode(itemCode);
         shoppingCartLineCommand.setItemName(itemBaseCommand.getTitle());
-        shoppingCartLineCommand.setItemPic(getItemPicUrl(itemId));
+        shoppingCartLineCommand.setItemPic(sdkShoppingCartLineImageManager.getItemPicUrl(itemId));
 
         List<Long> categoryList = CollectionsUtil.getPropertyValueList(itemCategoryList, "categoryId");
         shoppingCartLineCommand.setCategoryList(categoryList);
@@ -233,28 +236,4 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
         return true;
     }
 
-    /**
-     * 获得 item pic url.
-     *
-     * @param itemId
-     *            the item id
-     * @return the item pic url
-     */
-    private String getItemPicUrl(Long itemId){
-        List<Long> itemIds = new ArrayList<Long>(1);
-        itemIds.add(itemId);
-
-        List<ItemImageCommand> itemImageCommandList = sdkItemManager.findItemImagesByItemIds(itemIds, ItemImage.IMG_TYPE_LIST);
-        if (Validator.isNotNullOrEmpty(itemImageCommandList)){
-            ItemImageCommand itemImageCommand = itemImageCommandList.get(0);
-            if (Validator.isNotNullOrEmpty(itemImageCommand)){
-                List<ItemImage> imgList = itemImageCommand.getItemIamgeList();
-
-                if (Validator.isNotNullOrEmpty(imgList)){
-                    return imgList.get(0).getPicUrl();
-                }
-            }
-        }
-        return null;
-    }
 }

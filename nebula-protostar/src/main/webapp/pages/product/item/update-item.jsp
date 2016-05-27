@@ -80,7 +80,7 @@ display: none;
 		
 	
 		 <div class="ui-block-title1"><spring:message code="item.update.updateItem"/></div>
-	   <div class="ui-block-title1" style="background:#fff;color:#000;"><spring:message code="item.update.info"/></div>
+	   <div class="ui-block-title1 ui-block-title"><spring:message code="item.update.info"/></div>
 	
 	   <div class="ui-block-content border-grey">
 	   <div class="ui-block-line ">
@@ -208,7 +208,7 @@ display: none;
 	   	</div>
 	   	<div style="margin-top: 10px"></div>
 	   	
-		   <div class="ui-block-title1" style="background:#fff;color:#000;"><spring:message code="item.update.generalProperty"/></div>
+		   <div class="ui-block-title1 ui-block-title" ><spring:message code="item.update.generalProperty"/></div>
 		
 		   <div class="ui-block-content border-grey">
 		   		<%-- 一般属性 --%>
@@ -736,7 +736,7 @@ display: none;
 		<div style="margin-top: 10px"></div>
 		
 		<%-- 销售属性 --%>
-	   <div class="ui-block-title1" style="background:#fff;color:#000;"><spring:message code="item.update.itemprice" /></div>
+	   <div class="ui-block-title1 ui-block-title"><spring:message code="item.update.itemprice" /></div>
 	   <div class="ui-block-content border-grey">
 	         <div class="ui-block-line">
 		         <label ><spring:message code="item.update.salesprice" /></label>
@@ -755,7 +755,7 @@ display: none;
 	   	</div>
 		<div style="margin-top: 10px"></div>
 		<!-- 销售属性信息 多语言 -->
-	    <div class="ui-block-title1" style="background:#fff;color:#000;"><spring:message code="item.update.sales"/></div>
+	    <div class="ui-block-title1 ui-block-title"><spring:message code="item.update.sales"/></div>
 	    <c:if test="${i18nOnOff == true}">
 	      <c:set var="size" value="${fn:length(dynamicPropertyCommandList)}"></c:set>
 	      <c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
@@ -951,7 +951,7 @@ display: none;
 	  <%-- SEO --%>
 	  <div style="margin-top: 10px"></div>
 		
-	   <div class="ui-block-title1" style="background:#fff;color:#000;">seo<spring:message code="product.property.lable.search"/></div>
+	   <div class="ui-block-title1 ui-block-title">seo<spring:message code="product.property.lable.search"/></div>
 	
 	   <div class="ui-block-content border-grey">
 	   	  <c:if test="${i18nOnOff == true}">
@@ -1019,7 +1019,7 @@ display: none;
 	   
 	  <div style="margin-top: 10px"></div>
 		
-	   <div class="ui-block-title1" style="background:#fff;color:#000;"><spring:message code="item.update.description"/></div>
+	   <div class="ui-block-title1 ui-block-title"><spring:message code="item.update.description"/></div>
 	
 	   <div class="ui-block-content border-grey">
 	   

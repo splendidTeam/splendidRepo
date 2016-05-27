@@ -29,6 +29,7 @@ import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 /**
  * The Class SalesOrderCommand.
  */
+//TODO feilong 目前这个类 把创建 和查询的command 都融合在一起, 不利于扩展
 public class SalesOrderCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
@@ -224,7 +225,9 @@ public class SalesOrderCommand extends BaseModel{
     /** 微信支付相关 *. */
     private WechatPayParamCommand       wechatPayParamCommand;
 
-    /** 计算运费需要的信息 *. */
+    /**
+     * 计算运费需要的信息.
+     */
     private CalcFreightCommand          calcFreightCommand;
 
     /** ******************** 保存时 拆单需要保存每个店铺的快递和指定收货时间 *. */

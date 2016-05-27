@@ -5,109 +5,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><spring:message code="shop.add.shopmanager"/></title>
-<%@include file="/pages/commons/common-css.jsp"%>
-<%@include file="/pages/commons/common-javascript.jsp"%>
-<link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
-<script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
-<script type="text/javascript" src="/scripts/ckeditor/4-4-5/ckeditor.js"></script>
-<script type="text/javascript">	
-var itemCodeValidMsg = "${itemCodeValidMsg}";
-</script>
-<script type="text/javascript" src="${base}/scripts/product/item/add-item.js"></script>
-<SCRIPT type="text/javascript">
-var pdValidCode = "${pdValidCode}";
-var zNodes =
-[
-	{id:0, name:"ROOT",state:"0", open:true,root:"true",nocheck:true},
-	<c:forEach var="industry" items="${industryList}" varStatus="status">
-	<c:if test="${industry.isShow}">
-		{
-			id:${industry.id}, 
-			pId:${industry.pId},
-			name: "${industry.indu_name}",
-			open:${industry.open}
-			<c:if test="${industry.noCheck}">
-				,nocheck:true
-			</c:if>
-		}
-		<c:if test="${!status.last}">,</c:if>
-		</c:if>
-	</c:forEach>
-];
-
-var categoryzNodes  = [
-			{id:0, pId:-1, name:"ROOT",	  code:"ROOT", sortNo:1,	  open:true, lifecycle:1},  
-              <c:forEach var="category" items="${categoryList}" varStatus="status">
-              	
-              	{id:${category.id}, pId:${category.parentId}, 
-              		name:"${category.name}",
-              		code:"${category.code}", sortNo:${category.sortNo}, 
-              		drag:false, open:false,
-              		lifecycle:${category.lifecycle} } 
-              	<c:if test="${!status.last}">,</c:if>
-              </c:forEach>
-         ];
-          var baseUrl='${base}'; 
-</SCRIPT>
-<script type="text/javascript">
-		
-		<c:if test="${param.imageUpload==1}">
-		editor1.on( 'pluginsLoaded', function(ev)
-			{
-				if ( !CKEDITOR.dialog.exists( 'myDialog' ) )
-				{
-					CKEDITOR.dialog.add( 'myDialog', function( editor )
-							{
-								return {
-									title : '图片上传',
-									minWidth : 450,
-									minHeight : 200,
-									contents : [
-										{
-											id : 'tab1',
-											label : 'First Tab',
-											title : 'First Tab',
-											elements :
-											[
-												{
-													type:'vbox',
-													height:'250px',
-													children:[
-																{	type:'html',
-																	style:'width:95%;',
-																	html:'<iframe id ="uploadIfr" frameborder="0" name="uploadIfr" width="300" height="100" src="/common/upload.jsp"></iframe>'
-																}
-															]
-												}
-											]
-										}
-									]
-								};
-							} );
-				}
-				editor1.addCommand( 'myDialogCmd', new CKEDITOR.dialogCommand( 'myDialog' ) );
-				editor1.ui.addButton( 'MyButton',
-					{
-						label : '图片上传',
-						title : '图片上传',
-						command : 'myDialogCmd'
-					} );
-			});
-		</c:if>
-</script>
-<style type="text/css">
-.i18n-lang {
-	display: none;
-}
-
-.cke_button_myDialogCmd .cke_icon {
-	display: none !important;
-}
-
-.cke_button_myDialogCmd .cke_label {
-	display: inline !important;
-}
-</style>
+<%@include file="/pages/product/item/add-item-common.jsp"%>
+<script type="text/javascript" src="${base}/scripts/product/item/add-item-normal.js"></script>
 </head>
 <body>
 
@@ -158,7 +57,7 @@ var categoryzNodes  = [
 					 <%@include file="/pages/product/item/add-item-price.jsp"%>
 				   	 <div style="margin-top: 10px"></div>
 				   	 <%-- 一般属性信息 销售属性信息 --%>
-					 <%@include file="/pages/product/item/add-item-propertyInfo.jsp"%>
+					 <%@include file="/pages/product/item/add-item-property.jsp"%>
 				     <div style="margin-top: 10px"></div>
 					 <%-- SEO --%>
 				     <%@include file="/pages/product/item/add-item-seo.jsp"%>

@@ -33,180 +33,188 @@ import com.baozun.nebula.sdk.command.SkuCommand;
  * skuDao
  * 
  * @author xingyu.liu
- * 
  */
+public interface SkuDao extends GenericEntityDao<Sku, Long>{
 
-public interface SkuDao extends GenericEntityDao<Sku, Long> {
+    @NativeQuery(model = Sku.class)
+    Sku findSkuById(@QueryParam("id") Long id);
 
-	/**
-	 * 根据itemid查询Sku
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findSkuByItemId(@QueryParam("itemId") Long itemId);
+    /**
+     * 根据skuId查询库存
+     * 
+     * @param skuId
+     * @return
+     */
+    @NativeQuery(model = SkuCommand.class)
+    SkuCommand findInventoryById(@QueryParam("skuId") Long skuId);
 
-	/**
-	 * 根据itemids查询可用的Sku, lifecycle = 1
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findEffectSkuByItemIds(@QueryParam("itemIds") List<Long> itemIds);
+    /**
+     * 根据extentionCode查询Sku
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    Sku findSkuByExtentionCode(@QueryParam("extentionCode") String extentionCode);
 
-	/**
-	 * 获取第一个满足库存的SKU
-	 * 
-	 * @param itemIds
-	 * @param limitCount
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findEffectSkuTopOneByItemIdsWithinLimit(@QueryParam("shopId") Long shopId, @QueryParam("itemIds") List<Long> itemIds, @QueryParam("limitCount") Integer limitCount, @QueryParam("displayLimitCount") Integer displayLimitCount);
+    /**
+     * 根据itemid查询Sku
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findSkuByItemId(@QueryParam("itemId") Long itemId);
 
-	/**
-	 * 根据itemids查询Sku
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findSkuByItemIds(@QueryParam("itemIds") List<Long> itemIds);
-	
-	/**
-	 * 根据itemCodes查询Sku
-	 * 
-	 * @param itemCodes
-	 * @return
-	 */
-	@NativeUpdate
-	int deleteSkuByItemCodes(@QueryParam("itemCodes") List<String> itemCodes);
+    /**
+     * 根据itemids查询可用的Sku, lifecycle = 1
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findEffectSkuByItemIds(@QueryParam("itemIds") List<Long> itemIds);
 
-	/**
-	 * 根据extentionCode查询Sku
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	Sku findSkuByExtentionCode(@QueryParam("extentionCode") String extentionCode);
+    /**
+     * 获取第一个满足库存的SKU
+     * 
+     * @param itemIds
+     * @param limitCount
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findEffectSkuTopOneByItemIdsWithinLimit(
+                    @QueryParam("shopId") Long shopId,
+                    @QueryParam("itemIds") List<Long> itemIds,
+                    @QueryParam("limitCount") Integer limitCount,
+                    @QueryParam("displayLimitCount") Integer displayLimitCount);
 
-	/**
-	 * 根据extentionCode集合查询Sku集合
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findSkuByExtentionCodes(@QueryParam("extentionCodes") List<String> extentionCodes);
+    /**
+     * 根据itemids查询Sku
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findSkuByItemIds(@QueryParam("itemIds") List<Long> itemIds);
 
-	/**
-	 * 根据itemid删除Sku
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeUpdate
-	Integer deleteSkuByItemId(@QueryParam("itemId") Long itemId);
+    /**
+     * 根据itemCodes查询Sku
+     * 
+     * @param itemCodes
+     * @return
+     */
+    @NativeUpdate
+    int deleteSkuByItemCodes(@QueryParam("itemCodes") List<String> itemCodes);
 
-	@NativeQuery(model = Sku.class)
-	Sku findSkuById(@QueryParam("id") Long id);
+    /**
+     * 根据extentionCode集合查询Sku集合
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findSkuByExtentionCodes(@QueryParam("extentionCodes") List<String> extentionCodes);
 
-	/**
-	 * @param itemId
-	 * @param itemProperties
-	 * @return
-	 */
-	@NativeQuery(model = SkuCommand.class)
-	SkuCommand findInventory(@QueryParam Map<String, Object> paramMap);
+    /**
+     * 根据itemid删除Sku
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeUpdate
+    Integer deleteSkuByItemId(@QueryParam("itemId") Long itemId);
 
-	/**
-	 * 通过itemId获取商品库存
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = SkuCommand.class)
-	List<SkuCommand> findInventoryByItemId(@QueryParam("itemId") Long itemId);
-	
-	/**
-	 * 通过itemId获取lifescyle为有效的sku的库存
-	 * 
-	 * @param itemId
-	 * @return
-	 */
-	@NativeQuery(model = SkuCommand.class)
-	List<SkuCommand> findEffectiveSkuInvByItemId(@QueryParam("itemId") Long itemId);
+    /**
+     * @param itemId
+     * @param itemProperties
+     * @return
+     */
+    @NativeQuery(model = SkuCommand.class)
+    SkuCommand findInventory(@QueryParam Map<String, Object> paramMap);
 
-	@NativeUpdate
-	Integer deleteSkuBySkuIds(@QueryParam("skuIds") List<Long> skuIds);
+    /**
+     * 通过itemId获取商品库存
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = SkuCommand.class)
+    List<SkuCommand> findInventoryByItemId(@QueryParam("itemId") Long itemId);
 
-	/**
-	 * 通过商品id集合, 删除sku信息
-	 * 
-	 * @param itemIds
-	 * @return
-	 */
-	@NativeUpdate
-	Integer removeSkuByItemIds(@QueryParam("itemIds") List<Long> itemIds);
+    /**
+     * 通过itemId获取lifescyle为有效的sku的库存
+     * 
+     * @param itemId
+     * @return
+     */
+    @NativeQuery(model = SkuCommand.class)
+    List<SkuCommand> findEffectiveSkuInvByItemId(@QueryParam("itemId") Long itemId);
 
-	/**
-	 * 同步商品价格(sku级别)
-	 * 
-	 * @param salesPrice
-	 * @param listPrice
-	 * @param extentionCode
-	 * @return
-	 */
-	@NativeUpdate
-	Integer syncSkuPriceByExtentionCode(@QueryParam("salesPrice") BigDecimal salesPrice, @QueryParam("listPrice") BigDecimal listPrice, @QueryParam("extentionCode") String extentionCode);
+    @NativeUpdate
+    Integer deleteSkuBySkuIds(@QueryParam("skuIds") List<Long> skuIds);
 
-	/**
-	 * 同步商品的sku价格(item级别)
-	 * 
-	 * @param salesPrice
-	 * @param listPrice
-	 * @param itemCode
-	 * @return
-	 */
-	@NativeUpdate
-	Integer updateSkuPriceByItemCode(@QueryParam("salesPrice") BigDecimal salesPrice, @QueryParam("listPrice") BigDecimal listPrice, @QueryParam("itemCode") String itemCode);
+    /**
+     * 通过商品id集合, 删除sku信息
+     * 
+     * @param itemIds
+     * @return
+     */
+    @NativeUpdate
+    Integer removeSkuByItemIds(@QueryParam("itemIds") List<Long> itemIds);
 
-	/**
-	 * 查询在售的sku
-	 * 
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findAllOnSalesSkuList();
+    /**
+     * 同步商品价格(sku级别)
+     * 
+     * @param salesPrice
+     * @param listPrice
+     * @param extentionCode
+     * @return
+     */
+    @NativeUpdate
+    Integer syncSkuPriceByExtentionCode(
+                    @QueryParam("salesPrice") BigDecimal salesPrice,
+                    @QueryParam("listPrice") BigDecimal listPrice,
+                    @QueryParam("extentionCode") String extentionCode);
 
-	/**
-	 * 分页查询在售的sku
-	 * 
-	 * @param page
-	 * @param sorts
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findOnSalesItemListWithPage(Page page, Sort[] sorts);
+    /**
+     * 同步商品的sku价格(item级别)
+     * 
+     * @param salesPrice
+     * @param listPrice
+     * @param itemCode
+     * @return
+     */
+    @NativeUpdate
+    Integer updateSkuPriceByItemCode(
+                    @QueryParam("salesPrice") BigDecimal salesPrice,
+                    @QueryParam("listPrice") BigDecimal listPrice,
+                    @QueryParam("itemCode") String itemCode);
 
-	/**
-	 * 根据skuId查询库存
-	 * 
-	 * @param skuId
-	 * @return
-	 */
-	@NativeQuery(model = SkuCommand.class)
-	SkuCommand findInventoryById(@QueryParam("skuId") Long skuId);
-	
-	
-	/**
-	 * 通过paraMap中的条件查询sku信息
-	 * @param paraMap
-	 * @return
-	 */
-	@NativeQuery(model = Sku.class)
-	List<Sku> findSkuWithParaMap(@QueryParam Map<String, Object> paraMap);
+    /**
+     * 查询在售的sku
+     * 
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findAllOnSalesSkuList();
+
+    /**
+     * 分页查询在售的sku
+     * 
+     * @param page
+     * @param sorts
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findOnSalesItemListWithPage(Page page,Sort[] sorts);
+
+    /**
+     * 通过paraMap中的条件查询sku信息
+     * 
+     * @param paraMap
+     * @return
+     */
+    @NativeQuery(model = Sku.class)
+    List<Sku> findSkuWithParaMap(@QueryParam Map<String, Object> paraMap);
 }
