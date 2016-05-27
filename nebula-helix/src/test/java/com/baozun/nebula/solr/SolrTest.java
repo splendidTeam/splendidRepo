@@ -59,6 +59,9 @@ public class SolrTest {
 
 	@Autowired
 	private ItemSolrManager itemSolrManager;
+	
+	
+	
 
 	 @Test
 	public void testCleanAll() throws IOException {

@@ -45,6 +45,9 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 	/** 颜色属性值 */
 	private String propertyValue;
 	
+	/** 颜色属性值的图片 */
+	private String propertyValueThumb;
+	
 	/** 颜色属性显示值 */
 	private String propertyDisplayValue;
 	
@@ -89,6 +92,14 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 
 	public void setPropertyValue(String propertyValue) {
 		this.propertyValue = propertyValue;
+	}
+
+	public String getPropertyValueThumb() {
+		return propertyValueThumb;
+	}
+
+	public void setPropertyValueThumb(String propertyValueThumb) {
+		this.propertyValueThumb = propertyValueThumb;
 	}
 
 	public String getPropertyDisplayValue() {

@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
@@ -77,10 +76,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     /** The Constant SEPARATOR_FLAG. */
     private static final String                      SEPARATOR_FLAG = "\\|\\|";
-
-    /** The sdk order line manager. */
-    @Autowired
-    private SdkOrderLineManager                      sdkOrderLineManager;
 
     /** The sdk order line manager. */
     @Autowired
@@ -280,42 +275,32 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
             throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
         }
 
-        // 购物车
-        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = buildShopIdAndShoppingCartLineCommandListMap(
+                        shoppingCartCommand);
 
-        // shoppingCartLineCommandMap
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
-                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
-
-        // shoppingCartPromotionBriefMap
-        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
-
-        //基于店铺的促销
-        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
-                        .group(promotionSKUDiscAMTBySettingList, "shopId");
+        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = buildShopIdAndPromotionSKUDiscAMTBySettingMap(
+                        shoppingCartCommand);
 
         // shopCartCommandByShopMap
         Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = CollectionsUtil
                         .groupOne(shoppingCartCommand.getSummaryShopCartList(), "shopId");
 
         //*****************************************************************************************
-        String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
-        boolean isSendEmail = isSendEmailConfig != null && isSendEmailConfig.equals("true");
-
+        boolean isSendEmail = isSendEmail();
         List<Map<String, Object>> dataMapList = new ArrayList<Map<String, Object>>();
-
         for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
             Long shopId = entry.getKey();
             List<ShoppingCartLineCommand> shoppingCartLineCommandList = entry.getValue();
 
+            ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
+            List<PromotionSKUDiscAMTBySetting> shopPromotionSKUDiscAMTBySettingList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
             doWithPerShop(
                             shopId,
                             subOrdinate,
                             shoppingCartLineCommandList,
                             salesOrderCommand,
-                            shopIdAndShopCartCommandByShopMap.get(shopId),
-                            shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId),
+                            shopCartCommandByShop,
+                            shopPromotionSKUDiscAMTBySettingList,
                             isSendEmail,
                             dataMapList,
                             salesOrderCreateOptions);
@@ -341,6 +326,46 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         // 发邮件
         sdkOrderEmailManager.sendEmailOfCreateOrder(dataMapList);
         return subOrdinate;
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @return
+     * @since 5.3.1
+     */
+    private Map<Long, List<ShoppingCartLineCommand>> buildShopIdAndShoppingCartLineCommandListMap(ShoppingCartCommand shoppingCartCommand){
+        // 购物车
+        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
+
+        // shoppingCartLineCommandMap
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
+                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
+        return shopIdAndShoppingCartLineCommandListMap;
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @return
+     * @since 5.3.1
+     */
+    private Map<Long, List<PromotionSKUDiscAMTBySetting>> buildShopIdAndPromotionSKUDiscAMTBySettingMap(
+                    ShoppingCartCommand shoppingCartCommand){
+        // shoppingCartPromotionBriefMap
+        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
+                        .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
+
+        //基于店铺的促销
+        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
+                        .group(promotionSKUDiscAMTBySettingList, "shopId");
+        return shopIdAndPromotionSKUDiscAMTBySettingMap;
+    }
+
+    /**
+     * @return
+     */
+    private boolean isSendEmail(){
+        String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
+        return isSendEmailConfig != null && isSendEmailConfig.equals("true");
     }
 
     /**
@@ -458,10 +483,12 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * @return the pay main money
      */
     private BigDecimal getPayMainMoney(Long shopId,SalesOrder salesOrder,List<String> soPayMentDetails){
-        Long orderId = salesOrder.getId();
-        BigDecimal payMainMoney = salesOrder.getTotal().add(salesOrder.getActualFreight());
+        BigDecimal actualFreight = salesOrder.getActualFreight();
+        BigDecimal total = salesOrder.getTotal();
+        BigDecimal payMainMoney = total.add(actualFreight);
         // 除主支付方式之外的付款
 
+        Long orderId = salesOrder.getId();
         if (soPayMentDetails != null){
             for (String soPayMentDetail : soPayMentDetails){
                 // 支付方式 String格式：shopId||payMentType||金额
