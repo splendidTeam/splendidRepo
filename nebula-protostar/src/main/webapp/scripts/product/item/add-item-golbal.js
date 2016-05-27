@@ -37,8 +37,32 @@ $j.extend(loxia.regional['zh-CN'],{
     "PLEASE_SELECT_PROPERTY_GROUP":"请选择属性分组"
 });
 
+//zTree setting
+var setting = {
+	check : {
+		enable : true,
+		chkStyle : "radio",
+		radioType : "all"
+	},
+	view : {
+		dblClickExpand : true,
+		showIcon : false,
+		fontCss : getFontCss
+	},
+	data : {
+		simpleData : {
+			enable : true
+		}
+	},
+	callback : {
+		onClick : onClick,
+		beforeRemove : beforeRemove,
+		onRemove : onRemove,
+		onCheck : onCheck,
+	}
+};
+
 var mustCheckArray  = new Array();
-var validateSkuCodesUrl = base +'/item/validateSkuCode.json';
 
 var key,lastValue = "", nodeList = [], fontCss = {};
 function onCheck(event, treeId, treeNode){
@@ -222,6 +246,11 @@ function saveItem(form,args,param){
 }
 
 $j(document).ready(function(){
+	/*toggle div*/
+	$j(".ui-block-title").on("click",function(){
+		$j(this).next(".ui-block-content").slideToggle();
+	})
+	
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
     
@@ -343,9 +372,3 @@ $j(document).ready(function(){
     });
 });
 
-$j(document).ready(function(){
-	/*toggle div*/
-	$j(".ui-block-title").on("click",function(){
-		$j(this).next(".ui-block-content").slideToggle();
-	})
-})

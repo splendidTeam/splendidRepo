@@ -58,3 +58,55 @@ function unique(data){
 	}
 	return data;
 }
+
+$j(document).ready(function(){
+	// 添加商品价格表单验证方法
+	var baseInfoValidator = new FormValidator('', 50, function(){
+		
+		// 验证商品的吊牌价、销售价设置是否与sku的吊牌价、销售价一致
+		// 由于获取sku价格的必要条件是销售属性extentionCode验证通过，
+		// 所以价格的表单验证放到销售属性的验证之后进行
+		var salePrice = $j("#salePrice").val();
+		
+		var salePriceArray = new Array();
+		var salePriceIndex = 0;
+		var originalSalePriceArray = new Array();
+		$j("#extensionTable").find(".dynamicInputNameSalePrices").each(function(i,n){
+			var salePrice = parseFloat(n.value);
+			originalSalePriceArray[i] = salePrice;
+			if(!isNaN(salePrice)){
+				salePriceArray[salePriceIndex++] = salePrice;
+			}
+		});
+		salePriceArray = salePriceArray.sort(sortNumber);
+
+		if(salePriceArray.length>0){
+			if(!(salePrice>=salePriceArray[0]&&salePrice<=salePriceArray[salePriceArray.length-1])){
+				return nps.i18n("SALEPRICE_OUT_OF_RANGE");
+			}
+		}
+		   
+		var listPrice = $j("#listPrice").val();
+		if(listPrice != null && listPrice != ""){
+			var listPriceArray = new Array();
+			var listPriceIndex = 0;
+			  
+			$j("#extensionTable").find(".dynamicInputNameListPrices").each(function(i,n){
+				var listPrice =  parseFloat(n.value);
+				if(!isNaN(listPrice)){
+					listPriceArray[listPriceIndex++] = listPrice;   
+				}
+			});
+			listPriceArray = listPriceArray.sort(sortNumber);
+		   
+			if(listPriceArray.length>0){
+				if(!(listPrice>=listPriceArray[0]&&listPrice<=listPriceArray[listPriceArray.length-1])){
+					return nps.i18n("LISTPRICE_OUT_OF_RANGE");
+				}
+			}
+		}
+    	
+    	return loxia.SUCCESS;
+    });
+    formValidateList.push(baseInfoValidator);
+});

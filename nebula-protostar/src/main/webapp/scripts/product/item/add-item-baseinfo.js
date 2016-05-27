@@ -1,51 +1,26 @@
 var validateItemCodeUrl = base + '/item/validateItemCode.json';
 
-// zTree setting
-var setting = {
-	check : {
-		enable : true,
-		chkStyle : "radio",
-		radioType : "all"
-	},
-	view : {
-		dblClickExpand : true,
-		showIcon : false,
-		fontCss : getFontCss
-	},
-	data : {
-		simpleData : {
-			enable : true
-		}
-	},
-	callback : {
-		onClick : onClick,
-		beforeRemove : beforeRemove,
-		onRemove : onRemove,
-		onCheck : onCheck,
-	}
-};
-
 // 默认的分类树设置
-var defaultCategorySetting = {
-	check : {
-		enable : true,
-		chkStyle : "radio",
-		radioType : "all"
-	},
-	view : {
-		dblClickExpand : false,
-		showIcon : false
-	},
-	data : {
-		simpleData : {
-			enable : true
-		}
-	},
-	callback : {
-		onClick : defaultOnClick1,
-		onCheck : defaultOnCheck1,
-	}
-};
+//var defaultCategorySetting = {
+//	check : {
+//		enable : true,
+//		chkStyle : "radio",
+//		radioType : "all"
+//	},
+//	view : {
+//		dblClickExpand : false,
+//		showIcon : false
+//	},
+//	data : {
+//		simpleData : {
+//			enable : true
+//		}
+//	},
+//	callback : {
+//		onClick : defaultOnClick1,
+//		onCheck : defaultOnCheck1,
+//	}
+//};
 
 // 商品分类树设置
 var categorySetting = {
@@ -167,42 +142,42 @@ function setCategroyDef(id){
 $j(document).ready(function(){
 	//检查商品编码是否具有唯一性
 	$j("#code").bind("blur",function() {
-		    var code = $j("#code").val();
-	        if(code.trim()=="")return;
-	        // 正则验证
-	        if(pdValidCode != null && pdValidCode.length > 0){
-	        	var re =new RegExp(pdValidCode);
-				if(!re.test(code)){
- 					$j("#code").val("");
- 	 				$j("#loxiaTip-r").show();
- 					$j(".codetip").html(nps.i18n("ITEM_CODE_VALID_FAIL",[code]));
- 					$j("#code").addClass("ui-loxia-error");
- 					return;
- 				}else{
- 					$j("#loxiaTip-r").show();
- 	 				$j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ABLE"));
- 	 				setTimeout(function(){ 
- 	 					$j("#loxiaTip-r").hide();
- 	 				},2000);
- 				}
- 			}
- 			var json={"code":code};
- 		  	var _d = loxia.syncXhr(validateItemCodeUrl, json,{type: "GET"});
- 			if(_d.isSuccess == false){
- 				$j("#code").val("");
- 				$j("#loxiaTip-r").show();
-				$j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ENBLE"));
-				$j("#code").addClass("ui-loxia-error");
-				return;
- 			}else if(_d.isSuccess == true){
- 				 $j("#loxiaTip-r").show();
- 				 $j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ABLE"));
- 				 setTimeout(function(){ 
- 					$j("#loxiaTip-r").hide();
- 				 },2000); 
- 				 return;
- 			}
- 		
+		var code = $j("#code").val();
+		if(code.trim()=="")return;
+		// 正则验证
+		if(pdValidCode != null && pdValidCode.length > 0){
+			var re =new RegExp(pdValidCode);
+			if(!re.test(code)){
+	 			$j("#code").val("");
+	 	 		$j("#loxiaTip-r").show();
+	 			$j(".codetip").html(nps.i18n("ITEM_CODE_VALID_FAIL",[code]));
+	 			$j("#code").addClass("ui-loxia-error");
+	 			return;
+			} else {
+	 			$j("#loxiaTip-r").show();
+	 	 		$j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ABLE"));
+	 	 		setTimeout(function(){ 
+	 	 			$j("#loxiaTip-r").hide();
+	 	 		},2000);
+			}
+		}
+ 			
+		var json={"code":code};
+	 	var _d = loxia.syncXhr(validateItemCodeUrl, json,{type: "GET"});
+	 	if(_d.isSuccess == false){
+	 		$j("#code").val("");
+	 		$j("#loxiaTip-r").show();
+			$j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ENBLE"));
+			$j("#code").addClass("ui-loxia-error");
+			return;
+		} else if(_d.isSuccess == true) {
+			$j("#loxiaTip-r").show();
+	 		$j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ABLE"));
+	 		setTimeout(function(){ 
+	 			$j("#loxiaTip-r").hide();
+	 		},2000); 
+	 		return;
+		}
 	});
 	
 	$j("#code").bind("focus",function(){
@@ -229,4 +204,39 @@ $j(document).ready(function(){
 
 		$j("body").bind("mousedown", onBodyDown);
 	});
+    
+    // 添加商品基本信息表单验证方法
+    var baseInfoValidator = new FormValidator('', 10, function(){
+    	var code = $j("#code").val();
+    	
+    	// 正则验证
+    	if(pdValidCode != null && pdValidCode.length > 0){
+    		var re = new RegExp(pdValidCode);
+    		if(!re.test(code)){
+    			$j("#code").val("");
+    			$j("#loxiaTip-r").show();
+    			$j(".codetip").html(nps.i18n("ITEM_CODE_VALID_FAIL",[code]));
+    			$j("#code").addClass("ui-loxia-error");
+    			return nps.i18n("ITEM_CODE_VALID_FAIL",[code]);
+    		}else{
+    			$j("#loxiaTip-r").show();
+    			$j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ABLE"));
+    			setTimeout(function(){ 
+    				$j("#loxiaTip-r").hide();
+    			},2000);
+    		}
+    	}
+    	
+    	//如果选了分类，则必须设置默认分类
+    	var cateLen =$j("input[name='categoriesIds']").length;
+    	if(cateLen > 0){
+    		var defCategroyId =$j("#defCategroyId").val();
+    		if(defCategroyId == null || defCategroyId == ''){
+    			return nps.i18n("PLEASE_SET_DEF_CATEGORY");
+    		}
+    	}
+    	
+    	return loxia.SUCCESS;
+    });
+    formValidateList.push(baseInfoValidator);
 });
