@@ -1,12 +1,12 @@
 <%-- 一般属性 --%>
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.generalProperty" />
 </div>
 
-<div class="ui-block-content border-grey">
+<div class="ui-block-content border-grey propertyInfo">
 	<c:set var="notSalePropNum" value="0"></c:set>
 	<c:if test="${i18nOnOff == true}">
-		<div id="notSalepropertySpace">
+		<div id="notSalepropertySpace" class="i18nOn">
 			<c:set var="size" value="${fn:length(dynamicPropertyCommandList)}"></c:set>
 			<c:forEach var="dynamicPropertyCommand"
 				items="${dynamicPropertyCommandList}" varStatus="pstatus">
@@ -24,7 +24,7 @@
 									<c:if test="${dynamicPropertyCommand.property.valueType==1 }">
 										<input type='text'
 											name='iProperties.propertyValue.values[${notSalePropNum}-${status.index}]'
-											style='width: 600px' loxiaType='input'
+											loxiaType='input'
 											<c:forEach var="itemProperty" items="${itemProperties}">
 						          	                    <c:if test="${itemProperty.propertyId==dynamicPropertyCommand.property.id }">
 						          	                     <c:if test="${not empty itemProperty.propertyValue }">
@@ -127,8 +127,7 @@
 									varStatus="status">
 									<c:if
 										test="${itemProperty.propertyId==dynamicPropertyCommand.property.id }">
-										<select style='width: 160px; height: 25px'
-											name='iProperties.propertyValueId' mandatory='true'
+										<select name='iProperties.propertyValueId' mandatory='true'
 											onchange='doOther(this,${itemProperty.propertyId })'>
 											<c:forEach var="propertyValue"
 												items="${dynamicPropertyCommand.propertyValueList}">
@@ -181,8 +180,7 @@
 						<c:if test="${dynamicPropertyCommand.property.editingType==3 }">
 							<label>${dynamicPropertyCommand.property.name }</label>
 							<div>
-								<select style='width: 160px; height: 25px'
-									name='iProperties.propertyValueId' mandatory='true'>
+								<select name='iProperties.propertyValueId' mandatory='true'>
 									<c:forEach var="propertyValue"
 										items="${dynamicPropertyCommand.propertyValueList}">
 										<option value='${propertyValue.id }'
@@ -254,7 +252,7 @@
 						<c:if test="${dynamicPropertyCommand.property.editingType==5 }">
 							<%-- <c:if test="${not empty dynamicPropertyCommand.propertyValueList}"> --%>
 							<label>${dynamicPropertyCommand.property.name }</label>
-							<div class="priDiv">
+							<div class="priDiv custom-attr">
 								<c:forEach items="${i18nLangs}" var="i18nLang"
 									varStatus="istatus">
 									<c:set value="${istatus.index}" var="i"></c:set>
@@ -278,11 +276,11 @@
 										name="iProperties.propertyValue.values[${notSalePropNum}-${istatus.index}]"
 										isColorProp="false" editingtype='5'
 										propertyId=${dynamicPropertyCommand.property.id }
-										style="width: 600px; height: 45px">${str} </textarea>
+										>${str} </textarea>
 									<input class="i18n-lang" type="text"
 										name="iProperties.propertyValue.langs[${notSalePropNum}-${istatus.index}]"
 										value="${i18nLang.key}" />
-									<span style="margin: 17px 0 0 10px; position: absolute;">
+									<span class="property-tips">
 										${i18nLang.value}&nbsp;&nbsp;<spring:message
 											code="item.update.betweenPropertyName" />'||' <spring:message
 											code="item.update.split" />
@@ -335,7 +333,7 @@
 	</c:if>
 	<%-- 一般属性单语言 --%>
 	<c:if test="${i18nOnOff == false}">
-		<div id="notSalepropertySpace">
+		<div id="notSalepropertySpace" class="i18nOff">
 			<c:set var="size" value="${fn:length(dynamicPropertyCommandList)}"></c:set>
 			<c:forEach var="dynamicPropertyCommand"
 				items="${dynamicPropertyCommandList}" varStatus="status">
@@ -348,7 +346,7 @@
 								<c:if test="${dynamicPropertyCommand.property.valueType==1 }">
 									<input type='text'
 										name='iProperties.propertyValue.value[${notSalePropNum}]'
-										style='width: 600px' loxiaType='input'
+										loxiaType='input'
 										<c:forEach var="itemProperty" items="${itemProperties}">
 						          	                    <c:if test="${itemProperty.propertyId==dynamicPropertyCommand.property.id }">
 						          	                      value='${itemProperty.propertyValue.value}' 
@@ -417,8 +415,7 @@
 								<c:forEach var="itemProperty" items="${itemProperties}">
 									<c:if
 										test="${itemProperty.propertyId==dynamicPropertyCommand.property.id }">
-										<select style='width: 160px; height: 25px'
-											name='iProperties.propertyValueId' mandatory='true'
+										<select name='iProperties.propertyValueId' mandatory='true'
 											onchange='doOther(this,${itemProperty.propertyId })'>
 											<c:forEach var="propertyValue"
 												items="${dynamicPropertyCommand.propertyValueList}">
@@ -462,8 +459,7 @@
 						<c:if test="${dynamicPropertyCommand.property.editingType==3 }">
 							<label>${dynamicPropertyCommand.property.name }</label>
 							<div>
-								<select style='width: 160px; height: 25px'
-									name='iProperties.propertyValueId' mandatory='true'>
+								<select name='iProperties.propertyValueId' mandatory='true'>
 									<c:forEach var="propertyValue"
 										items="${dynamicPropertyCommand.propertyValueList}">
 										<option value='${propertyValue.id }'
@@ -528,7 +524,7 @@
 						</c:if>
 						<c:if test="${dynamicPropertyCommand.property.editingType==5 }">
 							<label>${dynamicPropertyCommand.property.name }</label>
-							<div class="priDiv">
+							<div class="priDiv custom-attr">
 								<c:forEach items="${ itemProperties }" var="itemProperty"
 									varStatus="status">
 									<c:if
@@ -543,8 +539,8 @@
 								<textarea class="customerSelect" loxiaType="input"
 									name="iProperties.propertyValue.value[${notSalePropNum}]"
 									isColorProp="false" editingtype='5'
-									propertyId=${dynamicPropertyCommand.property.id }
-									style="width: 600px; height: 45px">${str} </textarea>
+									propertyId=${dynamicPropertyCommand.property.id }>${str} 
+								</textarea>
 								<input type="hidden"
 									value='${dynamicPropertyCommand.property.id }'
 									name="iProperties.propertyId"> <input type="hidden"
@@ -556,7 +552,7 @@
 									type="hidden" value="" name="iProperties.itemId"> <input
 									type="hidden" value="" name="iProperties.picUrl"> <input
 									type="hidden" value="" name="iProperties.propertyValueId">
-								<span style="margin: 17px 0 0 10px; position: absolute;"><spring:message
+								<span class="property-tips" ><spring:message
 										code="item.update.betweenPropertyName" />'||'<spring:message
 										code="item.update.split" /></span>
 							</div>
@@ -594,10 +590,10 @@
 </div>
 
 
-<div style="margin-top: 10px"></div>
+<div class="mt10"></div>
  
 <!-- 销售属性信息 多语言 -->
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.sales" />
 </div>
 <c:if test="${i18nOnOff == true}">
@@ -605,9 +601,7 @@
 	<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 		<c:set var="lang" value="${i18nLang.key}"></c:set>
 		<c:set value="${status.index}" var="i"></c:set>
-		<div class="ui-block-content border-grey saleInfo"
-			lang="${i18nLang.key}"
-			<c:if test="${i>0 }"> style="margin-top: 5px;" </c:if>>
+		<div class="ui-block-content border-grey saleInfo <c:if test='${i>0 }'> mt5 </c:if>" lang="${i18nLang.key}" >
 			<div id="propertySpace">
 				<c:forEach var="dynamicPropertyCommand"
 					items="${dynamicPropertyCommandList}">
@@ -677,7 +671,7 @@
 									name='propertyValueInputs'
 									pid='${dynamicPropertyCommand.property.id}' />
 								<input type='hidden' value='${lang}' name='propertyValueInputs' />
-								<div class="priDiv">
+								<div class="priDiv custom-attr">
 
 									<c:set var="str" value=""></c:set>
 									<c:forEach items="${itemProperties}" var="itemProperty"
@@ -700,8 +694,8 @@
 									<textarea class="customerSelect spTa" loxiaType="input"
 										name="propertyValue" editingtype='5' isColorProp="true"
 										propertyId=${dynamicPropertyCommand.property.id }
-										style="width: 600px; height: 45px" mandatory="true">${str}</textarea>
-									<span style="margin: 17px 0 0 10px; position: absolute;">${i18nLang.value}&nbsp;&nbsp;<spring:message
+									    mandatory="true">${str}</textarea>
+									<span>${i18nLang.value}&nbsp;&nbsp;<spring:message
 											code="item.update.betweenPropertyName" />'||'<spring:message
 											code="item.update.split" /></span>
 
@@ -712,10 +706,9 @@
 				</c:forEach>
 			</div>
 
-			<div id="exten" class="ui-block-line exten" style="display: none;">
+			<div id="exten" class="ui-block-line exten none-normal">
 				<div id="extension">
-					<table id="extensionTable" class="border-grey extensionTable"
-						style="padding: 5px;">
+					<table id="extensionTable" class="border-grey extensionTable p5">
 
 					</table>
 				</div>
@@ -723,11 +716,10 @@
 
 			<div class="ui-block-line ">
 				<label></label>
-				<div style="clear: both;">
-					<a href="javascript:void(0)" class="func-button extension"
-						style="height: 30px;"><span><spring:message
-								code="item.update.encodingSettings" /></span></a>
-
+				<div class="clear">
+					<a href="javascript:void(0)" class="func-button extension height30">
+						<span><spring:message code="item.update.encodingSettings" /></span>
+					</a>
 				</div>
 			</div>
 		</div>
@@ -798,7 +790,7 @@
 								name='propertyIds' />
 							<input type='hidden' value='' name='propertyValueInputs'
 								pid='${dynamicPropertyCommand.property.id}' />
-							<div class="priDiv">
+							<div class="priDiv custom-attr">
 								<c:set var="str" value=""></c:set>
 								<c:forEach items="${ itemProperties }" var="itemProperty"
 									varStatus="status">
@@ -814,31 +806,28 @@
 								<textarea class="customerSelect spTa" loxiaType="input"
 									name="propertyValue" editingtype='5' isColorProp="true"
 									propertyId=${dynamicPropertyCommand.property.id }
-									style="width: 600px; height: 45px" mandatory="true">${str}</textarea>
-								<span style="margin: 17px 0 0 10px; position: absolute;"><spring:message
-										code="item.update.betweenPropertyName" />'||'<spring:message
-										code="item.update.split" /></span>
-
+								    mandatory="true">${str}</textarea>
+								<span class="property-tips">
+									<spring:message  code="item.update.betweenPropertyName" />'||'<spring:message code="item.update.split" />
+								</span>
 							</div>
 						</c:if>
 					</div>
 				</c:if>
 			</c:forEach>
 		</div>
-		<div id="exten" class="ui-block-line exten" style="display: none;">
+		<div id="exten" class="ui-block-line exten none-normal">
 			<div id="extension">
-				<table id="extensionTable" class="border-grey extensionTable"
-					style="padding: 5px;">
-
+				<table id="extensionTable" class="border-grey extensionTable p5">
 				</table>
 			</div>
 		</div>
 		<div class="ui-block-line ">
 			<label></label>
-			<div style="clear: both;">
-				<a href="javascript:void(0)" class="func-button extension"
-					style="height: 30px;"><span><spring:message
-							code="item.update.encodingSettings" /></span></a>
+			<div  class="clear">
+				<a href="javascript:void(0)" class="func-button extension height30">
+					<span><spring:message code="item.update.encodingSettings" /></span>
+				</a>
 			</div>
 		</div>
 	</div>

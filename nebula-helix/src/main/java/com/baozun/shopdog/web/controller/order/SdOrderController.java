@@ -105,7 +105,7 @@ public class SdOrderController implements AbstractSdOrderController{
      * @since
      */
     @Override
-    public List<ShopdogOrderCommand> saveOrder(HttpServletRequest request, ShopdogOrderParamCommand shopdogOrderParamCommand) {
+    public ShopdogOrderCommand saveOrder(HttpServletRequest request, ShopdogOrderParamCommand shopdogOrderParamCommand) {
         // 封装订单信息
         SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
         PropertyUtil.copyProperties(salesOrderCommand, shopdogOrderParamCommand, "countryId", "provinceId",
