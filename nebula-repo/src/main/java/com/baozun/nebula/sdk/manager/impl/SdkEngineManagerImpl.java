@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -106,14 +107,14 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
         Set<String> memboIds = null == memberId ? getCrowdScopeListByMemberAndGroup(null, null) : memCombos;
 
         //获取购物车中的所有店铺id.
-        Set<Long> ids = CollectionsUtil.getPropertyValueSet(shoppingCartCommand.getShoppingCartLineCommands(), "shopId");
-        List<Long> shopIds = new ArrayList<Long>(ids);
+        List<Long> shopIds = getShopIds(shoppingCartCommand);
+
         Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(shoppingCartCommand.getShoppingCartLineCommands());
 
         List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
                         .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
 
-        if (null == purchaseLimitationList || purchaseLimitationList.size() == 0){
+        if (Validator.isNullOrEmpty(purchaseLimitationList)){
             purchaseLimitationList = new ArrayList<LimitCommand>();
         }
 
@@ -121,29 +122,46 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
             for (ShoppingCartLineCommand shoppingCartLine : entry.getValue().getShoppingCartLineCommands()){
                 //直推礼品不做校验
                 if (!isNoNeedChoiceGift(shoppingCartLine)){
-                    doEngineCheck(shoppingCartLine, false, shoppingCartCommand, purchaseLimitationList);
+                    doEngineCheck(shoppingCartLine, false);
                 }
             }
         }
 
         //限购校验失败
         List<ShoppingCartLineCommand> errorLineList = doEngineCheckLimit(shoppingCartCommand, purchaseLimitationList);
-        if (null != errorLineList && errorLineList.size() > 0){
-            StringBuffer errorItemName = new StringBuffer();
-            List<Long> itemList = new ArrayList<Long>();
-            for (ShoppingCartLineCommand cartLine : errorLineList){
-                if ("".equals(errorItemName.toString())){
-                    errorItemName.append(cartLine.getItemName());
-                    itemList.add(cartLine.getItemId());
-                }else{
-                    if (!itemList.contains(cartLine.getItemId())){
-                        errorItemName.append(",").append(cartLine.getItemName());
-                        itemList.add(cartLine.getSkuId());
-                    }
+
+        if (Validator.isNotNullOrEmpty(errorLineList)){
+            toBusinessException(errorLineList);
+        }
+    }
+
+    /**
+     * @param errorLineList
+     */
+    private void toBusinessException(List<ShoppingCartLineCommand> errorLineList){
+        StringBuffer errorItemName = new StringBuffer();
+        List<Long> itemList = new ArrayList<Long>();
+        for (ShoppingCartLineCommand cartLine : errorLineList){
+            if ("".equals(errorItemName.toString())){
+                errorItemName.append(cartLine.getItemName());
+                itemList.add(cartLine.getItemId());
+            }else{
+                if (!itemList.contains(cartLine.getItemId())){
+                    errorItemName.append(",").append(cartLine.getItemName());
+                    itemList.add(cartLine.getSkuId());
                 }
             }
-            throw new BusinessException(Constants.THE_ORDER_CONTAINS_LIMIT_ITEM, new Object[] { errorItemName.toString() });
         }
+        throw new BusinessException(Constants.THE_ORDER_CONTAINS_LIMIT_ITEM, new Object[] { errorItemName.toString() });
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @return
+     */
+    private List<Long> getShopIds(ShoppingCartCommand shoppingCartCommand){
+        Set<Long> ids = CollectionsUtil.getPropertyValueSet(shoppingCartCommand.getShoppingCartLineCommands(), "shopId");
+        return new ArrayList<Long>(ids);
     }
 
     /**
@@ -231,18 +249,16 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public Integer doEngineCheck(
-                    ShoppingCartLineCommand line,
-                    boolean flag,
-                    ShoppingCartCommand cart,
-                    List<LimitCommand> purchaseLimitationList){
+    public Integer doEngineCheck(ShoppingCartLineCommand shoppingCartLineCommand,boolean flag){
         // 只有购物车中增加数量时才做相关检查
         if (!flag){
             // 商品类型是否赠品 , 赠品是不可以购买
-            Long skuId = line.getSkuId();
+            Long skuId = shoppingCartLineCommand.getSkuId();
             List<Long> skuIds = new ArrayList<Long>();
             skuIds.add(skuId);
+
             List<ItemInfo> itemInfoList = itemInfoDao.findItemInfosBySkuids(skuIds);
+
             if (null != itemInfoList && itemInfoList.size() > 0){
                 ItemInfo itemInfo = itemInfoList.get(0);
                 if (ItemInfo.TYPE_GIFT.equals(itemInfo.getType())){
@@ -250,42 +266,37 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
                 }
             }
 
-            if (!line.isValid()){
-                if (new Integer(1).equals(line.getValidType())){
-                    throw new BusinessException(
-                                    Constants.THE_ORDER_CONTAINS_NOTVALID_ITEM,
-                                    new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
-                }else{
-                    throw new BusinessException(
-                                    Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM,
-                                    new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
-                }
+            if (!shoppingCartLineCommand.isValid()){
+                throwBusinessException(
+                                new Integer(1).equals(shoppingCartLineCommand.getValidType()) ? Constants.THE_ORDER_CONTAINS_NOTVALID_ITEM
+                                                : Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM,
+                                shoppingCartLineCommand);
             }
 
             Sku sku = skuDao.getByPrimaryKey(skuId);
             //如果sku.lifecycle!=1,则表示不能通过检查,删除sku时会出现lifecycle=0
             if (!sku.getLifecycle().equals(Sku.LIFE_CYCLE_ENABLE)){
-                throw new BusinessException(
-                                Constants.CONTAINS_NOTVALID_ITEM,
-                                new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
+                throwBusinessException(Constants.CONTAINS_NOTVALID_ITEM, shoppingCartLineCommand);
             }
 
             // 商品还没有上架
             if (!checkActiveBeginTime(skuId)){
-                throw new BusinessException(
-                                Constants.THE_ORDER_CONTAINS_NOTVALID_ITEM,
-                                new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
+                throwBusinessException(Constants.THE_ORDER_CONTAINS_NOTVALID_ITEM, shoppingCartLineCommand);
             }
             // 如果更改购物车行时，若为增加购买时才检查库存
-
-            Integer stock = line.getStock();
-            if (null == stock || 0 == stock || stock < line.getQuantity()){
-                throw new BusinessException(
-                                Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM,
-                                new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
+            Integer stock = shoppingCartLineCommand.getStock();
+            if (null == stock || 0 == stock || stock < shoppingCartLineCommand.getQuantity()){
+                throwBusinessException(Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM, shoppingCartLineCommand);
             }
         }
         return Constants.SUCCESS;
+    }
+
+    private void throwBusinessException(int errorCode,ShoppingCartLineCommand shoppingCartLineCommand){
+        String itemName = shoppingCartLineCommand.getItemName();
+        String productCode = shoppingCartLineCommand.getProductCode();
+        String itemPic = shoppingCartLineCommand.getItemPic();
+        throw new BusinessException(errorCode, new Object[] { itemName, productCode, itemPic });
     }
 
     /*
@@ -319,6 +330,8 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
                 // 不存在
                 limitCommandList = new ArrayList<LimitCommand>();
             }
+
+            //***************************************************************************************
             ShoppingCartCommand shoppingCart = new ShoppingCartCommand();
             List<ShoppingCartLineCommand> tmpLineList = new ArrayList<ShoppingCartLineCommand>();
 
@@ -343,6 +356,7 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
                 BeanUtil.copyProperties(tmpLine, shoppingCartLineCommand);
                 tmpLineList.add(tmpLine);
             }
+
             shoppingCart.setShoppingCartLineCommands(tmpLineList);
             shoppingCart.setShoppingCartByShopIdMap(shoppingCartCommandByShop.getShoppingCartByShopIdMap());
             shoppingCart.setUserDetails(shoppingCartCommandByShop.getUserDetails());
@@ -359,37 +373,33 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getCrowdScopeListByMemberAndGroup(Long memberId,List<Long> memGroupId){
-        Set<String> cids = new HashSet<String>(); // 会员组合
+    public Set<String> getCrowdScopeListByMemberAndGroup(Long memberId,List<Long> memGroupIdList){
         Map<String, AbstractScopeConditionResult> crowdScopeConditionResultList = EngineManager.getInstance().getCrowdScopeEngine()
                         .getCrowdScopeMap();
 
-        if (null != crowdScopeConditionResultList && crowdScopeConditionResultList.size() > 0){
+        if (Validator.isNullOrEmpty(crowdScopeConditionResultList)){
+            return Collections.emptySet();
+        }
 
-            if (null != memberId && (null == memGroupId || memGroupId.size() == 0)){
-                memGroupId = new ArrayList<Long>();
-                List<MemberGroupRelation> memGroRelList = memberGroupRelationDao.findMemberGroupRelationListByMemberId(memberId);
-                if (null != memGroRelList && memGroRelList.size() != 0){
-                    for (MemberGroupRelation memberGroupRelation : memGroRelList){
-                        memGroupId.add(memberGroupRelation.getGroupId());
-                    }
-                }
+        if (null != memberId && Validator.isNullOrEmpty(memGroupIdList)){
+            List<MemberGroupRelation> memberGroupRelationList = memberGroupRelationDao.findMemberGroupRelationListByMemberId(memberId);
+            memGroupIdList = CollectionsUtil.getPropertyValueList(memberGroupRelationList, "groupId");
+        }
+
+        if (Validator.isNullOrEmpty(memGroupIdList)){
+            memGroupIdList = new ArrayList<Long>();
+            memGroupIdList.add(-1L);
+        }
+
+        Set<String> cids = new HashSet<String>(); // 会员组合
+        for (String key : crowdScopeConditionResultList.keySet()){
+            CrowdScopeConditionResult crowdScopeConditionResult = (CrowdScopeConditionResult) crowdScopeConditionResultList.get(key);
+            Boolean checkFlag = crowdScopeConditionResult.getResult(memberId, memGroupIdList);
+            if (checkFlag == null){
+                checkFlag = false;
             }
-
-            if (null == memGroupId || memGroupId.size() <= 0){
-                memGroupId = new ArrayList<Long>();
-                memGroupId.add(-1L);
-            }
-
-            for (String key : crowdScopeConditionResultList.keySet()){
-                CrowdScopeConditionResult crowdScopeConditionResult = (CrowdScopeConditionResult) crowdScopeConditionResultList.get(key);
-                Boolean checkFlag = crowdScopeConditionResult.getResult(memberId, memGroupId);
-                if (checkFlag == null){
-                    checkFlag = false;
-                }
-                if (checkFlag){
-                    cids.add(key);
-                }
+            if (checkFlag){
+                cids.add(key);
             }
         }
         return cids;

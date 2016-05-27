@@ -29,10 +29,11 @@ import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 /**
  * The Class SalesOrderCommand.
  */
+//TODO feilong 目前这个类 把创建 和查询的command 都融合在一起, 不利于扩展
 public class SalesOrderCommand extends BaseModel{
 
     /** The Constant serialVersionUID. */
-    private static final long           serialVersionUID  = 4539781027280506601L;
+    private static final long           serialVersionUID = 4539781027280506601L;
 
     /** PK. */
     private Long                        id;
@@ -193,17 +194,17 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 发票抬头. */
     private String                      receiptTitle;
-    
+
     /** 发票收货人. */
     private String                      receiptConsignee;
-    
+
     /** 发票收货人联系方式. */
     private String                      receiptTelphone;
-    
+
     /** 发票收货地址. */
     private String                      receiptAddress;
 
-	/** 发票内容. */
+    /** 发票内容. */
     private String                      receiptContent;
 
     /** 备注. */
@@ -215,15 +216,6 @@ public class SalesOrderCommand extends BaseModel{
     /** 创建时间. */
     private Date                        createTime;
 
-    /** 是否是立即购买的订单 *. */
-    private Boolean                     isImmediatelyBuy;
-
-    /** 是否是后台下单 *. */
-    private Boolean                     isBackCreateOrder = false;
-
-    /** 邮件模板 *. */
-    private String                      emailTemplete;
-
     /** 在线支付信息 *. */
     private OnLinePaymentCommand        onLinePaymentCommand;
 
@@ -233,7 +225,9 @@ public class SalesOrderCommand extends BaseModel{
     /** 微信支付相关 *. */
     private WechatPayParamCommand       wechatPayParamCommand;
 
-    /** 计算运费需要的信息 *. */
+    /**
+     * 计算运费需要的信息.
+     */
     private CalcFreightCommand          calcFreightCommand;
 
     /** ******************** 保存时 拆单需要保存每个店铺的快递和指定收货时间 *. */
@@ -258,21 +252,24 @@ public class SalesOrderCommand extends BaseModel{
 
     //*********************************************************************************************
 
-    /** 是否qs *. */
-    private Boolean                     isQs              = false;
+    /**
+     * 邮件模板.
+     * 
+     * @deprecated 没有用到
+     */
+    private String                      emailTemplete;
 
     /** 物流方式 *. */
     private Long                        distributionModeId;
 
     /** 银行分期付款的期数. */
     private Integer                     periods;
-    
+
     //*********************************************************************************************
-    
+
     /** 多语言 */
-    private String 						lang;
-    
-    
+    private String                      lang;
+
     /**
      * 获得 物流方式 *.
      *
@@ -372,6 +369,7 @@ public class SalesOrderCommand extends BaseModel{
      * 获得 邮件模板 *.
      *
      * @return the 邮件模板 *
+     * @deprecated 没有用到
      */
     public String getEmailTemplete(){
         return emailTemplete;
@@ -382,6 +380,7 @@ public class SalesOrderCommand extends BaseModel{
      *
      * @param emailTemplete
      *            the new 邮件模板 *
+     * @deprecated 没有用到
      */
     public void setEmailTemplete(String emailTemplete){
         this.emailTemplete = emailTemplete;
@@ -1338,44 +1337,6 @@ public class SalesOrderCommand extends BaseModel{
     }
 
     /**
-     * 获得 是否是立即购买的订单 *.
-     *
-     * @return the 是否是立即购买的订单 *
-     */
-    public Boolean getIsImmediatelyBuy(){
-        return isImmediatelyBuy;
-    }
-
-    /**
-     * 设置 是否是立即购买的订单 *.
-     *
-     * @param isImmediatelyBuy
-     *            the new 是否是立即购买的订单 *
-     */
-    public void setIsImmediatelyBuy(Boolean isImmediatelyBuy){
-        this.isImmediatelyBuy = isImmediatelyBuy;
-    }
-
-    /**
-     * 获得 是否是后台下单 *.
-     *
-     * @return the 是否是后台下单 *
-     */
-    public Boolean getIsBackCreateOrder(){
-        return isBackCreateOrder;
-    }
-
-    /**
-     * 设置 是否是后台下单 *.
-     *
-     * @param isBackCreateOrder
-     *            the new 是否是后台下单 *
-     */
-    public void setIsBackCreateOrder(Boolean isBackCreateOrder){
-        this.isBackCreateOrder = isBackCreateOrder;
-    }
-
-    /**
      * 获得 在线支付信息 *.
      *
      * @return the 在线支付信息 *
@@ -1528,25 +1489,6 @@ public class SalesOrderCommand extends BaseModel{
     }
 
     /**
-     * 获得 是否qs *.
-     *
-     * @return the 是否qs *
-     */
-    public Boolean getIsQs(){
-        return isQs;
-    }
-
-    /**
-     * 设置 是否qs *.
-     *
-     * @param isQs
-     *            the new 是否qs *
-     */
-    public void setIsQs(Boolean isQs){
-        this.isQs = isQs;
-    }
-
-    /**
      * 获得 订单类型 1-普通订单(默认), 2-预售订单.
      *
      * @return the 订单类型 1-普通订单(默认), 2-预售订单
@@ -1660,37 +1602,36 @@ public class SalesOrderCommand extends BaseModel{
         this.buyerTel = buyerTel;
     }
 
+    public String getReceiptConsignee(){
+        return receiptConsignee;
+    }
 
-	public String getReceiptConsignee() {
-		return receiptConsignee;
-	}
+    public void setReceiptConsignee(String receiptConsignee){
+        this.receiptConsignee = receiptConsignee;
+    }
 
-	public void setReceiptConsignee(String receiptConsignee) {
-		this.receiptConsignee = receiptConsignee;
-	}
+    public String getReceiptTelphone(){
+        return receiptTelphone;
+    }
 
-	public String getReceiptTelphone() {
-		return receiptTelphone;
-	}
+    public void setReceiptTelphone(String receiptTelphone){
+        this.receiptTelphone = receiptTelphone;
+    }
 
-	public void setReceiptTelphone(String receiptTelphone) {
-		this.receiptTelphone = receiptTelphone;
-	}
+    public String getReceiptAddress(){
+        return receiptAddress;
+    }
 
-	public String getReceiptAddress() {
-		return receiptAddress;
-	}
+    public void setReceiptAddress(String receiptAddress){
+        this.receiptAddress = receiptAddress;
+    }
 
-	public void setReceiptAddress(String receiptAddress) {
-		this.receiptAddress = receiptAddress;
-	}
+    public String getLang(){
+        return lang;
+    }
 
-	public String getLang() {
-		return lang;
-	}
-
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
+    public void setLang(String lang){
+        this.lang = lang;
+    }
 
 }

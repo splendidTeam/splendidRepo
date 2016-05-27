@@ -73,4 +73,9 @@ public class CacheKeyConstant{
 	 * @see com.baozun.nebula.search.FacetFilterHelperImpl.loadFacetFilterMetaData()
 	 */
 	public final static String			NAVIGATIONMETACACHEKEY		= "navigationMetaCacheKey_";
+	
+	/**
+	 * 基于搜索导航的搜索条件缓存
+	 */
+	public final static String				CONDITION_NAV_CACHEKEY		= "CONDITION_NAV_CACHEKEY_";
 }

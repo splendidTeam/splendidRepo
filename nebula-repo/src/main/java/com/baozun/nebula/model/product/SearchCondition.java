@@ -70,7 +70,16 @@ public class SearchCondition extends BaseModel {
 	/**
 	 * 搜索条件对应的分类Id
 	 */
+	@Deprecated
 	private Long 				categoryId;
+	
+	/**
+	 * 搜索条件对应的导航id，
+	 * 表示该搜索条件只会在这个导航下面显示，
+	 * 其他或者通用的页面不会显示该搜索条件
+	 * 
+	 */
+	private Long				navigationId;
 	
 	/**
 	 * 条件描述
@@ -211,5 +220,14 @@ public class SearchCondition extends BaseModel {
 	@Column(name = "CATEGORY_ID")
 	public Long getCategoryId() {
 		return categoryId;
+	}
+	
+	@Column(name="NAVIGATION_ID")
+	public Long getNavigationId() {
+		return navigationId;
+	}
+
+	public void setNavigationId(Long navigationId) {
+		this.navigationId = navigationId;
 	}
 }

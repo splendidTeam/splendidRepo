@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.baozun.nebula.sdk.manager.SdkCmsPageTemplateManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.utils.FileUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)

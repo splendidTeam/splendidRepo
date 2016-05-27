@@ -139,6 +139,23 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 		}
 		return resultList;
 	}
+	
+	
+	@Override
+	@Transactional(readOnly=true)
+	public List<SearchConditionCommand> findConditionByNavigation(Long navigationId) {
+		List<SearchCondition> cmdList =  searchConditionDao.findConditionByNavigaion(navigationId);
+		List<SearchConditionCommand> resultList = new ArrayList<SearchConditionCommand>();
+		if(null!=cmdList){
+			for(SearchCondition s:cmdList){
+				SearchConditionCommand cmd = new SearchConditionCommand();
+				cmd = (SearchConditionCommand) ConvertUtils.convertFromTarget(cmd, s);
+				cmd.setPropertyId(s.getPropertyId());
+				resultList.add(cmd);
+			}
+		}
+		return resultList;
+	}
 
 	@Override
 	public SearchCondition createOrUpdateSearchCondition(

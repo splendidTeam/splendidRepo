@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.manager.CacheManager;
-import com.baozun.nebula.sdk.manager.SdkCmsPageInstanceManager;
+import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
 
 /**
  * 引擎相关的Watch,在invoke方法中用于调用引擎初始化方法

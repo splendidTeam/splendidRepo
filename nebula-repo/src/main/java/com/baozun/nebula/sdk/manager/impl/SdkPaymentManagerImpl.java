@@ -134,7 +134,7 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
         }
 
         totalPayMoney = totalPayMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
-        sdkPayCodeManager.savaPayCode(totalPayMoney, subOrdinate);
+        sdkPayCodeManager.savaPayCode(subOrdinate, totalPayMoney);
         return subOrdinate;
     }
 

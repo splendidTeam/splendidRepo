@@ -35,7 +35,7 @@ import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
-import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.solr.utils.DatePattern;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;

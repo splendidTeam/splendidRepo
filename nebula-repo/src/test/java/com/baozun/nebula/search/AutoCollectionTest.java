@@ -40,27 +40,27 @@ public class AutoCollectionTest {
 
 	@Before
 	public void init() {
-		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
-		FacetParameter facetParameterCategory1 = new FacetParameter(FacetType.CATEGORY.name(),
-				"/usr|/usr/local|/usr/local/apache");
-		facetParameterCategory1.setFacetType(FacetType.CATEGORY);
-		FacetParameter facetParameterCategory2 = new FacetParameter(FacetType.CATEGORY.name(), "/etc|/etc/apache2");
-		facetParameterCategory2.setFacetType(FacetType.CATEGORY);
-		FacetParameter facetParameterTags = new FacetParameter(FacetType.TAG.name(), "a|b");
-		facetParameterTags.setFacetType(FacetType.TAG);
-		FacetParameter facetParameterProperties = new FacetParameter(FacetType.PROPERTY.name() + "_1", "1|2");
-		facetParameterProperties.setFacetType(FacetType.PROPERTY);
-		//facetParameters.add(facetParameterCategory1);
-		facetParameters.add(facetParameterCategory2);
-		//facetParameters.add(facetParameterTags);
-	//	facetParameters.add(facetParameterProperties);
-		collection.setFacetParameters(JSON.toJSONString(facetParameters));
-
-		context.setItemId(1L);
-		context.setCategories(Arrays.asList(new String[] { "/etc", "/etc/apache2" }));
-		context.setTags(Arrays.asList(new String[] { "hot", "new" }));
-
-		context.setProperties(Arrays.asList(new String[] { "1", "2" }));
+//		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
+//		FacetParameter facetParameterCategory1 = new FacetParameter(FacetType.CATEGORY.name(),
+//				"/usr|/usr/local|/usr/local/apache");
+//		facetParameterCategory1.setFacetType(FacetType.CATEGORY);
+//		FacetParameter facetParameterCategory2 = new FacetParameter(FacetType.CATEGORY.name(), "/etc|/etc/apache2");
+//		facetParameterCategory2.setFacetType(FacetType.CATEGORY);
+//		FacetParameter facetParameterTags = new FacetParameter(FacetType.TAG.name(), "a|b");
+//		facetParameterTags.setFacetType(FacetType.TAG);
+//		FacetParameter facetParameterProperties = new FacetParameter(FacetType.PROPERTY.name() + "_1", "1|2");
+//		facetParameterProperties.setFacetType(FacetType.PROPERTY);
+//		//facetParameters.add(facetParameterCategory1);
+//		facetParameters.add(facetParameterCategory2);
+//		//facetParameters.add(facetParameterTags);
+//	//	facetParameters.add(facetParameterProperties);
+//		collection.setFacetParameters(JSON.toJSONString(facetParameters));
+//
+//		context.setItemId(1L);
+//		context.setCategories(Arrays.asList(new String[] { "/etc", "/etc/apache2" }));
+//		context.setTags(Arrays.asList(new String[] { "hot", "new" }));
+//
+//		context.setProperties(Arrays.asList(new String[] { "1", "2" }));
 	}
 
 	@Test

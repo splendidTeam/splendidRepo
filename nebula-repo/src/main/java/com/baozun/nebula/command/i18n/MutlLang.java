@@ -14,7 +14,7 @@ public class MutlLang extends LangProperty {
 
 	private static final long serialVersionUID = -4877220898281372352L;
 	
-	private static Integer i18nSize;
+	//private static Integer i18nSize;
 
 	private static List<String> i18nLangs;
 
@@ -125,7 +125,7 @@ public class MutlLang extends LangProperty {
 	}
 
 	public static int i18nSize() {
-		if (i18nSize == null) {
+		/*if (i18nSize == null) {
 			List<I18nLang> langs = getI18nLangs();
 			if (Validator.isNullOrEmpty(langs)) {
 				return 0;
@@ -134,7 +134,11 @@ public class MutlLang extends LangProperty {
 			return i18nSize;
 		} else {
 			return i18nSize;
-		}
+		}*/
+		//以上方法有缺陷:
+		//多语言开启，从一种语言变到多个语言时i18nSize没有随之改变
+		List<I18nLang> langs = getI18nLangs();
+		return Validator.isNullOrEmpty(langs) ? 0 : langs.size();
 	}
 
 	public static List<String> i18nLangs() {

@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -91,6 +92,11 @@ public class AuditLogFilter extends OncePerRequestFilter {
      * @param response
      */
 	private void createSysAuditLog(HttpServletRequest request ,HttpServletResponse response ) {
+		
+		String uri = getRequestURI(request);
+		
+		if(StringUtils.isNotBlank(uri) && (uri.contains(".css") || uri.contains(".js")))
+			return;
 	
 		SecurityContext securityContext = (SecurityContext)request.getSession().getAttribute("SPRING_SECURITY_CONTEXT");
     	
@@ -117,7 +123,7 @@ public class AuditLogFilter extends OncePerRequestFilter {
     	sysAuditLog.setMethod(request.getMethod());
     	sysAuditLog.setParameters(JsonUtil.format(request.getParameterMap()));
     	sysAuditLog.setResponseCode(String.valueOf(response.getStatus()));
-    	sysAuditLog.setUri(getRequestURI(request));
+    	sysAuditLog.setUri(uri);
     	sysAuditLog.setCreateTime(new Date());
     	
     	ServletContext servletContext = request.getSession().getServletContext(); 

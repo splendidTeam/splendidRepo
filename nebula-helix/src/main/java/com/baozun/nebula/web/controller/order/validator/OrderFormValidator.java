@@ -23,7 +23,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
-import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.feilong.core.RegexPattern;

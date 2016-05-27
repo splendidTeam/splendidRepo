@@ -29,6 +29,46 @@
 		</constructor-arg>
 	</bean>
 	
+		<bean id="SearchCondition.findConditionByNavigaion" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查找导航下有效的搜索条件，将本导航和平台导航的搜索条件查询出来， 如果本导航中已经有的筛选条件，平台级别的不需要查询出来，是通过name来判断的 </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT
+						*
+					FROM
+						t_pd_search_con
+					WHERE
+						ID NOT IN (
+							SELECT
+								ID
+							FROM
+								t_pd_search_con
+							WHERE
+								NAME IN (
+									SELECT
+										NAME
+									FROM
+										t_pd_search_con
+									WHERE
+										navigation_id=:navId
+									AND lifecycle = 1
+								)
+							AND category_id IS NULL
+						)
+					AND (
+						navigation_id=:navId
+						OR navigation_id IS NULL
+					)
+					AND lifecycle = 1
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	
 	<bean id="SearchCondition.updateSearchConditionLang" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据ID更新searchCondition</description>
 		<constructor-arg>

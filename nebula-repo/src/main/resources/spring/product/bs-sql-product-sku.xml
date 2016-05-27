@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
@@ -14,7 +13,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.findSkuByItemIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemids查询Sku</description>
 		<constructor-arg>
@@ -29,7 +28,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.findEffectSkuByItemIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemids查询Sku</description>
 		<constructor-arg>
@@ -44,7 +43,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.deleteSkuByItemCodes" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemCodes删除Sku 用于商品上传使用 </description>
 		<constructor-arg>
@@ -62,7 +61,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.findEffectSkuTopOneByItemIdsWithinLimit" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemids查询Sku</description>
 		<constructor-arg>
@@ -83,7 +82,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.findSkuByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据extentionCode查询Sku</description>
 		<constructor-arg>
@@ -111,7 +110,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.deleteSkuByItemId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemid删除Sku</description>
 		<constructor-arg>
@@ -122,7 +121,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.deleteSkuBySkuIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据skuIds删除Sku(逻辑删除)</description>
 		<constructor-arg>
@@ -162,7 +161,10 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[ 
-					SELECT * FROM t_pd_sku WHERE id= :id
+					SELECT 
+						* 
+					FROM t_pd_sku 
+					WHERE id= :id
                  ]]>
 			</value>
 		</constructor-arg>
@@ -211,7 +213,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.findEffectiveSkuInvByItemId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>通过itemId获取lifescyle为有效的sku的库存</description>
 		<constructor-arg>
@@ -263,7 +265,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	
+
 	<bean id="Sku.findAllOnSalesSkuList" class="loxia.dao.support.DynamicQueryHolder">
 		<description>获取有效的Item列表 lifecycle =1</description>
 		<constructor-arg>
@@ -300,7 +302,9 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-					SELECT inv.available_qty as availableQty,inv.extention_code as extentionCode
+					SELECT 
+						inv.available_qty as availableQty,
+						inv.extention_code as extentionCode
 					FROM t_pd_sku_inventory inv
 					JOIN t_pd_sku sku ON sku.out_id = inv.extention_code
 					WHERE sku.id = :skuId AND sku.lifecycle = 1

@@ -46,7 +46,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SimpleOrderCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.OrderManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.google.gson.Gson;

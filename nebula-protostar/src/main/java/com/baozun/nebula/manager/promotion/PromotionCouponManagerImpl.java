@@ -50,7 +50,7 @@ import com.baozun.nebula.model.auth.User;
 import com.baozun.nebula.model.promotion.PromotionCoupon;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.SdkPromotionCouponCodeManager;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 
 /**
  * @author - 项硕

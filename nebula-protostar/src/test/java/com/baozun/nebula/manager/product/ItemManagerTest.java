@@ -19,6 +19,7 @@ import static org.easymock.EasyMock.createNiceControl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,11 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +51,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.Model;
 
 import com.baozun.nebula.command.ItemCommand;
+import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemInfo;
@@ -54,6 +61,7 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.utils.JsonFormatUtil;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.product.SkuImportController;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 
 /**
@@ -216,6 +224,17 @@ public class ItemManagerTest{
 		itemManager.importItemFromFile(new FileInputStream("C:\\Users\\shgz-pc-1486\\Desktop\\uploads\\tplt_sku_import.xls"), 256L);
 	}
 	
+	@Test
+	public void testJsonUtil() throws JsonParseException, JsonMappingException, IOException{
+		String json ="[{id:\"157\",code:\"P01enlang02UPc01\"}]";
+		/*List<SkuPropertyCommand> s =JsonUtil.toList(json , SkuPropertyCommand.class);
+		log.debug("sssss:{}", JsonUtil.format(s));*/
+		ObjectMapper om = new ObjectMapper();
+		om.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
+		TypeReference<List<SkuPropertyCommand>> valueTypeRef = new TypeReference<List<SkuPropertyCommand>>(){};
+		List<SkuPropertyCommand> skuInfoList= om.readValue(json, valueTypeRef);
+		log.debug("sssss:{}", JsonUtil.format(skuInfoList));
+	}
 }
 

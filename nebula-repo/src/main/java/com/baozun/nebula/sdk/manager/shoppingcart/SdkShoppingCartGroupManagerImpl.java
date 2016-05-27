@@ -50,10 +50,10 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
-import com.baozun.nebula.sdk.manager.impl.SdkPromotionCalculationManagerImpl;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManagerImpl;
+import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 
 @Transactional
 @Service("sdkShoppingCartGroupManager")
@@ -306,9 +306,6 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                         else
                             lineGift = lineGift + ",整单赠品";
                     }
-                    /*
-                     * if (line.getType()==0) lineGift = lineGift + ",非卖赠品"; else lineGift = lineGift + ",主卖赠品";
-                     */
                     log.info(lineGift);
                 }
             }
