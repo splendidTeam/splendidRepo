@@ -114,7 +114,7 @@ public interface SearchConditionDao extends GenericEntityDao<SearchCondition, Lo
 	 * @return
 	 */
 	@NativeQuery(model =SearchCondition.class )
-	List<SearchCondition> findConditionByNavigaion(@QueryParam("navId")Long navId);
+	List<SearchCondition> findConditionByNavigaions(@QueryParam("navIds")List<Long> navIds);
 	
 	/**
 	 * 

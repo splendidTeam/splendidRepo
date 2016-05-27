@@ -113,34 +113,34 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Transactional(readOnly = true)
     public ShoppingCartCommand buildShoppingCartCommand(
                     Long memberId,
-                    List<ShoppingCartLineCommand> shoppingCartLines,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     CalcFreightCommand calcFreightCommand,
                     List<String> coupons,
                     Set<String> memberComIds){
-        Validate.notEmpty(shoppingCartLines, "shoppingCartLines can't be null/empty!");
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLines can't be null/empty!");
 
         //*******************************************************************************************************
         int i = 0;
-        for (ShoppingCartLineCommand shoppingCartLine : shoppingCartLines){
-            if (shoppingCartLine.getId() == null){
-                shoppingCartLine.setId(new Long(--i));
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            if (shoppingCartLineCommand.getId() == null){
+                shoppingCartLineCommand.setId(new Long(--i));
             }
             //TODO feilong bundle不是这么玩的
-            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLine); // 封装购物车行信息
-            shoppingCartLine.setType(Constants.ITEM_TYPE_SALE);// 主卖品
+            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
+            shoppingCartLineCommand.setType(Constants.ITEM_TYPE_SALE);// 主卖品
 
             // 购物车行 金额小计
-            shoppingCartLine.setSubTotalAmt(NumberUtil.getMultiplyValue(shoppingCartLine.getQuantity(), shoppingCartLine.getSalePrice()));
+            shoppingCartLineCommand.setSubTotalAmt(NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice()));
         }
         //*******************************************************************************************************
 
-        Map<Long, Long> lineIdAndShopIdMapList = CollectionsUtil.getPropertyValueMap(shoppingCartLines, "id", "shopId");
+        Map<Long, Long> lineIdAndShopIdMapList = CollectionsUtil.getPropertyValueMap(shoppingCartLineCommandList, "id", "shopId");
 
         //*******************************************************************************************************
         List<ShoppingCartLineCommand> chooseLinesShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();// 被选中的购物车行
         List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();// 未选中的购物车行
         // 判断是否是被选中的购物车行
-        splitByCalcLevel(shoppingCartLines, chooseLinesShoppingCartLineCommandList, noChooseShoppingCartLineCommandList);
+        splitByCalcLevel(shoppingCartLineCommandList, chooseLinesShoppingCartLineCommandList, noChooseShoppingCartLineCommandList);
 
         //*************************************************************************************************
 
@@ -253,7 +253,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * @param shopIdAndShoppingCartCommandMap
      *            the shop id and shopping cart command map
      * @return the temp shop line
-     * @since 5.3.1
      */
     private ShoppingCartLineCommand getTempShopLine(
                     Long shopId,
@@ -346,7 +345,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * @param memberComIds
      *            the member com ids
      * @return the user details
-     * @since 5.3.1
      */
     private UserDetails buildUserDetails(Long memberId,Set<String> memberComIds){
         UserDetails userDetails = new UserDetails();

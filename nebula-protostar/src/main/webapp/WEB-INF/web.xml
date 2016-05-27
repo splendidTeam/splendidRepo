@@ -21,23 +21,13 @@
 	<filter>
 		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-		<init-param>
+		<init-param>         
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
 		</init-param>
 	</filter>
-
-	<!-- Spring Security -->
-	<filter>
-		<filter-name>springSecurityFilterChain</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
@@ -45,12 +35,21 @@
 		<filter-name>auditLogFilter</filter-name>
 		<filter-class>com.baozun.nebula.web.filter.AuditLogFilter</filter-class>
 	</filter>
-
 	<filter-mapping>
 		<filter-name>auditLogFilter</filter-name>
-		<url-pattern>*.json</url-pattern>
-        <url-pattern>*.htm</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+	<!-- Spring Security -->
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
 	<!-- 用于防范XSS -->
 	<filter>
 		<filter-name>securityFilter</filter-name>

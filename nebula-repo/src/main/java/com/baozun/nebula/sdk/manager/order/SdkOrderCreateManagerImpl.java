@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.api.salesorder.OrderCodeCreatorManager;
 import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
@@ -77,10 +76,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     /** The Constant SEPARATOR_FLAG. */
     private static final String                      SEPARATOR_FLAG = "\\|\\|";
-
-    /** The sdk order line manager. */
-    @Autowired
-    private SdkOrderLineManager                      sdkOrderLineManager;
 
     /** The sdk order line manager. */
     @Autowired
@@ -137,6 +132,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     /** The sdk order email manager. */
     @Autowired
     private SdkOrderEmailManager                     sdkOrderEmailManager;
+
+    @Autowired
+    private SdkOrderLineCreateManager                sdkOrderLineCreateManager;
 
     /** The order code creator. */
     @Autowired(required = false)
@@ -277,42 +275,32 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
             throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
         }
 
-        // 购物车
-        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = buildShopIdAndShoppingCartLineCommandListMap(
+                        shoppingCartCommand);
 
-        // shoppingCartLineCommandMap
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
-                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
-
-        // shoppingCartPromotionBriefMap
-        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
-
-        //基于店铺的促销
-        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
-                        .group(promotionSKUDiscAMTBySettingList, "shopId");
+        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = buildShopIdAndPromotionSKUDiscAMTBySettingMap(
+                        shoppingCartCommand);
 
         // shopCartCommandByShopMap
         Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = CollectionsUtil
                         .groupOne(shoppingCartCommand.getSummaryShopCartList(), "shopId");
 
         //*****************************************************************************************
-        String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
-        boolean isSendEmail = isSendEmailConfig != null && isSendEmailConfig.equals("true");
-
+        boolean isSendEmail = isSendEmail();
         List<Map<String, Object>> dataMapList = new ArrayList<Map<String, Object>>();
-
         for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
             Long shopId = entry.getKey();
             List<ShoppingCartLineCommand> shoppingCartLineCommandList = entry.getValue();
 
+            ShopCartCommandByShop shopCartCommandByShop = shopIdAndShopCartCommandByShopMap.get(shopId);
+            List<PromotionSKUDiscAMTBySetting> shopPromotionSKUDiscAMTBySettingList = shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId);
             doWithPerShop(
                             shopId,
                             subOrdinate,
                             shoppingCartLineCommandList,
                             salesOrderCommand,
-                            shopIdAndShopCartCommandByShopMap.get(shopId),
-                            shopIdAndPromotionSKUDiscAMTBySettingMap.get(shopId),
+                            shopCartCommandByShop,
+                            shopPromotionSKUDiscAMTBySettingList,
                             isSendEmail,
                             dataMapList,
                             salesOrderCreateOptions);
@@ -338,6 +326,46 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         // 发邮件
         sdkOrderEmailManager.sendEmailOfCreateOrder(dataMapList);
         return subOrdinate;
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @return
+     * @since 5.3.1
+     */
+    private Map<Long, List<ShoppingCartLineCommand>> buildShopIdAndShoppingCartLineCommandListMap(ShoppingCartCommand shoppingCartCommand){
+        // 购物车
+        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
+
+        // shoppingCartLineCommandMap
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
+                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
+        return shopIdAndShoppingCartLineCommandListMap;
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @return
+     * @since 5.3.1
+     */
+    private Map<Long, List<PromotionSKUDiscAMTBySetting>> buildShopIdAndPromotionSKUDiscAMTBySettingMap(
+                    ShoppingCartCommand shoppingCartCommand){
+        // shoppingCartPromotionBriefMap
+        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
+                        .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
+
+        //基于店铺的促销
+        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
+                        .group(promotionSKUDiscAMTBySettingList, "shopId");
+        return shopIdAndPromotionSKUDiscAMTBySettingMap;
+    }
+
+    /**
+     * @return
+     */
+    private boolean isSendEmail(){
+        String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
+        return isSendEmailConfig != null && isSendEmailConfig.equals("true");
     }
 
     /**
@@ -377,13 +405,21 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         SalesOrder salesOrder = sdkOrderManager.savaOrder(shopId, salesOrderCommand, shopCartCommandByShop);
         Long orderId = salesOrder.getId();
 
+        List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
+
         // 保存订单行、订单行优惠
-        //TODO feilong 如果是bundle的话 这里多条
-        savaOrderLinesAndPromotions(
-                        orderId,
-                        shoppingCartLineCommandList,
-                        salesOrderCommand.getCouponCodes(),
-                        promotionSKUDiscAMTBySettingList);
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            sdkOrderLineCreateManager.saveOrderLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
+        }
+
+        // 免运费
+        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
+                if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
+                    sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
+                }
+            }
+        }
 
         // 保存支付详细
         BigDecimal payMainMoney = getPayMainMoney(shopId, salesOrder, salesOrderCommand.getSoPayMentDetails());
@@ -394,7 +430,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         sdkConsigneeManager.saveConsignee(orderId, shopId, salesOrderCommand);
 
         // 保存OMS消息发送记录(销售订单信息推送给SCM)
-        //TODO feilong 如果是bundle的话 这里多条
         sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_ORDER_SEND, orderId, null);
 
         // 封装发送邮件数据
@@ -448,10 +483,12 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
      * @return the pay main money
      */
     private BigDecimal getPayMainMoney(Long shopId,SalesOrder salesOrder,List<String> soPayMentDetails){
-        Long orderId = salesOrder.getId();
-        BigDecimal payMainMoney = salesOrder.getTotal().add(salesOrder.getActualFreight());
+        BigDecimal actualFreight = salesOrder.getActualFreight();
+        BigDecimal total = salesOrder.getTotal();
+        BigDecimal payMainMoney = total.add(actualFreight);
         // 除主支付方式之外的付款
 
+        Long orderId = salesOrder.getId();
         if (soPayMentDetails != null){
             for (String soPayMentDetail : soPayMentDetails){
                 // 支付方式 String格式：shopId||payMentType||金额
@@ -467,74 +504,4 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         return payMainMoney;
     }
 
-    /**
-     * 保存订单行.
-     *
-     * @param orderId
-     *            the order id
-     * @param shoppingCartLineCommandList
-     *            the scc list
-     * @param couponCodes
-     *            the coupon codes
-     * @param promotionSKUDiscAMTBySettingList
-     *            the psdabs list
-     */
-    private void savaOrderLinesAndPromotions(
-                    Long orderId,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            //TODO feilong bundle 下单要进行拆分
-            OrderLine orderLine = sdkOrderLineManager.saveOrderLine(orderId, shoppingCartLineCommand);
-            if (orderLine == null){
-                continue;
-            }
-
-            savaOrderLinePromotions(orderId, couponCodes, promotionSKUDiscAMTBySettingList, orderLine);
-        }
-        // 免运费
-        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-                if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
-                    sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sava order line promotions.
-     *
-     * @param orderId
-     *            the order id
-     * @param couponCodes
-     *            the coupon codes
-     * @param promotionSKUDiscAMTBySettingList
-     *            the promotion sku disc amt by setting list
-     * @param orderLine
-     *            the order line
-     */
-    private void savaOrderLinePromotions(
-                    Long orderId,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    OrderLine orderLine){
-        if (Validator.isNullOrEmpty(promotionSKUDiscAMTBySettingList)){
-            return;
-        }
-
-        for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
-            boolean giftMark = promotionSKUDiscAMTBySetting.getGiftMark();
-            //0代表赠品 1代表主卖品
-            Integer type = !giftMark ? 1 : 0;
-
-            // 非免运费
-            if (!promotionSKUDiscAMTBySetting.getFreeShippingMark() && promotionSKUDiscAMTBySetting.getSkuId().equals(orderLine.getSkuId())
-                            && orderLine.getType().equals(type)){
-
-                sdkOrderPromotionManager.savaOrderPromotion(orderId, orderLine.getId(), promotionSKUDiscAMTBySetting, couponCodes);
-            }
-        }
-    }
 }

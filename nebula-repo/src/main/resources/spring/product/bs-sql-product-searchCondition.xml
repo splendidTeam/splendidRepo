@@ -34,34 +34,20 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[ 
-					SELECT
-						*
-					FROM
-						t_pd_search_con
-					WHERE
-						ID NOT IN (
-							SELECT
-								ID
-							FROM
-								t_pd_search_con
-							WHERE
-								NAME IN (
-									SELECT
-										NAME
-									FROM
-										t_pd_search_con
-									WHERE
-										navigation_id=:navId
-									AND lifecycle = 1
-								)
-							AND category_id IS NULL
-						)
-					AND (
-						navigation_id=:navId
-						OR navigation_id IS NULL
-					)
-					AND lifecycle = 1
-
+						SELECT 
+							* 
+						from 
+							t_pd_search_con 
+						where 
+							(
+								navigation_id is NULL 
+								or navigation_id in (
+									#foreach( $id in $navIds )
+	    								$id,
+						 			#end
+			       				 -1)
+			       			) 
+			       			and lifecycle = 1
                  ]]>
 			</value>
 		</constructor-arg>

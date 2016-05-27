@@ -2859,9 +2859,15 @@ height: 370px;
 
 
 /*add-item && update-item style*/
+.ui-subtitle{
+	padding-bottom: 10px;
+}
 .ui-block-title{
 	background: #fff;
     color: #000;
+}
+.i18n-lang{
+	display: none;
 }
 .baseInfo input, .baseInfo textarea{
 	width: 600px;
@@ -2874,4 +2880,65 @@ height: 370px;
 	width: auto;
 }
 
-
+.Category-line .categories-tips{
+	float: right; 
+	margin-right: 1000px;
+}
+.Category-line .del{
+	text-decoration: underline; 
+	color: #F8A721
+}
+.menulayer{
+	display:none; 
+	position: absolute; 
+	background-color:#f0f6e4;
+	border: 1px solid #617775;
+	padding:3px;
+}
+.menulayer ul.ztree{
+	margin-top:0; 
+	width:auto; 
+	height: 100%;
+}
+.sale-price input, .sale-list input{
+	width: 160px; 
+	height: 25px;
+}
+.propertyInfo input[type='text']{
+	width:600px;
+}
+.propertyInfo areatext{
+	width:600px;
+	height:45px;
+}
+.propertyInfo select{
+	width: 160px; 
+	height: 25px
+}
+.propertyInfo .property-tips{
+	margin: 17px 0 0 10px; 
+	position: absolute;
+}
+.none-normal{
+	display:none;
+}
+.pro-describe textarea{
+	width:600px;
+}
+.pro-describe .describe-con{
+	float: left; 
+	margin-left: 0px
+}
+.pro-describe .describe-tips{
+	display: block; 
+	float: left;
+}
+.seo-info input[type='text']{
+	width: 600px;
+}
+.chooseLine .choose-tips{
+	float: right; 
+	margin-right: 760px; 
+	text-decoration: underline; 
+	color: #F8A721
+}

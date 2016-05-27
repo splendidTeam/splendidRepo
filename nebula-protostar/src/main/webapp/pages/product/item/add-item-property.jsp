@@ -3,7 +3,7 @@
 
 <script type="text/javascript" src="${base}/scripts/product/item/add-item-property.js"></script>
 
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.add.generalProperty" />
 </div>
 
@@ -11,9 +11,9 @@
 	<div id="notSalepropertySpace"></div>
 </div>
 
-<div style="margin-top: 10px"></div>
+<div class="mt10"></div>
 
-<div class="ui-block-title1" style="background: #fff; color: #000;">
+<div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.add.sales" />
 </div>
 <c:if test="${i18nOnOff == true}">
@@ -21,15 +21,12 @@
 	<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 		<c:set var="lang" value="${i18nLang.key}"></c:set>
 		<c:set value="${status.index}" var="i"></c:set>
-		<div class="ui-block-content border-grey saleInfo"
-			lang="${i18nLang.key}"
-			<c:if test="${i>0 }"> style="margin-top: 5px;" </c:if>>
+		<div class="ui-block-content border-grey saleInfo <c:if test='${i>0 }'> mt5 </c:if>" lang="${i18nLang.key}"	>
 			<div id="propertySpace"></div>
 
-			<div id="exten" class="ui-block-line" style="display: none;">
+			<div id="exten" class="ui-block-line none-normal">
 				<div id="extension">
-					<table id="extensionTable" class="border-grey extensionTable"
-						style="padding: 5px;">
+					<table id="extensionTable" class="border-grey extensionTable p5">
 
 					</table>
 				</div>
@@ -37,9 +34,8 @@
 
 			<div class="ui-block-line ">
 				<label></label>
-				<div style="clear: both;">
-					<a href="javascript:void(0)" class="func-button extension"
-						style="height: 30px;"><span><spring:message
+				<div class="clear">
+					<a href="javascript:void(0)" class="func-button extension height30" ><span><spring:message
 								code="item.add.encodingSettings" /> </span></a>
 				</div>
 			</div>
@@ -52,9 +48,9 @@
 	<div class="ui-block-content border-grey saleInfo">
 		<div id="propertySpace"></div>
 
-		<div id="exten" class="ui-block-line  " style="display: none;">
+		<div id="exten" class="ui-block-line none-normal">
 			<div id="extension">
-				<table id="extensionTable" class="border-grey" style="padding: 5px;">
+				<table id="extensionTable" class="border-grey p5">
 
 				</table>
 			</div>
@@ -62,9 +58,8 @@
 
 		<div class="ui-block-line ">
 			<label></label>
-			<div style="clear: both;">
-				<a href="javascript:void(0)" class="func-button extension"
-					style="height: 30px;"><span><spring:message
+			<div class="clear">
+				<a href="javascript:void(0)" class="func-button extension height30"><span><spring:message
 							code="item.add.encodingSettings" /> </span></a>
 			</div>
 		</div>
