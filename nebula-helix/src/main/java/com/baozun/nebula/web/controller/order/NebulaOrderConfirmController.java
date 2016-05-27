@@ -52,8 +52,8 @@ import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewComman
 import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
+import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
-import com.feilong.framework.accessor.AutoKeyAccessor;
 
 /**
  * 订单确认控制器.
