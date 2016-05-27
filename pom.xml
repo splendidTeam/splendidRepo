@@ -25,7 +25,7 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
-		<version.feilong-platform>1.5.5-SNAPSHOT</version.feilong-platform>
+		<version.feilong-platform>1.5.5</version.feilong-platform>
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
@@ -149,8 +149,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.feilong.platform.framework</groupId>
-			<artifactId>feilong-framework-accessor</artifactId>
+			<groupId>com.feilong.platform</groupId>
+			<artifactId>feilong-accessor</artifactId>
 			<version>${version.feilong-platform}</version>
 		</dependency>
 
@@ -321,7 +321,7 @@
 			<groupId>org.apache.zookeeper</groupId>
 			<artifactId>zookeeper</artifactId>
 		</dependency>
-		
+
 		<!-- apache curator(zk client) -->
 		<dependency>
 			<groupId>org.apache.curator</groupId>
@@ -992,7 +992,7 @@
 				<artifactId>dom4j</artifactId>
 				<version>${version.dom4j}</version>
 			</dependency>
-			
+
 			<!-- apache curator(zk client) -->
 			<dependency>
 				<groupId>org.apache.curator</groupId>
@@ -1373,7 +1373,7 @@
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
+				<!-- <updatePolicy>always</updatePolicy> -->
 				<checksumPolicy>warn</checksumPolicy>
 			</snapshots>
 		</repository>

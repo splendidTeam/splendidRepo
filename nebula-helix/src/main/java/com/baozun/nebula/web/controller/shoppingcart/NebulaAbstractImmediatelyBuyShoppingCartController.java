@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.web.controller.BaseController;
-import com.feilong.framework.accessor.AutoKeyAccessor;
+import com.feilong.accessor.AutoKeyAccessor;
 
 /**
  * <p>
