@@ -107,85 +107,90 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
     @Override
     @Transactional(readOnly = true)
     public void packShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand){
-        //TODO feilong bundle 只有 relatedItemId
-        Long skuId = shoppingCartLineCommand.getSkuId();
-        Sku sku = skuDao.findSkuById(skuId);
-        if (sku == null){
-            shoppingCartLineCommand.setValid(false);
-            return;
-        }
+        Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
 
-        Long itemId = sku.getItemId();
-        Item item = itemDao.findItemById(itemId);
+        if (null != relatedItemId){
 
-        String outid = sku.getOutid();
-        if (Validator.isNullOrEmpty(shoppingCartLineCommand.getExtentionCode())){
-            shoppingCartLineCommand.setExtentionCode(outid);
-        }
-
-        // 购物车行有活动时, 同一个sku可以出现在多行中(可以是多个赠品), 库存数应为总库存数减去每个行中的qty
-        List<PromotionCommand> promotionCommandList = shoppingCartLineCommand.getPromotionList();
-
-        if (Validator.isNullOrEmpty(promotionCommandList)){
-            SkuCommand skuCommand = sdkSkuManager.findSkuQSVirtualInventoryById(skuId, outid);
-            shoppingCartLineCommand.setStock(null != skuCommand ? skuCommand.getAvailableQty() : 0);
-        }
-
-        //*************************************************************************************
-
-        if (Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(item.getLifecycle()))){
-            shoppingCartLineCommand.setValid(true); // 上架状态
-            if (!checkActiveBeginTime(skuId)){
-                setInValid(shoppingCartLineCommand, 1);
-            }else{
-                Integer stock = shoppingCartLineCommand.getStock();
-                if (stock <= 0 || stock < shoppingCartLineCommand.getQuantity()){
-                    setInValid(shoppingCartLineCommand, 2);
-                }
+            //TODO feilong bundle 只有 relatedItemId
+            Long skuId = shoppingCartLineCommand.getSkuId();
+            Sku sku = skuDao.findSkuById(skuId);
+            if (sku == null){
+                shoppingCartLineCommand.setValid(false);
+                return;
             }
-        }else{
-            setInValid(shoppingCartLineCommand, 1);
-        }
 
-        String itemCode = item.getCode();
-        Long shopId = item.getShopId();
+            Long itemId = sku.getItemId();
+            Item item = itemDao.findItemById(itemId);
 
-        ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoByCode(itemCode);
-        ShopCommand shopCommand = shopDao.findShopById(shopId);
-        // 店铺信息
-        shoppingCartLineCommand.setShopId(shopId);
-        shoppingCartLineCommand.setShopName(shopCommand.getShopname());
-        shoppingCartLineCommand.setStoreId(shopId);
+            String outid = sku.getOutid();
+            if (Validator.isNullOrEmpty(shoppingCartLineCommand.getExtentionCode())){
+                shoppingCartLineCommand.setExtentionCode(outid);
+            }
 
-        List<ItemCategory> itemCategoryList = itemCategoryDao.findItemCategoryListByItemId(itemId);
-        List<ItemTagRelation> itemTagRelationList = itemTagRelationDao.findItemTagRelationListByItemId(itemId);
+            // 购物车行有活动时, 同一个sku可以出现在多行中(可以是多个赠品), 库存数应为总库存数减去每个行中的qty
+            List<PromotionCommand> promotionCommandList = shoppingCartLineCommand.getPromotionList();
 
-        shoppingCartLineCommand.setComboIds(sdkEngineManager.getItemScopeListByItemAndCategory(itemId.toString(), itemCategoryList));
+            if (Validator.isNullOrEmpty(promotionCommandList)){
+                SkuCommand skuCommand = sdkSkuManager.findSkuQSVirtualInventoryById(skuId, outid);
+                shoppingCartLineCommand.setStock(null != skuCommand ? skuCommand.getAvailableQty() : 0);
+            }
 
-        shoppingCartLineCommand.setIndstryId(item.getIndustryId());
+            //*************************************************************************************
 
-        shoppingCartLineCommand.setItemId(item.getId());
-        shoppingCartLineCommand.setProductCode(itemCode);
-        shoppingCartLineCommand.setItemName(itemBaseCommand.getTitle());
-        shoppingCartLineCommand.setItemPic(sdkShoppingCartLineImageManager.getItemPicUrl(itemId));
+            if (Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(item.getLifecycle()))){
+                shoppingCartLineCommand.setValid(true); // 上架状态
+                if (!checkActiveBeginTime(skuId)){
+                    setInValid(shoppingCartLineCommand, 1);
+                }else{
+                    Integer stock = shoppingCartLineCommand.getStock();
+                    if (stock <= 0 || stock < shoppingCartLineCommand.getQuantity()){
+                        setInValid(shoppingCartLineCommand, 2);
+                    }
+                }
+            }else{
+                setInValid(shoppingCartLineCommand, 1);
+            }
 
-        List<Long> categoryList = CollectionsUtil.getPropertyValueList(itemCategoryList, "categoryId");
-        shoppingCartLineCommand.setCategoryList(categoryList);
+            String itemCode = item.getCode();
+            Long shopId = item.getShopId();
 
-        List<Long> lableIds = CollectionsUtil.getPropertyValueList(itemTagRelationList, "tagId");
-        shoppingCartLineCommand.setLableIds(lableIds);
+            ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoByCode(itemCode);
+            ShopCommand shopCommand = shopDao.findShopById(shopId);
+            // 店铺信息
+            shoppingCartLineCommand.setShopId(shopId);
+            shoppingCartLineCommand.setShopName(shopCommand.getShopname());
+            shoppingCartLineCommand.setStoreId(shopId);
 
-        shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
-        shoppingCartLineCommand.setListPrice(sku.getListPrice());
+            List<ItemCategory> itemCategoryList = itemCategoryDao.findItemCategoryListByItemId(itemId);
+            List<ItemTagRelation> itemTagRelationList = itemTagRelationDao.findItemTagRelationListByItemId(itemId);
 
-        shoppingCartLineCommand.setType(null == itemBaseCommand.getType() ? ItemInfo.TYPE_MAIN : itemBaseCommand.getType());
+            shoppingCartLineCommand.setComboIds(sdkEngineManager.getItemScopeListByItemAndCategory(itemId.toString(), itemCategoryList));
 
-        // 销售属性
-        String skuProperties = sku.getProperties();
-        shoppingCartLineCommand.setSaleProperty(skuProperties);
-        List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
-        if (Validator.isNotNullOrEmpty(skuPros)){
-            shoppingCartLineCommand.setSkuPropertys(skuPros);
+            shoppingCartLineCommand.setIndstryId(item.getIndustryId());
+
+            shoppingCartLineCommand.setItemId(item.getId());
+            shoppingCartLineCommand.setProductCode(itemCode);
+            shoppingCartLineCommand.setItemName(itemBaseCommand.getTitle());
+            shoppingCartLineCommand.setItemPic(sdkShoppingCartLineImageManager.getItemPicUrl(itemId));
+
+            List<Long> categoryList = CollectionsUtil.getPropertyValueList(itemCategoryList, "categoryId");
+            shoppingCartLineCommand.setCategoryList(categoryList);
+
+            List<Long> lableIds = CollectionsUtil.getPropertyValueList(itemTagRelationList, "tagId");
+            shoppingCartLineCommand.setLableIds(lableIds);
+
+            shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
+            shoppingCartLineCommand.setListPrice(sku.getListPrice());
+
+            shoppingCartLineCommand.setType(null == itemBaseCommand.getType() ? ItemInfo.TYPE_MAIN : itemBaseCommand.getType());
+
+            // 销售属性
+            String skuProperties = sku.getProperties();
+            shoppingCartLineCommand.setSaleProperty(skuProperties);
+            List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
+            if (Validator.isNotNullOrEmpty(skuPros)){
+                shoppingCartLineCommand.setSkuPropertys(skuPros);
+            }
         }
     }
 

@@ -92,6 +92,7 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         if (null == relatedItemId){
             saveCommonLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
         }else{
+            //TODO feilong 可以优化 重构成工厂模式
             saveRelatedLines(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
         }
     }
