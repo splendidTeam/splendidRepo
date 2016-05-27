@@ -342,3 +342,10 @@ $j(document).ready(function(){
 	   }});
     });
 });
+
+$j(document).ready(function(){
+	/*toggle div*/
+	$j(".ui-block-title").on("click",function(){
+		$j(this).next(".ui-block-content").slideToggle();
+	})
+})

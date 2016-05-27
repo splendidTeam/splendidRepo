@@ -36,9 +36,9 @@
 			      </div>
 				</div>
 			</div>
-			<div id="second" style="display: none">
+			<div id="second"  class="none-normal">
 				<div class="ui-block">
-			        <div class="ui-block-content ui-block-content-lb" style="padding-bottom: 10px;">
+			        <div class="ui-block-content ui-block-content-lb pb10">
 			            <table>
 			                <tr>
 			                    <td><label><spring:message code="item.add.selectIndustry"/></label></td>
@@ -52,35 +52,35 @@
 					 <div class="ui-block-title1"><spring:message code="item.add.addItem"/></div>
 				     <%-- 基本信息 --%>
 				     <%@include file="/pages/product/item/add-item-baseInfo.jsp"%>
-					 <div style="margin-top: 10px"></div>
+					 <div class="mt10"></div>
 					 <%-- 商品价格 --%>
 					 <%@include file="/pages/product/item/add-item-price.jsp"%>
-				   	 <div style="margin-top: 10px"></div>
+				   	 <div class="mt10"></div>
 				   	 <%-- 一般属性信息 销售属性信息 --%>
 					 <%@include file="/pages/product/item/add-item-property.jsp"%>
-				     <div style="margin-top: 10px"></div>
+				     <div class="mt10"></div>
 					 <%-- SEO --%>
 				     <%@include file="/pages/product/item/add-item-seo.jsp"%>
-				     <div style="margin-top: 10px"></div>
+				     <div class="mt10"></div>
 				     <%-- 商品描述 --%>
 					 <%@include file="/pages/product/item/add-item-description.jsp"%>
-				     <div style="margin-top: 10px"></div>
+				     <div class="mt10"></div>
 					 <div class="button-line">
 				         <input type="button" value="<spring:message code='btn.save'/>" class="button orange submit" title="<spring:message code='btn.save'/>"/>
 				         <input type="button" value="<spring:message code='item.add.previous'/>" class="button back"  title="<spring:message code='item.add.previous'/>" />
 					</div>
-					<div style="margin-top: 20px"></div>
+					<div class="mt20"></div>
 				</div>
 			</div>
 		</div>
    </form>
 </div>
 
-<div id="menuContent" class="menuContent" style="display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
-	<ul id="treeDemo" class="ztree" style="margin-top:0; width:auto; height: 100%;"></ul>
+<div id="menuContent" class="menuContent menulayer">
+	<ul id="treeDemo" class="ztree"></ul>
 </div>
-<div id="defaultMenuContent" class="menuContent" style="display:none; position: absolute; background-color:#f0f6e4;border: 1px solid #617775;padding:3px;">
-	<ul id="defaultCategoryTree" class="ztree" style="margin-top:0; width:auto; height: 100%;"></ul>
+<div id="defaultMenuContent" class="menuContent menulayer">
+	<ul id="defaultCategoryTree" class="ztree"></ul>
 </div>
 </body>
 </html>
