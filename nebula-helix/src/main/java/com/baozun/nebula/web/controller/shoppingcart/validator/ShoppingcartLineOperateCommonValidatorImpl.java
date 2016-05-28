@@ -27,9 +27,12 @@ import org.springframework.stereotype.Component;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.feilong.core.DatePattern;
 import com.feilong.core.Validator;
+import com.feilong.core.date.DateUtil;
 
 /**
  * The Class ShoppingcartLineOperateCommonValidatorImpl.
@@ -56,18 +59,20 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
      */
     @Override
     public ShoppingcartResult validate(Sku sku,Integer count){
-
         //===============① 数量不能小于1===============
         Validate.isTrue(count >= 1, "count:%s can not <1", count);
 
         //===============② 判断sku是否存在===============
         if (Validator.isNullOrEmpty(sku)){
+            //TODO feilong change to exception
+            LOGGER.error("sku not exist!!!!!!");
             return ShoppingcartResult.SKU_NOT_EXIST;
         }
 
-        // TODO feilong 
         //===============③ 判断sku生命周期===============
-        if (!sku.getLifecycle().equals(Sku.LIFE_CYCLE_ENABLE)){
+        Integer skuLifecycle = sku.getLifecycle();
+        if (!skuLifecycle.equals(Sku.LIFE_CYCLE_ENABLE)){
+            LOGGER.error("sku's lifecycle is:{},return SKU_NOT_ENABLE", skuLifecycle);
             return ShoppingcartResult.SKU_NOT_ENABLE;
         }
 
@@ -76,35 +81,30 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
         Integer lifecycle = itemCommand.getLifecycle();
 
         //===============④  判断item的生命周期===============
-        if (!com.baozun.nebula.sdk.constants.Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
-            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", itemCommand.getId(), lifecycle);
+        if (!Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
+            Long id = itemCommand.getId();
+            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", id, lifecycle);
             return ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
         }
 
-        // ********************************************************************************************
         //===============⑤  还没上架===============
-        if (!checkActiveBeginTime(itemCommand)){
-            // TODO feilong log
+        Date activeBeginTime = itemCommand.getActiveBeginTime();
+        Date now = new Date();
+        String itemCode = itemCommand.getCode();
+        if (null != activeBeginTime && DateUtil.isAfter(activeBeginTime, now)){
+            LOGGER.warn(
+                            "now is :[{}],but item:[{}]'s activeBeginTime is:{},return ITEM_NOT_ACTIVE_TIME",
+                            DateUtil.date2String(now, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND),
+                            itemCode,
+                            DateUtil.date2String(activeBeginTime, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND));
             return ShoppingcartResult.ITEM_NOT_ACTIVE_TIME;
         }
 
         //===============⑥ 赠品验证===============
         if (ItemInfo.TYPE_GIFT.equals(itemCommand.getType())){
+            LOGGER.warn("item:[{}] is gift don't need operate,return ITEM_IS_GIFT", itemCode);
             return ShoppingcartResult.ITEM_IS_GIFT;
         }
         return null;
-    }
-
-    /**
-     * Check active begin time.
-     *
-     * @author 何波 @Description: 检查商品是否上架 @param skuId @return Boolean @throws
-     * @param item
-     *            the item
-     * @return true, if check active begin time
-     */
-    private boolean checkActiveBeginTime(ItemCommand item){
-        Date activeBeginTime = item.getActiveBeginTime();
-        return null == activeBeginTime ? true : activeBeginTime.before(new Date());
     }
 }

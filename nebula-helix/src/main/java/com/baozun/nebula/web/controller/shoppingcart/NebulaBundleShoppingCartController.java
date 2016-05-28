@@ -24,7 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -33,9 +36,11 @@ import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyBundleForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ImmediatelyBuyBundleFormValidator;
 
 /**
  * 基于bundle购物车控制器.
@@ -55,7 +60,11 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatelyBuyShoppingCartController{
 
     /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
+    private static final Logger               LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
+
+    @Autowired
+    @Qualifier("immediatelyBuyBundleFormValidator")
+    private ImmediatelyBuyBundleFormValidator immediatelyBuyBundleFormValidator;
 
     /**
      * (立即购买)不走普通购物车直接走购物通道.
@@ -75,8 +84,15 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
     public NebulaReturnResult immediatelyBuyBundle(
                     @LoginMember MemberDetails memberDetails,
                     @ModelAttribute("immediatelyBuyBundleForm") ImmediatelyBuyBundleForm immediatelyBuyBundleForm,
+                    BindingResult bindingResult,
                     HttpServletRequest request,
                     Model model){
+
+        immediatelyBuyBundleFormValidator.validate(immediatelyBuyBundleForm, bindingResult);
+
+        if (bindingResult.hasErrors()){
+            return super.getResultFromBindingResult(bindingResult);
+        }
         //TODO feilong validator
         //        ShoppingcartResult shoppingcartResult = null;
         //
