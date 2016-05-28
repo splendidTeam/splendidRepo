@@ -24,8 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
@@ -33,7 +36,11 @@ import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValidator;
+import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyBundleForm;
+import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ImmediatelyBuyBundleFormValidator;
 
 /**
  * 基于bundle购物车控制器.
@@ -53,19 +60,19 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatelyBuyShoppingCartController{
 
     /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
+    private static final Logger               LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
+
+    @Autowired
+    @Qualifier("immediatelyBuyBundleFormValidator")
+    private ImmediatelyBuyBundleFormValidator immediatelyBuyBundleFormValidator;
 
     /**
      * (立即购买)不走普通购物车直接走购物通道.
      *
      * @param memberDetails
      *            某个用户
-     * @param relatedItemId
-     *            买的哪个bundle,本来想用 bundleId的,后来听程哥说 他们定义的很多接口都是用的itemId
-     * @param skuIds
-     *            里面有哪些skuid 的组合
-     * @param count
-     *            买几套bundle
+     * @param immediatelyBuyBundleForm
+     *            the immediately buy bundle form
      * @param request
      *            the request
      * @param model
@@ -76,11 +83,16 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
      */
     public NebulaReturnResult immediatelyBuyBundle(
                     @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "relatedItemId",required = true) Long relatedItemId,//听说bundle目前封装的 都是使用itemId做参数
-                    @RequestParam(value = "skuIds",required = true) Long[] skuIds,
-                    @RequestParam(value = "count",required = true) Integer count,
+                    @ModelAttribute("immediatelyBuyBundleForm") ImmediatelyBuyBundleForm immediatelyBuyBundleForm,
+                    BindingResult bindingResult,
                     HttpServletRequest request,
                     Model model){
+
+        immediatelyBuyBundleFormValidator.validate(immediatelyBuyBundleForm, bindingResult);
+
+        if (bindingResult.hasErrors()){
+            return super.getResultFromBindingResult(bindingResult);
+        }
         //TODO feilong validator
         //        ShoppingcartResult shoppingcartResult = null;
         //
@@ -88,7 +100,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         //            return toNebulaReturnResult(shoppingcartResult);
         //        }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(relatedItemId, skuIds, count);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = buildShoppingCartLineCommandList(immediatelyBuyBundleForm);
         String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
 
         String checkoutUrl = buildCheckoutUrl(key, request);
@@ -99,7 +111,24 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
     }
 
     //TODO feilong 构造bundle购物车信息
-    private List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(Long relatedItemId,Long[] skuIds,Integer count){
+    /**
+     * Builds the shopping cart line command list.
+     *
+     * @param relatedItemId
+     *            the related item id
+     * @param skuIds
+     *            the sku ids
+     * @param count
+     *            the count
+     * @return the list< shopping cart line command>
+     */
+    private List<ShoppingCartLineCommand> buildShoppingCartLineCommandList(ImmediatelyBuyForm immediatelyBuyForm){
+        ImmediatelyBuyBundleForm immediatelyBuyBundleForm = (ImmediatelyBuyBundleForm) immediatelyBuyForm;
+
+        Long relatedItemId = immediatelyBuyBundleForm.getRelatedItemId();
+        Long[] skuIds = immediatelyBuyBundleForm.getSkuIds();
+        Integer count = immediatelyBuyBundleForm.getCount();
+
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
 
         ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
@@ -117,6 +146,13 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         return shoppingCartLineCommandList;
     }
 
+    /**
+     * To nebula return result.
+     *
+     * @param shoppingcartResult
+     *            the shoppingcart result
+     * @return the nebula return result
+     */
     private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){
         DefaultReturnResult result = new DefaultReturnResult();
         if (shoppingcartResult != null){
@@ -133,6 +169,13 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         return result;
     }
 
+    /**
+     * To nebula return result.
+     *
+     * @param checkoutUrl
+     *            the checkout url
+     * @return the nebula return result
+     */
     private NebulaReturnResult toNebulaReturnResult(String checkoutUrl){
         DefaultReturnResult result = new DefaultReturnResult();
         result.setResult(true);

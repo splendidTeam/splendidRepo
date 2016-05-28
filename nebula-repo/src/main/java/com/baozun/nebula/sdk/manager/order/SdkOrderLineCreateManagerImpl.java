@@ -18,6 +18,7 @@ package com.baozun.nebula.sdk.manager.order;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -309,8 +310,8 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
             Integer type = !giftMark ? 1 : 0;
 
             boolean freeShippingMark = promotionSKUDiscAMTBySetting.getFreeShippingMark();
-            boolean equalsType = orderLineType.equals(type);
-            boolean equalsSkuId = promotionSKUDiscAMTBySetting.getSkuId().equals(orderLineSkuId);
+            boolean equalsType = Objects.equals(orderLineType, type);
+            boolean equalsSkuId = Objects.equals(promotionSKUDiscAMTBySetting.getSkuId(), orderLineSkuId);
 
             if (!freeShippingMark && equalsSkuId && equalsType){
                 sdkOrderPromotionManager.savaOrderPromotion(orderId, orderLineId, promotionSKUDiscAMTBySetting, couponCodes);

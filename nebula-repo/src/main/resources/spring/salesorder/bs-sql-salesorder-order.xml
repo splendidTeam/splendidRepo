@@ -1237,13 +1237,13 @@
 						)
 						and o.MEMBER_ID = :memberId
 						and o.LOGISTICS_STATUS not in(9,10)
-					or (o.LOGISTICS_STATUS 
+					and (o.LOGISTICS_STATUS 
 					in (
 		       		#foreach( $ls in $logisticsStatusList )
     					$ls,
 				    #end
 				     -1)
-					and o.financial_status 
+					or o.financial_status 
 					in (
 		       		#foreach( $ls in $financestatusList )
     					$ls,

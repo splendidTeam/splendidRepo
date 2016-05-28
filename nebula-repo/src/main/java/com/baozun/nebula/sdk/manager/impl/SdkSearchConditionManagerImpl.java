@@ -1,12 +1,16 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +25,9 @@ import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.model.product.SearchConditionLang;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
+import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.command.MetaDataCommand;
-import com.baozun.nebula.utils.Validator;
+import com.feilong.core.Validator;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -45,6 +50,12 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
     
     @Autowired
     private SearchConditionLangDao searchConditionLangDao;
+    
+
+	@Autowired(required=false)
+	@Qualifier("facetFilterHelper")
+	private FacetFilterHelper				facetFilterHelper;
+    
 	@Override
 	@Transactional(readOnly=true)
 	public Pagination<SearchConditionCommand> findSearchConditionByQueryMapWithPage(
@@ -144,15 +155,63 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 	@Override
 	@Transactional(readOnly=true)
 	public List<SearchConditionCommand> findConditionByNavigation(Long navigationId) {
-		List<SearchCondition> cmdList =  searchConditionDao.findConditionByNavigaion(navigationId);
+		
+		//所有导航id
+		List<Long> navIds = new ArrayList<Long>(5);
+		navIds.add(navigationId);
+		Long tmpId = navigationId;
+		int tmpSortNo = 0;
+		//导航的顺序
+		final Map<Long,Integer> navSortMap = new HashMap<Long,Integer>();
+		navSortMap.put(tmpId, tmpSortNo);
+		
+		//获取到所有导航树的id
+		if(facetFilterHelper != null){
+			Map<Long,MetaDataCommand> navMap = facetFilterHelper.loadNavigationMetaData();
+			while(true){
+				MetaDataCommand tmp = navMap.get(tmpId);
+				if(com.feilong.core.Validator.isNullOrEmpty(tmp) || tmp.getParentId() == null){
+					break;
+				}
+				navSortMap.put(tmp.getParentId(), ++tmpSortNo);
+				navIds.add(tmp.getParentId());
+				tmpId = tmp.getParentId();
+			}
+		}
+		
+		List<SearchCondition> cmdList =  searchConditionDao.findConditionByNavigaions(navIds);
+		
+		//将查出来的筛选条件排序，公共的筛选条件排在前面，父类的筛选条件排在子类导航的前面
+		Collections.sort(cmdList, new Comparator<SearchCondition>() {
+            public int compare(SearchCondition o1, SearchCondition o2) {
+              if(Validator.isNullOrEmpty(o1.getNavigationId())){
+            	  return 1;
+              }
+              
+              if(Validator.isNullOrEmpty(o2.getNavigationId())){
+            	  return -1;
+              }
+              
+              return navSortMap.get(o1.getNavigationId()) - navSortMap.get(o2.getNavigationId());
+            }
+        });
+
 		List<SearchConditionCommand> resultList = new ArrayList<SearchConditionCommand>();
 		if(null!=cmdList){
+			
+			//利用map的特性，将相同名称的筛选条件去除掉
+			Map<String,SearchCondition> tmpSearchConditionMap = new HashMap<String,SearchCondition>();
 			for(SearchCondition s:cmdList){
+				tmpSearchConditionMap.put(s.getName(), s);
+			}
+			
+			for(Entry<String, SearchCondition> entry : tmpSearchConditionMap.entrySet()){
 				SearchConditionCommand cmd = new SearchConditionCommand();
-				cmd = (SearchConditionCommand) ConvertUtils.convertFromTarget(cmd, s);
-				cmd.setPropertyId(s.getPropertyId());
+				cmd = (SearchConditionCommand) ConvertUtils.convertFromTarget(cmd, entry.getValue());
+				cmd.setPropertyId(entry.getValue().getPropertyId());
 				resultList.add(cmd);
 			}
+			
 		}
 		return resultList;
 	}

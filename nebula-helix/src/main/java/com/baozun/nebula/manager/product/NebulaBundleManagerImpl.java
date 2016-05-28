@@ -39,6 +39,7 @@ import com.baozun.nebula.command.product.BundleCommand.BundleStatus;
 import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
+import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleElementDao;
@@ -778,6 +779,22 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		}
 		
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.NebulaBundleManager#getBundleSkuPrice(java.lang.Long, java.lang.Long)
+	 */
+	@Override
+	public BundleSkuPriceCommand getBundleSkuPrice(Long bundleItemId, Long skuId) {
+		return bundleSkuDao.getBundleSkuPrice(bundleItemId, skuId);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.NebulaBundleManager#getBundleSkusPrice(java.lang.Long, java.util.List)
+	 */
+	@Override
+	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, List<Long> skuIds) {
+		return bundleSkuDao.getBundleSkusPrice(bundleItemId, skuIds);
 	}
 
 }
