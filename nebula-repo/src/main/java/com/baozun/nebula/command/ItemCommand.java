@@ -26,7 +26,7 @@ import com.baozun.nebula.model.product.ItemImage;
 /**
  * @author lin.liu
  */
-public class ItemCommand implements Command {
+public class ItemCommand implements Command{
 
 	/**
 	 * 
@@ -37,6 +37,7 @@ public class ItemCommand implements Command {
 	private Long				id;
 
 	private Long				shopId;
+
 	/**
 	 * 商品描述
 	 */
@@ -61,11 +62,11 @@ public class ItemCommand implements Command {
 	 * 商品名称
 	 */
 	private String				title;
-	
+
 	/**
 	 * 商品副标题
 	 */
-	private String 				subTitle;
+	private String				subTitle;
 
 	/** 行业名称 */
 	private String				industryName;
@@ -82,9 +83,9 @@ public class ItemCommand implements Command {
 
 	/** 分类名称 */
 	private List<String>		categoryNames;
-	
+
 	/** 分类编码 */
-	private List<String> 		categoryCodes;
+	private List<String>		categoryCodes;
 
 	/** 标签名称 */
 	private List<String>		tagNames;
@@ -169,16 +170,16 @@ public class ItemCommand implements Command {
 	private String				picUrl;
 
 	private String				itemUrl;
-	
-	private String              suitItem;
+
+	private String				suitItem;
 
 	private List<ItemImage>		itemImageList;
 
 	/**
-	 * 0非卖品，赠品
-	 * 1或者null为，正常商品
+	 * 0非卖品，赠品 1或者null为，正常商品
 	 */
 	private Integer				type;
+
 	/**
 	 * 商品图片个数
 	 */
@@ -188,352 +189,383 @@ public class ItemCommand implements Command {
 	 * 商品评分
 	 */
 	private Float				rankavg;
-	
+
 	private String				defCategory;
-	
+
 	private Long				defCategroyId;
-	
+
 	/**
 	 * 商品库存（该商品下所有UPC的累加可用库存）
 	 */
-	private Integer   inventory;
-	
-	/** 商品类型：普通商品  1;
-	  * 商品类型：捆绑类商品  3;
-	  * 商品类型：组商品  5;
-	  * 商品类型：虚拟商品  7;
-	  */
-	private Integer	  itemType;
-	
+	private Integer				inventory;
 
-	public Integer getInventory() {
+	/**
+	 * 商品类型：普通商品 1; 商品类型：捆绑类商品 3; 商品类型：组商品 5; 商品类型：虚拟商品 7;
+	 */
+	private Integer				itemType;
+
+	/** 被用户收藏的次数 */
+	private Integer				wishedNum;
+
+	/** 如果会员登录了，判断是否收藏了此商品 */
+	private boolean				isWished;
+
+	public Integer getInventory(){
 		return inventory;
 	}
 
-	public void setInventory(Integer inventory) {
+	public void setInventory(Integer inventory){
 		this.inventory = inventory;
 	}
 
-	public Integer getItemType() {
+	public Integer getItemType(){
 		return itemType;
 	}
 
-	public void setItemType(Integer itemType) {
+	public void setItemType(Integer itemType){
 		this.itemType = itemType;
 	}
 
-	public BigDecimal getSalePrice() {
+	public BigDecimal getSalePrice(){
 		return salePrice;
 	}
 
-	public void setSalePrice(BigDecimal salePrice) {
+	public void setSalePrice(BigDecimal salePrice){
 		this.salePrice = salePrice;
 	}
 
-	public BigDecimal getListPrice() {
+	public BigDecimal getListPrice(){
 		return listPrice;
 	}
 
-	public void setListPrice(BigDecimal listPrice) {
+	public void setListPrice(BigDecimal listPrice){
 		this.listPrice = listPrice;
 	}
 
-	public String getJsonSku() {
+	public String getJsonSku(){
 		return jsonSku;
 	}
 
-	public void setJsonSku(String jsonSku) {
+	public void setJsonSku(String jsonSku){
 		this.jsonSku = jsonSku;
 	}
 
-	public List<String> getCategoryNames() {
+	public List<String> getCategoryNames(){
 		return categoryNames;
 	}
 
-	public void setCategoryNames(List<String> categoryNames) {
+	public void setCategoryNames(List<String> categoryNames){
 		this.categoryNames = categoryNames;
 	}
 
-	public List<String> getCategoryCodes() {
+	public List<String> getCategoryCodes(){
 		return categoryCodes;
 	}
 
-	public void setCategoryCodes(List<String> categoryCodes) {
+	public void setCategoryCodes(List<String> categoryCodes){
 		this.categoryCodes = categoryCodes;
 	}
 
-	public Integer getLifecycle() {
+	public Integer getLifecycle(){
 		return lifecycle;
 	}
 
-	public void setLifecycle(Integer lifecycle) {
+	public void setLifecycle(Integer lifecycle){
 		this.lifecycle = lifecycle;
 	}
 
-	public Long getId() {
+	public Long getId(){
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Long id){
 		this.id = id;
 	}
 
-	public String getCode() {
+	public String getCode(){
 		return code;
 	}
 
-	public String getDescription() {
+	public String getDescription(){
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(String description){
 		this.description = description;
 	}
 
-	public String getIndustryId() {
+	public String getIndustryId(){
 		return industryId;
 	}
 
-	public void setIndustryId(String industryId) {
+	public void setIndustryId(String industryId){
 		this.industryId = industryId;
 	}
 
-	public void setCode(String code) {
+	public void setCode(String code){
 		this.code = code;
 	}
 
-	public String getTitle() {
+	public String getTitle(){
 		return title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(String title){
 		this.title = title;
 	}
 
-	public String getIndustryName() {
+	public String getIndustryName(){
 		return industryName;
 	}
 
-	public void setIndustryName(String industryName) {
+	public void setIndustryName(String industryName){
 		this.industryName = industryName;
 	}
 
-	public Date getCreateTime() {
+	public Date getCreateTime(){
 		return createTime;
 	}
 
-	public void setCreateTime(Date createTime) {
+	public void setCreateTime(Date createTime){
 		this.createTime = createTime;
 	}
 
-	public Date getModifyTime() {
+	public Date getModifyTime(){
 		return modifyTime;
 	}
 
-	public void setModifyTime(Date modifyTime) {
+	public void setModifyTime(Date modifyTime){
 		this.modifyTime = modifyTime;
 	}
 
-	public Date getVersion() {
+	public Date getVersion(){
 		return version;
 	}
 
-	public void setVersion(Date version) {
+	public void setVersion(Date version){
 		this.version = version;
 	}
 
-	public Date getListTime() {
+	public Date getListTime(){
 		return listTime;
 	}
 
-	public void setListTime(Date listTime) {
+	public void setListTime(Date listTime){
 		this.listTime = listTime;
 	}
 
-	public List<String> getTagNames() {
+	public List<String> getTagNames(){
 		return tagNames;
 	}
 
-	public void setTagNames(List<String> tagNames) {
+	public void setTagNames(List<String> tagNames){
 		this.tagNames = tagNames;
 	}
 
-	public Date getActiveBeginTime() {
+	public Date getActiveBeginTime(){
 		return activeBeginTime;
 	}
 
-	public void setActiveBeginTime(Date activeBeginTime) {
+	public void setActiveBeginTime(Date activeBeginTime){
 		this.activeBeginTime = activeBeginTime;
 	}
 
-	public Date getActiveEndTime() {
+	public Date getActiveEndTime(){
 		return activeEndTime;
 	}
 
-	public void setActiveEndTime(Date activeEndTime) {
+	public void setActiveEndTime(Date activeEndTime){
 		this.activeEndTime = activeEndTime;
 	}
 
-	public List<String> getChannels() {
+	public List<String> getChannels(){
 		return channels;
 	}
 
-	public void setChannels(List<String> channels) {
+	public void setChannels(List<String> channels){
 		this.channels = channels;
 	}
 
-	public Map<String, String> getAdditionalAttributes() {
+	public Map<String, String> getAdditionalAttributes(){
 		return additionalAttributes;
 	}
 
-	public void setAdditionalAttributes(Map<String, String> additionalAttributes) {
+	public void setAdditionalAttributes(Map<String, String> additionalAttributes){
 		this.additionalAttributes = additionalAttributes;
 	}
 
-	public String getSketch() {
+	public String getSketch(){
 		return sketch;
 	}
 
-	public void setSketch(String sketch) {
+	public void setSketch(String sketch){
 		this.sketch = sketch;
 	}
 
-	public Boolean getIsDefault() {
+	public Boolean getIsDefault(){
 		return isDefault;
 	}
 
-	public void setIsDefault(Boolean isDefault) {
+	public void setIsDefault(Boolean isDefault){
 		this.isDefault = isDefault;
 	}
 
-	public String getSeoDescription() {
+	public String getSeoDescription(){
 		return seoDescription;
 	}
 
-	public void setSeoDescription(String seoDescription) {
+	public void setSeoDescription(String seoDescription){
 		this.seoDescription = seoDescription;
 	}
 
-	public String getSeoTitle() {
+	public String getSeoTitle(){
 		return seoTitle;
 	}
 
-	public void setSeoTitle(String seoTitle) {
+	public void setSeoTitle(String seoTitle){
 		this.seoTitle = seoTitle;
 	}
 
-	public String getSeoKeywords() {
+	public String getSeoKeywords(){
 		return seoKeywords;
 	}
 
-	public void setSeoKeywords(String seoKeywords) {
+	public void setSeoKeywords(String seoKeywords){
 		this.seoKeywords = seoKeywords;
 	}
 
-	public void setShopId(Long shopId) {
+	public void setShopId(Long shopId){
 		this.shopId = shopId;
 	}
 
-	public Long getShopId() {
+	public Long getShopId(){
 		return shopId;
 	}
 
-	public String getPicUrl() {
+	public String getPicUrl(){
 		return picUrl;
 	}
 
-	public void setPicUrl(String picUrl) {
+	public void setPicUrl(String picUrl){
 		this.picUrl = picUrl;
 	}
 
-	public void setItemUrl(String itemUrl) {
+	public void setItemUrl(String itemUrl){
 		this.itemUrl = itemUrl;
 	}
 
-	public String getItemUrl() {
+	public String getItemUrl(){
 		return itemUrl;
 	}
 
-	public void setRankavg(Float rankavg) {
+	public void setRankavg(Float rankavg){
 		this.rankavg = rankavg;
 	}
 
-	public Float getRankavg() {
+	public Float getRankavg(){
 		return rankavg;
 	}
 
-	public Integer getSalesCount() {
+	public Integer getSalesCount(){
 		return salesCount;
 	}
 
-	public void setSalesCount(Integer salesCount) {
+	public void setSalesCount(Integer salesCount){
 		this.salesCount = salesCount;
 	}
 
-	public List<ItemImage> getItemImageList() {
+	public List<ItemImage> getItemImageList(){
 		return itemImageList;
 	}
 
-	public void setItemImageList(List<ItemImage> itemImageList) {
+	public void setItemImageList(List<ItemImage> itemImageList){
 		this.itemImageList = itemImageList;
 	}
 
-	public void setStyle(String style) {
+	public void setStyle(String style){
 		this.style = style;
 	}
 
-	public String getStyle() {
+	public String getStyle(){
 		return style;
 	}
 
-	public Integer getImageCount() {
+	public Integer getImageCount(){
 		return imageCount;
 	}
 
-	public void setImageCount(Integer imageCount) {
+	public void setImageCount(Integer imageCount){
 		this.imageCount = imageCount;
 	}
 
-	public String getSuitItem() {
+	public String getSuitItem(){
 		return suitItem;
 	}
 
-	public void setSuitItem(String suitItem) {
+	public void setSuitItem(String suitItem){
 		this.suitItem = suitItem;
 	}
 
-	public String getSubTitle() {
+	public String getSubTitle(){
 		return subTitle;
 	}
 
-	public void setSubTitle(String subTitle) {
+	public void setSubTitle(String subTitle){
 		this.subTitle = subTitle;
 	}
 
-	public Integer getType() {
+	public Integer getType(){
 		return type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(Integer type){
 		this.type = type;
 	}
 
-	public String getDefCategory() {
+	public String getDefCategory(){
 		return defCategory;
 	}
 
-	public void setDefCategory(String defCategory) {
+	public void setDefCategory(String defCategory){
 		this.defCategory = defCategory;
 	}
 
-	public Long getDefCategroyId() {
+	public Long getDefCategroyId(){
 		return defCategroyId;
 	}
 
-	public void setDefCategroyId(Long defCategroyId) {
+	public void setDefCategroyId(Long defCategroyId){
 		this.defCategroyId = defCategroyId;
 	}
-	
-	
-	
+
+	/**
+	 * @return the wishedNum
+	 */
+	public Integer getWishedNum(){
+		return wishedNum;
+	}
+
+	/**
+	 * @param wishedNum
+	 *            the wishedNum to set
+	 */
+	public void setWishedNum(Integer wishedNum){
+		this.wishedNum = wishedNum;
+	}
+
+	/**
+	 * @return the isWished
+	 */
+	public boolean isWished(){
+		return isWished;
+	}
+
+	/**
+	 * @param isWished
+	 *            the isWished to set
+	 */
+	public void setWished(boolean isWished){
+		this.isWished = isWished;
+	}
+
 }
