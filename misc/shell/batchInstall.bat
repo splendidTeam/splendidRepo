@@ -1,4 +1,3 @@
-::底层
 ::--by feilong 2016-05-07
 mode con cols=150 lines=5600
 
@@ -8,7 +7,6 @@ echo input params projects:[%projects%]
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 set mavenProject.current=%~dp0
 
-::如果是同盘符
 ::%~d0
 set DISK_NAME=%mavenProject.current:~0,2%
 %DISK_NAME%

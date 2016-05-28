@@ -19,4 +19,74 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="BundleSku.save" class="loxia.dao.support.DynamicQueryHolder">
+		<description>保存bundleElement</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					INSERT into t_pd_bundle_sku (bundle_id, bundle_element_id, item_id, sales_price, sku_id, style)
+						VALUES (:bundleId, :bundleElementId, :itemId, :salesPrice, :skuId, :style)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="BundleSku.delete" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据bundleId删除bundleElement</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					DELETE from t_pd_bundle_sku WHERE bundle_id = :bundleId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="BundleSku.getBundleSkusPrice" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT DISTINCT 
+						b.id bundle_id, b.item_id bundle_item_id, bs.id sku_id, s.list_price, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end sales_price 
+					FROM 
+						t_pd_bundle b
+					INNER JOIN 
+						t_pd_bundle_element be on be.bundle_id = b.id
+					INNER JOIN 
+						t_pd_bundle_sku bs on b.id = bs.bundle_id
+					INNER JOIN 
+						t_pd_sku s on bs.sku_id = s.id
+					WHERE 
+						b.item_id = :bundleItemId and bs.sku_id in
+						<foreach collection="list" item="skuIds" open="(" separator="," close=")">  
+        					#{skuIds}  
+     					</foreach>
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="BundleSku.getBundleSkuPrice" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT DISTINCT 
+						b.id bundle_id, b.item_id bundle_item_id, bs.id sku_id, s.list_price, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end sales_price 
+					FROM 
+						t_pd_bundle b
+					INNER JOIN 
+						t_pd_bundle_element be on be.bundle_id = b.id
+					INNER JOIN 
+						t_pd_bundle_sku bs on b.id = bs.bundle_id
+					INNER JOIN 
+						t_pd_sku s on bs.sku_id = s.id
+					WHERE 
+						b.item_id = :bundleItemId AND bs.sku_id = :skuId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>
