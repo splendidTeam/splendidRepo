@@ -29,7 +29,7 @@
 		</constructor-arg>
 	</bean>
 	
-		<bean id="SearchCondition.findConditionByNavigaion" class="loxia.dao.support.DynamicQueryHolder">
+		<bean id="SearchCondition.findConditionByNavigaions" class="loxia.dao.support.DynamicQueryHolder">
 		<description>查找导航下有效的搜索条件，将本导航和平台导航的搜索条件查询出来， 如果本导航中已经有的筛选条件，平台级别的不需要查询出来，是通过name来判断的 </description>
 		<constructor-arg>
 			<value>

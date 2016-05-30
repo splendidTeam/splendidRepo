@@ -38,6 +38,7 @@ import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
+import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
@@ -89,7 +90,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * <td>修改购物车数量</td>
  * </tr>
  * <tr valign="top">
- * <td>//TODO feilong</td>
+ * <td>//XXX feilong</td>
  * <td>修改商品销售属性</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
@@ -367,8 +368,6 @@ public class NebulaShoppingCartController extends BaseController{
                         .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
-
-    // TODO feilong 修改销售属性
 
     /**
      * 返回结果填充.

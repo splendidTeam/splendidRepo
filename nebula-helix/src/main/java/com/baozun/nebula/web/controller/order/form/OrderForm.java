@@ -78,8 +78,8 @@ public class OrderForm extends BaseForm{
     /** 发票信息. */
     private InvoiceInfoSubForm  invoiceInfoSubForm;
 
-    //TODO feilong 留言信息 comments
-    //TODO feilong 配送信息  目前我们都不支持用户在前端商城选择配送方式 ，以后这是趋势，可以在这里扩展
+    //XXX feilong 留言信息 comments
+    //XXX feilong 配送信息  目前我们都不支持用户在前端商城选择配送方式 ，以后这是趋势，可以在这里扩展
 
     //**********************************************************************************
 

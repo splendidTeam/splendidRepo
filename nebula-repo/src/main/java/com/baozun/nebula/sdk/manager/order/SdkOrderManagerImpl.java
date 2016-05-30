@@ -128,8 +128,7 @@ public class SdkOrderManagerImpl implements SdkOrderManager{
     }
 
     private void setRemark(Long shopId,SalesOrderCommand salesOrderCommand,SalesOrder salesOrder){
-        // 设置买家留言 格式一定要shopId_value 不留言就是shopid_
-        //TODO feilong 上样子这里的注释有误 分隔符描述不对
+        // 设置买家留言 
         List<String> remarks = salesOrderCommand.getRemarks();
         if (Validator.isNotNullOrEmpty(remarks)){
             for (String remark : remarks){

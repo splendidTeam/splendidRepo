@@ -23,6 +23,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     HttpServletRequest request,
                     HttpServletResponse response){
 
+        Validate.notNull(skuId, "skuId can't be null!");
+        Validate.notNull(count, "count can't be null!");
+
         Sku sku = sdkSkuManager.findSkuById(skuId);
         ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
 
@@ -119,7 +123,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.MAX_THAN_INVENTORY;
         }
 
-        // FIXME feilong
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(
                         memberDetails,
                         shoppingCartLineCommandList,

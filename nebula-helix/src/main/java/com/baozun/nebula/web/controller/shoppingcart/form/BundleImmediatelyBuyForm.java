@@ -23,7 +23,7 @@ package com.baozun.nebula.web.controller.shoppingcart.form;
  * @version 5.3.1 2016年5月28日 下午3:32:51
  * @since 5.3.1
  */
-public class ImmediatelyBuyBundleForm implements ImmediatelyBuyForm{
+public class BundleImmediatelyBuyForm implements ImmediatelyBuyForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 2326678444030091977L;

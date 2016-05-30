@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
+import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
@@ -133,6 +135,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     @Autowired
     private SdkOrderEmailManager                     sdkOrderEmailManager;
 
+    /** The sdk order line create manager. */
     @Autowired
     private SdkOrderLineCreateManager                sdkOrderLineCreateManager;
 
@@ -169,12 +172,15 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                     SalesOrderCommand salesOrderCommand,
                     Set<String> memCombos,
                     SalesOrderCreateOptions salesOrderCreateOptions){
-        if (salesOrderCommand == null || shoppingCartCommand == null){
-            throw new BusinessException(Constants.SHOPCART_IS_NULL);
-        }
-        salesOrderCreateOptions = null == salesOrderCreateOptions ? new SalesOrderCreateOptions() : salesOrderCreateOptions;
+        Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null!");
+        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
+
         preCreateOrder(shoppingCartCommand, salesOrderCommand, memCombos);
-        return saveOrderInfo(salesOrderCommand, shoppingCartCommand, salesOrderCreateOptions);
+
+        return saveOrderInfo(
+                        salesOrderCommand,
+                        shoppingCartCommand,
+                        null == salesOrderCreateOptions ? new SalesOrderCreateOptions() : salesOrderCreateOptions);
     }
 
     /**
@@ -269,25 +275,23 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                     SalesOrderCommand salesOrderCommand,
                     ShoppingCartCommand shoppingCartCommand,
                     SalesOrderCreateOptions salesOrderCreateOptions){
-        // 合并付款
         String subOrdinate = orderCodeCreator.createOrderSerialNO();
-        if (subOrdinate == null){
-            throw new BusinessException(Constants.CREATE_ORDER_FAILURE);
-        }
+        Validate.notBlank(subOrdinate, "subOrdinate can't be blank!");
 
+        //基于店铺的 订单行列表.
         Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = buildShopIdAndShoppingCartLineCommandListMap(
                         shoppingCartCommand);
 
+        //基于店铺的促销.
         Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = buildShopIdAndPromotionSKUDiscAMTBySettingMap(
                         shoppingCartCommand);
 
-        // shopCartCommandByShopMap
-        Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = CollectionsUtil
-                        .groupOne(shoppingCartCommand.getSummaryShopCartList(), "shopId");
+        //基于店铺的ShopCartCommandByShop.
+        Map<Long, ShopCartCommandByShop> shopIdAndShopCartCommandByShopMap = buildShopIdAndShopCartCommandByShopMap(shoppingCartCommand);
 
         //*****************************************************************************************
         boolean isSendEmail = isSendEmail();
-        List<Map<String, Object>> dataMapList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> emailDataMapList = new ArrayList<Map<String, Object>>();
         for (Map.Entry<Long, List<ShoppingCartLineCommand>> entry : shopIdAndShoppingCartLineCommandListMap.entrySet()){
             Long shopId = entry.getKey();
             List<ShoppingCartLineCommand> shoppingCartLineCommandList = entry.getValue();
@@ -302,7 +306,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
                             shopCartCommandByShop,
                             shopPromotionSKUDiscAMTBySettingList,
                             isSendEmail,
-                            dataMapList,
+                            emailDataMapList,
                             salesOrderCreateOptions);
         }
 
@@ -324,44 +328,54 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
         }
 
         // 发邮件
-        sdkOrderEmailManager.sendEmailOfCreateOrder(dataMapList);
+        sdkOrderEmailManager.sendEmailOfCreateOrder(emailDataMapList);
         return subOrdinate;
     }
 
     /**
+     * 基于店铺的ShopCartCommandByShop.
+     *
      * @param shoppingCartCommand
-     * @return
-     * @since 5.3.1
+     *            the shopping cart command
+     * @return the map< long, shop cart command by shop>
+     */
+    private Map<Long, ShopCartCommandByShop> buildShopIdAndShopCartCommandByShopMap(ShoppingCartCommand shoppingCartCommand){
+        return CollectionsUtil.groupOne(shoppingCartCommand.getSummaryShopCartList(), "shopId");
+    }
+
+    /**
+     * 基于店铺的 订单行列表.
+     *
+     * @param shoppingCartCommand
+     *            the shopping cart command
+     * @return the map< long, list< shopping cart line command>>
      */
     private Map<Long, List<ShoppingCartLineCommand>> buildShopIdAndShoppingCartLineCommandListMap(ShoppingCartCommand shoppingCartCommand){
-        // 购物车
         Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
-
-        // shoppingCartLineCommandMap
         Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
                         .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
         return shopIdAndShoppingCartLineCommandListMap;
     }
 
     /**
+     * 基于店铺的促销.
+     *
      * @param shoppingCartCommand
-     * @return
-     * @since 5.3.1
+     *            the shopping cart command
+     * @return the map< long, list< promotion sku disc amt by setting>>
      */
     private Map<Long, List<PromotionSKUDiscAMTBySetting>> buildShopIdAndPromotionSKUDiscAMTBySettingMap(
                     ShoppingCartCommand shoppingCartCommand){
-        // shoppingCartPromotionBriefMap
+        List<PromotionBrief> cartPromotionBriefList = shoppingCartCommand.getCartPromotionBriefList();
         List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCartCommand, shoppingCartCommand.getCartPromotionBriefList());
-
-        //基于店铺的促销
-        Map<Long, List<PromotionSKUDiscAMTBySetting>> shopIdAndPromotionSKUDiscAMTBySettingMap = CollectionsUtil
-                        .group(promotionSKUDiscAMTBySettingList, "shopId");
-        return shopIdAndPromotionSKUDiscAMTBySettingMap;
+                        .sharePromotionDiscountToEachLine(shoppingCartCommand, cartPromotionBriefList);
+        return CollectionsUtil.group(promotionSKUDiscAMTBySettingList, "shopId");
     }
 
     /**
-     * @return
+     * Checks if is send email.
+     *
+     * @return true, if checks if is send email
      */
     private boolean isSendEmail(){
         String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
@@ -434,7 +448,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         // 封装发送邮件数据
         if (isSendEmail){
-            //TODO feilong 待重构
             Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(
                             subOrdinate,
                             salesOrder,

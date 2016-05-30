@@ -72,7 +72,9 @@ public interface ItemDetailManager extends BaseManager{
 	public Map<String, Object> findDynamicProperty(Long itemId);
 	
 	/**
-	 * 获取一批商品动态属性(规格参数)
+	 * 获取一批商品动态属性(规格参数)，类似findDynamicProperty，只不过是查找
+	 * 多个商品，用于获取色块时，所有相关商品的色块详情
+	 * {@link com.baozun.nebula.web.controller.product.viewcommand.ItemColorSwatchViewCommand}
 	 * @param itemIds
 	 * @return
 	 */
@@ -80,7 +82,7 @@ public interface ItemDetailManager extends BaseManager{
 	
 	/**
 	 * <p>新的获取商品动态属性(规格参数)</p>
-	 * <p>特殊处理一般属性的获取</p>
+	 * <p>特殊处理一般属性的获取，按组划分属性</p>
 	 * @param itemId
 	 * @return
 	 */
