@@ -60,7 +60,7 @@ public class SdkFreightFeeManagerImpl implements SdkFreightFeeManager{
      *
      * @return the freight fee
      */
-    //TODO feilong add javadoc and flow image
+    //XXX feilong add javadoc and flow image
     @Override
     public BigDecimal getFreightFee(Long shopId,CalcFreightCommand calcFreightCommand,List<ShoppingCartLineCommand> validLines){
         if (null == calcFreightCommand){

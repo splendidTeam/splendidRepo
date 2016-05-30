@@ -21,11 +21,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.constants.CookieKeyConstants;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCountHandler;
 import com.feilong.servlet.http.CookieUtil;
 
 /**
@@ -39,7 +40,10 @@ import com.feilong.servlet.http.CookieUtil;
 public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersister{
 
     /** cookie的名称. */
-    private String cookieNameShoppingcartCount = CookieKeyConstants.SHOPPING_CART_COUNT;
+    private String                   cookieNameShoppingcartCount = CookieKeyConstants.SHOPPING_CART_COUNT;
+
+    @Autowired
+    private ShoppingCartCountHandler shoppingCartCountHandler;
 
     /*
      * (non-Javadoc)
@@ -49,7 +53,8 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
      */
     @Override
     public void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
-        CookieUtil.addCookie(cookieNameShoppingcartCount, "" + getTotalCount(shoppingCartLineCommandList), response);
+        String count = "" + shoppingCartCountHandler.buildCount(shoppingCartLineCommandList);
+        CookieUtil.addCookie(cookieNameShoppingcartCount, count, response);
 
     }
 
@@ -62,23 +67,6 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     @Override
     public void clear(HttpServletRequest request,HttpServletResponse response){
         CookieUtil.deleteCookie(cookieNameShoppingcartCount, response);
-    }
-
-    /**
-     * 获得 total count.
-     * 
-     * <p>
-     * 购物车数量,目前业界有两种实现, 天猫是显示的 list size;京东是 list quantity sum 总和
-     * </p>
-     *
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @return the total count
-     */
-    //TODO feilong 做成可配置式的
-    protected int getTotalCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        // 将购物车数量塞到Cookie 里面去
-        return ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);
     }
 
     /**

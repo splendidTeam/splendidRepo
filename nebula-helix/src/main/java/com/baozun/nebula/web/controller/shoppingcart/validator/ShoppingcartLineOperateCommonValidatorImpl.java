@@ -64,7 +64,7 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
 
         //===============② 判断sku是否存在===============
         if (Validator.isNullOrEmpty(sku)){
-            //TODO feilong change to exception
+            //XXX feilong change to exception
             LOGGER.error("sku not exist!!!!!!");
             return ShoppingcartResult.SKU_NOT_EXIST;
         }
