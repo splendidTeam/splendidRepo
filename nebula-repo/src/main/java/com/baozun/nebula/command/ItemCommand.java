@@ -208,7 +208,7 @@ public class ItemCommand implements Command{
 	private Integer				wishedNum;
 
 	/** 如果会员登录了，判断是否收藏了此商品 */
-	private boolean				isWished;
+	private boolean				wished;
 
 	public Integer getInventory(){
 		return inventory;
@@ -553,19 +553,21 @@ public class ItemCommand implements Command{
 		this.wishedNum = wishedNum;
 	}
 
+	
 	/**
-	 * @return the isWished
+	 * @return the wished
 	 */
-	public boolean isWished(){
-		return isWished;
+	public boolean getWished(){
+		return wished;
 	}
 
+	
 	/**
-	 * @param isWished
-	 *            the isWished to set
+	 * @param wished the wished to set
 	 */
-	public void setWished(boolean isWished){
-		this.isWished = isWished;
+	public void setWished(boolean wished){
+		this.wished = wished;
 	}
+
 
 }
