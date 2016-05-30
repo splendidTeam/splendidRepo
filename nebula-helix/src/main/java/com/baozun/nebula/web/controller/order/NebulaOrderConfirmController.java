@@ -189,7 +189,8 @@ public class NebulaOrderConfirmController extends BaseController{
                         .getShoppingCartLineCommandList(memberDetails, key, request);
         shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
 
-        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
+        //在当前正常流程，购物行可能为空，注释
+        //Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
         ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(
