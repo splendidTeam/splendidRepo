@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 

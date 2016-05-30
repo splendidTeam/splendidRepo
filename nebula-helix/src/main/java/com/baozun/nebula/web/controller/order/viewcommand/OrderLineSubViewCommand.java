@@ -60,7 +60,7 @@ public class OrderLineSubViewCommand extends BaseViewCommand{
     /** 外部编码 {@link Sku#outid},是扣减库存以及和后端对接数据的核心参数. */
     private String                   extentionCode;
 
-    //TODO feilong 销售属性map 是什么,此处应该可以和 PDP 骨架里面的相关view Command 通用 
+    //XXX feilong 销售属性map 是什么,此处应该可以和 PDP 骨架里面的相关view Command 通用 
     //参见 stander架构里面的  Map<PropertySubViewCommand, List<PropertyValueSubViewCommand>> salesPropertiesMap  
     //但是可能的结构是  Map<PropertySubViewCommand, PropertyValueSubViewCommand> salesPropertiesMap  
     //也可能的结构是  Map<String, String> salesPropertiesMap  

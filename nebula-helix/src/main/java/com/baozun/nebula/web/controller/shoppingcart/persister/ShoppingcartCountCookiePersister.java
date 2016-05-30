@@ -75,7 +75,7 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
      *            the shopping cart line command list
      * @return the total count
      */
-    //TODO feilong 
+    //TODO feilong 做成可配置式的
     protected int getTotalCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 将购物车数量塞到Cookie 里面去
         return ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList);

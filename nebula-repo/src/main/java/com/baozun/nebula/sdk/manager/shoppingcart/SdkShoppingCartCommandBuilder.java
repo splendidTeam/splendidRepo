@@ -25,6 +25,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
+ * 专门用来构建 ShoppingCartCommand.
  *
  * @author feilong
  * @version 5.3.1 2016年5月23日 下午5:47:16
@@ -33,15 +34,20 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 public interface SdkShoppingCartCommandBuilder extends BaseManager{
 
     /**
+     * Builds the shopping cart command.
+     *
      * @param memberId
+     *            the member id
+     * @param shoppingCartLines
+     *            获取购物车列表时候要经过 有效性引擎和促销引擎。 不走限购检查引擎 CalcFreightCommand 不为空时计算运费
+     *            为空不计算运费
+     * @param calcFreightCommand
+     *            the calc freight command
      * @param coupons
      *            优惠券
      * @param memberComIds
      *            组合id
-     * @param calFreightCommand
-     * @param shoppingCartLines
-     *            获取购物车列表时候要经过 有效性引擎和促销引擎。 不走限购检查引擎 CalcFreightCommand 不为空时计算运费
-     *            为空不计算运费
+     * @return the shopping cart command
      */
     ShoppingCartCommand buildShoppingCartCommand(
                     Long memberId,

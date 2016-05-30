@@ -53,6 +53,9 @@ public class PropertyValueViewCommand extends BaseViewCommand {
      * </p>
      */
     private String imageUrl;
+    
+    /** 颜色属性值的图片[属性管理里的属性图片值] */
+	private String propertyValueThumb;
 
 	public Long getItemPropertiesId() {
 		return itemPropertiesId;
@@ -101,5 +104,21 @@ public class PropertyValueViewCommand extends BaseViewCommand {
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
+
+	/**
+	 * @return the propertyValueThumb
+	 */
+	public String getPropertyValueThumb() {
+		return propertyValueThumb;
+	}
+
+	/**
+	 * @param propertyValueThumb the propertyValueThumb to set
+	 */
+	public void setPropertyValueThumb(String propertyValueThumb) {
+		this.propertyValueThumb = propertyValueThumb;
+	}
+	
+	
 
 }

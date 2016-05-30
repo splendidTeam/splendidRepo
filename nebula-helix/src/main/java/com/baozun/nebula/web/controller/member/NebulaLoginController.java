@@ -216,6 +216,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			returnResult.setResultMessage(message);
 			return returnResult;
 		}
+		
+		// 处理Form中数据的加解密
+		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
+		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
 
 		// 校验输入数据
 		loginFormValidator.validate(loginForm, bindingResult);
@@ -223,14 +227,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		// 如果校验失败，返回错误
 		if (bindingResult.hasErrors()) {
 			// 因为目前都还是密文，所以可以直接Debug输出
-			LOG.debug("loginForm validation error. [{}/{}]", loginForm.getLoginName(), loginForm.getPassword());
+			LOG.debug("loginForm validation error. [{}]", loginForm.getLoginName());
 			return getResultFromBindingResult(bindingResult);
 		}
-
-		// 处理Form中数据的加解密
-		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
-		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
-
+		
 		// 此后使用 loginForm.toMemberCommand 就可以获得业务层模型了
 		MemberCommand memberCommand = null;
 

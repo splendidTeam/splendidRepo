@@ -57,7 +57,7 @@ public interface BrowsingHistoryResolver{
      *            the klass
      * @return the browsing history
      */
-    //TODO feilong 设置成  BrowsingHistoryCommand
+    //TODO 设置成  BrowsingHistoryCommand
     <T extends Serializable> LinkedList<T> getBrowsingHistory(HttpServletRequest request,Class<T> klass);
 
 }
