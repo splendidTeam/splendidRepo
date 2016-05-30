@@ -92,7 +92,6 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
      *            the shopping cart line command list
      * @return the map< string, integer>
      */
-    //FIXME feilong 扣减库存 如果有bundle 逻辑处理
     private Map<String, Integer> buildExtentionCodeAndCountMap(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         Map<String, Integer> extentionCodeAndCountMap = new HashMap<String, Integer>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
@@ -110,10 +109,15 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
                     shoppingCartLineCommand.setQuantity(stock);
                 }
             }
-            //主卖品和赠品都扣库存
-            String extentionCode = shoppingCartLineCommand.getExtentionCode();
 
-            MapUtil.putSumValue(extentionCodeAndCountMap, extentionCode, quantity);
+            Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
+            if (null != relatedItemId){
+                //FIXME feilong 扣减库存 如果有bundle 逻辑处理
+            }else{
+                //主卖品和赠品都扣库存
+                String extentionCode = shoppingCartLineCommand.getExtentionCode();
+                MapUtil.putSumValue(extentionCodeAndCountMap, extentionCode, quantity);
+            }
         }
         return extentionCodeAndCountMap;
     }

@@ -162,6 +162,9 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
 
         //FIXME feilong 金额
         //sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
+        //shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
+        //shoppingCartLineCommand.setListPrice(sku.getListPrice()); 
+
         //封装 店铺和 行业信息
         packShopAndIndustry(shoppingCartLineCommand, item);
 
@@ -169,9 +172,6 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
         packItemInfo(shoppingCartLineCommand, item);
 
         packCategoryAndLables(shoppingCartLineCommand, item.getId());
-
-        //shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
-        //shoppingCartLineCommand.setListPrice(sku.getListPrice()); 
     }
 
     /**
