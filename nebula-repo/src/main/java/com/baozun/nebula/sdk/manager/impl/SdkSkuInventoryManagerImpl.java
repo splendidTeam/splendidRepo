@@ -25,12 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.util.MapUtil;
 
 /**
@@ -98,7 +98,7 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
             //如果直推礼品库存数小于购买量时，扣减现有库存
             Integer quantity = shoppingCartLineCommand.getQuantity();
-            if (isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
+            if (ShoppingCartUtil.isNoNeedChoiceGift(shoppingCartLineCommand)){//是否是不需要用户选择的礼品.
                 //下架
                 if (!shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1){
                     continue;
@@ -116,16 +116,5 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
             MapUtil.putSumValue(extentionCodeAndCountMap, extentionCode, quantity);
         }
         return extentionCodeAndCountMap;
-    }
-
-    /**
-     * 是否是不需要用户选择的礼品.
-     *
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @return true, if checks if is no need choice gift
-     */
-    private boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
-        return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
     }
 }

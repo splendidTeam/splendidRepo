@@ -295,7 +295,7 @@ public class SdkPromotionGuideManagerImpl implements SdkPromotionGuideManager{
                 itemId = item.getId();
                 List<ItemCategory> categoryLists = itemCategoryDao.findItemCategoryListByItemId(itemId);
 
-                itemComboIds.addAll(sdkEngineManager.getItemScopeListByItemAndCategory(String.valueOf(itemId), categoryLists));
+                itemComboIds.addAll(sdkEngineManager.getItemScopeListByItemAndCategory(itemId, categoryLists));
             }
         }
         // 获取人群和商品促销的交集

@@ -58,10 +58,9 @@ import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 
 /**
- * The Class SdkShoppingCartCommandBuilderImpl.
+ * 专门用来构建 ShoppingCartCommand.
  *
  * @author feilong
- * @version 5.3.1 2016年5月23日 下午5:48:22
  * @since 5.3.1
  */
 @Transactional
@@ -127,10 +126,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             }
             //TODO feilong bundle不是这么玩的
             sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
-            shoppingCartLineCommand.setType(Constants.ITEM_TYPE_SALE);// 主卖品
-
-            // 购物车行 金额小计
-            shoppingCartLineCommand.setSubTotalAmt(NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice()));
         }
         //*******************************************************************************************************
 
@@ -348,10 +343,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      */
     private UserDetails buildUserDetails(Long memberId,Set<String> memberComIds){
         UserDetails userDetails = new UserDetails();
-
         userDetails.setMemberId(memberId);
         userDetails.setMemComboList(null != memberId ? memberComIds : sdkEngineManager.getCrowdScopeListByMemberAndGroup(null, null));
-
         return userDetails;
     }
 
@@ -408,6 +401,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         // 购物车行信息
         shoppingCartCommand.setShoppingCartLineCommands(validedLines);
 
+        //**********************************************************************************************
+
         // 商品数量
         shoppingCartCommand.setOrderQuantity(ShoppingCartUtil.getSumQuantity(validedLines));
 
@@ -426,6 +421,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
     /**
      * 计算应付金额.
+     * 
+     * <p>
+     * 自动去除 gift 以及 isCaptionLine
+     * </p>
      *
      * @param shoppingCartLines
      *            the shopping cart lines
@@ -437,7 +436,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             if (cartLine.isGift() || cartLine.isCaptionLine()){
                 continue;
             }
-            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice()));
+            BigDecimal multiplyValue = NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice());
+            originPayAmount = originPayAmount.add(multiplyValue);
         }
         return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
@@ -476,8 +476,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
 
         // 设置应付金额
-        List<ShoppingCartLineCommand> noGiftShoppingCartLines = CollectionsUtil.select(allShoppingCartLines, "gift", false);
-        shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(noGiftShoppingCartLines));
+        shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(allShoppingCartLines));
 
         Map<String, BigDecimal> priceMap = CollectionsUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
 
@@ -563,7 +562,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         }
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
-
         BigDecimal originShippingFee = sdkFreightFeeManager.getFreightFee(shopId, calcFreightCommand, shoppingCartLineCommandList);
 
         //*****************************************************************************************
@@ -653,7 +651,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
 
         //***************************************************************************************
-
         ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
 
         shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
@@ -713,6 +710,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         shopCart.setOriginPayAmount(shopCartCommandByShop.getSumCurrentPayAmount());// 应付金额
         shopCart.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount()); // 实付金额
+
+        //***************************************************************************************************
 
         // 封装数据
         ShoppingCartCommand shoppingCartCommand = new ShoppingCartCommand();

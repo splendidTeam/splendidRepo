@@ -79,5 +79,5 @@ public interface SdkEngineManager extends BaseManager{
      * @param categoryLists
      * @return
      */
-    Set<String> getItemScopeListByItemAndCategory(String itemId,List<ItemCategory> categoryLists);
+    Set<String> getItemScopeListByItemAndCategory(Long itemId,List<ItemCategory> categoryLists);
 }

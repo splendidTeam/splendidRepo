@@ -23,9 +23,8 @@ import java.util.Set;
 
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.feilong.core.Validator;
@@ -40,15 +39,11 @@ import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
  * </p>
  *
  * @author feilong
- * @version 5.3.1 2016年5月24日 下午6:17:20
  * @see ShoppingCartLineCommand
  * @see ShoppingCartCommand
  * @since 5.3.1
  */
 public final class ShoppingCartUtil{
-
-    /** The Constant LOGGER. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartUtil.class);
 
     /** Don't let anyone instantiate this class. */
     private ShoppingCartUtil(){
@@ -100,6 +95,7 @@ public final class ShoppingCartUtil{
      *            the shopping cart lines
      * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回0<br>
      *         否则累加 每个元素的 quantity属性之和
+     * @see com.feilong.core.util.CollectionsUtil#sum(java.util.Collection, String)
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
@@ -116,6 +112,17 @@ public final class ShoppingCartUtil{
     public static Set<String> getItemComboIds(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         Set<Set<String>> comboIds = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "comboIds");
         return toPropertyValueSet(comboIds);
+    }
+
+    /**
+     * 是否是不需要用户选择的礼品.
+     *
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @return true, if checks if is no need choice gift
+     */
+    public static boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
+        return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
     }
 
     /**

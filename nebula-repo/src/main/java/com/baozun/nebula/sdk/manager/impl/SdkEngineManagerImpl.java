@@ -173,7 +173,7 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      * @return Boolean
      * @Description: 检查商品是否上架
      */
-    //TODO feilong 重复了
+    //TODO feilong 重复了 see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLinePackManagerImpl.checkActiveBeginTime(Long)
     private Boolean checkActiveBeginTime(Long skuId){
 
         List<Long> skuids = new ArrayList<Long>();
@@ -412,43 +412,51 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getItemScopeListByItemAndCategory(String itemId,List<ItemCategory> categoryLists){
-        Set<String> cids = new HashSet<String>(); // 商品组合
+    public Set<String> getItemScopeListByItemAndCategory(Long itemId,List<ItemCategory> categoryLists){
         Map<String, AbstractScopeConditionResult> itemScopeConditionResultList = EngineManager.getInstance().getItemScopeEngine()
                         .getItemScopeMap();
 
-        if (null != itemScopeConditionResultList && itemScopeConditionResultList.size() > 0){
+        if (Validator.isNullOrEmpty(itemScopeConditionResultList)){
+            return Collections.emptySet();
+        }
 
-            Long itemIdL = new Long(itemId);
-            List<Long> categoryIds = new ArrayList<Long>();
+        List<Long> categoryIds = buildCategoryIds(itemId, categoryLists);
 
-            if (null == categoryLists || categoryLists.size() == 0){
-                if (StringUtils.isNotBlank(itemId)){
-                    categoryLists = itemCategoryDao.findItemCategoryListByItemId(itemIdL);
-                    for (ItemCategory itemCategory : categoryLists){
-                        categoryIds.add(itemCategory.getCategoryId());
-                    }
-                }
-            }else{
-                for (ItemCategory itemCategory : categoryLists){
-                    categoryIds.add(itemCategory.getCategoryId());
-                }
-            }
-
-            if (null == categoryIds || categoryIds.size() <= 0){
-                categoryIds = new ArrayList<Long>();
-                categoryIds.add(-1L);
-            }
-
-            for (String key : itemScopeConditionResultList.keySet()){
-                ItemScopeConditionResult itemScopeConditionResult = (ItemScopeConditionResult) itemScopeConditionResultList.get(key);
-                Boolean checkFlag = itemScopeConditionResult.getResult(itemIdL, categoryIds);
-                if (checkFlag){
-                    cids.add(key);
-                }
+        Set<String> cids = new HashSet<String>(); // 商品组合
+        for (String key : itemScopeConditionResultList.keySet()){
+            ItemScopeConditionResult itemScopeConditionResult = (ItemScopeConditionResult) itemScopeConditionResultList.get(key);
+            Boolean checkFlag = itemScopeConditionResult.getResult(itemId, categoryIds);
+            if (checkFlag){
+                cids.add(key);
             }
         }
         return cids;
+    }
+
+    /**
+     * @param itemId
+     * @param categoryLists
+     * @return
+     * @since 5.3.1
+     */
+    private List<Long> buildCategoryIds(Long itemId,List<ItemCategory> categoryLists){
+        List<Long> categoryIds = new ArrayList<Long>();
+        if (Validator.isNullOrEmpty(categoryLists)){
+            categoryLists = itemCategoryDao.findItemCategoryListByItemId(itemId);
+            for (ItemCategory itemCategory : categoryLists){
+                categoryIds.add(itemCategory.getCategoryId());
+            }
+        }else{
+            for (ItemCategory itemCategory : categoryLists){
+                categoryIds.add(itemCategory.getCategoryId());
+            }
+        }
+
+        if (null == categoryIds || categoryIds.size() <= 0){
+            categoryIds = new ArrayList<Long>();
+            categoryIds.add(-1L);
+        }
+        return categoryIds;
     }
 
     /**
