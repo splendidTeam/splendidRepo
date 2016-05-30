@@ -109,7 +109,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
                         .buildShoppingCartLineCommandList(bundleImmediatelyBuyForm);
         String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
 
-        String checkoutUrl = buildCheckoutUrl(key, request);
+        String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);
 
         //成功需要返回 跳转到订单确认页面的地址
         //失败就直接返回失败的信息

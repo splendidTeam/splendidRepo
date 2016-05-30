@@ -121,7 +121,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
         String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
 
         // 跳转到订单确认页面的地址
-        String checkoutUrl = buildCheckoutUrl(key, request);
+        String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);
         return toNebulaReturnResult(checkoutUrl);
     }
 
