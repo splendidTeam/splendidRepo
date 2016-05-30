@@ -153,7 +153,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         }
 
         //***************************************************************************************
-        //TODO feilong 
+        //TODO feilong what's this?
         doWithNoChoose(noChooseShoppingCartLineCommandList, shoppingCartCommand, shopIdAndShoppingCartCommandMap);
 
         //************************************************************************************************

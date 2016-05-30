@@ -47,6 +47,7 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -102,8 +103,9 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
     @Autowired
     private SdkShoppingCartLineImageManager sdkShoppingCartLineImageManager;
 
-    //    @Autowired
-    //    private NebulaBundleManager             nebulaBundleManager;
+    /** The sdk bundle manager. */
+    @Autowired
+    private SdkBundleManager                sdkBundleManager;
 
     /*
      * (non-Javadoc)
@@ -155,8 +157,11 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
      * @since 5.3.1
      */
     private void doPackBundle(ShoppingCartLineCommand shoppingCartLineCommand,Item item){
-        //        shoppingCartLineCommand.getSkuIds();
-        //        shoppingCartLineCommand.getRelatedItemId();
+        Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
+        Long[] skuIds = shoppingCartLineCommand.getSkuIds();
+
+        //FIXME feilong 金额
+        //sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
         //封装 店铺和 行业信息
         packShopAndIndustry(shoppingCartLineCommand, item);
 

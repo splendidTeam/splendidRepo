@@ -369,8 +369,6 @@ public class NebulaShoppingCartController extends BaseController{
         return toNebulaReturnResult(shoppingcartResult);
     }
 
-    // TODO feilong 修改销售属性
-
     /**
      * 返回结果填充.
      *

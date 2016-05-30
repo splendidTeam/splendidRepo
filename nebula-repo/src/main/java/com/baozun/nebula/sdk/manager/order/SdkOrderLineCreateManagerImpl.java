@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
+import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.model.product.Item;
@@ -39,6 +40,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLineImageManager;
 import com.feilong.core.Validator;
@@ -63,9 +65,11 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
     @Autowired
     private SdkSkuManager                   sdkSkuManager;
 
+    /** The sdk item manager. */
     @Autowired
     private SdkItemManager                  sdkItemManager;
 
+    /** The item dao. */
     @Autowired
     private ItemDao                         itemDao;
 
@@ -73,8 +77,13 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
     @Autowired
     private SdkOrderPromotionManager        sdkOrderPromotionManager;
 
+    /** The sdk shopping cart line image manager. */
     @Autowired
     private SdkShoppingCartLineImageManager sdkShoppingCartLineImageManager;
+
+    /** The sdk bundle manager. */
+    @Autowired
+    private SdkBundleManager                sdkBundleManager;
 
     /*
      * (non-Javadoc)
@@ -98,6 +107,18 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         }
     }
 
+    /**
+     * Save related lines.
+     *
+     * @param orderId
+     *            the order id
+     * @param couponCodes
+     *            the coupon codes
+     * @param promotionSKUDiscAMTBySettingList
+     *            the promotion sku disc amt by setting list
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     */
     private void saveRelatedLines(
                     Long orderId,
                     List<CouponCodeCommand> couponCodes,
@@ -108,6 +129,7 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         Long[] skuIds = shoppingCartLineCommand.getSkuIds();
         Integer quantity = shoppingCartLineCommand.getQuantity();
 
+        //TODO feilong bundle 下单要进行拆分
         for (Long skuId : skuIds){
             ShoppingCartLineCommand newShoppingCartLineCommand = buildNewShoppingCartLineCommand(
                             relatedItemId,
@@ -119,11 +141,17 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
     }
 
     /**
+     * Builds the new shopping cart line command.
+     *
      * @param relatedItemId
+     *            the related item id
      * @param skuId
+     *            the sku id
      * @param quantity
+     *            the quantity
      * @param shoppingCartLineCommand
-     * @return
+     *            the shopping cart line command
+     * @return the shopping cart line command
      */
     private ShoppingCartLineCommand buildNewShoppingCartLineCommand(
                     Long relatedItemId,
@@ -133,7 +161,6 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         Integer type = shoppingCartLineCommand.getType();
         Long lineGroup = shoppingCartLineCommand.getLineGroup();
 
-        //TODO feilong bundle 下单要进行拆分
         ShoppingCartLineCommand newShoppingCartLineCommand = BeanUtil.cloneBean(shoppingCartLineCommand);
 
         Sku sku = sdkSkuManager.findSkuById(skuId);
@@ -142,8 +169,9 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoByCode(item.getCode());
 
         //FIXME feilong bundle商品金额
-        BigDecimal listPrice = new BigDecimal(999);
-        BigDecimal salePrice = new BigDecimal(999);
+        BundleSkuPriceCommand bundleSkuPriceCommand = sdkBundleManager.getBundleSkuPrice(relatedItemId, skuId);
+        BigDecimal listPrice = bundleSkuPriceCommand.getListPrice();
+        BigDecimal salePrice = bundleSkuPriceCommand.getSalesPrice();
         BigDecimal discount = new BigDecimal(0);
         BigDecimal subTotalAmt = NumberUtil.getMultiplyValue(salePrice, quantity, 2);
 
@@ -224,11 +252,29 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         }
     }
 
+    /**
+     * Save order line.
+     *
+     * @param orderId
+     *            the order id
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @return the order line
+     */
     private OrderLine saveOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
         OrderLine orderLine = buildOrderLine(orderId, shoppingCartLineCommand);
         return sdkOrderLineDao.save(orderLine);
     }
 
+    /**
+     * Builds the order line.
+     *
+     * @param orderId
+     *            the order id
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @return the order line
+     */
     private OrderLine buildOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
         OrderLine orderLine = new OrderLine();
         // 订单id
