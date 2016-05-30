@@ -33,7 +33,6 @@ import com.feilong.servlet.http.CookieUtil;
  * 基于cookie保存的用户购物车数量持久化.
  *
  * @author feilong
- * @version 5.3.1 2016年5月6日 下午10:09:28
  * @since 5.3.1
  */
 @Component("shoppingcartCountPersister")
@@ -42,6 +41,8 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     /** cookie的名称. */
     private String                   cookieNameShoppingcartCount = CookieKeyConstants.SHOPPING_CART_COUNT;
 
+    /** The shopping cart count handler. */
+    //XXX feilong default
     @Autowired
     private ShoppingCartCountHandler shoppingCartCountHandler;
 
