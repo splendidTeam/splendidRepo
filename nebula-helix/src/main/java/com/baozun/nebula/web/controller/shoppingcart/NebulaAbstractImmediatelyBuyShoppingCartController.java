@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ImmediatelyBuyCheckoutUrlHandler;
 import com.feilong.accessor.AutoKeyAccessor;
 
 /**
@@ -37,14 +38,19 @@ public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends
 
     @Autowired
     @Qualifier("immediatelyBuyAutoKeyAccessor")
-    protected AutoKeyAccessor autoKeyAccessor;
+    protected AutoKeyAccessor                autoKeyAccessor;
+
+    @Autowired
+    private ImmediatelyBuyCheckoutUrlHandler immediatelyBuyCheckoutUrlHandler;
 
     /**
      * @param key
      */
     protected String buildCheckoutUrl(String key,HttpServletRequest request){
         //FIXME feilong 可以做成配置式的
-        return request.getContextPath() + "/transaction/check?key=" + key;
+        return immediatelyBuyCheckoutUrlHandler.getImmediatelyBuyCheckoutUrl(key, request);
+
+        // request.getContextPath() + "/transaction/check?key=" + key;
     }
 
 }
