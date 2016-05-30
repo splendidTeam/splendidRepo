@@ -8,7 +8,7 @@
 		<div>
 			<input type="text" class="fLeft" id="code" name="itemCommand.code"  loxiaType="input" value="${code}" mandatory="true" placeholder="<spring:message code='item.update.code'/>" />
 		</div>
-		<div id="loxiaTip-r" class="loxiaTip-r none">
+		<div id="loxiaTip-r" class="loxiaTip-r none-normal">
 			<div class="arrow"></div>
 			<div class="inner ui-corner-all codetip"></div>
 		</div>
@@ -102,11 +102,12 @@
 	</div>
 	<div class="ui-block-line ">
 		<label></label>
-		<div id="chooseCategory">
+		<div id="chooseCategory" class="Category-line">
 			<c:forEach var="category" items="${categories}">
-				<div class="${category.id }">${category.name }
+				<div class="${category.id } ">${category.name }
 					<input type='hidden' name='categoriesIds' value="${category.id }" />
-					<span style='float: right; margin-right: 1000px;'> <c:choose>
+					<span class="categories-tips"> 
+						<c:choose>
 							<c:when test="${category.id eq defaultItemCategory.categoryId}">
 								<spring:message code="item.update.defaultspan" />
 							</c:when>
@@ -116,9 +117,8 @@
 									onclick='setCategroyDef(this.id)'><spring:message
 										code="item.update.setdefault" /></a>
 							</c:otherwise>
-						</c:choose> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a
-						href="javascript:void(0);" id="${category.id }"
-						style="text-decoration: underline; color: #F8A721"
+						</c:choose> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+						<a class="del" href="javascript:void(0);" id="${category.id }"
 						onclick='delCategroy(this.id)'><spring:message
 								code="item.update.deleteThis" /></a>
 					</span> <br />

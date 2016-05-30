@@ -7,12 +7,19 @@ import java.util.Map;
 
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
-import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.utils.spring.SpringUtil;
+import com.feilong.core.Validator;
 
 public class MutlLang extends LangProperty {
 
 	private static final long serialVersionUID = -4877220898281372352L;
+	
+	
+	//以下几个常量，其实应该从sdkI18nLangManager.geti18nLangCache()获取得到
+	//不应该判断为空情况下才去取
+	//因为在多语言开关开启的情况下是不为空的，如果新增了语言就无法同步更新
+	//通常情况下，品牌新增了语言由于涉及数据重新维护、图片、前段的设计
+	//等多方面问题，所以是会重新发布的。此处就先不加修改了，新增后记得重新跑项目
 	
 	//private static Integer i18nSize;
 

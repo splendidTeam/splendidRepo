@@ -52,8 +52,8 @@ import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewComman
 import com.baozun.nebula.web.controller.shoppingcart.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
+import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
-import com.feilong.framework.accessor.AutoKeyAccessor;
 
 /**
  * 订单确认控制器.
@@ -134,23 +134,29 @@ public class NebulaOrderConfirmController extends BaseController{
     @Qualifier("orderFormValidator")
     private OrderFormValidator               orderFormValidator;
 
+    /** The shoppingcart view command converter. */
     @Autowired
     @Qualifier("shoppingcartViewCommandConverter")
     private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
+    /** The auto key accessor. */
     @Autowired
     @Qualifier("immediatelyBuyAutoKeyAccessor")
     private AutoKeyAccessor                  autoKeyAccessor;
 
+    /** The sdk member manager. */
     @Autowired
     private SdkMemberManager                 sdkMemberManager;
 
+    /** The shoppingcart factory. */
     @Autowired
     private ShoppingcartFactory              shoppingcartFactory;
 
+    /** The order manager. */
     @Autowired
     private OrderManager                     orderManager;
 
+    /** The shopping cart command builder. */
     @Autowired
     private ShoppingCartCommandBuilder       shoppingCartCommandBuilder;
 
@@ -178,11 +184,6 @@ public class NebulaOrderConfirmController extends BaseController{
                     HttpServletResponse response,
                     Model model){
 
-        List<ContactCommand> addressList = null;
-        if (memberDetails != null){
-            addressList = sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
-        }
-
         // 获取购物车信息
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory
                         .getShoppingCartLineCommandList(memberDetails, key, request);
@@ -190,10 +191,11 @@ public class NebulaOrderConfirmController extends BaseController{
 
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
+        List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
         ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(
                         memberDetails,
                         shoppingCartLineCommandList,
-                        addressList,
+                        contactCommandList,
                         null);
 
         // 购物车为空
@@ -206,7 +208,7 @@ public class NebulaOrderConfirmController extends BaseController{
         OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
         orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
         // 收获地址信息
-        orderConfirmViewCommand.setAddressList(addressList);
+        orderConfirmViewCommand.setAddressList(contactCommandList);
         orderConfirmViewCommand.setKey(key);
 
         model.addAttribute("orderConfirmViewCommand", orderConfirmViewCommand);
@@ -214,10 +216,25 @@ public class NebulaOrderConfirmController extends BaseController{
     }
 
     /**
-     * 再次计算金额 使用情景：使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验)
-     * 
+     * 获得用户的收货地址列表.
+     *
      * @param memberDetails
      *            the member details
+     * @return 如果 <code>memberDetails</code> 是null,返回null<br>
+     *         否则调用 {@link com.baozun.nebula.sdk.manager.SdkMemberManager#findAllContactListByMemberId(Long)
+     *         SdkMemberManager.findAllContactListByMemberId(Long)}
+     */
+    private List<ContactCommand> getContactCommandList(MemberDetails memberDetails){
+        return null == memberDetails ? null : sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
+    }
+
+    /**
+     * 再次计算金额 使用情景：使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验).
+     *
+     * @param memberDetails
+     *            the member details
+     * @param key
+     *            the key
      * @param orderForm
      *            the order form
      * @param bindingResult
@@ -292,12 +309,15 @@ public class NebulaOrderConfirmController extends BaseController{
 
     /**
      * 获取选中的购物车信息.
-     * 
+     *
      * @param memberDetails
      *            the member details
-     * @param request
-     *            the request
-     * 
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param addressList
+     *            the address list
+     * @param couponCode
+     *            the coupon code
      * @return the cart info
      */
     private ShoppingCartCommand getChosenShoppingCartCommand(
@@ -317,8 +337,11 @@ public class NebulaOrderConfirmController extends BaseController{
     }
 
     /**
+     * Builds the calc freight command.
+     *
      * @param addressList
-     * @return
+     *            the address list
+     * @return the calc freight command
      */
     private CalcFreightCommand buildCalcFreightCommand(List<ContactCommand> addressList){
         //地址

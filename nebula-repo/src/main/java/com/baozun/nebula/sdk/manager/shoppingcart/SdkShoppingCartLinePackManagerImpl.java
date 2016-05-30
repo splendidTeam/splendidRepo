@@ -109,7 +109,7 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
     public void packShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand){
         Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
 
-        if (null != relatedItemId){
+        if (null == relatedItemId){
 
             //TODO feilong bundle 只有 relatedItemId
             Long skuId = shoppingCartLineCommand.getSkuId();

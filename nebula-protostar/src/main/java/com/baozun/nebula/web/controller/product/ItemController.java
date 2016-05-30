@@ -759,7 +759,7 @@ public class ItemController extends BaseController{
 		}else if ((propertyValueInputIds.length >= 2 && Validator.isNullOrEmpty(propertyValueInputs))
 				|| (propertyValueInputs.length >= 4 * langSize && Validator.isNullOrEmpty(propertyValueInputIds))){
 			// 两个自定义多选或两个多选
-			if (propertyValueInputs.length >= 8 && Validator.isNullOrEmpty(propertyValueInputIds)){
+			if (propertyValueInputs.length >= 4 * langSize && Validator.isNullOrEmpty(propertyValueInputIds)){
 				// 两个自定义多选
 				// 按原有顺序
 				Set<Long> set = new LinkedHashSet<Long>();

@@ -12,6 +12,8 @@ var propertyIdArrayIndex = 0;
 var clickFlag = false;
 var spChangedFlag = false;
 
+var validateSkuCodesUrl = base +'/item/validateSkuCode.json';
+
 //属性数量,全局范围，分组切换使用
 var num=0;
 
@@ -1349,4 +1351,90 @@ $j(document).ready(function(){
 			}
 		});
 	}
+	
+	// 添加商品属性表单验证方法
+	var baseInfoValidator = new FormValidator('', 30, function(){
+		
+		//判断非销售属性复选框必选
+		var att ="";
+		$j.each(mustCheckArray,function(j,val){
+			var a=0;
+			$j("#notSalepropertySpace").find("[mustCheck='"+mustCheckArray[j]+"']").each(function(i,n){
+			    if(this.checked){
+			    	a+=1;
+			    }
+		    });
+			if(a==0){
+				att+="【"+mustCheckArray[j]+"】,";
+			}
+		});
+		if(att!=""){
+		     nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),att.substring(0,att.length-1)+nps.i18n("MUST_SELECT"));
+		     return;
+		}
+		
+		// 销售属性extentionCode验证
+		if(!clickFlag){
+			return nps.i18n("PLEASE_SET_CODE");
+		}
+		
+		//验证 商家编码是否相同
+		var skuCodesArray = new Array();
+		   
+		// 验证是否至少填写了一个sku编码 PLEASE_INPUT_ONE_SKU_CODE
+		var atLeastOneCode = false;
+		   
+		$j("#extensionTable").find(".dynamicInputNameSkuCode").each(function(i,n){
+			skuCodesArray[i] = $j(this).val();
+		});
+		   
+		var validateArrayStr="";
+		for(var i=0;i<skuCodesArray.length;i++){
+			var curCode = skuCodesArray[i];
+				   
+			if(curCode!=null&&curCode!=""){
+				atLeastOneCode = true;
+				var curSp =  originalSalePriceArray[i];
+				if(isNaN(curSp)){
+					return nps.i18n("PLEASE_INPUT_SALEPRICES");
+				}
+			}
+			for(var j=0;j<skuCodesArray.length;j++){
+				if(i!=j&&curCode!=""&&curCode==skuCodesArray[j]){
+					return nps.i18n("MERCHANT_CODING_EQUAL");
+				}
+			}
+				   
+		}
+		   
+		if(!atLeastOneCode){
+			return nps.i18n("PLEASE_INPUT_ONE_SKU_CODE");
+		}
+		   
+		if(spChangedFlag){
+			return nps.i18n("SALES_PROPERTY_CHANGED");
+		}
+		   
+		if(skuCodesArray.length>0){
+			 //向服务器提交验证 TODO
+			for(var i=0;i<skuCodesArray.length;i++){
+				validateArrayStr+=skuCodesArray[i];
+				if(i!=skuCodesArray.length-1){
+					validateArrayStr+=",";
+				}
+			}
+			var skuCodeArrayJsonStr = JSON.stringify(skuCodesArray);
+			var validateJson = {"skuCodes":validateArrayStr};
+			console.log(validateJson);
+			var data = nps.syncXhr(validateSkuCodesUrl,validateJson);
+			  
+			if (data.isSuccess==false) {
+				return nps.i18n("SKU_CODE_REPEAT") + data.description;
+			}
+
+		}
+    	
+    	return loxia.SUCCESS;
+    });
+    formValidateList.push(baseInfoValidator);
 });

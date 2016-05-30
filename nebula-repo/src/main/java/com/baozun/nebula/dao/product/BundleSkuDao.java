@@ -37,6 +37,7 @@ import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
+import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.model.bundle.BundleSku;
 
 /**
@@ -49,4 +50,10 @@ public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	
 	@NativeQuery(model = BundleSku.class)
 	List<BundleSku> findByBundleId(@QueryParam("bundleId")Long bundleId);
+	
+	@NativeQuery(model = BundleSku.class)
+	List<BundleSkuPriceCommand> getBundleSkusPrice(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("skuIds") List<Long> skuIds);
+	
+	@NativeQuery(model = BundleSku.class)
+	BundleSkuPriceCommand getBundleSkuPrice(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("skuId") Long skuId);
 }
