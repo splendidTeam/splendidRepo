@@ -89,5 +89,5 @@ public interface SdkBundleManager {
 	 * @param bundleItemId bundle本身的itemId
 	 * @param inventory 扣减的库存量
 	 */
-	boolean deductingBundleInventory(Long bundleItemId, Integer inventory);
+	void deductingBundleInventory(Long bundleItemId, Integer inventory);
 }
