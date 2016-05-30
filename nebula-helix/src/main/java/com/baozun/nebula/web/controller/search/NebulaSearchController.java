@@ -171,7 +171,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		if (Validator.isNotNullOrEmpty(collection)) {
 			SearchCommand searchCommand = collectionToSearchCommand(collection);
 			
-			
+			searchCommand.setNavigationId(nid);
 			searchCommand.setFilterConditionStr(request.getParameter("filterConditionStr"));
 			searchCommand.setCategoryConditionStr(request.getParameter("categoryConditionStr"));
 			searchCommand.setNavigationConditionStr(request.getParameter("navigationConditionStr"));
