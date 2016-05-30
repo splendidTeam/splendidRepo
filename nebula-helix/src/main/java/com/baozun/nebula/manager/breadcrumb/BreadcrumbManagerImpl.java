@@ -215,6 +215,10 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			//PDP
 			//获取当前导航id
 			String refer =request.getHeader(HEADER_REFERER);
+			if(Validator.isNullOrEmpty(refer)){
+				LOG.warn("[BUILD_BREADCRUMB] can't get referer information by the request!");
+				return Collections.emptyList();
+			}
 			if(LOG.isDebugEnabled()){
 				LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
 			}
