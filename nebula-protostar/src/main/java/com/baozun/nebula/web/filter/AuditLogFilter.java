@@ -85,6 +85,27 @@ public class AuditLogFilter extends OncePerRequestFilter {
 		
 	}
 
+	/**
+	 *  过滤css js ，
+	 *  过滤图片 jpg、png、ico、bmp、gif、tif、pcx、tga 
+	 * @return
+	 */
+	private boolean validateSuffix(String uri){
+		
+		if(StringUtils.isBlank(uri))
+				return false;
+		
+		if(uri.contains(".css") || uri.contains(".js")
+				        || uri.contains(".jpg") || uri.contains(".png")
+						|| uri.contains(".ico") || uri.contains(".bmp")
+						|| uri.contains(".gif") || uri.contains(".tif")
+						|| uri.contains(".pcx") || uri.contains(".tga")
+						)
+			return false;
+		return true;
+		
+	}
+	
 	
 	/**
      * 保存系统日志
@@ -95,8 +116,9 @@ public class AuditLogFilter extends OncePerRequestFilter {
 		
 		String uri = getRequestURI(request);
 		
-		if(StringUtils.isNotBlank(uri) && (uri.contains(".css") || uri.contains(".js")))
+		if(!validateSuffix(uri)){
 			return;
+		}
 	
 		SecurityContext securityContext = (SecurityContext)request.getSession().getAttribute("SPRING_SECURITY_CONTEXT");
     	
