@@ -47,6 +47,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
@@ -81,15 +82,12 @@ public class SdOrderController implements AbstractSdOrderController{
     
     @Autowired
     private SalesOrderResolver salesOrderResolver;
-   
-    @Autowired
-    private SdkFreightFeeManager sdkFreightFeeManager;
-    
-    @Autowired
-    private SdkSkuManager sdkSkuManager;
     
     @Autowired
     private ShoppingCartCommandBuilder            shoppingCartCommandBuilder;
+    
+    @Autowired
+    private OrderManager orderManager;
     /**
      * @author 江家雷
      * @date 2016年5月25日 上午11:04:27
@@ -169,6 +167,24 @@ public class SdOrderController implements AbstractSdOrderController{
     }
     
     /**
+     * @author 江家雷
+     * @date 2016年5月30日 下午3:11:22
+     * @param request
+     * @param shopdogOrderParamCommand
+     * @return
+     * @see com.baozun.shopdog.web.controller.order.AbstractSdOrderController#queryPaymentStatus(javax.servlet.http.HttpServletRequest, com.baozun.shopdog.web.controller.order.viewcommand.ShopdogOrderParamCommand)
+     * @since
+     */
+    @Override
+    public Boolean queryPaymentStatus(HttpServletRequest request, ShopdogOrderParamCommand shopdogOrderParamCommand) {
+       /* SalesOrderCommand  salesOrder = orderManager.findOrderByCode(shopdogOrderParamCommand.getOrderCode(), 1);
+        salesOrder.getPayment*/
+        return null;
+    }
+    
+    
+    
+    /**
      * 预算信息
      * @author 江家雷
      * @param calcFreightCommand
@@ -177,25 +193,15 @@ public class SdOrderController implements AbstractSdOrderController{
      * @since
      */
     private ShopdogSettlementCommand getShopdogSettlementCommand(CalcFreightCommand calcFreightCommand,ShopdogOrderParamCommand shopdogOrderParamCommand){
-        
         ShopdogSettlementCommand shopdogSettlementCommand = new ShopdogSettlementCommand();
-        
-        List<ShoppingCartLineCommand> validLines = new ArrayList<>();
-        for(ShopdogSkusCommand shopdogSkusCommand:shopdogOrderParamCommand.getSkuList()){
-            ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
-            shoppingCartLineCommand.setSkuId(shopdogSkusCommand.getSkuId());
-            shoppingCartLineCommand.setQuantity(shopdogSkusCommand.getCount());            
-            Sku sku = sdkSkuManager.findSkuById(shopdogSkusCommand.getSkuId());
-            shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
-            validLines.add(shoppingCartLineCommand);
-        }
-        shopdogSettlementCommand.setFreightCharge(sdkFreightFeeManager.getFreightFee(1L, calcFreightCommand, validLines));
-        shopdogSettlementCommand.setTotalAmount(getOriginPayAmount(validLines));
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(calcFreightCommand, shopdogOrderParamCommand);
+        shopdogSettlementCommand.setFreightCharge(shoppingCartCommand.getCurrentShippingFee());
+        shopdogSettlementCommand.setTotalAmount(shoppingCartCommand.getCurrentPayAmount());
         return shopdogSettlementCommand;
     }
     
     /**
-     * 计算运费的对象
+     * 生成计算运费的对象
      * 
      * @param salesOrderCommand
      */
@@ -205,7 +211,7 @@ public class SdOrderController implements AbstractSdOrderController{
         calcFreightCommand.setCityId(shopdogOrderParamCommand.getCityId());
         calcFreightCommand.setCountyId(shopdogOrderParamCommand.getAreaId());
         calcFreightCommand.setTownId(shopdogOrderParamCommand.getTownId());
-        // 设置默认的物流方式
+        // 设置默认的物流方式,目前使用的是默认的物流方式，如果是app端选择的话，未做处理 TODO
         String modeId = mataInfoManager.findValue(MetaInfoConstants.DISTRIBUTION_MODE_ID);
         if (modeId != null) {
             calcFreightCommand.setDistributionModeId(Long.parseLong(modeId));
@@ -215,23 +221,26 @@ public class SdOrderController implements AbstractSdOrderController{
         }
         return calcFreightCommand;
     }
-    /**
-     * 计算应付金额.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the origin pay amount
-     */
-    private BigDecimal getOriginPayAmount(List<ShoppingCartLineCommand> shoppingCartLines){
-        BigDecimal originPayAmount = new BigDecimal(0);
-        for (ShoppingCartLineCommand cartLine : shoppingCartLines){
-            if (cartLine.isGift() || cartLine.isCaptionLine())
-                continue;
-            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice()));
+    
+    // 获取购物车信息
+    private ShoppingCartCommand buildShoppingCartCommand(CalcFreightCommand calcFreightCommand,ShopdogOrderParamCommand shopdogOrderParamCommand){
+     
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
+        for(ShopdogSkusCommand shopdogSkusCommand : shopdogOrderParamCommand.getSkuList()){
+            ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
+            shoppingCartLineCommand.setSkuId(shopdogSkusCommand.getSkuId());
+            shoppingCartLineCommand.setQuantity(shopdogSkusCommand.getCount());
+            //这个参数为模拟数据，后续写死
+            shoppingCartLineCommand.setSettlementState(1);
+            //这个参数待确定 TODO
+            shoppingCartLineCommand.setShopId(1L);
+            shoppingCartLineCommandList.add(shoppingCartLineCommand);
         }
-        return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
+                .buildShoppingCartCommand(null, shoppingCartLineCommandList, calcFreightCommand, null);
+        return shoppingCartCommand;
     }
-
+    
     private ShopdogOrderCommand createShopdogOrderCommand(HttpServletRequest request, String userName, String subOrdinate,String payType) {
         // 通過支付流水號查詢訂單
         SalesOrderCommand newOrder = salesOrderResolver.getSalesOrderCommand(subOrdinate);
@@ -249,5 +258,8 @@ public class SdOrderController implements AbstractSdOrderController{
         return shopdogOrderCommand;
         
     }
+
+
+    
 
 }
