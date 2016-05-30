@@ -413,7 +413,7 @@ function itemImageTemplate(data){
 	return loxia.getObject("imageCount", data);
 }
 function itemTypeTemplate(data){
-	var type = loxia.getObject("type", data);
+	var type = loxia.getObject("itemType", data);
 	if(type == null || type == 1){
 		return "普通商品";
 	}else if(type == 3){
