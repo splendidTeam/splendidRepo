@@ -215,68 +215,66 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			//PDP
 			//获取当前导航id
 			String refer =request.getHeader(HEADER_REFERER);
-			if(Validator.isNullOrEmpty(refer)){
-				LOG.warn("[BUILD_BREADCRUMB] can't get referer information by the request!");
-				return Collections.emptyList();
-			}
 			if(LOG.isDebugEnabled()){
 				LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
 			}
-			refer = refer.endsWith("/") ? refer.substring(0, refer.length()-1) : refer;
-			FilterNavigationCommand filterNavigation = navigationHelperManager.matchNavigationByUrl(refer, "");
-			if(Validator.isNotNullOrEmpty(filterNavigation)&&
-					Validator.isNotNullOrEmpty(filterNavigation.getNavId())){
-				results =buildCurmbCommand(filterNavigation.getNavId(), itemId);
-			}else{
-				//从refer中获取不到导航id，应该是链接直接打开，此时需构造ItemCollectionContext，根据ItemCollectionContext
-				//从所有的ItemCollection集合中利用AutoCollection找出符合条件的ItemCollection,有了ItemCollection就可以很快的定位到导航id
-				//1.查询所有的ItemCollection
-				Map<Long, ItemCollection> navItemCMap =loadNavItemCollectionMap();
-				if(Validator.isNullOrEmpty(navItemCMap)){
-					//如果为空，就不必要向下面进行了，找不到导航id的
-					LOG.warn("[BUILD_BREADCRUMB] navigation hasn't bulid relations with itemCollection yet!");
-					return Collections.emptyList();
+			if(Validator.isNotNullOrEmpty(refer)){
+				refer = refer.endsWith("/") ? refer.substring(0, refer.length()-1) : refer;
+				FilterNavigationCommand filterNavigation= navigationHelperManager.matchNavigationByUrl(refer, "");
+				if(Validator.isNotNullOrEmpty(filterNavigation)&&
+						Validator.isNotNullOrEmpty(filterNavigation.getNavId())){
+					results =buildCurmbCommand(filterNavigation.getNavId(), itemId);
+					return results;
 				}
-				//2.构造ItemCollectionContext
-				ItemCollectionContext itemCollectionContext =constructItemCollectionContextByItemId(itemId);
-				if(Validator.isNotNullOrEmpty(itemCollectionContext)){
-					if(LOG.isDebugEnabled()){
-						LOG.debug("[BUILD_BREADCRUMB] itemCollectionContext:{}", JsonUtil.format(itemCollectionContext));
-					}
-					//定位最佳导航id (取最大长度，长度相等时取最远时间)
-					Long navigationId =null;
-					int idx =0;
-					int tempTreeSize =0;
-					ItemCollection tempCollection =null;
-					List<CurmbCommand> resultCurmbCommands =null;
-					List<CurmbCommand> currentCurmbCommands =null;
-					for (Map.Entry<Long, ItemCollection> entry : navItemCMap.entrySet()) {
-						if(AutoCollection.apply(entry.getValue(), itemCollectionContext)){
-							navigationId =entry.getKey();
-							if(idx == 0){
-								tempCollection=entry.getValue();
-								resultCurmbCommands =buildCurmbCommand(navigationId, itemId);
-								tempTreeSize =Validator.isNotNullOrEmpty(resultCurmbCommands)?
-										resultCurmbCommands.size(): 0;
-							}else{
-								currentCurmbCommands =buildCurmbCommand(navigationId, itemId);
-								int currentTreeSize =Validator.isNotNullOrEmpty(currentCurmbCommands)?
-										currentCurmbCommands.size(): 0;
-								if(tempTreeSize < currentTreeSize){
-									//最大长度
+			}
+			//从refer中获取不到导航id，应该是链接直接打开，此时需构造ItemCollectionContext，根据ItemCollectionContext
+			//从所有的ItemCollection集合中利用AutoCollection找出符合条件的ItemCollection,有了ItemCollection就可以很快的定位到导航id
+			//1.查询所有的ItemCollection
+			Map<Long, ItemCollection> navItemCMap =loadNavItemCollectionMap();
+			if(Validator.isNullOrEmpty(navItemCMap)){
+				//如果为空，就不必要向下面进行了，找不到导航id的
+				LOG.warn("[BUILD_BREADCRUMB] navigation hasn't bulid relations with itemCollection yet!");
+				return Collections.emptyList();
+			}
+			//2.构造ItemCollectionContext
+			ItemCollectionContext itemCollectionContext =constructItemCollectionContextByItemId(itemId);
+			if(Validator.isNotNullOrEmpty(itemCollectionContext)){
+				if(LOG.isDebugEnabled()){
+					LOG.debug("[BUILD_BREADCRUMB] itemCollectionContext:{}", JsonUtil.format(itemCollectionContext));
+				}
+				//定位最佳导航id (取最大长度，长度相等时取最远时间)
+				Long navigationId =null;
+				int idx =0;
+				int tempTreeSize =0;
+				ItemCollection tempCollection =null;
+				List<CurmbCommand> resultCurmbCommands =null;
+				List<CurmbCommand> currentCurmbCommands =null;
+				for (Map.Entry<Long, ItemCollection> entry : navItemCMap.entrySet()) {
+					if(AutoCollection.apply(entry.getValue(), itemCollectionContext)){
+						navigationId =entry.getKey();
+						if(idx == 0){
+							tempCollection=entry.getValue();
+							resultCurmbCommands =buildCurmbCommand(navigationId, itemId);
+							tempTreeSize =Validator.isNotNullOrEmpty(resultCurmbCommands)?
+									resultCurmbCommands.size(): 0;
+						}else{
+							currentCurmbCommands =buildCurmbCommand(navigationId, itemId);
+							int currentTreeSize =Validator.isNotNullOrEmpty(currentCurmbCommands)?
+									currentCurmbCommands.size(): 0;
+							if(tempTreeSize < currentTreeSize){
+								//最大长度
+								resultCurmbCommands =currentCurmbCommands;
+							}else if(tempTreeSize == currentTreeSize){
+								//距离现在最久远时间
+								if(entry.getValue().getCreateTime().before(tempCollection.getCreateTime())){
 									resultCurmbCommands =currentCurmbCommands;
-								}else if(tempTreeSize == currentTreeSize){
-									//距离现在最久远时间
-									if(entry.getValue().getCreateTime().before(tempCollection.getCreateTime())){
-										resultCurmbCommands =currentCurmbCommands;
-									}
 								}
 							}
-							idx++;
 						}
+						idx++;
 					}
-					results =resultCurmbCommands;
 				}
+				results =resultCurmbCommands;
 			}
 		}   
 		return results;
