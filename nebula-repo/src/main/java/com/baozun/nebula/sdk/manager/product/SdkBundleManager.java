@@ -59,5 +59,5 @@ public interface SdkBundleManager {
 	 * @param skuIds bundle中选中的一组sku
 	 * @return
 	 */
-	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, List<Long> skuIds);
+	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, Long[] skuIds);
 }

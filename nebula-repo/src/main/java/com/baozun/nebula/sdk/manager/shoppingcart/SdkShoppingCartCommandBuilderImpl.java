@@ -146,14 +146,14 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = buildShopCartByShopIdMap(shoppingCartCommand);
         shoppingCartCommand.setShoppingCartByShopIdMap(shopIdAndShoppingCartCommandMap);
 
-        //TODO feilong 全不选的情况
+        //XXX feilong 全不选的情况
         if (Validator.isNotNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){
             // 设置购物车促销信息
             setShopCartPromotionInfos(shoppingCartCommand, calcFreightCommand);
         }
 
         //***************************************************************************************
-        //TODO feilong what's this?
+        //XXX feilong what's this?
         doWithNoChoose(noChooseShoppingCartLineCommandList, shoppingCartCommand, shopIdAndShoppingCartCommandMap);
 
         //************************************************************************************************
@@ -785,7 +785,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         if (settingId != null){
             shoppingCartLineCommand.setLineGroup(settingId);
         }
-        //TODO feilong what logic?
+        //XXX feilong what logic?
         shoppingCartLineCommand.setStock(qty);
         // 赠品都设置为有效
         shoppingCartLineCommand.setValid(true);

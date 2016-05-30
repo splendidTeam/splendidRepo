@@ -169,7 +169,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			SMSCommand smsCommand = new SMSCommand();
 			smsCommand.setTemplateCode(ForgetPasswordSendVCodeConstant.SMS_FORGET_PASSWORD_CAPTCHA);
 			smsCommand.setMobile(mobile);
-
+			smsCommand.addVar("maxsurvivaltime", ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME/60);
 			// 发送验证码结束
 			boolean sendFailOrSuccess = smsManager.send(
 					smsCommand,

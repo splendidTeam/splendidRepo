@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.baozun.nebula.payment.convert.PayParamCommandAdaptor;
 import com.baozun.nebula.payment.convert.PaymentConvertFactory;
 import com.baozun.nebula.payment.manager.PaymentManager;
+import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.Validator;
@@ -43,6 +44,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			.getLogger(PaymentManagerImpl.class);
 	
 	private static final String _INPUT_CHARSET = "utf-8";
+
 
 	@Override
 	public PaymentRequest createPayment(SalesOrderCommand order) {
@@ -124,24 +126,25 @@ public class PaymentManagerImpl implements PaymentManager {
 	public static String getPayType(Integer payType) {
 		String type = PaymentFactory.PAY_TYPE_ALIPAY;
 		switch (payType) {
-		case 1:
+		case ReservedPaymentType.ALIPAY:
 			type = PaymentFactory.PAY_TYPE_ALIPAY;
 			break;
-		case 3:
+		case ReservedPaymentType.ALIPAY_BANK:
 			type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;
 			break;
-		case 4:
+		case ReservedPaymentType.ALIPAY_CREDIT:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
+			break;
+		case ReservedPaymentType.ALIPAY_CREDIT_INT_V:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+			break;
+		case ReservedPaymentType.ALIPAY_CREDIT_INT_M:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+			break;
+		case ReservedPaymentType.WECHAT:
 			type = PaymentFactory.PAY_TYPE_WECHAT;
 			break;
-		case 14:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
-		case 131:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-			break;
-		case 141:
-			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
-			break;
-		case 161:
+		case ReservedPaymentType.UNIONPAY:
 			type = PaymentFactory.PAY_TYPE_UNIONPAY;
 			break;
 		}
