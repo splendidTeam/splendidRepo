@@ -176,10 +176,9 @@ public class SdOrderController implements AbstractSdOrderController{
      * @since
      */
     @Override
-    public Boolean queryPaymentStatus(HttpServletRequest request, ShopdogOrderParamCommand shopdogOrderParamCommand) {
-       /* SalesOrderCommand  salesOrder = orderManager.findOrderByCode(shopdogOrderParamCommand.getOrderCode(), 1);
-        salesOrder.getPayment*/
-        return null;
+    public Boolean queryPaymentStatus(ShopdogOrderParamCommand shopdogOrderParamCommand) {
+        SalesOrderCommand  salesOrder = orderManager.findOrderByCode(shopdogOrderParamCommand.getOrderCode(), 1);        
+        return salesOrder.getPayInfo().get(0).getPaySuccessStatus();
     }
     
     
