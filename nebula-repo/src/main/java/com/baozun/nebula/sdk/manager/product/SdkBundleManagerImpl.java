@@ -61,7 +61,7 @@ public class SdkBundleManagerImpl implements SdkBundleManager {
 	 * @see com.baozun.nebula.manager.product.NebulaBundleManager#getBundleSkusPrice(java.lang.Long, java.util.List)
 	 */
 	@Override
-	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, List<Long> skuIds) {
+	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, Long[] skuIds) {
 		return bundleSkuDao.getBundleSkusPrice(bundleItemId, skuIds);
 	}
 }

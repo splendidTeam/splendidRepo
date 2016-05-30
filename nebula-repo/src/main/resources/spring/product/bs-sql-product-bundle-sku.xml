@@ -59,7 +59,7 @@
 						t_pd_sku s on bs.sku_id = s.id
 					WHERE 
 						b.item_id = :bundleItemId and bs.sku_id in
-						<foreach collection="list" item="skuIds" open="(" separator="," close=")">  
+						<foreach collection="array" item="skuIds" open="(" separator="," close=")">  
         					#{skuIds}  
      					</foreach>
 				]]>
