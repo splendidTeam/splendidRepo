@@ -1,7 +1,8 @@
 package com.baozun.nebula.sdk.utils;
 
 import org.apache.commons.lang.StringUtils;
-import com.baozun.nebula.payment.convert.PaymentConvertFactory;
+
+import com.baozun.nebula.payment.manager.ReservedPaymentType;
 
 public class BankCodeConvertUtil {
 
@@ -10,12 +11,12 @@ public class BankCodeConvertUtil {
 	public static String getPayTypeDetail(String bankCode,int payType) {
 		String payTypeDetail = "支付宝支付";
 	
-		if(payType == PaymentConvertFactory.PAY_TYPE_UNIONPAY){
+		if(payType == ReservedPaymentType.UNIONPAY){
 				payTypeDetail = "银联在线支付";
 				return payTypeDetail;
 		}
 		
-		if(payType == PaymentConvertFactory.PAY_TYPE_CHINAPNR){
+		if(payType == ReservedPaymentType.CHINAPNR){
 			payTypeDetail = "汇付天下支付";
 			return payTypeDetail;
 		}
@@ -24,16 +25,16 @@ public class BankCodeConvertUtil {
 			return payTypeDetail;	
 		}
 		
-		if(payType == PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_V || payType == PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_M
-				|| payType == PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT){
+		if(payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M
+				|| payType == ReservedPaymentType.ALIPAY_CREDIT){
 				switch (payType) {
-				case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT:
+				case ReservedPaymentType.ALIPAY_CREDIT:
 					payTypeDetail = "支付宝国内信用卡支付";
 					break;
-				case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_V:
+				case ReservedPaymentType.ALIPAY_CREDIT_INT_V:
 					payTypeDetail = "支付宝VISA信用卡支付";
 					break;
-				case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_M:
+				case ReservedPaymentType.ALIPAY_CREDIT_INT_M:
 					payTypeDetail = "支付宝国际信用卡支付";
 					break;
 				default:
@@ -109,7 +110,7 @@ public class BankCodeConvertUtil {
 	public static String getPayTypeDetail(String bankCode,int payType,boolean exist) {
 		String payTypeDetail = "支付宝支付";
 	
-		if(payType == PaymentConvertFactory.PAY_TYPE_UNIONPAY){
+		if(payType == ReservedPaymentType.UNIONPAY){
 			if(!exist){
 				payTypeDetail = "银联在线支付";
 				return payTypeDetail;
@@ -117,7 +118,7 @@ public class BankCodeConvertUtil {
 			return StringUtils.EMPTY;
 		}
 		
-		if(payType == PaymentConvertFactory.PAY_TYPE_CHINAPNR){
+		if(payType == ReservedPaymentType.CHINAPNR){
 			if(!exist){
 				payTypeDetail = "汇付天下支付";
 				return payTypeDetail;
@@ -132,17 +133,17 @@ public class BankCodeConvertUtil {
 			return StringUtils.EMPTY;
 		}
 		
-		if(payType == PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_V || payType == PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_M
-				|| payType == PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT){
+		if(payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M
+				|| payType == ReservedPaymentType.ALIPAY_CREDIT){
 			if(!exist){
 				switch (payType) {
-				case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT:
+				case ReservedPaymentType.ALIPAY_CREDIT:
 					payTypeDetail = "支付宝国内信用卡支付";
 					break;
-				case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_V:
+				case ReservedPaymentType.ALIPAY_CREDIT_INT_V:
 					payTypeDetail = "支付宝VISA信用卡支付";
 					break;
-				case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_M:
+				case ReservedPaymentType.ALIPAY_CREDIT_INT_M:
 					payTypeDetail = "支付宝国际信用卡支付";
 					break;
 				default:
