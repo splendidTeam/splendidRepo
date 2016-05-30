@@ -168,7 +168,8 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 		List<ItemSolrCommand> itemCommandList = itemInfoManager
 				.findItemCommandByItemId(itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
-			return false;
+			//找不到说明是非卖品上架，不需要刷新索引。
+			return true;
 		}
 		List<ItemForSolrCommand> itemForSolrCommandList = new ArrayList<ItemForSolrCommand>();
 		for (ItemSolrCommand itemSolrCommand : itemCommandList) {			
