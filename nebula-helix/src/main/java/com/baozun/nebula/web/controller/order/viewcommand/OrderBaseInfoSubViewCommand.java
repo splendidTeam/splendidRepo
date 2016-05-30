@@ -177,7 +177,7 @@ public class OrderBaseInfoSubViewCommand extends BaseViewCommand {
     }
 
     /**
-     * 获得 //TODO feilong 总价.
+     * 获得.
      *
      * @return the total
      */
@@ -186,7 +186,7 @@ public class OrderBaseInfoSubViewCommand extends BaseViewCommand {
     }
 
     /**
-     * 设置 //TODO feilong 总价.
+     * 设置.
      *
      * @param total the total to set
      */

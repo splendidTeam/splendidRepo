@@ -90,7 +90,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * <td>修改购物车数量</td>
  * </tr>
  * <tr valign="top">
- * <td>//TODO feilong</td>
+ * <td>//XXX feilong</td>
  * <td>修改商品销售属性</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">

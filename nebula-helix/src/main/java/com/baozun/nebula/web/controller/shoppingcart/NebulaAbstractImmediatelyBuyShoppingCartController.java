@@ -43,7 +43,7 @@ public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends
      * @param key
      */
     protected String buildCheckoutUrl(String key,HttpServletRequest request){
-        //TODO feilong 可以做成配置式的
+        //FIXME feilong 可以做成配置式的
         return request.getContextPath() + "/transaction/check?key=" + key;
     }
 

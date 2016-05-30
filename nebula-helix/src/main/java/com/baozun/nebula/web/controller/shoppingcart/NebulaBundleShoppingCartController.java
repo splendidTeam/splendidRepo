@@ -116,7 +116,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         return toNebulaReturnResult(checkoutUrl);
     }
 
-    //TODO feilong 构造bundle购物车信息
+    //XXX feilong 构造bundle购物车信息
 
     /**
      * To nebula return result.

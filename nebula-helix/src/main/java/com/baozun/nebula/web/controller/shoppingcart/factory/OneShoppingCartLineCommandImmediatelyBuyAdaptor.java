@@ -58,7 +58,7 @@ public abstract class OneShoppingCartLineCommandImmediatelyBuyAdaptor implements
      *            the ts
      * @return the list< t>
      */
-    //TODO 等feilong 1.5.6 发布 直接调用  com.feilong.core.bean.ConvertUtil#toList(T...)
+    //TODO feilong 等feilong 1.5.6 发布 直接调用  com.feilong.core.bean.ConvertUtil#toList(T...)
     private <T> List<T> toList(T...ts){
         List<T> list = new ArrayList<T>();
         for (T t : ts){

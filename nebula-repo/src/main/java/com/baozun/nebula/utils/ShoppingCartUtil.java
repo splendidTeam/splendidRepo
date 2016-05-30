@@ -130,9 +130,9 @@ public final class ShoppingCartUtil{
      *
      * @param comboIds
      *            the combo ids
-     * @return the set< string>
+     * @return 如果 <code>dateList</code> 是null或者empty,返回 {@link Collections#emptyList()}<br>
      */
-    //TODO feilong 提取
+    //XXX feilong 提取
     private static Set<String> toPropertyValueSet(Set<Set<String>> comboIds){
         if (Validator.isNullOrEmpty(comboIds)){
             return Collections.emptySet();

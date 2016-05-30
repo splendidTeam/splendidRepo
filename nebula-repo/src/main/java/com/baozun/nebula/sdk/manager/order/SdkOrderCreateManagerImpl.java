@@ -448,7 +448,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         // 封装发送邮件数据
         if (isSendEmail){
-            //TODO feilong 待重构
             Map<String, Object> dataMap = sdkOrderEmailManager.buildDataMapForCreateOrder(
                             subOrdinate,
                             salesOrder,

@@ -173,7 +173,7 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
      * @return Boolean
      * @Description: 检查商品是否上架
      */
-    //TODO feilong 重复了 see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLinePackManagerImpl.checkActiveBeginTime(Long)
+    //XXX feilong 重复了 see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLinePackManagerImpl.checkActiveBeginTime(Long)
     private Boolean checkActiveBeginTime(Long skuId){
 
         List<Long> skuids = new ArrayList<Long>();

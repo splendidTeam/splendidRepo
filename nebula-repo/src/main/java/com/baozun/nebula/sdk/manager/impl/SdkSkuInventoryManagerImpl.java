@@ -92,7 +92,7 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
      *            the shopping cart line command list
      * @return the map< string, integer>
      */
-    //TODO feilong 扣减库存 如果有bundle 逻辑处理
+    //FIXME feilong 扣减库存 如果有bundle 逻辑处理
     private Map<String, Integer> buildExtentionCodeAndCountMap(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         Map<String, Integer> extentionCodeAndCountMap = new HashMap<String, Integer>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){

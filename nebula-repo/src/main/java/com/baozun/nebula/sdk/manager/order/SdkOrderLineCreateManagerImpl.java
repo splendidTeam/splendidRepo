@@ -141,7 +141,7 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         Item item = itemDao.findItemById(itemId);
         ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoByCode(item.getCode());
 
-        //FIXME feilong 
+        //FIXME feilong bundle商品金额
         BigDecimal listPrice = new BigDecimal(999);
         BigDecimal salePrice = new BigDecimal(999);
         BigDecimal discount = new BigDecimal(0);

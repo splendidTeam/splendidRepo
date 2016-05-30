@@ -124,7 +124,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             if (shoppingCartLineCommand.getId() == null){
                 shoppingCartLineCommand.setId(new Long(--i));
             }
-            //TODO feilong bundle不是这么玩的
             sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
         }
         //*******************************************************************************************************
@@ -704,7 +703,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         // 应付合计(应付金额+应付运费)
         shopCartCommandByShop.setSumCurrentPayAmount(shopCartCommandByShop.getSubtotalCurrentPayAmount().add(originShippingFee));
 
-        //TODO feilong 原来是这里加礼品的
+        //XXX feilong 原来是这里加礼品的
         shoppingCartLineCommandList.addAll(giftList); // 将礼品放入购物车当中
         shopCart.setShoppingCartLineCommands(shoppingCartLineCommandList);
 
