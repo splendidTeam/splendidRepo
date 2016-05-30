@@ -36,8 +36,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.BundleSkuPriceCommand;
+import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleSkuDao;
+import com.baozun.nebula.model.product.Item;
 
 /**
  * @author yue.ch
@@ -48,6 +51,9 @@ public class SdkBundleManagerImpl implements SdkBundleManager {
 	
 	@Autowired
 	private BundleSkuDao bundleSkuDao;
+	
+	@Autowired
+	private BundleDao bundleDao;
 
 	/* (non-Javadoc)
 	 * @see com.baozun.nebula.manager.product.NebulaBundleManager#getBundleSkuPrice(java.lang.Long, java.lang.Long)
@@ -63,5 +69,21 @@ public class SdkBundleManagerImpl implements SdkBundleManager {
 	@Override
 	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, Long[] skuIds) {
 		return bundleSkuDao.getBundleSkusPrice(bundleItemId, skuIds);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkBundleManager#findBundleCommandByBundleItemId(java.lang.Long, java.lang.Boolean)
+	 */
+	@Override
+	public BundleCommand findBundleCommandByBundleItemId(Long bundleItemId, Boolean flag) {
+		return bundleDao.findBundleByBundleItemId(bundleItemId, flag ? Item.LIFECYCLE_ENABLE : null);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkBundleManager#deductingBundleInventory(java.lang.Long, java.lang.Integer)
+	 */
+	@Override
+	public boolean deductingBundleInventory(Long bundleItemId, Integer inventory) {
+		return bundleDao.deductingBundleInventory(bundleItemId, inventory) > 0;
 	}
 }

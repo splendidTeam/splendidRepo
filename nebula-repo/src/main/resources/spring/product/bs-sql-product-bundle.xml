@@ -188,7 +188,59 @@
 		       			t_pd_item i on i.id = b.item_id 
 		       		WHERE 
 		       			b.item_id = :bundleItemId
+		       			#if($lifecycle)
+			       			and i.lifecycle = :lifecycle
+			       		#end
                  ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.save" class="loxia.dao.support.DynamicQueryHolder">
+		<description>保存bundle扩展信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					INSERT into t_pd_bundle (item_id, price_type, available_qty, sync_with_inv, create_time)
+						VALUES (:itemId, :priceType, :availableQty, :syncWithInv, now())
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.update" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新bundle扩展信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					UPDATE 
+						t_pd_bundle 
+					SET
+						item_id = :itemId,
+						price_type = :priceType,
+						available_qty = :availableQty,
+						sync_with_inv = :syncWithInv,
+						update_time = now()
+					WHERE id = :id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Bundle.deductingBundleInventory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>扣减bundle库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					UPDATE 
+						t_pd_bundle 
+					SET
+						available_qty = available_qty - :inventory
+					WHERE 
+						available_qty > :inventory 
+						and available_qty is not null 
+						and item_id = :bundleItemId
+				]]>
 			</value>
 		</constructor-arg>
 	</bean>
