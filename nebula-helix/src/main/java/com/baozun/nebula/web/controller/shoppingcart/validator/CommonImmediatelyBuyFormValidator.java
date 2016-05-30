@@ -20,16 +20,16 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import com.baozun.nebula.web.controller.shoppingcart.form.BundleImmediatelyBuyForm;
+import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyForm;
 
 /**
- * 立即购买 bundle参数的校验.
+ * 立即购买 的校验.
  *
  * @author feilong
  * @version 5.3.1 2016年5月28日 下午4:48:53
  * @since 5.3.1
  */
-public class ImmediatelyBuyBundleFormValidator implements Validator{
+public class CommonImmediatelyBuyFormValidator implements Validator{
 
     /*
      * (non-Javadoc)
@@ -38,7 +38,7 @@ public class ImmediatelyBuyBundleFormValidator implements Validator{
      */
     @Override
     public boolean supports(Class<?> clazz){
-        return BundleImmediatelyBuyForm.class.isAssignableFrom(clazz);
+        return CommonImmediatelyBuyForm.class.isAssignableFrom(clazz);
     }
 
     /*
@@ -48,8 +48,7 @@ public class ImmediatelyBuyBundleFormValidator implements Validator{
      */
     @Override
     public void validate(Object target,Errors errors){
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "relatedItemId", "field.required");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "skuIds", "field.required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "skuId", "field.required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "count", "field.required");
     }
 }

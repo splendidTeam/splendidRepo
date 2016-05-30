@@ -59,7 +59,7 @@ public class ItemDetailManagerTest{
 	 * Test method for {@link com.baozun.nebula.manager.product.ItemManagerImpl#findItemListByItemIds(java.lang.Long[])}.
 	 */
 	
-	private static final Long itemId =14060L;
+	private static final Long itemId =78L;
 	
 	@Before
 	public void setM(){
@@ -68,7 +68,7 @@ public class ItemDetailManagerTest{
 	
 	@Test
 	public void testFindDynamicProperty() {
-		LangUtil.setCurrentLang("zh_HK");
+		LangUtil.setCurrentLang("zh_CN");
 		Map<String, Object> dyp = itemDetailManager.findDynamicProperty(itemId);
 		if(dyp != null) {
 			System.out.println("===========" + dyp.size());
@@ -81,6 +81,7 @@ public class ItemDetailManagerTest{
 	
 	@Test
 	public void testGatherDy(){
+		LangUtil.setCurrentLang("zh_CN");
 		Map<String, Object> dyp = itemDetailManager.gatherDynamicProperty(itemId);
 		log.debug("sssssss:{}", JsonUtil.format(dyp));
 	}

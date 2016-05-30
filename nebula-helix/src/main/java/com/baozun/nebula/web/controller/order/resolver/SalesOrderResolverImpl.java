@@ -43,8 +43,10 @@ import com.baozun.nebula.sdk.utils.BankCodeConvertUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
+import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.RequestUtil;
@@ -81,9 +83,10 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         // 需要封装的对象
         SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
         // 设置收货地址信息
+        ShippingInfoSubForm shippingInfoSubForm = orderForm.getShippingInfoSubForm();
         PropertyUtil.copyProperties(
                         salesOrderCommand,
-                        orderForm.getShippingInfoSubForm(),
+                        shippingInfoSubForm,
                         "countryId",
                         "provinceId",
                         "cityId",
@@ -94,55 +97,54 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "mobile",
                         "tel",
                         "email");
-        
+
         //地址名称
-		Address country = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getCountryId());
-		Address province = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getProvinceId());
-		Address city = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getCityId());
-		Address area = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getAreaId());
-		Address town = AddressUtil.getAddressById(orderForm.getShippingInfoSubForm().getTownId());
-		salesOrderCommand.setCountry(country==null?"": country.getName());
-		salesOrderCommand.setProvince(province==null?"": province.getName());
-		salesOrderCommand.setCity(city==null?"": city.getName());
-		salesOrderCommand.setArea(area==null?"": area.getName());
-		salesOrderCommand.setTown(town==null?"": town.getName());
-		
+        Address country = AddressUtil.getAddressById(shippingInfoSubForm.getCountryId());
+        Address province = AddressUtil.getAddressById(shippingInfoSubForm.getProvinceId());
+        Address city = AddressUtil.getAddressById(shippingInfoSubForm.getCityId());
+        Address area = AddressUtil.getAddressById(shippingInfoSubForm.getAreaId());
+        Address town = AddressUtil.getAddressById(shippingInfoSubForm.getTownId());
+        salesOrderCommand.setCountry(country == null ? "" : country.getName());
+        salesOrderCommand.setProvince(province == null ? "" : province.getName());
+        salesOrderCommand.setCity(city == null ? "" : city.getName());
+        salesOrderCommand.setArea(area == null ? "" : area.getName());
+        salesOrderCommand.setTown(town == null ? "" : town.getName());
+
         // 用户信息
         boolean isGuest = Validator.isNullOrEmpty(memberDetails);
-//        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
-        salesOrderCommand.setName(orderForm.getShippingInfoSubForm().getName());
+        //        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
+        salesOrderCommand.setName(shippingInfoSubForm.getName());
         salesOrderCommand.setMemberName(isGuest ? "" : memberDetails.getLoginName());
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
         salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
-        salesOrderCommand.setBuyerName(orderForm.getShippingInfoSubForm().getBuyerName());
-        salesOrderCommand.setBuyerTel(orderForm.getShippingInfoSubForm().getBuyerTel());
+        salesOrderCommand.setBuyerName(shippingInfoSubForm.getBuyerName());
+        salesOrderCommand.setBuyerTel(shippingInfoSubForm.getBuyerTel());
         // 设置支付信息
         PaymentInfoSubForm paymentInfoSubForm = orderForm.getPaymentInfoSubForm();
-        salesOrderCommand.setPayment(Integer.parseInt(paymentInfoSubForm.getPaymentType()));
+        String paymentType = paymentInfoSubForm.getPaymentType();
+        salesOrderCommand.setPayment(Integer.parseInt(paymentType));
         salesOrderCommand.setPaymentStr(
-                        BankCodeConvertUtil.getPayTypeDetail(
-                                        paymentInfoSubForm.getBankcode(),
-                                        Integer.parseInt(paymentInfoSubForm.getPaymentType())));
+                        BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getBankcode(), Integer.parseInt(paymentType)));
         // 设置运费
         setFreghtCommand(salesOrderCommand);
         // 设置优惠券信息
         setCoupon(salesOrderCommand, orderForm.getCouponInfoSubForm().getCouponCode());
 
         // 发票信息
-        if (Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())){
-            if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()){
-                salesOrderCommand.setReceiptTitle(orderForm.getInvoiceInfoSubForm().getInvoiceTitle());
-                salesOrderCommand.setReceiptContent(orderForm.getInvoiceInfoSubForm().getInvoiceContent());
-                salesOrderCommand.setReceiptType(orderForm.getInvoiceInfoSubForm().getInvoiceType());
-                salesOrderCommand.setReceiptConsignee(orderForm.getInvoiceInfoSubForm().getConsignee());
-                salesOrderCommand.setReceiptAddress(orderForm.getInvoiceInfoSubForm().getAddress());
-                salesOrderCommand.setReceiptTelphone(orderForm.getInvoiceInfoSubForm().getTelphone());
+        InvoiceInfoSubForm invoiceInfoSubForm = orderForm.getInvoiceInfoSubForm();
+        if (Validator.isNotNullOrEmpty(invoiceInfoSubForm)){
+            if (invoiceInfoSubForm.getIsNeedInvoice()){
+                salesOrderCommand.setReceiptTitle(invoiceInfoSubForm.getInvoiceTitle());
+                salesOrderCommand.setReceiptContent(invoiceInfoSubForm.getInvoiceContent());
+                salesOrderCommand.setReceiptType(invoiceInfoSubForm.getInvoiceType());
+                salesOrderCommand.setReceiptConsignee(invoiceInfoSubForm.getConsignee());
+                salesOrderCommand.setReceiptAddress(invoiceInfoSubForm.getAddress());
+                salesOrderCommand.setReceiptTelphone(invoiceInfoSubForm.getTelphone());
             }
         }
 
         // 订单来源
         salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
-
         return salesOrderCommand;
     }
 
@@ -202,5 +204,4 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
 
         return orderManager.findOrderById(payInfoLogs.get(0).getOrderId(), SalesOrder.SALES_ORDER_STATUS_NEW);
     }
-
 }

@@ -76,7 +76,11 @@ public class ItemPropertiesCommand implements Serializable {
 	 * 属性值Id
 	 */
 	private Long				propertyValueId;
-
+	
+	/**
+	 * 配图地址，绝对地址
+	 */
+	private String              thumb;
 	/**
 	 * 所属属性
 	 */
@@ -135,6 +139,20 @@ public class ItemPropertiesCommand implements Serializable {
 
 	public void setPropertyValue(String propertyValue) {
 		this.propertyValue = propertyValue;
+	}
+	
+	/**
+	 * @return the thumb
+	 */
+	public String getThumb() {
+		return thumb;
+	}
+
+	/**
+	 * @param thumb the thumb to set
+	 */
+	public void setThumb(String thumb) {
+		this.thumb = thumb;
 	}
 
 	public Long getItemId() {

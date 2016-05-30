@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart;
+package com.baozun.nebula.web.controller.shoppingcart.factory;
 
 import java.util.List;
 

@@ -115,21 +115,4 @@ public interface NebulaBundleManager extends BaseManager {
 	 */
 	public BundleValidateResult validateBundle(Long bundleItemId,List<Long> skuIds,int quantity);
 	
-	/**
-	 * 获取bundle中某个sku的价格
-	 * 
-	 * @param bundleItemId bundle的itemId
-	 * @param skuId bundle中的某个sku
-	 * @return
-	 */
-	public BundleSkuPriceCommand getBundleSkuPrice(Long bundleItemId, Long skuId);
-	
-	/**
-	 * 获取bundle中某些sku的价格
-	 * 
-	 * @param bundleItemId bundle的itemId
-	 * @param skuIds bundle中选中的一组sku
-	 * @return
-	 */
-	public List<BundleSkuPriceCommand> getBundleSkusPrice(Long bundleItemId, List<Long> skuIds);
 }
