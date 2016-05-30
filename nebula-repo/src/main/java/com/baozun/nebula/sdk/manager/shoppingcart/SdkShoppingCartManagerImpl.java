@@ -791,7 +791,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     @Override
     @Deprecated
     public boolean merageShoppingCartLineById(Long userId,ShoppingCartLineCommand shoppingCartLine){
-
         String extentionCode = shoppingCartLine.getExtentionCode();
         if (null == extentionCode){
             return false;

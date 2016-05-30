@@ -90,7 +90,15 @@ public interface ShoppingcartResolver{
     //***************************************************************************************
     /**
      * 将特定的<code>skuid</code>,指定的数量<code>count</code>,加入到用户的购物车里面去.
-     *
+     * 
+     * <h3>流程:</h3>
+     * 
+     * <blockquote>
+     * 
+     * <p>
+     * <img src="http://venusdrogon.github.io/feilong-platform/mysource/store/添加到购物车.png"/>
+     * </p>
+     * 
      * @param memberDetails
      *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
      * @param skuId
@@ -101,7 +109,8 @@ public interface ShoppingcartResolver{
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult addShoppingCart(
                     MemberDetails memberDetails,
@@ -127,7 +136,8 @@ public interface ShoppingcartResolver{
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult updateShoppingCartCount(
                     MemberDetails memberDetails,
@@ -147,7 +157,8 @@ public interface ShoppingcartResolver{
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult deleteShoppingCartLine(
                     MemberDetails memberDetails,
@@ -172,7 +183,8 @@ public interface ShoppingcartResolver{
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult toggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
@@ -196,7 +208,8 @@ public interface ShoppingcartResolver{
      *            the request
      * @param response
      *            the response
-     * @return the shoppingcart result
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult toggleAllShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,

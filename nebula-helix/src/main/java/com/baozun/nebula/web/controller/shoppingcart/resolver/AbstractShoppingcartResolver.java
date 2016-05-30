@@ -123,7 +123,6 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             return ShoppingcartResult.MAX_THAN_INVENTORY;
         }
 
-        // FIXME feilong
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(
                         memberDetails,
                         shoppingCartLineCommandList,
