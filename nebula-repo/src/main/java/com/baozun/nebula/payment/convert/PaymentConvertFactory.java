@@ -7,22 +7,6 @@ import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 
 public class PaymentConvertFactory {
 	
-	public static final int PAY_TYPE_ALIPAY = 1;
-	
-	public static final int PAY_TYPE_ALIPAY_BANK = 3;
-	
-	public static final int PAY_TYPE_WECHAT = 4;
-	
-	public static final int PAY_TYPE_ALIPAY_CREDIT = 14;
-	
-	public static final int PAY_TYPE_ALIPAY_CREDIT_INT_V = 131;
-	
-	public static final int PAY_TYPE_ALIPAY_CREDIT_INT_M = 141;
-	
-	public static final int PAY_TYPE_CHINAPNR = 151;
-	
-	public static final int PAY_TYPE_UNIONPAY = 161;
-
 	private static PaymentConvertFactory inst = new PaymentConvertFactory();
 
 	private Map<String, PayParamCommandAdaptor> paymentConvertMap;

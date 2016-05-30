@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
-import com.baozun.nebula.utilities.common.command.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 
 public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor {
@@ -84,13 +84,13 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		Integer payType = salesOrderCommand.getOnLinePaymentCommand().getPayType();
 		String type = null;
 		switch(payType){
-			case PaymentConvertFactory.PAY_TYPE_ALIPAY : type = PaymentFactory.PAY_TYPE_ALIPAY;break;
-			case PaymentConvertFactory.PAY_TYPE_ALIPAY_BANK : type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;break;
-			case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT : type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;break;
-			case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_V : type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;break;
-			case PaymentConvertFactory.PAY_TYPE_ALIPAY_CREDIT_INT_M : type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;break;
-			case PaymentConvertFactory.PAY_TYPE_UNIONPAY : type = PaymentFactory.PAY_TYPE_UNIONPAY;break;
-			case PaymentConvertFactory.PAY_TYPE_WECHAT : type= PaymentFactory.PAY_TYPE_WECHAT;
+			case ReservedPaymentType.ALIPAY : type = PaymentFactory.PAY_TYPE_ALIPAY;break;
+			case ReservedPaymentType.ALIPAY_BANK : type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;break;
+			case ReservedPaymentType.ALIPAY_CREDIT : type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;break;
+			case ReservedPaymentType.ALIPAY_CREDIT_INT_V : type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;break;
+			case ReservedPaymentType.ALIPAY_CREDIT_INT_M : type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;break;
+			case ReservedPaymentType.UNIONPAY : type = PaymentFactory.PAY_TYPE_UNIONPAY;break;
+			case ReservedPaymentType.WECHAT : type= PaymentFactory.PAY_TYPE_WECHAT;
 		}
 		return type;
 	}
