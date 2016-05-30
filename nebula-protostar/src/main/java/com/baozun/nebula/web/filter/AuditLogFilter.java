@@ -70,12 +70,16 @@ public class AuditLogFilter extends OncePerRequestFilter {
 		
 		 try{
 			    filterChain.doFilter(request, response);
-	        	createSysAuditLog(request,response);
-	        	if (LOGGER.isDebugEnabled()){
-		            LOGGER.debug(
-		                            "[AUDIT_LOG_INFO] RequestInfoMapForLog:{}",
-		                            JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
-		        }
+			    
+				if(validateSuffix(getRequestURI(request))){
+					createSysAuditLog(request,response);
+		        	if (LOGGER.isDebugEnabled()){
+			            LOGGER.debug(
+			                            "[AUDIT_LOG_INFO] RequestInfoMapForLog:{}",
+			                            JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+			        }
+		        	
+				}
 		       
 	        }catch (Exception e){//可能有异常,比如  往request/model里面设置了 不能被json处理的对象或者字段
 	            LOGGER.error(Slf4jUtil.formatMessage(
@@ -84,7 +88,6 @@ public class AuditLogFilter extends OncePerRequestFilter {
 	        }
 		
 	}
-
 	
 	/**
      * 保存系统日志
@@ -93,11 +96,6 @@ public class AuditLogFilter extends OncePerRequestFilter {
      */
 	private void createSysAuditLog(HttpServletRequest request ,HttpServletResponse response ) {
 		
-		String uri = getRequestURI(request);
-		
-		if(StringUtils.isNotBlank(uri) && (uri.contains(".css") || uri.contains(".js")))
-			return;
-	
 		SecurityContext securityContext = (SecurityContext)request.getSession().getAttribute("SPRING_SECURITY_CONTEXT");
     	
     	SysAuditLog sysAuditLog = new SysAuditLog();
@@ -123,7 +121,7 @@ public class AuditLogFilter extends OncePerRequestFilter {
     	sysAuditLog.setMethod(request.getMethod());
     	sysAuditLog.setParameters(JsonUtil.format(request.getParameterMap()));
     	sysAuditLog.setResponseCode(String.valueOf(response.getStatus()));
-    	sysAuditLog.setUri(uri);
+    	sysAuditLog.setUri(getRequestURI(request));
     	sysAuditLog.setCreateTime(new Date());
     	
     	ServletContext servletContext = request.getSession().getServletContext(); 
@@ -142,4 +140,25 @@ public class AuditLogFilter extends OncePerRequestFilter {
         String forwardRequestUri = RequestUtil.getAttribute(request, RequestAttributes.FORWARD_REQUEST_URI);
         return Validator.isNotNullOrEmpty(forwardRequestUri) ? forwardRequestUri : request.getRequestURI().toString();
     }
+    
+	/**
+	 *  过滤css js ，
+	 *  过滤图片 jpg、png、ico、bmp、gif、tif、pcx、tga 
+	 * @return
+	 */
+	private boolean validateSuffix(String uri){
+		
+		if(StringUtils.isBlank(uri))
+				return false;
+		
+		if(uri.contains(".css") || uri.contains(".js")
+				        || uri.contains(".jpg") || uri.contains(".png")
+						|| uri.contains(".ico") || uri.contains(".bmp")
+						|| uri.contains(".gif") || uri.contains(".tif")
+						|| uri.contains(".pcx") || uri.contains(".tga")
+						)
+			return false;
+		return true;
+		
+	}
 }

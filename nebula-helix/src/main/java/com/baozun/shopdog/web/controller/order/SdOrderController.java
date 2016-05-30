@@ -132,22 +132,23 @@ public class SdOrderController implements AbstractSdOrderController{
         salesOrderCommand.setPayment(Integer.parseInt(shopdogOrderParamCommand.getPaymentType()));
         salesOrderCommand.setPaymentStr("支付宝支付");
         salesOrderCommand.setPayType(Integer.parseInt(shopdogOrderParamCommand.getPaymentType()));
-        
+        //此会员名称是否需要从数据库中查询 TODO
         salesOrderCommand.setMemberName("");
-        salesOrderCommand.setMemberId(null);
+        salesOrderCommand.setMemberId(shopdogOrderParamCommand.getMemberId());
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
 
         // 订单来源,暂时缺少驻店宝下单 TODO
         salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
 
         // 获取购物车信息
-
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
         for(ShopdogSkusCommand shopdogSkusCommand : shopdogOrderParamCommand.getSkuList()){
             ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
             shoppingCartLineCommand.setSkuId(shopdogSkusCommand.getSkuId());
             shoppingCartLineCommand.setQuantity(shopdogSkusCommand.getCount());
+            //这个参数为模拟数据，后续写死
             shoppingCartLineCommand.setSettlementState(1);
+            //这个参数待确定 TODO
             shoppingCartLineCommand.setShopId(1L);
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
         }

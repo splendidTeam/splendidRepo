@@ -186,6 +186,8 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 								property.getId().equals(itemPropertiesCommand.getPropertyId())){
 							//属性值
 							colorSwatchViewCommand.setPropertyValue(itemPropertiesCommand.getPropertyValue());
+							//属性配图值
+							colorSwatchViewCommand.setPropertyValueThumb(itemPropertiesCommand.getThumb());
 							resultList.add(colorSwatchViewCommand);
 						}
 					}
