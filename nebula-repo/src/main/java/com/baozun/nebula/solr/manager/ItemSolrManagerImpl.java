@@ -168,7 +168,8 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 		List<ItemSolrCommand> itemCommandList = itemInfoManager
 				.findItemCommandByItemId(itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
-			return false;
+			//找不到说明是非卖品上架，不需要刷新索引。
+			return true;
 		}
 		List<ItemForSolrCommand> itemForSolrCommandList = new ArrayList<ItemForSolrCommand>();
 		for (ItemSolrCommand itemSolrCommand : itemCommandList) {			
@@ -204,7 +205,8 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 		//修改成把所有国际化语言查询出来
 		List<ItemSolrI18nCommand> itemCommandList = itemInfoManager.findItemCommandByItemIdI18n(itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
-			return false;
+			//找不到说明是非卖品上架，不需要刷新索引。
+			return true;
 		}
 		List<ItemForSolrI18nCommand> itemForSolrCommandList = new ArrayList<ItemForSolrI18nCommand>();
 		for (ItemSolrI18nCommand itemSolrCommand : itemCommandList) {

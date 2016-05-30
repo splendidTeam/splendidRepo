@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.manager.salesorder.OrderLineManager;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
+import com.baozun.nebula.sdk.command.OrderPromotionCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
@@ -148,9 +149,9 @@ public class NebulaOrderDetailsController extends BaseController {
             } 
             // 优惠券信息
             CouponInfoSubViewCommand couponInfoSubViewCommand = new CouponInfoSubViewCommand();
-            List<CouponCodeCommand> couponCodes = salesOrderCommand.getCouponCodes();
-            if (null != couponCodes && couponCodes.size() != 0) {
-                couponInfoSubViewCommand.setCouponCode(couponCodes.get(0).getCouponCode());
+              List<OrderPromotionCommand> orderPromotions = salesOrderCommand.getOrderPromotions();
+            if (null != orderPromotions && orderPromotions.size() != 0) {
+                couponInfoSubViewCommand.setCouponCode(orderPromotions.get(0).getCoupon());
             }
             // 发票信息
             InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
