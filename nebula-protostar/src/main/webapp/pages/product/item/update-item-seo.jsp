@@ -14,12 +14,12 @@
 				<label>seo<spring:message
 						code="item.update.seoTitle" /></label>
 				<c:if test="${not empty seoTitle }">
-					<input loxiaType="input" 
+					<input loxiaType="input" type="text"
 						name="itemCommand.seoTitle.values[${status.index}]"
 						value="${ seoTitle.langValues[i18nLang.key] }" />
 				</c:if>
 				<c:if test="${empty seoTitle }">
-					<input loxiaType="input"
+					<input loxiaType="input" type="text"
 						name="itemCommand.seoTitle.values[${status.index}]" value="" />
 				</c:if>
 				<input class="i18n-lang" type="text"
@@ -33,12 +33,12 @@
 				<label>seo<spring:message
 						code="item.update.seoKeywords" /></label>
 				<c:if test="${not empty seoKeywords }">
-					<input loxiaType="input"
+					<input loxiaType="input" type="text"
 						name="itemCommand.seoKeywords.values[${status.index}]"
 						value="${ seoKeywords.langValues[i18nLang.key] }"/>
 				</c:if>
 				<c:if test="${empty seoKeywords }">
-					<input loxiaType="input"
+					<input loxiaType="input" type="text"
 						name="itemCommand.seoKeywords.values[${status.index}]" value="" />
 				</c:if>
 
@@ -62,7 +62,7 @@
 						name="itemCommand.seoDescription.values[${status.index}]"
 						loxiaType="input"></textarea>
 				</c:if>
-				<input class="i18n-lang" type="text"
+				<input class="i18n-lang" type="text" 
 					name="itemCommand.seoDescription.langs[${status.index}]"
 					value="${i18nLang.key}" /> <span>${i18nLang.value}</span>
 			</div>
@@ -73,11 +73,11 @@
 	<c:if test="${i18nOnOff == false}">
 		<div class="ui-block-line ">
 			<label>seo<spring:message code="item.update.seoTitle" /></label> 
-			<input loxiaType="input" name="itemCommand.seoTitle.value" value="${seoTitle.value}" />
+			<input loxiaType="input" type="text" name="itemCommand.seoTitle.value" value="${seoTitle.value}" />
 		</div>
 		<div class="ui-block-line ">
 			<label>seo<spring:message code="item.update.seoKeywords" /></label> 
-			<input loxiaType="input" name="itemCommand.seoKeywords.value" value="${ seoKeywords.value }" />
+			<input loxiaType="input" type="text" name="itemCommand.seoKeywords.value" value="${ seoKeywords.value }" />
 		</div>
 		<div class="ui-block-line ">
 			<label>seo<spring:message code="item.update.seoDesc" /></label>
