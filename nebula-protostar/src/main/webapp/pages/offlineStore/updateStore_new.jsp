@@ -5,12 +5,12 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <%@include file="/pages/commons/common-javascript.jsp" %>
-<link rel="stylesheet" type="text/css" href="${base}/scripts/uploadify3/uploadify.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="${base}/scripts/uploadify/uploadify.css" media="screen" />
 <script type="text/javascript">
 var $ = jQuery.noConflict();
 </script>
 <%-- <script type="text/javascript" src="${base}/scripts/jquery-1.6.2.min.js"></script> --%>
-<script type="text/javascript" src="${base}/scripts/uploadify3/jquery.uploadify.js"></script>
+<script type="text/javascript" src="${base}/scripts/uploadify/jquery.uploadify-3.1.js"></script>
 <script type="text/javascript" src="${base}/scripts/area.js"></script>
 <style type="text/css">  
         #editTable {
@@ -216,24 +216,33 @@ var $ = jQuery.noConflict();
 						</tr>
 						<tr>
 							<td style="border: 0px; min-width:300px;">
-								<input type="file" id="image-upload" name="file" />
+								<input type="file" id="storeImage-upload" name="file" />
 							</td>
 							<td style="border: 0px;">
-								<a href="javascript:if(checkImport('#image-upload-queue')){$('#image-upload').uploadify('upload','*')}">上传文件</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								<a href="javascript:$('#image-upload').uploadify('cancel','*');">取消上传</a>
+								<a href="javascript:if(checkImport('#storeImage-upload-queue')){$('#storeImage-upload').uploadify('upload','*')}">上传文件</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="javascript:$('#storeImage-upload').uploadify('cancel','*');">取消上传</a>
 							</td>
 						</tr>
 						<tr>
 							<td>店铺图片</td>
 							<td>
-								<div id="banner_image_url"><img src="${base}/offlineStore/getStoreImage.json?path=${store.storeImage}"/></div>
+								<div id="storebanner_image_url"><img src="${base}/offlineStore/getStoreImage.json?path=${store.storeImage}"/></div>
 								<input type="hidden" id="storeImagePath" name="storeImagePath" value="${store.storeImage}" />
+							</td>
+						</tr>
+						<tr>
+							<td style="border: 0px; min-width:300px;">
+								<input type="file" id="mapImage-upload" name="file" />
+							</td>
+							<td style="border: 0px;">
+								<a href="javascript:if(checkImport('#mapImage-upload-queue')){$('#mapImage-upload').uploadify('upload','*')}">上传文件</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="javascript:$('#mapImage-upload').uploadify('cancel','*');">取消上传</a>
 							</td>
 						</tr>
 						<tr>
 							<td>位置图片</td>
 							<td>
-								<div id="banner_image_url"><img src="${base}/offlineStore/getStoreImage.json?path=${store.mapImage}"/></div>
+								<div id="mapbanner_image_url"><img src="${base}/offlineStore/getStoreImage.json?path=${store.mapImage}"/></div>
 								<input type="hidden" id="mapImagePath" name="mapImagePath" value="${store.mapImage}" />
 							</td>
 						</tr>

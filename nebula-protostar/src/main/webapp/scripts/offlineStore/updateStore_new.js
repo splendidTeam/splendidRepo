@@ -107,7 +107,7 @@ function updateStoreLocator() {
 		success : function(data) {
 			if (data=="1") {
 				alert("修改店铺成功");
-				window.location.href="/offlineStore/store.htm";
+				window.location.href=base+"/offlineStore/store.htm";
 			}
 		}
 	});
@@ -150,10 +150,10 @@ function updateStoreLocator() {
 				$(objDistrict).attr("selected","selected");
 			}
 		});
-		
-		$("#image-upload").uploadify({
+		//店铺图片
+		$("#storeImage-upload").uploadify({
 			'width' : 150,  
-			'swf' : base+'/scripts/uploadify3/uploadify.swf',
+			'swf' : base+'/scripts/uploadify/uploadify.swf',
 			'buttonText' : '浏览', //按钮上的文字 
 			'uploader' : base+'/offlineStore/uploadStoreImage.json;jsessionid='+$("#sessionId").val(),
 			'fileTypeDesc' : '图片',//如果配置了以下的'fileTypeExts'属性，那么这个属性是必须的  
@@ -163,23 +163,60 @@ function updateStoreLocator() {
 			'multi' : true,
 			'queueSizeLimit' : 1,
 			'onUploadStart' : function(file) {
-				$("#image-upload").uploadify('settings','formData' ,{'storeId':$("#detail_id").val()});
+				$("#storeImage-upload").uploadify('settings','formData' ,{'storeId':$("#detail_id").val()});
 			},
 			'onUploadError' : function(file, errorCode, errorMsg, errorString) {
 	            alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
 	        },
-	        'onUploadSuccess' : completeUploadImage
+	        'onUploadSuccess' : completeUploadStoreImage
+		});
+		//位置图片
+		$("#mapImage-upload").uploadify({
+			'width' : 150,  
+			'swf' : base+'/scripts/uploadify/uploadify.swf',
+			'buttonText' : '浏览', //按钮上的文字 
+			'uploader' : base+'/offlineStore/uploadStoreImage.json;jsessionid='+$("#sessionId").val(),
+			'fileTypeDesc' : '图片',//如果配置了以下的'fileTypeExts'属性，那么这个属性是必须的  
+			'fileTypeExts' : '*.jpg;*.png;*.bmp', //允许的格式
+			'method'   : 'Post',
+			'formData' : {},
+			'multi' : true,
+			'queueSizeLimit' : 1,
+			'onUploadStart' : function(file) {
+				$("#mapImage-upload").uploadify('settings','formData' ,{'storeId':$("#detail_id").val()});
+			},
+			'onUploadError' : function(file, errorCode, errorMsg, errorString) {
+				alert('The file ' + file.name + ' could not be uploaded: ' + errorString);
+			},
+			'onUploadSuccess' : completeUploadMapImage
 		});
 	});
 	
-	function completeUploadImage(file, data, response) {
+	function completeUploadStoreImage(file, data, response) {
 		if (response) {
 			data=eval('('+data+')');
 			if (data.flag) {
 				//alert("上传完成，原文件名称：" + data.fileName+"，新文件名称："+data.complateServerPath);
 				// 更改上传后的新图片文件名称
-				$("#imagePath").val(data.complateServerPath);
-				$("#banner_image_url").find("img").attr("src",base+"/offlineStore/getStoreImage.json?path="+data.complateServerPath);
+				$("#storeImagePath").val(data.complateServerPath);
+				$("#storebanner_image_url").find("img").attr("src",base+"/offlineStore/getStoreImage.json?path="+data.complateServerPath);
+			} else {
+				if (data.warnMsg != null && data.warnMsg != ""){
+					alert(data.warnMsg);
+				}else {
+					alert("上传文件出错");
+				}
+			}
+		}
+	}
+	function completeUploadMapImage(file, data, response) {
+		if (response) {
+			data=eval('('+data+')');
+			if (data.flag) {
+				//alert("上传完成，原文件名称：" + data.fileName+"，新文件名称："+data.complateServerPath);
+				// 更改上传后的新图片文件名称
+				$("#mapImagePath").val(data.complateServerPath);
+				$("#mapbanner_image_url").find("img").attr("src",base+"/offlineStore/getStoreImage.json?path="+data.complateServerPath);
 			} else {
 				if (data.warnMsg != null && data.warnMsg != ""){
 					alert(data.warnMsg);
