@@ -2933,7 +2933,7 @@ height: 370px;
 	display: block; 
 	float: left;
 }
-.seo-info input[type='text']{
+.seo-info input[type='text'], .seo-info textarea{
 	width: 600px;
 }
 .chooseLine .choose-tips{
