@@ -3,7 +3,6 @@ $j.extend(loxia.regional['zh-CN'],{
 	"SYSTEM_ITEM_SELECT_INDUSTRY":"请选择商品所在行业",
 	"ITEM_UPDATE_CODE_ENBLE":"商品编码不可用",
 	"ITEM_UPDATE_CODE_ABLE":"商品编码可用",
-	"ITEM_CODE_VALID_FAIL":itemCodeValidMsg,
 	"INDUSTRY_FIND":" 共找到",
 	"PLEASE_SELECT":" 请选择",
 	"INDUSTRY_RESULT":"个结果",
@@ -37,212 +36,60 @@ $j.extend(loxia.regional['zh-CN'],{
     "PLEASE_SELECT_PROPERTY_GROUP":"请选择属性分组"
 });
 
-//zTree setting
-var setting = {
-	check : {
-		enable : true,
-		chkStyle : "radio",
-		radioType : "all"
-	},
-	view : {
-		dblClickExpand : true,
-		showIcon : false,
-		fontCss : getFontCss
-	},
-	data : {
-		simpleData : {
-			enable : true
-		}
-	},
-	callback : {
-		onClick : onClick,
-		beforeRemove : beforeRemove,
-		onRemove : onRemove,
-		onCheck : onCheck,
-	}
-};
-
-var mustCheckArray  = new Array();
-
-var key,lastValue = "", nodeList = [], fontCss = {};
-function onCheck(event, treeId, treeNode){
-	
-}
-
-function onClick(event, treeId, treeNode){
-	var treeObj = $j.fn.zTree.getZTreeObj("industrytreeDemo");
-	var nodes = treeObj.transformToArray(treeObj.getNodes());
-	for(var i = 0;i<nodes.length;i++){
-		if(!nodes[i].isParent){
-			nodes[i].checked = false;
-			treeObj.refresh();
-		}
-	}
-		treeNode.checked = true;
-		treeObj.refresh();
-		onCheck(event, treeId, treeNode);
-}
-
-function beforeRemove(event, treeId, treeNode){
-	
-}
-
-function onRemove(event, treeId, treeNode){
-	
-}
-
-//*******************************默认分类
-function defaultOnClick1(e, treeId, treeNode) {
-	var zTree = $j.fn.zTree.getZTreeObj("defaultCategoryTree");
-	zTree.checkNode(treeNode, !treeNode.checked, null, true);
-	
-	hideMenu("defaultMenuContent");
-	return false;
-}
-
-function defaultOnCheck1(e, treeId, treeNode) {
-	var zTree = $j.fn.zTree.getZTreeObj("defaultCategoryTree"),
-	nodes = zTree.getCheckedNodes(true),
-	v = "",
-	categoryHtml = "";
-	var defaultHtml = $j("#chooseDefaultCategory").html();
-	var id = $j('#chooseDefaultCategory').children('div').attr('class');
-	$j("#chooseDefaultCategory").html("");
-	for (var i=0, l=nodes.length; i<l; i++) {
-		v += nodes[i].name + ",";
-		var inode =$j("."+nodes[i].id+"");
-		if(inode.length==0){
-			categoryHtml = "<div class="+nodes[i].id +">"+nodes[i].name + 
-			"<input type='hidden' name='defaultCategoryId'  value='"+nodes[i].id+"' />"+
-			"<a href='javascript:void(0);'id="+nodes[i].id+" style='float:right;margin-right: 760px;text-decoration: underline;color:#F8A721' onclick='delDefaultCategroy(this.id)'>"+nps.i18n("DELETE_THIS_CATEGORY")+"</a><br/></div>";
-			$j("#chooseDefaultCategory").append(categoryHtml);
-		}else{
-			$j("#chooseDefaultCategory").html(defaultHtml);
-			zTree.checkNode(treeNode, !treeNode.checked, null, false);
-			
-			var zTree = $j.fn.zTree.getZTreeObj("defaultCategoryTree"),
-			nodes = zTree.getCheckedNodes(false);
-			for (var i=0, l=nodes.length; i<l; i++) {
-				if(id==nodes[i].id){
-					nodes[i].checked= true;
-				}
-			}
-			zTree.refresh();
-			
-			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"), nps.i18n("NOT_REPEATEDLY_RELEVANCE_CATEGORY"));
-			return;
-		}
-		
-	}
-}
-
-//删除默认分类
-function delDefaultCategroy(id){
-	$j("."+id+"").remove();
-	var zTree = $j.fn.zTree.getZTreeObj("defaultCategoryTree"),
-	nodes = zTree.getCheckedNodes(true);
-	for (var i=0, l=nodes.length; i<l; i++) {
-		if(id==nodes[i].id){
-			nodes[i].checked= false;
-		}
-	}
-	zTree.refresh();
-}
-
-function onBodyDownDefault(event) {
-	if (!(event.target.id == "menuBtn" || event.target.id == "industry" || event.target.id == "defaultMenuContent" || $j(event.target).parents("#defaultMenuContent").length>0)) {
-		hideMenu("defaultMenuContent");
-	}
-}
-/**********************industrytreeDemo 展示  end********************/
-
-/**
-* 搜索节点方法
-* 1.搜索到含有相应关键字的节点 
-* 2.展开该段节点 
-* 3.将字置为黄色
-*/
-function searchNode(e) {
-	var zTree = $j.fn.zTree.getZTreeObj("industrytreeDemo");
-	var value = $j.trim(key.get(0).value);
-	if(value==""){
-		$j("#search_result").html("");
-		updateNodes(false);
-	}
-		if (key.hasClass("empty")) {
-			value = "";
-		}
-		if (lastValue === value) return;
-		lastValue = value;
-		if (value === "") return;
-		updateNodes(false);
-		
-	nodeList = zTree.getNodesByParamFuzzy("name", value);
-	
-	$j("#search_result").html(nps.i18n("INDUSTRY_FIND")+ nodeList.length+ nps.i18n("INDUSTRY_RESULT"));
-	
-	if (nodeList.length > 0) {
-	$j.each(nodeList, function(i, node){      
-		 zTree.expandNode(node.getParentNode(),true, true, true);
-		}); 
-	}
-	updateNodes(true);
-	$j("#key").focus();
-}
-function focusKey(e) {
-	if (key.hasClass("empty")) {
-		key.removeClass("empty");
-	}
-}
-function blurKey(e) {
-	if (key.get(0).value === "") {
-		key.addClass("empty");
-	}
-}
-/**
-* 将搜索到的节点字体置为黄色
-*/
-function getFontCss(treeId, treeNode) {
-	return (!!treeNode.highlight) ? {color:"#333","background-color":"yellow"} : {color:"#333", "font-weight":"normal","background-color":""};		
-}
-/**
-* 将搜索到的节点展开的方法
-*/
-function updateNodes(highlight) {
-	var zTree = $j.fn.zTree.getZTreeObj("industrytreeDemo");
-	for( var i=0, l=nodeList.length; i<l; i++) {
-		nodeList[i].highlight = highlight;
-		zTree.updateNode(nodeList[i]);
-	}
-}
-/**********************industrytreeDemo 搜索  end********************/
-
 /**
  * only use for save item
  * @param form
  * @param args
  * @param param
  */
-function saveItem(form,args,param){
-	
-    var f = loxia._getForm(form),
-    mode = args.mode||"sync",
-    lock = (args.lock == undefined || args.lock)?true:false;
+//function saveItem(form,args,param){
+//	
+//    var f = loxia._getForm(form),
+//    mode = args.mode||"sync",
+//    lock = (args.lock == undefined || args.lock)?true:false;
+//
+//	if(lock){
+//	    loxia.lockPage();
+//	}
+//	
+//	var result=$j.extend({}, f,param);
+//	
+//	var c = this.validateForm(result);
+//	if(c){
+//	        nps.asyncXhr($(result).attr("action"),result,args)
+//	    
+//	}else{
+//	    loxia.unlockPage();
+//	}
+//	
+//}
 
-	if(lock){
-	    loxia.lockPage();
+function FormValidator(name, sortNo, validate) {
+	this.name = name;
+	this.sortNo = sortNo;
+	this.validate = validate;
+}
+
+var formValidateList = [];
+
+//表单验证
+function itemFormValidate(form){
+	formValidateList.sort(function(a, b){
+		return a.sortNo - b.sortNo;
+	});
+	
+	for(var i = 0; i < formValidateList.length; i++) {
+    	if(formValidateList[i] instanceof FormValidator) {
+        	var result = formValidateList[i].validate(form);
+        	if(result != loxia.SUCCESS) {
+            	return result;
+        	}
+    	} else {
+                        
+    	}
 	}
-	
-	var result=$j.extend({}, f,param);
-	
-	var c = this.validateForm(result);
-	if(c){
-	        nps.asyncXhr($(result).attr("action"),result,args)
-	    
-	}else{
-	    loxia.unlockPage();
-	}
-	
+        
+	return loxia.SUCCESS;
 }
 
 $j(document).ready(function(){
@@ -297,6 +144,10 @@ $j(document).ready(function(){
 		$j("#first").css("display","none");
 		$j("#second").css("display","block");
 		
+		$j.extend(loxia.regional['zh-CN'],{
+			"ITEM_CODE_VALID_FAIL":itemCodeValidMsg
+		});
+		
 		var ztree = $j.fn.zTree.getZTreeObj("industrytreeDemo");
 		var nodes_ = ztree.getCheckedNodes(true);
 		num = 0;
@@ -307,11 +158,10 @@ $j(document).ready(function(){
   			$j("#industryId").val(industryId);
   			
 			// TODO 这里根据编辑的商品类型不同，调用不同的初使化方法
-			try{
-				initProperties(industryId);
-			} catch(e) {
-				// do nothing
-			}
+  			// 初使化属性信息
+  			if(initProperties !== undefined) {
+  				initProperties(industryId);
+  			}
 		} else {
 			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SYSTEM_ITEM_SELECT_INDUSTRY"));
 		}
@@ -370,5 +220,14 @@ $j(document).ready(function(){
 			}
 	   }});
     });
+	
+	$j("body").bind("formvalidatefailed", function(args){
+		// TODO 这里定义的事件不能被顺利触发，详见loxia.submitForm()
+		$j.each(loxia.byCss("input:enabled,select:enabled,textarea:enabled", args[1]),function(index,widget){					
+			if(!widget.state()) {
+				$j(widget).parents(".ui-block-content").show();
+			}
+		});
+	});
 });
 

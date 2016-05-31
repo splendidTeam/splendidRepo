@@ -687,6 +687,47 @@ $j(document).ready(function(){
 	});
 	
 	
+	if ($j("#add-type").find("option:selected").val() == 5) {
+		$j("#add-type").parent().siblings(".navi-param").show();
+	}else{
+		$j("#add-type").parent().siblings(".navi-param").hide();
+	}
+
+	//新增导航初始化
+	var addFlag = false;
+	
+	$j("#add-type option").each(function(){
+		if ($j(this).val() == 5) {
+			addFlag = true;
+		}
+	});
+	if (!addFlag) {
+		$j("#add-type").prepend("<option value='5'>商品集合链接</option>");
+	}
+	
+	//修改导航初始化
+	var updateFlag = false;
+	$j("#update-type option").each(function(){
+		if ($j(this).val() == 5) {
+			updateFlag = true;
+		}
+	});
+	
+	if (!updateFlag) {
+		$j("#update-type").prepend("<option value='5'>商品集合链接</option>");
+	}
+	
+	if ($j("#update-type").find("option:selected").val() == 5) {
+		$j("#update-type").parent().siblings(".navi-param").show();
+		//重置排序链接
+		$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
+		
+	}else{
+		$j("#toItemSort").css('visibility','hidden');
+		$j("#update-type").parent().siblings(".navi-param").hide();
+	}
+	
+	
 });
 
 /********************************************** zTree配置与事件 **********************************************/
@@ -938,7 +979,6 @@ function onClick(event, treeId, treeNode)  {
 
 			}
 			
-			
 			//重置隐藏属性值
 			if(propertIds){
 				curParameterInput.data("property",propertIds.substring(0,propertIds.length-1));
@@ -965,63 +1005,9 @@ function onClick(event, treeId, treeNode)  {
 			curParameterInput.data("property", "");
 		}
 		
-		if (isParentNavigationURLType(treeNode)) {	// 父节点是URL类型，不能更改类型为分类类型的节点，或添加分类类型的子节点
-			$j("#update-type").val(3);
-			$j("#update-type option[value='5']").remove();
-			$j("#update-type").parent().siblings(".navi-param").hide();
-			$j("#add-type").val(3);
-			$j("#add-type option[value='5']").remove();
-			$j("#add-type").parent().siblings(".navi-param").hide();
-		} else {
-			if (treeNode.diy_type == 3) {	// 当前节点是URL类型，不能添加分类类型的子节点
-				$j("#add-type").val(3);
-				$j("#add-type option[value='5']").remove();
-				$j("#add-type").parent().siblings(".navi-param").hide();
-			} else {
-				//新增导航初始化
-				var addFlag = false;
-				
-				$j("#add-type option").each(function(){
-					if ($j(this).val() == 5) {
-						addFlag = true;
-					}
-				});
-				if (!addFlag) {
-					$j("#add-type").prepend("<option value='5'>商品集合链接</option>");
-				}
-				
-				if ($j("#add-type").find("option:selected").val() == 5) {
-					$j("#add-type").parent().siblings(".navi-param").show();
-				}
-				
-			}
-			
-			//修改导航初始化
-			var updateFlag = false;
-			
-			$j("#update-type option").each(function(){
-				if ($j(this).val() == 5) {
-					updateFlag = true;
-				}
-			});
-			
-			if (!updateFlag) {
-				$j("#update-type").prepend("<option value='5'>商品集合链接</option>");
-			}
-			
-			if ($j("#update-type").find("option:selected").val() == 5) {
-				$j("#update-type").parent().siblings(".navi-param").show();
-				//重置排序链接
-				$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
-				
-			}else{
-				$j("#toItemSort").css('visibility','hidden');
-			}
-			
-			$j("#update-type").val(treeNode.diy_type);
-			
-			$j("#update-type").change();	//触发事件，是否显示 “参数” 输入框
-		}
+		$j("#update-type").val(treeNode.diy_type);
+		
+		$j("#update-type").change();	//触发事件，是否显示 “参数” 输入框
 		
 		//页面“URL”显示
 		$j("#update-url").val(treeNode.diy_url);

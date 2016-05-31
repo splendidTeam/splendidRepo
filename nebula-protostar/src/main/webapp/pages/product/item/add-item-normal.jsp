@@ -7,6 +7,26 @@
 <title><spring:message code="shop.add.shopmanager"/></title>
 <%@include file="/pages/product/item/add-item-common.jsp"%>
 <script type="text/javascript" src="${base}/scripts/product/item/add-item-normal.js"></script>
+<script type="text/javascript">
+var zNodes =
+	[
+		{id:0, name:"ROOT",state:"0", open:true,root:"true",nocheck:true},
+		<c:forEach var="industry" items="${industryList}" varStatus="status">
+		<c:if test="${industry.isShow}">
+			{
+				id:${industry.id}, 
+				pId:${industry.pId},
+				name: "${industry.indu_name}",
+				open:${industry.open}
+				<c:if test="${industry.noCheck}">
+					,nocheck:true
+				</c:if>
+			}
+			<c:if test="${!status.last}">,</c:if>
+			</c:if>
+		</c:forEach>
+	];
+</script>
 </head>
 <body>
 

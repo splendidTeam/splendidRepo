@@ -704,7 +704,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			}
 		}
 
-		BundleCommand bundle = bundleDao.findBundleByBundleItemId(bundleItemId);
+		BundleCommand bundle = bundleDao.findBundleByBundleItemId(bundleItemId, isValidate ? Item.LIFECYCLE_ENABLE : null);
 
 		if (Validator.isNullOrEmpty(bundle)) {
 			LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] bundle is null: bundleItemId={}", bundleItemId);
