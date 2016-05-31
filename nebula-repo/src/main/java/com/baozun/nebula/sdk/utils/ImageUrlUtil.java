@@ -26,7 +26,7 @@ import com.baozun.nebula.utilities.common.Validator;
  * 因此,提取 {@link com.baozun.nebula.web.taglib.ImgUrlTag ImgUrlTag里面核心方法}
  * </p>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @author yimin.qiao
  * @version 1.2.2 2015年8月27日 下午3:51:08
  * @since 1.2.2

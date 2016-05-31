@@ -22,7 +22,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 /**
  * The Interface SdkShoppingCartLinePackManager.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public interface SdkShoppingCartLinePackManager extends BaseManager{

@@ -27,7 +27,7 @@ import com.baozun.nebula.solr.manager.BaseSolrData;
  * 
  * @param <T>
  *            the generic type
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2012-3-13 下午2:32:15
  * @param <T>
  */

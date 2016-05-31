@@ -32,7 +32,7 @@ import org.springframework.web.util.UriTemplate;
 /**
  * UriTemplate,此类是 单值 expend.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2012-5-22 上午11:24:41
  * @deprecated pls use {@link com.feilong.spring.web.util.UriTemplateUtil}
  */

@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ShopCommand;
+import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -55,7 +57,7 @@ import com.feilong.core.util.CollectionsUtil;
 /**
  * The Class SdkShoppingCartLinePackManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月23日 下午5:04:54
  * @since 5.3.1
  */
@@ -154,16 +156,16 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
      *            the shopping cart line command
      * @param item
      *            the item
-     * @since 5.3.1
      */
     private void doPackBundle(ShoppingCartLineCommand shoppingCartLineCommand,Item item){
         Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
         Long[] skuIds = shoppingCartLineCommand.getSkuIds();
 
-        //FIXME feilong 金额
-        //sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
-        //shoppingCartLineCommand.setSalePrice(sku.getSalePrice());
-        //shoppingCartLineCommand.setListPrice(sku.getListPrice()); 
+        List<BundleSkuPriceCommand> bundleSkuPriceCommandList = sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
+
+        Map<String, BigDecimal> sumMap = CollectionsUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice");
+        shoppingCartLineCommand.setSalePrice(sumMap.get("salesPrice"));
+        shoppingCartLineCommand.setListPrice(sumMap.get("listPrice"));
 
         //封装 店铺和 行业信息
         packShopAndIndustry(shoppingCartLineCommand, item);

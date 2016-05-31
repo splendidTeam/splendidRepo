@@ -28,7 +28,7 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 /**
  * 购物车里面的每行明细.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月25日 上午11:13:26
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand
  * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine

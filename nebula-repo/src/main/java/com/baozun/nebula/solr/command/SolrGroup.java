@@ -29,7 +29,7 @@ import com.baozun.nebula.command.ItemCommand;
 /**
  * 和group by 相关的参数,注释掉的部分 表示暂没有封装.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Nov 29, 2012 4:05:35 PM
  * @param <T>
  * @see {@link FacetParams}

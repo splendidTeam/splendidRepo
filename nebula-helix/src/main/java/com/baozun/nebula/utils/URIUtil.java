@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 处理url uri 等
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2010-6-11 上午02:06:43
  * @since 1.0
  * @deprecated pls use {@link com.feilong.core.net.URIUtil}

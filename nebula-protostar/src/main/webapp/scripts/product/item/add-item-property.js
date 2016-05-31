@@ -1394,10 +1394,6 @@ $j(document).ready(function(){
 				   
 			if(curCode!=null&&curCode!=""){
 				atLeastOneCode = true;
-				var curSp =  originalSalePriceArray[i];
-				if(isNaN(curSp)){
-					return nps.i18n("PLEASE_INPUT_SALEPRICES");
-				}
 			}
 			for(var j=0;j<skuCodesArray.length;j++){
 				if(i!=j&&curCode!=""&&curCode==skuCodesArray[j]){

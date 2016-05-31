@@ -59,7 +59,7 @@ import com.feilong.servlet.http.ResponseUtil;
  * </p>
  * </blockquote>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.2.2 2015年7月17日 上午12:45:06
  * @see ResponseUtil#setNoCacheHeader(HttpServletResponse)
  * @see javax.servlet.http.HttpServletResponse#setHeader(String, String)

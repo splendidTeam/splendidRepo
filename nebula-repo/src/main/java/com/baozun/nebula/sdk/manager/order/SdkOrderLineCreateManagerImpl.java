@@ -168,13 +168,6 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         Item item = itemDao.findItemById(itemId);
         ItemBaseCommand itemBaseCommand = sdkItemManager.findItemBaseInfoByCode(item.getCode());
 
-        //FIXME feilong bundle商品金额
-        BundleSkuPriceCommand bundleSkuPriceCommand = sdkBundleManager.getBundleSkuPrice(relatedItemId, skuId);
-        BigDecimal listPrice = bundleSkuPriceCommand.getListPrice();
-        BigDecimal salePrice = bundleSkuPriceCommand.getSalesPrice();
-        BigDecimal discount = new BigDecimal(0);
-        BigDecimal subTotalAmt = NumberUtil.getMultiplyValue(salePrice, quantity, 2);
-
         newShoppingCartLineCommand.setQuantity(quantity);
         newShoppingCartLineCommand.setSkuId(skuId);
         newShoppingCartLineCommand.setExtentionCode(sku.getOutid());
@@ -187,6 +180,30 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         newShoppingCartLineCommand.setItemPic(sdkShoppingCartLineImageManager.getItemPicUrl(itemId));
 
         //******************************************************************************************
+        //设置金额
+        serLinePrices(newShoppingCartLineCommand, relatedItemId, skuId, quantity);
+
+        // 销售属性信息
+        newShoppingCartLineCommand.setSaleProperty(sku.getProperties());
+        // 行类型
+        newShoppingCartLineCommand.setType(type);
+        // 分组号
+        newShoppingCartLineCommand.setLineGroup(lineGroup);
+        return newShoppingCartLineCommand;
+    }
+
+    /**
+     * @param newShoppingCartLineCommand
+     * @param relatedItemId
+     * @param skuId
+     * @param quantity
+     */
+    private void serLinePrices(ShoppingCartLineCommand newShoppingCartLineCommand,Long relatedItemId,Long skuId,Integer quantity){
+        //FIXME feilong bundle商品金额
+        BundleSkuPriceCommand bundleSkuPriceCommand = sdkBundleManager.getBundleSkuPrice(relatedItemId, skuId);
+        BigDecimal listPrice = bundleSkuPriceCommand.getListPrice();
+        BigDecimal salePrice = bundleSkuPriceCommand.getSalesPrice();
+        BigDecimal discount = new BigDecimal(0);
         // 原销售单价
         newShoppingCartLineCommand.setListPrice(listPrice);
 
@@ -197,15 +214,7 @@ public class SdkOrderLineCreateManagerImpl implements SdkOrderLineCreateManager{
         newShoppingCartLineCommand.setDiscount(discount);
 
         // 行小计
-        newShoppingCartLineCommand.setSubTotalAmt(subTotalAmt);
-
-        // 销售属性信息
-        newShoppingCartLineCommand.setSaleProperty(sku.getProperties());
-        // 行类型
-        newShoppingCartLineCommand.setType(type);
-        // 分组号
-        newShoppingCartLineCommand.setLineGroup(lineGroup);
-        return newShoppingCartLineCommand;
+        newShoppingCartLineCommand.setSubTotalAmt(NumberUtil.getMultiplyValue(salePrice, quantity, 2));
     };
 
     /**

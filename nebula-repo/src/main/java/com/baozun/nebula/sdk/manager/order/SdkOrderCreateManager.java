@@ -46,7 +46,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
  * </p>
  * </blockquote>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月14日 下午7:01:38
  * @since 5.3.1
  */

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 操作properties配置文件
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2010-3-22 上午10:05:19
  * @since 1.0
  */
@@ -29,7 +29,6 @@ public class PropertiesUtil {
 	/**
 	 * 读取方式
 	 * 
-	 * @author 金鑫 2010-4-20 下午04:16:34
 	 */
 	public enum ReadType{
 		/**

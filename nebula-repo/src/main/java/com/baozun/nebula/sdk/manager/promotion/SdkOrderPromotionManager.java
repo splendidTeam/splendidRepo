@@ -24,7 +24,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 /**
  * The Interface SdkOrderPromotionManager.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午5:22:24
  * @since 5.3.1
  */

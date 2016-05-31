@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * RuleConfig相关规则配置.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月2日 下午5:07:46
  * @since 1.5.3
  */

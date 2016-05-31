@@ -37,7 +37,7 @@ import com.baozun.nebula.utils.JsonFormatUtil;
 import com.baozun.nebula.web.UserDetails;
 
 /**
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jun 21, 2013 1:51:40 PM
  */
 @RunWith(SpringJUnit4ClassRunner.class)

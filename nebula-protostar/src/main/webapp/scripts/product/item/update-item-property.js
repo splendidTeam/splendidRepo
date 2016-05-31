@@ -868,7 +868,7 @@ $j(document).ready(function(){
 	selectcheck(itemcolorrefcheckURL);
 	
 	// 添加商品属性表单验证方法
-	var baseInfoValidator = new FormValidator('', 50, function(){
+	var baseInfoValidator = new FormValidator('', 30, function(){
 		
 		//判断复选框必选
 		var att ="";
@@ -914,10 +914,10 @@ $j(document).ready(function(){
 			var curCode = skuCodesArray[i];
 			if(curCode!=null&&curCode!=""){
 				atLeastOneCode = true;
-				var curSp = originalSalePriceArray[i];
-				if(isNaN(curSp)){
-					return nps.i18n("PLEASE_INPUT_SALEPRICES");
-				}
+//				var curSp = originalSalePriceArray[i];
+//				if(isNaN(curSp)){
+//					return nps.i18n("PLEASE_INPUT_SALEPRICES");
+//				}
 			}
 			for(var j=0;j<skuCodesArray.length;j++){
 				if(i!=j&&curCode!=""&&curCode==skuCodesArray[j]){

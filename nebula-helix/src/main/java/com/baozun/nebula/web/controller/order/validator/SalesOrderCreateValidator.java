@@ -22,7 +22,7 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 /**
  * The Interface SalesOrderCreateValidator.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public interface SalesOrderCreateValidator{

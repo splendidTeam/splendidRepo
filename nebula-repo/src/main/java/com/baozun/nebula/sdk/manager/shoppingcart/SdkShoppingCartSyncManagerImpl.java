@@ -19,8 +19,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +30,13 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 /**
  * The Class SdkShoppingCartSyncManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月23日 下午6:24:22
  * @since 5.3.1
  */
 @Transactional
 @Service("sdkShoppingCartSyncManager")
 public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManager{
-
-    /** The Constant LOGGER. */
-    private static final Logger    LOGGER = LoggerFactory.getLogger(SdkShoppingCartSyncManagerImpl.class);
 
     /** The sdk shopping cart line dao. */
     @Autowired

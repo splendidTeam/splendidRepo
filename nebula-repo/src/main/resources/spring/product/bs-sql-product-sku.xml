@@ -111,6 +111,23 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="Sku.findEnableSkuListBySkuIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据 skuids 查询 sku list(lifecycle=1)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					SELECT * FROM t_pd_sku 
+					WHERE lifecycle = 1 
+					and id in (
+					#foreach( $skuId in $skuIds)
+	   					skuId,
+					 #end
+		       		 '-1') 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
 	<bean id="Sku.deleteSkuByItemId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据itemid删除Sku</description>
 		<constructor-arg>

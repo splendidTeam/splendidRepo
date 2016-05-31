@@ -25,7 +25,7 @@ import com.baozun.nebula.model.product.Item;
 /**
  * 商品关联分类 结果 command.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jun 28, 2013 3:16:50 PM
  */
 public class ItemCategoryResultCommand implements Command{

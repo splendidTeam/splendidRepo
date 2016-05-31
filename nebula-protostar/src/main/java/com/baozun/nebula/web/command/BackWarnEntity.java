@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 返回提示.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2010-6-24 上午03:14:56
  * @since 1.0
  */

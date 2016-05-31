@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 用来 快速的获得 json, 交由开发人员自己控制 log 输出级别
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Sep 23, 2012 3:33:42 PM
  * @deprecated 不再维护,pls use {@link com.feilong.tools.jsonlib.JsonUtil} by feilong
  */

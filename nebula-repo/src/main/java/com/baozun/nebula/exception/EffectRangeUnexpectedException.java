@@ -35,7 +35,7 @@ package com.baozun.nebula.exception;
  * 
  * </pre>
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jun 28, 2013 3:32:00 PM
  */
 public class EffectRangeUnexpectedException extends Exception{

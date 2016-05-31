@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * 订单收货地址信息.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月28日 下午1:23:51
  * @see com.baozun.nebula.model.salesorder.Consignee
  * @since 5.3.1

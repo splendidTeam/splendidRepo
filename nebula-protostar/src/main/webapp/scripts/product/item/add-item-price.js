@@ -70,12 +70,15 @@ $j(document).ready(function(){
 		
 		var salePriceArray = new Array();
 		var salePriceIndex = 0;
-		var originalSalePriceArray = new Array();
+//		var originalSalePriceArray = new Array();
+		
 		$j("#extensionTable").find(".dynamicInputNameSalePrices").each(function(i,n){
 			var salePrice = parseFloat(n.value);
-			originalSalePriceArray[i] = salePrice;
+//			originalSalePriceArray[i] = salePrice;
 			if(!isNaN(salePrice)){
 				salePriceArray[salePriceIndex++] = salePrice;
+			} else {
+				return nps.i18n("PLEASE_INPUT_SALEPRICES");
 			}
 		});
 		salePriceArray = salePriceArray.sort(sortNumber);

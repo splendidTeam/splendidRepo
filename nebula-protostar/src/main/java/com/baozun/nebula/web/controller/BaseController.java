@@ -33,7 +33,7 @@ import com.baozun.nebula.web.command.BackWarnEntity;
  * BaseController
  * 
  * @author songdianchao
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public class BaseController{
 

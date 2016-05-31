@@ -3,7 +3,7 @@ package com.baozun.nebula.exception;
 /**
  * code 重复
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jul 10, 2013 10:02:45 AM
  */
 public class CodeRepeatException extends BusinessException{

@@ -27,7 +27,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 /**
  * 专门用来构建 ShoppingCartCommand.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月23日 下午5:47:16
  * @since 5.3.1
  */
