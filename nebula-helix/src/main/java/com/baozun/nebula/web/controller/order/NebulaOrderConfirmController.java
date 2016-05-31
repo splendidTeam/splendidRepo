@@ -189,8 +189,8 @@ public class NebulaOrderConfirmController extends BaseController{
                         .getShoppingCartLineCommandList(memberDetails, key, request);
         shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
 
-        //在当前正常流程，购物行可能为空，注释
-        //Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
+        //购物行为空，抛出异常
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
         ShoppingCartCommand shoppingCartCommand = getChosenShoppingCartCommand(
@@ -198,13 +198,9 @@ public class NebulaOrderConfirmController extends BaseController{
                         shoppingCartLineCommandList,
                         contactCommandList,
                         null);
-
-        // 购物车为空
-        if (shoppingCartCommand == null || shoppingCartCommand.getShoppingCartLineCommands() == null
-                        || shoppingCartCommand.getShoppingCartLineCommands().isEmpty()){
-            return "redirect:/index"; // 购物车为空返回的URL
-        }
-
+        //购物车为空，抛出异常
+        Validate.notNull(shoppingCartCommand,"shoppingCartCommand can't be null");
+        
         // 封装viewCommand
         OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
         orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
