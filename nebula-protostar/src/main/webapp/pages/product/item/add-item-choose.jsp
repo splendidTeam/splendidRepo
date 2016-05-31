@@ -70,17 +70,3 @@ var zNodes =
 </div>
 
 </body>
-<script>
-   $j(document).ready(function(){
-		$j(".select-btn input[type='radio']").on("change",function(){
-			var modal = $j(this).closest(".select-btn").next(".pro-modal");
-			if($j(this).prop("checked")){
-				if($j(this).hasClass("normalpro") || $j(this).hasClass("virtualpro")){
-					modal.show();
-				}else{
-					modal.hide();
-				}
-			}
-		})   
-   })
-   </script>
