@@ -1,5 +1,3 @@
-var originalSalePriceArray = new Array();
-
 function sortNumber(a,b){
 	return a - b;
 }
@@ -70,12 +68,15 @@ $j(document).ready(function(){
 		var salePrice = $j("#salePrice").val();
 		var salePriceArray = new Array();
 		var salePriceIndex = 0;
+//		var originalSalePriceArray = new Array();
 		
 		$j(".extensionTable").find(".dynamicInputNameSalePrices").each(function(i,n){
 			var salePrice = parseFloat(n.value);
-			originalSalePriceArray[i] = salePrice;
+//			originalSalePriceArray[i] = salePrice;
 			if(!isNaN(salePrice)){
 				salePriceArray[salePriceIndex++] = salePrice;
+			} else {
+				return nps.i18n("PLEASE_INPUT_SALEPRICES");
 			}
 			   
 		});
