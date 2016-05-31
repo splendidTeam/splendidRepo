@@ -4,6 +4,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><spring:message code="shop.add.shopmanager"/></title>
+<%@include file="/pages/commons/common-css.jsp"%>
+<%@include file="/pages/commons/common-javascript.jsp"%>
+<link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
+<script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
 </head>
 <body>
 
