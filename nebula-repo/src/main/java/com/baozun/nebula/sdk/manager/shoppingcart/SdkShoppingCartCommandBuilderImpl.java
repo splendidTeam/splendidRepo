@@ -276,7 +276,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      *            the shopping cart command
      * @param shopIdAndShoppingCartCommandMap
      *            the shop id and shopping cart command map
-     *///TODO feilong 感觉下面的逻辑没有用
+     *///XXX feilong 感觉下面的逻辑没有用
     private void doWithNoChoose(
                     List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,
                     ShoppingCartCommand shoppingCartCommand,
