@@ -32,7 +32,7 @@ import com.baozun.nebula.model.product.Category;
  * 商品分类manager
  * 
  * @author yi.huang
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public interface CategoryManager extends BaseManager{
 

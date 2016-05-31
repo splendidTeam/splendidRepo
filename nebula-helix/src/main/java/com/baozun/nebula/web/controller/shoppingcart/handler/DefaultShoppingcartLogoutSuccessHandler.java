@@ -27,7 +27,7 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCount
 /**
  * The Class DefaultShoppingcartLogoutSuccessHandler.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月7日 上午12:10:58
  * @since 5.3.1
  */

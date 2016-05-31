@@ -24,7 +24,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 /**
  * 订单的基本信息.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月12日 下午3:16:25
  * @since 5.3.1
  */

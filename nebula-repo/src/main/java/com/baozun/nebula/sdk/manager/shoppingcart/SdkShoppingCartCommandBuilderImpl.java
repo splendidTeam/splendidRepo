@@ -60,7 +60,7 @@ import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 /**
  * 专门用来构建 ShoppingCartCommand.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 @Transactional

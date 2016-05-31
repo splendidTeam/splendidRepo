@@ -37,7 +37,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * 此时,需要解析
  * </p>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月12日 下午3:16:25
  * @see com.baozun.nebula.model.salesorder.SalesOrder
  * @see com.baozun.nebula.model.salesorder.Logistics

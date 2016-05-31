@@ -27,7 +27,7 @@ import com.baozun.nebula.BaseJUnit4SpringContextTests;
 /**
  * The Class DaoTest.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0.9 2015年3月30日 上午11:24:09
  * @since 1.0.9
  */

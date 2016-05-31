@@ -41,7 +41,7 @@ import com.feilong.core.TimeInterval;
  * </p>
  * </blockquote>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0.9 2015年3月30日 下午4:25:10
  * @since 1.0.9
  */

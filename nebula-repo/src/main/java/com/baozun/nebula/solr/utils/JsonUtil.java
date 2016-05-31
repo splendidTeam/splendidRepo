@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * 
  * </pre>
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jan 26, 2013 8:02:09 PM
  */
 @Deprecated

@@ -33,7 +33,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 /**
  * The Class SdkOrderPromotionManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 @Transactional

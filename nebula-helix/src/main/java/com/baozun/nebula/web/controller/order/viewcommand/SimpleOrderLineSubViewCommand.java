@@ -29,7 +29,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 /**
  * The Class SimpleOrderLineSubViewCommand.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月6日 下午5:49:58
  * @see com.baozun.nebula.model.salesorder.OrderLine
  * @since 5.3.1

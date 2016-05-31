@@ -32,7 +32,7 @@ import com.feilong.servlet.http.CookieUtil;
 /**
  * 基于cookie保存的用户购物车数量持久化.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 @Component("shoppingcartCountPersister")

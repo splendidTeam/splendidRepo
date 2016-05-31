@@ -37,7 +37,7 @@ import com.feilong.core.Validator;
 /**
  * The Class DefaultShoppingcartLoginSuccessHandler.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月6日 上午1:15:13
  * @since 5.3.1
  */

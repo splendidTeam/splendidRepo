@@ -24,7 +24,7 @@ import com.baozun.nebula.manager.captcha.CaptchaValidate;
 /**
  * The Class CaptchaValidateableConfig.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月30日 上午12:11:17
  * @since 1.5.3
  */

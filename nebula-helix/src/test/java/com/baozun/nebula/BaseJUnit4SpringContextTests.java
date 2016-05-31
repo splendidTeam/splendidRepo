@@ -23,7 +23,7 @@ import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 /**
  * 公共的junit spring 测试类.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.1.1 2015年4月17日 下午2:24:26
  * @since 1.1.1
  */

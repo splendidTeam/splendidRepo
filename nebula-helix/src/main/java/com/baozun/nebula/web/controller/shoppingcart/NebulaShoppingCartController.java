@@ -136,7 +136,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * 所有的请求游客都可以操作,所以不需要加 NeedLogin
  * </p>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月21日 下午6:18:53
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand
  * @see com.baozun.nebula.web.controller.shoppingcart.viewcommand.

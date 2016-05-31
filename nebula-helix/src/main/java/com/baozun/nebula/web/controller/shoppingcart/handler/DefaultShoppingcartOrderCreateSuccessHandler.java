@@ -35,7 +35,7 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCount
 
 /**
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午3:43:09
  * @since 5.3.1
  */

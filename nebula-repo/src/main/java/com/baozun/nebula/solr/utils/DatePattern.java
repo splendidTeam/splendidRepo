@@ -18,7 +18,7 @@ package com.baozun.nebula.solr.utils;
 /**
  * date pattern.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2012 1 21 04:18:00
  * @deprecated pls use {@link com.feilong.core.DatePattern}
  */

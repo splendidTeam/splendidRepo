@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * 标识接口,标识是立即购买的form.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月28日 下午3:35:31
  * @since 5.3.1
  */

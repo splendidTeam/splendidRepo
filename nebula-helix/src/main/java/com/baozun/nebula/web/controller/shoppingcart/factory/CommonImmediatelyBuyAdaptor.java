@@ -23,7 +23,7 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 /**
  * The Class CommonImmediatelyBuyAdaptor.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public class CommonImmediatelyBuyAdaptor extends OneShoppingCartLineCommandImmediatelyBuyAdaptor{

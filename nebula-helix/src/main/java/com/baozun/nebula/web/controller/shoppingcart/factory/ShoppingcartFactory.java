@@ -27,7 +27,7 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolv
 /**
  * 购物车工厂.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月22日 下午2:51:08
  * @since 5.3.1
  */

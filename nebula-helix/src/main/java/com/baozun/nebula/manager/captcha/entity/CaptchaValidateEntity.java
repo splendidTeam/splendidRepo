@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * The Class CaptchaValidateEntity.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月28日 下午11:31:11
  * @since 1.5.3
  */

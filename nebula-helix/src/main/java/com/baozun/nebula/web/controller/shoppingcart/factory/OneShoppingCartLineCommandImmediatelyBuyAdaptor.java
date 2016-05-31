@@ -16,18 +16,18 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.factory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
+import com.feilong.core.bean.ConvertUtil;
 
 /**
  * The Class OneShoppingCartLineCommandImmediatelyBuyAdaptor.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public abstract class OneShoppingCartLineCommandImmediatelyBuyAdaptor implements ImmediatelyBuyAdaptor{
@@ -46,25 +46,7 @@ public abstract class OneShoppingCartLineCommandImmediatelyBuyAdaptor implements
         ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(immediatelyBuyForm);
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
-        return toList(shoppingCartLineCommand);
-    }
-
-    /**
-     * To list.
-     *
-     * @param <T>
-     *            the generic type
-     * @param ts
-     *            the ts
-     * @return the list< t>
-     */
-    //TODO feilong 等feilong 1.5.6 发布 直接调用  com.feilong.core.bean.ConvertUtil#toList(T...)
-    private <T> List<T> toList(T...ts){
-        List<T> list = new ArrayList<T>();
-        for (T t : ts){
-            list.add(t);
-        }
-        return list;
+        return ConvertUtil.toList(shoppingCartLineCommand);
     }
 
     /**

@@ -18,7 +18,7 @@ package com.baozun.nebula.manager.captcha.counter;
 /**
  * 比较结果.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月5日 下午10:00:16
  * @since 1.5.3
  */

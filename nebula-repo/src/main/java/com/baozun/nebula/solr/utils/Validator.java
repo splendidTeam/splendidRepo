@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * isNullOrEmpty(Object value),判断元素是否为空
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Sep 2, 2010 8:35:28 PM
  * @version 1.1 2012-9-23 21:34 api更新,isNullOrEmpty 替换isNull(deprecated)
  * @since 1.0

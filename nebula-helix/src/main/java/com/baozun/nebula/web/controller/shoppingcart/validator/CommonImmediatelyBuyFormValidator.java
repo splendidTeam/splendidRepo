@@ -25,7 +25,7 @@ import com.baozun.nebula.web.controller.shoppingcart.form.CommonImmediatelyBuyFo
 /**
  * 立即购买 的校验.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月28日 下午4:48:53
  * @since 5.3.1
  */

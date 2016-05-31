@@ -151,7 +151,7 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		dataMap.put("nickname", nickName);
 		
-		SendEmailResultCode resultCode=commonEmailManager.sendEmail(email, EmailConstants.EMAIL_ACTIVE_TEMPLATE, dataMap);
+		SendEmailResultCode resultCode=commonEmailManager.sendEmail(email, EmailConstants.EMAIL_SENDSUCCESS_TEMPLATE, dataMap);
 		log.info("send register successfully email end ");
 		
 		return resultCode;
@@ -210,21 +210,7 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 	}
 	
 
-//    /***
-//     * 发送邮件验证码
-//     * 
-//     * @Transactional(readOnly = true)
-//     * 
-//     */
-//
-//    public void sendEmailValidateCode(String code, String email) {
-//	log.info("send successfully email start ");
-//	Map<String, Object> dataMap = new HashMap<String, Object>();
-//	dataMap.put("code", code);
-//	// 发送
-//	commonSendEmail(this, "{code}", email, dataMap);
-//	log.info("send  successfully email end ");
-//    }
+
 
 	
 }

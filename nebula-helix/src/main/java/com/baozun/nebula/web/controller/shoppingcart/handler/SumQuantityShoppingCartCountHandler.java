@@ -24,7 +24,7 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 /**
  * 累计 shoppingCartLineCommandList 每行 Quantity 总和的 QuantityShoppingCartCountHandler.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public class SumQuantityShoppingCartCountHandler implements ShoppingCartCountHandler{

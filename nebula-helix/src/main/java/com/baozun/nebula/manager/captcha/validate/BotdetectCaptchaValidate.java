@@ -98,7 +98,7 @@ import botdetect.web.Captcha;
  * </p>
  * </blockquote>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月28日 下午5:12:09
  * @see <a href="https://captcha.com/">Botdetect</a>
  * @see <a href="https://captcha.com/captcha-examples.html">captcha-examples.html</a>

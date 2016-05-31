@@ -21,7 +21,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 /**
  * 店铺相关信息.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月25日 下午1:44:33
  * @see com.baozun.nebula.model.baseinfo.Shop
  * @see com.baozun.nebula.model.auth.Organization

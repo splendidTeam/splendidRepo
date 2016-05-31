@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * The Class CaptchaContainerAndValidateConfig.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月7日 下午8:11:14
  * @see CaptchaContainer
  * @see CaptchaValidateConfig

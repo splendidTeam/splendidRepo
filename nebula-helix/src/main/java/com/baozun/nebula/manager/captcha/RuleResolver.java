@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 通过配置的默认规则来判断是否需要验证码.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月7日 下午10:06:37
  * @since 1.5.3
  */

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
  * 不同的商城 可能地址不一样, 所以 实现类 需要每个商城 自行实现
  * </p>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public interface ImmediatelyBuyCheckoutUrlHandler{

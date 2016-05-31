@@ -28,7 +28,7 @@ import org.springframework.validation.BindingResult;
 /**
  * The Class BaseControllerTest.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.0.0 2016年3月21日 下午5:39:52
  * @since 5.0.0
  */
