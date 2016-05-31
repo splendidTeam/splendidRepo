@@ -16,14 +16,12 @@
  */
 package com.baozun.nebula.web.controller.member;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +37,12 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
-import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utils.EmailUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.constants.CommonUrlConstants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
-import com.baozun.nebula.web.controller.BaseController;
-import com.feilong.core.CharsetType;
 import com.feilong.core.Validator;
-import com.feilong.core.net.ParamUtil;
 
 /**
  * 邮箱账户激活相关的控制器，里面主要控制如下操作：
@@ -133,13 +127,14 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 		
 		//********************************************************************************
 		//获取跳转地址
-		EmailType e = EmailUtil.getEmailType(email);
+		EmailType e = EmailUtil.getEmailType(email); 
 		if(Validator.isNotNullOrEmpty(e)) {
 			model.addAttribute("sendEmail", e.getWebsite());
 		} else {
 			model.addAttribute("sendEmail", "");
 		}
 		
+		model.addAttribute("emailAdd", email);
 		model.addAttribute("resultCode", resultCode);
 		
 		return VIEW_MEMBER_REGISTER_ACTIVE_EMAIL;
@@ -166,21 +161,20 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 	 * 激活验证,默认推荐配置如下
 	 * @RequestMapping("/m/validEmailActiveUrl")
 	 * 
-	 * 账户已激活
-	 * model.addAttribute("result", "urlInvalid");
 	 * 
-	 * 链接已过期
-	 * model.addAttribute("result", "urlUnInvalid");
+	 * 需要不同商城自己定义是否要发送成功激活邮件
 	 * 
 	 * @param registerComfirm
 	 * @param httpRequest
 	 * @param httpResponse
+	 * @param model isSendSuccessMail  新增参数是否发送成功邮件
 	 * @param model
 	 * @return
 	 */
 	public String validEmailActiveUrl(@RequestParam(required = true, value = "registerComfirm") String registerComfirm,
 			 						  HttpServletRequest httpRequest, 
 			 						  HttpServletResponse httpResponse,
+			 						  boolean isSendSuccessMail,
 			 						  Model model) {
 		try {
 			LOG.info("valid register Email start");
@@ -214,8 +208,10 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 			model.addAttribute("email", member.getLoginEmail());
 			model.addAttribute("result", "success");
 			
-			//发送激活成功邮件
-			memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData.getNickname());
+			//发送激活成功邮件  调用时候传递boolean 参数  是否发送成功邮件
+			if(isSendSuccessMail){
+				memberEmailManager.sendRegsiterSuccessEmail(member.getLoginEmail(),personalData.getNickname());
+			}
 			MemberDetails memberDetails=super.constructMemberDetails(member,httpRequest);
 			onAuthenticationSuccess(memberDetails, httpRequest, httpResponse);
 			
