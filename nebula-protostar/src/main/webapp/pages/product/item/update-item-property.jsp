@@ -1,4 +1,6 @@
-<%-- 一般属性 --%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<script type="text/javascript" src="${base}/scripts/product/item/update-item-property.js"></script>
+
 <div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.generalProperty" />
 </div>
@@ -12,7 +14,7 @@
 				items="${dynamicPropertyCommandList}" varStatus="pstatus">
 				<c:if test="${!dynamicPropertyCommand.property.isSaleProp }">
 
-					<!-- 多语言属性 -->
+					<!-- å¤è¯­è¨å±æ§ -->
 					<c:set value="${i18nLang.key}" var="dl"></c:set>
 					<div class="ui-block-line ">
 						<c:if test="${dynamicPropertyCommand.property.editingType==1 }">
@@ -331,7 +333,7 @@
 			<input type="hidden" id="notSalePropSize" value="${notSalePropSize}" />
 		</div>
 	</c:if>
-	<%-- 一般属性单语言 --%>
+	<%-- ä¸è¬å±æ§åè¯­è¨ --%>
 	<c:if test="${i18nOnOff == false}">
 		<div id="notSalepropertySpace" class="i18nOff">
 			<c:set var="size" value="${fn:length(dynamicPropertyCommandList)}"></c:set>
@@ -487,7 +489,7 @@
 							<c:if
 								test="${not empty dynamicPropertyCommand.propertyValueList}">
 								<label>${dynamicPropertyCommand.property.name }</label>
-								<%-- 属性值分组  start --%>
+								<%-- å±æ§å¼åç»  start --%>
 								<c:if
 									test="${fn:length(dynamicPropertyCommand.propertyValueGroupList)>0}">
 									<select loxiaType="select" onchange="changeProGroup(this,2)"
@@ -500,7 +502,7 @@
 										</c:forEach>
 									</select>
 								</c:if>
-								<%-- 属性值分组  end --%>
+								<%-- å±æ§å¼åç»  end --%>
 								<div>
 									<c:forEach var="propertyValue"
 										items="${dynamicPropertyCommand.propertyValueList}">
@@ -592,7 +594,7 @@
 
 <div class="mt10"></div>
  
-<!-- 销售属性信息 多语言 -->
+<!-- éå®å±æ§ä¿¡æ¯ å¤è¯­è¨ -->
 <div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.sales" />
 </div>
@@ -618,7 +620,7 @@
 									<input type='hidden' value='' name='propertyValueInputIds'
 										pid='${dynamicPropertyCommand.property.id}' />
 
-									<%-- 属性值分组  start --%>
+									<%-- å±æ§å¼åç»  start --%>
 									<c:if
 										test="${fn:length(dynamicPropertyCommand.propertyValueGroupList)>0}">
 										<select loxiaType="select" onchange="changeProGroup(this,1)"
@@ -631,7 +633,7 @@
 											</c:forEach>
 										</select>
 									</c:if>
-									<%-- 属性值分组  end --%>
+									<%-- å±æ§å¼åç»  end --%>
 
 									<div>
 										<c:forEach var="propertyValue"
@@ -726,7 +728,7 @@
 	</c:forEach>
 </c:if>
 
-<!--销售属性信息 单语言-->
+<!--éå®å±æ§ä¿¡æ¯ åè¯­è¨-->
 <c:if test="${i18nOnOff == false}">
 	<div class="ui-block-content border-grey saleInfo">
 		<div id="propertySpace">

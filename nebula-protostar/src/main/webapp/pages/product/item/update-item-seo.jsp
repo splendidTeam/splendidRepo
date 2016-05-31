@@ -1,3 +1,6 @@
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<script type="text/javascript" src="${base}/scripts/product/item/update-item-seo.js"></script>
+
 <div class="ui-block-title1 ui-block-title">
 	seo
 	<spring:message code="product.property.lable.search" />

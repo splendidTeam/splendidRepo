@@ -40,6 +40,7 @@ import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleSkuDao;
+import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.model.product.Item;
 
 /**
@@ -83,7 +84,10 @@ public class SdkBundleManagerImpl implements SdkBundleManager {
 	 * @see com.baozun.nebula.sdk.manager.product.SdkBundleManager#deductingBundleInventory(java.lang.Long, java.lang.Integer)
 	 */
 	@Override
-	public boolean deductingBundleInventory(Long bundleItemId, Integer inventory) {
-		return bundleDao.deductingBundleInventory(bundleItemId, inventory) > 0;
+	public void deductingBundleInventory(Long bundleItemId, Integer inventory) {
+		int result = bundleDao.deductingBundleInventory(bundleItemId, inventory);
+		if(result != 1) {
+			throw new NativeUpdateRowCountNotEqualException(1, result);
+		}
 	}
 }
