@@ -47,6 +47,7 @@ import com.baozun.nebula.model.baseinfo.NavigationLang;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
 import com.baozun.nebula.search.FacetParameter;
+import com.baozun.utilities.DateUtil;
 
 import loxia.dao.Sort;
 
@@ -171,10 +172,12 @@ public class NavigationManagerImpl implements NavigationManager {
 			if(dbNavi.getCollectionId()!=null){
 				ItemCollection refItemCollection= itemCollectionDao.getByPrimaryKey(dbNavi.getCollectionId());
 				refItemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
+				refItemCollection.setModifyTime(DateUtil.now());
 				itemCollectionDao.save(refItemCollection);
 			}else{
 				ItemCollection itemCollection = new ItemCollection();
 				itemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
+				itemCollection.setCreateTime(DateUtil.now());
 				ItemCollection refItemCollection =  itemCollectionDao.save(itemCollection);
 				//关联导航
 				dbNavi.setCollectionId(refItemCollection.getId());
@@ -355,6 +358,7 @@ public class NavigationManagerImpl implements NavigationManager {
 		if(navigationCommand.getFacetParameterList()!=null && navigationCommand.getFacetParameterList().size()>0 ){
 			ItemCollection itemCollection = new ItemCollection();
 			itemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
+			itemCollection.setCreateTime(DateUtil.now());
 			ItemCollection refItemCollection =  itemCollectionDao.save(itemCollection);
 			
 			//设置导航与类型关联

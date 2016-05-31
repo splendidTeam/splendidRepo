@@ -53,7 +53,7 @@ public class InvoiceInfoSubViewCommand extends BaseViewCommand {
     /** 发票收货地址. */
     private String receiptAddress;
 
-    // TODO feilong 缺少属性
+    // XXX feilong 缺少属性
 
     /**
      * 获得 发票类型.

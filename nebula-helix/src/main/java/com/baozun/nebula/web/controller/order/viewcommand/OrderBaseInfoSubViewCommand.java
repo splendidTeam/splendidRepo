@@ -48,7 +48,7 @@ public class OrderBaseInfoSubViewCommand extends BaseViewCommand {
     /** 财务状态. */
     private Integer financialStatus;
 
-    /** //TODO feilong 总价. */
+    /** //XXX feilong 总价. */
     private BigDecimal total;
 
     /** 应付运费 */
