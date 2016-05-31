@@ -91,7 +91,7 @@ public class ShippingInfoSubForm implements Serializable{
     private String            appointType;
 
     //***************************************************************************
-    //TODO feilong 地址别名 String alias, 目前数据库还不支持
+    //XXX feilong 地址别名 String alias, 目前数据库还不支持
 
     //***************************************************************************
     /**

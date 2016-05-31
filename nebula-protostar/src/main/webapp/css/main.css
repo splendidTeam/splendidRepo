@@ -2942,3 +2942,18 @@ height: 370px;
 	text-decoration: underline; 
 	color: #F8A721
 }
+.select-pro-layer dl, .select-style-layer dl{
+	display:table;
+}
+.select-pro-layer dt , .select-style-layer dt{
+	display:table-cell;
+	width:60px;
+	height:60px;
+}
+.select-pro-layer dt img , .select-style-layer dt img{
+	width:100%;
+	vertical-align:middle;
+}
+.select-pro-layer dd , .select-style-layer dd{
+	display:table-cell;
+}
