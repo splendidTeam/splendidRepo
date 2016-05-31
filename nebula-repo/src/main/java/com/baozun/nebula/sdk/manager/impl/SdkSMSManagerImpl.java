@@ -17,14 +17,16 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.baozun.hub.sdk.api.SmsService;
 import com.baozun.hub.sdk.command.invoice2notice.SmsCommand;
 import com.baozun.nebula.command.SMSCommand;
@@ -53,13 +55,16 @@ public class SdkSMSManagerImpl implements SdkSMSManager {
 	public SendResult send(SMSCommand smsCommand){
 		//构建hub接口需要的SmsCommand
 		SmsCommand sms=buildSmsCommand(smsCommand);
-		
 		//TODO mobile没有mask
 		LOG.info("[SEND_SMS_BEGIN]  param : {}" ,JsonUtil.format(sms));
 		String result=SmsService.send(sms);
 		LOG.info("[SEND_SMS_END]  result : {}" ,result);
-		
-		Map<String, String> resultMap=JsonUtil.toMap(result,String.class);
+	         Map<String, Object> map = JsonUtil.toMap(result);
+		Map<String, String> resultMap=new HashMap<String, String>();
+		Set<Entry<String, Object>> entrySet = map.entrySet();
+		for (Entry<String, Object> entry : entrySet) {
+		        resultMap.put(entry.getKey(),entry.getValue().toString());
+		    }
 		//记录日志
 		saveSmsSendLog(resultMap, sms);
 		

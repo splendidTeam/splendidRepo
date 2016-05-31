@@ -33,6 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.sdk.command.DynamicPropertyCommand;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter;
 import com.baozun.nebula.web.controller.product.resolver.ItemColorSwatchViewCommandResolver;
@@ -78,9 +79,23 @@ public class ResolverTest {
 		ProfileConfigUtil.setMode("dev");
 	}
 	
+	/**
+	 * spring-manager.xml
+	 * 
+	 * 	<context:component-scan base-package="com.baozun.nebula.web.controller.product.resolver" />
+	 * 
+	 * 	<bean id="facetFilterHelper" class="com.baozun.nebula.search.FacetFilterHelperImpl" />
+	
+		<bean id="itemImageViewCommandConverter" class="com.baozun.nebula.web.controller.product.converter.ItemImageViewCommandConverter" />
+	
+		<bean id="imageViewCommandConverter" class="com.baozun.nebula.web.controller.product.converter.ImageViewCommandConverter" />
+
+	 */
+	
+	
 	@Test
 	public void testItemPropertyViewCommandResolver(){
-		
+		LangUtil.setCurrentLang("zh_CN");
 		Map<String, Object> returnMap =new HashMap<String, Object>();
 		ItemBaseInfoViewCommand baseInfoViewCommand =new ItemBaseInfoViewCommand();
 		List<ItemImageViewCommand> images =new ArrayList<ItemImageViewCommand>();
@@ -88,9 +103,9 @@ public class ResolverTest {
 		constrData(returnMap,
 				baseInfoViewCommand, images);
 		
+		ItemPropertyViewCommand itemPropertyViewCommand = itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images);
 		
-		
-		LOG.debug("sss:{}", JsonUtil.format(itemPropertyViewCommandResolver.resolve(baseInfoViewCommand, images)));
+		LOG.debug("sss:{}", JsonUtil.format(itemPropertyViewCommand));
 		
 	}
 	
@@ -154,6 +169,7 @@ public class ResolverTest {
 		propertyValueViewCommand1.setPropertyName("尺码");
 		propertyValueViewCommand1.setPropertyValue("xxl");
 		propertyValueViewCommand1.setItemPropertiesId(101l);
+		propertyValueViewCommand1.setPropertyValueThumb("/a.jpg");
 		propertyValueViewCommands1.add(propertyValueViewCommand1);
 		elementViewCommand.setPropertyValues(propertyValueViewCommands1);
 		salesProperties.add(elementViewCommand);
@@ -161,7 +177,7 @@ public class ResolverTest {
 		itemPropertyViewCommand.setSalesProperties(salesProperties);
 		
 		
-		baseInfoViewCommand.setId(14060L);
+		baseInfoViewCommand.setId(78L);
 		baseInfoViewCommand.setCode("42611WP364B33");
 		
 		

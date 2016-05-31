@@ -355,7 +355,7 @@ public class CaptchaUtil{
             LOGGER.debug("countThreshold value is :{},<=0 return true,don't need call counter", countThreshold);
             return true;
         }
-        //TODO feilong 提取 model返回的数据 ?
+        //XXX feilong 提取 model返回的数据 ?
         //String humanKeyValue = "";
         //humanKeyParamName
 

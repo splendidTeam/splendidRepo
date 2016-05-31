@@ -42,6 +42,7 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
+import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.constants.Constants;
@@ -55,7 +56,6 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
-import com.baozun.nebula.solr.utils.Validator;
 import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
@@ -64,6 +64,7 @@ import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
+import com.feilong.core.Validator;
 
 @Transactional
 @Service("paymentManager")
@@ -154,23 +155,6 @@ public class PayManagerImpl implements PayManager {
 
 	private static final String ORDERNOTEXIST = "ORDERNOTEXIST";
 	
-	/** 银联支付 */
-	private static final String PAYTYPE_UNIONPAY = "161";
-
-	/** 微信支付 */
-	private static final String PAYTYPE_WXPAY = "4";
-
-	/** Alipay */
-	private static final String PAYTYPE_ALIPAY = "1";
-	
-	/** Alipay 网银 */
-	private static final String PAYTYPE_ALIPAY_BANK = "3";
-	
-	/** Alipay 信用卡 */
-	private static final String PAYTYPE_ALIPAY_CREDIT = "14";
-	
-	
-    
 
 	@Override
 	public void savePayInfos(SalesOrderCommand so,PaymentRequest paymentRequest,String operator) {
@@ -532,7 +516,7 @@ public class PayManagerImpl implements PayManager {
 				if(Validator.isNotNullOrEmpty(paymenInfo)&& Boolean.parseBoolean(paymenInfo)){
 					//交易查询
 					PaymentResult  res = paymentManager.getOrderInfo(so);
-					if(payType.toString().equals(PAYTYPE_WXPAY) || payType.toString().equals(PAYTYPE_UNIONPAY)){
+					if(payType.equals(ReservedPaymentType.WECHAT) || payType.equals(ReservedPaymentType.UNIONPAY)){
 						/**
 						 * 微信 银联
 						 * 如果交易成功,用户支付中，记一下log；
@@ -546,7 +530,7 @@ public class PayManagerImpl implements PayManager {
 							isNeedClosePay = tradeOtherStatusHandler(beforePaymentCancelOrderCommand, orderCode, orderId);
 						}
 				     
-					}else if(payType.toString().equals(PAYTYPE_ALIPAY) || payType.toString().equals(PAYTYPE_ALIPAY_BANK) || payType.toString().equals(PAYTYPE_ALIPAY_CREDIT)){
+					}else if(payType.equals(ReservedPaymentType.ALIPAY) || payType.equals(ReservedPaymentType.ALIPAY_BANK) || payType.equals(ReservedPaymentType.ALIPAY_CREDIT)){
 						/**
 						 * 支付宝
 						 * 如果交易成功，记一下log；
@@ -567,7 +551,7 @@ public class PayManagerImpl implements PayManager {
                     PaymentResult  paymentResult = paymentManager.cancelPayment(so);
 					log.info("close payment request return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 					
-					if(payType.toString().equals(PAYTYPE_WXPAY) || payType.toString().equals(PAYTYPE_UNIONPAY)){
+					if(payType.equals(ReservedPaymentType.WECHAT) || payType.equals(ReservedPaymentType.UNIONPAY)){
 						if(ORDERNOTEXIST.equals(paymentResult.getMessage())){
 							
 							tradeOtherStatusHandler(beforePaymentCancelOrderCommand, orderCode, orderId);
@@ -582,7 +566,7 @@ public class PayManagerImpl implements PayManager {
                              throw new BusinessException(ErrorCodes.transaction_closed);
 						}
 						
-					}else if(payType.toString().equals(PAYTYPE_ALIPAY) || payType.toString().equals(PAYTYPE_ALIPAY_BANK) || payType.toString().equals(PAYTYPE_ALIPAY_CREDIT)){
+					}else if(payType.equals(ReservedPaymentType.ALIPAY) || payType.equals(ReservedPaymentType.ALIPAY_BANK) || payType.equals(ReservedPaymentType.ALIPAY_CREDIT)){
 						if(TRADE_NOT_EXIST.equals(paymentResult.getMessage())){
 							tradeOtherStatusHandler(beforePaymentCancelOrderCommand, orderCode, orderId);
 						}else{
