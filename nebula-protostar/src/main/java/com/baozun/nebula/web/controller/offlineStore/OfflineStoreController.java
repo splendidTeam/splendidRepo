@@ -291,7 +291,7 @@ public class OfflineStoreController {
 				excelDir.mkdirs();
 			}
 			try {
-				deleteImageNotExists(bannerImageUploadPath);
+				//deleteImageNotExists(bannerImageUploadPath);
 				UUID uuid = UUID.randomUUID();
 				SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
 				String timeString = format.format(new Date()) + "_" + uuid + fileName.substring(fileName.lastIndexOf("."), fileName.length());
@@ -328,7 +328,7 @@ public class OfflineStoreController {
 		if (CollectionUtils.isNotEmpty(storeList) && CollectionUtils.isNotEmpty(nameStrList)) {
 			for (OfflineStore sl : storeList) {
 				for (String name : nameStrList) {
-					if (sl.getStoreImage()!= null && sl.getStoreImage().contains(name)) {
+					if ((sl.getStoreImage()!= null || sl.getMapImage()!= null)&& (sl.getStoreImage().contains(name) || sl.getMapImage().contains(name))) {
 						newNameList.add(name);
 					}
 				}
