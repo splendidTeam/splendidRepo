@@ -49,13 +49,13 @@
 						name="itemCommand.subTitle.values[${status.index}]"
 						loxiaType="input"
 						value="${ subTilte.langValues[i18nLang.key] }" mandatory="false"
-						placeholder="ååå¯æ é¢" />
+						placeholder="商品副标题" />
 				</c:if>
 				<c:if test="${empty subTilte }">
 					<input type="text" id="subTitle"
 						name="itemCommand.subTitle.values[${status.index}]"
 						loxiaType="input" value="" mandatory="false"
-						placeholder="ååå¯æ é¢" />
+						placeholder="商品副标题" />
 				</c:if>
 				<input class="i18n-lang" type="text"
 					name="itemCommand.subTitle.langs[${status.index}]"
