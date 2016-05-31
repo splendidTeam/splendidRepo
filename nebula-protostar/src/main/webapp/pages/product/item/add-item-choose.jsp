@@ -8,6 +8,28 @@
 <%@include file="/pages/commons/common-javascript.jsp"%>
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
+<script type="text/javascript" src="${base}/scripts/product/item/add-item-choose.js"></script>
+<script type="text/javascript">
+<%-- 添加普通商品行业选择树 --%>
+var zNodes =
+	[
+		{id:0, name:"ROOT",state:"0", open:true,root:"true",nocheck:true},
+		<c:forEach var="industry" items="${industryList}" varStatus="status">
+		<c:if test="${industry.isShow}">
+			{
+				id:${industry.id}, 
+				pId:${industry.pId},
+				name: "${industry.indu_name}",
+				open:${industry.open}
+				<c:if test="${industry.noCheck}">
+					,nocheck:true
+				</c:if>
+			}
+			<c:if test="${!status.last}">,</c:if>
+			</c:if>
+		</c:forEach>
+	];
+</script>
 </head>
 <body>
 
