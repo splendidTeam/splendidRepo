@@ -33,7 +33,7 @@ import loxia.dao.Sort;
  * 商品分类处理Dao.
  * 
  * @author yi.huang
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public interface CategoryDao extends GenericEntityDao<Category, Long>{
 

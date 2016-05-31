@@ -40,7 +40,7 @@ import com.feilong.core.bean.ConvertUtil;
  * </ol>
  * </blockquote>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月28日 上午1:26:18
  * @since 1.5.3
  */

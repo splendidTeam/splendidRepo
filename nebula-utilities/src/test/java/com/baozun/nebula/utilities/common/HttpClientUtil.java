@@ -15,6 +15,8 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.utilities.io.http.HttpMethodType;
+
 
 /**
  * HttpClient 相关工具类

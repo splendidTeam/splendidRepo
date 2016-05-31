@@ -34,7 +34,7 @@ import com.baozun.nebula.sdk.manager.SdkPayInfoManager;
 /**
  * The Class SdkPayInfoManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:08:03
  * @since 5.3.1
  */

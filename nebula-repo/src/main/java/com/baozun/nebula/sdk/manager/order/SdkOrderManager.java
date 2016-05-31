@@ -8,7 +8,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 /**
  * 
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午2:38:35
  * @since 5.3.1
  */

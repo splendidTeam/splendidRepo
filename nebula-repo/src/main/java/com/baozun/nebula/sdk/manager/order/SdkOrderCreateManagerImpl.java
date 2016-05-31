@@ -65,7 +65,7 @@ import com.feilong.core.util.MapUtil;
 /**
  * 提取出来,专注于创建订单.
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月14日 下午6:55:04
  * @since 5.3.1
  */

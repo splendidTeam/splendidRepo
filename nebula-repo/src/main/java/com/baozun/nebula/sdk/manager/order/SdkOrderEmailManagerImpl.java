@@ -50,7 +50,7 @@ import com.feilong.core.Validator;
 /**
  * The Class SdkOrderCreateEmailManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午8:27:25
  * @since 5.3.1
  */

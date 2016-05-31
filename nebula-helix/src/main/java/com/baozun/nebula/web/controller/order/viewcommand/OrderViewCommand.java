@@ -24,7 +24,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * 主要显示订单明细.
  * 
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月6日 下午5:48:06
  * @see com.baozun.nebula.model.salesorder.SalesOrder
  * @see com.baozun.nebula.web.controller.order.form.OrderForm

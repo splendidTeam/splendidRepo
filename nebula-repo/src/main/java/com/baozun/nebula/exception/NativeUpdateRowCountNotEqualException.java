@@ -3,7 +3,7 @@ package com.baozun.nebula.exception;
 /**
  * NativeUpdate 返回值(实际操作行数)跟期待值(期待操作行数)不符.
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jun 28, 2013 3:32:00 PM
  */
 public class NativeUpdateRowCountNotEqualException extends RuntimeException{

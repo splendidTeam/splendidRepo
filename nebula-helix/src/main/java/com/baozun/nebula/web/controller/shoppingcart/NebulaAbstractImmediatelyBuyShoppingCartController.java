@@ -28,7 +28,7 @@ import com.feilong.accessor.AutoKeyAccessor;
 /**
  * nebula 立即购买 base ShoppingCart Controller类.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends BaseController{

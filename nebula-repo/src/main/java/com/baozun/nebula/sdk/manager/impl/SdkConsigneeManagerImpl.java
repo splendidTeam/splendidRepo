@@ -32,7 +32,7 @@ import com.feilong.core.Validator;
 
 /**
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午3:04:49
  * @since 5.3.1
  */

@@ -24,7 +24,7 @@ import com.feilong.core.Validator;
 /**
  * 计算 shoppingCartLineCommandList size的 QuantityShoppingCartCountHandler.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public class SizeShoppingCartCountHandler implements ShoppingCartCountHandler{

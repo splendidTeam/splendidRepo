@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 目前只支持 主键, 以后视情况而定吧 看看要不要把价格等信息放这里.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.2.2 2015年7月19日 下午11:29:32
  * @since 1.2.2
  */

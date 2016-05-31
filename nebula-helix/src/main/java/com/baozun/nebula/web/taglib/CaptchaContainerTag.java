@@ -32,7 +32,7 @@ import com.feilong.taglib.AbstractConditionalTag;
  * {@link Tag#SKIP_BODY}
  * </p>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月2日 下午4:59:47
  * @since 1.5.3
  */

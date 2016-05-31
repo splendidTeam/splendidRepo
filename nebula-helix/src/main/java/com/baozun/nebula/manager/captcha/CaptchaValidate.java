@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
  * 可以有短信验证码校验实现,图形验证码校验实现,目前可以参考 {@link com.baozun.nebula.manager.captcha.validate.BotdetectCaptchaValidate}
  * </p>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年3月28日 下午5:10:11
  * @since 1.5.3
  */

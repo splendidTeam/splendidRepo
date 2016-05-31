@@ -28,7 +28,7 @@ import com.feilong.servlet.http.RequestUtil;
 /**
  * 默认黑白名单形式的实现.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月2日 下午5:13:42
  * @since 1.5.3
  */

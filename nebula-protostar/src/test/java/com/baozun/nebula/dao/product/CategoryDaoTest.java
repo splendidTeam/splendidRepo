@@ -35,7 +35,7 @@ import com.baozun.nebula.utils.JsonFormatUtil;
 /**
  * @author yi.huang
  * @date 2013-6-20 下午02:12:19
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 @ContextConfiguration(locations = {
 									"classpath*:loxia-hibernate-context.xml",

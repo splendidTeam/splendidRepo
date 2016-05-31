@@ -43,7 +43,7 @@ import com.baozun.nebula.web.controller.BaseController;
  * 商品分类管理controller
  * 
  * @author yi.huang
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @date 2013-6-20 上午11:09:00
  */
 @Controller

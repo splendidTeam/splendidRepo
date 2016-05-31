@@ -18,7 +18,7 @@ package com.baozun.nebula.manager.captcha.counter;
 /**
  * 计数器,标识接口.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.3 2016年4月8日 上午10:39:14
  * @since 1.5.3
  */

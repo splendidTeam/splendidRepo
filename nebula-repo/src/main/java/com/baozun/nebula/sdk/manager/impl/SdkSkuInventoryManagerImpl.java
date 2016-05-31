@@ -30,13 +30,14 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviour;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.util.MapUtil;
 
 /**
  * The Class SdkSkuInventoryManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月12日 下午12:58:43
  * @since 5.3.1
  */
@@ -46,7 +47,10 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
 
     /** The sdk sku inventory dao. */
     @Autowired
-    private SdkSkuInventoryDao sdkSkuInventoryDao;
+    private SdkSkuInventoryDao                         sdkSkuInventoryDao;
+
+    @Autowired
+    private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
     /*
      * (non-Javadoc)
@@ -109,15 +113,10 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
                     shoppingCartLineCommand.setQuantity(stock);
                 }
             }
-
-            Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
-            if (null != relatedItemId){
-                //FIXME feilong 扣减库存 如果有bundle 逻辑处理
-            }else{
-                //主卖品和赠品都扣库存
-                String extentionCode = shoppingCartLineCommand.getExtentionCode();
-                MapUtil.putSumValue(extentionCodeAndCountMap, extentionCode, quantity);
-            }
+            SdkShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+            sdkShoppingCartLineCommandBehaviour
+                            .organizeExtentionCodeAndCountMapForDeductSkuInventory(shoppingCartLineCommand, extentionCodeAndCountMap);
         }
         return extentionCodeAndCountMap;
     }

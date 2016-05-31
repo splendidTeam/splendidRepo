@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 退出成功之后,购物车相关处理.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月7日 上午12:02:18
  * @since 5.3.1
  */

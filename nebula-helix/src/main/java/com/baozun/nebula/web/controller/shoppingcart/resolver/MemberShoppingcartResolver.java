@@ -32,7 +32,7 @@ import com.baozun.nebula.web.MemberDetails;
  * 会员购物车操作.
  *
  * @author weihui.tang
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月3日 下午1:35:48
  * @since 5.3.1
  */

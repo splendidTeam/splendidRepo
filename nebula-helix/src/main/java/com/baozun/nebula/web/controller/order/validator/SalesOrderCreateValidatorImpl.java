@@ -32,7 +32,7 @@ import com.feilong.core.Validator;
 
 /**
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 @Component("salesOrderCreateValidator")

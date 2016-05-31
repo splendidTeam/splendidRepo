@@ -31,7 +31,7 @@ import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 
 /**
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:56:19
  * @since 5.3.1
  */
