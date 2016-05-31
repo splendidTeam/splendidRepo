@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * 支付信息.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月28日 下午1:18:13
  * @since 5.3.1
  */

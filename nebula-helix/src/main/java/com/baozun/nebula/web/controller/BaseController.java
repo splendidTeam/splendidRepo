@@ -55,7 +55,7 @@ import com.baozun.nebula.utilities.common.encryptor.RSAEncryptor;
  * 应用事件发布，请注意未来应用是一个集群类的应用，对于事件的处理必须和集群的特性兼容
  * 
  * @author D.C
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public abstract class BaseController{
 	

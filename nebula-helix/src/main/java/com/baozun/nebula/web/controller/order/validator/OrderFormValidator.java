@@ -33,7 +33,7 @@ import com.feilong.core.util.RegexUtil;
  * 对用户提交的order 信息进行校验.
  *
  * @author weihui.tang
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月28日 下午9:31:45
  * @since 5.3.1
  */

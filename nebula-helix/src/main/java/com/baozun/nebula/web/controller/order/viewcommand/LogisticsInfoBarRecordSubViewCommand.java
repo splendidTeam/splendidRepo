@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * 巴枪扫描记录.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月12日 下午3:54:43
  * @see com.baozun.nebula.model.salesorder.Logistics#getTrackingDescription()
  * @since 5.3.1

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 专门给esapi 设置的监听器
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Nov 9, 2012 5:16:58 PM
  * 切换成新的安全处理机制 since 5.3.1
  */

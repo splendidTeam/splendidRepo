@@ -33,7 +33,7 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcart
  * 游客操作购物车.
  *
  * @author weihui.tang
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月3日 下午4:23:16
  * @since 5.3.1
  */

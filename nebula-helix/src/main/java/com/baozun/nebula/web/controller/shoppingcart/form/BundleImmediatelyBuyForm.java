@@ -19,7 +19,7 @@ package com.baozun.nebula.web.controller.shoppingcart.form;
 /**
  * 立即购买 bundle需要的参数.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月28日 下午3:32:51
  * @since 5.3.1
  */

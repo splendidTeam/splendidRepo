@@ -44,7 +44,7 @@ import com.feilong.servlet.http.CookieUtil;
 /**
  * 基于 {@link Cookie}的游客购物车持久化处理方式.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月3日 下午4:20:24
  * @since 5.3.1
  */

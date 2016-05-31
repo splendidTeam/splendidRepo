@@ -42,7 +42,7 @@ import com.baozun.nebula.model.BaseModel;
  * </table>
  * </blockquote>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月26日 下午12:26:50
  * @since 5.3.1
  */

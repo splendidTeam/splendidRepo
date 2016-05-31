@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 数组工具类
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2010-4-16 下午01:00:27
  * @since 1.0
  * @deprecated pls use {@link com.feilong.core.lang.ArrayUtil}

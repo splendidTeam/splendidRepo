@@ -31,7 +31,7 @@ import com.feilong.tools.jsonlib.JsonUtil;
 /**
  * The Class AbstractHandlerInterceptorAdapter.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.4.0 2015年8月6日 下午10:59:16
  * @since 1.4.0
  */

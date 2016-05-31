@@ -30,7 +30,7 @@ import com.feilong.core.bean.PropertyUtil;
 /**
  * The Class OrderQueryForm.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月6日 下午3:49:17
  * @since 5.3.1
  */

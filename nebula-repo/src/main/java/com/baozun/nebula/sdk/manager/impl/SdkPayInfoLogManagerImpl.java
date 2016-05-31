@@ -38,7 +38,7 @@ import com.feilong.core.Validator;
 /**
  * The Class SdkPayInfoLogManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:11:21
  * @since 5.3.1
  * @see com.baozun.nebula.sdk.manager.impl.SdkPayInfoManagerImpl

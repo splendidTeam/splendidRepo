@@ -24,7 +24,7 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ImmediatelyBuyForm;
 /**
  * 立即购买 购物车行list工厂.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public interface ImmediatelyBuyShoppingCartLineCommandListFactory{

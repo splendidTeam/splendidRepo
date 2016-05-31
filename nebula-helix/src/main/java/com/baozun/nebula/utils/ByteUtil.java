@@ -3,7 +3,7 @@ package com.baozun.nebula.utils;
 /**
  * Byte 工具类
  * 
- * @author 金鑫 2010-3-11 下午02:58:49
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 1.0
  * @deprecated 目前没有使用,feilong已经移动到新的jar 通常不会单独使用这个类 by feilong
  */

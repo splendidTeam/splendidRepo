@@ -48,7 +48,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  * 不好意思,优惠券等信息请独立构造,或者使用ajax形式来渲染<b>(推荐)</b>;这个对象关注的重点是 用户买了什么,而买了的东西享受何种促销或者活动请额外处理
  * </blockquote>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月22日 下午7:34:27
  * @since 5.3.1
  */

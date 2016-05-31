@@ -30,7 +30,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 /**
  * 订单相关的邮件处理.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午8:25:54
  * @since 5.3.1
  */

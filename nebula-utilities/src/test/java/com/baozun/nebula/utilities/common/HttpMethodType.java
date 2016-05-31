@@ -7,7 +7,7 @@ package com.baozun.nebula.utilities.common;
 /**
  * http请求方法
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2010-12-16 下午01:11:27
  * @since 1.0
  */

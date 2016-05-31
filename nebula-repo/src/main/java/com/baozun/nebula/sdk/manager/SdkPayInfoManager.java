@@ -25,7 +25,7 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 /**
  * The Interface SdkPayInfoManager.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:07:32
  * @since 5.3.1
  */

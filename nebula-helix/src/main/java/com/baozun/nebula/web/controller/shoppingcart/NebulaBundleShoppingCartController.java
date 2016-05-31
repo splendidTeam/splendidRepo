@@ -48,7 +48,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ImmediatelyBuyBun
  * </p>
  *
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月4日 下午7:23:19
  * @see com.baozun.nebula.model.bundle.Bundle
  * @see com.baozun.nebula.model.bundle.BundleElement

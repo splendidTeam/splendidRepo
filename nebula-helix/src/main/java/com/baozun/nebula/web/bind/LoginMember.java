@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * 标识spring mvc controller方法参数支持自动注入 用户session信息 ,参见 {@link LoginMemberHandlerMethodArgumentResolver}
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.5.0 2016年2月26日 下午7:36:41
  * @since 1.5.0
  * 

@@ -19,7 +19,7 @@ package com.baozun.nebula.enumeration;
 /**
  * 树节点 移动方式
  * 
- * @author <a href="mailto:venusdrogon@163.com">金鑫</a>
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 Jul 5, 2013 7:33:41 PM
  */
 public enum TreeMoveType{

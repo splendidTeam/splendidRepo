@@ -38,7 +38,7 @@ import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
  * 主要是计算 {@link ShoppingCartLineCommand} {@link ShoppingCartCommand} 等常用方法
  * </p>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see ShoppingCartLineCommand
  * @see ShoppingCartCommand
  * @since 5.3.1

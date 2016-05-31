@@ -37,7 +37,7 @@ import com.feilong.core.date.DateUtil;
 /**
  * The Class ShoppingcartLineOperateCommonValidatorImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午4:48:40
  * @since 5.3.1
  */

@@ -27,7 +27,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
  * 购物车数量,目前业界有两种实现,天猫是显示的 list size;京东是 list quantity sum 总和
  * </p>
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public interface ShoppingCartCountHandler{

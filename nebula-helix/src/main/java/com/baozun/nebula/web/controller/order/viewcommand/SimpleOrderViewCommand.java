@@ -25,7 +25,7 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 /**
  * The Class SimpleOrderViewCommand.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月6日 下午5:48:06
  * @see com.baozun.nebula.model.salesorder.SalesOrder
  * @since 5.3.1

@@ -120,7 +120,7 @@ import com.feilong.core.Validator;
  * </p>
  * </blockquote>
  * 
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月28日 上午11:42:30
  * @since 5.3.1
  */

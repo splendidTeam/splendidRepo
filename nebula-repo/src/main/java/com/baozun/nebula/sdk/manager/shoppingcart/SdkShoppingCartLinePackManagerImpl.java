@@ -57,7 +57,7 @@ import com.feilong.core.util.CollectionsUtil;
 /**
  * The Class SdkShoppingCartLinePackManagerImpl.
  *
- * @author feilong
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月23日 下午5:04:54
  * @since 5.3.1
  */
