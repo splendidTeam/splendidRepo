@@ -147,7 +147,10 @@ public class SalesOrder extends BaseModel{
 
     /** 商城正常下单. */
     public static final Integer SO_SOURCE_NORMAL                             = 1;
-
+    
+    /** Shopdog正常下单. */
+    public static final Integer SO_SOURCE_SHOPDOG_NORMAL                       = 2;
+    
     /** 手机端正常下单. */
     public static final Integer SO_SOURCE_MOBILE_NORMAL                      = 3;
 
