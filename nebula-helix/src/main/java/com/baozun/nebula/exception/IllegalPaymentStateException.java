@@ -49,6 +49,9 @@ public class IllegalPaymentStateException extends Exception {
 		/** 交易流水不存在或已支付 */
 		PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID,
 		
+		/** 交易流水不存在或尚未支付 */
+		PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_UNPAID,
+		
 		/** 订单不存在 */
 		PAYMENT_ILLEGAL_ORDER_NOT_EXISTS,
 		
