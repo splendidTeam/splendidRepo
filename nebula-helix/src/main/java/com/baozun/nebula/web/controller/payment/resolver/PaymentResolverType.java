@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.exception.IllegalPaymentStateException;
@@ -15,8 +14,7 @@ public class PaymentResolverType implements Serializable {
 
 	private static final long serialVersionUID = -216019187342593163L;
 	
-	@Autowired(required=false)
-	@Qualifier("paymentResolverTypes")
+	@Autowired
 	private Map<String, PaymentResolver> paymentResolverTypes;
 	
 	public PaymentResolver getInstance(String type) throws IllegalPaymentStateException {
