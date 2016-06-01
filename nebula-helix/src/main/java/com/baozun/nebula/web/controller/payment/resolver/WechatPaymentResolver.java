@@ -1,29 +1,22 @@
 package com.baozun.nebula.web.controller.payment.resolver;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
-import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
-import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
-import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.web.MemberDetails;
 import com.feilong.core.Validator;
 
@@ -202,6 +195,22 @@ public class WechatPaymentResolver implements PaymentResolver {
 		
 		
 		return null;
+	}
+
+	@Override
+	public String doPayReturn(HttpServletRequest request,
+			HttpServletResponse response, String payType)
+			throws IllegalPaymentStateException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void doPayNotify(HttpServletRequest request,
+			HttpServletResponse response, String payType)
+			throws IllegalPaymentStateException, IOException {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

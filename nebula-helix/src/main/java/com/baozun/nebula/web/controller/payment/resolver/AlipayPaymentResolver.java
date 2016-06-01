@@ -1,32 +1,54 @@
 package com.baozun.nebula.web.controller.payment.resolver;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
-import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.event.EventPublisher;
+import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
+import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.sdk.utils.MapConvertUtils;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
+import com.baozun.nebula.utilities.integration.payment.PaymentResult;
+import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.command.PaymentResultType;
+import com.baozun.nebula.web.constants.Constants;
+import com.baozun.nebula.web.controller.payment.NebulaPaymentController;
 import com.feilong.core.Validator;
+import com.feilong.servlet.http.RequestUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 public class AlipayPaymentResolver extends BasePaymentResolver implements PaymentResolver {
 	
+	 /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaPaymentController.class);	
+    
+    private static final String PAYMENT_SUCCESS = "PAYMENT_SUCCESS";
+    
 	@Autowired
 	private SdkPaymentManager sdkPaymentManager;
 	
@@ -35,6 +57,12 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 
 	@Autowired
 	private PayManager payManager;
+	
+	@Autowired
+	private OrderManager sdkOrderManager;
+	
+	@Autowired
+	private EventPublisher eventPublisher;
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
@@ -95,6 +123,121 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		
 		return null;
 	}
+	
+
+	@Override
+	public String doPayReturn(HttpServletRequest request,
+			HttpServletResponse response, String payType)
+			throws IllegalPaymentStateException {
+		String subOrdinate = request.getParameter("out_trade_no");
+		
+		LOGGER.info("[DO_PAY_RETURN] get sync notifications before , subOrdinate: {}" , subOrdinate );
+		
+		// 判断交易是否已有成功 防止重复调用 。
+		PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
+		
+		if (Validator.isNotNullOrEmpty(payCode)) {
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID, "订单已经被支付");
+		}
+		
+		LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+		
+		// 获取同步付款通知
+		PaymentResult paymentResult = paymentManager.getPaymentResultForSyn(request, PayTypeConvertUtil.getPayType(Integer.valueOf(payType)));
+		if (null == paymentResult) {
+			// 返回失败
+			return "redirect:" + getPayFailurePageRedirect(subOrdinate);
+		}
+		
+		LOGGER.info("[DO_PAY_RETURN] sync notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+		
+		
+		// 获取支付状态
+		String payStatus = paymentResult.getPaymentServiceSatus().toString();
+
+		if (PAYMENT_SUCCESS.equals(payStatus)) {
+			// 获取通知成功，修改支付及订单信息
+			payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), true, request);
+		} else {
+			// 获取通知失败或其他情况
+			payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_RETURN_AFTER_TYPE);
+			return "redirect:" + getPayFailurePageRedirect(subOrdinate);
+		}
+		
+		return "redirect:" + getPaySuccessPageRedirect(subOrdinate);
+	}
+
+
+	@Override
+	public void doPayNotify(HttpServletRequest request,
+			HttpServletResponse response, String payType)
+			throws IllegalPaymentStateException, IOException {
+		
+    	String subOrdinate = request.getParameter("out_trade_no");
+		
+		LOGGER.info("[DO_PAY_RETURN] get sync notifications before , subOrdinate: {}" , subOrdinate );
+		
+		// 判断交易是否已有成功 防止重复调用 。
+		PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
+		
+		if (Validator.isNotNullOrEmpty(payCode)) {
+			response.getWriter().write(PaymentResultType.SUCCESS);
+		}else{
+			LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+			
+			// 获取异步通知
+			PaymentResult paymentResult = paymentManager.getPaymentResultForAsy(request, PayTypeConvertUtil.getPayType(Integer.valueOf(payType)));
+			
+			LOGGER.info("async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+			
+			if (null == paymentResult) {
+				//log
+				sdkPaymentManager.savePaymentLog(new Date(),com.baozun.nebula.sdk.constants.Constants.PAY_LOG_NOTIFY_AFTER_MESSAGE,
+						 null,request.getRequestURL().toString());
+				// 返回失败
+				response.getWriter().write(PaymentResultType.FAIL);
+			}
+			
+			// 获取支付状态
+			String responseStatus = paymentResult.getPaymentServiceSatus().toString();
+
+			//添加订单查询：支付状态为1 物流状态为1||3
+			Map<String, Object> paraMap = new HashMap<String, Object>();
+			paraMap.put("subOrdinate", subOrdinate);
+			List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+			
+			SalesOrderCommand salesOrderCommand = null;
+			if(Validator.isNotNullOrEmpty(payInfoLogs)){
+				 salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
+			}
+			
+			if (PAYMENT_SUCCESS.equals(responseStatus)
+                    && Validator.isNotNullOrEmpty(salesOrderCommand)
+					&& (SalesOrder.SALES_ORDER_STATUS_NEW.equals(salesOrderCommand.getLogisticsStatus()) ||SalesOrder.SALES_ORDER_STATUS_TOOMS.equals(salesOrderCommand.getLogisticsStatus()))
+					&& SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT.equals(salesOrderCommand.getFinancialStatus())) {
+				// 获取通知成功，修改支付及订单信息
+				payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), false, request);
+			} else {
+				if(Validator.isNotNullOrEmpty(salesOrderCommand)){
+					 //log
+					String result = "FinancialStatus："+salesOrderCommand.getFinancialStatus()+" LogisticsStatus:"+salesOrderCommand.getLogisticsStatus();
+					
+					PayWarnningEvent payWarnningEvent = new PayWarnningEvent(this,salesOrderCommand.getCode(),null, new Date(),null, responseStatus, null,result); 
+	                eventPublisher.publish(payWarnningEvent);
+				}
+				
+				// 返回失败记录日志
+				payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_NOTIFY_AFTER_TYPE);
+			}
+			
+			response.getWriter().write(paymentResult.getResponseValue());
+		}
+		
+	}
+	
+	
+	
+	
 	
 	//TODO
 	//注意这里的paytype要设置成
