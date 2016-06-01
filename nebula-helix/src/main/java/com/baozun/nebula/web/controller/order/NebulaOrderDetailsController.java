@@ -258,8 +258,6 @@ public class NebulaOrderDetailsController extends BaseController{
      * @param salesOrderCommand
      *            the sales order command
      * @return true, if validate order<br>
-     *         如果 <code>memberDetails</code> 是null,抛出 {@link NullPointerException}<br>
-     *         如果 <code>salesOrderCommand</code> 是null,抛出 {@link NullPointerException}<br>
      * @time：2016年5月23日 下午2:56:06
      */
     protected boolean isSelfOrder(MemberDetails memberDetails,SalesOrderCommand salesOrderCommand){
