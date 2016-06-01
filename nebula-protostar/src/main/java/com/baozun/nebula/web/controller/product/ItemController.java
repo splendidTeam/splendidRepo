@@ -131,7 +131,7 @@ import loxia.dao.Sort;
 import loxia.support.json.JSONArray;
 
 /**
- * 商品管理controller
+ * 鍟嗗搧绠＄悊controller
  * 
  * @author xingyu.liu
  */
@@ -164,7 +164,7 @@ public class ItemController extends BaseController{
 	@Autowired
 	private SdkMataInfoManager					sdkMataInfoManager;
 
-	// 默认排序
+	// 榛樿鎺掑簭
 	@Autowired
 	private SdkItemSortScoreManager				sdkItemSortScoreManager;
 
@@ -180,7 +180,7 @@ public class ItemController extends BaseController{
 	@Autowired
 	private ItemPresaleInfoManager				itemPresaleInfoManager;
 
-	// 缩略图规格
+	// 缂╃暐鍥捐鏍�
 	// private static final String THUMBNAIL_CONFIG = "THUMBNAIL_CONFIG";
 
 	// private static final Integer MULTI_CHOICE = 4;
@@ -188,7 +188,7 @@ public class ItemController extends BaseController{
 	// private static final Integer CUSTOM_MULTI_CHOICE = 5;
 
 	/**
-	 * 上传图片的域名
+	 * 涓婁紶鍥剧墖鐨勫煙鍚�
 	 */
 	@Value("#{meta['upload.img.domain.base']}")
 	private String								UPLOAD_IMG_DOMAIN	= "";
@@ -199,35 +199,35 @@ public class ItemController extends BaseController{
 	private ItemLangManager						itemLangManager;
 
 	/**
-	 * 页面跳转 新增商品
+	 * 椤甸潰璺宠浆 鏂板鍟嗗搧
 	 * 
 	 * @param model
 	 * @return
 	 */
 	@RequestMapping(value = "/item/createItem.htm")
 	public String createItem(Model model){
-		// 查询orgId
+		// 鏌ヨorgId
 //		UserDetails userDetails = this.getUserDetails();
 //
 //		ShopCommand shopCommand = null;
 //		Long shopId = 0L;
 //
 //		Long currentOrgId = userDetails.getCurrentOrganizationId();
-//		// 根据orgId查询shopId
+//		// 鏍规嵁orgId鏌ヨshopId
 //		if (currentOrgId != null){
 //			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 //			shopId = shopCommand.getShopid();
 //		}
 
 		Sort[] sorts = Sort.parse("id desc");
-		// 获取行业信息
+		// 鑾峰彇琛屼笟淇℃伅
 //		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts), shopId);
 		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts));
 		model.addAttribute("industryList", industryList);
-		// 分类列表
+		// 鍒嗙被鍒楄〃
 		sorts = Sort.parse("parent_id asc,sort_no asc");
 		List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
-		// 缩略图规格
+		// 缂╃暐鍥捐鏍�
 		// List<ChooseOption> thumbnailConfig = chooseOptionManager.findEffectChooseOptionListByGroupCode(THUMBNAIL_CONFIG);
 		// model.addAttribute("thumbnailConfig", thumbnailConfig);
 		String itemCodeValidMsg = messageSource.getMessage(
@@ -254,7 +254,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 对页面的数据节点进行判断存储
+	 * 瀵归〉闈㈢殑鏁版嵁鑺傜偣杩涜鍒ゆ柇瀛樺偍
 	 * 
 	 * @param industryList
 	 * @return
@@ -310,7 +310,7 @@ public class ItemController extends BaseController{
 		return resultList;
 	}
 
-	// 递归用于筛选checked
+	// 閫掑綊鐢ㄤ簬绛涢�塩hecked
 //	static void searchChecked(List<Map<String, Object>> resultList,String id){
 //		for (Map<String, Object> map : resultList){
 //			if (map.get("id").toString().equals(id)){
@@ -324,7 +324,7 @@ public class ItemController extends BaseController{
 //	}
 
 	/**
-	 * 下一步按钮
+	 * 涓嬩竴姝ユ寜閽�
 	 * 
 	 * @param model
 	 * @return
@@ -332,7 +332,7 @@ public class ItemController extends BaseController{
 	@RequestMapping("/item/findDynamicPropertis.json")
 	@ResponseBody
 	public Object findDynamicPropertis(Model model,@RequestParam("industryId") Long industryId){
-		// 根据行业Id查找对应属性和属性值
+		// 鏍规嵁琛屼笟Id鏌ユ壘瀵瑰簲灞炴�у拰灞炴�у��
 		List<DynamicPropertyCommand> dynamicPropertyCommandList =itemManager.findDynamicPropertisByIndustryId(industryId);
 		SUCCESS.setDescription(dynamicPropertyCommandList);
 		return SUCCESS;
@@ -341,7 +341,7 @@ public class ItemController extends BaseController{
 	@RequestMapping("/item/findDynamicPropertisJson.json")
 	@ResponseBody
 	public Object findDynamicPropertisJson(Model model,@RequestParam("industryId") Long industryId){
-		// 根据行业Id查找对应属性和属性值
+		// 鏍规嵁琛屼笟Id鏌ユ壘瀵瑰簲灞炴�у拰灞炴�у��
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisByIndustryId(industryId);
 		JSONArray dynamicPropertyCommandListJson = new JSONArray(dynamicPropertyCommandList, "***");
 		String dynamicPropertyCommandListJsonStr = dynamicPropertyCommandListJson.toString();
@@ -353,7 +353,7 @@ public class ItemController extends BaseController{
 	@RequestMapping("/item/findProGroupInfo.json")
 	@ResponseBody
 	public Object findProGroupInfo(Model model,@RequestParam("proGroupId") Long proGroupId,@RequestParam("propertyId") Long propertyId){
-		// 通过属性值分组ID找到相对的属性值列表
+		// 閫氳繃灞炴�у�煎垎缁処D鎵惧埌鐩稿鐨勫睘鎬у�煎垪琛�
 		DynamicPropertyCommand dynamicPropertyCommand = propertyManager.findByProGroupIdAndPropertyId(proGroupId,propertyId);
 		SUCCESS.setDescription(dynamicPropertyCommand);
 		return SUCCESS;
@@ -361,52 +361,52 @@ public class ItemController extends BaseController{
 	
 	
 //	public List<DynamicPropertyCommand> findDynamicPropertisByShopIdAndIndustryId(Long industryId){
-//		// 查询orgId
+//		// 鏌ヨorgId
 //		UserDetails userDetails = this.getUserDetails();
 //
 //		ShopCommand shopCommand = null;
 //		Long shopId = 0L;
 //
 //		Long currentOrgId = userDetails.getCurrentOrganizationId();
-//		// 根据orgId查询shopId
+//		// 鏍规嵁orgId鏌ヨshopId
 //		if (currentOrgId != null){
 //			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 //			shopId = shopCommand.getShopid();
 //		}
-//		// 根据行业Id和店铺Id查找对应属性和属性值
+//		// 鏍规嵁琛屼笟Id鍜屽簵閾篒d鏌ユ壘瀵瑰簲灞炴�у拰灞炴�у��
 //		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisByIndustryId(industryId);
 //		return dynamicPropertyCommandList;
 //	}
 
 	@RequestMapping("/item/saveItem.json")
 	@ResponseBody
-	public Object saveItem(@ModelAttribute() ItemCommand itemCommand,@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
-			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
-			@ArrayCommand() ItemProperties[] iProperties,// 普通商品属性
-			@ArrayCommand(dataBind = true) Long[] propertyIds,// 用户填写的商品属性值的属性Id
-			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 用户输入的 商品销售属性的 属性值 （对于多选来说 是 pvId,pvId 对于自定义多选来说是 aa||bb）
+	public Object saveItem(@ModelAttribute() ItemCommand itemCommand,@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 鍟嗗搧鍔ㄦ�佸睘鎬�
+			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 鍟嗗搧鍒嗙被Id
+			@ArrayCommand() ItemProperties[] iProperties,// 鏅�氬晢鍝佸睘鎬�
+			@ArrayCommand(dataBind = true) Long[] propertyIds,// 鐢ㄦ埛濉啓鐨勫晢鍝佸睘鎬у�肩殑灞炴�d
+			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 鐢ㄦ埛杈撳叆鐨� 鍟嗗搧閿�鍞睘鎬х殑 灞炴�у�� 锛堝浜庡閫夋潵璇� 鏄� pvId,pvId 瀵逛簬鑷畾涔夊閫夋潵璇存槸 aa||bb锛�
 			HttpServletRequest request) throws Exception{
 
-		// 查询orgId
+		// 鏌ヨorgId
 		UserDetails userDetails = this.getUserDetails();
 		ShopCommand shopCommand = null;
 		Long shopId = 0L;
 		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
+		// 鏍规嵁orgId鏌ヨshopId
 		if (currentOrgId != null){
 			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 			shopId = shopCommand.getShopid();
 		}
 
 		itemCommand.setShopId(shopId);
-		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		// 灏嗕紶杩囨潵鐨勪笂浼犲浘鐗囦腑 鏄笂浼犵殑鍥剧墖鏇挎崲涓轰笉鍚煙鍚嶇殑鍥剧墖
 		itemCommand.setDescription(removeDefinedDomainInDesc(itemCommand.getDescription(), UPLOAD_IMG_DOMAIN));
 
 		SkuPropertyCommand[] skuPropertyCommandArray = getCmdArrrayFromRequest(request, propertyIds, propertyValueInputs);
 
 //		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
 		
-		// 保存商品
+		// 淇濆瓨鍟嗗搧
 		Item item = itemManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
@@ -421,8 +421,8 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * @author 何波
-	 * @Description: 处理商品属性和商品国际化信息
+	 * @author 浣曟尝
+	 * @Description: 澶勭悊鍟嗗搧灞炴�у拰鍟嗗搧鍥介檯鍖栦俊鎭�
 	 * @param itemCommand
 	 * @param propertyValueIds
 	 * @param categoriesIds
@@ -437,26 +437,26 @@ public class ItemController extends BaseController{
 	 */
 	@RequestMapping("/i18n/item/saveItem.json")
 	@ResponseBody
-	public Object saveItemI18n(@I18nCommand ItemInfoCommand itemCommand,@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
-			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
-			@I18nCommand ItemPropertiesCommand[] iProperties,// 普通商品属性
-			@ArrayCommand(dataBind = true) Long[] propertyIds,// 用户填写的商品属性值的属性Id
-			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 用户输入的 商品销售属性的 属性值 （对于多选来说 是 pvId,pvId 对于自定义多选来说是 aa||bb）-自定义多选
-			@ArrayCommand(dataBind = true) String[] propertyValueInputIds,// --多选
+	public Object saveItemI18n(@I18nCommand ItemInfoCommand itemCommand,@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 鍟嗗搧鍔ㄦ�佸睘鎬�
+			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 鍟嗗搧鍒嗙被Id
+			@I18nCommand ItemPropertiesCommand[] iProperties,// 鏅�氬晢鍝佸睘鎬�
+			@ArrayCommand(dataBind = true) Long[] propertyIds,// 鐢ㄦ埛濉啓鐨勫晢鍝佸睘鎬у�肩殑灞炴�d
+			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 鐢ㄦ埛杈撳叆鐨� 鍟嗗搧閿�鍞睘鎬х殑 灞炴�у�� 锛堝浜庡閫夋潵璇� 鏄� pvId,pvId 瀵逛簬鑷畾涔夊閫夋潵璇存槸 aa||bb锛�-鑷畾涔夊閫�
+			@ArrayCommand(dataBind = true) String[] propertyValueInputIds,// --澶氶��
 			HttpServletRequest request) throws Exception{
-		// 查询orgId
+		// 鏌ヨorgId
 		UserDetails userDetails = this.getUserDetails();
 		ShopCommand shopCommand = null;
 		Long shopId = 0L;
 		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
+		// 鏍规嵁orgId鏌ヨshopId
 		if (currentOrgId != null){
 			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 			shopId = shopCommand.getShopid();
 		}
 
 		itemCommand.setShopId(shopId);
-		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		// 灏嗕紶杩囨潵鐨勪笂浼犲浘鐗囦腑 鏄笂浼犵殑鍥剧墖鏇挎崲涓轰笉鍚煙鍚嶇殑鍥剧墖
 		dealDescImgUrl(itemCommand);
 		SkuPropertyMUtlLangCommand[] skuPropertyCommandArray = getCmdArrrayFromRequestI18n(
 				request,
@@ -464,7 +464,7 @@ public class ItemController extends BaseController{
 				propertyValueInputs,
 				propertyValueInputIds);
 //		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
-		// 保存商品
+		// 淇濆瓨鍟嗗搧
 		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
@@ -484,8 +484,8 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * @author 何波
-	 * @Description: 处理描述中输入的图片链接
+	 * @author 浣曟尝
+	 * @Description: 澶勭悊鎻忚堪涓緭鍏ョ殑鍥剧墖閾炬帴
 	 * @param itemCommand
 	 *            void
 	 * @throws
@@ -517,11 +517,11 @@ public class ItemController extends BaseController{
 	private SkuPropertyCommand[] getCmdArrrayFromRequest(HttpServletRequest request,Long[] propertyIds,String[] propertyValueInputs){
 		List<SkuPropertyCommand> cmdList = new ArrayList<SkuPropertyCommand>();
 
-		// 如果 propertyIds，propertyValueInputs 不同时为null 或者二者长度不等 ，说明数据不一致
+		// 濡傛灉 propertyIds锛宲ropertyValueInputs 涓嶅悓鏃朵负null 鎴栬�呬簩鑰呴暱搴︿笉绛� 锛岃鏄庢暟鎹笉涓�鑷�
 		if ((propertyIds != null && propertyValueInputs != null) && (propertyIds.length != propertyValueInputs.length)){
 			return null;
 		}
-		// 说明是没有销售属性的 只有一个sku
+		// 璇存槑鏄病鏈夐攢鍞睘鎬х殑 鍙湁涓�涓猻ku
 		if (propertyValueInputs == null || propertyValueInputs.length == 0){
 			SkuPropertyCommand spc = new SkuPropertyCommand();
 
@@ -560,7 +560,7 @@ public class ItemController extends BaseController{
 
 					String code = request.getParameter(codeKey);
 
-					// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+					// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 					if (code == null || "".equals(code.trim())){
 						continue;
 					}
@@ -610,7 +610,7 @@ public class ItemController extends BaseController{
 
 						String code = request.getParameter(codeKey);
 
-						if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+						if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 							continue;
 						}
 
@@ -652,7 +652,7 @@ public class ItemController extends BaseController{
 			String[] propertyValueInputs,
 			String[] propertyValueInputIds){
 		List<SkuPropertyMUtlLangCommand> cmdList = new ArrayList<SkuPropertyMUtlLangCommand>();
-		// 说明是没有销售属性的 只有一个sku
+		// 璇存槑鏄病鏈夐攢鍞睘鎬х殑 鍙湁涓�涓猻ku
 		if (Validator.isNullOrEmpty(propertyValueInputs) && Validator.isNullOrEmpty(propertyValueInputIds)){
 			SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
 
@@ -701,7 +701,7 @@ public class ItemController extends BaseController{
 		 * if(langSize==0){ throw Exception(""); }
 		 */
 
-		// 仅一个自定义多选或多选
+		// 浠呬竴涓嚜瀹氫箟澶氶�夋垨澶氶��
 		if ((propertyValueInputIds.length == 1 && Validator.isNullOrEmpty(propertyValueInputs))
 				|| (propertyValueInputs.length == 2 * langSize && Validator.isNullOrEmpty(propertyValueInputIds))){
 			Property p = propertyManager.findPropertiesById(propertyIds[0]);
@@ -728,7 +728,7 @@ public class ItemController extends BaseController{
 
 				String code = request.getParameter(codeKey);
 
-				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+				// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 				if (code == null || "".equals(code.trim())){
 					continue;
 				}
@@ -758,10 +758,10 @@ public class ItemController extends BaseController{
 
 		}else if ((propertyValueInputIds.length >= 2 && Validator.isNullOrEmpty(propertyValueInputs))
 				|| (propertyValueInputs.length >= 4 * langSize && Validator.isNullOrEmpty(propertyValueInputIds))){
-			// 两个自定义多选或两个多选
+			// 涓や釜鑷畾涔夊閫夋垨涓や釜澶氶��
 			if (propertyValueInputs.length >= 4 * langSize && Validator.isNullOrEmpty(propertyValueInputIds)){
-				// 两个自定义多选
-				// 按原有顺序
+				// 涓や釜鑷畾涔夊閫�
+				// 鎸夊師鏈夐『搴�
 				Set<Long> set = new LinkedHashSet<Long>();
 				for (Long l : propertyIds){
 					set.add(l);
@@ -795,7 +795,7 @@ public class ItemController extends BaseController{
 				String[] inputArray1 = null;
 				String[] inputArray2 = null;
 
-				// 默认语言下标
+				// 榛樿璇█涓嬫爣
 				int dp1 = 0;
 				int dp2 = 2;
 
@@ -830,7 +830,7 @@ public class ItemController extends BaseController{
 
 						String code = request.getParameter(codeKey);
 
-						if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+						if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 							continue;
 						}
 
@@ -864,21 +864,21 @@ public class ItemController extends BaseController{
 				}
 
 			}else{
-				// 三个及其以上销售属性
+				// 涓変釜鍙婂叾浠ヤ笂閿�鍞睘鎬�
 				List<Property> properties = new ArrayList<Property>();
 				Map<String, Property> propInputMap = new HashMap<String, Property>();
 				List<List<String>> list = new ArrayList<List<String>>();
 				for (int i = 0; i < propertyIds.length; i++){
-					// 根据id获取商品属性
+					// 鏍规嵁id鑾峰彇鍟嗗搧灞炴��
 					Property prop = propertyManager.findPropertiesById(propertyIds[i]);
 					properties.add(prop);
-					// 尺寸 [624,546] 颜色[847,1426] 季节[27,28]
+					// 灏哄 [624,546] 棰滆壊[847,1426] 瀛ｈ妭[27,28]
 					String[] inputArray = getInputArrayByProperty(prop, propertyValueInputIds[i]);
 					List<String> keyIds = Arrays.asList(inputArray);
 					list.add(keyIds);
 					if (!keyIds.isEmpty()){
 						for (String key : keyIds){
-							// [624,尺寸] [546,尺寸]
+							// [624,灏哄] [546,灏哄]
 							propInputMap.put(key, prop);
 						}
 					}
@@ -891,8 +891,8 @@ public class ItemController extends BaseController{
 				for (List<String> rList : result){
 					String prefix = "";
 					List<ItemPropertyMutlLangCommand> ipcList = new ArrayList<ItemPropertyMutlLangCommand>();
-					// ====第1行rList: [624, 847]
-					// ====第2行rList: [546, 847]
+					// ====绗�1琛宺List: [624, 847]
+					// ====绗�2琛宺List: [546, 847]
 					for (String r : rList){
 						prefix += r + "_";
 						Property prop = propInputMap.get(r);
@@ -901,7 +901,7 @@ public class ItemController extends BaseController{
 							ipcList.add(ipc1);
 						}
 					}
-					// 拼接key
+					// 鎷兼帴key
 					String codeKey = prefix + "code";
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
@@ -910,7 +910,7 @@ public class ItemController extends BaseController{
 
 					String code = request.getParameter(codeKey);
 
-					if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+					if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 						continue;
 					}
 
@@ -935,7 +935,7 @@ public class ItemController extends BaseController{
 
 		}else if (Validator.isNotNullOrEmpty(propertyValueInputs) && Validator.isNotNullOrEmpty(propertyValueInputIds)
 				&& propertyValueInputIds.length == 1 && propertyValueInputs.length >= 2 * langSize){
-			// 一个自定义多选、一个多选
+			// 涓�涓嚜瀹氫箟澶氶�夈�佷竴涓閫�
 			Set<Long> set = new LinkedHashSet<Long>();
 			for (Long l : propertyIds){
 				set.add(l);
@@ -956,7 +956,7 @@ public class ItemController extends BaseController{
 			String[] inputArray1 = null;
 			String[] inputArray2 = null;
 			for (Property p : properties){
-				// 找出多选
+				// 鎵惧嚭澶氶��
 				if (Property.EDITING_TYPE_MULTI_SELECT.equals(p.getEditingType())){
 					inputArray2 = getInputArrayByProperty(p, propertyValueInputIds[0]);
 				}else{
@@ -965,9 +965,9 @@ public class ItemController extends BaseController{
 			}
 			int outerNum = 0;
 			int innerNum = 0;
-			// 页面按p1、p2属性顺序传递参数,顺序确定了code的前缀
-			// inputArray2-多选;
-			// inputArray1->自定义多选
+			// 椤甸潰鎸塸1銆乸2灞炴�ч『搴忎紶閫掑弬鏁�,椤哄簭纭畾浜哻ode鐨勫墠缂�
+			// inputArray2-澶氶��;
+			// inputArray1->鑷畾涔夊閫�
 			for (String input1 : inputArray1){
 				innerNum = 0;
 				for (String input2 : inputArray2){
@@ -984,14 +984,14 @@ public class ItemController extends BaseController{
 
 					String code = request.getParameter(codeKey);
 
-					if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+					if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 						continue;
 					}
 
 					SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
 					List<ItemPropertyMutlLangCommand> ipcList = new ArrayList<ItemPropertyMutlLangCommand>();
 					for (Property p : properties){
-						// 找出多选
+						// 鎵惧嚭澶氶��
 						if (Property.EDITING_TYPE_MULTI_SELECT.equals(p.getEditingType())){
 							ItemPropertyMutlLangCommand ipc1 = getItemPropertyMutlLangCommand(p, input2, values, langs, innerNum);
 							ipcList.add(ipc1);
@@ -1030,7 +1030,7 @@ public class ItemController extends BaseController{
 			String[] propertyValueInputIds,
 			List<SkuPropertyMUtlLangCommand> cmdList){
 
-		// 仅一个自定义多选或多选
+		// 浠呬竴涓嚜瀹氫箟澶氶�夋垨澶氶��
 		if ((propertyValueInputIds.length == 1 && Validator.isNullOrEmpty(propertyValueInputs))
 				|| (propertyValueInputs.length == 1 && Validator.isNullOrEmpty(propertyValueInputIds))){
 			Property p = propertyManager.findPropertiesById(propertyIds[0]);
@@ -1052,7 +1052,7 @@ public class ItemController extends BaseController{
 
 				String code = request.getParameter(codeKey);
 
-				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+				// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 				if (code == null || "".equals(code.trim())){
 					continue;
 				}
@@ -1082,10 +1082,10 @@ public class ItemController extends BaseController{
 
 		}else if ((propertyValueInputIds.length >= 2 && Validator.isNullOrEmpty(propertyValueInputs))
 				|| (propertyValueInputs.length >= 2 && Validator.isNullOrEmpty(propertyValueInputIds))){
-			// 两个自定义多选或两个多选
+			// 涓や釜鑷畾涔夊閫夋垨涓や釜澶氶��
 			if (propertyValueInputs.length == 2 && Validator.isNullOrEmpty(propertyValueInputIds)){
-				// 两个自定义多选
-				// 按原有顺序
+				// 涓や釜鑷畾涔夊閫�
+				// 鎸夊師鏈夐『搴�
 				Set<Long> set = new LinkedHashSet<Long>();
 				for (Long l : propertyIds){
 					set.add(l);
@@ -1116,7 +1116,7 @@ public class ItemController extends BaseController{
 
 						String code = request.getParameter(codeKey);
 
-						if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+						if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 							continue;
 						}
 
@@ -1150,21 +1150,21 @@ public class ItemController extends BaseController{
 				}
 
 			}else{
-				// 三个及其以上销售属性
+				// 涓変釜鍙婂叾浠ヤ笂閿�鍞睘鎬�
 				List<Property> properties = new ArrayList<Property>();
 				Map<String, Property> propInputMap = new HashMap<String, Property>();
 				List<List<String>> list = new ArrayList<List<String>>();
 				for (int i = 0; i < propertyIds.length; i++){
-					// 根据id获取商品属性
+					// 鏍规嵁id鑾峰彇鍟嗗搧灞炴��
 					Property prop = propertyManager.findPropertiesById(propertyIds[i]);
 					properties.add(prop);
-					// 尺寸 [624,546] 颜色[847,1426] 季节[27,28]
+					// 灏哄 [624,546] 棰滆壊[847,1426] 瀛ｈ妭[27,28]
 					String[] inputArray = getInputArrayByProperty(prop, propertyValueInputIds[i]);
 					List<String> keyIds = Arrays.asList(inputArray);
 					list.add(keyIds);
 					if (!keyIds.isEmpty()){
 						for (String key : keyIds){
-							// [624,尺寸] [546,尺寸]
+							// [624,灏哄] [546,灏哄]
 							propInputMap.put(key, prop);
 						}
 					}
@@ -1177,8 +1177,8 @@ public class ItemController extends BaseController{
 				for (List<String> rList : result){
 					String prefix = "";
 					List<ItemPropertyMutlLangCommand> ipcList = new ArrayList<ItemPropertyMutlLangCommand>();
-					// ====第1行rList: [624, 847]
-					// ====第2行rList: [546, 847]
+					// ====绗�1琛宺List: [624, 847]
+					// ====绗�2琛宺List: [546, 847]
 					for (String r : rList){
 						prefix += r + "_";
 						Property prop = propInputMap.get(r);
@@ -1187,7 +1187,7 @@ public class ItemController extends BaseController{
 							ipcList.add(ipc1);
 						}
 					}
-					// 拼接key
+					// 鎷兼帴key
 					String codeKey = prefix + "code";
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
@@ -1196,7 +1196,7 @@ public class ItemController extends BaseController{
 
 					String code = request.getParameter(codeKey);
 
-					if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+					if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 						continue;
 					}
 
@@ -1221,7 +1221,7 @@ public class ItemController extends BaseController{
 
 		}else if (Validator.isNotNullOrEmpty(propertyValueInputs) && Validator.isNotNullOrEmpty(propertyValueInputIds)
 				&& propertyValueInputIds.length == 1 && propertyValueInputs.length == 1){
-			// 一个自定义多选、一个多选
+			// 涓�涓嚜瀹氫箟澶氶�夈�佷竴涓閫�
 			Set<Long> set = new LinkedHashSet<Long>();
 			for (Long l : propertyIds){
 				set.add(l);
@@ -1236,7 +1236,7 @@ public class ItemController extends BaseController{
 			String[] inputArray1 = null;
 			String[] inputArray2 = null;
 			for (Property p : properties){
-				// 找出多选
+				// 鎵惧嚭澶氶��
 				if (Property.EDITING_TYPE_MULTI_SELECT.equals(p.getEditingType())){
 					inputArray2 = getInputArrayByProperty(p, propertyValueInputIds[0]);
 				}else{
@@ -1245,9 +1245,9 @@ public class ItemController extends BaseController{
 			}
 			int outerNum = 0;
 			int innerNum = 0;
-			// 页面按p1、p2属性顺序传递参数,顺序确定了code的前缀
-			// inputArray2-多选;
-			// inputArray1->自定义多选
+			// 椤甸潰鎸塸1銆乸2灞炴�ч『搴忎紶閫掑弬鏁�,椤哄簭纭畾浜哻ode鐨勫墠缂�
+			// inputArray2-澶氶��;
+			// inputArray1->鑷畾涔夊閫�
 			for (String input1 : inputArray1){
 				innerNum = 0;
 				for (String input2 : inputArray2){
@@ -1264,14 +1264,14 @@ public class ItemController extends BaseController{
 
 					String code = request.getParameter(codeKey);
 
-					if (code == null || "".equals(code.trim())){// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
+					if (code == null || "".equals(code.trim())){// 濡傛灉娌℃湁濉啓skuCode ,閭ｄ箞灏辫涓� 娌℃湁璇ュ睘鎬х殑sku 涓嶈繘琛屼繚瀛樻垨鑰呬慨鏀�
 						continue;
 					}
 
 					SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
 					List<ItemPropertyMutlLangCommand> ipcList = new ArrayList<ItemPropertyMutlLangCommand>();
 					for (Property p : properties){
-						// 找出多选
+						// 鎵惧嚭澶氶��
 						if (Property.EDITING_TYPE_MULTI_SELECT.equals(p.getEditingType())){
 							ItemPropertyMutlLangCommand ipc1 = getItemPropertyMutlLangCommand(p, input2, null, null, innerNum);
 							ipcList.add(ipc1);
@@ -1417,7 +1417,7 @@ public class ItemController extends BaseController{
 		}
 
 		if (Property.EDITING_TYPE_CUSTOM_MULTI_SELECT.equals(p.getEditingType())){
-			// TODO 设置多语言信息
+			// TODO 璁剧疆澶氳瑷�淇℃伅
 			boolean i18n = LangProperty.getI18nOnOff();
 			if (i18n){
 				MutlLang mutlLang = new MutlLang();
@@ -1507,7 +1507,7 @@ public class ItemController extends BaseController{
 		return backWarnEntity;
 	}
 
-	// 将数据库中取出来的 商品描述中的本地服务器地址加上domain
+	// 灏嗘暟鎹簱涓彇鍑烘潵鐨� 鍟嗗搧鎻忚堪涓殑鏈湴鏈嶅姟鍣ㄥ湴鍧�鍔犱笂domain
 	public String addDefinedDomainInDesc(String desc,String defineDomain){
 		if (desc == null)
 			return "";
@@ -1569,7 +1569,7 @@ public class ItemController extends BaseController{
 		return desc;
 	}
 
-	// 将传过来的商品描述中的 中图像地址 （如果是本地上传，则改为去掉服务器域名）
+	// 灏嗕紶杩囨潵鐨勫晢鍝佹弿杩颁腑鐨� 涓浘鍍忓湴鍧� 锛堝鏋滄槸鏈湴涓婁紶锛屽垯鏀逛负鍘绘帀鏈嶅姟鍣ㄥ煙鍚嶏級
 	public String removeDefinedDomainInDesc(String desc,String defineDomain){
 		Document doc = Jsoup.parse(desc);
 		Elements es = doc.select("img");
@@ -1606,23 +1606,23 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 页面跳转 修改商品
+	 * 椤甸潰璺宠浆 淇敼鍟嗗搧
 	 * 
 	 * @param model
 	 * @return
 	 */
 	@RequestMapping(value = "/item/updateItem.htm")
 	public String updateItem(Model model,@RequestParam("itemId") String itemId){
-		// 分类列表
+		// 鍒嗙被鍒楄〃
 		Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
 		List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
 		model.addAttribute("categoryList", categoryList);
 
-		// 查找商品编码、所属行业
+		// 鏌ユ壘鍟嗗搧缂栫爜銆佹墍灞炶涓�
 		Item item = itemManager.findItemById(Long.valueOf(itemId));
-		// 根据行业Id查找行业
+		// 鏍规嵁琛屼笟Id鏌ユ壘琛屼笟
 		Industry industry = industryManager.findIndustryById(item.getIndustryId());
-		// 查找商品分类
+		// 鏌ユ壘鍟嗗搧鍒嗙被
 		Long[] categoryIds;
 		List<Category> categories = null;
 		List<ItemCategory> itemCategoryList = itemCategoryManager.findItemCategoryListByItemId(Long.valueOf(itemId));
@@ -1633,15 +1633,15 @@ public class ItemController extends BaseController{
 				categoryIds[i] = itemCategory.getCategoryId();
 				i++;
 			}
-			// 根据分类Id数组查询商品分类
+			// 鏍规嵁鍒嗙被Id鏁扮粍鏌ヨ鍟嗗搧鍒嗙被
 			categories = categoryManager.findCategoryListByCategoryIds(categoryIds);
 		}
-		// 根据商品id查询商品分类
+		// 鏍规嵁鍟嗗搧id鏌ヨ鍟嗗搧鍒嗙被
 		ItemCategoryCommand defaultItemCategory = itemCategoryManager.findDefaultCategoryByItemId(Long.valueOf(itemId));
 
-		// 查找商品属性及属性值
+		// 鏌ユ壘鍟嗗搧灞炴�у強灞炴�у��
 		List<ItemPropertiesCommand> itemProperties = itemManager.findItemPropertiesCommandListyByItemId(Long.valueOf(itemId));
-		// 根据行业Id和店铺Id查找对应属性和属性值
+		// 鏍规嵁琛屼笟Id鍜屽簵閾篒d鏌ユ壘瀵瑰簲灞炴�у拰灞炴�у��
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = itemManager.findDynamicPropertisByIndustryId(item.getIndustryId());
 		List<Object> propertyIdArray = new ArrayList<Object>();
 		List<Object> propertyNameArray = new ArrayList<Object>();
@@ -1666,13 +1666,13 @@ public class ItemController extends BaseController{
 			}
 		}
 
-		// 根据itemId查找Sku
+		// 鏍规嵁itemId鏌ユ壘Sku
 		List<Sku> skuList = itemManager.findSkuByItemId(item.getId());
 
 		List<Object> newSkuList = new ArrayList<Object>();
-		// sku销售价
+		// sku閿�鍞环
 		List<BigDecimal> salePrices = new ArrayList<BigDecimal>();
-		// sku销售价
+		// sku閿�鍞环
 		List<BigDecimal> listPrices = new ArrayList<BigDecimal>();
 
 		for (Sku sku : skuList){
@@ -1699,10 +1699,10 @@ public class ItemController extends BaseController{
 		JSONArray dynamicPropertyCommandListJson = new JSONArray(dynamicPropertyCommandList, "***");
 		String dynamicPropertyCommandListJsonStr = dynamicPropertyCommandListJson.toString();
 
-		// // 缩略图规格
+		// // 缂╃暐鍥捐鏍�
 		// List<ChooseOption> thumbnailConfig = chooseOptionManager.findEffectChooseOptionListByGroupCode(THUMBNAIL_CONFIG);
 		// model.addAttribute("thumbnailConfig", thumbnailConfig);
-		// 查找商品名称、商品描述
+		// 鏌ユ壘鍟嗗搧鍚嶇О銆佸晢鍝佹弿杩�
 		ItemInfoCommand itemInfo = itemManager.findItemInfoCommandByItemId(Long.valueOf(itemId));
 		model.addAttribute("industry", industry);
 		model.addAttribute("code", item.getCode());
@@ -1727,7 +1727,7 @@ public class ItemController extends BaseController{
 		model.addAttribute("lastSelectPropertyValueId", itemInfo.getLastSelectPropertyValueId());
 		model.addAttribute("itemPropertiesStr", itemPropertiesStr);
 		model.addAttribute("isStyleEnable", isEnableStyle());
-		// 国际化属性
+		// 鍥介檯鍖栧睘鎬�
 		model.addAttribute("itemProperties", itemProperties);
 
 		model.addAttribute("title", itemInfo.getTitle());
@@ -1748,7 +1748,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 验证商品编码的唯一性
+	 * 楠岃瘉鍟嗗搧缂栫爜鐨勫敮涓�鎬�
 	 * 
 	 * @param code
 	 * @return
@@ -1756,14 +1756,14 @@ public class ItemController extends BaseController{
 	@RequestMapping("/item/validateItemCode.json")
 	@ResponseBody
 	public Object validateItemCode(@RequestParam("code") String code){
-		// 查询orgId
+		// 鏌ヨorgId
 		UserDetails userDetails = this.getUserDetails();
 
 		ShopCommand shopCommand = null;
 		Long shopId = 0L;
 
 		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
+		// 鏍规嵁orgId鏌ヨshopId
 		if (currentOrgId != null){
 			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 			shopId = shopCommand.getShopid();
@@ -1777,7 +1777,7 @@ public class ItemController extends BaseController{
 		}
 	}
 
-	// 页面商品管理
+	// 椤甸潰鍟嗗搧绠＄悊
 	@RequestMapping("/item/itemList.htm")
 	public String itemList(Model model){
 		Sort[] sorts = Sort.parse("parent_id asc,sort_no asc");
@@ -1787,14 +1787,14 @@ public class ItemController extends BaseController{
 		model.addAttribute("industrylist", result);
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
-		// 查询这个开关配置（开关的作用是控制商品管理页面是显示'最近上架时间'还是'初始上架时间'）
+		// 鏌ヨ杩欎釜寮�鍏抽厤缃紙寮�鍏崇殑浣滅敤鏄帶鍒跺晢鍝佺鐞嗛〉闈㈡槸鏄剧ず'鏈�杩戜笂鏋舵椂闂�'杩樻槸'鍒濆涓婃灦鏃堕棿'锛�
 		String updateListTimeFlag = sdkMataInfoManager.findValue(MataInfo.UPDATE_ITEM_LISTTIME);
 		model.addAttribute("updateListTimeFlag", updateListTimeFlag);
 		return "/product/item/item-List";
 	}
 
 	/**
-	 * 动态获取商品列表
+	 * 鍔ㄦ�佽幏鍙栧晢鍝佸垪琛�
 	 * 
 	 * @param QueryBean
 	 * @param Model
@@ -1804,13 +1804,13 @@ public class ItemController extends BaseController{
 	@ResponseBody
 	public Pagination<ItemCommand> findItemListJson(Model model,@QueryBeanParam QueryBean queryBean){
 
-		// 查询orgId
+		// 鏌ヨorgId
 		UserDetails userDetails = this.getUserDetails();
 		ShopCommand shopCommand = null;
 		Long shopId = 0L;
 
 		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
+		// 鏍规嵁orgId鏌ヨshopId
 		if (currentOrgId != null){
 			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 			if (shopCommand != null){
@@ -1832,7 +1832,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 通过itemid启用禁用商品
+	 * 閫氳繃itemid鍚敤绂佺敤鍟嗗搧
 	 * 
 	 * @param itemid
 	 * @param state
@@ -1857,7 +1857,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 通过itemid启用禁用商品
+	 * 閫氳繃itemid鍚敤绂佺敤鍟嗗搧
 	 * 
 	 * @param itemid
 	 * @param state
@@ -1885,7 +1885,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 通过ids逻辑删除
+	 * 閫氳繃ids閫昏緫鍒犻櫎
 	 * 
 	 * @param ids
 	 * @param model
@@ -1931,7 +1931,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 下载导入商品模板
+	 * 涓嬭浇瀵煎叆鍟嗗搧妯℃澘
 	 * 
 	 * @param model
 	 * @param request
@@ -1948,7 +1948,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 导入商品
+	 * 瀵煎叆鍟嗗搧
 	 * 
 	 * @param request
 	 * @param model
@@ -1956,7 +1956,7 @@ public class ItemController extends BaseController{
 	 */
 	@RequestMapping(value = "/sku/skuUpload.json",method = RequestMethod.POST)
 	public void skuUpload(HttpServletRequest request,Model model,HttpServletResponse response){
-		// 清除用户错误信息文件
+		// 娓呴櫎鐢ㄦ埛閿欒淇℃伅鏂囦欢
 		claerUserFile();
 		response.setContentType("text/html;charset=UTF-8");
 		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
@@ -1973,7 +1973,7 @@ public class ItemController extends BaseController{
 
 		try{
 			List<Item> itemList = itemManager.importItemFromFileI18n(file.getInputStream(), shopId);
-			// 刷solr
+			// 鍒穝olr
 			if (Validator.isNotNullOrEmpty(itemList)){
 				List<Long> idList = new ArrayList<Long>();
 				for (Item item : itemList){
@@ -2013,7 +2013,7 @@ public class ItemController extends BaseController{
 				}
 			}
 			String userFilekey = addErrorInfo(errorMessages, cacher, response, name);
-			// 返回值
+			// 杩斿洖鍊�
 			rs.put("isSuccess", false);
 			rs.put("description", errorMessages);
 			rs.put("userFilekey", userFilekey);
@@ -2041,14 +2041,14 @@ public class ItemController extends BaseController{
 	}
 
 	public Long findShopId(){
-		// 查询orgId
+		// 鏌ヨorgId
 		UserDetails userDetails = this.getUserDetails();
 
 		ShopCommand shopCommand = null;
 		Long shopId = 0L;
 
 		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
+		// 鏍规嵁orgId鏌ヨshopId
 		if (currentOrgId != null){
 			shopCommand = shopManager.findShopByOrgId(currentOrgId);
 			shopId = shopCommand.getShopid();
@@ -2081,7 +2081,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * @author 何波
+	 * @author 浣曟尝
 	 * @Description:
 	 * @param model
 	 * @return String
@@ -2120,8 +2120,8 @@ public class ItemController extends BaseController{
 			return result;
 		}catch (BusinessException e){
 			result.setIsSuccess(false);
-			result.setDescription("添加失败");
-			log.error("排序规则添加失败", e);
+			result.setDescription("娣诲姞澶辫触");
+			log.error("鎺掑簭瑙勫垯娣诲姞澶辫触", e);
 			return result;
 		}
 
@@ -2137,8 +2137,8 @@ public class ItemController extends BaseController{
 			return result;
 		}catch (BusinessException e){
 			result.setIsSuccess(false);
-			result.setDescription("删除失败");
-			log.error("排序规则删除失败", e);
+			result.setDescription("鍒犻櫎澶辫触");
+			log.error("鎺掑簭瑙勫垯鍒犻櫎澶辫触", e);
 			return result;
 		}
 
@@ -2154,8 +2154,8 @@ public class ItemController extends BaseController{
 			return result;
 		}catch (BusinessException e){
 			result.setIsSuccess(false);
-			result.setDescription("排序规则启用或禁用失败");
-			log.error("排序规则启用或禁用失败", e);
+			result.setDescription("鎺掑簭瑙勫垯鍚敤鎴栫鐢ㄥけ璐�");
+			log.error("鎺掑簭瑙勫垯鍚敤鎴栫鐢ㄥけ璐�", e);
 			return result;
 		}
 
@@ -2167,7 +2167,7 @@ public class ItemController extends BaseController{
 		try{
 			return sdkItemSortScoreManager.findItemSortScoreById(id);
 		}catch (BusinessException e){
-			log.error("获取排序规则失败", e);
+			log.error("鑾峰彇鎺掑簭瑙勫垯澶辫触", e);
 			return null;
 		}
 	}
@@ -2232,13 +2232,13 @@ public class ItemController extends BaseController{
 					}
 					cell.setCellStyle(cellStyle);
 					// cell.removeCellComment();
-					// 定义注释的大小和位置
+					// 瀹氫箟娉ㄩ噴鐨勫ぇ灏忓拰浣嶇疆
 					// HSSFComment comment = patr.createComment(new HSSFClientAnchor(0,0,0,0, (short)4, 2 ,(short) 6, 5));
 					// comment.setString(new HSSFRichTextString(info));
-					// 设置注释内容
+					// 璁剧疆娉ㄩ噴鍐呭
 					// cell.setCellComment(comment);
 				}else if (msgs.length == 6){
-					// Sheet 1 单元格 N8 : 找不到值【test1029】
+					// Sheet 1 鍗曞厓鏍� N8 : 鎵句笉鍒板�笺�恡est1029銆�
 					String rcIndex = msgs[3];
 					int[] rc = getRowCellIndex(rcIndex);
 					String info = rcIndex + msgs[5];
@@ -2251,10 +2251,10 @@ public class ItemController extends BaseController{
 					}
 					cell.setCellStyle(cellStyle);
 					// cell.removeCellComment();
-					// 定义注释的大小和位置
+					// 瀹氫箟娉ㄩ噴鐨勫ぇ灏忓拰浣嶇疆
 					// HSSFComment comment = patr.createComment(new HSSFClientAnchor(0,0,0,0, (short)4, 2 ,(short) 6, 5));
 					// comment.setString(new HSSFRichTextString(info));
-					// 设置注释内容
+					// 璁剧疆娉ㄩ噴鍐呭
 					// cell.setCellComment(comment);
 				}
 			}
@@ -2268,7 +2268,7 @@ public class ItemController extends BaseController{
 
 	private static int getExcelCol(String col){
 		col = col.toUpperCase();
-		// 从-1开始计算,字母重1开始运算。这种总数下来算数正好相同。
+		// 浠�-1寮�濮嬭绠�,瀛楁瘝閲�1寮�濮嬭繍绠椼�傝繖绉嶆�绘暟涓嬫潵绠楁暟姝ｅソ鐩稿悓銆�
 		int count = -1;
 		char[] cs = col.toCharArray();
 		for (int i = 0; i < cs.length; i++){
@@ -2290,8 +2290,8 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * @author 何波
-	 * @Description: 清除用户错误信息文件 void
+	 * @author 浣曟尝
+	 * @Description: 娓呴櫎鐢ㄦ埛閿欒淇℃伅鏂囦欢 void
 	 * @throws
 	 */
 	private void claerUserFile(){
@@ -2302,7 +2302,7 @@ public class ItemController extends BaseController{
 				Long time = Long.parseLong(timeStr);
 				Long ctime = System.currentTimeMillis();
 				Long t = ctime - time;
-				// 一小时
+				// 涓�灏忔椂
 				if (t > (3600 * 1000)){
 					userExcelFile.remove(key);
 				}
@@ -2326,10 +2326,10 @@ public class ItemController extends BaseController{
 			return table;
 		}
 
-		// 组织第i个"销售属性"
+		// 缁勭粐绗琲涓�"閿�鍞睘鎬�"
 		List<String> dataRow = data.get(dataRowIndex);
 
-		// 组织第1个"销售属性"时
+		// 缁勭粐绗�1涓�"閿�鍞睘鎬�"鏃�
 		if (table.size() == 0){
 			for (String dataItem : dataRow){
 				List<String> targetRow = new ArrayList<String>();
@@ -2346,12 +2346,12 @@ public class ItemController extends BaseController{
 			}
 		}
 
-		// 递归组织下一行数据
+		// 閫掑綊缁勭粐涓嬩竴琛屾暟鎹�
 		return buildTable(result, data, ++dataRowIndex);
 	}
 
 	/**
-	 * 将所有每行的属性拼成prekey
+	 * 灏嗘墍鏈夋瘡琛岀殑灞炴�ф嫾鎴恜rekey
 	 * 
 	 * @param result
 	 * @return
@@ -2370,7 +2370,7 @@ public class ItemController extends BaseController{
 	}
 
 	/**
-	 * 商品预售编辑
+	 * 鍟嗗搧棰勫敭缂栬緫
 	 * 
 	 * @param model
 	 * @param itemId
@@ -2404,18 +2404,18 @@ public class ItemController extends BaseController{
 			itemPresaleInfoManager.updateOrSaveItemPresalseInfo(itemPresalseInfoCommand);
 		}else{
 			backWarnEntity.setIsSuccess(false);
-			 backWarnEntity.setDescription("数据异常保存失败!");
+			 backWarnEntity.setDescription("鏁版嵁寮傚父淇濆瓨澶辫触!");
 		}
 		return backWarnEntity;
 	}
 	
-//	//获取商品属性值分组信息
+//	//鑾峰彇鍟嗗搧灞炴�у�煎垎缁勪俊鎭�
 //	private List<ItemProValGroupRelation> getItemProValueGroupRelation(HttpServletRequest request,Long[] propertyIds){
 //		List<ItemProValGroupRelation> list = new ArrayList<ItemProValGroupRelation>();
 //		if(propertyIds!=null && propertyIds.length>0){
 //			for(Long propertyId:propertyIds){
 //				String proValGroupId  = request.getParameter("proGroup_"+propertyId);
-//				//存在分组并选择
+//				//瀛樺湪鍒嗙粍骞堕�夋嫨
 //				if(proValGroupId !=null && proValGroupId.length()>0){
 //					ItemProValGroupRelation relation = new ItemProValGroupRelation();
 //					relation.setItemPropertyId(propertyId);
