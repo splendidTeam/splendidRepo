@@ -41,6 +41,7 @@ import com.baozun.nebula.model.BaseModel;
 @Table(name = "t_pd_item_collection")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemCollection extends BaseModel {
+	private static final long serialVersionUID = 3088013871822587744L;
 	private Long id;
 	/**
 	 * 类型定义，可以用来隔离不同的业务领域，比如：推荐区、活动区、导航区等
