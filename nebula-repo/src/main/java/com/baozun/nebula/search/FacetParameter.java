@@ -18,8 +18,6 @@ package com.baozun.nebula.search;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Facet Parameter. Is used for representing a user facing facet.
@@ -27,8 +25,6 @@ import java.util.regex.Pattern;
  * @author D.C
  */
 public class FacetParameter{
-
-	static private Pattern	RANGE_PATTERN			= Pattern.compile("([0-9]+[\\.0-9]*)\\-([0-9]+[\\.0-9]*)");
 
 	private String			name;
 
@@ -77,17 +73,11 @@ public class FacetParameter{
 	 * @return contains value
 	 */
 	public boolean containsValue(String facetValue){
-		if (this.facetType == FacetType.RANGE) {
-			Matcher rangeMatcher = RANGE_PATTERN.matcher(facetValue);
-			if (rangeMatcher.matches() && this.values.size() == 2) {
-				String min = rangeMatcher.group(1);
-				String max = rangeMatcher.group(2);
-				return (this.values.get(0).equals(min) && this.values.get(1).equals(max));
-			}
+		if(values==null){
 			return false;
-		}else{
-			return this.values.contains(facetValue);
 		}
+		return this.values.contains(facetValue);
+		
 	}
 
 	public FacetType getFacetType(){

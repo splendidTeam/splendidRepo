@@ -101,110 +101,35 @@ $j(document).ready(function(){
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
     
-    $j.fn.zTree.init($j("#industrytreeDemo"), setting, zNodes);
-    
-    key = $j("#key");
-	key.bind("focus", focusKey)
-	.bind("blur", blurKey)
-	.bind("propertychange", searchNode)
-	.bind("input", searchNode);
-	
-	var treeObj = $j.fn.zTree.getZTreeObj("industrytreeDemo");
-	//1.将所有的节点转换为简单 Array 格式
-	var nodes = treeObj.transformToArray(treeObj.getNodes());
-	var booleanFlag = true;
-	for(var i = 0;i<nodes.length;i++){
-		//2.如果此节点为父节点 或者 为ROOT节点 ，则让此节点没有radio选框
-		if(nodes[i].isParent || nodes[i].id == 0){
-			nodes[i].nocheck = true;
-		}else{
-			if(booleanFlag){
-				//3.第一个叶子节点的 radio为checked，然后把booleanFlag设置为false
-				nodes[i].checked = true;
-				var node = nodes[i].getParentNode();
-				console.log(node.name);
-				if(null != node){
-					node.open = true;
-					firstNodeId=nodes[i].id;
-					firstNodeName=nodes[i].name;
-					booleanFlag = false;
-				}
-				//onCheck(event, treeId, nodes[i]);
-				
-			}
-		}
-		treeObj.refresh();
-	}
-	
-	//下一步
-	$j(".button.orange.next").on("click",function(){
-		$j("#secondBtnLineDiv").show();
-		$j("#firstBtnLineDiv").hide();
+	//初始化id为colorPropertyContent的div内部的所有Loxia组件
+	loxia.initContext($j(".ui-block "));
 		
-		$j("#first").css("display","none");
-		$j("#second").css("display","block");
-		
-		$j.extend(loxia.regional['zh-CN'],{
-			"ITEM_CODE_VALID_FAIL":itemCodeValidMsg
+	$j(".spCkb").each(function(){
+		var curCheckBox = $j(this);
+			
+		curCheckBox.change(function(){
+			spChangedFlag = true;
+			clickFlag = false;
 		});
-		
-		var ztree = $j.fn.zTree.getZTreeObj("industrytreeDemo");
-		var nodes_ = ztree.getCheckedNodes(true);
-		num = 0;
-		if (nodes_.length>0) {
-			var industryId =nodes_[0].id;
-			var name = nodes_[0].name;
-			$j("#chooseIndustry").html(name);
-  			$j("#industryId").val(industryId);
-  			
-			// TODO 这里根据编辑的商品类型不同，调用不同的初使化方法
-  			// 初使化属性信息
-  			if(initProperties !== undefined) {
-  				initProperties(industryId);
-  			}
-		} else {
-			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SYSTEM_ITEM_SELECT_INDUSTRY"));
-		}
-		
-		//初始化id为colorPropertyContent的div内部的所有Loxia组件
-		loxia.initContext($j(".ui-block "));
-		
-		$j(".spCkb").each(function(){
-			var curCheckBox = $j(this);
 			
-			curCheckBox.change(function(){
-				spChangedFlag = true;
-				clickFlag = false;
-			});
-			
-		});
+	});
 		
-		$j(".spTa").each(function(){
-			var ta = $j(this);
+	$j(".spTa").each(function(){
+		var ta = $j(this);
 			
-			ta.bind("change",function(){
-				spChangedFlag = true;
-				clickFlag = false;
-			});
-		});
-		
-		$j(".normalCheckBoxCls").each(function(){
-			
-			var curCheckBox = $j(this);
-			curCheckBox.change(function(){
-				drawNoSalePropEditing4Type(num);				
-			});
-			
+		ta.bind("change",function(){
+			spChangedFlag = true;
+			clickFlag = false;
 		});
 	});
-	
-	//上一步
-    $j(".button.back").on("click",function(){
-    	window.location.href=base+"/item/createItem.htm";
-    });
-    //返回
-	$j(".button.return").on("click",function(){
-		window.location.href=base+"/item/itemList.htm";
+		
+	$j(".normalCheckBoxCls").each(function(){
+			
+		var curCheckBox = $j(this);
+		curCheckBox.change(function(){
+			drawNoSalePropEditing4Type(num);				
+		});
+			
 	});
 	
 	//保存商品

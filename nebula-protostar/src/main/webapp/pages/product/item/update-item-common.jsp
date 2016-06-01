@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="${base}/scripts/jquery/ztree/zTreeStyle.css" type="text/css"></link>
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
 <script type="text/javascript" src="/scripts/ckeditor/4-4-5/ckeditor.js"></script>
-<script type="text/javascript" src="${base}/scripts/product/item/update-item-golbal.js"></script>
+<script type="text/javascript" src="${base}/scripts/product/item/update-item-global.js"></script>
 <script type="text/javascript">	
 var itemCodeValidMsg = "${itemCodeValidMsg}";
 var pdValidCode = "${pdValidCode}";

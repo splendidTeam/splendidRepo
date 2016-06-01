@@ -15,7 +15,7 @@ public class PaymentResolverType implements Serializable {
 
 	private static final long serialVersionUID = -216019187342593163L;
 	
-	@Autowired
+	@Autowired(required=false)
 	@Qualifier("paymentResolverTypes")
 	private Map<String, PaymentResolver> paymentResolverTypes;
 	

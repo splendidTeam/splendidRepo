@@ -36,8 +36,8 @@ import com.feilong.core.Validator;
  * <h3>获取页面的面包屑(分为plp、pdp两种场景)</h3>
  * <p>一、用法实例:</p>
  * <ul>
- * 		<li>PLP:<jsp:include page="/item/breadcrumb.htm?navId =1" /></li>
- * 		<li>PDP:<jsp:include page="/item/breadcrumb.htm?itemId =2" /></li>
+ * 		<li>PLP:{@code <jsp:include page="/item/breadcrumb.htm?navId =1" />}</li>
+ * 		<li>PDP:{@code <jsp:include page="/item/breadcrumb.htm?itemId =2" />}</li>
  * </ul>
  * <p>二、具体实现:</p>
  * <p>

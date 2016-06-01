@@ -219,7 +219,10 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 				LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
 			}
 			if(Validator.isNotNullOrEmpty(refer)){
+				StringBuffer url = request.getRequestURL();  
+				String domainUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString(); 
 				refer = refer.endsWith("/") ? refer.substring(0, refer.length()-1) : refer;
+				refer =	refer.substring(domainUrl.length(), refer.length());
 				FilterNavigationCommand filterNavigation= navigationHelperManager.matchNavigationByUrl(refer, "");
 				if(Validator.isNotNullOrEmpty(filterNavigation)&&
 						Validator.isNotNullOrEmpty(filterNavigation.getNavId())){
