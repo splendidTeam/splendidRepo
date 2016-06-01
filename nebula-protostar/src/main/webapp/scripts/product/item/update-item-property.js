@@ -890,17 +890,15 @@ $j(document).ready(function(){
 		
 		// 验证skuCode 是否重复
 		var skuCodesArray = new Array();
-		var skuCodeValidateInfoArray = new Array();
+		var skuIdArray = new Array();
 		$j(".extensionTable").find(".dynamicInputNameSkuCode").each(function(i,n){
 			skuCodesArray[i] = $j(this).val();
 			var skuId = $j(this).attr("skuId");
-			var skuInfo = new Object();
 			if(skuId==null||skuId=="null"){
-				skuId =-1;
+				skuIdArray[i] = -1;
+			}else{
+				skuIdArray[i] =skuId;
 			}
-			skuInfo.id = skuId;
-			skuInfo.code = $j(this).val();
-			skuCodeValidateInfoArray[i]=skuInfo;
 		});
 		   
 		if(spChangedFlag){
@@ -914,10 +912,6 @@ $j(document).ready(function(){
 			var curCode = skuCodesArray[i];
 			if(curCode!=null&&curCode!=""){
 				atLeastOneCode = true;
-//				var curSp = originalSalePriceArray[i];
-//				if(isNaN(curSp)){
-//					return nps.i18n("PLEASE_INPUT_SALEPRICES");
-//				}
 			}
 			for(var j=0;j<skuCodesArray.length;j++){
 				if(i!=j&&curCode!=""&&curCode==skuCodesArray[j]){
@@ -927,11 +921,9 @@ $j(document).ready(function(){
 				   
 		}
 		   
-		if(skuCodeValidateInfoArray.length>0){
-			var validateJsonStr = JSON.stringify(skuCodeValidateInfoArray);
-			var json = {"skuInfos":validateJsonStr};
-			var data = nps.syncXhr(validateUpdateSkuCodesUrl,json);
-			  
+		if(skuIdArray.length>0){
+			var json = {"skuIds":skuIdArray ,"skuCodes":skuCodesArray};
+			var data = loxia.syncXhr(validateUpdateSkuCodesUrl, json, {type:'post'});
 			if (data.isSuccess==false) {
 				return nps.i18n("SKU_CODE_REPEAT")+data.description;
 			}
