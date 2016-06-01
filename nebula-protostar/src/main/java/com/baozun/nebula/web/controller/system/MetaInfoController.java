@@ -27,6 +27,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.SystemConfigWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
@@ -34,8 +36,6 @@ import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.zk.SystemConfigWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * MataInfoController
@@ -50,7 +50,7 @@ public class MetaInfoController extends BaseController {
 	private SdkMataInfoManager sdkMataInfoManager;
 
 	@Autowired
-	private ZooKeeperOperator zooKeeperOperator;
+	private ZkOperator zkOperator;
 
 	@RequestMapping("/mataInfo/list.htm")
 	public String list() {
@@ -172,7 +172,7 @@ public class MetaInfoController extends BaseController {
 	@RequestMapping("/mataInfo/activeMetaInfo.json")
 	@ResponseBody
 	private BackWarnEntity activeMetaInfo() {
-		zooKeeperOperator.noticeZkServer(SystemConfigWatchInvoke.LISTEN_PATH);
+		zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
 		return SUCCESS;
 	}
 }
