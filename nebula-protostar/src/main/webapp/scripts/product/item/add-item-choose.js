@@ -177,7 +177,20 @@ function updateNodes(highlight) {
 /**********************industrytreeDemo 搜索  end********************/
 
 $j(document).ready(function(){
-	// 初使化行业选择树
+	$j(".select-btn input[type='radio']").on("change",function(){
+		var modal = $j(this).closest(".select-btn").next(".pro-modal");
+		if($j(this).prop("checked")){
+			if($j(this).hasClass("normalpro") || $j(this).hasClass("virtualpro")){
+				modal.show();
+			}else{
+				modal.hide();
+			}
+		}
+	})
+	
+	$j(".select-btn input[type='radio']").trigger('change');
+	
+	// 初使化普通商品/虚拟商品行业选择树
 	$j.fn.zTree.init($j("#industrytreeDemo"), setting, zNodes);
     
     key = $j("#key");
@@ -212,4 +225,32 @@ $j(document).ready(function(){
 		}
 		treeObj.refresh();
 	}
+	
+	// 下一步
+	$j(".button.orange.next").on("click",function(){
+		var itemType = $j(".select-btn input[type='radio']:checked").val();
+
+		if(itemType == '1' || itemType == '7') {
+			// 如果是普通商品或者虚拟商品，校验是否选择了行业
+			var ztree = $j.fn.zTree.getZTreeObj("industrytreeDemo");
+			var nodes_ = ztree.getCheckedNodes(true);
+			if (nodes_.length > 0) {
+				var industryId = nodes_[0].id;
+				window.location.href = base + "/item/" + (itemType == '1' ? "createNormalItem" : "createVirtualItem") + ".htm?industryId=" + industryId;
+			} else {
+				nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SYSTEM_ITEM_SELECT_INDUSTRY"));
+			}
+		} else if(itemType == '3') {
+			window.location.href = base + "/item/createBundleItem.htm";
+		} else if(itemType == '5') {
+			// TODO 去往搭配商品编辑页面
+		} else {
+			
+		}
+	});
+	
+	// 返回
+	$j(".button.return").on("click",function(){
+		window.location.href = base + "/item/itemList.htm";
+	});
 });

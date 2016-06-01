@@ -392,8 +392,8 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 				// 判断是否选中
 				for (FacetParameter facetParameter : facetParameters){
-					if (FacetType.CATEGORY.equals(facetParameter.getFacetType())) {
-						if (facetParameter.containsValue(facet.getId().toString())) {
+					if (FacetType.CATEGORY.equals(facetParameter.getFacetType())) {						
+						if (facetParameter.containsValue(facet.getValue())) {
 							facet.setSelected(true);
 							break;
 						}

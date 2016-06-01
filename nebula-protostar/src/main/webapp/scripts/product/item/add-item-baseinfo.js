@@ -1,27 +1,5 @@
 var validateItemCodeUrl = base + '/item/validateItemCode.json';
 
-// 默认的分类树设置
-//var defaultCategorySetting = {
-//	check : {
-//		enable : true,
-//		chkStyle : "radio",
-//		radioType : "all"
-//	},
-//	view : {
-//		dblClickExpand : false,
-//		showIcon : false
-//	},
-//	data : {
-//		simpleData : {
-//			enable : true
-//		}
-//	},
-//	callback : {
-//		onClick : defaultOnClick1,
-//		onCheck : defaultOnCheck1,
-//	}
-//};
-
 // 商品分类树设置
 var categorySetting = {
 	check : {

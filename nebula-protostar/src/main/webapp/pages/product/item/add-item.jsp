@@ -127,7 +127,7 @@ var categoryzNodes  = [
 <body>
 
 <div class="content-box width-percent100">
-    
+
    <form id="itemForm" name="itemForm" action="/i18n/item/saveItem.json" method="post">
     <input type="hidden" id="industryId" name="itemCommand.industryId"  value=""/>
     <input type="hidden" id="jsonSku" name="itemCommand.jsonSku"  value=""/>

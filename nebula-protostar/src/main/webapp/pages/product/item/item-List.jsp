@@ -36,7 +36,7 @@ var  industry_ZNodes = [
 </script>
 
 </head>
-<body>
+<body> 
 <div class="content-box width-percent100">
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="item.update.manage"/>
          <input type="button"   value="<spring:message code='btn.all.delete'/>" class="button butch delete"  title="<spring:message code='btn.all.delete'/>"/>

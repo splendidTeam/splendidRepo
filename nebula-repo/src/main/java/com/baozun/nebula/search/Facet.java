@@ -54,6 +54,7 @@ public class Facet {
 		this.count = facet.getCount();
 		this.childrens = facet.getChildrens();
 		this.sortNo=facet.getSortNo();
+		this.value = facet.getValue();
 	}
 	
 

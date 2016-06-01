@@ -10,7 +10,7 @@
 <script type="text/javascript" src="${base}/scripts/jquery/ztree/jquery.ztree.all-3.5.js"></script>
 <script type="text/javascript" src="${base}/scripts/product/item/add-item-choose.js"></script>
 <script type="text/javascript">
-<%-- 添加普通商品行业选择树 --%>
+<%-- 添加普通商品/虚拟商品的行业选择树 --%>
 var zNodes =
 	[
 		{id:0, name:"ROOT",state:"0", open:true,root:"true",nocheck:true},
@@ -33,19 +33,19 @@ var zNodes =
 </head>
 <body>
 
-<!-- 这是普通商品行业选择模块 -->
 <div class="content-box width-percent100">
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="item.add.manage"/></div>
 		<div class="ui-block">
 			<div id="first">
+				<!-- 这是普通商品/虚拟商品行业选择树模块 -->
 				<div class="ui-block border-grey pl10">
 				   <%-- <div class="ui-block-title1"><spring:message code="item.add.industry"/></div> --%>
 				   <div class="addpro-title font20 pb10">新增商品</div>
 				   <div class="form-group select-btn">
-				   		<label> <input type="radio" class="normalpro" name="newPro" />普通商品 </label>
-				   		<label> <input type="radio" name="newPro" />捆绑商品 </label>
-				   		<label> <input type="radio" name="newPro" />搭配商品 </label>
-				   		<label> <input type="radio" class="virtualpro" name="newPro" />虚拟商品 </label>
+				   		<label> <input type="radio" class="normalpro" name="newPro" value="1" checked="checked" />普通商品 </label>
+				   		<label> <input type="radio" name="newPro" value="3" />捆绑商品 </label>
+				   		<label> <input type="radio" name="newPro" value="5" />搭配商品 </label>
+				   		<label> <input type="radio" class="virtualpro" name="newPro" value="7" />虚拟商品 </label>
 				   </div>
 				   <div class="pro-modal pt10 pb10 none-normal">
 				   	   <p class="font20">选择商品模板</p>
@@ -70,17 +70,4 @@ var zNodes =
 </div>
 
 </body>
-<script>
-   $j(document).ready(function(){
-		$j(".select-btn input[type='radio']").on("change",function(){
-			var modal = $j(this).closest(".select-btn").next(".pro-modal");
-			if($j(this).prop("checked")){
-				if($j(this).hasClass("normalpro") || $j(this).hasClass("virtualpro")){
-					modal.show();
-				}else{
-					modal.hide();
-				}
-			}
-		})   
-   })
-   </script>
+

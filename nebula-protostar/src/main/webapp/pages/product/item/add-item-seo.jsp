@@ -13,7 +13,7 @@
 		<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 			<div class="ui-block-line ">
 				<label style="">seo<spring:message
-						code="item.update.seoTitle" /></label> <input loxiaType="input"
+						code="item.update.seoTitle" /></label> <input loxiaType="input" type="text"
 					name="itemCommand.seoTitle.values[${status.index}]"
 					value="${ seoTitle }" /> <input class="i18n-lang" type="text"
 					name="itemCommand.seoTitle.langs[${status.index}]"
@@ -23,7 +23,7 @@
 		<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 			<div class="ui-block-line ">
 				<label style="">seo<spring:message
-						code="item.update.seoKeywords" /></label> <input loxiaType="input"
+						code="item.update.seoKeywords" /></label> <input loxiaType="input" type="text"
 					name="itemCommand.seoKeywords.values[${status.index}]"
 					value="${ seoKeywords }"  /> <input
 					class="i18n-lang" type="text"
@@ -48,13 +48,13 @@
 	<c:if test="${i18nOnOff == false}">
 		<div class="ui-block-line ">
 			<label style="">seo<spring:message
-					code="item.update.seoTitle" /></label> <input loxiaType="input"
+					code="item.update.seoTitle" /></label> <input loxiaType="input" type="text"
 			    name="itemCommand.seoTitle.value"
 				value="${seoTitle}" />
 		</div>
 		<div class="ui-block-line ">
 			<label style="">seo<spring:message
-					code="item.update.seoKeywords" /></label> <input loxiaType="input"
+					code="item.update.seoKeywords" /></label> <input loxiaType="input" type="text"
 				name="itemCommand.seoKeywords.value" value="${ seoKeywords }" />
 		</div>
 		<div class="ui-block-line ">
