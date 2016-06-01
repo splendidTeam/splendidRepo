@@ -125,6 +125,10 @@ public interface ErrorCodes {
 	public static final Integer	PROPERTY_SAVE_FAIL							= 6102;
 	/** 行业修改失败 */
 	public static final Integer	INDUSTRY_SAVE_FAIL							= 6103;
+	/** 行业不可用 */
+	public static final Integer	INDUSTRY_NOT_AVAILABLE						= 6104;
+	/** 行业不可存在 */
+	public static final Integer	INDUSTRY_NOT_EXISTS							= 6105;
 
 	/** 属性启用失败 */
 	public static final Integer	PRODUCT_PROPERTY__ENABLE_FAIL				= 6023;

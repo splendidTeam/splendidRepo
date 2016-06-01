@@ -42,10 +42,10 @@ var zNodes =
 				   <%-- <div class="ui-block-title1"><spring:message code="item.add.industry"/></div> --%>
 				   <div class="addpro-title font20 pb10">新增商品</div>
 				   <div class="form-group select-btn">
-				   		<label> <input type="radio" class="normalpro" name="newPro" />普通商品 </label>
-				   		<label> <input type="radio" name="newPro" />捆绑商品 </label>
-				   		<label> <input type="radio" name="newPro" />搭配商品 </label>
-				   		<label> <input type="radio" class="virtualpro" name="newPro" />虚拟商品 </label>
+				   		<label> <input type="radio" class="normalpro" name="newPro" value="1" checked="checked" />普通商品 </label>
+				   		<label> <input type="radio" name="newPro" value="3" />捆绑商品 </label>
+				   		<label> <input type="radio" name="newPro" value="5" />搭配商品 </label>
+				   		<label> <input type="radio" class="virtualpro" name="newPro" value="7" />虚拟商品 </label>
 				   </div>
 				   <div class="pro-modal pt10 pb10 none-normal">
 				   	   <p class="font20">选择商品模板</p>

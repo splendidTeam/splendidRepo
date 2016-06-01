@@ -63,7 +63,7 @@ function itemFormValidate(form){
 }
 
 $j(document).ready(function(){
-	/*toggle div*/
+	/* toggle div */
 	$j(".ui-block-title").on("click",function(){
 		$j(this).next(".ui-block-content").slideToggle();
 	})
@@ -100,7 +100,7 @@ $j(document).ready(function(){
 	
     //返回
 	$j(".button.return").on("click",function(){
-		window.location.href=base+"/item/itemList.htm";
+		window.location.href = base+"/item/itemList.htm";
 	});
 	
 	loxia.initContext($j(".ui-block "));

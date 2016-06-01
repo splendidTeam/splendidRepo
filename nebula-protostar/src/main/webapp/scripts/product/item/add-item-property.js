@@ -798,7 +798,6 @@ function drawNoSalePropEditing4Type(curSize){
 }
 
 function initProperties(industryId){
-//	debugger;
 	var json={"industryId":industryId};
 	var _data = loxia.syncXhr(base+'/item/findDynamicPropertisJson.json', json,{type: "GET"});
 	dynamicPropertyCommandListJsonStr=_data.description;
@@ -1296,6 +1295,8 @@ function initProperties(industryId){
 }
 
 $j(document).ready(function(){
+	initProperties($j('#industryId').val());
+	
 	//编码设置
 	$j(".func-button.extension").on("click",function(){
 //		produceExtension();

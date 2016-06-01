@@ -1,4 +1,5 @@
 /**
+
 "type:" * Copyright (c) 2012 Baozun All Rights Reserved.
 
  *
@@ -2427,4 +2428,127 @@ public class ItemController extends BaseController{
 //		return list;
 //	}
 //	
+	
+	// 以下是2016-5-31商品管理页面拆分后的新的controller定义
+	
+	/**
+	 * 新建商品类型选择页面
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/item/createItemChoose.htm")
+	public String createItemChoose(Model model) {
+		Sort[] sorts = Sort.parse("id desc");
+		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts));
+		model.addAttribute("industryList", industryList);
+		
+		return "/product/item/add-item-choose";
+	}
+	
+	/**
+	 * 新建普通商品页面
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/item/createNormalItem.htm")
+	public String createNormalItem(@RequestParam("industryId") Long industryId, Model model) {
+		// 验证选定的行业
+		Industry industry = industryManager.findIndustryById(industryId);
+		if(industry == null) {
+			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_EXISTS);
+		} else if(!Industry.LIFECYCLE_ENABLE.equals(industry.getLifecycle())) {
+			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_AVAILABLE);
+		} else {
+			model.addAttribute("industryId", industryId);
+			model.addAttribute("industryName", industry.getName());
+			
+			Sort[] sorts = Sort.parse("id desc");
+			// 分类列表
+			sorts = Sort.parse("parent_id asc,sort_no asc");
+			List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
+			
+			String itemCodeValidMsg = messageSource.getMessage(
+					ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ITEM_CODE_VALID_ERROR,
+					new Object[] {},
+					Locale.SIMPLIFIED_CHINESE);
+			model.addAttribute("itemCodeValidMsg", itemCodeValidMsg);
+			String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
+			model.addAttribute("pdValidCode", pdValidCode);
+			model.addAttribute("categoryList", categoryList);
+			model.addAttribute("isStyleEnable", isEnableStyle());
+		}
+		
+		return "/product/item/add-item-normal";
+	}
+	
+	/**
+	 * 新建bundle商品页面
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/item/createBundleItem.htm")
+	public String createBundleItem(Model model) {
+		return "/product/item/add-item-bundle";
+	}
+	
+	/**
+	 * 保存普通商品
+	 * @param itemCommand
+	 * @param propertyValueIds
+	 * @param categoriesIds
+	 * @param iProperties
+	 * @param propertyIds
+	 * @param propertyValueInputs
+	 * @param propertyValueInputIds
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/i18n/item/saveNormalItem.json")
+	@ResponseBody
+	public Object saveNormalItemI18n(@I18nCommand ItemInfoCommand itemCommand,@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
+			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
+			@I18nCommand ItemPropertiesCommand[] iProperties,// 普通商品属性
+			@ArrayCommand(dataBind = true) Long[] propertyIds,// 用户填写的商品属性值的属性Id
+			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 用户输入的 商品销售属性的 属性值 （对于多选来说 是 pvId,pvId 对于自定义多选来说是 aa||bb）-自定义多选
+			@ArrayCommand(dataBind = true) String[] propertyValueInputIds,// --多选
+			HttpServletRequest request) throws Exception{
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null){
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		dealDescImgUrl(itemCommand);
+		SkuPropertyMUtlLangCommand[] skuPropertyCommandArray = getCmdArrrayFromRequestI18n(
+				request,
+				propertyIds,
+				propertyValueInputs,
+				propertyValueInputIds);
+//		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
+		// 保存商品
+		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
+
+		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
+			List<Long> itemIdsForSolr = new ArrayList<Long>();
+			itemIdsForSolr.add(item.getId());
+			boolean i18n = LangProperty.getI18nOnOff();
+			if (i18n){
+				itemSolrManager.saveOrUpdateItemI18n(itemIdsForSolr);
+			}else{
+				itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
+			}
+		}
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+	}
 }
