@@ -30,6 +30,8 @@ import javax.persistence.Version;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
+import com.baozun.nebula.model.BaseModel;
+
 /**
  * 商品集定义，包括商品集的规则定义和指定商品的排序
  * @author D.C
@@ -38,7 +40,8 @@ import org.hibernate.annotations.OptimisticLockType;
 @Entity
 @Table(name = "t_pd_item_collection")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
-public class ItemCollection {
+public class ItemCollection extends BaseModel {
+	private static final long serialVersionUID = 3088013871822587744L;
 	private Long id;
 	/**
 	 * 类型定义，可以用来隔离不同的业务领域，比如：推荐区、活动区、导航区等
