@@ -28,6 +28,8 @@ import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 
 /**
  * The Class SalesOrderCommand.
+ * 
+ * @see com.baozun.nebula.model.salesorder.SalesOrder
  */
 //XXX feilong 目前这个类 把创建 和查询的command 都融合在一起, 不利于扩展
 public class SalesOrderCommand extends BaseModel{
