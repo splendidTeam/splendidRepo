@@ -56,16 +56,19 @@ public class NebulaPaymentController extends BaseController {
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaPaymentController.class);
     
-    
     //view的常量定义
     /** 支付成功页面. */
-    public static final String VIEW_PAY_SUCCESS = "payment.pay-success";
+    protected static final String VIEW_PAY_SUCCESS = "payment.pay-success";
     
     /** 支付失败页面. */
-    public static final String VIEW_PAY_FAILURE = "payment.pay-failure";
+    protected static final String VIEW_PAY_FAILURE = "payment.pay-failure";
     
     /** 去支付的异常页面. */
-    public static final String VIEW_PAY_TOPAY_EXCEPTION = "payment.topay-exception";
+    protected static final String VIEW_PAY_TOPAY_EXCEPTION = "payment.topay-exception";
+    
+    //默认url的定义
+    /** 支付异常页的url */
+    protected static String URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
     
     @Autowired
 	private SdkPaymentManager sdkPaymentManager;
@@ -101,10 +104,11 @@ public class NebulaPaymentController extends BaseController {
 		} catch (IllegalPaymentStateException e) {
 			
 			LOGGER.error(e.getMessage(), e);
-			// TODO 去往支付异常页面
+			
+			//去往支付异常页面
+			return "redirect:" + getToPayExceptionPageRedirect(subOrdinate);
 		}
     	
-    	return null;
     }
     
     /**
@@ -241,6 +245,10 @@ public class NebulaPaymentController extends BaseController {
 		return true;
 	}
 	
+	protected String getToPayExceptionPageRedirect(String subOrdinate) {
+		return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
+	}
+	
 	/**
 	 * 根据流水号获取订单信息
 	 * 
@@ -257,7 +265,7 @@ public class NebulaPaymentController extends BaseController {
             throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_UNPAID, "支付信息不存在或尚未支付");
         }
         
-        // 根据支付流水号，去取结果页面上要显示的订单号
+        // 根据支付流水号，去取结果页面上要显示的订单信息
         PayInfoLog payInfoLog = payInfoLogList.get(0);
 		SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 2);
 		
