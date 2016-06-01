@@ -58,10 +58,11 @@
 					INNER JOIN 
 						t_pd_sku s on bs.sku_id = s.id
 					WHERE 
-						b.item_id = :bundleItemId and bs.sku_id in
-						<foreach collection="array" item="skuIds" open="(" separator="," close=")">  
-        					#{skuIds}  
-     					</foreach>
+						b.item_id = :bundleItemId and bs.sku_id in (
+						#foreach($id in $skuIds)
+    						$id,
+					 	#end
+		       		 	-1)
 				]]>
 			</value>
 		</constructor-arg>
