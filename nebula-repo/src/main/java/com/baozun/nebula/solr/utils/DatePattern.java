@@ -37,7 +37,12 @@ public final class DatePattern{
     /** <code>{@value}</code> 月日带星期 example:01-22(星期四). */
     public static final String monthAndDayWithWeek        = "MM-dd(E)";
 
-    /** <code>{@value}</code> 不带秒. */
+    /**
+     * <code>{@value}</code> 不带秒.
+     * 
+     * @deprecated pls use {@link com.feilong.core.DatePattern#COMMON_DATE_AND_TIME_WITHOUT_SECOND}
+     */
+    @Deprecated
     public static final String commonWithoutSecond        = "yyyy-MM-dd HH:mm";
 
     /** <code>{@value}</code>. */

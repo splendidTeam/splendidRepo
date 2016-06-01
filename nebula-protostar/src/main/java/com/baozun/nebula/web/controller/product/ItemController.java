@@ -1,7 +1,5 @@
 /**
-
-"type:" * Copyright (c) 2012 Baozun All Rights Reserved.
-
+ * Copyright (c) 2015 Baozun All Rights Reserved.
  *
  * This software is the confidential and proprietary information of Baozun.
  * You shall not disclose such Confidential Information and shall use it only in
@@ -49,9 +47,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
@@ -102,11 +97,9 @@ import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
-import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
-import com.baozun.nebula.model.product.ShopProperty;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;

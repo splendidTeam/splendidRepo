@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,6 +144,7 @@ public class SdkShoppingCartLinePackManagerImpl implements SdkShoppingCartLinePa
     private void doPackRelatedShoppingCartLineCommand(ShoppingCartLineCommand shoppingCartLineCommand){
         Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
         Item item = itemDao.findItemById(relatedItemId);
+        Validate.notNull(item, "when relatedItemId:[%s],item can't be null!", relatedItemId);
         Integer type = item.getType();
         if (Item.ITEM_TYPE_BUNDLE.equals(type)){
             doPackBundle(shoppingCartLineCommand, item);
