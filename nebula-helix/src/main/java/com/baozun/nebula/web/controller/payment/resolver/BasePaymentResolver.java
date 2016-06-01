@@ -43,7 +43,6 @@ public abstract class BasePaymentResolver {
 	
 	/**
 	 * 获取支付信息
-	 * 
 	 * @param bankCode
 	 * @param payType
 	 * @return
@@ -63,28 +62,26 @@ public abstract class BasePaymentResolver {
 		return onLinePaymentCommand;
 	}
 	
-	
+	/**
+	 * 获取过期时间
+	 * @param orderCreateDate
+	 * @return
+	 * @throws IllegalPaymentStateException
+	 */
 	protected String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
 		String payExpiryTime = mataInfoManager.findValue(PAY_EXPIRY_TIME);
-
 		Date now = new Date();
-
 		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  
-
 		if (payExpiryTime == null) {
 			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
 		}
-
 		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
-
 		if (itBPay <= 0L) {
 			return "0m";
 		} else {
 			return itBPay.toString() + "m";
 		}
-
 	}
-
 	
 
 }

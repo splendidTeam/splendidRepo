@@ -65,7 +65,10 @@ public class IllegalPaymentStateException extends Exception {
 		PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME,
 		
 		/** 非当前用户的订单 */
-		PAYMENT_ILLEGAL_ORDER_INVALID_OWNER;
+		PAYMENT_ILLEGAL_ORDER_INVALID_OWNER,
+		
+		/**获取跳转地址失败 */
+		PAYMENT_GETURL_ERROR
 
 	}
 }
