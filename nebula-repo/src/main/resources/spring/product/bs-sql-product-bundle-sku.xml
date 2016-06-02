@@ -73,7 +73,7 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[
-					SELECT DISTINCT 
+					SELECT  
 						b.id bundle_id, b.item_id bundle_item_id, bs.sku_id sku_id, s.list_price, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end sales_price 
 					FROM 
 						t_pd_bundle b
@@ -84,7 +84,7 @@
 					INNER JOIN 
 						t_pd_sku s on bs.sku_id = s.id
 					WHERE 
-						b.item_id = :bundleItemId AND bs.sku_id = :skuId
+						b.item_id = :bundleItemId and bs.sku_id = :skuId
 				]]>
 			</value>
 		</constructor-arg>
