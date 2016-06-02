@@ -152,5 +152,5 @@ function itemTypeTemplate(data, args, idx) {
 		case 3 : return "捆绑商品"; 
 		case 5 : return "搭配商品"; 
 		case 7 : return "虚拟商品"; 
-	}
+	} 
 }

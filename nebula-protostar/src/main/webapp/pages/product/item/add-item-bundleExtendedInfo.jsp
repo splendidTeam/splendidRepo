@@ -96,18 +96,18 @@
 			<div class="ui-block">
 				<div class="ui-block-content ui-block-content-lb">
 					<form id="mainItemDialogSearchForm">
-							<div class="form-group p10">
-								<label>类型</label>
-								<input type="radio" name="type" value="product" checked="checked" />商品
-								<input type="radio" name="type" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
-							</div>
-							<div class="form-group p10">
-								<label>编码</label>
-								<input type="text" loxiaType="input" name="q_sl_code" mandatory="false" />
-							</div>
-							<div class="button-line1 right">
-								<a href="javascript:void(0);" class="func-button orange" id="search_button"><span>搜索</span></a>
-							</div>
+						<div class="form-group p10">
+							<label>类型</label>
+							<input type="radio" name="type" value="product" checked="checked" />商品
+							<input type="radio" name="type" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
+						</div>
+						<div class="form-group p10">
+							<label>编码</label>
+							<input type="text" loxiaType="input" name="q_sl_code" mandatory="false" />
+						</div>
+						<div class="button-line1 right">
+							<a href="javascript:void(0);" class="func-button orange" id="search_button"><span>搜索</span></a>
+						</div>
 					</form>	
 				</div>
 			</div>
