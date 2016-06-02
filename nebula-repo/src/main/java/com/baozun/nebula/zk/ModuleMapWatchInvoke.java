@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.sdk.manager.cms.SdkCmsModuleInstanceManager;
 
-@Deprecated
 public class ModuleMapWatchInvoke extends WatchInvoke {
 
 	public static final String LISTEN_PATH=ZooKeeperOperator.LIFECYCLE_NODE+"/modulemap";

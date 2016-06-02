@@ -50,6 +50,7 @@ import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 /**
@@ -92,6 +93,9 @@ public class CmsPageTemplateController extends BaseController {
 	
 	@Autowired
 	private SdkCmsEditAreaManager sdkCmsEditAreaManager;
+	
+	@Autowired
+	private ZooKeeperOperator zooKeeperOperator;
 	
 	/** 进去模板列表 */
 	@RequestMapping(value = "/newcms/pageTemplateList.htm")

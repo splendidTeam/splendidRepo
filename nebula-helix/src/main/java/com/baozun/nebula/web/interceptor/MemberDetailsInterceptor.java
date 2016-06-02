@@ -127,7 +127,9 @@ public class MemberDetailsInterceptor extends HandlerInterceptorAdapter implemen
 			if(Boolean.TRUE.equals(guestAllowed) && needLogin.guest()){
 				LOG.debug("Guest action for next step: {}", request.getRequestURI());
 				//删除游客标志
-				request.getSession().removeAttribute(GUEST_ENTER_ONCE);
+				
+				//2016-6-2 18:26  由于订单确认页面以及创建订单ajax事件 都会标识 @NeedLogin(guest=true),会出现频繁的登陆以及异常,为了最小改动,和刘总讨论了, 这行去掉
+				//request.getSession().removeAttribute(GUEST_ENTER_ONCE);
 				return true;
 			}else{
 				LOG.info("No Login information found, need re-login");

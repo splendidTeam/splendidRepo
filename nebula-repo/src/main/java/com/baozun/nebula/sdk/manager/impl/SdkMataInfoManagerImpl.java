@@ -26,12 +26,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.invoke.SystemConfigWatchInvoke;
 import com.baozun.nebula.dao.system.MataInfoDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
+import com.baozun.nebula.zk.SystemConfigWatchInvoke;
+import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 import loxia.dao.Page;
@@ -50,7 +50,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
     private MataInfoDao                mataInfoDao;
 
     @Autowired
-    private ZkOperator          zkOperator;
+    private ZooKeeperOperator          zooKeeperOperator;
 
     private static Map<String, String> metaMap = new ConcurrentHashMap<String, String>();
 
@@ -108,7 +108,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
             model.setLifecycle(1);
             mataInfo = mataInfoDao.save(model);
         }
-        zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+        zooKeeperOperator.noticeZkServer(SystemConfigWatchInvoke.LISTEN_PATH);
         return mataInfo;
     }
 
@@ -178,7 +178,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      */
     public void enableOrDisableMataInfoByIds(List<Long> ids,Integer state){
         mataInfoDao.enableOrDisableMataInfoByIds(ids, state);
-        zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+        zooKeeperOperator.noticeZkServer(SystemConfigWatchInvoke.LISTEN_PATH);
     }
 
     /**
@@ -190,7 +190,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      */
     public void removeMataInfoByIds(List<Long> ids){
         mataInfoDao.removeMataInfoByIds(ids);
-        zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+        zooKeeperOperator.noticeZkServer(SystemConfigWatchInvoke.LISTEN_PATH);
     }
 
     /**

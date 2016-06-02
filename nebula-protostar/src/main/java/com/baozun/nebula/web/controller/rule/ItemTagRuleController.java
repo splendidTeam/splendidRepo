@@ -41,8 +41,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baozun.nebula.command.product.ProductComboDetailsCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.command.rule.ItemTagRuleCommand;
-import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.auth.OrganizationManager;
@@ -63,6 +61,8 @@ import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.zk.EngineWatchInvoke;
+import com.baozun.nebula.zk.ZooKeeperOperator;
 
 @Controller
 public class ItemTagRuleController extends BaseController {
@@ -85,7 +85,7 @@ public class ItemTagRuleController extends BaseController {
 	@Autowired
 	private ShopManager						shopManager;
 	@Autowired
-	private ZkOperator				zkOperator;
+	private ZooKeeperOperator				zooKeeperOperator;
 	@Autowired
 	private SdkPromotionManager				sdkPromotionManager;
 	@Autowired
@@ -212,7 +212,7 @@ public class ItemTagRuleController extends BaseController {
 			combo.setCreateId(userId);
 			combo.setCreateTime(new Date());
 			sdkItemTagRuleManager.update(combo);
-			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
 			rs.put("isSuccess", true);
 		} else {
 			rs.put(RESULT_CODE, "userNotLogin");
@@ -234,7 +234,7 @@ public class ItemTagRuleController extends BaseController {
 			@RequestParam("lifecycle") Integer activeMark) {
 		try {
 			sdkItemTagRuleManager.enableOrDisableProductGroupById(id, activeMark);
-			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return FAILTRUE;

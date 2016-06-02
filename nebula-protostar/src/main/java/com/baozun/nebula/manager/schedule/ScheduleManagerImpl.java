@@ -19,9 +19,7 @@ package com.baozun.nebula.manager.schedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.invoke.ScheduleTaskWatchInvoker;
-
+import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * @author Tianlong.Zhang
@@ -30,13 +28,15 @@ import com.baozun.nebula.curator.invoke.ScheduleTaskWatchInvoker;
 @Service("scheduleManager")
 public class ScheduleManagerImpl implements ScheduleManager{
 	
+	public static final String NOTICE_PATH=ZooKeeperOperator.LIFECYCLE_NODE+"/schedule";
+
 	@Autowired
-	protected ZkOperator zkOperator;
+	protected ZooKeeperOperator zooKeeperOperator;
 	
 	@Override
 	public boolean noticeTask(Long id) {
 		String data = id.toString();
-		boolean result = zkOperator.noticeZkServer(zkOperator.getPath(ScheduleTaskWatchInvoker.PATH_KEY), data);
+		boolean result = zooKeeperOperator.noticeZkServer(NOTICE_PATH, data);
 		return result;
 	}
 

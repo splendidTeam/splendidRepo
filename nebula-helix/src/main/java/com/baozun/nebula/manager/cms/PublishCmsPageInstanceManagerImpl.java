@@ -25,6 +25,7 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPublishedManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsTemplateHtmlManager;
+import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 @Service("publishCmsPageInstanceManager")
@@ -55,6 +56,9 @@ public class PublishCmsPageInstanceManagerImpl implements PublishCmsPageInstance
 	
 	@Autowired
 	private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
+	
+	@Autowired
+	private ZooKeeperOperator			zooKeeperOperator;
 	
 	@Autowired
 	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
