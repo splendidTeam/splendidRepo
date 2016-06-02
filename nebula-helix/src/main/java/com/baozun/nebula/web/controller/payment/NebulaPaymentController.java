@@ -43,6 +43,7 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.payment.resolver.PaymentResolver;
 import com.baozun.nebula.web.controller.payment.resolver.PaymentResolverType;
 import com.feilong.core.Validator;
+import com.feilong.servlet.http.RequestUtil;
 
 /**
  * Neubla支付Controller
@@ -120,8 +121,20 @@ public class NebulaPaymentController extends BaseController {
      */
     public String doPayReturn(@PathVariable("payType") String payType, 
     		HttpServletRequest request, HttpServletResponse response, Model model) {
-    	
-    	return null;
+	   try {
+			
+			if(LOGGER.isDebugEnabled()){
+				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
+		    }
+			
+			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+			
+			return paymentResolver.doPayReturn(request, response, payType);
+			
+		} catch (IllegalPaymentStateException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return null;
     }
     
     /**
