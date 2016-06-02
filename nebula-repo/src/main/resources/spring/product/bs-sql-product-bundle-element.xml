@@ -18,5 +18,28 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="BundleElement.save" class="loxia.dao.support.DynamicQueryHolder">
+		<description>保存bundleElement</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					INSERT into t_pd_bundle_element (bundle_id, is_main_element, sales_price, sort_no)
+						VALUES (:bundleId, :isMainElement, :salesPrice, :sortNo)
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="BundleElement.delete" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据bundleId删除bundleElement</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					DELETE from t_pd_bundle_element WHERE bundle_id = :bundleId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 </beans>

@@ -1891,15 +1891,9 @@ function drawNoSalePropEditing4Type(curSize){
 $j(document).ready(function(){
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
-//    removeTextareaLastChar();
-    //isExistSaleProperty();
     
     oldval = $j("#code").val();
     itemId = $j("#itemid").val();
-//    thumbnailConfig = $j("#thumbnailConfig").val();
-//    loadItemImage();
-//************************************************附加分类
-	
     
     $j("#category").click(function() {
     	if(!categoryTreeInited) {
@@ -1913,33 +1907,6 @@ $j(document).ready(function(){
 
 		$j("body").bind("mousedown", onBodyDown);
 	});
-//***************************************************默认分类  
-//    //商品分类下拉树
-//	$j.fn.zTree.init($j("#defaultCategoryTree"), defaultCategorySetting, defaultCategoryzNodes);
-//	//让商品分类下拉树只有叶子节点可选
-//	var $tree = $j.fn.zTree.getZTreeObj("defaultCategoryTree");
-//	//节点全部展开
-//	$tree.expandAll(true); 
-//	//1.将所有的节点转换为简单 Array 格式
-//	var _defaultNodes = $tree.transformToArray($tree.getNodes());
-//	for(var i = 0;i<_defaultNodes.length;i++){
-//		//2.如果此节点为父节点 或者 为ROOT节点 ，则让此节点没有radio选框
-//		if(_defaultNodes[i].isParent || _defaultNodes[i].id == 0){
-//			_defaultNodes[i].nocheck = true;
-//		}
-//		$tree.refresh();
-//	}
-//
-//    $j("#defaultCategory").click(function() {
-//    	var cityObj = $j(this);
-//    	var cityOffset = $j(this).offset();
-//    	$j("#defaultMenuContent").css({left:cityOffset.left + "px", top:cityOffset.top + cityObj.outerHeight() + "px"}).slideDown("fast");
-//    	
-//    	$j("body").bind("mousedown", onBodyDownDefault);
-//    });
-    
-    
-    
    //清空填充属性名称Array及属性idArray
    propertyArray.splice(0,propertyArray.length);
    var propertyIdsStr =$j("#propertyIdArray").val();
@@ -1954,11 +1921,7 @@ $j(document).ready(function(){
    mustCheckArray =eval("("+mustCheckArrayStr+")");
    //自动编码
    showSkuTable(true);
-//   produceExtension();
     $j("#category").on("change",function(){
-		//var categoryTree = $j.fn.zTree.getZTreeObj("treeDemo");
-		//var node = categoryTree.getCheckedNodes();
-		//alert("sdfsdf");
 	});
     
   //检查商品编码是否具有唯一性
@@ -1993,8 +1956,6 @@ $j(document).ready(function(){
  				 $j("#loxiaTip-r").show();
  				 $j(".codetip").html(nps.i18n("ITEM_UPDATE_CODE_ENBLE"));
  				 
- 				 //$j("#code").addClass("ui-loxia-error");
- 				 
  				 setTimeout(function(){ 
  					$j("#loxiaTip-r").hide();
  				 },4000); 
@@ -2016,66 +1977,6 @@ $j(document).ready(function(){
 	
 	
 	$j(".button.orange.submit").click(function(){
-
-//	   var changePropertyJson = "";
-//	   $j.each(restItemImagesArray(), function(index, itemImages){
-//		   if(index == changedColorPropertyArray.length-1){
-//			   changePropertyJson += itemImages;
-//		   }else{
-//			   changePropertyJson = itemImages + '|';
-//		   }
-//	   });
-	   
-//	   var listPrice = $j("#listPrice").val();
-//	   if(listPrice!=null&&listPrice!=""){
-//		   var listPriceArray = new Array();
-//		   var listPriceIndex = 0;
-//
-//		   $j("#extensionTable").find("input[name='listPrices']").each(function(i,n){
-//			   listPriceArray[i] = n.value;
-//			});
-//		   listPriceArray = listPriceArray.sort();
-//		   
-//		   if(listPriceArray.length>0){
-//			   if(!(listPrice>=listPriceArray[0]&&listPrice<=listPriceArray[listPriceArray.length-1])){
-//				   nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"), nps.i18n("LISTPRICE_OUT_OF_RANGE"));
-//				   return;
-//			   }
-//		   }else{
-//			   nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"), nps.i18n("PLEASE_INPUT_LISTPRICE"));
-//			   return;
-//		   }
-//	   }
-	   
-//	   var _itemId = $j('#itemid').val();
-//	   if($j('#colorProperty').val() != ''){
-//		   var _pvidpiditemid = ($j('#colorProperty').val()).split('#');
-//		   if(_pvidpiditemid.length > 2){
-//			   //保存最后一次的属性值
-//			   updateItemInfoLastPropertyValueId(_pvidpiditemid[0], _itemId);
-//		   }
-//	   }
-//	   if($j('#propSelect').val() != ''){
-//		   var _nameAndId = ($j('#propSelect').val()).split('#');
-//		   if(_nameAndId.length > 1){
-//			   //保存最后一次的属性
-//			   updateItemInfoLastPropertyId(_nameAndId[1], _itemId);
-//		   }
-//		}
-//	   $j("#changePropertyJson").val(changePropertyJson);
-	   
-	   //验证默认分类
-//	   var _defaultCategoryId = $j('input[name="defaultCategoryId"]').val();
-//	   if(_defaultCategoryId == undefined){
-//		   nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"), nps.i18n("PLEASE_SELECT_DEFAULT_CATEGORY"));
-//		   return;
-//	   }
-		/*$j(".saleInfo").each(function(i,dom){
-			var me = $j(this);
-			var val = me.find(".customerSelect").val();
-			me.find(".propertyValueInputs").val(val);
-		});*/
-	  
 	   nps.submitForm('itemForm',{mode: 'async', 
 			successHandler : function(data){
 			if(data.isSuccess == true)
@@ -2097,10 +1998,7 @@ $j(document).ready(function(){
 	});
     //图片预览
 	$j("input[name='img1']").on("change",function(){
-		
-		//alert($j("input[name='img1']").files.item(0).getAsDataURL());
-		//alert($j("input[name='img1']").files.item(0).getAsDataURL());
-		//alert(document.getElementByTabName("img1").value);
+
 	});
 	
 	
@@ -2143,374 +2041,7 @@ $j(document).ready(function(){
 			return;
 		}
 		showSkuTable(false,saleInfo);
-//		produceExtension();
 	});
-	
-//	
-//	//--------向上 
-//	$j(".ui-block").on("click",".up-ic",function(e){
-//		e.stopPropagation();
-//		var thisprev=$j(this).parent().parent().parent(".color-select-line").prev(".color-select-line");
-//		if(thisprev.length>0){
-//			$j(this).parent().parent().parent(".color-select-line").detach().insertBefore(thisprev);
-//			
-//			changeColorProperty();
-//		}
-//	});
-//	
-//	//向下
-//	$j(".ui-block").on("click",".down-ic",function(e){
-//		e.stopPropagation();
-//		var thisnext=$j(this).parent().parent().parent(".color-select-line").next(".color-select-line");
-//		if(thisnext.length>0){
-//			$j(this).parent().parent().parent(".color-select-line").detach().insertAfter(thisnext);
-//			
-//			changeColorProperty();
-//		}
-//	});
-//	
-//	//添加
-//	$j(".ui-block-line").on("click",".color-select-add",function(){
-//		//var str='<div class="ui-block-line color-select-line"><label><img src="../images/main/mrimg.jpg" class="color-select-img"/></label><div><div class="color-select-line"><input loxiaType="input"/><a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>浏览</span></a><span class="common-ic up-ic"></span></div><div class="color-select-line"><input loxiaType="input" style="width:218px;"/><span class="common-ic down-ic"></span></div></div></div>';
-//		var itemIdAndItemProperties = $j('#colorProperty').val();
-//		var itemIdAndItemPropertiess = itemIdAndItemProperties.split('#');
-//		var itemPropeties = "";
-//		if(itemIdAndItemPropertiess.length > 0 && itemIdAndItemPropertiess != ''){
-//			itemPropeties = itemIdAndItemPropertiess[1];
-//		}else{
-//			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT_COLOR_PROPERTY"));
-//			return;
-//		}
-//		//验证是否有新建的, 且没有填写内容
-//		var isEmpty = validatorOnlyOneNewIsEmpty();
-//		if(isEmpty){
-//			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("WRITE_ALL_INFO"));
-//			return;
-//		}
-//		
-//		var str = '<div class="ui-block-line color-select-line">'
-//				+'<label><img src="../images/main/mrimg.jpg" class="color-select-img"/></label>'
-//				+'<input type="hidden" loxiaType="input" name="itemImages.itemProperties" value="'+itemProperties+'" />'
-//				+'<div><div class="color-select-line">'
-//				//+'<input complete="colorComplete" class="imgUploadComponet" role="'+thumbnailConfig+'" model="C" hName="itemImage'+hnameIndex+'" hValue="../images/main/mrimg.jpg" type="file" url="/demo/upload.json"/>'
-//				+'<input loxiaType="input" readonly="true" name="itemImageUrl"/>'
-//				+'<a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>浏览</span>'
-//				+'<input complete="colorComplete" class="imgUploadComponet fileupload" role="'+thumbnailConfig+'" model="C" hName="itemImage'+hnameIndex+'" hValue="../images/main/mrimg.jpg" type="file" url="/demo/upload.json"/></a>'
-//				+'<span class="common-ic up-ic"></span>'
-//				+'<input type="hidden" name="itemImage'+hnameIndex+'" value="../images/main/mrimg.jpg"/>'
-//				+'</div>'
-//				+'<div class="color-select-line">'
-//				+'<input loxiaType="input" name="itemImages.description" checkmaster="changeColorProperty" style="width:218px;"/><span class="common-ic down-ic"></span>'
-//				+'</div>'
-//				+'<div class="color-select-line">'
-//				+'<opt:select name="itemImages.type" id="imageType"  expression="chooseOption.IMAGE_TYPE" defaultValue="3" otherProperties="loxiaType=\'select\' "/>'
-//                +'<span class="common-ic delete-ic"></span>'
-//				+'</div></div></div>';
-//		//$j(str).insertBefore($j(this).parent(".ui-block-line"));
-//		var _colorPropertyContent = $j("#colorPropertyContent");
-//		_colorPropertyContent.append(str);
-////		loxia.init({debug: true, region: 'zh-CN'});
-////		nps.init();
-//		hnameIndex++;
-//		//加载上传组件
-//		$j.getScript(base+'/scripts/ajaxfileupload.js');
-//		//初始化id为colorPropertyContent的div内部的所有Loxia组件
-//		loxia.initContext($j("#colorPropertyContent"));
-//		changeColorProperty();
-//		
-//	});
-//	
-//	
-//	
-//	//删除
-//	$j(".ui-block").on("click",".color-select-line .delete-ic",function(e){
-//		e.stopPropagation();
-//		var thiscolor=$j(this).parent().parent().parent(".color-select-line");
-//		thiscolor.remove();
-//		changeColorProperty();
-//	});
-//	//属性--一级菜单
-//	$j(".ui-block-line").on("change", "#propSelect", function(){
-//		$j("#colorPropertyContent").empty();
-//	});
-//	//属性值--二级菜单
-//	$j(".ui-block-line").on("change", "#colorProperty", function(){
-//		// propertyValueIdAndProperyId的数据格式:  ${propertyValueId}#${propertyId} 如:717#595
-//		var itemIdAndItemPropertyId = $j(this).val();
-//		var itemIdAndItemPropertyIds = itemIdAndItemPropertyId.split('#');
-//		
-//		var _colorPropertyContent = $j("#colorPropertyContent");
-//		var _propertyValueId = '';
-//		if(itemIdAndItemPropertyIds.length > 0 && itemIdAndItemPropertyIds != ''){
-//			_propertyValueId = itemIdAndItemPropertyIds[0];
-//			itemProperties = itemIdAndItemPropertyIds[2];
-//			//判断数组中存在propertyValueId, 存在就遍历, 不存在就到数据库中读取
-//			var isExist = false;//是否存在
-//			$j.each(changedColorPropertyArray, function(index, itemImages){
-//				_colorPropertyContent.empty();
-//				var dataObj = $j.parseJSON(itemImages);
-//				if(dataObj.propertyValueId != '' && dataObj.propertyValueId != 'undefined'){
-//					if(dataObj.propertyValueId == propertyValueId){
-//						//遍历 
-//						$j.each(dataObj.itemImages, function(i, itemImage){
-//							var _picUrl = itemImage.picUrl;
-//							if(_picUrl == 'undefined'){
-//								_picUrl = "../images/main/mrimg.jpg";
-//							}
-//							var str = '<div class="ui-block-line color-select-line">'
-//								+'<label><img src="'+_picUrl+'" class="color-select-img"/></label>'
-//								//+'<input type="hidden" loxiaType="input" name="itemImages.itemProperties" value="'+itemProperties+'" />'
-//								+'<div>'
-//								+'<div class="color-select-line">'
-//								//+'<input complete="colorComplete" class="imgUploadComponet" role="'+thumbnailConfig+'" model="C" hName="itemImages'+hnameIndex+'" hValue="../images/main/mrimg.jpg"  type="file" url="/demo/upload.json"/>'
-//								+'<input loxiaType="input" readonly="true" name="itemImageUrl" value="'+_picUrl+'"/>'
-//								+'<a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>浏览</span>'
-//								+'<input complete="colorComplete" class="imgUploadComponet fileupload" role="'+thumbnailConfig+'" model="C" hName="itemImage'+hnameIndex+'" hValue="../images/main/mrimg.jpg" type="file" url="/demo/upload.json"/></a>'
-//								+'<span class="common-ic up-ic"></span>'
-//					            +'</div>'
-//					            +'<div class="color-select-line">'
-//					            +'<input loxiaType="input" name="itemImages.description" checkmaster="changeColorProperty" style="width:218px;" value="'+itemImage.description+'"/>'
-//					            +'<span class="common-ic down-ic"></span>'
-//					            +'</div>'
-//								+'<div class="color-select-line">'
-//				                +'<span class="common-ic delete-ic"></span>'
-//					            +'</div>'
-//					            +'</div>'
-//					            +'</div>';
-//								//追加id="colorPropertyContent"的内容
-//								_colorPropertyContent.append(str);
-//								hnameIndex++;
-//						});
-//						isExist = true;
-//						return false;
-//					}
-//				}else if(dataObj.itemProperties != '' && dataObj.itemProperties != 'undefined'){
-//				//自定义多选
-//					if(dataObj.itemProperties == itemProperties){
-//						
-//						//遍历 
-//						$j.each(dataObj.itemImages, function(i, itemImage){
-//							var _picUrl = itemImage.picUrl;
-//							if(_picUrl == 'undefined'){
-//								_picUrl = "../images/main/mrimg.jpg";
-//							}
-//							var str = '<div class="ui-block-line color-select-line">'
-//								+'<label><img src="'+_picUrl+'" class="color-select-img"/></label>'
-//								//+'<input type="hidden" loxiaType="input" name="itemImages.itemProperties" value="'+itemProperties+'" />'
-//								+'<div>'
-//								+'<div class="color-select-line">'
-//								//+'<input complete="colorComplete" class="imgUploadComponet" role="'+thumbnailConfig+'" model="C" hName="itemImages'+hnameIndex+'" hValue="../images/main/mrimg.jpg"  type="file" url="/demo/upload.json"/>'
-//								+'<input loxiaType="input" readonly="true" name="itemImageUrl" value="'+_picUrl+'"/>'
-//								+'<a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>浏览</span>'
-//								+'<input complete="colorComplete" class="imgUploadComponet fileupload" role="'+thumbnailConfig+'" model="C" hName="itemImage'+hnameIndex+'" hValue="../images/main/mrimg.jpg" type="file" url="/demo/upload.json"/></a>'
-//								+'<span class="common-ic up-ic"></span>'
-//					            +'</div>'
-//					            +'<div class="color-select-line">'
-//					            +'<input loxiaType="input" name="itemImages.description" checkmaster="changeColorProperty" style="width:218px;" value="'+itemImage.description+'"/>'
-//					            +'<span class="common-ic down-ic"></span>'
-//					            +'</div>'
-//								+'<div class="color-select-line">'
-//				                +'<span class="common-ic delete-ic"></span>'
-//					            +'</div>'
-//					            +'</div>'
-//					            +'</div>';
-//								//追加id="colorPropertyContent"的内容
-//								_colorPropertyContent.append(str);
-//								hnameIndex++;
-//						});
-//						isExist = true;
-//						return false;
-//					}
-//				}
-//			});
-//			if(!isExist){
-//				//得到item图片
-//				var data = {'itemProperties': itemProperties, 'itemId':itemId, 'propertyValueId':_propertyValueId};
-//				var backWarnEntity = loxia.syncXhrPost(findItemImageByItemPropAndItemIdUrl, data);
-//				if(backWarnEntity.isSuccess){
-//					var _itemImages = backWarnEntity.description;
-//					if(_itemImages.length > 0 && _itemImages != ''){
-//						//清空id='colorPropertyContent'里的元素
-//						_colorPropertyContent.empty();
-//						$j.each(_itemImages, function(index, itemImage){
-//							var str = '<div class="ui-block-line color-select-line">'
-//								+'<label><img src="'+itemImage.picUrl+'" class="color-select-img"/></label>'
-//								//+'<input type="hidden" loxiaType="input" name="itemImages.id" value="'+itemImage.id+'" />'
-//								//+'<input type="hidden" loxiaType="input" name="itemImages.itemProperties" value="'+itemProperties+'" />'
-//								+'<div>'
-//								+'<div class="color-select-line">'
-//								//+'<input complete="colorComplete" class="imgUploadComponet" role="'+thumbnailConfig+'" model="C" hName="itemImages'+hnameIndex+'" hValue="../images/main/mrimg.jpg"  type="file" url="/demo/upload.json"/>'
-//								+'<input loxiaType="input" readonly="true" name="itemImageUrl" value="'+itemImage.picUrl+'"/>'
-//								+'<a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>浏览</span>'
-//								+'<input complete="colorComplete" class="imgUploadComponet fileupload" role="'+thumbnailConfig+'" model="C" hName="itemImage'+hnameIndex+'" hValue="../images/main/mrimg.jpg" type="file" url="/demo/upload.json"/></a>'
-//								+'<span class="common-ic up-ic"></span>'
-//					            +'</div>'
-//					            +'<div class="color-select-line">'
-//					            +'<input loxiaType="input" name="itemImages.description" checkmaster="changeColorProperty" style="width:218px;" value="'+itemImage.description+'"/>'
-//					            +'<span class="common-ic down-ic"></span>'
-//					            +'</div>'
-//								+'<div class="color-select-line">'
-//								+'<opt:select name="itemImages.type" id="imageType"  expression="chooseOption.IMAGE_TYPE" defaultValue="3" otherProperties="loxiaType=\"select\" "/>'
-//				                +'<span class="common-ic delete-ic"></span>'
-//					            +'</div>'
-//					            +'</div>'
-//					            +'</div>';
-//							//追加id="colorPropertyContent"的内容
-//							_colorPropertyContent.append(str);
-//							hnameIndex++;
-//						});
-//					}else{
-//						//清空id='colorPropertyContent'里的元素
-//						_colorPropertyContent.empty();
-//					}
-//				}
-//			}
-//			//updateItemInfoLastPropertyValueId(_propertyValueId, _itemId);
-//		}else{
-//			//清空id='colorPropertyContent'里的元素
-//			_colorPropertyContent.empty();
-//			
-//		}
-//		//加载上传组件
-//		$j.getScript(base+'/scripts/ajaxfileupload.js');
-//		//初始化id为colorPropertyContent的div内部的所有Loxia组件
-//		loxia.initContext($j("#colorPropertyContent"));
-//		
-//		
-//	
-//	});
-
-	
-	
-//	if(lastSelectPropertyId != ''){
-//		_propertyValueId = lastSelectPropertyValueId;
-//		//隐藏销售属性的选择框
-//		$j('#propSelect').hide();
-//		//加载属性值
-//		var itemid = $j('#itemid').val();
-//		var _name = $j('#propSelect').val();
-//		var _nameAndId = _name.split('#');
-//		if(_nameAndId.length < 1){
-//			return;
-//		}
-//		var html ='<option value="">请选择</option>';
-//		$j.each(dynamicPropertyCommandListJsonStr, function(index, obj){
-//			if(obj.property.name==_nameAndId[0]){
-//				$j.each(obj.propertyValueList, function(index, proval){
-//					if(proval.id == lastSelectPropertyValueId){
-//						html+='<option selected="selected" value="'+proval.id+'#'+proval.propertyId+'#'+itemid+'">'+proval.value+'</option>';			
-//					}else{
-//						html+='<option value="'+proval.id+'#'+proval.propertyId+'#'+itemid+'">'+proval.value+'</option>';			
-//					}
-//				});
-//			}
-//		});
-//		$j("#colorProperty").html(html);
-//		//加载图片信息
-//		if(lastSelectPropertyValueId != ''){
-//			var _colorPropertyContent = $j("#colorPropertyContent");
-//			var data = {'propertyValueId': lastSelectPropertyValueId, 'itemId':itemid};
-//			var backWarnEntity = loxia.syncXhrPost(findItemImageByPVIdUrl, data);
-//			if(backWarnEntity.isSuccess){
-//				var _itemImages = backWarnEntity.description;
-//				if(_itemImages.length > 0 && _itemImages != ''){
-//					//清空id='colorPropertyContent'里的元素
-//					_colorPropertyContent.empty();
-//					$j.each(_itemImages, function(index, itemImage){
-//						var str = '<div class="ui-block-line color-select-line">'
-//							+'<label><img src="'+itemImage.picUrl+'" class="color-select-img"/></label>'
-//							//+'<input type="hidden" loxiaType="input" name="itemImages.id" value="'+itemImage.id+'" />'
-//							+'<input type="hidden" loxiaType="input" name="itemImages.propertyValueId" value="'+_propertyValueId+'" />'
-//							+'<div>'
-//							+'<div class="color-select-line">'
-//							//+'<input complete="colorComplete" class="imgUploadComponet" role="'+thumbnailConfig+'" model="C" hName="itemImages'+hnameIndex+'" hValue="../images/main/mrimg.jpg"  type="file" url="/demo/upload.json"/>'
-//							+'<input loxiaType="input" readonly="true" name="itemImageUrl" value="'+itemImage.picUrl+'"/>'
-//							+'<a class="func-button ml5 uploadlink" href="javascript:void(0);"><span>浏览</span>'
-//							+'<input complete="colorComplete" class="imgUploadComponet fileupload" role="'+thumbnailConfig+'" model="C" hName="itemImage'+hnameIndex+'" hValue="../images/main/mrimg.jpg" type="file" url="/demo/upload.json"/></a>'
-//							+'<span class="common-ic up-ic"></span>'
-//				            +'</div>'
-//				            +'<div class="color-select-line">'
-//				            +'<input loxiaType="input" name="itemImages.description" checkmaster="changeColorProperty" style="width:218px;" value="'+itemImage.description+'"/>'
-//				            +'<span class="common-ic down-ic"></span>'
-//				            +'</div>'
-//							+'<div class="color-select-line">'
-//			                +'<span class="common-ic delete-ic"></span>'
-//				            +'</div>'
-//				            +'</div>'
-//				            +'</div>';
-//						//追加id="colorPropertyContent"的内容
-//						_colorPropertyContent.append(str);
-//						hnameIndex++;
-//					});
-//				}else{
-//					//清空id='colorPropertyContent'里的元素
-//					_colorPropertyContent.empty();
-//				}
-//			}
-//		}
-//		//隐藏确定选择按钮
-//		$j('.ui-block-line .confirmSelect').hide();
-//		//初始化id为colorPropertyContent的div内部的所有Loxia组件
-//		loxia.initContext($j("#colorPropertyContent"));	
-//	}else{
-//		//隐藏编辑按钮
-//		$j('.ui-block-line .propertyEdit').hide();
-//		//隐藏属性值select
-//		$j('#colorProperty').parent('.ui-block-line').hide();
-//		//隐藏"+"
-//		$j('#colorProperty').parent('.ui-block-line').nextAll('.ui-block-line').hide();
-//		//显示确定选择按钮
-//		$j('.ui-block-line .confirmSelect').show();
-//	}
-	
-	//点击确定选择按钮
-//	$j('.ui-block-line .confirmSelect').on('click', function(){
-//		//判断是不是选择的请选择
-//		var _propSelect = $j('#propSelect').val();
-//		var _nameAndId = _propSelect.split('#');
-//		if(_nameAndId.length < 1){
-//			return;
-//		}
-//		if(_propSelect == ''){
-//			nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"), nps.i18n("PLEASE_SELECT_PROPERTY"));
-//			return;
-//		}
-//		//加载属性值
-//		loadPropertyValue();
-//		//隐藏销售属性的选择框
-//		$j('#propSelect').hide();
-//		//隐藏确定选择按钮
-//		$j('.ui-block-line .confirmSelect').hide();
-//		//显示编辑按钮
-//		$j('.ui-block-line .propertyEdit').show();
-//		//显示销售属性的lable
-//		$j('.ui-block-line .propertyEdit').siblings('lable').show();
-//		$j('.ui-block-line .propertyEdit').siblings('lable').html(_nameAndId[0]);
-//		
-//		//显示属性值select
-//		$j('#colorProperty').parent('.ui-block-line').show();
-//		//显示"+"
-//		$j('#colorProperty').parent('.ui-block-line').nextAll('.ui-block-line').show();
-//	})
-	
-	//点击编辑按钮
-//	$j('.ui-block-line .propertyEdit').on('click', function(){
-//		//显示销售属性的选择框
-//		$j(this).siblings('#propSelect').show();
-//		//隐藏销售属性的lable
-//		$j(this).siblings('lable').hide();
-//		//隐藏"编辑"按钮
-//		$j(this).hide();
-//		//显示确定选择按钮
-//		$j('.ui-block-line .confirmSelect').show();
-//	})
-//	$j('.customerSelect').live('blur', function(){
-//		loadColorProp($j(this).val(), $j(this));
-//	})
-	
-	//加载上传组件
-//	$j.getScript(base+'/scripts/ajaxfileupload.js');
-	
 	
 	loxia.initContext($j(".ui-block "));
 	
@@ -2549,9 +2080,6 @@ $j(document).ready(function(){
 		});
 	}
 	PropEditing4Typeinit();
-	
-
-
 	
 	if(i18nOnOff){
 		var i18nSize = i18nLangs.length;
@@ -2624,7 +2152,6 @@ $j(document).ready(function(){
         return selestrefret;
 	}
 	
-	
 	function  selectcheck(URL){
 		var selestrefre=selestref();
 	    var json = {
@@ -2650,9 +2177,4 @@ $j(document).ready(function(){
 		});
 	}
 	selectcheck(itemcolorrefcheckURL);
-	
-	
-
-	
-	
 });
