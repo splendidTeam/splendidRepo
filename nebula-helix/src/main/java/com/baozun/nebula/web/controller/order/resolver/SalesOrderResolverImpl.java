@@ -64,20 +64,34 @@ import com.feilong.tools.jsonlib.JsonUtil;
 public class SalesOrderResolverImpl implements SalesOrderResolver{
 
     /** The Constant log. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
+    private static final Logger      LOGGER = LoggerFactory.getLogger(SalesOrderResolverImpl.class);
 
+    /** The mata info manager. */
     @Autowired
-    private MataInfoManager     mataInfoManager;
+    private MataInfoManager          mataInfoManager;
 
+    /** The sales order manager. */
     @Autowired
-    private SalesOrderManager   salesOrderManager;
+    private SalesOrderManager        salesOrderManager;
 
+    /** The sdk payment manager. */
     @Autowired
-    private SdkPaymentManager   sdkPaymentManager;
+    private SdkPaymentManager        sdkPaymentManager;
 
+    /** The order manager. */
     @Autowired
-    private OrderManager        orderManager;
+    private OrderManager             orderManager;
 
+    /** The sales order source resolver. */
+    @Autowired
+    private SalesOrderSourceResolver salesOrderSourceResolver;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver#buildSalesOrderCommand(com.baozun.nebula.web.MemberDetails,
+     * com.baozun.nebula.web.controller.order.form.OrderForm, javax.servlet.http.HttpServletRequest)
+     */
     @Override
     public SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request){
         // 需要封装的对象
@@ -144,15 +158,17 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         }
 
         // 订单来源
-        salesOrderCommand.setSource(SalesOrder.SO_SOURCE_NORMAL);
+        salesOrderCommand.setSource(salesOrderSourceResolver.resolveOrderSource(memberDetails, orderForm, request));
         return salesOrderCommand;
     }
 
     /**
-     * 设置优惠券
-     * 
+     * 设置优惠券.
+     *
      * @param salesOrderCommand
+     *            the sales order command
      * @param coupon
+     *            the coupon
      */
     private void setCoupon(SalesOrderCommand salesOrderCommand,String coupon){
         if (Validator.isNotNullOrEmpty(coupon)){
@@ -169,9 +185,10 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     }
 
     /**
-     * 设置运费
-     * 
+     * 设置运费.
+     *
      * @param salesOrderCommand
+     *            the freght command
      */
     private void setFreghtCommand(SalesOrderCommand salesOrderCommand){
         CalcFreightCommand calcFreightCommand = new CalcFreightCommand();
@@ -191,10 +208,11 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
     }
 
     /**
-     * 通過支付流水號查詢訂單
-     * 
+     * 通過支付流水號查詢訂單.
+     *
      * @param subOrdinate
-     * @return
+     *            the sub ordinate
+     * @return the sales order command
      */
     @Override
     public SalesOrderCommand getSalesOrderCommand(String subOrdinate){
