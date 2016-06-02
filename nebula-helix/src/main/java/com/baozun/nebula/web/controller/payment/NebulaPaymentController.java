@@ -56,19 +56,16 @@ public class NebulaPaymentController extends BaseController {
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaPaymentController.class);
     
+    
     //view的常量定义
     /** 支付成功页面. */
-    protected static final String VIEW_PAY_SUCCESS = "payment.pay-success";
+    public static final String VIEW_PAY_SUCCESS = "payment.pay-success";
     
     /** 支付失败页面. */
-    protected static final String VIEW_PAY_FAILURE = "payment.pay-failure";
+    public static final String VIEW_PAY_FAILURE = "payment.pay-failure";
     
     /** 去支付的异常页面. */
-    protected static final String VIEW_PAY_TOPAY_EXCEPTION = "payment.topay-exception";
-    
-    //默认url的定义
-    /** 支付异常页的url */
-    protected static String URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
+    public static final String VIEW_PAY_TOPAY_EXCEPTION = "payment.topay-exception";
     
     @Autowired
 	private SdkPaymentManager sdkPaymentManager;
@@ -104,17 +101,14 @@ public class NebulaPaymentController extends BaseController {
 		} catch (IllegalPaymentStateException e) {
 			
 			LOGGER.error(e.getMessage(), e);
-			
-			//去往支付异常页面
-			return "redirect:" + getToPayExceptionPageRedirect(subOrdinate);
+			// TODO 去往支付异常页面
 		}
     	
+    	return null;
     }
     
     /**
      * 支付完成的前台通知
-     * 
-     * @RequestMapping(value = "/payment/return/{payType}.htm")
      * 
      * @return
      */
@@ -126,9 +120,6 @@ public class NebulaPaymentController extends BaseController {
     
     /**
      * 支付完成的后台通知
-     * 
-     * @RequestMapping(value = "/payment/notify/{payType}.htm")
-     * 
      * @param payType
      * @param request
      * @param response
@@ -140,9 +131,6 @@ public class NebulaPaymentController extends BaseController {
     
     /**
      * 支付成功页面
-     * 
-     * @RequestMapping(value = "/payment/success.htm")
-     * 
      * @param memberDetails
      * @param subOrdinate
      * @param request
@@ -160,9 +148,6 @@ public class NebulaPaymentController extends BaseController {
     
     /**
      * 支付失败页面
-     * 
-     * @RequestMapping(value = "/payment/failure.htm")
-     * 
      * @param memberDetails
      * @param subOrdinate
      * @param request
@@ -180,9 +165,6 @@ public class NebulaPaymentController extends BaseController {
     
     /**
      * 发起支付异常页面
-     * 
-     * @RequestMapping(value = "/payment/error.htm")
-     * 
      * @param memberDetails
      * @param subOrdinate
      * @param request
@@ -245,55 +227,13 @@ public class NebulaPaymentController extends BaseController {
 		return true;
 	}
 	
-	protected String getToPayExceptionPageRedirect(String subOrdinate) {
-		return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
-	}
-	
-	/**
-	 * 根据流水号获取订单信息
-	 * 
-	 * @param subOrdinate 支付流水号
-	 * @param paySuccessStatus 支付状态，1表示支付成功，2表示未支付
-	 * @return
-	 * @throws IllegalPaymentStateException 
-	 */
-	protected SalesOrderCommand getSalesOrderBySubOrdinate(String subOrdinate, Integer paySuccessStatus) throws IllegalPaymentStateException {
-        List<PayInfoLog> payInfoLogList = getPayInfoLogListBySubOrdinate(subOrdinate, paySuccessStatus);
-        
-        if (Validator.isNullOrEmpty(payInfoLogList)){
-            LOGGER.error("can not get payInfo_log by subOrdinate:[{}] and paySuccessStatus:[{}]", subOrdinate, true);
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_UNPAID, "支付信息不存在或尚未支付");
-        }
-        
-        // 根据支付流水号，去取结果页面上要显示的订单信息
-        PayInfoLog payInfoLog = payInfoLogList.get(0);
-		SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 2);
-		
-        return salesOrder;
-    }
-	
-	/**
-	 * 根据流水号取未付款支付信息日志
-	 * @param subOrdinate
-	 * @return
-	 */
 	private List<PayInfoLog> getUnpaidPayInfoLogsBySubOrdinate(String subOrdinate) {
+		Map<String, Object> paraMap = new HashMap<String, Object>();
+		paraMap.put("subOrdinate", subOrdinate);
 		//2代表支付没有成功，pay_success_status为false
-		return getPayInfoLogListBySubOrdinate(subOrdinate, 2);
+		paraMap.put("paySuccessStatusStr", 2); 
+		List<PayInfoLog> payInfoLogList = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+		return payInfoLogList;
 	}
-	
-	/**
-	 * 根据流水号取支付信息日志
-	 * @param subOrdinate 支付流水号
-	 * @param paySuccessStatus 支付状态，1表示支付成功，2表示未支付
-	 * @return
-	 */
-	private List<PayInfoLog> getPayInfoLogListBySubOrdinate(String subOrdinate, Integer paySuccessStatus) {
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("subOrdinate", subOrdinate);
-        paraMap.put("paySuccessStatusStr", paySuccessStatus);
-        List<PayInfoLog> payInfoLogList = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-        return payInfoLogList;
-    }
     
 }

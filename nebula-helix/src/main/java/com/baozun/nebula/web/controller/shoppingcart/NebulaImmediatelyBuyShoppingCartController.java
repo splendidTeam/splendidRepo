@@ -126,6 +126,22 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
     }
 
     /**
+     * To nebula return result.
+     *
+     * @param checkoutUrl
+     *            the checkout url
+     * @return the nebula return result
+     */
+    private NebulaReturnResult toNebulaReturnResult(String checkoutUrl){
+        DefaultReturnResult result = new DefaultReturnResult();
+        result.setResult(true);
+        DefaultResultMessage message = new DefaultResultMessage();
+        message.setMessage(checkoutUrl);
+        result.setResultMessage(message);
+        return result;
+    }
+
+    /**
      * @param shoppingcartResult
      */
     private NebulaReturnResult toNebulaReturnResult(ShoppingcartResult shoppingcartResult){

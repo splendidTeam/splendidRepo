@@ -194,12 +194,4 @@ public class OrderQueryForm extends BaseForm{
         }
         return orderQueryCommand;
     }
-
-    @Override
-    public String toString() {
-        return "OrderQueryForm [itemName=" + itemName + ", itemCode=" + itemCode + ", orderCode=" + orderCode
-                + ", orderStatus=" + orderStatus + ", orderTimeType=" + orderTimeType + "]";
-    }
-    
-    
 }

@@ -49,9 +49,6 @@ public class IllegalPaymentStateException extends Exception {
 		/** 交易流水不存在或已支付 */
 		PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID,
 		
-		/** 交易流水不存在或尚未支付 */
-		PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_UNPAID,
-		
 		/** 订单不存在 */
 		PAYMENT_ILLEGAL_ORDER_NOT_EXISTS,
 		
@@ -65,10 +62,7 @@ public class IllegalPaymentStateException extends Exception {
 		PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME,
 		
 		/** 非当前用户的订单 */
-		PAYMENT_ILLEGAL_ORDER_INVALID_OWNER,
-		
-		/**获取跳转地址失败 */
-		PAYMENT_GETURL_ERROR
+		PAYMENT_ILLEGAL_ORDER_INVALID_OWNER;
 
 	}
 }

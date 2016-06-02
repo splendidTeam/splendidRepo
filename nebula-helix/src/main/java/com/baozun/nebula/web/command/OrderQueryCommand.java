@@ -89,13 +89,6 @@ public class OrderQueryCommand {
     public void setFinancestatusList(List<Integer> financestatusList) {
         this.financestatusList = financestatusList;
     }
-
-    @Override
-    public String toString() {
-        return "OrderQueryCommand [itemName=" + itemName + ", itemCode=" + itemCode + ", orderCode="
-                + orderCode + ", startDate=" + startDate + ", endDate=" + endDate + ", logisticsStatusList="
-                + logisticsStatusList + ", financestatusList=" + financestatusList + "]";
-    }
     
     
 }

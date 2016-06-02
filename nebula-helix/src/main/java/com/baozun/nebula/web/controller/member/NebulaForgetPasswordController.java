@@ -1,8 +1,10 @@
 package com.baozun.nebula.web.controller.member;
 
 import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +14,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.member.MemberPasswordManager;
 import com.baozun.nebula.manager.system.TokenManager;
 import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
+import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.web.controller.BaseController;
@@ -37,7 +41,7 @@ public class NebulaForgetPasswordController extends BaseController{
 	private static final Logger			LOG							= LoggerFactory.getLogger(NebulaForgetPasswordController.class);
 
 	/* 忘记密码的页面定义 */
-	public static final String		VIEW_FORGET_PASSWORD		= "member.forgetpassword";
+	public static final String			VIEW_FORGET_PASSWORD		= "member.forgetpassword";
 
 	/* 重置密码的页面定义 */
 	public static final String			VIEW_RESET_PASSWORD			= "member.resetpassword";

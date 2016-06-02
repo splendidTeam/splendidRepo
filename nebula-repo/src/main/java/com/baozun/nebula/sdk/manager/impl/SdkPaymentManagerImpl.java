@@ -80,7 +80,7 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
         paraMap.put("orderId", orderId);
         paraMap.put("paySuccessStatusStr", 2);
         List<PayInfoLog> payInfoList = payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
-        if (payInfoList != null&&payInfoList.size()!=0){
+        if (payInfoList != null){
             //根据createTime 降序排列 取第一个
             PayInfoLog payInfoLog = payInfoList.get(0);
             payInfoLog.setCallCloseStatus(true);

@@ -18,16 +18,10 @@ package com.baozun.nebula.web.controller.shoppingcart;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.web.controller.DefaultResultMessage;
-import com.baozun.nebula.web.controller.DefaultReturnResult;
-import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ImmediatelyBuyCheckoutUrlHandler;
 import com.feilong.accessor.AutoKeyAccessor;
 
@@ -38,9 +32,6 @@ import com.feilong.accessor.AutoKeyAccessor;
  * @since 5.3.1
  */
 public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends BaseController{
-
-    /** The Constant log. */
-    private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaAbstractImmediatelyBuyShoppingCartController.class);
 
     /** The auto key accessor. */
     @Autowired
@@ -61,26 +52,7 @@ public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends
      * @return the immediately buy checkout url
      */
     protected String getImmediatelyBuyCheckoutUrl(String key,HttpServletRequest request){
-        String immediatelyBuyCheckoutUrl = immediatelyBuyCheckoutUrlHandler.getImmediatelyBuyCheckoutUrl(key, request);
-        Validate.notBlank(immediatelyBuyCheckoutUrl, "immediatelyBuyCheckoutUrl can't be blank!");
-        LOGGER.debug("key:{},immediatelyBuyCheckoutUrl:{}", key, immediatelyBuyCheckoutUrl);
-        return immediatelyBuyCheckoutUrl;
-    }
-
-    /**
-     * To nebula return result.
-     *
-     * @param checkoutUrl
-     *            the checkout url
-     * @return the nebula return result
-     */
-    protected NebulaReturnResult toNebulaReturnResult(String checkoutUrl){
-        DefaultReturnResult result = new DefaultReturnResult();
-        result.setResult(true);
-        DefaultResultMessage message = new DefaultResultMessage();
-        message.setMessage(checkoutUrl);
-        result.setResultMessage(message);
-        return result;
+        return immediatelyBuyCheckoutUrlHandler.getImmediatelyBuyCheckoutUrl(key, request);
     }
 
 }

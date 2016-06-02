@@ -51,9 +51,9 @@ public interface BundleSkuDao extends GenericEntityDao<BundleSku, Long> {
 	@NativeQuery(model = BundleSku.class)
 	List<BundleSku> findByBundleId(@QueryParam("bundleId")Long bundleId);
 	
-	@NativeQuery(model = BundleSkuPriceCommand.class)
+	@NativeQuery(model = BundleSku.class)
 	List<BundleSkuPriceCommand> getBundleSkusPrice(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("skuIds") Long[] skuIds);
 	
-	@NativeQuery(model = BundleSkuPriceCommand.class)
+	@NativeQuery(model = BundleSku.class)
 	BundleSkuPriceCommand getBundleSkuPrice(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("skuId") Long skuId);
 }

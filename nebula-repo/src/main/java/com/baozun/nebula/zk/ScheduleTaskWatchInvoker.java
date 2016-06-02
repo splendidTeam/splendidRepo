@@ -36,6 +36,7 @@ import com.baozun.nebula.utils.spring.SpringUtil;
  * @author Tianlong.Zhang
  *
  */
+@Deprecated
 public class ScheduleTaskWatchInvoker extends WatchInvoke {
 	private static final Logger			log	= LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
 	

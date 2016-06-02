@@ -95,10 +95,10 @@ public class NebulaRegisterController extends NebulaLoginController{
 	public static final String					VIEW_MEMBER_CENTER			= "/member/center.htm";
 
 	/** 发送手机验证码短信长度 */
-	//public static Integer						SEND_MOBILE_MSG_LENGTH		= 5;
+	public static Integer						SEND_MOBILE_MSG_LENGTH		= 5;
 
 	/** 发送手机验证码有效期 */
-	//public static Integer						SEND_MOBILE_MSG_LIVETIME	= 2 * 60;
+	public static Integer						SEND_MOBILE_MSG_LIVETIME	= 2 * 60;
 
 	/**
 	 * PC || Tablet <br/>
@@ -462,7 +462,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		smsCommand.setTemplateCode(SMSTemplateConstants.SMS_REGISTER_CAPTCHA);
 
 		// 发送验证码短信，captcha会根据validity保存在redis中
-		boolean sendResult = smsManager.send(smsCommand, CaptchaType.MIXED, SMSTemplateConstants.VALIDATE_CODE_LENGTH, SMSTemplateConstants.MAX_EXIST_TIME);
+		boolean sendResult = smsManager.send(smsCommand, CaptchaType.MIXED, SEND_MOBILE_MSG_LENGTH, SEND_MOBILE_MSG_LIVETIME);
 
 		return sendResult;
 	}

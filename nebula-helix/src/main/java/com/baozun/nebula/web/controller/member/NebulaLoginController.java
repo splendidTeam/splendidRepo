@@ -174,7 +174,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			return getShowPage4LoginedUserViewLoginPage(memberDetails, request, model);
 		}
 
-		return buildShowLoginPageReturn(memberDetails, request, response, model);
+		return VIEW_MEMBER_LOGIN;
 	}
 
 	/**
@@ -620,22 +620,6 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	protected boolean isSupportAutoLogin(){
 		return Boolean.FALSE.booleanValue();
 	}
-	
-	
-	/**
-	 * 构建显示登陆页面的返回
-	 * @return String
-	 * @param memberDetails
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @author 冯明雷
-	 * @time 2016年6月1日下午3:48:00
-	 */
-	protected String buildShowLoginPageReturn(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
-		return VIEW_MEMBER_LOGIN;
-	}
-	
 
 	/**
 	 * get remberMeValidityPeriod
