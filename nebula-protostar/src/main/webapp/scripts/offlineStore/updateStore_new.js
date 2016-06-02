@@ -80,7 +80,6 @@ function addStoreLocator() {
 		data : $('#storeForm').serialize(),
 		dataType : "text",
 		success : function(data) {
-			alert(data);
 			if (data=="1") {
 				alert("新增店铺成功");
 				window.location=base+"/offlineStore/store.htm";
