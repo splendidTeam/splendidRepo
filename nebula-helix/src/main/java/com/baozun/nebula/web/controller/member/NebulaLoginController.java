@@ -17,10 +17,12 @@
  */
 package com.baozun.nebula.web.controller.member;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,7 @@ import com.baozun.nebula.web.controller.member.form.LoginForm;
 import com.baozun.nebula.web.controller.member.validator.LoginFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberLoginViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartLogoutSuccessHandler;
+import com.baozun.nebula.web.interceptor.LoginForwardHandler;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.CookieUtil;
 import com.feilong.servlet.http.RequestUtil;
@@ -111,6 +114,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 
 	/* Login 登录密码 */
 	public static final String					MODEL_KEY_MEMBER_LOGIN_PWD	= "password";
+	
+	/** 游客标识，和MemberDetailsInterceptor中的字段一致 */
+	public static final String 					GUEST_ENTER_ONCE 			= "login.guestAllowed";
 
 	/** 默认的记住用户名cookie有效期，商城可以重写set方法 */
 	private int									remberMeValidityPeriod		= -1;
@@ -128,6 +134,10 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	@Autowired(required = false)
 	@Qualifier("loginCaptchaContainerAndValidateConfig")
 	private CaptchaContainerAndValidateConfig	loginCaptchaContainerAndValidateConfig;
+	
+	@Autowired
+	@Qualifier("loginForwardHandler")
+	private LoginForwardHandler 				loginForwardHandler;
 
 	/**
 	 * 会员业务管理类
@@ -292,6 +302,28 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			return returnResult;
 		}
 	}
+	
+	
+	/**
+	 * 游客登录
+	 * @return NebulaReturnResult
+	 * @param loginForm
+	 * @param bindingResult
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @author 冯明雷
+	 * @throws IOException 
+	 * @time 2016年6月2日下午6:25:27
+	 */
+	public String guestLogin(HttpServletRequest request,HttpServletResponse response,Model model) throws IOException{
+		//游客标识
+		request.getSession().setAttribute(GUEST_ENTER_ONCE, true);
+		//条状页面
+		loginForwardHandler.forward(request, response);		 
+		return null;
+	}
+	
 
 	/**
 	 * 登出，主要是重置session
@@ -303,7 +335,9 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	public NebulaReturnResult loginOut(HttpServletRequest request,HttpServletResponse response,Model model){
 		// 1.清空session中保存的用户信息
-		request.getSession().removeAttribute(SessionKeyConstants.MEMBER_CONTEXT);
+		HttpSession session = request.getSession();
+		session.removeAttribute(SessionKeyConstants.MEMBER_CONTEXT);
+		session.removeAttribute(GUEST_ENTER_ONCE);
 
 		onLogoutSuccess(request, response);
 		return DefaultReturnResult.SUCCESS;
