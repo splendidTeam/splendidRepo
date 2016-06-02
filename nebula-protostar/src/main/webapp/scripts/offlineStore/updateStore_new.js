@@ -21,7 +21,7 @@ function validate() {
 		alert("请输入店铺详细地址");
 		return false;
 	}
-	if (detail_ename=="") {
+	/*if (detail_ename=="") {
 		alert("请输入店铺英文名称");
 		return false;
 	}
@@ -32,19 +32,19 @@ function validate() {
 	if (detail_ename2=="") {
 		alert("请输入店铺英文名称2");
 		return false;
-	}
+	}*/
 	/* if (detail_address=="") {
 		alert("请输入店铺简要地址");
 		return false;
 	} */
-	if (detail_phone=="") {
+	/*if (detail_phone=="") {
 		alert("请输入店铺电话");
 		return false;
 	}
 	if (detail_hours=="") {
 		alert("请输入店铺营业时间");
 		return false;
-	}
+	}*/
 	if (detail_province=="选择省份") {
 		alert("请选择省份");
 		return false;
