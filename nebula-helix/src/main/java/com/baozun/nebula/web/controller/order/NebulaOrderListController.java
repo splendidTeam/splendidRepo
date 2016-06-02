@@ -66,7 +66,7 @@ import loxia.dao.Pagination;
  */
 public class NebulaOrderListController extends BaseController{
 
-    private static final Logger             LOGGER = LoggerFactory.getLogger(NebulaOrderListController.class);
+    private static final Logger    LOGGER = LoggerFactory.getLogger(NebulaOrderListController.class);
 
     @Autowired
     private SalesOrderManager               salesOrderManager;
@@ -108,15 +108,24 @@ public class NebulaOrderListController extends BaseController{
                     HttpServletResponse response,
                     Model model){
         // 校验查询条件非空
+        if(LOGGER.isInfoEnabled()){
+            LOGGER.info("订单列表查询条件为orderQueryForm {} ",orderQueryForm); 
+        }
         orderQueryFormValidator.validate(orderQueryForm, bindingResult);
         if (bindingResult.hasErrors()){
             NebulaReturnResult resultFromBindingResult = super.getResultFromBindingResult(bindingResult);
+            if(LOGGER.isInfoEnabled()){
+                LOGGER.info("订单列表error {} ",resultFromBindingResult); 
+            }
             model.addAttribute("errors", resultFromBindingResult);
             return "order.orderlist";
         }
         // queryform表单进行转换
         OrderQueryCommand orderQueryCommand = new OrderQueryCommand();
         orderQueryForm.convertToOrderQueryCommand(orderQueryCommand);
+        if(LOGGER.isInfoEnabled()){
+            LOGGER.info("订单列表查询orderQueryCommand {} ",orderQueryCommand); 
+        }
         // 当前页，每页10条
         Page page = new Page(pageForm.getCurrentPage(), pageForm.getSize());// 当前页，每页10条
         // 获取数据
