@@ -63,7 +63,9 @@ public abstract class AbstractCacheBuilder<T, EX extends Exception> {
 			
 			// put to cache
 			try {
-				cacheManager.setObject(getKey(), t, getExpire());
+				if(t != null) {
+					cacheManager.setObject(getKey(), t, getExpire());
+				}
 			} catch(Exception e) {
 				LOG.error("set cache exception. exception:{} [{}] \"{}\"",
 						    e.getMessage(), new Date(), this.getClass().getSimpleName());

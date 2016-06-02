@@ -3,6 +3,12 @@
  */
 package com.baozun.nebula.constant;
 
+import java.util.Properties;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+
 /**
  * 短信模板code 常量
  * 
@@ -12,8 +18,22 @@ package com.baozun.nebula.constant;
 public class SMSTemplateConstants{
 
 	/** 注册发送验证码短信模板 */
-	public static final String	SMS_REGISTER_CAPTCHA	= "register_captcha";
+        public static final String	SMS_REGISTER_CAPTCHA;
 	
-	/** 忘记密码发送验证码短信模板 */
-	public static final String	SMS_FORGET_PASSWORD_CAPTCHA	= "forget_password_captcha";
+	/* 验证码的生存时间 */
+        public static final Integer     MAX_EXIST_TIME;
+
+        /* 验证码的位数 */
+        public static final Integer     VALIDATE_CODE_LENGTH;
+
+        static{
+                Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
+
+                MAX_EXIST_TIME = Integer.valueOf(StringUtils.trim(pro.getProperty("sms.vcode.max.exist.time")));
+
+                VALIDATE_CODE_LENGTH = Integer.valueOf(StringUtils.trim(pro.getProperty("sms.vcode.length")));
+
+                SMS_REGISTER_CAPTCHA = StringUtils.trim(pro.getProperty("sms.register.captcha"));
+
+        }
 }
