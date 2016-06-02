@@ -125,7 +125,7 @@ public class NebulaPaymentController extends BaseController {
      */
     public String doPayReturn(@PathVariable("payType") String payType, 
     		HttpServletRequest request, HttpServletResponse response, Model model) {
-		try {
+	    try {
 			
 			if(LOGGER.isDebugEnabled()){
 				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
@@ -139,7 +139,6 @@ public class NebulaPaymentController extends BaseController {
 			LOGGER.error(e.getMessage(), e);
 		}
 		return null;
-		
     }
     
     /**
@@ -153,21 +152,19 @@ public class NebulaPaymentController extends BaseController {
      */
     public void doPayNotify(@PathVariable("payType") String payType,
     		HttpServletRequest request, HttpServletResponse response) {
-    	
-        try {
-			
-			if(LOGGER.isDebugEnabled()){
-				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
-		    }
-			
-			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
-			
-			paymentResolver.doPayNotify(request, response, payType);
-			
-		} catch (IllegalPaymentStateException | IOException e) {
-			LOGGER.error(e.getMessage(), e);
-		}
-    	
+    	 try {
+  			
+  			if(LOGGER.isDebugEnabled()){
+  				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
+  		    }
+  			
+  			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+  			
+  			paymentResolver.doPayNotify(request, response, payType);
+  			
+  		} catch (IllegalPaymentStateException | IOException e) {
+  			LOGGER.error(e.getMessage(), e);
+  		}
     }
     
     /**
@@ -187,7 +184,7 @@ public class NebulaPaymentController extends BaseController {
     		@RequestParam(value = "subOrdinate") String subOrdinate, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	
-    	PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
+        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
     	
 		if (Validator.isNotNullOrEmpty(pc)) {
 			Map<String, Object> paraMap = new HashMap<String, Object>();
@@ -212,6 +209,7 @@ public class NebulaPaymentController extends BaseController {
 		}
 		
     	return VIEW_PAY_SUCCESS;
+    	
     }
     
     /**
