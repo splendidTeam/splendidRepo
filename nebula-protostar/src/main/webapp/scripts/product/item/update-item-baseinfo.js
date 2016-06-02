@@ -120,7 +120,7 @@ function setCategroyDef(id){
 	var nodeObj=null;
 	for (var i=0, l=nodes.length; i<l; i++) {
 		if(id==nodes[i].id){
-			nodeObj =nodes[i];
+			nodeObj = nodes[i];
 		}
 	}
 	onCheck1(null,null,nodeObj);
