@@ -18,7 +18,6 @@
 			</value>
 		</constructor-arg>
 	</bean>
-<<<<<<< HEAD
 	
 	<bean id="BundleElement.deleteByBundleId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据bundleId删除bundleElement</description>
@@ -30,7 +29,5 @@
 			</value>
 		</constructor-arg>
 	</bean>
-=======
->>>>>>> branch 'master' of http://git.baozun.cn/nebula/nebula.git
 
 </beans>
