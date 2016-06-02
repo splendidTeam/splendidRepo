@@ -37,6 +37,7 @@ import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.model.bundle.Bundle;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
@@ -105,6 +106,6 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	 * @param inventory
 	 * @return
 	 */
-	Integer deductingBundleInventory(Long bundleItemId, Integer inventory);
-	
+	@NativeUpdate
+	Integer deductingBundleInventory(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("inventory")Integer inventory);
 }

@@ -180,6 +180,14 @@ public class ItemInfoCommand implements Command {
 	 * 1或者null为，正常商品
 	 */
 	private Integer				type;
+	
+	/**
+	 * 商品类型
+	 * 
+	 * @see com.baozun.nebula.model.product.Item#type
+	 */
+	private Integer				itemType;
+	
 	/**
 	 * 商品图片个数
 	 */
@@ -494,6 +502,14 @@ public class ItemInfoCommand implements Command {
 
 	public void setLastSelectPropertyValueId(Long lastSelectPropertyValueId) {
 		this.lastSelectPropertyValueId = lastSelectPropertyValueId;
+	}
+
+	public Integer getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(Integer itemType) {
+		this.itemType = itemType;
 	}
 	
 	
