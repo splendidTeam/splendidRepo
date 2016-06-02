@@ -137,7 +137,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
 		
 		if (Validator.isNotNullOrEmpty(payCode)) {
-			return "redirect:" + getPaySuccessPageRedirect(subOrdinate);
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID, "订单已经被支付");
 		}
 		
 		LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
@@ -214,18 +214,14 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 	                    && Validator.isNotNullOrEmpty(salesOrderCommand)
 						&& (SalesOrder.SALES_ORDER_STATUS_NEW.equals(salesOrderCommand.getLogisticsStatus()) ||SalesOrder.SALES_ORDER_STATUS_TOOMS.equals(salesOrderCommand.getLogisticsStatus()))
 						&& SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT.equals(salesOrderCommand.getFinancialStatus())) {
-					
 					// 获取通知成功，修改支付及订单信息
-					
 					payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), false, request);
-				
 				} else {
 					if(Validator.isNotNullOrEmpty(salesOrderCommand)){
 						 //log
 						String result = "FinancialStatus："+salesOrderCommand.getFinancialStatus()+" LogisticsStatus:"+salesOrderCommand.getLogisticsStatus();
 						
 						PayWarnningEvent payWarnningEvent = new PayWarnningEvent(this,salesOrderCommand.getCode(),null, new Date(),null, responseStatus, null,result); 
-						
 		                eventPublisher.publish(payWarnningEvent);
 					}
 					
