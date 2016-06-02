@@ -16,9 +16,12 @@
  */
 package com.baozun.nebula.web.controller.payment;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
+import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
@@ -148,7 +152,19 @@ public class NebulaPaymentController extends BaseController {
      */
     public void doPayNotify(@PathVariable("payType") String payType,
     		HttpServletRequest request, HttpServletResponse response) {
-    	
+    	try {
+  			
+  			if(LOGGER.isDebugEnabled()){
+  				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
+  		    }
+  			
+  			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+  			
+  			paymentResolver.doPayNotify(request, response, payType);
+  			
+  		} catch (IllegalPaymentStateException | IOException e) {
+  			LOGGER.error(e.getMessage(), e);
+  		}
     }
     
     /**
@@ -167,7 +183,30 @@ public class NebulaPaymentController extends BaseController {
     		@LoginMember MemberDetails memberDetails,
     		@RequestParam(value = "subOrdinate") String subOrdinate, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
+        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
     	
+		if (Validator.isNotNullOrEmpty(pc)) {
+			Map<String, Object> paraMap = new HashMap<String, Object>();
+			paraMap.put("subOrdinate", subOrdinate);
+			// 查询订单的需要支付的payInfolog
+			List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+			Set<Long> set = new HashSet<Long>();
+			StringBuffer orderCode = new StringBuffer();
+			for (PayInfoLog payInfoLog : payInfoLogs) {
+				set.add(payInfoLog.getOrderId());
+			}
+
+			for (Long oid : set) {
+				SalesOrderCommand so = orderManager.findOrderById(oid, null);
+				orderCode.append(so.getCode()).append("、");
+			}
+
+			model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
+
+			model.addAttribute("totalFee", pc.getPayMoney());
+		}
+		
     	return VIEW_PAY_SUCCESS;
     }
     
