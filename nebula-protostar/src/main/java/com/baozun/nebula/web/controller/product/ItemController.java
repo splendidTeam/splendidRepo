@@ -76,6 +76,7 @@ import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.product.ItemSortScoreCommand;
@@ -2540,6 +2541,50 @@ public class ItemController extends BaseController{
 				itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
 			}
 		}
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+	}
+	
+	/**
+	 * 保存bundle商品
+	 */
+	@RequestMapping("/i18n/item/saveNormalItem.json")
+	@ResponseBody
+	public Object saveBundlelItemI18n(@I18nCommand ItemInfoCommand itemCommand,
+			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
+			BundleCommand bundleCommand, // bundle扩展信息
+			HttpServletRequest request) throws Exception{
+		
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null){
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		dealDescImgUrl(itemCommand);
+		// 保存商品
+		Item item = itemLangManager.createOrUpdateBundleItem(itemCommand, bundleCommand, categoriesIds);
+
+		// bundle暂时不加入solr
+//		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
+//			List<Long> itemIdsForSolr = new ArrayList<Long>();
+//			itemIdsForSolr.add(item.getId());
+//			boolean i18n = LangProperty.getI18nOnOff();
+//			if (i18n){
+//				itemSolrManager.saveOrUpdateItemI18n(itemIdsForSolr);
+//			}else{
+//				itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
+//			}
+//		}
 
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
