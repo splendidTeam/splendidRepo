@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.payment;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -151,6 +152,19 @@ public class NebulaPaymentController extends BaseController {
      */
     public void doPayNotify(@PathVariable("payType") String payType,
     		HttpServletRequest request, HttpServletResponse response) {
+    	try {
+  			
+  			if(LOGGER.isDebugEnabled()){
+  				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
+  		    }
+  			
+  			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+  			
+  			paymentResolver.doPayNotify(request, response, payType);
+  			
+  		} catch (IllegalPaymentStateException | IOException e) {
+  			LOGGER.error(e.getMessage(), e);
+  		}
     	
     }
     

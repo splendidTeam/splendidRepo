@@ -137,7 +137,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
 		
 		if (Validator.isNotNullOrEmpty(payCode)) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID, "订单已经被支付");
+			return "redirect:" + getPaySuccessPageRedirect(subOrdinate);
 		}
 		
 		LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
@@ -196,43 +196,46 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 						 null,request.getRequestURL().toString());
 				// 返回失败
 				response.getWriter().write(PaymentResultType.FAIL);
-			}
-			
-			// 获取支付状态
-			String responseStatus = paymentResult.getPaymentServiceSatus().toString();
+			} else{
+				// 获取支付状态
+				String responseStatus = paymentResult.getPaymentServiceSatus().toString();
 
-			//添加订单查询：支付状态为1 物流状态为1||3
-			Map<String, Object> paraMap = new HashMap<String, Object>();
-			paraMap.put("subOrdinate", subOrdinate);
-			List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-			
-			SalesOrderCommand salesOrderCommand = null;
-			if(Validator.isNotNullOrEmpty(payInfoLogs)){
-				 salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
-			}
-			
-			if (PAYMENT_SUCCESS.equals(responseStatus)
-                    && Validator.isNotNullOrEmpty(salesOrderCommand)
-					&& (SalesOrder.SALES_ORDER_STATUS_NEW.equals(salesOrderCommand.getLogisticsStatus()) ||SalesOrder.SALES_ORDER_STATUS_TOOMS.equals(salesOrderCommand.getLogisticsStatus()))
-					&& SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT.equals(salesOrderCommand.getFinancialStatus())) {
-				// 获取通知成功，修改支付及订单信息
-				payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), false, request);
-			} else {
-				if(Validator.isNotNullOrEmpty(salesOrderCommand)){
-					 //log
-					String result = "FinancialStatus："+salesOrderCommand.getFinancialStatus()+" LogisticsStatus:"+salesOrderCommand.getLogisticsStatus();
-					
-					PayWarnningEvent payWarnningEvent = new PayWarnningEvent(this,salesOrderCommand.getCode(),null, new Date(),null, responseStatus, null,result); 
-	                eventPublisher.publish(payWarnningEvent);
+				//添加订单查询：支付状态为1 物流状态为1||3
+				Map<String, Object> paraMap = new HashMap<String, Object>();
+				paraMap.put("subOrdinate", subOrdinate);
+				List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+				
+				SalesOrderCommand salesOrderCommand = null;
+				if(Validator.isNotNullOrEmpty(payInfoLogs)){
+					 salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
 				}
 				
-				// 返回失败记录日志
-				payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_NOTIFY_AFTER_TYPE);
+				if (PAYMENT_SUCCESS.equals(responseStatus)
+	                    && Validator.isNotNullOrEmpty(salesOrderCommand)
+						&& (SalesOrder.SALES_ORDER_STATUS_NEW.equals(salesOrderCommand.getLogisticsStatus()) ||SalesOrder.SALES_ORDER_STATUS_TOOMS.equals(salesOrderCommand.getLogisticsStatus()))
+						&& SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT.equals(salesOrderCommand.getFinancialStatus())) {
+					
+					// 获取通知成功，修改支付及订单信息
+					
+					payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), false, request);
+				
+				} else {
+					if(Validator.isNotNullOrEmpty(salesOrderCommand)){
+						 //log
+						String result = "FinancialStatus："+salesOrderCommand.getFinancialStatus()+" LogisticsStatus:"+salesOrderCommand.getLogisticsStatus();
+						
+						PayWarnningEvent payWarnningEvent = new PayWarnningEvent(this,salesOrderCommand.getCode(),null, new Date(),null, responseStatus, null,result); 
+						
+		                eventPublisher.publish(payWarnningEvent);
+					}
+					
+					// 返回失败记录日志
+					payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_NOTIFY_AFTER_TYPE);
+				}
+				
+				response.getWriter().write(paymentResult.getResponseValue());
 			}
-			
-			response.getWriter().write(paymentResult.getResponseValue());
 		}
-		
 	}
 	
 	
