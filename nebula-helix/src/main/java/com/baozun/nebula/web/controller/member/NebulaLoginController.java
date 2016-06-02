@@ -335,9 +335,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 	 */
 	public NebulaReturnResult loginOut(HttpServletRequest request,HttpServletResponse response,Model model){
 		// 1.清空session中保存的用户信息
-		HttpSession session = request.getSession();
-		session.removeAttribute(SessionKeyConstants.MEMBER_CONTEXT);
-		session.removeAttribute(GUEST_ENTER_ONCE);
+		request.getSession().invalidate();
 
 		onLogoutSuccess(request, response);
 		return DefaultReturnResult.SUCCESS;
