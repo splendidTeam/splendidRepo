@@ -97,19 +97,6 @@
 			<div class="ui-block">
 				<div class="ui-block-content ui-block-content-lb">
 					<form action="/recommand/findItemInfoList.json" id="mainItemDialogSearchForm">
-							<div class="form-group p10">
-								<label>类型</label>
-								<input type="radio" name="setType" value="product" checked="checked" />商品
-								<input type="radio" name="setType" value="style" />款
-							</div>
-							<div class="form-group p10">
-								<label>编码</label>
-								<input type="text">
-							</div>
-							<div class="button-line1 right">
-								<a href="javascript:void(0);" class="func-button orange"><span>搜索</span></a>
-							</div>
-					<form id="mainItemDialogSearchForm">
 						<div class="form-group p10">
 							<label>类型</label>
 							<input type="radio" name="type" value="product" checked="checked" />商品
