@@ -46,7 +46,7 @@ public class UrlMapWatchInvoke implements IWatcherInvoke {
 		
 		byte[] datas;
 		try {
-			datas = zkOperator.getZkData(path);
+			datas = zkOperator.getData(path);
 			LOG.info("urlmap:"+datas.length);
 			String s_data = new String(datas);
 			if(s_data!=null && s_data.length()>0){
