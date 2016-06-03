@@ -33,7 +33,7 @@ $j(document).ready(function(){
 	bindClose();
 	
 	$j("#addMainProduct").on("click",function(){
-		$j(".dialog-close").click();
+		$j(".proto-dialog .dialog-close").click();
 		$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
 		bindClose();
 		$j("#selectPro").hide();
