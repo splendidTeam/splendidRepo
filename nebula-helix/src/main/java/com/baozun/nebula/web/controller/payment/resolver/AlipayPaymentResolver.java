@@ -104,7 +104,13 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		so.setOnLinePaymentCommand(getOnLinePaymentCommand(bankCode, payType, itBPay, request));
 		
 		// 获取支付请求( url)链接对象
-		PaymentRequest paymentRequest = paymentManager.createPayment(so);
+		PaymentRequest paymentRequest = null ;
+		
+		if(device.isMobile()){
+			paymentRequest = paymentManager.createPaymentForWap(so);
+		}else{
+			paymentRequest = paymentManager.createPayment(so);
+		}
 
 		if (null == paymentRequest) {
 			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
@@ -127,7 +133,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 
 	@Override
 	public String doPayReturn(HttpServletRequest request,
-			HttpServletResponse response, String payType)
+			HttpServletResponse response, String payType, Device device)
 			throws IllegalPaymentStateException {
 		String subOrdinate = request.getParameter("out_trade_no");
 		
@@ -143,14 +149,20 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
 		
 		// 获取同步付款通知
-		PaymentResult paymentResult = paymentManager.getPaymentResultForSyn(request, PayTypeConvertUtil.getPayType(Integer.valueOf(payType)));
+		PaymentResult paymentResult = null ;
+		
+		String paymentType =  PayTypeConvertUtil.getPayType(Integer.valueOf(payType));
+		
+		if(device.isMobile()){
+			paymentResult = paymentManager.getPaymentResultForSynOfWap(request, paymentType);
+		}else{
+			paymentResult = paymentManager.getPaymentResultForSyn(request, paymentType);
+		}
 		if (null == paymentResult) {
 			// 返回失败
 			return "redirect:" + getPayFailurePageRedirect(subOrdinate);
 		}
-		
 		LOGGER.info("[DO_PAY_RETURN] sync notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
-		
 		
 		// 获取支付状态
 		String payStatus = paymentResult.getPaymentServiceSatus().toString();
@@ -170,7 +182,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 
 	@Override
 	public void doPayNotify(HttpServletRequest request,
-			HttpServletResponse response, String payType)
+			HttpServletResponse response, String payType, Device device)
 			throws IllegalPaymentStateException, IOException {
 		
     	String subOrdinate = request.getParameter("out_trade_no");
@@ -186,7 +198,15 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 			LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
 			
 			// 获取异步通知
-			PaymentResult paymentResult = paymentManager.getPaymentResultForAsy(request, PayTypeConvertUtil.getPayType(Integer.valueOf(payType)));
+			PaymentResult paymentResult =  null;
+			
+			String paymentType =  PayTypeConvertUtil.getPayType(Integer.valueOf(payType));
+			
+			if(device.isMobile()){
+				paymentResult = paymentManager.getPaymentResultForAsyOfWap(request, paymentType);
+			}else{
+				paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
+			}
 			
 			LOGGER.info("async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 			
