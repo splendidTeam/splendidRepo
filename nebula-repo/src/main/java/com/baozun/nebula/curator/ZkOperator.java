@@ -238,7 +238,7 @@ public class ZkOperator {
 	}
 	
 	/**
-	 * 创建节点（支持级联创建）,节点默认值为当前时间戳
+	 * 创建节点（支持级联创建）
 	 * 
 	 * <p>
 	 * <ul>
@@ -274,7 +274,7 @@ public class ZkOperator {
 	}
 
 	/**
-	 * 创建节点（支持级联创建）,节点默认值为当前时间戳
+	 * 创建节点（支持级联创建）
 	 * 
 	 * @param path
 	 * @param createMode

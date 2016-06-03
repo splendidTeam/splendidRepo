@@ -146,6 +146,23 @@ $j(document).ready(function(){
 		}],
 		dataurl : findItemInfoListJsonUrl
 	});
+	
+	// 添加bundle扩展信息表单验证方法
+	var baseInfoValidator = new FormValidator('', 30, function(){
+		
+		// TODO 校验主卖品是否存在
+		
+		// TODO 校验成员是否存在至少一个
+		
+		// TODO 校验成员是否重复（包括主卖品）
+		
+		// TODO 校验某个成员里面是否有至少一个sku参与
+		
+		// TODO 按三种价格模型分别校验价格设置
+    	
+    	return loxia.SUCCESS;
+    });
+    formValidateList.push(baseInfoValidator);
 });
 /*
  * 判断进入页面时是否设置主商品
