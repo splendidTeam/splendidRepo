@@ -13,8 +13,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.command.product.BundleCommand;
-import com.baozun.nebula.command.product.BundleSkuPriceCommand;
-import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.tools.jsonlib.JsonUtil;
 
@@ -30,10 +28,7 @@ import loxia.dao.Pagination;
 public class NebulaBundleManagerTest {
 
 	@Autowired
-	private NebulaBundleManager bundleManager;
-	
-	@Autowired
-	private SdkBundleManager sdkBundleManager;
+	private NebulaBundleManager bundleManager ;
 	
 	private static final Logger log = LoggerFactory.getLogger(NebulaBundleManagerTest.class);
 	
@@ -79,13 +74,5 @@ public class NebulaBundleManagerTest {
 		BundleValidateResult result = bundleManager.validateBundle(3L, skuIds, 10);
 		System.out.println(result.getType());
 
-	}
-	
-	@Test
-	public void testGetBundleSkusPrice(){
-		List<BundleSkuPriceCommand> result = sdkBundleManager.getBundleSkusPrice(3L, new Long[]{1L, 2L});
-		for(BundleSkuPriceCommand command : result) {
-			System.out.println(command.getListPrice().intValueExact() + "***" + command.getSalesPrice().intValueExact());
-		}
 	}
 }

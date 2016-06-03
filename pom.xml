@@ -25,7 +25,7 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
-		<version.feilong-platform>1.5.7-SNAPSHOT</version.feilong-platform>
+		<version.feilong-platform>1.5.6</version.feilong-platform>
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
@@ -79,7 +79,7 @@
 		<version.pinyin4j>2.5.0</version.pinyin4j>
 		<version.hibernate>3.5.1-Final</version.hibernate>
 		<version.javamail>1.4</version.javamail>
-		<version.spring>3.2.17.RELEASE</version.spring>
+		<version.spring>3.2.16.RELEASE</version.spring>
 		<version.spring.security>3.2.9.RELEASE</version.spring.security>
 		<version.jsoup>1.7.3</version.jsoup>
 		<version.zookeeper>3.4.5</version.zookeeper>
@@ -145,13 +145,6 @@
 		<dependency>
 			<groupId>com.feilong.platform.spring</groupId>
 			<artifactId>feilong-spring-web</artifactId>
-			<version>${version.feilong-platform}</version>
-		</dependency>
-
-		<!--feilong-spring-mobile -->
-		<dependency>
-			<groupId>com.feilong.platform.spring</groupId>
-			<artifactId>feilong-spring-mobile</artifactId>
 			<version>${version.feilong-platform}</version>
 		</dependency>
 
@@ -1380,7 +1373,7 @@
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
+				<!-- <updatePolicy>always</updatePolicy> -->
 				<checksumPolicy>warn</checksumPolicy>
 			</snapshots>
 		</repository>

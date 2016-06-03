@@ -28,13 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.invoke.I18nLangWatchInvoke;
-import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.i18n.I18nLangDao;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.utils.Validator;
+import com.baozun.nebula.zk.I18nLangWatchInvoke;
+import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * I18nLangManager
@@ -53,7 +52,7 @@ public class SdkI18nLangManagerImpl implements SdkI18nLangManager {
 	private String defaultLang = null;
 	
 	@Autowired
-	private ZkOperator zkOperator;
+	private ZooKeeperOperator zooKeeperOperator;
 	
 	/**
 	 * 保存I18nLang
@@ -89,7 +88,7 @@ public class SdkI18nLangManagerImpl implements SdkI18nLangManager {
 		}
 		i18nLangCache = null;
 		defaultLang = null;
-		zkOperator.noticeZkServer(zkOperator.getPath(I18nLangWatchInvoke.PATH_KEY));
+		zooKeeperOperator.noticeZkServer(I18nLangWatchInvoke.LISTEN_PATH);
 		return model;
 	}
 	
@@ -156,7 +155,7 @@ public class SdkI18nLangManagerImpl implements SdkI18nLangManager {
 	@Override
 	public int updateLifecycle(List<Long> ids, int lifecycle) {
 		i18nLangCache = null;
-		zkOperator.noticeZkServer(zkOperator.getPath(I18nLangWatchInvoke.PATH_KEY));
+		zooKeeperOperator.noticeZkServer(I18nLangWatchInvoke.LISTEN_PATH);
 		return i18nLangDao.updateLifecycle(ids, lifecycle);
 	}
 

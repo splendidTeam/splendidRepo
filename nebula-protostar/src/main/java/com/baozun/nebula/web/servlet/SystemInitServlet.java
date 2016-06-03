@@ -29,8 +29,8 @@ public class SystemInitServlet extends HttpServlet{
 	public void init(ServletConfig config) throws ServletException {
 			
 		initProfileUtil(config);
-//		initEngine();
-//		initZookeeper(config);
+		initEngine();
+		initZookeeper(config);
 		initCms(config);
 	}
 	

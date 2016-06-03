@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemI18nCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
@@ -96,101 +97,60 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	@Autowired(required = false)
 	private ItemExtendManager itemExtendManager;
 	
+	@Autowired
+	private BundleManager bundleManager;
+	
 	@Override
 	public Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties,
 			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception {
 
-		Item item = null;
-		if (itemCommand.getId() != null) {// 更新
-			item = itemDao.getByPrimaryKey(itemCommand.getId());
-			item.setModifyTime(new Date());
-			item.setCode(itemCommand.getCode());
-			if (categoriesIds != null && categoriesIds.length > 0) {
-				item.setIsaddcategory(1);
-			} else {
-				item.setIsaddcategory(0);
-			}
-			item = itemDao.save(item);
-		} else {// 新增
-
-			if (itemCommand.getId() == null) {
-				Integer count = validateItemCode(itemCommand.getCode(),
-						itemCommand.getShopId());
-
-				if (count > 0) {
-					throw new BusinessException(ErrorCodes.PRODUCT_CODE_REPEAT);
-				}
-			}
-			item = new Item();
-			item.setCode(itemCommand.getCode());
-			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
-			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
-			item.setCreateTime(new Date());
-			item.setShopId(itemCommand.getShopId());
-			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
-
-			if (categoriesIds != null && categoriesIds.length > 0) {
-				item.setIsaddcategory(1);
-			} else {
-				item.setIsaddcategory(0);
-			}
-			item.setIsAddTag(0);
-			item = itemDao.save(item);
-		}
+		// 保存商品
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
 		
 		ItemI18nCommand itemI18nCommand = new ItemI18nCommand();
 		itemI18nCommand.setItem(item);
 		
 		// 商品所有的属性值集合
-		List<ItemPropertiesCommand> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand, itemI18nCommand);
+		List<ItemPropertiesCommand> savedItemProperties = createOrUpdateItemProperties(itemCommand, propertyValueIds, iProperties, item.getId(), skuPropertyCommand, itemI18nCommand);
 		// 保存Sku
-		this.createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand,savedItemProperties);
-
-		// 保存商品信息
-		this.createOrUpdateItemInfo(itemCommand, item.getId());
-
-		if (categoriesIds != null && categoriesIds.length > 0) {
-			Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
-
-			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
-			int index = 0;
-			for (Long id : categoriesIds) {
-				if (!defaultId.equals(id)) {
-					categoryIdArray[index] = id;
-					index++;
-				}
-			}
-			// 绑定附加分类
-			itemCategoryManager.createOrUpdateItemCategory(itemCommand,
-					item.getId(), categoryIdArray);
-			// 绑定默认分类
-			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,
-					item.getId(), defaultId);
-
-		} else {
-			List<ItemCategory> ctgList = itemCategoryManager
-					.findItemCategoryListByItemId(item.getId());
-			Long[] itemIds = new Long[1];
-			itemIds[0] = item.getId();
-			for (ItemCategory ic : ctgList) {
-				List<Long> itemIdList = new ArrayList<Long>();
-				itemIdList.add(item.getId());
-				itemCategoryManager.unBindItemCategory(itemIds,
-						ic.getCategoryId());
-
-			}
-		}
+		createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand,savedItemProperties);
 		
 		// 执行扩展点
 		if(null != itemExtendManager) {
 			itemExtendManager.extendAfterCreateOrUpdateItemI18n(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand, itemI18nCommand);
 		}
 		
-		//
-		return item;
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
 
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds);
+		
+		return item;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.ItemLangManager#createOrUpdateBundleItem(com.baozun.nebula.command.product.ItemInfoCommand, com.baozun.nebula.command.product.BundleCommand, java.lang.Long[])
+	 */
+	@Override
+	public Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds)
+			throws Exception {
+		
+		// 保存商品
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
+		
+		// 保存bundle扩展信息
+		bundleManager.createOrUpdate(bundleCommand);
+		
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
+		
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds);
+				
+		return item;
 	}
 	
 	@Override
@@ -1262,5 +1222,80 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		return false;
 	}
 	
+	private Item createOrUpdateItem(ItemInfoCommand itemCommand, Long[] categoriesIds){
+		
+		Item item = null;
+		if (itemCommand.getId() != null) {// 更新
+			item = itemDao.getByPrimaryKey(itemCommand.getId());
+			item.setModifyTime(new Date());
+			item.setCode(itemCommand.getCode());
+			if (categoriesIds != null && categoriesIds.length > 0) {
+				item.setIsaddcategory(1);
+			} else {
+				item.setIsaddcategory(0);
+			}
+			item = itemDao.save(item);
+		} else {// 新增
 
+			if (itemCommand.getId() == null) {
+				Integer count = validateItemCode(itemCommand.getCode(),
+						itemCommand.getShopId());
+
+				if (count > 0) {
+					throw new BusinessException(ErrorCodes.PRODUCT_CODE_REPEAT);
+				}
+			}
+			item = new Item();
+			item.setCode(itemCommand.getCode());
+			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
+			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
+			item.setCreateTime(new Date());
+			item.setShopId(itemCommand.getShopId());
+			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
+
+			if (categoriesIds != null && categoriesIds.length > 0) {
+				item.setIsaddcategory(1);
+			} else {
+				item.setIsaddcategory(0);
+			}
+			item.setIsAddTag(0);
+			item = itemDao.save(item);
+		}
+		
+		return item;
+	}
+	
+	private void itemCategoryHandle(ItemInfoCommand itemCommand, Item item, Long[] categoriesIds){
+		if (categoriesIds != null && categoriesIds.length > 0) {
+			Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
+
+			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
+			int index = 0;
+			for (Long id : categoriesIds) {
+				if (!defaultId.equals(id)) {
+					categoryIdArray[index] = id;
+					index++;
+				}
+			}
+			// 绑定附加分类
+			itemCategoryManager.createOrUpdateItemCategory(itemCommand,
+					item.getId(), categoryIdArray);
+			// 绑定默认分类
+			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,
+					item.getId(), defaultId);
+
+		} else {
+			List<ItemCategory> ctgList = itemCategoryManager
+					.findItemCategoryListByItemId(item.getId());
+			Long[] itemIds = new Long[1];
+			itemIds[0] = item.getId();
+			for (ItemCategory ic : ctgList) {
+				List<Long> itemIdList = new ArrayList<Long>();
+				itemIdList.add(item.getId());
+				itemCategoryManager.unBindItemCategory(itemIds,
+						ic.getCategoryId());
+
+			}
+		}
+	}
 }

@@ -15,14 +15,14 @@
  */
 package com.baozun.nebula.manager.product;
 
-import java.util.List;
-
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
-import com.baozun.nebula.model.product.ItemProValGroupRelation;
 
 /**
  * item 操作接口
@@ -32,14 +32,14 @@ import com.baozun.nebula.model.product.ItemProValGroupRelation;
  */
 public interface ItemLangManager extends BaseManager {
 
-	Item createOrUpdateItem(ItemInfoCommand itemCommand,
-			Long[] propertyValueIds, Long[] categoriesIds,
-			ItemPropertiesCommand[] iProperties,
-			SkuPropertyMUtlLangCommand[] skuPropertyCommand
-			) throws Exception;
-	
+	Item createOrUpdateItem(ItemInfoCommand itemCommand, Long[] propertyValueIds, Long[] categoriesIds,
+			ItemPropertiesCommand[] iProperties, SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception;
+
+	Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds)
+					throws Exception;
+
 	Integer validateItemCode(String code, Long shopId);
-	
-	void saveOrUpdateItemInfoLang(String title,String subTitle,String description,String sketch,
-			String seoDescription,String seoKeyword,String seoTitle,String lang,Long itemInfoId);
+
+	void saveOrUpdateItemInfoLang(String title, String subTitle, String description, String sketch,
+			String seoDescription, String seoKeyword, String seoTitle, String lang, Long itemInfoId);
 }

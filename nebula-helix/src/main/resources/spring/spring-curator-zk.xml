@@ -14,60 +14,16 @@
 		<property name="retryType" value="#{meta['zk.retryType']}" />
 		<property name="maxElapsedTimeMs" value="#{meta['zk.maxElapsedTimeMs']}" />
 		<property name="sleepMsBetweenRetries" value="#{meta['zk.sleepMsBetweenRetries']}" />
-		<property name="lifeCycleNode" value="#{meta['zk.path.root']}" />
-		<property name="pathMap">
-			<map>
-				<entry key="enginewatch" value="#{meta['zk.path.enginewatch']}"></entry>
-				<entry key="freightwatch" value="#{meta['zk.path.freightwatch']}"></entry>
-				<entry key="i18nlangwatch" value="#{meta['zk.path.i18nlangwatch']}"></entry>
-				<entry key="modulemapwatch" value="#{meta['zk.path.modulemapwatch']}"></entry>
-				<entry key="scheduletaskwatch" value="#{meta['zk.path.scheduletaskwatch']}"></entry>
-				<entry key="systemconfigwatch" value="#{meta['zk.path.systemconfigwatch']}"></entry>
-				<entry key="urlmapwatch" value="#{meta['zk.path.urlmapwatch']}"></entry>
-			</map>
-		</property>
 	</bean>
-	<!-- 
+	
 	<bean id="demoWatcherInvoke" class="com.baozun.nebula.curator.watcher.DemoWatcherInvoke" />
 	<bean id="defaultNodeDataChangedWatcher" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
 		<property name="listenerPath" value="/test1" />
 		<property name="watcherInvoke" ref="demoWatcherInvoke" />
-	</bean> -->
+	</bean>
+	<bean id="defaultOnceNodeDataChangedWatcher" class="com.baozun.nebula.curator.watcher.DefaultOnceNodeDataChangedWatcher">
+		<property name="listenerPath" value="/test1" />
+		<property name="watcherInvoke" ref="demoWatcherInvoke" />
+	</bean>
 	
-	
-	<bean id="engineWatchInvoke" class="com.baozun.nebula.curator.invoke.EngineWatchInvoke" />
-	<bean id="engineWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.enginewatch']}" />
-		<property name="watcherInvoke" ref="engineWatchInvoke" />
-	</bean>
-	<bean id="freightWatchInvoke" class="com.baozun.nebula.curator.invoke.FreightWatchInvoke" />
-	<bean id="freightWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.freightwatch']}" />
-		<property name="watcherInvoke" ref="freightWatchInvoke" />
-	</bean>
-	<bean id="i18nLangWatchInvoke" class="com.baozun.nebula.curator.invoke.I18nLangWatchInvoke" />
-	<bean id="i18nLangwatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.i18nlangwatch']}" />
-		<property name="watcherInvoke" ref="i18nLangWatchInvoke" />
-	</bean>
-	<bean id="moduleMapWatchInvoke" class="com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke" />
-	<bean id="moduleMapWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.modulemapwatch']}" />
-		<property name="watcherInvoke" ref="moduleMapWatchInvoke" />
-	</bean>
-	<bean id="scheduleTaskWatchInvoker" class="com.baozun.nebula.curator.invoke.ScheduleTaskWatchInvoker" />
-	<bean id="scheduleTaskWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.scheduletaskwatch']}" />
-		<property name="watcherInvoke" ref="scheduleTaskWatchInvoker" />
-	</bean>
-	<bean id="systemConfigWatchInvoke" class="com.baozun.nebula.curator.invoke.SystemConfigWatchInvoke" />
-	<bean id="systemConfigWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.systemconfigwatch']}" />
-		<property name="watcherInvoke" ref="systemConfigWatchInvoke" />
-	</bean>
-	<bean id="urlMapWatchInvoke" class="com.baozun.nebula.curator.invoke.UrlMapWatchInvoke" />
-	<bean id="urlMapWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.urlmapwatch']}" />
-		<property name="watcherInvoke" ref="urlMapWatchInvoke" />
-	</bean>
 </beans>
