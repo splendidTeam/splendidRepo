@@ -314,16 +314,6 @@ public class ZkOperator {
 	}
 	
 	/**
-	 * 封装方法，添加root节点信息
-	 * @param path
-	 * @return
-	 * @throws Exception
-	 */
-	public byte[] getZkData(String path) throws Exception {
-		LOG.info("getZKData:"+this.lifeCycleNode + path);
-		return getZkClient().getData().forPath(this.lifeCycleNode + path);
-	}
-	/**
 	 * 获取节点数据
 	 * 
 	 * @param path

@@ -74,7 +74,7 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	@Override
 	public void invoke(String path, byte[] data) {
 		try {
-			byte[] datas = zkOperator.getZkData(path);
+			byte[] datas = zkOperator.getData(path);
 			Long id = Long.parseLong(new String(datas));
 			
 			// 根据Id 来做不同的事情
