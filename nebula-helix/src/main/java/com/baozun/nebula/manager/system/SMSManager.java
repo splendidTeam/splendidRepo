@@ -44,7 +44,7 @@ public interface SMSManager extends BaseManager{
 	 *            验证码的有效期（ 单位为秒）
 	 * @return
 	 */
-	boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity);
+	boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity,String businesscode);
 
 	/**
 	 * 验证手机短信验证码是否真确

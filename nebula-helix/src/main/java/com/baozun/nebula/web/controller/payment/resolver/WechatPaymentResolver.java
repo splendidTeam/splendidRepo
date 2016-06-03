@@ -199,7 +199,7 @@ public class WechatPaymentResolver implements PaymentResolver {
 
 	@Override
 	public String doPayReturn(HttpServletRequest request,
-			HttpServletResponse response, String payType)
+			HttpServletResponse response, String payType, Device device)
 			throws IllegalPaymentStateException {
 		// TODO Auto-generated method stub
 		return null;
@@ -207,7 +207,7 @@ public class WechatPaymentResolver implements PaymentResolver {
 
 	@Override
 	public void doPayNotify(HttpServletRequest request,
-			HttpServletResponse response, String payType)
+			HttpServletResponse response, String payType, Device device)
 			throws IllegalPaymentStateException, IOException {
 		// TODO Auto-generated method stub
 		

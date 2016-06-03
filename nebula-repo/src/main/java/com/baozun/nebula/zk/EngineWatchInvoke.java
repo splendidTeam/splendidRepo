@@ -14,6 +14,7 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
  * @author Justin Hu
  *
  */
+@Deprecated
 public class EngineWatchInvoke extends WatchInvoke {
 
 	public static final String LISTEN_PATH=ZooKeeperOperator.LIFECYCLE_NODE+"/engine";

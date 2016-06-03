@@ -30,8 +30,8 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
-import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 
 /**
@@ -113,7 +113,7 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
                     shoppingCartLineCommand.setQuantity(stock);
                 }
             }
-            SdkShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+            ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
                             .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
             sdkShoppingCartLineCommandBehaviour
                             .organizeExtentionCodeAndCountMapForDeductSkuInventory(shoppingCartLineCommand, extentionCodeAndCountMap);

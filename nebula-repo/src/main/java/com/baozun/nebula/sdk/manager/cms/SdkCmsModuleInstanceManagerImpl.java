@@ -36,6 +36,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsModuleInstanceDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
@@ -46,8 +48,6 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPublished;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.zk.ModuleMapWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 /**
@@ -83,7 +83,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	private  SdkCmsPublishedManager sdkCmsPublishedManager;
 	
 	@Autowired
-	private ZooKeeperOperator			zooKeeperOperator;
+	private ZkOperator			zkOperator;
 
 	@Autowired
 	private CacheManager				cacheManager;
@@ -202,7 +202,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		// 先删除, 再添加
 		cmsModuleInstanceDao.removeCmsModuleInstanceByIds(ids);
 		log.info("remove module Success, module's id is "+removeids);
-		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 	}
 	
 	
@@ -367,7 +367,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		cmsTemplateHtml.setData(data);
 		sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 		log.info("publishModuleInstance Success, module's id is "+moduleInstance.getId()+", code is " + moduleInstance.getCode());
-		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 		
 	}
 	
@@ -384,7 +384,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		sdkCmsModuleInstanceVersionManager.cancelInstanceVersionInModuleId(moduleInstance.getId());
 		sdkCmsTemplateHtmlManager.removeCmsTemplateHtmlByModuleCode(moduleInstance.getCode());
 		log.info("cancelpublishModuleInstance success, module's id is "+moduleId+", code is " + moduleInstance.getCode());
-		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 	}
 
 	@Override

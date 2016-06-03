@@ -14,18 +14,17 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.shoppingcart;
+package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.pack;
 
-import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
- * The Interface SdkShoppingCartLinePackManager.
+ * The Interface SdkShoppingCartLineCommandBehaviour.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
-public interface SdkShoppingCartLinePackManager extends BaseManager{
+public interface ShoppingCartLineCommandPackBehaviour{
 
     /**
      * 封装购物车行数据.
@@ -52,4 +51,5 @@ public interface SdkShoppingCartLinePackManager extends BaseManager{
      *            the shopping cart line command
      */
     void packShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand);
+
 }
