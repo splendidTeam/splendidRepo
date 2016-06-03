@@ -144,8 +144,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         PaymentInfoSubForm paymentInfoSubForm = orderForm.getPaymentInfoSubForm();
         String paymentType = paymentInfoSubForm.getPaymentType();
         salesOrderCommand.setPayment(Integer.parseInt(paymentType));
-        salesOrderCommand.setPaymentStr(
-                        BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getBankcode(), Integer.parseInt(paymentType)));
+        salesOrderCommand.setPaymentStr(BankCodeConvertUtil.getPayTypeDetail(paymentInfoSubForm.getBankcode(),paymentType));
         // 设置运费
         setFreghtCommand(salesOrderCommand);
         // 设置优惠券信息

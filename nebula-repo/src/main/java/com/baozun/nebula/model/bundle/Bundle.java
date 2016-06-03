@@ -77,12 +77,16 @@ public class Bundle extends BaseModel {
 	public static final int PRICE_TYPE_CUSTOMPRICE = 3;
 	
 	/** 捆绑装类型：商品对商品 */
+	@Deprecated
 	public static final int BUNDLE_TYPE_ITEMBYITEM = 1;
 	/** 捆绑装类型：商品对款 */
+	@Deprecated
 	public static final int BUNDLE_TYPE_ITEMBYSTYLE = 2;
 	/** 捆绑装类型：款对款 */
+	@Deprecated
 	public static final int BUNDLE_TYPE_STYLEBYSTYLE = 3;
 	/** 捆绑装类型：款对商品 */
+	@Deprecated
 	public static final int BUNDLE_TYPE_STYLEBYITEM = 4;
 
 	/**
@@ -136,6 +140,7 @@ public class Bundle extends BaseModel {
 	 * <li>款对商品，通常用于针对某一款商品主卖品配置捆绑装，捆绑装中搭配的是单品。</li>
 	 * </ol>
 	 */
+	@Deprecated
 	private Integer bundleType;
 	
 	/**
@@ -203,10 +208,12 @@ public class Bundle extends BaseModel {
 	}
 
 	@Column(name = "BUNDLE_TYPE")
+	@Deprecated
 	public Integer getBundleType() {
 		return bundleType;
 	}
 
+	@Deprecated
 	public void setBundleType(Integer bundleType) {
 		this.bundleType = bundleType;
 	}
