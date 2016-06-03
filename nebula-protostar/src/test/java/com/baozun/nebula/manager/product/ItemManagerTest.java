@@ -20,17 +20,15 @@ import static org.easymock.EasyMock.createNiceControl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
@@ -47,21 +45,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.ui.Model;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemProperties;
-import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.utils.JsonFormatUtil;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
-import com.baozun.nebula.web.controller.product.SkuImportController;
 import com.feilong.tools.jsonlib.JsonUtil;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 
 /**
@@ -86,6 +88,9 @@ public class ItemManagerTest{
 	
 	@Autowired
 	private ItemDao				itemDao;
+	
+	@Autowired
+	private BundleManager		bundleManager;
 	
 	private static final Logger	log	= LoggerFactory.getLogger(ItemManagerTest.class);
 
@@ -235,6 +240,50 @@ public class ItemManagerTest{
 		TypeReference<List<SkuPropertyCommand>> valueTypeRef = new TypeReference<List<SkuPropertyCommand>>(){};
 		List<SkuPropertyCommand> skuInfoList= om.readValue(json, valueTypeRef);
 		log.debug("sssss:{}", JsonUtil.format(skuInfoList));
+	}
+	
+	@Test
+	public void testCreateBundle() {
+		BundleCommand bundle = new BundleCommand();
+		bundle.setId(20L);
+		bundle.setItemId(1L);
+		bundle.setPriceType(2);
+		bundle.setAvailableQty(10);
+		bundle.setSyncWithInv(true);
+		
+		BundleElementCommand bec1 = new BundleElementCommand();
+		bec1.setIsMainElement(true);
+		bec1.setSalesPrice(new BigDecimal(100));
+		bec1.setSortNo(1);
+		
+		BundleItemCommand bic1 = new BundleItemCommand();
+		BundleSkuCommand bsc1 = new BundleSkuCommand();
+		bsc1.setSkuId(1L);
+		bsc1.setSalesPrice(new BigDecimal(100));
+		BundleSkuCommand bsc2 = new BundleSkuCommand();
+		bsc2.setSkuId(2L);
+		bsc2.setSalesPrice(new BigDecimal(100));
+		bic1.setBundleSkus(Arrays.asList(bsc1, bsc2));
+		bec1.setItems(Arrays.asList(bic1));
+		
+		BundleElementCommand bec2 = new BundleElementCommand();
+		bec2.setIsMainElement(false);
+		bec2.setSalesPrice(new BigDecimal(100));
+		bec2.setSortNo(2);
+		
+		BundleItemCommand bic2 = new BundleItemCommand();
+		BundleSkuCommand bsc3 = new BundleSkuCommand();
+		bsc3.setSkuId(3L);
+		bsc3.setSalesPrice(new BigDecimal(100));
+		BundleSkuCommand bsc4 = new BundleSkuCommand();
+		bsc4.setSkuId(4L);
+		bsc4.setSalesPrice(new BigDecimal(100));
+		bic2.setBundleSkus(Arrays.asList(bsc3, bsc4));
+		bec2.setItems(Arrays.asList(bic2));
+		
+		bundle.setBundleElementCommands(Arrays.asList(bec1, bec2));
+		
+		bundleManager.createOrUpdate(bundle);
 	}
 }
 

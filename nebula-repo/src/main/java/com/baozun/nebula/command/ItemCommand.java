@@ -200,7 +200,9 @@ public class ItemCommand implements Command{
 	private Integer				inventory;
 
 	/**
-	 * 商品类型：普通商品 1; 商品类型：捆绑类商品 3; 商品类型：组商品 5; 商品类型：虚拟商品 7;
+	 * 商品类型
+	 * 
+	 * @see com.baozun.nebula.model.product.Item#type
 	 */
 	private Integer				itemType;
 

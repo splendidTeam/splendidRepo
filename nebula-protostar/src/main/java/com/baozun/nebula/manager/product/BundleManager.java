@@ -42,5 +42,4 @@ import com.baozun.nebula.model.bundle.Bundle;
 public interface BundleManager extends BaseManager {
 
 	Bundle createOrUpdate(BundleCommand bundle);
-	
 }

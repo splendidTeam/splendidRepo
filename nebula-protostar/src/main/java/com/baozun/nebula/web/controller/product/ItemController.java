@@ -2481,7 +2481,6 @@ public class ItemController extends BaseController{
 	 */
 	@RequestMapping("/item/createBundleItem.htm")
 	public String createBundleItem(Model model) {
-		model.addAttribute("isEnableStyle", isEnableStyle());
 		return "/product/item/add-item-bundle";
 	}
 	
@@ -2545,5 +2544,4 @@ public class ItemController extends BaseController{
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
 	}
-	
 }

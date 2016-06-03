@@ -15,7 +15,6 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
  * @author Justin Hu
  *
  */
-@Deprecated
 public class SystemConfigWatchInvoke extends WatchInvoke {
 
 	public static final String LISTEN_PATH=ZooKeeperOperator.LIFECYCLE_NODE+"/systemconfig";

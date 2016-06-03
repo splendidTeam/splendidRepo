@@ -32,7 +32,6 @@
 package com.baozun.nebula.curator;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -59,9 +58,6 @@ import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.feilong.core.Validator;
 
 /**
  * 基于Apache Curator封装的zookeeper操作类
@@ -115,8 +111,6 @@ public class ZkOperator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ZkOperator.class);
 	
-	private String lifeCycleNode;
-	
 	private Executor executor;
 
 	private volatile CuratorFramework zkClient;
@@ -133,8 +127,6 @@ public class ZkOperator {
 
 	/** 连接超时时间 （ms） */
 	private int connectionTimeoutMs = 10000;
-	
-	private Map<String, String> pathMap;
 
 	/**
 	 * 失败重试策略，默认采用{@code RetryForever}
@@ -538,39 +530,6 @@ public class ZkOperator {
 
 		return retryPolicy;
 	}
-	
-	/**
-	 * 通知zkServer的path 发生了数据变改
-	 * 一般用于pts通知zk的服务
-	 * @return
-	 */
-	public boolean noticeZkServer(String path){
-		
-		String data=String.valueOf(System.currentTimeMillis());
-		noticeZkServer(path,data);
-		
-		return true;
-	}
-	
-	/**
-	 * 通知zkServer的path 发生了数据变改
-	 * 一般用于pts通知zk的服务
-	 * @param path 路径
-	 * @param data 前后双方约定的数据
-	 * @return
-	 */
-	public boolean noticeZkServer(String path,String data){
-	
-		try{
-			setData(path, data.getBytes());
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			return false;
-		}
-		
-		return true;
-	}
 
 	public String getConnectionString() {
 		return connectionString;
@@ -666,29 +625,5 @@ public class ZkOperator {
 
 	public void setBgThreadPoolSize(int bgThreadPoolSize) {
 		this.bgThreadPoolSize = bgThreadPoolSize;
-	}
-
-	public String getLifeCycleNode() {
-		return lifeCycleNode;
-	}
-
-	public void setLifeCycleNode(String lifeCycleNode) {
-		this.lifeCycleNode = lifeCycleNode;
-	}
-
-	public Map<String, String> getPathMap() {
-		return pathMap;
-	}
-
-	public void setPathMap(Map<String, String> pathMap) {
-		this.pathMap = pathMap;
-	}
-	
-	public String getPath(String key){
-		if(Validator.isNotNullOrEmpty(this.pathMap)){
-			return this.pathMap.get(key);
-		}else{
-			return null;
-		}
 	}
 }

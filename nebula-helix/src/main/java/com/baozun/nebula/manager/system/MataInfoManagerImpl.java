@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import redis.clients.jedis.JedisSentinelPool;
 
-import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
+import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class MataInfoManagerImpl implements MataInfoManager{
 	private JedisSentinelPool jedisPool;
 	
 	@Autowired
-	private ZkOperator zkOperator;
+	private ZooKeeperOperator zooKeeperOperator;
 	
 	@Autowired
 	protected SolrServer solrServer;
@@ -82,7 +82,7 @@ public class MataInfoManagerImpl implements MataInfoManager{
 		}
 		//检查zk url
 		try {
-			zkOperator.checkExists(zkOperator.getLifeCycleNode());
+			zooKeeperOperator.getZk().exists(ZooKeeperOperator.LIFECYCLE_NODE, false);
 		} catch (Exception e) {
 			info.append("FAIL-ZK,");
 			log.error("FAIL-ZK", e);

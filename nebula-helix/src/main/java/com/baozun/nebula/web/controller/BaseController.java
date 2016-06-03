@@ -44,7 +44,6 @@ import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.utilities.common.encryptor.RSAEncryptor;
-import com.feilong.spring.mobile.device.DeviceUtil;
 
 /**
  * BaseController
@@ -59,76 +58,75 @@ import com.feilong.spring.mobile.device.DeviceUtil;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  */
 public abstract class BaseController{
-
-    private static final Logger  LOG                  = LoggerFactory.getLogger(BaseController.class);
-
-    @Resource
-    protected ApplicationContext context;
+	
+	private static final Logger	LOG	= LoggerFactory.getLogger(BaseController.class);
 
     @Resource
-    protected EventPublisher     eventPublisher;
+    protected ApplicationContext        context;
 
+    @Resource
+    protected EventPublisher            eventPublisher;
+    
     @Autowired
-    private MessageSource        messageSource;
+	private MessageSource				messageSource;
 
+    private static final DeviceResolver DEVICE_RESOLVER 		= new LiteDeviceResolver();
+    
     //RSA加密全局的PublicKey
-    private static final String  SENSITIVE_PUBLIC_KEY = "sensitivePublicKey";
-
+    private static final String			SENSITIVE_PUBLIC_KEY	="sensitivePublicKey";
+    
     /**
      * 获取i18n信息
-     * 
      * @param key
      * @return
      */
     protected String getMessage(String key){
-        return getMessage(key, new Object[] {});
+    	return getMessage(key, new Object[]{});
     }
-
+    
     /**
      * 获取i18n信息
-     * 
      * @param key
      * @param params
      * @return
      */
-    protected String getMessage(String key,Object[] params){
-        return messageSource.getMessage(key, params, LocaleContextHolder.getLocale());
+    protected String getMessage(String key, Object[] params){
+    	return messageSource.getMessage(key, params, LocaleContextHolder.getLocale());
     }
-
+    
     /**
      * 根据BindingResult获得返回数据对象
-     * 
      * @param bindingResult
      * @return
      */
     protected NebulaReturnResult getResultFromBindingResult(BindingResult bindingResult){
-        DefaultReturnResult returnResult = new DefaultReturnResult();
-        if (bindingResult.hasErrors()){
-            returnResult.setResult(false);
-            for (ObjectError error : bindingResult.getAllErrors()){
-                DefaultResultMessage message = new DefaultResultMessage();
-                message.setMessage(error.getCode());
-                if (error.getArguments() != null)
-                    message.setParams(Arrays.asList(error.getArguments()));
-                returnResult.getExtraResultMessages().add(message);
-            }
-            returnResult.setResultMessage(returnResult.getExtraResultMessages().get(0));
-        }
-        return returnResult;
+    	DefaultReturnResult returnResult = new DefaultReturnResult();
+    	if(bindingResult.hasErrors()){
+    		returnResult.setResult(false);
+			for(ObjectError error : bindingResult.getAllErrors()){
+				DefaultResultMessage message = new DefaultResultMessage();
+				message.setMessage(error.getCode());
+				if(error.getArguments() != null)
+					message.setParams(Arrays.asList(error.getArguments()));
+				returnResult.getExtraResultMessages().add(message);
+			}
+			returnResult.setResultMessage(returnResult.getExtraResultMessages().get(0));
+    	}
+    	return returnResult;
     }
-
+    
+   
     /**
      * 使用RSA非对称加解密 默认使用全局的public key，使用servlet初始化， 如果安全上要求每个用户使用不同public
      * key时需要商城重写
-     * 
      * @param request
-     * @param model
+     * @param model 
      * @author 冯明雷
      * @time 2016年3月30日下午4:43:47
      */
     protected void init4SensitiveDataEncryptedByJs(HttpServletRequest request,Model model){
-        //默认的js使用的公钥
-        model.addAttribute(SENSITIVE_PUBLIC_KEY, new RSAEncryptor().getStrPublicKey());
+    	//默认的js使用的公钥
+    	model.addAttribute(SENSITIVE_PUBLIC_KEY, new RSAEncryptor().getStrPublicKey());
     }
 
     /**
@@ -138,12 +136,12 @@ public abstract class BaseController{
      * @return
      */
     protected String decryptSensitiveDataEncryptedByJs(String sensitiveData,HttpServletRequest request){
-        try{
-            return EncryptUtil.getInstance().getEncryptor("RSA").decrypt(sensitiveData);
-        }catch (EncryptionException e1){
-            LOG.warn("[DECRYPTION_ERROR] [{}]", sensitiveData);
-            return sensitiveData;
-        }
+        try {
+			return EncryptUtil.getInstance().getEncryptor("RSA").decrypt(sensitiveData);
+		} catch (EncryptionException e1) {
+			LOG.warn("[DECRYPTION_ERROR] [{}]", sensitiveData);
+			return sensitiveData;
+		}
     }
 
     /**
@@ -178,10 +176,9 @@ public abstract class BaseController{
      * @see Device
      * @see org.springframework.mobile.device.DeviceResolverHandlerInterceptor#DeviceResolverHandlerInterceptor()
      * @see org.springframework.mobile.device.LiteDeviceResolver
-     * @see com.feilong.spring.mobile.device.DeviceUtil#getDevice(HttpServletRequest)
      */
     protected Device getDevice(HttpServletRequest request){
-        return DeviceUtil.getDevice(request);
+        return DEVICE_RESOLVER.resolveDevice(request);
     }
 
 }

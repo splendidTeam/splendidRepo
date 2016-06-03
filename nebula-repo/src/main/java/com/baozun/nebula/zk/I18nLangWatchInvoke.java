@@ -12,7 +12,6 @@ import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 
-@Deprecated
 public class I18nLangWatchInvoke extends WatchInvoke {
 
 	public static final String LISTEN_PATH=ZooKeeperOperator.LIFECYCLE_NODE+"/i18nLang";
