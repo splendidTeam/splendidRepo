@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.web.controller.payment;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -132,7 +134,7 @@ public class NebulaPaymentController extends BaseController {
 			
 			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
 			
-			return paymentResolver.doPayReturn(request, response, payType);
+			return paymentResolver.doPayReturn(request, response, payType, getDevice(request));
 			
 		} catch (IllegalPaymentStateException e) {
 			LOGGER.error(e.getMessage(), e);
@@ -151,7 +153,20 @@ public class NebulaPaymentController extends BaseController {
      */
     public void doPayNotify(@PathVariable("payType") String payType,
     		HttpServletRequest request, HttpServletResponse response) {
-    	
+    	try {
+  			
+  			if(LOGGER.isDebugEnabled()){
+  				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
+  		    }
+  			
+  			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+  			
+  			paymentResolver.doPayNotify(request, response, payType, getDevice(request));
+  			
+  		} catch (IllegalPaymentStateException | IOException e) {
+  			LOGGER.error(e.getMessage(), e);
+  		}
+
     }
     
     /**
