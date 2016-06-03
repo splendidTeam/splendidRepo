@@ -36,6 +36,7 @@ import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.product.viewcommand.BundleElementViewCommand;
+import com.feilong.core.bean.BeanUtil;
 
 /**
  * 捆绑类商品成员视图模型转换器
@@ -57,7 +58,9 @@ public class BundleElementViewCommandConverter extends BaseConverter<BundleEleme
 		
 		if (data instanceof BundleElementCommand) {
 			BundleElementCommand bundleElementCommand = (BundleElementCommand) data;
-			return (BundleElementViewCommand)ConvertUtils.convertTwoObject(new BundleElementViewCommand(), bundleElementCommand);
+			BundleElementViewCommand bundleElementViewCommand = new BundleElementViewCommand();
+			BeanUtil.copyProperties(bundleElementViewCommand, bundleElementCommand);
+			return bundleElementViewCommand;//(BundleElementViewCommand)ConvertUtils.convertTwoObject(new BundleElementViewCommand(), bundleElementCommand);
 		} else {
 			throw new UnsupportDataTypeException(
 					data.getClass() + " cannot convert to " + BundleElementViewCommand.class + "yet.");
