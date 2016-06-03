@@ -34,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.cms.CmsModuleInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsModuleInstanceVersionDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
@@ -46,8 +48,6 @@ import com.baozun.nebula.model.cms.CmsPageInstance;
 import com.baozun.nebula.model.cms.CmsPublished;
 import com.baozun.nebula.model.cms.CmsTemplateHtml;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.zk.ModuleMapWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 /**
@@ -83,7 +83,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	private CacheManager cacheManager;
 	
 	@Autowired
-	private ZooKeeperOperator			zooKeeperOperator;
+	private ZkOperator			zkOperator;
 	
 	@Autowired
 	private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
@@ -237,7 +237,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					String data = sdkCmsParseHtmlContentManager.getParseModuleData(editAreaList, module.getTemplateId());
 					cmsTemplateHtml.setData(data);
 					sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
-					zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+					zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
 					logger.info("publish moduleversion success : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
 				} catch (Exception e) {
 					logger.error("publish moduleversion error : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
@@ -331,7 +331,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					CmsTemplateHtml cmsTemplateHtml = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(moduleInstance.getCode(), versionId);		
 					sdkCmsTemplateHtmlManager.removeCmsTemplateHtml(cmsTemplateHtml.getId());
 				}
-				zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+				zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
 			}catch(Exception e){
 				logger.error("cancelpublish moduleversion error cause of publich baseversion error or removepublic error, modulecode="+moduleInstance.getCode()+", moduleId="+moduleInstance.getId()+", versionId="+versionId);
 				e.printStackTrace();
@@ -396,7 +396,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 
 		removeModuleVersionByIds(versionIds);
 		logger.info("remove moduleVersion's ids is " + ids);
-		zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+		zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
 	}
 	
 	@Override

@@ -33,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.cms.CmsPageInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.CacheManager;
@@ -50,8 +52,6 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPublishedManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsTemplateHtmlManager;
-import com.baozun.nebula.zk.UrlMapWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 /**
@@ -78,7 +78,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 	private SdkCmsPublishedManager		sdkCmsPublishedManager;
 
 	@Autowired
-	private ZooKeeperOperator			zooKeeperOperator;
+	private ZkOperator 					zkOperator;
 
 	@Autowired
 	private CacheManager				cacheManager;
@@ -247,7 +247,8 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			e.printStackTrace();
 			log.error("remove PublishedPage's id="+instanceIds+" , PublishedPageVersions Error versionids="+vids);
 		}
-		zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH);
+		
+		zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY));
 	}
 
 	@Override
@@ -292,7 +293,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			cmsTemplateHtml.setData(data);
 			sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 			log.debug("PublishPage, Save CmsTemplateHtml's id : " + cmsTemplateHtml.getId());
-			zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH,"#"+cmsPageInstance.getCode());
+			zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
 			log.info("PublishPage Success, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode());
 		}catch(Exception e){
 			log.info("PublishPage Error, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode()+", error cause is "+e.getMessage());
@@ -368,7 +369,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			e.printStackTrace();
 			log.error("cancelPublishedInstanceVersion Error versionids="+vids);
 		}
-		zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH,"#"+cmsPageInstance.getCode());
+		zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
 		
 	}
 

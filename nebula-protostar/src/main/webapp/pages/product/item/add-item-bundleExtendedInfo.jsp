@@ -99,8 +99,8 @@
 					<form action="/recommand/findItemInfoList.json" id="mainItemDialogSearchForm">
 						<div class="form-group p10">
 							<label>类型</label>
-							<input type="radio" name="type" value="product" checked="checked" />商品
-							<input type="radio" name="type" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
+							<input type="radio" name="selectType" value="product" checked="checked" />商品
+							<input type="radio" name="selectType" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
 						</div>
 						<div class="form-group p10">
 							<label>编码</label>

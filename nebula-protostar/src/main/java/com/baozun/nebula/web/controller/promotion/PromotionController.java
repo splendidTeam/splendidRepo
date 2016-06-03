@@ -56,6 +56,8 @@ import com.baozun.nebula.command.promotion.SettingNormalCommand;
 import com.baozun.nebula.command.rule.ItemTagRuleCommand;
 import com.baozun.nebula.command.rule.MemberTagRuleCommand;
 import com.baozun.nebula.command.rule.MiniItemAtomCommand;
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
@@ -80,8 +82,6 @@ import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.zk.EngineWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * 
@@ -105,7 +105,7 @@ public class PromotionController extends BaseController {
 	@Autowired
 	private SdkItemTagRuleManager sdkItemTagRuleManager;
 	@Autowired
-	private ZooKeeperOperator zooKeeperOperator;
+	private ZkOperator zkOperator;
 	@Autowired
 	private SdkCustomizeFilterClassManager sdkCustomizeFilterClassManager;
 	// 何波 注入商品管理接口
@@ -264,7 +264,7 @@ public class PromotionController extends BaseController {
 			sdkPromotionManager.activatePromotionById(id, getUserDetails()
 					.getUserId());
 
-			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 			rs.setIsSuccess(true);
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -290,7 +290,7 @@ public class PromotionController extends BaseController {
 			sdkPromotionManager.inactivatePromotionById(id, getUserDetails()
 					.getUserId());
 
-			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 
 			rs.setIsSuccess(true);
 		} catch (BusinessException e) {

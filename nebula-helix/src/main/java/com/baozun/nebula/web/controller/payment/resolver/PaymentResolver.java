@@ -20,8 +20,8 @@ public interface PaymentResolver {
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException;
 
 	String doPayReturn(HttpServletRequest request,
-			HttpServletResponse response, String payType) throws IllegalPaymentStateException;
+			HttpServletResponse response, String payType, Device device) throws IllegalPaymentStateException;
 
 	void doPayNotify(HttpServletRequest request, HttpServletResponse response,
-			String payType) throws IllegalPaymentStateException, IOException;
+			String payType, Device device) throws IllegalPaymentStateException, IOException;
 }

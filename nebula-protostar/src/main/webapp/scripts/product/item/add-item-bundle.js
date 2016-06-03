@@ -65,7 +65,7 @@ $j(document).ready(function(){
 	});
 	
 	//设置主卖品  选择类型
-	$j("input[name='setType']").bind('change', function(){
+	$j("input[name='selectType']").bind('change', function(){
 		var currVal = $j(this).val();
 		
 		if(currVal == 'product') {
@@ -96,7 +96,7 @@ $j(document).ready(function(){
 	
 	// 点击搜索
 	$j("#search_button").on("click", function(){
-		var currVal = $j(':radio[name=type]:checked').val();
+		var currVal = $j("input[name='selectType']:checked").val();
 		if(currVal == 'product') {
 			findProduct();
 		} else {

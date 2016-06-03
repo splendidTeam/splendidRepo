@@ -33,6 +33,16 @@ public class BundleElementCommand extends BundleElement{
 	private static final long serialVersionUID = -8462331832705645692L;
 	
 	/**
+	 * 是否是款（用于pts bundle编辑）
+	 */
+	private boolean isStyle;
+	
+	/**
+	 * 款号（用于pts bundle编辑）
+	 */
+	private String style;
+	
+	/**
 	 * 最小商品原销售价
 	 */
 	private BigDecimal minOriginalSalesPrice = BigDecimal.ZERO;
@@ -102,6 +112,22 @@ public class BundleElementCommand extends BundleElement{
 		this.maxSalesPrice = maxSalesPrice;
 	}
 	
+	public boolean isStyle() {
+		return isStyle;
+	}
+
+	public void setIsStyle(boolean isStyle) {
+		this.isStyle = isStyle;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
 	/**
 	 * 
 	 * 查找element中item的最小原销售价格

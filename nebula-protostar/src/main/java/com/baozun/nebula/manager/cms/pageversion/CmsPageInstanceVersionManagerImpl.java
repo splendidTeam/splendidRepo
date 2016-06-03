@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsPageInstanceVersionDao;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.cms.pageinstance.CmsPageInstanceManager;
@@ -33,8 +35,6 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPublishedManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsTemplateHtmlManager;
 import com.baozun.nebula.web.command.BackWarnEntity;
-import com.baozun.nebula.zk.UrlMapWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 @Service
@@ -72,7 +72,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 	private SdkCmsPublishedManager sdkCmsPublishedManager;
 	
 	@Autowired
-	private ZooKeeperOperator			zooKeeperOperator;
+	private ZkOperator zkOperator;
 
 	@Autowired
 	private CmsPageInstanceManager cmsPageInstanceManager;
@@ -221,7 +221,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 			}	
 
 			sdkCmsPageInstanceVersionManager.setPublicVersionCacheInfo();
-			zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY));
 			result.setIsSuccess(true);
 			logger.info("removeCmsPageInstanceVersion Success, page id is "+removeids);
 		} catch (Exception e) {
@@ -276,7 +276,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 				cmsTemplateHtml.setData(data);
 				sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 				logger.info("publish PageInstanceVersion Success : versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
-				zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH,"#"+cmsPageInstance.getCode());
+				zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
 				backWarnEntity.setIsSuccess(true);
 			} catch (Exception e) {
 				logger.error("publish PageInstanceVersion error : versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
@@ -323,7 +323,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 			e.printStackTrace();
 			return result;
 		}	
-		zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH,"#"+pageCode);
+		zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+pageCode);
 		result.setIsSuccess(true);
 		logger.info("cancelpublish pageversion success, pagecode="+pageCode+", instanceId="+cmsPageInstance.getId()+", versionId="+versionId);
 		return result;

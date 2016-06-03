@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,6 @@ import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.promotion.PromotionCoupon;
@@ -61,16 +59,13 @@ import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.UserDetails;
-import com.baozun.nebula.sdk.command.logistics.ItemFreightInfoCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
-import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.SdkEffectiveManager;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkFilterManager;
@@ -79,15 +74,14 @@ import com.baozun.nebula.sdk.manager.SdkPurchaseLimitRuleFilterManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationSettingManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionGuideManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
-import com.feilong.core.util.CollectionsUtil;
 
 /**
  * The Class SdkShoppingCartManagerImpl.
@@ -100,96 +94,96 @@ import com.feilong.core.util.CollectionsUtil;
 public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
     /** The Constant log. */
-    private static final Logger                   log             = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
+    private static final Logger                        log             = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer                  SUCCESS         = 1;
+    private static final Integer                       SUCCESS         = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer                  FAILURE         = 0;
+    private static final Integer                       FAILURE         = 0;
 
     /** The Constant CHECKED_STATE. */
-    private static final int                      CHECKED_STATE   = 1;
+    private static final int                           CHECKED_STATE   = 1;
 
     /** 优惠设置是否按单件计算，是指按Qty计算，还是Qty为1来计算 *. */
-    private static final BigDecimal               ONE_PIECE_QTY   = new BigDecimal(1);
+    private static final BigDecimal                    ONE_PIECE_QTY   = new BigDecimal(1);
 
     /** 百分百 *. */
-    private static final BigDecimal               HUNDRED_PERCENT = new BigDecimal(1);
+    private static final BigDecimal                    HUNDRED_PERCENT = new BigDecimal(1);
 
     /** The sdk shopping cart line dao. */
     @Autowired
-    private SdkShoppingCartLineDao                sdkShoppingCartLineDao;
+    private SdkShoppingCartLineDao                     sdkShoppingCartLineDao;
 
     /** The item info dao. */
     @Autowired
-    private ItemInfoDao                           itemInfoDao;
+    private ItemInfoDao                                itemInfoDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao                                skuDao;
+    private SkuDao                                     skuDao;
 
     /** The item category dao. */
     @Autowired
-    private ItemCategoryDao                       itemCategoryDao;
+    private ItemCategoryDao                            itemCategoryDao;
 
     /** The sdk filter manager. */
     @Autowired
-    private SdkFilterManager                      sdkFilterManager;
+    private SdkFilterManager                           sdkFilterManager;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager                      sdkEngineManager;
+    private SdkEngineManager                           sdkEngineManager;
 
     /** The sdk promotion calculation manager. */
     @Autowired
-    private SdkPromotionCalculationManager        sdkPromotionCalculationManager;
+    private SdkPromotionCalculationManager             sdkPromotionCalculationManager;
 
     /** The sdk promotion rule filter manager. */
     @Autowired
-    private SdkPromotionRuleFilterManager         sdkPromotionRuleFilterManager;
+    private SdkPromotionRuleFilterManager              sdkPromotionRuleFilterManager;
 
     /** The sdk order line dao. */
     @Autowired
-    private SdkOrderLineDao                       sdkOrderLineDao;
+    private SdkOrderLineDao                            sdkOrderLineDao;
 
     /** The sdk purchase rule filter manager. */
     @Autowired
-    private SdkPurchaseLimitRuleFilterManager     sdkPurchaseRuleFilterManager;
+    private SdkPurchaseLimitRuleFilterManager          sdkPurchaseRuleFilterManager;
 
     /** The sdk effective manager. */
     @Autowired
-    private SdkEffectiveManager                   sdkEffectiveManager;
+    private SdkEffectiveManager                        sdkEffectiveManager;
 
     /** The sdk promotion coupon manager. */
     @Autowired
-    private SdkPromotionCouponManager             sdkPromotionCouponManager;
+    private SdkPromotionCouponManager                  sdkPromotionCouponManager;
 
     /** The sdk promotion setting manager. */
     @Autowired
-    private SdkPromotionCalculationSettingManager sdkPromotionSettingManager;
+    private SdkPromotionCalculationSettingManager      sdkPromotionSettingManager;
 
     /** The sdk promotion guide manager. */
     @Autowired
-    private SdkPromotionGuideManager              sdkPromotionGuideManager;
+    private SdkPromotionGuideManager                   sdkPromotionGuideManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager                    sdkMataInfoManager;
+    private SdkMataInfoManager                         sdkMataInfoManager;
 
     /** The sdk shopping cart lines manager. */
     @Autowired
-    private SdkShoppingCartLinesManager           sdkShoppingCartLinesManager;
+    private SdkShoppingCartLinesManager                sdkShoppingCartLinesManager;
 
     /** The sdk promotion manager. */
     @Autowired
-    private SdkPromotionManager                   sdkPromotionManager;
+    private SdkPromotionManager                        sdkPromotionManager;
 
     @Autowired
-    private SdkShoppingCartLinePackManager        sdkShoppingCartLinePackManager;
+    private SdkShoppingCartCommandBuilder              sdkShoppingCartCommandBuilder;
 
     @Autowired
-    private SdkShoppingCartCommandBuilder         sdkShoppingCartCommandBuilder;
+    private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
     /**
      * @param memberId
@@ -871,7 +865,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         try{
             Integer retval = SUCCESS;
             ShoppingCartCommand cart = new ShoppingCartCommand();
-            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLine);
+
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(shoppingCartLine);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLine);
+
             // 检查商品有效性
             retval = sdkEffectiveManager.checkItemIsValid(shoppingCartLine.isValid());
             if (SUCCESS != retval){
@@ -5874,7 +5872,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             }
 
             // 封装购物车行数据
-            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(line);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
+
             if (extentionCode.equals(line.getExtentionCode())){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
@@ -5954,8 +5955,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<ShoppingCartLineCommand> validLines = new ArrayList<ShoppingCartLineCommand>();
 
         for (ShoppingCartLineCommand line : lines){
+
             // 封装购物车行数据
-            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(line);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
+
             if (line.getId().equals(lineId)){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
@@ -6036,7 +6041,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         for (ShoppingCartLineCommand line : lines){
             // 封装购物车行数据
-            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(line);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
+
             if (line.getExtentionCode().equals(extentionCode)){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
@@ -6122,7 +6130,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         // 封装购物车行数据
         for (ShoppingCartLineCommand line : lines){
-            sdkShoppingCartLinePackManager.packShoppingCartLine(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(line);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
         }
 
         // 获取限购规则
@@ -6627,7 +6637,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     public Integer manualBuy(BigDecimal buyPrice,ShoppingCartLineCommand shoppingCartLine,List<ShoppingCartLineCommand> lines){
         try{
             Integer retval = SUCCESS;
-            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLine);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(shoppingCartLine);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLine);
+
             shoppingCartLine.setSalePrice(buyPrice);
             // 检查商品有效性
             retval = sdkEffectiveManager.checkItemIsValid(shoppingCartLine.isValid());
@@ -6811,7 +6824,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             command.setQuantity(1);
             command.setGift(true);
             command.setPromotionId(promotionId);
-            sdkShoppingCartLinePackManager.packShoppingCartLine(command);
+
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(command);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(command);
+
             /** 添加赠品行 */
             sdkShoppingCartLineDao.insertShoppingCartLineWithLineGroup(
                             command.getExtentionCode(),

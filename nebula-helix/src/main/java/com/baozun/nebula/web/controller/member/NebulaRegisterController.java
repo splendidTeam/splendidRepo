@@ -47,6 +47,7 @@ import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
+import com.baozun.nebula.web.constants.ForgetPasswordSendVCodeConstant;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -462,7 +463,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 		SMSCommand smsCommand = new SMSCommand();
 		smsCommand.setMobile(mobile);
 		smsCommand.setTemplateCode(SMSTemplateConstants.SMS_REGISTER_CAPTCHA);
-
+		smsCommand.addVar("maxsurvivaltime", ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME/60);
 		// 发送验证码短信，captcha会根据validity保存在redis中
 		boolean sendResult = smsManager.send(smsCommand, CaptchaType.MIXED, SMSTemplateConstants.VALIDATE_CODE_LENGTH, SMSTemplateConstants.MAX_EXIST_TIME,SMS_REGISTER_CAPTCHA_CODE);
 
