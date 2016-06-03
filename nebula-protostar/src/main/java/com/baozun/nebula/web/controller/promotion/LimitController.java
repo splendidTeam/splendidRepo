@@ -327,7 +327,7 @@ public class LimitController extends BaseController {
 		BackWarnEntity rs = new BackWarnEntity(false, null);
 		try {
 			sdkLimitManager.cancelLimit(id, getUserDetails().getUserId());
-			zkOperator.noticeZkServer(EngineWatchInvoke.PATH_KEY);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 			return SUCCESS;
 		} catch (BusinessException e) {
 			e.printStackTrace();

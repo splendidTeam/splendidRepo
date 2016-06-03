@@ -238,7 +238,7 @@ public class ZkOperator {
 	}
 	
 	/**
-	 * 创建节点（支持级联创建）,节点默认值为当前时间戳
+	 * 创建节点（支持级联创建）
 	 * 
 	 * <p>
 	 * <ul>
@@ -274,7 +274,7 @@ public class ZkOperator {
 	}
 
 	/**
-	 * 创建节点（支持级联创建）,节点默认值为当前时间戳
+	 * 创建节点（支持级联创建）
 	 * 
 	 * @param path
 	 * @param createMode
@@ -313,16 +313,6 @@ public class ZkOperator {
 		getZkClient().createContainers(path);
 	}
 	
-	/**
-	 * 封装方法，添加root节点信息
-	 * @param path
-	 * @return
-	 * @throws Exception
-	 */
-	public byte[] getZkData(String path) throws Exception {
-		LOG.info("getZKData:"+this.lifeCycleNode + path);
-		return getZkClient().getData().forPath(this.lifeCycleNode + path);
-	}
 	/**
 	 * 获取节点数据
 	 * 

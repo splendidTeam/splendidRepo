@@ -59,6 +59,8 @@ import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
+ * shopdog订单预算信息、创建订单、查询支付状态方法的实现
+ * 
  * @author 江家雷
  * @date 2016年5月24日 下午2:20:23
  * @since
@@ -85,7 +87,7 @@ public class SdOrderController implements AbstractSdOrderController {
 
     @Autowired
     private OrderManager orderManager;
-    
+
     @Autowired
     private SdkMemberManager sdkMemberManager;
 
@@ -101,18 +103,19 @@ public class SdOrderController implements AbstractSdOrderController {
         PropertyUtil.copyProperties(salesOrderCommand, shopdogOrderParamCommand, "countryId", "provinceId", "cityId", "areaId", "townId", "postcode", "mobile", "email");
         salesOrderCommand.setBuyerName(shopdogOrderParamCommand.getName());
         salesOrderCommand.setBuyerTel(shopdogOrderParamCommand.getMobile());
-        // 设置支付信息
-        if("1".equals(shopdogOrderParamCommand.getPaymentType())){
+
+        // 设置支付信息，1是支付宝支付，2微信支付
+        if ("1".equals(shopdogOrderParamCommand.getPaymentType())) {
             salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
             salesOrderCommand.setPaymentStr("支付宝支付");
             salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
-        }else if("2".equals(shopdogOrderParamCommand.getPaymentType())){
+        } else if ("2".equals(shopdogOrderParamCommand.getPaymentType())) {
             salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
             salesOrderCommand.setPaymentStr("微信支付");
             salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
         }
-                
-        //此会员名称是否需要从数据库中查询
+
+        // 如果有memberId，根据memberId查询此会员的相关信息
         if (null != shopdogOrderParamCommand.getMemberId()) {
             MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
             salesOrderCommand.setMemberName(null != memberCommand ? memberCommand.getRealName() : "");
@@ -120,7 +123,7 @@ public class SdOrderController implements AbstractSdOrderController {
         }
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
 
-        //订单来源
+        // 订单来源
         salesOrderCommand.setSource(SalesOrder.SO_SOURCE_SHOPDOG_NORMAL);
 
         // 获取购物车信息
@@ -182,6 +185,7 @@ public class SdOrderController implements AbstractSdOrderController {
         ShopdogSettlementCommand shopdogSettlementCommand = new ShopdogSettlementCommand();
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(calcFreightCommand, shopdogOrderParamCommand);
         shopdogSettlementCommand.setFreightCharge(shoppingCartCommand.getCurrentShippingFee());
+        shopdogSettlementCommand.setOriginPayAmount(shoppingCartCommand.getOriginPayAmount());
         shopdogSettlementCommand.setTotalAmount(shoppingCartCommand.getCurrentPayAmount());
         return shopdogSettlementCommand;
     }
@@ -212,28 +216,35 @@ public class SdOrderController implements AbstractSdOrderController {
     private ShoppingCartCommand buildShoppingCartCommand(CalcFreightCommand calcFreightCommand, ShopdogOrderParamCommand shopdogOrderParamCommand) {
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
+        // 循环获取ShopdogSkusCommand并构建shoppingCartLineCommand的LIST
         for (ShopdogSkusCommand shopdogSkusCommand : shopdogOrderParamCommand.getSkuList()) {
             ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
             shoppingCartLineCommand.setSkuId(shopdogSkusCommand.getSkuId());
             shoppingCartLineCommand.setQuantity(shopdogSkusCommand.getCount());
-            // 这个参数为模拟数据，后续写死
+            // 这个参数为模拟数据，模拟购物车行被选中
             shoppingCartLineCommand.setSettlementState(1);
-            // 这个参数待确定 TODO
+            // 店铺id,商城的shopid是什么？待确定 TODO
             shoppingCartLineCommand.setShopId(1L);
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
         }
+
+        // 调用nebula构建ShoppingCartCommand的方法
         ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(null, shoppingCartLineCommandList, calcFreightCommand, null);
         return shoppingCartCommand;
     }
 
+    // 构建返回给APP所需的command
     private ShopdogOrderCommand createShopdogOrderCommand(HttpServletRequest request, String userName, String subOrdinate, String payType) {
         // 通過支付流水號查詢訂單
         SalesOrderCommand newOrder = salesOrderResolver.getSalesOrderCommand(subOrdinate);
         ShopdogOrderCommand shopdogOrderCommand = new ShopdogOrderCommand();
         shopdogOrderCommand.setOrderCode(newOrder.getCode());
+        // 支付宝支付
         if (SalesOrder.SO_PAYMENT_TYPE_ALIPAY.equals(payType)) {
             shopdogOrderCommand.setPayUrl(sdPaymentController.getPaymentUrl(request, userName, subOrdinate, payType));
         }
+
+        // 微信支付
         if (SalesOrder.SO_PAYMENT_TYPE_WECHAT.equals(payType)) {
             shopdogOrderCommand.setPayCode(sdPaymentController.getPaymentUrl(request, userName, subOrdinate, payType));
         }

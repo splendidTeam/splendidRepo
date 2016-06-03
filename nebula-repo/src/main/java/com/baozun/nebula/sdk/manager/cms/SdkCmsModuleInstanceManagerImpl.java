@@ -202,7 +202,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		// 先删除, 再添加
 		cmsModuleInstanceDao.removeCmsModuleInstanceByIds(ids);
 		log.info("remove module Success, module's id is "+removeids);
-		zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 	}
 	
 	
@@ -367,7 +367,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		cmsTemplateHtml.setData(data);
 		sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 		log.info("publishModuleInstance Success, module's id is "+moduleInstance.getId()+", code is " + moduleInstance.getCode());
-		zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 		
 	}
 	
@@ -384,7 +384,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		sdkCmsModuleInstanceVersionManager.cancelInstanceVersionInModuleId(moduleInstance.getId());
 		sdkCmsTemplateHtmlManager.removeCmsTemplateHtmlByModuleCode(moduleInstance.getCode());
 		log.info("cancelpublishModuleInstance success, module's id is "+moduleId+", code is " + moduleInstance.getCode());
-		zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 	}
 
 	@Override
