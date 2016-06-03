@@ -74,7 +74,7 @@ public class SMSManagerImpl implements SMSManager{
 	 * com.baozun.nebula.manager.system.SMSManager.RandomType, int, int)
 	 */
 	@Override
-	public boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity){
+	public boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity,String businessCode){
 		// 根据要生成的验证码类型和长度生成captcha
 		String captcha = createSMSCaptcha(type, length);
 
@@ -89,7 +89,6 @@ public class SMSManagerImpl implements SMSManager{
 		SendResult sendResult = sdkSMSManager.send(smsCommand);
 		// 发送短信成功，保存captcha到redies
 		if (sendResult.equals(SendResult.SUCESS)){
-			String businessCode = SMS_REGISTER_CAPTCHA_CODE + mobile;
 			tokenManager.saveToken(businessCode, mobile, validity, captcha);
 			return true;
 		}else{
@@ -107,8 +106,8 @@ public class SMSManagerImpl implements SMSManager{
 	 * @return
 	 */
 	private String createSMSCaptcha(CaptchaType type,int length){
-		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		String mixedChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		String chars = "abcdefghijklmnopqrstuvwxyz";
+		String mixedChar = "abcdefghijklmnopqrstuvwxyz0123456789";
 
 		String captcha;
 		if (type.equals(CaptchaType.NUMBER)){
