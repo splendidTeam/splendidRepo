@@ -23,7 +23,7 @@ public class EngineWatchInvoke implements IWatcherInvoke {
 	
 	private Logger LOG = LoggerFactory.getLogger(EngineWatchInvoke.class);
 	
-	public static final String PATH_KEY = "enginewatch";
+	public static final String PATH_KEY = "/enginewatch";
 
 	@Autowired
 	private SdkPromotionManager sdkPromotionManager;

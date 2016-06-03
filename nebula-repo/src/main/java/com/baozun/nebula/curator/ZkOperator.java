@@ -115,7 +115,7 @@ public class ZkOperator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ZkOperator.class);
 	
-	private String lifeCycleNode;
+	private String lifeCycleNode = "/nebula/tmp/app";
 	
 	private Executor executor;
 
@@ -314,6 +314,16 @@ public class ZkOperator {
 	}
 	
 	/**
+	 * 封装方法，添加root节点信息
+	 * @param path
+	 * @return
+	 * @throws Exception
+	 */
+	public byte[] getZkData(String path) throws Exception {
+		LOG.info("getZKData:"+this.lifeCycleNode + path);
+		return getZkClient().getData().forPath(this.lifeCycleNode + path);
+	}
+	/**
 	 * 获取节点数据
 	 * 
 	 * @param path
@@ -344,6 +354,7 @@ public class ZkOperator {
 	 * @throws Exception
 	 */
 	public Stat checkExists(String path) throws Exception {
+		LOG.info("checkpath:" + path);
 		return getZkClient().checkExists().forPath(path);
 	}
 	
@@ -562,7 +573,8 @@ public class ZkOperator {
 	public boolean noticeZkServer(String path,String data){
 	
 		try{
-			setData(path, data.getBytes());
+			LOG.info("noticeZkServer:" + this.lifeCycleNode + path);
+			setData(this.lifeCycleNode + path, data.getBytes());
 		}
 		catch(Exception e){
 			e.printStackTrace();

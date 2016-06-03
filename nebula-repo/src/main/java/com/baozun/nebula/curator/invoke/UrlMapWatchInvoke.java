@@ -22,7 +22,7 @@ public class UrlMapWatchInvoke implements IWatcherInvoke {
 
 	private Logger LOG = LoggerFactory.getLogger(SystemConfigWatchInvoke.class);
 	
-	public static final String PATH_KEY = "urlmapwatch";
+	public static final String PATH_KEY = "/urlmapwatch";
 	
 	@Autowired
 	private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;
@@ -46,7 +46,8 @@ public class UrlMapWatchInvoke implements IWatcherInvoke {
 		
 		byte[] datas;
 		try {
-			datas = zkOperator.getData(path);
+			datas = zkOperator.getZkData(path);
+			LOG.info("urlmap:"+datas.length);
 			String s_data = new String(datas);
 			if(s_data!=null && s_data.length()>0){
 				if(s_data.startsWith("#")){

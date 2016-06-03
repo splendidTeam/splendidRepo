@@ -40,7 +40,7 @@ import com.feilong.core.Validator;
 public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	private Logger LOG = LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
 	
-	public static final String PATH_KEY = "scheduletaskwatch";
+	public static final String PATH_KEY = "/scheduletaskwatch";
 	
 	@Autowired
 	private SchedulerManager schedulerManager;
@@ -74,7 +74,7 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	@Override
 	public void invoke(String path, byte[] data) {
 		try {
-			byte[] datas = zkOperator.getData(path);
+			byte[] datas = zkOperator.getZkData(path);
 			Long id = Long.parseLong(new String(datas));
 			
 			// 根据Id 来做不同的事情

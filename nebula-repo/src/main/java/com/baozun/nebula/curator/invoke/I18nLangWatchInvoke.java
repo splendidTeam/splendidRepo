@@ -21,7 +21,7 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 
 	private Logger LOG = LoggerFactory.getLogger(I18nLangWatchInvoke.class);
 	
-	public static final String PATH_KEY = "i18nlangwatch";
+	public static final String PATH_KEY = "/i18nlangwatch";
 	
 	@Autowired
 	private SdkI18nLangManager sdkI18nLangManager;
