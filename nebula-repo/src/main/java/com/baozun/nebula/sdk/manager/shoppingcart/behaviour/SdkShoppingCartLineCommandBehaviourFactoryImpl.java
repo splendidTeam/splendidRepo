@@ -16,11 +16,16 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.dao.product.ItemDao;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
+import com.feilong.tools.slf4j.Slf4jUtil;
 
 /**
  * The Class SdkShoppingCartLineCommandBehaviourFactoryImpl.
@@ -32,12 +37,15 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 public class SdkShoppingCartLineCommandBehaviourFactoryImpl implements SdkShoppingCartLineCommandBehaviourFactory{
 
     @Autowired
-    @Qualifier("sdkShoppingCartLineCommandBundleBehaviour")
-    private SdkShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBundleBehaviour;
+    @Qualifier("shoppingCartLineCommandBundleBehaviour")
+    private ShoppingCartLineCommandBehaviour shoppingCartLineCommandBundleBehaviour;
 
     @Autowired
-    @Qualifier("sdkShoppingCartLineCommandCommonBehaviour")
-    private SdkShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandCommonBehaviour;
+    @Qualifier("shoppingCartLineCommandCommonBehaviour")
+    private ShoppingCartLineCommandBehaviour shoppingCartLineCommandCommonBehaviour;
+
+    @Autowired
+    private ItemDao                          itemDao;
 
     /*
      * (non-Javadoc)
@@ -46,11 +54,21 @@ public class SdkShoppingCartLineCommandBehaviourFactoryImpl implements SdkShoppi
      * shoppingcart.ShoppingCartLineCommand)
      */
     @Override
-    public SdkShoppingCartLineCommandBehaviour getShoppingCartLineCommandBehaviour(ShoppingCartLineCommand shoppingCartLineCommand){
+    public ShoppingCartLineCommandBehaviour getShoppingCartLineCommandBehaviour(ShoppingCartLineCommand shoppingCartLineCommand){
         Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
         if (null == relatedItemId){
-            return sdkShoppingCartLineCommandCommonBehaviour;
+            return shoppingCartLineCommandCommonBehaviour;
         }
-        return sdkShoppingCartLineCommandBundleBehaviour;
+
+        Item item = itemDao.findItemById(relatedItemId);
+        Validate.notNull(item, "when relatedItemId:[%s],item can't be null!", relatedItemId);
+
+        //bundle item?
+        Integer type = item.getType();
+        if (Item.ITEM_TYPE_BUNDLE.equals(type)){
+            return shoppingCartLineCommandBundleBehaviour;
+        }
+        //XXX feilong 将来 1 可以在这里扩展, 2可能换成默认 实现 shoppingCartLineCommandCommonBehaviour
+        throw new UnsupportedOperationException(Slf4jUtil.formatMessage("item:[{}],type is :[{}],not support", relatedItemId, type));
     }
 }

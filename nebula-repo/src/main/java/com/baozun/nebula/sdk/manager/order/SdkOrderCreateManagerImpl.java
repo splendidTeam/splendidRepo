@@ -58,6 +58,8 @@ import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.MapUtil;
@@ -74,78 +76,77 @@ import com.feilong.core.util.MapUtil;
 public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     /** The Constant LOGGER. */
-    private static final Logger                      LOGGER         = LoggerFactory.getLogger(SdkOrderCreateManagerImpl.class);
+    private static final Logger                        LOGGER         = LoggerFactory.getLogger(SdkOrderCreateManagerImpl.class);
 
     /** The Constant SEPARATOR_FLAG. */
-    private static final String                      SEPARATOR_FLAG = "\\|\\|";
+    private static final String                        SEPARATOR_FLAG = "\\|\\|";
 
     /** The sdk order line manager. */
     @Autowired
-    private SdkConsigneeManager                      sdkConsigneeManager;
+    private SdkConsigneeManager                        sdkConsigneeManager;
 
     /** The sdk msg manager. */
     @Autowired
-    private SdkMsgManager                            sdkMsgManager;
+    private SdkMsgManager                              sdkMsgManager;
 
     /** The sdk pay code manager. */
     @Autowired
-    private SdkPayCodeManager                        sdkPayCodeManager;
+    private SdkPayCodeManager                          sdkPayCodeManager;
 
     /** The sdk pay info manager. */
     @Autowired
-    private SdkPayInfoManager                        sdkPayInfoManager;
+    private SdkPayInfoManager                          sdkPayInfoManager;
 
     /** The sdk pay info log manager. */
     @Autowired
-    private SdkPayInfoLogManager                     sdkPayInfoLogManager;
+    private SdkPayInfoLogManager                       sdkPayInfoLogManager;
 
     /** The sdk shopping cart manager. */
     @Autowired
-    private SdkShoppingCartManager                   sdkShoppingCartManager;
+    private SdkShoppingCartManager                     sdkShoppingCartManager;
 
     /** The sdk sku inventory manager. */
     @Autowired
-    private SdkSkuInventoryManager                   sdkSkuInventoryManager;
+    private SdkSkuInventoryManager                     sdkSkuInventoryManager;
 
     /** The sdk order manager. */
     @Autowired
-    private SdkOrderManager                          sdkOrderManager;
+    private SdkOrderManager                            sdkOrderManager;
 
     /** The sdk order promotion manager. */
     @Autowired
-    private SdkOrderPromotionManager                 sdkOrderPromotionManager;
+    private SdkOrderPromotionManager                   sdkOrderPromotionManager;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager                         sdkEngineManager;
+    private SdkEngineManager                           sdkEngineManager;
 
     /** The sdk promotion coupon code manager. */
     @Autowired
-    private SdkPromotionCouponCodeManager            sdkPromotionCouponCodeManager;
+    private SdkPromotionCouponCodeManager              sdkPromotionCouponCodeManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager                       sdkMataInfoManager;
+    private SdkMataInfoManager                         sdkMataInfoManager;
 
     /** The sdk effective manager. */
     @Autowired
-    private SdkEffectiveManager                      sdkEffectiveManager;
+    private SdkEffectiveManager                        sdkEffectiveManager;
 
     /** The sdk order email manager. */
     @Autowired
-    private SdkOrderEmailManager                     sdkOrderEmailManager;
+    private SdkOrderEmailManager                       sdkOrderEmailManager;
 
-    /** The sdk order line create manager. */
     @Autowired
-    private SdkOrderLineCreateManager                sdkOrderLineCreateManager;
+    private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
     /** The order code creator. */
     @Autowired(required = false)
-    private OrderCodeCreatorManager                  orderCodeCreator;
+    private OrderCodeCreatorManager                    orderCodeCreator;
 
     /** The sdk promotion calculation share to sku manager. */
     @Autowired
-    private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
+    private SdkPromotionCalculationShareToSKUManager   sdkPromotionCalculationShareToSKUManager;
 
     /*
      * (non-Javadoc)
@@ -423,7 +424,10 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         // 保存订单行、订单行优惠
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            sdkOrderLineCreateManager.saveOrderLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
+
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+            shoppingCartLineCommandBehaviour.saveOrderLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
         }
 
         // 免运费
