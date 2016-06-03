@@ -76,7 +76,7 @@ public abstract class AbstractWatcher implements IWatcher {
 	 */
 	@PostConstruct
 	public void initListen() throws Exception {
-		Assert.notNull(listenerPath, "listenerPath can not be null!");
+		Assert.notNull(getListenerPath(), "listenerPath can not be null!");
 		Assert.notNull("watcherInvoke", "watcherInvoke can not be null!");
 
 		String path = getListenerPath();
@@ -229,7 +229,9 @@ public abstract class AbstractWatcher implements IWatcher {
 	}
 
 	public String getListenerPath() {
-		return listenerPath;
+		String rootpath = zkOperator.getLifeCycleNode();
+		LOG.info("listenerpath:root="+rootpath + ",listenerpath="+listenerPath);
+		return  rootpath + listenerPath;
 	}
 
 	/*

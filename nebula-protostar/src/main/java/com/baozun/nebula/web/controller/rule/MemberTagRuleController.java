@@ -40,6 +40,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baozun.nebula.command.member.SimpleMemberCombo;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.command.rule.MemberTagRuleCommand;
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.member.MemberGroupManager;
@@ -55,8 +57,6 @@ import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.zk.EngineWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * 
@@ -72,7 +72,7 @@ public class MemberTagRuleController extends BaseController {
 	@Autowired
 	private MemberGroupManager				memberGroupManager;
 	@Autowired
-	private ZooKeeperOperator				zooKeeperOperator;
+	private ZkOperator				zkOperator;
 	@Autowired
 	private SdkPromotionManager				sdkPromotionManager;
 	@Autowired
@@ -125,7 +125,7 @@ public class MemberTagRuleController extends BaseController {
 		try {
 			sdkMemberTagRuleManager.activateMemberTagRule(id);
 			rs.setIsSuccess(true);
-			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			rs.setDescription(getMessage(e.getErrorCode()));
@@ -149,7 +149,7 @@ public class MemberTagRuleController extends BaseController {
 		try {
 			sdkMemberTagRuleManager.inactivateMemberTagRule(id);
 			rs.setIsSuccess(true);
-			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			rs.setDescription(getMessage(e.getErrorCode()));
@@ -187,7 +187,7 @@ public class MemberTagRuleController extends BaseController {
 			cmd.setCreateId(getUserDetails().getUserId());
 			cmd.setCreateTime(new Date());
 			sdkMemberTagRuleManager.save(cmd);
-			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 			rs.setIsSuccess(true);
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -305,7 +305,7 @@ public class MemberTagRuleController extends BaseController {
 		BackWarnEntity rs = new BackWarnEntity(false, null);
 		try {
 			sdkMemberTagRuleManager.update(cmd);
-			zooKeeperOperator.noticeZkServer(EngineWatchInvoke.LISTEN_PATH);
+			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
 			rs.setIsSuccess(true);
 		} catch (BusinessException e) {
 			e.printStackTrace();

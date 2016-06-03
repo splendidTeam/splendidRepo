@@ -11,6 +11,7 @@ import com.baozun.nebula.freight.manager.FreightMemoryManager;
  * @author Justin Hu
  *
  */
+@Deprecated
 public class FreightWatchInvoke extends WatchInvoke {
 
 	public static final String LISTEN_PATH=ZooKeeperOperator.LIFECYCLE_NODE+"/fw";

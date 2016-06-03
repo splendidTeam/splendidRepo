@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
+import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
 import com.baozun.nebula.model.cms.CmsEditArea;
 import com.baozun.nebula.model.cms.CmsModuleInstance;
 import com.baozun.nebula.model.cms.CmsPageInstance;
@@ -37,9 +40,6 @@ import com.baozun.nebula.sdk.manager.cms.SdkCmsPageInstanceManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsPageTemplateManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsParseHtmlContentManager;
 import com.baozun.nebula.sdk.manager.cms.SdkCmsTemplateHtmlManager;
-import com.baozun.nebula.zk.ModuleMapWatchInvoke;
-import com.baozun.nebula.zk.UrlMapWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 import com.feilong.core.Validator;
 
 /**
@@ -65,7 +65,7 @@ public class SdkCmsInitManagerImpl implements SdkCmsInitManager {
 	private SdkCmsParseHtmlContentManager sdkCmsParseHtmlContentManager;
 	
 	@Autowired
-	private ZooKeeperOperator zooKeeperOperator;
+	private ZkOperator zkOperator;
 	private final static Logger log = LoggerFactory.getLogger(SdkCmsInitManagerImpl.class);
 	
 
@@ -98,7 +98,7 @@ public class SdkCmsInitManagerImpl implements SdkCmsInitManager {
 					cmsTemplateHtml.setData(data);
 					CmsTemplateHtml cmsTemplateHtmlNew = sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 					log.info("This published Basic page's code is "+cmsPageInstance.getCode()+", save cmsTemplateHtml id is "+cmsTemplateHtmlNew.getId());
-					zooKeeperOperator.noticeZkServer(UrlMapWatchInvoke.LISTEN_PATH,"#"+cmsPageInstance.getCode());
+					zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
 				}
 
 			}
@@ -126,7 +126,7 @@ public class SdkCmsInitManagerImpl implements SdkCmsInitManager {
 					cmsTemplateHtml.setData(data);
 					CmsTemplateHtml cmsTemplateHtmlNew = sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 					log.info("This published Basic module's code is "+cmsModulenstance.getCode()+", save cmsTemplateHtml id is "+cmsTemplateHtmlNew.getId());
-					zooKeeperOperator.noticeZkServer(ModuleMapWatchInvoke.LISTEN_PATH);
+					zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 				}
 
 			}
