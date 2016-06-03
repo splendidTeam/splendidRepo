@@ -22,7 +22,7 @@ public class UrlMapWatchInvoke implements IWatcherInvoke {
 
 	private Logger LOG = LoggerFactory.getLogger(SystemConfigWatchInvoke.class);
 	
-	public static final String PATH_KEY = "/urlmapwatch";
+	public static final String PATH_KEY = "urlmapwatch";
 	
 	@Autowired
 	private SdkCmsPageInstanceManager sdkCmsPageInstanceManager;

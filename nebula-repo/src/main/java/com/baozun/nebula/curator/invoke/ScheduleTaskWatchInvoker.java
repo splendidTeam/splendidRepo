@@ -40,7 +40,7 @@ import com.feilong.core.Validator;
 public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	private Logger LOG = LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
 	
-	public static final String PATH_KEY = "/scheduletaskwatch";
+	public static final String PATH_KEY = "scheduletaskwatch";
 	
 	@Autowired
 	private SchedulerManager schedulerManager;
