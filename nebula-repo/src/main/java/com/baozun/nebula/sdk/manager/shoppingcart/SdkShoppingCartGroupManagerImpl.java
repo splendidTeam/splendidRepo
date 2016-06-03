@@ -54,24 +54,26 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManagerImpl;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 
 @Transactional
 @Service("sdkShoppingCartGroupManager")
 public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupManager{
 
-    private static final Logger            log = LoggerFactory.getLogger(SdkPromotionCalculationManagerImpl.class);
+    private static final Logger                        log = LoggerFactory.getLogger(SdkPromotionCalculationManagerImpl.class);
 
     @Autowired
-    private SdkPromotionRuleFilterManager  sdkPromotionRuleFilterManager;
+    private SdkShoppingCartLineDao                     sdkShoppingCartLineDao;
 
     @Autowired
-    private SdkShoppingCartLineDao         sdkShoppingCartLineDao;
+    private SdkSkuManager                              sdkSkuManager;
 
     @Autowired
-    private SdkShoppingCartLinePackManager sdkShoppingCartLinePackManager;
+    private SdkPromotionRuleFilterManager              sdkPromotionRuleFilterManager;
 
     @Autowired
-    private SdkSkuManager                  sdkSkuManager;
+    private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
     /**
      * 根据促销引擎计算的结果，把原购物车行数据重新分组。 添加Caption行，按lineGroup分组排列好相应的行。 jsp负责显示。 1，调用引擎，获得SkuSettingList活动的行优惠结果
@@ -215,7 +217,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
             if (line.isCaptionLine())
                 continue;
             //if (line.getPromotionList() == null)
-            //	continue;
+            //  continue;
             curComsumeSku = 0;
             prvComsumeSku = 0;
 
@@ -234,7 +236,11 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 }else if (skuIvt.getAvailableQty() < curComsumeSku){
                     line.setStock(skuIvt.getAvailableQty() - prvComsumeSku);
                 }
-                sdkShoppingCartLinePackManager.packShoppingCartLine(line);
+
+                ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                                .getShoppingCartLineCommandBehaviour(line);
+
+                sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(line);
             }
             //}
         }
@@ -262,7 +268,12 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                     }else if (skuIvt.getAvailableQty() < curComsumeSku){
                         line.setStock(skuIvt.getAvailableQty() - prvComsumeSku);
                     }
-                    sdkShoppingCartLinePackManager.packShoppingCartLine(line);
+
+                    ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                                    .getShoppingCartLineCommandBehaviour(line);
+
+                    sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(line);
+
                 }
             }
         }
@@ -1017,6 +1028,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param promotion
      * @return
      */
+    @Override
     public Boolean checkPromotionHasLineGift(List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList,PromotionCommand onePromotion){
         Boolean orderBase = checkOrderBaseByPromotion(onePromotion);
         Boolean hasGift = false;

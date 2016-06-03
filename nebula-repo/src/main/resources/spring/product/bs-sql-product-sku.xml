@@ -120,7 +120,7 @@
 					WHERE lifecycle = 1 
 					and id in (
 					#foreach( $skuId in $skuIds)
-	   					skuId,
+	   					$skuId,
 					 #end
 		       		 '-1') 
                  ]]>
