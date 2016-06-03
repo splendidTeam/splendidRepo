@@ -104,10 +104,10 @@ public interface ErrorCodes {
 	/** 系统中已经存在该编码<code>{@value}</code>. */
 	public static final Integer	PRODUCT_CATEGORY_CODE_REPEAT				= 6020;
 
-	public static final Integer	PRODUCT_CODE_REPEAT							= 6020;
-
 	/** {0} 分类下,存在名字 {1} 的分类 <code>{@value}</code>. */
 	public static final Integer	PRODUCT_CATEGORY_PARENT_EXIST_NAMECATEGORY	= 6021;
+	
+	public static final Integer	PRODUCT_CODE_REPEAT							= 6020;
 
 	/** 店铺修改失败 */
 	public static final Integer	PRODUCT_PROPERTY_NAME_REPEAT				= 6022;
@@ -636,4 +636,13 @@ public interface ErrorCodes {
 	
 	/** 商品编码不符合正则表达式要求 */
 	public static final Integer	ITEM_CODE_VALID_ERROR						= 25003;
+	
+	/** bundle成员款号丢失 */
+	public static final Integer	ITEM_BUNDLE_ELEMENT_STYLE_LOST				= 25011;
+	
+	/** bundle商品扩展信息不能为空  */
+	public static final Integer ITEM_BUNDLE_EXPANDINFO_NULL					= 25012;
+	
+	/** bundle商品的item重复 */
+	public static final Integer	ITEM_BUNDLE_PRODUCT_CODE_REPEAT				= 25013;
 }

@@ -79,7 +79,7 @@ public class BundleManagerImpl implements BundleManager {
 	@Transactional
 	public Bundle createOrUpdate(BundleCommand bundle) {
 		if(bundle == null) {
-			throw new BusinessException("");
+			throw new BusinessException(ErrorCodes.ITEM_BUNDLE_EXPANDINFO_NULL);
 		}
 		
 		Bundle b = null;
@@ -102,7 +102,7 @@ public class BundleManagerImpl implements BundleManager {
 			
 			// 校验指定的item是否已经存在bundle扩展信息
 			if(bundleDao.findBundleByBundleItemId(itemId, null) != null) {
-				throw new BusinessException(ErrorCodes.PRODUCT_CODE_REPEAT);
+				throw new BusinessException(ErrorCodes.ITEM_BUNDLE_PRODUCT_CODE_REPEAT, new Object[]{itemId});
 			}
 			
 			b = (Bundle) ConvertUtils.convertTwoObject(new Bundle(), bundle);
@@ -135,6 +135,14 @@ public class BundleManagerImpl implements BundleManager {
 					bsc.setBundleElementId(bec.getId());
 					bsc.setBundleId(id);
 					bsc.setItemId(bc.getItemId());
+					// 如果成员是款
+					if(bec.isStyle()) {
+						if(bec.getStyle() == null) {
+							throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_STYLE_LOST);
+						} else {
+							bsc.setStyle(bec.getStyle());
+						}
+					}
 					BundleSku bs = (BundleSku) ConvertUtils.convertTwoObject(new BundleSku(), bsc);
 					bundleSkuDao.save(bs);
 					bsc.setId(bs.getId());
