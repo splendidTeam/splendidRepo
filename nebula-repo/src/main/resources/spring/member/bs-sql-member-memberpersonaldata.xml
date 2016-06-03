@@ -14,7 +14,7 @@
 				select 
 				    a.id as memberId,
 		       		a.login_name as loginName,
-		       		a.login_email as loginEmail,
+		       		a.login_email as loginEmail, 
 		       		a.lifecycle as lifeCycle,
 		       		a.login_mobile as loginMobile,
 		       		a.source as source,
