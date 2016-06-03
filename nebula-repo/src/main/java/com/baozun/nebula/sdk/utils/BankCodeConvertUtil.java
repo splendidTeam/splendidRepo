@@ -2,110 +2,132 @@ package com.baozun.nebula.sdk.utils;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 
 public class BankCodeConvertUtil {
 
 	public static final String UNDERLINE = "_";
 	
-	public static String getPayTypeDetail(String bankCode,int payType) {
-		String payTypeDetail = "支付宝支付";
-	
-		if(payType == ReservedPaymentType.UNIONPAY){
-				payTypeDetail = "银联在线支付";
-				return payTypeDetail;
+	public static String getPayTypeDetail(String bankCode,String payType) {
+		
+		if(SalesOrder.SO_PAYMENT_TYPE_COD.equals(payType)){
+			return "货到付款";
 		}
 		
-		if(payType == ReservedPaymentType.CHINAPNR){
-			payTypeDetail = "汇付天下支付";
-			return payTypeDetail;
+		if(SalesOrder.SO_PAYMENT_TYPE_ALIPAY.equals(payType)){
+			return "支付宝支付";
+		}
+		if(SalesOrder.SO_PAYMENT_TYPE_WECHAT.equals(payType)){
+			return "微信支付";
 		}
 		
-		if(payType == 1){
-			return payTypeDetail;	
+		if(SalesOrder.SO_PAYMENT_TYPE_UNIONPAY.equals(payType)){
+			return "银联在线支付";
 		}
 		
-		if(payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M
-				|| payType == ReservedPaymentType.ALIPAY_CREDIT){
-				switch (payType) {
-				case ReservedPaymentType.ALIPAY_CREDIT:
-					payTypeDetail = "支付宝国内信用卡支付";
-					break;
-				case ReservedPaymentType.ALIPAY_CREDIT_INT_V:
-					payTypeDetail = "支付宝VISA信用卡支付";
-					break;
-				case ReservedPaymentType.ALIPAY_CREDIT_INT_M:
-					payTypeDetail = "支付宝国际信用卡支付";
-					break;
-				default:
-					break;
-				}
-			return payTypeDetail;
-		}
-		
-		StringBuffer bankDesc = new StringBuffer(payTypeDetail).append(UNDERLINE);
-		if(StringUtils.isBlank(bankCode)){
-			return payTypeDetail;
-		}
-		switch (BankDesc.valueOf(bankCode)) {
-		case BOCB2C:
-			bankDesc.append("中国银行");
-			break;
-		case ICBCB2C:
-			bankDesc.append("中国工商银行");
-			break;
-		case CMB:
-			bankDesc.append("招商银行");
-			break;
-		case CCB:
-			bankDesc.append("中国建设银行");
-			break;
-		case ABC:
-			bankDesc.append("中国农业银行");
-			break;
-
-		case SPDB:
-			bankDesc.append("上海浦东发展银行");
-			break;
-		case CIB:
-			bankDesc.append("兴业银行");
-			break;
-		case GDB:
-			bankDesc.append("广东发展银行");
-			break;
-		case CMBC:
-			bankDesc.append("中国民生银行");
-			break;
-		case COMM:
-			bankDesc.append("交通银行");
-			break;
-		case CITIC:
-			bankDesc.append("中信银行");
-			break;
-		case HZCBB2C:
-			bankDesc.append("杭州银行");
-			break;
-		case CEB:
-			bankDesc.append("中国光大银行");
-			break;
-		case SHBANK:
-			bankDesc.append("上海银行");
-			break;
-		case NBBANK:
-			bankDesc.append("宁波银行");
-			break;
-		case SPABANK:
-			bankDesc.append("平安银行");
-			break;
-		case BJRCB:
-			bankDesc.append("北京农商银行");
-			break;
-		case FDB:
-			bankDesc.append("富滇银行");
-			break;
-		}
-		return bankDesc.toString();
+		return "支付宝支付";
 	}
+	
+	
+//	public static String getPayTypeDetail(String bankCode,int payType) {
+//		String payTypeDetail = "支付宝支付";
+//	
+//		if(payType == ReservedPaymentType.UNIONPAY){
+//				payTypeDetail = "银联在线支付";
+//				return payTypeDetail;
+//		}
+//		
+//		if(payType == ReservedPaymentType.CHINAPNR){
+//			payTypeDetail = "汇付天下支付";
+//			return payTypeDetail;
+//		}
+//		
+//		if(payType == 1){
+//			return payTypeDetail;	
+//		}
+//		
+//		if(payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M
+//				|| payType == ReservedPaymentType.ALIPAY_CREDIT){
+//				switch (payType) {
+//				case ReservedPaymentType.ALIPAY_CREDIT:
+//					payTypeDetail = "支付宝国内信用卡支付";
+//					break;
+//				case ReservedPaymentType.ALIPAY_CREDIT_INT_V:
+//					payTypeDetail = "支付宝VISA信用卡支付";
+//					break;
+//				case ReservedPaymentType.ALIPAY_CREDIT_INT_M:
+//					payTypeDetail = "支付宝国际信用卡支付";
+//					break;
+//				default:
+//					break;
+//				}
+//			return payTypeDetail;
+//		}
+//		
+//		StringBuffer bankDesc = new StringBuffer(payTypeDetail).append(UNDERLINE);
+//		if(StringUtils.isBlank(bankCode)){
+//			return payTypeDetail;
+//		}
+//		switch (BankDesc.valueOf(bankCode)) {
+//		case BOCB2C:
+//			bankDesc.append("中国银行");
+//			break;
+//		case ICBCB2C:
+//			bankDesc.append("中国工商银行");
+//			break;
+//		case CMB:
+//			bankDesc.append("招商银行");
+//			break;
+//		case CCB:
+//			bankDesc.append("中国建设银行");
+//			break;
+//		case ABC:
+//			bankDesc.append("中国农业银行");
+//			break;
+//
+//		case SPDB:
+//			bankDesc.append("上海浦东发展银行");
+//			break;
+//		case CIB:
+//			bankDesc.append("兴业银行");
+//			break;
+//		case GDB:
+//			bankDesc.append("广东发展银行");
+//			break;
+//		case CMBC:
+//			bankDesc.append("中国民生银行");
+//			break;
+//		case COMM:
+//			bankDesc.append("交通银行");
+//			break;
+//		case CITIC:
+//			bankDesc.append("中信银行");
+//			break;
+//		case HZCBB2C:
+//			bankDesc.append("杭州银行");
+//			break;
+//		case CEB:
+//			bankDesc.append("中国光大银行");
+//			break;
+//		case SHBANK:
+//			bankDesc.append("上海银行");
+//			break;
+//		case NBBANK:
+//			bankDesc.append("宁波银行");
+//			break;
+//		case SPABANK:
+//			bankDesc.append("平安银行");
+//			break;
+//		case BJRCB:
+//			bankDesc.append("北京农商银行");
+//			break;
+//		case FDB:
+//			bankDesc.append("富滇银行");
+//			break;
+//		}
+//		return bankDesc.toString();
+//	}
 	
 	public static String getPayTypeDetail(String bankCode,int payType,boolean exist) {
 		String payTypeDetail = "支付宝支付";
