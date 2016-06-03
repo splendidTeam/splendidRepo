@@ -43,6 +43,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.freight.DistributionModeCommand;
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.FreightWatchInvoke;
 import com.baozun.nebula.dao.freight.ShippingFeeConfigDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
@@ -61,8 +63,6 @@ import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.controller.BaseController;
-import com.baozun.nebula.zk.FreightWatchInvoke;
-import com.baozun.nebula.zk.ZooKeeperOperator;
 
 /**
  * @author jumbo
@@ -90,7 +90,7 @@ public class ShippingController extends BaseController{
 	private ExcelManipulatorFactory excelFactory;
 	
 	@Autowired
-	private ZooKeeperOperator zooKeeperOperator;
+	private ZkOperator zkOperator;
 	
 	private static final String		DEFAULT_PATH							= "excel/";
 	private static final String		FILE_NAME								= "shipping_fee_import.xlsx";
@@ -137,7 +137,7 @@ public class ShippingController extends BaseController{
 	@RequestMapping(value = "/freight/enableShippingTemplate.htm")
 	@ResponseBody
 	public Object enableShippingTemeplate( Model model ) {
-		zooKeeperOperator.noticeZkServer(FreightWatchInvoke.LISTEN_PATH);
+		zkOperator.noticeZkServer(zkOperator.getPath(FreightWatchInvoke.PATH_KEY));
 		return SUCCESS;
 	}
 	
