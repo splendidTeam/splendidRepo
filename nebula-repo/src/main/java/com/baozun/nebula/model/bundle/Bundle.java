@@ -133,7 +133,12 @@ public class Bundle extends BaseModel {
 	/**
 	 * 捆绑装类型
 	 * 
-	 * <p>新的设计中已经支持商品和款的混合模式，故不再考虑通过BundleType来区分bundle类型。</p>
+	 * <ol>
+	 * <li>商品对商品，通常用于针对单品主卖品配置捆绑装，捆绑装中搭配的也是单品。</li>
+	 * <li>商品对款，通常用于针对单品主卖品配置捆绑装，捆绑装中搭配的是一款或多款商品。</li>
+	 * <li>款对款，通常用于针对某一款商品主卖品配置捆绑装，捆绑装中搭配的是一款或多款商品。</li>
+	 * <li>款对商品，通常用于针对某一款商品主卖品配置捆绑装，捆绑装中搭配的是单品。</li>
+	 * </ol>
 	 */
 	@Deprecated
 	private Integer bundleType;
@@ -202,20 +207,12 @@ public class Bundle extends BaseModel {
 		this.syncWithInv = syncWithInv;
 	}
 
-	/**
-	 * @see Bundle#bundleType
-	 * @return
-	 */
 	@Column(name = "BUNDLE_TYPE")
 	@Deprecated
 	public Integer getBundleType() {
 		return bundleType;
 	}
 
-	/**
-	 * @see Bundle#bundleType
-	 * @param bundleType
-	 */
 	@Deprecated
 	public void setBundleType(Integer bundleType) {
 		this.bundleType = bundleType;

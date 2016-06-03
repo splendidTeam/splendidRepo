@@ -429,7 +429,7 @@ public class DemoController  {
 	@ResponseBody
 	public Object testZk()throws Exception{
 		
-		boolean result=zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+		boolean result=zkOperator.noticeZkServer(EngineWatchInvoke.PATH_KEY);
 		
 		return result;
 	}

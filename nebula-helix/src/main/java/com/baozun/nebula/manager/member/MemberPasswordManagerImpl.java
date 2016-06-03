@@ -175,7 +175,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 					smsCommand,
 					CaptchaType.MIXED,
 					ForgetPasswordSendVCodeConstant.VALIDATE_CODE_LENGTH,
-					ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME);
+					ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME,BUSINESS_CODE);
 			flag = sendFailOrSuccess;
 		}
 		return flag;

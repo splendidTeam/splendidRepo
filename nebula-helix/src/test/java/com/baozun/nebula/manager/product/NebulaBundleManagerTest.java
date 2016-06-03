@@ -13,7 +13,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.baozun.nebula.command.product.BundleCommand;
-import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.web.command.BundleValidateResult;
 import com.feilong.tools.jsonlib.JsonUtil;
 
@@ -75,16 +74,5 @@ public class NebulaBundleManagerTest {
 		BundleValidateResult result = bundleManager.validateBundle(3L, skuIds, 10);
 		System.out.println(result.getType());
 
-	}
-	
-	@Test
-	public void testGetBundleSkusPrice(){
-		List<Long> skuIds = new ArrayList<Long>();
-		skuIds.add(1L);
-		skuIds.add(2L);
-		List<BundleSkuPriceCommand> result = bundleManager.getBundleSkusPrice(3L, skuIds);
-		for(BundleSkuPriceCommand command : result) {
-			System.out.println(command.getListPrice().intValueExact() + "***" + command.getSalesPrice().intValueExact());
-		}
 	}
 }

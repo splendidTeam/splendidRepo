@@ -365,7 +365,6 @@ function showSkuTable(isLoadInit,saleInfo){
 	
 }
 
-list = "";
 function drawTableContent(propertyValueArray,propertyNameArray,propertyInputValueArray,isLoadInit,saleInfo){
 
 	var skuInfoList = new Array();
@@ -437,10 +436,14 @@ function drawTableContent(propertyValueArray,propertyNameArray,propertyInputValu
 
 				tableContent += ("<tr>"+dynamicStr+proHtml+"</tr>");
 			}
+			
+			
 		}else{
 			//多个销售属性的展示
 			tableContent = bulidTable(null, propertyValueArray, 0,isLoadInit);
+			
 		}
+		
 		
 		$j("#jsonSku").val(JSON.stringify(skuInfoList));
 	}else{
@@ -471,8 +474,10 @@ function drawTableContent(propertyValueArray,propertyNameArray,propertyInputValu
 		$j("#jsonSku").val(list);
 	}
 	
+	
 	var html =  tableHeader+tableContent;
 	saleInfo.find(".extensionTable").html(html);
+	
 }
 
 //--------------------------------多个销售属性循环start-------------------------------

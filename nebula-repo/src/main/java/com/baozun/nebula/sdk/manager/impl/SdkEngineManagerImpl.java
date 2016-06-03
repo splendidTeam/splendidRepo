@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,7 +121,11 @@ public class SdkEngineManagerImpl implements SdkEngineManager{
             for (ShoppingCartLineCommand shoppingCartLine : entry.getValue().getShoppingCartLineCommands()){
                 //直推礼品不做校验
                 if (!isNoNeedChoiceGift(shoppingCartLine)){
-                    doEngineCheck(shoppingCartLine, false);
+
+                    if (null == shoppingCartLine.getRelatedItemId()){
+                        doEngineCheck(shoppingCartLine, false);
+
+                    }
                 }
             }
         }

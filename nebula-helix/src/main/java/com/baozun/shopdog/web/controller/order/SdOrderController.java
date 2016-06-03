@@ -102,11 +102,17 @@ public class SdOrderController implements AbstractSdOrderController {
         salesOrderCommand.setBuyerName(shopdogOrderParamCommand.getName());
         salesOrderCommand.setBuyerTel(shopdogOrderParamCommand.getMobile());
         // 设置支付信息
-        salesOrderCommand.setPayment(Integer.parseInt(shopdogOrderParamCommand.getPaymentType()));
-        salesOrderCommand.setPaymentStr("支付宝支付");
-        salesOrderCommand.setPayType(Integer.parseInt(shopdogOrderParamCommand.getPaymentType()));
-        
-        //此会员名称是否需要从数据库中查询 TODO
+        if("1".equals(shopdogOrderParamCommand.getPaymentType())){
+            salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
+            salesOrderCommand.setPaymentStr("支付宝支付");
+            salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
+        }else if("2".equals(shopdogOrderParamCommand.getPaymentType())){
+            salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
+            salesOrderCommand.setPaymentStr("微信支付");
+            salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
+        }
+                
+        //此会员名称是否需要从数据库中查询
         if (null != shopdogOrderParamCommand.getMemberId()) {
             MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
             salesOrderCommand.setMemberName(null != memberCommand ? memberCommand.getRealName() : "");

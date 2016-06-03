@@ -15,7 +15,57 @@ $j.extend(loxia.regional['zh-CN'],{
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
 
 $j(document).ready(function(){
-	$j(':radio[name=type]').bind('change', function(){
+	
+	//点击'设置主卖品'弹出对应弹层
+	$j("#selectPro").on("click",function(){
+		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
+		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
+	});	
+	
+	//点击'+新成员'弹出对应弹层
+	$j(".selectStyle").on("click",function(){
+		$j('.select-style-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
+	});	
+	
+	
+	/*=================    添加主商品    ==========================*/
+	//dialog-close  给关闭图标绑定点击事件
+	bindClose();
+	
+	$j("#addMainProduct").on("click",function(){
+		$j(".dialog-close").click();
+		$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
+		bindClose();
+		$j("#selectPro").hide();
+	})
+	
+	initSetMainProduct();
+	
+	/*=================    添加主商品    ==========================*/
+	
+	
+	
+	
+	
+	
+	//价格设置
+	$j("input[name='setPrice']").bind('change', function(){
+		var currVal = $j(this).val();
+		
+		if(currVal == 'subtotal') {//按捆绑商品总价
+			$j('.product-table').hide();
+			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
+		} else if(currVal == 'fix'){//一口价
+			$j('.product-table').show();
+			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
+		} else if(currVal == 'custom'){//定制
+			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
+			$j('.product-table').hide();
+		}
+	});
+	
+	//设置主卖品  选择类型
+	$j("input[name='selectType']").bind('change', function(){
 		var currVal = $j(this).val();
 		
 		if(currVal == 'product') {
@@ -28,10 +78,10 @@ $j(document).ready(function(){
 	});
 	
 	// 点击添加主卖品
-	$j("#set_main_element").on("click",function(){
-		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});
-		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
-	});	
+//	$j("#set_main_element").on("click",function(){
+//		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});
+//		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
+//	});	
 	
 	// 点击添加捆绑成员
 	$j("#add_bundle_element").on("click",function(){
@@ -46,7 +96,7 @@ $j(document).ready(function(){
 	
 	// 点击搜索
 	$j("#search_button").on("click", function(){
-		var currVal = $j(':radio[name=type]:checked').val();
+		var currVal = $j("input[name='selectType']:checked").val();
 		if(currVal == 'product') {
 			findProduct();
 		} else {
@@ -96,6 +146,32 @@ $j(document).ready(function(){
 		}],
 		dataurl : findItemInfoListJsonUrl
 	});
+});
+/*
+ * 判断进入页面时是否设置主商品
+ * 		1、设置了就不显示‘设置主商品’
+ * 		2、未设置就显示‘设置主商品’
+ */
+function initSetMainProduct(){
+	if($j("#selectPro").prev() != null){
+		$j("#selectPro").hide();
+	}else{
+		$j("#selectPro").show();
+	}
+}
+
+
+/*
+ *给关闭图标绑定点击事件 
+ */
+function bindClose(){
+	$j(".setMainProduct .dialog-close").bind("click",function(){
+		$j("#selectPro").show();
+	})
+	//关闭图标
+	$j(".dialog-close").bind("click",function(){
+		$j(this).closest("li.main-pro").remove();
+	})
 	// 商品状态
 	$j.ui.loxiasimpletable().typepainter.threeState = {
 		getContent : function(data) {
@@ -110,8 +186,8 @@ $j(document).ready(function(){
 		postHandle : function(context) {
 			// do nothing
 		}
-	};
-});
+	}
+}
 
 function findProduct(){
 	$j("#selectProList_product").data().uiLoxiasimpletable.options.currentPage = 1;

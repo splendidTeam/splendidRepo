@@ -62,34 +62,57 @@ public class OrderFormValidator implements Validator{
     public void validate(Object target,Errors errors){
         OrderForm orderForm = (OrderForm) target;
         
-        // 地址信息数据
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.name", "name.field.required");// 收货人姓名
- 		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.buyerName", "buyerName.field.required");// 收货人购买人姓名
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.countryId", "countryId.field.required");// 国家
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.provinceId", "provinceId.field.required");// 省
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.cityId", "cityId.field.required");// 城市
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.areaId", "areaId.field.required");// 区
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.townId", "townId.field.required");// 县
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.address", "address.field.required");// 地址
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.postcode", "postcode.field.required");// 邮编
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.mobile", "mobile.field.required");// 收货人手机
- 		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.email", "email.field.required");// 收货人邮箱
- 		// 邮箱有效性检查
+        //验证订单form流程，流程模板模式，如果不需要某一项验证，就继承空方法
+        validateShippingInfoSubForm(orderForm,errors);
+        validateEmail(orderForm,errors);
+        validateMobile(orderForm,errors);
+        validatePaymentType(orderForm,errors);
+ 		validateCouponInfoSubForm(orderForm,errors);
+ 		validateInvoiceInfoSubForm(orderForm, errors);
+
+    }
+    
+    protected void validatePaymentType(OrderForm orderForm,Errors errors){
+    	// 支付信息验证
+    	ValidationUtils.rejectIfEmptyOrWhitespace(errors, "paymentInfoSubForm.paymentType", "paymentType.field.required");// 支付方式
+    }
+    
+    protected void validateEmail(OrderForm orderForm,Errors errors){
+    	// 邮箱有效性检查
  		if (!errors.hasFieldErrors("shippingInfoSubForm.email")){
 			if (!EmailValidator.getInstance().isValid(orderForm.getShippingInfoSubForm().getEmail())){
 				errors.rejectValue("shippingInfoSubForm.email", "member.email.error");
 			}
 		}
- 		// 手机有效性检查
+    }
+    
+    protected void validateMobile(OrderForm orderForm,Errors errors){
+    	// 手机有效性检查
  		if (!errors.hasFieldErrors("shippingInfoSubForm.mobile")){
 			if (!RegexUtil.matches(RegexPattern.MOBILEPHONE, orderForm.getShippingInfoSubForm().getMobile())){
 				errors.rejectValue("shippingInfoSubForm.mobile", "member.mobile.error");
 			}
 		}
- 		// 支付信息验证
- 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "paymentInfoSubForm.paymentType", "paymentType.field.required");// 支付方式
- 		
- 		// 优惠券信息验证
+    }
+    
+    
+    protected void validateShippingInfoSubForm(OrderForm orderForm,Errors errors){
+    	// 地址信息数据
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.name", "name.field.required");// 收货人姓名
+		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.buyerName", "buyerName.field.required");// 收货人购买人姓名
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.countryId", "countryId.field.required");// 国家
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.provinceId", "provinceId.field.required");// 省
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.cityId", "cityId.field.required");// 城市
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.areaId", "areaId.field.required");// 区
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.townId", "townId.field.required");// 县
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.address", "address.field.required");// 地址
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.postcode", "postcode.field.required");// 邮编
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.mobile", "mobile.field.required");// 收货人手机
+		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.email", "email.field.required");// 收货人邮箱
+    }
+    
+    protected void validateCouponInfoSubForm(OrderForm orderForm,Errors errors){
+    	// 优惠券信息验证
  		// 优惠券不为空时，需要验证优惠券是否可用
  		if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getCouponInfoSubForm())) {
  			if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getCouponInfoSubForm().getCouponCode())) {
@@ -101,16 +124,18 @@ public class OrderFormValidator implements Validator{
  				}
  				
  	 		}
- 		}
- 		 
- 		// 发票信息验证
+ 		}	
+    }
+    
+    protected void validateInvoiceInfoSubForm(OrderForm orderForm,Errors errors){
+    	// 发票信息验证
  		// 需要发票时候，验证发票相关信息
  		if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm())) {
  			if (com.feilong.core.Validator.isNotNullOrEmpty(orderForm.getInvoiceInfoSubForm().getIsNeedInvoice())) {
  				if (orderForm.getInvoiceInfoSubForm().getIsNeedInvoice()) {// 是否需要发票
-// 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.consignee", "consignee.field.required");// 发票收货人
-// 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.telphone", "telphone.field.required");// 发票联系方式
-// 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.address", "address.field.required");// 发票地址
+//    	 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.consignee", "consignee.field.required");// 发票收货人
+//    	 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.telphone", "telphone.field.required");// 发票联系方式
+//    	 					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.address", "address.field.required");// 发票地址
  					//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "invoiceInfoSubForm.invoiceContent", "invoiceContent.field.required");// 发票内容
  					
  					if (InvoiceInfoSubForm.INVOICE_TYPE_COMPANY.equals(orderForm.getInvoiceInfoSubForm().getInvoiceTitle())) {// 发票类型  个人还是公司  公司要判断抬头
@@ -119,10 +144,6 @@ public class OrderFormValidator implements Validator{
  	 			}
  			}
 		}
-
-    }
-
-
-    
+    }  
 
 }

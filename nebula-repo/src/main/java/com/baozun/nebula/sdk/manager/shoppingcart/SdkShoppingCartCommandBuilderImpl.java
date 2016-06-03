@@ -51,6 +51,8 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
+import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
@@ -68,39 +70,38 @@ import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommandBuilder{
 
     /** The Constant CHECKED_STATE. */
-    private static final int                         CHECKED_STATE = 1;
+    private static final int                           CHECKED_STATE = 1;
 
-    /** The sdk shopping cart line pack manager. */
     @Autowired
-    private SdkShoppingCartLinePackManager           sdkShoppingCartLinePackManager;
+    private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager                         sdkEngineManager;
+    private SdkEngineManager                           sdkEngineManager;
 
     /** The sdk shopping cart group manager. */
     @Autowired
-    private SdkShoppingCartGroupManager              sdkShoppingCartGroupManager;
+    private SdkShoppingCartGroupManager                sdkShoppingCartGroupManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager                       sdkMataInfoManager;
+    private SdkMataInfoManager                         sdkMataInfoManager;
 
     /** The sdk promotion calculation manager. */
     @Autowired
-    private SdkPromotionCalculationManager           sdkPromotionCalculationManager;
+    private SdkPromotionCalculationManager             sdkPromotionCalculationManager;
 
     /** The sdk promotion calculation share to sku manager. */
     @Autowired
-    private SdkPromotionCalculationShareToSKUManager sdkPromotionCalculationShareToSKUManager;
+    private SdkPromotionCalculationShareToSKUManager   sdkPromotionCalculationShareToSKUManager;
 
     /** The sdk freight fee manager. */
     @Autowired
-    private SdkFreightFeeManager                     sdkFreightFeeManager;
+    private SdkFreightFeeManager                       sdkFreightFeeManager;
 
     /** The sdk promotion rule filter manager. */
     @Autowired
-    private SdkPromotionRuleFilterManager            sdkPromotionRuleFilterManager;
+    private SdkPromotionRuleFilterManager              sdkPromotionRuleFilterManager;
 
     /*
      * (non-Javadoc)
@@ -124,7 +125,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             if (shoppingCartLineCommand.getId() == null){
                 shoppingCartLineCommand.setId(new Long(--i));
             }
-            sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
+
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+            shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
         }
         //*******************************************************************************************************
 
@@ -789,7 +793,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartLineCommand.setStock(qty);
         // 赠品都设置为有效
         shoppingCartLineCommand.setValid(true);
-        sdkShoppingCartLinePackManager.packShoppingCartLine(shoppingCartLineCommand);
+
+        ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                        .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+        shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
 
         shoppingCartLineCommand.setPromotionId(promotionSKUDiscAMTBySetting.getPromotionId());
         shoppingCartLineCommand.setSettingId(settingId);

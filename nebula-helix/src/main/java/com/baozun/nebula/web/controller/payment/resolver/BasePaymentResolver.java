@@ -21,8 +21,6 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.command.OnLinePaymentCommand;
@@ -34,9 +32,14 @@ import com.feilong.servlet.http.RequestUtil;
 
 public abstract class BasePaymentResolver {
 	
-	private static final Logger	LOG = LoggerFactory.getLogger(BasePaymentResolver.class);
-	
+	/** 过期时间参数 */
 	private final static String PAY_EXPIRY_TIME = "payExpiryTime";
+	
+    /** 支付成功页面. */
+    protected static final String URL_PAY_SUCCESS = "/payment/success.htm";
+    
+    /** 支付失败页面. */
+    protected static final String URL_PAY_FAILURE = "/payment/failure.htm";
 	
 	@Autowired
 	private MataInfoManager mataInfoManager;
@@ -81,6 +84,19 @@ public abstract class BasePaymentResolver {
 		} else {
 			return itBPay.toString() + "m";
 		}
+	}
+	
+	/**
+	 * 
+	 * @param subOrdinate
+	 * @return
+	 */
+	protected String getPaySuccessPageRedirect(String subOrdinate) {
+		return URL_PAY_SUCCESS + "?subOrdinate=" + subOrdinate;
+	}
+	
+	protected String getPayFailurePageRedirect(String subOrdinate) {
+		return URL_PAY_FAILURE + "?subOrdinate=" + subOrdinate;
 	}
 	
 

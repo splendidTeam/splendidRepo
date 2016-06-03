@@ -9,7 +9,7 @@
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title">主卖品</div>
 		<div class="ui-block-content border-grey">
-			<ul class="clearfix">
+			<ul class="clearfix setMainProduct">
 				<li class="main-pro">
 					<a class="showpic"> 
 						<img src="">
@@ -18,94 +18,7 @@
 					<p class="title p10">ABCD1234</p>
 					<p class="sub-title">超级舒适运动跑鞋</p>
 				</li>
-				<li id="set_main_element" class="main-pro pro-empty selectPro">设置主卖品</li>
-			</ul>
-		</div>
-	</div>
-	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">捆绑成员</div>
-		<div class="ui-block-content border-grey">
-			<ul class="clearfix">
-				<li class="main-pro">
-					<a class="showpic"> 
-						<img src="">
-					 	<span class="dialog-close">X</span>
-					</a>
-					<p class="title p10">ABCD1234</p>
-					<p class="sub-title">超级舒适运动跑鞋</p>
-				</li>
-				<li id="add_bundle_element" class="main-pro pro-empty selectStyle">+新成员</li>
-			</ul>
-			<a class="user-refresh"></a>
-		</div>
-	</div>
-	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">价格设置</div>
-		<div class="ui-block-content border-grey">
-	   		<label class="label-line block pb10"> <input type="radio" name="setPrice"> 按捆绑商品总价  </label>
-	   		<label class="label-line block pb10"> <input type="radio" name="setPrice"> 一口价（简单）  </label>
-	   		<label class="label-line block pb10"> <input type="radio" name="setPrice"> 定制    </label>
-	   		<label class="label-line block pb10"> 捆绑商品总价 <input type="text" name="setPrice" readonly placeholder="900"> </label>
-		</div>
-	   	<table class="inform-person" >
-			<thead>
-				<tr>
-					<th width="10%">成员序号</th>
-					<th width="25%">商品</th>
-					<th width="25%">原销售价 </th>
-					<th width="15%">现售价</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>1</td>
-					<td>ABCD1234</td>
-					<td>500</td>
-					<td> <input type="text" name="setPrice" placeholder="500"></td>
-				</tr>
-			</tbody>
-		</table>
-		<table class="inform-person" >
-			<thead>
-				<tr>
-					<th width="10%">成员序号</th>
-					<th width="25%">销售单元</th>
-					<th width="25%">是否参与 </th>
-					<th width="25%">原销售价</th>
-					<th width="15%">现售价</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>1</td>
-					<td>商品</td>
-					<td>ABCD1234</td>
-					<td>500</td>
-					<td> <input type="text" name="setPrice" placeholder="500"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-</div>					 
-
-<div class="ui-block-title1 ui-block-title" >
-	<spring:message code="item.add.bundleExtendedInfo" />
-</div>
-
-<div class="ui-block-content border-grey">
-	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">主卖品</div>
-		<div class="ui-block-content border-grey">
-			<ul class="clearfix">
-				<li class="main-pro">
-					<a class="showpic"> 
-						<img src="">
-						<span class="dialog-close">X</span>
-					</a>
-					<p class="title p10">ABCD1234</p>
-					<p class="sub-title">超级舒适运动跑鞋</p>
-				</li>
-				<li class="main-pro pro-empty selectPro">设置主卖品</li>
+				<li class="main-pro pro-empty" id="selectPro">设置主卖品</li>
 			</ul>
 		</div>
 	</div>
@@ -129,12 +42,12 @@
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title">价格设置</div>
 		<div class="ui-block-content border-grey">
-	   		<label class="label-line block pb10"> <input type="radio" name="setPrice"> 按捆绑商品总价  </label>
-	   		<label class="label-line block pb10"> <input type="radio" name="setPrice"> 一口价（简单）  </label>
-	   		<label class="label-line block pb10"> <input type="radio" name="setPrice"> 定制    </label>
+	   		<label class="label-line block pb10"> <input type="radio" name="setPrice" value="subtotal" checked="checked"> 按捆绑商品总价  </label>
+	   		<label class="label-line block pb10"> <input type="radio" name="setPrice" value="fix"> 一口价（简单）  </label>
+	   		<label class="label-line block pb10"> <input type="radio" name="setPrice" value="custom"> 定制    </label>
 	   		<label class="label-line block pb10"> 捆绑商品总价 <input type="text" name="setPrice" readonly placeholder="900"> </label>
 		</div>
-	   	<table class="inform-person" >
+	   	<table class="inform-person sku-table" >
 			<thead>
 				<tr>
 					<th width="10%">成员序号</th>
@@ -148,11 +61,11 @@
 					<td>1</td>
 					<td>ABCD1234</td>
 					<td>500</td>
-					<td> <input type="text" name="setPrice" placeholder="500"></td>
+					<td> <input type="text" name="setPrice" readonly placeholder="500"></td>
 				</tr>
 			</tbody>
 		</table>
-		<table class="inform-person" >
+		<table class="inform-person product-table" style="display:none">
 			<thead>
 				<tr>
 					<th width="10%">成员序号</th>
@@ -174,6 +87,7 @@
 		</table>
 	</div>
 </div>					 
+				 
 
 <!-- 选择商品弹出层 -->
 <div class="select-pro-layer proto-dialog">
@@ -182,11 +96,11 @@
 		<div class="ui-block">
 			<div class="ui-block">
 				<div class="ui-block-content ui-block-content-lb">
-					<form id="mainItemDialogSearchForm">
+					<form action="/recommand/findItemInfoList.json" id="mainItemDialogSearchForm">
 						<div class="form-group p10">
 							<label>类型</label>
-							<input type="radio" name="type" value="product" checked="checked" />商品
-							<input type="radio" name="type" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
+							<input type="radio" name="selectType" value="product" checked="checked" />商品
+							<input type="radio" name="selectType" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
 						</div>
 						<div class="form-group p10">
 							<label>编码</label>
@@ -243,6 +157,6 @@
 		</div>
 	</div>
 	<div class="proto-dialog-button-line right">
-		<input type="button" value="确定" class="button orange"/>
+		<input type="button" value="确定" class="button orange" id="addMainProduct"/>
 	</div>
 </div>
