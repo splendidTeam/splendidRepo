@@ -114,6 +114,10 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		// 查询
 		SearchResultPage<ItemForSolrCommand> searchResultPage = searchManager.search(solrQuery);
 		
+		if (Validator.isNotNullOrEmpty(searchCommand.getSearchWord())) {
+			model.addAttribute(ITEM_LIST_SEARCH_TITLE, searchCommand.getSearchWord());
+		}
+		
 		// 是否分组显示
 		String isGroup = solrQuery.get(GroupParams.GROUP);
 		//如果是分组
@@ -143,10 +147,6 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		ItemListViewCommand itemListViewCommand = listViewCommandConverter.convert(searchResultPage);
 
 		model.addAttribute(ITEM_LIST_VIEW_COMMOND, itemListViewCommand);
-
-		if (Validator.isNotNullOrEmpty(searchCommand.getSearchWord())) {
-			model.addAttribute(ITEM_LIST_SEARCH_TITLE, searchCommand.getSearchWord());
-		}
 
 		return ITEM_LIST;
 	}
