@@ -199,14 +199,13 @@ public class NebulaOrderConfirmController extends BaseController{
                         contactCommandList,
                         null);
         //购物车为空，抛出异常
-        Validate.notNull(shoppingCartCommand,"shoppingCartCommand can't be null");
-        
+        Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
+
         // 封装viewCommand
         OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
         orderConfirmViewCommand.setShoppingCartCommand(shoppingCartCommand);
         // 收获地址信息
         orderConfirmViewCommand.setAddressList(contactCommandList);
-        orderConfirmViewCommand.setKey(key);
 
         model.addAttribute("orderConfirmViewCommand", orderConfirmViewCommand);
         return "transaction.check";
