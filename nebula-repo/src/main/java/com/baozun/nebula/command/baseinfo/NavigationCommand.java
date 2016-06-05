@@ -33,7 +33,7 @@ public class NavigationCommand implements Command{
 	private LangProperty			name;
 
 	/**
-	 * 导航类型 1.url类型，设置一个url 2.分类类型，表示与分类相关联
+	 * 导航类型 3.活动推广链接，设置一个url 5.商品集合链接，表示与分类，属性相关联
 	 */
 	private Integer					type;
 
