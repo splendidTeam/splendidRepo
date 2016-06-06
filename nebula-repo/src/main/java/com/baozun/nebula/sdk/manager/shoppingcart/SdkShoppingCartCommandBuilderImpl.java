@@ -18,7 +18,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
@@ -48,11 +46,10 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
@@ -87,10 +84,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkMataInfoManager                         sdkMataInfoManager;
 
-    /** The sdk promotion calculation manager. */
-    @Autowired
-    private SdkPromotionCalculationManager             sdkPromotionCalculationManager;
-
     /** The sdk promotion calculation share to sku manager. */
     @Autowired
     private SdkPromotionCalculationShareToSKUManager   sdkPromotionCalculationShareToSKUManager;
@@ -99,9 +92,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkFreightFeeManager                       sdkFreightFeeManager;
 
-    /** The sdk promotion rule filter manager. */
     @Autowired
-    private SdkPromotionRuleFilterManager              sdkPromotionRuleFilterManager;
+    private PromotionBriefBuilder                      promotionBriefBuilder;
 
     /*
      * (non-Javadoc)
@@ -455,7 +447,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      */
     private void setShopCartPromotionInfos(ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand){
         // 获取促销数据.需要调用促销引擎计算优惠价格
-        List<PromotionBrief> promotionBriefList = calcuPromoBriefs(shoppingCartCommand);
+        List<PromotionBrief> promotionBriefList = promotionBriefBuilder.getPromotionBriefList(shoppingCartCommand);
 
         Map<Long, List<PromotionBrief>> shopIdAndPromotionBriefListMap = CollectionsUtil.group(promotionBriefList, "shopId");
 
@@ -823,34 +815,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     }
 
     //**********************************************************************************************
-
-    /**
-     * 用于计算获取促销数据.
-     *
-     * @param shoppingCartCommand
-     *            the shop cart
-     * @return the list< promotion brief>
-     */
-    private List<PromotionBrief> calcuPromoBriefs(ShoppingCartCommand shoppingCartCommand){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
-        Set<String> memboSet = shoppingCartCommand.getUserDetails().getMemComboList();
-
-        // 获取人群和商品促销的交集
-        Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
-        Set<String> itemComboIdsSet = ShoppingCartUtil.getItemComboIds(shoppingCartLineCommandList);
-
-        List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
-                        new ArrayList<Long>(shopIdSet),
-                        memboSet,
-                        itemComboIdsSet,
-                        shoppingCartCommand.getCurrentTime());
-
-        if (Validator.isNotNullOrEmpty(promotionList)){
-            // 通过购物车和促销集合计算商品促销
-            return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionList);
-        }
-        return Collections.emptyList();
-    }
 
     /**
      * 根据店铺封装shopCart对象.
