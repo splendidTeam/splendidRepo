@@ -206,3 +206,18 @@ INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","o
 INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'PRODUCT_CUSTOMIZE_FILTER', '自定义筛选器类型',  '1', '条件', '3', '3', now(), 'zh-CN', true);
 INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'PRODUCT_CUSTOMIZE_FILTER', '自定义筛选器类型',  '1', '优惠', '4', '4', now(), 'zh-CN', true);
 
+-- 库存变更日志类型
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_TYPE', '库存日志变化类型', '1', '全量', '1', '1', now(), 'zh-CN', true);
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_TYPE', '库存日志变化类型', '1', '增加', '2', '2', now(), 'zh-CN', true);
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_TYPE', '库存日志变化类型', '1', '减少', '3', '3', now(), 'zh-CN', true);
+
+-- 库存变更日志来源
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_SOURCE', '库存日志变化来源', '1', '商城', '1', '1', now(), 'zh-CN', true);
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_SOURCE', '库存日志变化来源', '1', 'PTS', '2', '2', now(), 'zh-CN', true);
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_SOURCE', '库存日志变化来源', '1', '定时任务', '3', '3', now(), 'zh-CN', true);
+INSERT INTO "t_sys_choose_option"("id" ,"group_code","group_desc","lifecycle","option_label" ,"option_value","sort_no","version","label_lang","is_system") values(nextval('s_t_sys_choose_option'), 'SKUINV_CHANGE_LOG_SOURCE', '库存日志变化来源', '1', 'OMS', '4', '4', now(), 'zh-CN', true);
+
+
+
+
+
