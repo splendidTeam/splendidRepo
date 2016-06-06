@@ -150,7 +150,7 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 		log.info("send register successfully email start ");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		dataMap.put("nickname", nickName);
-		
+		dataMap.put("email",email);
 		SendEmailResultCode resultCode=commonEmailManager.sendEmail(email, EmailConstants.EMAIL_SENDSUCCESS_TEMPLATE, dataMap);
 		log.info("send register successfully email end ");
 		
