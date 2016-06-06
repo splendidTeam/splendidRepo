@@ -29,6 +29,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +57,7 @@ import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * 专门用来构建 ShoppingCartCommand.
@@ -65,6 +68,9 @@ import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 @Transactional
 @Service("sdkShoppingCartCommandBuilder")
 public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommandBuilder{
+
+    /** The Constant log. */
+    private static final Logger                        LOGGER        = LoggerFactory.getLogger(SdkShoppingCartCommandBuilderImpl.class);
 
     /** The Constant CHECKED_STATE. */
     private static final int                           CHECKED_STATE = 1;
@@ -448,6 +454,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     private void setShopCartPromotionInfos(ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand){
         // 获取促销数据.需要调用促销引擎计算优惠价格
         List<PromotionBrief> promotionBriefList = promotionBriefBuilder.getPromotionBriefList(shoppingCartCommand);
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug(JsonUtil.format(promotionBriefList));
+        }
 
         Map<Long, List<PromotionBrief>> shopIdAndPromotionBriefListMap = CollectionsUtil.group(promotionBriefList, "shopId");
 
