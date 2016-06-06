@@ -69,6 +69,44 @@ public class PaymentManagerImpl implements PaymentManager {
 		return paymentRequest;
 	}
 
+    /**
+     * 创建支付链接（定制传参）
+     * @author 江家雷
+     * @date 2016年6月3日 下午5:35:18
+     * @param order
+     * @param additionParams
+     * @return
+     * @see com.baozun.nebula.payment.manager.PaymentManager#createPayment(com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Map)
+     * @since
+     */
+    @Override
+    public PaymentRequest createPayment(SalesOrderCommand order, Map<String, String> additionParams) {
+        PaymentRequest paymentRequest = null;
+        try {
+            PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
+            PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(getPayType(order.getOnLinePaymentCommand().getPayType()));
+            payParamCommandAdaptor.setSalesOrderCommand(order);
+            PaymentFactory paymentFactory = PaymentFactory.getInstance();
+            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());//获得支付适配器
+            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
+            paymentRequest = paymentFactory.getPaymentResult(payParamCommandAdaptor.getPaymentType());//获得对应的结果类
+            Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
+            // 將支付所需的定制参数赋值给addition，例如定制化参数 qr_pay_mode
+            if (null != additionParams) {
+                addition.putAll(additionParams);
+            }          
+            paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);
+        } catch (PaymentParamErrorException e) {
+            log.error("CreatePayment error: "+e.toString(), e);
+            return null;
+        }catch(Exception ex){
+            log.error("CreatePayment error: "+ex.toString(), ex);
+            return null;
+        }
+        return paymentRequest;
+    }
+
+
 	@Override
 	public PaymentResult getPaymentResultForSyn(HttpServletRequest request,String paymentType) {
 		PaymentFactory paymentFactory = PaymentFactory.getInstance();
@@ -468,6 +506,5 @@ public class PaymentManagerImpl implements PaymentManager {
  		}
 		
 	}
-
 	
 }
