@@ -97,9 +97,9 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
     @Override
     public void sendEmailOfCreateOrder(List<Map<String, Object>> dataMapList){
         if (Validator.isNotNullOrEmpty(dataMapList)){
+            String createOrderSuccess = EmailConstants.CREATE_ORDER_SUCCESS;
             for (Map<String, Object> dataMap : dataMapList){
                 String email = dataMap.get("email").toString();
-                String createOrderSuccess = EmailConstants.CREATE_ORDER_SUCCESS;
                 EmailEvent emailEvent = new EmailEvent(this, email, createOrderSuccess, dataMap);
                 eventPublisher.publish(emailEvent);
             }
