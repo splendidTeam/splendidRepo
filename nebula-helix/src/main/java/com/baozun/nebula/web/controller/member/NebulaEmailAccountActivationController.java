@@ -25,6 +25,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -80,6 +81,9 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 	@Autowired
 	private MemberEmailManager memberEmailManager;
 	
+	
+	@Value("#{meta['page.base']}")
+	private String  pageUrlBase = "";
 	
 	/**
 	 * 发送激活邮件,成功后跳转到提示用户激活页面,默认推荐配置如下
@@ -147,12 +151,8 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 	 * @param request
 	 * @return
 	 */
-	// http://wwww/www/
 	private String getRegEmailValidPath(HttpServletRequest request) {
-		String path = request.getContextPath();
-		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + path
-				+ "/m/validEmailActiveUrl";
+		String basePath =pageUrlBase+ "/m/validEmailActiveUrl";
 		return basePath;
 	}
 	

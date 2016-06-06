@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -76,6 +75,19 @@ public class NebulaPaymentController extends BaseController {
     /** 支付异常页的url */
     protected static String URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
     
+    //支付宝扫码模式 
+    /** 扫码支付-简约前置模式  */
+    private static final String QR_PAY_MODE_SIMPLE_FRONT = "0";
+    
+    /** 扫码支付-前置模式  */
+    private static final String QR_PAY_MODE_FRONT = "1";
+    
+    /** 扫码支付-迷你前置模式  */
+    private static final String QR_PAY_MODE_MINI_FRONT = "3";
+    
+    /** 扫码支付-跳转模式  */
+    private static final String QR_PAY_MODE_REDIRECT = "2";
+    
     @Autowired
 	private SdkPaymentManager sdkPaymentManager;
 	
@@ -104,8 +116,9 @@ public class NebulaPaymentController extends BaseController {
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	
     	try {
+    		
 			//根据不同的支付方式准备url
-			return buildPayUrl(subOrdinate, memberDetails, request, response, model);
+			return buildPayUrl(subOrdinate, memberDetails, getExtraData(), request, response, model);
 			
 		} catch (IllegalPaymentStateException e) {
 			
@@ -115,6 +128,19 @@ public class NebulaPaymentController extends BaseController {
 			return "redirect:" + getToPayExceptionPageRedirect(subOrdinate);
 		}
     	
+    }
+    /**
+     * 支付所需要的额外参数
+     * @return
+     */
+    protected Map<String,Object> getExtraData(){
+    	
+    	Map<String,Object> extra = new HashMap<String,Object>();
+    	
+    	//支付宝扫码支付显示模式，默认跳转
+    	extra.put("qrPayMode", QR_PAY_MODE_REDIRECT);
+    	
+    	return extra;
     }
     
     /**
@@ -138,8 +164,9 @@ public class NebulaPaymentController extends BaseController {
 			
 		} catch (IllegalPaymentStateException e) {
 			LOGGER.error(e.getMessage(), e);
+			//去往支付异常页面
+			return "redirect:" + getToPayExceptionPageRedirect(e.getSubordinate());
 		}
-		return null;
     }
     
     /**
@@ -153,6 +180,7 @@ public class NebulaPaymentController extends BaseController {
      */
     public void doPayNotify(@PathVariable("payType") String payType,
     		HttpServletRequest request, HttpServletResponse response) {
+    	
     	try {
   			
   			if(LOGGER.isDebugEnabled()){
@@ -252,7 +280,7 @@ public class NebulaPaymentController extends BaseController {
     	return VIEW_PAY_TOPAY_EXCEPTION;
     }
     
-    protected String buildPayUrl(String subOrdinate, MemberDetails memberDetails, HttpServletRequest request, HttpServletResponse response, Model model) 
+    protected String buildPayUrl(String subOrdinate, MemberDetails memberDetails, Map<String,Object> extra, HttpServletRequest request, HttpServletResponse response, Model model) 
 			throws IllegalPaymentStateException {
 		//根据流水号查询未支付订单信息
 		List<PayInfoLog> unpaidPayInfoLogs = getUnpaidPayInfoLogsBySubOrdinate(subOrdinate);
@@ -269,7 +297,7 @@ public class NebulaPaymentController extends BaseController {
 		//校验订单是否存在、取消、已支付
 		if(validateSalesOrderStatus(salesOrder)) {
 			PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-			return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), request, response, model);
+			return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
 		}
 		
 		return null;

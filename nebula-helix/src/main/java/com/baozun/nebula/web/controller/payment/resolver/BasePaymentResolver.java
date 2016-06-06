@@ -50,7 +50,7 @@ public abstract class BasePaymentResolver {
 	 * @param payType
 	 * @return
 	 */
-	protected OnLinePaymentCommand getOnLinePaymentCommand(String bankCode, Integer payType, String itBPay, HttpServletRequest request) {
+	protected OnLinePaymentCommand getOnLinePaymentCommand(String bankCode, Integer payType, String itBPay, String qrPayMode, HttpServletRequest request) {
 		OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
 		onLinePaymentCommand.setBankCode(bankCode);
 		onLinePaymentCommand.setCustomerIp(RequestUtil.getClientIp(request));
@@ -62,6 +62,7 @@ public abstract class BasePaymentResolver {
 			onLinePaymentCommand.setIsInternationalCard(false);
 		}
 		onLinePaymentCommand.setPayType(payType);
+		//onLinePaymentCommand.setQrPayMode(qrPayMode);
 		return onLinePaymentCommand;
 	}
 	

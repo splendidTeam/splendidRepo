@@ -76,5 +76,8 @@ public interface SdkSkuInventoryChangeLogManager {
 	Pagination<SkuInventoryChangeLogCommand> findSkuInventoryChangeLogListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap);
 	
 	
-	
+	/**
+	 * 删除一个月前数据
+	 */
+	void clearSkuInventoryChangeLogOneMonthAgo();
 }

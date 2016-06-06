@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
@@ -69,6 +70,10 @@ public interface SkuInventoryChangeLogDao extends GenericEntityDao<SkuInventoryC
 	 */
 	@NativeQuery(model = SkuInventoryChangeLogCommand.class)
 	Pagination<SkuInventoryChangeLogCommand> findSkuInventoryChangeLogListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+	
+	
+	@NativeUpdate
+	void clearSkuInventoryChangeLogOneMonthAgo();
 	
 	
 	
