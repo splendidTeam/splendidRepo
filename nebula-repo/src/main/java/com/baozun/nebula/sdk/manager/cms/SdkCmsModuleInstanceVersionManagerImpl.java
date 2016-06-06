@@ -237,7 +237,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					String data = sdkCmsParseHtmlContentManager.getParseModuleData(editAreaList, module.getTemplateId());
 					cmsTemplateHtml.setData(data);
 					sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
-					zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
+					zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 					logger.info("publish moduleversion success : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
 				} catch (Exception e) {
 					logger.error("publish moduleversion error : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
@@ -331,7 +331,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					CmsTemplateHtml cmsTemplateHtml = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(moduleInstance.getCode(), versionId);		
 					sdkCmsTemplateHtmlManager.removeCmsTemplateHtml(cmsTemplateHtml.getId());
 				}
-				zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
+				zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 			}catch(Exception e){
 				logger.error("cancelpublish moduleversion error cause of publich baseversion error or removepublic error, modulecode="+moduleInstance.getCode()+", moduleId="+moduleInstance.getId()+", versionId="+versionId);
 				e.printStackTrace();
@@ -375,8 +375,8 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 			}
 
 		}
-		cacheManager.setMapObject(CacheKeyConstant.CMS_MODULE_KEY, CacheKeyConstant.CMS_MODULE_VERSION_KEY, publishVersionsQueue,
-				TimeInterval.SECONDS_PER_WEEK);
+		/*cacheManager.setMapObject(CacheKeyConstant.CMS_MODULE_KEY, CacheKeyConstant.CMS_MODULE_VERSION_KEY, publishVersionsQueue,
+				TimeInterval.SECONDS_PER_WEEK);*/
 	}
 
 	@Override
@@ -396,7 +396,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 
 		removeModuleVersionByIds(versionIds);
 		logger.info("remove moduleVersion's ids is " + ids);
-		zkOperator.noticeZkServer(ModuleMapWatchInvoke.PATH_KEY);
+		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
 	}
 	
 	@Override

@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.createline;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -215,6 +216,8 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
         orderLine.setEvaluationStatus(null);
         // 商品快照版本
         orderLine.setSnapshot(null);
+
+        orderLine.setVersion(new Date());
         return orderLine;
     }
 }

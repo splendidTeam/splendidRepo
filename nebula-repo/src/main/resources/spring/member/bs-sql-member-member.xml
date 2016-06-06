@@ -717,7 +717,7 @@
 		       			login_email,
 		       			login_mobile
 					from T_MEM_MEMBER 
-	       			where lifecycle !=2 and group_id=$groupId and id!=group_id
+	       			where lifecycle !=2 and group_id=:groupId and id!=:groupId
                  ]]>
 			</value>
 		</constructor-arg>

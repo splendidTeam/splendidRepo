@@ -75,7 +75,8 @@
 		       			tpii.description  as description,
 		       			tpii.type  as type,
 		       			tpi.pic_url as picUrl,
-		       			tpi.code as code
+		       			tpi.code as code,
+		       			tpi.lifecycle as lifecycle
 		       		from  t_pd_item tpi left join t_pd_iteminfo tpii 
 		       		on tpi.id = tpii.item_id
 		       		where tpi.id in (
@@ -103,7 +104,8 @@
 						tpiil.description  as description,
 						tpii.type  as type,
 						tpi.pic_url as picUrl,
-						tpi.code as code
+						tpi.code as code,
+						tpi.lifecycle as lifecycle
 					  from  t_pd_item tpi 
 						left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
 						left join t_pd_iteminfo_lang tpiil on tpii.id = tpiil.item_info_id 

@@ -24,7 +24,12 @@ import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.feilong.core.CharsetType;
 
 /**
  * 登录跳转控制器
@@ -32,6 +37,9 @@ import com.baozun.nebula.web.constants.SessionKeyConstants;
  *
  */
 public class LoginForwardHandler {
+    
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginForwardHandler.class);
 
 	/**
 	 * 设置跳转URL，默认实现是放入Session，可重载
@@ -40,7 +48,10 @@ public class LoginForwardHandler {
 	 * @throws IOException
 	 */
 	public void setForwardURL(HttpServletRequest request, String url) throws IOException{
-		request.getSession().setAttribute(SessionKeyConstants.MEMBER_IBACK_URL, URLEncoder.encode(url, "UTF-8"));
+		String encodeUrl = URLEncoder.encode(url, CharsetType.UTF8);
+        request.getSession().setAttribute(SessionKeyConstants.MEMBER_IBACK_URL, encodeUrl);
+        
+        LOGGER.debug("set [MEMBER_IBACK_URL] Attribute to session,url :[{}],encodeUrl:[{}]",url, encodeUrl);
 	}
 	
 	/**
@@ -55,7 +66,9 @@ public class LoginForwardHandler {
 		if(url != null){
 			request.getSession().removeAttribute(SessionKeyConstants.MEMBER_IBACK_URL);
 			
-			return URLDecoder.decode(url, "UTF-8");
+			String decodeUrl = URLDecoder.decode(url, CharsetType.UTF8);
+		    LOGGER.debug("MEMBER_IBACK_URL in session:[{}],remove it,and return decodeUrl:[{}]", url,decodeUrl);
+            return decodeUrl;
 		}else{
 			return null;
 		}
@@ -69,7 +82,7 @@ public class LoginForwardHandler {
 	 */
 	public void forward(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		String url = getForwardURL(request);
-		if(url != null)
-			response.sendRedirect(url);
+        Validate.notBlank(url, "url can't be blank!");
+		response.sendRedirect(url);
 	}
 }

@@ -16,7 +16,7 @@ public class ModuleMapWatchInvoke implements IWatcherInvoke {
 
 	private Logger LOG = LoggerFactory.getLogger(ModuleMapWatchInvoke.class);
 	
-	public static final String PATH_KEY = "/modulemapwatch";
+	public static final String PATH_KEY = "modulemapwatch";
 	
 	@Autowired
 	private SdkCmsModuleInstanceManager sdkCmsModuleInstanceManager;

@@ -19,7 +19,8 @@
 	<import resource="spring/spring-schedu.xml" />
 	<import resource="spring/spring-solr.xml" />
 	<import resource="spring/spring-redis.xml" />
-	<import resource="spring/spring-zk.xml" />
+<!-- 	<import resource="spring/spring-zk.xml" /> -->
+	<import resource="spring/spring-curator-zk.xml" />
 	<import resource="spring/spring-activeMq.xml" />
 	
 	<!-- 配置文件加密工具 start -->

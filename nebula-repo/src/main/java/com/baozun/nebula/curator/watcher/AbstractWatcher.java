@@ -93,7 +93,8 @@ public abstract class AbstractWatcher implements IWatcher {
 		// 注册session失效的监听器，以便session重置后重新注册watcher
 		registerWatcherAfterReconnected();
 
-		// invoke(getListenerPath());
+		// 初使化后无条件触发watcher invoke
+		watcherInvoke.invoke(getListenerPath(), getZkOperator().getData(getListenerPath()));
 	}
 
 	/*

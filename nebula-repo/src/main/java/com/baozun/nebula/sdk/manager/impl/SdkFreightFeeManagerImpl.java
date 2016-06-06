@@ -87,20 +87,29 @@ public class SdkFreightFeeManagerImpl implements SdkFreightFeeManager{
     /**
      * To item freight info command list.
      *
-     * @param validLines
+     * @param validShoppingCartLineCommandList
      *            the valid lines
      * @return the list< item freight info command>
      */
-    private List<ItemFreightInfoCommand> toItemFreightInfoCommandList(List<ShoppingCartLineCommand> validLines){
+    private List<ItemFreightInfoCommand> toItemFreightInfoCommandList(List<ShoppingCartLineCommand> validShoppingCartLineCommandList){
         // 无促销情况下统计金额小计
-        List<ItemFreightInfoCommand> itemList = new ArrayList<ItemFreightInfoCommand>();
-        for (ShoppingCartLineCommand line : validLines){
-            ItemFreightInfoCommand itemInfo = new ItemFreightInfoCommand();
-            itemInfo.setItemId(line.getItemId());
-            itemInfo.setCount(line.getQuantity());
-            itemList.add(itemInfo);
+        List<ItemFreightInfoCommand> itemFreightInfoCommandList = new ArrayList<ItemFreightInfoCommand>();
+        for (ShoppingCartLineCommand shoppingCartLineCommand : validShoppingCartLineCommandList){
+            ItemFreightInfoCommand itemFreightInfoCommand = toItemFreightInfoCommand(shoppingCartLineCommand);
+            itemFreightInfoCommandList.add(itemFreightInfoCommand);
         }
-        return itemList;
+        return itemFreightInfoCommandList;
+    }
+
+    /**
+     * @param shoppingCartLineCommand
+     * @return
+     */
+    private ItemFreightInfoCommand toItemFreightInfoCommand(ShoppingCartLineCommand shoppingCartLineCommand){
+        ItemFreightInfoCommand itemFreightInfoCommand = new ItemFreightInfoCommand();
+        itemFreightInfoCommand.setItemId(shoppingCartLineCommand.getItemId());
+        itemFreightInfoCommand.setCount(shoppingCartLineCommand.getQuantity());
+        return itemFreightInfoCommand;
     }
 
 }
