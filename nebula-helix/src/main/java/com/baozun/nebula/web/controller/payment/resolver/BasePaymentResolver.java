@@ -62,7 +62,7 @@ public abstract class BasePaymentResolver {
 			onLinePaymentCommand.setIsInternationalCard(false);
 		}
 		onLinePaymentCommand.setPayType(payType);
-		onLinePaymentCommand.setQrPayMode(qrPayMode);
+		//onLinePaymentCommand.setQrPayMode(qrPayMode);
 		return onLinePaymentCommand;
 	}
 	
