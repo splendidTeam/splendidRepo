@@ -1,6 +1,7 @@
 package com.baozun.nebula.web.controller.payment.resolver;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +34,7 @@ public class WechatPaymentResolver implements PaymentResolver {
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, HttpServletRequest request, 
+			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException {
 		
 		String payInfo = payInfoLog.getPayInfo();

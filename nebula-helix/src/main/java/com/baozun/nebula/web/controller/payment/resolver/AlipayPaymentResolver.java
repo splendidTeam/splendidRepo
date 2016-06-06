@@ -66,7 +66,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, HttpServletRequest request, 
+			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException {
         
 		String itBPay = getItBPay(originalSalesOrder.getCreateTime());	
@@ -97,11 +97,17 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		
 		PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 		
+		String qrPayMode = "";
+		
+		if(extra.get("qrPayMode")!=null){
+			qrPayMode = extra.get("qrPayMode").toString();
+		}
+		
 		// 参数封装
 		SalesOrderCommand so = new SalesOrderCommand();
 		so.setCode(subOrdinate);
 		so.setTotal(pc.getPayMoney());
-		so.setOnLinePaymentCommand(getOnLinePaymentCommand(bankCode, payType, itBPay, request));
+		so.setOnLinePaymentCommand(getOnLinePaymentCommand(bankCode, payType, itBPay, qrPayMode, request));
 		
 		// 获取支付请求( url)链接对象
 		PaymentRequest paymentRequest = null ;
@@ -143,7 +149,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
 		
 		if (Validator.isNotNullOrEmpty(payCode)) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID, "订单已经被支付");
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID, subOrdinate, "订单已经被支付");
 		}
 		
 		LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
@@ -187,7 +193,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		
     	String subOrdinate = request.getParameter("out_trade_no");
 		
-		LOGGER.info("[DO_PAY_RETURN] get sync notifications before , subOrdinate: {}" , subOrdinate );
+		LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}" , subOrdinate );
 		
 		// 判断交易是否已有成功 防止重复调用 。
 		PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
@@ -195,7 +201,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		if (Validator.isNotNullOrEmpty(payCode)) {
 			response.getWriter().write(PaymentResultType.SUCCESS);
 		}else{
-			LOGGER.debug( "[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+			LOGGER.debug( "[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
 			
 			// 获取异步通知
 			PaymentResult paymentResult =  null;
@@ -208,7 +214,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 				paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
 			}
 			
-			LOGGER.info("async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+			LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 			
 			if (null == paymentResult) {
 				//log
