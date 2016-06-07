@@ -10,6 +10,8 @@ public class IllegalPaymentStateException extends Exception {
 	
 	private IllegalPaymentState state;
 	
+	private String subordinate;
+	
 	public IllegalPaymentStateException(){
 		super();
 	}
@@ -31,6 +33,12 @@ public class IllegalPaymentStateException extends Exception {
 		super(message);
 		this.state = state;
 	}
+	
+	public IllegalPaymentStateException(IllegalPaymentState state, String subordinate, String message){
+		super(message);
+		this.state = state;
+		this.subordinate = subordinate;
+	}
 
 	public IllegalPaymentStateException(Throwable cause){
 		super(cause);
@@ -38,6 +46,11 @@ public class IllegalPaymentStateException extends Exception {
 	
 	public IllegalPaymentState getState() {
 		return state;
+	}
+
+
+	public String getSubordinate() {
+		return subordinate;
 	}
 
 

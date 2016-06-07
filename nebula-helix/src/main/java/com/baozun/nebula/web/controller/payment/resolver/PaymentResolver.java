@@ -1,6 +1,7 @@
 package com.baozun.nebula.web.controller.payment.resolver;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +17,7 @@ import com.baozun.nebula.web.MemberDetails;
 public interface PaymentResolver {
 	
 	String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, HttpServletRequest request, 
+			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException;
 
 	String doPayReturn(HttpServletRequest request,

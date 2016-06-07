@@ -218,10 +218,20 @@ public class SdkPriorityAdjustManagerImpl implements SdkPriorityAdjustManager{
     }
 
     /**
-     * 调整促销优先级. 将强制调整优先级的促销集合添加到 促销集合的最前面
-     * Origin：159,166,167,168,162.Adjustment:168,167,166(不参与),169(原中不存在) 步骤：
-     * 1，把调整中的不参与的，从原列表中去掉； 2，把调整中的不在原列表中的，从调整列表中去掉； 3，把原列表中的，添加都调整列表中，存在的就不添加；
-     * 4，返回最后的调整列表； 以上结果：168,167,159,162
+     * 调整促销优先级.
+     * 
+     * 将强制调整优先级的促销集合添加到 促销集合的最前面
+     * 
+     * Origin: 159,166,167,168,162.
+     * Adjustment: 168,167,166(不参与),169(原中不存在)
+     * 
+     * 步骤：
+     * 1，把调整中的不参与的，从原列表中去掉；
+     * 2，把调整中的不在原列表中的，从调整列表中去掉；
+     * 3，把原列表中的，添加都调整列表中，存在的就不添加；
+     * 4，返回最后的调整列表；
+     * 
+     * 以上结果：168,167,159,162
      * 
      * @param promos
      * @param shopIds
@@ -240,7 +250,7 @@ public class SdkPriorityAdjustManagerImpl implements SdkPriorityAdjustManager{
         if (null == originalOneShopPromosList || originalOneShopPromosList.size() == 0){
             return null;
         }
-        log.info("内存中筛选过后的排序");
+        log.debug("内存中筛选过后的排序");
         logPromotionPriority(originalOneShopPromosList);
 
         List<Long> shopIds = new ArrayList<Long>();
@@ -276,22 +286,27 @@ public class SdkPriorityAdjustManagerImpl implements SdkPriorityAdjustManager{
         if (null == allPromotionList || allPromotionList.size() < 0)
             return;
         String exclusiveType = "";
-        for (PromotionCommand one : allPromotionList){
-            if (null == one.getGroupType()){
+        for (PromotionCommand promotionCommand : allPromotionList){
+            if (null == promotionCommand.getGroupType()){
                 exclusiveType = "null";
-            }else if (one.getGroupType().equals(PromotionExclusiveGroupType.SHARE)){
+            }else if (promotionCommand.getGroupType().equals(PromotionExclusiveGroupType.SHARE)){
                 exclusiveType = "共享";
-            }else if (one.getGroupType().equals(PromotionExclusiveGroupType.SINGLE)){
+            }else if (promotionCommand.getGroupType().equals(PromotionExclusiveGroupType.SINGLE)){
                 exclusiveType = "单享";
             }else{
                 exclusiveType = "null";
             }
-            log.info(
-                            "活动编号：" + one.getPromotionId() + "，优先级：" + one.getPriority() + "，缺省排他：" + one.getExclusiveMark() + "，排他组类型："
-                                            + exclusiveType + "，拍他组名：" + one.getGroupName() + "，确省优先级：" + one.getDefaultPriority()
-                                            + "，活动名称：" + one.getPromotionName());
+            log.debug(
+                            "活动编号：[{}]，优先级：[{}]，缺省排他：[{}]，排他组类型：[{}]，排他组名：[{}]，确省优先级：[{}]，活动名称：[{}]",
+                            promotionCommand.getPromotionId(),
+                            promotionCommand.getPriority(),
+                            promotionCommand.getExclusiveMark(),
+                            exclusiveType,
+                            promotionCommand.getGroupName(),
+                            promotionCommand.getDefaultPriority(),
+                            promotionCommand.getPromotionName());
         }
-        log.info("结束！");
+        log.debug("结束！");
     }
 
     /**

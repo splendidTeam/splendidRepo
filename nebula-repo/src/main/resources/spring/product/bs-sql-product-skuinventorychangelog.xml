@@ -60,6 +60,18 @@
 		       						)
 		       					)
 		       				#end
+		       				
+		       				#if($itemTitle)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select item_id 
+		       							from t_pd_iteminfo
+		       							where title like :itemTitle
+		       						)
+		       					)
+		       				#end
 		       			
 		       				#if($extentionCode)
 		       					and EXTENTION_CODE like :extentionCode
@@ -86,11 +98,11 @@
 		       					and SOURCE=:source
 		       				#end
 
-		       				#if($createTime)
-		       					and CREATE_TIME >= :startTime
+		       				#if($createStartDate)
+		       					and CREATE_TIME >= :createStartDate
 		       				#end
-		       				#if($createTime)
-		       					and CREATE_TIME <= :endTime
+		       				#if($createEndDate)
+		       					and CREATE_TIME <= :createEndDate
 		       				#end
 		       				
 	       					#if($operatorName && $source && $source ==1)
@@ -232,6 +244,20 @@
 	       						and (1=1)
 	       					#end 
 		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SkuInventoryChangeLog.clearSkuInventoryChangeLogOneMonthAgo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete 
+		       		from t_pd_sku_inventory_change_log 
+		       		where 
+		       			create_time <= (now() - interval '1 month')
                  ]]>
 			</value>
 		</constructor-arg>
