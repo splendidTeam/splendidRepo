@@ -16,13 +16,6 @@
 		<property name="sleepMsBetweenRetries" value="#{meta['zk.sleepMsBetweenRetries']}" />
 		<property name="lifeCycleNode" value="#{meta['zk.path.root']}" />
 	</bean>
-	<!-- 
-	<bean id="demoWatcherInvoke" class="com.baozun.nebula.curator.watcher.DemoWatcherInvoke" />
-	<bean id="defaultNodeDataChangedWatcher" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="/test1" />
-		<property name="watcherInvoke" ref="demoWatcherInvoke" />
-	</bean> -->
-	
 	
 	<bean id="engineWatchInvoke" class="com.baozun.nebula.curator.invoke.EngineWatchInvoke" />
 	<bean id="engineWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
