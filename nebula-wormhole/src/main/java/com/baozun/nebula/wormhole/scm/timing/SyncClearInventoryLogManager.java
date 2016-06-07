@@ -23,8 +23,8 @@ package com.baozun.nebula.wormhole.scm.timing;
  * @date 2016年6月6日 下午3:38:32 
  * @version   
  */
-public interface SyncClearSkuInventoryChangeLogManager {
+public interface SyncClearInventoryLogManager {
 
-	public void clearAllLog();
+	public void clearLogBeforeOneMonth();
 	
 }
