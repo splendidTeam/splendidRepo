@@ -43,7 +43,6 @@ import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.payment.resolver.PaymentResolver;
 import com.baozun.nebula.web.controller.payment.resolver.PaymentResolverType;
 import com.feilong.core.Validator;
@@ -56,7 +55,7 @@ import com.feilong.servlet.http.RequestUtil;
  * @version 1.0
  * @time 2016年5月26日  上午11:33:30
  */
-public class NebulaPaymentController extends BaseController {
+public class NebulaPaymentController extends NebulaBasePaymentController {
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaPaymentController.class);
@@ -331,51 +330,4 @@ public class NebulaPaymentController extends BaseController {
 		return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
 	}
 	
-	/**
-	 * 根据流水号获取订单信息
-	 * 
-	 * @param subOrdinate 支付流水号
-	 * @param paySuccessStatus 支付状态，1表示支付成功，2表示未支付
-	 * @return
-	 * @throws IllegalPaymentStateException 
-	 */
-	protected SalesOrderCommand getSalesOrderBySubOrdinate(String subOrdinate, Integer paySuccessStatus) throws IllegalPaymentStateException {
-        List<PayInfoLog> payInfoLogList = getPayInfoLogListBySubOrdinate(subOrdinate, paySuccessStatus);
-        
-        if (Validator.isNullOrEmpty(payInfoLogList)){
-            LOGGER.error("can not get payInfo_log by subOrdinate:[{}] and paySuccessStatus:[{}]", subOrdinate, true);
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_UNPAID, "支付信息不存在或尚未支付");
-        }
-        
-        // 根据支付流水号，去取结果页面上要显示的订单信息
-        PayInfoLog payInfoLog = payInfoLogList.get(0);
-		SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 2);
-		
-        return salesOrder;
-    }
-	
-	/**
-	 * 根据流水号取未付款支付信息日志
-	 * @param subOrdinate
-	 * @return
-	 */
-	private List<PayInfoLog> getUnpaidPayInfoLogsBySubOrdinate(String subOrdinate) {
-		//2代表支付没有成功，pay_success_status为false
-		return getPayInfoLogListBySubOrdinate(subOrdinate, 2);
-	}
-	
-	/**
-	 * 根据流水号取支付信息日志
-	 * @param subOrdinate 支付流水号
-	 * @param paySuccessStatus 支付状态，1表示支付成功，2表示未支付
-	 * @return
-	 */
-	private List<PayInfoLog> getPayInfoLogListBySubOrdinate(String subOrdinate, Integer paySuccessStatus) {
-        Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("subOrdinate", subOrdinate);
-        paraMap.put("paySuccessStatusStr", paySuccessStatus);
-        List<PayInfoLog> payInfoLogList = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-        return payInfoLogList;
-    }
-    
 }

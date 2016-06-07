@@ -202,8 +202,7 @@ public class WechatPaymentResolver implements PaymentResolver {
 	public String doPayReturn(HttpServletRequest request,
 			HttpServletResponse response, String payType, Device device)
 			throws IllegalPaymentStateException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IllegalAccessError("wechat pay donot support return invoke.");
 	}
 
 	@Override
