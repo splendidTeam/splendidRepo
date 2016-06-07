@@ -129,12 +129,13 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
                     List<String> extentionCodeList,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     List<ShoppingCartLineCommand> needChangeCheckedStatusShoppingCartLineCommandList,
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
         // 将修改后的购物车保存cookie
-        guestShoppingcartPersister.save(needChangeCheckedStatusShoppingCartLineCommandList, request, response);
+        guestShoppingcartPersister.save(shoppingCartLineCommandList, request, response);
         return null;
     }
 }
