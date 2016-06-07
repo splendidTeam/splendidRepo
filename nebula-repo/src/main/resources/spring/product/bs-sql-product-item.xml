@@ -495,7 +495,7 @@
 					from t_pd_item tpi 
 					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
 					left join t_pd_iteminfo_lang tpiil on tpiil.item_info_id = tpii.id 
-					where tpi.code = :code and tpiil.lang = :lang
+					where tpi.code = :code and tpi.lifecycle!=2 and tpiil.lang = :lang
 				 ]]>
 			</value>
 		</constructor-arg>
