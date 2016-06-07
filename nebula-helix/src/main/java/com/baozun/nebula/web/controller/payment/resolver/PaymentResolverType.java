@@ -3,18 +3,13 @@ package com.baozun.nebula.web.controller.payment.resolver;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 
-@Component
 public class PaymentResolverType implements Serializable {
 
 	private static final long serialVersionUID = -216019187342593163L;
 	
-	@Autowired
 	private Map<String, PaymentResolver> paymentResolverTypes;
 	
 	public PaymentResolver getInstance(String type) throws IllegalPaymentStateException {
@@ -24,4 +19,15 @@ public class PaymentResolverType implements Serializable {
 		}
 		return paymentResolver;
 	}
+
+	public Map<String, PaymentResolver> getPaymentResolverTypes() {
+		return paymentResolverTypes;
+	}
+
+	public void setPaymentResolverTypes(
+			Map<String, PaymentResolver> paymentResolverTypes) {
+		this.paymentResolverTypes = paymentResolverTypes;
+	}
+	
+	
 }
