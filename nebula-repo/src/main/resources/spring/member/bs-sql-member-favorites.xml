@@ -48,7 +48,7 @@
 						item.lifecycle as lifecycle,
 						(case when favorites.sku_id is not null then sku.properties else '' end ) as properties,
 						(case when favorites.sku_id is not null then sku.out_id else '' end) as extentionCode,
-						itemIvt.qty
+						itemIvt.qty as itemIvt
 					from t_member_favorites favorites 
 						left join t_pd_item  item on  favorites.item_id = item.id
 						left join t_pd_iteminfo itemInfo on itemInfo.item_id = item.id

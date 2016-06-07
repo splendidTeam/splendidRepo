@@ -41,6 +41,38 @@
 			</div>
 		</div>
    </form>
+   <!-- 选择商品弹出层 -->
+   <div class="select-pro-layer proto-dialog">
+		<h5 id="bundle_dialog_title">选择主卖品/成员</h5>
+		<div class="proto-dialog-content">
+			<div class="ui-block">
+				<div class="ui-block">
+					<div class="ui-block-content ui-block-content-lb">
+						<form id="mainItemDialogSearchForm">
+							<div class="form-group p10">
+								<label>类型</label>
+								<input type="radio" name="selectType" value="product" checked="checked" />商品
+								<input type="radio" name="selectType" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
+							</div> 
+							<div class="form-group p10">
+								<label>编码</label>
+								<input type="text" loxiaType="input" id="code_add" name="q_sl_code" mandatory="true"/>
+							</div>
+							<div class="button-line1 right">
+								<a href="javascript:void(0);" class="func-button orange" id="search_button"><span>搜索</span></a>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="ui-block">
+					<div class="border-grey" id="selectProList_product" caption="商品列表 "></div>
+				</div>
+			</div>
+		</div>
+		<div class="proto-dialog-button-line right">
+			<input type="button" value="确定" class="button orange" id="addMainProduct"/>
+		</div>
+	</div>
 </div>
 
 <div id="menuContent" class="menuContent menulayer">

@@ -64,25 +64,6 @@ $j(document).ready(function(){
 		}
 	});
 	
-	//设置主卖品  选择类型
-	$j("input[name='selectType']").bind('change', function(){
-		var currVal = $j(this).val();
-		
-		if(currVal == 'product') {
-			$j('#selectProList_product').show();
-			$j('#selectProList_style').hide();
-		} else {
-			$j('#selectProList_product').hide();
-			$j('#selectProList_style').show();
-		}
-	});
-	
-	// 点击添加主卖品
-//	$j("#set_main_element").on("click",function(){
-//		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});
-//		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
-//	});	
-	
 	// 点击添加捆绑成员
 	$j("#add_bundle_element").on("click",function(){
 		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
@@ -94,15 +75,8 @@ $j(document).ready(function(){
 		
 	});
 	
-	// 点击搜索
-	$j("#search_button").on("click", function(){
-		var currVal = $j("input[name='selectType']:checked").val();
-		if(currVal == 'product') {
-			findProduct();
-		} else {
-			
-		}
-	});
+	loxia.init({debug: true, region: 'zh-CN'});
+    nps.init();
 	
 	$j("#selectProList_product").loxiasimpletable({
 		page : true,
@@ -145,6 +119,14 @@ $j(document).ready(function(){
 			type : "threeState"
 		}],
 		dataurl : findItemInfoListJsonUrl
+	});
+	
+	refreshData();
+	
+	// 点击搜索
+	$j("#search_button").click(function() {
+		$j("#selectProList_product").data().uiLoxiasimpletable.options.currentPage = 1;
+		refreshData();
 	});
 	
 	// 添加bundle扩展信息表单验证方法
@@ -206,8 +188,9 @@ function bindClose(){
 	}
 }
 
-function findProduct(){
-	$j("#selectProList_product").data().uiLoxiasimpletable.options.currentPage = 1;
+
+//刷新表格数据
+function refreshData(){
 	$j("#selectProList_product").loxiasimpletable("refresh");
 }
 
