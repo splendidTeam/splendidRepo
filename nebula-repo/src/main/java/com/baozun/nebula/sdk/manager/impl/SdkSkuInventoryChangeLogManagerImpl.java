@@ -49,6 +49,7 @@ public class SdkSkuInventoryChangeLogManagerImpl implements SdkSkuInventoryChang
 	 * 保存SkuInventoryChangeLog
 	 * 
 	 */
+	@Override
 	public SkuInventoryChangeLog saveSkuInventoryChangeLog(SkuInventoryChangeLog model){
 	
 		return skuInventoryChangeLogDao.save(model);
@@ -58,6 +59,7 @@ public class SdkSkuInventoryChangeLogManagerImpl implements SdkSkuInventoryChang
 	 * 通过id获取SkuInventoryChangeLog
 	 * 
 	 */
+	@Override
 	public SkuInventoryChangeLog findSkuInventoryChangeLogById(Long id){
 	
 		return skuInventoryChangeLogDao.getByPrimaryKey(id);
@@ -67,6 +69,7 @@ public class SdkSkuInventoryChangeLogManagerImpl implements SdkSkuInventoryChang
 	 * 获取所有SkuInventoryChangeLog列表
 	 * @return
 	 */
+	@Override
 	public List<SkuInventoryChangeLog> findAllSkuInventoryChangeLogList(){
 	
 		return skuInventoryChangeLogDao.findAllSkuInventoryChangeLogList();
@@ -77,6 +80,7 @@ public class SdkSkuInventoryChangeLogManagerImpl implements SdkSkuInventoryChang
 	 * @param ids
 	 * @return
 	 */
+	@Override
 	public List<SkuInventoryChangeLog> findSkuInventoryChangeLogListByIds(List<Long> ids){
 	
 		return skuInventoryChangeLogDao.findSkuInventoryChangeLogListByIds(ids);
@@ -87,6 +91,7 @@ public class SdkSkuInventoryChangeLogManagerImpl implements SdkSkuInventoryChang
 	 * @param paraMap
 	 * @return
 	 */
+	@Override
 	public List<SkuInventoryChangeLog> findSkuInventoryChangeLogListByQueryMap(Map<String, Object> paraMap){
 	
 		return skuInventoryChangeLogDao.findSkuInventoryChangeLogListByQueryMap(paraMap);
@@ -100,8 +105,18 @@ public class SdkSkuInventoryChangeLogManagerImpl implements SdkSkuInventoryChang
 	 * @param sorts 
 	 * @return
 	 */
+	@Transactional(readOnly = true)
+	@Override
 	public Pagination<SkuInventoryChangeLogCommand> findSkuInventoryChangeLogListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
 		return skuInventoryChangeLogDao.findSkuInventoryChangeLogListByQueryMapWithPage(page,sorts,paraMap);
+	}
+
+	/* 
+	 * @see com.baozun.nebula.sdk.manager.SdkSkuInventoryChangeLogManager#clearSkuInventoryChangeLogOneMonthAgo()
+	 */
+	@Override
+	public void clearSkuInventoryChangeLogOneMonthAgo() {
+		skuInventoryChangeLogDao.clearSkuInventoryChangeLogOneMonthAgo();
 	};
 	
 	

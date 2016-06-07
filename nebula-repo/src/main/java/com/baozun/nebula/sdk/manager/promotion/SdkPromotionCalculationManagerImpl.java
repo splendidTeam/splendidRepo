@@ -56,13 +56,14 @@ import com.baozun.nebula.sdk.manager.SdkPriorityAdjustManager;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeFilterLoader;
 import com.baozun.nebula.sdk.manager.impl.SdkCustomizeSettingLoader;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.baozun.nebula.calculateEngine.param.PromotionExclusiveGroupType;
 
 @Transactional
 @Service("sdkPromotionCalculationManager")
 public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculationManager{
 
-    private static final Logger                     log = LoggerFactory.getLogger(SdkPromotionCalculationManagerImpl.class);
+    private static final Logger                     LOGGER = LoggerFactory.getLogger(SdkPromotionCalculationManagerImpl.class);
 
     @Autowired
     private SdkShoppingCartManager                  shoppingCartmanager;
@@ -174,9 +175,9 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                             briefListPrevious);
             briefOnePromotion.setConditionExpressionComplex(conditionExpressionComplex);
         }else{
-            log.info("活动编号：" + suitPromotion.getPromotionId().toString() + "，名称:" + suitPromotion.getPromotionName());
-            log.info("---条件表达式：" + suitPromotion.getConditionExpression());
-            log.info("---条件表达式状态：不满足!");
+            LOGGER.info("活动编号：" + suitPromotion.getPromotionId().toString() + "，名称:" + suitPromotion.getPromotionName());
+            LOGGER.info("---条件表达式：" + suitPromotion.getConditionExpression());
+            LOGGER.info("---条件表达式状态：不满足!");
         }
         return briefOnePromotion;
     }
@@ -201,9 +202,14 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
         if (null == allPromotionList || allPromotionList.size() < 0)
             return;
         for (PromotionCommand one : allPromotionList){
-            log.info("优先级：" + one.getPromotionId() + "，活动编号：" + one.getPromotionId());
+            LOGGER.debug("活动编号：{},优先级：{}", one.getPromotionId(), one.getPriority());
         }
-        log.info("结束！");
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug(JsonUtil.formatWithIncludes(allPromotionList, "promotionId", "priority"));
+        }
+
+        LOGGER.debug("结束！");
     }
 
     /**
@@ -361,7 +367,7 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
     @Override
     @Transactional(readOnly = true)
     public List<PromotionBrief> calculationPromotion(ShoppingCartCommand shoppingCartCommand,List<PromotionCommand> allPromotionList){
-        log.info("促销引擎开始！");
+        LOGGER.info("促销引擎开始！");
         if (shoppingCartCommand == null){
             return null;
         }
@@ -439,8 +445,8 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                 }
             }
         }
-        log.info("促销引擎正常结束！");
-        log.info("订单金额：" + shoppingCartCommand.getOriginPayAmount());
+        LOGGER.info("促销引擎正常结束！");
+        LOGGER.info("订单金额：" + shoppingCartCommand.getOriginPayAmount());
         logBriefsByPromotion(briefListAll);
         return briefListAll;
     }
@@ -560,7 +566,7 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                             promotionOne.getShopId(),
                             briefListPrevious);
 
-            log.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
+            LOGGER.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
             if (conditionResultFactor > CHECKFAILURE){
                 settingList = promotionOne.getAtomicSettingList();
                 briefOnePromotion = calculationPromotionByAtomicSetting(
@@ -579,8 +585,8 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                     return null;
                 }
             }else{
-                log.info("---条件表达式：" + promotionOne.getConditionExpression());
-                log.info("---条件表达式状态：不满足!");
+                LOGGER.info("---条件表达式：" + promotionOne.getConditionExpression());
+                LOGGER.info("---条件表达式状态：不满足!");
             }
             // Summarizes setting details to brief
             if (briefList != null && briefList.size() > 0)
@@ -630,9 +636,9 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                     return null;
                 }
             }else{
-                log.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
-                log.info("---条件表达式：" + promotionOne.getConditionExpression());
-                log.info("---条件表达式状态：不满足!");
+                LOGGER.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
+                LOGGER.info("---条件表达式：" + promotionOne.getConditionExpression());
+                LOGGER.info("---条件表达式状态：不满足!");
             }
             // summarizes setting details to brief
             if (briefList != null && briefList.size() > 0)
@@ -687,9 +693,9 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                     return null;
                 }
             }else{
-                log.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
-                log.info("---条件表达式：" + promotionOne.getConditionExpression());
-                log.info("---条件表达式状态：不满足!");
+                LOGGER.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
+                LOGGER.info("---条件表达式：" + promotionOne.getConditionExpression());
+                LOGGER.info("---条件表达式状态：不满足!");
             }
             // summarizes setting details to brief
             if (briefList != null && briefList.size() > 0)
@@ -765,13 +771,13 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
                     return null;
                 }
             }else{
-                log.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
-                log.info("---常规条件表达式：" + promotionOne.getConditionExpression());
+                LOGGER.info("活动编号：" + promotionOne.getPromotionId().toString() + "，名称:" + promotionOne.getPromotionName());
+                LOGGER.info("---常规条件表达式：" + promotionOne.getConditionExpression());
                 if (conditionResultFactor == CHECKFAILURE){
-                    log.info("---常规条件表达式状态：不满足!");
+                    LOGGER.info("---常规条件表达式状态：不满足!");
                 }
                 if (complexConditionId < 1){
-                    log.info("---阶梯表达式状态：不满足!");
+                    LOGGER.info("---阶梯表达式状态：不满足!");
                 }
             }
             // summarizes setting details to brief
@@ -2585,29 +2591,29 @@ public class SdkPromotionCalculationManagerImpl implements SdkPromotionCalculati
     private void logBriefsByPromotion(List<PromotionBrief> briefListOnePromotion){
         List<PromotionSKUDiscAMTBySetting> skulist = null;
         for (PromotionBrief brief : briefListOnePromotion){
-            log.info(
+            LOGGER.info(
                             "活动编号：" + brief.getPromotionId().toString() + "，名称:" + brief.getPromotionName() + ",店铺编号："
                                             + brief.getShopId().toString());
-            log.info("优惠类型：" + brief.getConditionType().toString());
+            LOGGER.info("优惠类型：" + brief.getConditionType().toString());
             if (brief.getConditionExpression() != null){
-                log.info("优惠条件：" + brief.getConditionExpression().toString());
+                LOGGER.info("优惠条件：" + brief.getConditionExpression().toString());
             }
             if (brief.getConditionExpressionComplex() != null && brief.getConditionExpressionComplex() != ""){
-                log.info("Complex优惠条件：" + brief.getConditionExpressionComplex().toString());
+                LOGGER.info("Complex优惠条件：" + brief.getConditionExpressionComplex().toString());
             }
 
-            log.info("优惠金额：" + brief.getPromotionAmount().toString());
+            LOGGER.info("优惠金额：" + brief.getPromotionAmount().toString());
 
-            log.info("活动状态：满足！");
+            LOGGER.info("活动状态：满足！");
 
             for (PromotionSettingDetail detail : brief.getDetails()){
-                log.info(
+                LOGGER.info(
                                 "---设置类型:" + detail.getSettingTypeTag() + ",设置表达式：" + detail.getSettingExpression() + "，优惠金额："
                                                 + (detail.getDiscountAmount() == null ? "0" : detail.getDiscountAmount()));
                 skulist = detail.getAffectSKUDiscountAMTList();
                 if (skulist != null && skulist.size() > 0){
                     for (PromotionSKUDiscAMTBySetting setting : skulist){
-                        log.info(
+                        LOGGER.info(
                                         "------PID:" + setting.getItemId() + "------SKU:" + setting.getSkuId() + ",店铺编号："
                                                         + setting.getShopId().toString() + ",名称：" + setting.getItemName() + ",QTY："
                                                         + setting.getQty() + ",单价：" + setting.getSalesPrice() + "，优惠金额："

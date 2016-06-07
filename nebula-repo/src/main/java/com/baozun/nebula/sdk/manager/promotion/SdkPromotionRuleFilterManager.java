@@ -25,26 +25,6 @@ public interface SdkPromotionRuleFilterManager extends BaseManager{
                     Date currentTime);
 
     /**
-     * 返回所有人群规则的Promotion
-     * 
-     * @param shopIds
-     * @param memComboIds
-     * @param currentTime
-     * @return
-     */
-    public List<PromotionCommand> getActiveCrowdPromotionData(List<Long> shopIds,Set<String> crowdComboIds,Date currentTime);
-
-    /**
-     * 返回所有商品范围PromotionCommand
-     * 
-     * @param shopIds
-     * @param productComboIds
-     * @param currentTime
-     * @return
-     */
-    public List<PromotionCommand> getActiveItemScopePromotionData(List<Long> shopIds,Set<String> itemComboIds,Date currentTime);
-
-    /**
      * 获取促销活动
      * 
      * @param promotionId
