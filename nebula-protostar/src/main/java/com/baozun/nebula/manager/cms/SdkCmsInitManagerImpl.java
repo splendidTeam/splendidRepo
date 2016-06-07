@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
@@ -66,6 +67,9 @@ public class SdkCmsInitManagerImpl implements SdkCmsInitManager {
 	
 	@Autowired
 	private ZkOperator zkOperator;
+	@Autowired
+	private ZKWatchPath zkWatchPath;
+	
 	private final static Logger log = LoggerFactory.getLogger(SdkCmsInitManagerImpl.class);
 	
 
@@ -98,7 +102,7 @@ public class SdkCmsInitManagerImpl implements SdkCmsInitManager {
 					cmsTemplateHtml.setData(data);
 					CmsTemplateHtml cmsTemplateHtmlNew = sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 					log.info("This published Basic page's code is "+cmsPageInstance.getCode()+", save cmsTemplateHtml id is "+cmsTemplateHtmlNew.getId());
-					zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
+					zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class),"#"+cmsPageInstance.getCode());
 				}
 
 			}
@@ -126,7 +130,7 @@ public class SdkCmsInitManagerImpl implements SdkCmsInitManager {
 					cmsTemplateHtml.setData(data);
 					CmsTemplateHtml cmsTemplateHtmlNew = sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 					log.info("This published Basic module's code is "+cmsModulenstance.getCode()+", save cmsTemplateHtml id is "+cmsTemplateHtmlNew.getId());
-					zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+					zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 				}
 
 			}

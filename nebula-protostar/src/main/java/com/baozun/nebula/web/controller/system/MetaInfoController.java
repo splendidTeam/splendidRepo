@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.SystemConfigWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
@@ -51,6 +52,9 @@ public class MetaInfoController extends BaseController {
 
 	@Autowired
 	private ZkOperator zkOperator;
+	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
 
 	@RequestMapping("/mataInfo/list.htm")
 	public String list() {
@@ -172,7 +176,7 @@ public class MetaInfoController extends BaseController {
 	@RequestMapping("/mataInfo/activeMetaInfo.json")
 	@ResponseBody
 	private BackWarnEntity activeMetaInfo() {
-		zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(SystemConfigWatchInvoke.class));
 		return SUCCESS;
 	}
 }

@@ -19,8 +19,6 @@ public class SystemConfigWatchInvoke implements IWatcherInvoke {
 
 	private Logger LOG = LoggerFactory.getLogger(SystemConfigWatchInvoke.class);
 	
-	public static final String PATH_KEY = "systemconfigwatch";
-	
 	@Autowired
 	private SdkMataInfoManager sdkMataInfoManager;
 
