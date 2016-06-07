@@ -29,6 +29,7 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
 
     /**
      * 获取整单优惠在行上的分摊
+     * 
      * @deprecated see {@link com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilderImpl#getCurSKUDiscount(List
      *             <PromotionSKUDiscAMTBySetting>, ShoppingCartLineCommand)} since 5.3.1
      */
@@ -144,13 +145,13 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
                 }
 
                 if (onePromotionShareBySKUShippingBase != null && onePromotionShareBySKUShippingBase.size() > 0){
-                    for (PromotionSKUDiscAMTBySetting one : onePromotionShareBySKUShippingBase){
-                        one.setShopId(onePromotion.getShopId());
-                        one.setPromotionId(onePromotion.getPromotionId());
-                        one.setPromotionName(onePromotion.getPromotionName());
-                        one.setPromotionType(onePromotion.getConditionType());
-                        one.setFreeShippingMark(true);
-                        one.setBaseOrder(true);
+                    for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : onePromotionShareBySKUShippingBase){
+                        promotionSKUDiscAMTBySetting.setShopId(onePromotion.getShopId());
+                        promotionSKUDiscAMTBySetting.setPromotionId(onePromotion.getPromotionId());
+                        promotionSKUDiscAMTBySetting.setPromotionName(onePromotion.getPromotionName());
+                        promotionSKUDiscAMTBySetting.setPromotionType(onePromotion.getConditionType());
+                        promotionSKUDiscAMTBySetting.setFreeShippingMark(true);
+                        promotionSKUDiscAMTBySetting.setBaseOrder(true);
                     }
                     allPromotionShareBySKU.addAll(onePromotionShareBySKUShippingBase);
                     onePromotionShareBySKUShippingBase = null;

@@ -28,5 +28,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Service("shoppingCartLineCommandCreateLineCommonBehaviour")
 public class ShoppingCartLineCommandCreateLineCommonBehaviour extends AbstractShoppingCartLineCommandCreateLineBehaviour{
-
+    //行为 继承自 父类
 }

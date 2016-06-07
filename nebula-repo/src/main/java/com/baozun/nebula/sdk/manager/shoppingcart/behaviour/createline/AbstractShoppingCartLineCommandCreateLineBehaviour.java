@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
@@ -36,13 +34,12 @@ import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
 import com.feilong.core.Validator;
 
 /**
+ * The Class AbstractShoppingCartLineCommandCreateLineBehaviour.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour implements ShoppingCartLineCommandCreateLineBehaviour{
-
-    private static final Logger      LOGGER = LoggerFactory.getLogger(AbstractShoppingCartLineCommandCreateLineBehaviour.class);
 
     /** The sdk order line dao. */
     @Autowired
@@ -68,10 +65,16 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
     }
 
     /**
+     * Save common line.
+     *
      * @param orderId
+     *            the order id
      * @param couponCodes
+     *            the coupon codes
      * @param promotionSKUDiscAMTBySettingList
+     *            the promotion sku disc amt by setting list
      * @param shoppingCartLineCommand
+     *            the shopping cart line command
      */
     //XXX feilong  这里的参数 shoppingCartLineCommand 最好是单独定制 一个额外的类 这样不会影响原来的对象
     protected void saveCommonLine(
