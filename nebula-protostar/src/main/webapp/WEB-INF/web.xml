@@ -1,4 +1,5 @@
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
     http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
 	version="2.5">
 
@@ -17,11 +18,12 @@
 		<param-name>spring.profiles.active</param-name>
 		<param-value>dev</param-value>
 	</context-param>
-	
+
 	<filter>
 		<filter-name>encodingFilter</filter-name>
-		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-		<init-param>         
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
 		</init-param>
@@ -30,10 +32,11 @@
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 	<filter>
 		<filter-name>auditLogFilter</filter-name>
-		<filter-class>com.baozun.nebula.web.filter.AuditLogFilter</filter-class>
+		<filter-class>com.baozun.nebula.web.filter.AuditLogFilter
+		</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>auditLogFilter</filter-name>
@@ -43,13 +46,14 @@
 	<!-- Spring Security -->
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy
+		</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 	<!-- 用于防范XSS -->
 	<filter>
 		<filter-name>securityFilter</filter-name>
@@ -59,78 +63,74 @@
 		<filter-name>securityFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
+
 	<filter>
 		<filter-name>csrfFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy
+		</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>csrfFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	
-<!-- 	<filter> -->
-<!-- 		<filter-name>cmsResourceFilter</filter-name> -->
-<!-- 		<filter-class>com.baozun.nebula.web.filter.CmsResourceFilter</filter-class> -->
-<!-- 	</filter> -->
-	
-<!-- 	<filter-mapping> -->
-<!-- 		<filter-name>cmsResourceFilter</filter-name> -->
-<!-- 		<url-pattern>/resources/*</url-pattern> -->
-<!-- 	</filter-mapping> -->
-	<!-- ********************************** listener ********************************** 
 
-	<context-param>
-		<param-name>logbackConfigLocation</param-name>
-		<param-value>classpath:logback.xml</param-value>
-	</context-param>
-	
+	<!-- <filter> -->
+	<!-- <filter-name>cmsResourceFilter</filter-name> -->
+	<!-- <filter-class>com.baozun.nebula.web.filter.CmsResourceFilter</filter-class> -->
+	<!-- </filter> -->
+
+	<!-- <filter-mapping> -->
+	<!-- <filter-name>cmsResourceFilter</filter-name> -->
+	<!-- <url-pattern>/resources/*</url-pattern> -->
+	<!-- </filter-mapping> -->
+	<!-- ********************************** listener ********************************** 
+		<context-param> <param-name>logbackConfigLocation</param-name> <param-value>classpath:logback.xml</param-value> 
+		</context-param> <listener> <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class> 
+		</listener> -->
 	<listener>
-		<listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
-	</listener>
-	-->
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+		<listener-class>org.springframework.web.context.ContextLoaderListener
+		</listener-class>
 	</listener>
 	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+		<listener-class>org.springframework.web.context.request.RequestContextListener
+		</listener-class>
 	</listener>
 	<listener>
-		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher
+		</listener-class>
 	</listener>
-	
+	<listener>
+		<listener-class>com.baozun.nebula.web.listener.NebulaSystemInitListener
+		</listener-class>
+	</listener>
+
 	<filter>
 		<filter-name>FileUploadFilter</filter-name>
 		<filter-class>com.ckfinder.connector.FileUploadFilter</filter-class>
-                <init-param>
-                    <param-name>sessionCookieName</param-name>
-                    <param-value>JSESSIONID</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>sessionParameterName</param-name>
-                    <param-value>jsessionid</param-value>
-                </init-param>
+		<init-param>
+			<param-name>sessionCookieName</param-name>
+			<param-value>JSESSIONID</param-value>
+		</init-param>
+		<init-param>
+			<param-name>sessionParameterName</param-name>
+			<param-value>jsessionid</param-value>
+		</init-param>
 	</filter>
 	<filter-mapping>
 		<filter-name>FileUploadFilter</filter-name>
 		<url-pattern>
 			/ckfinder/core/connector/java/connector.java
-     	 </url-pattern>
+		</url-pattern>
 	</filter-mapping>
 
 	<!-- ********************************** servlet ********************************** -->
 	<servlet>
 		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
-	
-	<servlet>
-		<servlet-name>systemServlet</servlet-name>
-		<servlet-class>com.baozun.nebula.web.servlet.SystemInitServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
-	</servlet> 
+
 
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
@@ -158,7 +158,7 @@
 		</url-pattern>
 	</servlet-mapping>
 	<!-- ckfinder end -->
-	
+
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
@@ -176,7 +176,7 @@
 		<exception-type>java.lang.Exception</exception-type>
 		<location>/errors/error.htm</location>
 	</error-page>
-	
+
 	<jsp-config>
 		<jsp-property-group>
 			<url-pattern>*.jsp</url-pattern>
@@ -185,5 +185,5 @@
 			<page-encoding>UTF-8</page-encoding>
 		</jsp-property-group>
 	</jsp-config>
-	
+
 </web-app>

@@ -1,7 +1,5 @@
 package com.baozun.nebula.utilities.integration.payment;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -10,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.ResourceUtil;
 import com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor;
 import com.baozun.nebula.utilities.common.convertor.PayParamConvertorForAlipayAdaptor;
 import com.baozun.nebula.utilities.common.convertor.PayParamConvertorForUnionPayAdaptor;
@@ -174,30 +171,19 @@ public class PaymentFactory {
 	 */
 	public Properties initConfig(String payMentType)
 			throws PaymentAdaptorInitialFailureException {
-		Properties configs = new Properties();
-		String configFile = paymentConfigMap.get(payMentType);
-		InputStream is = ResourceUtil.getResourceAsStream(configFile,
-				PaymentFactory.class);
 
-		if (is != null) {
-			try {
-				configs.load(is);
-				if (null == configs.getProperty(PaymentAdaptor.PAYMENT_GATEWAY) &&
-						null ==	configs.getProperty("payment_gateway_front"))
-					throw new PaymentAdaptorInitialFailureException(
-							"No payment gateway address defined.");
-			} catch (IOException e) {
-				e.printStackTrace();
-				logger.error("Error occurs when loading {}", configFile);
-				throw new PaymentAdaptorInitialFailureException(
-						"Load Configuration failure", e);
-			}
-		} else {
-			logger.error("Could not find {}", configFile);
-			throw new PaymentAdaptorInitialFailureException(
-					"Cannot find Configuration file " + configFile);
+		String configFile = paymentConfigMap.get(payMentType);
+		try {
+			Properties configs = ProfileConfigUtil.findCommonPro(configFile);
+			if (null == configs.getProperty(PaymentAdaptor.PAYMENT_GATEWAY)
+					&& null == configs.getProperty("payment_gateway_front"))
+				throw new PaymentAdaptorInitialFailureException("No payment gateway address defined.");
+			return configs;
+		} catch (Exception e) {
+			logger.error("Error occurs when loading {}", configFile);
+			throw new PaymentAdaptorInitialFailureException("Load Configuration failure", e);
 		}
-		return configs;
+
 	}
 
 	/*

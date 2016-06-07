@@ -1,13 +1,11 @@
 package com.baozun.nebula.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baozun.nebula.utilities.common.ResourceUtil;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 
 public class EmailPropertiesUtil {
 	
@@ -22,21 +20,15 @@ public class EmailPropertiesUtil {
 		return SingletonHolder.instance;
 	}
 
+	/**
+	 * @deprecated 推荐使用注入的方式获取属性文件的值，如：@Value("#{meta['order.subOrdinate.head']}")
+	 * @param filePath
+	 * @param className
+	 * @return
+	 */
+	@Deprecated
 	public Properties initEmailProperties(String filePath, Class<?> className) {
-		InputStream is = ResourceUtil.getResourceAsStream(filePath,
-				className);
-		Properties properties = new Properties();
-		if (is != null) {
-			try {
-				properties.load(is);
-			} catch (IOException e) {
-				e.printStackTrace();
-				logger.error("Error occurs when loading {}", filePath);
-			}
-		} else {
-			logger.error("Could not find {}", filePath);
-		}
-		return properties;
+		return ProfileConfigUtil.findPro(filePath);
 	}
 
 }

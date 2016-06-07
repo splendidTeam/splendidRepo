@@ -14,9 +14,10 @@ import org.slf4j.LoggerFactory;
 
 
 /**
+ * @deprecated 推荐使用注入的方式获取属性文件的值，如：@Value("#{meta['order.subOrdinate.head']}")
  * 操作properties配置文件
  * 
- * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
+  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 1.0 2010-3-22 上午10:05:19
  * @since 1.0
  */
@@ -29,6 +30,7 @@ public class PropertiesUtil {
 	/**
 	 * 读取方式
 	 * 
+	 * @author 金鑫 2010-4-20 下午04:16:34
 	 */
 	public enum ReadType{
 		/**

@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.utilities.common;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -67,22 +65,11 @@ public class ConfigurationUtil {
 	 * @return
 	 */
 	public static List<Properties> loadConfiguration(String... configs){
+
 		List<Properties> props = new ArrayList<Properties>();
 		for(String config: configs){
-			InputStream is = ResourceUtil.getResourceAsStream(
-					config + ".properties", ConfigurationUtil.class);
-			if(is != null){
-				Properties prop = new Properties();
-				try {
-					prop.load(is);
-					props.add(prop);
-				} catch (IOException e) {
-					e.printStackTrace();			
-					logger.warn("Error occurs when loading {}.properties", config);
-				}
-			}else{
-				logger.warn("Could not find {}.properties", config);
-			}
+			Properties prop = ProfileConfigUtil.findCommonPro(config + ".properties");
+			props.add(prop);
 		}
 		return props;
 	}

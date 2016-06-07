@@ -17,8 +17,6 @@
 package com.baozun.nebula.utilities.integration.payment.alipay;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,24 +31,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.Md5Encrypt;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.RequestMapUtil;
-import com.baozun.nebula.utilities.common.ResourceUtil;
 import com.baozun.nebula.utilities.common.Validator;
-import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
-import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
-import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
-import com.baozun.nebula.utilities.integration.payment.PaymentResult;
-import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
-import com.baozun.nebula.utilities.integration.payment.exception.PaymentAdaptorInitialFailureException;
-import com.baozun.nebula.utilities.integration.payment.exception.PaymentException;
-import com.baozun.nebula.utilities.io.http.HttpClientUtil;
-import com.baozun.nebula.utilities.io.http.HttpMethodType;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnForMobileCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.condition.ResponseParam;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
 import com.baozun.nebula.utilities.common.convertor.RequestToCommand;
+import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
+import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
+import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
+import com.baozun.nebula.utilities.integration.payment.PaymentResult;
+import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
+import com.baozun.nebula.utilities.integration.payment.exception.PaymentException;
+import com.baozun.nebula.utilities.io.http.HttpClientUtil;
+import com.baozun.nebula.utilities.io.http.HttpMethodType;
 
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 
@@ -215,6 +212,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 				paymentResult.setMessage("sign not match");
 			}
 		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -307,6 +305,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 			paymentServiceReturnForMobileCommand = requestToCommand.alipaySynRequestToCommandForMobile(request,resultMap);
 			paymentResult.setPaymentStatusInformation(paymentServiceReturnForMobileCommand);
 		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -378,6 +377,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 
 	@Override
 	public boolean isSupportClosePaymentRequest() {
+		// TODO Auto-generated method stub
 		return true;
 	}
 
@@ -535,26 +535,10 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 	 * 初始化地址配置参数
 	 */
 	public void getAddress(String paymentType) {
-		Properties configs = new Properties();
-		InputStream is = ResourceUtil.getResourceAsStream(
-				PaymentFactory.ALIPAYADDRESS, PaymentFactory.class);
-		if (is != null) {
-			try {
-				configs.load(is);
-				this.returnUrl = configs.getProperty(paymentType
-						+ ".return_url");
-				this.notifyUrl = configs.getProperty(paymentType
-						+ ".notify_url");
-				this.errorNotifyUrl = configs.getProperty(paymentType
-						+ ".error_notify_url");
-			} catch (IOException e) {
-				e.printStackTrace();
-				logger.error("Error occurs when loading {}",
-						PaymentFactory.ALIPAYADDRESS);
-			}
-		} else {
-			logger.error("Could not find {}", PaymentFactory.ALIPAYADDRESS);
-		}
+		Properties configs = ProfileConfigUtil.findCommonPro(PaymentFactory.ALIPAYADDRESS);
+		this.returnUrl = configs.getProperty(paymentType + ".return_url");
+		this.notifyUrl = configs.getProperty(paymentType + ".notify_url");
+		this.errorNotifyUrl = configs.getProperty(paymentType + ".error_notify_url");
 	}
 	
 	@Override

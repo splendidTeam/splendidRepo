@@ -1,12 +1,13 @@
 package com.baozun.nebula.utilities.common;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.jasypt.encryption.StringEncryptor;
+import org.jasypt.properties.EncryptableProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,8 @@ public class ProfileConfigUtil {
 	 */
 	private static String mode="null";
 	
+	private static StringEncryptor stringEncryptor;
+
 	/**
 	 * getProfilePath方法中会对此路径进行处理，加上profile的路径
 	 * 如 
@@ -41,7 +44,11 @@ public class ProfileConfigUtil {
 	public static String getMode(){
 		return mode;
 	}
-	
+
+	public void setStringEncryptor(StringEncryptor stringEncryptor) {
+		ProfileConfigUtil.stringEncryptor = stringEncryptor;
+	}
+
 	private static void checkModel(){
 		if(StringUtils.isBlank(mode)||mode.equalsIgnoreCase("null")){
 			throw new RuntimeException("profile获取在初始化之前，这是不被允许的！请联系NEBULA的相关人员！");
@@ -69,10 +76,12 @@ public class ProfileConfigUtil {
 	}
 	
 	/**
+	 * @deprecated 推荐使用注入的方式获取属性文件的值，如：@Value("#{meta['order.subOrdinate.head']}")
 	 * 通过路径返回properties文件,会进行profile处理
 	 * @param source
 	 * @return
 	 */
+	@Deprecated
 	public static Properties findPro(String source){
 		checkModel();
 		String path=getProfilePath(source);
@@ -86,10 +95,10 @@ public class ProfileConfigUtil {
 			 pro=new Properties();
 			try {
 				pro.load(is);
+				pro = enableEncryptProperties(pro);
 				proMap.put(path, pro);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e) {
+				log.error("配置文件加载异常{}", path, e);
 			}
 			
 		}
@@ -97,11 +106,24 @@ public class ProfileConfigUtil {
 		return pro;
 	}
 	
+	private static Properties enableEncryptProperties(Properties pro) {
+		if (stringEncryptor == null) {
+			return pro;
+		}
+
+		// 如果配置了加密类，则对配置文件中的加密属性提供解密能力
+		EncryptableProperties encryptableProperties = new EncryptableProperties(stringEncryptor);
+		encryptableProperties.putAll(pro);
+		return encryptableProperties;
+	}
+
 	/**
+	 * @deprecated 推荐使用注入的方式获取属性文件的值，如：@Value("#{meta['order.subOrdinate.head']}")
 	 * 通过路径返回properties文件,不会进行profile路径处理
 	 * @param source
 	 * @return
 	 */
+	@Deprecated
 	public static Properties findCommonPro(String source){
 		
 		String path=source;
@@ -115,24 +137,13 @@ public class ProfileConfigUtil {
 			 pro=new Properties();
 			try {
 				pro.load(is);
+				pro = enableEncryptProperties(pro);
 				proMap.put(path, pro);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e) {
+				log.error("配置文件加载异常{}", source, e);
 			}
 		}
 		
 		return pro;
-	}
-	
-	public static void main(String[] args){
-		mode="dev";
-		String str="config/asdfas/config/test";
-		
-		System.out.println(getProfilePath(str));
-		
-		findPro(str);
-		
-		findCommonPro(str);
 	}
 }

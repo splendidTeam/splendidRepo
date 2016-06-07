@@ -20,7 +20,7 @@
 	</context-param>
 	
 	<listener>
-		<listener-class>com.baozun.nebula.wormhole.web.listener.SystemInitListener</listener-class>
+		<listener-class>com.baozun.nebula.wormhole.web.listener.NebulaSystemInitListener</listener-class>
 	</listener>
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -31,16 +31,6 @@
 	<listener>
 		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
 	</listener>
-
-	<!-- ********************************** servlet ********************************** -->
-
-	<servlet>
-		<servlet-name>systemServlet</servlet-name>
-		<servlet-class>com.baozun.nebula.wormhole.web.servlet.SystemInitServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-
-
 
 	<session-config>
 		<session-timeout>60</session-timeout>

@@ -209,7 +209,7 @@
 					<ignorePackaging>true</ignorePackaging>
 					<systemProperties>
 						<tomcatName>tomcat-nebula-protostar</tomcatName>
-						<JAVA_OPTS>-Xms256m -Xmx1024m -XX:MaxPermSize=512m</JAVA_OPTS>
+						<JAVA_OPTS>-Xms256m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+UseParallelGC</JAVA_OPTS>
 					</systemProperties>
 					<warFile>${project.build.directory}/nebula-protostar.war</warFile>
 					<warDirectory>target/nebula-protostar</warDirectory>

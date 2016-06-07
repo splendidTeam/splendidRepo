@@ -74,7 +74,6 @@ public abstract class AbstractWatcher implements IWatcher {
 	 * 如果注册Watcher的节点当前不存在，则默认按指定的CreateMode、ACL创建一个空节点；
 	 * </p>
 	 */
-	@PostConstruct
 	public void initListen() throws Exception {
 		Assert.notNull(getListenerPath(), "listenerPath can not be null!");
 		Assert.notNull("watcherInvoke", "watcherInvoke can not be null!");

@@ -53,7 +53,6 @@ public class HelixConfig {
 					prop.load(is);
 					props.add(prop);
 				} catch (IOException e) {
-					e.printStackTrace();			
 					LOG.warn("Error occurs when loading {}.properties", config);
 				}
 			}else{
