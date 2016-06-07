@@ -1,4 +1,6 @@
 $j.extend(loxia.regional['zh-CN'],{
+	"SYSTEM_ITEM_MESSAGE":"提示信息",
+	"ADDITEM_FAIL":"新增商品失败",
 	"BUNDLE_DIALOG_TITLE_MAIN":"选择主卖品",
 	"BUNDLE_DIALOG_TITLE_ELEMENT":"选择成员",
 	"NO_DATA":"无数据",
@@ -13,67 +15,29 @@ $j.extend(loxia.regional['zh-CN'],{
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
+//设置返回的是主卖品还是成员商品
+var selectStoreyType = '';
 
 $j(document).ready(function(){
 	
+	/*==================================     bundle扩展信息    ==========================*/
+	/*==================================     弹出层    ==========================*/
 	//点击'设置主卖品'弹出对应弹层
 	$j("#selectPro").on("click",function(){
+		//返回的是主卖品
+		selectStoreyType = 1;
 		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
 		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
 	});	
 	
 	//点击'+新成员'弹出对应弹层
-	$j(".selectStyle").on("click",function(){
-		$j('.select-style-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
-	});	
-	
-	
-	/*=================    添加主商品    ==========================*/
-	//dialog-close  给关闭图标绑定点击事件
-	bindClose();
-	
-	$j("#addMainProduct").on("click",function(){
-		$j(".proto-dialog .dialog-close").click();
-		$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
-		bindClose();
-		$j("#selectPro").hide();
-	})
-	
-	initSetMainProduct();
-	
-	/*=================    添加主商品    ==========================*/
-	
-	
-	
-	
-	
-	
-	//价格设置
-	$j("input[name='setPrice']").bind('change', function(){
-		var currVal = $j(this).val();
-		
-		if(currVal == 'subtotal') {//按捆绑商品总价
-			$j('.product-table').hide();
-			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
-		} else if(currVal == 'fix'){//一口价
-			$j('.product-table').show();
-			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
-		} else if(currVal == 'custom'){//定制
-			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
-			$j('.product-table').hide();
-		}
-	});
-	
-	// 点击添加捆绑成员
-	$j("#add_bundle_element").on("click",function(){
+	$j("#selectStyle").on("click",function(){
+		//返回的是成员商品
+		selectStoreyType = 2;
 		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
 		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_ELEMENT"));
 	});	
 	
-	// 点击删除bundle成员
-	$j(".dialog_close").on("click", function(){
-		
-	});
 	
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
@@ -121,6 +85,22 @@ $j(document).ready(function(){
 		dataurl : findItemInfoListJsonUrl
 	});
 	
+	// 商品状态
+	$j.ui.loxiasimpletable().typepainter.threeState = {
+		getContent : function(data) {
+			if (data == 0) {
+				return "<span class='ui-pyesno ui-pyesno-no' title='下架'></span>";
+			} else if (data == 1) {
+				return "<span class='ui-pyesno ui-pyesno-yes' title='上架'></span>";
+			} else if (data == 3) {
+				return "<span class='ui-pyesno ui-pyesno-wait' title='新建'></span>";
+			}
+		},
+		postHandle : function(context) {
+			// do nothing
+		}
+	}
+	
 	refreshData();
 	
 	// 点击搜索
@@ -145,47 +125,87 @@ $j(document).ready(function(){
     	return loxia.SUCCESS;
     });
     formValidateList.push(baseInfoValidator);
+    
+    
+	//dialog-close  给关闭图标绑定点击事件
+	bindClose(selectStoreyType);
+	
+	$j("#addMainProduct").on("click",function(){
+		//关闭弹出层
+		$j(".proto-dialog .dialog-close").click();
+		if(selectStoreyType == 1){
+			$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
+			$j("#selectPro").hide();
+		}else if(selectStoreyType == 2){
+			$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
+		}
+		bindClose(selectStoreyType);
+		
+	});
+	
+	
+	/*==================================     弹出层    ==========================*/
+	/*==================================     bundle扩展信息    ==========================*/
+	
+	
+	
+	
+	
+	/*==================================     价格设置    ==========================*/
+	$j("input[name='setPrice']").bind('change', function(){
+		var currVal = $j(this).val();
+		
+		if(currVal == 'subtotal') {//按捆绑商品总价
+			$j('.product-table').hide();
+			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
+		} else if(currVal == 'fix'){//一口价
+			$j('.product-table').show();
+			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
+		} else if(currVal == 'custom'){//定制
+			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
+			$j('.product-table').hide();
+		}
+	});
+	/*==================================     价格设置    ==========================*/
+	
+	
+	
+	//保存商品
+	$j(".button.orange.submit").click(function(){
+	   nps.submitForm('itemForm',{mode: 'async', 
+			successHandler : function(data){
+			if(data.isSuccess == true)
+			{
+				window.location.href=base+"/item/itemList.htm";
+			}else
+			{
+				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("ADDITEM_FAIL"));
+			}
+	   }});
+    });
+	
+	//上一步
+    $j(".button.back").on("click",function(){
+    	window.location.href=base+"/item/createItemChoose.htm";
+    });
+	
 });
-/*
- * 判断进入页面时是否设置主商品
- * 		1、设置了就不显示‘设置主商品’
- * 		2、未设置就显示‘设置主商品’
- */
-function initSetMainProduct(){
-	if($j("#selectPro").prev() != null){
-		$j("#selectPro").hide();
-	}else{
-		$j("#selectPro").show();
-	}
-}
 
 
 /*
  *给关闭图标绑定点击事件 
  */
-function bindClose(){
-	$j(".setMainProduct .dialog-close").bind("click",function(){
-		$j("#selectPro").show();
-	})
+function bindClose(selectStoreyType){
+	if(selectStoreyType == 1){
+		$j(".setMainProduct .dialog-close").bind("click",function(){
+			$j("#selectPro").show();
+		})
+	}
+	
 	//关闭图标
 	$j(".dialog-close").bind("click",function(){
 		$j(this).closest("li.main-pro").remove();
 	})
-	// 商品状态
-	$j.ui.loxiasimpletable().typepainter.threeState = {
-		getContent : function(data) {
-			if (data == 0) {
-				return "<span class='ui-pyesno ui-pyesno-no' title='下架'></span>";
-			} else if (data == 1) {
-				return "<span class='ui-pyesno ui-pyesno-yes' title='上架'></span>";
-			} else if (data == 3) {
-				return "<span class='ui-pyesno ui-pyesno-wait' title='新建'></span>";
-			}
-		},
-		postHandle : function(context) {
-			// do nothing
-		}
-	}
 }
 
 
