@@ -21,8 +21,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +32,7 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcart
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 
 /**
+ * The Class DefaultShoppingcartOrderCreateSuccessHandler.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午3:43:09
@@ -42,14 +41,15 @@ import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCount
 @Component("shoppingcartOrderCreateSuccessHandler")
 public class DefaultShoppingcartOrderCreateSuccessHandler implements ShoppingcartOrderCreateSuccessHandler{
 
-    private static final Logger        LOGGER = LoggerFactory.getLogger(DefaultShoppingcartOrderCreateSuccessHandler.class);
-
+    /** The shoppingcart factory. */
     @Autowired
     private ShoppingcartFactory        shoppingcartFactory;
 
+    /** The guest shoppingcart persister. */
     @Autowired
     private GuestShoppingcartPersister guestShoppingcartPersister;
 
+    /** The shoppingcart count persister. */
     @Autowired
     private ShoppingcartCountPersister shoppingcartCountPersister;
 
