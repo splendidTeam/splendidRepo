@@ -54,6 +54,10 @@ public class PayParamConvertorForAlipayAdaptor implements PayParamConvertorAdapt
 			throw new PaymentParamErrorException(
 					"it_b_pay can't be null/empty!");
 		}
+		//支付宝扫码支付方式
+		if(Validator.isNotNullOrEmpty(payParamCommand.getQrPayMode())){
+			requestParam.put("qr_pay_mode", payParamCommand.getQrPayMode());
+		}
 		
 		if (Validator.isNotNullOrEmpty(payParamCommand.getBody())) {
 			requestParam.put("body", payParamCommand.getBody());// 商品描述(可为空)
