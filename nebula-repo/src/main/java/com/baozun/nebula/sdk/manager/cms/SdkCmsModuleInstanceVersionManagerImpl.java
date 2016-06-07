@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.cms.CmsModuleInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsModuleInstanceVersionDao;
@@ -84,6 +85,9 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	
 	@Autowired
 	private ZkOperator			zkOperator;
+	
+	@Autowired
+	private ZKWatchPath 		zkWatchPath;
 	
 	@Autowired
 	private SdkCmsTemplateHtmlManager sdkCmsTemplateHtmlManager;
@@ -237,7 +241,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					String data = sdkCmsParseHtmlContentManager.getParseModuleData(editAreaList, module.getTemplateId());
 					cmsTemplateHtml.setData(data);
 					sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
-					zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+					zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 					logger.info("publish moduleversion success : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
 				} catch (Exception e) {
 					logger.error("publish moduleversion error : moduleId="+module.getId()+", versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
@@ -331,7 +335,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 					CmsTemplateHtml cmsTemplateHtml = sdkCmsTemplateHtmlManager.findCmsTemplateHtmlByModuleCodeAndVersionId(moduleInstance.getCode(), versionId);		
 					sdkCmsTemplateHtmlManager.removeCmsTemplateHtml(cmsTemplateHtml.getId());
 				}
-				zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+				zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 			}catch(Exception e){
 				logger.error("cancelpublish moduleversion error cause of publich baseversion error or removepublic error, modulecode="+moduleInstance.getCode()+", moduleId="+moduleInstance.getId()+", versionId="+versionId);
 				e.printStackTrace();
@@ -396,7 +400,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 
 		removeModuleVersionByIds(versionIds);
 		logger.info("remove moduleVersion's ids is " + ids);
-		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 	}
 	
 	@Override
