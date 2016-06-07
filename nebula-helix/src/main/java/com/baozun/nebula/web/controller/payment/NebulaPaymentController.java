@@ -128,16 +128,26 @@ public class NebulaPaymentController extends NebulaBasePaymentController {
 		}
     	
     }
+    
     /**
-     * 支付所需要的额外参数
+     * <pre>
+     *  设置支付所需要的额外参数，设置初始化参数 如果有需要需要重写该方法
+     * 
+     *  1： 当设置支付宝扫码支付模式qrPayMode为0或1或3（扫码支付方式为订单码-简约前置模式或订单码-前置模式或订单码-迷你前置模式）的情况下，
+     *  同步通知地址return_url需要传入商户中间跳转页面，即该页面需要实现让父页面自行跳转的功能，
+     *  中间页面javascript代码：<script>window.parent.location.href='父页面调整的URL';</script>
+     *   
+     *  2：目前仅仅需要用到上面这个参数……
+     *  
+     * </pre>
      * @return
      */
     protected Map<String,Object> getExtraData(){
     	
     	Map<String,Object> extra = new HashMap<String,Object>();
     	
-    	//支付宝扫码支付显示模式，默认跳转
-    	extra.put("qrPayMode", QR_PAY_MODE_REDIRECT);
+    	//默认即时到账，非扫码
+    	extra.put("qrPayMode", null);
     	
     	return extra;
     }
