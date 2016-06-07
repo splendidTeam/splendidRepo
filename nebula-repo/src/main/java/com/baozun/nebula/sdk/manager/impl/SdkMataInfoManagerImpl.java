@@ -54,7 +54,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
     @Autowired
     private ZkOperator          zkOperator;
     
-    @Autowired
+    @Autowired(required=false)
     private ZKWatchPath			zkWatchPath;
 
     private static Map<String, String> metaMap = new ConcurrentHashMap<String, String>();
