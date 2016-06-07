@@ -259,6 +259,18 @@ public class AlipayPaymentRequest implements PaymentRequest, Serializable {
 	 */
 	@PaymentParam(sampleValue = "1h")
 	private String it_b_pay;
+	
+	/**
+	 *  支付宝扫码支付方式
+	 * 	0：订单码-简约前置模式，对应iframe宽度不能小于600px，高度不能小于300px；
+	 *	1：订单码-前置模式，对应iframe宽度不能小于300px，高度不能小于600px；
+	 *	3：订单码-迷你前置模式，对应iframe宽度不能小于75px，高度不能小于75px。
+	 *	跳转模式下，用户的扫码界面是由支付宝生成的，不在商户的域名下。
+	 *	2：订单码-跳转模式
+	 *
+	 */
+	@PaymentParam(sampleValue = "1")
+	private String qr_pay_mode;
 
 	/**
 	 * 商户申请的产品类型
@@ -523,6 +535,9 @@ public class AlipayPaymentRequest implements PaymentRequest, Serializable {
 		if (Validator.isNotNullOrEmpty(it_b_pay)) {
 			addition.put("it_b_pay", it_b_pay);// 超时时间(可为空)参数不接受小数点
 		}
+		if (Validator.isNotNullOrEmpty(qr_pay_mode)) {
+			addition.put("qr_pay_mode", qr_pay_mode);// 支付宝扫描支付方式
+		}	
 		if (Validator.isNotNullOrEmpty(product_type)) {
 			addition.put("product_type", product_type);// 商户申请的产品类型(可为空)
 		}

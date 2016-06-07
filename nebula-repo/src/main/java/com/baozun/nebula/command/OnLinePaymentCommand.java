@@ -30,6 +30,11 @@ public class OnLinePaymentCommand implements Serializable{
 	 * 持卡人IP地址
 	 */
 	private String customerIp;
+	
+	/**
+	 * 扫描支付方式
+	 */
+	private String qrPayMode;
 
 	
 	public OnLinePaymentCommand() {
@@ -100,6 +105,14 @@ public class OnLinePaymentCommand implements Serializable{
 
 	public void setItBPay(String itBPay) {
 		this.itBPay = itBPay;
+	}
+
+	public String getQrPayMode() {
+		return qrPayMode;
+	}
+
+	public void setQrPayMode(String qrPayMode) {
+		this.qrPayMode = qrPayMode;
 	}
 	
 	

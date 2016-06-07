@@ -6,18 +6,20 @@
 		http://loxia.benjamin.cn/schema/core http://loxia.benjamin.cn/schema/core/loxia-spring-ext.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd	
 		">
+		
+	<bean id="paymentResolverType" class="com.baozun.nebula.web.controller.payment.resolver.PaymentResolverType">
+		<property name="paymentResolverTypes">
+			<map>
+				<entry key="6">
+					<bean class="com.baozun.nebula.web.controller.payment.resolver.AlipayPaymentResolver" />
+				</entry>
 
-	<bean id="alipayPaymentResolver" class="com.baozun.nebula.web.controller.payment.resolver.AlipayPaymentResolver"  />
-	<bean id="wechatPaymentResolver" class="com.baozun.nebula.web.controller.payment.resolver.WechatPaymentResolver"  />
+				<entry key="4">
+					<bean class="com.baozun.nebula.web.controller.payment.resolver.WechatPaymentResolver" />
+				</entry>
+			</map>
+		</property>
 
-	<bean id="paymentResolverTypes" class="java.util.HashMap">
-		<constructor-arg>
-		     <map>
-				<entry key="6" value-ref="alipayPaymentResolver"/>
-				<entry key="4" value-ref="wechatPaymentResolver"/>
-		     </map>
-		 </constructor-arg>
 	</bean>
-
 	
 </beans>
