@@ -19,7 +19,9 @@ package com.baozun.nebula.manager.schedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.curator.invoke.ScheduleTaskWatchInvoker;
 
 
@@ -33,10 +35,13 @@ public class ScheduleManagerImpl implements ScheduleManager{
 	@Autowired
 	protected ZkOperator zkOperator;
 	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
+	
 	@Override
 	public boolean noticeTask(Long id) {
 		String data = id.toString();
-		boolean result = zkOperator.noticeZkServer(zkOperator.getPath(ScheduleTaskWatchInvoker.PATH_KEY), data);
+		boolean result = zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ScheduleTaskWatchInvoker.class), data);
 		return result;
 	}
 

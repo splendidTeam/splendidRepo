@@ -307,15 +307,15 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 		
 		Integer lifecycle = itemBaseInfo.getLifecycle();
-		if(Item.LIFECYCLE_DELETED == lifecycle) {
+		if(Item.LIFECYCLE_DELETED.equals(lifecycle)) {
 			// 商品逻辑删除
 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item logical deleted. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_LOGICAL_DELETED);
-		} else if(Item.LIFECYCLE_UNACTIVE == lifecycle) {
+		} else if(Item.LIFECYCLE_UNACTIVE.equals(lifecycle)) {
 			// 商品新建状态
 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
-		} else if(Item.LIFECYCLE_DISABLE == lifecycle) {
+		} else if(Item.LIFECYCLE_DISABLE.equals(lifecycle)) {
 			// 商品未上架
 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);

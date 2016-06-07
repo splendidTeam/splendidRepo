@@ -43,7 +43,7 @@
    </form>
    <!-- 选择商品弹出层 -->
    <div class="select-pro-layer proto-dialog">
-		<h5 id="bundle_dialog_title">选择主卖品/成员</h5>
+		<h5 id="bundle_dialog_title"></h5>
 		<div class="proto-dialog-content">
 			<div class="ui-block">
 				<div class="ui-block">
@@ -56,7 +56,7 @@
 							</div> 
 							<div class="form-group p10">
 								<label>编码</label>
-								<input type="text" loxiaType="input" id="code_add" name="q_sl_code" mandatory="true"/>
+								<input type="text" loxiaType="input" name="q_sl_code" mandatory="false"/>
 							</div>
 							<div class="button-line1 right">
 								<a href="javascript:void(0);" class="func-button orange" id="search_button"><span>搜索</span></a>

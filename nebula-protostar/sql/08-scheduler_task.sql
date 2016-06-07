@@ -8,3 +8,4 @@ INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 's
 INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'solrRefreshManager', 'solr_refresh', 'solr定时刷新', 1, 'refresh', '0 0 3 * * ?', NULL);
 INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'syncLogisticManager', 'sync_logistic_info', 'SCM同步物流信息到商城', 1, 'syncLogisticInfo', '0 0 2 * * ?', NULL);
 INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'auditLogArchiveManager', 'audit_log_archive', '系统审计日志归档', '1', 'archive', '0 30 2 10 * ?', NULL);
+INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'syncClearInventoryLogManager', 'auto_clear_inv_change_log', '定时清理库存变更日志', '1', 'clearLogBeforeOneMonth', '0 30 0 1 * ?', NULL);

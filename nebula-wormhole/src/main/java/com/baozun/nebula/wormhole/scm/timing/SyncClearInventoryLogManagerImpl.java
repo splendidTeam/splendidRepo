@@ -31,7 +31,7 @@ import com.baozun.nebula.sdk.manager.SdkSkuInventoryChangeLogManager;
  */
 @Service("syncClearInventoryLogManager")
 public class SyncClearInventoryLogManagerImpl implements
-		SyncClearSkuInventoryChangeLogManager {
+		SyncClearInventoryLogManager {
 	private static Logger log = LoggerFactory.getLogger(SyncClearInventoryLogManagerImpl.class);
 
 	@Autowired
@@ -41,7 +41,7 @@ public class SyncClearInventoryLogManagerImpl implements
 	 * @see com.baozun.nebula.wormhole.scm.timing.SyncClearSkuInventoryChangeLogManager#clearAllLog()
 	 */
 	@Override
-	public void clearAllLog() {
+	public void clearLogBeforeOneMonth() {
 		log.debug("start to clear SkuInventoryChangeLog 1 month ago...");
 		changeLogManager.clearSkuInventoryChangeLogOneMonthAgo();
 	}

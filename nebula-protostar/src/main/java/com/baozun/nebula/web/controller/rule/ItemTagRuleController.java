@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.baozun.nebula.command.product.ProductComboDetailsCommand;
 import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.command.rule.ItemTagRuleCommand;
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
@@ -86,6 +87,8 @@ public class ItemTagRuleController extends BaseController {
 	private ShopManager						shopManager;
 	@Autowired
 	private ZkOperator				zkOperator;
+	@Autowired
+	private ZKWatchPath 			zkWatchPath;
 	@Autowired
 	private SdkPromotionManager				sdkPromotionManager;
 	@Autowired
@@ -212,7 +215,7 @@ public class ItemTagRuleController extends BaseController {
 			combo.setCreateId(userId);
 			combo.setCreateTime(new Date());
 			sdkItemTagRuleManager.update(combo);
-			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(EngineWatchInvoke.class));
 			rs.put("isSuccess", true);
 		} else {
 			rs.put(RESULT_CODE, "userNotLogin");
@@ -234,7 +237,7 @@ public class ItemTagRuleController extends BaseController {
 			@RequestParam("lifecycle") Integer activeMark) {
 		try {
 			sdkItemTagRuleManager.enableOrDisableProductGroupById(id, activeMark);
-			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(EngineWatchInvoke.class));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return FAILTRUE;

@@ -10,14 +10,6 @@
 		<div class="ui-block-title1 ui-block-title">主卖品</div>
 		<div class="ui-block-content border-grey">
 			<ul class="clearfix setMainProduct">
-				<li class="main-pro">
-					<a class="showpic"> 
-						<img src="">
-						<span class="dialog-close">X</span>
-					</a>
-					<p class="title p10">ABCD1234</p>
-					<p class="sub-title">超级舒适运动跑鞋</p>
-				</li>
 				<li class="main-pro pro-empty" id="selectPro">设置主卖品</li>
 			</ul>
 		</div>
@@ -26,15 +18,7 @@
 		<div class="ui-block-title1 ui-block-title">捆绑成员</div>
 		<div class="ui-block-content border-grey">
 			<ul class="clearfix">
-				<li class="main-pro">
-					<a class="showpic"> 
-						<img src="">
-					 	<span class="dialog-close">X</span>
-					</a>
-					<p class="title p10">ABCD1234</p>
-					<p class="sub-title">超级舒适运动跑鞋</p>
-				</li>
-				<li class="main-pro pro-empty selectStyle">+新成员</li>
+				<li class="main-pro pro-empty" id="selectStyle">+新成员</li>
 			</ul>
 			<a class="user-refresh"></a>
 		</div>

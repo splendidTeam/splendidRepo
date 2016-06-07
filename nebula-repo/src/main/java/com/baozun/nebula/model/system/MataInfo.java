@@ -50,6 +50,7 @@ public class MataInfo  implements Serializable {
 	 */
 	public static final String PAYMENT_INFO = "paymentInfo";
 
+	public static final String PAYMENT_EXPIRY_TIME = "payExpiryTime";
 	
 	/**
 	 * 返回价格，数量，是否包含未进行促销的行,TRUE以及FALSE，默认为FALSE
