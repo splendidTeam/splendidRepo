@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.cms.CmsPageInstanceVersionCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
@@ -79,6 +80,9 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 
 	@Autowired
 	private ZkOperator 					zkOperator;
+	
+	@Autowired
+	private ZKWatchPath					zkWatchPath;
 
 	@Autowired
 	private CacheManager				cacheManager;
@@ -248,7 +252,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			log.error("remove PublishedPage's id="+instanceIds+" , PublishedPageVersions Error versionids="+vids);
 		}
 		
-		zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class));
 	}
 
 	@Override
@@ -293,7 +297,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			cmsTemplateHtml.setData(data);
 			sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 			log.debug("PublishPage, Save CmsTemplateHtml's id : " + cmsTemplateHtml.getId());
-			zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class),"#"+cmsPageInstance.getCode());
 			log.info("PublishPage Success, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode());
 		}catch(Exception e){
 			log.info("PublishPage Error, Page's id : "+cmsPageInstance.getId()+", code : " + cmsPageInstance.getCode()+", error cause is "+e.getMessage());
@@ -369,7 +373,7 @@ public class CmsPageInstanceManagerImpl implements CmsPageInstanceManager {
 			e.printStackTrace();
 			log.error("cancelPublishedInstanceVersion Error versionids="+vids);
 		}
-		zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class),"#"+cmsPageInstance.getCode());
 		
 	}
 

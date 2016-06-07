@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.UrlMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsPageInstanceVersionDao;
@@ -73,6 +74,9 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 	
 	@Autowired
 	private ZkOperator zkOperator;
+	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
 
 	@Autowired
 	private CmsPageInstanceManager cmsPageInstanceManager;
@@ -221,7 +225,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 			}	
 
 			sdkCmsPageInstanceVersionManager.setPublicVersionCacheInfo();
-			zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY));
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class));
 			result.setIsSuccess(true);
 			logger.info("removeCmsPageInstanceVersion Success, page id is "+removeids);
 		} catch (Exception e) {
@@ -276,7 +280,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 				cmsTemplateHtml.setData(data);
 				sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 				logger.info("publish PageInstanceVersion Success : versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
-				zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+cmsPageInstance.getCode());
+				zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class),"#"+cmsPageInstance.getCode());
 				backWarnEntity.setIsSuccess(true);
 			} catch (Exception e) {
 				logger.error("publish PageInstanceVersion error : versionId="+versionId+", startTime="+startTime+", endTime="+endTime);
@@ -323,7 +327,7 @@ public class CmsPageInstanceVersionManagerImpl implements CmsPageInstanceVersion
 			e.printStackTrace();
 			return result;
 		}	
-		zkOperator.noticeZkServer(zkOperator.getPath(UrlMapWatchInvoke.PATH_KEY),"#"+pageCode);
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(UrlMapWatchInvoke.class),"#"+pageCode);
 		result.setIsSuccess(true);
 		logger.info("cancelpublish pageversion success, pagecode="+pageCode+", instanceId="+cmsPageInstance.getId()+", versionId="+versionId);
 		return result;

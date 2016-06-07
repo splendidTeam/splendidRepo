@@ -51,6 +51,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
 
 import com.baozun.nebula.command.SkuPropertyCommand;
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.manager.CacheManager;
@@ -75,6 +76,9 @@ public class DemoController  {
 	
 	@Autowired
 	private ZkOperator zkOperator;
+	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
 
 
 	@Autowired
@@ -429,7 +433,7 @@ public class DemoController  {
 	@ResponseBody
 	public Object testZk()throws Exception{
 		
-		boolean result=zkOperator.noticeZkServer(EngineWatchInvoke.PATH_KEY);
+		boolean result=zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(EngineWatchInvoke.class));
 		
 		return result;
 	}

@@ -43,6 +43,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.freight.DistributionModeCommand;
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.FreightWatchInvoke;
 import com.baozun.nebula.dao.freight.ShippingFeeConfigDao;
@@ -92,6 +93,9 @@ public class ShippingController extends BaseController{
 	@Autowired
 	private ZkOperator zkOperator;
 	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
+	
 	private static final String		DEFAULT_PATH							= "excel/";
 	private static final String		FILE_NAME								= "shipping_fee_import.xlsx";
 	
@@ -137,7 +141,7 @@ public class ShippingController extends BaseController{
 	@RequestMapping(value = "/freight/enableShippingTemplate.htm")
 	@ResponseBody
 	public Object enableShippingTemeplate( Model model ) {
-		zkOperator.noticeZkServer(zkOperator.getPath(FreightWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(FreightWatchInvoke.class));
 		return SUCCESS;
 	}
 	

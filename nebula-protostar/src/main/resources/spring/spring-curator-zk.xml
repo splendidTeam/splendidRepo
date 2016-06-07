@@ -15,15 +15,18 @@
 		<property name="maxElapsedTimeMs" value="#{meta['zk.maxElapsedTimeMs']}" />
 		<property name="sleepMsBetweenRetries" value="#{meta['zk.sleepMsBetweenRetries']}" />
 		<property name="lifeCycleNode" value="#{meta['zk.path.root']}" />
+	</bean>
+	
+	<bean id="zkWatchPath" class="com.baozun.nebula.curator.ZKWatchPath">
 		<property name="pathMap">
 			<map>
-				<entry key="enginewatch" value="#{meta['zk.path.enginewatch']}"></entry>
-				<entry key="freightwatch" value="#{meta['zk.path.freightwatch']}"></entry>
-				<entry key="i18nlangwatch" value="#{meta['zk.path.i18nlangwatch']}"></entry>
-				<entry key="modulemapwatch" value="#{meta['zk.path.modulemapwatch']}"></entry>
-				<entry key="scheduletaskwatch" value="#{meta['zk.path.scheduletaskwatch']}"></entry>
-				<entry key="systemconfigwatch" value="#{meta['zk.path.systemconfigwatch']}"></entry>
-				<entry key="urlmapwatch" value="#{meta['zk.path.urlmapwatch']}"></entry>
+				<entry key="EngineWatchInvoke" value="#{meta['zk.path.enginewatch']}"></entry>
+				<entry key="FreightWatchInvoke" value="#{meta['zk.path.freightwatch']}"></entry>
+				<entry key="I18nLangWatchInvoke" value="#{meta['zk.path.i18nlangwatch']}"></entry>
+				<entry key="ModuleMapWatchInvoke" value="#{meta['zk.path.modulemapwatch']}"></entry>
+				<entry key="ScheduleTaskWatchInvoker" value="#{meta['zk.path.scheduletaskwatch']}"></entry>
+				<entry key="SystemConfigWatchInvoke" value="#{meta['zk.path.systemconfigwatch']}"></entry>
+				<entry key="UrlMapWatchInvoke" value="#{meta['zk.path.urlmapwatch']}"></entry>
 			</map>
 		</property>
 	</bean>

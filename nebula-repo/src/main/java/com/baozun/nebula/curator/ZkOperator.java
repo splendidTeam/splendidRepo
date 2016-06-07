@@ -134,8 +134,6 @@ public class ZkOperator {
 	/** 连接超时时间 （ms） */
 	private int connectionTimeoutMs = 10000;
 	
-	private Map<String, String> pathMap;
-
 	/**
 	 * 失败重试策略，默认采用{@code RetryForever}
 	 * <p>
@@ -676,21 +674,5 @@ public class ZkOperator {
 
 	public void setLifeCycleNode(String lifeCycleNode) {
 		this.lifeCycleNode = lifeCycleNode;
-	}
-
-	public Map<String, String> getPathMap() {
-		return pathMap;
-	}
-
-	public void setPathMap(Map<String, String> pathMap) {
-		this.pathMap = pathMap;
-	}
-	
-	public String getPath(String key){
-		if(Validator.isNotNullOrEmpty(this.pathMap)){
-			return this.pathMap.get(key);
-		}else{
-			return null;
-		}
 	}
 }
