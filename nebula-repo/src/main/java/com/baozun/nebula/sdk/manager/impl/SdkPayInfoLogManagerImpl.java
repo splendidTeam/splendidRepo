@@ -16,12 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +38,8 @@ import com.feilong.core.Validator;
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:11:21
- * @since 5.3.1
  * @see com.baozun.nebula.sdk.manager.impl.SdkPayInfoManagerImpl
+ * @since 5.3.1
  */
 @Transactional
 @Service("sdkPayInfoLogManager")
@@ -51,6 +49,12 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
     @Autowired
     private PayInfoLogDao payInfoLogDao;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkPayInfoLogManager#savePayInfoLogOfPayMain(java.lang.String,
+     * com.baozun.nebula.sdk.command.SalesOrderCommand, com.baozun.nebula.model.salesorder.PayInfo)
+     */
     @Override
     public void savePayInfoLogOfPayMain(String subOrdinate,SalesOrderCommand salesOrderCommand,PayInfo payInfo){
         PayInfoLog payInfoLog = new PayInfoLog();
@@ -82,11 +86,16 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
      * @param salesOrderCommand
      *            the sales order command
      * @return the pay type
-     * @since 5.3.1
      */
     private String getPayType(SalesOrderCommand salesOrderCommand){
-        Properties pro = ProfileConfigUtil.findCommonPro("config/payMentInfo.properties");
+        String source = "config/payMentInfo.properties";
+        Properties properties = ProfileConfigUtil.findCommonPro(source);
         String payInfoStr = salesOrderCommand.getPaymentStr();
-        return pro.getProperty(payInfoStr + ".payType").trim();
+        Validate.notBlank(payInfoStr, "payInfoStr can't be blank!");
+
+        String key = payInfoStr + ".payType";
+        String property = properties.getProperty(key);
+        Validate.notBlank(property, "property can't be blank!,can not find:[%s] in [%s]", key, source);
+        return property.trim();
     }
 }

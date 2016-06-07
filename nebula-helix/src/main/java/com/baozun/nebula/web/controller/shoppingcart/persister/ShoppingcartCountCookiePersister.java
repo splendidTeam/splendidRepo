@@ -21,13 +21,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.web.constants.CookieKeyConstants;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCountHandler;
-import com.feilong.servlet.http.CookieUtil;
+import com.feilong.accessor.cookie.CookieAccessor;
 
 /**
  * 基于cookie保存的用户购物车数量持久化.
@@ -35,16 +31,13 @@ import com.feilong.servlet.http.CookieUtil;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
-@Component("shoppingcartCountPersister")
 public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersister{
 
-    /** cookie的名称. */
-    private String                   cookieNameShoppingcartCount = CookieKeyConstants.SHOPPING_CART_COUNT;
-
     /** The shopping cart count handler. */
-    //XXX feilong default
-    @Autowired
     private ShoppingCartCountHandler shoppingCartCountHandler;
+
+    /** cookie寄存器. */
+    private CookieAccessor           cookieAccessor;
 
     /*
      * (non-Javadoc)
@@ -55,8 +48,7 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
     @Override
     public void save(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
         String count = "" + shoppingCartCountHandler.buildCount(shoppingCartLineCommandList);
-        CookieUtil.addCookie(cookieNameShoppingcartCount, count, response);
-
+        cookieAccessor.save(count, response);
     }
 
     /*
@@ -67,16 +59,26 @@ public class ShoppingcartCountCookiePersister implements ShoppingcartCountPersis
      */
     @Override
     public void clear(HttpServletRequest request,HttpServletResponse response){
-        CookieUtil.deleteCookie(cookieNameShoppingcartCount, response);
+        cookieAccessor.remove(response);
     }
 
     /**
-     * 设置 cookie的名称.
+     * 设置 cookie寄存器.
      *
-     * @param cookieNameShoppingcartCount
-     *            the cookieNameShoppingcartCount to set
+     * @param cookieAccessor
+     *            the cookieAccessor to set
      */
-    public void setCookieNameShoppingcartCount(String cookieNameShoppingcartCount){
-        this.cookieNameShoppingcartCount = cookieNameShoppingcartCount;
+    public void setCookieAccessor(CookieAccessor cookieAccessor){
+        this.cookieAccessor = cookieAccessor;
+    }
+
+    /**
+     * 设置 the shopping cart count handler.
+     *
+     * @param shoppingCartCountHandler
+     *            the shoppingCartCountHandler to set
+     */
+    public void setShoppingCartCountHandler(ShoppingCartCountHandler shoppingCartCountHandler){
+        this.shoppingCartCountHandler = shoppingCartCountHandler;
     }
 }
