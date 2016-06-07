@@ -8,6 +8,7 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (5, 1, 5, '', now(), null, 'operation', '运营管理');
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (6, 1, 6, '', now(), null, 'baseinfo', '基础信息管理');
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (7, 1, 7, '', now(), null, 'system', '系统管理');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (8, 1, 8, '', now(), null, 'log', '日志管理');
 
 
 -- 商品管理
@@ -117,3 +118,6 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (71021, 1, 20, '/auth/list.htm', now(), 710, null, '权限管理');
 -- 国际化语言管理
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (741, 1, 20, '/i18nLang/list.htm', now(), 7, null, '国际化语言管理');
+
+-- 日志管理
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (810, 1, 1, '/backlog/skuInventoryChangeLog/list.htm', now(), 8, null, '库存变更日志管理');

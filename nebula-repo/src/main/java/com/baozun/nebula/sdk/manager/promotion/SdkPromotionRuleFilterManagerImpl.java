@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
 package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.ArrayList;
@@ -7,37 +23,46 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.calculateEngine.common.EngineManager;
 import com.baozun.nebula.command.promotion.PromotionCommand;
-import com.baozun.nebula.sdk.manager.SdkPriorityAdjustManager;
+import com.feilong.core.util.CollectionsUtil;
 
+/**
+ * The Class SdkPromotionRuleFilterManagerImpl.
+ */
 @Service("sdkPromotionRuleFilterManager")
 @Transactional
 public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilterManager{
 
-    static final Logger              log = LoggerFactory.getLogger(SdkPromotionRuleFilterManagerImpl.class);
-
-    @Autowired
-    private SdkPriorityAdjustManager sdkPriorityAdjustManager;
-
-    private List<PromotionCommand>   promos;
-
-    public SdkPromotionRuleFilterManagerImpl(){
-        super();
+    /**
+     * 获得 promotion by promotion id.
+     *
+     * @param promotionId
+     *            the promotion id
+     * @return the promotion by promotion id
+     */
+    @Override
+    public PromotionCommand getPromotionByPromotionId(Long promotionId){
+        List<PromotionCommand> promotionCommandList = EngineManager.getInstance().getPromotionCommandList();
+        //从promotionCommandList 查找 属性名字是promotionId, 属性值是 参数promotionId值的对象
+        return CollectionsUtil.find(promotionCommandList, "promotionId", promotionId);
     }
 
     /**
-     * 获取人群和商品的促销活动的交集
-     * 
+     * 获取人群和商品的促销活动的交集.
+     *
      * @param shopIds
-     * @param crowdComIds
+     *            the shop ids
+     * @param crowdComboIds
+     *            the crowd combo ids
      * @param itemComboIds
+     *            the item combo ids
+     * @param currentTime
+     *            the current time
+     * @return the intersect activity rule data
      */
     @Override
     public List<PromotionCommand> getIntersectActivityRuleData(
@@ -45,7 +70,7 @@ public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilter
                     Set<String> crowdComboIds,
                     Set<String> itemComboIds,
                     Date currentTime){
-        promos = EngineManager.getInstance().getPromotionCommandList();
+        List<PromotionCommand> promos = EngineManager.getInstance().getPromotionCommandList();
         if (null == promos || promos.size() == 0){
             return null;
         }
@@ -54,9 +79,9 @@ public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilter
         // 调整促销优先级
         // promos = adjustPriority(promos, shopIds, currentTime);
         // 获取人群过滤后的促销规则
-        List<PromotionCommand> memberProms = getActiveCrowdPromotionData(shopIds, crowdComboIds, currentTime);
+        List<PromotionCommand> memberProms = getActiveCrowdPromotionData(promos, shopIds, crowdComboIds);
         // 获取商品过滤后的促销规则
-        List<PromotionCommand> productProms = getActiveItemScopePromotionData(shopIds, itemComboIds, currentTime);
+        List<PromotionCommand> productProms = getActiveItemScopePromotionData(promos, shopIds, itemComboIds);
         if (null == memberProms || memberProms.size() == 0 || null == productProms || productProms.size() == 0){
             return null;
         }
@@ -75,14 +100,15 @@ public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilter
     }
 
     /**
-     * 获取人群的促销活动
-     * 
+     * 获取人群的促销活动.
+     *
      * @param shopIds
-     * @param crowdForCheckCommand
-     * @param currentTime
+     *            the shop ids
+     * @param crowdComboIds
+     *            the crowd combo ids
+     * @return the active crowd promotion data
      */
-    @Override
-    public List<PromotionCommand> getActiveCrowdPromotionData(List<Long> shopIds,Set<String> crowdComboIds,Date currentTime){
+    private List<PromotionCommand> getActiveCrowdPromotionData(List<PromotionCommand> promos,List<Long> shopIds,Set<String> crowdComboIds){
         if (null == promos || promos.size() == 0 || null == crowdComboIds || crowdComboIds.size() == 0){
             return null;
         }
@@ -112,14 +138,18 @@ public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilter
     }
 
     /**
-     * 获取商品的促销活动
-     * 
+     * 获取商品的促销活动.
+     *
      * @param shopIds
-     * @param itemForCheckCommands
-     * @param currentTime
+     *            the shop ids
+     * @param itemComboIds
+     *            the item combo ids
+     * @return the active item scope promotion data
      */
-    @Override
-    public List<PromotionCommand> getActiveItemScopePromotionData(List<Long> shopIds,Set<String> itemComboIds,Date currentTime){
+    private List<PromotionCommand> getActiveItemScopePromotionData(
+                    List<PromotionCommand> promos,
+                    List<Long> shopIds,
+                    Set<String> itemComboIds){
         if (null == promos || promos.size() == 0 || null == itemComboIds || itemComboIds.size() == 0){
             return null;
         }
@@ -149,10 +179,13 @@ public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilter
     }
 
     /**
-     * 根据当前时间过滤促销规则
-     * 
+     * 根据当前时间过滤促销规则.
+     *
      * @param promotionList
-     * @return
+     *            the promotion list
+     * @param currentTime
+     *            the current time
+     * @return the list< promotion command>
      */
     private List<PromotionCommand> filterPromotionRule(List<PromotionCommand> promotionList,Date currentTime){
         long currentMilliseconds = currentTime.getTime();
@@ -167,21 +200,4 @@ public class SdkPromotionRuleFilterManagerImpl implements SdkPromotionRuleFilter
         return promList;
     }
 
-    /**
-     * 
-     * @param promotionId
-     * @return
-     */
-    @Override
-    public PromotionCommand getPromotionByPromotionId(Long promotionId){
-        List<PromotionCommand> list = EngineManager.getInstance().getPromotionCommandList();
-        if (list == null)
-            return null;
-        for (PromotionCommand one : list){
-            if (one.getPromotionId().equals(promotionId)){
-                return one;
-            }
-        }
-        return null;
-    }
 }

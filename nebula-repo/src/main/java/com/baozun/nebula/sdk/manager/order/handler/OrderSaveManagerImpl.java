@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.order;
+package com.baozun.nebula.sdk.manager.order.handler;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -42,8 +42,8 @@ import com.feilong.core.Validator;
  * @since 5.3.1
  */
 @Transactional
-@Service("sdkOrderManager")
-public class SdkOrderManagerImpl implements SdkOrderManager{
+@Service("orderSaveManager")
+public class OrderSaveManagerImpl implements OrderSaveManager{
 
     /** The sdk order dao. */
     @Autowired
