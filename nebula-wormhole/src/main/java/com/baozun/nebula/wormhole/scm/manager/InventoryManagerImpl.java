@@ -33,10 +33,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
+import com.baozun.nebula.model.product.SkuInventoryChangeLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
+import com.baozun.nebula.sdk.manager.SdkSkuInventoryChangeLogManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.utils.Validator;
@@ -68,6 +70,9 @@ public class InventoryManagerImpl implements InventoryManager {
 	
 	@Autowired
 	private SdkSkuManager	sdkSkuManager;
+	
+	@Autowired
+	private SdkSkuInventoryChangeLogManager skuInventoryChangeLogManager;
 	
 	@Autowired(required=false)
 	private SyncInventoryHandler syncInventoryHandler;
@@ -269,6 +274,7 @@ public class InventoryManagerImpl implements InventoryManager {
 			return;
 		}
 		SkuInventory skuInv = sdkSkuInventoryDao.findSkuInventoryByExtentionCode(skuInvV5.getExtentionCode()); 
+		Integer logType =SkuInventoryChangeLog.TYPE_INCREASE;
 		if(null == skuInv){
 			//如果现在库存还不存在的时候
 			skuInv = new SkuInventory();
@@ -278,11 +284,14 @@ public class InventoryManagerImpl implements InventoryManager {
 				availableQty = availableQty + Math.abs(qty);
 			} else if(STORAGE_OUT.equals(skuInvV5.getDirection())){
 				availableQty = availableQty - Math.abs(qty);
+				logType =SkuInventoryChangeLog.TYPE_REDUCE;
 			}
 			skuInv.setAvailableQty(availableQty);
 			skuInv.setLastSyncTime(skuInvV5.getOpTime());
 			skuInv.setExtentionCode(skuInvV5.getExtentionCode());
 			sdkSkuInventoryDao.save(skuInv);
+			//保存变更日志
+			saveChangeLogBySkuInventoryV5(skuInvV5, logType);
 		} else {
 			/**当基线时间在 日志更新时间之前 可以更新*/
 			if(null == skuInv.getBaselineTime() || skuInv.getBaselineTime().before(skuInvV5.getOpTime())){
@@ -294,6 +303,7 @@ public class InventoryManagerImpl implements InventoryManager {
 					availableQty = availableQty + Math.abs(qty);
 				} else if(STORAGE_OUT.equals(skuInvV5.getDirection())){
 					availableQty = availableQty - Math.abs(qty);
+					logType =SkuInventoryChangeLog.TYPE_REDUCE;
 				}
 				//skuInv.setAvailableQty(availableQty);
 				if(null == skuInv.getLastSyncTime() || skuInv.getLastSyncTime().before(skuInvV5.getOpTime())){
@@ -302,6 +312,8 @@ public class InventoryManagerImpl implements InventoryManager {
 				//sdkSkuInventoryDao.addSkuInventory(extentionCode, count);
 				sdkSkuInventoryDao.addSkuInventoryById(skuInv.getId(), availableQty, 
 						skuInv.getLastSyncTime());
+				//保存变更日志
+				saveChangeLogBySkuInventoryV5(skuInvV5, logType);
 			}
 		}
 	}
@@ -346,6 +358,8 @@ public class InventoryManagerImpl implements InventoryManager {
 			skuInv.setAvailableQty(availableQty);
 			skuInv.setBaselineTime(skuInvV5.getOpTime());
 			sdkSkuInventoryDao.save(skuInv);
+			//保存变更日志
+			saveChangeLogBySkuInventoryV5(skuInvV5, SkuInventoryChangeLog.TYPE_FULL);
 		} else {
 			/**当基线时间在 日志更新时间之前 可以更新*/
 			if((null == skuInv.getBaselineTime() || skuInv.getBaselineTime().before(skuInvV5.getOpTime()))){
@@ -354,6 +368,8 @@ public class InventoryManagerImpl implements InventoryManager {
 				//skuInv.setVersion(nowDate);
 				sdkSkuInventoryDao.updateInventoryById(skuInv.getId(), skuInv.getAvailableQty(), 
 						skuInv.getLastSyncTime(), skuInv.getBaselineTime());
+				//保存变更日志
+				saveChangeLogBySkuInventoryV5(skuInvV5, SkuInventoryChangeLog.TYPE_FULL);
 			}
 		}
 	}
@@ -554,5 +570,23 @@ public class InventoryManagerImpl implements InventoryManager {
 		}
 		return retMap;
 	}
+	
+	private void saveChangeLogBySkuInventoryV5(SkuInventoryV5 skuInventory,
+			Integer type
+			){
+		SkuInventoryChangeLog log =new SkuInventoryChangeLog();
+		log.setCreateTime(new Date());
+		log.setExtentionCode(skuInventory.getExtentionCode());
+		log.setQty(Integer.valueOf(skuInventory.getQty().toString()));
+		log.setSource(SkuInventoryChangeLog.SOURCE_OMS);
+		log.setType(type);
+		try {
+			skuInventoryChangeLogManager.saveSkuInventoryChangeLog(log);
+		} catch (Exception e) {
+			logger.warn("sync oms inventory error : unable to save inventory change log.");
+		}
+	}
+	
+	
 
 }
