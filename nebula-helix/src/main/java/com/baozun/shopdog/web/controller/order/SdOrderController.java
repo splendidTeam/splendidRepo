@@ -47,6 +47,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
+import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogOrderCommand;
@@ -103,7 +104,9 @@ public class SdOrderController implements AbstractSdOrderController {
         PropertyUtil.copyProperties(salesOrderCommand, shopdogOrderParamCommand, "countryId", "provinceId", "cityId", "areaId", "townId", "postcode", "mobile", "email");
         salesOrderCommand.setBuyerName(shopdogOrderParamCommand.getName());
         salesOrderCommand.setBuyerTel(shopdogOrderParamCommand.getMobile());
-
+        if(LOGGER.isInfoEnabled()){
+            LOGGER.info("创建订单所需的参数：ShopdogOrderParamCommand["+JsonUtil.format(shopdogOrderParamCommand)+"]");
+        }
         // 设置支付信息，1是支付宝支付，2微信支付
         if ("1".equals(shopdogOrderParamCommand.getPaymentType())) {
             salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
@@ -115,14 +118,24 @@ public class SdOrderController implements AbstractSdOrderController {
             salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
         }
 
-        // 如果有memberId，根据memberId查询此会员的相关信息
+        // 如果有memberId，根据memberId查询此会员的相关信息,初始化memberDetails用于下单使用
+        MemberDetails memberDetails = null;
         if (null != shopdogOrderParamCommand.getMemberId()) {
             MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
             salesOrderCommand.setMemberName(null != memberCommand ? memberCommand.getRealName() : "");
             salesOrderCommand.setMemberId(null != memberCommand ? shopdogOrderParamCommand.getMemberId() : null);
+            
+            //用于会员下单使用
+            memberDetails = new MemberDetails();
+            memberDetails.setGroupId(null != memberCommand ? memberCommand.getGroupId() : null);
+            memberDetails.setMemberId(null != memberCommand ? shopdogOrderParamCommand.getMemberId() : null);
+            memberDetails.setLoginMobile(null != memberCommand ? memberCommand.getLoginMobile() : "");
+            memberDetails.setLoginName(null != memberCommand ? memberCommand.getLoginName() : "");
+            memberDetails.setLoginEmail(null != memberCommand ? memberCommand.getLoginEmail() : "");
+            memberDetails.setRealName(null != memberCommand ? memberCommand.getRealName() : "");
         }
+        
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
-
         // 订单来源
         salesOrderCommand.setSource(SalesOrder.SO_SOURCE_SHOPDOG_NORMAL);
 
@@ -138,7 +151,7 @@ public class SdOrderController implements AbstractSdOrderController {
             shoppingCartLineCommand.setShopId(1L);
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
         }
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(null, shoppingCartLineCommandList, getCalcFreightCommand(shopdogOrderParamCommand), null);
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, getCalcFreightCommand(shopdogOrderParamCommand), null);
 
         SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
         salesOrderCreateOptions.setIsImmediatelyBuy(true);
@@ -227,9 +240,20 @@ public class SdOrderController implements AbstractSdOrderController {
             shoppingCartLineCommand.setShopId(1L);
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
         }
-
+        // 添加会员信息
+        MemberDetails memberDetails = null;
+        if (null != shopdogOrderParamCommand.getMemberId()) {
+            MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
+            memberDetails = new MemberDetails();
+            memberDetails.setGroupId(null != memberCommand ? memberCommand.getGroupId() : null);
+            memberDetails.setMemberId(null != memberCommand ? shopdogOrderParamCommand.getMemberId() : null);
+            memberDetails.setLoginMobile(null != memberCommand ? memberCommand.getLoginMobile() : "");
+            memberDetails.setLoginName(null != memberCommand ? memberCommand.getLoginName() : "");
+            memberDetails.setLoginEmail(null != memberCommand ? memberCommand.getLoginEmail() : "");
+            memberDetails.setRealName(null != memberCommand ? memberCommand.getRealName() : "");
+        }
         // 调用nebula构建ShoppingCartCommand的方法
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(null, shoppingCartLineCommandList, calcFreightCommand, null);
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, null);
         return shoppingCartCommand;
     }
 
