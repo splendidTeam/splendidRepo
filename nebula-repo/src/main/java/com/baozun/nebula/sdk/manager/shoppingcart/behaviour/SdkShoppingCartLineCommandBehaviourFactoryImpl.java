@@ -69,6 +69,6 @@ public class SdkShoppingCartLineCommandBehaviourFactoryImpl implements SdkShoppi
             return shoppingCartLineCommandBundleBehaviour;
         }
         //XXX feilong 将来 1 可以在这里扩展, 2可能换成默认 实现 shoppingCartLineCommandCommonBehaviour
-        throw new UnsupportedOperationException(Slf4jUtil.formatMessage("item:[{}],type is :[{}],not support", relatedItemId, type));
+        throw new UnsupportedOperationException(Slf4jUtil.format("item:[{}],type is :[{}],not support", relatedItemId, type));
     }
 }
