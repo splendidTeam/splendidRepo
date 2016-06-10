@@ -22,162 +22,147 @@ import com.baozun.nebula.sdk.manager.SdkMsgManager;
 
 @Service("sdkMsgManager")
 @Transactional
-public class SdkMsgManagerImpl implements SdkMsgManager {
+public class SdkMsgManagerImpl implements SdkMsgManager{
 
-	@Autowired
-	private MsgReceiveContentDao msgReceiveContentDao;
+    @Autowired
+    private MsgReceiveContentDao msgReceiveContentDao;
 
-	@Autowired
-	private MsgSendContentDao msgSendContentDao;
+    @Autowired
+    private MsgSendContentDao    msgSendContentDao;
 
-	@Autowired
-	private MsgSendRecordDao msgSendRecordDao;
+    @Autowired
+    private MsgSendRecordDao     msgSendRecordDao;
 
-	@Override
-	public MsgReceiveContent saveMsgReceiveContent(MsgReceiveContent mrc) {
+    @Override
+    public MsgReceiveContent saveMsgReceiveContent(MsgReceiveContent mrc){
+        return msgReceiveContentDao.save(mrc);
+    }
 
-		return msgReceiveContentDao.save(mrc);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgReceiveContent> findAllMsgReceiveContentList(){
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgReceiveContent> findAllMsgReceiveContentList() {
+        return msgReceiveContentDao.findAllMsgReceiveContentList();
+    }
 
-		return msgReceiveContentDao.findAllMsgReceiveContentList();
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public MsgReceiveContent findMsgReceiveContentById(Long id){
 
-	@Override
-	@Transactional(readOnly=true)
-	public MsgReceiveContent findMsgReceiveContentById(Long id) {
+        return msgReceiveContentDao.getByPrimaryKey(id);
+    }
 
-		return msgReceiveContentDao.getByPrimaryKey(id);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgReceiveContent> findMsgReceiveContentListByIds(List<Long> ids){
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgReceiveContent> findMsgReceiveContentListByIds(List<Long> ids) {
+        return msgReceiveContentDao.findMsgReceiveContentListByIds(ids);
+    }
 
-		return msgReceiveContentDao.findMsgReceiveContentListByIds(ids);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgReceiveContent> findMsgReceiveContentListByQueryMap(Map<String, Object> paraMap){
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgReceiveContent> findMsgReceiveContentListByQueryMap(Map<String, Object> paraMap) {
+        return msgReceiveContentDao.findMsgReceiveContentListByQueryMap(paraMap);
+    }
 
-		return msgReceiveContentDao.findMsgReceiveContentListByQueryMap(paraMap);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<MsgReceiveContent> findMsgReceiveContentListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
+        return msgReceiveContentDao.findMsgReceiveContentListByQueryMapWithPage(page, sorts, paraMap);
+    }
 
-	@Override
-	@Transactional(readOnly=true)
-	public Pagination<MsgReceiveContent> findMsgReceiveContentListByQueryMapWithPage(Page page, Sort[] sorts, Map<String, Object> paraMap) {
+    @Override
+    public MsgSendContent saveMsgSendContent(MsgSendContent msc){
+        return msgSendContentDao.save(msc);
+    }
 
-		return msgReceiveContentDao.findMsgReceiveContentListByQueryMapWithPage(page, sorts, paraMap);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendContent> findAllMsgSendContentList(){
+        return msgSendContentDao.findAllMsgSendContentList();
+    }
 
-	@Override
-	public MsgSendContent saveMsgSendContent(MsgSendContent msc) {
+    @Override
+    @Transactional(readOnly = true)
+    public MsgSendContent findMsgSendContentById(Long id){
+        return msgSendContentDao.getByPrimaryKey(id);
+    }
 
-		return msgSendContentDao.save(msc);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendContent> findMsgSendContentListByIds(List<Long> ids){
+        return msgSendContentDao.findMsgSendContentListByIds(ids);
+    }
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendContent> findAllMsgSendContentList() {
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendContent> findMsgSendContentListByQueryMap(Map<String, Object> paraMap){
+        return msgSendContentDao.findMsgSendContentListByQueryMap(paraMap);
+    }
 
-		return msgSendContentDao.findAllMsgSendContentList();
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<MsgSendContent> findMsgSendContentListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
+        return msgSendContentDao.findMsgSendContentListByQueryMapWithPage(page, sorts, paraMap);
+    }
 
-	@Override
-	@Transactional(readOnly=true)
-	public MsgSendContent findMsgSendContentById(Long id) {
+    @Override
+    public MsgSendRecord saveMsgSendRecord(MsgSendRecord msr){
+        return msgSendRecordDao.save(msr);
+    }
 
-		return msgSendContentDao.getByPrimaryKey(id);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public MsgSendRecord findMsgSendRecordById(Long id){
+        return msgSendRecordDao.getByPrimaryKey(id);
+    }
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendContent> findMsgSendContentListByIds(List<Long> ids) {
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendRecord> findAllMsgSendRecordList(){
+        return msgSendRecordDao.findAllMsgSendRecordList();
+    }
 
-		return msgSendContentDao.findMsgSendContentListByIds(ids);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendRecord> findAllNoFeedbackMsgSendRecordList(){
+        return msgSendRecordDao.findAllNoFeedbackMsgSendRecordList();
+    }
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendContent> findMsgSendContentListByQueryMap(Map<String, Object> paraMap) {
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendRecord> findMsgSendRecordListByIds(List<Long> ids){
+        return msgSendRecordDao.findMsgSendRecordListByIds(ids);
+    }
 
-		return msgSendContentDao.findMsgSendContentListByQueryMap(paraMap);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public List<MsgSendRecord> findMsgSendRecordListByQueryMap(Map<String, Object> paraMap){
+        return msgSendRecordDao.findMsgSendRecordListByQueryMap(paraMap);
+    }
 
-	@Override
-	@Transactional(readOnly=true)
-	public Pagination<MsgSendContent> findMsgSendContentListByQueryMapWithPage(Page page, Sort[] sorts, Map<String, Object> paraMap) {
+    @Override
+    @Transactional(readOnly = true)
+    public Pagination<MsgSendRecord> findMsgSendRecordListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
+        return msgSendRecordDao.findMsgSendRecordListByQueryMapWithPage(page, sorts, paraMap);
+    }
 
-		return msgSendContentDao.findMsgSendContentListByQueryMapWithPage(page, sorts, paraMap);
-	}
+    @Override
+    public void updateMsgRecContIsProByIds(List<Long> ids){
+        msgReceiveContentDao.updateMsgRecContIsProByIds(ids);
+    }
 
-	@Override
-	public MsgSendRecord saveMsgSendRecord(MsgSendRecord msr) {
-
-		return msgSendRecordDao.save(msr);
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public MsgSendRecord findMsgSendRecordById(Long id) {
-
-		return msgSendRecordDao.getByPrimaryKey(id);
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendRecord> findAllMsgSendRecordList() {
-
-		return msgSendRecordDao.findAllMsgSendRecordList();
-	}
-	
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendRecord> findAllNoFeedbackMsgSendRecordList(){
-		return msgSendRecordDao.findAllNoFeedbackMsgSendRecordList();
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendRecord> findMsgSendRecordListByIds(List<Long> ids) {
-
-		return msgSendRecordDao.findMsgSendRecordListByIds(ids);
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public List<MsgSendRecord> findMsgSendRecordListByQueryMap(Map<String, Object> paraMap) {
-
-		return msgSendRecordDao.findMsgSendRecordListByQueryMap(paraMap);
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public Pagination<MsgSendRecord> findMsgSendRecordListByQueryMapWithPage(Page page, Sort[] sorts, Map<String, Object> paraMap) {
-
-		return msgSendRecordDao.findMsgSendRecordListByQueryMapWithPage(page, sorts, paraMap);
-	}
-
-	@Override
-	public void updateMsgRecContIsProByIds(List<Long> ids) {
-
-		msgReceiveContentDao.updateMsgRecContIsProByIds(ids);
-	}
-
-	@Override
-	public MsgSendRecord saveMsgSendRecord(String ifIdentify, Long targetId, String ext) {
-		MsgSendRecord msr = new MsgSendRecord();
-		msr.setCreateTime(new Date());
-		msr.setIfIdentify(ifIdentify);
-		msr.setSendCount(0);
-		msr.setVersion(new Date());
-		msr.setTargetId(targetId);
-		msr.setExt(ext);
-		return msgSendRecordDao.save(msr);
-	}
+    @Override
+    public MsgSendRecord saveMsgSendRecord(String ifIdentify,Long targetId,String ext){
+        MsgSendRecord msgSendRecord = new MsgSendRecord();
+        msgSendRecord.setCreateTime(new Date());
+        msgSendRecord.setIfIdentify(ifIdentify);
+        msgSendRecord.setSendCount(0);
+        msgSendRecord.setVersion(new Date());
+        msgSendRecord.setTargetId(targetId);
+        msgSendRecord.setExt(ext);
+        return msgSendRecordDao.save(msgSendRecord);
+    }
 
 }

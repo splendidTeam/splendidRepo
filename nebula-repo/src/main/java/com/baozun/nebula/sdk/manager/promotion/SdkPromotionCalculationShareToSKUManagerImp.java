@@ -61,24 +61,26 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
      * java.util.List)
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> sharePromotionDiscountToEachLine(ShoppingCartCommand shopCart,List<PromotionBrief> briefList){
+    public List<PromotionSKUDiscAMTBySetting> sharePromotionDiscountToEachLine(
+                    ShoppingCartCommand shoppingCartCommand,
+                    List<PromotionBrief> promotionBriefList){
         // 按店铺取购物车
         Long oneShopId = 0L;
-        for (ShoppingCartLineCommand line : shopCart.getShoppingCartLineCommands()){
-            if (null != line.getShopId() && line.getShopId() > 0L){
-                oneShopId = line.getShopId();
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartCommand.getShoppingCartLineCommands()){
+            if (null != shoppingCartLineCommand.getShopId() && shoppingCartLineCommand.getShopId() > 0L){
+                oneShopId = shoppingCartLineCommand.getShopId();
                 break;
             }
         }
 
-        Map<Long, ShoppingCartCommand> shopCartAll = shopCart.getShoppingCartByShopIdMap();
+        Map<Long, ShoppingCartCommand> shopCartAll = shoppingCartCommand.getShoppingCartByShopIdMap();
         if (shopCartAll == null || shopCartAll.size() == 0){
             shopCartAll = new HashMap<Long, ShoppingCartCommand>();
-            shopCartAll.put(oneShopId, shopCart);
+            shopCartAll.put(oneShopId, shoppingCartCommand);
         }
 
         // 取促销列表中的店铺列表
-        Map<Long, List<PromotionBrief>> shopIdSetBriefList = getShopIdListFromPromotionBriefList(briefList);
+        Map<Long, List<PromotionBrief>> shopIdSetBriefList = getShopIdListFromPromotionBriefList(promotionBriefList);
         if (shopIdSetBriefList == null || shopIdSetBriefList.size() == 0){
             return null;
         }
@@ -88,11 +90,11 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
         // 按店铺分摊自己店铺的促销到店铺自己的订单行上
         for (Entry<Long, List<PromotionBrief>> entry : shopIdSetBriefList.entrySet()){
             Long shopId = entry.getKey();
-            briefList = entry.getValue();
+            promotionBriefList = entry.getValue();
             List<PromotionSettingDetail> allPromotionShareBySKULineBase = null;
 
             // 按活动遍历
-            for (PromotionBrief onePromotion : briefList){
+            for (PromotionBrief onePromotion : promotionBriefList){
                 if (onePromotion.getPromotionAmount() == null || onePromotion.getPromotionAmount().compareTo(BigDecimal.ZERO) <= 0)
                     continue;
                 for (PromotionSettingDetail detail : onePromotion.getDetails()){
