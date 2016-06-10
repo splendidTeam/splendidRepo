@@ -47,7 +47,7 @@ public enum OrderTimeType{
 
         @Override
         public Date[] getBeginAndEndDate(){
-            Date myDate = DateUtil.string2Date("2015-01-01", DatePattern.COMMON_DATE);
+            Date myDate = DateUtil.toDate("2015-01-01", DatePattern.COMMON_DATE);
             return new Date[] { myDate, DateUtil.addMonth(new Date(), -3) };
         }
     };
