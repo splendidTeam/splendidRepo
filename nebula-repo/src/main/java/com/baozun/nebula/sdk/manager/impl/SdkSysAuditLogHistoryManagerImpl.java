@@ -16,17 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.utils.PropertyUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,13 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.system.SysAuditLogDao;
 import com.baozun.nebula.dao.system.SysAuditLogHistoryDao;
-import com.baozun.nebula.exception.BusinessException;
-import com.baozun.nebula.exception.ErrorCodes;
-import com.baozun.nebula.model.system.SysAuditLog;
 import com.baozun.nebula.model.system.SysAuditLogHistory;
 import com.baozun.nebula.sdk.manager.SdkSysAuditLogHistoryManager;
-import com.feilong.core.Validator;
-import com.feilong.core.date.CalendarUtil;
+import com.feilong.core.date.DateUtil;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * SysAuditLogHistoryManager
@@ -124,20 +117,11 @@ public class SdkSysAuditLogHistoryManagerImpl implements SdkSysAuditLogHistoryMa
 	@Override
 	public void archive() {
         Map<String, Object> paraMap = new HashMap<String, Object>();
-        paraMap.put("createTimeStart", getCreateTimeStart());
+        paraMap.put("createTimeStart",DateUtil.addMonth(new Date(), -1));//当前日期的前一个月
         
         sysAuditLogHistoryDao.archiveSysAuditLogToHistoryByQueryMap(paraMap);
 		sysAuditLogDao.deleteSysAuditLogListByQueryMap(paraMap);
 	}
 
-	/**
-	 * 当前日期的前一个月
-	 * @return
-	 */
-	private Date getCreateTimeStart() {
-		Calendar c = Calendar.getInstance();
-        c.add(Calendar.MONTH, -1);
-		return CalendarUtil.toDate(c);
-	};
 	
 }
