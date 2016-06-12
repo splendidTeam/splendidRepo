@@ -142,6 +142,8 @@ public class BrowsingHistoryCookieResolver implements BrowsingHistoryResolver{
         }
 
         Serializable id = browsingHistoryViewCommand.getId();
+        
+        if(null == id) return null;
 
         LinkedList<String> linkedList = null;
         try{
