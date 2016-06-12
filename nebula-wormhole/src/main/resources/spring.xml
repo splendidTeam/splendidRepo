@@ -36,6 +36,9 @@
 		<property name="provider" ref="bouncyCastleProvider" />
 		<property name="config" ref="environmentVariablesConfiguration" />
 	</bean>
+	<bean class="com.baozun.nebula.utilities.common.ProfileConfigUtil">
+		<property name="stringEncryptor" ref="configurationEncryptor" />
+	</bean>
 	<!-- 配置文件加密工具 end -->
 	
 	<beans profile="dev">
