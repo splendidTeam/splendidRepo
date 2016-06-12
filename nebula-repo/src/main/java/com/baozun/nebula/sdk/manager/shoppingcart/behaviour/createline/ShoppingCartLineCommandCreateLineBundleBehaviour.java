@@ -18,8 +18,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.createline;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +36,6 @@ import com.baozun.nebula.sdk.manager.shoppingcart.bundle.SdkShoppingCartBundleNe
 @Transactional
 @Service("shoppingCartLineCommandCreateLineBundleBehaviour")
 public class ShoppingCartLineCommandCreateLineBundleBehaviour extends AbstractShoppingCartLineCommandCreateLineBehaviour{
-
-    /** The Constant LOGGER. */
-    private static final Logger                 LOGGER = LoggerFactory.getLogger(ShoppingCartLineCommandCreateLineBundleBehaviour.class);
 
     /** The sdk shopping cart bundle new line builder. */
     @Autowired

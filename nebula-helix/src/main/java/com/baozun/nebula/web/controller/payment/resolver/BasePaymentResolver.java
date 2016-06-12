@@ -21,19 +21,11 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.baozun.nebula.command.OnLinePaymentCommand;
-import com.baozun.nebula.exception.IllegalPaymentStateException;
-import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
-import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.feilong.servlet.http.RequestUtil;
 
 public abstract class BasePaymentResolver {
-	
-	/** 过期时间参数 */
-	private final static String PAY_EXPIRY_TIME = "payExpiryTime";
 	
     /** 支付成功页面. */
     protected static final String URL_PAY_SUCCESS = "/payment/success.htm";
@@ -41,8 +33,6 @@ public abstract class BasePaymentResolver {
     /** 支付失败页面. */
     protected static final String URL_PAY_FAILURE = "/payment/failure.htm";
 	
-	@Autowired
-	private MataInfoManager mataInfoManager;
 	
 	/**
 	 * 获取支付信息
@@ -64,27 +54,6 @@ public abstract class BasePaymentResolver {
 		onLinePaymentCommand.setPayType(payType);
 		//onLinePaymentCommand.setQrPayMode(qrPayMode);
 		return onLinePaymentCommand;
-	}
-	
-	/**
-	 * 获取过期时间
-	 * @param orderCreateDate
-	 * @return
-	 * @throws IllegalPaymentStateException
-	 */
-	protected String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
-		String payExpiryTime = mataInfoManager.findValue(PAY_EXPIRY_TIME);
-		Date now = new Date();
-		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  
-		if (payExpiryTime == null) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
-		}
-		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
-		if (itBPay <= 0L) {
-			return "0m";
-		} else {
-			return itBPay.toString() + "m";
-		}
 	}
 	
 	/**

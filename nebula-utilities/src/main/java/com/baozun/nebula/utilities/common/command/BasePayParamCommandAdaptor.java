@@ -63,5 +63,10 @@ public interface BasePayParamCommandAdaptor {
 	 * 过期时间
 	 */
 	public String getIt_b_pay();
+	
+	/**
+	 * 扫码支付方式
+	 */
+	public String getQrPayMode();
 
 }

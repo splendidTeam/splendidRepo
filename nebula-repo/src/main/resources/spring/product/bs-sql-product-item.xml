@@ -622,7 +622,7 @@
 						tpii.active_begin_time as activeBeginTime
 					from t_pd_item tpi 
 					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
-					where tpii.style = :style and tpi.lifecycle!=2
+					where tpii.style = :style and tpi.lifecycle in ( 0 , 1 )
 					order by tpi.create_time 
                  ]]>
 			</value>
@@ -659,7 +659,7 @@
 					from t_pd_item tpi 
 					left join t_pd_iteminfo tpii on tpi.id = tpii.item_id 
 					left join t_pd_iteminfo_lang tpiil on tpiil.item_info_id = tpii.id 
-					where tpii.style = :style and tpi.lifecycle!=2
+					where tpii.style = :style and tpi.lifecycle in( 0 , 1 )
 					and tpiil.lang =:lang 
 					order by tpi.create_time 
                  ]]>

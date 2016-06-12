@@ -6697,7 +6697,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // 购物车行 金额小计
             shoppingCartLine.setSubTotalAmt(new BigDecimal(shoppingCartLine.getQuantity()).multiply(shoppingCartLine.getSalePrice()));
             // 判断是否是被选中的购物车行
-
         }
 
         splitByCalcLevel(shoppingCartLines, chooseLines, notChooseLines);

@@ -386,6 +386,8 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the member details
      * @param extentionCodeList
      *            the extention code list
+     * @param shoppingCartLineCommandList
+     *            所有的购物车行
      * @param needChangeCheckedStatusShoppingCartLineCommandList
      *            需要更改状态的购物车行list
      * @param checkStatus
@@ -399,6 +401,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     protected abstract ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
                     List<String> extentionCodeList,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     List<ShoppingCartLineCommand> needChangeCheckedStatusShoppingCartLineCommandList,
                     boolean checkStatus,
                     HttpServletRequest request,
@@ -501,7 +504,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                 return commandValidateShoppingcartResult;
             }
 
-            if (isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
+            if (checkStatus && isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
                 return ShoppingcartResult.MAX_THAN_INVENTORY;
             }
 
@@ -518,6 +521,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(
                         memberDetails,
                         extentionCodeList,
+                        shoppingCartLineCommandList,
                         needChangeCheckedCommandList,
                         checkStatus,
                         request,

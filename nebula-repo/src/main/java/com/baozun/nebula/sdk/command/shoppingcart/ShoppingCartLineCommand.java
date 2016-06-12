@@ -231,7 +231,12 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 行促销(此商口多个数量的促销总和) 折扣-包含整单优惠分摊. */
     private BigDecimal                 discount         = BigDecimal.ZERO;
 
-    /** 折扣单价-不包含整单优惠分摊. */
+    /**
+     * 折扣单价-不包含整单优惠分摊.
+     * 
+     * @deprecated 感觉没有用到
+     */
+    @Deprecated
     private BigDecimal                 discountPrice    = BigDecimal.ZERO;
 
     /** 套餐、行赠品类型，只有一个PromotionId 其他类型可能有多个活动 *. */
@@ -1232,7 +1237,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 折扣单价-不包含整单优惠分摊.
      *
      * @return the 折扣单价-不包含整单优惠分摊
+     * @deprecated 感觉没有用到
      */
+    @Deprecated
     public BigDecimal getDiscountPrice(){
         return discountPrice;
     }
@@ -1242,7 +1249,9 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param discountPrice
      *            the new 折扣单价-不包含整单优惠分摊
+     * @deprecated 感觉没有用到
      */
+    @Deprecated
     public void setDiscountPrice(BigDecimal discountPrice){
         this.discountPrice = discountPrice;
     }

@@ -16,12 +16,11 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,14 +33,16 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPayInfoLogManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.feilong.core.Validator;
+import com.feilong.core.bean.ConvertUtil;
+import com.feilong.core.util.ResourceBundleUtil;
 
 /**
  * The Class SdkPayInfoLogManagerImpl.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月13日 下午4:11:21
- * @since 5.3.1
  * @see com.baozun.nebula.sdk.manager.impl.SdkPayInfoManagerImpl
+ * @since 5.3.1
  */
 @Transactional
 @Service("sdkPayInfoLogManager")
@@ -51,29 +52,37 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
     @Autowired
     private PayInfoLogDao payInfoLogDao;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkPayInfoLogManager#savePayInfoLogOfPayMain(java.lang.String,
+     * com.baozun.nebula.sdk.command.SalesOrderCommand, com.baozun.nebula.model.salesorder.PayInfo)
+     */
     @Override
     public void savePayInfoLogOfPayMain(String subOrdinate,SalesOrderCommand salesOrderCommand,PayInfo payInfo){
+        boolean paySuccessStatus = salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD);
+        String payInfoStr = salesOrderCommand.getPaymentStr();
+
+        Validate.notBlank(payInfoStr, "payInfoStr can't be blank!");
+
         PayInfoLog payInfoLog = new PayInfoLog();
 
         payInfoLog.setOrderId(payInfo.getOrderId());
-        payInfoLog.setPaySuccessStatus(salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD));
+        payInfoLog.setPaySuccessStatus(paySuccessStatus);
         payInfoLog.setCallCloseStatus(false);
+
         payInfoLog.setPayType(salesOrderCommand.getPayment());
         payInfoLog.setPayMoney(payInfo.getPayMoney());
         payInfoLog.setPayNumerical(payInfo.getPayNumerical());
         // 用于保存银行
-        payInfoLog.setPayInfo(salesOrderCommand.getPaymentStr());
+        payInfoLog.setPayInfo(payInfoStr);
         payInfoLog.setSubOrdinate(subOrdinate);
         payInfoLog.setPayInfoId(payInfo.getId());
 
-        String payType = getPayType(salesOrderCommand);
-        if (Validator.isNotNullOrEmpty(payType)){
-            payInfoLog.setThirdPayType(Integer.parseInt(payType));
-        }
+        payInfoLog.setThirdPayType(getThirdPayType(payInfoStr));
 
         payInfoLog.setCreateTime(new Date());
         payInfoLogDao.save(payInfoLog);
-
     }
 
     /**
@@ -82,11 +91,8 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
      * @param salesOrderCommand
      *            the sales order command
      * @return the pay type
-     * @since 5.3.1
      */
-    private String getPayType(SalesOrderCommand salesOrderCommand){
-        Properties pro = ProfileConfigUtil.findCommonPro("config/payMentInfo.properties");
-        String payInfoStr = salesOrderCommand.getPaymentStr();
-        return pro.getProperty(payInfoStr + ".payType").trim();
+    private Integer getThirdPayType(String payInfoStr){
+        return ConvertUtil.toInteger(ResourceBundleUtil.getValue("config.payMentInfo", payInfoStr + ".payType"));
     }
 }

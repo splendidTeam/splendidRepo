@@ -110,4 +110,9 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		return salesOrderCommand.getOnLinePaymentCommand().getItBPay();
 	}
 
+	@Override
+	public String getQrPayMode() {
+		return salesOrderCommand.getOnLinePaymentCommand().getQrPayMode();
+	}
+
 }

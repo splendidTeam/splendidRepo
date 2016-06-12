@@ -44,6 +44,23 @@ public class MemberAddressFormValidator implements Validator {
 			//验证手机号码和电话号码
 			validateAddress(memberAddressForm);	
 			
+			// 通用性检验
+			if (com.feilong.core.Validator.isNotNullOrEmpty(memberAddressForm.getMobile())) {
+				if (!RegexUtil.matches(RegexPattern.MOBILEPHONE,memberAddressForm.getMobile().trim())) {
+					errors.rejectValue("mobile", "memberaddress.phone.error");
+				}					
+			}
+			if (com.feilong.core.Validator.isNotNullOrEmpty(memberAddressForm.getTelphone())) {	
+				if (!RegexUtil.matches(RegexPattern.TELEPHONE,memberAddressForm.getTelphone().trim())) {
+					errors.rejectValue("telephone", "memberaddress.telephone.error");
+				}	
+			}
+			if (com.feilong.core.Validator.isNotNullOrEmpty(memberAddressForm.getPostcode())) {
+				if (!RegexUtil.matches(RegexPattern.ZIPCODE,memberAddressForm.getPostcode().trim())) {
+					errors.rejectValue("postcode", "memberaddress.postcode.error");
+				}	
+			}
+			
 		}
 	}
 	

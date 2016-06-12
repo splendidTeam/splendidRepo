@@ -18,8 +18,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart.bundle;
 
 import java.math.BigDecimal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +36,7 @@ import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.lang.NumberUtil;
 
 /**
+ * The Class SdkShoppingCartBundleNewLineBuilderImpl.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
@@ -45,8 +44,6 @@ import com.feilong.core.lang.NumberUtil;
 @Transactional
 @Service("sdkShoppingCartBundleNewLineBuilder")
 public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartBundleNewLineBuilder{
-
-    private static final Logger             LOGGER = LoggerFactory.getLogger(SdkShoppingCartBundleNewLineBuilderImpl.class);
 
     /** The sdk order line dao. */
     @Autowired
@@ -105,7 +102,7 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
 
         //******************************************************************************************
         //设置金额
-        serLinePrices(newShoppingCartLineCommand, relatedItemId, skuId, quantity);
+        setLinePrices(newShoppingCartLineCommand, relatedItemId, skuId, quantity);
 
         // 销售属性信息
         newShoppingCartLineCommand.setSaleProperty(sku.getProperties());
@@ -118,16 +115,23 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
     }
 
     /**
+     * 设置 line prices.
+     *
      * @param newShoppingCartLineCommand
+     *            the new shopping cart line command
      * @param relatedItemId
+     *            the related item id
      * @param skuId
+     *            the sku id
      * @param quantity
+     *            the quantity
      */
-    private void serLinePrices(ShoppingCartLineCommand newShoppingCartLineCommand,Long relatedItemId,Long skuId,Integer quantity){
-        //FIXME feilong bundle商品金额
+    private void setLinePrices(ShoppingCartLineCommand newShoppingCartLineCommand,Long relatedItemId,Long skuId,Integer quantity){
         BundleSkuPriceCommand bundleSkuPriceCommand = sdkBundleManager.getBundleSkuPrice(relatedItemId, skuId);
         BigDecimal listPrice = bundleSkuPriceCommand.getListPrice();
         BigDecimal salePrice = bundleSkuPriceCommand.getSalesPrice();
+
+        //FIXME feilong bundle商品金额 计算折扣
         BigDecimal discount = new BigDecimal(0);
         // 原销售单价
         newShoppingCartLineCommand.setListPrice(listPrice);

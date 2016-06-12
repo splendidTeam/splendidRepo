@@ -16,12 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.pack;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.command.ShopCommand;
@@ -41,13 +38,12 @@ import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
+ * The Class AbstractShoppingCartLineCommandPackBehaviour.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public abstract class AbstractShoppingCartLineCommandPackBehaviour implements ShoppingCartLineCommandPackBehaviour{
-
-    private static final Logger             LOGGER = LoggerFactory.getLogger(AbstractShoppingCartLineCommandPackBehaviour.class);
 
     /** The shop dao. */
     @Autowired
@@ -84,12 +80,17 @@ public abstract class AbstractShoppingCartLineCommandPackBehaviour implements Sh
     public void packShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand){
         doPackShoppingCartLine(shoppingCartLineCommand);
 
-        // 购物车行 金额小计
-        BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
-        BigDecimal subTotalAmt = NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), salePrice);
-        shoppingCartLineCommand.setSubTotalAmt(subTotalAmt);
+        //XXX 购物车行 金额小计 这里貌似没有算促销
+        shoppingCartLineCommand.setSubTotalAmt(
+                        NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice()));
     }
 
+    /**
+     * Do pack shopping cart line.
+     *
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     */
     protected abstract void doPackShoppingCartLine(ShoppingCartLineCommand shoppingCartLineCommand);
 
     /**

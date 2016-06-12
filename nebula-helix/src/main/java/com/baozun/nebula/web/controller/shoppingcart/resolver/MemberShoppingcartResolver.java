@@ -127,6 +127,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
                     List<String> extentionCodeList,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     List<ShoppingCartLineCommand> needChangeCheckedCommandList,
                     boolean checkStatus,
                     HttpServletRequest request,

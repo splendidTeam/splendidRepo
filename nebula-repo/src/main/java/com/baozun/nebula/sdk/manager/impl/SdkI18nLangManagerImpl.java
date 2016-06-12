@@ -49,7 +49,7 @@ public class SdkI18nLangManagerImpl implements SdkI18nLangManager {
 	@Autowired
 	private I18nLangDao i18nLangDao;
 	
-	@Autowired
+	@Autowired(required=false)
 	private ZKWatchPath zkWatchPath;
 
 	private List<I18nLang> i18nLangCache = null;

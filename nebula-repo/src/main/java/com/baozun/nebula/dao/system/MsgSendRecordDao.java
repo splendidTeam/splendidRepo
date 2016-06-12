@@ -30,54 +30,56 @@ import com.baozun.nebula.model.system.MsgSendRecord;
 
 /**
  * MsgSendRecordDao
- * @author  Justin
+ * 
+ * @author Justin
  *
  */
-public interface MsgSendRecordDao extends GenericEntityDao<MsgSendRecord,Long>{
+public interface MsgSendRecordDao extends GenericEntityDao<MsgSendRecord, Long>{
 
-	/**
-	 * 获取所有MsgSendRecord列表
-	 * @return
-	 */
-	@NativeQuery(model = MsgSendRecord.class)
-	List<MsgSendRecord> findAllMsgSendRecordList();
-	
-	
-	
-	/**
-	 * 获取所有未反馈(feedbacktime==nulll)MsgSendRecord列表
-	 * @return
-	 */
-	@NativeQuery(model = MsgSendRecord.class)
-	List<MsgSendRecord> findAllNoFeedbackMsgSendRecordList();
-	
-	/**
-	 * 通过ids获取MsgSendRecord列表
-	 * @param ids
-	 * @return
-	 */
-	@NativeQuery(model = MsgSendRecord.class)
-	List<MsgSendRecord> findMsgSendRecordListByIds(@QueryParam("ids")List<Long> ids);
-	
-	/**
-	 * 通过参数map获取MsgSendRecord列表
-	 * @param paraMap
-	 * @return
-	 */
-	@NativeQuery(model = MsgSendRecord.class)
-	List<MsgSendRecord> findMsgSendRecordListByQueryMap(@QueryParam Map<String, Object> paraMap);
-	
-	/**
-	 * 分页获取MsgSendRecord列表
-	 * @param start
-	 * @param size
-	 * @param paraMap
-	 * @param sorts 
-	 * @return
-	 */
-	@NativeQuery(model = MsgSendRecord.class)
-	Pagination<MsgSendRecord> findMsgSendRecordListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
-	
-	
-	
+    /**
+     * 获取所有MsgSendRecord列表
+     * 
+     * @return
+     */
+    @NativeQuery(model = MsgSendRecord.class)
+    List<MsgSendRecord> findAllMsgSendRecordList();
+
+    /**
+     * 获取所有未反馈(feedbacktime==nulll)MsgSendRecord列表
+     * 
+     * @return
+     */
+    @NativeQuery(model = MsgSendRecord.class)
+    List<MsgSendRecord> findAllNoFeedbackMsgSendRecordList();
+
+    /**
+     * 通过ids获取MsgSendRecord列表
+     * 
+     * @param ids
+     * @return
+     */
+    @NativeQuery(model = MsgSendRecord.class)
+    List<MsgSendRecord> findMsgSendRecordListByIds(@QueryParam("ids") List<Long> ids);
+
+    /**
+     * 通过参数map获取MsgSendRecord列表
+     * 
+     * @param paraMap
+     * @return
+     */
+    @NativeQuery(model = MsgSendRecord.class)
+    List<MsgSendRecord> findMsgSendRecordListByQueryMap(@QueryParam Map<String, Object> paraMap);
+
+    /**
+     * 分页获取MsgSendRecord列表
+     * 
+     * @param start
+     * @param size
+     * @param paraMap
+     * @param sorts
+     * @return
+     */
+    @NativeQuery(model = MsgSendRecord.class)
+    Pagination<MsgSendRecord> findMsgSendRecordListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+
 }
