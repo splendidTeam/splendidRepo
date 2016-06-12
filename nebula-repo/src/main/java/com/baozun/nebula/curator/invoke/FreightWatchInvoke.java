@@ -17,8 +17,6 @@ public class FreightWatchInvoke implements IWatcherInvoke  {
 
 	private Logger LOG = LoggerFactory.getLogger(FreightWatchInvoke.class);
 	
-	public static final String PATH_KEY = "freightwatch";
-	
 	@Autowired
 	private FreightMemoryManager  freightMemoryManager;
 

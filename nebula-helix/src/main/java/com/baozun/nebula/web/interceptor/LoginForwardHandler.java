@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ public class LoginForwardHandler {
 	 */
 	public void forward(HttpServletRequest request, HttpServletResponse response) throws IOException{
 		String url = getForwardURL(request);
-		if(url != null)
-			response.sendRedirect(url);
+        Validate.notBlank(url, "url can't be blank!");
+		response.sendRedirect(url);
 	}
 }

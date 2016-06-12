@@ -46,10 +46,11 @@ import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
-import com.baozun.nebula.model.product.SkuInventoryLog;
+import com.baozun.nebula.model.product.SkuInventoryChangeLog;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.command.SkuCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.sdk.manager.SdkSkuInventoryChangeLogManager;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryLogManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
@@ -108,6 +109,9 @@ public class SdkItemManagerImpl implements SdkItemManager {
 
 	@Autowired
 	private  SdkSkuInventoryLogManager sdkSkuInventoryLogManager;
+	
+	@Autowired
+	private SdkSkuInventoryChangeLogManager skuInventoryChangeLogManager;
 	
 	@Override
 	@Transactional(readOnly=true)
@@ -461,13 +465,21 @@ public class SdkItemManagerImpl implements SdkItemManager {
 	public void saveSkuInventory(SkuInventory skuInventory ,Long userId) {
 		saveSkuInventory(skuInventory);
 		//何波 添加修改商品库存的日志记录
-		SkuInventoryLog log = new SkuInventoryLog();
+		/*SkuInventoryLog log = new SkuInventoryLog();
 		log.setUserId(userId);
 		log.setExtentionCode(skuInventory.getExtentionCode());
 		log.setModifyTime(new Date());
 		log.setQty(skuInventory.getAvailableQty());
 		log.setType(SkuInventoryLog.TYPE_PTS);
-		sdkSkuInventoryLogManager.saveSkuInventoryLog(log);
+		sdkSkuInventoryLogManager.saveSkuInventoryLog(log);*/
+		SkuInventoryChangeLog log =new SkuInventoryChangeLog();
+		log.setCreateTime(new Date());
+		log.setExtentionCode(skuInventory.getExtentionCode());
+		log.setOperator(userId);
+		log.setQty(skuInventory.getAvailableQty());
+		log.setSource(SkuInventoryChangeLog.SOURCE_PTS);
+		log.setType(SkuInventoryChangeLog.TYPE_FULL);
+		skuInventoryChangeLogManager.saveSkuInventoryChangeLog(log);
 	}
 
 	/*

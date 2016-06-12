@@ -13,45 +13,42 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
  */
 public class OrderConfirmViewCommand extends BaseViewCommand{
 
-	private static final long		serialVersionUID	= -8532701843297930089L;
+    private static final long    serialVersionUID = -8532701843297930089L;
 
-	/**
-	 * 购物车
-	 */
-	private ShoppingCartCommand		shoppingCartCommand;
+    /**
+     * 购物车
+     * 
+     * @deprecated will change to viewCommand
+     */
+    private ShoppingCartCommand  shoppingCartCommand;
 
-	/**
-	 * 会员收货地址
-	 */
-	private List<ContactCommand>	addressList;
-	
-	/***
-	 * 立即购买的key
-	 */
-	private String					key;
+    /**
+     * 会员收货地址
+     */
+    private List<ContactCommand> addressList;
 
-	public ShoppingCartCommand getShoppingCartCommand(){
-		return shoppingCartCommand;
-	}
+    /**
+     * @deprecated will change to viewCommand
+     * @return
+     */
+    public ShoppingCartCommand getShoppingCartCommand(){
+        return shoppingCartCommand;
+    }
 
-	public void setShoppingCartCommand(ShoppingCartCommand shoppingCartCommand){
-		this.shoppingCartCommand = shoppingCartCommand;
-	}
+    /**
+     * @deprecated will change to viewCommand
+     * @param shoppingCartCommand
+     */
+    public void setShoppingCartCommand(ShoppingCartCommand shoppingCartCommand){
+        this.shoppingCartCommand = shoppingCartCommand;
+    }
 
-	public List<ContactCommand> getAddressList(){
-		return addressList;
-	}
+    public List<ContactCommand> getAddressList(){
+        return addressList;
+    }
 
-	public void setAddressList(List<ContactCommand> addressList){
-		this.addressList = addressList;
-	}
-
-	public String getKey(){
-		return key;
-	}
-
-	public void setKey(String key){
-		this.key = key;
-	}
+    public void setAddressList(List<ContactCommand> addressList){
+        this.addressList = addressList;
+    }
 
 }

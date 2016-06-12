@@ -26,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.I18nLangWatchInvoke;
 import com.baozun.nebula.curator.invoke.SystemConfigWatchInvoke;
 import com.baozun.nebula.dao.system.MataInfoDao;
 import com.baozun.nebula.exception.BusinessException;
@@ -51,6 +53,9 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
 
     @Autowired
     private ZkOperator          zkOperator;
+    
+    @Autowired(required=false)
+    private ZKWatchPath			zkWatchPath;
 
     private static Map<String, String> metaMap = new ConcurrentHashMap<String, String>();
 
@@ -108,7 +113,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
             model.setLifecycle(1);
             mataInfo = mataInfoDao.save(model);
         }
-        zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+        zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(SystemConfigWatchInvoke.class));
         return mataInfo;
     }
 
@@ -178,7 +183,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      */
     public void enableOrDisableMataInfoByIds(List<Long> ids,Integer state){
         mataInfoDao.enableOrDisableMataInfoByIds(ids, state);
-        zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+        zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(SystemConfigWatchInvoke.class));
     }
 
     /**
@@ -190,7 +195,7 @@ public class SdkMataInfoManagerImpl implements SdkMataInfoManager{
      */
     public void removeMataInfoByIds(List<Long> ids){
         mataInfoDao.removeMataInfoByIds(ids);
-        zkOperator.noticeZkServer(zkOperator.getPath(SystemConfigWatchInvoke.PATH_KEY));
+        zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(SystemConfigWatchInvoke.class));
     }
 
     /**

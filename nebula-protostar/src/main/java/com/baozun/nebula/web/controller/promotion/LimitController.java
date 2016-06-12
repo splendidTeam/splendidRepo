@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.command.limit.LimitCommand;
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.exception.BusinessException;
@@ -61,6 +62,9 @@ public class LimitController extends BaseController {
 	private ShopManager shopManager;
 	@Autowired
 	private ZkOperator zkOperator;
+	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
 	
 	@Value("#{meta['frontend.url']}")
 	private  String  frontend_url;
@@ -304,7 +308,7 @@ public class LimitController extends BaseController {
 		BackWarnEntity rs = new BackWarnEntity(false, null);
 		try {
 			sdkLimitManager.activateLimit(id, getUserDetails().getUserId());
-			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(EngineWatchInvoke.class));
 			return SUCCESS;
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -327,7 +331,7 @@ public class LimitController extends BaseController {
 		BackWarnEntity rs = new BackWarnEntity(false, null);
 		try {
 			sdkLimitManager.cancelLimit(id, getUserDetails().getUserId());
-			zkOperator.noticeZkServer(zkOperator.getPath(EngineWatchInvoke.PATH_KEY));
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(EngineWatchInvoke.class));
 			return SUCCESS;
 		} catch (BusinessException e) {
 			e.printStackTrace();

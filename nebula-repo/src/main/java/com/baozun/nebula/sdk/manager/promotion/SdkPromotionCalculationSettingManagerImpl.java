@@ -285,36 +285,36 @@ public class SdkPromotionCalculationSettingManagerImpl implements SdkPromotionCa
      */
     @Override
     public List<PromotionSKUDiscAMTBySetting> compressMultipSKUSetting2One(List<PromotionSKUDiscAMTBySetting> list){
-        PromotionSKUDiscAMTBySetting oneInstance = null;
+        PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting = null;
 
         List<PromotionSKUDiscAMTBySetting> listReturn = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (PromotionSKUDiscAMTBySetting one : list){
-            oneInstance = new PromotionSKUDiscAMTBySetting();
-            oneInstance.setShopId(one.getShopId());
-            oneInstance.setPromotionId(one.getPromotionId());
-            oneInstance.setPromotionName(one.getPromotionName());
-            oneInstance.setSettingId(one.getSettingId());
-            oneInstance.setSettingTypeTag(one.getSettingTypeTag());
-            oneInstance.setSettingName(one.getSettingName());
-            oneInstance.setSettingExpression(one.getSettingExpression());
-            oneInstance.setSkuId(one.getSkuId());
-            oneInstance.setItemId(one.getItemId());
-            oneInstance.setCategoryList(one.getCategoryList());
-            oneInstance.setComboIds(one.getComboIds());
-            oneInstance.setItemName(one.getItemName());
-            oneInstance.setSalesPrice(one.getSalesPrice());
-            oneInstance.setQty(one.getQty());
-            oneInstance.setCouponCodes(one.getCouponCodes());
-            oneInstance.setBaseOrder(one.getBaseOrder());
-            oneInstance.setFreeShippingMark(one.getFreeShippingMark());
-            oneInstance.setGiftMark(one.getGiftMark());
-            oneInstance.setGiftChoiceType(one.getGiftChoiceType());
-            oneInstance.setGiftCountLimited(one.getGiftCountLimited());
-            oneInstance.setSettingId(one.getSettingId());
-            oneInstance.setPromotionId(one.getPromotionId());
+            promotionSKUDiscAMTBySetting = new PromotionSKUDiscAMTBySetting();
+            promotionSKUDiscAMTBySetting.setShopId(one.getShopId());
+            promotionSKUDiscAMTBySetting.setPromotionId(one.getPromotionId());
+            promotionSKUDiscAMTBySetting.setPromotionName(one.getPromotionName());
+            promotionSKUDiscAMTBySetting.setSettingId(one.getSettingId());
+            promotionSKUDiscAMTBySetting.setSettingTypeTag(one.getSettingTypeTag());
+            promotionSKUDiscAMTBySetting.setSettingName(one.getSettingName());
+            promotionSKUDiscAMTBySetting.setSettingExpression(one.getSettingExpression());
+            promotionSKUDiscAMTBySetting.setSkuId(one.getSkuId());
+            promotionSKUDiscAMTBySetting.setItemId(one.getItemId());
+            promotionSKUDiscAMTBySetting.setCategoryList(one.getCategoryList());
+            promotionSKUDiscAMTBySetting.setComboIds(one.getComboIds());
+            promotionSKUDiscAMTBySetting.setItemName(one.getItemName());
+            promotionSKUDiscAMTBySetting.setSalesPrice(one.getSalesPrice());
+            promotionSKUDiscAMTBySetting.setQty(one.getQty());
+            promotionSKUDiscAMTBySetting.setCouponCodes(one.getCouponCodes());
+            promotionSKUDiscAMTBySetting.setBaseOrder(one.getBaseOrder());
+            promotionSKUDiscAMTBySetting.setFreeShippingMark(one.getFreeShippingMark());
+            promotionSKUDiscAMTBySetting.setGiftMark(one.getGiftMark());
+            promotionSKUDiscAMTBySetting.setGiftChoiceType(one.getGiftChoiceType());
+            promotionSKUDiscAMTBySetting.setGiftCountLimited(one.getGiftCountLimited());
+            promotionSKUDiscAMTBySetting.setSettingId(one.getSettingId());
+            promotionSKUDiscAMTBySetting.setPromotionId(one.getPromotionId());
 
-            if (!checkExistsBySKUId(listReturn, oneInstance.getSkuId())){
-                listReturn.add(oneInstance);
+            if (!checkExistsBySKUId(listReturn, promotionSKUDiscAMTBySetting.getSkuId())){
+                listReturn.add(promotionSKUDiscAMTBySetting);
             }
         }
 

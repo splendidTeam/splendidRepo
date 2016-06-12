@@ -82,7 +82,6 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 	public List<ItemColorSwatchViewCommand> resolve(
 			ItemBaseInfoViewCommand baseInfoViewCommand,
 			ItemImageViewCommandConverter itemImageViewCommandConverter) {
-		Long itemId =baseInfoViewCommand.getId();
 		String itemCode =baseInfoViewCommand.getCode();
 		String style =baseInfoViewCommand.getStyle();
 		if(Validator.isNullOrEmpty(style)){
@@ -96,13 +95,13 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 		//①.商品信息、图片信息
 		List<ItemColorSwatchViewCommand> colorSwatchViewCommands =new ArrayList<ItemColorSwatchViewCommand>();
 		//根据商品的style获取同款商品
-		List<ItemCommand> itemCommands =itemDetailManager.findItemListByItemId(itemId, style);
-		Map<Long, String> codeMap =new HashMap<Long, String>();
+		List<ItemCommand> itemCommands = sdkItemManager.findItemCommandByStyle(style);
+		Map<Long, ItemCommand> itemMap =new HashMap<Long, ItemCommand>();
 		//结果冗余的itemCode需要事先获取[itemId,itemCode]的对应关系
 		List<Long> itemIds = new ArrayList<Long>();
 		for (ItemCommand itemCommand : itemCommands) {
 			itemIds.add(itemCommand.getId());
-			codeMap.put(itemCommand.getId(), itemCommand.getCode());
+			itemMap.put(itemCommand.getId(), itemCommand);
 		}
 		//获取所有相关的图片
 		List<ItemImage> itemImageList = sdkItemManager.findItemImageByItemIds(itemIds, null);
@@ -112,7 +111,7 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 			for (ItemImageViewCommand itemImageViewCommand : imageViewCommands) {
 				//找到colorItemPropertyId，设值
 				if(Validator.isNotNullOrEmpty(itemImageViewCommand.getColorItemPropertyId())){
-					colorSwatchViewCommands.add(contructItemColorSwatchViewCommand(codeMap,
+					colorSwatchViewCommands.add(contructItemColorSwatchViewCommand(itemMap,
 							itemImageViewCommand));
 				}
 			}
@@ -200,15 +199,16 @@ public class ItemColorSwatchViewCommandResolverImpl implements ItemColorSwatchVi
 	
 	/**
 	 * 构造view对象，设置基本属性信息
-	 * @param codeMap
+	 * @param itemMap
 	 * @param itemImageViewCommand
 	 * @return
 	 */
-	private ItemColorSwatchViewCommand contructItemColorSwatchViewCommand(Map<Long, String> codeMap,
+	private ItemColorSwatchViewCommand contructItemColorSwatchViewCommand(Map<Long, ItemCommand> itemMap,
 			ItemImageViewCommand itemImageViewCommand){
 		ItemColorSwatchViewCommand colorSwatchViewCommand =new ItemColorSwatchViewCommand();
 		colorSwatchViewCommand.setItemId(itemImageViewCommand.getItemId());
-		colorSwatchViewCommand.setItemCode(codeMap.get(itemImageViewCommand.getItemId()));
+		colorSwatchViewCommand.setItemCode(itemMap.get(itemImageViewCommand.getItemId()).getCode());
+		colorSwatchViewCommand.setLifecycle(itemMap.get(itemImageViewCommand.getItemId()).getLifecycle());
 		Map<String, List<ImageViewCommand>> images =itemImageViewCommand.getImages();
 		if(Validator.isNotNullOrEmpty(images) && 
 				Validator.isNotNullOrEmpty(images.get(IMG_TYPE_COLOR))){

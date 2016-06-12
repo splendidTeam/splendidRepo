@@ -43,12 +43,12 @@ public class GenerateMain {
 	/**
 	 * 生命周期字段,如果没有则为""空串
 	 */
-	private final String lifecycle="lifecycle";
+	private final String lifecycle="";
 	
 	/**
 	 * 是否拥有删除状态,拥有删除状态则会在所有的查询后加上lifecycle!=2
 	 */
-	private final Boolean hasDeleteLifecycle=true;
+	private final Boolean hasDeleteLifecycle=false;
 	
 	private String getAutoMakeCode(){
 		
@@ -102,9 +102,9 @@ public class GenerateMain {
 		
 		GenerateMain gm=new GenerateMain();
 		args = new String[5];
-		args[0]="com.baozun.nebula.model.SkuGiftType";
-		args[1]="chenguang.zhou";
-		args[2]="lifecycle";
+		args[0]="com.baozun.nebula.model.product.SkuInventoryChangeLog";
+		args[1]="dongliang.ma";
+		args[2]="";
 		args[3]="true";
 		gm.execute(args);
 		

@@ -48,6 +48,7 @@ import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
 import com.baozun.nebula.search.FacetParameter;
 import com.baozun.utilities.DateUtil;
+import com.feilong.core.Validator;
 
 import loxia.dao.Sort;
 
@@ -168,7 +169,8 @@ public class NavigationManagerImpl implements NavigationManager {
 		if(dbNavi ==null ||dbNavi.getId() ==null){
 			ifNotExpectedCountThrowException(1, 0);
 		}
-		if(navigationCommand.getFacetParameterList()!=null && navigationCommand.getFacetParameterList().size()>0 ){
+		//商品集合链接
+		if (Navigation.TYPE_ITEM_LIST == navigationCommand.getType()){
 			if(dbNavi.getCollectionId()!=null){
 				ItemCollection refItemCollection= itemCollectionDao.getByPrimaryKey(dbNavi.getCollectionId());
 				refItemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
@@ -182,7 +184,16 @@ public class NavigationManagerImpl implements NavigationManager {
 				//关联导航
 				dbNavi.setCollectionId(refItemCollection.getId());
 			}
+		}else{
+			//活动推广链接,如果存在对应的商品集合则删除
+			if(dbNavi.getCollectionId()!=null){
+				itemCollectionDao.deleteByPrimaryKey(dbNavi.getCollectionId());
+				dbNavi.setCollectionId(null);
+			}
+			
+			
 		}
+		
 		
 		//父节点
 		Long parentId =dbNavi.getParentId();
@@ -355,7 +366,7 @@ public class NavigationManagerImpl implements NavigationManager {
 			Navigation navigation) {
 		
 		//导航关联分类与属性
-		if(navigationCommand.getFacetParameterList()!=null && navigationCommand.getFacetParameterList().size()>0 ){
+		if (Navigation.TYPE_ITEM_LIST == navigationCommand.getType() && Validator.isNotNullOrEmpty(navigationCommand.getFacetParameterList())){
 			ItemCollection itemCollection = new ItemCollection();
 			itemCollection.setFacetParameters(JSON.toJSONString(navigationCommand.getFacetParameterList()));
 			itemCollection.setCreateTime(DateUtil.now());

@@ -1,5 +1,7 @@
 package com.baozun.nebula.payment.manager;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
@@ -13,6 +15,11 @@ public interface PaymentManager {
 	 * 创建支付链接
 	 */
 	public PaymentRequest createPayment(SalesOrderCommand order);
+    
+    /**
+     * 创建支付链接(新增接口，shopdog使用)
+     */
+    public PaymentRequest createPayment(SalesOrderCommand order, Map<String,String> additionParams);
 	
 	/**
 	 * 同步方式获取返回结果

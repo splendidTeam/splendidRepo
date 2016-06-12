@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.cms.CmsModuleInstanceDao;
@@ -84,6 +85,9 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 	
 	@Autowired
 	private ZkOperator			zkOperator;
+	
+	@Autowired(required=false)
+	private ZKWatchPath			zkWatchPath;
 
 	@Autowired
 	private CacheManager				cacheManager;
@@ -202,7 +206,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		// 先删除, 再添加
 		cmsModuleInstanceDao.removeCmsModuleInstanceByIds(ids);
 		log.info("remove module Success, module's id is "+removeids);
-		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 	}
 	
 	
@@ -367,7 +371,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		cmsTemplateHtml.setData(data);
 		sdkCmsTemplateHtmlManager.saveCmsTemplateHtml(cmsTemplateHtml);
 		log.info("publishModuleInstance Success, module's id is "+moduleInstance.getId()+", code is " + moduleInstance.getCode());
-		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 		
 	}
 	
@@ -384,7 +388,7 @@ public class SdkCmsModuleInstanceManagerImpl implements SdkCmsModuleInstanceMana
 		sdkCmsModuleInstanceVersionManager.cancelInstanceVersionInModuleId(moduleInstance.getId());
 		sdkCmsTemplateHtmlManager.removeCmsTemplateHtmlByModuleCode(moduleInstance.getCode());
 		log.info("cancelpublishModuleInstance success, module's id is "+moduleId+", code is " + moduleInstance.getCode());
-		zkOperator.noticeZkServer(zkOperator.getPath(ModuleMapWatchInvoke.PATH_KEY));
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(ModuleMapWatchInvoke.class));
 	}
 
 	@Override

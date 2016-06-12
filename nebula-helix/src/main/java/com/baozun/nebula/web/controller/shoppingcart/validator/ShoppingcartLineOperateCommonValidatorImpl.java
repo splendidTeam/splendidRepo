@@ -94,9 +94,9 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
         if (null != activeBeginTime && DateUtil.isAfter(activeBeginTime, now)){
             LOGGER.warn(
                             "now is :[{}],but item:[{}]'s activeBeginTime is:{},return ITEM_NOT_ACTIVE_TIME",
-                            DateUtil.date2String(now, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND),
+                            DateUtil.toString(now, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND),
                             itemCode,
-                            DateUtil.date2String(activeBeginTime, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND));
+                            DateUtil.toString(activeBeginTime, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND));
             return ShoppingcartResult.ITEM_NOT_ACTIVE_TIME;
         }
 

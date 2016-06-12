@@ -678,13 +678,8 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			if (command.getIsDefault()){// 设置其他为非默认
 				contactDao.updateContactByMemberId(command.getMemberId(), Contact.NOTDEFAULT);
 			}
-
 		}
-		if (null != con){
-			decryptContact(con);
-			return convertContactToContactCommand(con);
-		}
-		return null;
+		return convertContactToContactCommand(con);
 	}
 
 	private ContactCommand convertContactToContactCommand(Contact con){

@@ -18,7 +18,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +29,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.command.promotion.PromotionCommand;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
@@ -48,16 +48,16 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShareDiscountToLineManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * 专门用来构建 ShoppingCartCommand.
@@ -68,6 +68,9 @@ import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 @Transactional
 @Service("sdkShoppingCartCommandBuilder")
 public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommandBuilder{
+
+    /** The Constant log. */
+    private static final Logger                        LOGGER        = LoggerFactory.getLogger(SdkShoppingCartCommandBuilderImpl.class);
 
     /** The Constant CHECKED_STATE. */
     private static final int                           CHECKED_STATE = 1;
@@ -87,21 +90,15 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkMataInfoManager                         sdkMataInfoManager;
 
-    /** The sdk promotion calculation manager. */
-    @Autowired
-    private SdkPromotionCalculationManager             sdkPromotionCalculationManager;
-
-    /** The sdk promotion calculation share to sku manager. */
-    @Autowired
-    private SdkPromotionCalculationShareToSKUManager   sdkPromotionCalculationShareToSKUManager;
-
     /** The sdk freight fee manager. */
     @Autowired
     private SdkFreightFeeManager                       sdkFreightFeeManager;
 
-    /** The sdk promotion rule filter manager. */
     @Autowired
-    private SdkPromotionRuleFilterManager              sdkPromotionRuleFilterManager;
+    private PromotionBriefBuilder                      promotionBriefBuilder;
+
+    @Autowired
+    private ShareDiscountToLineManager                 shareDiscountToLineManager;
 
     /*
      * (non-Javadoc)
@@ -455,7 +452,11 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      */
     private void setShopCartPromotionInfos(ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand){
         // 获取促销数据.需要调用促销引擎计算优惠价格
-        List<PromotionBrief> promotionBriefList = calcuPromoBriefs(shoppingCartCommand);
+        List<PromotionBrief> promotionBriefList = promotionBriefBuilder.getPromotionBriefList(shoppingCartCommand);
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug(JsonUtil.format(promotionBriefList));
+        }
 
         Map<Long, List<PromotionBrief>> shopIdAndPromotionBriefListMap = CollectionsUtil.group(promotionBriefList, "shopId");
 
@@ -725,44 +726,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartByShopIdMap(map);
 
         // 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值
-        shareDiscountToLine(shoppingCartCommand, promotionBriefList);
+        shareDiscountToLineManager.shareDiscountToLine(shoppingCartCommand, promotionBriefList);
         shopCart.setShoppingCartLineCommands(shoppingCartCommand.getShoppingCartLineCommands());
 
         return shopCartCommandByShop;
-    }
-
-    /**
-     * 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart
-     * @param promotionBriefList
-     *            the promotion brief list
-     */
-    private void shareDiscountToLine(ShoppingCartCommand shoppingCartCommand,List<PromotionBrief> promotionBriefList){
-        // 分摊结果
-        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCartCommand, promotionBriefList);
-        if (null == promotionSKUDiscAMTBySettingList || promotionSKUDiscAMTBySettingList.size() == 0
-                        || shoppingCartCommand.getShoppingCartLineCommands() == null
-                        || shoppingCartCommand.getShoppingCartLineCommands().size() == 0){
-            return;
-        }
-
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartCommand.getShoppingCartLineCommands()){
-            if (shoppingCartLineCommand.isGift()){
-                continue;
-            }
-            BigDecimal curSKUDiscount = getCurSKUDiscount(promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
-            shoppingCartLineCommand.setDiscount(curSKUDiscount);
-            // 购物车行小计
-            BigDecimal subTotalAmt = NumberUtil
-                            .getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice());
-
-            BigDecimal lineSubTotalAmt = subTotalAmt.subtract(curSKUDiscount);
-
-            shoppingCartLineCommand.setSubTotalAmt(lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt);
-        }
     }
 
     /**
@@ -825,34 +792,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     //**********************************************************************************************
 
     /**
-     * 用于计算获取促销数据.
-     *
-     * @param shoppingCartCommand
-     *            the shop cart
-     * @return the list< promotion brief>
-     */
-    private List<PromotionBrief> calcuPromoBriefs(ShoppingCartCommand shoppingCartCommand){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
-        Set<String> memboSet = shoppingCartCommand.getUserDetails().getMemComboList();
-
-        // 获取人群和商品促销的交集
-        Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
-        Set<String> itemComboIdsSet = ShoppingCartUtil.getItemComboIds(shoppingCartLineCommandList);
-
-        List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
-                        new ArrayList<Long>(shopIdSet),
-                        memboSet,
-                        itemComboIdsSet,
-                        shoppingCartCommand.getCurrentTime());
-
-        if (Validator.isNotNullOrEmpty(promotionList)){
-            // 通过购物车和促销集合计算商品促销
-            return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionList);
-        }
-        return Collections.emptyList();
-    }
-
-    /**
      * 根据店铺封装shopCart对象.
      *
      * @param shoppingCartCommand
@@ -894,24 +833,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                 return !shoppingCartLineCommand.isCaptionLine();
             }
         });
-    }
-
-    private BigDecimal getCurSKUDiscount(
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    final ShoppingCartLineCommand shoppingCartLineCommand){
-        final Long skuId = shoppingCartLineCommand.getSkuId();
-        //TODO feilong 提取
-        BigDecimal discountAmountSum = CollectionsUtil
-                        .sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
-
-                            @Override
-                            public boolean evaluate(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
-                                boolean freeShipOrGiftMark = promotionSKUDiscAMTBySetting.getFreeShippingMark()
-                                                || promotionSKUDiscAMTBySetting.getGiftMark();
-                                return !freeShipOrGiftMark && skuId.equals(promotionSKUDiscAMTBySetting.getSkuId());
-                            }
-                        });
-        return null == discountAmountSum ? BigDecimal.ZERO : discountAmountSum;
     }
 
 }

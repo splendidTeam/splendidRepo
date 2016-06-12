@@ -87,6 +87,7 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 		
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		dataMap.put("activeEmailUrl", packageActiveEmailUrl);
+		dataMap.put("email",email);
 		// 发送
 		SendEmailResultCode resultCode=commonEmailManager.sendEmail(email, EmailConstants.EMAIL_ACTIVE_TEMPLATE, dataMap);
 		
@@ -150,7 +151,6 @@ public  class MemberEmailManagerImpl implements MemberEmailManager{
 		log.info("send register successfully email start ");
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		dataMap.put("nickname", nickName);
-		
 		SendEmailResultCode resultCode=commonEmailManager.sendEmail(email, EmailConstants.EMAIL_SENDSUCCESS_TEMPLATE, dataMap);
 		log.info("send register successfully email end ");
 		

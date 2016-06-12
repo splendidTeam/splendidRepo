@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="SkuInventoryChangeLog.findAllSkuInventoryChangeLogList" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_change_log 
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SkuInventoryChangeLog.findSkuInventoryChangeLogListByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_pd_sku_inventory_change_log where 
+		       		id in (
+		       		#foreach( $id in $ids )
+    					$id,
+					 #end
+		       		 -1)
+		       		
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	
+	<bean id="SkuInventoryChangeLog.findSkuInventoryChangeLogListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			id as id,
+		       			extention_code as extentionCode,
+		       			qty as qty,
+		       			type as type,
+		       			source as source,
+		       			operator as operator,
+		       			create_time as createTime
+		       		from t_pd_sku_inventory_change_log log where 
+		       			1=1	
+		       		
+							#if($itemCode)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select id 
+		       							from t_pd_item
+		       							where code like :itemCode
+		       						)
+		       					)
+		       				#end
+		       				
+		       				#if($itemTitle)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select item_id 
+		       							from t_pd_iteminfo
+		       							where title like :itemTitle
+		       						)
+		       					)
+		       				#end
+		       			
+		       				#if($extentionCode)
+		       					and EXTENTION_CODE like :extentionCode
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select id 
+		       							from t_pd_item
+		       							where LIFECYCLE=:lifecycle
+		       						)
+		       					)
+		       				#end
+
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($source)
+		       					and SOURCE=:source
+		       				#end
+
+		       				#if($createStartDate)
+		       					and CREATE_TIME >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and CREATE_TIME <= :createEndDate
+		       				#end
+		       				
+	       					#if($operatorName && $source && $source ==1)
+	       						and operator is not null
+	       						and operator in(
+	       							select id
+	       							from t_mem_member
+	       							where login_email like :operatorName
+	       						)
+	       					#elseif($operatorName && $source && $source ==2)
+	       						and operator is not null
+	       						and operator in(
+	       							select id
+	       							from t_au_user
+	       							where user_name like :operatorName
+	       						)
+	       					#elseif($operatorName && !$source)
+	       						and operator is not null
+	       						and (
+		       						operator in(
+		       							select id
+		       							from t_mem_member
+		       							where login_email like :operatorName
+		       						) or operator in(
+	       							select id
+	       							from t_au_user
+	       							where user_name like :operatorName
+	       						)
+	       						)
+	       					#else
+	       						and (1=1)
+	       					#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="SkuInventoryChangeLog.findSkuInventoryChangeLogListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			id as id,
+		       			extention_code as extentionCode,
+		       			qty as qty,
+		       			type as type,
+		       			source as source,
+		       			operator as operator,
+		       			create_time as createTime
+		       		from t_pd_sku_inventory_change_log log where 
+		       			1=1	
+		       		
+							#if($itemCode)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select id 
+		       							from t_pd_item
+		       							where code like :itemCode
+		       						)
+		       					)
+		       				#end
+		       				
+		       				#if($itemTitle)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select item_id 
+		       							from t_pd_iteminfo
+		       							where title like :itemTitle
+		       						)
+		       					)
+		       				#end
+		       			
+		       				#if($extentionCode)
+		       					and EXTENTION_CODE like :extentionCode
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and EXTENTION_CODE in(
+		       						select out_id
+		       						from t_pd_sku
+		       						where item_id in(
+		       							select id 
+		       							from t_pd_item
+		       							where LIFECYCLE=:lifecycle
+		       						)
+		       					)
+		       				#end
+
+		       				#if($type)
+		       					and TYPE=:type
+		       				#end
+
+		       			
+		       				#if($source)
+		       					and SOURCE=:source
+		       				#end
+
+		       				#if($createStartDate)
+		       					and CREATE_TIME >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and CREATE_TIME <= :createEndDate
+		       				#end
+		       				
+	       					#if($operatorName && $source && $source ==1)
+	       						and operator is not null
+	       						and operator in(
+	       							select id
+	       							from t_mem_member
+	       							where login_email like :operatorName
+	       						)
+	       					#elseif($operatorName && $source && $source ==2)
+	       						and operator is not null
+	       						and operator in(
+	       							select id
+	       							from t_au_user
+	       							where user_name like :operatorName
+	       						)
+	       					#elseif($operatorName && !$source)
+	       						and operator is not null
+	       						and (
+		       						operator in(
+		       							select id
+		       							from t_mem_member
+		       							where login_email like :operatorName
+		       						) or operator in(
+	       							select id
+	       							from t_au_user
+	       							where user_name like :operatorName
+	       						)
+	       						)
+	       					#else
+	       						and (1=1)
+	       					#end 
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="SkuInventoryChangeLog.clearSkuInventoryChangeLogOneMonthAgo" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		delete 
+		       		from t_pd_sku_inventory_change_log 
+		       		where 
+		       			create_time <= (now() - interval '1 month')
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

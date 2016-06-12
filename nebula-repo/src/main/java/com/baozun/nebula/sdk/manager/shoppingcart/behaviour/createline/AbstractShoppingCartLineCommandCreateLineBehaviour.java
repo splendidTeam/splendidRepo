@@ -17,11 +17,10 @@
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.createline;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
@@ -35,13 +34,12 @@ import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
 import com.feilong.core.Validator;
 
 /**
+ * The Class AbstractShoppingCartLineCommandCreateLineBehaviour.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
 public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour implements ShoppingCartLineCommandCreateLineBehaviour{
-
-    private static final Logger      LOGGER = LoggerFactory.getLogger(AbstractShoppingCartLineCommandCreateLineBehaviour.class);
 
     /** The sdk order line dao. */
     @Autowired
@@ -67,10 +65,16 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
     }
 
     /**
+     * Save common line.
+     *
      * @param orderId
+     *            the order id
      * @param couponCodes
+     *            the coupon codes
      * @param promotionSKUDiscAMTBySettingList
+     *            the promotion sku disc amt by setting list
      * @param shoppingCartLineCommand
+     *            the shopping cart line command
      */
     //XXX feilong  这里的参数 shoppingCartLineCommand 最好是单独定制 一个额外的类 这样不会影响原来的对象
     protected void saveCommonLine(
@@ -167,6 +171,8 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
      * @return the order line
      */
     private OrderLine buildOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
+        boolean isGift = shoppingCartLineCommand.isGift();
+
         OrderLine orderLine = new OrderLine();
         // 订单id
         orderLine.setOrderId(orderId);
@@ -186,21 +192,10 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
         // 商品主图
         orderLine.setItemPic(shoppingCartLineCommand.getItemPic());
         //******************************************************************************************
-        // 原销售单价
-        orderLine.setMSRP(shoppingCartLineCommand.getListPrice());
-        // 现销售单价
-        BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
-        orderLine.setSalePrice(salePrice);
-        // 行小计
-        orderLine.setSubtotal(shoppingCartLineCommand.getSubTotalAmt());
-        // 折扣、行类型
-        if (shoppingCartLineCommand.isGift()){
-            orderLine.setDiscount(salePrice);
-            orderLine.setType(ItemInfo.TYPE_GIFT);
-        }else{
-            orderLine.setDiscount(shoppingCartLineCommand.getDiscount());
-            orderLine.setType(ItemInfo.TYPE_MAIN);
-        }
+
+        //设置价格信息
+        setPrice(orderLine, shoppingCartLineCommand, isGift);
+        orderLine.setType(isGift ? ItemInfo.TYPE_GIFT : ItemInfo.TYPE_MAIN);
 
         // 销售属性信息
         orderLine.setSaleProperty(shoppingCartLineCommand.getSaleProperty());
@@ -215,6 +210,31 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
         orderLine.setEvaluationStatus(null);
         // 商品快照版本
         orderLine.setSnapshot(null);
+
+        orderLine.setVersion(new Date());
         return orderLine;
+    }
+
+    /**
+     * 设置 price.
+     *
+     * @param orderLine
+     *            the order line
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @param isGift
+     *            the is gift
+     * @since 5.3.1
+     */
+    private void setPrice(OrderLine orderLine,ShoppingCartLineCommand shoppingCartLineCommand,boolean isGift){
+        // 原销售单价
+        orderLine.setMSRP(shoppingCartLineCommand.getListPrice());
+        // 现销售单价
+        BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
+        orderLine.setSalePrice(salePrice);
+        // 行小计
+        orderLine.setSubtotal(shoppingCartLineCommand.getSubTotalAmt());
+        // 折扣、行类型
+        orderLine.setDiscount(isGift ? salePrice : shoppingCartLineCommand.getDiscount());
     }
 }
