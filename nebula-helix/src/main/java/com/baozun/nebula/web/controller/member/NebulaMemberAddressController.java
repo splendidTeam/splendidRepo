@@ -170,6 +170,8 @@ public class NebulaMemberAddressController extends BaseController {
 		ContactCommand contactCommand = sdkMemberManager.createOrUpdateContact(contact);
 		if(Validator.isNotNullOrEmpty(contactCommand)){
 			defaultReturnResult.setResult(true);
+			//返回添加地址对象
+			defaultReturnResult.setReturnObject(contactCommand);
 		}else{
 			defaultReturnResult.setResult(false);
 		}

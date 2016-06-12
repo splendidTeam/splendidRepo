@@ -42,4 +42,7 @@ public class SessionKeyConstants {
 	public static final String VALID_EMAIL_COUNT = "reg_v_e_c";
 	
 	public static final String IMMEDIATELYBUY_SESSION_SHOPCART = "im_s_cart"; 
+	
+	/** 用户在微信公众号的openid，微信支付使用 */
+	public static final String MEMBER_WECHAT_OPENID = "member_wechat_openid";
 }

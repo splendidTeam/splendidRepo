@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ import com.baozun.nebula.model.salesorder.Consignee;
 import com.baozun.nebula.model.salesorder.OrderStatusLog;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.ReturnOrderApp;
+import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.CancelOrderCommand;
 import com.baozun.nebula.sdk.command.ConsigneeCommand;
@@ -366,11 +368,14 @@ public class OrderManagerImpl implements OrderManager{
         // 判断订单是否存在
         SalesOrderCommand order = judgeOrderIfExist(cancelOrderCommand.getOrderCode());
         Integer orderStatus = order.getLogisticsStatus();
-        if (com.baozun.nebula.model.salesorder.SalesOrder.SALES_ORDER_STATUS_CANCELED.equals(orderStatus)
-                        || com.baozun.nebula.model.salesorder.SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED.equals(orderStatus))
+
+        if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_CANCELED, orderStatus)
+                        || Objects.equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED, orderStatus)){
             throw new BusinessException(Constants.ORDER_ALREADY_CANCEL);
-        if (com.baozun.nebula.model.salesorder.SalesOrder.SALES_ORDER_STATUS_FINISHED.equals(orderStatus))
+        }
+        if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_FINISHED, orderStatus)){
             throw new BusinessException(Constants.ORDER_ALREADY_COMPELETE);
+        }
         // 判断该订单是否已经申请了取消订单
         CancelOrderCommand cancelOrdApp = sdkCancelOrderDao.findCancelOrderAppByCode(cancelOrderCommand.getOrderCode());
         if (null != cancelOrdApp)// 该订单已经申请了取消订单，则不允许再次申请

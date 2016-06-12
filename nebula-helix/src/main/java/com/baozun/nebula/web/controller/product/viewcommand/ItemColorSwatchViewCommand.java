@@ -53,6 +53,9 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 	
 	/** 颜色属性图片 */
 	private String image;
+	
+	/** 商品状态(上架： 1 ;  下架: 0. )*/
+	private Integer lifecycle;
 
 	public Long getItemId() {
 		return itemId;
@@ -117,5 +120,21 @@ public class ItemColorSwatchViewCommand extends BaseViewCommand {
 	public void setImage(String image) {
 		this.image = image;
 	}
+
+	/**
+	 * @return the lifecycle
+	 */
+	public Integer getLifecycle() {
+		return lifecycle;
+	}
+
+	/**
+	 * @param lifecycle the lifecycle to set
+	 */
+	public void setLifecycle(Integer lifecycle) {
+		this.lifecycle = lifecycle;
+	}
+	
+	
 
 }

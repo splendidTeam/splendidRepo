@@ -19,8 +19,6 @@ package com.baozun.nebula.sdk.manager.order.handler;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +49,6 @@ import com.feilong.core.Validator;
 @Transactional
 @Service("orderCreateByShopManager")
 public class OrderCreateByShopManagerImpl implements OrderCreateByShopManager{
-
-    private static final Logger                        LOGGER         = LoggerFactory.getLogger(OrderCreateByShopManagerImpl.class);
 
     /** The Constant SEPARATOR_FLAG. */
     private static final String                        SEPARATOR_FLAG = "\\|\\|";

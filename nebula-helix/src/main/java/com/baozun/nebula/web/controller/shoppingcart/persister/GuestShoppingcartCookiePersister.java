@@ -23,9 +23,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -34,12 +35,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.CookieShoppingCartLine;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
-import com.baozun.nebula.web.constants.CookieKeyConstants;
-import com.feilong.core.TimeInterval;
+import com.feilong.accessor.cookie.CookieAccessor;
 import com.feilong.core.Validator;
-import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.util.CollectionsUtil;
-import com.feilong.servlet.http.CookieUtil;
 
 /**
  * 基于 {@link Cookie}的游客购物车持久化处理方式.
@@ -48,22 +46,13 @@ import com.feilong.servlet.http.CookieUtil;
  * @version 5.3.1 2016年5月3日 下午4:20:24
  * @since 5.3.1
  */
-@Component("guestShoppingcartPersister")
 public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersister{
 
     /** The Constant LOGGER. */
-    private static final Logger   LOGGER                      = LoggerFactory.getLogger(GuestShoppingcartCookiePersister.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuestShoppingcartCookiePersister.class);
 
-    /** cookie的名称. */
-    private String                cookieNameGuestShoppingcart = CookieKeyConstants.GUEST_COOKIE_GC;
-
-    private static final String[] COPY_PROPERTY_NAMES         = {
-                                                                  "skuId",
-                                                                  "extentionCode",
-                                                                  "quantity",
-                                                                  "createTime",
-                                                                  "settlementState",
-                                                                  "lineGroup" };
+    /** cookie寄存器. */
+    private CookieAccessor      cookieAccessor;
 
     /*
      * (non-Javadoc)
@@ -73,7 +62,7 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
      */
     @Override
     public void clear(HttpServletRequest request,HttpServletResponse response){
-        CookieUtil.deleteCookie(cookieNameGuestShoppingcart, response);
+        cookieAccessor.remove(response);
     }
 
     /*
@@ -87,20 +76,16 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
         try{
             // 获取cookie中的购物车行集合
             List<CookieShoppingCartLine> cookieShoppingCartLineList = getCookieShoppingCartLines(request);
-
             if (Validator.isNullOrEmpty(cookieShoppingCartLineList)){
                 return null;
             }
 
-            return toShoppingCartLineCommandList(cookieShoppingCartLineList);
-
+            return CollectionsUtil.collect(cookieShoppingCartLineList, new ToShoppingCartLineCommandTransformer());
         }catch (EncryptionException e){
             LOGGER.error("EncryptionException e :", e);
             throw new IllegalArgumentException(e);// XXX feilong 换成更好的 runtimeexception
         }
     }
-
-    //***************************************************************************************************
 
     /**
      * 把cookie购物车行对象加入cookie当中.
@@ -114,68 +99,16 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
      */
     @Override
     public void save(List<ShoppingCartLineCommand> needChangeCheckedCommandList,HttpServletRequest request,HttpServletResponse response){
-        List<CookieShoppingCartLine> cartLineList = toCookieShoppingCartLineList(needChangeCheckedCommandList);
+        List<CookieShoppingCartLine> cartLineList = CollectionsUtil
+                        .collect(needChangeCheckedCommandList, new ToCookieShoppingCartLineTransformer());
 
         String json = JSON.toJSONString(cartLineList);
         try{
             String encrypt = EncryptUtil.getInstance().encrypt(json);
-            CookieUtil.addCookie(cookieNameGuestShoppingcart, encrypt, TimeInterval.SECONDS_PER_YEAR, response);
+            cookieAccessor.save(encrypt, response);
         }catch (EncryptionException e){
             LOGGER.error("EncryptionException e:", e);
         }
-
-    }
-
-    //*******************************************************************************************
-    /**
-     * 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象.
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the list< cookie shopping cart line>
-     */
-    private List<CookieShoppingCartLine> toCookieShoppingCartLineList(final List<ShoppingCartLineCommand> shoppingCartLines){
-        // 将ShoppingCartLineCommand对象转换为CookieShoppingCartLine对象
-        Transformer<ShoppingCartLineCommand, CookieShoppingCartLine> transformer = new Transformer<ShoppingCartLineCommand, CookieShoppingCartLine>(){
-
-            @Override
-            public CookieShoppingCartLine transform(ShoppingCartLineCommand shoppingCartLineCommand){
-                CookieShoppingCartLine cookieShoppingCartLine = new CookieShoppingCartLine();
-                PropertyUtil.copyProperties(cookieShoppingCartLine, shoppingCartLineCommand, COPY_PROPERTY_NAMES);
-
-                cookieShoppingCartLine.setIsGift(shoppingCartLineCommand.isGift());
-                // XXX feilong bundle 以后再考虑 id
-                cookieShoppingCartLine.setId(
-                                null == shoppingCartLineCommand.getId() ? shoppingCartLines.size() : shoppingCartLineCommand.getId());
-                return cookieShoppingCartLine;
-            }
-        };
-        return CollectionsUtil.collect(shoppingCartLines, transformer);
-    }
-
-    /**
-     * 获取cookie中的购物车行信息.将cookie中的购物车 转换为 shoppingCartLineCommand
-     *
-     * @param cookieShoppingCartLineList
-     *            the cookie shopping cart line list
-     * @return the list< shopping cart line command>
-     */
-    private List<ShoppingCartLineCommand> toShoppingCartLineCommandList(List<CookieShoppingCartLine> cookieShoppingCartLineList){
-        Transformer<CookieShoppingCartLine, ShoppingCartLineCommand> transformer = new Transformer<CookieShoppingCartLine, ShoppingCartLineCommand>(){
-
-            @Override
-            public ShoppingCartLineCommand transform(CookieShoppingCartLine cookieShoppingCartLine){
-                // 将cookie中的购物车 转换为 shoppingCartLineCommand
-                ShoppingCartLineCommand shoppingLineCommand = new ShoppingCartLineCommand();
-                PropertyUtil.copyProperties(shoppingLineCommand, cookieShoppingCartLine, COPY_PROPERTY_NAMES);
-
-                shoppingLineCommand.setId(cookieShoppingCartLine.getId());
-                shoppingLineCommand.setGift(null == cookieShoppingCartLine.getIsGift() ? false : cookieShoppingCartLine.getIsGift());
-
-                return shoppingLineCommand;
-            }
-        };
-        return CollectionsUtil.collect(cookieShoppingCartLineList, transformer);
     }
 
     /**
@@ -188,27 +121,21 @@ public class GuestShoppingcartCookiePersister implements GuestShoppingcartPersis
      *             the encryption exception
      */
     private List<CookieShoppingCartLine> getCookieShoppingCartLines(HttpServletRequest request) throws EncryptionException{
-        Cookie cookie = CookieUtil.getCookie(request, cookieNameGuestShoppingcart);
-
-        if (null == cookie){
+        String value = cookieAccessor.get(request);
+        if (Validator.isNullOrEmpty(value)){
             return null;
         }
-
-        if (Validator.isNullOrEmpty(cookie.getValue())){
-            return null;
-        }
-
-        String decrypt = EncryptUtil.getInstance().decrypt(cookie.getValue());
+        String decrypt = EncryptUtil.getInstance().decrypt(value);
         return JSON.parseObject(decrypt, new TypeReference<ArrayList<CookieShoppingCartLine>>(){});
     }
 
     /**
-     * 设置 cookie的名称.
+     * 设置 cookie寄存器.
      *
-     * @param cookieNameGuestShoppingcart
-     *            the cookieNameGuestShoppingcart to set
+     * @param cookieAccessor
+     *            the cookieAccessor to set
      */
-    public void setCookieNameGuestShoppingcart(String cookieNameGuestShoppingcart){
-        this.cookieNameGuestShoppingcart = cookieNameGuestShoppingcart;
+    public void setCookieAccessor(CookieAccessor cookieAccessor){
+        this.cookieAccessor = cookieAccessor;
     }
 }

@@ -48,10 +48,10 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShareDiscountToLineManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
@@ -90,16 +90,15 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkMataInfoManager                         sdkMataInfoManager;
 
-    /** The sdk promotion calculation share to sku manager. */
-    @Autowired
-    private SdkPromotionCalculationShareToSKUManager   sdkPromotionCalculationShareToSKUManager;
-
     /** The sdk freight fee manager. */
     @Autowired
     private SdkFreightFeeManager                       sdkFreightFeeManager;
 
     @Autowired
     private PromotionBriefBuilder                      promotionBriefBuilder;
+
+    @Autowired
+    private ShareDiscountToLineManager                 shareDiscountToLineManager;
 
     /*
      * (non-Javadoc)
@@ -727,44 +726,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartByShopIdMap(map);
 
         // 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值
-        shareDiscountToLine(shoppingCartCommand, promotionBriefList);
+        shareDiscountToLineManager.shareDiscountToLine(shoppingCartCommand, promotionBriefList);
         shopCart.setShoppingCartLineCommands(shoppingCartCommand.getShoppingCartLineCommands());
 
         return shopCartCommandByShop;
-    }
-
-    /**
-     * 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart
-     * @param promotionBriefList
-     *            the promotion brief list
-     */
-    private void shareDiscountToLine(ShoppingCartCommand shoppingCartCommand,List<PromotionBrief> promotionBriefList){
-        // 分摊结果
-        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = sdkPromotionCalculationShareToSKUManager
-                        .sharePromotionDiscountToEachLine(shoppingCartCommand, promotionBriefList);
-        if (null == promotionSKUDiscAMTBySettingList || promotionSKUDiscAMTBySettingList.size() == 0
-                        || shoppingCartCommand.getShoppingCartLineCommands() == null
-                        || shoppingCartCommand.getShoppingCartLineCommands().size() == 0){
-            return;
-        }
-
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartCommand.getShoppingCartLineCommands()){
-            if (shoppingCartLineCommand.isGift()){
-                continue;
-            }
-            BigDecimal curSKUDiscount = getCurSKUDiscount(promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
-            shoppingCartLineCommand.setDiscount(curSKUDiscount);
-            // 购物车行小计
-            BigDecimal subTotalAmt = NumberUtil
-                            .getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice());
-
-            BigDecimal lineSubTotalAmt = subTotalAmt.subtract(curSKUDiscount);
-
-            shoppingCartLineCommand.setSubTotalAmt(lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt);
-        }
     }
 
     /**
@@ -868,24 +833,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                 return !shoppingCartLineCommand.isCaptionLine();
             }
         });
-    }
-
-    private BigDecimal getCurSKUDiscount(
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    final ShoppingCartLineCommand shoppingCartLineCommand){
-        final Long skuId = shoppingCartLineCommand.getSkuId();
-        //TODO feilong 提取
-        BigDecimal discountAmountSum = CollectionsUtil
-                        .sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
-
-                            @Override
-                            public boolean evaluate(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
-                                boolean freeShipOrGiftMark = promotionSKUDiscAMTBySetting.getFreeShippingMark()
-                                                || promotionSKUDiscAMTBySetting.getGiftMark();
-                                return !freeShipOrGiftMark && skuId.equals(promotionSKUDiscAMTBySetting.getSkuId());
-                            }
-                        });
-        return null == discountAmountSum ? BigDecimal.ZERO : discountAmountSum;
     }
 
 }

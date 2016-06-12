@@ -86,7 +86,7 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 	@Autowired
 	private ZkOperator			zkOperator;
 	
-	@Autowired
+	@Autowired(required=false)
 	private ZKWatchPath 		zkWatchPath;
 	
 	@Autowired

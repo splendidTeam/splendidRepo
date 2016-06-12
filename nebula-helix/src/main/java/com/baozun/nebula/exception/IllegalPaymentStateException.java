@@ -68,6 +68,9 @@ public class IllegalPaymentStateException extends Exception {
 		/** 订单不存在 */
 		PAYMENT_ILLEGAL_ORDER_NOT_EXISTS,
 		
+		/** 订单状态不允许支付 */
+		PAYMENT_ILLEGAL_ORDER_STATUS,
+		
 		/** 订单已经被支付 */
 		PAYMENT_ILLEGAL_ORDER_PAID,
 		

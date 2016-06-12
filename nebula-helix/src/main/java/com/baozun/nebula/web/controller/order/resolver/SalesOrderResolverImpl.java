@@ -134,7 +134,12 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         boolean isGuest = Validator.isNullOrEmpty(memberDetails);
         //        salesOrderCommand.setName(isGuest ? "" : memberDetails.getNickName());
         salesOrderCommand.setName(shippingInfoSubForm.getName());
-        salesOrderCommand.setMemberName(isGuest ? "" : memberDetails.getLoginName());
+        
+        String memberName = "";
+        if (!isGuest) {
+        	memberName = Validator.isNullOrEmpty(memberDetails.getLoginEmail()) ? memberDetails.getLoginMobile() : memberDetails.getLoginEmail();
+        }
+        salesOrderCommand.setMemberName(memberName);
 
         salesOrderCommand.setIp(clientIp);
         salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());

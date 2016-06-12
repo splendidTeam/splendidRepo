@@ -85,7 +85,7 @@ public class DefaultOrderCodeCreatorManager implements OrderCodeCreatorManager{
         Long sequence = sdkOrderDao.findOrderSerialNO();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(DateUtil.date2String(new Date(), DatePattern.yyyyMMdd));
+        sb.append(DateUtil.toString(new Date(), DatePattern.yyyyMMdd));
         sb.append(sequence);
         return sb.toString();
     }

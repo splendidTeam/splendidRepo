@@ -14,19 +14,26 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.createline;
+package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
 /**
- * 普通的ShoppingCartLineCommand 创建订单行.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
-@Transactional
-@Service("shoppingCartLineCommandCreateLineCommonBehaviour")
-public class ShoppingCartLineCommandCreateLineCommonBehaviour extends AbstractShoppingCartLineCommandCreateLineBehaviour{
-    //行为 继承自 父类
+public interface ShareDiscountToLineManager extends BaseManager{
+
+    /**
+     * 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值.
+     * 
+     * @param shoppingCartCommand
+     * @param promotionBriefList
+     */
+    void shareDiscountToLine(ShoppingCartCommand shoppingCartCommand,List<PromotionBrief> promotionBriefList);
 }

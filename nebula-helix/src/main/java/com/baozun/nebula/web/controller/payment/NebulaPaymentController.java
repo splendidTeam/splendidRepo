@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,95 +54,110 @@ import com.feilong.servlet.http.RequestUtil;
  *
  * @author yimin.qiao
  * @version 1.0
- * @time 2016年5月26日  上午11:33:30
+ * @time 2016年5月26日 上午11:33:30
  */
-public class NebulaPaymentController extends NebulaBasePaymentController {
+public class NebulaPaymentController extends NebulaBasePaymentController{
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaPaymentController.class);
-    
+    private static final Logger   LOGGER                   = LoggerFactory.getLogger(NebulaPaymentController.class);
+
     //view的常量定义
     /** 支付成功页面. */
-    protected static final String VIEW_PAY_SUCCESS = "payment.pay-success";
-    
+    protected static final String VIEW_PAY_SUCCESS         = "payment.pay-success";
+
     /** 支付失败页面. */
-    protected static final String VIEW_PAY_FAILURE = "payment.pay-failure";
-    
+    protected static final String VIEW_PAY_FAILURE         = "payment.pay-failure";
+
     /** 去支付的异常页面. */
     protected static final String VIEW_PAY_TOPAY_EXCEPTION = "payment.topay-exception";
-    
+
     //默认url的定义
     /** 支付异常页的url */
-    protected static String URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
-    
+    protected static String       URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
+
     //支付宝扫码模式 
-    /** 扫码支付-简约前置模式  */
-    private static final String QR_PAY_MODE_SIMPLE_FRONT = "0";
-    
-    /** 扫码支付-前置模式  */
-    private static final String QR_PAY_MODE_FRONT = "1";
-    
-    /** 扫码支付-迷你前置模式  */
-    private static final String QR_PAY_MODE_MINI_FRONT = "3";
-    
-    /** 扫码支付-跳转模式  */
-    private static final String QR_PAY_MODE_REDIRECT = "2";
-    
+    /** 扫码支付-简约前置模式 */
+    private static final String   QR_PAY_MODE_SIMPLE_FRONT = "0";
+
+    /** 扫码支付-前置模式 */
+    private static final String   QR_PAY_MODE_FRONT        = "1";
+
+    /** 扫码支付-迷你前置模式 */
+    private static final String   QR_PAY_MODE_MINI_FRONT   = "3";
+
+    /** 扫码支付-跳转模式 */
+    private static final String   QR_PAY_MODE_REDIRECT     = "2";
+
     @Autowired
-	private SdkPaymentManager sdkPaymentManager;
-	
-	@Autowired
-	private OrderManager orderManager;
-	
-	@Autowired
-	private PaymentResolverType paymentResolverType;
-	
-	/**
-	 * 去往支付页面
-	 * <p>一般会进入第三方的支付平台页面（如，支付宝），或商城定义的支付页面（如，微信扫码支付）</p>
-	 * 
-	 * @RequestMapping(value = "/payment/toPay.htm")
-	 * 
-	 * @param memberDetails
-	 * @param subOrdinate
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-    public String toPay(
-    		@LoginMember MemberDetails memberDetails,
-    		@RequestParam(value = "subOrdinate") String subOrdinate, 
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-    	
-    	try {
-    		
-			//根据不同的支付方式准备url
-			return buildPayUrl(subOrdinate, memberDetails, getExtraData(), request, response, model);
-			
-		} catch (IllegalPaymentStateException e) {
-			
-			LOGGER.error(e.getMessage(), e);
-			
-			//去往支付异常页面
-			return "redirect:" + getToPayExceptionPageRedirect(subOrdinate);
-		}
-    	
-    }
+    private SdkPaymentManager     sdkPaymentManager;
+
+    @Autowired
+    private OrderManager          orderManager;
+
+    @Autowired
+    private PaymentResolverType   paymentResolverType;
+
     /**
-     * 支付所需要的额外参数
+     * 去往支付页面
+     * <p>
+     * 一般会进入第三方的支付平台页面（如，支付宝），或商城定义的支付页面（如，微信扫码支付）
+     * </p>
+     * 
+     * @RequestMapping(value = "/payment/toPay.htm")
+     * 
+     * @param memberDetails
+     * @param subOrdinate
+     * @param request
+     * @param response
+     * @param model
      * @return
      */
-    protected Map<String,Object> getExtraData(){
-    	
-    	Map<String,Object> extra = new HashMap<String,Object>();
-    	
-    	//支付宝扫码支付显示模式，默认跳转
-    	extra.put("qrPayMode", QR_PAY_MODE_REDIRECT);
-    	
-    	return extra;
+    public String toPay(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "subOrdinate") String subOrdinate,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
+
+        try{
+
+            //根据不同的支付方式准备url
+            return buildPayUrl(subOrdinate, memberDetails, getExtraData(), request, response, model);
+
+        }catch (IllegalPaymentStateException e){
+
+            LOGGER.error(e.getMessage(), e);
+
+            //去往支付异常页面
+            return "redirect:" + getToPayExceptionPageRedirect(subOrdinate);
+        }
+
     }
-    
+
+    /**
+     * <pre>
+     *  设置支付所需要的额外参数，设置初始化参数 如果有需要需要重写该方法
+     * 
+     *  1： 当设置支付宝扫码支付模式qrPayMode为0或1或3（扫码支付方式为订单码-简约前置模式或订单码-前置模式或订单码-迷你前置模式）的情况下，
+     *  同步通知地址return_url需要传入商户中间跳转页面，即该页面需要实现让父页面自行跳转的功能，
+     *  中间页面javascript代码：<script>window.parent.location.href='父页面调整的URL';</script>
+     *   
+     *  2：目前仅仅需要用到上面这个参数……
+     * 
+     * </pre>
+     * 
+     * @return
+     */
+    protected Map<String, Object> getExtraData(){
+
+        Map<String, Object> extra = new HashMap<String, Object>();
+
+        //默认即时到账，非扫码
+        extra.put("qrPayMode", null);
+
+        return extra;
+    }
+
     /**
      * 支付完成的前台通知
      * 
@@ -149,25 +165,24 @@ public class NebulaPaymentController extends NebulaBasePaymentController {
      * 
      * @return
      */
-    public String doPayReturn(@PathVariable("payType") String payType, 
-    		HttpServletRequest request, HttpServletResponse response, Model model) {
-	   try {
-			
-			if(LOGGER.isDebugEnabled()){
-				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
-		    }
-			
-			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
-			
-			return paymentResolver.doPayReturn(request, response, payType, getDevice(request));
-			
-		} catch (IllegalPaymentStateException e) {
-			LOGGER.error(e.getMessage(), e);
-			//去往支付异常页面
-			return "redirect:" + getToPayExceptionPageRedirect(e.getSubordinate());
-		}
+    public String doPayReturn(@PathVariable("payType") String payType,HttpServletRequest request,HttpServletResponse response,Model model){
+        try{
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("[PAY_NOTIFY] {}", RequestUtil.getRequestURL(request));
+            }
+
+            PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+
+            return paymentResolver.doPayReturn(request, response, payType, getDevice(request));
+
+        }catch (IllegalPaymentStateException e){
+            LOGGER.error(e.getMessage(), e);
+            //去往支付异常页面
+            return "redirect:" + getToPayExceptionPageRedirect(e.getSubordinate());
+        }
     }
-    
+
     /**
      * 支付完成的后台通知
      * 
@@ -177,25 +192,24 @@ public class NebulaPaymentController extends NebulaBasePaymentController {
      * @param request
      * @param response
      */
-    public void doPayNotify(@PathVariable("payType") String payType,
-    		HttpServletRequest request, HttpServletResponse response) {
-    	
-    	try {
-  			
-  			if(LOGGER.isDebugEnabled()){
-  				LOGGER.debug("[PAY_NOTIFY] {}",RequestUtil.getRequestURL(request));
-  		    }
-  			
-  			PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
-  			
-  			paymentResolver.doPayNotify(request, response, payType, getDevice(request));
-  			
-  		} catch (IllegalPaymentStateException | IOException e) {
-  			LOGGER.error(e.getMessage(), e);
-  		}
+    public void doPayNotify(@PathVariable("payType") String payType,HttpServletRequest request,HttpServletResponse response){
+
+        try{
+
+            if (LOGGER.isDebugEnabled()){
+                LOGGER.debug("[PAY_NOTIFY] {}", RequestUtil.getRequestURL(request));
+            }
+
+            PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
+
+            paymentResolver.doPayNotify(request, response, payType, getDevice(request));
+
+        }catch (IllegalPaymentStateException | IOException e){
+            LOGGER.error(e.getMessage(), e);
+        }
 
     }
-    
+
     /**
      * 支付成功页面
      * 
@@ -209,36 +223,38 @@ public class NebulaPaymentController extends NebulaBasePaymentController {
      * @return
      */
     public String showPaySuccess(
-    		@LoginMember MemberDetails memberDetails,
-    		@RequestParam(value = "subOrdinate") String subOrdinate, 
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-    	
-	    PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
-    	
-		if (Validator.isNotNullOrEmpty(pc)) {
-			Map<String, Object> paraMap = new HashMap<String, Object>();
-			paraMap.put("subOrdinate", subOrdinate);
-			// 查询订单的需要支付的payInfolog
-			List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "subOrdinate") String subOrdinate,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
 
-			Set<Long> set = new HashSet<Long>();
-			StringBuffer orderCode = new StringBuffer();
-			for (PayInfoLog payInfoLog : payInfoLogs) {
-				set.add(payInfoLog.getOrderId());
-			}
+        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
-			for (Long oid : set) {
-				SalesOrderCommand so = orderManager.findOrderById(oid, null);
-				orderCode.append(so.getCode()).append("、");
-			}
+        if (Validator.isNotNullOrEmpty(pc)){
+            Map<String, Object> paraMap = new HashMap<String, Object>();
+            paraMap.put("subOrdinate", subOrdinate);
+            // 查询订单的需要支付的payInfolog
+            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
 
-			model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
+            Set<Long> set = new HashSet<Long>();
+            StringBuffer orderCode = new StringBuffer();
+            for (PayInfoLog payInfoLog : payInfoLogs){
+                set.add(payInfoLog.getOrderId());
+            }
 
-			model.addAttribute("totalFee", pc.getPayMoney());
-		}
-    	return VIEW_PAY_SUCCESS;
+            for (Long oid : set){
+                SalesOrderCommand so = orderManager.findOrderById(oid, null);
+                orderCode.append(so.getCode()).append("、");
+            }
+
+            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
+
+            model.addAttribute("totalFee", pc.getPayMoney());
+        }
+        return VIEW_PAY_SUCCESS;
     }
-    
+
     /**
      * 支付失败页面
      * 
@@ -252,13 +268,15 @@ public class NebulaPaymentController extends NebulaBasePaymentController {
      * @return
      */
     public String showPayFailure(
-    		@LoginMember MemberDetails memberDetails,
-    		@RequestParam(value = "subOrdinate") String subOrdinate, 
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-    	
-    	return VIEW_PAY_FAILURE;
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "subOrdinate") String subOrdinate,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
+
+        return VIEW_PAY_FAILURE;
     }
-    
+
     /**
      * 发起支付异常页面
      * 
@@ -272,62 +290,73 @@ public class NebulaPaymentController extends NebulaBasePaymentController {
      * @return
      */
     public String showToPayException(
-    		@LoginMember MemberDetails memberDetails,
-    		@RequestParam(value = "subOrdinate") String subOrdinate, 
-			HttpServletRequest request, HttpServletResponse response, Model model) {
-    	
-    	return VIEW_PAY_TOPAY_EXCEPTION;
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "subOrdinate") String subOrdinate,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
+
+        return VIEW_PAY_TOPAY_EXCEPTION;
     }
-    
-    protected String buildPayUrl(String subOrdinate, MemberDetails memberDetails, Map<String,Object> extra, HttpServletRequest request, HttpServletResponse response, Model model) 
-			throws IllegalPaymentStateException {
-		//根据流水号查询未支付订单信息
-		List<PayInfoLog> unpaidPayInfoLogs = getUnpaidPayInfoLogsBySubOrdinate(subOrdinate);
-		
-		if(Validator.isNullOrEmpty(unpaidPayInfoLogs)) {
-			//支付信息不存在或已支付
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID, "支付信息不存在或已支付");
-		}
-		
-		//如果找到多条，只取第一条
-		PayInfoLog payInfoLog = unpaidPayInfoLogs.get(0);
-		SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 1);
-		
-		//校验订单是否存在、取消、已支付
-		if(validateSalesOrderStatus(salesOrder)) {
-			PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-			return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * 验证订单的状态
-	 * 
-	 */
-	protected boolean validateSalesOrderStatus(SalesOrderCommand salesOrder) throws IllegalPaymentStateException {
-		//订单不存在
-		if (Validator.isNullOrEmpty(salesOrder) || Validator.isNullOrEmpty(salesOrder.getId())
-				|| Validator.isNullOrEmpty(salesOrder.getCode())) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_NOT_EXISTS);
-		} else {
-			//订单已取消
-			if (SalesOrder.SALES_ORDER_STATUS_CANCELED.equals(salesOrder.getLogisticsStatus())
-					|| SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED.equals(salesOrder.getLogisticsStatus())) {
-				throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_CANCLED);
+
+    protected String buildPayUrl(
+                    String subOrdinate,
+                    MemberDetails memberDetails,
+                    Map<String, Object> extra,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model) throws IllegalPaymentStateException{
+        //根据流水号查询未支付订单信息
+        List<PayInfoLog> unpaidPayInfoLogs = getUnpaidPayInfoLogsBySubOrdinate(subOrdinate);
+
+        if (Validator.isNullOrEmpty(unpaidPayInfoLogs)){
+            //支付信息不存在或已支付
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID, "支付信息不存在或已支付");
+        }
+
+        //如果找到多条，只取第一条
+        PayInfoLog payInfoLog = unpaidPayInfoLogs.get(0);
+        SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 1);
+
+        //校验订单是否存在、取消、已支付
+        if (validateSalesOrderStatus(salesOrder)){
+            PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
+            return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
+        }
+
+        return null;
+    }
+
+    /**
+     * 验证订单的状态
+     * 
+     */
+    protected boolean validateSalesOrderStatus(SalesOrderCommand salesOrder) throws IllegalPaymentStateException{
+        //订单不存在
+        if (Validator.isNullOrEmpty(salesOrder) || Validator.isNullOrEmpty(salesOrder.getId())
+                        || Validator.isNullOrEmpty(salesOrder.getCode())){
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_NOT_EXISTS);
+        }else{
+            //订单已取消
+            if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_CANCELED, salesOrder.getLogisticsStatus())
+                            || Objects.equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED, salesOrder.getLogisticsStatus())){
+                throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_CANCLED);
+            }
+            //订单已支付
+            else if (Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, salesOrder.getFinancialStatus())){
+                throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
+            }
+			//其它的不能支付状态（不是新建状态，也不是已同步OMS状态）
+			else if (!Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, salesOrder.getLogisticsStatus())
+                    && !Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, salesOrder.getLogisticsStatus())) {
+				throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
 			}
-			//订单已支付
-			if (SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT.equals(salesOrder.getFinancialStatus())) {
-				throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
-			}
-		}
-		
-		return true;
-	}
-	
-	protected String getToPayExceptionPageRedirect(String subOrdinate) {
-		return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
-	}
-	
+        }
+
+        return true;
+    }
+
+    protected String getToPayExceptionPageRedirect(String subOrdinate){
+        return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
+    }
 }
