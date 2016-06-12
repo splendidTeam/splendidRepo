@@ -27,47 +27,5 @@ import com.feilong.servlet.http.RequestUtil;
 
 public abstract class BasePaymentResolver {
 	
-    /** 支付成功页面. */
-    protected static final String URL_PAY_SUCCESS = "/payment/success.htm";
-    
-    /** 支付失败页面. */
-    protected static final String URL_PAY_FAILURE = "/payment/failure.htm";
 	
-	
-	/**
-	 * 获取支付信息
-	 * @param bankCode
-	 * @param payType
-	 * @return
-	 */
-	protected OnLinePaymentCommand getOnLinePaymentCommand(String bankCode, Integer payType, String itBPay, String qrPayMode, HttpServletRequest request) {
-		OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
-		onLinePaymentCommand.setBankCode(bankCode);
-		onLinePaymentCommand.setCustomerIp(RequestUtil.getClientIp(request));
-		onLinePaymentCommand.setPayTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
-		onLinePaymentCommand.setItBPay(itBPay);
-		if (payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V) {
-			onLinePaymentCommand.setIsInternationalCard(true);
-		} else {
-			onLinePaymentCommand.setIsInternationalCard(false);
-		}
-		onLinePaymentCommand.setPayType(payType);
-		//onLinePaymentCommand.setQrPayMode(qrPayMode);
-		return onLinePaymentCommand;
-	}
-	
-	/**
-	 * 
-	 * @param subOrdinate
-	 * @return
-	 */
-	protected String getPaySuccessPageRedirect(String subOrdinate) {
-		return URL_PAY_SUCCESS + "?subOrdinate=" + subOrdinate;
-	}
-	
-	protected String getPayFailurePageRedirect(String subOrdinate) {
-		return URL_PAY_FAILURE + "?subOrdinate=" + subOrdinate;
-	}
-	
-
 }

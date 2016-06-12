@@ -1,6 +1,7 @@
 package com.baozun.nebula.web.controller.payment.resolver;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
+import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
@@ -29,6 +31,7 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
+import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
@@ -141,7 +144,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
                     response.sendRedirect(url);
                 }catch (IOException e){
                     e.printStackTrace();
-                }
+                } 
             }
         }
 
@@ -149,8 +152,8 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     }
 
     @Override
-    public String doPayReturn(HttpServletRequest request,HttpServletResponse response,String payType,Device device)
-                    throws IllegalPaymentStateException{
+    public String doPayReturn(String payType, Device device, String paySuccessRedirect, String payFailureRedirect, 
+    		HttpServletRequest request, HttpServletResponse response) throws IllegalPaymentStateException{
         String subOrdinate = request.getParameter("out_trade_no");
 
         LOGGER.info("[DO_PAY_RETURN] get sync notifications before , subOrdinate: {}", subOrdinate);
@@ -176,7 +179,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         }
         if (null == paymentResult){
             // 返回失败
-            return "redirect:" + getPayFailurePageRedirect(subOrdinate);
+            return "redirect:" + payFailureRedirect;
         }
         LOGGER.info("[DO_PAY_RETURN] sync notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 
@@ -189,15 +192,15 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         }else{
             // 获取通知失败或其他情况
             payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_RETURN_AFTER_TYPE);
-            return "redirect:" + getPayFailurePageRedirect(subOrdinate);
+            return "redirect:" + payFailureRedirect;
         }
 
-        return "redirect:" + getPaySuccessPageRedirect(subOrdinate);
+        return "redirect:" + paySuccessRedirect;
     }
 
     @Override
-    public void doPayNotify(HttpServletRequest request,HttpServletResponse response,String payType,Device device)
-                    throws IllegalPaymentStateException,IOException{
+    public void doPayNotify(String payType,Device device, HttpServletRequest request, 
+    		HttpServletResponse response) throws IllegalPaymentStateException,IOException{
         String subOrdinate = request.getParameter("out_trade_no");
 
         LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
@@ -275,6 +278,28 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
             }
         }
     }
+    
+    /**
+	 * 获取支付信息
+	 * @param bankCode
+	 * @param payType
+	 * @return
+	 */
+	protected OnLinePaymentCommand getOnLinePaymentCommand(String bankCode, Integer payType, String itBPay, String qrPayMode, HttpServletRequest request) {
+		OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
+		onLinePaymentCommand.setBankCode(bankCode);
+		onLinePaymentCommand.setCustomerIp(RequestUtil.getClientIp(request));
+		onLinePaymentCommand.setPayTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+		onLinePaymentCommand.setItBPay(itBPay);
+		if (payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V) {
+			onLinePaymentCommand.setIsInternationalCard(true);
+		} else {
+			onLinePaymentCommand.setIsInternationalCard(false);
+		}
+		onLinePaymentCommand.setPayType(payType);
+		//onLinePaymentCommand.setQrPayMode(qrPayMode);
+		return onLinePaymentCommand;
+	}
 
     /**
      * @param responseStatus

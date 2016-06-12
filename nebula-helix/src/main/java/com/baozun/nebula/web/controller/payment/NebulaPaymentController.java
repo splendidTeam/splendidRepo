@@ -73,7 +73,13 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
     //默认url的定义
     /** 支付异常页的url */
-    protected static String       URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
+    protected static final String URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
+    
+    /** 支付成功页面. */
+    protected static final String URL_PAY_SUCCESS_PAGE     = "/payment/success.htm";
+    
+    /** 支付失败页面. */
+    protected static final String URL_PAY_FAILURE_PAGE     = "/payment/failure.htm";
 
     //支付宝扫码模式 
     /** 扫码支付-简约前置模式 */
@@ -129,7 +135,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
             LOGGER.error(e.getMessage(), e);
 
             //去往支付异常页面
-            return "redirect:" + getToPayExceptionPageRedirect(subOrdinate);
+            return "redirect:" + getToPayExceptionPageRedirect() + "?subOrdinate=" + subOrdinate;
         }
 
     }
@@ -165,7 +171,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
      * 
      * @return
      */
-    public String doPayReturn(@PathVariable("payType") String payType,HttpServletRequest request,HttpServletResponse response,Model model){
+    public String doPayReturn(@PathVariable("payType") String payType, HttpServletRequest request,HttpServletResponse response, Model model){
         try{
 
             if (LOGGER.isDebugEnabled()){
@@ -174,12 +180,12 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
             PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
 
-            return paymentResolver.doPayReturn(request, response, payType, getDevice(request));
+            return paymentResolver.doPayReturn(payType, getDevice(request), getPaySuccessRedirect(), getPayFailureRedirect(), request, response);
 
-        }catch (IllegalPaymentStateException e){
+        } catch (IllegalPaymentStateException e){
             LOGGER.error(e.getMessage(), e);
             //去往支付异常页面
-            return "redirect:" + getToPayExceptionPageRedirect(e.getSubordinate());
+            return "redirect:" + getToPayExceptionPageRedirect() + "?subOrdinate=" + e.getSubOrdinate();
         }
     }
 
@@ -202,7 +208,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
             PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
 
-            paymentResolver.doPayNotify(request, response, payType, getDevice(request));
+            paymentResolver.doPayNotify(payType, getDevice(request), request, response);
 
         }catch (IllegalPaymentStateException | IOException e){
             LOGGER.error(e.getMessage(), e);
@@ -347,16 +353,26 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                 throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
             }
 			//其它的不能支付状态（不是新建状态，也不是已同步OMS状态）
-			else if (!Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, salesOrder.getLogisticsStatus())
-                    && !Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, salesOrder.getLogisticsStatus())) {
-				throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
-			}
+            else if (!Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, salesOrder.getLogisticsStatus())
+                            && !Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, salesOrder.getLogisticsStatus())) {
+                throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
+            }
         }
 
         return true;
     }
 
-    protected String getToPayExceptionPageRedirect(String subOrdinate){
-        return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
+    protected String getToPayExceptionPageRedirect(){
+        return URL_TOPAY_EXCEPTION_PAGE;
     }
+    
+	protected String getPaySuccessRedirect() {
+			//return URL_PAY_SUCCESS_PAGE + "?subOrdinate=" + subOrdinate;
+		return URL_PAY_SUCCESS_PAGE;
+	}
+	
+	protected String getPayFailureRedirect() {
+			//return URL_PAY_FAILURE_PAGE + "?subOrdinate=" + subOrdinate;
+		return URL_PAY_FAILURE_PAGE;
+	}
 }
