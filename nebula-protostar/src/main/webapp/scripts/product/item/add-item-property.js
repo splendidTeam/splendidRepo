@@ -1354,7 +1354,7 @@ $j(document).ready(function(){
 	}
 	
 	// 添加商品属性表单验证方法
-	var baseInfoValidator = new FormValidator('', 30, function(){
+	var propertyValidator = new FormValidator('', 30, function(){
 		
 		//判断非销售属性复选框必选
 		var att ="";
@@ -1433,5 +1433,5 @@ $j(document).ready(function(){
     	
     	return loxia.SUCCESS;
     });
-    formValidateList.push(baseInfoValidator);
+    formValidateList.push(propertyValidator);
 });

@@ -33,7 +33,7 @@ $j(document).ready(function(){
 	}
 	
 	// 添加商品描述表单验证方法
-	var baseInfoValidator = new FormValidator('', 100, function(){
+	var descriptionValidator = new FormValidator('', 100, function(){
 		
 		// 填充商品描述字段隐藏域
 		if(i18nOnOff){
@@ -52,5 +52,5 @@ $j(document).ready(function(){
     	
     	return loxia.SUCCESS;
     });
-    formValidateList.push(baseInfoValidator);
+    formValidateList.push(descriptionValidator);
 });

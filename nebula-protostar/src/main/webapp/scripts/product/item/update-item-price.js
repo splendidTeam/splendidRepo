@@ -59,7 +59,7 @@ function unique(data){
 
 $j(document).ready(function(){
 	// 添加商品价格表单验证方法
-	var baseInfoValidator = new FormValidator('', 30, function(){
+	var priceValidator = new FormValidator('', 30, function(){
 		
 		// 验证商品的吊牌价、销售价设置是否与sku的吊牌价、销售价一致
 		// 由于获取sku价格的必要条件是销售属性extentionCode验证通过，
@@ -112,5 +112,5 @@ $j(document).ready(function(){
     	
     	return loxia.SUCCESS;
     });
-    formValidateList.push(baseInfoValidator);
+    formValidateList.push(priceValidator);
 });
