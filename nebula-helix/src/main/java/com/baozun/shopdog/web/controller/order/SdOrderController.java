@@ -26,7 +26,9 @@
 package com.baozun.shopdog.web.controller.order;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.constants.MetaInfoConstants;
 import com.baozun.nebula.manager.system.MataInfoManager;
+import com.baozun.nebula.model.member.MemberGroup;
+import com.baozun.nebula.model.member.MemberGroupRelation;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
@@ -47,6 +51,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
+import com.baozun.nebula.utilities.library.address.Address;
+import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
@@ -55,7 +61,9 @@ import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogOrderParamComm
 import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogSettlementCommand;
 import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogSkusCommand;
 import com.baozun.shopdog.web.controller.payment.AbstractSdPaymentController;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.util.CollectionsUtil;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
@@ -102,10 +110,29 @@ public class SdOrderController implements AbstractSdOrderController {
         // 封装订单信息
         SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
         PropertyUtil.copyProperties(salesOrderCommand, shopdogOrderParamCommand, "countryId", "provinceId", "cityId", "areaId", "townId", "postcode", "mobile", "email");
+
+        // 地址名称
+        Address country = AddressUtil.getAddressById(shopdogOrderParamCommand.getCountryId());
+        Address province = AddressUtil.getAddressById(shopdogOrderParamCommand.getProvinceId());
+        Address city = AddressUtil.getAddressById(shopdogOrderParamCommand.getCityId());
+        Address area = AddressUtil.getAddressById(shopdogOrderParamCommand.getAreaId());
+        Address town = AddressUtil.getAddressById(shopdogOrderParamCommand.getTownId());
+        salesOrderCommand.setCountry(country == null ? "" : country.getName());
+        salesOrderCommand.setProvince(province == null ? "" : province.getName());
+        salesOrderCommand.setCity(city == null ? "" : city.getName());
+        salesOrderCommand.setArea(area == null ? "" : area.getName());
+        salesOrderCommand.setTown(town == null ? "" : town.getName());
+        salesOrderCommand.setCountry(country == null ? "" : country.getName());
+        salesOrderCommand.setProvince(province == null ? "" : province.getName());
+        salesOrderCommand.setCity(city == null ? "" : city.getName());
+        salesOrderCommand.setArea(area == null ? "" : area.getName());
+        salesOrderCommand.setTown(town == null ? "" : town.getName());
+
         salesOrderCommand.setBuyerName(shopdogOrderParamCommand.getName());
         salesOrderCommand.setBuyerTel(shopdogOrderParamCommand.getMobile());
-        if(LOGGER.isInfoEnabled()){
-            LOGGER.info("创建订单所需的参数：ShopdogOrderParamCommand["+JsonUtil.format(shopdogOrderParamCommand)+"]");
+        salesOrderCommand.setName(shopdogOrderParamCommand.getName());
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("创建订单所需的参数：ShopdogOrderParamCommand[" + JsonUtil.format(shopdogOrderParamCommand) + "]");
         }
         // 设置支付信息，1是支付宝支付，2微信支付
         if ("1".equals(shopdogOrderParamCommand.getPaymentType())) {
@@ -122,19 +149,47 @@ public class SdOrderController implements AbstractSdOrderController {
         MemberDetails memberDetails = null;
         if (null != shopdogOrderParamCommand.getMemberId()) {
             MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
-            salesOrderCommand.setMemberName(null != memberCommand ? memberCommand.getRealName() : "");
-            salesOrderCommand.setMemberId(null != memberCommand ? shopdogOrderParamCommand.getMemberId() : null);
-            
-            //用于会员下单使用
-            memberDetails = new MemberDetails();
-            memberDetails.setGroupId(null != memberCommand ? memberCommand.getGroupId() : null);
-            memberDetails.setMemberId(null != memberCommand ? shopdogOrderParamCommand.getMemberId() : null);
-            memberDetails.setLoginMobile(null != memberCommand ? memberCommand.getLoginMobile() : "");
-            memberDetails.setLoginName(null != memberCommand ? memberCommand.getLoginName() : "");
-            memberDetails.setLoginEmail(null != memberCommand ? memberCommand.getLoginEmail() : "");
-            memberDetails.setRealName(null != memberCommand ? memberCommand.getRealName() : "");
+            // 当会员信息存在的时候，用于会员下单使用。模拟会员登录之后初始化的memberDetails
+            if (memberCommand != null) {
+                memberDetails = new MemberDetails();
+                Long memberId = memberCommand.getId();
+                PropertyUtil.copyProperties(memberDetails, memberCommand);
+                memberDetails.setMemberId(memberId);
+                memberDetails.setNickName(memberCommand.getLoginName());
+
+                // 分组id
+                List<Long> groupIds = new ArrayList<Long>();
+
+                // 根据会员id查询出所属分组
+                List<MemberGroupRelation> memberGroupRelations = sdkMemberManager.findMemberGroupRelationListByMemberId(memberId);
+                if (Validator.isNotNullOrEmpty(memberGroupRelations)) {
+                    groupIds = CollectionsUtil.getPropertyValueList(memberGroupRelations, "groupId");
+                }
+
+                // 根据分组id批量查询会员分组的list
+                if (groupIds != null) {
+                    List<MemberGroup> groups = sdkMemberManager.findMemberGroupListByIds(groupIds);
+                    memberDetails.setGroups(groups);
+                }
+
+                // 根据会员ID，会员分组，获取会员组合的Id
+                Set<String> comboIds = new HashSet<String>();
+                comboIds = sdkMemberManager.getMemComboIdsByGroupIdMemberId(groupIds, memberId);
+                memberDetails.setMemComboList(comboIds);
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("创建订单所需会员的参数：memberDetails[" + JsonUtil.format(memberDetails) + "]");
+                }
+            }
+            // 用户信息
+            boolean isGuest = Validator.isNullOrEmpty(memberDetails);
+            String memberName = "";
+            if (!isGuest) {
+                memberName = Validator.isNullOrEmpty(memberDetails.getLoginEmail()) ? memberDetails.getLoginMobile() : memberDetails.getLoginEmail();
+            }
+            salesOrderCommand.setMemberName(memberName);
+            salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
+
         }
-        
         salesOrderCommand.setIp(RequestUtil.getClientIp(request));
         // 订单来源
         salesOrderCommand.setSource(SalesOrder.SO_SOURCE_SHOPDOG_NORMAL);
@@ -158,9 +213,11 @@ public class SdOrderController implements AbstractSdOrderController {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("shoppingCartCommand:" + JSON.toJSONString(shoppingCartCommand));
         }
-
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("创建订单所需的参数：salesOrderCommand[" + JsonUtil.format(salesOrderCommand) + "]");
+        }
         // 新建订单
-        String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, null, salesOrderCreateOptions);
+        String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memberDetails != null ? memberDetails.getMemComboList() : null, salesOrderCreateOptions);
 
         return createShopdogOrderCommand(request, salesOrderCommand.getName(), subOrdinate, String.valueOf(salesOrderCommand.getPayType()));
     }
