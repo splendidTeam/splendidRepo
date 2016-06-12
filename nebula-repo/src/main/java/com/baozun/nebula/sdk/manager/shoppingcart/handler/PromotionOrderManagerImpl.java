@@ -299,7 +299,7 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
             if (cartLine.isGift() || cartLine.isCaptionLine()){
                 continue;
             }
-            BigDecimal multiplyValue = NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice());
+            BigDecimal multiplyValue = NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice(),2);
             originPayAmount = originPayAmount.add(multiplyValue);
         }
         return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);

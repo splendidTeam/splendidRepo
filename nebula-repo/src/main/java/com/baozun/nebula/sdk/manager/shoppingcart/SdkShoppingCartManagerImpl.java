@@ -360,7 +360,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         for (ShoppingCartLineCommand cartLine : shoppingCartLines){
             if (cartLine.isGift() || cartLine.isCaptionLine())
                 continue;
-            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice()));
+            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice(),2));
         }
         return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }

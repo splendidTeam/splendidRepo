@@ -82,7 +82,7 @@ public abstract class AbstractShoppingCartLineCommandPackBehaviour implements Sh
 
         //XXX 购物车行 金额小计 这里貌似没有算促销
         shoppingCartLineCommand.setSubTotalAmt(
-                        NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice()));
+                        NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice(), 2));
     }
 
     /**

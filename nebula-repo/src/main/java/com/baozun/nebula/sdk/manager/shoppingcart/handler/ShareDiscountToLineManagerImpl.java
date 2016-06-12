@@ -79,7 +79,7 @@ public class ShareDiscountToLineManagerImpl implements ShareDiscountToLineManage
             // 购物车行小计
             BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
             Integer quantity = shoppingCartLineCommand.getQuantity();
-            BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice).subtract(discount);
+            BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice,2).subtract(discount);
             BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt;
 
             LOGGER.debug("salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}]", salePrice, quantity, discount, subTotalAmt);
