@@ -16,7 +16,6 @@ import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
 import com.baozun.nebula.exception.IllegalPaymentStateException;
-import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.MataInfo;
@@ -28,7 +27,6 @@ import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
-import com.baozun.utilities.DateUtil;
 import com.feilong.servlet.http.RequestUtil;
 
 public class WechatPaymentResolver implements PaymentResolver {
@@ -120,7 +118,8 @@ public class WechatPaymentResolver implements PaymentResolver {
         
         //trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。
         if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(tradeType)) {
-        	wechatPayParamCommand.setOpenid(openId);
+        	//TODO
+        	wechatPayParamCommand.setOpenid("");
         }
         
         //trade_type=NATIVE，此参数必传。此id为二维码中包含的商品ID，商户自行定义。
@@ -151,7 +150,7 @@ public class WechatPaymentResolver implements PaymentResolver {
 	 * @return
 	 * @throws IllegalPaymentStateException
 	 */
-	private String getPayExpireTime(Date orderCreateDate) throws IllegalPaymentStateException {
+	private String getPayExpireTime(Date orderCreateDate) {
 		String payExpiryMinute = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
 		
 		if (payExpiryMinute != null) {

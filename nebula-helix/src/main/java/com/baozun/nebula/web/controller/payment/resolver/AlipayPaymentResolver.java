@@ -22,9 +22,11 @@ import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
+import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
@@ -64,6 +66,9 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 
     @Autowired
     private EventPublisher      eventPublisher;
+    
+    @Autowired
+	private MataInfoManager     mataInfoManager;
 
     @Override
     public String buildPayUrl(
@@ -290,6 +295,28 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
                                         SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT,
                                         financialStatus);
     }
+    
+    /**
+	 * 获取过期时间
+	 * @param orderCreateDate
+	 * @return
+	 * @throws IllegalPaymentStateException
+	 */
+	private String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
+		String payExpiryTime = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
+		Date now = new Date();
+		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  
+		if (payExpiryTime == null) {
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
+		}
+		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
+		if (itBPay <= 0L) {
+			return "0m";
+		} else {
+			return itBPay.toString() + "m";
+		}
+	}
+    
 
     //TODO
     //注意这里的paytype要设置成
