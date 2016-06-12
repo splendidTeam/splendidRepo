@@ -52,7 +52,7 @@ public class MemberAddressFormValidator implements Validator {
 			}
 			if (com.feilong.core.Validator.isNotNullOrEmpty(memberAddressForm.getTelphone())) {	
 				if (!RegexUtil.matches(RegexPattern.TELEPHONE,memberAddressForm.getTelphone().trim())) {
-					errors.rejectValue("telephone", "memberaddress.telephone.error");
+					errors.rejectValue("telphone", "memberaddress.telephone.error");
 				}	
 			}
 			if (com.feilong.core.Validator.isNotNullOrEmpty(memberAddressForm.getPostcode())) {
