@@ -343,9 +343,14 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                 throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_CANCLED);
             }
             //订单已支付
-            if (Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, salesOrder.getFinancialStatus())){
+            else if (Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, salesOrder.getFinancialStatus())){
                 throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
             }
+			//其它的不能支付状态（不是新建状态，也不是已同步OMS状态）
+			else if (!Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, salesOrder.getLogisticsStatus())
+                    && !Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, salesOrder.getLogisticsStatus())) {
+				throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
+			}
         }
 
         return true;
@@ -354,5 +359,4 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     protected String getToPayExceptionPageRedirect(String subOrdinate){
         return URL_TOPAY_EXCEPTION_PAGE + "?subOrdinate=" + subOrdinate;
     }
-
 }
