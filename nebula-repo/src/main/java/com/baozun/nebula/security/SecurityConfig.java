@@ -49,7 +49,11 @@ public class SecurityConfig {
 	 * @param ignoreParameters the ignoreParameters to set
 	 */
 	public void setIgnoreParameters(Set<String> ignoreParameters) {
-		SecurityConfig.ignoreParameters = ignoreParameters;
+		if(SecurityConfig.ignoreParameters != null && !SecurityConfig.ignoreParameters.isEmpty()) {
+			SecurityConfig.ignoreParameters.addAll(ignoreParameters);
+		} else {
+			SecurityConfig.ignoreParameters = ignoreParameters;
+		}
 	}
 	
 	public List<String> getWhiteList() {
