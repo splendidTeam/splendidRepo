@@ -171,6 +171,8 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
      * @return the order line
      */
     private OrderLine buildOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
+        boolean isGift = shoppingCartLineCommand.isGift();
+
         OrderLine orderLine = new OrderLine();
         // 订单id
         orderLine.setOrderId(orderId);
@@ -190,21 +192,10 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
         // 商品主图
         orderLine.setItemPic(shoppingCartLineCommand.getItemPic());
         //******************************************************************************************
-        // 原销售单价
-        orderLine.setMSRP(shoppingCartLineCommand.getListPrice());
-        // 现销售单价
-        BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
-        orderLine.setSalePrice(salePrice);
-        // 行小计
-        orderLine.setSubtotal(shoppingCartLineCommand.getSubTotalAmt());
-        // 折扣、行类型
-        if (shoppingCartLineCommand.isGift()){
-            orderLine.setDiscount(salePrice);
-            orderLine.setType(ItemInfo.TYPE_GIFT);
-        }else{
-            orderLine.setDiscount(shoppingCartLineCommand.getDiscount());
-            orderLine.setType(ItemInfo.TYPE_MAIN);
-        }
+
+        //设置价格信息
+        setPrice(orderLine, shoppingCartLineCommand, isGift);
+        orderLine.setType(isGift ? ItemInfo.TYPE_GIFT : ItemInfo.TYPE_MAIN);
 
         // 销售属性信息
         orderLine.setSaleProperty(shoppingCartLineCommand.getSaleProperty());
@@ -222,5 +213,28 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
 
         orderLine.setVersion(new Date());
         return orderLine;
+    }
+
+    /**
+     * 设置 price.
+     *
+     * @param orderLine
+     *            the order line
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @param isGift
+     *            the is gift
+     * @since 5.3.1
+     */
+    private void setPrice(OrderLine orderLine,ShoppingCartLineCommand shoppingCartLineCommand,boolean isGift){
+        // 原销售单价
+        orderLine.setMSRP(shoppingCartLineCommand.getListPrice());
+        // 现销售单价
+        BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
+        orderLine.setSalePrice(salePrice);
+        // 行小计
+        orderLine.setSubtotal(shoppingCartLineCommand.getSubTotalAmt());
+        // 折扣、行类型
+        orderLine.setDiscount(isGift ? salePrice : shoppingCartLineCommand.getDiscount());
     }
 }

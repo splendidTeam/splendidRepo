@@ -46,250 +46,248 @@ import com.baozun.nebula.model.BaseModel;
 public class SalesOrder extends BaseModel{
 
     /** The Constant serialVersionUID. */
-    private static final long   serialVersionUID                             = 8864498764122811848L;
+    private static final long  serialVersionUID                             = 8864498764122811848L;
 
     /** 1新建. */
-    public static final Integer SALES_ORDER_STATUS_NEW                       = 1;
+    public static final int    SALES_ORDER_STATUS_NEW                       = 1;
 
     /** 3 已同步oms. */
-    public static final Integer SALES_ORDER_STATUS_TOOMS                     = 3;
+    public static final int    SALES_ORDER_STATUS_TOOMS                     = 3;
 
     /** 4 库存已确认. */
-    public static final Integer SALES_ORDER_STATUS_CONFIRMED                 = 4;
+    public static final int    SALES_ORDER_STATUS_CONFIRMED                 = 4;
 
     /** 5 库房准备中. */
-    public static final Integer SALES_ORDER_STATUS_WH_HANDLING               = 5;
+    public static final int    SALES_ORDER_STATUS_WH_HANDLING               = 5;
 
     /** 6 在途. */
-    public static final Integer SALES_ORDER_STATUS_DELIVERIED                = 6;
+    public static final int    SALES_ORDER_STATUS_DELIVERIED                = 6;
 
     /** 9 会员取消. */
-    public static final Integer SALES_ORDER_STATUS_CANCELED                  = 9;
+    public static final int    SALES_ORDER_STATUS_CANCELED                  = 9;
 
     /** 10 商城取消. */
-    public static final Integer SALES_ORDER_STATUS_SYS_CANCELED              = 10;
+    public static final int    SALES_ORDER_STATUS_SYS_CANCELED              = 10;
 
     /** 15 交易完成. */
-    public static final Integer SALES_ORDER_STATUS_FINISHED                  = 15;
+    public static final int    SALES_ORDER_STATUS_FINISHED                  = 15;
 
     // so finance status
     /** 财务状态:未收款 1. */
-    public static final Integer SALES_ORDER_FISTATUS_NO_PAYMENT              = 1;
+    public static final int    SALES_ORDER_FISTATUS_NO_PAYMENT              = 1;
 
     /** 财务状态:货到付款 2. */
-    public static final Integer SALES_ORDER_FISTATUS_COD                     = 2;
+    public static final int    SALES_ORDER_FISTATUS_COD                     = 2;
 
     /** 财务状态:已全额收款 3. */
-    public static final Integer SALES_ORDER_FISTATUS_FULL_PAYMENT            = 3;
+    public static final int    SALES_ORDER_FISTATUS_FULL_PAYMENT            = 3;
 
     /** 财务状态:已部分收款4. */
-    public static final Integer SALES_ORDER_FISTATUS_PART_PAYMENT            = 4;
+    public static final int    SALES_ORDER_FISTATUS_PART_PAYMENT            = 4;
 
     /** 1 货到付款. */
-    public static final String  SO_PAYMENT_TYPE_COD                          = "1";
+    public static final String SO_PAYMENT_TYPE_COD                          = "1";
 
     /** 2 银行电汇. */
-    public static final String  SO_PAYMENT_TYPE_TELETRANSFER                 = "2";
+    public static final String SO_PAYMENT_TYPE_TELETRANSFER                 = "2";
 
     /** 3 网银在线. */
-    public static final String  SO_PAYMENT_TYPE_NETPAY                       = "3";
+    public static final String SO_PAYMENT_TYPE_NETPAY                       = "3";
 
     /** 4 微信支付. */
-    public static final String  SO_PAYMENT_TYPE_WECHAT                       = "4";
+    public static final String SO_PAYMENT_TYPE_WECHAT                       = "4";
 
     /** 6 支付宝. */
-    public static final String  SO_PAYMENT_TYPE_ALIPAY                       = "6";
+    public static final String SO_PAYMENT_TYPE_ALIPAY                       = "6";
 
     /** 7 快钱. */
-    public static final String  SO_PAYMENT_TYPE_99BILL                       = "7";
+    public static final String SO_PAYMENT_TYPE_99BILL                       = "7";
 
     /** 10 预付卡 只有全额抵扣才会设置此种支付类型. */
-    public static final String  SO_PAYMENT_TYPE_PREPAID_CARD                 = "10";
+    public static final String SO_PAYMENT_TYPE_PREPAID_CARD                 = "10";
 
     /** 11 财付通. */
-    public static final String  SO_PAYMENT_TYPE_TENPAY                       = "300";
+    public static final String SO_PAYMENT_TYPE_TENPAY                       = "300";
 
     /** 12 外部积分兑换. */
-    public static final String  SO_PAYMENT_TYPE_EXTERNAL_POINT               = "12";
+    public static final String SO_PAYMENT_TYPE_EXTERNAL_POINT               = "12";
 
     /** 新华一成卡. */
-    public static final String  SO_PAYMENT_TYPE_XINHUA_CARD                  = "104";
+    public static final String SO_PAYMENT_TYPE_XINHUA_CARD                  = "104";
 
     /** LEVIS淘宝B2C－支付宝. */
-    public static final String  SO_PAYMENT_TYPE_LEVIS_ALIPAY_B2C             = "108";
+    public static final String SO_PAYMENT_TYPE_LEVIS_ALIPAY_B2C             = "108";
 
     /** 百付宝（汇付天下）. */
-    public static final String  SO_PAYMENT_TYPE_BAIFUBAO                     = "200";
+    public static final String SO_PAYMENT_TYPE_BAIFUBAO                     = "200";
 
     /** 现金收款. */
-    public static final String  SO_PAYMENT_TYPE_SASH                         = "9";
+    public static final String SO_PAYMENT_TYPE_SASH                         = "9";
 
     /** 14 信用卡-支付宝. */
-    public static final String  SO_PAYMENT_TYPE_ALIPAY_CREDIT                = "14";
+    public static final String SO_PAYMENT_TYPE_ALIPAY_CREDIT                = "14";
 
     /** 18支付宝-快捷支付网关接口. */
-    public static final String  SO_PAYMENT_TYPE_ALIPAY_EXPRESS               = "18";
+    public static final String SO_PAYMENT_TYPE_ALIPAY_EXPRESS               = "18";
 
     /** 支付宝信用卡分期付款. */
-    public static final String  SO_PAYMENT_TYPE_ALIPAY_GREDITCARDINSTALLMENT = "19";
+    public static final String SO_PAYMENT_TYPE_ALIPAY_GREDITCARDINSTALLMENT = "19";
 
     /** 零元购. */
-    public static final String  SO_PAYMENT_TYPE_ZERO_PURCHASE                = "20";
+    public static final String SO_PAYMENT_TYPE_ZERO_PURCHASE                = "20";
 
     /** 320 银联支付. */
-    public static final String  SO_PAYMENT_TYPE_UNIONPAY                     = "320";
+    public static final String SO_PAYMENT_TYPE_UNIONPAY                     = "320";
 
     /** 21 分期支付. */
-    public static final String  SO_PAYMENT_TYPE_PERIODS                      = "21";
+    public static final String SO_PAYMENT_TYPE_PERIODS                      = "21";
 
     /** 22 信用卡支付. */
-    public static final String  SO_PAYMENT_TYPE_CREDIT_CARD                  = "22";
+    public static final String SO_PAYMENT_TYPE_CREDIT_CARD                  = "22";
 
     /** 商城正常下单. */
-    public static final Integer SO_SOURCE_NORMAL                             = 1;
-    
+    public static final int    SO_SOURCE_NORMAL                             = 1;
+
     /** Shopdog正常下单. */
-    public static final Integer SO_SOURCE_SHOPDOG_NORMAL                       = 2;
-    
+    public static final int    SO_SOURCE_SHOPDOG_NORMAL                     = 2;
+
     /** 手机端正常下单. */
-    public static final Integer SO_SOURCE_MOBILE_NORMAL                      = 3;
+    public static final int    SO_SOURCE_MOBILE_NORMAL                      = 3;
 
     /** 订单类型 1-普通订单. */
-    public static final Integer NORMAL_ORDER                                 = 1;
+    public static final int    NORMAL_ORDER                                 = 1;
 
     /** 订单类型 2-预售订单. */
-    public static final Integer PRESALE_ORDER                                = 2;
+    public static final int    PRESALE_ORDER                                = 2;
 
     /** 支付类型 1-全额付款. */
-    public static final Integer Full_Payment                                 = 1;
+    public static final int    Full_Payment                                 = 1;
 
     /** 支付类型 2-分阶段付款. */
-    public static final Integer Phased_Payment                               = 2;
+    public static final int    Phased_Payment                               = 2;
 
     /** COD收款类型：现金. */
-    public static final Integer COD_TYPE_CASH                                = 1;
+    public static final int    COD_TYPE_CASH                                = 1;
 
     /** COD收款类型：刷卡. */
-    public static final Integer COD_TYPE_CARD                                = 2;
+    public static final int    COD_TYPE_CARD                                = 2;
 
     // -----------------------------------------------------------------
 
     /** PK. */
-    private Long                id;
+    private Long               id;
 
     /** 订单号. */
-    private String              code;
+    private String             code;
 
     /** OMS订单号. */
-    private String              omsCode;
+    private String             omsCode;
 
     /** 店铺id. */
-    private Long                shopId;
+    private Long               shopId;
 
     /** 会员id. */
-    private Long                memberId;
+    private Long               memberId;
 
     /** 会员名称. */
-    private String              memberName;
+    private String             memberName;
 
     /** 游客标识. */
-    private String              guestIdentify;
+    private String             guestIdentify;
 
     /** 订单类型 1-普通订单(默认), 2-预售订单. */
-    private Integer             orderType;
+    private Integer            orderType;
 
     /** 预计发货时间. */
-    private Date                appointShipDate;
+    private Date               appointShipDate;
 
     /** 支付类型 1-全额付款（默认）, 2-分阶段付款. */
-    private Integer             payType;
+    private Integer            payType;
 
     /** 商品总数量. */
-    private Integer             quantity;
+    private Integer            quantity;
 
     /** 总价 不含运费的客户端显示最终金额 总价+整单折扣=sum（行商品销售价X数量）. */
-    private BigDecimal          total;
+    private BigDecimal         total;
 
     /** 整单折扣 整单折扣-sum（行折扣）= 由于整单促销/商城积分形成的未分摊到行上的折扣总额. */
-    private BigDecimal          discount;
+    private BigDecimal         discount;
 
     /** 物流状态. */
-    private Integer             logisticsStatus;
+    private Integer            logisticsStatus;
 
     /** 财务状态. */
-    private Integer             financialStatus;
+    private Integer            financialStatus;
 
     /** 支付方式. */
-    private Integer             payment;
+    private Integer            payment;
 
     /** 订单来源. */
-    private Integer             source;
+    private Integer            source;
 
     /** 下单ip. */
-    private String              ip;
+    private String             ip;
 
     /** 应付运费. */
-    private BigDecimal          payableFreight;
+    private BigDecimal         payableFreight;
 
     /** 实付运费. */
-    private BigDecimal          actualFreight;
+    private BigDecimal         actualFreight;
 
     /** 物流单号 快递单号：当出库时会提供. */
-    private String              transCode;
+    private String             transCode;
 
     /** 物流商编码. */
-    private String              logisticsProviderCode;
+    private String             logisticsProviderCode;
 
     /** 物流商名称. */
-    private String              logisticsProviderName;
+    private String             logisticsProviderName;
 
     //**********************************************************************
     /** 发票号. */
-    private String              receiptCode;
+    private String             receiptCode;
 
     /** 发票类型. */
-    private Integer             receiptType;
+    private Integer            receiptType;
 
     /** 发票抬头. */
-    private String              receiptTitle;
-    
+    private String             receiptTitle;
+
     /** 发票收货人. */
-    private String              receiptConsignee;
-    
+    private String             receiptConsignee;
+
     /** 发票收货人联系方式. */
-    private String              receiptTelphone;
-    
+    private String             receiptTelphone;
+
     /** 发票收货地址. */
-    private String              receiptAddress;
+    private String             receiptAddress;
 
     /** 发票内容. */
-    private String              receiptContent;
-    
-    
+    private String             receiptContent;
 
     //**********************************************************************
     /** 下单时的语言 由于用于wormhole发邮件时邮件模板的多语言，以及地址信息的多语言. */
-    private String              lang;
+    private String             lang;
 
     /** 备注. */
-    private String              remark;
+    private String             remark;
 
     /** 是否是QS订单，默认false. */
-    private Boolean             isQS                                         = false;
+    private Boolean            isQS                                         = false;
 
     /** COD类型. */
-    private Integer             codPaymentType;
+    private Integer            codPaymentType;
 
     //**********************************************************************
 
     /** 创建时间. */
-    private Date                createTime;
+    private Date               createTime;
 
     /** 修改时间. */
-    private Date                modifyTime;
+    private Date               modifyTime;
 
     /** version. */
-    private Date                version;
+    private Date               version;
 
     //**********************************************************************
 
@@ -979,30 +977,30 @@ public class SalesOrder extends BaseModel{
     }
 
     @Column(name = "RECEIPT_CONSIGNEE")
-	public String getReceiptConsignee() {
-		return receiptConsignee;
-	}
+    public String getReceiptConsignee(){
+        return receiptConsignee;
+    }
 
-	public void setReceiptConsignee(String receiptConsignee) {
-		this.receiptConsignee = receiptConsignee;
-	}
+    public void setReceiptConsignee(String receiptConsignee){
+        this.receiptConsignee = receiptConsignee;
+    }
 
-	@Column(name = "RECEIPT_TELPHONE")
-	public String getReceiptTelphone() {
-		return receiptTelphone;
-	}
+    @Column(name = "RECEIPT_TELPHONE")
+    public String getReceiptTelphone(){
+        return receiptTelphone;
+    }
 
-	public void setReceiptTelphone(String receiptTelphone) {
-		this.receiptTelphone = receiptTelphone;
-	}
+    public void setReceiptTelphone(String receiptTelphone){
+        this.receiptTelphone = receiptTelphone;
+    }
 
-	@Column(name = "RECEIPT_ADDRESS")
-	public String getReceiptAddress() {
-		return receiptAddress;
-	}
+    @Column(name = "RECEIPT_ADDRESS")
+    public String getReceiptAddress(){
+        return receiptAddress;
+    }
 
-	public void setReceiptAddress(String receiptAddress) {
-		this.receiptAddress = receiptAddress;
-	}
+    public void setReceiptAddress(String receiptAddress){
+        this.receiptAddress = receiptAddress;
+    }
 
 }

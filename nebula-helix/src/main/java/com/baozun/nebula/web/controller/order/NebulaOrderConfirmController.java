@@ -244,7 +244,7 @@ public class NebulaOrderConfirmController extends BaseController{
     }
 
     /**
-     * 再次计算金额 使用情景：使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验).
+     * 再次计算金额 使用情景：使用优惠券,取消使用优惠券，切换地址(本方法并不对入参进行有效性校验，请在各商城端对其校验).
      *
      * @param memberDetails
      *            the member details
@@ -275,9 +275,9 @@ public class NebulaOrderConfirmController extends BaseController{
 
         CouponInfoSubForm couponInfoSubForm = orderForm.getCouponInfoSubForm();
 
-        // 优惠券
+        // 优惠券   
         String couponCode = null;
-        if (couponInfoSubForm != null){
+        if (couponInfoSubForm != null && Validator.isNotNullOrEmpty(couponInfoSubForm.getCouponCode())){
             couponCode = couponInfoSubForm.getCouponCode();
             //非用户绑定优惠券
             if (couponInfoSubForm.getId() == null){

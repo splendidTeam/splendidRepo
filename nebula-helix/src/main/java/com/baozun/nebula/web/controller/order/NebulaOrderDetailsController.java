@@ -76,21 +76,21 @@ import com.feilong.tools.jsonlib.JsonUtil;
  * @version 1.0
  * @date 2016年5月10日
  */
-public class NebulaOrderDetailsController extends BaseController {
+public class NebulaOrderDetailsController extends BaseController{
 
     /** The order manager. */
     @Autowired
-    private OrderManager orderManager;
+    private OrderManager        orderManager;
 
     /** The order line manager. */
     @Autowired
     @Qualifier("OrderLineManager")
-    private OrderLineManager orderLineManager;
+    private OrderLineManager    orderLineManager;
 
     /** The logistics manager. */
     @Autowired
     @Qualifier("logisticsManager")
-    private LogisticsManager logisticsManager;
+    private LogisticsManager    logisticsManager;
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderDetailsController.class);
@@ -106,18 +106,24 @@ public class NebulaOrderDetailsController extends BaseController {
      * 
      * 失败返回空的字符串,商城端去进行判断
      *
-     * @param memberDetails the member details
-     * @param orderCode the order code
-     * @param request the request
-     * @param model the model
+     * @param memberDetails
+     *            the member details
+     * @param orderCode
+     *            the order code
+     * @param request
+     *            the request
+     * @param model
+     *            the model
      * @return the string
      * @since 5.3.1
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "order/{orderCode}", method = RequestMethod.GET)
      */
-    public String showOrderDetails(@LoginMember MemberDetails memberDetails,
-            @RequestParam(value = "orderCode", required = true) String orderCode, HttpServletRequest request,
-            Model model) {
+    public String showOrderDetails(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "orderCode",required = true) String orderCode,
+                    HttpServletRequest request,
+                    Model model){
         Validate.notNull(memberDetails, "memberDetails can't be null!");
 
         // 通过orderCode查询 command
@@ -126,8 +132,7 @@ public class NebulaOrderDetailsController extends BaseController {
 
         // 判断是否为本人进行操作
         boolean isSelfOrder = isSelfOrder(memberDetails, salesOrderCommand);
-        Validate.isTrue(isSelfOrder, "order:%s,is not his self:[{}] order", orderCode,
-                JsonUtil.format(memberDetails, 0, 0));
+        Validate.isTrue(isSelfOrder, "order:%s,is not his self:[{}] order", orderCode, JsonUtil.format(memberDetails, 0, 0));
 
         OrderViewCommand orderViewCommand = toOrderViewCommand(salesOrderCommand);
         model.addAttribute("orderViewCommand", orderViewCommand);
@@ -140,17 +145,33 @@ public class NebulaOrderDetailsController extends BaseController {
      * @return
      * @since 5.3.1
      */
-    private OrderViewCommand toOrderViewCommand(SalesOrderCommand salesOrderCommand) {
+    private OrderViewCommand toOrderViewCommand(SalesOrderCommand salesOrderCommand){
         // 订单信息
         OrderBaseInfoSubViewCommand orderBaseInfoSubViewCommand = new OrderBaseInfoSubViewCommand();
-        PropertyUtil.copyProperties(orderBaseInfoSubViewCommand, salesOrderCommand, "createTime",
-                "logisticsStatus", "financialStatus", "total", "discount", "actualFreight");
+        PropertyUtil.copyProperties(
+                        orderBaseInfoSubViewCommand,
+                        salesOrderCommand,
+                        "createTime",
+                        "logisticsStatus",
+                        "financialStatus",
+                        "total",
+                        "discount",
+                        "actualFreight");
         orderBaseInfoSubViewCommand.setOrderId(salesOrderCommand.getId());
         orderBaseInfoSubViewCommand.setOrderCode(salesOrderCommand.getCode());
         // 收货地址信息
         ConsigneeSubViewCommand consigneeSubViewCommand = new ConsigneeSubViewCommand();
-        PropertyUtil.copyProperties(consigneeSubViewCommand, salesOrderCommand, "name", "address", "mobile",
-                "tel", "email", "postcode", "buyerTel", "buyerName");
+        PropertyUtil.copyProperties(
+                        consigneeSubViewCommand,
+                        salesOrderCommand,
+                        "name",
+                        "address",
+                        "mobile",
+                        "tel",
+                        "email",
+                        "postcode",
+                        "buyerTel",
+                        "buyerName");
         Address country = AddressUtil.getAddressById(salesOrderCommand.getCountryId());
         Address province = AddressUtil.getAddressById(salesOrderCommand.getProvinceId());
         Address city = AddressUtil.getAddressById(salesOrderCommand.getCityId());
@@ -162,45 +183,62 @@ public class NebulaOrderDetailsController extends BaseController {
         // 支付信息
         PaymentInfoSubViewCommand paymentInfoSubViewCommand = new PaymentInfoSubViewCommand();
         PropertyUtil.copyProperties(paymentInfoSubViewCommand, salesOrderCommand, "payment");
-        if (orderBaseInfoSubViewCommand.getFinancialStatus() == 1) {
+        if (orderBaseInfoSubViewCommand.getFinancialStatus() == 1){
             paymentInfoSubViewCommand.setSubOrdinate(salesOrderCommand.getPayInfo().get(0).getSubOrdinate());
         }
         // 优惠券信息
         CouponInfoSubViewCommand couponInfoSubViewCommand = new CouponInfoSubViewCommand();
         List<OrderPromotionCommand> orderPromotions = salesOrderCommand.getOrderPromotions();
-        if (null != orderPromotions && orderPromotions.size() != 0) {
+        if (null != orderPromotions && orderPromotions.size() != 0){
             String coupon = orderPromotions.get(0).getCoupon();
-            if(Validator.isNotNullOrEmpty(coupon)){
-                coupon=coupon.replace("[", "").replace("]", "");
+            if (Validator.isNotNullOrEmpty(coupon)){
+                coupon = coupon.replace("[", "").replace("]", "");
                 couponInfoSubViewCommand.setCouponCode(coupon);
             }
         }
         // 发票信息
         InvoiceInfoSubViewCommand invoiceInfoSubViewCommand = new InvoiceInfoSubViewCommand();
-        PropertyUtil.copyProperties(invoiceInfoSubViewCommand, salesOrderCommand, "receiptType",
-                "receiptTitle", "receiptContent", "receiptCode", "receiptConsignee", "receiptTelphone",
-                "receiptAddress");
+        PropertyUtil.copyProperties(
+                        invoiceInfoSubViewCommand,
+                        salesOrderCommand,
+                        "receiptType",
+                        "receiptTitle",
+                        "receiptContent",
+                        "receiptCode",
+                        "receiptConsignee",
+                        "receiptTelphone",
+                        "receiptAddress");
         // ordline信息
-        List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager
-                .findByOrderID(salesOrderCommand.getId());
+        List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager.findByOrderID(salesOrderCommand.getId());
         List<OrderLineSubViewCommand> orderLineSubViewCommandlist = new ArrayList<OrderLineSubViewCommand>();
-        for (SimpleOrderLineSubViewCommand simpleOrderLine : simpleOrderLineSubViewCommand) {
+        for (SimpleOrderLineSubViewCommand simpleOrderLine : simpleOrderLineSubViewCommand){
             OrderLineSubViewCommand orderLineSubViewCommand = new OrderLineSubViewCommand();
-            PropertyUtil.copyProperties(orderLineSubViewCommand, simpleOrderLine, "id", "addTime", "itemId",
-                    "itemCode", "itemName", "skuId", "extentionCode", "propertiesMap", "skuPropertys",
-                    "quantity", "itemPic", "salePrice", "listPrice", "subTotalAmt");
+            PropertyUtil.copyProperties(
+                            orderLineSubViewCommand,
+                            simpleOrderLine,
+                            "id",
+                            "addTime",
+                            "itemId",
+                            "itemCode",
+                            "itemName",
+                            "skuId",
+                            "extentionCode",
+                            "propertiesMap",
+                            "skuPropertys",
+                            "quantity",
+                            "itemPic",
+                            "salePrice",
+                            "listPrice",
+                            "subTotalAmt");
             orderLineSubViewCommandlist.add(orderLineSubViewCommand);
         }
         // 物流信息
         LogisticsInfoSubViewCommand logisticsInfoSubViewCommand = new LogisticsInfoSubViewCommand();
-        LogisticsCommand logisticsCommand = logisticsManager
-                .findLogisticsByOrderId(salesOrderCommand.getId());
-        PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode",
-                "logisticsProviderName");
-        if (null != logisticsCommand) {
+        LogisticsCommand logisticsCommand = logisticsManager.findLogisticsByOrderId(salesOrderCommand.getId());
+        PropertyUtil.copyProperties(logisticsInfoSubViewCommand, salesOrderCommand, "transCode", "logisticsProviderName");
+        if (null != logisticsCommand){
             String trackingDescription = logisticsCommand.getTrackingDescription();
-            logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(
-                    transformTrackingDescription(trackingDescription));
+            logisticsInfoSubViewCommand.setLogisticsInfoBarRecordSubViewCommandList(transformTrackingDescription(trackingDescription));
         }
         OrderViewCommand orderViewCommand = new OrderViewCommand();
         orderViewCommand.setConsigneeSubViewCommand(consigneeSubViewCommand);
@@ -219,19 +257,21 @@ public class NebulaOrderDetailsController extends BaseController {
      * memberid相同 or 收货人姓名相同.
      *
      * @author 张乃骐
-     * @param memberDetails the member details
-     * @param salesOrderCommand the sales order command
+     * @param memberDetails
+     *            the member details
+     * @param salesOrderCommand
+     *            the sales order command
      * @return true, if validate order<br>
      * @time：2016年5月23日 下午2:56:06
      */
-    protected boolean isSelfOrder(MemberDetails memberDetails, SalesOrderCommand salesOrderCommand) {
+    protected boolean isSelfOrder(MemberDetails memberDetails,SalesOrderCommand salesOrderCommand){
         Long memberId = salesOrderCommand.getMemberId();
         String name = salesOrderCommand.getName();
 
-        if (null != memberDetails.getMemberId()) {
+        if (null != memberDetails.getMemberId()){
             return memberDetails.getMemberId().longValue() == memberId.longValue();
         }
-        if (Validator.isNotNullOrEmpty(memberDetails.getRealName())) {
+        if (Validator.isNotNullOrEmpty(memberDetails.getRealName())){
             return memberDetails.getRealName().equals(name);
         }
         return false;
@@ -241,23 +281,22 @@ public class NebulaOrderDetailsController extends BaseController {
      * 说明：String物流信息转换为 List<LogisticsInfoBarRecordSubViewCommand>.
      *
      * @author 张乃骐
-     * @param TrackingDescription the Tracking description
+     * @param TrackingDescription
+     *            the Tracking description
      * @return the list< logistics info bar record sub view command>
      * @time：2016年5月12日 下午8:28:56
      */
-    private List<LogisticsInfoBarRecordSubViewCommand> transformTrackingDescription(
-            String TrackingDescription) {
-        if (Validator.isNullOrEmpty(TrackingDescription)) {
+    private List<LogisticsInfoBarRecordSubViewCommand> transformTrackingDescription(String TrackingDescription){
+        if (Validator.isNullOrEmpty(TrackingDescription)){
             return null;
         }
         List<LogisticsInfoBarRecordSubViewCommand> list = new ArrayList<LogisticsInfoBarRecordSubViewCommand>();
         // String[] split = StringUtils.split(TrackingDescription, "<br/>");
         String[] split = TrackingDescription.split("<br/>");
-        for (String string : split) {
+        for (String string : split){
             LogisticsInfoBarRecordSubViewCommand logisticsInfoBarRecordSubViewCommand = new LogisticsInfoBarRecordSubViewCommand();
             String date = StringUtils.substring(string, 0, 17);
-            logisticsInfoBarRecordSubViewCommand.setBarScanDate(
-                    DateUtil.string2Date(date, DatePattern.COMMON_DATE_AND_TIME_WITHOUT_SECOND));
+            logisticsInfoBarRecordSubViewCommand.setBarScanDate(DateUtil.toDate(date, DatePattern.COMMON_DATE_AND_TIME_WITHOUT_SECOND));
             logisticsInfoBarRecordSubViewCommand.setRemark(StringUtils.substring(string, 17));
             list.add(logisticsInfoBarRecordSubViewCommand);
         }
