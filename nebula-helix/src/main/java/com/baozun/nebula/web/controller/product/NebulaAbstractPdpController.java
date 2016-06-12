@@ -496,9 +496,16 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	}
 	
 	/**
-	 * 构造最近浏览的商品信息
+	 * <pre>
+	 * <p>读取并刷新最近浏览的商品信息</p>
+	 * <ul>
+	 *  <li>当itemId为null时，相当于单独查询浏览信息。</li>
+	 *  <li>当itemId不为null时，查询并更新浏览信息cookie数据。</li>
+	 * </ul>
 	 * @param itemId
 	 * @return
+	 * 
+	 * </pre>
 	 */
 	protected List<RelationItemViewCommand> buildItemBrowsingHistoryViewCommand(Long itemId, HttpServletRequest request, HttpServletResponse response) {
 		LinkedList<Long> browsingHistoryItemIds = browsingHistoryResolver.getBrowsingHistory(request, Long.class);
