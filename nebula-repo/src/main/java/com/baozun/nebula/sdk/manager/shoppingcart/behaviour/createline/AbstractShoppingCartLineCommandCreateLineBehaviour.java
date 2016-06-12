@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
@@ -40,6 +42,9 @@ import com.feilong.core.Validator;
  * @since 5.3.1
  */
 public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour implements ShoppingCartLineCommandCreateLineBehaviour{
+
+    /** The Constant log. */
+    private static final Logger      LOGGER = LoggerFactory.getLogger(AbstractShoppingCartLineCommandCreateLineBehaviour.class);
 
     /** The sdk order line dao. */
     @Autowired
@@ -228,13 +233,18 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
      */
     private void setPrice(OrderLine orderLine,ShoppingCartLineCommand shoppingCartLineCommand,boolean isGift){
         // 原销售单价
-        orderLine.setMSRP(shoppingCartLineCommand.getListPrice());
+        BigDecimal listPrice = shoppingCartLineCommand.getListPrice();
+        orderLine.setMSRP(listPrice);
         // 现销售单价
         BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
         orderLine.setSalePrice(salePrice);
         // 行小计
-        orderLine.setSubtotal(shoppingCartLineCommand.getSubTotalAmt());
+        BigDecimal subTotalAmt = shoppingCartLineCommand.getSubTotalAmt();
+        orderLine.setSubtotal(subTotalAmt);
         // 折扣、行类型
-        orderLine.setDiscount(isGift ? salePrice : shoppingCartLineCommand.getDiscount());
+        BigDecimal discount = shoppingCartLineCommand.getDiscount();
+        orderLine.setDiscount(isGift ? salePrice : discount);
+
+        LOGGER.debug("orderLine msrp:{},salePrice:{},discount:{},subtotal:{}", listPrice, salePrice, discount, subTotalAmt);
     }
 }

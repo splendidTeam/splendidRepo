@@ -19,6 +19,7 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,9 @@ import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.model.promotion.LinePromotionSize;
 import com.baozun.nebula.model.promotion.LinePromotionSizeComparator;
 import com.baozun.nebula.model.rule.ItemTagRule;
+import com.baozun.nebula.model.rule.TagRule;
 import com.baozun.nebula.sdk.command.SkuCommand;
+import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionConditionSKU;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
@@ -56,12 +59,14 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManagerImp
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
+import com.feilong.core.Validator;
+import com.feilong.core.date.DateExtensionUtil;
 
 @Transactional
 @Service("sdkShoppingCartGroupManager")
 public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupManager{
 
-    private static final Logger                        log = LoggerFactory.getLogger(SdkPromotionCalculationManagerImpl.class);
+    private static final Logger                        LOGGER = LoggerFactory.getLogger(SdkPromotionCalculationManagerImpl.class);
 
     @Autowired
     private SdkShoppingCartLineDao                     sdkShoppingCartLineDao;
@@ -76,135 +81,153 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
     private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
     /**
-     * 根据促销引擎计算的结果，把原购物车行数据重新分组。 添加Caption行，按lineGroup分组排列好相应的行。 jsp负责显示。 1，调用引擎，获得SkuSettingList活动的行优惠结果
-     * 2，根据行优惠，获得这些活动的条件行； 3，根据优惠行，和条件行分组，Compress压缩 添加caption行； 返回前端显示所需要shoppingcartlines a,套餐 b，赠品 c，normal的活动
+     * 根据促销引擎计算的结果，把原购物车行数据重新分组。 添加Caption行，按lineGroup分组排列好相应的行。 jsp负责显示。
+     * 
+     * 1，调用引擎，获得SkuSettingList活动的行优惠结果
+     * 2，根据行优惠，获得这些活动的条件行；
+     * 3，根据优惠行，和条件行分组，Compress压缩 添加caption行； 返回前端显示所需要shoppingcartlines a,套餐 b，赠品 c，normal的活动
      * 4，没活动的行；
      * 
-     * @param oneShopLines
-     *            当前店铺的所有行
      */
     @Override
     @Transactional(readOnly = true)
     public List<ShoppingCartLineCommand> groupShoppingCartLinesToDisplayByLinePromotionResult(
-                    ShoppingCartCommand oneShoppingCart,
+                    ShoppingCartCommand shoppingCartCommand,
                     List<PromotionBrief> promotionBriefList){
-        if (oneShoppingCart == null || oneShoppingCart.getShoppingCartLineCommands() == null
-                        || oneShoppingCart.getShoppingCartLineCommands().size() == 0)
-            return null;
-        Long memberId = 0L;
-        if (oneShoppingCart.getUserDetails() != null)
-            memberId = oneShoppingCart.getUserDetails().getMemberId();
-        // 无优惠，直接返回
-        // List<PromotionBrief> promotionBriefList = sdkShoppingCartManager.calcuPromoBriefs(oneShoppingCart);
-        if (promotionBriefList == null || promotionBriefList.size() == 0)
-            return oneShoppingCart.getShoppingCartLineCommands();
-        // 无行优惠，也直接返回
-        List<PromotionCommand> allLinePromotionList = getAllLinePromotionsBySKUSettingList(promotionBriefList);
-        if (allLinePromotionList == null || allLinePromotionList.size() == 0)
-            return oneShoppingCart.getShoppingCartLineCommands();
 
-        List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList = new ArrayList<PromotionSKUDiscAMTBySetting>();
-        List<PromotionConditionSKU> onePromotionConditionSKUList = new ArrayList<PromotionConditionSKU>();
+        Date beginDate = new Date();
+
+        // 无优惠，直接返回
+        List<ShoppingCartLineCommand> shoppingCartLineCommands = shoppingCartCommand.getShoppingCartLineCommands();
+        if (Validator.isNullOrEmpty(promotionBriefList)){
+            return shoppingCartLineCommands;
+        }
+
+        // 无行优惠，也直接返回
+        List<PromotionCommand> promotionCommandList = getAllLinePromotionsBySKUSettingList(promotionBriefList);
+        if (Validator.isNullOrEmpty(promotionCommandList)){
+            return shoppingCartLineCommands;
+        }
+
+        //******************************************************************************************
         // 套餐行
-        List<ShoppingCartLineCommand> suitLines = new ArrayList<ShoppingCartLineCommand>();
         List<ShoppingCartLineCommand> allSuitLines = new ArrayList<ShoppingCartLineCommand>();
         // 行赠品行
-        List<ShoppingCartLineCommand> lineGiftLines = new ArrayList<ShoppingCartLineCommand>();
         List<ShoppingCartLineCommand> allLineGiftLines = new ArrayList<ShoppingCartLineCommand>();
         // 整单赠品行
-        List<ShoppingCartLineCommand> orderGiftLines = new ArrayList<ShoppingCartLineCommand>();
         List<ShoppingCartLineCommand> allOrderGiftLines = new ArrayList<ShoppingCartLineCommand>();
         // 常规优惠行
-        List<ShoppingCartLineCommand> normalAMTLines = new ArrayList<ShoppingCartLineCommand>();
         List<ShoppingCartLineCommand> allNormalAMTLines = new ArrayList<ShoppingCartLineCommand>();
 
-        // 分组过的行、包括无优惠的行，所有的行
-        List<ShoppingCartLineCommand> allGroupedLines = new ArrayList<ShoppingCartLineCommand>();
+        //******************************************************************************************
+        for (PromotionCommand promotionCommand : promotionCommandList){
+            Long promotionId = promotionCommand.getPromotionId();
 
-        for (PromotionCommand onePromotion : allLinePromotionList){
-            onePromotionConditionSKUList = new ArrayList<PromotionConditionSKU>();
-            onePromotionSettingSKUList = new ArrayList<PromotionSKUDiscAMTBySetting>();
+            List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = getOnePromotionSKUSettingListByPromotionBriefs(
+                            promotionId,
+                            promotionBriefList);
 
-            onePromotionSettingSKUList = getOnePromotionSKUSettingListByPromotionBriefs(promotionBriefList, onePromotion.getPromotionId());
-            onePromotionConditionSKUList = getPromotionConditionSKUListFromShoppingCartLines(
-                            oneShoppingCart.getShoppingCartLineCommands(),
-                            onePromotion.getPromotionId());
-            if (this.checkPromotionHasSuitKits(onePromotion)){
-                suitLines = new ArrayList<ShoppingCartLineCommand>();
-                // 套餐行
-                suitLines = this.getLinesOfSuitKitsPromotion(
-                                oneShoppingCart.getShoppingCartLineCommands(),
-                                onePromotionSettingSKUList,
-                                onePromotionConditionSKUList);
-                if (suitLines != null && suitLines.size() > 0)
+            List<PromotionConditionSKU> promotionConditionSKUList = getPromotionConditionSKUListFromShoppingCartLines(
+                            promotionId,
+                            shoppingCartLineCommands);
+
+            //******************************************************************************
+            // 套餐行
+            if (this.checkPromotionHasSuitKits(promotionCommand)){
+                List<ShoppingCartLineCommand> suitLines = getLinesOfSuitKitsPromotion(
+                                shoppingCartLineCommands,
+                                promotionSKUDiscAMTBySettingList,
+                                promotionConditionSKUList);
+                if (Validator.isNotNullOrEmpty(suitLines)){
                     allSuitLines.addAll(suitLines);
-            }else if (this.checkPromotionHasLineGift(onePromotionSettingSKUList, onePromotion)){
-                lineGiftLines = new ArrayList<ShoppingCartLineCommand>();
-                // 买赠行整合
-                lineGiftLines = this.getLinesOfLineGiftPromotion(
-                                oneShoppingCart.getShoppingCartLineCommands(),
-                                onePromotionSettingSKUList,
-                                onePromotionConditionSKUList);
-                if (lineGiftLines != null && lineGiftLines.size() > 0)
+                }
+            }
+            // 买赠行整合
+            else if (this.checkPromotionHasLineGift(promotionSKUDiscAMTBySettingList, promotionCommand)){
+                List<ShoppingCartLineCommand> lineGiftLines = getLinesOfLineGiftPromotion(
+                                shoppingCartLineCommands,
+                                promotionSKUDiscAMTBySettingList,
+                                promotionConditionSKUList);
+                if (Validator.isNotNullOrEmpty(lineGiftLines)){
                     allLineGiftLines.addAll(lineGiftLines);
-            }else if (this.checkPromotionOrderGift(onePromotionSettingSKUList, onePromotion)){
-                orderGiftLines = new ArrayList<ShoppingCartLineCommand>();
-                // 整单赠品
-                orderGiftLines = this
-                                .getLinesOfOrderGiftPromotion(oneShoppingCart.getShoppingCartLineCommands(), onePromotionSettingSKUList);
-                if (orderGiftLines != null && orderGiftLines.size() > 0)
+                }
+            }
+            // 整单赠品
+            else if (this.checkPromotionOrderGift(promotionSKUDiscAMTBySettingList, promotionCommand)){
+                List<ShoppingCartLineCommand> orderGiftLines = getLinesOfOrderGiftPromotion(
+                                shoppingCartLineCommands,
+                                promotionSKUDiscAMTBySettingList);
+                if (Validator.isNotNullOrEmpty(orderGiftLines)){
                     allOrderGiftLines.addAll(orderGiftLines);
-            }else{
-                // 行上直接减
-                // 可能多个叠加.可能是无条件行优惠onePromotionConditionSKUList
-                normalAMTLines = this.getLinesOfNormalPromotion(
-                                oneShoppingCart.getShoppingCartLineCommands(),
-                                onePromotionSettingSKUList,
-                                onePromotionConditionSKUList);
+                }
+            }
+            // 行上直接减  可能多个叠加.可能是无条件行优惠onePromotionConditionSKUList
+            else{//获取非套餐、非行赠品类型优惠，购物车行 直接减金额 显示后排除这些行，待无优惠行显示
+                List<ShoppingCartLineCommand> normalAMTLines = getLinesOfPromotionBySettingAndConditionList(
+                                shoppingCartLineCommands,
+                                promotionSKUDiscAMTBySettingList,
+                                promotionConditionSKUList);
+
                 allNormalAMTLines = appendShoppingCartLines(allNormalAMTLines, normalAMTLines);
             }
         }
+
+        //******************************************************************************************
         // 买赠行和直接减行，需要去重
         allNormalAMTLines = appendShoppingCartLines(allNormalAMTLines, allLineGiftLines);
 
+        //******************************************************************************************
+        // 分组过的行、包括无优惠的行，所有的行
+        List<ShoppingCartLineCommand> returnShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
         // 可以调整显示循序
         // 套餐行
-        if (allSuitLines != null && allSuitLines.size() > 0){
+        if (Validator.isNotNullOrEmpty(allSuitLines)){
             // 需要按照活动再分组
-            allSuitLines = appendCaptionLinesToGroupedLines(allSuitLines);
-            allGroupedLines.addAll(allSuitLines);
+            returnShoppingCartLineCommandList.addAll(appendCaptionLinesToGroupedLines(allSuitLines));
         }
         // 行减
-        if (allNormalAMTLines != null && allNormalAMTLines.size() > 0){
+        if (Validator.isNotNullOrEmpty(allNormalAMTLines)){
             // 原行赠品，和行减，与套餐和整单赠品，是有区别的
             // 取行上活动最多的行，按这些活动，分在一组。循环执行以上动作，直至所有行分组完毕
             // 最终Caption Line后面，跟的lineGroup值，可能不一样
-            allNormalAMTLines = appendCaptionLinesByMaxPromotions(allNormalAMTLines);
-            allGroupedLines.addAll(allNormalAMTLines);
+            returnShoppingCartLineCommandList.addAll(appendCaptionLinesByMaxPromotions(allNormalAMTLines));
         }
         // 整单赠品
-        if (allOrderGiftLines != null && allOrderGiftLines.size() > 0){
+        if (Validator.isNotNullOrEmpty(allOrderGiftLines)){
             // 需要按照活动再分组
-            allOrderGiftLines = appendCaptionLinesToGroupedLines(allOrderGiftLines);
-            allGroupedLines.addAll(allOrderGiftLines);
+            returnShoppingCartLineCommandList.addAll(appendCaptionLinesToGroupedLines(allOrderGiftLines));
         }
 
-        // 检查original lines，没有包含在allGroupedLines中的，就是无优惠的，常规行，添加到allGroupedLines中
-        allGroupedLines = appendShoppingCartLinesOfNoPromotion(oneShoppingCart.getShoppingCartLineCommands(), allGroupedLines);
-        // 设置选中赠品行
-        allGroupedLines = setGiftLinesSettlement(allGroupedLines, memberId);
-        // 设置行库存状态
-        if ((allGroupedLines != null && allGroupedLines.size() > 0) && (allLinePromotionList != null && allLinePromotionList.size() > 0))
-            allGroupedLines = setShoppingCartLineOutOfStockBySKUId(allGroupedLines, allLinePromotionList);
+        //****************************************************************************
+        UserDetails userDetails = shoppingCartCommand.getUserDetails();
+        Long memberId = userDetails != null ? userDetails.getMemberId() : 0L;
 
-        logLines(allGroupedLines);
-        return allGroupedLines;
+        // 检查original lines，没有包含在allGroupedLines中的，就是无优惠的，常规行，添加到allGroupedLines中
+        returnShoppingCartLineCommandList = appendShoppingCartLinesOfNoPromotion(
+                        shoppingCartLineCommands,
+                        returnShoppingCartLineCommandList);
+
+        //*********************************************************************************************
+
+        // 设置选中赠品行
+        returnShoppingCartLineCommandList = setGiftLinesSettlement(returnShoppingCartLineCommandList, memberId);
+        // 设置行库存状态
+        if (Validator.isNotNullOrEmpty(returnShoppingCartLineCommandList)){
+            returnShoppingCartLineCommandList = setShoppingCartLineOutOfStockBySKUId(
+                            returnShoppingCartLineCommandList,
+                            promotionCommandList);
+        }
+
+        logLines(returnShoppingCartLineCommandList);
+
+        LOGGER.info("use time:{}", DateExtensionUtil.getIntervalForView(beginDate, new Date()));
+
+        return returnShoppingCartLineCommandList;
     }
 
     /*
      * 按SKU ID设置赠品行库存，考虑整个购物车中赠品的消费数量
      */
-    @Transactional(readOnly = true)
     private List<ShoppingCartLineCommand> setShoppingCartLineOutOfStockBySKUId(
                     List<ShoppingCartLineCommand> groupedLines,
                     List<PromotionCommand> linePromotions){
@@ -214,14 +237,12 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         // It be ordered by promotion priority
         //先处理条件行
         for (ShoppingCartLineCommand line : groupedLines){
-            if (line.isCaptionLine())
+            if (line.isCaptionLine()){
                 continue;
-            //if (line.getPromotionList() == null)
-            //  continue;
+            }
             curComsumeSku = 0;
             prvComsumeSku = 0;
 
-            //for (PromotionCommand pcmd : linePromotions) {
             if (line.isGift() == false){
                 if (hisSKUQuantityList.containsKey(line.getSkuId())){
                     prvComsumeSku = hisSKUQuantityList.get(line.getSkuId());
@@ -242,14 +263,15 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
 
                 sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(line);
             }
-            //}
         }
         //再处理赠品行
         for (ShoppingCartLineCommand line : groupedLines){
-            if (line.isCaptionLine())
+            if (line.isCaptionLine()){
                 continue;
-            if (line.getPromotionList() == null)
+            }
+            if (line.getPromotionList() == null){
                 continue;
+            }
             curComsumeSku = 0;
             prvComsumeSku = 0;
 
@@ -281,25 +303,29 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
     }
 
     private void logLines(List<ShoppingCartLineCommand> allGroupedLines){
-        log.info("分组Log开始!");
+        LOGGER.debug("分组Log开始!");
         String lineGift = "";
-        if (allGroupedLines == null || allGroupedLines.size() == 0)
+        if (allGroupedLines == null || allGroupedLines.size() == 0){
             return;
+        }
         for (ShoppingCartLineCommand line : allGroupedLines){
             if (line.isCaptionLine()){
-                if (line.isSuitLine())
-                    log.info("店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动标题：" + line.getLineCaption() + "。需要套数调节器！");
-                else
-                    log.info("店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动标题：" + line.getLineCaption());
+                if (line.isSuitLine()){
+                    LOGGER.debug(
+                                    "店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动标题：" + line.getLineCaption()
+                                                    + "。需要套数调节器！");
+                }else{
+                    LOGGER.debug("店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动标题：" + line.getLineCaption());
+                }
             }else{
-                if (line.getLineGroup() == null || line.getLineGroup() == 0L)
-                    log.info(
+                if (line.getLineGroup() == null || line.getLineGroup() == 0L){
+                    LOGGER.debug(
                                     "店铺编号：" + line.getShopId() + ",活动编号：" + line.getPromotionIds() + ",常   规   行：-------------ID："
                                                     + line.getId() + ",ItemID：" + line.getItemId() + ",SKU ID：" + line.getSkuId()
                                                     + ",ExtCode：" + line.getExtentionCode() + ",名        称：" + line.getItemName()
                                                     + ",价        格：" + line.getSalePrice() + ",优        惠：" + line.getDiscount() + ",件数："
                                                     + line.getQuantity() + ",库存：" + line.getStock());
-                else{
+                }else{
                     lineGift = "店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动编号：" + line.getPromotionIds() + ",----赠品："
                                     + (line.isGift() == true ? "是，" : "否，") + "套装：" + (line.isSuitLine() == true ? "是，" : "否，") + "ID："
                                     + line.getId() + ",ItemID：" + line.getItemId() + ",SKU ID：" + line.getSkuId() + ",ExtCode："
@@ -308,16 +334,18 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                                     + line.getSettlementState();
                     if (line.isGift() == true){
                         lineGift = lineGift + (line.getGiftType() == GiftType.OrderGift ? ",整赠" : ",行赠");
-                        if (line.getGiftChoiceType() == GiftChoiceType.NeedChoice)
+                        if (line.getGiftChoiceType() == GiftChoiceType.NeedChoice){
                             lineGift = lineGift + ",最多选" + line.getGiftCountLimited();
-                        else
+                        }else{
                             lineGift = lineGift + ",直推";
-                        if (line.getGiftType() == GiftType.LineGift)
+                        }
+                        if (line.getGiftType() == GiftType.LineGift){
                             lineGift = lineGift + ",行赠品";
-                        else
+                        }else{
                             lineGift = lineGift + ",整单赠品";
+                        }
                     }
-                    log.info(lineGift);
+                    LOGGER.debug(lineGift);
                 }
             }
         }
@@ -329,33 +357,37 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param linesNoCaptions
      * @return
      */
-    public List<ShoppingCartLineCommand> appendCaptionLinesByMaxPromotions(List<ShoppingCartLineCommand> linesNoCaptions){
+    private List<ShoppingCartLineCommand> appendCaptionLinesByMaxPromotions(List<ShoppingCartLineCommand> linesNoCaptions){
         List<LinePromotionSize> lineSizeList = new ArrayList<LinePromotionSize>();
         List<Long> promotionList = new ArrayList<Long>();
 
         boolean exist = false;
         for (ShoppingCartLineCommand line : linesNoCaptions){
             exist = false;
-            if (line.isGift() == true)
+            if (line.isGift() == true){
                 continue;
+            }
             for (LinePromotionSize size : lineSizeList){
                 if (size.getLineId().equals(line.getId())){
                     exist = true;
                     // append promotion
                     promotionList = new ArrayList<Long>();
-                    if (size.getPromotionList() != null)
+                    if (size.getPromotionList() != null){
                         promotionList = size.getPromotionList();
+                    }
 
                     if (line.getPromotionList() != null){
                         for (PromotionCommand pm : line.getPromotionList()){
                             // BeanUtils.copyProperties(pm,tmpPromotion);
 
-                            if (!promotionList.contains(pm.getPromotionId()))
+                            if (!promotionList.contains(pm.getPromotionId())){
                                 promotionList.add(pm.getPromotionId());
+                            }
                         }
                     }
-                    if (promotionList != null)
+                    if (promotionList != null){
                         size.setPromotionList(promotionList);
+                    }
                     break;
                 }
             }
@@ -388,10 +420,11 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 groupedLines.add(captionLine);
                 groupedLines.addAll(oneGroupLines);
                 for (ShoppingCartLineCommand line : oneGroupLines){
-                    if (line.isCaptionLine())
+                    if (line.isCaptionLine()){
                         continue;
-                    else
+                    }else{
                         line.setLineGroup(lineGroup);
+                    }
                 }
 
                 leftLines = getLeftLinesAfterRemoveOneGroup(leftLines, oneGroupLines);
@@ -430,7 +463,6 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param promotionList
      * @return
      */
-    @Transactional(readOnly = true)
     private List<PromotionCommand> appendPromotionsByPromotionIdList(List<PromotionCommand> tmpList,List<Long> promotionIdList){
         List<PromotionCommand> fetchPromotion = new ArrayList<PromotionCommand>();
         PromotionCommand tmpPromotion = new PromotionCommand();
@@ -453,7 +485,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         return fetchPromotion;
     }
 
-    public List<ShoppingCartLineCommand> getShoppingCartLinesByPromotions(
+    private List<ShoppingCartLineCommand> getShoppingCartLinesByPromotions(
                     List<ShoppingCartLineCommand> linesNoCaptions,
                     List<Long> promotionList){
         Boolean exists = false;
@@ -463,14 +495,17 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
 
         for (ShoppingCartLineCommand line : linesNoCaptions){
             exists = false;
-            if (line.isCaptionLine())
+            if (line.isCaptionLine()){
                 continue;
-            if (line.getPromotionList() == null)
+            }
+            if (line.getPromotionList() == null){
                 continue;
+            }
             linePromotions = new ArrayList<Long>();
             for (PromotionCommand pm : line.getPromotionList()){
-                if (!linePromotions.contains(pm.getPromotionId()))
+                if (!linePromotions.contains(pm.getPromotionId())){
                     linePromotions.add(pm.getPromotionId());
+                }
             }
             linePromotions.retainAll(promotionList);
             if (linePromotions != null && linePromotions.size() > 0){
@@ -558,22 +593,24 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param memberId
      * @return
      */
-    @Transactional(readOnly = true)
-    public List<ShoppingCartLineCommand> setGiftLinesSettlement(List<ShoppingCartLineCommand> lines,Long memberId){
+    private List<ShoppingCartLineCommand> setGiftLinesSettlement(List<ShoppingCartLineCommand> lines,Long memberId){
         List<ShoppingCartLineCommand> giftLinesSeleted = sdkShoppingCartLineDao
                         .findShopCartGiftLineByMemberId(memberId, Constants.CHECKED_CHOOSE_STATE);
 
         for (ShoppingCartLineCommand line : lines){
             if (line.isGift() && GiftChoiceType.NeedChoice.equals(line.getGiftChoiceType())){
-                if (line.getLineGroup() == null || null == giftLinesSeleted)
+                if (line.getLineGroup() == null || null == giftLinesSeleted){
                     continue;
+                }
                 for (ShoppingCartLineCommand gift : giftLinesSeleted){
-                    if (gift.getLineGroup() == null)
+                    if (gift.getLineGroup() == null){
                         continue;
+                    }
                     //SkuCommand invtSku = skuDao.findInventoryById(gift.getSkuId());
                     SkuCommand invtSku = sdkSkuManager.findSkuQSVirtualInventoryById(gift.getSkuId(), gift.getExtentionCode());
-                    if (null == invtSku || null == invtSku.getAvailableQty())
+                    if (null == invtSku || null == invtSku.getAvailableQty()){
                         continue;
+                    }
                     // if (invtSku.getAvailableQty() < line.getQuantity())
                     // continue;
                     if (line.getPromotionId().equals(gift.getPromotionId()) && line.getItemId().equals(gift.getItemId())
@@ -581,10 +618,11 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                         line.setId(gift.getId());
                         line.setSkuId(gift.getSkuId());
                         line.setExtentionCode(gift.getExtentionCode());
-                        if (gift.getSettlementState() != null && Constants.CHECKED_CHOOSE_STATE.equals(gift.getSettlementState()))
+                        if (gift.getSettlementState() != null && Constants.CHECKED_CHOOSE_STATE.equals(gift.getSettlementState())){
                             line.setSettlementState(Constants.CHECKED_CHOOSE_STATE);
-                        else
+                        }else{
                             line.setSettlementState(Constants.NOCHECKED_CHOOSE_STATE);
+                        }
                         //log.debug("-------->>> {} have inventory {}", gift.getExtentionCode(), gift.getStock());
                         //sdkEngineManager.packShoppingCartLine(line);
                         continue;
@@ -606,7 +644,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param linesHasPromotion
      * @return
      */
-    public ShoppingCartLineCommand getPromotionCaptionFromActualLines(List<ShoppingCartLineCommand> linesHasPromotion){
+    private ShoppingCartLineCommand getPromotionCaptionFromActualLines(List<ShoppingCartLineCommand> linesHasPromotion){
         ShoppingCartLineCommand captionLine = new ShoppingCartLineCommand();
         List<PromotionCommand> linePromotions = new ArrayList<PromotionCommand>();
         List<PromotionCommand> groupLinesPromotions = new ArrayList<PromotionCommand>();
@@ -627,10 +665,11 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         if (groupLinesPromotions != null){
             for (PromotionCommand prom : groupLinesPromotions){
                 shopId = prom.getShopId();
-                if (caption.isEmpty())
+                if (caption.isEmpty()){
                     caption = prom.getPromotionName();
-                else
+                }else{
                     caption = caption + "," + prom.getPromotionName();
+                }
             }
         }
         captionLine.setPromotionList(groupLinesPromotions);
@@ -648,7 +687,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param groupedShoppingCartLines
      * @return
      */
-    public List<ShoppingCartLineCommand> appendShoppingCartLinesOfNoPromotion(
+    private List<ShoppingCartLineCommand> appendShoppingCartLinesOfNoPromotion(
                     List<ShoppingCartLineCommand> originShoppingCartLines,
                     List<ShoppingCartLineCommand> groupedShoppingCartLines){
         boolean exsit = false;
@@ -656,8 +695,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
             Long oskuId = originShoppingCartLine.getSkuId();
             Long oId = originShoppingCartLine.getId();
             // 加载进来的赠品可以不管，但必须把有line id的行添加进来
-            if (oId == null)
+            if (oId == null){
                 continue;
+            }
             for (ShoppingCartLineCommand groupedShoppingCartLine : groupedShoppingCartLines){
                 // 过滤活动行
                 if (groupedShoppingCartLine.isCaptionLine()){
@@ -667,8 +707,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 Long lineGroup = groupedShoppingCartLine.getLineGroup();
                 Long lineId = groupedShoppingCartLine.getId();
                 // 已经添加到分组列表中的，无行Id的，必定是赠品，也忽略
-                if (lineId == null)
+                if (lineId == null){
                     continue;
+                }
                 if (lineId.equals(oId) && skuId.equals(oskuId) && (lineGroup != null)){
                     exsit = true;
                     // 结束当前循环
@@ -690,22 +731,24 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param allSettingSKUList
      * @return
      */
-    @Transactional(readOnly = true)
-    public List<PromotionCommand> getAllLinePromotionsBySKUSettingList(List<PromotionBrief> promotionBriefList){
+    private List<PromotionCommand> getAllLinePromotionsBySKUSettingList(List<PromotionBrief> promotionBriefList){
         List<PromotionCommand> linePromotionList = new ArrayList<PromotionCommand>();
-        PromotionCommand onePromotion = new PromotionCommand();
+        PromotionCommand promotionCommand = new PromotionCommand();
         if (null != promotionBriefList && promotionBriefList.size() > 0){
             for (PromotionBrief promotionBrief : promotionBriefList){
-                List<PromotionSettingDetail> details = promotionBrief.getDetails();
-                if (null == details || details.size() == 0)
+                List<PromotionSettingDetail> promotionSettingDetailList = promotionBrief.getDetails();
+                if (Validator.isNullOrEmpty(promotionSettingDetailList)){
                     continue;
-                for (PromotionSettingDetail detail : details){
-                    List<PromotionSKUDiscAMTBySetting> affectSkuList = detail.getAffectSKUDiscountAMTList();
-                    if (null != affectSkuList && affectSkuList.size() > 0){
-                        onePromotion = new PromotionCommand();
-                        onePromotion = sdkPromotionRuleFilterManager.getPromotionByPromotionId(detail.getPromotionId());
-                        if (linePromotionList.contains(onePromotion) == false)
-                            linePromotionList.add(onePromotion);
+                }
+
+                for (PromotionSettingDetail promotionSettingDetail : promotionSettingDetailList){
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = promotionSettingDetail
+                                    .getAffectSKUDiscountAMTList();
+                    if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+                        promotionCommand = sdkPromotionRuleFilterManager.getPromotionByPromotionId(promotionSettingDetail.getPromotionId());
+                        if (linePromotionList.contains(promotionCommand) == false){
+                            linePromotionList.add(promotionCommand);
+                        }
                     }
                 }
             }
@@ -717,19 +760,21 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * 根据优惠引擎的摘要，获取所有有优惠的行
      * 
      * @param promotionBriefList
+     * 
      * @return
      */
-    public List<PromotionSKUDiscAMTBySetting> getOnePromotionSKUSettingListByPromotionBriefs(
-                    List<PromotionBrief> promotionBriefList,
-                    Long onePromotionId){
+    private List<PromotionSKUDiscAMTBySetting> getOnePromotionSKUSettingListByPromotionBriefs(
+                    Long promotionId,
+                    List<PromotionBrief> promotionBriefList){
         List<PromotionSKUDiscAMTBySetting> affectSkuList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         List<PromotionSKUDiscAMTBySetting> oneSettingSkuList;
-        if (null != promotionBriefList && promotionBriefList.size() > 0){
+        if (Validator.isNotNullOrEmpty(promotionBriefList)){
             for (PromotionBrief promotionBrief : promotionBriefList){
-                if (onePromotionId.equals(promotionBrief.getPromotionId())){
+                if (promotionId.equals(promotionBrief.getPromotionId())){
                     List<PromotionSettingDetail> details = promotionBrief.getDetails();
-                    if (null == details || details.size() == 0)
+                    if (null == details || details.size() == 0){
                         continue;
+                    }
                     for (PromotionSettingDetail detail : details){
                         oneSettingSkuList = detail.getAffectSKUDiscountAMTList();
                         if (null != oneSettingSkuList && oneSettingSkuList.size() > 0){
@@ -746,16 +791,15 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
     /**
      * 根据活动，回溯满足活动的条件行
      * 
-     * @param shoppingLines
      * @param promotionId
+     * @param shoppingCartLineCommandList
+     * 
      * @return
      */
-    @Transactional(readOnly = true)
-    public List<PromotionConditionSKU> getPromotionConditionSKUListFromShoppingCartLines(
-                    List<ShoppingCartLineCommand> shoppingLines,
-                    Long promotionId){
-        if (shoppingLines == null || shoppingLines.size() == 0)
-            return null;
+    private List<PromotionConditionSKU> getPromotionConditionSKUListFromShoppingCartLines(
+                    Long promotionId,
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+
         List<PromotionConditionSKU> suitSKUList = new ArrayList<PromotionConditionSKU>();
 
         List<AtomicCondition> condList = new ArrayList<AtomicCondition>();
@@ -765,42 +809,50 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         condList = new ArrayList<AtomicCondition>();
         oneSKUList = new ArrayList<PromotionConditionSKU>();
         onePromotion = sdkPromotionRuleFilterManager.getPromotionByPromotionId(promotionId);
-        if (onePromotion == null)
+        if (onePromotion == null){
             return null;
+        }
 
         if (onePromotion.getAtomicConditionList() != null){
             condList.addAll(onePromotion.getAtomicConditionList());
         }
         if (onePromotion.getAtomicComplexConditionList() != null){
             if (onePromotion.getConditionType().equalsIgnoreCase(ConditionMasterType.EXP_STEP)){
-                if (onePromotion.getAtomicComplexConditionList().size() > 0)
+                if (onePromotion.getAtomicComplexConditionList().size() > 0){
                     condList.add(onePromotion.getAtomicComplexConditionList().get(0));
+                }
             }else{
                 condList.addAll(onePromotion.getAtomicComplexConditionList());
             }
         }
-        if (condList == null || condList.size() == 0)
+        if (condList == null || condList.size() == 0){
             return null;
+        }
         for (AtomicCondition condition : condList){
             // 整单其实不需要分组，直接显示在最后面即可
             if (condition.getConditionValue() != null && condition.getConditionTag() != null
                             && condition.getConditionTag().equalsIgnoreCase(ConditionType.EXP_CUSTOM)){
-                oneSKUList = getCustomConditionSKUList(shoppingLines, Long.valueOf(condition.getConditionValue().toString()), condition);
+                oneSKUList = getCustomConditionSKUList(
+                                shoppingCartLineCommandList,
+                                Long.valueOf(condition.getConditionValue().toString()),
+                                condition);
             }else{
-                if ((condition.getScopeTag() == null || condition.getScopeValue() <= 0L))
+                if ((condition.getScopeTag() == null || condition.getScopeValue() <= 0L)){
                     continue;
+                }
                 if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_PRODUCT)){
-                    oneSKUList = getProductConditionSKUList(shoppingLines, condition.getScopeValue(), condition);
+                    oneSKUList = getProductConditionSKUList(shoppingCartLineCommandList, condition.getScopeValue(), condition);
                 }else if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_CATEGORY)){
-                    oneSKUList = getCategoryConditionSKUList(shoppingLines, condition.getScopeValue(), condition);
+                    oneSKUList = getCategoryConditionSKUList(shoppingCartLineCommandList, condition.getScopeValue(), condition);
                 }else if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_CUSTOM)){
-                    oneSKUList = getCustomScopeConditionSKUList(shoppingLines, condition.getScopeValue(), condition);
-                }else if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_COMBO)){
-                    oneSKUList = getComboConditionSKUList(shoppingLines, condition.getScopeValue(), condition);
+                    oneSKUList = getCustomScopeConditionSKUList(shoppingCartLineCommandList, condition.getScopeValue(), condition);
+                }else if (condition.getScopeTag().equalsIgnoreCase(TagRule.EXP_PREFIX_COMBO)){
+                    oneSKUList = getComboConditionSKUList(shoppingCartLineCommandList, condition.getScopeValue(), condition);
                 }
             }
-            if (oneSKUList == null || oneSKUList.size() == 0)
+            if (oneSKUList == null || oneSKUList.size() == 0){
                 continue;
+            }
             for (PromotionConditionSKU sku : oneSKUList){
                 sku.setPromotionId(promotionId);
             }
@@ -817,11 +869,8 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param promotion
      * @return
      */
-    @Override
-    public Boolean checkPromotionHasSuitKits(PromotionCommand promotion){
-        if (promotion.getConditionType().equalsIgnoreCase(ConditionMasterType.EXP_CHOICE))
-            return true;
-        return false;
+    private Boolean checkPromotionHasSuitKits(PromotionCommand promotion){
+        return promotion.getConditionType().equalsIgnoreCase(ConditionMasterType.EXP_CHOICE);
     }
 
     /**
@@ -833,14 +882,14 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param kitPromotionSettingSKUList
      * @return
      */
-    @Override
-    public List<ShoppingCartLineCommand> getLinesOfSuitKitsPromotion(
+    private List<ShoppingCartLineCommand> getLinesOfSuitKitsPromotion(
                     List<ShoppingCartLineCommand> oneShopCartLineList,
                     List<PromotionSKUDiscAMTBySetting> kitPromotionSettingSKUList,
                     List<PromotionConditionSKU> kitPromotionConditionSKUList){
         // TODO 套餐代码是个mockup，还需要验证
-        if (kitPromotionSettingSKUList == null || kitPromotionSettingSKUList.size() == 0)
+        if (kitPromotionSettingSKUList == null || kitPromotionSettingSKUList.size() == 0){
             return null;
+        }
         List<Long> lineGroupList = new ArrayList<Long>();
         List<ShoppingCartLineCommand> suitLines = new ArrayList<ShoppingCartLineCommand>();
         Long suitPromotionId = 0L;
@@ -848,8 +897,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         // getLinesOfPromotionBySettingAndConditionList(oneShopCartLineList,kitPromotionSettingSKUList,kitPromotionConditionSKUList);
         // 1,从当前Setting list中，获取Promotion Id，按当前Promotion Id获取行
         suitPromotionId = kitPromotionSettingSKUList.get(0).getPromotionId();
-        if (suitPromotionId.equals(0L))
+        if (suitPromotionId.equals(0L)){
             return null;
+        }
         // 2,按line group分组，即是suitId。line group为空的为非套餐行
         for (ShoppingCartLineCommand line : oneShopCartLineList){
             if ((line.getPromotionId() != null && !line.getPromotionId().equals(suitPromotionId))
@@ -870,85 +920,97 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
     /**
      * 根据活动的条件和优惠行，获取行分组
      * 
-     * @param oneShopCartLineList
-     * @param promotionSettingSKUList
+     * @param shoppingCartLineCommandList
+     * @param promotionSKUDiscAMTBySettingList
      * @param promotionConditionSKUList
      * @return
      */
-    @Transactional(readOnly = true)
-    public List<ShoppingCartLineCommand> getLinesOfPromotionBySettingAndConditionList(
-                    List<ShoppingCartLineCommand> oneShopCartLineList,
-                    List<PromotionSKUDiscAMTBySetting> promotionSettingSKUList,
+    private List<ShoppingCartLineCommand> getLinesOfPromotionBySettingAndConditionList(
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
                     List<PromotionConditionSKU> promotionConditionSKUList){
-        if (promotionSettingSKUList == null)
-            return oneShopCartLineList;
+        if (Validator.isNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+            return shoppingCartLineCommandList;
+        }
 
         List<ShoppingCartLineCommand> allPromotionLines = new ArrayList<ShoppingCartLineCommand>();
-        ShoppingCartLineCommand oneTempLine = new ShoppingCartLineCommand();
-        List<PromotionCommand> promotionList = new ArrayList<PromotionCommand>();
-        PromotionCommand onePromotion = null;
+
+        List<PromotionCommand> promotionCommandList = new ArrayList<PromotionCommand>();
+        PromotionCommand promotionCommand = null;
         Long lineGroup = 0L;
 
-        if (promotionConditionSKUList != null && promotionConditionSKUList.size() > 0){
-            for (PromotionConditionSKU conditionSKU : promotionConditionSKUList){
-                if (onePromotion == null)
-                    onePromotion = this.sdkPromotionRuleFilterManager.getPromotionByPromotionId(conditionSKU.getPromotionId());
+        if (Validator.isNotNullOrEmpty(promotionConditionSKUList)){
+            for (PromotionConditionSKU promotionConditionSKU : promotionConditionSKUList){
+                if (promotionCommand == null){
+                    promotionCommand = sdkPromotionRuleFilterManager.getPromotionByPromotionId(promotionConditionSKU.getPromotionId());
+                }
 
-                if (promotionList == null)
-                    promotionList = new ArrayList<PromotionCommand>();
-
-                if (!promotionList.contains(onePromotion))
-                    promotionList.add(onePromotion);
+                if (!promotionCommandList.contains(promotionCommand)){
+                    promotionCommandList.add(promotionCommand);
+                }
 
                 // 一个活动有多个优惠设置
-                lineGroup = onePromotion.getSettingId();
+                lineGroup = promotionCommand.getSettingId();
 
-                oneTempLine = this.getShoppingCartLineBySKUId(oneShopCartLineList, lineGroup, conditionSKU.getSkuId());
-                if (null == oneTempLine)
+                ShoppingCartLineCommand shoppingCartLineCommand = getShoppingCartLineBySKUId(
+                                shoppingCartLineCommandList,
+                                lineGroup,
+                                promotionConditionSKU.getSkuId());
+                if (null == shoppingCartLineCommand){
                     continue;
-                if (!this.checkLineExistsByLineGroupAndSKU(allPromotionLines, lineGroup, oneTempLine.getSkuId())){
-                    oneTempLine.setLineGroup(lineGroup);
-                    allPromotionLines.add(oneTempLine);
+                }
+                Long skuId = shoppingCartLineCommand.getSkuId();
+                if (!checkLineExistsByLineGroupAndSKU(allPromotionLines, lineGroup, skuId)){
+                    shoppingCartLineCommand.setLineGroup(lineGroup);
+                    allPromotionLines.add(shoppingCartLineCommand);
                 }else{
-                    System.out.print(oneTempLine.getSkuId() + "：行已经存在！");
+                    LOGGER.info(skuId + "：行已经存在！");
                 }
             }
         }
-        if (promotionSettingSKUList != null && promotionSettingSKUList.size() > 0){
-            for (PromotionSKUDiscAMTBySetting settingSKU : promotionSettingSKUList){
-                if (onePromotion == null)
-                    onePromotion = this.sdkPromotionRuleFilterManager.getPromotionByPromotionId(settingSKU.getPromotionId());
 
-                if (promotionList == null)
-                    promotionList = new ArrayList<PromotionCommand>();
+        //****************************************************************************************************
+        for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
+            if (promotionCommand == null){
+                promotionCommand = sdkPromotionRuleFilterManager.getPromotionByPromotionId(promotionSKUDiscAMTBySetting.getPromotionId());
+            }
 
-                if (!promotionList.contains(onePromotion))
-                    promotionList.add(onePromotion);
+            if (!promotionCommandList.contains(promotionCommand)){
+                promotionCommandList.add(promotionCommand);
+            }
 
-                // 用优惠设置SettingId填充lineGroup
-                if (lineGroup == null || lineGroup == 0L)
-                    lineGroup = onePromotion.getSettingId();
-                if (settingSKU.getGiftMark() == false){
-                    oneTempLine = this.getShoppingCartLineBySKUId(oneShopCartLineList, lineGroup, settingSKU.getSkuId());
-                    if (null == oneTempLine)
-                        continue;
-                    if (!this.checkLineExistsByLineGroupAndSKU(allPromotionLines, lineGroup, oneTempLine.getSkuId())){
-                        // 设置优惠金额
-                        oneTempLine.setLineGroup(lineGroup);
-                        allPromotionLines.add(oneTempLine);
-                    }
-                }else{
-                    oneTempLine = this.getShoppingCartGiftLineByItemId(oneShopCartLineList, lineGroup, settingSKU.getItemId());
-                    if (null == oneTempLine)
-                        continue;
-                    oneTempLine.setLineGroup(lineGroup);
-                    allPromotionLines.add(oneTempLine);
+            // 用优惠设置SettingId填充lineGroup
+            if (lineGroup == null || lineGroup == 0L){
+                lineGroup = promotionCommand.getSettingId();
+            }
+            if (promotionSKUDiscAMTBySetting.getGiftMark() == false){
+                ShoppingCartLineCommand shoppingCartLineCommand = getShoppingCartLineBySKUId(
+                                shoppingCartLineCommandList,
+                                lineGroup,
+                                promotionSKUDiscAMTBySetting.getSkuId());
+                if (null == shoppingCartLineCommand){
+                    continue;
                 }
+                if (!checkLineExistsByLineGroupAndSKU(allPromotionLines, lineGroup, shoppingCartLineCommand.getSkuId())){
+                    // 设置优惠金额
+                    shoppingCartLineCommand.setLineGroup(lineGroup);
+                    allPromotionLines.add(shoppingCartLineCommand);
+                }
+            }else{
+                ShoppingCartLineCommand shoppingCartLineCommand = getShoppingCartGiftLineByItemId(
+                                shoppingCartLineCommandList,
+                                lineGroup,
+                                promotionSKUDiscAMTBySetting.getItemId());
+                if (null == shoppingCartLineCommand){
+                    continue;
+                }
+                shoppingCartLineCommand.setLineGroup(lineGroup);
+                allPromotionLines.add(shoppingCartLineCommand);
             }
         }
-        if (promotionList != null && allPromotionLines.size() > 0){
-            for (ShoppingCartLineCommand lineSKU : allPromotionLines){
-                lineSKU.setPromotionList(promotionList);
+        if (allPromotionLines.size() > 0){
+            for (ShoppingCartLineCommand shoppingCartLineCommand : allPromotionLines){
+                shoppingCartLineCommand.setPromotionList(promotionCommandList);
             }
         }
         return allPromotionLines;
@@ -962,12 +1024,14 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param skuId
      * @return
      */
-    public Boolean checkLineExistsByLineGroupAndSKU(List<ShoppingCartLineCommand> shopCartLineList,Long lineGroup,Long skuId){
-        if (shopCartLineList == null || shopCartLineList.size() == 0)
+    private Boolean checkLineExistsByLineGroupAndSKU(List<ShoppingCartLineCommand> shopCartLineList,Long lineGroup,Long skuId){
+        if (shopCartLineList == null || shopCartLineList.size() == 0){
             return false;
+        }
         for (ShoppingCartLineCommand line : shopCartLineList){
-            if (line.getLineGroup() != null && line.getLineGroup().equals(lineGroup) && line.getSkuId().equals(skuId) && line.getId() > 0L)
+            if (line.getLineGroup() != null && line.getLineGroup().equals(lineGroup) && line.getSkuId().equals(skuId) && line.getId() > 0L){
                 return true;
+            }
         }
         return false;
     }
@@ -979,11 +1043,12 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param skuId
      * @return
      */
-    public ShoppingCartLineCommand getShoppingCartLineBySKUId(List<ShoppingCartLineCommand> shopCartLineList,Long lineGroup,Long skuId){
+    private ShoppingCartLineCommand getShoppingCartLineBySKUId(List<ShoppingCartLineCommand> shopCartLineList,Long lineGroup,Long skuId){
         ShoppingCartLineCommand lineTmp = new ShoppingCartLineCommand();
         for (ShoppingCartLineCommand line : shopCartLineList){
-            if (line.isCaptionLine())
+            if (line.isCaptionLine()){
                 continue;
+            }
             if (line.getLineGroup() != null && line.getLineGroup().equals(lineGroup) && line.getSkuId().equals(skuId)){
                 BeanUtils.copyProperties(line, lineTmp);
                 return lineTmp;
@@ -1002,8 +1067,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                     Long itemId){
         ShoppingCartLineCommand lineTmp = new ShoppingCartLineCommand();
         for (ShoppingCartLineCommand line : shopCartLineList){
-            if (line.isCaptionLine())
+            if (line.isCaptionLine()){
                 continue;
+            }
             if (line.getLineGroup() != null && line.getLineGroup().equals(lineGroup) && line.getItemId().equals(itemId)
                             && line.isGift() == true){
                 BeanUtils.copyProperties(line, lineTmp);
@@ -1011,8 +1077,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
             }
         }
         for (ShoppingCartLineCommand line : shopCartLineList){
-            if (line.isCaptionLine())
+            if (line.isCaptionLine()){
                 continue;
+            }
             if (line.getItemId().equals(itemId) && line.isGift() == true){
                 BeanUtils.copyProperties(line, lineTmp);
                 return lineTmp;
@@ -1028,12 +1095,12 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param promotion
      * @return
      */
-    @Override
-    public Boolean checkPromotionHasLineGift(List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList,PromotionCommand onePromotion){
+    private Boolean checkPromotionHasLineGift(List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList,PromotionCommand onePromotion){
+        if (onePromotionSettingSKUList == null){
+            return false;
+        }
         Boolean orderBase = checkOrderBaseByPromotion(onePromotion);
         Boolean hasGift = false;
-        if (onePromotionSettingSKUList == null)
-            return false;
         for (PromotionSKUDiscAMTBySetting skuSetting : onePromotionSettingSKUList){
             if (skuSetting.getGiftMark() == true){
                 hasGift = true;
@@ -1049,15 +1116,15 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param onePromotion
      * @return
      */
-    public Boolean checkOrderBaseByPromotion(PromotionCommand onePromotion){
+    private Boolean checkOrderBaseByPromotion(PromotionCommand onePromotion){
         List<AtomicCondition> condList = onePromotion.getAtomicConditionList();
         Boolean condCheck = checkOrderBaseByPromotionCondition(condList);
-        if (condCheck == true)
+        if (condCheck == true){
             return condCheck;
+        }
 
         List<AtomicCondition> complexCondList = onePromotion.getAtomicComplexConditionList();
-        Boolean condComplexCheck = checkOrderBaseByPromotionCondition(complexCondList);
-        return condComplexCheck;
+        return checkOrderBaseByPromotionCondition(complexCondList);
     }
 
     /**
@@ -1066,9 +1133,10 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param condList
      * @return
      */
-    public Boolean checkOrderBaseByPromotionCondition(List<AtomicCondition> condList){
-        if (condList == null || condList.size() == 0)
+    private Boolean checkOrderBaseByPromotionCondition(List<AtomicCondition> condList){
+        if (condList == null || condList.size() == 0){
             return false;
+        }
         Boolean result = false;
         Boolean resultOne = false;
         if (condList != null && condList.size() == 1){
@@ -1127,10 +1195,11 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 resultOne = false;
             }
 
-            if (condition.getOperateTag().equalsIgnoreCase("&"))
+            if (condition.getOperateTag().equalsIgnoreCase("&")){
                 result = result && resultOne;
-            else
+            }else{
                 result = result || resultOne;
+            }
         }
         return result;
     }
@@ -1144,8 +1213,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param lineGiftPromotionConditionSKUList
      * @return
      */
-    @Override
-    public List<ShoppingCartLineCommand> getLinesOfLineGiftPromotion(
+    private List<ShoppingCartLineCommand> getLinesOfLineGiftPromotion(
                     List<ShoppingCartLineCommand> oneShopCartLineList,
                     List<PromotionSKUDiscAMTBySetting> lineGiftPromotionSettingSKUList,
                     List<PromotionConditionSKU> lineGiftPromotionConditionSKUList){
@@ -1169,12 +1237,12 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param onePromotionSettingSKUList
      * @return
      */
-    @Override
-    public Boolean checkPromotionOrderGift(List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList,PromotionCommand onePromotion){
+    private Boolean checkPromotionOrderGift(List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList,PromotionCommand onePromotion){
         Boolean orderBase = checkOrderBaseByPromotion(onePromotion);
         Boolean hasGift = false;
-        if (orderBase == false)
+        if (orderBase == false){
             return false;
+        }
         for (PromotionSKUDiscAMTBySetting skuSetting : onePromotionSettingSKUList){
             if (skuSetting.getGiftMark() == true){
                 hasGift = true;
@@ -1192,14 +1260,14 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param onePromotionSettingSKUList
      * @return
      */
-    @Override
-    public List<ShoppingCartLineCommand> getLinesOfOrderGiftPromotion(
+    private List<ShoppingCartLineCommand> getLinesOfOrderGiftPromotion(
                     List<ShoppingCartLineCommand> oneShopCartLineList,
                     List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList){
-        List<ShoppingCartLineCommand> lines = new ArrayList<ShoppingCartLineCommand>();
-        lines = getLinesOfPromotionBySettingAndConditionList(oneShopCartLineList, onePromotionSettingSKUList, null);
+        List<ShoppingCartLineCommand> lines = getLinesOfPromotionBySettingAndConditionList(
+                        oneShopCartLineList,
+                        onePromotionSettingSKUList,
+                        null);
         for (ShoppingCartLineCommand line : lines){
-            // line.setLineGroup(line.getLineGroup());
             line.setGiftType(GiftType.OrderGift);
         }
         return lines;
@@ -1222,16 +1290,13 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
             return linesBefore;
         }
         List<ShoppingCartLineCommand> originalLines = new ArrayList<ShoppingCartLineCommand>();
-        ShoppingCartLineCommand tmpLine = new ShoppingCartLineCommand();
         for (ShoppingCartLineCommand line : linesBefore){
-            tmpLine = new ShoppingCartLineCommand();
+            ShoppingCartLineCommand tmpLine = new ShoppingCartLineCommand();
             BeanUtils.copyProperties(line, tmpLine);
             originalLines.add(tmpLine);
         }
 
         Boolean existInBefore = false;
-        BigDecimal lineDiscount = BigDecimal.ZERO;
-        List<PromotionCommand> linePromotions = new ArrayList<PromotionCommand>();
 
         // 需要去压缩 ,已经存在的，discount加上去，line上的Promotion List添加当前的
         for (ShoppingCartLineCommand curLine : currentPromotionLines){
@@ -1239,35 +1304,43 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 continue;
             }
             existInBefore = false;
+            Long lineGroup = curLine.getLineGroup();
+            Long id = curLine.getId();
+
+            Long skuId = curLine.getSkuId();
+
             for (ShoppingCartLineCommand befLine : linesBefore){
                 if (befLine.isCaptionLine()){
                     continue;
                 }
-                if (befLine.getId() != null && curLine.getId() != null && befLine.getId().equals(curLine.getId())){
+                if (befLine.getId() != null && id != null && befLine.getId().equals(id)){
                     existInBefore = true;
                     break;
-                }else if (befLine.getLineGroup().equals(curLine.getLineGroup()) && befLine.getSkuId().equals(curLine.getSkuId())){
+                }else if (befLine.getLineGroup().equals(lineGroup) && befLine.getSkuId().equals(skuId)){
                     existInBefore = true;
                     break;
                 }
             }
             if (existInBefore){
+
+                List<PromotionCommand> promotionList = curLine.getPromotionList();
                 // Update to original lines
-                for (ShoppingCartLineCommand orgLine : originalLines){
-                    if ((orgLine.getId() != null && curLine.getId() != null && orgLine.getId().equals(curLine.getId()))
-                                    || (orgLine.getLineGroup().equals(curLine.getLineGroup()) && orgLine.getSkuId().equals(
-                                                    curLine.getSkuId()))){
-                        linePromotions = new ArrayList<PromotionCommand>();
-                        linePromotions = orgLine.getPromotionList();
-                        if (curLine.getPromotionList() != null){
-                            for (PromotionCommand prm : curLine.getPromotionList()){
+                for (ShoppingCartLineCommand shoppingCartLineCommand : originalLines){
+                    Long id2 = shoppingCartLineCommand.getId();
+                    Long lineGroup2 = shoppingCartLineCommand.getLineGroup();
+                    Long skuId2 = shoppingCartLineCommand.getSkuId();
+                    if ((id2 != null && id != null && id2.equals(id)) || (lineGroup2.equals(lineGroup) && skuId2.equals(skuId))){
+                        List<PromotionCommand> linePromotions = shoppingCartLineCommand.getPromotionList();
+                        if (promotionList != null){
+                            for (PromotionCommand prm : promotionList){
                                 if (!linePromotions.contains(prm)){
                                     linePromotions.add(prm);
                                 }
                             }
                         }
-                        if (orgLine.isGift() == false)
-                            orgLine.setPromotionList(linePromotions);
+                        if (shoppingCartLineCommand.isGift() == false){
+                            shoppingCartLineCommand.setPromotionList(linePromotions);
+                        }
                     }
                 }
             }else{
@@ -1279,43 +1352,18 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
     }
 
     /**
-     * 获取非套餐、非行赠品类型优惠，购物车行 直接减金额 显示后排除这些行，待无优惠行显示
-     * 
-     * @param oneShopCartLineList
-     *            ，剩下的商品行
-     * @param onePromotionConditionSKUList
-     * @param onePromotionSettingSKUList
-     * @return
-     */
-    @Override
-    public List<ShoppingCartLineCommand> getLinesOfNormalPromotion(
-                    List<ShoppingCartLineCommand> oneShopCartLineList,
-                    List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList,
-                    List<PromotionConditionSKU> onePromotionConditionSKUList){
-        List<ShoppingCartLineCommand> linesNeedToCompress = new ArrayList<ShoppingCartLineCommand>();
-
-        linesNeedToCompress = getLinesOfPromotionBySettingAndConditionList(
-                        oneShopCartLineList,
-                        onePromotionSettingSKUList,
-                        onePromotionConditionSKUList);
-
-        return linesNeedToCompress;
-    }
-
-    /**
      * 获取满足优惠活动条件的SKU，直接取促销活动的条件表达式。调用现有Condition检查方法。
      * 
      * @shoppingLines确定店铺下的购物车行
      * @promotionIdList确定店铺下活动号列表，从优惠结果SettingSKU List中来；
      * @return
      */
-    @Override
-    @Transactional(readOnly = true)
-    public List<PromotionConditionSKU> getPromotionConditionSKUListFromShoppingCartLines(
+    private List<PromotionConditionSKU> getPromotionConditionSKUListFromShoppingCartLines(
                     List<ShoppingCartLineCommand> shoppingLines,
                     List<Long> promotionIdList){
-        if (shoppingLines == null || shoppingLines.size() == 0 || promotionIdList == null || promotionIdList.size() == 0)
+        if (shoppingLines == null || shoppingLines.size() == 0 || promotionIdList == null || promotionIdList.size() == 0){
             return null;
+        }
         List<PromotionConditionSKU> suitSKUList = new ArrayList<PromotionConditionSKU>();
         // get each promotion condition list
         List<AtomicCondition> condList = new ArrayList<AtomicCondition>();
@@ -1325,22 +1373,25 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
             condList = new ArrayList<AtomicCondition>();
             oneSKUList = new ArrayList<PromotionConditionSKU>();
             onePromotion = sdkPromotionRuleFilterManager.getPromotionByPromotionId(promotionId);
-            if (onePromotion == null)
+            if (onePromotion == null){
                 continue;
+            }
 
             if (onePromotion.getAtomicConditionList() != null){
                 condList.addAll(onePromotion.getAtomicConditionList());
             }
             if (onePromotion.getAtomicComplexConditionList() != null){
                 if (onePromotion.getConditionType().equalsIgnoreCase(ConditionMasterType.EXP_STEP)){
-                    if (onePromotion.getAtomicComplexConditionList().size() > 0)
+                    if (onePromotion.getAtomicComplexConditionList().size() > 0){
                         condList.add(onePromotion.getAtomicComplexConditionList().get(0));
+                    }
                 }else{
                     condList.addAll(onePromotion.getAtomicComplexConditionList());
                 }
             }
-            if (condList == null || condList.size() == 0)
+            if (condList == null || condList.size() == 0){
                 continue;
+            }
             for (AtomicCondition condition : condList){
                 // 整单其实不需要分组，直接显示在最后面即可
                 /*
@@ -1356,20 +1407,22 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                                     Long.valueOf(condition.getConditionValue().toString()),
                                     condition);
                 }else{
-                    if (condition.getScopeTag() == null || condition.getScopeValue() <= 0L)
+                    if (condition.getScopeTag() == null || condition.getScopeValue() <= 0L){
                         continue;
+                    }
                     if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_PRODUCT)){
                         oneSKUList = getProductSuitSKUList(shoppingLines, condition.getScopeValue(), condition);
                     }else if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_CATEGORY)){
                         oneSKUList = getCategorySuitSKUList(shoppingLines, condition.getScopeValue(), condition);
                     }else if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_CUSTOM)){
                         oneSKUList = getCustomScopeConditionSKUList(shoppingLines, condition.getScopeValue(), condition);
-                    }else if (condition.getScopeTag().equalsIgnoreCase(ItemTagRule.EXP_PREFIX_COMBO)){
+                    }else if (condition.getScopeTag().equalsIgnoreCase(TagRule.EXP_PREFIX_COMBO)){
                         oneSKUList = getComboSuitSKUList(shoppingLines, condition.getScopeValue(), condition);
                     }
                 }
-                if (oneSKUList == null || oneSKUList.size() == 0)
+                if (oneSKUList == null || oneSKUList.size() == 0){
                     continue;
+                }
                 for (PromotionConditionSKU sku : oneSKUList){
                     sku.setPromotionId(promotionId);
                 }
@@ -1417,8 +1470,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 if (null == shoppingLine.getItemId()){
                     continue;
                 }
-                if (shoppingLine.isGift() == true)
+                if (shoppingLine.isGift() == true){
                     continue;
+                }
                 if (itemId.equals(shoppingLine.getItemId())){
                     sku = new PromotionConditionSKU();
                     sku.setShopId(shoppingLine.getShopId());
@@ -1514,8 +1568,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * 
      * @param skuListSetting所有活动的
      */
-    @Override
-    public List<PromotionCommand> getPromotionListBySKU(List<PromotionSKUDiscAMTBySetting> skuListSetting,Long skuId){
+    private List<PromotionCommand> getPromotionListBySKU(List<PromotionSKUDiscAMTBySetting> skuListSetting,Long skuId){
         if (skuListSetting == null || skuListSetting.size() == 0 || skuId == null){
             return null;
         }
@@ -1545,8 +1598,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * @param listSKUCondition所有活动的
      * @param
      */
-    @Override
-    public List<PromotionConditionSKU> getConditionSKUListByPromotionId(List<PromotionConditionSKU> listSKUCondition,Long promotionId){
+    private List<PromotionConditionSKU> getConditionSKUListByPromotionId(List<PromotionConditionSKU> listSKUCondition,Long promotionId){
         if (listSKUCondition == null || listSKUCondition.size() == 0 || promotionId == null){
             return null;
         }
@@ -1567,8 +1619,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      *            ,行上活动
      * @param promotionId
      */
-    @Override
-    public List<PromotionSKUDiscAMTBySetting> getSettingSKUListByPromotionId(
+    private List<PromotionSKUDiscAMTBySetting> getSettingSKUListByPromotionId(
                     List<PromotionSKUDiscAMTBySetting> skuListSetting,
                     Long promotionId){
         if (skuListSetting == null || skuListSetting.size() == 0 || promotionId == null){
@@ -1598,8 +1649,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                 if (null == shoppingLine.getItemId()){
                     continue;
                 }
-                if (shoppingLine.isGift() == true)
+                if (shoppingLine.isGift() == true){
                     continue;
+                }
                 if (itemId.equals(shoppingLine.getItemId())){
                     sku = new PromotionConditionSKU();
                     sku.setShopId(shoppingLine.getShopId());
@@ -1661,8 +1713,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         PromotionConditionSKU sku = null;
         List<Long> customItemIds = new ArrayList<Long>();
         customItemIds = SdkCustomizeFilterLoader.load(String.valueOf(customId));
-        if (null == customItemIds)
+        if (null == customItemIds){
             return null;
+        }
         if (null != shoppingLines && shoppingLines.size() > 0){
             for (ShoppingCartLineCommand shoppingLine : shoppingLines){
                 if (shoppingLine.getItemId() == null){
@@ -1699,8 +1752,9 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         Long promotionId = 0L;
         promotionId = condition.getPromotionId();
 
-        if (promotionId <= 0)
+        if (promotionId <= 0){
             return null;
+        }
         if (null != shoppingLines && shoppingLines.size() > 0){
             for (ShoppingCartLineCommand shoppingLine : shoppingLines){
                 if (shoppingLine.getItemId() == null){

@@ -39,21 +39,19 @@ import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
-import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShareDiscountToLineManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionOrderManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
+import com.feilong.core.date.DateExtensionUtil;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
@@ -75,6 +73,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     /** The Constant CHECKED_STATE. */
     private static final int                           CHECKED_STATE = 1;
 
+    /** The sdk shopping cart line command behaviour factory. */
     @Autowired
     private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
 
@@ -94,11 +93,13 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkFreightFeeManager                       sdkFreightFeeManager;
 
+    /** The promotion brief builder. */
     @Autowired
     private PromotionBriefBuilder                      promotionBriefBuilder;
 
+    /** The promotion order manager. */
     @Autowired
-    private ShareDiscountToLineManager                 shareDiscountToLineManager;
+    private PromotionOrderManager                      promotionOrderManager;
 
     /*
      * (non-Javadoc)
@@ -168,6 +169,18 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     }
 
     //TODO feilong 这是什么鬼逻辑?
+    /**
+     * Do with rebuild shopping cart line commands.
+     *
+     * @param shoppingCartCommand
+     *            the shopping cart command
+     * @param noChooseShoppingCartLineCommandList
+     *            the no choose shopping cart line command list
+     * @param lineIdAndShopIdMapList
+     *            the line id and shop id map list
+     * @param shopIdAndShoppingCartCommandMap
+     *            the shop id and shopping cart command map
+     */
     private void doWithRebuildShoppingCartLineCommands(
                     ShoppingCartCommand shoppingCartCommand,
                     List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,
@@ -479,6 +492,18 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         List<ShoppingCartLineCommand> allShoppingCartLines = getAllShoppingCartLines(shopIdAndShoppingCartCommandMap);
         shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
 
+        setShoppingCartCommandPrice(shoppingCartCommand, summaryShopCartList, allShoppingCartLines);
+    }
+
+    /**
+     * @param shoppingCartCommand
+     * @param summaryShopCartList
+     * @param allShoppingCartLines
+     */
+    private void setShoppingCartCommandPrice(
+                    ShoppingCartCommand shoppingCartCommand,
+                    List<ShopCartCommandByShop> summaryShopCartList,
+                    List<ShoppingCartLineCommand> allShoppingCartLines){
         // 设置应付金额
         shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(allShoppingCartLines));
 
@@ -548,23 +573,29 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     ShoppingCartCommand shoppingCartCommand,
                     CalcFreightCommand calcFreightCommand,
                     List<PromotionBrief> promotionBriefList){
-
         if (Validator.isNotNullOrEmpty(promotionBriefList)){
-            // 计算分店铺的优惠.只计算有效的购物车行
-            ShopCartCommandByShop shopCartCommandByShop = getPromotionDiscountAmtSummarySkuListGroup(
-                            shoppingCartCommand,
-                            calcFreightCommand,
-                            promotionBriefList);
-
-            List<ShoppingCartLineCommand> groupShoppingCartLinesToDisplayByLinePromotionResult = sdkShoppingCartGroupManager
-                            .groupShoppingCartLinesToDisplayByLinePromotionResult(shoppingCartCommand, promotionBriefList);
-
-            shoppingCartCommand.setShoppingCartLineCommands(groupShoppingCartLinesToDisplayByLinePromotionResult);
-
-            shopCartCommandByShop.setShopId(shopId);
-            return shopCartCommandByShop;
+            return doWithPromotion(shopId, shoppingCartCommand, calcFreightCommand, promotionBriefList);
         }
 
+        return doWithNoPromotion(shopId, shoppingCartCommand, calcFreightCommand);
+    }
+
+    /**
+     * Do with no promotion.
+     *
+     * @param shopId
+     *            the shop id
+     * @param shoppingCartCommand
+     *            the shopping cart command
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @return the shop cart command by shop
+     * @since 5.3.1
+     */
+    private ShopCartCommandByShop doWithNoPromotion(
+                    Long shopId,
+                    ShoppingCartCommand shoppingCartCommand,
+                    CalcFreightCommand calcFreightCommand){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
         BigDecimal originShippingFee = sdkFreightFeeManager.getFreightFee(shopId, calcFreightCommand, shoppingCartLineCommandList);
 
@@ -596,181 +627,35 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     }
 
     /**
-     * 构造用于购物车页面促销信息显示的数据.
-     * 
-     * @param shopCart
-     *            the shop cart
+     * Do with promotion.
+     *
+     * @param shopId
+     *            the shop id
+     * @param shoppingCartCommand
+     *            the shopping cart command
      * @param calcFreightCommand
      *            the calc freight command
      * @param promotionBriefList
      *            the promotion brief list
-     *
-     * @return the promotion discount amt summary sku list group
+     * @return the shop cart command by shop
+     * @since 5.3.1
      */
-    private ShopCartCommandByShop getPromotionDiscountAmtSummarySkuListGroup(
-                    ShoppingCartCommand shopCart,
+    private ShopCartCommandByShop doWithPromotion(
+                    Long shopId,
+                    ShoppingCartCommand shoppingCartCommand,
                     CalcFreightCommand calcFreightCommand,
                     List<PromotionBrief> promotionBriefList){
 
-        BigDecimal disAmtOnOrder = BigDecimal.ZERO;// 商品行优惠金额
-        BigDecimal baseOnOrderDisAmt = BigDecimal.ZERO;// 整单优惠金额
-        BigDecimal offersShippingDisAmt = BigDecimal.ZERO;// 运费整单优惠金额
+        // 计算分店铺的优惠.只计算有效的购物车行
+        ShopCartCommandByShop shopCartCommandByShop = promotionOrderManager
+                        .buildShopCartCommandByShop(shoppingCartCommand, calcFreightCommand, promotionBriefList);
 
-        List<ShoppingCartLineCommand> giftList = new ArrayList<ShoppingCartLineCommand>();// 礼品行
-        if (Validator.isNotNullOrEmpty(promotionBriefList)){
+        shoppingCartCommand.setShoppingCartLineCommands(
+                        sdkShoppingCartGroupManager
+                                        .groupShoppingCartLinesToDisplayByLinePromotionResult(shoppingCartCommand, promotionBriefList));
 
-            for (PromotionBrief promotionBrief : promotionBriefList){
-                List<PromotionSettingDetail> promotionSettingDetailList = promotionBrief.getDetails();
-                if (Validator.isNullOrEmpty(promotionSettingDetailList)){
-                    continue;
-                }
-
-                for (PromotionSettingDetail promotionSettingDetail : promotionSettingDetailList){
-                    List<PromotionSKUDiscAMTBySetting> affectPromotionSKUDiscAMTBySettingList = promotionSettingDetail
-                                    .getAffectSKUDiscountAMTList();
-
-                    if (Validator.isNotNullOrEmpty(affectPromotionSKUDiscAMTBySettingList)){
-                        for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : affectPromotionSKUDiscAMTBySettingList){
-                            // 如果是礼品
-                            if (promotionSKUDiscAMTBySetting.getGiftMark()){
-                                giftList.add(toGiftShoppingCartLineCommand(promotionSKUDiscAMTBySetting));
-                            }else{
-                                BigDecimal skuDisAmt = promotionSKUDiscAMTBySetting.getDiscountAmount();
-                                disAmtOnOrder = disAmtOnOrder.add(skuDisAmt);// 非礼品才算优惠
-                            }
-                        }
-                    }else{
-                        BigDecimal disAmt = promotionSettingDetail.getDiscountAmount();// 基于整单的
-                        if (promotionSettingDetail.getFreeShippingMark()){
-                            offersShippingDisAmt = offersShippingDisAmt.add(disAmt); // 运费优惠
-                        }else{
-                            baseOnOrderDisAmt = baseOnOrderDisAmt.add(disAmt);
-                        }
-                    }
-                }
-            }
-        }
-
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shopCart.getShoppingCartLineCommands();// 有效的购物车行
-        Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
-
-        //***************************************************************************************
-        ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
-
-        shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
-
-        BigDecimal originPayAmount = getOriginPayAmount(shoppingCartLineCommandList);
-        shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount); // 应付小计
-        shopCartCommandByShop.setSumCurrentPayAmount(originPayAmount); // 应付合计
-
-        BigDecimal shopCartAllDisAmt = disAmtOnOrder.add(baseOnOrderDisAmt);// 购物车的所有优惠(不包含运费)
-
-        shopCartCommandByShop.setOffersShipping(BigDecimal.ZERO);// 计算运费
-        shopCartCommandByShop.setOriginShoppingFee(BigDecimal.ZERO);// 源运费
-
-        BigDecimal originShippingFee = BigDecimal.ZERO; // 应付运费
-        BigDecimal currentShippingFee = BigDecimal.ZERO;// 实付运费
-
-        if (null != calcFreightCommand){
-            originShippingFee = sdkFreightFeeManager.getFreightFee(shopId, calcFreightCommand, shoppingCartLineCommandList);
-            shopCartCommandByShop.setOriginShoppingFee(originShippingFee); // 应付运费
-            shopCartCommandByShop.setOffersShipping(
-                            originShippingFee.compareTo(offersShippingDisAmt) >= 0 ? offersShippingDisAmt : originShippingFee); // 运费优惠
-            shopCart.setOriginShoppingFee(originShippingFee); // 应付运费
-            currentShippingFee = shopCartCommandByShop.getOriginShoppingFee().subtract(shopCartCommandByShop.getOffersShipping()); // 实付运费
-            shopCart.setCurrentShippingFee(currentShippingFee);
-        }
-
-        // 当应付合计金额 小于订单优惠时
-        if (shopCartCommandByShop.getSumCurrentPayAmount().compareTo(disAmtOnOrder) < 0){
-            shopCartCommandByShop.setOffersTotal(shopCartCommandByShop.getSubtotalCurrentPayAmount());
-            shopCartCommandByShop.setDisAmtOnOrder(shopCartCommandByShop.getSubtotalCurrentPayAmount());
-            shopCartCommandByShop.setOffersShipping(BigDecimal.ZERO);
-            shopCartCommandByShop.setDisAmtSingleOrder(BigDecimal.ZERO);
-        }else{
-            // 当应付合计金额 小于优惠合计时
-            if (shopCartCommandByShop.getSumCurrentPayAmount().compareTo(shopCartAllDisAmt) < 0){
-                shopCartCommandByShop.setOffersTotal(shopCartCommandByShop.getSumCurrentPayAmount());
-                BigDecimal differAmt = shopCartCommandByShop.getSumCurrentPayAmount().subtract(disAmtOnOrder);// 整单优惠=应付金额-订单优惠
-                shopCartCommandByShop.setDisAmtSingleOrder(differAmt); // 整单优惠
-            }else{
-                shopCartCommandByShop.setDisAmtSingleOrder(baseOnOrderDisAmt);
-                shopCartCommandByShop.setOffersTotal(shopCartAllDisAmt);
-            }
-            shopCartCommandByShop.setDisAmtOnOrder(disAmtOnOrder);// 订单优惠
-        }
-
-        // 实付合计(应付金额+实付运费-商品优惠总额)
-        BigDecimal realPayAmt = shopCartCommandByShop.getSumCurrentPayAmount().add(currentShippingFee)
-                        .subtract(shopCartCommandByShop.getOffersTotal());
-        shopCartCommandByShop.setRealPayAmount(realPayAmt);// 实付合计
-
-        // 应付合计(应付金额+应付运费)
-        shopCartCommandByShop.setSumCurrentPayAmount(shopCartCommandByShop.getSubtotalCurrentPayAmount().add(originShippingFee));
-
-        //XXX feilong 原来是这里加礼品的
-        shoppingCartLineCommandList.addAll(giftList); // 将礼品放入购物车当中
-        shopCart.setShoppingCartLineCommands(shoppingCartLineCommandList);
-
-        shopCart.setOriginPayAmount(shopCartCommandByShop.getSumCurrentPayAmount());// 应付金额
-        shopCart.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount()); // 实付金额
-
-        //***************************************************************************************************
-
-        // 封装数据
-        ShoppingCartCommand shoppingCartCommand = new ShoppingCartCommand();
-        Map<Long, ShoppingCartCommand> map = new HashMap<Long, ShoppingCartCommand>();
-        map.put(shopId, shopCart);
-
-        shoppingCartCommand.setShoppingCartLineCommands(shopCart.getShoppingCartLineCommands());
-        shoppingCartCommand.setShoppingCartByShopIdMap(map);
-
-        // 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值
-        shareDiscountToLineManager.shareDiscountToLine(shoppingCartCommand, promotionBriefList);
-        shopCart.setShoppingCartLineCommands(shoppingCartCommand.getShoppingCartLineCommands());
-
+        shopCartCommandByShop.setShopId(shopId);
         return shopCartCommandByShop;
-    }
-
-    /**
-     * 封装礼品购物车行.
-     *
-     * @param promotionSKUDiscAMTBySetting
-     *            the pro sku
-     * @return the gift shopping cart line command
-     */
-    private ShoppingCartLineCommand toGiftShoppingCartLineCommand(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
-        Integer qty = promotionSKUDiscAMTBySetting.getQty();
-        Long settingId = promotionSKUDiscAMTBySetting.getSettingId();
-
-        ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
-
-        shoppingCartLineCommand.setItemId(promotionSKUDiscAMTBySetting.getItemId());
-        shoppingCartLineCommand.setItemName(promotionSKUDiscAMTBySetting.getItemName());
-        shoppingCartLineCommand.setQuantity(qty);
-        shoppingCartLineCommand.setGift(promotionSKUDiscAMTBySetting.getGiftMark());
-        shoppingCartLineCommand.setShopId(promotionSKUDiscAMTBySetting.getShopId());
-        shoppingCartLineCommand.setType(Constants.ITEM_TYPE_PREMIUMS);
-        shoppingCartLineCommand.setSkuId(promotionSKUDiscAMTBySetting.getSkuId());
-
-        if (settingId != null){
-            shoppingCartLineCommand.setLineGroup(settingId);
-        }
-        //XXX feilong what logic?
-        shoppingCartLineCommand.setStock(qty);
-        // 赠品都设置为有效
-        shoppingCartLineCommand.setValid(true);
-
-        ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                        .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
-        shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
-
-        shoppingCartLineCommand.setPromotionId(promotionSKUDiscAMTBySetting.getPromotionId());
-        shoppingCartLineCommand.setSettingId(settingId);
-        shoppingCartLineCommand.setGiftChoiceType(promotionSKUDiscAMTBySetting.getGiftChoiceType());
-        shoppingCartLineCommand.setGiftCountLimited(promotionSKUDiscAMTBySetting.getGiftCountLimited());
-
-        return shoppingCartLineCommand;
     }
 
     /**
@@ -822,6 +707,13 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         return shopCartByShopIdMap;
     }
 
+    /**
+     * 获得 shop id and shopping cart line command list.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @return the shop id and shopping cart line command list
+     */
     private Map<Long, List<ShoppingCartLineCommand>> getShopIdAndShoppingCartLineCommandList(
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList){
 

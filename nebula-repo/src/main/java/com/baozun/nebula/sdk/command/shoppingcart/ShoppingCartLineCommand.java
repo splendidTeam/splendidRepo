@@ -121,13 +121,17 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     //*********************************************************************************
 
-    /** 吊牌价 *. */
+    /** 吊牌价. */
     private BigDecimal                 listPrice;
 
     /** 商品单价. */
     private BigDecimal                 salePrice;
 
-    /** 购物车行 金额小计 *. */
+    /**
+     * 购物车行 金额小计.
+     * 
+     * @see com.baozun.nebula.model.salesorder.OrderLine#setSubtotal(BigDecimal)
+     */
     private BigDecimal                 subTotalAmt      = BigDecimal.ZERO;
 
     /** 加入时间. */
@@ -309,19 +313,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 购物车行 金额小计 *.
+     * 获得 购物车行 金额小计.
      *
-     * @return the 购物车行 金额小计 *
+     * @return the 购物车行 金额小计
      */
     public BigDecimal getSubTotalAmt(){
         return subTotalAmt;
     }
 
     /**
-     * 设置 购物车行 金额小计 *.
+     * 设置 购物车行 金额小计 .
      *
      * @param subTotalAmt
-     *            the new 购物车行 金额小计 *
+     *            the new 购物车行 金额小计
      */
     public void setSubTotalAmt(BigDecimal subTotalAmt){
         this.subTotalAmt = subTotalAmt;

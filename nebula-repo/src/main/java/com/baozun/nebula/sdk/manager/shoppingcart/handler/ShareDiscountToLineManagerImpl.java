@@ -75,12 +75,15 @@ public class ShareDiscountToLineManagerImpl implements ShareDiscountToLineManage
             }
             BigDecimal discount = getLineDiscount(shoppingCartLineCommand, promotionSKUDiscAMTBySettingList);
             shoppingCartLineCommand.setDiscount(discount);
-            // 购物车行小计
-            BigDecimal subTotalAmt = NumberUtil
-                            .getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice());
 
-            BigDecimal lineSubTotalAmt = subTotalAmt.subtract(discount);
-            shoppingCartLineCommand.setSubTotalAmt(lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt);
+            // 购物车行小计
+            BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
+            Integer quantity = shoppingCartLineCommand.getQuantity();
+            BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice).subtract(discount);
+            BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt;
+
+            LOGGER.debug("salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}]", salePrice, quantity, discount, subTotalAmt);
+            shoppingCartLineCommand.setSubTotalAmt(subTotalAmt);
         }
     }
 

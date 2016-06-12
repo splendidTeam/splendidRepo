@@ -41,182 +41,182 @@ public class SdkShoppingCartGroupManagerImplTest {
 		sdkPromotionManager.publishPromotion(date);
 	}
 
-	@Test
-	public void getPromotionListBySKUTest() {
+//	@Test
+//	public void getPromotionListBySKUTest() {
+//
+//		Long skuId = new Long(1213);
+//		List<PromotionSKUDiscAMTBySetting> skuListSetting = new ArrayList<PromotionSKUDiscAMTBySetting>();
+//
+//		for (int i = 0; i < 10; i++) {
+//			PromotionSKUDiscAMTBySetting pss = new PromotionSKUDiscAMTBySetting();
+//			if (i % 2 == 0) {
+//				pss.setSkuId(skuId);
+//				pss.setPromotionId(new Long(351));
+//			} else {
+//				pss.setSkuId(new Long(25));
+//				pss.setPromotionId(new Long(63111));
+//			}
+//			skuListSetting.add(pss);
+//		}
+//		List<PromotionCommand> promotionCommands = sdkShoppingCartGroupManager
+//				.getPromotionListBySKU(skuListSetting, skuId);
+//		Assert.assertSame(5, promotionCommands.size());
+//
+//	}
 
-		Long skuId = new Long(1213);
-		List<PromotionSKUDiscAMTBySetting> skuListSetting = new ArrayList<PromotionSKUDiscAMTBySetting>();
+//	@Test
+//	public void getConditionSKUListByPromotionId() {
+//		Long skuId = 1213l;
+//		List<PromotionConditionSKU> skuListSetting = new ArrayList<PromotionConditionSKU>();
+//
+//		for (int i = 0; i < 10; i++) {
+//			PromotionConditionSKU pss = new PromotionConditionSKU();
+//			if (i % 2 == 0) {
+//				pss.setPromotionId(skuId);
+//			}
+//			skuListSetting.add(pss);
+//		}
+//		List<PromotionConditionSKU> promotionCommands = sdkShoppingCartGroupManager
+//				.getConditionSKUListByPromotionId(skuListSetting, skuId);
+//		Assert.assertSame(5, promotionCommands.size());
+//
+//	}
 
-		for (int i = 0; i < 10; i++) {
-			PromotionSKUDiscAMTBySetting pss = new PromotionSKUDiscAMTBySetting();
-			if (i % 2 == 0) {
-				pss.setSkuId(skuId);
-				pss.setPromotionId(new Long(351));
-			} else {
-				pss.setSkuId(new Long(25));
-				pss.setPromotionId(new Long(63111));
-			}
-			skuListSetting.add(pss);
-		}
-		List<PromotionCommand> promotionCommands = sdkShoppingCartGroupManager
-				.getPromotionListBySKU(skuListSetting, skuId);
-		Assert.assertSame(5, promotionCommands.size());
+//	@Test
+//	public void getSettingSKUListByPromotionId() {
+//
+//		Long skuId = 1213l;
+//		List<PromotionSKUDiscAMTBySetting> skuListSetting = new ArrayList<PromotionSKUDiscAMTBySetting>();
+//
+//		for (int i = 0; i < 10; i++) {
+//			PromotionSKUDiscAMTBySetting pss = new PromotionSKUDiscAMTBySetting();
+//			if (i % 2 == 0) {
+//				pss.setSkuId(skuId);
+//			}
+//			skuListSetting.add(pss);
+//		}
+//		List<PromotionSKUDiscAMTBySetting> promotionCommands = sdkShoppingCartGroupManager
+//				.getSettingSKUListByPromotionId(skuListSetting, skuId);
+//		Assert.assertSame(5, promotionCommands.size());
+//
+//	}
 
-	}
+//	@Test
+//	public void getLinesOfNormalPromotion() {
+//
+//		List<ShoppingCartLineCommand> oneShopCartLineList = new ArrayList<ShoppingCartLineCommand>();
+//
+//		ShoppingCartLineCommand s1 = new ShoppingCartLineCommand();
+//		s1.setSkuId(3492l);
+//		s1.setExtentionCode("code");
+//		s1.setShopId(256l);
+//
+//		ShoppingCartLineCommand s2 = new ShoppingCartLineCommand();
+//		s2.setSkuId(3486l);
+//		s2.setExtentionCode("code");
+//		s2.setShopId(256l);
+//
+//		oneShopCartLineList.add(s1);
+//		oneShopCartLineList.add(s2);
+//
+//		List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList = new ArrayList<PromotionSKUDiscAMTBySetting>();
+//		PromotionSKUDiscAMTBySetting ps1 = new PromotionSKUDiscAMTBySetting();
+//		ps1.setSkuId(3486l);
+//		ps1.setPromotionId(437l);
+//		ps1.setDiscountAmount(new BigDecimal(3));
+//		ps1.setShopId(256l);
+//
+//		PromotionSKUDiscAMTBySetting ps2 = new PromotionSKUDiscAMTBySetting();
+//		ps2.setPromotionId(438l);
+//		ps2.setDiscountAmount(new BigDecimal(2));
+//		ps2.setSkuId(3486l);
+//		ps2.setShopId(256l);
+//
+//		onePromotionSettingSKUList.add(ps1);
+//		onePromotionSettingSKUList.add(ps2);
+//
+//		List<PromotionConditionSKU> onePromotionConditionSKUList = new ArrayList<PromotionConditionSKU>();
+//
+//		PromotionConditionSKU pcs0 = new PromotionConditionSKU();
+//		pcs0.setPromotionId(437l);
+//		pcs0.setSkuId(3492l);
+//		pcs0.setShopId(256l);
+//
+//		PromotionConditionSKU pcs = new PromotionConditionSKU();
+//		pcs.setPromotionId(437l);
+//		pcs.setSkuId(3486l);
+//		pcs.setShopId(256l);
+//
+//		PromotionConditionSKU pcs1 = new PromotionConditionSKU();
+//		pcs1.setPromotionId(438l);
+//		pcs1.setSkuId(3486l);
+//		pcs1.setShopId(256l);
+//
+//		onePromotionConditionSKUList.add(pcs0);
+//		onePromotionConditionSKUList.add(pcs);
+//		onePromotionConditionSKUList.add(pcs1);
+//
+//		List<ShoppingCartLineCommand> promotionCommands = sdkShoppingCartGroupManager
+//				.getLinesOfNormalPromotion(oneShopCartLineList,
+//						onePromotionSettingSKUList,
+//						onePromotionConditionSKUList);
+//		for (ShoppingCartLineCommand shoppingCartLineCommand : promotionCommands) {
+//			System.out.println();
+//			System.out.println(shoppingCartLineCommand.getLineGroup() + ":"
+//					+ shoppingCartLineCommand.getSkuId() + ":"
+//					+ shoppingCartLineCommand.getDiscount());
+//		}
+//		Assert.assertSame(2, promotionCommands.size());
+//
+//	}
 
-	@Test
-	public void getConditionSKUListByPromotionId() {
-		Long skuId = 1213l;
-		List<PromotionConditionSKU> skuListSetting = new ArrayList<PromotionConditionSKU>();
-
-		for (int i = 0; i < 10; i++) {
-			PromotionConditionSKU pss = new PromotionConditionSKU();
-			if (i % 2 == 0) {
-				pss.setPromotionId(skuId);
-			}
-			skuListSetting.add(pss);
-		}
-		List<PromotionConditionSKU> promotionCommands = sdkShoppingCartGroupManager
-				.getConditionSKUListByPromotionId(skuListSetting, skuId);
-		Assert.assertSame(5, promotionCommands.size());
-
-	}
-
-	@Test
-	public void getSettingSKUListByPromotionId() {
-
-		Long skuId = 1213l;
-		List<PromotionSKUDiscAMTBySetting> skuListSetting = new ArrayList<PromotionSKUDiscAMTBySetting>();
-
-		for (int i = 0; i < 10; i++) {
-			PromotionSKUDiscAMTBySetting pss = new PromotionSKUDiscAMTBySetting();
-			if (i % 2 == 0) {
-				pss.setSkuId(skuId);
-			}
-			skuListSetting.add(pss);
-		}
-		List<PromotionSKUDiscAMTBySetting> promotionCommands = sdkShoppingCartGroupManager
-				.getSettingSKUListByPromotionId(skuListSetting, skuId);
-		Assert.assertSame(5, promotionCommands.size());
-
-	}
-
-	@Test
-	public void getLinesOfNormalPromotion() {
-
-		List<ShoppingCartLineCommand> oneShopCartLineList = new ArrayList<ShoppingCartLineCommand>();
-
-		ShoppingCartLineCommand s1 = new ShoppingCartLineCommand();
-		s1.setSkuId(3492l);
-		s1.setExtentionCode("code");
-		s1.setShopId(256l);
-
-		ShoppingCartLineCommand s2 = new ShoppingCartLineCommand();
-		s2.setSkuId(3486l);
-		s2.setExtentionCode("code");
-		s2.setShopId(256l);
-
-		oneShopCartLineList.add(s1);
-		oneShopCartLineList.add(s2);
-
-		List<PromotionSKUDiscAMTBySetting> onePromotionSettingSKUList = new ArrayList<PromotionSKUDiscAMTBySetting>();
-		PromotionSKUDiscAMTBySetting ps1 = new PromotionSKUDiscAMTBySetting();
-		ps1.setSkuId(3486l);
-		ps1.setPromotionId(437l);
-		ps1.setDiscountAmount(new BigDecimal(3));
-		ps1.setShopId(256l);
-
-		PromotionSKUDiscAMTBySetting ps2 = new PromotionSKUDiscAMTBySetting();
-		ps2.setPromotionId(438l);
-		ps2.setDiscountAmount(new BigDecimal(2));
-		ps2.setSkuId(3486l);
-		ps2.setShopId(256l);
-
-		onePromotionSettingSKUList.add(ps1);
-		onePromotionSettingSKUList.add(ps2);
-
-		List<PromotionConditionSKU> onePromotionConditionSKUList = new ArrayList<PromotionConditionSKU>();
-
-		PromotionConditionSKU pcs0 = new PromotionConditionSKU();
-		pcs0.setPromotionId(437l);
-		pcs0.setSkuId(3492l);
-		pcs0.setShopId(256l);
-
-		PromotionConditionSKU pcs = new PromotionConditionSKU();
-		pcs.setPromotionId(437l);
-		pcs.setSkuId(3486l);
-		pcs.setShopId(256l);
-
-		PromotionConditionSKU pcs1 = new PromotionConditionSKU();
-		pcs1.setPromotionId(438l);
-		pcs1.setSkuId(3486l);
-		pcs1.setShopId(256l);
-
-		onePromotionConditionSKUList.add(pcs0);
-		onePromotionConditionSKUList.add(pcs);
-		onePromotionConditionSKUList.add(pcs1);
-
-		List<ShoppingCartLineCommand> promotionCommands = sdkShoppingCartGroupManager
-				.getLinesOfNormalPromotion(oneShopCartLineList,
-						onePromotionSettingSKUList,
-						onePromotionConditionSKUList);
-		for (ShoppingCartLineCommand shoppingCartLineCommand : promotionCommands) {
-			System.out.println();
-			System.out.println(shoppingCartLineCommand.getLineGroup() + ":"
-					+ shoppingCartLineCommand.getSkuId() + ":"
-					+ shoppingCartLineCommand.getDiscount());
-		}
-		Assert.assertSame(2, promotionCommands.size());
-
-	}
-
-	@Test
-	public void appendShoppingCartLinesOfNoPromotion() {
-
-		SdkShoppingCartGroupManagerImpl groupManagerImpl = new SdkShoppingCartGroupManagerImpl();
-
-		List<ShoppingCartLineCommand> oneShopCartLineList = new ArrayList<ShoppingCartLineCommand>();
-		ShoppingCartLineCommand s1 = new ShoppingCartLineCommand();
-		s1.setSkuId(3492l);
-		s1.setExtentionCode("code");
-		s1.setShopId(256l);
-
-		ShoppingCartLineCommand s2 = new ShoppingCartLineCommand();
-		s2.setSkuId(3486l);
-		s2.setExtentionCode("code");
-		s2.setShopId(256l);
-
-		ShoppingCartLineCommand s3 = new ShoppingCartLineCommand();
-		s3.setSkuId(34l);
-		s3.setExtentionCode("code");
-		s3.setShopId(256l);
-		oneShopCartLineList.add(s1);
-		oneShopCartLineList.add(s2);
-		oneShopCartLineList.add(s3);
-		List<ShoppingCartLineCommand> promotionCommands = groupManagerImpl
-				.appendShoppingCartLinesOfNoPromotion(oneShopCartLineList,
-						oneShopCartLineList);
-		Assert.assertSame(3, promotionCommands.size());
-
-		List<ShoppingCartLineCommand> goneShopCartLineList = new ArrayList<ShoppingCartLineCommand>();
-		ShoppingCartLineCommand gs1 = new ShoppingCartLineCommand();
-		gs1.setSkuId(3492l);
-		gs1.setExtentionCode("code");
-		gs1.setShopId(256l);
-
-		ShoppingCartLineCommand gs2 = new ShoppingCartLineCommand();
-		gs2.setSkuId(3486l);
-		gs2.setExtentionCode("code");
-		gs2.setShopId(256l);
-		goneShopCartLineList.add(gs1);
-		goneShopCartLineList.add(gs2);
-
-		promotionCommands = groupManagerImpl
-				.appendShoppingCartLinesOfNoPromotion(oneShopCartLineList,
-						goneShopCartLineList);
-		Assert.assertSame(3, promotionCommands.size());
-
-	}
+//	@Test
+//	public void appendShoppingCartLinesOfNoPromotion() {
+//
+//		SdkShoppingCartGroupManagerImpl groupManagerImpl = new SdkShoppingCartGroupManagerImpl();
+//
+//		List<ShoppingCartLineCommand> oneShopCartLineList = new ArrayList<ShoppingCartLineCommand>();
+//		ShoppingCartLineCommand s1 = new ShoppingCartLineCommand();
+//		s1.setSkuId(3492l);
+//		s1.setExtentionCode("code");
+//		s1.setShopId(256l);
+//
+//		ShoppingCartLineCommand s2 = new ShoppingCartLineCommand();
+//		s2.setSkuId(3486l);
+//		s2.setExtentionCode("code");
+//		s2.setShopId(256l);
+//
+//		ShoppingCartLineCommand s3 = new ShoppingCartLineCommand();
+//		s3.setSkuId(34l);
+//		s3.setExtentionCode("code");
+//		s3.setShopId(256l);
+//		oneShopCartLineList.add(s1);
+//		oneShopCartLineList.add(s2);
+//		oneShopCartLineList.add(s3);
+//		List<ShoppingCartLineCommand> promotionCommands = groupManagerImpl
+//				.appendShoppingCartLinesOfNoPromotion(oneShopCartLineList,
+//						oneShopCartLineList);
+//		Assert.assertSame(3, promotionCommands.size());
+//
+//		List<ShoppingCartLineCommand> goneShopCartLineList = new ArrayList<ShoppingCartLineCommand>();
+//		ShoppingCartLineCommand gs1 = new ShoppingCartLineCommand();
+//		gs1.setSkuId(3492l);
+//		gs1.setExtentionCode("code");
+//		gs1.setShopId(256l);
+//
+//		ShoppingCartLineCommand gs2 = new ShoppingCartLineCommand();
+//		gs2.setSkuId(3486l);
+//		gs2.setExtentionCode("code");
+//		gs2.setShopId(256l);
+//		goneShopCartLineList.add(gs1);
+//		goneShopCartLineList.add(gs2);
+//
+//		promotionCommands = groupManagerImpl
+//				.appendShoppingCartLinesOfNoPromotion(oneShopCartLineList,
+//						goneShopCartLineList);
+//		Assert.assertSame(3, promotionCommands.size());
+//
+//	}
 
 	@Test
 	public void appendShoppingCartLines() throws Exception {
