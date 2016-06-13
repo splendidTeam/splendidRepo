@@ -1592,7 +1592,7 @@ public class ItemController extends BaseController{
 
 	public String getFullDomainUrl(String domain,String imgStr){
 		String newUrl = "";
-		if (null != imgStr && !imgStr.startsWith("http://")){
+		if (null != imgStr && !imgStr.startsWith(domain)){
 			newUrl = domain + imgStr;
 			return newUrl;
 		}else{
