@@ -72,6 +72,7 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionGuideManager;
 import com.baozun.nebula.solr.command.DataFromSolr;
 import com.baozun.nebula.solr.command.QueryConditionCommand;
 import com.baozun.nebula.solr.manager.ItemInfoManager;
+import com.baozun.nebula.web.constants.ImgConstants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
 import com.feilong.core.Validator;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -111,17 +112,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		if (itemBaseCommand == null) {
 			throw new BusinessException(ErrorCodesFoo.ITEM_NOT_EXIST);
 		}
-		// 给商品描述的html中的图片加上域名地址(customBaseUrl)
-		String desc = itemBaseCommand.getDescription();
-		if (StringUtils.isNotBlank(customBaseUrl) && StringUtils.isNotBlank(desc)) {
-			Document document = Jsoup.parse(desc);
-			Elements elements = document.select("img");
-			for (Element element : elements) {
-				String src = customBaseUrl + element.attr("src");
-				element.attr("src", src);
-			}
-			itemBaseCommand.setDescription(document.body().html());
-		}
+		setItemDescImgSrc(itemBaseCommand, customBaseUrl);
 
 		return itemBaseCommand;
 	}
@@ -133,7 +124,28 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		if (itemBaseCommand == null) {
 			throw new BusinessException(ErrorCodesFoo.ITEM_NOT_EXIST);
 		}
+		String customBaseUrl =ImgConstants.IMG_BASE;
+		setItemDescImgSrc(itemBaseCommand, customBaseUrl);
 		return itemBaseCommand;
+	}
+
+	/**
+	 * 给商品描述的html中的图片加上域名地址(customBaseUrl)
+	 * @param itemBaseCommand
+	 * @param customBaseUrl
+	 */
+	private void setItemDescImgSrc(ItemBaseCommand itemBaseCommand,
+			String customBaseUrl) {
+		String desc = itemBaseCommand.getDescription();
+		if (StringUtils.isNotBlank(customBaseUrl) && StringUtils.isNotBlank(desc)) {
+			Document document = Jsoup.parse(desc);
+			Elements elements = document.select("img");
+			for (Element element : elements) {
+				String src = customBaseUrl + element.attr("src");
+				element.attr("src", src);
+			}
+			itemBaseCommand.setDescription(document.body().html());
+		}
 	}
 
 	@Transactional(readOnly=true)
@@ -786,17 +798,7 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 		if (itemBaseCommand == null) {
 			throw new BusinessException(ErrorCodes.ITEM_NOT_EXIST);
 		}
-		// 给商品描述的html中的图片加上域名地址(customBaseUrl)
-		String desc = itemBaseCommand.getDescription();
-		if (StringUtils.isNotBlank(customBaseUrl) && StringUtils.isNotBlank(desc)) {
-			Document document = Jsoup.parse(desc);
-			Elements elements = document.select("img");
-			for (Element element : elements) {
-				String src = customBaseUrl + element.attr("src");
-				element.attr("src", src);
-			}
-			itemBaseCommand.setDescription(document.body().html());
-		}
+		setItemDescImgSrc(itemBaseCommand, customBaseUrl);
 
 		return itemBaseCommand;
 	}
