@@ -367,12 +367,10 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     }
     
 	protected String getPaySuccessRedirect() {
-			//return URL_PAY_SUCCESS_PAGE + "?subOrdinate=" + subOrdinate;
 		return URL_PAY_SUCCESS_PAGE;
 	}
 	
 	protected String getPayFailureRedirect() {
-			//return URL_PAY_FAILURE_PAGE + "?subOrdinate=" + subOrdinate;
 		return URL_PAY_FAILURE_PAGE;
 	}
 }

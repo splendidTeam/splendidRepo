@@ -39,6 +39,8 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaWechatPaymentController.class);
     
+    protected static final String URL_GET_OPENID_REDIRECT = "/payment/wechat/openid.htm";
+    
     //进入微信支付页面
     //如果是pc端，则显示二维码及其他订单信息，供用户扫码支付，二维码从session中获取
     //如果是mobile端，则进入mobile端的支付页面，调用jsapi发起支付，需要封装额外的信息
@@ -47,6 +49,24 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     		@RequestParam(value = "subOrdinate") String subOrdinate, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	
+    	return null;
+    }
+    
+    /**
+     * 
+     * @RequestMapping(value = URL_GET_OPENID_REDIRECT)
+     * 
+     * @param memberDetails
+     * @param subOrdinate
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
+    public String getWechatOpenidPage(
+    		@LoginMember MemberDetails memberDetails,
+    		@RequestParam(value = "subOrdinate") String subOrdinate, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
     	return null;
     }
 }
