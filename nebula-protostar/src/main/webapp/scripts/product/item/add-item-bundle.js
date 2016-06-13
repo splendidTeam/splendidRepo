@@ -11,7 +11,11 @@ $j.extend(loxia.regional['zh-CN'],{
 	"TABLE_TITLE_ITEM_PRICE":"商品价格",
 	"TABLE_TITLE_ITEM_INVENTORY":"库存",
 	"TABLE_TITLE_ITEM_STATUS":"状态",
-	"TABLE_TITLE_STYLE_CODE":"款号"
+	"TABLE_TITLE_STYLE_CODE":"款号",
+	"SELECT-PRODUCT":"请选择商品",
+	"SELECT-PRODUCT-EXIST":"您选中的商品已存在",
+	"MAIN-PRODUCT-NOT-EXIST":"主卖品不存在",
+	"MEMBER-PRODUCT-NOT-EXIST":"成员商品不存在"
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
@@ -65,9 +69,13 @@ $j(document).ready(function(){
 	var bundleExtInfoValidator = new FormValidator('', 30, function(){
 		
 		// TODO 校验主卖品是否存在
-		
+		if($j(".setMainProduct").find(".validate-code").text() == null){
+			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
+		}
 		// TODO 校验成员是否存在至少一个
-		
+		if($j("#selectStyle").prev().find(".validate-code").text() == null){
+			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
+		}
 		// TODO 校验成员是否重复（包括主卖品）
 		
 		// TODO 校验某个成员里面是否有至少一个sku参与
@@ -83,27 +91,43 @@ $j(document).ready(function(){
 	bindClose(selectStoreyType);
 	
 	$j("#addMainProduct").on("click",function(){
-		//关闭弹出层
-		$j(".proto-dialog .dialog-close").click();
-		//如果类型_type是商品则显示编码和名称、如果类型是款只显示款号
-		var _type = $j(':input[name="selectType"]:checked').val();
-		var element = $j(':input[name="bundle_element"]:checked').parent().next();
-		if(selectStoreyType == 1){
-			if(_type == "product") {
-				$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p><p class="sub-title">'+element.next().html()+'</p></li>');
-				$j("#selectPro").hide();refreshItemData();
-			} else if(_type == "style") {
-				$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p></li>');
-				$j("#selectPro").hide();
+		var hasRepeat = false;
+		var element = $j(':input[name="bundle_element"]:checked');
+		//校验是否有重复选择商品
+		$j(".validate-code").each(function(){
+			if( element.parent().next().html() == $j(this).html() ){
+				hasRepeat = true;
 			}
-		}else if(selectStoreyType == 2){
-			if(_type == "product") {
-				$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p><p class="sub-title">'+element.next().html()+'</p></li>');
-			} else if(_type == "style") {
-				$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p></li>');
+		});
+		//判断是否选择了商品
+		if(element.val() != null){
+			if(!hasRepeat){
+				//关闭弹出层
+				$j(".proto-dialog .dialog-close").click();
+				//如果类型_type是商品则显示编码和名称、如果类型是款只显示款号
+				var _type = $j(':input[name="selectType"]:checked').val();
+				if(selectStoreyType == 1){
+					if(_type == "product") {
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
+						$j("#selectPro").hide();refreshItemData();
+					} else if(_type == "style") {
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						$j("#selectPro").hide();
+					}
+				}else if(selectStoreyType == 2){
+					if(_type == "product") {
+						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
+					} else if(_type == "style") {
+						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+					}
+				}
+				bindClose(selectStoreyType);
+			}else{
+				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT-EXIST"));
 			}
+		}else{
+			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT"));
 		}
-		bindClose(selectStoreyType);
 	});
 	
 	

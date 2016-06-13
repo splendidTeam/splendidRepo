@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentSt
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
@@ -53,8 +51,6 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     /** The Constant LOGGER. */
     private static final Logger LOGGER          = LoggerFactory.getLogger(NebulaPaymentController.class);
 
-    private static final String PAYMENT_SUCCESS = "PAYMENT_SUCCESS";
-
     @Autowired
     private SdkPaymentManager   sdkPaymentManager;
 
@@ -72,7 +68,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     
     @Autowired
 	private MataInfoManager     mataInfoManager;
-
+    
     @Override
     public String buildPayUrl(
                     SalesOrderCommand originalSalesOrder,
@@ -302,26 +298,6 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 	}
 
     /**
-     * @param responseStatus
-     * @param salesOrderCommand
-     * @return
-     */
-    private boolean canUpdatePayInfos(String responseStatus,SalesOrderCommand salesOrderCommand){
-        if (null == salesOrderCommand){
-            return false;
-        }
-
-        Integer logisticsStatus = salesOrderCommand.getLogisticsStatus();
-        Integer financialStatus = salesOrderCommand.getFinancialStatus();
-        return PAYMENT_SUCCESS.equals(responseStatus)
-                        && (Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, logisticsStatus)
-                                        || Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, logisticsStatus))
-                        && Objects.equals(
-                                        SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT,
-                                        financialStatus);
-    }
-    
-    /**
 	 * 获取过期时间
 	 * @param orderCreateDate
 	 * @return
@@ -341,7 +317,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 			return itBPay.toString() + "m";
 		}
 	}
-    
+
 
     //TODO
     //注意这里的paytype要设置成

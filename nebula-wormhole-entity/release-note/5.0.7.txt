@@ -1,7 +1,0 @@
-2016-01-27:
-	预售相关更新：	
-	DeliveryInfoV5增加appointShipDate，预计发货时间，预售订单中非空
-	SalesOrderV5增加orderType, 订单类型 1-NORMAL_ORDER, 2-PRESALE_ORDER，类中有常量
-	
-	
-	

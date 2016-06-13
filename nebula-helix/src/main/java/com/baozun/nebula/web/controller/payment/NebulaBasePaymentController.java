@@ -19,6 +19,7 @@ package com.baozun.nebula.web.controller.payment;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
+import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
 
@@ -50,6 +53,40 @@ public class NebulaBasePaymentController extends BaseController {
 	
 	@Autowired
 	private OrderManager orderManager;
+	
+	/**
+     * 验证订单的状态
+     * 
+     */
+    protected boolean validateSalesOrderStatus(SalesOrderCommand salesOrder, MemberDetails memberDetails) throws IllegalPaymentStateException{
+        //订单不存在
+        if (Validator.isNullOrEmpty(salesOrder) || Validator.isNullOrEmpty(salesOrder.getId())
+                        || Validator.isNullOrEmpty(salesOrder.getCode())){
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_NOT_EXISTS);
+        } 
+        
+        //不是当前用户的订单
+        if (Validator.isNotNullOrEmpty(memberDetails) && !memberDetails.getMemberId().equals(salesOrder.getMemberId())) {
+        	throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_INVALID_OWNER);
+        }
+        
+        //订单已取消
+        if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_CANCELED, salesOrder.getLogisticsStatus())
+                        || Objects.equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED, salesOrder.getLogisticsStatus())){
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_CANCLED);
+        }
+        //订单已支付
+        else if (Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, salesOrder.getFinancialStatus())){
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
+        }
+		//其它的不能支付状态（不是新建状态，也不是已同步OMS状态）
+        else if (!Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, salesOrder.getLogisticsStatus())
+                        && !Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, salesOrder.getLogisticsStatus())) {
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
+        }
+
+        return true;
+    }
 	
 	/**
 	 * 根据流水号获取订单信息

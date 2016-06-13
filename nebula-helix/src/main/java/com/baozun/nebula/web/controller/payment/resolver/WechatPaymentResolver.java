@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,9 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
+import com.baozun.nebula.event.EventPublisher;
+import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.manager.system.MataInfoManager;
+import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
@@ -27,15 +32,21 @@ import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.baozun.nebula.sdk.utils.MapConvertUtils;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
+import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
-public class WechatPaymentResolver implements PaymentResolver {
+public class WechatPaymentResolver extends BasePaymentResolver implements PaymentResolver {
 	
 	/** The Constant LOGGER. */
     private static final Logger LOGGER          = LoggerFactory.getLogger(WechatPaymentResolver.class);
@@ -51,6 +62,12 @@ public class WechatPaymentResolver implements PaymentResolver {
 	
 	@Autowired
 	private MataInfoManager mataInfoManager;
+	
+	@Autowired
+	private OrderManager sdkOrderManager;
+	
+	@Autowired
+	private EventPublisher eventPublisher;
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
@@ -80,15 +97,15 @@ public class WechatPaymentResolver implements PaymentResolver {
 		
 		if(PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus())) {
 			//2.根据不同的交易类型跳转到不同的处理页面
-			//2.1公众号支付, 构造页面所需参数
+			//2.1公众号支付, 将预支付id放入session
 			if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request))) {
-				
+				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_JSAPI_PREPAY_ID, paymentResult.getPaymentStatusInformation().getPrepayId());
 				//TODO 进入公众号支付页面，应该支持定制
 				return "redirect:/payment/wechat/wxpay.htm";
 			} 
 			//2.2扫码支付，将二维码链接放入session
 			else if(WechatResponseKeyConstants.TRADE_TYPE_NATIVE.equals(getWechatPayType(request))) {
-				request.getSession().setAttribute(SessionKeyConstants.WECHAT_NATIVE_CODE_URL, paymentResult.getPaymentStatusInformation().getCodeUrl());
+				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_NATIVE_CODE_URL, paymentResult.getPaymentStatusInformation().getCodeUrl());
 				//TODO 进入扫码页面，应该支持定制
 				return "redirect:/payment/wechat/codepay.htm";
 			}
@@ -110,9 +127,107 @@ public class WechatPaymentResolver implements PaymentResolver {
 	@Override
 	public void doPayNotify(String payType, Device device, HttpServletRequest request,
 			HttpServletResponse response) throws IllegalPaymentStateException, IOException {
-		// TODO Auto-generated method stub
+		
+		    String paymentType = PayTypeConvertUtil.getPayType(Integer.valueOf(payType));
+		
+		    // 获取异步通知
+	        PaymentResult paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
+	        
+	        String subOrdinate = null;
+	        
+	        if(paymentResult!=null &&  paymentResult.getPaymentStatusInformation()!=null){
+	        	subOrdinate = paymentResult.getPaymentStatusInformation().getOrderNo();
+	        }
+	        
+	        if(subOrdinate == null) return;
+
+	        LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
+	        
+	        LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+
+	        // 判断交易是否已有成功 防止重复调用 。
+	        PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
+
+	        if (Validator.isNotNullOrEmpty(payCode)){
+	        	// 向微信返回SUCCESS
+	        	responseNotifyOrder(response);
+	        	
+	        }else{
+	            LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+
+	            if (null == paymentResult){
+	                //log
+	                sdkPaymentManager.savePaymentLog(
+	                                new Date(),
+	                                com.baozun.nebula.sdk.constants.Constants.PAY_LOG_NOTIFY_AFTER_MESSAGE,
+	                                null,
+	                                request.getRequestURL().toString());
+	            }else{
+	                // 获取支付状态
+	                String responseStatus = paymentResult.getPaymentServiceSatus().toString();
+
+	                //添加订单查询：支付状态为1 物流状态为1||3
+	                Map<String, Object> paraMap = new HashMap<String, Object>();
+	                paraMap.put("subOrdinate", subOrdinate);
+	                List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+	                SalesOrderCommand salesOrderCommand = null;
+	                if (Validator.isNotNullOrEmpty(payInfoLogs)){
+	                    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
+	                }
+
+	                if (canUpdatePayInfos(responseStatus, salesOrderCommand)){
+	                    // 获取通知成功，修改支付及订单信息
+	                    payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), false, request);
+	                }else{
+	                    if (Validator.isNotNullOrEmpty(salesOrderCommand)){
+	                        //log
+	                        String result = "FinancialStatus：" + salesOrderCommand.getFinancialStatus() + " LogisticsStatus:"
+	                                        + salesOrderCommand.getLogisticsStatus();
+
+	                        PayWarnningEvent payWarnningEvent = new PayWarnningEvent(
+	                                        this,
+	                                        salesOrderCommand.getCode(),
+	                                        null,
+	                                        new Date(),
+	                                        null,
+	                                        responseStatus,
+	                                        null,
+	                                        result);
+	                        eventPublisher.publish(payWarnningEvent);
+	                    }
+
+	                    // 返回失败记录日志
+	                    payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_NOTIFY_AFTER_TYPE);
+	                }
+
+	                // 向微信返回SUCCESS
+		        	responseNotifyOrder(response);
+	            }
+	        }
 		
 	}
+	/**
+	 * 微信支付异步通知处理成功时发送此response给微信，否则无需发送，微信会以一定的频率继续通知到商城
+	 * @param response
+	 */
+	public void responseNotifyOrder(HttpServletResponse response) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<xml>");
+		sb.append("<return_code><![CDATA[SUCCESS]]></return_code>");
+		sb.append("<return_msg><![CDATA[OK]]></return_msg>");
+		sb.append("</xml>");
+		try {
+			response.setHeader("Cache-Control", "no-cache");
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("text/xml"); 
+			response.getWriter().write(sb.toString());
+		} catch (Exception e) {
+			LOGGER.error("responseNotifyOrder error.", e);
+		}
+	}
+	
+
 	
 	//openid的获取分三种情况：
 	//1.用户在微信中打开网站时，商城已经自动完成了微信登录，此时从session中获取

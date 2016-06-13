@@ -279,7 +279,29 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
+    	PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
+        if (Validator.isNotNullOrEmpty(pc)){
+            Map<String, Object> paraMap = new HashMap<String, Object>();
+            paraMap.put("subOrdinate", subOrdinate);
+            // 查询订单的需要支付的payInfolog
+            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+            Set<Long> set = new HashSet<Long>();
+            StringBuffer orderCode = new StringBuffer();
+            for (PayInfoLog payInfoLog : payInfoLogs){
+                set.add(payInfoLog.getOrderId());
+            }
+
+            for (Long oid : set){
+                SalesOrderCommand so = orderManager.findOrderById(oid, null);
+                orderCode.append(so.getCode()).append("、");
+            }
+
+            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
+
+            model.addAttribute("totalFee", pc.getPayMoney());
+        }
         return VIEW_PAY_FAILURE;
     }
 
@@ -325,41 +347,12 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 1);
 
         //校验订单是否存在、取消、已支付
-        if (validateSalesOrderStatus(salesOrder)){
+        if (validateSalesOrderStatus(salesOrder, memberDetails)){
             PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
             return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
         }
 
         return null;
-    }
-
-    /**
-     * 验证订单的状态
-     * 
-     */
-    protected boolean validateSalesOrderStatus(SalesOrderCommand salesOrder) throws IllegalPaymentStateException{
-        //订单不存在
-        if (Validator.isNullOrEmpty(salesOrder) || Validator.isNullOrEmpty(salesOrder.getId())
-                        || Validator.isNullOrEmpty(salesOrder.getCode())){
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_NOT_EXISTS);
-        }else{
-            //订单已取消
-            if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_CANCELED, salesOrder.getLogisticsStatus())
-                            || Objects.equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED, salesOrder.getLogisticsStatus())){
-                throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_CANCLED);
-            }
-            //订单已支付
-            else if (Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, salesOrder.getFinancialStatus())){
-                throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
-            }
-			//其它的不能支付状态（不是新建状态，也不是已同步OMS状态）
-            else if (!Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, salesOrder.getLogisticsStatus())
-                            && !Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, salesOrder.getLogisticsStatus())) {
-                throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
-            }
-        }
-
-        return true;
     }
 
     protected String getToPayExceptionPageRedirect(){
