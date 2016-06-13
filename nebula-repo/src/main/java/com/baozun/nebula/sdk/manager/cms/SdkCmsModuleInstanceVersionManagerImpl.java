@@ -379,8 +379,8 @@ public class SdkCmsModuleInstanceVersionManagerImpl implements SdkCmsModuleInsta
 			}
 
 		}
-		/*cacheManager.setMapObject(CacheKeyConstant.CMS_MODULE_KEY, CacheKeyConstant.CMS_MODULE_VERSION_KEY, publishVersionsQueue,
-				TimeInterval.SECONDS_PER_WEEK);*/
+		cacheManager.setMapObject(CacheKeyConstant.CMS_MODULE_KEY, CacheKeyConstant.CMS_MODULE_VERSION_KEY, publishVersionsQueue,
+				TimeInterval.SECONDS_PER_WEEK);
 	}
 
 	@Override
