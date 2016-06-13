@@ -136,7 +136,26 @@
 		</constructor-arg>
 	</bean>
 	
-
+	<bean id="Item.findStyleListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询款号</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select distinct
+						ii.style 
+					from 
+						t_pd_iteminfo ii 
+					inner join 
+						t_pd_item i on i.id = ii.item_id and i.lifecycle in (0, 1)
+					where 
+						i.shop_id = :shopId
+						#if($code)
+		       				and ii.style like :code
+		       			#end
+                ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 	
 	
 	<bean id="Item.findEffectItemInfoListByQueryMap" class="loxia.dao.support.DynamicQueryHolder">
