@@ -78,6 +78,19 @@ public class RegisterForm extends BaseForm{
 	private String				receiveMessage;
 
 	private String				age;
+	
+	/**
+	 * Mobile 注册的时候的 email
+	 */
+	private String              email;
+	
+	
+	/**
+	 * PC 注册的时候的 mobile
+	 */
+	private String              mobile;
+	
+	
 
 	/**
 	 * RegisterForm 对象装换为 MemberFrontendCommand
@@ -337,4 +350,20 @@ public class RegisterForm extends BaseForm{
 		this.sex = sex;
 	}
 
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	
 }
