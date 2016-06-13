@@ -127,26 +127,27 @@
 	</dependencies>
 
 
+
 	<profiles>
+		<profile>
+			<id>pro</id>
+			<properties>
+				<profile>pro</profile>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<profile>test</profile>
+			</properties>
+		</profile>
 		<profile>
 			<id>dev</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<env>dev</env>
-			</properties>
-		</profile>
-		<profile>
-			<id>test</id>
-			<properties>
-				<env>test</env>
-			</properties>
-		</profile>
-		<profile>
-			<id>pro</id>
-			<properties>
-				<env>pro</env>
+				<profile>dev</profile>
 			</properties>
 		</profile>
 	</profiles>
@@ -163,27 +164,13 @@
 					<classesClassifier>api</classesClassifier>
 				</configuration>
 			</plugin>
+
+
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
 				<version>1.5.2</version>
 				<executions>
-					<execution>
-						<phase>package</phase>
-						<id>replace web.xml</id>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-						<configuration>
-							<file>${project.build.directory}/${project.artifactId}/WEB-INF/web.xml</file>
-							<token>&lt;param-value&gt;dev&lt;/param-value&gt;</token>
-							<value>&lt;param-value&gt;${env}&lt;/param-value&gt;</value>
-							<regexFlags>
-								<regexFlag>CASE_INSENSITIVE</regexFlag>
-								<regexFlag>MULTILINE</regexFlag>
-							</regexFlags>
-						</configuration>
-					</execution>
 					<execution>
 						<phase>prepare-package</phase>
 						<id>replace ckfinder</id>
@@ -192,12 +179,12 @@
 						</goals>
 						<configuration>
 							<file>${project.build.directory}/classes/ckfinder/ckfinder-config.xml</file>
-							<tokenValueMap>${project.build.directory}/classes/config/${env}/metainfo.properties</tokenValueMap>
+							<tokenValueMap>src/main/env/${profile}/config/metainfo.properties</tokenValueMap>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -209,14 +196,30 @@
 					<ignorePackaging>true</ignorePackaging>
 					<systemProperties>
 						<tomcatName>tomcat-nebula-protostar</tomcatName>
-						<JAVA_OPTS>-Xms256m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=512m -XX:+UseParallelGC</JAVA_OPTS>
+						<JAVA_OPTS>-Xms256m -Xmx1024m -XX:PermSize=128m
+							-XX:MaxPermSize=512m -XX:+UseParallelGC</JAVA_OPTS>
 					</systemProperties>
 					<warFile>${project.build.directory}/nebula-protostar.war</warFile>
 					<warDirectory>target/nebula-protostar</warDirectory>
 					<contextFile>src/main/resources/context.xml</contextFile>
 				</configuration>
 			</plugin>
-			
 		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>config/**/*</exclude>
+					<exclude>logback.xml</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/env/${profile}</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 </project>
