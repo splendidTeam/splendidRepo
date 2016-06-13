@@ -19,6 +19,15 @@ var findStyleInfoListJsonUrl = base + "/item/styleList.json";
 //设置返回的是主卖品还是成员商品
 var selectStoreyType = '';
 
+var mainEelment = null;
+var elements = new Array();
+var bundleElement = {
+	isMainElement : false,
+	sort : 0,
+	styleCode : '',
+	itemCode : ''
+};
+
 $j(document).ready(function(){
 	
 	/*==================================     bundle扩展信息    ==========================*/
@@ -76,11 +85,23 @@ $j(document).ready(function(){
 	$j("#addMainProduct").on("click",function(){
 		//关闭弹出层
 		$j(".proto-dialog .dialog-close").click();
+		//如果类型_type是商品则显示编码和名称、如果类型是款只显示款号
+		var _type = $j(':input[name="selectType"]:checked').val();
+		var element = $j(':input[name="bundle_element"]:checked').parent().next();
 		if(selectStoreyType == 1){
-			$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
-			$j("#selectPro").hide();
+			if(_type == "product") {
+				$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p><p class="sub-title">'+element.next().html()+'</p></li>');
+				$j("#selectPro").hide();refreshItemData();
+			} else if(_type == "style") {
+				$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p></li>');
+				$j("#selectPro").hide();
+			}
 		}else if(selectStoreyType == 2){
-			$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
+			if(_type == "product") {
+				$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p><p class="sub-title">'+element.next().html()+'</p></li>');
+			} else if(_type == "style") {
+				$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p></li>');
+			}
 		}
 		bindClose(selectStoreyType);
 		
@@ -88,7 +109,6 @@ $j(document).ready(function(){
 	
 	
 	/*==================================     弹出层    ==========================*/
-	/*==================================     bundle扩展信息    ==========================*/
 	
 	
 	
@@ -100,19 +120,23 @@ $j(document).ready(function(){
 		
 		if(currVal == 'subtotal') {//按捆绑商品总价
 			$j('.product-table').hide();
-			$j('.sku-table').show();
+			$j('.product-table > tbody > tr').remove();
+			$j('.sku-table').hide();
+			$j('.sku-table > tbody > tr').remove();
 			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
 		} else if(currVal == 'fix'){//一口价
 			$j('.product-table').show();
 			$j('.sku-table').hide();
+			$j('.sku-table > tbody > tr').remove();
 		} else if(currVal == 'custom'){//定制
 			$j('.product-table').hide();
+			$j('.product-table > tbody > tr').remove();
 			$j('.sku-table').show();
 			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
 		}
 	});
 	/*==================================     价格设置    ==========================*/
-	
+	/*==================================     bundle扩展信息    ==========================*/
 	
 	
 	//保存商品
@@ -230,7 +254,7 @@ function refreshStyleData(){
 		cols : [ {
 			label : "",
 			width : "3%",
-			template : "radioTemplate"
+			template : "radioTemplate1"
 		}, {
 			name : "style",
 			label : nps.i18n("TABLE_TITLE_STYLE_CODE"),
@@ -252,6 +276,10 @@ function radioTemplate(data, args, idx) {
 	// bundle成员只能是普通商品
 	var _type = loxia.getObject("type", data);
 	return "<input type='radio' name='bundle_element' value='" + loxia.getObject("id", data) + "' " + (_type == 1 ? "" : "disabled=disabled") + "/>";
+}
+
+function radioTemplate1(data, args, idx) {
+	return "<input type='radio' name='bundle_element' value='" + loxia.getObject("id", data) + "' />";
 }
 
 function itemCodeTemplate(data, args, idx) {
@@ -305,4 +333,25 @@ Array.prototype.remove = function(val) {
     if (index > -1) {
         this.splice(index, 1);
     }
-};
+}
+
+/**
+ * 装填“一口价”表格数据
+ */
+function loadBundleElement(){
+	var _e = elements;
+	_e.push(mainElement);
+	var data = nps.syncXhr("", _e);
+	  
+	if (data.isSuccess==false) {
+		return nps.i18n("");
+	}
+}
+
+/**
+ * 装填“定制”表格数据
+ */
+function loadBundleSku(){
+	
+}
+
