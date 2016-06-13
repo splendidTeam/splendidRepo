@@ -46,6 +46,9 @@ public class SessionKeyConstants {
 	/** 用户在微信公众号的openid，微信支付使用 */
 	public static final String MEMBER_WECHAT_OPENID = "member_wechat_openid";
 	
-	/** 微信扫码支付返回的链接，使用此链接生成二维码 */
-	public static final String WECHAT_NATIVE_CODE_URL = "wechat_native_code_url";
+	/** 微信支付统一下单返回的扫码链接，使用此链接生成二维码 */
+	public static final String WECHATPAY_NATIVE_CODE_URL = "wechat_native_code_url";
+	
+	/** 微信支付统一下单返回的预支付Id */
+	public static final String WECHATPAY_JSAPI_PREPAY_ID = "wechatpay_jsapi_prepay_id";
 }

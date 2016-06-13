@@ -80,15 +80,15 @@ public class WechatPaymentResolver implements PaymentResolver {
 		
 		if(PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus())) {
 			//2.根据不同的交易类型跳转到不同的处理页面
-			//2.1公众号支付, 构造页面所需参数
+			//2.1公众号支付, 将预支付id放入session
 			if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request))) {
-				
+				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_JSAPI_PREPAY_ID, paymentResult.getPaymentStatusInformation().getPrepayId());
 				//TODO 进入公众号支付页面，应该支持定制
 				return "redirect:/payment/wechat/wxpay.htm";
 			} 
 			//2.2扫码支付，将二维码链接放入session
 			else if(WechatResponseKeyConstants.TRADE_TYPE_NATIVE.equals(getWechatPayType(request))) {
-				request.getSession().setAttribute(SessionKeyConstants.WECHAT_NATIVE_CODE_URL, paymentResult.getPaymentStatusInformation().getCodeUrl());
+				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_NATIVE_CODE_URL, paymentResult.getPaymentStatusInformation().getCodeUrl());
 				//TODO 进入扫码页面，应该支持定制
 				return "redirect:/payment/wechat/codepay.htm";
 			}
