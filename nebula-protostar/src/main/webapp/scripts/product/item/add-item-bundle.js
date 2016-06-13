@@ -76,19 +76,29 @@ $j(document).ready(function(){
 	$j("#addMainProduct").on("click",function(){
 		//关闭弹出层
 		$j(".proto-dialog .dialog-close").click();
+		//如果类型_type是商品则显示编码和名称、如果类型是款只显示款号
+		var _type = $j(':input[name="selectType"]:checked').val();
+		var element = $j(':input[name="bundle_element"]:checked').parent().next();
 		if(selectStoreyType == 1){
-			$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
-			$j("#selectPro").hide();
+			if(_type == "product") {
+				$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p><p class="sub-title">'+element.next().html()+'</p></li>');
+				$j("#selectPro").hide();refreshItemData();
+			} else if(_type == "style") {
+				$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p></li>');
+				$j("#selectPro").hide();
+			}
 		}else if(selectStoreyType == 2){
-			$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">ABCD1234</p><p class="sub-title">超级舒适运动跑鞋</p></li>');
+			if(_type == "product") {
+				$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p><p class="sub-title">'+element.next().html()+'</p></li>');
+			} else if(_type == "style") {
+				$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10">'+element.html()+'</p></li>');
+			}
 		}
 		bindClose(selectStoreyType);
-		
 	});
 	
 	
 	/*==================================     弹出层    ==========================*/
-	/*==================================     bundle扩展信息    ==========================*/
 	
 	
 	
@@ -112,7 +122,7 @@ $j(document).ready(function(){
 		}
 	});
 	/*==================================     价格设置    ==========================*/
-	
+	/*==================================     bundle扩展信息    ==========================*/
 	
 	
 	//保存商品
