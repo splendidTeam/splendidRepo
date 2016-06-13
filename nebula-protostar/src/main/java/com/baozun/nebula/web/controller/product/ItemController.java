@@ -2585,4 +2585,11 @@ public class ItemController extends BaseController{
 		
 		return null;
 	}
+	
+	@RequestMapping("/item/loadBundleSku.json")
+	@ResponseBody
+	public Object loadBundleSku(@ArrayCommand(dataBind = true) BundleElementViewCommand[] commands){
+		
+		return null;
+	}
 }
