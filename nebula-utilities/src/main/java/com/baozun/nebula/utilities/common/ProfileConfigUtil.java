@@ -54,9 +54,9 @@ public class ProfileConfigUtil {
 	}
 
 	private static void checkModel(){
-		if(StringUtils.isBlank(mode)||mode.equalsIgnoreCase("null")){
+		/*if(StringUtils.isBlank(mode)||mode.equalsIgnoreCase("null")){
 			throw new RuntimeException("profile获取在初始化之前，这是不被允许的！请联系NEBULA的相关人员！");
-		}
+		}*/
 	}
 	
 	/**
