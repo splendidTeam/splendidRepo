@@ -17,7 +17,7 @@
 package com.baozun.nebula.web.controller.payment.resolver;
 
 
-public abstract class BasePaymentResolver {
-	
+
+public abstract class BasePaymentResolver implements PaymentResolver {
 	
 }
