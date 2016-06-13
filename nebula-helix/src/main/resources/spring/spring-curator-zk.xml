@@ -52,4 +52,18 @@
 		<property name="listenerPath" value="#{meta['zk.path.urlmapwatch']}" />
 		<property name="watcherInvoke" ref="urlMapWatchInvoke" />
 	</bean>
+	
+	<bean id="zkWatcherControl" class="com.baozun.nebula.curator.watcher.ZkWatcherControl">
+		<property name="watchers">
+			<list>
+				<ref local="engineWatch" />
+				<ref local="freightWatch" />
+				<ref local="i18nLangwatch" />
+				<ref local="moduleMapWatch" />
+				<!-- <ref local="scheduleTaskWatch" /> -->
+				<ref local="systemConfigWatch" />
+				<ref local="urlMapWatch" />
+			</list>
+		</property>
+	</bean>
 </beans>

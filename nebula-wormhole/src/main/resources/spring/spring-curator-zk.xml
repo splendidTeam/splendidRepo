@@ -37,19 +37,28 @@
 		<property name="listenerPath" value="#{meta['zk.path.modulemapwatch']}" />
 		<property name="watcherInvoke" ref="moduleMapWatchInvoke" />
 	</bean>
-	<bean id="scheduleTaskWatchInvoker" class="com.baozun.nebula.curator.invoke.ScheduleTaskWatchInvoker" />
-	<bean id="scheduleTaskWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.scheduletaskwatch']}" />
-		<property name="watcherInvoke" ref="scheduleTaskWatchInvoker" />
+	<bean id="urlMapWatchInvoke" class="com.baozun.nebula.curator.invoke.UrlMapWatchInvoke" />
+	<bean id="urlMapWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
+		<property name="listenerPath" value="#{meta['zk.path.urlmapwatch']}" />
+		<property name="watcherInvoke" ref="urlMapWatchInvoke" />
 	</bean>
 	<bean id="systemConfigWatchInvoke" class="com.baozun.nebula.curator.invoke.SystemConfigWatchInvoke" />
 	<bean id="systemConfigWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
 		<property name="listenerPath" value="#{meta['zk.path.systemconfigwatch']}" />
 		<property name="watcherInvoke" ref="systemConfigWatchInvoke" />
 	</bean>
-	<bean id="urlMapWatchInvoke" class="com.baozun.nebula.curator.invoke.UrlMapWatchInvoke" />
-	<bean id="urlMapWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
-		<property name="listenerPath" value="#{meta['zk.path.urlmapwatch']}" />
-		<property name="watcherInvoke" ref="urlMapWatchInvoke" />
+	<bean id="scheduleTaskWatchInvoker" class="com.baozun.nebula.curator.invoke.ScheduleTaskWatchInvoker" />
+	<bean id="scheduleTaskWatch" class="com.baozun.nebula.curator.watcher.DefaultNodeDataChangedWatcher">
+		<property name="listenerPath" value="#{meta['zk.path.scheduletaskwatch']}" />
+		<property name="watcherInvoke" ref="scheduleTaskWatchInvoker" />
+	</bean>
+	
+	<bean id="zkWatcherControl" class="com.baozun.nebula.curator.watcher.ZkWatcherControl">
+		<property name="watchers">
+			<list>
+				<ref local="scheduleTaskWatch" />
+				<ref local="systemConfigWatch" />
+			</list>
+		</property>
 	</bean>
 </beans>
