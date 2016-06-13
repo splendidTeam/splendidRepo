@@ -69,4 +69,15 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	return null;
     }
+    
+    public String showWechatJsapiPayPage(@RequestParam(value = "subOrdinate") String subOrdinate, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+    	return null;
+    }
+    
+    public String showWechatCodePayPage(@RequestParam(value = "subOrdinate") String subOrdinate, 
+			HttpServletRequest request, HttpServletResponse response, Model model) {
+    	return null;
+    }
+    
 }

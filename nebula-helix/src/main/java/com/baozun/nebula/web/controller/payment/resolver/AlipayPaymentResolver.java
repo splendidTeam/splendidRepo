@@ -68,7 +68,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     
     @Autowired
 	private MataInfoManager     mataInfoManager;
-
+    
     @Override
     public String buildPayUrl(
                     SalesOrderCommand originalSalesOrder,
@@ -317,7 +317,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 			return itBPay.toString() + "m";
 		}
 	}
-    
+
 
     //TODO
     //注意这里的paytype要设置成
