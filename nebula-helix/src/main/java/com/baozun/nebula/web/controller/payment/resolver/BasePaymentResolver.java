@@ -16,14 +16,6 @@
  */
 package com.baozun.nebula.web.controller.payment.resolver;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.baozun.nebula.command.OnLinePaymentCommand;
-import com.baozun.nebula.payment.manager.ReservedPaymentType;
-import com.feilong.servlet.http.RequestUtil;
 
 public abstract class BasePaymentResolver {
 	
