@@ -19,12 +19,8 @@ import com.baozun.nebula.wormhole.manager.SchedulerInitManager;
  */
 public class NebulaSystemInitListener implements ServletContextListener {
 	
-	private static final String PROFILE_KEY="spring.profiles.active";
-	
-	
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		initProfileUtil(sce);
 		initScheduler(sce);
 		initZookeeper(sce);
 		extendProcess(sce);
@@ -44,11 +40,6 @@ public class NebulaSystemInitListener implements ServletContextListener {
 		
 	}
 
-	private void initProfileUtil(ServletContextEvent sce){
-		String profileName = sce.getServletContext().getInitParameter(PROFILE_KEY);
-		ProfileConfigUtil.setMode(profileName);
-	}
-	
 	/**
 	 * 任务加进来
 	 * 

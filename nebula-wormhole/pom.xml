@@ -111,56 +111,37 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<env>dev</env>
+				<profile>dev</profile>
 			</properties>
 		</profile>
 		<profile>
 			<id>test</id>
 			<properties>
-				<env>test</env>
+				<profile>test</profile>
 			</properties>
 		</profile>
 		<profile>
 			<id>pro</id>
 			<properties>
-				<env>pro</env>
+				<profile>pro</profile>
 			</properties>
 		</profile>
 	</profiles>
 	<build>
-		<finalName>nebula-wormhole</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<!--注意增加这两行，在打包时相关的类会被独立打成jar -->
-					<attachClasses>true</attachClasses>
-					<classesClassifier>api</classesClassifier>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<version>1.5.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<file>${project.build.directory}/${project.artifactId}/WEB-INF/web.xml</file>
-					<token>&lt;param-value&gt;dev&lt;/param-value&gt;</token>
-					<value>&lt;param-value&gt;${env}&lt;/param-value&gt;</value>
-					<regexFlags>
-						<regexFlag>CASE_INSENSITIVE</regexFlag>
-						<regexFlag>MULTILINE</regexFlag>
-					</regexFlags>
-				</configuration>
-			</plugin>
-		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>config/**/*</exclude>
+					<exclude>logback.xml</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/env/${profile}</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 </project>

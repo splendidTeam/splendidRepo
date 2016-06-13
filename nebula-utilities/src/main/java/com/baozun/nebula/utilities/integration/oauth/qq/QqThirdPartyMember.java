@@ -64,8 +64,6 @@ public class QqThirdPartyMember extends AbstractThirdPartyMemberAdaptor  impleme
 
 	public QqThirdPartyMember() {
 		
-		logger.debug("-----------QqThirdParty-getModel:"+ProfileConfigUtil.getMode());
-		
 		Properties pro=ProfileConfigUtil.findPro("config/thirdpartymember.properties");
 		
 		clientId = pro.getProperty("thirdparty.qq.clientId");
