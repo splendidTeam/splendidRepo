@@ -73,7 +73,7 @@ $j(document).ready(function(){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
 		// TODO 校验成员是否存在至少一个
-		if($j("#selectStyle").prev().find(".validate-code").text() == null){
+		if($j(".setMemberProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
 		// TODO 校验成员是否重复（包括主卖品）
@@ -110,15 +110,43 @@ $j(document).ready(function(){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
+						bundleElement = {
+								isMainElement : true,
+								sort : 1,
+								styleCode : '',
+								itemCode : element.parent().next().html()
+							};
+						elements.push(bundleElement);
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
+						bundleElement = {
+								isMainElement : true,
+								sort : 1,
+								styleCode : element.parent().next().html(),
+								itemCode : ''
+							};
+						elements.push(bundleElement);
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
+						bundleElement = {
+								isMainElement : false,
+								sort : $(".setMemberProduct li").length-1,
+								styleCode : '',
+								itemCode : element.parent().next().html()
+							};
+						elements.push(bundleElement);
 					} else if(_type == "style") {
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						bundleElement = {
+								isMainElement : false,
+								sort : $(".setMemberProduct li").length-1,
+								styleCode : element.parent().next().html(),
+								itemCode : ''
+							};
+						elements.push(bundleElement);
 					}
 				}
 				bindClose(selectStoreyType);

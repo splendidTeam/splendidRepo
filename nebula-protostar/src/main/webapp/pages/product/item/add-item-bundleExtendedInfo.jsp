@@ -21,7 +21,7 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title">捆绑成员</div>
 		<div class="ui-block-content border-grey">
-			<ul class="clearfix">
+			<ul class="clearfix setMemberProduct">
 				<li class="main-pro pro-empty" id="selectStyle">+新成员</li>
 			</ul>
 			<a class="user-refresh"></a>
