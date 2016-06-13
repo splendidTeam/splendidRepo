@@ -33,8 +33,6 @@ package com.baozun.nebula.curator.watcher;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.state.ConnectionState;
@@ -91,7 +89,7 @@ public abstract class AbstractWatcher implements IWatcher {
 
 		// 注册session失效的监听器，以便session重置后重新注册watcher
 		registerWatcherAfterReconnected();
-
+		
 		// 初使化后无条件触发watcher invoke
 		watcherInvoke.invoke(getListenerPath(), getZkOperator().getData(getListenerPath()));
 	}

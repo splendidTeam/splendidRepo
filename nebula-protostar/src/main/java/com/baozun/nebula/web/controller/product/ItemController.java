@@ -117,6 +117,7 @@ import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.I18nCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
+import com.baozun.nebula.web.command.BundleElementViewCommand;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.google.gson.Gson;
@@ -2573,8 +2574,22 @@ public class ItemController extends BaseController{
 			}
 		}
 
-		Pagination<ItemStyleCommand> args = itemManager.findStyleListByQueryMap(queryBean.getPage(), queryBean.getSorts(), queryBean.getParaMap(), shopId);
+		Pagination<ItemStyleCommand> args = itemManager.findStyleListByQueryMap(queryBean.getPage(), null, queryBean.getParaMap(), shopId);
 
 		return args;
+	}
+	
+	@RequestMapping("/item/loadBundleElement.json")
+	@ResponseBody
+	public Object loadBundleElement(@ArrayCommand(dataBind = true) BundleElementViewCommand[] commands){
+		
+		return null;
+	}
+	
+	@RequestMapping("/item/loadBundleSku.json")
+	@ResponseBody
+	public Object loadBundleSku(@ArrayCommand(dataBind = true) BundleElementViewCommand[] commands){
+		
+		return null;
 	}
 }
