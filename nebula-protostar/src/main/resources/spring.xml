@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:encryption="http://www.jasypt.org/schema/encryption"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
@@ -21,10 +23,10 @@
 	<import resource="spring/spring-redis.xml" />
 	<import resource="spring/spring-excel.xml" />
 	<import resource="spring/spring-schedu.xml" />
-	<!--  <import resource="spring/spring-zk.xml" />-->
+	<!-- <import resource="spring/spring-zk.xml" /> -->
 	<!-- Apache Curator Zookeeper Client -->
 	<import resource="spring/spring-curator-zk.xml" />
-	
+
 	<!-- 配置文件加密工具 start -->
 	<bean id="environmentVariablesConfiguration"
 		class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
@@ -43,29 +45,10 @@
 	</bean>
 	<!-- 配置文件加密工具 end -->
 
-	<beans profile="dev">
-		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/dev/metainfo.properties"/>
-		<encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/dev/solr.properties"/>
-		<encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/dev/redis.properties"/>
-	</beans>
-	<beans profile="test">
-		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/test/metainfo.properties"/>
-		<encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/test/solr.properties"/>
-		<encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/test/redis.properties"/>
-	</beans>
-	<beans profile="sta">
-		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/sta/metainfo.properties"/>
-		<encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/sta/solr.properties"/>
-		<encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/sta/redis.properties"/>
-	</beans>
-	<beans profile="pre">
-		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/pre/metainfo.properties"/>
-		<encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/pre/solr.properties"/>
-		<encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/pre/redis.properties"/>
-	</beans>
-	<beans profile="pro">
-		<encryption:encryptable-properties id="meta" encryptor="configurationEncryptor" location="classpath:config/pro/metainfo.properties"/>
-		<encryption:encryptable-properties id="solr" encryptor="configurationEncryptor" location="classpath:config/pro/solr.properties"/>
-		<encryption:encryptable-properties id="redis" encryptor="configurationEncryptor" location="classpath:config/pro/redis.properties"/>
-	</beans>
+	<encryption:encryptable-properties
+		id="meta" encryptor="configurationEncryptor" location="classpath:config/metainfo.properties" />
+	<encryption:encryptable-properties
+		id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
+	<encryption:encryptable-properties
+		id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
 </beans>

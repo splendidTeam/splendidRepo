@@ -25,24 +25,24 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemInfo;
-import com.baozun.nebula.model.product.ItemProValGroupRelation;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
 
 /**
  * item 操作接口
@@ -386,4 +386,10 @@ public interface ItemManager extends BaseManager {
 	 * @time 2016年4月7日下午4:07:42
 	 */
 	Integer findItemCountByPropertyId(Long propertyId);
+	
+	/**
+	 * 条件查询店铺商品款号
+	 */
+	Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts,
+			Map<String, Object> paraMap, Long shopId);
 }

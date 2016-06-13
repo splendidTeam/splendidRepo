@@ -79,6 +79,7 @@ import com.baozun.nebula.command.i18n.SingleLang;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.product.ItemSortScoreCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.command.promotion.ItemPropertyMutlLangCommand;
 import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.exception.BusinessException;
@@ -1591,7 +1592,7 @@ public class ItemController extends BaseController{
 
 	public String getFullDomainUrl(String domain,String imgStr){
 		String newUrl = "";
-		if (null != imgStr && !imgStr.startsWith("http://")){
+		if (null != imgStr && !imgStr.startsWith(domain)){
 			newUrl = domain + imgStr;
 			return newUrl;
 		}else{
@@ -2481,6 +2482,8 @@ public class ItemController extends BaseController{
 	 */
 	@RequestMapping("/item/createBundleItem.htm")
 	public String createBundleItem(Model model) {
+		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
+		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
 		return "/product/item/add-item-bundle";
 	}
 	
@@ -2543,5 +2546,35 @@ public class ItemController extends BaseController{
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
+	}
+	
+	/**
+	 * 动态获取款号
+	 * 
+	 * @param QueryBean
+	 * @param Model
+	 * @return
+	 */
+	@RequestMapping("/item/styleList.json")
+	@ResponseBody
+	public Pagination<ItemStyleCommand> findStyleListJson(Model model,@QueryBeanParam QueryBean queryBean){
+
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null){
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			if (shopCommand != null){
+				shopId = shopCommand.getShopid();
+			}
+		}
+
+		Pagination<ItemStyleCommand> args = itemManager.findStyleListByQueryMap(queryBean.getPage(), queryBean.getSorts(), queryBean.getParaMap(), shopId);
+
+		return args;
 	}
 }

@@ -18,6 +18,12 @@ package com.baozun.nebula.dao.product;
 import java.util.List;
 import java.util.Map;
 
+import com.baozun.nebula.command.ItemCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
+import com.baozun.nebula.command.product.ProductInventoryCommand;
+import com.baozun.nebula.model.product.Item;
+import com.baozun.nebula.sdk.command.ItemBaseCommand;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -25,12 +31,6 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
-
-import com.baozun.nebula.command.ItemCommand;
-import com.baozun.nebula.command.product.ItemInfoLangCommand;
-import com.baozun.nebula.command.product.ProductInventoryCommand;
-import com.baozun.nebula.model.product.Item;
-import com.baozun.nebula.sdk.command.ItemBaseCommand;
 
 /**
  * Item dao
@@ -300,5 +300,6 @@ public interface ItemDao extends GenericEntityDao<Item, Long> {
 	@NativeQuery(model = Item.class)
 	Item findItemByExtentionCode(@QueryParam("extentionCode") String extentionCode);
 
-	
+	@NativeQuery(model = ItemStyleCommand.class)
+	Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap, @QueryParam("shopId") Long shopId);
 }

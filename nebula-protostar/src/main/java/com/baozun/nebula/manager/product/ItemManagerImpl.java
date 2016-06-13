@@ -42,18 +42,6 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
-import loxia.support.excel.ExcelKit;
-import loxia.support.excel.ExcelManipulatorFactory;
-import loxia.support.excel.ExcelReader;
-import loxia.support.excel.ExcelUtil;
-import loxia.support.excel.ReadStatus;
-import loxia.support.excel.definition.ExcelBlock;
-import loxia.support.excel.definition.ExcelCell;
-import loxia.support.excel.definition.ExcelSheet;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -95,6 +83,7 @@ import com.baozun.nebula.command.product.ImpSkuCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemInfoExcelCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -150,6 +139,18 @@ import com.baozun.nebula.utils.image.ImageOpeartion;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+import loxia.support.excel.ExcelKit;
+import loxia.support.excel.ExcelManipulatorFactory;
+import loxia.support.excel.ExcelReader;
+import loxia.support.excel.ExcelUtil;
+import loxia.support.excel.ReadStatus;
+import loxia.support.excel.definition.ExcelBlock;
+import loxia.support.excel.definition.ExcelCell;
+import loxia.support.excel.definition.ExcelSheet;
 
 /**
  * @author yi.huang
@@ -6401,6 +6402,22 @@ public class ItemManagerImpl implements ItemManager{
 	public Integer findItemCountByPropertyId(Long propertyId){
 		Integer count = itemPropertiesDao.findItemCountByPropertyId(propertyId);
 		return count == null ? 0 : count;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findStyleListByCode(loxia.dao.Page, loxia.dao.Sort[], java.lang.String, java.lang.Long)
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts, Map<String, Object> paraMap, Long shopId) {
+		Pagination<ItemStyleCommand> pagination = itemDao.findStyleListByQueryMap(page, sorts, paraMap, shopId);
+		
+		List<ItemStyleCommand> itemStyleCommand = pagination.getItems();
+		for(ItemStyleCommand c : itemStyleCommand) {
+			c.setItems(itemDao.findItemCommandByStyle(c.getStyle()));
+		}
+		
+		return pagination;
 	}
 	
 }
