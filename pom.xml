@@ -1327,8 +1327,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-eclipse-plugin</artifactId>
 					<configuration>
-						<downloadSources>true</downloadSources>
-						<downloadJavadocs>true</downloadJavadocs>
+						<downloadSources>false</downloadSources>
+						<downloadJavadocs>false</downloadJavadocs>
 					</configuration>
 				</plugin>
 			</plugins>

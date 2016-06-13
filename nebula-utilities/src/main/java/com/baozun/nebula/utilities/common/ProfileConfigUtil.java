@@ -10,7 +10,11 @@ import org.jasypt.encryption.StringEncryptor;
 import org.jasypt.properties.EncryptableProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * 该类取值逻辑已经调整为profile无关，项目在打包时已经将对应profile配置做了区分打包
+ * @author D.C
+ * 2016年6月12日下午4:18:43
+ */
 public class ProfileConfigUtil {
 	
 	private static final Logger log = LoggerFactory.getLogger(ProfileConfigUtil.class);
@@ -18,7 +22,7 @@ public class ProfileConfigUtil {
 	/**
 	 * 当前模式(dev,test,production)
 	 */
-	private static String mode="null";
+	private static String mode="";
 	
 	private static StringEncryptor stringEncryptor;
 
@@ -38,7 +42,7 @@ public class ProfileConfigUtil {
 
 	public static void setMode(String m){
 		log.debug("------------setModel:"+m);
-		mode=m;
+		//mode=m;
 	}
 	
 	public static String getMode(){
@@ -61,16 +65,15 @@ public class ProfileConfigUtil {
 	 * @return
 	 */
 	public static String getProfilePath(String source){
-		checkModel();
 		//source与mode都不为空
-		if(StringUtils.isNotBlank(source) &&StringUtils.isNotBlank(mode)){
+		//if(StringUtils.isNotBlank(source) &&StringUtils.isNotBlank(mode)){
 			for(String path:filterPath){
 				//必须以此字符为前辍
 				if(source.startsWith(path)){
 					return source.replaceFirst(path, path+mode+"/");
 				}
 			}
-		}
+		//}
 		
 		return source;
 	}
