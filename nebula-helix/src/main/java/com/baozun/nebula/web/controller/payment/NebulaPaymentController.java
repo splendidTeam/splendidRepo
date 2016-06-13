@@ -279,7 +279,29 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
+    	PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
+        if (Validator.isNotNullOrEmpty(pc)){
+            Map<String, Object> paraMap = new HashMap<String, Object>();
+            paraMap.put("subOrdinate", subOrdinate);
+            // 查询订单的需要支付的payInfolog
+            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+            Set<Long> set = new HashSet<Long>();
+            StringBuffer orderCode = new StringBuffer();
+            for (PayInfoLog payInfoLog : payInfoLogs){
+                set.add(payInfoLog.getOrderId());
+            }
+
+            for (Long oid : set){
+                SalesOrderCommand so = orderManager.findOrderById(oid, null);
+                orderCode.append(so.getCode()).append("、");
+            }
+
+            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
+
+            model.addAttribute("totalFee", pc.getPayMoney());
+        }
         return VIEW_PAY_FAILURE;
     }
 

@@ -20,11 +20,8 @@ import com.baozun.nebula.utilities.common.ProfileConfigUtil;
  */
 public class NebulaSystemInitListener implements ServletContextListener {
 
-	private static final String PROFILE_KEY = "spring.profiles.active";
-
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		initProfileUtil(sce);
 		initZookeeper(sce);
 		initCms(sce);
 		extendProcess(sce);
@@ -42,11 +39,6 @@ public class NebulaSystemInitListener implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 
-	}
-
-	private void initProfileUtil(ServletContextEvent sce) {
-		String profileName = sce.getServletContext().getInitParameter(PROFILE_KEY);
-		ProfileConfigUtil.setMode(profileName);
 	}
 
 	private void initZookeeper(ServletContextEvent sce) {

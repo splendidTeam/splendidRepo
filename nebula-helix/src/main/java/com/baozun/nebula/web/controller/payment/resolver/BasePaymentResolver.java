@@ -16,8 +16,33 @@
  */
 package com.baozun.nebula.web.controller.payment.resolver;
 
+import java.util.Objects;
+
+import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 
-public abstract class BasePaymentResolver implements PaymentResolver {
+public abstract class BasePaymentResolver {
 	
+    protected static final String PAYMENT_SUCCESS = "PAYMENT_SUCCESS";
+    
+    /**
+     * @param responseStatus
+     * @param salesOrderCommand
+     * @return
+     */
+    protected boolean canUpdatePayInfos(String responseStatus,SalesOrderCommand salesOrderCommand){
+        if (null == salesOrderCommand){
+            return false;
+        }
+
+        Integer logisticsStatus = salesOrderCommand.getLogisticsStatus();
+        Integer financialStatus = salesOrderCommand.getFinancialStatus();
+        return PAYMENT_SUCCESS.equals(responseStatus)
+                        && (Objects.equals(SalesOrder.SALES_ORDER_STATUS_NEW, logisticsStatus)
+                                        || Objects.equals(SalesOrder.SALES_ORDER_STATUS_TOOMS, logisticsStatus))
+                        && Objects.equals(
+                                        SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT,
+                                        financialStatus);
+    }
 }

@@ -45,56 +45,13 @@
 	<bean class="com.baozun.nebula.utilities.common.ProfileConfigUtil">
 		<property name="stringEncryptor" ref="configurationEncryptor" />
 	</bean>
-	
+
 	<!-- 配置文件加密工具 end -->
 
-	<beans profile="dev">
-		<encryption:encryptable-properties
-			id="meta" encryptor="configurationEncryptor" location="classpath:config/dev/metainfo.properties" />
-		<encryption:encryptable-properties
-			id="solr" encryptor="configurationEncryptor" location="classpath:config/dev/solr.properties" />
-		<encryption:encryptable-properties
-			id="redis" encryptor="configurationEncryptor" location="classpath:config/dev/redis.properties" />
-	</beans>
-
-	<beans profile="dev">
-		<encryption:encryptable-properties
-			id="meta" encryptor="configurationEncryptor" location="classpath:config/dev/metainfo.properties" />
-		<encryption:encryptable-properties
-			id="solr" encryptor="configurationEncryptor" location="classpath:config/dev/solr.properties" />
-		<encryption:encryptable-properties
-			id="redis" encryptor="configurationEncryptor" location="classpath:config/dev/redis.properties" />
-	</beans>
-	<beans profile="test">
-		<encryption:encryptable-properties
-			id="meta" encryptor="configurationEncryptor" location="classpath:config/test/metainfo.properties" />
-		<encryption:encryptable-properties
-			id="solr" encryptor="configurationEncryptor" location="classpath:config/test/solr.properties" />
-		<encryption:encryptable-properties
-			id="redis" encryptor="configurationEncryptor" location="classpath:config/test/redis.properties" />
-	</beans>
-	<beans profile="sta">
-		<encryption:encryptable-properties
-			id="meta" encryptor="configurationEncryptor" location="classpath:config/sta/metainfo.properties" />
-		<encryption:encryptable-properties
-			id="solr" encryptor="configurationEncryptor" location="classpath:config/sta/solr.properties" />
-		<encryption:encryptable-properties
-			id="redis" encryptor="configurationEncryptor" location="classpath:config/sta/redis.properties" />
-	</beans>
-	<beans profile="pre">
-		<encryption:encryptable-properties
-			id="meta" encryptor="configurationEncryptor" location="classpath:config/pre/metainfo.properties" />
-		<encryption:encryptable-properties
-			id="solr" encryptor="configurationEncryptor" location="classpath:config/pre/solr.properties" />
-		<encryption:encryptable-properties
-			id="redis" encryptor="configurationEncryptor" location="classpath:config/pre/redis.properties" />
-	</beans>
-	<beans profile="pro">
-		<encryption:encryptable-properties
-			id="meta" encryptor="configurationEncryptor" location="classpath:config/pro/metainfo.properties" />
-		<encryption:encryptable-properties
-			id="solr" encryptor="configurationEncryptor" location="classpath:config/pro/solr.properties" />
-		<encryption:encryptable-properties
-			id="redis" encryptor="configurationEncryptor" location="classpath:config/pro/redis.properties" />
-	</beans>
+	<encryption:encryptable-properties
+		id="meta" encryptor="configurationEncryptor" location="classpath:config/metainfo.properties" />
+	<encryption:encryptable-properties
+		id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
+	<encryption:encryptable-properties
+		id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
 </beans>
