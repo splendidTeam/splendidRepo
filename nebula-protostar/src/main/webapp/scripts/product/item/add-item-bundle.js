@@ -104,7 +104,6 @@ $j(document).ready(function(){
 			}
 		}
 		bindClose(selectStoreyType);
-		
 	});
 	
 	
