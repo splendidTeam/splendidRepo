@@ -15,6 +15,7 @@ $j.extend(loxia.regional['zh-CN'],{
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
+var findStyleInfoListJsonUrl = base + "/item/styleList.json";
 //设置返回的是主卖品还是成员商品
 var selectStoreyType = '';
 
@@ -38,79 +39,21 @@ $j(document).ready(function(){
 		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_ELEMENT"));
 	});	
 	
-	
 	loxia.init({debug: true, region: 'zh-CN'});
     nps.init();
 	
-	$j("#selectProList_product").loxiasimpletable({
-		page : true,
-		size : 15,
-		nodatamessage : '<span>' + nps.i18n("NO_DATA") + '</span>',
-		form : "mainItemDialogSearchForm",
-		cols : [ {
-			label : "",
-			width : "3%",
-			template : "radioTemplate"
-		}, {
-			name : "code",
-			label : nps.i18n("TABLE_TITLE_ITEM_CODE"),
-			width : "10%"
-		}, {
-			name : "title",
-			label : nps.i18n("TABLE_TITLE_ITEM_TITLE"),
-			width : "25%"
-		}, {
-			name : "categoryNames",
-			label : nps.i18n("TABLE_TITLE_ITEM_CATEGROY"),
-			width : "30%"
-		}, {
-			name : "type",
-			label : nps.i18n("TABLE_TITLE_ITEM_TYPE"),
-			width : "10%",
-			template : "itemTypeTemplate"
-		}, {
-			name : "salePrice",
-			label : nps.i18n("TABLE_TITLE_ITEM_PRICE"),
-			width : "10%"
-		}, {
-			name : "inventory",
-			label : nps.i18n("TABLE_TITLE_ITEM_INVENTORY"),
-			width : "5%"
-		}, {
-			name : "lifecycle",
-			label : nps.i18n("TABLE_TITLE_ITEM_STATUS"),
-			width : "15%",
-			type : "threeState"
-		}],
-		dataurl : findItemInfoListJsonUrl
-	});
-	
-	// 商品状态
-	$j.ui.loxiasimpletable().typepainter.threeState = {
-		getContent : function(data) {
-			if (data == 0) {
-				return "<span class='ui-pyesno ui-pyesno-no' title='下架'></span>";
-			} else if (data == 1) {
-				return "<span class='ui-pyesno ui-pyesno-yes' title='上架'></span>";
-			} else if (data == 3) {
-				return "<span class='ui-pyesno ui-pyesno-wait' title='新建'></span>";
-			}
-		},
-		postHandle : function(context) {
-			// do nothing
-		}
-	}
-	
-	refreshData();
-	
 	// 点击搜索
 	$j("#search_button").click(function() {
-		$j("#selectProList_product").data().uiLoxiasimpletable.options.currentPage = 1;
-		refreshData();
+		var _type = $j(':input[name="selectType"]:checked').val();
+		if(_type == "product") {
+			refreshItemData();
+		} else if(_type == "style") {
+			refreshStyleData();
+		}
 	});
 	
 	// 添加bundle扩展信息表单验证方法
-	var baseInfoValidator = new FormValidator('', 30, function(){
+	var bundleExtInfoValidator = new FormValidator('', 30, function(){
 		
 		// TODO 校验主卖品是否存在
 		
@@ -124,7 +67,7 @@ $j(document).ready(function(){
     	
     	return loxia.SUCCESS;
     });
-    formValidateList.push(baseInfoValidator);
+    formValidateList.push(bundleExtInfoValidator);
     
     
 	//dialog-close  给关闭图标绑定点击事件
@@ -157,13 +100,15 @@ $j(document).ready(function(){
 		
 		if(currVal == 'subtotal') {//按捆绑商品总价
 			$j('.product-table').hide();
+			$j('.sku-table').show();
 			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
 		} else if(currVal == 'fix'){//一口价
 			$j('.product-table').show();
-			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
+			$j('.sku-table').hide();
 		} else if(currVal == 'custom'){//定制
-			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
 			$j('.product-table').hide();
+			$j('.sku-table').show();
+			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
 		}
 	});
 	/*==================================     价格设置    ==========================*/
@@ -209,13 +154,116 @@ function bindClose(selectStoreyType){
 }
 
 
-//刷新表格数据
-function refreshData(){
+//刷新商品表格数据
+function refreshItemData(){
+	$j("#selectProList_product").loxiasimpletable({
+		page : true,
+		size : 5,
+		nodatamessage : '<span>' + nps.i18n("NO_DATA") + '</span>',
+		form : "mainItemDialogSearchForm",
+		cols : [ {
+			label : "",
+			width : "3%",
+			template : "radioTemplate"
+		}, {
+			name : "code",
+			label : nps.i18n("TABLE_TITLE_ITEM_CODE"),
+			width : "10%",
+			rowspan : true
+		}, {
+			name : "title",
+			label : nps.i18n("TABLE_TITLE_ITEM_TITLE"),
+			width : "25%"
+		}, {
+			name : "categoryNames",
+			label : nps.i18n("TABLE_TITLE_ITEM_CATEGROY"),
+			width : "30%",
+			template : "formatCategoryNames"
+		}, {
+			name : "type",
+			label : nps.i18n("TABLE_TITLE_ITEM_TYPE"),
+			width : "10%",
+			template : "itemTypeTemplate"
+		}, {
+			name : "salePrice",
+			label : nps.i18n("TABLE_TITLE_ITEM_PRICE"),
+			width : "10%"
+		}, {
+			name : "inventory",
+			label : nps.i18n("TABLE_TITLE_ITEM_INVENTORY"),
+			width : "5%"
+		}, {
+			name : "lifecycle",
+			label : nps.i18n("TABLE_TITLE_ITEM_STATUS"),
+			width : "15%",
+			type : "threeState"
+		}],
+		dataurl : findItemInfoListJsonUrl
+	});
+	
+	// 商品状态
+	$j.ui.loxiasimpletable().typepainter.threeState = {
+		getContent : function(data) {
+			if (data == 0) {
+				return "<span class='ui-pyesno ui-pyesno-no' title='下架'></span>";
+			} else if (data == 1) {
+				return "<span class='ui-pyesno ui-pyesno-yes' title='上架'></span>";
+			} else if (data == 3) {
+				return "<span class='ui-pyesno ui-pyesno-wait' title='新建'></span>";
+			}
+		},
+		postHandle : function(context) {
+			// do nothing
+		}
+	}
+	
+	$j("#selectProList_product").loxiasimpletable("refresh");
+}
+
+//刷新款号表格数据
+function refreshStyleData(){
+	$j("#selectProList_product").loxiasimpletable({
+		page : true,
+		size : 5,
+		nodatamessage : '<span>' + nps.i18n("NO_DATA") + '</span>',
+		form : "mainItemDialogSearchForm",
+		cols : [ {
+			label : "",
+			width : "3%",
+			template : "radioTemplate"
+		}, {
+			name : "style",
+			label : nps.i18n("TABLE_TITLE_STYLE_CODE"),
+			width : "10%",
+			rowspan : true
+		}, {
+			name : "items",
+			label : nps.i18n("TABLE_TITLE_ITEM_CODE"),
+			width : "25%",
+			template : "itemCodeTemplate"
+		}],
+		dataurl : findStyleInfoListJsonUrl
+	});
+	
 	$j("#selectProList_product").loxiasimpletable("refresh");
 }
 
 function radioTemplate(data, args, idx) {
-	return "<input type='radio' value='" + loxia.getObject("id", data) + "' />";
+	// bundle成员只能是普通商品
+	var _type = loxia.getObject("type", data);
+	return "<input type='radio' name='bundle_element' value='" + loxia.getObject("id", data) + "' " + (_type == 1 ? "" : "disabled=disabled") + "/>";
+}
+
+function itemCodeTemplate(data, args, idx) {
+	var result = new Array();
+	var itemArray = loxia.getObject("items", data);
+	if(itemArray) {
+		for(var i = 0; i < itemArray.length; i++) {
+			result.push(itemArray[i].code);
+		}
+	}
+	
+	return result;
 }
 
 function formatCategoryNames(data, args, idx) {
@@ -247,6 +295,14 @@ function itemTypeTemplate(data, args, idx) {
 		case 1 : return "普通商品";
 		case 3 : return "捆绑商品"; 
 		case 5 : return "搭配商品"; 
-		case 7 : return "虚拟商品"; 
+		case 7 : return "虚拟商品";
+		default: return "未知";
 	} 
 }
+
+Array.prototype.remove = function(val) {
+    var index = this.indexOf(val);
+    if (index > -1) {
+        this.splice(index, 1);
+    }
+};

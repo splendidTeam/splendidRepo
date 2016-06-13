@@ -1,6 +1,10 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/pages/commons/common.jsp"%>
 
+<script type="text/javascript">
+var categoryDisplayMode = "${categoryDisplayMode}";
+</script>
+
 <div class="ui-block-title1 ui-block-title" >
 	<spring:message code="item.add.bundleExtendedInfo" />
 </div>
