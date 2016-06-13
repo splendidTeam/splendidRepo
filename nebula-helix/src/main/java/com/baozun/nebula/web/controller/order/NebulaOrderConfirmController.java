@@ -38,6 +38,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.bundle.SdkShoppingCartBundleNewLineBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
@@ -168,6 +169,10 @@ public class NebulaOrderConfirmController extends BaseController{
     /** The sdk shopping cart bundle new line builder. */
     @Autowired
     private SdkShoppingCartBundleNewLineBuilder sdkShoppingCartBundleNewLineBuilder;
+    
+    @Autowired
+    private SdkSecretManager sdkSecretManager;
+    
 
     /**
      * 显示订单结算页面.
@@ -193,7 +198,22 @@ public class NebulaOrderConfirmController extends BaseController{
                     HttpServletResponse response,
                     Model model){
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
-
+        // 解密
+        for (ContactCommand contactCommand : contactCommandList) {
+        	sdkSecretManager.decrypt(contactCommand, new String[] {
+    				"name",
+    				"country",
+    				"province",
+    				"city",
+    				"area",
+    				"town",
+    				"address",
+    				"postcode",
+    				"telphone",
+    				"mobile",
+    				"email" });
+		}
+        
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
         // 封装viewCommand
