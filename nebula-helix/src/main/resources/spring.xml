@@ -49,9 +49,9 @@
 	<!-- 配置文件加密工具 end -->
 
 	<encryption:encryptable-properties
-		id="meta" encryptor="configurationEncryptor" location="classpath:config/dev/metainfo.properties" />
+		id="meta" encryptor="configurationEncryptor" location="classpath:config/metainfo.properties" />
 	<encryption:encryptable-properties
-		id="solr" encryptor="configurationEncryptor" location="classpath:config/dev/solr.properties" />
+		id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
 	<encryption:encryptable-properties
-		id="redis" encryptor="configurationEncryptor" location="classpath:config/dev/redis.properties" />
+		id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
 </beans>
