@@ -129,9 +129,41 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	@Autowired
 	private SdkSecretManager		sdkSecretManager;
 	
+	
+	
+	/**
+	 * 加密Member对象
+	 * @param member
+	 */
+	private void encrypt(Member member){
+		sdkSecretManager.encrypt(member, new String[] {
+				"loginName",
+				"loginEmail",
+				"loginMobile",
+				"password",
+				"oldPassword"
+			});
+	}
+	
+	/**
+	 * 解密Member对象
+	 * @param member
+	 */
+	private void decrypt(Member member){
+		sdkSecretManager.decrypt(member, new String[] {
+				"loginName",
+				"loginEmail",
+				"loginMobile",
+				"password",
+				"oldPassword"
+			});
+	}
 
+	/**
+	 * 加密MemberPersonalData对象
+	 * @param mpd
+	 */
 	private void encrypt(MemberPersonalData mpd){
-
 		sdkSecretManager.encrypt(mpd, new String[] {
 				"nickname",
 				"localRealName",
@@ -160,6 +192,11 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 				"postCode" });
 	}
 
+	
+	/**
+	 * 解密MemberPersonalData对象
+	 * @param mpd
+	 */
 	private void decrypt(MemberPersonalData mpd){
 
 		sdkSecretManager.decrypt(mpd, new String[] {
@@ -889,16 +926,12 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		return member;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#rewriteRegister(com.baozun.nebula.model.member.Member)
+	/**
+	 * 新增对象 加密对象
 	 */
 	@Override
 	public Member rewriteRegister(Member member){
-		// pwd处理为密文
-		String encodePassword = EncryptUtil.getInstance().hash(member.getPassword(), member.getLoginName());
-		member.setPassword(encodePassword);
-
+		encrypt(member);
 		member = memberDao.save(member);
 		return member;
 	}
@@ -1035,9 +1068,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	@Override
 	public MemberPersonalData savePersonData(MemberPersonalData personData){
-
 		encrypt(personData);
-
 		MemberPersonalData oldMemberPersonalData = memberPersonalDataDao.getByPrimaryKey(personData.getId());
 		MemberPersonalData memberPersonalData = null;
 		if (oldMemberPersonalData != null){
@@ -1048,7 +1079,6 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		}else{
 			memberPersonalData = memberPersonalDataDao.save(personData);
 		}
-		decrypt(memberPersonalData);
 		return memberPersonalData;
 	}
 
