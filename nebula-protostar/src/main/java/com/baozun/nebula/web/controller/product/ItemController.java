@@ -2586,13 +2586,13 @@ public class ItemController extends BaseController{
 	
 	@RequestMapping("/item/loadBundleElement.json")
 	@ResponseBody
-	public Object loadBundleElement(@ArrayCommand() BundleElementViewCommand[] bundleElement){
-		return bundleManager.loadBundleElement(bundleElement);
+	public Object loadBundleElement(@ArrayCommand() BundleElementViewCommand[] bundleElements){
+		return bundleManager.loadBundleElement(bundleElements);
 	}
 	
 	@RequestMapping("/item/loadBundleSku.json")
 	@ResponseBody
-	public Object loadBundleSku(@ArrayCommand() BundleElementViewCommand[] bundleElement){
-		return bundleManager.loadBundleSku(bundleElement);
+	public Object loadBundleSku(@ArrayCommand() BundleElementViewCommand[] bundleElements){
+		return bundleManager.loadBundleSku(bundleElements);
 	}
 }
