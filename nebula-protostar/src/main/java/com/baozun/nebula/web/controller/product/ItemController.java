@@ -2489,6 +2489,7 @@ public class ItemController extends BaseController{
 	public String createBundleItem(Model model) {
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
+		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
 		return "/product/item/add-item-bundle";
 	}
 	
