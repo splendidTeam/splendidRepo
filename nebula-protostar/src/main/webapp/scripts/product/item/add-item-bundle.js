@@ -106,7 +106,7 @@ $j(document).ready(function(){
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
 						mainEelment = {
-								isMainElement : false,
+								isMainElement : true,
 								sort : 1,
 								styleCode : '',
 								itemCode : element.parent().next().text()
@@ -115,7 +115,7 @@ $j(document).ready(function(){
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
 						mainEelment = {
-								isMainElement : false,
+								isMainElement : true,
 								sort : 1,
 								styleCode : element.parent().next().text(),
 								itemCode : ''
