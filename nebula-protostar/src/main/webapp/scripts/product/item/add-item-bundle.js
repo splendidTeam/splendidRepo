@@ -25,12 +25,7 @@ var selectStoreyType = '';
 
 var mainEelment = null;
 var elements = new Array();
-var bundleElement = {
-	isMainElement : false,
-	sort : 0,
-	styleCode : '',
-	itemCode : ''
-};
+var bundleElement = null;
 
 $j(document).ready(function(){
 	
@@ -110,30 +105,28 @@ $j(document).ready(function(){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
-						bundleElement = {
+						mainEelment = {
 								isMainElement : true,
 								sort : 1,
 								styleCode : '',
 								itemCode : element.parent().next().html()
 							};
-						elements.push(bundleElement);
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
-						bundleElement = {
+						mainEelment = {
 								isMainElement : true,
 								sort : 1,
 								styleCode : element.parent().next().html(),
 								itemCode : ''
 							};
-						elements.push(bundleElement);
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
-								sort : $j(".setMemberProduct li").length-1,
+								sort : $j(".setMemberProduct li").length,
 								styleCode : '',
 								itemCode : element.parent().next().html()
 							};
@@ -142,7 +135,7 @@ $j(document).ready(function(){
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
-								sort : $j(".setMemberProduct li").length-1,
+								sort : $j(".setMemberProduct li").length,
 								styleCode : element.parent().next().html(),
 								itemCode : ''
 							};
