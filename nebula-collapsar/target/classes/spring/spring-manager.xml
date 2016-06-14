@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.baozun.nebula.solr.dao" />
+	<context:component-scan base-package="com.baozun.**.manager" >
+		<context:exclude-filter type="regex" expression="com.baozun.nebula.manager.cms.*" />
+		<context:exclude-filter type="regex" expression="com.baozun.nebula.cms.*" />
+	</context:component-scan>
+	<context:component-scan base-package="com.baozun.**.event" />
+	<context:component-scan base-package="com.baozun.**.engine" />
+	<context:component-scan base-package="com.baozun.**.impl" >
+		<context:exclude-filter type="regex" expression="com.baozun.nebula.cms.*" />
+	</context:component-scan>
+	
+	<context:component-scan base-package="com.baozun.**.scm.makemsgcon" />
+	<context:component-scan base-package="com.baozun.**.scm.timing" />
+	<context:component-scan base-package="com.baozun.**.scm.manager" />
+	<context:component-scan base-package="com.baozun.**.scm" />
+	<!-- 转换器 -->
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="jsonHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+	<bean id="jsonHttpMessageConverter"
+		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+		<!--
+			解决 HttpMediaTypeNotAcceptableException: Could not find acceptable
+			representation
+		-->
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+				<value>text/json;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="applicationEventMulticaster"
+		class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="contextCollector" class="com.baozun.nebula.utils.spring.SpringUtil">
+		<property name="contextKey">
+			<value>mainContext</value>
+		</property>
+	</bean> 
+	
+</beans>

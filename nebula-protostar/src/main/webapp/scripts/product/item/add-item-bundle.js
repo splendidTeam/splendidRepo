@@ -73,7 +73,7 @@ $j(document).ready(function(){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
 		// TODO 校验成员是否存在至少一个
-		if($j("#selectStyle").prev().find(".validate-code").text() == null){
+		if($j(".setMemberProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
 		// TODO 校验成员是否重复（包括主卖品）
@@ -110,15 +110,43 @@ $j(document).ready(function(){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
+						bundleElement = {
+								isMainElement : true,
+								sort : 1,
+								styleCode : '',
+								itemCode : element.parent().next().html()
+							};
+						elements.push(bundleElement);
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
+						bundleElement = {
+								isMainElement : true,
+								sort : 1,
+								styleCode : element.parent().next().html(),
+								itemCode : ''
+							};
+						elements.push(bundleElement);
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
+						bundleElement = {
+								isMainElement : false,
+								sort : $j(".setMemberProduct li").length-1,
+								styleCode : '',
+								itemCode : element.parent().next().html()
+							};
+						elements.push(bundleElement);
 					} else if(_type == "style") {
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						bundleElement = {
+								isMainElement : false,
+								sort : $j(".setMemberProduct li").length-1,
+								styleCode : element.parent().next().html(),
+								itemCode : ''
+							};
+						elements.push(bundleElement);
 					}
 				}
 				bindClose(selectStoreyType);
@@ -151,11 +179,13 @@ $j(document).ready(function(){
 			$j('.product-table').show();
 			$j('.sku-table').hide();
 			$j('.sku-table > tbody > tr').remove();
+			loadBundleElement();
 		} else if(currVal == 'custom'){//定制
 			$j('.product-table').hide();
 			$j('.product-table > tbody > tr').remove();
 			$j('.sku-table').show();
 			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
+			loadBundleSku();
 		}
 	});
 	/*==================================     价格设置    ==========================*/
@@ -362,12 +392,10 @@ Array.prototype.remove = function(val) {
  * 装填“一口价”表格数据
  */
 function loadBundleElement(){
-	var _e = elements;
-	_e.push(mainElement);
-	var data = nps.syncXhr("", _e);
-	  
-	if (data.isSuccess==false) {
-		return nps.i18n("");
+	if(fillForm()) {
+		var f = loxia._getForm("bundle_element_form");
+		var data = nps.syncXhr("/item/loadBundleElement.json", f);
+		// TODO 绘制表格
 	}
 }
 
@@ -375,6 +403,40 @@ function loadBundleElement(){
  * 装填“定制”表格数据
  */
 function loadBundleSku(){
+	if(fillForm()) {
+		var f = loxia._getForm("bundle_element_form");
+		var data = nps.syncXhr("/item/loadBundleSku.json", f);
+		// TODO 绘制表格
+	}
+}
+
+function fillForm(){
+	$j('#bundle_element_form > input').remove();
 	
+	var _html = '';
+	var _e = new Array();
+	
+	// 校验主卖品
+	if(mainEelment) {
+		_e.push(mainElement)
+	} else {
+		return false;
+	}
+	
+	// 校验捆绑成员
+	if(elements && elements.length > 0) {
+		_e.push(elements)
+	} else {
+		return false;
+	}
+	
+	for(var i = 0; i < _e.length; i++) {
+		_html += '<input type="hidden" name="bundleElements.isMainElement" value="' + _e[i].isMainElement + '" />';
+		_html += '<input type="hidden" name="bundleElements.sort" value="' + _e[i].sort + '" />';
+		_html += '<input type="hidden" name="bundleElements.styleCode" value="' + _e[i].styleCode + '" />';
+		_html += '<input type="hidden" name="bundleElements.itemCode" value="' + _e[i].itemCode + '" />';
+	}
+	
+	return true;
 }
 
