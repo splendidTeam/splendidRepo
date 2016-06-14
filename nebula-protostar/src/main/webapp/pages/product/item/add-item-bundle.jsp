@@ -12,6 +12,7 @@
 <div class="content-box width-percent100">
    <form id="itemForm" name="itemForm" action="/i18n/item/saveBundleItem.json" method="post">
     <input type="hidden" id="jsonSku" name="itemCommand.jsonSku"  value=""/>
+    <input type="hidden" loxiaType="input" name="baseImageUrl" id="baseImageUrl" value="${baseImageUrl}" />
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="item.add.manage"/></div>
 		<div class="ui-block">
 			<div id="second">

@@ -2489,6 +2489,7 @@ public class ItemController extends BaseController{
 	public String createBundleItem(Model model) {
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
+		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
 		return "/product/item/add-item-bundle";
 	}
 	
@@ -2585,13 +2586,13 @@ public class ItemController extends BaseController{
 	
 	@RequestMapping("/item/loadBundleElement.json")
 	@ResponseBody
-	public Object loadBundleElement(@ArrayCommand() BundleElementViewCommand[] bundleElement){
-		return bundleManager.loadBundleElement(bundleElement);
+	public Object loadBundleElement(@ArrayCommand() BundleElementViewCommand[] bundleElements){
+		return bundleManager.loadBundleElement(bundleElements);
 	}
 	
 	@RequestMapping("/item/loadBundleSku.json")
 	@ResponseBody
-	public Object loadBundleSku(@ArrayCommand() BundleElementViewCommand[] bundleElement){
-		return bundleManager.loadBundleSku(bundleElement);
+	public Object loadBundleSku(@ArrayCommand() BundleElementViewCommand[] bundleElements){
+		return bundleManager.loadBundleSku(bundleElements);
 	}
 }
