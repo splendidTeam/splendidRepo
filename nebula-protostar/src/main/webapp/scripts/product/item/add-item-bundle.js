@@ -411,6 +411,35 @@ function loadBundleElement(){
 		var f = loxia._getForm("bundle_element_form");
 		var data = nps.syncXhr("/item/loadBundleElement.json", f);
 		// TODO 绘制表格
+		
+		var _html = '';
+		$j(data).each(function(idx, d){
+			if($(this).styleCode) { // 同款商品
+				var bundleItems = $(this).bundleItemViewCommands;
+				html += '<tr>';
+				html += '<td rowspan="' + bundleitems.length + '">' + idx + 1 + '</td>';
+				$j(bundleItems).each(function(i, bivc){
+					html += '<td>' + $(this).itemCode + '</td>';
+					html += '<td>' + $(this).salesPrice + '</td>';
+					if(i == 0) {
+						html += '<td rowspan="' + bundleitems.length + '><input type="text" name="bundleElement.salesPrice" /></td>';
+					}
+					html += '</tr>';
+					if(i < bundleItems.length - 1) {
+						html += '<tr>';
+					}
+				});
+				html += '</tr>';
+			} else { // 单一商品
+				html += '<tr>';
+				html += '<td>' + idx + 1 + '</td>';
+				html += '<td>' + $(this).itemCode + '</td>';
+				html += '<td>' + $(this).bundleItemViewCommands[0].salesPrice + '</td>';
+				html += '<td><input type="text" name="bundleElement.salesPrice" /></td>';
+				html += '</tr>';
+			}
+		}); 
+		$j('#product-table > tbody').html(_html);
 	}
 }
 
@@ -426,6 +455,7 @@ function loadBundleSku(){
 }
 
 function fillForm(){
+	debugger;
 	$j('#bundle_element_form > input').remove();
 	
 	var _html = '';
