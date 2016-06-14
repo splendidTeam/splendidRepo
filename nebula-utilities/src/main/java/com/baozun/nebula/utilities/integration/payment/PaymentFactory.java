@@ -46,15 +46,15 @@ public class PaymentFactory {
 	
 	public static final String ALIPAYDEFAULTALIPAYCONFIG = "config/alipay.properties";
 
-	public static final String ALIPAYINTERNATIONALCREDITCARDCONFIG = "configurations/payment/alipay/alipay_InternationalCreditCard.properties";
+	public static final String ALIPAYINTERNATIONALCREDITCARDCONFIG = "config/payment/alipay/alipay_InternationalCreditCard.properties";
 	
-	public static final String ALIPAYADDRESS = "configurations/payment/alipay/alipayAddress.properties";
+	public static final String ALIPAYADDRESS = "config/payment/alipay/alipayAddress.properties";
 	
-	public static final String CHINAPNRDEFAULTALIPAYCONFIG = "configurations/payment/chinaPnR/chinaPnR.properties";
+	public static final String CHINAPNRDEFAULTALIPAYCONFIG = "config/payment/chinaPnR/chinaPnR.properties";
 	
-	public static final String UNIONPAYDEFAULTALIPAYCONFIG = "configurations/payment/unionpay/unionpay.properties";
+	public static final String UNIONPAYDEFAULTALIPAYCONFIG = "config/payment/unionpay/unionpay.properties";
 	
-	//public static final String WECHATDEFAULTALIPAYCONFIG = "/configurations/payment/wechat/wechat.properties";
+	//public static final String WECHATDEFAULTALIPAYCONFIG = "/config/payment/wechat/wechat.properties";
 
 	private static PaymentFactory inst = new PaymentFactory();
 

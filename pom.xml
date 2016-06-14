@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.baozun.nebula</groupId>
 	<artifactId>nebula</artifactId>
@@ -110,6 +111,7 @@
 
 		<!-- apache curator(zookeeper client) -->
 		<version.curator>2.10.0</version.curator>
+		<version.logbackExtSpring>0.1.4</version.logbackExtSpring>
 	</properties>
 
 	<dependencies>
@@ -470,6 +472,11 @@
 		<dependency>
 			<groupId>janino</groupId>
 			<artifactId>janino</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.logback-extensions</groupId>
+			<artifactId>logback-ext-spring</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -1015,6 +1022,11 @@
 				<artifactId>curator-test</artifactId>
 				<version>${version.curator}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.logback-extensions</groupId>
+				<artifactId>logback-ext-spring</artifactId>
+				<version>${version.logbackExtSpring}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -1068,11 +1080,11 @@
 						<exclude>**/*.min.js</exclude>
 						<exclude>**/*-min.js</exclude>
 					</excludes>
- 					<skip>false</skip>
+					<skip>${yuicompressor.skip}</skip>
 				</configuration>
 			</plugin>
 
-			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径，
+			<!-- 在配置过程中发现无论将phase设置为哪个阶段，最终打包的文件总是原始文件，并未被压缩， 原因: maven-war-plugin会自动把webapp目录下的文件复制到输出路径， 
 				因此可以通过warSourceExcludes配置排除复制,的文件或路径， **by feilong 2015-07-01 -->
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -1269,7 +1281,7 @@
 					<version>${v.maven-war-plugin}</version>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -1317,9 +1329,6 @@
 						<path>${tomcat7.path}</path>
 						<uriEncoding>utf-8</uriEncoding>
 						<ignorePackaging>true</ignorePackaging>
-						<systemProperties>
-							<spring.profiles.active>dev</spring.profiles.active>
-						</systemProperties>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -1332,8 +1341,78 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<excludes>
+					<exclude>config/**/*</exclude>
+					<exclude>logback.xml</exclude>
+				</excludes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources/config/${profile}</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<targetPath>${project.build.directory}/test-classes/config/</targetPath>
+			</testResource>
+		</testResources>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>config/**/*</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/config/${profile}</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<targetPath>${project.build.directory}/classes/config/</targetPath>
+			</resource>
+		</resources>
 	</build>
-
+	<profiles>
+		<profile>
+			<id>pro</id>
+			<properties>
+				<profile>pro</profile>
+				<yuicompressor.skip>false</yuicompressor.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>pre</id>
+			<properties>
+				<profile>pre</profile>
+				<yuicompressor.skip>false</yuicompressor.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>sta</id>
+			<properties>
+				<profile>sta</profile>
+				<yuicompressor.skip>false</yuicompressor.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<profile>test</profile>
+				<yuicompressor.skip>false</yuicompressor.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<profile>dev</profile>
+				<yuicompressor.skip>true</yuicompressor.skip>
+			</properties>
+		</profile>
+	</profiles>
 	<reporting>
 		<plugins>
 			<plugin>
