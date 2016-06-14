@@ -18,6 +18,8 @@ import com.feilong.core.util.RegexUtil;
  *
  */
 public class MemberAddressFormValidator implements Validator {
+    
+    public static final String TELEPHONE = "^(\\d{3,4}-)?\\d{6,8}(-\\d{1,6})?$";
 
 	public MemberAddressFormValidator() {
 	}
@@ -51,7 +53,7 @@ public class MemberAddressFormValidator implements Validator {
 				}					
 			}
 			if (com.feilong.core.Validator.isNotNullOrEmpty(memberAddressForm.getTelphone())) {	
-				if (!RegexUtil.matches(RegexPattern.TELEPHONE,memberAddressForm.getTelphone().trim())) {
+				if (!RegexUtil.matches(TELEPHONE,memberAddressForm.getTelphone().trim())) {
 					errors.rejectValue("telphone", "memberaddress.telephone.error");
 				}	
 			}
