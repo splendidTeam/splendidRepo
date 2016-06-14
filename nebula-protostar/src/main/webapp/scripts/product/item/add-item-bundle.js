@@ -112,7 +112,7 @@ $j(document).ready(function(){
 								itemCode : element.parent().next().text()
 							};
 					} else if(_type == "style") {
-						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
 						mainEelment = {
 								isMainElement : false,
@@ -132,7 +132,7 @@ $j(document).ready(function(){
 							};
 						elements.push(bundleElement);
 					} else if(_type == "style") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
 								sort : $j(".setMemberProduct li").length,
@@ -336,18 +336,7 @@ function radioTemplate(data, args, idx) {
 }
 
 function radioTemplate1(data, args, idx) {
-	var _itemImageList = loxia.getObject("itemImageList", data);
-	var _itemImage = null;
-	if( _itemImageList != null ){
-		for(var i = 0; i < _itemImageList.length; i++) {
-			var imgType = _itemImageList[i].type;
-			if( imgType == 1 ){
-				_itemImage = _itemImageList[i].picUrl;
-				break;
-			}
-		}
-	}
-	return "<input type='radio' data-src='"+ _itemImage +"' name='bundle_element' value='" + loxia.getObject("id", data) + "' />";
+	return "<input type='radio' data-src='' name='bundle_element' value='" + loxia.getObject("id", data) + "' />";
 }
 
 function itemCodeTemplate(data, args, idx) {
