@@ -133,7 +133,7 @@ $j(document).ready(function(){
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
-								sort : $(".setMemberProduct li").length-1,
+								sort : $j(".setMemberProduct li").length-1,
 								styleCode : '',
 								itemCode : element.parent().next().html()
 							};
@@ -142,7 +142,7 @@ $j(document).ready(function(){
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
-								sort : $(".setMemberProduct li").length-1,
+								sort : $j(".setMemberProduct li").length-1,
 								styleCode : element.parent().next().html(),
 								itemCode : ''
 							};
