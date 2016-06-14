@@ -52,11 +52,11 @@ public class BundleElementViewCommand implements Serializable, Comparable<Bundle
 	
 	private List<BundleItemViewCommand> bundleItemViewCommands;
 
-	public boolean isMainElement() {
+	public boolean getIsMainElement() {
 		return isMainElement;
 	}
 
-	public void setMainElement(boolean isMainElement) {
+	public void setIsMainElement(boolean isMainElement) {
 		this.isMainElement = isMainElement;
 	}
 

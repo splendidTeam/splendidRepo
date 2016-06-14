@@ -85,6 +85,7 @@ import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
+import com.baozun.nebula.manager.product.BundleManager;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.IndustryManager;
 import com.baozun.nebula.manager.product.ItemCategoryManager;
@@ -175,6 +176,9 @@ public class ItemController extends BaseController{
 
 	@Autowired
 	private ItemPresaleInfoManager				itemPresaleInfoManager;
+	
+	@Autowired
+	private BundleManager						bundleManager;
 
 	// 缩略图规格
 	// private static final String THUMBNAIL_CONFIG = "THUMBNAIL_CONFIG";
@@ -2427,7 +2431,7 @@ public class ItemController extends BaseController{
 	// 以下是2016-5-31商品管理页面拆分后的新的controller定义
 	
 	/**
-	 * 新建商品类型选择页面
+	 * 新建商品 类型选择页面
 	 * @param model
 	 * @return
 	 */
@@ -2581,15 +2585,13 @@ public class ItemController extends BaseController{
 	
 	@RequestMapping("/item/loadBundleElement.json")
 	@ResponseBody
-	public Object loadBundleElement(@ArrayCommand(dataBind = true) BundleElementViewCommand[] commands){
-		
-		return null;
+	public Object loadBundleElement(@ArrayCommand() BundleElementViewCommand[] bundleElement){
+		return bundleManager.loadBundleElement(bundleElement);
 	}
 	
 	@RequestMapping("/item/loadBundleSku.json")
 	@ResponseBody
-	public Object loadBundleSku(@ArrayCommand(dataBind = true) BundleElementViewCommand[] commands){
-		
-		return null;
+	public Object loadBundleSku(@ArrayCommand() BundleElementViewCommand[] bundleElement){
+		return bundleManager.loadBundleSku(bundleElement);
 	}
 }

@@ -31,9 +31,12 @@
 */
 package com.baozun.nebula.manager.product;
 
+import java.util.List;
+
 import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.bundle.Bundle;
+import com.baozun.nebula.web.command.BundleElementViewCommand;
 
 /**
  * @author yue.ch
@@ -42,4 +45,8 @@ import com.baozun.nebula.model.bundle.Bundle;
 public interface BundleManager extends BaseManager {
 
 	Bundle createOrUpdate(BundleCommand bundle);
+	
+	List<BundleElementViewCommand> loadBundleElement(BundleElementViewCommand[] commands);
+	
+	List<BundleElementViewCommand> loadBundleSku(BundleElementViewCommand[] commands);
 }
