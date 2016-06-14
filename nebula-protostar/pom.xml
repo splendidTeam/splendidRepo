@@ -179,7 +179,7 @@
 						</goals>
 						<configuration>
 							<file>${project.build.directory}/classes/ckfinder/ckfinder-config.xml</file>
-							<tokenValueMap>${basedir}/src/main/env/${profile}/config/metainfo.properties</tokenValueMap>
+							<tokenValueMap>${basedir}/src/main/resources/config/${profile}/config/metainfo.properties</tokenValueMap>
 						</configuration>
 					</execution>
 				</executions>
@@ -205,7 +205,21 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<excludes>
+					<exclude>config/**/*</exclude>
+					<exclude>logback.xml</exclude>
+				</excludes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources/config/${profile}</directory>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</testResource>
+		</testResources>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -215,7 +229,7 @@
 				</excludes>
 			</resource>
 			<resource>
-				<directory>src/main/env/${profile}</directory>
+				<directory>src/main/resources/config/${profile}</directory>
 				<includes>
 					<include>**/*</include>
 				</includes>
