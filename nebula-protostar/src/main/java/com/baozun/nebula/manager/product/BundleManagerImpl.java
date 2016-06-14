@@ -31,7 +31,10 @@
 */
 package com.baozun.nebula.manager.product;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -41,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
@@ -48,11 +52,19 @@ import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleElementDao;
 import com.baozun.nebula.dao.product.BundleSkuDao;
+import com.baozun.nebula.dao.product.ItemDao;
+import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.bundle.BundleElement;
 import com.baozun.nebula.model.bundle.BundleSku;
+import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.sdk.command.SkuProperty;
+import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.web.command.BundleElementViewCommand;
+import com.baozun.nebula.web.command.BundleItemViewCommand;
+import com.baozun.nebula.web.command.BundleSkuViewCommand;
 
 /**
  * @author yue.ch
@@ -71,6 +83,15 @@ public class BundleManagerImpl implements BundleManager {
 	
 	@Autowired
 	private BundleSkuDao bundleSkuDao;
+	
+	@Autowired
+	private ItemDao itemDao;
+	
+	@Autowired
+	private SkuDao skuDao;
+	
+	@Autowired
+	private SdkSkuManager sdkSkuManager;
 
 	/* (non-Javadoc)
 	 * @see com.baozun.nebula.manager.product.BundleManager#createOrUpdate(com.baozun.nebula.model.bundle.Bundle)
@@ -149,6 +170,80 @@ public class BundleManagerImpl implements BundleManager {
 				}
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.BundleManager#loadBundleElement(com.baozun.nebula.web.command.BundleElementViewCommand[])
+	 */
+	@Override
+	public List<BundleElementViewCommand> loadBundleElement(BundleElementViewCommand[] commands) {
+		List<BundleElementViewCommand> result = new ArrayList<BundleElementViewCommand>();
+		result.addAll(Arrays.asList(commands));
+		Iterator<BundleElementViewCommand> iterator = result.iterator();
+		while(iterator.hasNext()) {
+			BundleElementViewCommand command = iterator.next();
+			String styleCode = command.getStyleCode();
+			if(styleCode != null) { // 成员为款
+				List<ItemCommand> itemCommands = itemDao.findItemCommandByStyle(styleCode);
+				if(itemCommands != null) {
+					List<BundleItemViewCommand> bundleItemViewCommands = new ArrayList<BundleItemViewCommand>();
+					for(ItemCommand ic : itemCommands) {
+						BundleItemViewCommand bivc = new BundleItemViewCommand();
+						bivc.setItemId(ic.getId());
+						bivc.setItemCode(ic.getCode());
+						bivc.setSalesPrice(ic.getSalePrice());
+						bundleItemViewCommands.add(bivc);
+					}
+					command.setBundleItemViewCommands(bundleItemViewCommands);
+				}
+			} else { // 成员为商品
+				String itemCode = command.getItemCode();
+				ItemCommand ic = itemDao.findItemCommandByCode(itemCode);
+				BundleItemViewCommand bivc = new BundleItemViewCommand();
+				bivc.setItemId(ic.getId());
+				bivc.setItemCode(itemCode);
+				bivc.setSalesPrice(ic.getSalePrice());
+				command.setBundleItemViewCommands(Arrays.asList(bivc));
+			}
+		}
+		
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.BundleManager#loadBundleSku(com.baozun.nebula.web.command.BundleElementViewCommand[])
+	 */
+	@Override
+	public List<BundleElementViewCommand> loadBundleSku(BundleElementViewCommand[] commands) {
+		List<BundleElementViewCommand> result = loadBundleElement(commands);
+		for(BundleElementViewCommand command : result) {
+			List<BundleItemViewCommand> bundleItemViewCommands = command.getBundleItemViewCommands();
+			if(bundleItemViewCommands == null) {
+				continue;
+			}
+			
+			for(BundleItemViewCommand bivc : bundleItemViewCommands) {
+				List<Sku> skus = skuDao.findSkuByItemId(bivc.getItemId());
+				List<BundleSkuViewCommand> bundleSkuViewCommands = new ArrayList<BundleSkuViewCommand>();
+				for(Sku sku : skus) {
+					BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+					bsvc.setSkuId(sku.getId());
+					bsvc.setOriginalSalesPrice(sku.getSalePrice());
+					
+					List<SkuProperty> skuProperties = sdkSkuManager.getSkuPros(sku.getProperties());
+					StringBuilder sb = new StringBuilder();
+					for(SkuProperty property : skuProperties) {
+						sb.append(property.getValue()).append("-");
+					}
+					bsvc.setProperty(sb.toString().replaceAll("-$", ""));
+					
+					bundleSkuViewCommands.add(bsvc);
+				}
+				bivc.setBundleSkuViewCommands(bundleSkuViewCommands);
+			}
+		}
+		
+		return result;
 	}
 
 }

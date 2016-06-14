@@ -21,7 +21,7 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title">捆绑成员</div>
 		<div class="ui-block-content border-grey">
-			<ul class="clearfix">
+			<ul class="clearfix setMemberProduct">
 				<li class="main-pro pro-empty" id="selectStyle">+新成员</li>
 			</ul>
 			<a class="user-refresh"></a>
@@ -35,7 +35,7 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 	   		<label class="label-line block pb10"> <input type="radio" name="setPrice" value="custom"> 定制    </label>
 	   		<label class="label-line block pb10"> 捆绑商品总价 <input type="text" name="setPrice" readonly placeholder="900"> </label>
 		</div>
-	   	<table class="inform-person sku-table" >
+	   	<table class="inform-person product-table" style="display:none">
 			<thead>
 				<tr>
 					<th width="10%">成员序号</th>
@@ -53,7 +53,7 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 				</tr>
 			</tbody>
 		</table>
-		<table class="inform-person product-table" style="display:none">
+		<table class="inform-person sku-table" style="display:none">
 			<thead>
 				<tr>
 					<th width="10%">成员序号</th>

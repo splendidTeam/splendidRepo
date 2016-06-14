@@ -81,5 +81,10 @@
 <div id="defaultMenuContent" class="menuContent menulayer">
 	<ul id="defaultCategoryTree" class="ztree"></ul>
 </div>
+
+<div style="display:none">
+	<form id="bundle_element_form" name="bundle_element_form" method="POST"></form>
+</div>
+
 </body>
 </html>

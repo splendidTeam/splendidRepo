@@ -179,7 +179,7 @@
 						</goals>
 						<configuration>
 							<file>${project.build.directory}/classes/ckfinder/ckfinder-config.xml</file>
-							<tokenValueMap>src/main/env/${profile}/config/metainfo.properties</tokenValueMap>
+							<tokenValueMap>${basedir}/src/main/env/${profile}/config/metainfo.properties</tokenValueMap>
 						</configuration>
 					</execution>
 				</executions>
