@@ -1068,7 +1068,7 @@
 						<exclude>**/*.min.js</exclude>
 						<exclude>**/*-min.js</exclude>
 					</excludes>
-
+ 					<skip>false</skip>
 				</configuration>
 			</plugin>
 
@@ -1383,6 +1383,5 @@
 				<checksumPolicy>warn</checksumPolicy>
 			</snapshots>
 		</repository>
-
 	</repositories>
 </project>
