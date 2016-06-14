@@ -74,21 +74,11 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException {
 		
-		String subOrdinate = payInfoLog.getSubOrdinate();
-		
-		Integer payType = payInfoLog.getPayType();
-		
-		//更新t_so_paycode
-    	sdkPaymentManager.updatePayCodeBySubOrdinate(subOrdinate, payType);
-    	
-		// 加上showwxpaytitle=1 微信会显示“微信安全支付”
-		String url = "/pay/wechatPay.htm?showwxpaytitle=1&soCode="+subOrdinate;
-		
 		//0.如果是公众号支付需要准备openid
 		if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request)) 
 				&& request.getSession().getAttribute(SessionKeyConstants.MEMBER_WECHAT_OPENID) == null) {
 			//TODO 应该支持定制
-			return "redirect:/payment/wechat/openid.htm";
+			return "redirect:/payment/wechat/openid.htm?subOrdinate=" + payInfoLog.getSubOrdinate();
 		}
 	
 		//1. 统一下单
@@ -101,17 +91,17 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 			if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request))) {
 				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_JSAPI_PREPAY_ID, paymentResult.getPaymentStatusInformation().getPrepayId());
 				//TODO 进入公众号支付页面，应该支持定制
-				return "redirect:/payment/wechat/wxpay.htm";
+				return "redirect:/payment/wechat/jsapipay.htm?subOrdinate=" + payInfoLog.getSubOrdinate();
 			} 
 			//2.2扫码支付，将二维码链接放入session
 			else if(WechatResponseKeyConstants.TRADE_TYPE_NATIVE.equals(getWechatPayType(request))) {
 				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_NATIVE_CODE_URL, paymentResult.getPaymentStatusInformation().getCodeUrl());
 				//TODO 进入扫码页面，应该支持定制
-				return "redirect:/payment/wechat/codepay.htm";
+				return "redirect:/payment/wechat/codepay.htm?subOrdinate=" + payInfoLog.getSubOrdinate();
 			}
 			
 		} else {
-			LOGGER.error("[BUILD_PAY_URL] wechat unifie order error. subOrdinate:{}, message:[{}]", subOrdinate, paymentResult.getMessage());
+			LOGGER.error("[BUILD_PAY_URL] wechat unifie order error. subOrdinate:{}, message:[{}]", payInfoLog.getSubOrdinate(), paymentResult.getMessage());
 			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
 		}
 		

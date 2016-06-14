@@ -84,7 +84,13 @@ public class IllegalPaymentStateException extends Exception {
 		PAYMENT_ILLEGAL_ORDER_INVALID_OWNER,
 		
 		/**获取跳转地址失败 */
-		PAYMENT_GETURL_ERROR
+		PAYMENT_GETURL_ERROR,
+		
+		/**微信扫码支付的url不存在 */
+		PAYMENT_WECHATPAY_CODEURL_NOT_EXISTS,
+		
+		/**微信公众号支付的预支付id不存在 */
+		PAYMENT_WECHATPAY_PREPAYID_NOT_EXISTS
 
 	}
 }
