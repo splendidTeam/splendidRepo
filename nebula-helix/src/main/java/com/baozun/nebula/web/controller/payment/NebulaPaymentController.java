@@ -125,12 +125,12 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                     HttpServletResponse response,
                     Model model){
 
-        try{
+        try {
 
             //根据不同的支付方式准备url
             return buildPayUrl(subOrdinate, memberDetails, getExtraData(), request, response, model);
 
-        }catch (IllegalPaymentStateException e){
+        } catch (IllegalPaymentStateException e){
 
             LOGGER.error(e.getMessage(), e);
 
@@ -339,7 +339,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
         if (Validator.isNullOrEmpty(unpaidPayInfoLogs)){
             //支付信息不存在或已支付
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID, "支付信息不存在或已支付");
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID);
         }
 
         //如果找到多条，只取第一条
@@ -347,12 +347,10 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 1);
 
         //校验订单是否存在、取消、已支付
-        if (validateSalesOrderStatus(salesOrder, memberDetails)){
-            PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-            return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
-        }
-
-        return null;
+        validateSalesOrder(salesOrder, memberDetails);
+        
+        PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
+        return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
     }
 
     protected String getToPayExceptionPageRedirect(){

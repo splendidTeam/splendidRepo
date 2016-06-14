@@ -58,7 +58,7 @@ public class NebulaBasePaymentController extends BaseController {
      * 验证订单的状态
      * 
      */
-    protected boolean validateSalesOrderStatus(SalesOrderCommand salesOrder, MemberDetails memberDetails) throws IllegalPaymentStateException{
+    protected void validateSalesOrder(SalesOrderCommand salesOrder, MemberDetails memberDetails) throws IllegalPaymentStateException{
         //订单不存在
         if (Validator.isNullOrEmpty(salesOrder) || Validator.isNullOrEmpty(salesOrder.getId())
                         || Validator.isNullOrEmpty(salesOrder.getCode())){
@@ -85,7 +85,6 @@ public class NebulaBasePaymentController extends BaseController {
             throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_STATUS);
         }
 
-        return true;
     }
 	
 	/**
