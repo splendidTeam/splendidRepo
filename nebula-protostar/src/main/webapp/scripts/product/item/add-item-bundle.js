@@ -25,12 +25,7 @@ var selectStoreyType = '';
 
 var mainEelment = null;
 var elements = new Array();
-var bundleElement = {
-	isMainElement : false,
-	sort : 0,
-	styleCode : '',
-	itemCode : ''
-};
+var bundleElement = null;
 
 $j(document).ready(function(){
 	
@@ -110,30 +105,28 @@ $j(document).ready(function(){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
-						bundleElement = {
+						mainEelment = {
 								isMainElement : true,
 								sort : 1,
 								styleCode : '',
 								itemCode : element.parent().next().html()
 							};
-						elements.push(bundleElement);
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
-						bundleElement = {
+						mainEelment = {
 								isMainElement : true,
 								sort : 1,
 								styleCode : element.parent().next().html(),
 								itemCode : ''
 							};
-						elements.push(bundleElement);
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
-								sort : $j(".setMemberProduct li").length-1,
+								sort : $j(".setMemberProduct li").length,
 								styleCode : '',
 								itemCode : element.parent().next().html()
 							};
@@ -142,7 +135,7 @@ $j(document).ready(function(){
 						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						bundleElement = {
 								isMainElement : false,
-								sort : $j(".setMemberProduct li").length-1,
+								sort : $j(".setMemberProduct li").length,
 								styleCode : element.parent().next().html(),
 								itemCode : ''
 							};
@@ -396,6 +389,35 @@ function loadBundleElement(){
 		var f = loxia._getForm("bundle_element_form");
 		var data = nps.syncXhr("/item/loadBundleElement.json", f);
 		// TODO 绘制表格
+		
+		var _html = '';
+		$j(data).each(function(idx, d){
+			if($(this).styleCode) { // 同款商品
+				var bundleItems = $(this).bundleItemViewCommands;
+				html += '<tr>';
+				html += '<td rowspan="' + bundleitems.length + '">' + idx + 1 + '</td>';
+				$j(bundleItems).each(function(i, bivc){
+					html += '<td>' + $(this).itemCode + '</td>';
+					html += '<td>' + $(this).salesPrice + '</td>';
+					if(i == 0) {
+						html += '<td rowspan="' + bundleitems.length + '><input type="text" name="bundleElement.salesPrice" /></td>';
+					}
+					html += '</tr>';
+					if(i < bundleItems.length - 1) {
+						html += '<tr>';
+					}
+				});
+				html += '</tr>';
+			} else { // 单一商品
+				html += '<tr>';
+				html += '<td>' + idx + 1 + '</td>';
+				html += '<td>' + $(this).itemCode + '</td>';
+				html += '<td>' + $(this).bundleItemViewCommands[0].salesPrice + '</td>';
+				html += '<td><input type="text" name="bundleElement.salesPrice" /></td>';
+				html += '</tr>';
+			}
+		}); 
+		$j('#product-table > tbody').html(_html);
 	}
 }
 
@@ -411,6 +433,7 @@ function loadBundleSku(){
 }
 
 function fillForm(){
+	debugger;
 	$j('#bundle_element_form > input').remove();
 	
 	var _html = '';
