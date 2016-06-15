@@ -91,7 +91,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 			if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request))) {
 				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_JSAPI_PREPAY_ID, paymentResult.getPaymentStatusInformation().getPrepayId());
 				//TODO 进入公众号支付页面，应该支持定制
-				return "redirect:/payment/wechat/jsapipay.htm?subOrdinate=" + payInfoLog.getSubOrdinate();
+				return "redirect:/payment/wechat/jsapipay.htm?showwxpaytitle=1&subOrdinate=" + payInfoLog.getSubOrdinate();
 			} 
 			//2.2扫码支付，将二维码链接放入session
 			else if(WechatResponseKeyConstants.TRADE_TYPE_NATIVE.equals(getWechatPayType(request))) {
@@ -215,16 +215,6 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 		} catch (Exception e) {
 			LOGGER.error("responseNotifyOrder error.", e);
 		}
-	}
-	
-
-	
-	//openid的获取分三种情况：
-	//1.用户在微信中打开网站时，商城已经自动完成了微信登录，此时从session中获取
-	//2.通过NBP获取，获取后也放在session中
-	//3.直接通过微信获取，获取后也放在session中
-	public String getOpenid(HttpServletRequest request, HttpServletResponse response, Model model) {
-		return (String)request.getSession().getAttribute(SessionKeyConstants.MEMBER_WECHAT_OPENID);
 	}
 	
 	//获取统一下单的参数

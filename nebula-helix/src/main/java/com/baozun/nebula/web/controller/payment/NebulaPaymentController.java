@@ -109,7 +109,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
      * 一般会进入第三方的支付平台页面（如，支付宝），或商城定义的支付页面（如，微信扫码支付）
      * </p>
      * 
-     * @RequestMapping(value = "/payment/toPay.htm")
+     * @RequestMapping(value = URL_TOPAY)
      * 
      * @param memberDetails
      * @param subOrdinate
