@@ -61,6 +61,7 @@ import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineC
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.feilong.core.Validator;
 import com.feilong.core.date.DateExtensionUtil;
+import com.feilong.core.util.CollectionsUtil;
 
 @Transactional
 @Service("sdkShoppingCartGroupManager")
@@ -87,7 +88,6 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
      * 2，根据行优惠，获得这些活动的条件行；
      * 3，根据优惠行，和条件行分组，Compress压缩 添加caption行； 返回前端显示所需要shoppingcartlines a,套餐 b，赠品 c，normal的活动
      * 4，没活动的行；
-     * 
      */
     @Override
     @Transactional(readOnly = true)
@@ -138,9 +138,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                                 shoppingCartLineCommands,
                                 promotionSKUDiscAMTBySettingList,
                                 promotionConditionSKUList);
-                if (Validator.isNotNullOrEmpty(suitLines)){
-                    allSuitLines.addAll(suitLines);
-                }
+                CollectionsUtil.addAllIgnoreNull(allSuitLines, suitLines);
             }
             // 买赠行整合
             else if (this.checkPromotionHasLineGift(promotionSKUDiscAMTBySettingList, promotionCommand)){
@@ -148,18 +146,14 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
                                 shoppingCartLineCommands,
                                 promotionSKUDiscAMTBySettingList,
                                 promotionConditionSKUList);
-                if (Validator.isNotNullOrEmpty(lineGiftLines)){
-                    allLineGiftLines.addAll(lineGiftLines);
-                }
+                CollectionsUtil.addAllIgnoreNull(allLineGiftLines, lineGiftLines);
             }
             // 整单赠品
             else if (this.checkPromotionOrderGift(promotionSKUDiscAMTBySettingList, promotionCommand)){
                 List<ShoppingCartLineCommand> orderGiftLines = getLinesOfOrderGiftPromotion(
                                 shoppingCartLineCommands,
                                 promotionSKUDiscAMTBySettingList);
-                if (Validator.isNotNullOrEmpty(orderGiftLines)){
-                    allOrderGiftLines.addAll(orderGiftLines);
-                }
+                CollectionsUtil.addAllIgnoreNull(allOrderGiftLines, orderGiftLines);
             }
             // 行上直接减  可能多个叠加.可能是无条件行优惠onePromotionConditionSKUList
             else{//获取非套餐、非行赠品类型优惠，购物车行 直接减金额 显示后排除这些行，待无优惠行显示
@@ -178,168 +172,173 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
 
         //******************************************************************************************
         // 分组过的行、包括无优惠的行，所有的行
-        List<ShoppingCartLineCommand> returnShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
+        List<ShoppingCartLineCommand> returnList = new ArrayList<ShoppingCartLineCommand>();
         // 可以调整显示循序
         // 套餐行
         if (Validator.isNotNullOrEmpty(allSuitLines)){
             // 需要按照活动再分组
-            returnShoppingCartLineCommandList.addAll(appendCaptionLinesToGroupedLines(allSuitLines));
+            returnList.addAll(appendCaptionLinesToGroupedLines(allSuitLines));
         }
         // 行减
         if (Validator.isNotNullOrEmpty(allNormalAMTLines)){
             // 原行赠品，和行减，与套餐和整单赠品，是有区别的
             // 取行上活动最多的行，按这些活动，分在一组。循环执行以上动作，直至所有行分组完毕
             // 最终Caption Line后面，跟的lineGroup值，可能不一样
-            returnShoppingCartLineCommandList.addAll(appendCaptionLinesByMaxPromotions(allNormalAMTLines));
+            returnList.addAll(appendCaptionLinesByMaxPromotions(allNormalAMTLines));
         }
         // 整单赠品
         if (Validator.isNotNullOrEmpty(allOrderGiftLines)){
             // 需要按照活动再分组
-            returnShoppingCartLineCommandList.addAll(appendCaptionLinesToGroupedLines(allOrderGiftLines));
+            returnList.addAll(appendCaptionLinesToGroupedLines(allOrderGiftLines));
         }
+
+        // 检查original lines，没有包含在allGroupedLines中的，就是无优惠的，常规行，添加到allGroupedLines中
+        returnList = appendShoppingCartLinesOfNoPromotion(shoppingCartLineCommands, returnList);
 
         //****************************************************************************
         UserDetails userDetails = shoppingCartCommand.getUserDetails();
-        Long memberId = userDetails != null ? userDetails.getMemberId() : 0L;
-
-        // 检查original lines，没有包含在allGroupedLines中的，就是无优惠的，常规行，添加到allGroupedLines中
-        returnShoppingCartLineCommandList = appendShoppingCartLinesOfNoPromotion(
-                        shoppingCartLineCommands,
-                        returnShoppingCartLineCommandList);
-
-        //*********************************************************************************************
-
-        // 设置选中赠品行
-        returnShoppingCartLineCommandList = setGiftLinesSettlement(returnShoppingCartLineCommandList, memberId);
-        // 设置行库存状态
-        if (Validator.isNotNullOrEmpty(returnShoppingCartLineCommandList)){
-            returnShoppingCartLineCommandList = setShoppingCartLineOutOfStockBySKUId(
-                            returnShoppingCartLineCommandList,
-                            promotionCommandList);
+        if (null != userDetails && null != userDetails.getMemberId()){
+            // 设置选中赠品行
+            returnList = setGiftLinesSettlement(returnList, userDetails.getMemberId());
         }
 
-        logLines(returnShoppingCartLineCommandList);
+        // 设置行库存状态
+        returnList = setShoppingCartLineOutOfStockBySKUId(returnList, promotionCommandList);
+        logLines(returnList);
 
         LOGGER.info("use time:{}", DateExtensionUtil.getIntervalForView(beginDate, new Date()));
-
-        return returnShoppingCartLineCommandList;
+        return returnList;
     }
 
-    /*
+    /**
      * 按SKU ID设置赠品行库存，考虑整个购物车中赠品的消费数量
+     * 
+     * @param shoppingCartLineCommandList
+     * @param promotionCommandList
+     * @return
      */
     private List<ShoppingCartLineCommand> setShoppingCartLineOutOfStockBySKUId(
-                    List<ShoppingCartLineCommand> groupedLines,
-                    List<PromotionCommand> linePromotions){
-        Map<Long, Integer> hisSKUQuantityList = new HashMap<Long, Integer>();
-        Integer curComsumeSku = 0;
-        Integer prvComsumeSku = 0;
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    List<PromotionCommand> promotionCommandList){
+
+        Map<Long, Integer> hisSKUQuantityMap = new HashMap<Long, Integer>();
+
         // It be ordered by promotion priority
         //先处理条件行
-        for (ShoppingCartLineCommand line : groupedLines){
-            if (line.isCaptionLine()){
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            if (shoppingCartLineCommand.isCaptionLine() || shoppingCartLineCommand.isGift()){
                 continue;
             }
-            curComsumeSku = 0;
-            prvComsumeSku = 0;
 
-            if (line.isGift() == false){
-                if (hisSKUQuantityList.containsKey(line.getSkuId())){
-                    prvComsumeSku = hisSKUQuantityList.get(line.getSkuId());
-                    curComsumeSku = hisSKUQuantityList.get(line.getSkuId()) + line.getQuantity();
-                }else{
-                    curComsumeSku = line.getQuantity();
-                }
-                hisSKUQuantityList.put(line.getSkuId(), curComsumeSku);
-                SkuCommand skuIvt = sdkSkuManager.findSkuQSVirtualInventoryById(line.getSkuId(), line.getExtentionCode());
-                if (skuIvt == null || skuIvt.getAvailableQty() == null){
-                    line.setStock(0);
-                }else if (skuIvt.getAvailableQty() < curComsumeSku){
-                    line.setStock(skuIvt.getAvailableQty() - prvComsumeSku);
-                }
+            Long skuId = shoppingCartLineCommand.getSkuId();
 
-                ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                                .getShoppingCartLineCommandBehaviour(line);
-
-                sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(line);
+            Integer curComsumeSku = 0;
+            Integer prvComsumeSku = 0;
+            if (hisSKUQuantityMap.containsKey(skuId)){
+                prvComsumeSku = hisSKUQuantityMap.get(skuId);
+                curComsumeSku = hisSKUQuantityMap.get(skuId) + shoppingCartLineCommand.getQuantity();
+            }else{
+                curComsumeSku = shoppingCartLineCommand.getQuantity();
             }
+            hisSKUQuantityMap.put(skuId, curComsumeSku);
+            SkuCommand skuIvt = sdkSkuManager.findSkuQSVirtualInventoryById(skuId, shoppingCartLineCommand.getExtentionCode());
+            if (skuIvt == null || skuIvt.getAvailableQty() == null){
+                shoppingCartLineCommand.setStock(0);
+            }else if (skuIvt.getAvailableQty() < curComsumeSku){
+                shoppingCartLineCommand.setStock(skuIvt.getAvailableQty() - prvComsumeSku);
+            }
+
+            ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
+                            .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+
+            sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLineCommand);
         }
         //再处理赠品行
-        for (ShoppingCartLineCommand line : groupedLines){
-            if (line.isCaptionLine()){
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            if (shoppingCartLineCommand.isCaptionLine()){
                 continue;
             }
-            if (line.getPromotionList() == null){
+            if (shoppingCartLineCommand.getPromotionList() == null){
                 continue;
             }
-            curComsumeSku = 0;
-            prvComsumeSku = 0;
+            Integer curComsumeSku = 0;
+            Integer prvComsumeSku = 0;
 
-            for (PromotionCommand pcmd : linePromotions){
-                if (line.isGift() == true && line.getPromotionList().contains(pcmd)){
-                    if (hisSKUQuantityList.containsKey(line.getSkuId())){
-                        prvComsumeSku = hisSKUQuantityList.get(line.getSkuId());
-                        curComsumeSku = hisSKUQuantityList.get(line.getSkuId()) + line.getQuantity();
+            for (PromotionCommand promotionCommand : promotionCommandList){
+                if (shoppingCartLineCommand.isGift() == true && shoppingCartLineCommand.getPromotionList().contains(promotionCommand)){
+                    if (hisSKUQuantityMap.containsKey(shoppingCartLineCommand.getSkuId())){
+                        prvComsumeSku = hisSKUQuantityMap.get(shoppingCartLineCommand.getSkuId());
+                        curComsumeSku = hisSKUQuantityMap.get(shoppingCartLineCommand.getSkuId()) + shoppingCartLineCommand.getQuantity();
                     }else{
-                        curComsumeSku = line.getQuantity();
+                        curComsumeSku = shoppingCartLineCommand.getQuantity();
                     }
-                    hisSKUQuantityList.put(line.getSkuId(), curComsumeSku);
-                    SkuCommand skuIvt = sdkSkuManager.findSkuQSVirtualInventoryById(line.getSkuId(), line.getExtentionCode());
+                    hisSKUQuantityMap.put(shoppingCartLineCommand.getSkuId(), curComsumeSku);
+                    SkuCommand skuIvt = sdkSkuManager.findSkuQSVirtualInventoryById(
+                                    shoppingCartLineCommand.getSkuId(),
+                                    shoppingCartLineCommand.getExtentionCode());
                     if (skuIvt == null || skuIvt.getAvailableQty() == null){
-                        line.setStock(0);
+                        shoppingCartLineCommand.setStock(0);
                     }else if (skuIvt.getAvailableQty() < curComsumeSku){
-                        line.setStock(skuIvt.getAvailableQty() - prvComsumeSku);
+                        shoppingCartLineCommand.setStock(skuIvt.getAvailableQty() - prvComsumeSku);
                     }
 
                     ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                                    .getShoppingCartLineCommandBehaviour(line);
-
-                    sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(line);
-
+                                    .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+                    sdkShoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLineCommand);
                 }
             }
         }
-        return groupedLines;
+        return shoppingCartLineCommandList;
     }
 
     private void logLines(List<ShoppingCartLineCommand> allGroupedLines){
         LOGGER.debug("分组Log开始!");
-        String lineGift = "";
-        if (allGroupedLines == null || allGroupedLines.size() == 0){
+        if (Validator.isNullOrEmpty(allGroupedLines)){
             return;
         }
-        for (ShoppingCartLineCommand line : allGroupedLines){
-            if (line.isCaptionLine()){
-                if (line.isSuitLine()){
-                    LOGGER.debug(
-                                    "店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动标题：" + line.getLineCaption()
-                                                    + "。需要套数调节器！");
+        for (ShoppingCartLineCommand shoppingCartLineCommand : allGroupedLines){
+            Long shopId = shoppingCartLineCommand.getShopId();
+            Long lineGroup = shoppingCartLineCommand.getLineGroup();
+
+            boolean suitLine = shoppingCartLineCommand.isSuitLine();
+            if (shoppingCartLineCommand.isCaptionLine()){
+                String lineCaption = shoppingCartLineCommand.getLineCaption();
+                if (suitLine){
+                    LOGGER.debug("店铺编号：" + shopId + ",分组编号：" + lineGroup + ",活动标题：" + lineCaption + "。需要套数调节器！");
                 }else{
-                    LOGGER.debug("店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动标题：" + line.getLineCaption());
+                    LOGGER.debug("店铺编号：" + shopId + ",分组编号：" + lineGroup + ",活动标题：" + lineCaption);
                 }
             }else{
-                if (line.getLineGroup() == null || line.getLineGroup() == 0L){
+                Long id = shoppingCartLineCommand.getId();
+                Integer quantity = shoppingCartLineCommand.getQuantity();
+                Long skuId = shoppingCartLineCommand.getSkuId();
+                String itemName = shoppingCartLineCommand.getItemName();
+                Long itemId = shoppingCartLineCommand.getItemId();
+                BigDecimal discount = shoppingCartLineCommand.getDiscount();
+                Integer stock = shoppingCartLineCommand.getStock();
+                String promotionIds = shoppingCartLineCommand.getPromotionIds();
+                BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
+                String extentionCode = shoppingCartLineCommand.getExtentionCode();
+                if (lineGroup == null || lineGroup == 0L){
                     LOGGER.debug(
-                                    "店铺编号：" + line.getShopId() + ",活动编号：" + line.getPromotionIds() + ",常   规   行：-------------ID："
-                                                    + line.getId() + ",ItemID：" + line.getItemId() + ",SKU ID：" + line.getSkuId()
-                                                    + ",ExtCode：" + line.getExtentionCode() + ",名        称：" + line.getItemName()
-                                                    + ",价        格：" + line.getSalePrice() + ",优        惠：" + line.getDiscount() + ",件数："
-                                                    + line.getQuantity() + ",库存：" + line.getStock());
+                                    "店铺编号：" + shopId + ",活动编号：" + promotionIds + ",常   规   行：-------------ID：" + id + ",ItemID：" + itemId
+                                                    + ",SKU ID：" + skuId + ",ExtCode：" + extentionCode + ",名        称：" + itemName
+                                                    + ",价        格：" + salePrice + ",优        惠：" + discount + ",件数：" + quantity + ",库存："
+                                                    + stock);
                 }else{
-                    lineGift = "店铺编号：" + line.getShopId() + ",分组编号：" + line.getLineGroup() + ",活动编号：" + line.getPromotionIds() + ",----赠品："
-                                    + (line.isGift() == true ? "是，" : "否，") + "套装：" + (line.isSuitLine() == true ? "是，" : "否，") + "ID："
-                                    + line.getId() + ",ItemID：" + line.getItemId() + ",SKU ID：" + line.getSkuId() + ",ExtCode："
-                                    + line.getExtentionCode() + ",名        称：" + line.getItemName() + ",价        格：" + line.getSalePrice()
-                                    + ",优        惠：" + line.getDiscount() + ",件数：" + line.getQuantity() + ",库存：" + line.getStock() + ",选中："
-                                    + line.getSettlementState();
-                    if (line.isGift() == true){
-                        lineGift = lineGift + (line.getGiftType() == GiftType.OrderGift ? ",整赠" : ",行赠");
-                        if (line.getGiftChoiceType() == GiftChoiceType.NeedChoice){
-                            lineGift = lineGift + ",最多选" + line.getGiftCountLimited();
+                    String lineGift = "店铺编号：" + shopId + ",分组编号：" + lineGroup + ",活动编号：" + promotionIds + ",----赠品："
+                                    + (shoppingCartLineCommand.isGift() == true ? "是，" : "否，") + "套装：" + (suitLine == true ? "是，" : "否，")
+                                    + "ID：" + id + ",ItemID：" + itemId + ",SKU ID：" + skuId + ",ExtCode：" + extentionCode + ",名        称："
+                                    + itemName + ",价        格：" + salePrice + ",优        惠：" + discount + ",件数：" + quantity + ",库存：" + stock
+                                    + ",选中：" + shoppingCartLineCommand.getSettlementState();
+                    if (shoppingCartLineCommand.isGift() == true){
+                        lineGift = lineGift + (shoppingCartLineCommand.getGiftType() == GiftType.OrderGift ? ",整赠" : ",行赠");
+                        if (shoppingCartLineCommand.getGiftChoiceType() == GiftChoiceType.NeedChoice){
+                            lineGift = lineGift + ",最多选" + shoppingCartLineCommand.getGiftCountLimited();
                         }else{
                             lineGift = lineGift + ",直推";
                         }
-                        if (line.getGiftType() == GiftType.LineGift){
+                        if (shoppingCartLineCommand.getGiftType() == GiftType.LineGift){
                             lineGift = lineGift + ",行赠品";
                         }else{
                             lineGift = lineGift + ",整单赠品";
