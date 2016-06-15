@@ -3,6 +3,9 @@ package com.baozun.nebula.utils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.baozun.nebula.utilities.common.Md5Encrypt;
+import com.feilong.core.Validator;
+
 public class EmailParamEnciphermentUtil {
 	
 	/**
