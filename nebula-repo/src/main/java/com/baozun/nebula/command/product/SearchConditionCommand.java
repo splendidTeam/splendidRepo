@@ -53,7 +53,19 @@ public class SearchConditionCommand  extends BaseModel{
 	/**
 	 * 搜索条件对应的分类Id
 	 */
+	@Deprecated
 	private Long 				categoryId;
+
+	/**
+	 * 导航Id
+	 */
+	private Long				navigationId;
+	
+	/**
+	 * 导航名称
+	 */
+	private String	navigationName;
+	
 	
 	/**
 	 * 排序
@@ -223,4 +235,20 @@ public class SearchConditionCommand  extends BaseModel{
 		return itemList;
 	}
 	
+
+	public Long getNavigationId() {
+		return navigationId;
+	}
+
+	public void setNavigationId(Long navigationId) {
+		this.navigationId = navigationId;
+	}
+
+	public String getNavigationName() {
+		return navigationName;
+	}
+
+	public void setNavigationName(String navigationName) {
+		this.navigationName = navigationName;
+	}
 }

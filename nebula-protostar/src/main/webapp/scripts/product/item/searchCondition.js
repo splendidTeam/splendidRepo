@@ -5,7 +5,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	    "LABEL_SORT":"顺序",
 	    "LABEL_STATE":"状态",
 	    "LABEL_CONFIG":"操作",
-	    "LABEL_CATEGORY":"分类",
+	    "LABEL_CATEGORY":"导航",
 	    "TO_UPDATE":"修改",
 	    "TO_ENABLE":"启用",
 	    "TO_DELETE":"删除",
@@ -117,9 +117,8 @@ var setting = {
 function drawPropertyName(data, args, idx){
 	var result=""; 
 	var name=loxia.getObject("propertyName", data);
-	var iname=loxia.getObject("industryName", data);
 	if(name!=null&&name!=""){
-		return iname+" > "+name;
+		return name;
 	}
 	return "";
 }
@@ -492,7 +491,7 @@ $j(document).ready(function() {
 			width : "10%" ,
 			template:"typeNames"
 		},{
-			name : "categoryName",
+			name : "navigationName",
 			label : nps.i18n("LABEL_CATEGORY"),
 			width : "10%" 
 		}, {

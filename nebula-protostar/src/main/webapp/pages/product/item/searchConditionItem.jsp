@@ -18,18 +18,18 @@ var category_ZNodes = [
 		{id:0, pId:-1, name:"ROOT",
 			  code:"ROOT", sortNo:1,
 			  open:true, lifecycle:1},  
-              <c:forEach var="category" items="${categoryList}" varStatus="status">
+              <c:forEach var="navigation" items="${naviList}" varStatus="status">
               	
-              	{id:${category.id}, pId:${category.parentId}, name:"${category.name}", 
-              		code:"${category.code}", sortNo:${category.sortNo}, 
-              		open:false, lifecycle:${category.lifecycle}}
+              	{id:${navigation.id}, pId:${navigation.parentId}, name:"${navigation.name}", 
+              		code:"${navigation.id}", sortNo:${navigation.sort}, 
+              		open:false, lifecycle:${navigation.lifecycle}}
               	<c:if test="${!status.last}">,</c:if>
               </c:forEach>
          ];
 </SCRIPT>
 </head>
 <body>
-	
+	==============${naviList}
 <div class="content-box width-percent100">
 	<input type="hidden" id="pid" value="${searchConditionVo.id}"  mandatory="false"/>
 	<div class="ui-title1"><img src="${base }/images/wmi/blacks/32x32/user.png">  

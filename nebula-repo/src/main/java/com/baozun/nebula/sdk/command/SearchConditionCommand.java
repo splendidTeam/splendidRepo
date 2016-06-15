@@ -52,6 +52,7 @@ public class SearchConditionCommand  extends BaseModel{
 	/**
 	 * 搜索条件对应的分类Id
 	 */
+	@Deprecated
 	private Long 				categoryId;
 	
 	/**
@@ -80,11 +81,31 @@ public class SearchConditionCommand  extends BaseModel{
     /**
      * 关联的类型名
      */
+    @Deprecated
     private String categoryName;
     
     
+    /**
+     * 导航id
+     */
+    private Long  navigationId;
+    
+    /**
+     * 导航名称
+     */
+    private String	navigationName;
+    
+    
 
-    public Long getIndustryId() {
+    public String getNavigationName() {
+		return navigationName;
+	}
+
+	public void setNavigationName(String navigationName) {
+		this.navigationName = navigationName;
+	}
+
+	public Long getIndustryId() {
         return industryId;
     }
 
@@ -220,6 +241,14 @@ public class SearchConditionCommand  extends BaseModel{
 
 	public List<SearchConditionItemCommand> getItemList() {
 		return itemList;
+	}
+
+	public Long getNavigationId() {
+		return navigationId;
+	}
+
+	public void setNavigationId(Long navigationId) {
+		this.navigationId = navigationId;
 	}
 	
 }

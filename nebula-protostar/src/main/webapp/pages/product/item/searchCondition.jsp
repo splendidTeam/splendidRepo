@@ -15,16 +15,27 @@
 <script type="text/javascript" src="${base }/scripts/main.js"></script>
 <SCRIPT type="text/javascript">	
 //<spring:message code="industry.list.expand"/>ROOT
+
+//<c:forEach var="category" items="${categoryList}" varStatus="status">
+  //             	{id:${category.id}, pId:${category.parentId}, name:"${category.name}", 
+    //           		code:"${category.code}", sortNo:${category.sortNo}, 
+      //         		open:false, lifecycle:${category.lifecycle}}
+        //       	<c:if test="${!status.last}">,</c:if>
+          //     </c:forEach>
+               
 var zNodes = [
           	{id:0, pId:-1, name:"ROOT", 
            		code:"ROOT", sortNo:1, 
            		open:true, lifecycle:1,nocheck:true},
-               <c:forEach var="category" items="${categoryList}" varStatus="status">
-               	{id:${category.id}, pId:${category.parentId}, name:"${category.name}", 
-               		code:"${category.code}", sortNo:${category.sortNo}, 
-               		open:false, lifecycle:${category.lifecycle}}
-               	<c:if test="${!status.last}">,</c:if>
-               </c:forEach>
+               
+               
+               <c:forEach var="navigation" items="${naviList}" varStatus="status">
+             	
+             	{id:${navigation.id}, pId:${navigation.parentId}, name:"${navigation.name}", 
+             		code:"${navigation.id}", sortNo:${navigation.sort}, 
+             		open:false, lifecycle:${navigation.lifecycle}}
+             	<c:if test="${!status.last}">,</c:if>
+             </c:forEach>
           ];
           
 var zNodes2 = [
@@ -56,10 +67,10 @@ var zNodes2 = [
 	        	<td><label><spring:message code='item.searchCodition.name'/></label></td>
 	            <td><input type="text" id="name" placeHolder="<spring:message code='item.searchCodition.name'/>" name="q_sl_name" loxiaType="input" mandatory="false"></input></td>  
 	                  
-			   <td><label>分类</label></td>
+			   <td><label>导航</label></td>
 	             <td> 
-	             	<input type="text" id="category" name="categoryN" readOnly="readOnly" placeHolder="<spring:message code='item.searchCodition.category'/>" loxiaType="input" mandatory="false"></input>
-	             	<input type="hidden" id="categoryId" name="q_long_categoryId" loxiaType="input" />
+	             	<input type="text" id="category" name="categoryN" readOnly="readOnly" placeHolder="导航" loxiaType="input" mandatory="false"></input>
+	             	<input type="hidden" id="categoryId" name="q_long_navigationId" loxiaType="input" />
 	             </td>
 	            <td><label><spring:message code='item.searchCodition.industry'/></label></td>
 	            <td>

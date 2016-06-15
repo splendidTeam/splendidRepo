@@ -35,9 +35,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
+import com.baozun.nebula.manager.baseinfo.NavigationManager;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.IndustryManager;
 import com.baozun.nebula.manager.product.PropertyManager;
+import com.baozun.nebula.model.baseinfo.Navigation;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.PropertyValue;
 import com.baozun.nebula.model.product.SearchCondition;
@@ -75,13 +77,21 @@ public class SearchConditionController extends BaseController {
     @Autowired
     private PropertyManager propertyManager;
     
+	@Autowired
+	private NavigationManager			navigationManager;
+    
     
     @RequestMapping("/item/itemSearchCondition/manager.htm")
     public String itemSearchConditionManager(Model model,QueryBean queryBean) {
         
-        Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
-        List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
-        model.addAttribute("categoryList", categoryList);
+//        Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
+//        List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
+//        model.addAttribute("categoryList", categoryList);
+        
+        List<Navigation> naviList = navigationManager.findAllNavigationList(Navigation.COMMOM_SORTS);
+        
+        model.addAttribute("naviList", naviList);
+        
         model.addAttribute("industryList", industryManager.findAllIndustryList());
         
         return "product/item/searchCondition";
@@ -261,9 +271,11 @@ public class SearchConditionController extends BaseController {
     @RequestMapping("/item/itemSearchCondition/managerAddCondition.htm")
     public String itemSearchConditionManagerAdd(Model model,Long id) {
         
-        Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
-        List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
-        model.addAttribute("categoryList", categoryList);
+//        Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
+//        List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
+//        model.addAttribute("categoryList", categoryList);
+        List<Navigation> naviList = navigationManager.findAllNavigationList(Navigation.COMMOM_SORTS);
+        model.addAttribute("naviList", naviList);
         model.addAttribute("industryList", industryManager.findAllIndustryList());
         
         if(id!=null){
@@ -281,9 +293,13 @@ public class SearchConditionController extends BaseController {
     @RequestMapping("/i18n/item/itemSearchCondition/managerAddCondition.htm")
     public String itemSearchConditionManagerAddI18n(Model model,Long id) {
         
-        Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
-        List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
-        model.addAttribute("categoryList", categoryList);
+//        Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
+//        List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
+//        model.addAttribute("categoryList", categoryList);
+    	
+    	 List<Navigation> naviList = navigationManager.findAllNavigationList(Navigation.COMMOM_SORTS);
+         model.addAttribute("naviList", naviList);
+    	
         model.addAttribute("industryList", industryManager.findAllIndustryList());
         
         if(id != null){

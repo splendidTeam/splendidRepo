@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.manager.system;
 
-
 /**
  * 平台访问策略中控类
  * 可以用于验证码的保存、验证、访问控制
@@ -33,13 +32,14 @@ public interface TokenManager {
 	 */
 	void saveToken(String businessCode, String human, int liveTime, String token);
 	/**
-	 * 验证
+	 * 校验验证码，不区分大小写
 	 * @param businessCode 业务编码
 	 * @param human  人的识别码
 	 * @param token 验证码
 	 * @return
 	 */
 	VerifyResult verifyToken(String businessCode, String human, String token);
+	
 	
 	enum VerifyResult {
 		SUCESS, FAILURE, EXPIRED, LIMITED;

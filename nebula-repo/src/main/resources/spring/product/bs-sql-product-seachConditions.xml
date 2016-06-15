@@ -63,12 +63,10 @@
 					t1.property_id as propertyId,
 					t1."type" as type,
 					t2."name" as propertyName,
-					t3."name" as industryName,
-					t4."name" as categoryName
+					t4."name" as navigationName
 					from t_pd_search_con t1 
 					LEFT JOIN t_pd_property t2 on t2.id=t1.property_id
-					LEFT JOIN t_pd_industry t3 on t2.industry_id=t3.id
-					LEFT JOIN t_pd_category t4 on t1.category_id=t4.id
+					LEFT JOIN t_base_navigation t4 on t1.navigation_id=t4.id
 					where t1.lifecycle BETWEEN 0 AND 1
 					#if($name)
 						AND t1."name" like :name
@@ -78,6 +76,9 @@
 					#end
 					#if($categoryId)
 						AND (t1.category_id=:categoryId or t1.category_id is null)
+					#end
+					#if($navigationId)
+						AND (t1.NAVIGATION_ID=:navigationId or t1.NAVIGATION_ID is null)
 					#end
 					#if($propertyId)
 						AND (t1.property_id=:propertyId or t1.property_id is null)
@@ -102,12 +103,13 @@
 					t2."name" as propertyName,
 					t3."id" as industryId,
 					t3."name" as industryName,
-					t1.category_id as categoryId,
-					t4."name" as categoryName
+					t1.navigation_id as navigationId,
+					t4."name" as navigationName
 					from t_pd_search_con t1 
 					LEFT JOIN t_pd_property t2 on t2.id=t1.property_id
-					LEFT JOIN t_pd_industry t3 on t2.industry_id=t3.id
-					LEFT JOIN t_pd_category t4 on t1.category_id=t4.id
+					LEFT JOIN t_pd_industry_property_relation t5 on t5.property_id = t2.id
+					LEFT JOIN t_pd_industry t3 on t5.industry_id=t3.id
+					LEFT JOIN t_base_navigation t4 on t1.navigation_id=t4.id					
 					where t1.lifecycle BETWEEN 0 AND 1
 					#if($id)
 						AND t1.id=:id
@@ -179,6 +181,9 @@
 					#end
 					#if($sc.categoryId)
 						,category_id=:sc.categoryId
+					#end
+					#if($sc.navigationId)
+						,navigation_id=:sc.navigationId
 					#end
 					WHERE id=:id
                  ]]>
