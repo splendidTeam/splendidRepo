@@ -2638,8 +2638,10 @@ public class ItemController extends BaseController{
 				shopId = shopCommand.getShopid();
 			}
 		}
+		
+		Sort sort = new Sort("ii.style", "asc");
 
-		Pagination<ItemStyleCommand> args = itemManager.findStyleListByQueryMap(queryBean.getPage(), null, queryBean.getParaMap(), shopId);
+		Pagination<ItemStyleCommand> args = itemManager.findStyleListByQueryMap(queryBean.getPage(), new Sort[]{sort}, queryBean.getParaMap(), shopId);
 
 		return args;
 	}
