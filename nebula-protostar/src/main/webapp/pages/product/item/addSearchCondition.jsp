@@ -21,10 +21,11 @@ var zNodes2 = [
             	{id:0, pId:-1, name:"ROOT", 
              		code:"ROOT", sortNo:1, 
              		open:true, lifecycle:1,nocheck:true},
-                 <c:forEach var="category" items="${categoryList}" varStatus="status">
-                 	{id:${category.id}, pId:${category.parentId}, name:"${category.name}", 
-                 		code:"${category.code}", sortNo:${category.sortNo}, 
-                 		open:false, lifecycle:${category.lifecycle}}
+             	<c:forEach var="navigation" items="${naviList}" varStatus="status">
+                 	
+                 	{id:${navigation.id}, pId:${navigation.parentId}, name:"${navigation.name}", 
+                 		code:"${navigation.id}", sortNo:${navigation.sort}, 
+                 		open:false, lifecycle:${navigation.lifecycle}}
                  	<c:if test="${!status.last}">,</c:if>
                  </c:forEach>
             ];
@@ -95,10 +96,10 @@ display: none;
   </c:if>
  
   <div class="ui-block-line navi-param" style="display: block;">
-    <label><spring:message code='item.searchCodition.category'/></label>
-    <input type="text" readOnly="readOnly" value="" id="category" placeholder="<spring:message code='item.searchCodition.category'/>" loxiaType="input" aria-disabled="true">
-    <input type="hidden" value="" name="condition.categoryId" id="categoryId" >
-    <a href="javascript:void(0);" id="addType" class="func-button view-block-type"><spring:message code='item.searchCodition.cCategory'/></a>
+    <label>导航</label>
+    <input type="text" readOnly="readOnly" value="" id="category" placeholder="导航" loxiaType="input" aria-disabled="true">
+    <input type="hidden" value="" name="condition.navigationId" id="categoryId" >
+    <a href="javascript:void(0);" id="addType" class="func-button view-block-type">选择导航</a>
   </div>
   
   <div class="ui-block-line">
