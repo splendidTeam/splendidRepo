@@ -40,15 +40,15 @@ var zNodes =
 				<!-- 这是普通商品/虚拟商品行业选择树模块 -->
 				<div class="ui-block border-grey pl10">
 				   <%-- <div class="ui-block-title1"><spring:message code="item.add.industry"/></div> --%>
-				   <div class="addpro-title font20 pb10">新增商品</div>
+				   <div class="addpro-title font20 pb10"><spring:message code="item.add.addItem" /></div>
 				   <div class="form-group select-btn">
-				   		<label> <input type="radio" class="normalpro" name="newPro" value="1" checked="checked" />普通商品 </label>
-				   		<label> <input type="radio" name="newPro" value="3" />捆绑商品 </label>
-				   		<label> <input type="radio" name="newPro" value="5" />搭配商品 </label>
-				   		<label> <input type="radio" class="virtualpro" name="newPro" value="7" />虚拟商品 </label>
+				   		<label> <input type="radio" class="normalpro" name="newPro" value="1" checked="checked" /><spring:message code="item.type.simple" /> </label>
+				   		<label> <input type="radio" name="newPro" value="3" /><spring:message code="item.type.bundle" /> </label>
+				   		<label> <input type="radio" name="newPro" value="5" /><spring:message code="item.type.group" /></label>
+				   		<label> <input type="radio" class="virtualpro" name="newPro" value="7" /><spring:message code="item.type.virturl" /></label>
 				   </div>
 				   <div class="pro-modal pt10 pb10 none-normal">
-				   	   <p class="font20">选择商品模板</p>
+				   	   <p class="font20"><spring:message code="item.add.selectIndustry" /></p>
 					   <div class="ui-block ui-block-fleft w240">
 					        <div class="ui-block-content ui-block-content-lb">
 					            <div class="tree-control">
