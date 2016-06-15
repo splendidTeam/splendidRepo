@@ -63,9 +63,5 @@ public class AutoCollectionTest {
 //		context.setProperties(Arrays.asList(new String[] { "1", "2" }));
 	}
 
-	@Test
-	public void testAutoCollection() {
-		AutoCollection.apply(collection, context);
-	}
 
 }
