@@ -30,8 +30,8 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title">库存设置</div>
 		<div class="ui-block-content border-grey">
-	   		<label class="label-line block pb10"> 是否同步扣减sku库存 <input type="radio" name="syncWithInv" value="1" checked="checked">是   <input type="radio" name="syncWithInv" value="0" >否 </label>
 	   		<label class="label-line block pb10"> 库存数量 <input type="text" name="availableQty" placeholder=""> </label>
+	   		<label class="label-line block pb10"> 是否同步扣减sku库存 <input type="radio" name="syncWithInv" value="1" checked="checked">是   <input type="radio" name="syncWithInv" value="0" >否 </label>
 		</div>
 	</div>
 	<div class="ui-block">
