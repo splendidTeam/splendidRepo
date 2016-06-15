@@ -93,6 +93,22 @@
 		</constructor-arg>
 	</bean> 
 
+	<bean id="ItemImage.findItemImageByItemId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过商品id查询商品图片</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					select * from t_pd_item_image 
+					where 
+						item_id = :itemId 
+					#if($type)
+						and (type = :type )
+					#end
+				]]>
+			</value>
+		</constructor-arg>
+	</bean> 
+
 	<bean id="ItemImage.findItemImageByItemIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description>通过商品id集合查询商品图片</description>
 		<constructor-arg>

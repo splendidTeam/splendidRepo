@@ -326,7 +326,7 @@ function radioTemplate(data, args, idx) {
 	if( _itemImageList != null ){
 		for(var i = 0; i < _itemImageList.length; i++) {
 			var imgType = _itemImageList[i].type;
-			if( imgType == 1 ){
+			if( imgType == "1" ){
 				_itemImage = _itemImageList[i].picUrl;
 				break;
 			}
