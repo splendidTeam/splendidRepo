@@ -14,8 +14,8 @@ $j.extend(loxia.regional['zh-CN'],{
 	"TABLE_TITLE_STYLE_CODE":"款号",
 	"SELECT-PRODUCT":"请选择商品",
 	"SELECT-PRODUCT-EXIST":"您选中的商品已存在",
-	"MAIN-PRODUCT-NOT-EXIST":"主卖品不存在",
-	"MEMBER-PRODUCT-NOT-EXIST":"成员商品不存在"
+	"MAIN-PRODUCT-NOT-EXIST":"主卖品未设置",
+	"MEMBER-PRODUCT-NOT-EXIST":"成员商品未设置"
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
@@ -106,7 +106,7 @@ $j(document).ready(function(){
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
 						mainEelment = {
-								isMainElement : false,
+								isMainElement : true,
 								sort : 1,
 								styleCode : '',
 								itemCode : element.parent().next().text()
@@ -115,7 +115,7 @@ $j(document).ready(function(){
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
 						$j("#selectPro").hide();
 						mainEelment = {
-								isMainElement : false,
+								isMainElement : true,
 								sort : 1,
 								styleCode : element.parent().next().text(),
 								itemCode : ''
@@ -159,51 +159,24 @@ $j(document).ready(function(){
 	
 	
 	/*==================================     价格设置    ==========================*/
-	$j("input[name='setPrice']").bind('change', function(){
+	$j("input[name='priceType']").bind('change', function(){
 		var currVal = $j(this).val();
 		
-		if(currVal == 'subtotal') {//按捆绑商品总价
+		if(currVal == '1') {//按捆绑商品总价
 			$j('.product-table').hide();
 			$j('.product-table > tbody').html('');
-			$j('.sku-table').hide();
-			$j('.sku-table > tbody').html('');
-			$j('.sku-table').find("input[name='setPrice']").attr("readonly","readonly");
-		} else if(currVal == 'fix'){//一口价
+			loadBundleElements(false, true);
+		} else if(currVal == '2'){//一口价
 			$j('.product-table').show();
-			$j('.sku-table').hide();
-			$j('.sku-table > tbody').html('');
-			loadBundleElement();
-		} else if(currVal == 'custom'){//定制
+			loadBundleElements(false, false);
+		} else if(currVal == '3'){//定制
 			$j('.product-table').hide();
 			$j('.product-table > tbody').html('');
-			$j('.sku-table').show();
-			$j('.sku-table').find("input[name='setPrice']").removeAttr("readonly");
-			loadBundleSku();
+			loadBundleElements(true);
 		}
 	});
 	/*==================================     价格设置    ==========================*/
 	/*==================================     bundle扩展信息    ==========================*/
-	
-	
-	//保存商品
-	$j(".button.orange.submit").click(function(){
-	   nps.submitForm('itemForm',{mode: 'async', 
-			successHandler : function(data){
-			if(data.isSuccess == true)
-			{
-				window.location.href=base+"/item/itemList.htm";
-			}else
-			{
-				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("ADDITEM_FAIL"));
-			}
-	   }});
-    });
-	
-	//上一步
-    $j(".button.back").on("click",function(){
-    	window.location.href=base+"/item/createItemChoose.htm";
-    });
-	
 });
 
 
@@ -326,7 +299,7 @@ function radioTemplate(data, args, idx) {
 	if( _itemImageList != null ){
 		for(var i = 0; i < _itemImageList.length; i++) {
 			var imgType = _itemImageList[i].type;
-			if( imgType == 1 ){
+			if( imgType == "1" ){
 				_itemImage = _itemImageList[i].picUrl;
 				break;
 			}
@@ -395,78 +368,90 @@ Array.prototype.remove = function(val) {
 /**
  * 装填“一口价”表格数据
  */
-function loadBundleElement(){
-	if(fillForm()) {
-		var f = loxia._getForm("bundle_element_form");
-		var data = nps.syncXhr("/item/loadBundleElement.json", f);
-		// TODO 绘制表格
-		
-		var _html = '';
-		$j(data).each(function(idx, d){
-			debugger;
-			if($(this).styleCode) { // 同款商品
-				var bundleItems = $(this).bundleItemViewCommands;
-				html += '<tr>';
-				html += '<td rowspan="' + bundleitems.length + '">' + idx + 1 + '</td>';
-				$j(bundleItems).each(function(i, bivc){
-					html += '<td>' + $(this).itemCode + '</td>';
-					html += '<td>' + $(this).salesPrice + '</td>';
-					if(i == 0) {
-						html += '<td rowspan="' + bundleitems.length + '><input type="text" name="bundleElement.salesPrice" /></td>';
-					}
-					html += '</tr>';
-					if(i < bundleItems.length - 1) {
-						html += '<tr>';
-					}
-				});
-				html += '</tr>';
-			} else { // 单一商品
-				html += '<tr>';
-				html += '<td>' + idx + 1 + '</td>';
-				html += '<td>' + $(this).itemCode + '</td>';
-				html += '<td>' + $(this).bundleItemViewCommands[0].salesPrice + '</td>';
-				html += '<td><input type="text" name="bundleElement.salesPrice" /></td>';
-				html += '</tr>';
-			}
-		}); 
-		$j('#product-table > tbody').html(_html);
-	}
+function fillProductTable(data){
+	var _html = '';
+	$j(data).each(function(idx, element){
+		if(element.styleCode) { // 同款商品
+			var bundleItems = $j(element.bundleItemViewCommands);
+			_html += '<tr>';
+			_html += '<td rowspan="' + bundleItems.length + '">' + (idx + 1) + '</td>';
+			$j(bundleItems).each(function(i, item){
+				_html += '<td>' + item.itemCode + '</td>';
+				_html += '<td>' + item.salesPrice + '</td>';
+				if(i == 0) {
+					_html += '<td rowspan="' + bundleItems.length + '"><input type="text" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + item.salesPrice + '" /></td>';
+				}
+				_html += '</tr>';
+				if(i < bundleItems.length - 1) {
+					_html += '<tr>';
+				}
+			});
+			_html += '</tr>';
+		} else { // 单一商品
+			_html += '<tr>';
+			_html += '<td>' + (idx + 1) + '</td>';
+			_html += '<td>' + element.itemCode + '</td>';
+			_html += '<td>' + element.bundleItemViewCommands[0].salesPrice + '</td>';
+			_html += '<td><input type="text" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + element.bundleItemViewCommands[0].salesPrice + '" /></td>';
+			_html += '</tr>';
+		}
+	}); 
+	$j('.product-table > tbody').html(_html);
 }
 
 /**
  * 装填“定制”表格数据
  */
-function loadBundleSku(){
+function loadBundleElements(editable, showDefaultValue){
 	if(fillForm()) {
 		var f = loxia._getForm("bundle_element_form");
-		var data = nps.syncXhr("/item/loadBundleSku.json", f);
-		// TODO 绘制表格
+		loxia.lockPage();
+		var data = nps.syncXhr("/item/loadBundleElements.json", f);
+		loxia.unlockPage();
+		
+		// 如果是一口价，装填“一口价”表格数据
+		if($j("input[name='priceType']:checked").val() == 2){
+			fillProductTable(data);
+		}
 		
 		var _html = '';
 		var _a = new Array();
 		$j(data).each(function(idx, element){
 			_html += '<tr>';
-			_html += '<td colsapn="##' + idx + '##">' + idx + 1 + '</td>';
-			var bundleItems = $(this).bundleItemViewCommands;
+			_html += '<td rowspan="##' + idx + '##">' + (idx + 1) + '</td>'
+				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].isMainElement" value="' + element.isMainElement + '" />'
+				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].sort" value="' + element.sort + '" />'
+				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].styleCode" value="' + element.styleCode + '" />'
+				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].itemCode" value="' + element.itemCode + '" />';
+			var bundleItems = element.bundleItemViewCommands;
 			var rowspan = 0;
-			$j($(bundleItems)).each(function(m, item){
+			$j(bundleItems).each(function(m, item){
 				_html += '<td>商品</td>';
-				_html += '<td>' + $(this).itemCode + '</td>';
+				_html += '<td>' + item.itemCode + '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].itemId" value="' + item.itemId + '" /></td>';
 				_html += '<td></td>';
 				_html += '<td></td>';
 				_html += '</tr>';
 				rowspan ++;
-				$j(this.bundleSkuViewCommands).each(function(m, sku){
-					
+				var bundleSkus = item.bundleSkuViewCommands;
+				$j(bundleSkus).each(function(n, sku){
+					rowspan ++;
+					_html += '<tr>';
+					_html += '<td>' + sku.property + '</td>';
+					_html += '<td><input type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" checked=checked /></td>';
+					_html += '<td>' + sku.originalSalesPrice + '</td>';
+					_html += '<td><input type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.originalSalesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
+						+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].skuId" value="' + sku.skuId + '" /></td>';
+					_html += '</tr>';
 				});
 			});
+			_a.push(rowspan);
 		}); 
 		
 		for(var i = 0; i < _a.length; i++) {
-			_html.replace('##' + i + '##', _a[i]);
+			_html = _html.replace('##' + i + '##', _a[i]);
 		}
 		
-		$j('#sku-table > tbody').html(_html);
+		$j('.sku-table > tbody').html(_html);
 	}
 }
 
@@ -480,13 +465,15 @@ function fillForm(){
 	if(mainEelment) {
 		_e.push(mainEelment)
 	} else {
+		nps.info(nps.i18n('MAIN-PRODUCT-NOT-EXIST'));
 		return false;
 	}
 	
 	// 校验捆绑成员
 	if(elements && elements.length > 0) {
-		_e.push(elements)
+		_e = _e.concat(elements);
 	} else {
+		nps.info(nps.i18n('MEMBER-PRODUCT-NOT-EXIST'));
 		return false;
 	}
 	
