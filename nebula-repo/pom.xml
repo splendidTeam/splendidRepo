@@ -20,7 +20,7 @@
 		<dependency>
 		     <groupId>com.baozun.scm</groupId>
 		      <artifactId>bizhub-sdk-bs2notice</artifactId>
-		      <version>1.0.0</version>
+		      <version>1.0.1</version>
 		      <exclusions>
 		      	<exclusion>
 		      		<artifactId>slf4j-log4j12</artifactId>
