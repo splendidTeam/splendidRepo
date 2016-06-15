@@ -33,12 +33,15 @@ package com.baozun.nebula.manager.product;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,7 +129,11 @@ public class BundleManagerImpl implements BundleManager {
 				throw new BusinessException(ErrorCodes.ITEM_BUNDLE_PRODUCT_CODE_REPEAT, new Object[]{itemId});
 			}
 			
-			b = (Bundle) ConvertUtils.convertTwoObject(new Bundle(), bundle);
+			b = new Bundle();
+			b.setItemId(itemId);
+			b.setAvailableQty(bundle.getAvailableQty());
+			b.setPriceType(bundle.getPriceType());
+			b.setSyncWithInv(bundle.getSyncWithInv());
 			b.setCreateTime(new Date());
 		}
 		
@@ -145,7 +152,11 @@ public class BundleManagerImpl implements BundleManager {
 		List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
 		for(BundleElementCommand bec : bundleElementCommands) {
 			bec.setBundleId(id);
-			BundleElement be = (BundleElement) ConvertUtils.convertTwoObject(new BundleElement(), bec);
+			BundleElement be = new BundleElement();
+			be.setBundleId(bundle.getId());
+			be.setIsMainElement(bec.getIsMainElement());
+			be.setSalesPrice(bec.getSalesPrice());
+			be.setSortNo(bec.getSortNo());
 			bundleElementDao.save(be);
 			bec.setId(be.getId());
 			
@@ -173,17 +184,18 @@ public class BundleManagerImpl implements BundleManager {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.baozun.nebula.manager.product.BundleManager#loadBundleElement(com.baozun.nebula.web.command.BundleElementViewCommand[])
+	 * @see com.baozun.nebula.manager.product.BundleManager#loadBundleSku(com.baozun.nebula.web.command.BundleElementViewCommand[])
 	 */
 	@Override
-	public List<BundleElementViewCommand> loadBundleElement(BundleElementViewCommand[] commands) {
+	public List<BundleElementViewCommand> loadBundleElements(BundleElementViewCommand[] commands) {
 		List<BundleElementViewCommand> result = new ArrayList<BundleElementViewCommand>();
 		result.addAll(Arrays.asList(commands));
+		Collections.sort(result);
 		Iterator<BundleElementViewCommand> iterator = result.iterator();
 		while(iterator.hasNext()) {
 			BundleElementViewCommand command = iterator.next();
 			String styleCode = command.getStyleCode();
-			if(styleCode != null) { // 成员为款
+			if(StringUtils.isNotBlank(styleCode)) { // 成员为同款商品
 				List<ItemCommand> itemCommands = itemDao.findItemCommandByStyle(styleCode);
 				if(itemCommands != null) {
 					List<BundleItemViewCommand> bundleItemViewCommands = new ArrayList<BundleItemViewCommand>();
@@ -196,7 +208,7 @@ public class BundleManagerImpl implements BundleManager {
 					}
 					command.setBundleItemViewCommands(bundleItemViewCommands);
 				}
-			} else { // 成员为商品
+			} else { // 成员为单个商品
 				String itemCode = command.getItemCode();
 				ItemCommand ic = itemDao.findItemCommandByCode(itemCode);
 				BundleItemViewCommand bivc = new BundleItemViewCommand();
@@ -207,15 +219,6 @@ public class BundleManagerImpl implements BundleManager {
 			}
 		}
 		
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.manager.product.BundleManager#loadBundleSku(com.baozun.nebula.web.command.BundleElementViewCommand[])
-	 */
-	@Override
-	public List<BundleElementViewCommand> loadBundleSku(BundleElementViewCommand[] commands) {
-		List<BundleElementViewCommand> result = loadBundleElement(commands);
 		for(BundleElementViewCommand command : result) {
 			List<BundleItemViewCommand> bundleItemViewCommands = command.getBundleItemViewCommands();
 			if(bundleItemViewCommands == null) {

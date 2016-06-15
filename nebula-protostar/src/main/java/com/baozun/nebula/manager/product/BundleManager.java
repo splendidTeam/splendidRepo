@@ -46,7 +46,6 @@ public interface BundleManager extends BaseManager {
 
 	Bundle createOrUpdate(BundleCommand bundle);
 	
-	List<BundleElementViewCommand> loadBundleElement(BundleElementViewCommand[] commands);
+	List<BundleElementViewCommand> loadBundleElements(BundleElementViewCommand[] commands);
 	
-	List<BundleElementViewCommand> loadBundleSku(BundleElementViewCommand[] commands);
 }

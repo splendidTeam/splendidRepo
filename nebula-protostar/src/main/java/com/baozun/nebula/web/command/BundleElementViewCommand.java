@@ -32,6 +32,7 @@
 package com.baozun.nebula.web.command;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -49,6 +50,8 @@ public class BundleElementViewCommand implements Serializable, Comparable<Bundle
 	private String styleCode;
 	
 	private String itemCode;
+	
+	private BigDecimal salesPrice;
 	
 	private List<BundleItemViewCommand> bundleItemViewCommands;
 
@@ -84,6 +87,14 @@ public class BundleElementViewCommand implements Serializable, Comparable<Bundle
 		this.itemCode = itemCode;
 	}
 
+	public BigDecimal getSalesPrice() {
+		return salesPrice;
+	}
+
+	public void setSalesPrice(BigDecimal salesPrice) {
+		this.salesPrice = salesPrice;
+	}
+
 	public List<BundleItemViewCommand> getBundleItemViewCommands() {
 		return bundleItemViewCommands;
 	}
@@ -94,7 +105,6 @@ public class BundleElementViewCommand implements Serializable, Comparable<Bundle
 
 	@Override
 	public int compareTo(BundleElementViewCommand o) {
-		return o.getSort() - getSort();
+		return  getSort() - o.getSort();
 	}
-
 }

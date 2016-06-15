@@ -54,6 +54,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -76,6 +77,10 @@ import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
+import com.baozun.nebula.command.product.BundleCommand;
+import com.baozun.nebula.command.product.BundleElementCommand;
+import com.baozun.nebula.command.product.BundleItemCommand;
+import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.product.ItemSortScoreCommand;
@@ -119,6 +124,9 @@ import com.baozun.nebula.web.bind.I18nCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.command.BundleElementViewCommand;
+import com.baozun.nebula.web.command.BundleItemViewCommand;
+import com.baozun.nebula.web.command.BundleSkuViewCommand;
+import com.baozun.nebula.web.command.BundleViewCommand;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.google.gson.Gson;
@@ -2487,9 +2495,25 @@ public class ItemController extends BaseController{
 	 */
 	@RequestMapping("/item/createBundleItem.htm")
 	public String createBundleItem(Model model) {
+		Sort[] sorts = Sort.parse("id desc");
+		// 分类列表
+		sorts = Sort.parse("parent_id asc,sort_no asc");
+		List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
+		
+		String itemCodeValidMsg = messageSource.getMessage(
+				ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ITEM_CODE_VALID_ERROR,
+				new Object[] {},
+				Locale.SIMPLIFIED_CHINESE);
+		model.addAttribute("itemCodeValidMsg", itemCodeValidMsg);
+		String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
+		model.addAttribute("pdValidCode", pdValidCode);
+		model.addAttribute("categoryList", categoryList);
+		model.addAttribute("isStyleEnable", isEnableStyle());
+		
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
 		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
+		
 		return "/product/item/add-item-bundle";
 	}
 	
@@ -2555,6 +2579,42 @@ public class ItemController extends BaseController{
 	}
 	
 	/**
+	 * 保存捆绑商品
+	 */
+	@RequestMapping("/i18n/item/saveBundleItem.json")
+	@ResponseBody
+	public Object saveBundleItemI18n(@I18nCommand ItemInfoCommand itemCommand,
+			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
+			BundleViewCommand bundle, 
+			HttpServletRequest request) throws Exception{
+		
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null){
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		dealDescImgUrl(itemCommand);
+		
+		// BundleViewCommand -> BundleCommand
+		BundleCommand command = convertToBundleCommand(bundle);
+		
+		// 保存商品
+		Item item = itemLangManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds);
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+	}
+	
+	/**
 	 * 动态获取款号
 	 * 
 	 * @param QueryBean
@@ -2584,15 +2644,69 @@ public class ItemController extends BaseController{
 		return args;
 	}
 	
-	@RequestMapping("/item/loadBundleElement.json")
+	@RequestMapping("/item/loadBundleElements.json")
 	@ResponseBody
-	public Object loadBundleElement(@ArrayCommand() BundleElementViewCommand[] bundleElements){
-		return bundleManager.loadBundleElement(bundleElements);
+	public Object loadBundleElements(@ArrayCommand() BundleElementViewCommand[] bundleElements){
+		return bundleManager.loadBundleElements(bundleElements);
 	}
 	
-	@RequestMapping("/item/loadBundleSku.json")
-	@ResponseBody
-	public Object loadBundleSku(@ArrayCommand() BundleElementViewCommand[] bundleElements){
-		return bundleManager.loadBundleSku(bundleElements);
+	private BundleCommand convertToBundleCommand(BundleViewCommand command) {
+		if(command == null) {
+			return null;
+		}
+		
+		// 转换bundle对象
+		BundleCommand result = new BundleCommand();
+		result.setPriceType(command.getPriceType());
+		Integer qty = command.getAvailableQty();
+		if(qty != null) {
+			result.setAvailableQty(qty);
+			result.setSyncWithInv(command.getSyncWithInv());
+		}
+		
+		List<BundleElementCommand> bundleElements = new ArrayList<BundleElementCommand>();
+		List<BundleElementViewCommand> bevcs = command.getBundleElementViewCommands();
+		for(BundleElementViewCommand bevc : bevcs) {
+			BundleElementCommand bec = new BundleElementCommand();
+			bec.setIsMainElement(bevc.getIsMainElement());
+			bec.setSalesPrice(bevc.getSalesPrice());
+			bec.setSortNo(bevc.getSort());
+			// 判断是否是同款商品
+			String styleCode = bevc.getStyleCode();
+			if(StringUtils.isNotBlank(styleCode)) {
+				bec.setIsStyle(true);
+				bec.setStyle(styleCode);
+			}
+			
+			List<BundleItemCommand> bundleItems = new ArrayList<BundleItemCommand>();
+			List<BundleItemViewCommand> bivcs = bevc.getBundleItemViewCommands();
+			for(BundleItemViewCommand bivc : bivcs) {
+				BundleItemCommand bic = new BundleItemCommand();
+				bic.setItemId(bivc.getItemId());
+				
+				List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
+				List<BundleSkuViewCommand> bsvcs = bivc.getBundleSkuViewCommands();
+				for(BundleSkuViewCommand bsvc : bsvcs) {
+					if(!bsvc.getisParticipation()) {
+						continue;
+					}
+					
+					BundleSkuCommand bsc = new BundleSkuCommand();
+					bsc.setSkuId(bsvc.getSkuId());
+					bsc.setSalesPrice(bsvc.getSalesPrice());
+					bundleSkus.add(bsc);
+				}
+				
+				bic.setBundleSkus(bundleSkus);
+				bundleItems.add(bic);
+			}
+			
+			bec.setItems(bundleItems);
+			bundleElements.add(bec);
+		}
+		
+		result.setBundleElementCommands(bundleElements);
+		
+		return result;
 	}
 }

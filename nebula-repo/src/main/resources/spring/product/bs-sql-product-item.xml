@@ -24,7 +24,9 @@
 						tpit.lifecycle as lifecycle,
 						tpifo.title as title,
 						tpifo.style as style,
-						tpifo.description as description
+						tpifo.description as description,
+						tpifo.list_price as listPrice,
+						tpifo.sale_price as salePrice
 					from t_pd_item tpit,t_pd_iteminfo tpifo,
 						t_pd_industry tpid
 						

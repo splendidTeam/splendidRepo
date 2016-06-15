@@ -107,6 +107,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception {
 
 		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_SIMPLE);
 		Item item = createOrUpdateItem(itemCommand, categoriesIds);
 		
 		ItemI18nCommand itemI18nCommand = new ItemI18nCommand();
@@ -139,9 +140,11 @@ public class ItemLangManagerImpl implements ItemLangManager {
 			throws Exception {
 		
 		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_BUNDLE);
 		Item item = createOrUpdateItem(itemCommand, categoriesIds);
 		
 		// 保存bundle扩展信息
+		bundleCommand.setItemId(item.getId());
 		bundleManager.createOrUpdate(bundleCommand);
 		
 		// 保存商品扩展信息
@@ -1246,12 +1249,15 @@ public class ItemLangManagerImpl implements ItemLangManager {
 				}
 			}
 			item = new Item();
+			item.setType(itemCommand.getItemType());
 			item.setCode(itemCommand.getCode());
 			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
 			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
 			item.setCreateTime(new Date());
 			item.setShopId(itemCommand.getShopId());
-			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
+			if(Item.ITEM_TYPE_SIMPLE.equals(item.getType())) {
+				item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
+			}
 
 			if (categoriesIds != null && categoriesIds.length > 0) {
 				item.setIsaddcategory(1);

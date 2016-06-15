@@ -76,11 +76,11 @@ public class BundleSkuViewCommand implements Serializable {
 		this.salesPrice = salesPrice;
 	}
 
-	public boolean isParticipation() {
+	public boolean getisParticipation() {
 		return isParticipation;
 	}
 
-	public void setParticipation(boolean isParticipation) {
+	public void setIsParticipation(boolean isParticipation) {
 		this.isParticipation = isParticipation;
 	}
 
