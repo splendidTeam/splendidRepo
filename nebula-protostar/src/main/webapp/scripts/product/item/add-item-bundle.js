@@ -15,7 +15,11 @@ $j.extend(loxia.regional['zh-CN'],{
 	"SELECT-PRODUCT":"请选择商品",
 	"SELECT-PRODUCT-EXIST":"您选中的商品已存在",
 	"MAIN-PRODUCT-NOT-EXIST":"主卖品未设置",
-	"MEMBER-PRODUCT-NOT-EXIST":"成员商品未设置"
+	"MEMBER-PRODUCT-NOT-EXIST":"成员商品未设置",
+	"ITEM_TYPE_SIMPLE" : "普通商品",
+	"ITEM_TYPE_BUNDLE" : "捆绑商品",
+	"ITEM_TYPE_GROUP" : "搭配商品",
+	"ITEM_TYPE_VIRTUAL" : "虚拟商品"
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
@@ -223,7 +227,7 @@ function refreshItemData(){
 			width : "30%",
 			template : "formatCategoryNames"
 		}, {
-			name : "type",
+			name : "itemType",
 			label : nps.i18n("TABLE_TITLE_ITEM_TYPE"),
 			width : "10%",
 			template : "itemTypeTemplate"
@@ -348,7 +352,7 @@ function formatCategoryNames(data, args, idx) {
 }
 
 function itemTypeTemplate(data, args, idx) {
-	var _type = loxia.getObject("type", data);
+	var _type = loxia.getObject("itemType", data);
 	switch(_type) {
 		case 1 : return "普通商品";
 		case 3 : return "捆绑商品"; 
