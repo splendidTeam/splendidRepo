@@ -1168,7 +1168,7 @@
 						from t_pd_item_rate rate
 						inner join t_mem_member member on rate.member_id = member.id
 						inner join t_so_orderline line  on line.id = rate.order_line_id
-						where member.id = 17
+						where member.id = :memberId
 						group by line.order_id ) then 0
                           else 1 end as isRate
                         from t_so_salesorder
