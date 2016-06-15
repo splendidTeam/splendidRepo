@@ -15,9 +15,6 @@
  */
 package com.baozun.nebula.manager.product;
 
-import com.baozun.nebula.command.product.BundleCommand;
-import com.baozun.nebula.command.product.BundleElementCommand;
-import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
@@ -34,9 +31,6 @@ public interface ItemLangManager extends BaseManager {
 
 	Item createOrUpdateItem(ItemInfoCommand itemCommand, Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties, SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception;
-
-	Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds)
-					throws Exception;
 
 	Integer validateItemCode(String code, Long shopId);
 

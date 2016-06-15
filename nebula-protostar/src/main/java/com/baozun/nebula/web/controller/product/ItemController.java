@@ -54,7 +54,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -77,20 +76,14 @@ import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
-import com.baozun.nebula.command.product.BundleCommand;
-import com.baozun.nebula.command.product.BundleElementCommand;
-import com.baozun.nebula.command.product.BundleItemCommand;
-import com.baozun.nebula.command.product.BundleSkuCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
 import com.baozun.nebula.command.product.ItemSortScoreCommand;
-import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.command.promotion.ItemPropertyMutlLangCommand;
 import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
-import com.baozun.nebula.manager.product.BundleManager;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.IndustryManager;
 import com.baozun.nebula.manager.product.ItemCategoryManager;
@@ -123,10 +116,6 @@ import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.bind.I18nCommand;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.command.BackWarnEntity;
-import com.baozun.nebula.web.command.BundleElementViewCommand;
-import com.baozun.nebula.web.command.BundleItemViewCommand;
-import com.baozun.nebula.web.command.BundleSkuViewCommand;
-import com.baozun.nebula.web.command.BundleViewCommand;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.google.gson.Gson;
@@ -184,9 +173,6 @@ public class ItemController extends BaseController{
 
 	@Autowired
 	private ItemPresaleInfoManager				itemPresaleInfoManager;
-	
-	@Autowired
-	private BundleManager						bundleManager;
 
 	// 缩略图规格
 	// private static final String THUMBNAIL_CONFIG = "THUMBNAIL_CONFIG";
@@ -2436,279 +2422,4 @@ public class ItemController extends BaseController{
 //	}
 //	
 	
-	// 以下是2016-5-31商品管理页面拆分后的新的controller定义
-	
-	/**
-	 * 新建商品 类型选择页面
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping("/item/createItemChoose.htm")
-	public String createItemChoose(Model model) {
-		Sort[] sorts = Sort.parse("id desc");
-		List<Map<String, Object>> industryList = processIndusgtryList(shopManager.findAllIndustryList(sorts));
-		model.addAttribute("industryList", industryList);
-		
-		return "/product/item/add-item-choose";
-	}
-	
-	/**
-	 * 新建普通商品页面
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping("/item/createNormalItem.htm")
-	public String createNormalItem(@RequestParam("industryId") Long industryId, Model model) {
-		// 验证选定的行业
-		Industry industry = industryManager.findIndustryById(industryId);
-		if(industry == null) {
-			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_EXISTS);
-		} else if(!Industry.LIFECYCLE_ENABLE.equals(industry.getLifecycle())) {
-			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_AVAILABLE);
-		} else {
-			model.addAttribute("industryId", industryId);
-			model.addAttribute("industryName", industry.getName());
-			
-			Sort[] sorts = Sort.parse("id desc");
-			// 分类列表
-			sorts = Sort.parse("parent_id asc,sort_no asc");
-			List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
-			
-			String itemCodeValidMsg = messageSource.getMessage(
-					ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ITEM_CODE_VALID_ERROR,
-					new Object[] {},
-					Locale.SIMPLIFIED_CHINESE);
-			model.addAttribute("itemCodeValidMsg", itemCodeValidMsg);
-			String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
-			model.addAttribute("pdValidCode", pdValidCode);
-			model.addAttribute("categoryList", categoryList);
-			model.addAttribute("isStyleEnable", isEnableStyle());
-		}
-		
-		return "/product/item/add-item-normal";
-	}
-	
-	/**
-	 * 新建bundle商品页面
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping("/item/createBundleItem.htm")
-	public String createBundleItem(Model model) {
-		Sort[] sorts = Sort.parse("id desc");
-		// 分类列表
-		sorts = Sort.parse("parent_id asc,sort_no asc");
-		List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
-		
-		String itemCodeValidMsg = messageSource.getMessage(
-				ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ITEM_CODE_VALID_ERROR,
-				new Object[] {},
-				Locale.SIMPLIFIED_CHINESE);
-		model.addAttribute("itemCodeValidMsg", itemCodeValidMsg);
-		String pdValidCode = sdkMataInfoManager.findValue(MataInfo.PD_VALID_CODE);
-		model.addAttribute("pdValidCode", pdValidCode);
-		model.addAttribute("categoryList", categoryList);
-		model.addAttribute("isStyleEnable", isEnableStyle());
-		
-		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
-		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
-		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
-		
-		return "/product/item/add-item-bundle";
-	}
-	
-	/**
-	 * 保存普通商品
-	 * @param itemCommand
-	 * @param propertyValueIds
-	 * @param categoriesIds
-	 * @param iProperties
-	 * @param propertyIds
-	 * @param propertyValueInputs
-	 * @param propertyValueInputIds
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping("/i18n/item/saveNormalItem.json")
-	@ResponseBody
-	public Object saveNormalItemI18n(@I18nCommand ItemInfoCommand itemCommand,@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
-			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
-			@I18nCommand ItemPropertiesCommand[] iProperties,// 普通商品属性
-			@ArrayCommand(dataBind = true) Long[] propertyIds,// 用户填写的商品属性值的属性Id
-			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 用户输入的 商品销售属性的 属性值 （对于多选来说 是 pvId,pvId 对于自定义多选来说是 aa||bb）-自定义多选
-			@ArrayCommand(dataBind = true) String[] propertyValueInputIds,// --多选
-			HttpServletRequest request) throws Exception{
-		// 查询orgId
-		UserDetails userDetails = this.getUserDetails();
-		ShopCommand shopCommand = null;
-		Long shopId = 0L;
-		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
-		if (currentOrgId != null){
-			shopCommand = shopManager.findShopByOrgId(currentOrgId);
-			shopId = shopCommand.getShopid();
-		}
-
-		itemCommand.setShopId(shopId);
-		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
-		dealDescImgUrl(itemCommand);
-		SkuPropertyMUtlLangCommand[] skuPropertyCommandArray = getCmdArrrayFromRequestI18n(
-				request,
-				propertyIds,
-				propertyValueInputs,
-				propertyValueInputIds);
-//		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
-		// 保存商品
-		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
-
-		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
-			List<Long> itemIdsForSolr = new ArrayList<Long>();
-			itemIdsForSolr.add(item.getId());
-			boolean i18n = LangProperty.getI18nOnOff();
-			if (i18n){
-				itemSolrManager.saveOrUpdateItemI18n(itemIdsForSolr);
-			}else{
-				itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
-			}
-		}
-
-		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
-		backWarnEntity.setErrorCode(item.getId().intValue());
-		return backWarnEntity;
-	}
-	
-	/**
-	 * 保存捆绑商品
-	 */
-	@RequestMapping("/i18n/item/saveBundleItem.json")
-	@ResponseBody
-	public Object saveBundleItemI18n(@I18nCommand ItemInfoCommand itemCommand,
-			@ArrayCommand(dataBind = true) Long[] categoriesIds,// 商品分类Id
-			BundleViewCommand bundle, 
-			HttpServletRequest request) throws Exception{
-		
-		// 查询orgId
-		UserDetails userDetails = this.getUserDetails();
-		ShopCommand shopCommand = null;
-		Long shopId = 0L;
-		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
-		if (currentOrgId != null){
-			shopCommand = shopManager.findShopByOrgId(currentOrgId);
-			shopId = shopCommand.getShopid();
-		}
-
-		itemCommand.setShopId(shopId);
-		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
-		dealDescImgUrl(itemCommand);
-		
-		// BundleViewCommand -> BundleCommand
-		BundleCommand command = convertToBundleCommand(bundle);
-		
-		// 保存商品
-		Item item = itemLangManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds);
-
-		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
-		backWarnEntity.setErrorCode(item.getId().intValue());
-		return backWarnEntity;
-	}
-	
-	/**
-	 * 动态获取款号
-	 * 
-	 * @param QueryBean
-	 * @param Model
-	 * @return
-	 */
-	@RequestMapping("/item/styleList.json")
-	@ResponseBody
-	public Pagination<ItemStyleCommand> findStyleListJson(Model model,@QueryBeanParam QueryBean queryBean){
-
-		// 查询orgId
-		UserDetails userDetails = this.getUserDetails();
-		ShopCommand shopCommand = null;
-		Long shopId = 0L;
-
-		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
-		if (currentOrgId != null){
-			shopCommand = shopManager.findShopByOrgId(currentOrgId);
-			if (shopCommand != null){
-				shopId = shopCommand.getShopid();
-			}
-		}
-		
-		Sort sort = new Sort("ii.style", "asc");
-
-		Pagination<ItemStyleCommand> args = itemManager.findStyleListByQueryMap(queryBean.getPage(), new Sort[]{sort}, queryBean.getParaMap(), shopId);
-
-		return args;
-	}
-	
-	@RequestMapping("/item/loadBundleElements.json")
-	@ResponseBody
-	public Object loadBundleElements(@ArrayCommand() BundleElementViewCommand[] bundleElements){
-		return bundleManager.loadBundleElements(bundleElements);
-	}
-	
-	private BundleCommand convertToBundleCommand(BundleViewCommand command) {
-		if(command == null) {
-			return null;
-		}
-		
-		// 转换bundle对象
-		BundleCommand result = new BundleCommand();
-		result.setPriceType(command.getPriceType());
-		Integer qty = command.getAvailableQty();
-		if(qty != null) {
-			result.setAvailableQty(qty);
-			result.setSyncWithInv(command.getSyncWithInv());
-		}
-		
-		List<BundleElementCommand> bundleElements = new ArrayList<BundleElementCommand>();
-		List<BundleElementViewCommand> bevcs = command.getBundleElementViewCommands();
-		for(BundleElementViewCommand bevc : bevcs) {
-			BundleElementCommand bec = new BundleElementCommand();
-			bec.setIsMainElement(bevc.getIsMainElement());
-			bec.setSalesPrice(bevc.getSalesPrice());
-			bec.setSortNo(bevc.getSort());
-			// 判断是否是同款商品
-			String styleCode = bevc.getStyleCode();
-			if(StringUtils.isNotBlank(styleCode)) {
-				bec.setIsStyle(true);
-				bec.setStyle(styleCode);
-			}
-			
-			List<BundleItemCommand> bundleItems = new ArrayList<BundleItemCommand>();
-			List<BundleItemViewCommand> bivcs = bevc.getBundleItemViewCommands();
-			for(BundleItemViewCommand bivc : bivcs) {
-				BundleItemCommand bic = new BundleItemCommand();
-				bic.setItemId(bivc.getItemId());
-				
-				List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
-				List<BundleSkuViewCommand> bsvcs = bivc.getBundleSkuViewCommands();
-				for(BundleSkuViewCommand bsvc : bsvcs) {
-					if(!bsvc.getisParticipation()) {
-						continue;
-					}
-					
-					BundleSkuCommand bsc = new BundleSkuCommand();
-					bsc.setSkuId(bsvc.getSkuId());
-					bsc.setSalesPrice(bsvc.getSalesPrice());
-					bundleSkus.add(bsc);
-				}
-				
-				bic.setBundleSkus(bundleSkus);
-				bundleItems.add(bic);
-			}
-			
-			bec.setItems(bundleItems);
-			bundleElements.add(bec);
-		}
-		
-		result.setBundleElementCommands(bundleElements);
-		
-		return result;
-	}
 }

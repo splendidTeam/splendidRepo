@@ -6413,21 +6413,5 @@ public class ItemManagerImpl implements ItemManager{
 		Integer count = itemPropertiesDao.findItemCountByPropertyId(propertyId);
 		return count == null ? 0 : count;
 	}
-
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.manager.product.ItemManager#findStyleListByCode(loxia.dao.Page, loxia.dao.Sort[], java.lang.String, java.lang.Long)
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts, Map<String, Object> paraMap, Long shopId) {
-		Pagination<ItemStyleCommand> pagination = itemDao.findStyleListByQueryMap(page, sorts, paraMap, shopId);
-		
-		List<ItemStyleCommand> itemStyleCommand = pagination.getItems();
-		for(ItemStyleCommand c : itemStyleCommand) {
-			c.setItems(itemDao.findItemCommandByStyle(c.getStyle()));
-		}
-		
-		return pagination;
-	}
 	
 }

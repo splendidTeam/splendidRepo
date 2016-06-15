@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
-import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemI18nCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
@@ -97,9 +96,6 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	@Autowired(required = false)
 	private ItemExtendManager itemExtendManager;
 	
-	@Autowired
-	private BundleManager bundleManager;
-	
 	@Override
 	public Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
@@ -129,30 +125,6 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		// 处理商品分类
 		itemCategoryHandle(itemCommand, item, categoriesIds);
 		
-		return item;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.manager.product.ItemLangManager#createOrUpdateBundleItem(com.baozun.nebula.command.product.ItemInfoCommand, com.baozun.nebula.command.product.BundleCommand, java.lang.Long[])
-	 */
-	@Override
-	public Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds)
-			throws Exception {
-		
-		// 保存商品
-		itemCommand.setItemType(Item.ITEM_TYPE_BUNDLE);
-		Item item = createOrUpdateItem(itemCommand, categoriesIds);
-		
-		// 保存bundle扩展信息
-		bundleCommand.setItemId(item.getId());
-		bundleManager.createOrUpdate(bundleCommand);
-		
-		// 保存商品扩展信息
-		createOrUpdateItemInfo(itemCommand, item.getId());
-		
-		// 处理商品分类
-		itemCategoryHandle(itemCommand, item, categoriesIds);
-				
 		return item;
 	}
 	
