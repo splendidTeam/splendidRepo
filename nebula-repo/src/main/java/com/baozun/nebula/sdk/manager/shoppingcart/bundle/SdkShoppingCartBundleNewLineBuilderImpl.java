@@ -32,6 +32,7 @@ import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLineImageManager;
+import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.lang.NumberUtil;
 
@@ -143,6 +144,6 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
         newShoppingCartLineCommand.setDiscount(discount);
 
         // 行小计
-        newShoppingCartLineCommand.setSubTotalAmt(NumberUtil.getMultiplyValue(salePrice, quantity, 2));
+        newShoppingCartLineCommand.setSubTotalAmt(ShoppingCartUtil.getSubTotalAmt(newShoppingCartLineCommand));
     };
 }
