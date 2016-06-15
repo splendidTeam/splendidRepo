@@ -213,4 +213,21 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="Bundle.unDeductingBundleInventory" class="loxia.dao.support.DynamicQueryHolder">
+		<description>归还bundle库存</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					UPDATE 
+						t_pd_bundle 
+					SET
+						available_qty = available_qty + :inventory
+					WHERE 
+						available_qty is not null 
+						and item_id = :bundleItemId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

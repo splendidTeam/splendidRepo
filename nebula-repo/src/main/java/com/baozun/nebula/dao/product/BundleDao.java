@@ -108,4 +108,13 @@ public interface BundleDao extends GenericEntityDao<Bundle, Long> {
 	 */
 	@NativeUpdate
 	Integer deductingBundleInventory(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("inventory")Integer inventory);
+	
+	/**
+	 * 归还bundle库存
+	 * @param bundleItemId
+	 * @param inventory
+	 * @return
+	 */
+	@NativeUpdate
+	Integer unDeductingBundleInventory(@QueryParam("bundleItemId")Long bundleItemId, @QueryParam("inventory")Integer inventory);
 }

@@ -85,9 +85,26 @@ public class SdkBundleManagerImpl implements SdkBundleManager {
 	 */
 	@Override
 	public void deductingBundleInventory(Long bundleItemId, Integer inventory) {
-		int result = bundleDao.deductingBundleInventory(bundleItemId, inventory);
-		if(result != 1) {
-			throw new NativeUpdateRowCountNotEqualException(1, result);
+		BundleCommand bundle = bundleDao.findBundleByBundleItemId(bundleItemId, null);
+		if(bundle.getAvailableQty() != null) {
+			int result = bundleDao.deductingBundleInventory(bundleItemId, inventory);
+			if(result != 1) {
+				throw new NativeUpdateRowCountNotEqualException(1, result);
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.sdk.manager.product.SdkBundleManager#unDeductingBundleInventory(java.lang.Long, java.lang.Integer)
+	 */
+	@Override
+	public void unDeductingBundleInventory(Long bundleItemId, Integer inventory) {
+		BundleCommand bundle = bundleDao.findBundleByBundleItemId(bundleItemId, null);
+		if(bundle.getAvailableQty() != null) {
+			int result = bundleDao.unDeductingBundleInventory(bundleItemId, inventory);
+			if(result != 1) {
+				throw new NativeUpdateRowCountNotEqualException(1, result);
+			}
 		}
 	}
 }

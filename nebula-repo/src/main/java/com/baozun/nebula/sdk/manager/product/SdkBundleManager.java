@@ -83,11 +83,24 @@ public interface SdkBundleManager {
 	 * 
 	 * <ul>
 	 * <li>如果bundle本身维护了库存，则在bundle可用库存基础上扣减</li>
-	 * <li>如果bundle没有维护库存，则直接返回false</li>
+	 * <li>如果bundle没有维护库存，则不作处理</li>
 	 * </ul>
 	 * 
 	 * @param bundleItemId bundle本身的itemId
 	 * @param inventory 扣减的库存量
 	 */
 	void deductingBundleInventory(Long bundleItemId, Integer inventory);
+	
+	/**
+	 * 归还bundle库存
+	 * 
+	 * <ul>
+	 * <li>如果bundle本身维护了库存，则在bundle可用库存基础上归还</li>
+	 * <li>如果bundle没有维护库存，则不作处理</li>
+	 * </ul>
+	 * 
+	 * @param bundleItemId bundle本身的itemId
+	 * @param inventory 归还的库存量
+	 */
+	void unDeductingBundleInventory(Long bundleItemId, Integer inventory);
 }
