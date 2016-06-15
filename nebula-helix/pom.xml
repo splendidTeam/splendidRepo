@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.baozun.nebula</groupId>
@@ -24,9 +25,9 @@
 			<version>${version.nebula}</version>
 		</dependency>
 		<dependency>
-		  <groupId>com.baozun.shopdog</groupId>
-		  <artifactId>shopdog-helix</artifactId>
-		  <version>1.0.3</version>
+			<groupId>com.baozun.shopdog</groupId>
+			<artifactId>shopdog-helix</artifactId>
+			<version>1.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>
@@ -85,5 +86,4 @@
 			<version>4.0.baozun.RELEASE</version>
 		</dependency>
 	</dependencies>
-
 </project>

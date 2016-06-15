@@ -360,7 +360,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         for (ShoppingCartLineCommand cartLine : shoppingCartLines){
             if (cartLine.isGift() || cartLine.isCaptionLine())
                 continue;
-            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice(),2));
+            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice(), 2));
         }
         return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
@@ -6695,8 +6695,8 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // sdkEngineManager.packShoppingCartLine(shoppingCartLine);
             shoppingCartLine.setType(Constants.ITEM_TYPE_SALE);
             // 购物车行 金额小计
-            shoppingCartLine.setSubTotalAmt(new BigDecimal(shoppingCartLine.getQuantity()).multiply(shoppingCartLine.getSalePrice()));
-            // 判断是否是被选中的购物车行
+            shoppingCartLine.setSubTotalAmt(ShoppingCartUtil.getSubTotalAmt(shoppingCartLine));
+
         }
 
         splitByCalcLevel(shoppingCartLines, chooseLines, notChooseLines);

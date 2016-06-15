@@ -14,7 +14,19 @@
 			classpath*:spring.xml
 		</param-value>
 	</context-param>
-
+	
+	<context-param>
+		<param-name>logbackConfigLocation</param-name>
+		<param-value>classpath:config/logback.xml</param-value>
+	</context-param>
+	
+	<!--
+		since spring3.2.2
+		need config first
+	-->
+	<listener>
+		<listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+	</listener>
 	<filter>
 		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter
@@ -70,19 +82,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- <filter> -->
-	<!-- <filter-name>cmsResourceFilter</filter-name> -->
-	<!-- <filter-class>com.baozun.nebula.web.filter.CmsResourceFilter</filter-class> -->
-	<!-- </filter> -->
-
-	<!-- <filter-mapping> -->
-	<!-- <filter-name>cmsResourceFilter</filter-name> -->
-	<!-- <url-pattern>/resources/*</url-pattern> -->
-	<!-- </filter-mapping> -->
-	<!-- ********************************** listener ********************************** 
-		<context-param> <param-name>logbackConfigLocation</param-name> <param-value>classpath:logback.xml</param-value> 
-		</context-param> <listener> <listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class> 
-		</listener> -->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener
 		</listener-class>
@@ -157,6 +156,7 @@
 
 	<session-config>
 		<session-timeout>60</session-timeout>
+		<tracking-mode>COOKIE</tracking-mode>
 	</session-config>
 
 	<!-- Welcome files -->

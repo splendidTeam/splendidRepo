@@ -56,7 +56,6 @@ import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewComman
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
-import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.bean.ConvertUtil;
@@ -145,11 +144,6 @@ public class NebulaOrderConfirmController extends BaseController{
     @Qualifier("shoppingcartViewCommandConverter")
     private ShoppingcartViewCommandConverter    shoppingcartViewCommandConverter;
 
-    /** The auto key accessor. */
-    @Autowired
-    @Qualifier("immediatelyBuyAutoKeyAccessor")
-    private AutoKeyAccessor                     autoKeyAccessor;
-
     /** The sdk member manager. */
     @Autowired
     private SdkMemberManager                    sdkMemberManager;
@@ -169,10 +163,9 @@ public class NebulaOrderConfirmController extends BaseController{
     /** The sdk shopping cart bundle new line builder. */
     @Autowired
     private SdkShoppingCartBundleNewLineBuilder sdkShoppingCartBundleNewLineBuilder;
-    
+
     @Autowired
-    private SdkSecretManager sdkSecretManager;
-    
+    private SdkSecretManager                    sdkSecretManager;
 
     /**
      * 显示订单结算页面.
@@ -199,23 +192,23 @@ public class NebulaOrderConfirmController extends BaseController{
                     Model model){
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
         // 解密
-        if(Validator.isNotNullOrEmpty(contactCommandList)) {
-        	for (ContactCommand contactCommand : contactCommandList) {
-            	sdkSecretManager.decrypt(contactCommand, new String[] {
-        				"name",
-        				"country",
-        				"province",
-        				"city",
-        				"area",
-        				"town",
-        				"address",
-        				"postcode",
-        				"telphone",
-        				"mobile",
-        				"email" });
-    		}
+        if (Validator.isNotNullOrEmpty(contactCommandList)){
+            for (ContactCommand contactCommand : contactCommandList){
+                sdkSecretManager.decrypt(contactCommand, new String[] {
+                                                                        "name",
+                                                                        "country",
+                                                                        "province",
+                                                                        "city",
+                                                                        "area",
+                                                                        "town",
+                                                                        "address",
+                                                                        "postcode",
+                                                                        "telphone",
+                                                                        "mobile",
+                                                                        "email" });
+            }
         }
-        
+
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
         // 封装viewCommand
