@@ -88,13 +88,13 @@ public class BreadcrumbManagerTest {
 	
 	@Test
 	public void test(){
-		doTest(14l, 26l, null);
+		doTest(14l, 58l, null);
 	}
 	
 	@Test
 	public void test2(){
 		HttpServletRequest request =getRequest(); 
-		doTest(null, 26l, request);
+		doTest(null, 84l, request);
 	}
 	
 	public void doTest(Long navId, Long itemId,HttpServletRequest request){
@@ -481,7 +481,7 @@ public class BreadcrumbManagerTest {
 			@Override
 			public String getHeader(String paramString) {
 				// TODO Auto-generated method stub
-				return "http://www.baidu.com";
+				return null;
 			}
 			
 			@Override

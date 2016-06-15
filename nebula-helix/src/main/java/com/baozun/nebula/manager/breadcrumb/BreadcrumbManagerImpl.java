@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.product.FilterNavigationCommand;
@@ -52,6 +51,7 @@ import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.sdk.manager.SdkItemCategoryManager;
 import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
@@ -111,6 +111,9 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	
 	@Autowired
 	private SdkItemManager											sdkItemManager;
+	
+	@Autowired
+	private SdkItemCategoryManager									sdkItemCategoryManager;
 	
 	@Autowired
 	private SdkItemCollectionManager								sdkItemCollectionManager;
@@ -253,8 +256,12 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 				List<CurmbCommand> resultCurmbCommands =null;
 				List<CurmbCommand> currentCurmbCommands =null;
 				for (Map.Entry<Long, ItemCollection> entry : navItemCMap.entrySet()) {
-					if(AutoCollection.apply(entry.getValue(), itemCollectionContext)){
+					if(AutoCollection.fuzzyApply(entry.getValue(), itemCollectionContext)){
 						navigationId =entry.getKey();
+						if(AutoCollection.exactApply(entry.getValue(), itemCollectionContext)){
+							resultCurmbCommands =buildCurmbCommand(navigationId, itemId);
+							break;
+						}
 						if(idx == 0){
 							tempCollection=entry.getValue();
 							resultCurmbCommands =buildCurmbCommand(navigationId, itemId);
@@ -360,40 +367,39 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	 */
 	private List<String> getCategories(Long itemId) {
 		List<String> results =new ArrayList<String>();
-		ItemCategory itemCategory = sdkItemManager.findDefaultCateoryByItemId(itemId);
-		List<Category> categories = new LinkedList<Category>();
-
-		Long pid = itemCategory.getCategoryId();
-		do{
-			Category category = null;
-			
-			boolean i18n = LangProperty.getI18nOnOff();
-			if(i18n){
-				category = categoryDao.findCategoryByIdI18n(pid, LangUtil.getCurrentLang());
-			}else{
-				category = categoryDao.findCategoryById(pid);
-			}
-			
-			if(null != category){
-				pid = category.getParentId();
-				categories.add(0, category);
-			}
-		}while(pid!=null&&pid>0);
-		//构造["1"]或者["1-10"]这样的数据
-		if(Validator.isNotNullOrEmpty(categories)){
-			if(categories.size() == 1){
-				results.add(categories.get(0).getId().toString());
-			}else{
-				String res ="";
-				int i =0;
-				for (Category category : categories) {
-					if(i == 0){
-						res=category.getId().toString();
-					}else
-						res +="-"+category.getId().toString();
-					i++;
+		List<ItemCategory>	itemCategoryList =sdkItemCategoryManager.findItemCategoryListByItemId(itemId);
+		for (ItemCategory itemCategory : itemCategoryList) {
+			List<Category> categories = new LinkedList<Category>();
+			Long pid = itemCategory.getCategoryId();
+			do{
+				Category category = null;
+				boolean i18n = LangProperty.getI18nOnOff();
+				if(i18n){
+					category = categoryDao.findCategoryByIdI18n(pid, LangUtil.getCurrentLang());
+				}else{
+					category = categoryDao.findCategoryById(pid);
 				}
-				results.add(res);
+				if(null != category){
+					pid = category.getParentId();
+					categories.add(0, category);
+				}
+			}while(pid!=null&&pid>0);
+			//构造["1"]或者["1-10"]这样的数据
+			if(Validator.isNotNullOrEmpty(categories)){
+				if(categories.size() == 1){
+					results.add(categories.get(0).getId().toString());
+				}else{
+					String res ="";
+					int i =0;
+					for (Category category : categories) {
+						if(i == 0){
+							res=category.getId().toString();
+						}else
+							res +="-"+category.getId().toString();
+						i++;
+					}
+					results.add(res);
+				}
 			}
 		}
 		return results;
@@ -450,7 +456,9 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 				}
 				if(Validator.isNotNullOrEmpty(pvIds)){
 					Collections.sort(pvIds);
-					results.add(JSON.toJSONString(pvIds));
+					for (String pvId : pvIds) {
+						results.add(pvId);
+					}
 				}
 			}
 		}
