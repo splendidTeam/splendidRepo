@@ -24,8 +24,6 @@ import org.springframework.stereotype.Service;
 import com.baozun.nebula.manager.CacheManager;
 import com.feilong.core.Validator;
 
-import redis.clients.jedis.JedisSentinelPool;
-
 /**
  * @author D.C
  * @time 2016年3月24日 下午4:04:47
@@ -37,9 +35,6 @@ public class TokenManagerImpl implements TokenManager, Serializable {
 	@Autowired
 	private CacheManager cacheManager;
 
-	@Autowired(required = false)
-	private JedisSentinelPool jedisPool;
-
 	@Override
 	public void saveToken(String businessCode, String human, int liveTime, String code) {
 		cacheManager.setObject(generateKey(businessCode, human),
@@ -50,7 +45,7 @@ public class TokenManagerImpl implements TokenManager, Serializable {
 	public VerifyResult verifyToken(String businessCode, String human, String code) {
 		Token token = cacheManager.getObject(generateKey(businessCode, human));
 		if (!Validator.isNullOrEmpty(token)) {
-			if (code.equals(token.getCode())) {
+			if (code.equalsIgnoreCase(token.getCode())) {
 				cacheManager.remove(generateKey(businessCode, human));
 				if ((token.getCreated() + token.getLiveTime() * 1000) >= System.currentTimeMillis()) {
 					return VerifyResult.SUCESS;

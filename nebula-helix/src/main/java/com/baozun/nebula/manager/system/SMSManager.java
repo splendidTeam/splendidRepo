@@ -5,7 +5,6 @@ package com.baozun.nebula.manager.system;
 
 import com.baozun.nebula.command.SMSCommand;
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 
 /**
  * 短信校验码‘发送’;
@@ -46,17 +45,6 @@ public interface SMSManager extends BaseManager{
 	 */
 	boolean send(SMSCommand smsCommand,CaptchaType type,int length,int validity,String businesscode);
 
-	/**
-	 * 验证手机短信验证码是否真确
-	 * 
-	 * @param mobile
-	 *            手机
-	 * @param captcha
-	 *            发给上面手机的，需要验证的验证码
-	 * @return
-	 */
-	@Deprecated
-	VerifyResult validate(String mobile,String captcha);
 
 	enum CaptchaType{
 		NUMBER, CHARACTER, MIXED

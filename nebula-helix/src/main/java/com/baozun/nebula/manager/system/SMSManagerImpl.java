@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.SMSCommand;
-import com.baozun.nebula.manager.system.TokenManager.VerifyResult;
 import com.baozun.nebula.sdk.manager.SdkSMSManager;
 import com.baozun.nebula.sdk.manager.SdkSMSManager.SendResult;
 import com.feilong.core.RegexPattern;
@@ -120,20 +119,5 @@ public class SMSManagerImpl implements SMSManager{
 		}
 
 		return captcha;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.baozun.nebula.manager.system.SMSManager#validate(java.lang.String, java.lang.String)
-	 */
-	@Override
-	@Deprecated
-	public VerifyResult validate(String mobile,String captcha){
-
-		String businessCode = SMS_REGISTER_CAPTCHA_CODE + mobile;
-
-		VerifyResult verifyToken = tokenManager.verifyToken(businessCode, mobile, captcha);
-
-		return verifyToken;
 	}
 }

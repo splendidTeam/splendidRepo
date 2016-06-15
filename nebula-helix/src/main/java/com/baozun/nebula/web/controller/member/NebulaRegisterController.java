@@ -465,8 +465,15 @@ public class NebulaRegisterController extends NebulaLoginController{
 		smsCommand.setTemplateCode(SMSTemplateConstants.SMS_REGISTER_CAPTCHA);
 		smsCommand.addVar("maxsurvivaltime", ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME/60);
 		// 发送验证码短信，captcha会根据validity保存在redis中
-		boolean sendResult = smsManager.send(smsCommand, CaptchaType.MIXED, SMSTemplateConstants.VALIDATE_CODE_LENGTH, SMSTemplateConstants.MAX_EXIST_TIME,SMS_REGISTER_CAPTCHA_CODE);
+		boolean sendResult = smsManager.send(smsCommand, getCaptchaType(), SMSTemplateConstants.VALIDATE_CODE_LENGTH, SMSTemplateConstants.MAX_EXIST_TIME,SMS_REGISTER_CAPTCHA_CODE);
 
 		return sendResult;
+	}
+	/**
+	 * 获取验证码类型
+	 * @return
+	 */
+	protected CaptchaType getCaptchaType() {
+		return CaptchaType.MIXED;
 	}
 }
