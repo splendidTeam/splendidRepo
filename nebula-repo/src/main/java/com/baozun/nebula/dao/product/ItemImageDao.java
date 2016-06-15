@@ -121,4 +121,6 @@ public interface ItemImageDao extends GenericEntityDao<ItemImage, Long>{
 	@NativeQuery(model = ItemImageLang.class)
 	ItemImageLang findItemImageLang(@QueryParam("id")Long id,@QueryParam("lang") String lang);
 
+	@NativeQuery(model = ItemImage.class)
+	List<ItemImage> findItemImageByItemId(@QueryParam("itemId") Long itemId, @QueryParam("type") String type);
 }

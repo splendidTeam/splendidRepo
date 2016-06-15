@@ -660,6 +660,16 @@ public class ItemManagerImpl implements ItemManager{
 			items.get(i).setCategoryCodes(categoryCodeList);
 
 			itemIds.add(items.get(i).getId());
+			
+			/*
+			 * 图片类型
+			 * 1为列表页
+			 * 2为内容页
+			 */
+			List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(),"1");
+			if(Validator.isNotNullOrEmpty(imageList)){
+				items.get(i).setItemImageList(imageList);
+			}
 
 		}
 
