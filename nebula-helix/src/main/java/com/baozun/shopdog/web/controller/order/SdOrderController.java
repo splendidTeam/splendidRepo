@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSON;
 import com.baozun.nebula.constants.MetaInfoConstants;
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.member.MemberGroup;
 import com.baozun.nebula.model.member.MemberGroupRelation;
@@ -56,6 +57,8 @@ import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
+import com.baozun.shopdog.exception.ShopdogBusinessException;
+import com.baozun.shopdog.exception.ShopdogErrorCodes;
 import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogOrderCommand;
 import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogOrderParamCommand;
 import com.baozun.shopdog.web.controller.order.viewcommand.ShopdogSettlementCommand;
@@ -106,120 +109,129 @@ public class SdOrderController implements AbstractSdOrderController {
     }
 
     @Override
-    public ShopdogOrderCommand saveOrder(HttpServletRequest request, ShopdogOrderParamCommand shopdogOrderParamCommand) {
-        // 封装订单信息
-        SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
-        PropertyUtil.copyProperties(salesOrderCommand, shopdogOrderParamCommand, "countryId", "provinceId", "cityId", "areaId", "townId", "postcode", "mobile", "email");
+    public ShopdogOrderCommand saveOrder(HttpServletRequest request, ShopdogOrderParamCommand shopdogOrderParamCommand) throws ShopdogBusinessException {
 
-        // 地址名称
-        Address country = AddressUtil.getAddressById(shopdogOrderParamCommand.getCountryId());
-        Address province = AddressUtil.getAddressById(shopdogOrderParamCommand.getProvinceId());
-        Address city = AddressUtil.getAddressById(shopdogOrderParamCommand.getCityId());
-        Address area = AddressUtil.getAddressById(shopdogOrderParamCommand.getAreaId());
-        Address town = AddressUtil.getAddressById(shopdogOrderParamCommand.getTownId());
-        salesOrderCommand.setCountry(country == null ? "" : country.getName());
-        salesOrderCommand.setProvince(province == null ? "" : province.getName());
-        salesOrderCommand.setCity(city == null ? "" : city.getName());
-        salesOrderCommand.setArea(area == null ? "" : area.getName());
-        salesOrderCommand.setTown(town == null ? "" : town.getName());
-        salesOrderCommand.setCountry(country == null ? "" : country.getName());
-        salesOrderCommand.setProvince(province == null ? "" : province.getName());
-        salesOrderCommand.setCity(city == null ? "" : city.getName());
-        salesOrderCommand.setArea(area == null ? "" : area.getName());
-        salesOrderCommand.setTown(town == null ? "" : town.getName());
+        ShopdogOrderCommand shopdogOrderCommand = null;
+        try {
+            // 封装订单信息
+            SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
+            PropertyUtil.copyProperties(salesOrderCommand, shopdogOrderParamCommand, "countryId", "provinceId", "cityId", "areaId", "townId", "postcode", "mobile", "email");
 
-        salesOrderCommand.setBuyerName(shopdogOrderParamCommand.getName());
-        salesOrderCommand.setBuyerTel(shopdogOrderParamCommand.getMobile());
-        salesOrderCommand.setName(shopdogOrderParamCommand.getName());
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("创建订单所需的参数：ShopdogOrderParamCommand[" + JsonUtil.format(shopdogOrderParamCommand) + "]");
-        }
-        // 设置支付信息，1是支付宝支付，2微信支付
-        if ("1".equals(shopdogOrderParamCommand.getPaymentType())) {
-            salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
-            salesOrderCommand.setPaymentStr("支付宝支付");
-            salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
-        } else if ("2".equals(shopdogOrderParamCommand.getPaymentType())) {
-            salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
-            salesOrderCommand.setPaymentStr("微信支付");
-            salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
-        }
+            // 地址名称
+            Address country = AddressUtil.getAddressById(shopdogOrderParamCommand.getCountryId());
+            Address province = AddressUtil.getAddressById(shopdogOrderParamCommand.getProvinceId());
+            Address city = AddressUtil.getAddressById(shopdogOrderParamCommand.getCityId());
+            Address area = AddressUtil.getAddressById(shopdogOrderParamCommand.getAreaId());
+            Address town = AddressUtil.getAddressById(shopdogOrderParamCommand.getTownId());
+            salesOrderCommand.setCountry(country == null ? "" : country.getName());
+            salesOrderCommand.setProvince(province == null ? "" : province.getName());
+            salesOrderCommand.setCity(city == null ? "" : city.getName());
+            salesOrderCommand.setArea(area == null ? "" : area.getName());
+            salesOrderCommand.setTown(town == null ? "" : town.getName());
+            salesOrderCommand.setCountry(country == null ? "" : country.getName());
+            salesOrderCommand.setProvince(province == null ? "" : province.getName());
+            salesOrderCommand.setCity(city == null ? "" : city.getName());
+            salesOrderCommand.setArea(area == null ? "" : area.getName());
+            salesOrderCommand.setTown(town == null ? "" : town.getName());
 
-        // 如果有memberId，根据memberId查询此会员的相关信息,初始化memberDetails用于下单使用
-        MemberDetails memberDetails = null;
-        if (null != shopdogOrderParamCommand.getMemberId()) {
-            MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
-            // 当会员信息存在的时候，用于会员下单使用。模拟会员登录之后初始化的memberDetails
-            if (memberCommand != null) {
-                memberDetails = new MemberDetails();
-                Long memberId = memberCommand.getId();
-                PropertyUtil.copyProperties(memberDetails, memberCommand);
-                memberDetails.setMemberId(memberId);
-                memberDetails.setNickName(memberCommand.getLoginName());
-
-                // 分组id
-                List<Long> groupIds = new ArrayList<Long>();
-
-                // 根据会员id查询出所属分组
-                List<MemberGroupRelation> memberGroupRelations = sdkMemberManager.findMemberGroupRelationListByMemberId(memberId);
-                if (Validator.isNotNullOrEmpty(memberGroupRelations)) {
-                    groupIds = CollectionsUtil.getPropertyValueList(memberGroupRelations, "groupId");
-                }
-
-                // 根据分组id批量查询会员分组的list
-                if (groupIds != null) {
-                    List<MemberGroup> groups = sdkMemberManager.findMemberGroupListByIds(groupIds);
-                    memberDetails.setGroups(groups);
-                }
-
-                // 根据会员ID，会员分组，获取会员组合的Id
-                Set<String> comboIds = new HashSet<String>();
-                comboIds = sdkMemberManager.getMemComboIdsByGroupIdMemberId(groupIds, memberId);
-                memberDetails.setMemComboList(comboIds);
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("创建订单所需会员的参数：memberDetails[" + JsonUtil.format(memberDetails) + "]");
-                }
+            salesOrderCommand.setBuyerName(shopdogOrderParamCommand.getName());
+            salesOrderCommand.setBuyerTel(shopdogOrderParamCommand.getMobile());
+            salesOrderCommand.setName(shopdogOrderParamCommand.getName());
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("创建订单所需的参数：ShopdogOrderParamCommand[" + JsonUtil.format(shopdogOrderParamCommand) + "]");
             }
-            // 用户信息
-            boolean isGuest = Validator.isNullOrEmpty(memberDetails);
-            String memberName = "";
-            if (!isGuest) {
-                memberName = Validator.isNullOrEmpty(memberDetails.getLoginEmail()) ? memberDetails.getLoginMobile() : memberDetails.getLoginEmail();
+            // 设置支付信息，1是支付宝支付，2微信支付
+            if ("1".equals(shopdogOrderParamCommand.getPaymentType())) {
+                salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
+                salesOrderCommand.setPaymentStr("支付宝支付");
+                salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY));
+            } else if ("2".equals(shopdogOrderParamCommand.getPaymentType())) {
+                salesOrderCommand.setPayment(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
+                salesOrderCommand.setPaymentStr("微信支付");
+                salesOrderCommand.setPayType(Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_WECHAT));
             }
-            salesOrderCommand.setMemberName(memberName);
-            salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
 
-        }
-        salesOrderCommand.setIp(RequestUtil.getClientIp(request));
-        // 订单来源
-        salesOrderCommand.setSource(SalesOrder.SO_SOURCE_SHOPDOG_NORMAL);
+            // 如果有memberId，根据memberId查询此会员的相关信息,初始化memberDetails用于下单使用
+            MemberDetails memberDetails = null;
+            if (null != shopdogOrderParamCommand.getMemberId()) {
+                MemberCommand memberCommand = sdkMemberManager.findMemberById(shopdogOrderParamCommand.getMemberId());
+                // 当会员信息存在的时候，用于会员下单使用。模拟会员登录之后初始化的memberDetails
+                if (memberCommand != null) {
+                    memberDetails = new MemberDetails();
+                    Long memberId = memberCommand.getId();
+                    PropertyUtil.copyProperties(memberDetails, memberCommand);
+                    memberDetails.setMemberId(memberId);
+                    memberDetails.setNickName(memberCommand.getLoginName());
 
-        // 获取购物车信息
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
-        for (ShopdogSkusCommand shopdogSkusCommand : shopdogOrderParamCommand.getSkuList()) {
-            ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
-            shoppingCartLineCommand.setSkuId(shopdogSkusCommand.getSkuId());
-            shoppingCartLineCommand.setQuantity(shopdogSkusCommand.getCount());
-            // 这个参数为模拟购物车选中结算
-            shoppingCartLineCommand.setSettlementState(1);
-            // 这个参数待确定 TODO
-            shoppingCartLineCommand.setShopId(1L);
-            shoppingCartLineCommandList.add(shoppingCartLineCommand);
-        }
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, getCalcFreightCommand(shopdogOrderParamCommand), null);
+                    // 分组id
+                    List<Long> groupIds = new ArrayList<Long>();
 
-        SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
-        salesOrderCreateOptions.setIsImmediatelyBuy(true);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("shoppingCartCommand:" + JSON.toJSONString(shoppingCartCommand));
-        }
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("创建订单所需的参数：salesOrderCommand[" + JsonUtil.format(salesOrderCommand) + "]");
-        }
-        // 新建订单
-        String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memberDetails != null ? memberDetails.getMemComboList() : null, salesOrderCreateOptions);
+                    // 根据会员id查询出所属分组
+                    List<MemberGroupRelation> memberGroupRelations = sdkMemberManager.findMemberGroupRelationListByMemberId(memberId);
+                    if (Validator.isNotNullOrEmpty(memberGroupRelations)) {
+                        groupIds = CollectionsUtil.getPropertyValueList(memberGroupRelations, "groupId");
+                    }
 
-        return createShopdogOrderCommand(request, salesOrderCommand.getName(), subOrdinate, String.valueOf(salesOrderCommand.getPayType()));
+                    // 根据分组id批量查询会员分组的list
+                    if (groupIds != null) {
+                        List<MemberGroup> groups = sdkMemberManager.findMemberGroupListByIds(groupIds);
+                        memberDetails.setGroups(groups);
+                    }
+
+                    // 根据会员ID，会员分组，获取会员组合的Id
+                    Set<String> comboIds = new HashSet<String>();
+                    comboIds = sdkMemberManager.getMemComboIdsByGroupIdMemberId(groupIds, memberId);
+                    memberDetails.setMemComboList(comboIds);
+                    if (LOGGER.isInfoEnabled()) {
+                        LOGGER.info("创建订单所需会员的参数：memberDetails[" + JsonUtil.format(memberDetails) + "]");
+                    }
+                }
+                // 用户信息
+                boolean isGuest = Validator.isNullOrEmpty(memberDetails);
+                String memberName = "";
+                if (!isGuest) {
+                    memberName = Validator.isNullOrEmpty(memberDetails.getLoginEmail()) ? memberDetails.getLoginMobile() : memberDetails.getLoginEmail();
+                }
+                salesOrderCommand.setMemberName(memberName);
+                salesOrderCommand.setMemberId(isGuest ? null : memberDetails.getGroupId());
+
+            }
+            salesOrderCommand.setIp(RequestUtil.getClientIp(request));
+            // 订单来源
+            salesOrderCommand.setSource(SalesOrder.SO_SOURCE_SHOPDOG_NORMAL);
+
+            // 获取购物车信息
+            List<ShoppingCartLineCommand> shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
+            for (ShopdogSkusCommand shopdogSkusCommand : shopdogOrderParamCommand.getSkuList()) {
+                ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
+                shoppingCartLineCommand.setSkuId(shopdogSkusCommand.getSkuId());
+                shoppingCartLineCommand.setQuantity(shopdogSkusCommand.getCount());
+                // 这个参数为模拟购物车选中结算
+                shoppingCartLineCommand.setSettlementState(1);
+                // 这个参数待确定 TODO
+                shoppingCartLineCommand.setShopId(1L);
+                shoppingCartLineCommandList.add(shoppingCartLineCommand);
+            }
+            ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, getCalcFreightCommand(shopdogOrderParamCommand), null);
+
+            SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
+            salesOrderCreateOptions.setIsImmediatelyBuy(true);
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("shoppingCartCommand:" + JSON.toJSONString(shoppingCartCommand));
+            }
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("创建订单所需的参数：salesOrderCommand[" + JsonUtil.format(salesOrderCommand) + "]");
+            }
+            // 新建订单
+            String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memberDetails != null ? memberDetails.getMemComboList() : null, salesOrderCreateOptions);
+
+            shopdogOrderCommand = createShopdogOrderCommand(request, salesOrderCommand.getName(), subOrdinate, String.valueOf(salesOrderCommand.getPayType()));
+        } catch (BusinessException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new ShopdogBusinessException(Integer.toString(e.getErrorCode()), e.getMessage());
+        }
+
+        return shopdogOrderCommand;
     }
 
     /**
