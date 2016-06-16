@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +37,6 @@ import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
@@ -80,19 +78,6 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     
     /** 支付失败页面. */
     protected static final String URL_PAY_FAILURE_PAGE     = "/payment/failure.htm";
-
-    //支付宝扫码模式 
-    /** 扫码支付-简约前置模式 */
-    private static final String   QR_PAY_MODE_SIMPLE_FRONT = "0";
-
-    /** 扫码支付-前置模式 */
-    private static final String   QR_PAY_MODE_FRONT        = "1";
-
-    /** 扫码支付-迷你前置模式 */
-    private static final String   QR_PAY_MODE_MINI_FRONT   = "3";
-
-    /** 扫码支付-跳转模式 */
-    private static final String   QR_PAY_MODE_REDIRECT     = "2";
 
     @Autowired
     private SdkPaymentManager     sdkPaymentManager;

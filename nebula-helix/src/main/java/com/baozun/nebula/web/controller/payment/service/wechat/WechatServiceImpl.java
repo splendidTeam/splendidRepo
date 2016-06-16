@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -54,47 +55,47 @@ public class WechatServiceImpl implements WechatService {
 	private static final Integer CACHE_EXPIRESECONDS_ACCESSTOKEN 	= 90 * TimeInterval.SECONDS_PER_MINUTE; 
 	
 	/** ## 商户app数据-appId */
-	//@Value("#{wechat['wechat.appId']}")
+	@Value("#{wechat['wechat.appId']}")
 	private String					appId;
 	
 	/** ## 商户app数据-appSecret */
-	//@Value("#{wechat['wechat.appSecret']}")
+	@Value("#{wechat['wechat.appSecret']}")
 	private String					appSecret;
 	
 	/** ##获取code的url */
-	//@Value("#{wechat['wechat.oAuth.authorize.url']}")
+	@Value("#{wechat['wechat.oAuth.authorize.url']}")
 	private String					oAuthAuthorizeUrl;
 	
 	/** ##获取授权accessToken的url */
-	//@Value("#{wechat['wechat.oAuth.accessToken.url']}")
+	@Value("#{wechat['wechat.oAuth.accessToken.url']}")
 	private String					oAuthAccessTokenUrl;
 	
 	/** ##获取全局accessToken的url */
-	//@Value("#{wechat['wechat.global.accessToken.url']}")
+	@Value("#{wechat['wechat.global.accessToken.url']}")
 	private String					globalAccessTokenUrl;
 	
 	/** ##获取ticket的url */
-	//@Value("#{wechat['wechat.ticket.get.url']}")
+	@Value("#{wechat['wechat.ticket.get.url']}")
 	private String					ticketUrl;
 	
 	/** ## NBP提供的appid */
-	//@Value("#{wechat['wechat.nbp.appId']}")
+	@Value("#{wechat['wechat.nbp.appId']}")
 	private String					nbpAppId;
 	
 	/** ## NBP提供的key */
-	//@Value("#{wechat['wechat.nbp.key']}")
+	@Value("#{wechat['wechat.nbp.key']}")
 	private String					nbpKey;
 	
 	/** ## NBP提供的获取openId的url */
-	//@Value("#{wechat['wechat.nbp.openid.url']}")
+	@Value("#{wechat['wechat.nbp.openid.url']}")
 	private String					nbpOpenidUrl;
 	
 	/** ## 从NBP获取openId后跳转的url */
-	//@Value("#{wechat['wechat.nbp.openid.redirect.url']}")
+	@Value("#{wechat['wechat.nbp.openid.redirect.url']}")
 	private String					nbpOpenidRedirectUrl;
 	
 	/** ## 从NBP获取jsapi_ticket的url */
-	//@Value("#{wechat['wechat.nbp.jsapi_ticket.url']}")
+	@Value("#{wechat['wechat.nbp.jsapi_ticket.url']}")
 	private String					nbpJsapiTicketUrl;
 	
 	@Override
