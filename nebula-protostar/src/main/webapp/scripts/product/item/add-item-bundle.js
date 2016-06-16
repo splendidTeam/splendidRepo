@@ -72,22 +72,26 @@ $j(document).ready(function(){
 		
 		// 校验主卖品是否存在
 		if($j(".setMainProduct").find(".validate-code").text() == null){
+			alert("1");
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
 		// 校验成员是否存在至少一个
 		if($j(".setMemberProduct").find(".validate-code").text() == null){
+			alert("2");
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
 		
 		// 一口价时    只校验‘商品表’每个价格是否有值
 		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
     	if($j("input[name='priceType']:checked").val() == 2){
+    		alert("4");
     		$j('.fix-price').each(function(){
     			if($j(this).val() == null){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
     			}
     		});
     	}else if($j("input[name='priceType']:checked").val() == 3){
+    		alert("3");
     		var flag = true;
     		$j('.tr-product').each(function(){
     			var _flag = false;
@@ -109,6 +113,7 @@ $j(document).ready(function(){
     		
     		
     		$j('.check-sku:checked').each(function(){
+    			alert("5");
     			if($j(this).parent().next().next().find('.sku-price').val() == null){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECKED-PRICE-IS-NULL"));
     			}
@@ -140,43 +145,17 @@ $j(document).ready(function(){
 				var _type = $j(':input[name="selectType"]:checked').val();
 				if(selectStoreyType == 1){
 					if(_type == "product") {
-						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
 						$j("#selectPro").hide();refreshItemData();
-						mainEelment = {
-								isMainElement : true,
-								sort : 1,
-								styleCode : '',
-								itemCode : element.parent().next().text()
-							};
 					} else if(_type == "style") {
-						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
 						$j("#selectPro").hide();
-						mainEelment = {
-								isMainElement : true,
-								sort : 1,
-								styleCode : element.parent().next().text(),
-								itemCode : ''
-							};
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
-						bundleElement = {
-								isMainElement : false,
-								sort : $j(".setMemberProduct li").length,
-								styleCode : '',
-								itemCode : element.parent().next().text()
-							};
-						elements.push(bundleElement);
+						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
 					} else if(_type == "style") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
-						bundleElement = {
-								isMainElement : false,
-								sort : $j(".setMemberProduct li").length,
-								styleCode : element.parent().next().text(),
-								itemCode : ''
-							};
-						elements.push(bundleElement);
+						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
 					}
 				}
 				bindClose(selectStoreyType);
@@ -230,7 +209,7 @@ $j(document).ready(function(){
  *给关闭图标绑定点击事件 
  */
 function bindClose(selectStoreyType){
-	if(selectStoreyType == 1){
+	if(selectStoreyType =1){
 		$j(".setMainProduct .dialog-close").bind("click",function(){
 			$j("#selectPro").show();
 		})
@@ -449,6 +428,7 @@ function fillProductTable(data){
  * 装填“定制”表格数据
  */
 function loadBundleElements(editable, showDefaultValue){
+	getElements();
 	if(fillForm()) {
 		var f = loxia._getForm("bundle_element_form");
 		loxia.lockPage();
@@ -532,5 +512,57 @@ function fillForm(){
 	$j('#bundle_element_form').html(_html);
 	
 	return true;
+}
+
+//获取主商品和成员商品的对象
+function getElements(){
+	
+	mainEelment = null;
+	elements = new Array();
+    bundleElement = null;
+	
+	//主商品
+	var mainProductCode = $j(".setMainProduct").find(".validate-code");
+	if(mainProductCode.text() != null){
+		if(mainProductCode.attr("data-type") == "product"){
+			mainEelment = {
+					isMainElement : true,
+					sort : 1,
+					styleCode : '',
+					itemCode : mainProductCode.text()
+				};
+		}else if(mainProductCode.attr("data-type") == "style"){
+			mainEelment = {
+					isMainElement : true,
+					sort : 1,
+					styleCode : mainProductCode.text(),
+					itemCode : ''
+				};
+		}
+	}
+	
+	//成员商品
+	var memberProductCode = null;
+	$j(".setMemberProduct").find(".validate-code").each(function(){
+		if($j(this).text() != null){
+			if($j(this).attr("data-type") == "product"){
+				bundleElement = {
+						isMainElement : false,
+						sort : $j(".setMemberProduct li").length,
+						styleCode : '',
+						itemCode : $j(this).text()
+					};
+				elements.push(bundleElement);
+			}else if($j(this).attr("data-type") == "style"){
+				bundleElement = {
+						isMainElement : false,
+						sort : $j(".setMemberProduct li").length,
+						styleCode : $j(this).text(),
+						itemCode : ''
+					};
+				elements.push(bundleElement);
+			}
+		}
+	});
 }
 
