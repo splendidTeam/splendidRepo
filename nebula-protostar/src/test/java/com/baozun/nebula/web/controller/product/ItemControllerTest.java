@@ -86,18 +86,18 @@ public class ItemControllerTest {
 		model = control.createMock("model", Model.class);
 	}
 
-	@Test
-	public final void testCreateItem() {
-		List<Industry> industryList = new ArrayList<Industry>();
-		List<Category> categoryList = new ArrayList<Category>();
-		Sort[] sorts = Sort.parse("parent_id asc,sort_no asc");
-		EasyMock.expect(industryManager.findAllIndustryList()).andReturn(industryList);
-		EasyMock.expect(categoryManager.findEnableCategoryList(sorts)).andReturn(categoryList);
-		EasyMock.expect(model.addAttribute(EasyMock.eq("industryList"), EasyMock.eq(industryList))).andReturn(model);
-		EasyMock.expect(model.addAttribute(EasyMock.eq("categoryList"), EasyMock.eq(categoryList))).andReturn(model);
-		control.replay();
-		assertEquals("/product/item/add-item", itemController.createItem(model));
-	}
+//	@Test
+//	public final void testCreateItem() {
+//		List<Industry> industryList = new ArrayList<Industry>();
+//		List<Category> categoryList = new ArrayList<Category>();
+//		Sort[] sorts = Sort.parse("parent_id asc,sort_no asc");
+//		EasyMock.expect(industryManager.findAllIndustryList()).andReturn(industryList);
+//		EasyMock.expect(categoryManager.findEnableCategoryList(sorts)).andReturn(categoryList);
+//		EasyMock.expect(model.addAttribute(EasyMock.eq("industryList"), EasyMock.eq(industryList))).andReturn(model);
+//		EasyMock.expect(model.addAttribute(EasyMock.eq("categoryList"), EasyMock.eq(categoryList))).andReturn(model);
+//		control.replay();
+//		assertEquals("/product/item/add-item", itemController.createItem(model));
+//	}
 
 	@Test
 	public final void testFindDynamicPropertis() {

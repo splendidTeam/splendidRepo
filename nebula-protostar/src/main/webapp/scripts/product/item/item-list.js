@@ -647,7 +647,7 @@ $j(document).ready(function() {
 	});
 	// 新增
 	$j(".button.orange.new").click(function() {
-		window.location.href = base + "/item/createItem.htm";
+		window.location.href = base + "/item/createItemChoose.htm";
 	});
 
 	// 批量逻辑删除

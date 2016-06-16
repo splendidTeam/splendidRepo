@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemI18nCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
@@ -96,9 +97,12 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	@Autowired(required = false)
 	private ItemExtendManager itemExtendManager;
 	
+	@Autowired
+	private BundleManager bundleManager;
+	
 	@Override
-	public Item createOrUpdateItem(ItemInfoCommand itemCommand,
-			Long[] propertyValueIds, Long[] categoriesIds,
+	public Item createOrUpdateSimpleItem(ItemInfoCommand itemCommand,
+			Long[] propertyValueIds, Long[] categoriesIds, Long defaultCategoryId,
 			ItemPropertiesCommand[] iProperties,
 			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception {
 
@@ -123,8 +127,32 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		createOrUpdateItemInfo(itemCommand, item.getId());
 
 		// 处理商品分类
-		itemCategoryHandle(itemCommand, item, categoriesIds);
+		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
 		
+		return item;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.ItemLangManager#createOrUpdateBundleItem(com.baozun.nebula.command.product.ItemInfoCommand, com.baozun.nebula.command.product.BundleCommand, java.lang.Long[])
+	 */
+	@Override
+	public Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
+			throws Exception {
+		
+		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_BUNDLE);
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
+		
+		// 保存bundle扩展信息
+		bundleCommand.setItemId(item.getId());
+		bundleManager.createOrUpdate(bundleCommand);
+		
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
+		
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+				
 		return item;
 	}
 	
@@ -1243,24 +1271,26 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		return item;
 	}
 	
-	private void itemCategoryHandle(ItemInfoCommand itemCommand, Item item, Long[] categoriesIds){
+	private void itemCategoryHandle(ItemInfoCommand itemCommand, Item item, Long[] categoriesIds, Long defaultCategoryId){
 		if (categoriesIds != null && categoriesIds.length > 0) {
-			Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
+//			Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
 
+//			int index = 0;
+//			for (Long id : categoriesIds) {
+//				if (!defaultId.equals(id)) {
+//					categoryIdArray[index] = id;
+//					index++;
+//				}
+//			}
+			
 			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
-			int index = 0;
-			for (Long id : categoriesIds) {
-				if (!defaultId.equals(id)) {
-					categoryIdArray[index] = id;
-					index++;
-				}
-			}
+			
 			// 绑定附加分类
 			itemCategoryManager.createOrUpdateItemCategory(itemCommand,
 					item.getId(), categoryIdArray);
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,
-					item.getId(), defaultId);
+					item.getId(), defaultCategoryId);
 
 		} else {
 			List<ItemCategory> ctgList = itemCategoryManager

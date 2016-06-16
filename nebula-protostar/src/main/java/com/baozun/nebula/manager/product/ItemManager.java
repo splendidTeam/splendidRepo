@@ -387,4 +387,9 @@ public interface ItemManager extends BaseManager {
 	 */
 	Integer findItemCountByPropertyId(Long propertyId);
 	
+	/**
+	 * 条件查询店铺商品款号
+	 */
+	Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts,
+			Map<String, Object> paraMap, Long shopId);
 }

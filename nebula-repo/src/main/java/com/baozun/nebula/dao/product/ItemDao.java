@@ -299,4 +299,7 @@ public interface ItemDao extends GenericEntityDao<Item, Long> {
 	
 	@NativeQuery(model = Item.class)
 	Item findItemByExtentionCode(@QueryParam("extentionCode") String extentionCode);
+	
+	@NativeQuery(model = ItemStyleCommand.class)
+	Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap, @QueryParam("shopId") Long shopId);
 }
