@@ -543,12 +543,14 @@ function getElements(){
 	
 	//成员商品
 	var memberProductCode = null;
+	var _sort = 1;
 	$j(".setMemberProduct").find(".validate-code").each(function(){
 		if($j(this).text() != null){
+			_sort++;
 			if($j(this).attr("data-type") == "product"){
 				bundleElement = {
 						isMainElement : false,
-						sort : $j(".setMemberProduct li").length,
+						sort : _sort,
 						styleCode : '',
 						itemCode : $j(this).text()
 					};
@@ -556,7 +558,7 @@ function getElements(){
 			}else if($j(this).attr("data-type") == "style"){
 				bundleElement = {
 						isMainElement : false,
-						sort : $j(".setMemberProduct li").length,
+						sort : _sort,
 						styleCode : $j(this).text(),
 						itemCode : ''
 					};
