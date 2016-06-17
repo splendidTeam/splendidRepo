@@ -41,6 +41,11 @@ $j(document).ready(function(){
 	/*==================================     bundle扩展信息    ==========================*/
 	/*==================================     弹出层    ==========================*/
 	//点击'设置主卖品'弹出对应弹层
+	$j("#selectPro").hover(function(){
+		$j(this).attr("style","text-decoration: underline");
+	},function(){
+		$j(this).attr("style","");
+	});
 	$j("#selectPro").on("click",function(){
 		//返回的是主卖品
 		selectStoreyType = 1;
@@ -49,6 +54,11 @@ $j(document).ready(function(){
 	});	
 	
 	//点击'+新成员'弹出对应弹层
+	$j("#selectStyle").hover(function(){
+		$j(this).attr("style","text-decoration: underline");
+	},function(){
+		$j(this).attr("style","");
+	});
 	$j("#selectStyle").on("click",function(){
 		//返回的是成员商品
 		selectStoreyType = 2;
@@ -180,6 +190,11 @@ $j(document).ready(function(){
 	
 	
 	//成员商品下的刷新按钮
+	 $j("#refresh-table").hover(function(){
+			$j(this).attr("style","text-decoration: underline");
+		},function(){
+			$j(this).attr("style","");
+		});
 	$j('#refresh-table').click(function() {
 		if($j("input[name='priceType']:checked").val() == 1){
 			loadBundleElements(false, true);
@@ -410,10 +425,12 @@ Array.prototype.remove = function(val) {
  */
 function fillProductTable(data){
 	var _html = '';
+	var number = 0;
 	$j(data).each(function(idx, element){
+		number++;
 		if(element.styleCode) { // 同款商品
 			var bundleItems = $j(element.bundleItemViewCommands);
-			_html += '<tr>';
+			_html += '<tr class="'+(number%2==0?"odd":"even")+'">';
 			_html += '<td rowspan="' + bundleItems.length + '">' + (idx + 1) + '</td>';
 			$j(bundleItems).each(function(i, item){
 				_html += '<td>' + item.itemCode + '</td>';
@@ -428,7 +445,7 @@ function fillProductTable(data){
 			});
 			_html += '</tr>';
 		} else { // 单一商品
-			_html += '<tr>';
+			_html += '<tr class="'+(number%2==0?"odd":"even")+'">';
 			_html += '<td>' + (idx + 1) + '</td>';
 			_html += '<td>' + element.itemCode + '</td>';
 			_html += '<td>' + element.bundleItemViewCommands[0].salesPrice + '</td>';
@@ -457,6 +474,7 @@ function loadBundleElements(editable, showDefaultValue){
 		
 		var _html = '';
 		var _a = new Array();
+		var num = 0;
 		$j(data).each(function(idx, element){
 			_html += '<tr class="tr-product" data-product="' + idx + '">';
 			_html += '<td rowspan="##' + idx + '##">' + (idx + 1) + '</td>'
@@ -476,7 +494,7 @@ function loadBundleElements(editable, showDefaultValue){
 				var bundleSkus = item.bundleSkuViewCommands;
 				$j(bundleSkus).each(function(n, sku){
 					rowspan ++;
-					_html += '<tr class="tr-sku" data-sku="' + idx + '">';
+					_html += '<tr class="tr-sku odd" data-sku="' + idx + '">';
 					_html += '<td>' + sku.property + '</td>';
 					_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" checked=checked /></td>';
 					_html += '<td>' + sku.originalSalesPrice + '</td>';
