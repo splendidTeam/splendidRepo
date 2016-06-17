@@ -117,7 +117,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
         } catch (IllegalPaymentStateException e){
 
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("[TO_PAY] " + e.getMessage(), e);
 
             //去往支付异常页面
             return "redirect:" + getToPayExceptionPageRedirect() + "?subOrdinate=" + subOrdinate;
@@ -324,7 +324,14 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
         if (Validator.isNullOrEmpty(unpaidPayInfoLogs)){
             //支付信息不存在或已支付
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID);
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID,
+            		"支付信息不存在或已支付, subOrdinate:" + subOrdinate);
+        }
+        
+        if (unpaidPayInfoLogs.size() > 1){
+            //支付信息不存在或已支付
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_MULTI_ORDERS,
+            		"交易流水对应多个未支付订单, subOrdinate:" + subOrdinate);
         }
 
         //如果找到多条，只取第一条
