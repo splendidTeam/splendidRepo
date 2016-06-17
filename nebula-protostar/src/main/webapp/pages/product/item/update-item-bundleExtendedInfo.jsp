@@ -33,14 +33,16 @@
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title">捆绑成员</div>
 		<div class="ui-block-content border-grey">
-			<ul class="clearfix setMemberProduct">
-				<c:forEach var="element" items="${elements }" varStatus="status">
-					<li class="main-pro">
-						<a class="showpic"><img src="${element.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
-						<p class="title p10 validate-code"><span title="${element.bundleItemViewCommands[0].itemCode }">${element.bundleItemViewCommands[0].itemCode }</span></p>
-						<p class="sub-title"><span title="${element.bundleItemViewCommands[0].title }">${element.bundleItemViewCommands[0].title }</span></p>
-					</li>
-				</c:forEach>
+			<ul class="clearfix">
+			 	<div class="setMemberProduct">
+					<c:forEach var="element" items="${elements }" varStatus="status">
+						<li class="main-pro">
+							<a class="showpic"><img src="${element.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
+							<p class="title p10 validate-code"><span title="${element.bundleItemViewCommands[0].itemCode }">${element.bundleItemViewCommands[0].itemCode }</span></p>
+							<p class="sub-title"><span title="${element.bundleItemViewCommands[0].title }">${element.bundleItemViewCommands[0].title }</span></p>
+						</li>
+					</c:forEach>
+				</div>
 				<li class="main-pro pro-empty" id="selectStyle">+新成员</li>
 			</ul>
 			<a class="user-refresh"></a>
