@@ -524,8 +524,8 @@ function loadBundleElements(editable, showDefaultValue){
 		}
 		
 		$j('.sku-table > tbody').html(_html);
+		isRefresh = true;
 	}
-	isRefresh = true;
 }
 
 function fillForm(){

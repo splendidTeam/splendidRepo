@@ -10,10 +10,8 @@
 <script type="text/javascript" src="${base}/scripts/product/item/update-item-bundle.js"></script>
 <script type="text/javascript">
 var categoryDisplayMode = "${categoryDisplayMode}";
-var elements = ${elementsStr};
-var mainElement = ${mainElementStr};
 $j(document).ready(function(){
-	$j("input[name='priceType']").trigger("change");
+	initBundleElement(${bundleViewCommand.priceType});
 });
 </script>
 </head>

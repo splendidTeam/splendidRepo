@@ -2673,7 +2673,10 @@ public class ItemController extends BaseController {
 
 		// 转换bundle对象
 		BundleCommand result = new BundleCommand();
+		result.setId(command.getId());
+		result.setItemId(command.getItemId());
 		result.setPriceType(command.getPriceType());
+		result.setCreateTime(command.getCreateTime());
 		Integer qty = command.getAvailableQty();
 		if (qty != null) {
 			result.setAvailableQty(qty);
@@ -2738,6 +2741,7 @@ public class ItemController extends BaseController {
 		bundleViewCommand.setAvailableQty(bundleCommand.getAvailableQty());
 		bundleViewCommand.setPriceType(bundleCommand.getPriceType());
 		bundleViewCommand.setSyncWithInv(bundleCommand.getSyncWithInv());
+		bundleViewCommand.setCreateTime(bundleCommand.getCreateTime());
 		
 		model.addAttribute("bundleViewCommand", bundleViewCommand);
 		
@@ -2847,14 +2851,12 @@ public class ItemController extends BaseController {
 			
 			if(bevc.getIsMainElement()) {
 				model.addAttribute("mainElement", bevc);
-				model.addAttribute("mainElementStr", JsonUtil.format(bevc));
 			} else {
 				bevcs.add(bevc);
 			}
 		}
 		
 		model.addAttribute("elements", bevcs);
-		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
 	}
 	
 	private String getItemImageByPLP(Long itemId){

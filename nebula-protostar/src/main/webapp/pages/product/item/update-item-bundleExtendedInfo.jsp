@@ -14,11 +14,11 @@
 					<c:choose>
 						<c:when test="${mainElement.styleCode != null}">
 							<a class="showpic"><img src=""><span class="dialog-close">X</span></a>
-							<p class="title p10 validate-code"><span title="${mainElement.styleCode }">${mainElement.styleCode }</span></p>
+							<p class="title p10 validate-code" data-type="style"><span title="${mainElement.styleCode }">${mainElement.styleCode }</span></p>
 						</c:when>
 						<c:otherwise>
 							<a class="showpic"><img src="${mainElement.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
-							<p class="title p10 validate-code"><span title="${mainElement.itemCode }">${mainElement.itemCode }</span></p>
+							<p class="title p10 validate-code" data-type="product"><span title="${mainElement.itemCode }">${mainElement.itemCode }</span></p>
 							<p class="sub-title"><span title="${mainElement.bundleItemViewCommands[0].title }">${mainElement.bundleItemViewCommands[0].title }</span></p>
 						</c:otherwise>
 					</c:choose>
@@ -37,9 +37,17 @@
 			 	<div class="setMemberProduct">
 					<c:forEach var="element" items="${elements }" varStatus="status">
 						<li class="main-pro">
-							<a class="showpic"><img src="${element.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
-							<p class="title p10 validate-code"><span title="${element.bundleItemViewCommands[0].itemCode }">${element.bundleItemViewCommands[0].itemCode }</span></p>
-							<p class="sub-title"><span title="${element.bundleItemViewCommands[0].title }">${element.bundleItemViewCommands[0].title }</span></p>
+						<c:choose>
+							<c:when test="${element.styleCode != null}">
+								<a class="showpic"><img src=""><span class="dialog-close">X</span></a>
+								<p class="title p10 validate-code" data-type="style"><span title="${element.styleCode }">${element.styleCode }</span></p>
+							</c:when>
+							<c:otherwise>
+								<a class="showpic"><img src="${element.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
+								<p class="title p10 validate-code" data-type="product"><span title="${element.itemCode }">${element.itemCode }</span></p>
+								<p class="sub-title"><span title="${element.bundleItemViewCommands[0].title }">${element.bundleItemViewCommands[0].title }</span></p>
+							</c:otherwise>
+						</c:choose>
 						</li>
 					</c:forEach>
 				</div>

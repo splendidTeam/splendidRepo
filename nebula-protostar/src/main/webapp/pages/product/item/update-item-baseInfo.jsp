@@ -17,6 +17,7 @@
 		</div>
 	</div>
 
+	<input type="hidden" name="itemCommand.id" id="itemid" value="${id }"/>
 	<c:if test="${i18nOnOff == true}">
 		<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 			<c:set value="${status.index}" var="i"></c:set>
@@ -132,8 +133,7 @@
 	<div class="ui-block-line ">
 		<label></label>
 		<div id="chooseDefaultCategoryHid">
-			<input type='hidden' name='defCategroyId' id='defCategroyId'
-				value="${defaultItemCategory.categoryId}" />
+			<input type='hidden' id="defaultCategoryId" name='defaultCategoryId' value="${defaultItemCategory.categoryId }" />
 		</div>
 	</div>
 	<div class="ui-block-line ">

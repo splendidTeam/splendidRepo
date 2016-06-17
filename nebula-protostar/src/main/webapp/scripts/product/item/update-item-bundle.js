@@ -32,6 +32,8 @@ var findStyleInfoListJsonUrl = base + "/item/styleList.json";
 //设置返回的是主卖品还是成员商品
 var selectStoreyType = '';
 
+var elements = new Array();
+var mainElement = null;
 var isRefresh = true;
 
 $j(document).ready(function(){
@@ -461,6 +463,7 @@ function fillProductTable(data){
 		}
 	}); 
 	$j('.product-table > tbody').html(_html);
+	isRefresh = true;
 }
 
 /**
@@ -518,6 +521,7 @@ function loadBundleElements(editable, showDefaultValue){
 		}
 		
 		$j('.sku-table > tbody').html(_html);
+		isRefresh = true;
 	}
 }
 
@@ -528,8 +532,8 @@ function fillForm(){
 	var _e = new Array();
 	
 	// 校验主卖品
-	if(mainElement) {
-		_e.push(mainElement)
+	if(mainElement ) {
+		_e.push(mainElement )
 	} else {
 		nps.info(nps.i18n('MAIN-PRODUCT-NOT-EXIST'));
 		return false;
@@ -609,21 +613,11 @@ function getElements(){
 	});
 }
 
-var itemcolorrefcheckURL="/itemColor/itemcolorcheck.json";
-var saveitemcolorrefURL="/itemColor/savecolorvalue.htm";
-
-function saveitemcolorref(){
-	var selestrefre=selestref();
-    var json = {
-           'itemcolor' : selestrefre,
-           'code': $j("#code").val()  
-     };
-	// 提交表單
-	$j.ajax({
-		url:saveitemcolorrefURL, 
-		data:json,
-		type: "post",
-		success:function(data) { 
-		}
-	});
+function initBundleElement(priceType){
+	switch(priceType) {
+	case 1 : loadBundleElements(false, true);break;
+	case 2 : loadBundleElements(false, false);break;
+	case 3 : loadBundleElements(true);break;
+	}
 }
+
