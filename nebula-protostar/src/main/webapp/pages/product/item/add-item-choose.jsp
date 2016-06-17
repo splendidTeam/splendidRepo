@@ -47,8 +47,8 @@ var zNodes =
 				   		<label> <input type="radio" name="newPro" value="5" /><spring:message code="item.type.group" /></label>
 				   		<label> <input type="radio" class="virtualpro" name="newPro" value="7" /><spring:message code="item.type.virturl" /></label>
 				   </div>
-				   <div class="pro-modal pt10 pb10 none-normal">
-				   	   <p class="font20"><spring:message code="item.add.selectIndustry" /></p>
+				   <div class="pro-modal pt10 pb10 none-normal" style="display:block;">
+				   	   <p class="font20"><spring:message code="item.add.industry" /></p>
 					   <div class="ui-block ui-block-fleft w240">
 					        <div class="ui-block-content ui-block-content-lb">
 					            <div class="tree-control">

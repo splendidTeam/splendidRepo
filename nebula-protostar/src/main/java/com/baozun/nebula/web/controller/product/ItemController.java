@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -102,18 +103,21 @@ import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemCategory;
+import com.baozun.nebula.model.product.ItemImage;
+import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
+import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkItemSortScoreManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
+import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.baozun.nebula.solr.manager.ItemSolrManager;
-import com.baozun.nebula.solr.utils.JsonFormatUtil;
 import com.baozun.nebula.utilities.common.LangUtil;
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utils.InputStreamCacher;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.UserDetails;
@@ -127,6 +131,8 @@ import com.baozun.nebula.web.command.BundleSkuViewCommand;
 import com.baozun.nebula.web.command.BundleViewCommand;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.gson.Gson;
 
 import loxia.dao.Pagination;
@@ -182,6 +188,15 @@ public class ItemController extends BaseController {
 
 	@Autowired
 	private BundleManager bundleManager;
+	
+	@Autowired
+	private SdkBundleManager sdkBundleManager;
+	
+	@Autowired
+	private SdkSkuManager sdkSkuManager;
+	
+	@Autowired
+	private SdkItemManager sdkItemManager;
 
 	/**
 	 * 上传图片的域名
@@ -1171,19 +1186,6 @@ public class ItemController extends BaseController {
 		return cmdList.toArray(cmdArray);
 	}
 
-	private String[] getMutlPropertyValuesOrLangs(String[] inputs) {
-		String[] values = new String[inputs.length - 1];
-		int num = 0;
-		for (int i = 0; i < inputs.length; i++) {
-			String str = inputs[i];
-			if (i != 2) {
-				values[num] = str;
-				num++;
-			}
-		}
-		return values;
-	}
-
 	private String[] getValues(String[] inputs) {
 		String[] values = new String[MutlLang.i18nSize()];
 		int num = 0;
@@ -1207,24 +1209,6 @@ public class ItemController extends BaseController {
 			}
 		}
 		return langs;
-
-	}
-
-	private Map<String, String[]> getValues(Property p, String[] values) {
-		String[] vs = new String[MutlLang.i18nSize()];
-		Map<String, String[]> map = new HashMap<String, String[]>();
-		for (int i = 0; i < MutlLang.i18nLangs().size(); i++) {
-			for (int j = 0; j < values.length; j++) {
-				String str = values[j];
-				if (str.split("\\|\\|").length == 1) {
-					vs[j] = str.split("\\|\\|")[0];
-				} else {
-					vs[j] = str.split("\\|\\|")[i];
-				}
-			}
-			map.put(MutlLang.i18nLangs().get(i), vs);
-		}
-		return map;
 
 	}
 
@@ -1902,7 +1886,7 @@ public class ItemController extends BaseController {
 		PrintWriter out = null;
 		try {
 			out = response.getWriter();
-			out.write(JsonFormatUtil.format(rs));
+			out.write(JsonUtil.format(rs));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} finally {
@@ -2089,7 +2073,6 @@ public class ItemController extends BaseController {
 				if (msgs.length == 5) {
 					String rcIndex = msgs[3];
 					int[] rc = getRowCellIndex(rcIndex);
-					String info = rcIndex + msgs[4];
 					HSSFRow row = sheet.getRow(rc[0] - 1);
 					HSSFCell cell = row.getCell(rc[1]);
 					if (cell == null) {
@@ -2205,6 +2188,7 @@ public class ItemController extends BaseController {
 		} else {
 			for (String dataItem : dataRow) {
 				for (List<String> tableLine : table) {
+					@SuppressWarnings("unchecked")
 					List<String> targetRow = (ArrayList<String>) ((ArrayList<String>) tableLine).clone();
 					targetRow.add(dataItem);
 					result.add(targetRow);
@@ -2214,25 +2198,6 @@ public class ItemController extends BaseController {
 
 		// 递归组织下一行数据
 		return buildTable(result, data, ++dataRowIndex);
-	}
-
-	/**
-	 * 将所有每行的属性拼成prekey
-	 * 
-	 * @param result
-	 * @return
-	 */
-	private List<String> buildPreKeys(List<List<String>> result) {
-		List<String> prekeys = new ArrayList<String>();
-		for (List<String> lists : result) {
-			StringBuffer sbf = new StringBuffer();
-			for (String list : lists) {
-				sbf.append(list + "_");
-			}
-			prekeys.add(sbf.toString());
-		}
-
-		return prekeys;
 	}
 
 	/**
@@ -2300,18 +2265,11 @@ public class ItemController extends BaseController {
 	 */
 	@RequestMapping("/item/createSimpleItem.htm")
 	public String createSimpleItem(@RequestParam("industryId") Long industryId, Model model) {
-		// 验证选定的行业
+		
+		getCommonInfoForCreateOrUpdateItem(model);
+		
 		Industry industry = industryManager.findIndustryById(industryId);
-		if (industry == null) {
-			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_EXISTS);
-		} else if (!Industry.LIFECYCLE_ENABLE.equals(industry.getLifecycle())) {
-			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_AVAILABLE);
-		} else {
-			model.addAttribute("industryId", industryId);
-			model.addAttribute("industryName", industry.getName());
-
-			getCommonInfoForCreateOrUpdateItem(model);
-		}
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
 
 		return "/product/item/add-item-simple";
 	}
@@ -2323,9 +2281,12 @@ public class ItemController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping("/item/createBundleItem.htm")
-	public String createBundleItem(Model model) {
+	public String createBundleItem(@RequestParam("industryId") Long industryId, Model model) {
 		
 		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(industryId);
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
 
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
@@ -2367,14 +2328,17 @@ public class ItemController extends BaseController {
 	 * @return
 	 */
 	private String updateSimpleItem(Model model, Item item) {
+		
 		// 装载公共信息
 		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(item.getIndustryId());
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
 		
 		// 装载商品所属分类信息
 		getCategoryInfoForUpdateItem(model, item);
 		
 		// 装载商品扩展信息
-		Industry industry = industryManager.findIndustryById(item.getIndustryId());
 		getItemInfoByUpdateItem(model, item, industry);
 		
 		// 装载属性信息
@@ -2423,22 +2387,28 @@ public class ItemController extends BaseController {
 	 * @return
 	 */
 	private String updateBundleItem(Model model, Item item) {
+		
 		// 装载公共信息
 		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(item.getIndustryId());
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
 
 		// 装载商品所属分类信息
 		getCategoryInfoForUpdateItem(model, item);
 
 		// 装载商品扩展信息
-		Industry industry = industryManager.findIndustryById(item.getIndustryId());
 		getItemInfoByUpdateItem(model, item, industry);
 		
-		// TODO 装载bundle信息
+		// 装载bundle信息
+		BundleCommand bundleCommand = bundleManager.findBundleCommandByBundleItemId(item.getId());
+		fillBundleViewCommand(model, bundleCommand);
 
 		return "/product/item/update-item-bundle";
 	}
 	
 	private void getCommonInfoForCreateOrUpdateItem(Model model) {
+		
 		String itemCodeValidMsg = messageSource.getMessage(
 				ErrorCodes.BUSINESS_EXCEPTION_PREFIX + ErrorCodes.ITEM_CODE_VALID_ERROR, new Object[] {},
 				Locale.SIMPLIFIED_CHINESE);
@@ -2451,6 +2421,16 @@ public class ItemController extends BaseController {
 		List<Category> categoryList = categoryManager.findEnableCategoryList(sorts);
 		model.addAttribute("categoryList", categoryList);
 		model.addAttribute("isStyleEnable", isEnableStyle());
+	}
+	
+	private void getIndustryInfoForCreateOrUpdateItem(Model model, Industry industry) {
+		if (industry == null) {
+			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_EXISTS);
+		} else if (!Industry.LIFECYCLE_ENABLE.equals(industry.getLifecycle())) {
+			throw new BusinessException(ErrorCodes.INDUSTRY_NOT_AVAILABLE);
+		} else {
+			model.addAttribute("industry", industry);
+		}
 	}
 	
 	private void getCategoryInfoForUpdateItem(Model model, Item item) {
@@ -2485,7 +2465,6 @@ public class ItemController extends BaseController {
 		List<Object> propertyNameArray = new ArrayList<Object>();
 		List<Object> mustCheckArray = new ArrayList<Object>();
 
-		int j = 0;
 		if (dynamicPropertyCommandList != null && dynamicPropertyCommandList.size() > 0) {
 			for (DynamicPropertyCommand dynamicPropertyCommand : dynamicPropertyCommandList) {
 				Property property = dynamicPropertyCommand.getProperty();
@@ -2501,7 +2480,6 @@ public class ItemController extends BaseController {
 						mustCheckArray.add("'" + dynamicPropertyCommand.getProperty().getName() + "'");
 					}
 				}
-				j++;
 			}
 		}
 
@@ -2683,6 +2661,11 @@ public class ItemController extends BaseController {
 		return bundleManager.loadBundleElements(bundleElements);
 	}
 
+	/**
+	 * bundle视图模型转换为业务模型
+	 * @param command
+	 * @return
+	 */
 	private BundleCommand convertToBundleCommand(BundleViewCommand command) {
 		if (command == null) {
 			return null;
@@ -2741,5 +2724,145 @@ public class ItemController extends BaseController {
 		result.setBundleElementCommands(bundleElements);
 
 		return result;
+	}
+	
+	/**
+	 * 根据bundle业务模型填充视图模型
+	 * @param bundleCommand
+	 * @return
+	 */
+	private void fillBundleViewCommand(Model model, BundleCommand bundleCommand) {
+		BundleViewCommand bundleViewCommand = new BundleViewCommand();
+		bundleViewCommand.setId(bundleCommand.getId());
+		bundleViewCommand.setItemId(bundleCommand.getItemId());
+		bundleViewCommand.setAvailableQty(bundleCommand.getAvailableQty());
+		bundleViewCommand.setPriceType(bundleCommand.getPriceType());
+		bundleViewCommand.setSyncWithInv(bundleCommand.getSyncWithInv());
+		
+		model.addAttribute("bundleViewCommand", bundleViewCommand);
+		
+		List<BundleElementCommand> becs = bundleCommand.getBundleElementCommands();
+		List<BundleElementViewCommand> bevcs = new ArrayList<BundleElementViewCommand>();
+		for(BundleElementCommand bec : becs) {
+			BundleElementViewCommand bevc = new BundleElementViewCommand();
+			bevc.setIsMainElement(bec.getIsMainElement());
+			bevc.setSalesPrice(bec.getSalesPrice());
+			bevc.setSort(bec.getSortNo());
+			boolean isStyle = bec.getIsStyle();
+			if(isStyle) {
+				bevc.setStyleCode(bec.getStyle());
+			} else {
+				bevc.setItemCode(bec.getItems().get(0).getItemCode());
+			}
+			
+			List<BundleItemCommand> bics = bec.getItems();
+			List<BundleItemViewCommand> bivcs = new ArrayList<BundleItemViewCommand>();
+			List<Long> currentItemIds = new ArrayList<Long>();
+			for(BundleItemCommand bic : bics) {
+				BundleItemViewCommand bivc = new BundleItemViewCommand();
+				Long itemId = bic.getItemId();
+				if(isStyle) {
+					currentItemIds.add(itemId);
+				}
+				bivc.setItemId(itemId);
+				bivc.setItemCode(bic.getItemCode());
+				// 商品的原销售价不会冗余到bundle，需要从商品扩展信息表中获取
+				ItemInfo itemInfo = itemManager.findItemInfoByItemId(bic.getItemId());
+				bivc.setSalesPrice(itemInfo.getSalePrice());
+				bivc.setTitle(itemInfo.getTitle());
+				bivc.setPicUrl(getItemImageByPLP(itemId));
+				
+				List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
+				List<BundleSkuCommand> bscs = bic.getBundleSkus();
+				List<Long> currentSkuIds = new ArrayList<Long>();
+				for(BundleSkuCommand bsc : bscs) {
+					Long skuId = bsc.getSkuId();
+					Sku sku = sdkSkuManager.findSkuById(skuId);
+					if(sku == null) {
+						continue;
+					}
+					currentSkuIds.add(skuId);
+					BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+					bsvc.setSkuId(skuId);
+					bsvc.setIsParticipation(true);
+					bsvc.setOriginalSalesPrice(sku.getSalePrice());
+					bsvc.setSalesPrice(bsc.getSalesPrice());
+					bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+					
+					bsvcs.add(bsvc);
+				}
+				
+				// bundle中仅包含参与捆绑的sku，所以在编辑的时候，需要把未参与的sku也包括进来
+				List<Sku> skus = itemManager.findSkuByItemId(itemId);
+				for(Sku sku : skus) {
+					Long skuId = sku.getId();
+					if(!currentSkuIds.contains(skuId)) {
+						BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+						bsvc.setSkuId(skuId);
+						bsvc.setIsParticipation(false);
+						bsvc.setOriginalSalesPrice(sku.getSalePrice());
+						bsvc.setSalesPrice(sku.getSalePrice());
+						bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+						
+						bsvcs.add(bsvc);
+					}
+				}
+				Collections.sort(bsvcs);
+				bivc.setBundleSkuViewCommands(bsvcs);
+				
+				bivcs.add(bivc);
+			}
+			
+			// 如果捆绑成员是基于款号配置的，在编辑的时候需要检查该款号下是否有新增的商品
+			if(isStyle){
+				List<ItemCommand> itemCommands = itemManager.findItemCommandsByStyle(bec.getStyle());
+				for(ItemCommand command : itemCommands) {
+					Long itemId = command.getId();
+					if(!currentItemIds.contains(itemId)) {
+						BundleItemViewCommand bivc = new BundleItemViewCommand();
+						bivc.setItemId(itemId);
+						bivc.setItemCode(command.getCode());
+						bivc.setSalesPrice(command.getSalePrice());
+						
+						List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
+						List<Sku> skus = itemManager.findSkuByItemId(itemId);
+						for(Sku sku : skus) {
+							BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+							bsvc.setIsParticipation(false);
+							bsvc.setOriginalSalesPrice(sku.getSalePrice());
+							bsvc.setSalesPrice(bsvc.getSalesPrice());
+							bsvc.setSkuId(sku.getId());
+							bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+							
+							bsvcs.add(bsvc);
+						}
+						bivc.setBundleSkuViewCommands(bsvcs);
+						
+						bivcs.add(bivc);
+					}
+				}
+			}
+			Collections.sort(bivcs);
+			bevc.setBundleItemViewCommands(bivcs);
+			
+			if(bevc.getIsMainElement()) {
+				model.addAttribute("mainElement", bevc);
+				model.addAttribute("mainElementStr", JsonUtil.format(bevc));
+			} else {
+				bevcs.add(bevc);
+			}
+		}
+		
+		model.addAttribute("elements", bevcs);
+		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
+	}
+	
+	private String getItemImageByPLP(Long itemId){
+		List<ItemImage> itemImages = sdkItemManager.findItemImageByItemIds(Arrays.asList(itemId), ItemImage.IMG_TYPE_LIST);
+		if(itemImages != null && !itemImages.isEmpty()) {
+			return UPLOAD_IMG_DOMAIN + itemImages.get(0).getPicUrl();
+		}
+		
+		return null;
 	}
 }

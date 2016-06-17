@@ -36,6 +36,7 @@ import java.util.List;
 import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.bundle.Bundle;
+import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.command.BundleElementViewCommand;
 
 /**
@@ -48,4 +49,7 @@ public interface BundleManager extends BaseManager {
 	
 	List<BundleElementViewCommand> loadBundleElements(BundleElementViewCommand[] commands);
 	
+	String getSkuPropertyStrForBundle(Sku sku);
+	
+	BundleCommand findBundleCommandByBundleItemId(Long bundleItemId);
 }
