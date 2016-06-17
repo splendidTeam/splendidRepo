@@ -5,6 +5,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><spring:message code="shop.add.shopmanager"/></title>
 <%@include file="/pages/product/item/add-item-common.jsp"%>
+<link rel="stylesheet" type="text/css" href="${base}/scripts/sortable/css/sortable-theme-bootstrap.css"/>
+<script type="text/javascript" src="${base}/scripts/sortable/js/sortable.js"></script>
 <script type="text/javascript" src="${base}/scripts/product/item/add-item-bundle.js"></script>
 </head>
 <body>

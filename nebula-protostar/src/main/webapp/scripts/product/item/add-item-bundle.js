@@ -22,7 +22,8 @@ $j.extend(loxia.regional['zh-CN'],{
 	"ITEM_TYPE_VIRTUAL" : "虚拟商品",
 	"PRICE-IS-NULL" : "现销售价不能为空",
 	"CHECK-MEMBER-SKU" : "每个商品必须有一个sku被选中",
-	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空"
+	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空",
+	"REFRESH-TABLE" : "请点击‘刷新’更新表格数据"
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
@@ -33,6 +34,7 @@ var selectStoreyType = '';
 var mainEelment = null;
 var elements = new Array();
 var bundleElement = null;
+var isRefresh = true;
 
 $j(document).ready(function(){
 	
@@ -72,26 +74,22 @@ $j(document).ready(function(){
 		
 		// 校验主卖品是否存在
 		if($j(".setMainProduct").find(".validate-code").text() == null){
-			alert("1");
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
 		// 校验成员是否存在至少一个
 		if($j(".setMemberProduct").find(".validate-code").text() == null){
-			alert("2");
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
 		
 		// 一口价时    只校验‘商品表’每个价格是否有值
 		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
     	if($j("input[name='priceType']:checked").val() == 2){
-    		alert("4");
     		$j('.fix-price').each(function(){
     			if($j(this).val() == null){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
     			}
     		});
     	}else if($j("input[name='priceType']:checked").val() == 3){
-    		alert("3");
     		var flag = true;
     		$j('.tr-product').each(function(){
     			var _flag = false;
@@ -113,19 +111,23 @@ $j(document).ready(function(){
     		
     		
     		$j('.check-sku:checked').each(function(){
-    			alert("5");
     			if($j(this).parent().next().next().find('.sku-price').val() == null){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECKED-PRICE-IS-NULL"));
     			}
     		});
     	}
+    	//校验是否点击刷新
+    	if(!isRefresh){
+    		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
+    	}
+    	
     	return loxia.SUCCESS;
     });
     formValidateList.push(bundleExtInfoValidator);
     
     
 	//dialog-close  给关闭图标绑定点击事件
-	bindClose(selectStoreyType);
+	bindClose();
 	
 	$j("#addMainProduct").on("click",function(){
 		var hasRepeat = false;
@@ -153,19 +155,29 @@ $j(document).ready(function(){
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
+						$j(".setMemberProduct").append('<li class="main-pro remove"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
 					} else if(_type == "style") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
+						$j(".setMemberProduct").append('<li class="main-pro remove"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
 					}
 				}
-				bindClose(selectStoreyType);
+				bindClose();
 			}else{
 				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT-EXIST"));
 			}
 		}else{
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT"));
 		}
+		isRefresh = false;
+		$j(".setMemberProduct").sortable();
+		$j(".remove").disableSelection();
 	});
+	
+	 $j(".setMemberProduct").sortable({
+		  beforeStop: function( event, ui ) {
+			  isRefresh = false;
+		  }
+	});  
+	
 	
 	//成员商品下的刷新按钮
 	$j('#refresh-table').click(function() {
@@ -176,6 +188,7 @@ $j(document).ready(function(){
 		}else if($j("input[name='priceType']:checked").val() == 3){
 			loadBundleElements(true);
 		}
+		isRefresh = true;
 	});
 	/*==================================     弹出层    ==========================*/
 	
@@ -208,12 +221,14 @@ $j(document).ready(function(){
 /*
  *给关闭图标绑定点击事件 
  */
-function bindClose(selectStoreyType){
-	if(selectStoreyType =1){
-		$j(".setMainProduct .dialog-close").bind("click",function(){
-			$j("#selectPro").show();
-		})
-	}
+function bindClose(){
+	$j(".setMainProduct .dialog-close").bind("click",function(){
+		$j("#selectPro").show();
+		isRefresh = false;
+	})
+	$j(".setMemberProduct .dialog-close").bind("click",function(){
+		isRefresh = false;
+	})
 	
 	//关闭图标
 	$j(".dialog-close").bind("click",function(){
