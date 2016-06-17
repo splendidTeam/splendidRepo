@@ -1255,6 +1255,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
 			item.setCreateTime(new Date());
 			item.setShopId(itemCommand.getShopId());
+			item.setIndustryId(Long.parseLong(itemCommand.getIndustryId()));
 			if(Item.ITEM_TYPE_SIMPLE.equals(item.getType())) {
 				item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
 			}
@@ -1275,6 +1276,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		if (categoriesIds != null && categoriesIds.length > 0) {
 //			Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
 
+//			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
+			
 //			int index = 0;
 //			for (Long id : categoriesIds) {
 //				if (!defaultId.equals(id)) {
@@ -1283,11 +1286,9 @@ public class ItemLangManagerImpl implements ItemLangManager {
 //				}
 //			}
 			
-			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
-			
 			// 绑定附加分类
 			itemCategoryManager.createOrUpdateItemCategory(itemCommand,
-					item.getId(), categoryIdArray);
+					item.getId(), categoriesIds);
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,
 					item.getId(), defaultCategoryId);
