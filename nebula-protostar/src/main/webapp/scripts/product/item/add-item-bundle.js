@@ -38,9 +38,16 @@ var isRefresh = true;
 
 $j(document).ready(function(){
 	
+	refreshItemData([]);
+	
 	/*==================================     bundle扩展信息    ==========================*/
 	/*==================================     弹出层    ==========================*/
 	//点击'设置主卖品'弹出对应弹层
+	$j("#selectPro").hover(function(){
+		$j(this).attr("style","text-decoration: underline");
+	},function(){
+		$j(this).attr("style","");
+	});
 	$j("#selectPro").on("click",function(){
 		//返回的是主卖品
 		selectStoreyType = 1;
@@ -49,6 +56,11 @@ $j(document).ready(function(){
 	});	
 	
 	//点击'+新成员'弹出对应弹层
+	$j("#selectStyle").hover(function(){
+		$j(this).attr("style","text-decoration: underline");
+	},function(){
+		$j(this).attr("style","");
+	});
 	$j("#selectStyle").on("click",function(){
 		//返回的是成员商品
 		selectStoreyType = 2;
@@ -63,9 +75,9 @@ $j(document).ready(function(){
 	$j("#search_button").click(function() {
 		var _type = $j(':input[name="selectType"]:checked').val();
 		if(_type == "product") {
-			refreshItemData();
+			refreshItemData(findItemInfoListJsonUrl);
 		} else if(_type == "style") {
-			refreshStyleData();
+			refreshStyleData(findStyleInfoListJsonUrl);
 		}
 	});
 	
@@ -76,6 +88,7 @@ $j(document).ready(function(){
 		if($j(".setMainProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
+		
 		// 校验成员是否存在至少一个
 		if($j(".setMemberProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
@@ -116,6 +129,7 @@ $j(document).ready(function(){
     			}
     		});
     	}
+    	
     	//校验是否点击刷新
     	if(!isRefresh){
     		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
@@ -148,7 +162,7 @@ $j(document).ready(function(){
 				if(selectStoreyType == 1){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
-						$j("#selectPro").hide();refreshItemData();
+						$j("#selectPro").hide();
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
 						$j("#selectPro").hide();
@@ -180,6 +194,11 @@ $j(document).ready(function(){
 	
 	
 	//成员商品下的刷新按钮
+	 $j("#refresh-table").hover(function(){
+			$j(this).attr("style","text-decoration: underline");
+		},function(){
+			$j(this).attr("style","");
+		});
 	$j('#refresh-table').click(function() {
 		if($j("input[name='priceType']:checked").val() == 1){
 			loadBundleElements(false, true);
@@ -188,7 +207,6 @@ $j(document).ready(function(){
 		}else if($j("input[name='priceType']:checked").val() == 3){
 			loadBundleElements(true);
 		}
-		isRefresh = true;
 	});
 	/*==================================     弹出层    ==========================*/
 	
@@ -211,6 +229,15 @@ $j(document).ready(function(){
 			$j('.product-table').hide();
 			$j('.product-table > tbody').html('');
 			loadBundleElements(true);
+		}
+	});
+	
+	$j("input[name='selectType']").bind('change', function(){
+		var currVal = $j(this).val();
+		if(currVal == 'product') {
+			refreshItemData([]);
+		} else {
+			refreshStyleData([]);
 		}
 	});
 	/*==================================     价格设置    ==========================*/
@@ -238,7 +265,7 @@ function bindClose(){
 
 
 //刷新商品表格数据
-function refreshItemData(){
+function refreshItemData(dataUrl){
 	$j("#selectProList_product").loxiasimpletable({
 		page : true,
 		size : 5,
@@ -281,7 +308,7 @@ function refreshItemData(){
 			width : "15%",
 			type : "threeState"
 		}],
-		dataurl : findItemInfoListJsonUrl
+		dataurl : dataUrl
 	});
 	
 	// 商品状态
@@ -304,7 +331,7 @@ function refreshItemData(){
 }
 
 //刷新款号表格数据
-function refreshStyleData(){
+function refreshStyleData(dataUrl){
 	$j("#selectProList_product").loxiasimpletable({
 		page : true,
 		size : 5,
@@ -325,7 +352,7 @@ function refreshStyleData(){
 			width : "25%",
 			template : "itemCodeTemplate"
 		}],
-		dataurl : findStyleInfoListJsonUrl
+		dataurl : dataUrl
 	});
 	
 	$j("#selectProList_product").loxiasimpletable("refresh");
@@ -390,11 +417,11 @@ function formatCategoryNames(data, args, idx) {
 function itemTypeTemplate(data, args, idx) {
 	var _type = loxia.getObject("itemType", data);
 	switch(_type) {
-		case 1 : return "普通商品";
-		case 3 : return "捆绑商品"; 
-		case 5 : return "搭配商品"; 
-		case 7 : return "虚拟商品";
-		default: return "未知";
+		case 1 : return nps.i18n("ITEM_TYPE_SIMPLE");
+		case 3 : return nps.i18n("ITEM_TYPE_BUNDLE"); 
+		case 5 : return nps.i18n("ITEM_TYPE_GROUP"); 
+		case 7 : return nps.i18n("ITEM_TYPE_VIRTUAL");
+		default: return nps.i18n("ITEM_TYPE_UNKNOWN");
 	} 
 }
 
@@ -410,10 +437,12 @@ Array.prototype.remove = function(val) {
  */
 function fillProductTable(data){
 	var _html = '';
+	var number = 0;
 	$j(data).each(function(idx, element){
+		number++;
 		if(element.styleCode) { // 同款商品
 			var bundleItems = $j(element.bundleItemViewCommands);
-			_html += '<tr>';
+			_html += '<tr class="'+(number%2==0?"odd":"even")+'">';
 			_html += '<td rowspan="' + bundleItems.length + '">' + (idx + 1) + '</td>';
 			$j(bundleItems).each(function(i, item){
 				_html += '<td>' + item.itemCode + '</td>';
@@ -428,7 +457,7 @@ function fillProductTable(data){
 			});
 			_html += '</tr>';
 		} else { // 单一商品
-			_html += '<tr>';
+			_html += '<tr class="'+(number%2==0?"odd":"even")+'">';
 			_html += '<td>' + (idx + 1) + '</td>';
 			_html += '<td>' + element.itemCode + '</td>';
 			_html += '<td>' + element.bundleItemViewCommands[0].salesPrice + '</td>';
@@ -437,6 +466,7 @@ function fillProductTable(data){
 		}
 	}); 
 	$j('.product-table > tbody').html(_html);
+	isRefresh = true;
 }
 
 /**
@@ -457,6 +487,7 @@ function loadBundleElements(editable, showDefaultValue){
 		
 		var _html = '';
 		var _a = new Array();
+		var num = 0;
 		$j(data).each(function(idx, element){
 			_html += '<tr class="tr-product" data-product="' + idx + '">';
 			_html += '<td rowspan="##' + idx + '##">' + (idx + 1) + '</td>'
@@ -476,7 +507,7 @@ function loadBundleElements(editable, showDefaultValue){
 				var bundleSkus = item.bundleSkuViewCommands;
 				$j(bundleSkus).each(function(n, sku){
 					rowspan ++;
-					_html += '<tr class="tr-sku" data-sku="' + idx + '">';
+					_html += '<tr class="tr-sku odd" data-sku="' + idx + '">';
 					_html += '<td>' + sku.property + '</td>';
 					_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" checked=checked /></td>';
 					_html += '<td>' + sku.originalSalesPrice + '</td>';
@@ -494,6 +525,7 @@ function loadBundleElements(editable, showDefaultValue){
 		
 		$j('.sku-table > tbody').html(_html);
 	}
+	isRefresh = true;
 }
 
 function fillForm(){

@@ -20,7 +20,11 @@ $j.extend(loxia.regional['zh-CN'],{
 	"ITEM_TYPE_BUNDLE" : "捆绑商品",
 	"ITEM_TYPE_GROUP" : "组商品",
 	"ITEM_TYPE_VIRTUAL" : "虚拟商品",
-	"ITEM_TYPE_UNKNOWN" : "未知类型"
+	"ITEM_TYPE_UNKNOWN" : "未知类型",
+	"PRICE-IS-NULL" : "现销售价不能为空",
+	"CHECK-MEMBER-SKU" : "每个商品必须有一个sku被选中",
+	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空",
+	"REFRESH-TABLE" : "请点击‘刷新’更新表格数据"
 });
 
 var findItemInfoListJsonUrl = base + "/item/itemList.json";
@@ -28,29 +32,38 @@ var findStyleInfoListJsonUrl = base + "/item/styleList.json";
 //设置返回的是主卖品还是成员商品
 var selectStoreyType = '';
 
-var mainElement = null;
-var elements = new Array();
+var isRefresh = true;
 
 $j(document).ready(function(){
+	
+	refreshItemData([]);
 	
 	/*==================================     bundle扩展信息    ==========================*/
 	/*==================================     弹出层    ==========================*/
 	//点击'设置主卖品'弹出对应弹层
+	$j("#selectPro").hover(function(){
+		$j(this).attr("style","text-decoration: underline");
+	},function(){
+		$j(this).attr("style","");
+	});
 	$j("#selectPro").on("click",function(){
 		//返回的是主卖品
 		selectStoreyType = 1;
 		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
 		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
-		refreshItemData([]);
 	});	
 	
 	//点击'+新成员'弹出对应弹层
+	$j("#selectStyle").hover(function(){
+		$j(this).attr("style","text-decoration: underline");
+	},function(){
+		$j(this).attr("style","");
+	});
 	$j("#selectStyle").on("click",function(){
 		//返回的是成员商品
 		selectStoreyType = 2;
 		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
 		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_ELEMENT"));
-		refreshItemData([]);
 	});	
 	
 	loxia.init({debug: true, region: 'zh-CN'});
@@ -69,19 +82,54 @@ $j(document).ready(function(){
 	// 添加bundle扩展信息表单验证方法
 	var bundleExtInfoValidator = new FormValidator('', 30, function(){
 		
-		// TODO 校验主卖品是否存在
+		// 校验主卖品是否存在
 		if($j(".setMainProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
-		// TODO 校验成员是否存在至少一个
+		// 校验成员是否存在至少一个
 		if($j(".setMemberProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
-		// TODO 校验成员是否重复（包括主卖品）
 		
-		// TODO 校验某个成员里面是否有至少一个sku参与
-		
-		// TODO 按三种价格模型分别校验价格设置
+		// 一口价时    只校验‘商品表’每个价格是否有值
+		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
+    	if($j("input[name='priceType']:checked").val() == 2){
+    		$j('.fix-price').each(function(){
+    			if($j(this).val() == null){
+    				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
+    			}
+    		});
+    	}else if($j("input[name='priceType']:checked").val() == 3){
+    		var flag = true;
+    		$j('.tr-product').each(function(){
+    			var _flag = false;
+    			var _data = $j(this).attr("data-product")
+    			$j('.tr-sku').each(function(){
+    				if($j(this).attr("data-sku") == _data && $j(this).find('.check-sku').is(':checked')){
+    					_flag = true;
+    				}	
+    			});
+    			
+    			if(!_flag){
+    				flag = false;
+    			}
+    		});
+    		
+    		if(!flag){
+    			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECK-MEMBER-SKU"));
+    		}
+    		
+    		
+    		$j('.check-sku:checked').each(function(){
+    			if($j(this).parent().next().next().find('.sku-price').val() == null){
+    				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECKED-PRICE-IS-NULL"));
+    			}
+    		});
+    	}
+    	//校验是否点击刷新
+    	if(!isRefresh){
+    		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
+    	}
     	
     	return loxia.SUCCESS;
     });
@@ -111,54 +159,51 @@ $j(document).ready(function(){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();
-//						refreshItemData(findItemInfoListJsonUrl);
-						mainElement = {
-								isMainElement : true,
-								sort : 1,
-								styleCode : '',
-								itemCode : element.parent().next().text()
-							};
 					} else if(_type == "style") {
-						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
 						$j("#selectPro").hide();
-						mainElement = {
-								isMainElement : true,
-								sort : 1,
-								styleCode : element.parent().next().text(),
-								itemCode : ''
-							};
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
-						var bundleElement = {
-								isMainElement : false,
-								sort : $j(".setMemberProduct li").length,
-								styleCode : '',
-								itemCode : element.parent().next().text()
-							};
-						elements.push(bundleElement);
+						$j(".setMemberProduct").append('<li class="main-pro remove"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
 					} else if(_type == "style") {
-						$j("#selectStyle").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p></li>');
-						var bundleElement = {
-								isMainElement : false,
-								sort : $j(".setMemberProduct li").length,
-								styleCode : element.parent().next().text(),
-								itemCode : ''
-							};
-						elements.push(bundleElement);
+						$j(".setMemberProduct").append('<li class="main-pro remove"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
 					}
 				}
-				bindClose(selectStoreyType);
+				bindClose();
 			}else{
 				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT-EXIST"));
 			}
 		}else{
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT"));
 		}
+		isRefresh = false;
+		$j(".setMemberProduct").sortable();
+		$j(".remove").disableSelection();
 	});
 	
+	 $j(".setMemberProduct").sortable({
+		  beforeStop: function( event, ui ) {
+			  isRefresh = false;
+		  }
+	});  
 	
+	//成员商品下的刷新按钮
+	 $j("#refresh-table").hover(function(){
+			$j(this).attr("style","text-decoration: underline");
+		},function(){
+			$j(this).attr("style","");
+		});
+	$j('#refresh-table').click(function() {
+		if($j("input[name='priceType']:checked").val() == 1){
+			loadBundleElements(false, true);
+		}else if($j("input[name='priceType']:checked").val() == 2){
+			loadBundleElements(false, false);
+		}else if($j("input[name='priceType']:checked").val() == 3){
+			loadBundleElements(true);
+		}
+		isRefresh = true;
+	});
 	/*==================================     弹出层    ==========================*/
 	
 	
@@ -200,11 +245,13 @@ $j(document).ready(function(){
  *给关闭图标绑定点击事件 
  */
 function bindClose(selectStoreyType){
-	if(selectStoreyType == 1){
-		$j(".setMainProduct .dialog-close").bind("click",function(){
-			$j("#selectPro").show();
-		})
-	}
+	$j(".setMainProduct .dialog-close").bind("click",function(){
+		$j("#selectPro").show();
+		isRefresh = false;
+	})
+	$j(".setMemberProduct .dialog-close").bind("click",function(){
+		isRefresh = false;
+	})
 	
 	//关闭图标
 	$j(".dialog-close").bind("click",function(){
@@ -385,16 +432,18 @@ Array.prototype.remove = function(val) {
  */
 function fillProductTable(data){
 	var _html = '';
+	var number = 0;
 	$j(data).each(function(idx, element){
+		number++;
 		if(element.styleCode) { // 同款商品
 			var bundleItems = $j(element.bundleItemViewCommands);
-			_html += '<tr>';
+			_html += '<tr class="'+(number%2==0?"odd":"even")+'">';
 			_html += '<td rowspan="' + bundleItems.length + '">' + (idx + 1) + '</td>';
 			$j(bundleItems).each(function(i, item){
 				_html += '<td>' + item.itemCode + '</td>';
 				_html += '<td>' + item.salesPrice + '</td>';
 				if(i == 0) {
-					_html += '<td rowspan="' + bundleItems.length + '"><input type="text" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + item.salesPrice + '" /></td>';
+					_html += '<td rowspan="' + bundleItems.length + '"><input type="text" class="fix-price" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + item.salesPrice + '" /></td>';
 				}
 				_html += '</tr>';
 				if(i < bundleItems.length - 1) {
@@ -403,11 +452,11 @@ function fillProductTable(data){
 			});
 			_html += '</tr>';
 		} else { // 单一商品
-			_html += '<tr>';
+			_html += '<tr class="'+(number%2==0?"odd":"even")+'">';
 			_html += '<td>' + (idx + 1) + '</td>';
 			_html += '<td>' + element.itemCode + '</td>';
 			_html += '<td>' + element.bundleItemViewCommands[0].salesPrice + '</td>';
-			_html += '<td><input type="text" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + element.bundleItemViewCommands[0].salesPrice + '" /></td>';
+			_html += '<td><input type="text" class="fix-price" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + element.bundleItemViewCommands[0].salesPrice + '" /></td>';
 			_html += '</tr>';
 		}
 	}); 
@@ -418,10 +467,11 @@ function fillProductTable(data){
  * 装填“定制”表格数据
  */
 function loadBundleElements(editable, showDefaultValue){
+	getElements();
 	if(fillForm()) {
 		var f = loxia._getForm("bundle_element_form");
 		loxia.lockPage();
-		data = nps.syncXhr("/item/loadBundleElements.json", f);
+		var data = nps.syncXhr("/item/loadBundleElements.json", f);
 		loxia.unlockPage();
 		
 		// 如果是一口价，装填“一口价”表格数据
@@ -431,8 +481,9 @@ function loadBundleElements(editable, showDefaultValue){
 		
 		var _html = '';
 		var _a = new Array();
+		var num = 0;
 		$j(data).each(function(idx, element){
-			_html += '<tr>';
+			_html += '<tr class="tr-product" data-product="' + idx + '">';
 			_html += '<td rowspan="##' + idx + '##">' + (idx + 1) + '</td>'
 				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].isMainElement" value="' + element.isMainElement + '" />'
 				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].sort" value="' + element.sort + '" />'
@@ -450,11 +501,11 @@ function loadBundleElements(editable, showDefaultValue){
 				var bundleSkus = item.bundleSkuViewCommands;
 				$j(bundleSkus).each(function(n, sku){
 					rowspan ++;
-					_html += '<tr>';
+					_html += '<tr class="tr-sku odd" data-sku="' + idx + '">';
 					_html += '<td>' + sku.property + '</td>';
-					_html += '<td><input type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" checked=checked /></td>';
+					_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" checked=checked /></td>';
 					_html += '<td>' + sku.originalSalesPrice + '</td>';
-					_html += '<td><input type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.originalSalesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
+					_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.originalSalesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
 						+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].skuId" value="' + sku.skuId + '" /></td>';
 					_html += '</tr>';
 				});
@@ -503,3 +554,76 @@ function fillForm(){
 	return true;
 }
 
+
+//获取主商品和成员商品的对象
+function getElements(){
+	
+	mainElement = null;
+	elements = new Array();
+    bundleElement = null;
+	
+	//主商品
+	var mainProductCode = $j(".setMainProduct").find(".validate-code");
+	if(mainProductCode.text() != null){
+		if(mainProductCode.attr("data-type") == "product"){
+			mainElement = {
+					isMainElement : true,
+					sort : 1,
+					styleCode : '',
+					itemCode : mainProductCode.text()
+				};
+		}else if(mainProductCode.attr("data-type") == "style"){
+			mainElement = {
+					isMainElement : true,
+					sort : 1,
+					styleCode : mainProductCode.text(),
+					itemCode : ''
+				};
+		}
+	}
+	
+	//成员商品
+	var memberProductCode = null;
+	var _sort = 1;
+	$j(".setMemberProduct").find(".validate-code").each(function(){
+		if($j(this).text() != null){
+			_sort++;
+			if($j(this).attr("data-type") == "product"){
+				bundleElement = {
+						isMainElement : false,
+						sort : _sort,
+						styleCode : '',
+						itemCode : $j(this).text()
+					};
+				elements.push(bundleElement);
+			}else if($j(this).attr("data-type") == "style"){
+				bundleElement = {
+						isMainElement : false,
+						sort : _sort,
+						styleCode : $j(this).text(),
+						itemCode : ''
+					};
+				elements.push(bundleElement);
+			}
+		}
+	});
+}
+
+var itemcolorrefcheckURL="/itemColor/itemcolorcheck.json";
+var saveitemcolorrefURL="/itemColor/savecolorvalue.htm";
+
+function saveitemcolorref(){
+	var selestrefre=selestref();
+    var json = {
+           'itemcolor' : selestrefre,
+           'code': $j("#code").val()  
+     };
+	// 提交表單
+	$j.ajax({
+		url:saveitemcolorrefURL, 
+		data:json,
+		type: "post",
+		success:function(data) { 
+		}
+	});
+}

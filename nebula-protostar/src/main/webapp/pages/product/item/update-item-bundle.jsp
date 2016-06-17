@@ -5,11 +5,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><spring:message code="shop.add.shopmanager"/></title>
 <%@include file="/pages/product/item/update-item-common.jsp"%>
+<link rel="stylesheet" type="text/css" href="${base}/scripts/sortable/css/sortable-theme-bootstrap.css"/>
+<script type="text/javascript" src="${base}/scripts/sortable/js/sortable.js"></script>
 <script type="text/javascript" src="${base}/scripts/product/item/update-item-bundle.js"></script>
 <script type="text/javascript">
 var categoryDisplayMode = "${categoryDisplayMode}";
-elements.push(${elementsStr});
-mainElement = ${mainElementStr};
+var elements = ${elementsStr};
+var mainElement = ${mainElementStr};
 $j(document).ready(function(){
 	$j("input[name='priceType']").trigger("change");
 });
@@ -22,6 +24,9 @@ $j(document).ready(function(){
     <input type="hidden" id="industryId" name="itemCommand.industryId"  value="${industry.id }"/>
     <input type="hidden" id="jsonSku" name="itemCommand.jsonSku"  value=""/>
     <input type="hidden" loxiaType="input" name="baseImageUrl" id="baseImageUrl" value="${baseImageUrl}" />
+    <input type="hidden" name="id" value="${bundleViewCommand.id }" />
+    <input type="hidden" name="itemId" value="${bundleViewCommand.itemId }" />
+    <input type="hidden" name="createTime" value="${bundleViewCommand.createTime }" />
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="item.update.manage"/></div>
 		<div class="ui-block">
 			<div id="second">
