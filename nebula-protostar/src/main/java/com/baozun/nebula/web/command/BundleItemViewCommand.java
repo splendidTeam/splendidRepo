@@ -39,13 +39,17 @@ import java.util.List;
  * @author yue.ch
  * @time 2016年6月13日 上午11:33:06
  */
-public class BundleItemViewCommand implements Serializable {
+public class BundleItemViewCommand implements Serializable,Comparable<BundleItemViewCommand> {
 
 	private static final long serialVersionUID = 3701579978086490700L;
 	
 	private Long itemId;
 	
 	private String itemCode;
+	
+	private String title;
+	
+	private String picUrl;
 	
 	private BigDecimal salesPrice;
 	
@@ -81,6 +85,27 @@ public class BundleItemViewCommand implements Serializable {
 
 	public void setBundleSkuViewCommands(List<BundleSkuViewCommand> bundleSkuViewCommands) {
 		this.bundleSkuViewCommands = bundleSkuViewCommands;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getPicUrl() {
+		return picUrl;
+	}
+
+	public void setPicUrl(String picUrl) {
+		this.picUrl = picUrl;
+	}
+
+	@Override
+	public int compareTo(BundleItemViewCommand o) {
+		return getItemId().intValue() - o.getItemId().intValue();
 	}
 
 }

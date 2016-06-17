@@ -18,6 +18,22 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	<bean id="BundleSku.findByBundleElementId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>分页查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			*
+		       		from 
+		       			t_pd_bundle_sku  
+		       		where 
+		       		    bundle_element_id = :bundleElementId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 
 	<bean id="BundleSku.save" class="loxia.dao.support.DynamicQueryHolder">
 		<description>保存bundleElement</description>

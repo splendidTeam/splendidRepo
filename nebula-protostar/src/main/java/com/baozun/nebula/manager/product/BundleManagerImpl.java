@@ -35,8 +35,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -167,7 +169,7 @@ public class BundleManagerImpl implements BundleManager {
 					bsc.setBundleId(id);
 					bsc.setItemId(bc.getItemId());
 					// 如果成员是款
-					if(bec.isStyle()) {
+					if(bec.getIsStyle()) {
 						if(bec.getStyle() == null) {
 							throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_STYLE_LOST);
 						} else {
@@ -231,13 +233,7 @@ public class BundleManagerImpl implements BundleManager {
 					BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
 					bsvc.setSkuId(sku.getId());
 					bsvc.setOriginalSalesPrice(sku.getSalePrice());
-					
-					List<SkuProperty> skuProperties = sdkSkuManager.getSkuPros(sku.getProperties());
-					StringBuilder sb = new StringBuilder();
-					for(SkuProperty property : skuProperties) {
-						sb.append(property.getValue()).append("-");
-					}
-					bsvc.setProperty(sb.toString().replaceAll("-$", ""));
+					bsvc.setProperty(getSkuPropertyStrForBundle(sku));
 					
 					bundleSkuViewCommands.add(bsvc);
 				}
@@ -246,6 +242,106 @@ public class BundleManagerImpl implements BundleManager {
 		}
 		
 		return result;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.BundleManager#findBundleCommandByBundleItemId(java.lang.Long)
+	 */
+	@Override
+	public BundleCommand findBundleCommandByBundleItemId(Long bundleItemId) {
+		BundleCommand result = bundleDao.findBundleByBundleItemId(bundleItemId, null);
+		if(result != null) {
+			List<BundleElement> bundleElements = bundleElementDao.findByBundleId(result.getId());
+			List<BundleElementCommand> becs = new ArrayList<BundleElementCommand>();
+			for(BundleElement be : bundleElements) {
+				BundleElementCommand bec = new BundleElementCommand();
+				bec.setBundleId(be.getBundleId());
+				bec.setId(be.getId());
+				bec.setIsMainElement(be.getIsMainElement());
+				bec.setSalesPrice(be.getSalesPrice());
+				bec.setSortNo(be.getSortNo());
+				List<BundleItemCommand> bundleItems = new ArrayList<BundleItemCommand>();
+				List<BundleSku> bundleSkus = bundleSkuDao.findByBundleElementId(bec.getId());
+				String style = bundleSkus.get(0).getStyle();
+				if(StringUtils.isNoneBlank(style)) { // bundleElement为同款商品
+					bec.setIsStyle(true);
+					bec.setStyle(style);
+					
+					List<BundleSkuCommand> bscs = new ArrayList<BundleSkuCommand>();
+					Map<Long, BundleItemCommand> bicMap = new HashMap<Long, BundleItemCommand>();
+					for(BundleSku sku : bundleSkus) {
+						Long itemId = sku.getItemId();
+						ItemCommand itemCommand = itemDao.findItemCommandById(itemId);
+						
+						BundleItemCommand bic = bicMap.get(itemId);
+						if(bic == null) {
+							bic = new BundleItemCommand();
+							bic.setItemCode(itemCommand.getCode());
+							bic.setItemId(itemId);
+							bic.setBundleSkus(new ArrayList<BundleSkuCommand>());
+							bicMap.put(itemId, bic);
+						}
+						
+						BundleSkuCommand bsc = new BundleSkuCommand();
+						bsc.setBundleElementId(sku.getBundleElementId());
+						bsc.setBundleId(bsc.getBundleId());
+						bsc.setId(sku.getId());
+						bsc.setItemId(sku.getItemId());
+						bsc.setSalesPrice(bsc.getSalesPrice());
+						bsc.setSkuId(sku.getSkuId());
+						bscs.add(bsc);
+						bic.getBundleSkus().addAll(bscs);
+					}
+					
+					bundleItems.addAll(bicMap.values());
+				} else { // bundleElement为单个商品
+					BundleItemCommand bic = new BundleItemCommand();
+					Long itemId = bundleSkus.get(0).getItemId();
+					ItemCommand itemCommand = itemDao.findItemCommandById(itemId);
+					bic.setItemCode(itemCommand.getCode());
+					bic.setItemId(itemId);
+					List<BundleSkuCommand> bscs = new ArrayList<BundleSkuCommand>();
+					for(BundleSku sku : bundleSkus) {
+						BundleSkuCommand bsc = new BundleSkuCommand();
+						bsc.setBundleElementId(sku.getBundleElementId());
+						bsc.setBundleId(bsc.getBundleId());
+						bsc.setId(sku.getId());
+						bsc.setItemId(sku.getItemId());
+						bsc.setSalesPrice(bsc.getSalesPrice());
+						bsc.setSkuId(sku.getSkuId());
+						bscs.add(bsc);
+					}
+					bic.setBundleSkus(bscs);
+					
+					bundleItems.add(bic);
+				}
+				
+				bec.setItems(bundleItems);
+				
+				becs.add(bec);
+			}
+			
+			result.setBundleElementCommands(becs);
+		}
+		
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.baozun.nebula.manager.product.BundleManager#
+	 * getSkuPropertyStrForBundle(com.baozun.nebula.model.product.Sku)
+	 */
+	@Override
+	public String getSkuPropertyStrForBundle(Sku sku) {
+		// 拼接sku属性字符串
+		List<SkuProperty> skuProperties = sdkSkuManager.getSkuPros(sku.getProperties());
+		StringBuilder sb = new StringBuilder();
+		for (SkuProperty property : skuProperties) {
+			sb.append(property.getValue()).append("-");
+		}
+		return sb.toString().replaceAll("-$", "");
 	}
 
 }
