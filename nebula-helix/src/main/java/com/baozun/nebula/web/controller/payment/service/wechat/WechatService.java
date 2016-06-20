@@ -5,7 +5,7 @@ import com.baozun.nebula.web.controller.payment.service.wechat.command.AuthAcces
 
 public interface WechatService {
 	
-	String genWechatAuthCodeUrl(String callbackUrl, String scope, String state);
+	String genWechatAuthCodeUrl(String queryString, String scope, String state);
 	
 	AuthAccessTokenCommand getAuthAccessToken(String code);
 	
@@ -13,7 +13,7 @@ public interface WechatService {
 	
 	String getJsapiTicket();
 	
-	String genGetOpenidUrlFromNbp(String callbackUrl);
+	String genGetOpenidUrlFromNbp(String queryString);
 	
 	String getJsaipTicketFromNbp();
 }

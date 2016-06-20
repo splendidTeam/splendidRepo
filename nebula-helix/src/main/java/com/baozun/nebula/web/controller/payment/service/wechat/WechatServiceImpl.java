@@ -78,6 +78,10 @@ public class WechatServiceImpl implements WechatService {
 	@Value("#{wechat['wechat.ticket.get.url']}")
 	private String					ticketUrl;
 	
+	/** ##获取授权code的回跳url */
+	@Value("#{wechat['wechat.oAuth.redirect.uri']}")
+	private String					authRedirectUri;
+	
 	/** ## NBP提供的appid */
 	@Value("#{wechat['wechat.nbp.appId']}")
 	private String					nbpAppId;
@@ -99,10 +103,10 @@ public class WechatServiceImpl implements WechatService {
 	private String					nbpJsapiTicketUrl;
 	
 	@Override
-	public String genWechatAuthCodeUrl(String callbackUrl, String scope, String state) {
+	public String genWechatAuthCodeUrl(String queryString, String scope, String state) {
 		Map<String,String> connectionParam=new LinkedHashMap<String, String>();
 		connectionParam.put("appid", appId);
-		connectionParam.put("redirect_uri", URIUtil.encode(callbackUrl, "UTF-8"));
+		connectionParam.put("redirect_uri", URIUtil.encode(authRedirectUri + queryString, "UTF-8"));
 		connectionParam.put("response_type", "code");
 		connectionParam.put("scope", scope);
 		if(Validator.isNotNullOrEmpty(state)) {
@@ -174,14 +178,14 @@ public class WechatServiceImpl implements WechatService {
 	}
 	
 	@Override
-	public String genGetOpenidUrlFromNbp(String callbackUrl) {
+	public String genGetOpenidUrlFromNbp(String queryString) {
 		Map<String,String> connectionParam=new LinkedHashMap<String, String>();
 		connectionParam.put("appid", nbpAppId);
-		connectionParam.put("redirect_uri", URIUtil.encode(callbackUrl, "UTF-8"));
+		connectionParam.put("redirect_uri", URIUtil.encode(nbpOpenidRedirectUrl + queryString, "UTF-8"));
 		connectionParam.put("sign", Md5Encrypt.md5(ParamUtil.toNaturalOrderingQueryString(connectionParam) + "&key=" + nbpKey).toUpperCase());
 		
 		String getOpenidUrl = ParamUtil.addParameterSingleValueMap(nbpOpenidUrl, connectionParam, null);
-		LOGGER.info("[BUILD_GETOPENIDURL_FROMNBP] url:[{}], callbackUrl:[{}]", getOpenidUrl, callbackUrl);
+		LOGGER.info("[BUILD_GETOPENIDURL_FROMNBP] url:[{}], queryString:[{}]", getOpenidUrl, queryString);
 		
 		return getOpenidUrl;
 	}
