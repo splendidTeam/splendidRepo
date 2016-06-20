@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -113,7 +114,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         try {
 
             //根据不同的支付方式准备url
-            return buildPayUrl(subOrdinate, memberDetails, getExtraData(), request, response, model);
+            return buildPayUrl(subOrdinate, memberDetails, request, response, model);
 
         } catch (IllegalPaymentStateException e){
 
@@ -123,30 +124,6 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
             return "redirect:" + getToPayExceptionPageRedirect() + "?subOrdinate=" + subOrdinate;
         }
 
-    }
-
-    /**
-     * <pre>
-     *  设置支付所需要的额外参数，设置初始化参数 如果有需要需要重写该方法
-     * 
-     *  1： 当设置支付宝扫码支付模式qrPayMode为0或1或3（扫码支付方式为订单码-简约前置模式或订单码-前置模式或订单码-迷你前置模式）的情况下，
-     *  同步通知地址return_url需要传入商户中间跳转页面，即该页面需要实现让父页面自行跳转的功能，
-     *  中间页面javascript代码：<script>window.parent.location.href='父页面调整的URL';</script>
-     *   
-     *  2：目前仅仅需要用到上面这个参数……
-     * 
-     * </pre>
-     * 
-     * @return
-     */
-    protected Map<String, Object> getExtraData(){
-
-        Map<String, Object> extra = new HashMap<String, Object>();
-
-        //默认即时到账，非扫码
-        extra.put("qrPayMode", null);
-
-        return extra;
     }
 
     /**
@@ -315,7 +292,6 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     protected String buildPayUrl(
                     String subOrdinate,
                     MemberDetails memberDetails,
-                    Map<String, Object> extra,
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model) throws IllegalPaymentStateException{
@@ -342,7 +318,33 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         validateSalesOrder(salesOrder, memberDetails);
         
         PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-        return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
+        Map<String, Object> extraPayParams = getExtraPayParams(salesOrder, payInfoLog, memberDetails, getDevice(request), request);
+        return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extraPayParams, request, response, model);
+    }
+    
+    /**
+     * <pre>
+     *  设置支付所需要的额外参数，设置初始化参数 如果有需要需要重写该方法
+     * 
+     *  1： 当设置支付宝扫码支付模式qrPayMode为0或1或3（扫码支付方式为订单码-简约前置模式或订单码-前置模式或订单码-迷你前置模式）的情况下，
+     *  同步通知地址return_url需要传入商户中间跳转页面，即该页面需要实现让父页面自行跳转的功能，
+     *  中间页面javascript代码：<script>window.parent.location.href='父页面调整的URL';</script>
+     *   
+     *  2：目前仅仅需要用到上面这个参数……
+     * 
+     * </pre>
+     * 
+     * @return
+     */
+    protected Map<String, Object> getExtraPayParams(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
+			MemberDetails memberDetails, Device device, HttpServletRequest request) {
+
+        Map<String, Object> extra = new HashMap<String, Object>();
+
+        //默认即时到账，非扫码
+        extra.put("qrPayMode", null);
+
+        return extra;
     }
 
     protected String getToPayExceptionPageRedirect(){
