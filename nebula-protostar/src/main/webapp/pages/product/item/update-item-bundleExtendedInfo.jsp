@@ -23,6 +23,7 @@
 						</c:otherwise>
 					</c:choose>
 				</li>
+				<li class="main-pro pro-empty" id="selectPro" style="display:none">设置主卖品</li>
 			</ul>
 		</div>
 	</div>
@@ -53,7 +54,7 @@
 				</div>
 				<li class="main-pro pro-empty" id="selectStyle">+新成员</li>
 			</ul>
-			<a class="user-refresh"></a>
+			<a class="user-refresh" id="refresh-table">刷新</a>
 		</div>
 	</div>
 	<div class="ui-block">

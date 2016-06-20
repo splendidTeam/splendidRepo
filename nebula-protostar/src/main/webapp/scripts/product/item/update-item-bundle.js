@@ -139,7 +139,7 @@ $j(document).ready(function(){
     
     
 	//dialog-close  给关闭图标绑定点击事件
-	bindClose(selectStoreyType);
+	bindClose();
 	
 	$j("#addMainProduct").on("click",function(){
 		var hasRepeat = false;
@@ -159,7 +159,7 @@ $j(document).ready(function(){
 				var _type = $j(':input[name="selectType"]:checked').val();
 				if(selectStoreyType == 1){
 					if(_type == "product") {
-						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
@@ -246,7 +246,7 @@ $j(document).ready(function(){
 /*
  *给关闭图标绑定点击事件 
  */
-function bindClose(selectStoreyType){
+function bindClose(){
 	$j(".setMainProduct .dialog-close").bind("click",function(){
 		$j("#selectPro").show();
 		isRefresh = false;
