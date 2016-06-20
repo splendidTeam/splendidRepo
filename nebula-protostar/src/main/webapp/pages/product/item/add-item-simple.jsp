@@ -12,7 +12,7 @@
 <div class="content-box width-percent100">
     
    <form id="itemForm" name="itemForm" action="/i18n/item/saveSimpleItem.json" method="post">
-    <input type="hidden" id="industryId" name="itemCommand.industryId"  value="${industryId }"/>
+    <input type="hidden" id="industryId" name="itemCommand.industryId"  value="${industry.id }"/>
     <input type="hidden" id="jsonSku" name="itemCommand.jsonSku"  value=""/>
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="item.add.manage"/></div>
 		<div class="ui-block">
@@ -22,7 +22,7 @@
 			            <table>
 			                <tr>
 			                    <td><label><spring:message code="item.add.selectIndustry"/></label></td>
-			                    <td><span id="chooseIndustry">${industryName }</span></td>
+			                    <td><span id="chooseIndustry">${industry.name }</span></td>
 			                    
 			                </tr>
 			            </table>

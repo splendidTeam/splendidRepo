@@ -112,7 +112,7 @@ public class BundleElementCommand extends BundleElement{
 		this.maxSalesPrice = maxSalesPrice;
 	}
 	
-	public boolean isStyle() {
+	public boolean getIsStyle() {
 		return isStyle;
 	}
 

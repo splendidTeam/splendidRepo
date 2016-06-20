@@ -83,7 +83,9 @@ $j(document).ready(function(){
 		nps.submitForm('itemForm',{mode: 'async', 
 			successHandler : function(data){
 			if(data.isSuccess == true) {
-				saveitemcolorref();
+				if(saveitemcolorref){
+					saveitemcolorref();
+				}
 				nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("UPDATEITEM_SUCCESS"));
 				window.location.href=window.location.href;
 				return;

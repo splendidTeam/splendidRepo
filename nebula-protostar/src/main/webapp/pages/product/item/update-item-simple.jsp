@@ -13,9 +13,8 @@
 <div class="content-box width-percent100">
     
    <form name="itemForm" action="/i18n/item/saveSimpleItem.json" method="post">
-    <input type="hidden" id="industryId" name="itemCommand.industryId"  value=""/>
+    <input type="hidden" id="industryId" name="itemCommand.industryId"  value="${industry.id }"/>
     <input type="hidden" id="jsonSku" name="itemCommand.jsonSku"  value=""/>
-    <input type="hidden" name="itemCommand.id" id="itemid" value="${id }"/>
     <input type="hidden" id="propertyIdArray" value="${propertyIdArray }"/>
     <input type="hidden" id="propertyNameArray" value="${propertyNameArray }"/>
     <input type="hidden" id="mustCheckArray" value="${mustCheckArray }"/>

@@ -38,7 +38,7 @@ import java.math.BigDecimal;
  * @author yue.ch
  * @time 2016年6月13日 上午11:34:09
  */
-public class BundleSkuViewCommand implements Serializable {
+public class BundleSkuViewCommand implements Serializable,Comparable<BundleSkuViewCommand> {
 
 	private static final long serialVersionUID = -5611494630803303719L;
 	
@@ -90,6 +90,11 @@ public class BundleSkuViewCommand implements Serializable {
 
 	public void setProperty(String property) {
 		this.property = property;
+	}
+
+	@Override
+	public int compareTo(BundleSkuViewCommand o) {
+		return getSkuId().intValue() - o.getSkuId().intValue();
 	}
 
 }
