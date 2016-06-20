@@ -197,13 +197,7 @@ $j(document).ready(function(){
 			$j(this).attr("style","");
 		});
 	$j('#refresh-table').click(function() {
-		if($j("input[name='priceType']:checked").val() == 1){
-			loadBundleElements(false, true);
-		}else if($j("input[name='priceType']:checked").val() == 2){
-			loadBundleElements(false, false);
-		}else if($j("input[name='priceType']:checked").val() == 3){
-			loadBundleElements(true);
-		}
+		initBundleElement($j("input[name='priceType']:checked").val())
 		isRefresh = true;
 	});
 	/*==================================     弹出层    ==========================*/
