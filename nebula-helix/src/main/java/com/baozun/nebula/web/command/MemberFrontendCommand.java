@@ -95,6 +95,16 @@ public class MemberFrontendCommand {
 	 * 姓名
 	 */
 	private String							nickname;
+	
+	/**
+	 * 手机
+	 */
+	private  String                      mobile;
+	
+	/**
+	 * 邮箱
+	 */
+	private String                       email;
 
 	// /**
 	// * 登录次数
@@ -292,10 +302,29 @@ public class MemberFrontendCommand {
 	// public void setLoginIp(String loginIp) {
 	// this.loginIp = loginIp;
 	// }
+	
+	public String getMobile() {
+		return mobile;
+	}
 
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	
+	
 	public MemberPersonalDataCommand getMemberPersonalDataCommand() {
 		return memberPersonalDataCommand;
 	}
+
 
 	public void setMemberPersonalDataCommand(MemberPersonalDataCommand memberPersonalDataCommand) {
 		this.memberPersonalDataCommand = memberPersonalDataCommand;
@@ -337,7 +366,7 @@ public class MemberFrontendCommand {
 	@Override
 	public String toString() {
 		return "MemberFrontendCommand [id=" + id + ", loginName=" + loginName + ", loginEmail=" + loginEmail
-				+ ", loginMobile=" + loginMobile + ", password=" + password + ", thirdPartyIdentify="
+				+ ", loginMobile=" + loginMobile + ",mobile=" + mobile + ",email=" + email + ", password=" + password + ", thirdPartyIdentify="
 				+ thirdPartyIdentify + ", source=" + source + ", type=" + type /*+ ", isaddgroup=" + isaddgroup*/
 				+ ", sex=" + sex + ", birthday=" + birthday + ", repassword=" + repassword + ", lifecycle=" + lifecycle
 				+ ", realName=" + realName + ", receiveMail=" + receiveMail+ ", nickname=" + nickname + ", newPassword=" + newPassword
