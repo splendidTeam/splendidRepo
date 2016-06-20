@@ -931,7 +931,9 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	 */
 	@Override
 	public Member rewriteRegister(Member member){
-		encrypt(member);
+		// pwd处理为密文
+		String encodePassword = EncryptUtil.getInstance().hash(member.getPassword(), member.getLoginName());
+		member.setPassword(encodePassword);
 		member = memberDao.save(member);
 		return member;
 	}
