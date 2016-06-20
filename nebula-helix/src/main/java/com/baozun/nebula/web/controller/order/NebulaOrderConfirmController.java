@@ -191,24 +191,6 @@ public class NebulaOrderConfirmController extends BaseController{
                     HttpServletResponse response,
                     Model model){
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
-        // 解密
-        if (Validator.isNotNullOrEmpty(contactCommandList)){
-            for (ContactCommand contactCommand : contactCommandList){
-                sdkSecretManager.decrypt(contactCommand, new String[] {
-                                                                        "name",
-                                                                        "country",
-                                                                        "province",
-                                                                        "city",
-                                                                        "area",
-                                                                        "town",
-                                                                        "address",
-                                                                        "postcode",
-                                                                        "telphone",
-                                                                        "mobile",
-                                                                        "email" });
-            }
-        }
-
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
         // 封装viewCommand
