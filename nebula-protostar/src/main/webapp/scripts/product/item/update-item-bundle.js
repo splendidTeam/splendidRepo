@@ -93,6 +93,10 @@ $j(document).ready(function(){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
 		
+		//校验是否点击刷新
+    	if(!isRefresh){
+    		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
+    	}
 		// 一口价时    只校验‘商品表’每个价格是否有值
 		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
     	if($j("input[name='priceType']:checked").val() == 2){
@@ -127,10 +131,6 @@ $j(document).ready(function(){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECKED-PRICE-IS-NULL"));
     			}
     		});
-    	}
-    	//校验是否点击刷新
-    	if(!isRefresh){
-    		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
     	}
     	
     	return loxia.SUCCESS;
@@ -197,8 +197,13 @@ $j(document).ready(function(){
 			$j(this).attr("style","");
 		});
 	$j('#refresh-table').click(function() {
-		initBundleElement($j("input[name='priceType']:checked").val())
-		isRefresh = true;
+		if($j("input[name='priceType']:checked").val() == 1){
+			loadBundleElements(false, true);
+		}else if($j("input[name='priceType']:checked").val() == 2){
+			loadBundleElements(false, false);
+		}else if($j("input[name='priceType']:checked").val() == 3){
+			loadBundleElements(true);
+		}
 	});
 	/*==================================     弹出层    ==========================*/
 	
