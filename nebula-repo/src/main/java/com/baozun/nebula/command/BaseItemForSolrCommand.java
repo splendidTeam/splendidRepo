@@ -147,6 +147,20 @@ public class BaseItemForSolrCommand implements Command {
 	 * @return
 	 */
 	private String style;
+	
+	/**
+	 * 商品类型
+	 * @see com.baozun.nebula.model.product.Item#type
+	 */
+	private Long type;
+
+	public Long getType() {
+		return type;
+	}
+
+	public void setType(Long type) {
+		this.type = type;
+	}
 
 	public Long getId() {
 		return id;

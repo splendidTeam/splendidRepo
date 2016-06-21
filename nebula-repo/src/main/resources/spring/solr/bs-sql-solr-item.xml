@@ -12,7 +12,7 @@
 		       		select 
 					it.id,code,title,sub_title as subTitle, sketch,itf.description,it.lifecycle,it.create_time as createTime,it.delist_time,
 					itf.list_price,itf.sale_price,it.modify_time as modifyTime,it.list_time as listTime,
-					it.template_id,
+					it.template_id,it.type,
 					itf.active_begin_time as activeBeginTime,
 					isaddcategory,isAddTag,ind.id as industryId,ind.name as industryName,ind.sort_no as industry_sortNo,shopInfo.id as shopId,shopInfo.name as shopName,
 					seodescription as seoDescription,seokeywords as seoKeywords,seotitle as seoTitle,style
@@ -36,7 +36,7 @@
 		       		select 
 					it.id,code,title,sub_title as subTitle, sketch,itf.description,it.lifecycle,it.create_time  as createTime,it.delist_time,
 					itf.list_price,itf.sale_price,it.modify_time as modifyTime,it.list_time as listTime,
-					it.template_id,
+					it.template_id,it.type,
 					itf.active_begin_time as activeBeginTime,
 					isaddcategory,isAddTag,ind.id as industryId,ind.name as industryName,ind.sort_no as industry_sortNo,shopInfo.id as shopId,shopInfo.name as shopName,
 					seodescription as seoDescription,seokeywords as seoKeywords,seotitle as seoTitle,style
