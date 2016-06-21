@@ -39,7 +39,7 @@ import com.baozun.nebula.sdk.manager.SdkSysAuditLogHistoryManager;
 @Transactional
 public class AuditLogArchiveManagerImpl implements AuditLogArchiveManager{
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SolrRefreshManager.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogArchiveManagerImpl.class);
 	
 	@Autowired
 	private SdkSysAuditLogHistoryManager sdkSysAuditLogHistoryManager;

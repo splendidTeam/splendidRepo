@@ -95,52 +95,69 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		select * from T_SYS_AUDITLOG where 
-		       		
+		       		select 
+		       			id as id,
+		       			uri as uri,
+		       			parameters as parameters,
+		       			method as method,
+		       			ip as ip,
+		       			response_code as responseCode,
+		       			exception as exception,
+		       			operater_id as operaterId,
+		       			create_time as createTime
+		       		from 
+		       			T_SYS_AUDITLOG log 
+		       		where 
 		       			1=1	
 		       		
-					
-		       			
 		       				#if($uri)
-		       					and URI=:uri
+		       					and URI like :uri
 		       				#end
 
 		       			
 		       				#if($parameters)
-		       					and PARAMETERS=:parameters
+		       					and PARAMETERS like :parameters
 		       				#end
 
 		       			
 		       				#if($method)
-		       					and METHOD=:method
+		       					and METHOD = :method
 		       				#end
 
 		       			
 		       				#if($ip)
-		       					and IP=:ip
+		       					and IP like :ip
 		       				#end
 
 		       			
 		       				#if($responseCode)
-		       					and RESPONSE_CODE=:responseCode
+		       					and RESPONSE_CODE like :responseCode
 		       				#end
 
 		       			
-		       				#if($exception)
-		       					and EXCEPTION=:exception
+		       				#if($exception && $exception == 'empty')
+		       					and (EXCEPTION is null or EXCEPTION ='')
+		       				#end
+		       				
+		       				#if($exception && $exception == 'nonempty')
+		       					and EXCEPTION is not null and EXCEPTION !=''
 		       				#end
 
 		       			
-		       				#if($operaterId)
-		       					and OPERATER_ID=:operaterId
-		       				#end
+		       				#if($operatorName)
+	       						and operater_id is not null
+	       						and operater_id in(
+	       							select id
+	       							from t_au_user
+	       							where user_name like :operatorName
+	       					)
+	       					#end
 
-		       			
-		       				#if($createTime)
-		       					and CREATE_TIME >= :createTimeStart
+		       				#if($createStartDate)
+		       					and CREATE_TIME >= :createStartDate
 		       				#end
-		       				#if($createTime)
-		       					and CREATE_TIME <= :createTimeEnd
+		       				#if($createEndDate)
+		       					and CREATE_TIME <= :createEndDate
 		       				#end
 		       				
                  ]]>
@@ -157,7 +174,7 @@
 		       		delete from  T_SYS_AUDITLOG
 		       		where 1 = 1
 			       		#if($createTimeStart)
-	       					and CREATE_TIME >= :createTimeStart
+	       					and CREATE_TIME <= :createTimeStart
 	       				#end
                  ]]>
 			</value>
