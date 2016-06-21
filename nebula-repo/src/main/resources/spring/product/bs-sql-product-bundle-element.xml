@@ -19,6 +19,22 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="BundleElement.findByBundleId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据bundleId查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select 
+		       			*
+		       		from 
+		       			t_pd_bundle_element  
+		       		where 
+		       		    bundle_id = :bundleId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 	<bean id="BundleElement.deleteByBundleId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据bundleId删除bundleElement</description>
 		<constructor-arg>

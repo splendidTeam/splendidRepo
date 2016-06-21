@@ -102,4 +102,18 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
+	<build>
+		<finalName>nebula-wormhole</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<!--注意增加这两行，在打包时相关的类会被独立打成jar -->
+					<attachClasses>true</attachClasses>
+					<classesClassifier>api</classesClassifier>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

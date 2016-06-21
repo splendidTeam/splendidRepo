@@ -6429,4 +6429,12 @@ public class ItemManagerImpl implements ItemManager{
 		
 		return pagination;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.ItemManager#findItemCommandsByStyle(java.lang.String)
+	 */
+	@Override
+	public List<ItemCommand> findItemCommandsByStyle(String styleCode) {
+		return itemDao.findItemCommandByStyle(styleCode);
+	}
 }

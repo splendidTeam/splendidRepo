@@ -25,7 +25,7 @@
 		<maven-compiler-plugin.encoding>${project.build.sourceEncoding}</maven-compiler-plugin.encoding>
 		<!-- **********************end maven-compiler-plugin config******************************************* -->
 
-		<version.feilong-platform>1.7.0</version.feilong-platform>
+		<version.feilong-platform>1.7.1</version.feilong-platform>
 
 		<!--*********************begin plugins version************************************ -->
 		<v.maven-clean-plugin>2.6.1</v.maven-clean-plugin>
@@ -1080,7 +1080,6 @@
 						<exclude>**/*.min.js</exclude>
 						<exclude>**/*-min.js</exclude>
 					</excludes>
-					<skip>${yuicompressor.skip}</skip>
 				</configuration>
 			</plugin>
 
@@ -1409,7 +1408,7 @@
 			</activation>
 			<properties>
 				<profile>dev</profile>
-				<yuicompressor.skip>true</yuicompressor.skip>
+				<yuicompressor.skip>false</yuicompressor.skip>
 			</properties>
 		</profile>
 	</profiles>

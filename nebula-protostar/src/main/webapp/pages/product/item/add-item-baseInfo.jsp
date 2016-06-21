@@ -101,8 +101,6 @@ var categoryzNodes  = [
 		<div id="chooseDefaultCategory" class="chooseLine">
 			<c:if test="${ !empty defaultItemCategory }">
 				<div class="${defaultItemCategory.categoryId }">${defaultItemCategory.categoryName }
-					<input type='hidden' name='defaultCategoryId'
-						value="${defaultItemCategory.categoryId }" /> 
 						<a class="choose-tips" href="javascript:void(0);" id="${defaultItemCategory.categoryId }" onclick='delDefaultCategroy(this.id)'><spring:message
 							code="item.update.deleteThis" /></a>
 						<br />
@@ -127,7 +125,7 @@ var categoryzNodes  = [
 	<div class="ui-block-line ">
 		<label></label>
 		<div id="chooseDefaultCategoryHid">
-			<input type='hidden' name='defCategroyId' id='defCategroyId' value="" />
+			<input type='hidden' id="defaultCategoryId" name='defaultCategoryId' value="${defaultItemCategory.categoryId }" /> 
 		</div>
 	</div>
 	<div class="mt10"></div>

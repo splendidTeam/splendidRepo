@@ -2,6 +2,7 @@ package com.baozun.nebula.solr.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,8 @@ import com.baozun.nebula.command.ItemResultCommand;
 import com.baozun.nebula.command.ItemSolrCommand;
 import com.baozun.nebula.command.ItemSolrI18nCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
+import com.baozun.nebula.dao.product.ItemDao;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.handler.ItemForSolrCommandHandler;
 import com.baozun.nebula.sdk.manager.SdkItemVisibilityManager;
@@ -64,6 +67,9 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 
 	@Autowired(required = false)
 	private ItemForSolrCommandHandler customizeItemForSolrHandler;
+	
+	@Autowired
+	private ItemDao itemDao;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -165,6 +171,17 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 
 	@Override
 	public Boolean saveOrUpdateItem(List<Long> itemIds) {
+		// 目前仅普通商品需要刷新solr
+		// changed by yue.ch in 2016-6-20
+		Iterator<Long> iterator = itemIds.iterator();
+		while (iterator.hasNext()) {
+			Long itemId = iterator.next();
+			Item item = itemDao.findItemById(itemId);
+			if (item == null || !Item.ITEM_TYPE_SIMPLE.equals(item.getType())) {
+				iterator.remove();
+			}
+		}
+				
 		List<ItemSolrCommand> itemCommandList = itemInfoManager
 				.findItemCommandByItemId(itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
@@ -202,6 +219,17 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 	* @throws
 	 */
 	public Boolean saveOrUpdateItemI18n(List<Long> itemIds) {
+		// 目前仅普通商品需要刷新solr 
+		// changed by yue.ch in 2016-6-20
+		Iterator<Long> iterator = itemIds.iterator();
+		while(iterator.hasNext()) {
+			Long itemId = iterator.next();
+			Item item = itemDao.findItemById(itemId);
+			if(item == null || !Item.ITEM_TYPE_SIMPLE.equals(item.getType())) {
+				iterator.remove();
+			}
+		}
+		
 		//修改成把所有国际化语言查询出来
 		List<ItemSolrI18nCommand> itemCommandList = itemInfoManager.findItemCommandByItemIdI18n(itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
@@ -230,8 +258,8 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 	}
 	@Override
 	public Boolean reRefreshAllItem() {
-		List<ItemSolrCommand> itemCommandList = itemInfoManager
-				.findItemCommand();
+		// TODO 非普通商品不刷新solr
+		List<ItemSolrCommand> itemCommandList = itemInfoManager.findItemCommand();
 		if (null == itemCommandList || itemCommandList.size() < 1) {
 			return false;
 		}

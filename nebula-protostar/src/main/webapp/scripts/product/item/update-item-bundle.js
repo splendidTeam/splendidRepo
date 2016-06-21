@@ -18,8 +18,9 @@ $j.extend(loxia.regional['zh-CN'],{
 	"MEMBER-PRODUCT-NOT-EXIST":"成员商品未设置",
 	"ITEM_TYPE_SIMPLE" : "普通商品",
 	"ITEM_TYPE_BUNDLE" : "捆绑商品",
-	"ITEM_TYPE_GROUP" : "搭配商品",
+	"ITEM_TYPE_GROUP" : "组商品",
 	"ITEM_TYPE_VIRTUAL" : "虚拟商品",
+	"ITEM_TYPE_UNKNOWN" : "未知类型",
 	"PRICE-IS-NULL" : "现销售价不能为空",
 	"CHECK-MEMBER-SKU" : "每个商品必须有一个sku被选中",
 	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空",
@@ -31,9 +32,8 @@ var findStyleInfoListJsonUrl = base + "/item/styleList.json";
 //设置返回的是主卖品还是成员商品
 var selectStoreyType = '';
 
-var mainElement = null;
 var elements = new Array();
-var bundleElement = null;
+var mainElement = null;
 var isRefresh = true;
 
 $j(document).ready(function(){
@@ -88,7 +88,6 @@ $j(document).ready(function(){
 		if($j(".setMainProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
-		
 		// 校验成员是否存在至少一个
 		if($j(".setMemberProduct").find(".validate-code").text() == null){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
@@ -98,7 +97,6 @@ $j(document).ready(function(){
     	if(!isRefresh){
     		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
     	}
-		
 		// 一口价时    只校验‘商品表’每个价格是否有值
 		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
     	if($j("input[name='priceType']:checked").val() == 2){
@@ -161,7 +159,7 @@ $j(document).ready(function(){
 				var _type = $j(':input[name="selectType"]:checked').val();
 				if(selectStoreyType == 1){
 					if(_type == "product") {
-						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().text()+'</p><p class="sub-title">'+element.parent().next().next().text()+'</p></li>');
+						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
 						$j("#selectPro").hide();
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
@@ -191,7 +189,6 @@ $j(document).ready(function(){
 			  isRefresh = false;
 		  }
 	});  
-	
 	
 	//成员商品下的刷新按钮
 	 $j("#refresh-table").hover(function(){
@@ -262,7 +259,6 @@ function bindClose(){
 		$j(this).closest("li.main-pro").remove();
 	})
 }
-
 
 //刷新商品表格数据
 function refreshItemData(dataUrl){
@@ -535,8 +531,8 @@ function fillForm(){
 	var _e = new Array();
 	
 	// 校验主卖品
-	if(mainElement) {
-		_e.push(mainElement)
+	if(mainElement ) {
+		_e.push(mainElement )
 	} else {
 		nps.info(nps.i18n('MAIN-PRODUCT-NOT-EXIST'));
 		return false;
@@ -560,6 +556,7 @@ function fillForm(){
 	
 	return true;
 }
+
 
 //获取主商品和成员商品的对象
 function getElements(){
@@ -613,5 +610,13 @@ function getElements(){
 			}
 		}
 	});
+}
+
+function initBundleElement(priceType){
+	switch(priceType) {
+	case 1 : loadBundleElements(false, true);break;
+	case 2 : loadBundleElements(false, false);break;
+	case 3 : loadBundleElements(true);break;
+	}
 }
 

@@ -389,7 +389,7 @@ public class MemberManagerImpl implements MemberManager{
         MemberPersonalData personData = new MemberPersonalData();
         personData = (MemberPersonalData) ConvertUtils.convertTwoObject(personData, memberCommand.getMemberPersonalDataCommand());
         if (null == personData){
-            personData = new MemberPersonalData();
+            personData = new MemberPersonalData();   
         }
         personData.setId(memberId);
 
@@ -402,6 +402,16 @@ public class MemberManagerImpl implements MemberManager{
                 }
             }
         }
+        
+        if (StringUtils.isNotBlank(memberCommand.getMobile())){
+            personData.setMobile(memberCommand.getMobile());
+        }
+        
+        if (StringUtils.isNotBlank(memberCommand.getEmail())){
+            personData.setEmail(memberCommand.getEmail());
+        }
+        
+        
         // loginMobile不为null,则写入persondata
         if (StringUtils.isNotBlank(memberCommand.getLoginMobile())){
             personData.setMobile(memberCommand.getLoginMobile());

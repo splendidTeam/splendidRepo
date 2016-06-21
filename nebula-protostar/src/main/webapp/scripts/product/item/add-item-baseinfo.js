@@ -31,7 +31,7 @@ function onCheck1(e, treeId, treeNode) {
 			.getCheckedNodes(true), v = "", categoryHtml = "";
 	var defaultHtml = $j("#chooseCategory").html();
 	$j("#chooseCategory").html("");
-	var defCategroyId = $j("#defCategroyId").val();
+	var defCategroyId = $j("#defaultCategoryId").val();
 
 	var innerDefHtml = "";
 
@@ -97,15 +97,15 @@ function delCategroy(id){
 		}
 	}
 	
-	if(id==$j("#defCategroyId").val()){
-		$j("#defCategroyId").val('');
+	if(id==$j("#defaultCategoryId").val()){
+		$j("#defaultCategoryId").val('');
 	}
 	zTree.refresh();
 }
 
 //设为默认分类
 function setCategroyDef(id){
-	$j("#defCategroyId").val(id);
+	$j("#defaultCategoryId").val(id);
 	var zTree = $j.fn.zTree.getZTreeObj("treeDemo"),
 	nodes = zTree.getCheckedNodes(true);
 	var nodeObj=null;
@@ -208,7 +208,7 @@ $j(document).ready(function(){
     	//如果选了分类，则必须设置默认分类
     	var cateLen =$j("input[name='categoriesIds']").length;
     	if(cateLen > 0){
-    		var defCategroyId =$j("#defCategroyId").val();
+    		var defCategroyId =$j("#defaultCategoryId").val();
     		if(defCategroyId == null || defCategroyId == ''){
     			return nps.i18n("PLEASE_SET_DEF_CATEGORY");
     		}

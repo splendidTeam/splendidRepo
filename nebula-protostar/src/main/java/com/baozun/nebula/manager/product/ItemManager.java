@@ -302,6 +302,13 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	public ItemCommand findItemCommandByCode(String code, String customBaseUrl);
+	
+	/**
+	 * 根据款号查找同款商品
+	 * @param styleCode
+	 * @return
+	 */
+	public List<ItemCommand> findItemCommandsByStyle(String styleCode);
 
 	/**
 	 * 

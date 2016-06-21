@@ -5,17 +5,31 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title><spring:message code="shop.add.shopmanager"/></title>
 <%@include file="/pages/product/item/add-item-common.jsp"%>
+<link rel="stylesheet" type="text/css" href="${base}/scripts/sortable/css/sortable-theme-bootstrap.css"/>
+<script type="text/javascript" src="${base}/scripts/sortable/js/sortable.js"></script>
 <script type="text/javascript" src="${base}/scripts/product/item/add-item-bundle.js"></script>
 </head>
 <body>
 
 <div class="content-box width-percent100">
    <form id="itemForm" name="itemForm" action="/i18n/item/saveBundleItem.json" method="post">
+    <input type="hidden" id="industryId" name="itemCommand.industryId"  value="${industry.id }"/>
     <input type="hidden" id="jsonSku" name="itemCommand.jsonSku"  value=""/>
     <input type="hidden" loxiaType="input" name="baseImageUrl" id="baseImageUrl" value="${baseImageUrl}" />
 	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="item.add.manage"/></div>
 		<div class="ui-block">
 			<div id="second">
+				<div class="ui-block">
+			        <div class="ui-block-content ui-block-content-lb ui-subtitle">
+			            <table>
+			                <tr>
+			                    <td><label><spring:message code="item.update.selectedIndustry"/></label></td>
+			                    <td><span id="chooseIndustry">${industry.name }</span></td>
+			                    
+			                </tr>
+			            </table>
+			        </div>
+			    </div>
 				<div class="ui-block ">
 					 <div class="ui-block-title1"><spring:message code="item.add.addItem"/></div>
 				     <%-- 基本信息 --%>
