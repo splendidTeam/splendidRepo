@@ -167,7 +167,7 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     		@RequestParam(value = "openid") String openid, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	request.getSession().setAttribute(SessionKeyConstants.MEMBER_WECHAT_OPENID, openid);
-    	return "redirect:" + URL_TOPAY + subOrdinate;
+    	return "redirect:" + URL_TOPAY + "?subOrdinate=" + subOrdinate;
     }
     
     /**

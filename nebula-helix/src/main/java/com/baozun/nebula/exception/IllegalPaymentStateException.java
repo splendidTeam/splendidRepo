@@ -68,6 +68,9 @@ public class IllegalPaymentStateException extends Exception {
 		/** 交易流水对应多个未支付订单（暂不支持合并付款） */
 		PAYMENT_ILLEGAL_SUBORDINATE_MULTI_ORDERS,
 		
+		/** 交易流水不存在 */
+		PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS,
+		
 		/** 订单不存在 */
 		PAYMENT_ILLEGAL_ORDER_NOT_EXISTS,
 		

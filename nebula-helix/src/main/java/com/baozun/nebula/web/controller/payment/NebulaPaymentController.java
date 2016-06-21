@@ -34,6 +34,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.model.payment.PayCode;
@@ -199,28 +200,37 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
         PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
-        if (Validator.isNotNullOrEmpty(pc)){
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            paraMap.put("subOrdinate", subOrdinate);
-            // 查询订单的需要支付的payInfolog
-            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-            Set<Long> set = new HashSet<Long>();
-            StringBuffer orderCode = new StringBuffer();
-            for (PayInfoLog payInfoLog : payInfoLogs){
-                set.add(payInfoLog.getOrderId());
-            }
-
-            for (Long oid : set){
-                SalesOrderCommand so = orderManager.findOrderById(oid, null);
-                orderCode.append(so.getCode()).append("、");
-            }
-
-            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
-
-            model.addAttribute("totalFee", pc.getPayMoney());
+        if(Validator.isNullOrEmpty(pc)){
+        	throw new BusinessException("Show pay success error.");
         }
-        return VIEW_PAY_SUCCESS;
+        
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("subOrdinate", subOrdinate);
+        // 查询订单的需要支付的payInfolog
+        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+        Set<Long> set = new HashSet<Long>();
+        for (PayInfoLog payInfoLog : payInfoLogs){
+            set.add(payInfoLog.getOrderId());
+        }
+
+        List<SalesOrderCommand> orders = new ArrayList<SalesOrderCommand>();
+        
+        for (Long oid : set){
+            SalesOrderCommand so = orderManager.findOrderById(oid, null);
+            orders.add(so);
+        }
+
+        model.addAttribute("orders", orders);
+
+        model.addAttribute("totalFee", pc.getPayMoney());
+        
+        if(pc.getPaySuccessStatus()){
+        	 return VIEW_PAY_SUCCESS;
+        }else{
+             return VIEW_PAY_FAILURE;
+        }
+        
     }
 
     /**
@@ -241,30 +251,39 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-    	PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
+        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
-        if (Validator.isNotNullOrEmpty(pc)){
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            paraMap.put("subOrdinate", subOrdinate);
-            // 查询订单的需要支付的payInfolog
-            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-            Set<Long> set = new HashSet<Long>();
-            StringBuffer orderCode = new StringBuffer();
-            for (PayInfoLog payInfoLog : payInfoLogs){
-                set.add(payInfoLog.getOrderId());
-            }
-
-            for (Long oid : set){
-                SalesOrderCommand so = orderManager.findOrderById(oid, null);
-                orderCode.append(so.getCode()).append("、");
-            }
-
-            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
-
-            model.addAttribute("totalFee", pc.getPayMoney());
+        if(Validator.isNullOrEmpty(pc)){
+        	throw new BusinessException("Show pay failure error.");
         }
-        return VIEW_PAY_FAILURE;
+        
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("subOrdinate", subOrdinate);
+        // 查询订单的需要支付的payInfolog
+        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+        Set<Long> set = new HashSet<Long>();
+        for (PayInfoLog payInfoLog : payInfoLogs){
+            set.add(payInfoLog.getOrderId());
+        }
+
+        List<SalesOrderCommand> orders = new ArrayList<SalesOrderCommand>();
+        
+        for (Long oid : set){
+            SalesOrderCommand so = orderManager.findOrderById(oid, null);
+            orders.add(so);
+        }
+
+        model.addAttribute("orders", orders);
+
+        model.addAttribute("totalFee", pc.getPayMoney());
+        
+        if(pc.getPaySuccessStatus()){
+        	 return VIEW_PAY_SUCCESS;
+        }else{
+             return VIEW_PAY_FAILURE;
+        }
+        
     }
 
     /**
