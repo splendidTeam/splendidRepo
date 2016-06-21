@@ -66,11 +66,6 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     /** 微信支付的openid和jsapiticket的来源: 默认从微信获取 */
     protected static final Integer WECAT_PAYSOURCEMODE_DEFAULT = WECAT_PAYSOURCEMODE_WECHAT;
     
-    //url的常量定义
-    protected static final String 	URL_GETOPENID_FROMNBP_CALLBACK 		= "/wechat/nbpopenid/callback.htm";
-    
-    protected static final String 	URL_GETOPENID_FROMWECHAT_CALLBACK 	= "/wechat/auth/callback.htm";
-    
     //model key的常量定义
     /** 扫码支付页支付url */
   	public static final String		MODEL_KEY_JSAPI_PAY_PARAM		= "jsapiPayParam";
@@ -117,7 +112,6 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
      * @param model
      * @return 获取openid的url
      */
-    
   	public String showWechatOpenidPage(
     		@LoginMember MemberDetails memberDetails,
     		@RequestParam(value = "subOrdinate") String subOrdinate, 
@@ -131,16 +125,16 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     
     //从微信中获取openid
     protected String getOpenidFromWechat(String subOrdinate) {
-    	return "redirect:" + wechatService.genWechatAuthCodeUrl(URL_GETOPENID_FROMWECHAT_CALLBACK + "&subOrdinate=" + subOrdinate, "snsapi_base", null);
+    	return "redirect:" + wechatService.genWechatAuthCodeUrl("?subOrdinate=" + subOrdinate, "snsapi_base", null);
     }
     
     //从nbp中获取openid
     protected String getOpenidFromNbp(String subOrdinate) {
-    	return "redirect:" + wechatService.genGetOpenidUrlFromNbp(URL_GETOPENID_FROMNBP_CALLBACK + "&subOrdinate=" + subOrdinate);
+    	return "redirect:" + wechatService.genGetOpenidUrlFromNbp("?subOrdinate=" + subOrdinate);
     }
     
     /**
-     * @RequestMapping(value = URL_GETOPENID_FROMWECHAT_CALLBACK)
+     * @RequestMapping(value = "/wechat/auth/callback.htm")
      * @param code
      * @param subOrdinate
      * @param request
@@ -154,12 +148,12 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	AuthAccessTokenCommand authAccessTokenCommand = wechatService.getAuthAccessToken(code);
     	request.getSession().setAttribute(SessionKeyConstants.MEMBER_WECHAT_OPENID, authAccessTokenCommand.getOpenid());
-    	return "redirect:" + URL_TOPAY + subOrdinate;
+    	return "redirect:" + URL_TOPAY + "?subOrdinate=" + subOrdinate;
     }
     
     /**
      * 
-     * @RequestMapping(value = URL_GETOPENID_FROMNBP_CALLBACK)
+     * @RequestMapping(value = "/wechat/nbpopenid/callback.htm")
      * 
      * @param subOrdinate
      * @param openid
@@ -173,7 +167,7 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     		@RequestParam(value = "openid") String openid, 
 			HttpServletRequest request, HttpServletResponse response, Model model) {
     	request.getSession().setAttribute(SessionKeyConstants.MEMBER_WECHAT_OPENID, openid);
-    	return "redirect:" + URL_TOPAY + subOrdinate;
+    	return "redirect:" + URL_TOPAY + "?subOrdinate=" + subOrdinate;
     }
     
     /**

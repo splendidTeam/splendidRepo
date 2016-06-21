@@ -77,7 +77,6 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 		//0.如果是公众号支付需要准备openid
 		if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request)) 
 				&& request.getSession().getAttribute(SessionKeyConstants.MEMBER_WECHAT_OPENID) == null) {
-			//TODO 应该支持定制
 			return "redirect:/payment/wechat/openid.htm?subOrdinate=" + payInfoLog.getSubOrdinate();
 		}
 	
@@ -90,13 +89,11 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 			//2.1公众号支付, 将预支付id放入session
 			if(WechatResponseKeyConstants.TRADE_TYPE_JSAPI.equals(getWechatPayType(request))) {
 				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_JSAPI_PREPAY_ID, paymentResult.getPaymentStatusInformation().getPrepayId());
-				//TODO 进入公众号支付页面，应该支持定制
 				return "redirect:/payment/wechat/jsapipay.htm?showwxpaytitle=1&subOrdinate=" + payInfoLog.getSubOrdinate();
 			} 
 			//2.2扫码支付，将二维码链接放入session
 			else if(WechatResponseKeyConstants.TRADE_TYPE_NATIVE.equals(getWechatPayType(request))) {
 				request.getSession().setAttribute(SessionKeyConstants.WECHATPAY_NATIVE_CODE_URL, paymentResult.getPaymentStatusInformation().getCodeUrl());
-				//TODO 进入扫码页面，应该支持定制
 				return "redirect:/payment/wechat/codepay.htm?subOrdinate=" + payInfoLog.getSubOrdinate();
 			}
 			

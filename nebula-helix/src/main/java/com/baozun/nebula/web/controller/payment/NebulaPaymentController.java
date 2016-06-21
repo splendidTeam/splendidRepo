@@ -29,10 +29,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
 import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentState;
 import com.baozun.nebula.model.payment.PayCode;
@@ -113,40 +115,16 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         try {
 
             //根据不同的支付方式准备url
-            return buildPayUrl(subOrdinate, memberDetails, getExtraData(), request, response, model);
+            return buildPayUrl(subOrdinate, memberDetails, request, response, model);
 
         } catch (IllegalPaymentStateException e){
 
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("[TO_PAY] " + e.getMessage(), e);
 
             //去往支付异常页面
             return "redirect:" + getToPayExceptionPageRedirect() + "?subOrdinate=" + subOrdinate;
         }
 
-    }
-
-    /**
-     * <pre>
-     *  设置支付所需要的额外参数，设置初始化参数 如果有需要需要重写该方法
-     * 
-     *  1： 当设置支付宝扫码支付模式qrPayMode为0或1或3（扫码支付方式为订单码-简约前置模式或订单码-前置模式或订单码-迷你前置模式）的情况下，
-     *  同步通知地址return_url需要传入商户中间跳转页面，即该页面需要实现让父页面自行跳转的功能，
-     *  中间页面javascript代码：<script>window.parent.location.href='父页面调整的URL';</script>
-     *   
-     *  2：目前仅仅需要用到上面这个参数……
-     * 
-     * </pre>
-     * 
-     * @return
-     */
-    protected Map<String, Object> getExtraData(){
-
-        Map<String, Object> extra = new HashMap<String, Object>();
-
-        //默认即时到账，非扫码
-        extra.put("qrPayMode", null);
-
-        return extra;
     }
 
     /**
@@ -222,28 +200,37 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
         PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
-        if (Validator.isNotNullOrEmpty(pc)){
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            paraMap.put("subOrdinate", subOrdinate);
-            // 查询订单的需要支付的payInfolog
-            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-            Set<Long> set = new HashSet<Long>();
-            StringBuffer orderCode = new StringBuffer();
-            for (PayInfoLog payInfoLog : payInfoLogs){
-                set.add(payInfoLog.getOrderId());
-            }
-
-            for (Long oid : set){
-                SalesOrderCommand so = orderManager.findOrderById(oid, null);
-                orderCode.append(so.getCode()).append("、");
-            }
-
-            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
-
-            model.addAttribute("totalFee", pc.getPayMoney());
+        if(Validator.isNullOrEmpty(pc)){
+        	throw new BusinessException("Show pay success error.");
         }
-        return VIEW_PAY_SUCCESS;
+        
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("subOrdinate", subOrdinate);
+        // 查询订单的需要支付的payInfolog
+        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+        Set<Long> set = new HashSet<Long>();
+        for (PayInfoLog payInfoLog : payInfoLogs){
+            set.add(payInfoLog.getOrderId());
+        }
+
+        List<SalesOrderCommand> orders = new ArrayList<SalesOrderCommand>();
+        
+        for (Long oid : set){
+            SalesOrderCommand so = orderManager.findOrderById(oid, null);
+            orders.add(so);
+        }
+
+        model.addAttribute("orders", orders);
+
+        model.addAttribute("totalFee", pc.getPayMoney());
+        
+        if(pc.getPaySuccessStatus()){
+        	 return VIEW_PAY_SUCCESS;
+        }else{
+             return VIEW_PAY_FAILURE;
+        }
+        
     }
 
     /**
@@ -264,30 +251,39 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){
-    	PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
+        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
 
-        if (Validator.isNotNullOrEmpty(pc)){
-            Map<String, Object> paraMap = new HashMap<String, Object>();
-            paraMap.put("subOrdinate", subOrdinate);
-            // 查询订单的需要支付的payInfolog
-            List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-            Set<Long> set = new HashSet<Long>();
-            StringBuffer orderCode = new StringBuffer();
-            for (PayInfoLog payInfoLog : payInfoLogs){
-                set.add(payInfoLog.getOrderId());
-            }
-
-            for (Long oid : set){
-                SalesOrderCommand so = orderManager.findOrderById(oid, null);
-                orderCode.append(so.getCode()).append("、");
-            }
-
-            model.addAttribute("orderCode", orderCode.substring(0, orderCode.length() - 1));
-
-            model.addAttribute("totalFee", pc.getPayMoney());
+        if(Validator.isNullOrEmpty(pc)){
+        	throw new BusinessException("Show pay failure error.");
         }
-        return VIEW_PAY_FAILURE;
+        
+        Map<String, Object> paraMap = new HashMap<String, Object>();
+        paraMap.put("subOrdinate", subOrdinate);
+        // 查询订单的需要支付的payInfolog
+        List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+        Set<Long> set = new HashSet<Long>();
+        for (PayInfoLog payInfoLog : payInfoLogs){
+            set.add(payInfoLog.getOrderId());
+        }
+
+        List<SalesOrderCommand> orders = new ArrayList<SalesOrderCommand>();
+        
+        for (Long oid : set){
+            SalesOrderCommand so = orderManager.findOrderById(oid, null);
+            orders.add(so);
+        }
+
+        model.addAttribute("orders", orders);
+
+        model.addAttribute("totalFee", pc.getPayMoney());
+        
+        if(pc.getPaySuccessStatus()){
+        	 return VIEW_PAY_SUCCESS;
+        }else{
+             return VIEW_PAY_FAILURE;
+        }
+        
     }
 
     /**
@@ -315,7 +311,6 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     protected String buildPayUrl(
                     String subOrdinate,
                     MemberDetails memberDetails,
-                    Map<String, Object> extra,
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model) throws IllegalPaymentStateException{
@@ -324,7 +319,14 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
         if (Validator.isNullOrEmpty(unpaidPayInfoLogs)){
             //支付信息不存在或已支付
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID);
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID,
+            		"支付信息不存在或已支付, subOrdinate:" + subOrdinate);
+        }
+        
+        if (unpaidPayInfoLogs.size() > 1){
+            //支付信息不存在或已支付
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_MULTI_ORDERS,
+            		"交易流水对应多个未支付订单, subOrdinate:" + subOrdinate);
         }
 
         //如果找到多条，只取第一条
@@ -335,7 +337,33 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         validateSalesOrder(salesOrder, memberDetails);
         
         PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-        return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extra, request, response, model);
+        Map<String, Object> extraPayParams = getExtraPayParams(salesOrder, payInfoLog, memberDetails, getDevice(request), request);
+        return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extraPayParams, request, response, model);
+    }
+    
+    /**
+     * <pre>
+     *  设置支付所需要的额外参数，设置初始化参数 如果有需要需要重写该方法
+     * 
+     *  1： 当设置支付宝扫码支付模式qrPayMode为0或1或3（扫码支付方式为订单码-简约前置模式或订单码-前置模式或订单码-迷你前置模式）的情况下，
+     *  同步通知地址return_url需要传入商户中间跳转页面，即该页面需要实现让父页面自行跳转的功能，
+     *  中间页面javascript代码：<script>window.parent.location.href='父页面调整的URL';</script>
+     *   
+     *  2：目前仅仅需要用到上面这个参数……
+     * 
+     * </pre>
+     * 
+     * @return
+     */
+    protected Map<String, Object> getExtraPayParams(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
+			MemberDetails memberDetails, Device device, HttpServletRequest request) {
+
+        Map<String, Object> extra = new HashMap<String, Object>();
+
+        //默认即时到账，非扫码
+        extra.put("qrPayMode", null);
+
+        return extra;
     }
 
     protected String getToPayExceptionPageRedirect(){
