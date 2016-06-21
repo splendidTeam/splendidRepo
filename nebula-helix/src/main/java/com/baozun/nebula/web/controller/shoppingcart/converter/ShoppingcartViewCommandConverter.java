@@ -144,7 +144,11 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
 				continue;
 			}
 			ShoppingCartLineSubViewCommand viewCommand = new ShoppingCartLineSubViewCommand();
-			viewCommand.setChecked(command.getSettlementState() == 0 ? false : true);
+			if(Validator.isNotNullOrEmpty(command.getSettlementState())) {
+				viewCommand.setChecked(command.getSettlementState() == 0 ? false : true);
+			} else {
+				viewCommand.setChecked(false);
+			}
 			viewCommand.setIsGift(command.isGift());
 			viewCommand.setItemCode(command.getProductCode());
 			viewCommand.setAddTime(command.getCreateTime());
