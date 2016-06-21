@@ -137,7 +137,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
             if (StringUtils.isNotBlank(url)){
                 try{
                     // 记录日志和跳转到支付宝支付页面
-                    payManager.savePayInfos(so, paymentRequest, null);
+                    payManager.savePayInfos(so, paymentRequest, memberDetails.getLoginName());
                     response.sendRedirect(url);
                 }catch (IOException e){
                     e.printStackTrace();
