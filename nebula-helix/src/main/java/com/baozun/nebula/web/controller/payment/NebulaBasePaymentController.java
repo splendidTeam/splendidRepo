@@ -49,7 +49,7 @@ public class NebulaBasePaymentController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBasePaymentController.class);
     
     /** 去支付的url. */
-    protected static final String URL_TOPAY = "/payment/toPay.htm";
+    protected static final String URL_TOPAY = "/pay/toPay.htm";
     
     @Autowired
 	private SdkPaymentManager sdkPaymentManager;

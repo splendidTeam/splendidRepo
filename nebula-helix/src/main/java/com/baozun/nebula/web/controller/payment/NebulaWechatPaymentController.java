@@ -205,6 +205,12 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
         //如果找到多条，只取第一条
         PayInfoLog payInfoLog = unpaidPayInfoLogs.get(0);
         SalesOrderCommand salesOrder = orderManager.findOrderById(payInfoLog.getOrderId(), 1);
+        
+        if (unpaidPayInfoLogs.size() > 1){
+            //支付信息不存在或已支付
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_MULTI_ORDERS,
+            		"交易流水对应多个未支付订单, subOrdinate:" + subOrdinate);
+        }
 
         //校验订单是否存在、取消、已支付
         validateSalesOrder(salesOrder, memberDetails);
@@ -252,6 +258,12 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
         	LOGGER.error("[SHOW_WECHAT_CODEPAY_PAGE] subordinate not exists or paid. subOrdinate:{}", subOrdinate);
             throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS_OR_PAID);
         }
+        
+        if (unpaidPayInfoLogs.size() > 1){
+            //支付信息不存在或已支付
+            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_MULTI_ORDERS,
+            		"交易流水对应多个未支付订单, subOrdinate:" + subOrdinate);
+        }
 
         //如果找到多条，只取第一条
         PayInfoLog payInfoLog = unpaidPayInfoLogs.get(0);
@@ -266,6 +278,10 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     	return VIEW_CODE_PAY;
     }
     
+    protected Integer getWecatPaySourceMode() {
+    	return WECAT_PAYSOURCEMODE_DEFAULT;
+    }
+    
     //获取jsapi ticket
     private String getJsapiTicket() {
     	if(WECAT_PAYSOURCEMODE_NBP.equals(getWecatPaySourceMode())) {
@@ -275,7 +291,4 @@ public class NebulaWechatPaymentController extends NebulaBasePaymentController {
     	return wechatService.getJsapiTicket();
     }
     
-    protected Integer getWecatPaySourceMode() {
-    	return WECAT_PAYSOURCEMODE_DEFAULT;
-    }
 }
