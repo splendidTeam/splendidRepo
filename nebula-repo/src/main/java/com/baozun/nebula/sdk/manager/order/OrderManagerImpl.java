@@ -214,10 +214,10 @@ public class OrderManagerImpl implements OrderManager{
         }
 
         List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
+        boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
+    			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
+    			searchParam.get("sdkQueryType").equals("1");
         for (SalesOrderCommand cmd : salesOrderPage){
-        	boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
-        			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
-        			searchParam.get("sdkQueryType").equals("1");
         	if(isDecrypt){
         		decryptSalesOrderCommand(cmd);
         	}
