@@ -215,6 +215,12 @@ public class OrderManagerImpl implements OrderManager{
 
         List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
         for (SalesOrderCommand cmd : salesOrderPage){
+        	boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
+        			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
+        			searchParam.get("sdkQueryType").equals("1");
+        	if(isDecrypt){
+        		decryptSalesOrderCommand(cmd);
+        	}
             idList.add(cmd.getId());
         }
 
@@ -249,7 +255,13 @@ public class OrderManagerImpl implements OrderManager{
         List<SalesOrderCommand> salesOrderCommandList = salesOrderPage.getItems();
         if (null != salesOrderCommandList){
             List<Long> idList = new ArrayList<Long>(salesOrderCommandList.size());
+            boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
+        			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
+        			searchParam.get("sdkQueryType").equals("1");
             for (SalesOrderCommand cmd : salesOrderCommandList){
+            	if(isDecrypt){
+            		decryptSalesOrderCommand(cmd);
+            	}
                 idList.add(cmd.getId());
             }
 
