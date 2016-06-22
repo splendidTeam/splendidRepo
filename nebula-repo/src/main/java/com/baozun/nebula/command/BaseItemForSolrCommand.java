@@ -1,11 +1,6 @@
 package com.baozun.nebula.command;
 
-import java.math.BigDecimal;
 import java.util.Date;
-
-import org.apache.solr.client.solrj.beans.Field;
-
-import com.baozun.nebula.utilities.common.Validator;
 
 public class BaseItemForSolrCommand implements Command {
 
@@ -147,6 +142,20 @@ public class BaseItemForSolrCommand implements Command {
 	 * @return
 	 */
 	private String style;
+	
+	/**
+	 * 商品类型
+	 * @see com.baozun.nebula.model.product.Item#type
+	 */
+	private Long type;
+
+	public Long getType() {
+		return type;
+	}
+
+	public void setType(Long type) {
+		this.type = type;
+	}
 
 	public Long getId() {
 		return id;
