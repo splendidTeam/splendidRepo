@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -118,7 +117,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory
                         .buildShoppingCartLineCommandList(commonImmediatelyBuyForm);
-        String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
+        String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         // 跳转到订单确认页面的地址
         String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);

@@ -280,7 +280,19 @@ public class NebulaRegisterController extends NebulaLoginController{
 
 	/**
 	 * 注册处理，默认推荐配置如下
-	 * 
+	 * <ol>
+	 * 	<li>注册的时候会存在以下情况</li>
+	 * 	<li>1.registerForm 的mobile和email 分为LoginMobile--mobile，LoginEmail--email 4个字段</li>
+	 *  <li>2.PC注册的时候 输入loginEmail和mobile 这时候的mobile不能做为登录用的LoginMobile,
+	 *  	所以将其存到mobile属性中，用以保存个人信息
+	 *  </li>
+	 *  <li>3.Mobile注册的时候 输入loginMobile和email 这时候的email不能做为登录用的loginEmail,
+	 *  	所以将其存到email属性中，用以保存个人信息
+	 *  </li>
+	 *  <li>4.注册的时候如果填写信息有生日这个参数，请注意要使用String类型的“birthdayFromPage”
+	 *  	转换的时候会将它转换成Date类型的“birthday”。用于对应的3个Obj的转换
+	 *  </li>
+	 * </ol>
 	 * @RequestMapping(value = "/member/register.json", method = RequestMethod.POST)
 	 * @param registerForm
 	 * @param bindingResult
@@ -305,6 +317,8 @@ public class NebulaRegisterController extends NebulaLoginController{
 			defaultReturnResult.setStatusCode("reigster.validator.errors");
 			return defaultReturnResult;
 		}
+		
+		LOGGER.info("----------------------------------");
 
 		// 密码解密，密码传输通过RSA做了加密，此处需要解密
 		registerForm.setPassword(decryptSensitiveDataEncryptedByJs(registerForm.getPassword(), request));

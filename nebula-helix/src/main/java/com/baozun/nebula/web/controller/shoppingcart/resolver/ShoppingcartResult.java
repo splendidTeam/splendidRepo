@@ -42,6 +42,11 @@ public enum ShoppingcartResult {
 	 * 购物车主卖行超过大小
 	 */
 	MAIN_LINE_MAX_THAN_COUNT,
+	
+	/**
+	 * 单商品超过最大数量
+	 */
+	ONE_LINE_MAX_THAN_COUNT,
 
 	/**
 	 * 超过库存数

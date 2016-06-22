@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
+import java.io.Serializable;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.Validate;
@@ -24,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -65,6 +69,27 @@ public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends
         Validate.notBlank(immediatelyBuyCheckoutUrl, "immediatelyBuyCheckoutUrl can't be blank!");
         LOGGER.debug("key:{},immediatelyBuyCheckoutUrl:{}", key, immediatelyBuyCheckoutUrl);
         return immediatelyBuyCheckoutUrl;
+    }
+
+    /**
+     * 将list保存到 寄存器.
+     * 
+     * <p>
+     * 由于保存到session中的对象 是引用类型,操作会直接影响到session里面保存的对象, 比如在订单确认页面 使用优惠券和取消使用优惠券会影响到session里面的对象
+     * </p>
+     * 
+     * @param shoppingCartLineCommandList
+     * @param request
+     * @return
+     * @since 5.3.1.2
+     * @see com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactoryImpl#getFromAccessor(String, HttpServletRequest)
+     */
+    protected String saveToAccessor(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request){
+//        String[] exclude = ConvertUtil.toArray("skuPropertys", "categoryList", "promotionList", "couponCodeOnLine", "lableIds");
+//        Serializable serializable = JsonUtil.format(shoppingCartLineCommandList, exclude, 0, 0);
+//        
+        Serializable serializable=(Serializable) shoppingCartLineCommandList;
+        return autoKeyAccessor.save(serializable, request);
     }
 
     /**
