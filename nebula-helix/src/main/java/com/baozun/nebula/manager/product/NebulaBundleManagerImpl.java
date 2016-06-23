@@ -173,7 +173,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 		// 如果校验结果有任何异常，刷新bundle缓存。
 		if (BundleStatus.BUNDLE_CAN_SALE.getStatus() != result.getType()) {
-			LOG.debug("[VALIDATE_BUNDLE] bundle validate failed, flush cache: cache-key=\"{}\"", CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)));
+			LOG.debug("[VALIDATE_BUNDLE] bundle validate failed, refresh cache: cache-key=\"{}\"", CacheKeyConstant.BUNDLE_CACHE_KEY.concat(" ").concat(String.valueOf(bundleItemId)));
 			try {
 				// 删除以bundle类商品id为key的缓存
 				cacheManager.removeMapValue(CacheKeyConstant.BUNDLE_CACHE_KEY, String.valueOf(bundleItemId));

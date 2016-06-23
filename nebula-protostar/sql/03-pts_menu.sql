@@ -121,3 +121,4 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 
 -- 日志管理
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (810, 1, 1, '/backlog/skuInventoryChangeLog/list.htm', now(), 8, null, '库存变更日志管理');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (811, 1, 2, '/backlog/sysAuditLog/list.htm', now(), 8, null, '审计日志查询列表');

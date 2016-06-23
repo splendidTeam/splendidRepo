@@ -266,9 +266,14 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		sdkSecretManager.encrypt(memberCommand, new String[] { "loginEmail", "loginMobile", "realName" });
 	}
 
+	
+	/**
+	 * 去除解密的字段"loginEmail", "loginMobile", "realName"
+	 * @param memberCommand
+	 */
 	private void decrypt(MemberCommand memberCommand){
 
-		sdkSecretManager.decrypt(memberCommand, new String[] { "loginEmail", "loginMobile", "realName" });
+		sdkSecretManager.decrypt(memberCommand, new String[] {  });
 	}
 
 	private void encryptContact(ContactCommand contact){

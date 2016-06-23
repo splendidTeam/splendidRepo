@@ -7,7 +7,7 @@
 
 <div class="ui-block-content border-grey">
 	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">主卖品</div>
+		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.mainProduct" /></div>
 		<div class="ui-block-content border-grey">
 			<ul class="clearfix setMainProduct">
 				<li class="main-pro">
@@ -23,7 +23,7 @@
 						</c:otherwise>
 					</c:choose>
 				</li>
-				<li class="main-pro pro-empty" id="selectPro" style="display:none">设置主卖品</li>
+				<li class="main-pro pro-empty" id="selectPro" style="display:none"><spring:message code="item.common.setMainProduct" /></li>
 			</ul>
 		</div>
 	</div>
@@ -32,7 +32,7 @@
 		<c:otherwise></c:otherwise>
 	</c:choose>
 	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">捆绑成员</div>
+		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.memberProduct" /></div>
 		<div class="ui-block-content border-grey">
 			<ul class="clearfix">
 			 	<div class="setMemberProduct">
@@ -52,33 +52,33 @@
 						</li>
 					</c:forEach>
 				</div>
-				<li class="main-pro pro-empty" id="selectStyle">+新成员</li>
+				<li class="main-pro pro-empty" id="selectStyle"><spring:message code="item.common.addMemberProduct" /></li>
 			</ul>
-			<a class="user-refresh" id="refresh-table">刷新</a>
+			<a class="user-refresh" id="refresh-table"><spring:message code="refresh" /></a>
 		</div>
 	</div>
 	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">库存设置</div>
+		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.setRepertory" /></div>
 		<div class="ui-block-content border-grey">
-	   		<label class="label-line block pb10"> 库存数量 <input type="text" name="availableQty" value="${bundleViewCommand.availableQty }" /> </label>
-	   		<label class="label-line block pb10"> 是否同步扣减sku库存 <input type="radio" name="syncWithInv" value="1" <c:if test="${bundleViewCommand.syncWithInv == true }">checked="checked"</c:if>>是   <input type="radio" name="syncWithInv" value="0" <c:if test="${bundleViewCommand.syncWithInv == false }">checked="checked"</c:if>>否 </label>
+	   		<label class="label-line block pb10"> <spring:message code="item.common.repertoryNumber" /> <input type="text" name="availableQty" value="${bundleViewCommand.availableQty }" /> </label>
+	   		<label class="label-line block pb10"> <spring:message code="item.common.isSynchronization" /> <input type="radio" name="syncWithInv" value="1" <c:if test="${bundleViewCommand.syncWithInv == true }">checked="checked"</c:if>><spring:message code="shop.property.true" />   <input type="radio" name="syncWithInv" value="0" <c:if test="${bundleViewCommand.syncWithInv == false }">checked="checked"</c:if>><spring:message code="shop.property.false" /> </label>
 		</div>
 	</div>
 	<div class="ui-block">
-		<div class="ui-block-title1 ui-block-title">价格设置</div>
+		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.setPrice" /></div>
 		<div class="ui-block-content border-grey">
-	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="1" <c:if test="${bundleViewCommand.priceType == 1 }">checked="checked"</c:if>> 按捆绑商品总价  </label>
-	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="2" <c:if test="${bundleViewCommand.priceType == 2 }">checked="checked"</c:if>> 一口价（简单）  </label>
-	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="3" <c:if test="${bundleViewCommand.priceType == 3 }">checked="checked"</c:if>> 定制    </label>
-	   		<label class="label-line block pb10"> 捆绑商品总价 <input type="text" readonly placeholder="900" value=""> </label>
+	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="1" <c:if test="${bundleViewCommand.priceType == 1 }">checked="checked"</c:if>> <spring:message code="item.common.onBundleTotalPrice" />  </label>
+	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="2" <c:if test="${bundleViewCommand.priceType == 2 }">checked="checked"</c:if>> <spring:message code="item.common.fixPrice" />  </label>
+	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="3" <c:if test="${bundleViewCommand.priceType == 3 }">checked="checked"</c:if>> <spring:message code="item.common.customPrice" />   </label>
+	   		<label class="label-line block pb10"> <spring:message code="item.common.bundleTotalPrice" /> <input type="text" readonly placeholder="900" value=""> </label>
 		</div>
 	   	<table class="inform-person product-table" style="display:none">
 			<thead>
 				<tr>
-					<th width="10%">成员序号</th>
-					<th width="25%">商品</th>
-					<th width="25%">原销售价 </th>
-					<th width="15%">现售价</th>
+					<th width="10%"><spring:message code="item.common.memberId" /></th>
+					<th width="25%"><spring:message code="item.common.product" /></th>
+					<th width="25%"><spring:message code="item.common.oldSalePrice" /></th>
+					<th width="15%"><spring:message code="item.common.newSalePrice" /></th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -86,11 +86,11 @@
 		<table class="inform-person sku-table">
 			<thead>
 				<tr>
-					<th width="10%">成员序号</th>
-					<th width="25%">销售单元</th>
-					<th width="25%">是否参与 </th>
-					<th width="25%">原销售价</th>
-					<th width="15%">现售价</th>
+					<th width="10%"><spring:message code="item.common.memberId" /></th>
+					<th width="25%"><spring:message code="item.common.saleElement" /></th>
+					<th width="25%"><spring:message code="item.common.isJoin" /></th>
+					<th width="25%"><spring:message code="item.common.oldSalePrice" /></th>
+					<th width="15%"><spring:message code="item.common.newSalePrice" /></th>
 				</tr>
 			</thead>
 			<tbody></tbody>

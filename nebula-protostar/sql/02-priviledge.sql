@@ -274,8 +274,13 @@ insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextv
 insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'系统','ACL_I18N_MANAGE','国际化语言管理','国际化语言管理',1,now(),1);
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/i18nLang/list.htm','国际化语言管理',currval('s_t_au_privilege'));
 
--- 日志管理
+-- 库存变更日志管理
 insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_BACKLOG_SKUINVENTORY_CHANGE','库存变更日志管理','库存变更日志管理',1,now(),2);
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/skuInventoryChangeLog/list.htm','库存变更日志管理',currval('s_t_au_privilege'));
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/skuInventoryChangeLog/page.json','库存变更日志列表',currval('s_t_au_privilege'));
+
+-- 审计日志查询列表
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_BACKLOG_SYSAUDITLOG','审计日志查询列表','审计日志查询列表',1,now(),2);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/sysAuditLog/list.htm','审计日志查询列表',currval('s_t_au_privilege'));
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/sysAuditLog/page.json','审计日志查询列表',currval('s_t_au_privilege'));
 

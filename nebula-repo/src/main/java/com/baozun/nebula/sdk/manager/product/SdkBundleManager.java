@@ -54,7 +54,7 @@ public interface SdkBundleManager {
 	public BundleSkuPriceCommand getBundleSkuPrice(Long bundleItemId, Long skuId);
 	
 	/**
-	 * 获取bundle中某些sku的价格
+	 * 获取bundle中一组sku的价格
 	 * 
 	 * @param bundleItemId bundle的itemId
 	 * @param skuIds bundle中选中的一组sku

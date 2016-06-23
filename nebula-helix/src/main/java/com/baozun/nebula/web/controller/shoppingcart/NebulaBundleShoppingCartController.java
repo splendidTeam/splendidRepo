@@ -107,7 +107,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory
                         .buildShoppingCartLineCommandList(bundleImmediatelyBuyForm);
-        String key = autoKeyAccessor.save((Serializable) shoppingCartLineCommandList, request);
+        String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);
 

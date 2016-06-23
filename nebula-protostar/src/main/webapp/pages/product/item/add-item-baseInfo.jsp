@@ -51,10 +51,10 @@ var categoryzNodes  = [
 		</c:forEach>
 		<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 			<div class="ui-block-line ">
-				<label>商品副标题</label> <input type="text" id="subTitle"
+				<label><spring:message code='item.baseInfo.productSubhead'/></label> <input type="text" id="subTitle"
 					name="itemCommand.subTitle.values[${status.index}]"
 					loxiaType="input" value="${ subTilte }"
-					mandatory="false" placeholder="商品副标题" /> <input class="i18n-lang"
+					mandatory="false" placeholder="<spring:message code='item.baseInfo.productSubhead'/>" /> <input class="i18n-lang"
 					type="text" name="itemCommand.subTitle.langs[${status.index}]"
 					value="${i18nLang.key}" /> <span>${i18nLang.value}</span>
 			</div>
@@ -69,10 +69,10 @@ var categoryzNodes  = [
 				placeholder="<spring:message code='item.update.name'/>" />
 		</div>
 		<div class="ui-block-line ">
-			<label>商品副标题</label> <input type="text" id="subTitle"
+			<label><spring:message code='item.baseInfo.productSubhead'/></label> <input type="text" id="subTitle"
 				name="itemCommand.subTitle.value" 
 				loxiaType="input" value="${ subTilte }" mandatory="false"
-				placeholder="商品副标题" />
+				placeholder="<spring:message code='item.baseInfo.productSubhead'/>" />
 		</div>
 	</c:if>
 	<c:if test="${isStyleEnable}">
@@ -130,11 +130,11 @@ var categoryzNodes  = [
 	</div>
 	<div class="mt10"></div>
 	<div class="ui-block-line ">
-		<label>商品类型</label>
+		<label><spring:message code='item.baseInfo.productType'/></label>
 		<div>
 			<select loxiaType="select" name="itemCommand.type">
-				<option value="1">主卖品</option>
-				<option value="0">非卖品</option>
+				<option value="1"><spring:message code='item.common.mainProduct'/></option>
+				<option value="0"><spring:message code='item.baseInfo.notSaleProduct'/></option>
 			</select>
 		</div>
 	</div>

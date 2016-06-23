@@ -44,19 +44,19 @@
 		<c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 			<c:set value="${status.index}" var="i"></c:set>
 			<div class="ui-block-line ">
-				<label>商品副标题</label>
+				<label><spring:message code='item.baseInfo.productSubhead'/></label>
 				<c:if test="${not empty subTilte }">
 					<input type="text" id="subTitle"
 						name="itemCommand.subTitle.values[${status.index}]"
 						loxiaType="input"
 						value="${ subTilte.langValues[i18nLang.key] }" mandatory="false"
-						placeholder="商品副标题" />
+						placeholder="<spring:message code='item.baseInfo.productSubhead'/>" />
 				</c:if>
 				<c:if test="${empty subTilte }">
 					<input type="text" id="subTitle"
 						name="itemCommand.subTitle.values[${status.index}]"
 						loxiaType="input" value="" mandatory="false"
-						placeholder="商品副标题" />
+						placeholder="<spring:message code='item.baseInfo.productSubhead'/>" />
 				</c:if>
 				<input class="i18n-lang" type="text"
 					name="itemCommand.subTitle.langs[${status.index}]"
@@ -74,7 +74,7 @@
 				placeholder="<spring:message code='item.update.name'/>" />
 		</div>
 		<div class="ui-block-line ">
-			<label>商品副标题</label>
+			<label><spring:message code='item.baseInfo.productSubhead'/></label>
 			<textarea id="subTitle" name="itemCommand.subTitle.value" rows="10"
 				class="ui-loxia-default ui-corner-all"><c:out
 					value='${subTilte.value}' escapeXml="false"></c:out></textarea>
@@ -137,11 +137,11 @@
 		</div>
 	</div>
 	<div class="ui-block-line ">
-		<label>商品类型</label>
+		<label><spring:message code='item.baseInfo.productType'/></label>
 		<div>
 			<select loxiaType="select" name="itemCommand.type">
-				<option value="1" ${ type == '1'?'selected="selected"':'' }>主卖品</option>
-				<option value="0" ${ type == '0'?'selected="selected"':'' }>非卖品</option>
+				<option value="1" ${ type == '1'?'selected="selected"':'' }><spring:message code='item.common.mainProduct'/></option>
+				<option value="0" ${ type == '0'?'selected="selected"':'' }><spring:message code='item.baseInfo.notSaleProduct'/></option>
 			</select>
 		</div>
 	</div>

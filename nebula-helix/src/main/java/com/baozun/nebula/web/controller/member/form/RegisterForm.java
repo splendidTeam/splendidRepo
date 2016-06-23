@@ -1,5 +1,7 @@
 package com.baozun.nebula.web.controller.member.form;
 
+import java.util.Date;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.baozun.nebula.command.MemberPersonalDataCommand;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.BaseForm;
+import com.feilong.core.DatePattern;
+import com.feilong.core.Validator;
+import com.feilong.core.date.DateUtil;
 
 /**
  * 会员注册提交的属性
@@ -47,7 +52,9 @@ public class RegisterForm extends BaseForm{
 	 */
 	private int					sex;
 
-	private String				birthday;
+	private String				birthdayFromPage;
+	
+	private Date                birthday;
 
 	/*******************************************/
 	/** 省 */
@@ -102,6 +109,10 @@ public class RegisterForm extends BaseForm{
 		MemberPersonalDataCommand memberPersonalDataCommand = new MemberPersonalDataCommand();
 		// 数据转换
 		try{
+			if(Validator.isNotNullOrEmpty(this.birthdayFromPage)){
+				Date birthday=DateUtil.toDate(this.birthdayFromPage, DatePattern.COMMON_DATE);
+				this.setBirthday(birthday);
+			}
 			BeanUtils.copyProperties(memberFrontendCommand, this);
 			BeanUtils.copyProperties(memberPersonalDataCommand, this);
 
@@ -121,16 +132,24 @@ public class RegisterForm extends BaseForm{
 	public void setAge(String age){
 		this.age = age;
 	}
+	
 
-	public String getBirthday(){
+	public String getBirthdayFromPage() {
+		return birthdayFromPage;
+	}
+
+	public void setBirthdayFromPage(String birthdayFromPage) {
+		this.birthdayFromPage = birthdayFromPage;
+	}
+
+	public Date getBirthday() {
 		return birthday;
 	}
 
-	public void setBirthday(String birthday){
+	public void setBirthday(Date birthday) {
 		this.birthday = birthday;
 	}
 
-	
 	public String getNickname() {
 		return nickname;
 	}

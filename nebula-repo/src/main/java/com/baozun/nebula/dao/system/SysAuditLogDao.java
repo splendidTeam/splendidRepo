@@ -27,6 +27,7 @@ import loxia.dao.Pagination;
 import loxia.dao.Sort;
 import loxia.dao.Page;
 
+import com.baozun.nebula.command.system.SysAuditLogCommand;
 import com.baozun.nebula.model.system.SysAuditLog;
 
 /**
@@ -67,8 +68,8 @@ public interface SysAuditLogDao extends GenericEntityDao<SysAuditLog,Long>{
 	 * @param sorts 
 	 * @return
 	 */
-	@NativeQuery(model = SysAuditLog.class)
-	Pagination<SysAuditLog> findSysAuditLogListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+	@NativeQuery(model = SysAuditLogCommand.class)
+	Pagination<SysAuditLogCommand> findSysAuditLogListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
 	/**
 	 * 归档一段时间的记录，则需要删除该表的记录

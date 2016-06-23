@@ -97,7 +97,7 @@ public interface NebulaBundleManager extends BaseManager {
 	public Pagination<BundleCommand> findBundleCommandByPage(Page page, Sort[] sorts , Boolean flag);
 	
 	/**
-	 * <h3>下单 加入购物车时验证bundle的信息</h3>
+	 * <h3>下单 加入购物车时验证bundle的信息（包括bundle可用性和库存）</h3>
 	 * <ul>
 	 *    <ol>
 	 *    	 <li>bundle是否存在</li>

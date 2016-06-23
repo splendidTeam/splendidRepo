@@ -61,7 +61,7 @@ public class SdkShoppingCartLineCommandBehaviourFactoryImpl implements SdkShoppi
         }
 
         Item item = itemDao.findItemById(relatedItemId);
-        Validate.notNull(item, "when relatedItemId:[%s],item can't be null!", relatedItemId);
+        Validate.notNull(item, "when relatedItemId:[%s],item is null!", relatedItemId);
 
         //bundle item?
         Integer type = item.getType();

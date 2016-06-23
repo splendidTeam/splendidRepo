@@ -139,7 +139,7 @@ public final class JsonFormatUtil{
 	public static String format(Object object){
 		if (object instanceof Properties){
 			Properties properties = (Properties) object;
-			return format(com.feilong.core.util.PropertiesUtil.toMap(properties));
+			return format(com.feilong.core.bean.ConvertUtil.toMap(properties));
 		}
 		// 数组
 		if (object instanceof Object[]){
