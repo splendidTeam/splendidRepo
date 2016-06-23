@@ -222,10 +222,19 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 				LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
 			}
 			if(Validator.isNotNullOrEmpty(refer)){
-				StringBuffer url = request.getRequestURL();  
-				String domainUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString(); 
+				StringBuffer url = request.getRequestURL();
+				String domainUrl = url.delete(url.length() - request.getRequestURI().length(), url.length()).toString();
 				refer = refer.endsWith("/") ? refer.substring(0, refer.length()-1) : refer;
-				refer =	refer.substring(domainUrl.length(), refer.length());
+				int sub_start =domainUrl.length();
+				//单独处理https域名情况下获取到的域名为http的情况
+				if(refer.indexOf("https") != -1 &&
+						domainUrl.indexOf("https") == -1){
+					sub_start += 1;
+				}
+				refer =	refer.substring(sub_start, refer.length());
+				if(LOG.isDebugEnabled()){
+					LOG.debug("[BUILD_BREADCRUMB] referer:{}", refer);
+				}
 				FilterNavigationCommand filterNavigation= navigationHelperManager.matchNavigationByUrl(refer, "");
 				if(Validator.isNotNullOrEmpty(filterNavigation)&&
 						Validator.isNotNullOrEmpty(filterNavigation.getNavId())){
@@ -321,6 +330,9 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 			}
 		}
 		//itemId为空时 将导航树作为面包屑(场景PLP)
+		if(LOG.isDebugEnabled()){
+			LOG.debug("[BUILD_BREADCRUMB] results:{}", JsonUtil.format(results));
+		}
 		return results;
 	}
 
