@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,22 @@ public class CommonEmailManagerImpl implements CommonEmailManager {
 	//策略控制类
 	@Autowired
 	private TokenManager tokenManager;
+	
+	//通过value注解获取properties的value
+	@Value("#{meta['send.mail.key']}")
+	private String sendMailKey;
+
+	//通过value注解获取properties的value
+	@Value("#{meta['send.mail.maxSendNumber']}")
+	private Long maxSendNumber;
+
+	//通过value注解获取properties的value
+	@Value("#{meta['send.mail.intervalTime']}")
+	private Long intervalTime;
+	
+	//通过value注解获取properties的value
+	@Value("#{meta['send.mail.emailCacheExpireTime']}")
+	private Long emailCacheExpireTime;
 
 	
 	/**
@@ -76,7 +93,10 @@ public class CommonEmailManagerImpl implements CommonEmailManager {
 
 		sendEmailConfig =new SendEmailConfig();
 		sendEmailConfig.setIsValidIntervalTime(false);
-		sendEmailConfig.setIsValidMaxSendNumber(false);
+		sendEmailConfig.setIsValidMaxSendNumber(true);
+		sendEmailConfig.setMaxSendNumber(maxSendNumber);
+		sendEmailConfig.setIntervalTime(intervalTime);
+		sendEmailConfig.setEmailCacheExpireTime(emailCacheExpireTime);
 		
 		// 判断邮箱是否为空 如为空则返回失败
 		if (Validator.isNullOrEmpty(email)) {
@@ -88,9 +108,8 @@ public class CommonEmailManagerImpl implements CommonEmailManager {
 		// 判断是否开启最大次数验证 如开启 组装访问策略pojo
 		// RollingTimeWindow limit 为最大发送数 ,window为该窗口有效期
 		if (sendEmailConfig.getIsValidMaxSendNumber()) {
-			RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(sendEmailConfig.getMaxSendNumber(),
-					sendEmailConfig.getEmailCacheExpireTime());
-			VerifyResult resultcode = tokenManager.verifyAccess("validEmailMaxSendNum", email, rollingTimeWindow);
+			RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(sendEmailConfig.getMaxSendNumber(),sendEmailConfig.getEmailCacheExpireTime());
+			VerifyResult resultcode = tokenManager.verifyAccess("validEmailMaxSendNum"+emailTemplateCode, email, rollingTimeWindow);
 			log.debug("validate result is" + resultcode);
 			//判断结果
 			if (resultcode == VerifyResult.LIMITED) {
@@ -101,12 +120,11 @@ public class CommonEmailManagerImpl implements CommonEmailManager {
 		// 判断是否开始期间间隔验证 如开启 组装访问策略pojo
 		// RollingTimeWindow limit为时间间隔 ,window为该窗口有效期
 		if (sendEmailConfig.getIsValidIntervalTime()) {
-			RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(sendEmailConfig.getIntervalTime(),
-					sendEmailConfig.getEmailCacheExpireTime());
-			VerifyResult resultcode = tokenManager.verifyAccess("validEmailIntervalTime", email, rollingTimeWindow);
+			RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(1L,sendEmailConfig.getIntervalTime());
+			VerifyResult resultcode = tokenManager.verifyAccess("validEmailIntervalTime"+emailTemplateCode, email, rollingTimeWindow);
 			log.debug("validate result is" + resultcode);
 			//判断结果
-			if (resultcode == VerifyResult.EXPIRED) {
+			if (resultcode == VerifyResult.LIMITED) {
 				return SendEmailResultCode.INTERVALTIMEERROR;
 			}
 		}
