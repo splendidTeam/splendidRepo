@@ -290,59 +290,6 @@ public class ItemController extends BaseController {
 		return SUCCESS;
 	}
 
-	@RequestMapping("/item/saveItem.json")
-	@ResponseBody
-	public Object saveItem(@ModelAttribute() ItemCommand itemCommand,
-			@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
-			@ArrayCommand(dataBind = true) Long[] categoriesIds, // 商品分类Id
-			@ArrayCommand() ItemProperties[] iProperties, // 普通商品属性
-			@ArrayCommand(dataBind = true) Long[] propertyIds, // 用户填写的商品属性值的属性Id
-			@ArrayCommand(dataBind = true) String[] propertyValueInputs, // 用户输入的
-																			// 商品销售属性的
-																			// 属性值
-																			// （对于多选来说
-																			// 是
-																			// pvId,pvId
-																			// 对于自定义多选来说是
-																			// aa||bb）
-			HttpServletRequest request) throws Exception {
-
-		// 查询orgId
-		UserDetails userDetails = this.getUserDetails();
-		ShopCommand shopCommand = null;
-		Long shopId = 0L;
-		Long currentOrgId = userDetails.getCurrentOrganizationId();
-		// 根据orgId查询shopId
-		if (currentOrgId != null) {
-			shopCommand = shopManager.findShopByOrgId(currentOrgId);
-			shopId = shopCommand.getShopid();
-		}
-
-		itemCommand.setShopId(shopId);
-		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
-		itemCommand.setDescription(removeDefinedDomainInDesc(itemCommand.getDescription(), UPLOAD_IMG_DOMAIN));
-
-		SkuPropertyCommand[] skuPropertyCommandArray = getCmdArrrayFromRequest(request, propertyIds,
-				propertyValueInputs);
-
-		// List<ItemProValGroupRelation> groupRelation =
-		// getItemProValueGroupRelation(request,propertyIds);
-
-		// 保存商品
-		Item item = itemManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties,
-				skuPropertyCommandArray);
-
-		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
-			List<Long> itemIdsForSolr = new ArrayList<Long>();
-			itemIdsForSolr.add(item.getId());
-			itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
-		}
-
-		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
-		backWarnEntity.setErrorCode(item.getId().intValue());
-		return backWarnEntity;
-	}
-
 	/**
 	 * @author 何波 @Description: 处理描述中输入的图片链接 @param itemCommand void @throws
 	 */
@@ -2524,20 +2471,97 @@ public class ItemController extends BaseController {
 		model.addAttribute("lastSelectPropertyId", itemInfo.getLastSelectPropertyId());
 		model.addAttribute("lastSelectPropertyValueId", itemInfo.getLastSelectPropertyValueId());
 	}
+	
+	/**
+	 * 保存普通商品
+	 */
+	@RequestMapping("/i18n/item/saveSimpleItem.json")
+	@ResponseBody
+	public Object saveSimpleItem(@ModelAttribute() ItemCommand itemCommand,
+			@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
+			@ArrayCommand(dataBind = true) Long[] categoriesIds, // 商品分类Id
+			Long defaultCategoryId, // 默认分类
+			@ArrayCommand() ItemProperties[] iProperties, // 普通商品属性
+			@ArrayCommand(dataBind = true) Long[] propertyIds, // 用户填写的商品属性值的属性Id
+			@ArrayCommand(dataBind = true) String[] propertyValueInputs, // 用户输入的商品销售属性的属性值（对于多选来说是pvId,pvId对于自定义多选来说是aa||bb）
+			HttpServletRequest request) throws Exception {
+
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null) {
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		itemCommand.setDescription(removeDefinedDomainInDesc(itemCommand.getDescription(), UPLOAD_IMG_DOMAIN));
+
+		SkuPropertyCommand[] skuPropertyCommandArray = getCmdArrrayFromRequest(request, propertyIds,
+				propertyValueInputs);
+
+		// List<ItemProValGroupRelation> groupRelation =
+		// getItemProValueGroupRelation(request,propertyIds);
+
+		// 保存商品
+		Item item = itemManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, iProperties,
+				skuPropertyCommandArray);
+
+		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)) {
+			List<Long> itemIdsForSolr = new ArrayList<Long>();
+			itemIdsForSolr.add(item.getId());
+			itemSolrManager.saveOrUpdateItem(itemIdsForSolr);
+		}
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+
+	}
+	
+	/**
+	 * 保存捆绑商品
+	 */
+	@RequestMapping("/item/saveBundleItem.json")
+	@ResponseBody
+	public Object saveBundleItem(@I18nCommand ItemCommand itemCommand,
+			@ArrayCommand(dataBind = true) Long[] categoriesIds, // 商品分类Id
+			Long defaultCategoryId, // 默认分类
+			BundleViewCommand bundle, HttpServletRequest request) throws Exception {
+
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null) {
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		itemCommand.setDescription(removeDefinedDomainInDesc(itemCommand.getDescription(), UPLOAD_IMG_DOMAIN));
+
+		// BundleViewCommand -> BundleCommand
+		BundleCommand command = convertToBundleCommand(bundle);
+
+		// 保存商品
+		Item item = itemManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds, defaultCategoryId);
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+	}
 
 	/**
 	 * 保存普通商品
-	 * 
-	 * @param itemCommand
-	 * @param propertyValueIds
-	 * @param categoriesIds
-	 * @param iProperties
-	 * @param propertyIds
-	 * @param propertyValueInputs
-	 * @param propertyValueInputIds
-	 * @param request
-	 * @return
-	 * @throws Exception
 	 */
 	@RequestMapping("/i18n/item/saveSimpleItem.json")
 	@ResponseBody

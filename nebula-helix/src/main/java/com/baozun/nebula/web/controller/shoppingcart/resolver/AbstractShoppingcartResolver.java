@@ -104,7 +104,15 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         ShoppingCartLineCommand currentShoppingCartLineCommand = findSameSkuShoppingCartLineCommand(mainLines, sku);
 
         if (null != currentShoppingCartLineCommand){// 存在
-            currentShoppingCartLineCommand.setQuantity(currentShoppingCartLineCommand.getQuantity() + count);
+        	
+        	Integer oneLineTotalCount = currentShoppingCartLineCommand.getQuantity() + count;
+        	
+            currentShoppingCartLineCommand.setQuantity(oneLineTotalCount);
+            
+            if (oneLineTotalCount > Constants.SHOPPING_CART_SKU_ONE_LINE_COUNT) {
+            	return ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
+            }
+            
         }else{
             // 最大行数验证
             // 校验是否超过购物车规定的商品行数

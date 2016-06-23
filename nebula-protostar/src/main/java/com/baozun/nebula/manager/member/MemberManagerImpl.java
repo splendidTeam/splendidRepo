@@ -33,6 +33,7 @@ import com.baozun.nebula.model.member.MemberGroup;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 
@@ -61,6 +62,9 @@ public class MemberManagerImpl implements MemberManager {
 	
 	@Autowired
 	private ItemImageDao itemImageDao;
+	
+	@Autowired
+	private SdkSecretManager		sdkSecretManager;
 	
     
 	/**
@@ -99,7 +103,7 @@ public class MemberManagerImpl implements MemberManager {
 					groupNameList.add(groupName.get(j).getGroupName());
 				}
 			}
-			
+			decrypt(items.get(i));
 			items.get(i).setGroupName(groupNameList);
 			items.get(i).setTypeName(optionMap.get("MEMBER_TYPE-"+items.get(i).getType()));
 			items.get(i).setSourceName(optionMap.get("MEMBER_SOURCE-"+items.get(i).getSource()));
@@ -107,6 +111,9 @@ public class MemberManagerImpl implements MemberManager {
 		}
 		
 		result.setItems(items);
+		for (MemberCommand command : result.getItems()){
+			decrypt(command);
+		}
 		
 		return result;
 	}
@@ -171,6 +178,8 @@ public class MemberManagerImpl implements MemberManager {
 	public MemberPersonalDataCommand findMemberById(Long memberId){
 		// TODO Auto-generated method stub
 		MemberPersonalDataCommand memberPersonalDataCommand =memberPersonalDataDao.findById(memberId);
+		
+		decrypt(memberPersonalDataCommand);
         
 		List<String> groupCodes=new ArrayList<String>();
 		groupCodes.add("MEMBER_SOURCE");
@@ -184,16 +193,7 @@ public class MemberManagerImpl implements MemberManager {
 		for(ChooseOption co:optionList){
 			optionMap.put(co.getGroupCode()+"-"+co.getOptionValue(), co.getOptionLabel());
 		}   
-		//获取地址
-    	memberPersonalDataCommand.setCountry(memberPersonalDataCommand.getCountryId()==null ? "" : 
-    		AddressUtil.getAddressById(memberPersonalDataCommand.getCountryId()).getName());
-    	memberPersonalDataCommand.setProvince(memberPersonalDataCommand.getProvinceId()==null ? "" :
-    		AddressUtil.getAddressById(memberPersonalDataCommand.getProvinceId()).getName());
-    	memberPersonalDataCommand.setCity(memberPersonalDataCommand.getCityId()==null ? "" :
-    		AddressUtil.getAddressById(memberPersonalDataCommand.getCityId()).getName());
-    	memberPersonalDataCommand.setArea(memberPersonalDataCommand.getAreaId()==null ? "":
-    		AddressUtil.getAddressById(memberPersonalDataCommand.getAreaId()).getName()); 
-    	
+		
 		memberPersonalDataCommand.setTypeName(optionMap.get("MEMBER_TYPE-"+memberPersonalDataCommand.getType()));
 		memberPersonalDataCommand.setSourceName(optionMap.get("MEMBER_SOURCE-"+memberPersonalDataCommand.getSource()));
 		memberPersonalDataCommand.setSexName(optionMap.get("MEMBER_SEX-"+memberPersonalDataCommand.getSex()));
@@ -275,6 +275,28 @@ public class MemberManagerImpl implements MemberManager {
 	        } 
 		} 
 		return contactCommand;
+	}
+	
+	private void decrypt(MemberCommand memberCommand){
+
+		sdkSecretManager.decrypt(memberCommand, new String[] { "loginName", "nickName"});
+	}
+	
+	private void decrypt(MemberPersonalDataCommand mpdc){
+
+		sdkSecretManager.decrypt(mpdc, new String[] {
+				"nickname",
+				"localRealName",
+				"intelRealName",
+				"bloodType",
+				"marriage",
+				"country",
+				"province",
+				"city",
+				"area",
+				"address",
+				"credentialsNo",
+				"postCode" });
 	}
 	
 }

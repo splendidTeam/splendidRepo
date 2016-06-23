@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.command.system.SysAuditLogCommand;
+import com.baozun.nebula.dao.auth.UserDao;
 import com.baozun.nebula.dao.system.SysAuditLogDao;
+import com.baozun.nebula.model.auth.User;
 import com.baozun.nebula.model.system.SysAuditLog;
 import com.baozun.nebula.sdk.manager.SdkSysAuditLogManager;
+import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * SysAuditLogManager
@@ -41,7 +48,10 @@ import com.baozun.nebula.sdk.manager.SdkSysAuditLogManager;
 public class SdkSysAuditLogManagerImpl implements SdkSysAuditLogManager {
 
 	@Autowired
-	private SysAuditLogDao sysAuditLogDao;
+	private SysAuditLogDao 							sysAuditLogDao;
+	
+	@Autowired
+	private UserDao									userDao;
 
 
 	/**
@@ -99,9 +109,59 @@ public class SdkSysAuditLogManagerImpl implements SdkSysAuditLogManager {
 	 * @param sorts 
 	 * @return
 	 */
-	public Pagination<SysAuditLog> findSysAuditLogListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
-	
-		return sysAuditLogDao.findSysAuditLogListByQueryMapWithPage(page,sorts,paraMap);
+	public Pagination<SysAuditLogCommand> findSysAuditLogListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
+		
+		Pagination<SysAuditLogCommand> result =sysAuditLogDao.findSysAuditLogListByQueryMapWithPage(page,sorts,paraMap);
+		
+		//1.调整请求参数显示格式
+		//2.设置操作人显示名
+		if(Validator.isNotNullOrEmpty(result)&&
+				Validator.isNotNullOrEmpty(result.getItems())){
+			List<Long> backUserIds =new ArrayList<Long>();
+			for(SysAuditLogCommand auditLogCommand : result.getItems()){
+				if(Validator.isNotNullOrEmpty(auditLogCommand.getOperaterId())){
+					backUserIds.add(auditLogCommand.getOperaterId());
+				}
+			}
+			Map<Long, User> backIdAndInfoMap =new HashMap<Long, User>();
+			if(Validator.isNotNullOrEmpty(backUserIds)){
+				List<User> userList=userDao.findUserListByIds(backUserIds);
+				for (User user : userList) {
+					backIdAndInfoMap.put(user.getId(), user);
+				}
+			}
+			String formatPara ="";
+			String formatValue ="";
+			for(SysAuditLogCommand auditLogCommand : result.getItems()){
+				if(Validator.isNotNullOrEmpty(auditLogCommand.getParameters())&&
+						auditLogCommand.getParameters() != "{}"){
+					formatPara ="";
+					formatValue ="";
+					Map<String, Object> map = JsonUtil.toMap(auditLogCommand.getParameters());
+					int i =0;
+					for (Map.Entry<String, Object> entry : map.entrySet()) {
+						formatValue =entry.getValue().toString();
+						//请求参数值去头、去尾，例如["26,black"]->26,black
+						formatPara += entry.getKey() + " : " + formatValue.substring(2 , formatValue.length()-2);
+						i++;
+						if(i != map.size()){
+							formatPara +="</br>";
+						}
+					}
+					auditLogCommand.setParametersLabel(formatPara);
+				}else{
+					auditLogCommand.setParametersLabel("");
+				}
+				if(Validator.isNotNullOrEmpty(backIdAndInfoMap)&&
+						Validator.isNotNullOrEmpty(backIdAndInfoMap
+								.get(auditLogCommand.getOperaterId()))){
+					auditLogCommand.setOperatorLabel(backIdAndInfoMap
+							.get(auditLogCommand.getOperaterId()).getUserName());
+				}
+				
+			}
+		}
+		return result;
 	}
 
 	@Override

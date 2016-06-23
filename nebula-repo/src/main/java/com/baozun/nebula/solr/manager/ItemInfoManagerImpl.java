@@ -28,6 +28,7 @@ import com.baozun.nebula.dao.product.ItemInfoDao;
 import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.PropertyValueDao;
 import com.baozun.nebula.model.product.CategoryLang;
+import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemImage;
 import com.baozun.nebula.model.product.ItemImageLang;
 import com.baozun.nebula.model.product.ItemInfo;
@@ -50,7 +51,7 @@ import com.baozun.nebula.solr.dao.BaseItemForSolrTagCommandDao;
 import com.baozun.nebula.solr.dao.ItemForSolrFavouritedCountCommandDao;
 import com.baozun.nebula.solr.dao.ItemForSolrRateCommandDao;
 import com.baozun.nebula.solr.dao.ItemForSolrSalesCountCommandDao;
-import com.baozun.nebula.utilities.common.Validator;
+import com.feilong.core.Validator;
 
 @Service("ItemInfoManager")
 @Transactional
@@ -159,6 +160,11 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 		List<ItemPropertiesCommand> allItemColorList = new ArrayList<ItemPropertiesCommand>();
 		
 			for(BaseItemForSolrCommand baseItemForSolrCommand : baseItemForSolrCommandList){
+				// 目前仅普通商品需要刷新solr 
+				// changed by yue.ch in 2016-6-22
+				if(!Item.ITEM_TYPE_SIMPLE.equals(baseItemForSolrCommand.getType())) {
+					continue;
+				}
 				List<ItemPropertiesCommand> itemPropertiesForSearchList = new ArrayList<ItemPropertiesCommand>();
 				List<ItemPropertiesCommand> itemPropertiesWithOutSearchList = new ArrayList<ItemPropertiesCommand>();
 				List<ItemPropertiesCommand> itemPropertiesForCustomerList = new ArrayList<ItemPropertiesCommand>();

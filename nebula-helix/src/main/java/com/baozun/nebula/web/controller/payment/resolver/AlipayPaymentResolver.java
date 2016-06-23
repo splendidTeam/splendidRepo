@@ -27,6 +27,7 @@ import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentSt
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
+import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;

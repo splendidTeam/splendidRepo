@@ -14,7 +14,7 @@
 </head>
 <body>
 <div class="content-box width-percent100">
-	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png">商品上下架操作日志管理
+	<div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/cube.png"><spring:message code="log.itemOperateLog.operateLog"/>
     </div>
     <form id="searchForm">
     <div class="ui-block">
@@ -35,12 +35,12 @@
 						</td>
                     </tr>
                     <tr>
-                    	<td><label>操作类型</label></td>
+                    	<td><label><spring:message code="log.itemOperateLog.operateType"/></label></td>
                         <td> <span id="searchkeytext"> 
                         		<opt:select name="q_int_operateType" loxiaType="select" expression="chooseOption.LOG_OPERATE_TYPE"/>
 							</span> 
 						</td>
-                        <td><label>操作时间</label></td>
+                        <td><label><spring:message code="log.itemOperateLog.operateTime"/></label></td>
                         <td>
                            <input type="text" name="q_date_operateBeginTime" loxiaType="date" mandatory="false"></input>
 			            </td>
@@ -50,25 +50,25 @@
 			            </td>
 
 
-                   		 <td><label>操作人</label></td>	
+                   		 <td><label><spring:message code="log.itemOperateLog.operator"/></label></td>	
 	                     <td><input 
 								type="text" loxiaType="input" name="q_sl_operatorName"
-								mandatory="false" placeholder="操作人"/>
+								mandatory="false" placeholder="<spring:message code='log.itemOperateLog.operator'/>"/>
 						</td>
                     </tr>
                     
                     <tr>
                     
-                    	<td><label>在架时长[单位：天]</label></td>
+                    	<td><label><spring:message code="log.itemOperateLog.activeTime"/><spring:message code="log.itemOperateLog.day"/></label></td>
                          <td>
-                            <input type="text" name="q_long_activeTime" loxiaType="input" mandatory="false" placeholder="在架时长"></input>
+                            <input type="text" name="q_long_activeTime" loxiaType="input" mandatory="false" placeholder="<spring:message code='log.itemOperateLog.activeTime'/>"></input>
 			            </td>
                     </tr>
                     
                 </table>
                 <div class="button-line1">
                 <a href="javascript:void(0);"
-                   class="func-button search"><span>搜索</span></a>
+                   class="func-button search"><span><spring:message code="btn.search"/></span></a>
                 </div>
             </div>
  

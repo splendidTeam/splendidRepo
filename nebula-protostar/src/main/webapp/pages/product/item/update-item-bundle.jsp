@@ -76,27 +76,27 @@ $j(document).ready(function(){
 					<div class="ui-block-content ui-block-content-lb">
 						<form id="mainItemDialogSearchForm">
 							<div class="form-group p10">
-								<label>类型</label>
-								<input type="radio" name="selectType" value="product" checked="checked" />商品
-								<input type="radio" name="selectType" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> />款
+								<label><spring:message code="member.group.type" /></label>
+								<input type="radio" name="selectType" value="product" checked="checked" /><spring:message code="item.common.product" />
+								<input type="radio" name="selectType" value="style" <c:if test="${isEnableStyle == false }">disable="disable"</c:if> /><spring:message code="item.common.style" />
 							</div> 
 							<div class="form-group p10">
-								<label>编码</label>
+								<label><spring:message code="product.property.lable.code" /></label>
 								<input type="text" loxiaType="input" name="q_sl_code" mandatory="false"/>
 							</div>
 							<div class="button-line1 right">
-								<a href="javascript:void(0);" class="func-button orange" id="search_button"><span>搜索</span></a>
+								<a href="javascript:void(0);" class="func-button orange" id="search_button"><span><spring:message code="btn.search" /></span></a>
 							</div>
 						</form>
 					</div>
 				</div>
 				<div class="ui-block">
-					<div class="border-grey" id="selectProList_product" caption="商品列表 "></div>
+					<div class="border-grey" id="selectProList_product" caption="<spring:message code='item.list.itemList' />"></div>
 				</div>
 			</div>
 		</div>
 		<div class="proto-dialog-button-line right">
-			<input type="button" value="确定" class="button orange" id="addMainProduct"/>
+			<input type="button" value="<spring:message code='btn.confirm' />" class="button orange" id="addMainProduct"/>
 		</div>
 	</div>
 </div>

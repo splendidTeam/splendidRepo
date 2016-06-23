@@ -25,46 +25,47 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.baozun.nebula.command.product.SkuInventoryChangeLogCommand;
-import com.baozun.nebula.manager.product.SkuInventoryChangeLogManager;
+import com.baozun.nebula.command.system.SysAuditLogCommand;
+import com.baozun.nebula.sdk.manager.SdkSysAuditLogManager;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.QueryBeanParam;
 import com.baozun.nebula.web.controller.BaseController;
 /**
- * 库存变更日志查询
+ * 审计日志查询
  * @author  dongliang.ma
  *
  */
  @Controller
  @RequestMapping(value="/backlog")
-public class SkuInventoryChangeLogController extends BaseController{
+public class SysAuditLogController extends BaseController{
 
 
 	@Autowired
-	private SkuInventoryChangeLogManager skuInventoryChangeLogManager;
+	private SdkSysAuditLogManager sysAuditLogManager;
 	
-	@RequestMapping("/skuInventoryChangeLog/list.htm")
+	@RequestMapping("/sysAuditLog/list.htm")
 	public String list(){
-		return "log/skuInventoryChangeLog-list";
+		return "/log/sysAuditLog-list";
 	}
 	
 	/**
-	* @Description: 分页获取SkuInventoryChangeLog列表
+	* @Description: 分页获取SysAuditLog列表
 	* @param queryBean
 	* @return   
-	* Pagination<SkuInventoryChangeLogCommand>
+	* Pagination<SysAuditLogCommand>
 	* @throws
 	 */
-	@RequestMapping("/skuInventoryChangeLog/page.json")
+	@RequestMapping("/sysAuditLog/page.json")
 	@ResponseBody
-	public Pagination<SkuInventoryChangeLogCommand> findSkuInventoryChangeLogListByQueryMapWithPage(@QueryBeanParam QueryBean queryBean) {
+	public Pagination<SysAuditLogCommand> findSysAuditLogListByQueryMapWithPage(@QueryBeanParam QueryBean queryBean) {
 		Sort[] sorts = queryBean.getSorts();
 		if (sorts == null || sorts.length == 0){
 			Sort sort = new Sort("log.create_time", "desc");
 			sorts = new Sort[1];
 			sorts[0] = sort;
 		}
-		return  skuInventoryChangeLogManager.findSkuInventoryChangeLogListByQueryMapWithPage(queryBean.getPage(),
+		return  sysAuditLogManager.findSysAuditLogListByQueryMapWithPage(queryBean.getPage(),
 				sorts, queryBean.getParaMap());
 	}
+	
 }

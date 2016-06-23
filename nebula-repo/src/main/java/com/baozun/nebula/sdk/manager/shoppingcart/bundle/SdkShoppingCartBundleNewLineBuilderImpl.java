@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.shoppingcart.bundle;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,14 @@ import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartLineImageManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.lang.NumberUtil;
 
@@ -111,6 +114,13 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
         newShoppingCartLineCommand.setType(type);
         // 分组号
         newShoppingCartLineCommand.setLineGroup(lineGroup);
+        
+        // 销售属性
+        String skuProperties = sku.getProperties();
+        List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
+        if (Validator.isNotNullOrEmpty(skuPros)){
+            shoppingCartLineCommand.setSkuPropertys(skuPros);
+        }
 
         return newShoppingCartLineCommand;
     }
