@@ -85,9 +85,12 @@ function drawName(data, args, idx){
 	
 	var memberId=loxia.getObject("id", data);
 	var tempDataUrl = memberViewUrl+'?memberId='+memberId;
+	var loginName =loxia.getObject("loginName", data);
+	if(loginName == null){
+		loginName ='';
+	}
 	
-	
-	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('"+tempDataUrl+"');\">"+loxia.getObject("loginName", data)+"</a>";
+	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('"+tempDataUrl+"');\">"+loginName+"</a>";
 }
 
 
