@@ -45,11 +45,31 @@ import com.baozun.nebula.web.command.BundleElementViewCommand;
  */
 public interface BundleManager extends BaseManager {
 
+	/**
+	 * 保存bundle扩展信息
+	 * @param bundle
+	 * @return
+	 */
 	Bundle createOrUpdate(BundleCommand bundle);
 	
+	/**
+	 * 加载bundle成员信息
+	 * @param commands
+	 * @return
+	 */
 	List<BundleElementViewCommand> loadBundleElements(BundleElementViewCommand[] commands);
 	
+	/**
+	 * 获取sku销售属性值字符串
+	 * @param sku
+	 * @return 以“-”分隔的属性值字符串，如：黑色-XXL
+	 */
 	String getSkuPropertyStrForBundle(Sku sku);
 	
+	/**
+	 * 根据bundle商品ID查找bundle信息
+	 * @param bundleItemId
+	 * @return
+	 */
 	BundleCommand findBundleCommandByBundleItemId(Long bundleItemId);
 }

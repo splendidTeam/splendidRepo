@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
@@ -80,25 +81,6 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	List<DynamicPropertyCommand> findDynamicPropertisByIndustryId(Long industryId);
-	/**
-	 * 保存商品
-	 * 
-	 * @param itemCommand
-	 * @param shopId
-	 * @param categoriesIds
-	 * @param propertyValueIds
-	 * @param codes
-	 * @param iProperties
-	 * @param changePropertyJson
-	 * @param defaultCategoryId
-	 * @return
-	 */
-
-	Item createOrUpdateItem(ItemCommand itemCommand, Long shopId,
-			Long[] categoriesIds, Long[] propertyValueIds, String[] codes,
-			BigDecimal[] salePrices, BigDecimal[] listPrices,
-			ItemProperties[] iProperties, String changePropertyJson,
-			Long defaultCategoryId) throws Exception;
 
 	/**
 	 * 根据商品id查询商品
@@ -249,12 +231,16 @@ public interface ItemManager extends BaseManager {
 	public Integer updateItemInfoLSPVIdByItemId(Long lastSelectPropertyValueId,
 			Long itemId);
 
-	public Item createOrUpdateItem(ItemCommand itemCommand,
+	public Item createOrUpdateSimpleItem(ItemCommand itemCommand,
 			Long[] propertyValueIds, // 动态
 			Long[] categoriesIds,// 商品分类Id
+			Long defaultCategoryId, // 默认分类ID
 			ItemProperties[] iProperties,// 普通商品属性
 			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
 	) throws Exception;
+	
+	public Item createOrUpdateBundleItem(ItemCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
+			throws Exception;
 
 	/**
 	 * 保存商品图片
