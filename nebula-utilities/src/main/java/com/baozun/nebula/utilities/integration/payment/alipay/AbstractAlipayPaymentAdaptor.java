@@ -269,8 +269,7 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 		RequestMapUtil.requestConvert(request, responseMap);
 		String sign = request.getParameter("sign").toString();
 		try {
-			resultMap = MapAndStringConvertor.convertResultToMap(request
-					.getParameter("notify_data").toString());
+			resultMap = MapAndStringConvertor.convertResultToMap(responseMap.get("notify_data"));
 			String resultStr = resultMap.get("trade_status").toString();
 			String notify_id = resultMap.get("notify_id").toString();
 
