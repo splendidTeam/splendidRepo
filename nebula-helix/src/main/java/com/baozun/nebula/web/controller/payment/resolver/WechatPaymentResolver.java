@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
+			MemberDetails memberDetails, Device device, Map<String,String> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException {
 		
 		//0.如果是公众号支付需要准备openid
@@ -112,10 +113,10 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	}
 
 	@Override
-	public void doPayNotify(String payType, Device device, HttpServletRequest request,
-			HttpServletResponse response) throws IllegalPaymentStateException, IOException {
+	public void doPayNotify(String payType, HttpServletRequest request,
+			HttpServletResponse response) throws IllegalPaymentStateException, IOException, DocumentException{
 		
-		    String paymentType = PayTypeConvertUtil.getPayType(Integer.valueOf(payType));
+		    String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.WECHAT);
 		
 		    // 获取异步通知
 	        PaymentResult paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
@@ -216,7 +217,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	
 	//获取统一下单的参数
 	private WechatPayParamCommand buildWechatPayParamCommand(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request) {
+			MemberDetails memberDetails, Device device, Map<String,String> extra, HttpServletRequest request) {
 		
 		WechatPayParamCommand wechatPayParamCommand = new WechatPayParamCommand();
 		

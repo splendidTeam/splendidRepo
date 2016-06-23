@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,11 +211,11 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
             PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
 
-            paymentResolver.doPayNotify(payType, getDevice(request), request, response);
+            paymentResolver.doPayNotify(payType, request, response);
 
-        }catch (IllegalPaymentStateException | IOException e){
+        }catch (IllegalPaymentStateException | IOException | DocumentException e){
             LOGGER.error(e.getMessage(), e);
-        }
+        } 
 
     }
 
@@ -376,7 +377,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         validateSalesOrder(salesOrder, memberDetails);
         
         PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-        Map<String, Object> extraPayParams = getExtraPayParams(salesOrder, payInfoLog, memberDetails, getDevice(request), request);
+        Map<String, String> extraPayParams = getExtraPayParams(salesOrder, payInfoLog, memberDetails, getDevice(request), request);
         return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extraPayParams, request, response, model);
     }
     
@@ -394,10 +395,10 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
      * 
      * @return
      */
-    protected Map<String, Object> getExtraPayParams(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
+    protected Map<String, String> getExtraPayParams(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
 			MemberDetails memberDetails, Device device, HttpServletRequest request) {
 
-        Map<String, Object> extra = new HashMap<String, Object>();
+        Map<String, String> extra = new HashMap<String, String>();
 
         //默认即时到账，非扫码
         extra.put("qrPayMode", null);
