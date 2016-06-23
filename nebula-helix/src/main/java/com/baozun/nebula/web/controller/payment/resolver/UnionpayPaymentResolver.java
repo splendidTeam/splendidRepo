@@ -27,6 +27,7 @@ import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentSt
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
+import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
@@ -35,24 +36,27 @@ import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.RequestMapUtil;
-import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
-import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.command.PaymentResultType;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.payment.NebulaPaymentController;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
-public class AlipayPaymentResolver extends BasePaymentResolver implements PaymentResolver{
+public class UnionpayPaymentResolver extends BasePaymentResolver implements PaymentResolver{
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER          = LoggerFactory.getLogger(NebulaPaymentController.class);
+    
+	/**
+	 * 返回服务器信息
+	 */
+	public static final String UNIONSUCCESS = "200";
+
+	public static final String UNIONFAIL = "000";
 
     @Autowired
     private SdkPaymentManager   sdkPaymentManager;
@@ -86,7 +90,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         String itBPay = getItBPay(originalSalesOrder.getCreateTime());
 
         // 超时校验
-        if (itBPay.equals("0m")){
+        if (itBPay.equals("0")){
             throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME);
         }
 
@@ -125,23 +129,18 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         so.setOnLinePaymentCommand(getOnLinePaymentCommand(bankCode, payType, itBPay, qrPayMode, request));
 
         // 获取支付请求( url)链接对象
-        PaymentRequest paymentRequest = null;
-
-        if (device.isMobile()){
-            paymentRequest = paymentManager.createPaymentForWap(so);
-        }else{
-            paymentRequest = paymentManager.createPayment(so);
-        }
+        PaymentRequest paymentRequest =  paymentManager.createPayment(so);
 
         if (null == paymentRequest){
             throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
         }else{
-            String url = paymentRequest.getRequestURL();
+            String url = paymentRequest.getRequestHtml();
             if (StringUtils.isNotBlank(url)){
                 try{
                     // 记录日志和跳转到支付宝支付页面
                     payManager.savePayInfos(so, paymentRequest, memberDetails.getLoginName());
-                    response.sendRedirect(url);
+                    //response.sendRedirect(url);
+                    response.getWriter().write(url);
                 }catch (IOException e){
                     e.printStackTrace();
                 } 
@@ -154,74 +153,13 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     @Override
     public String doPayReturn(String payType, Device device, String paySuccessRedirect, String payFailureRedirect, 
     		HttpServletRequest request, HttpServletResponse response) throws IllegalPaymentStateException{
-        String subOrdinate = request.getParameter("out_trade_no");
-
-        LOGGER.info("[DO_PAY_RETURN] get sync notifications before , subOrdinate: {}", subOrdinate);
-        
-    	// 查询支付订单号信息
-		PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
-		
-		if (Validator.isNullOrEmpty(pc)) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS, subOrdinate, "交易流水不存在");
-		}
-        
-        // 判断交易是否已有成功 防止重复调用 。
-        PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
-
-        if (Validator.isNotNullOrEmpty(payCode)){
-        	return "redirect:" + paySuccessRedirect + "?subOrdinate=" + subOrdinate;
-        }
-
-        LOGGER.debug("[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
-
-        // 获取同步付款通知
-        PaymentResult paymentResult = null;
-
-        String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
-
-        if (device.isMobile()){
-            paymentResult = paymentManager.getPaymentResultForSynOfWap(request, paymentType);
-        }else{
-            paymentResult = paymentManager.getPaymentResultForSyn(request, paymentType);
-        }
-        if (null == paymentResult){
-            // 返回失败
-            return "redirect:" + payFailureRedirect + "?subOrdinate=" + subOrdinate;
-        }
-        LOGGER.info("[DO_PAY_RETURN] sync notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
-
-      	if(device.isMobile() && PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus())){
-    		// 因为同步通知手机端返回的是SUCCESS,所以此处需要将alipay pc端返回码设进去
-    		paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
-    	}
-        
-        // 获取支付状态
-        String payStatus = paymentResult.getPaymentServiceSatus().toString();
-
-        if (PAYMENT_SUCCESS.equals(payStatus)){
-            // 获取通知成功，修改支付及订单信息
-            payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), true, request);
-        }else{
-            // 获取通知失败或其他情况
-            payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_RETURN_AFTER_TYPE);
-            return "redirect:" + payFailureRedirect + "?subOrdinate=" + subOrdinate;
-        }
-
-        return "redirect:" + paySuccessRedirect + "?subOrdinate=" + subOrdinate;
+    	throw new IllegalAccessError("union pay donot support return invoke.");
     }
 
     @Override
     public void doPayNotify(String payType, HttpServletRequest request, 
     		HttpServletResponse response) throws IllegalPaymentStateException,IOException, DocumentException{
-    	boolean isMobile = false;
-    	
-		String aliPayMobileReturnData = request.getParameter("notify_data");
-		
-		if (Validator.isNotNullOrEmpty(aliPayMobileReturnData)) {
-			isMobile = true;
-		}
-		
-        String subOrdinate = getSubOrdinate(request, isMobile);
+        String subOrdinate = request.getParameter("orderId");
 
         LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
 
@@ -229,21 +167,15 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
 
         if (Validator.isNotNullOrEmpty(payCode)){
-            response.getWriter().write(PaymentResultType.SUCCESS);
+        	response.getWriter().write(UNIONSUCCESS);
         }else{
             LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
 
+            String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.UNIONPAY);
+            
             // 获取异步通知
-            PaymentResult paymentResult = null;
-
-            String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
-
-			if (isMobile) {
-				 paymentResult = paymentManager.getPaymentResultForAsyOfWap(request, paymentType);
-			}else{
-				 paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
-			}
-
+            PaymentResult paymentResult =  paymentManager.getPaymentResultForAsy(request, paymentType);
+            
             LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 
             if (null == paymentResult){
@@ -254,7 +186,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
                                 null,
                                 request.getRequestURL().toString());
                 // 返回失败
-                response.getWriter().write(PaymentResultType.FAIL);
+                response.getWriter().write(UNIONFAIL);
             }else{
                 // 获取支付状态
                 String responseStatus = paymentResult.getPaymentServiceSatus().toString();
@@ -294,7 +226,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
                     payManager.savePaymentResultPaymentLog(paymentResult, null, Constants.DO_NOTIFY_AFTER_TYPE);
                 }
 
-                response.getWriter().write(paymentResult.getResponseValue());
+                response.getWriter().write(UNIONSUCCESS);
             }
         }
     }
@@ -317,7 +249,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 			onLinePaymentCommand.setIsInternationalCard(false);
 		}
 		onLinePaymentCommand.setPayType(payType);
-		onLinePaymentCommand.setQrPayMode(qrPayMode);
+		//onLinePaymentCommand.setQrPayMode(qrPayMode);
 		return onLinePaymentCommand;
 	}
 
@@ -336,32 +268,11 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		}
 		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
 		if (itBPay <= 0L) {
-			return "0m";
+			return "0";
 		} else {
-			return itBPay.toString() + "m";
+			return itBPay.toString();
 		}
 	}
-	
-	/**
-	 * 从通知请求中解析交易流水号（支付宝异步通知用）
-	 * 
-	 * @param request
-	 * @param isMobile
-	 * @return
-	 * @throws DocumentException
-	 */
-	private String getSubOrdinate(HttpServletRequest request, boolean isMobile) throws DocumentException {
-		if (isMobile) {
-			Map<String, String> responseMap = new HashMap<String, String>();
-			RequestMapUtil.requestConvert(request, responseMap);
-			LOGGER.info("[DO_PAY_NOTIFY]request notify_data is [{}]", responseMap.get("notify_data"));
-			Map<String, String> resultMap = MapAndStringConvertor
-					.convertResultToMap(responseMap.get("notify_data"));
-			return resultMap.get("out_trade_no");
-		}
-		return request.getParameter("out_trade_no");
-	}
-
 
 
     //TODO

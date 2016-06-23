@@ -10,12 +10,16 @@
 	<bean id="paymentResolverType" class="com.baozun.nebula.web.controller.payment.resolver.PaymentResolverType">
 		<property name="paymentResolverTypes">
 			<map>
+				<entry key="4">
+					<bean class="com.baozun.nebula.web.controller.payment.resolver.WechatPaymentResolver" />
+				</entry>
+				
 				<entry key="6">
 					<bean class="com.baozun.nebula.web.controller.payment.resolver.AlipayPaymentResolver" />
 				</entry>
-
-				<entry key="4">
-					<bean class="com.baozun.nebula.web.controller.payment.resolver.WechatPaymentResolver" />
+				
+				<entry key="320">
+					<bean class="com.baozun.nebula.web.controller.payment.resolver.UnionpayPaymentResolver" />
 				</entry>
 			</map>
 		</property>

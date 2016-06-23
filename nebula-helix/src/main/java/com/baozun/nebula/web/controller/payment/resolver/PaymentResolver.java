@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dom4j.DocumentException;
 import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
@@ -23,6 +24,6 @@ public interface PaymentResolver {
 	String doPayReturn(String payType, Device device, String paySuccessRedirect, String payFailureRedirect,
 			HttpServletRequest request, HttpServletResponse response) throws IllegalPaymentStateException;
 
-	void doPayNotify(String payType, Device device, HttpServletRequest request, 
-			HttpServletResponse response) throws IllegalPaymentStateException, IOException;
+	void doPayNotify(String payType,HttpServletRequest request, 
+			HttpServletResponse response) throws IllegalPaymentStateException, IOException, DocumentException;
 }

@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,45 @@ import com.feilong.servlet.http.RequestUtil;
 
 /**
  * Neubla支付Controller
+ * 
+ * <p>Nebula预支持如下的支付方式，分期去实现（括号中为期次）：</br>
+ * 
+ * 一、PC网页
+ * <ol>
+ * <li>支付宝即时到账(I)</li>
+ * <li>支付宝扫码(I)</li>
+ * <li>微信扫码(I)</li>
+ * <li>银联网关支付(II)</li>
+ * <li>建行直连支付(III)</li>
+ * <li>Asia Pay(III)</li>
+ * <li>Paypal(III)</li>
+ * <li>支付宝国际卡支付 (III)</li>
+ * </ol>
+ * 二、移动页面
+ * <ol>
+ * <li>支付宝手机网站支付(I)</li>
+ * <li>银联手机支付(II)</li>
+ * <li>微信H5支付(III)</li>
+ * </ol>
+ * 三、微信公众号
+ * <ol>
+ * <li>微信公众号支付 (I)</li>
+ * </ol>
+ * </p>
  *
+ * <ul>支付相关的操作：
+ * <li>发起支付: {@link #toPay(MemberDetails, String, HttpServletRequest, HttpServletResponse, Model)}}</br>
+ * 根据不同的支付方式，构造进入第三方支付平台支付页面的url，微信支付和其他的支付方式不同，会进入商城自己实现的支付页面，在该页面完成扫码或者公众号支付。
+ * {@link #buildPayUrl(String, MemberDetails, HttpServletRequest, HttpServletResponse, Model)}，该实现默认不支持合并付款，所以传过来的流水号理论上只能查询到一笔支付日志（PayInfoLog）。
+ * 在发起支付的逻辑里，会对当前支付流水及订单做基本的校验，比如，订单是否存在，订单状态是否和规等，如果不满足需求可以重写{@link #NebulaBasePaymentController.validateSalesOrder(SalesOrderCommand, MemberDetails)}
+ * </li>
+ * <li>支付完成的前台通知:{@link #doPayReturn(String, HttpServletRequest, HttpServletResponse, Model)} </li>
+ * <li>支付完成的后台通知:{@link #doPayNotify(String, HttpServletRequest, HttpServletResponse)}</li>
+ * <li>支付成功页面:{@link #showPaySuccess(MemberDetails, String, HttpServletRequest, HttpServletResponse, Model)}</li>
+ * <li>支付失败页面:{@link #showPayFailure(MemberDetails, String, HttpServletRequest, HttpServletResponse, Model)}</li>
+ * <li>发起支付异常页面:{@link #showToPayException(MemberDetails, String, HttpServletRequest, HttpServletResponse, Model)}</li>
+ * </ul>
+ * 
  * @author yimin.qiao
  * @version 1.0
  * @time 2016年5月26日 上午11:33:30
@@ -74,13 +113,13 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
     //默认url的定义
     /** 支付异常页的url */
-    protected static final String URL_TOPAY_EXCEPTION_PAGE = "/payment/error.htm";
+    protected static final String URL_TOPAY_EXCEPTION_PAGE = "/pay/error.htm";
     
     /** 支付成功页面. */
-    protected static final String URL_PAY_SUCCESS_PAGE     = "/payment/success.htm";
+    protected static final String URL_PAY_SUCCESS_PAGE     = "/pay/success.htm";
     
     /** 支付失败页面. */
-    protected static final String URL_PAY_FAILURE_PAGE     = "/payment/failure.htm";
+    protected static final String URL_PAY_FAILURE_PAGE     = "/pay/failure.htm";
 
     @Autowired
     private SdkPaymentManager     sdkPaymentManager;
@@ -131,7 +170,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     /**
      * 支付完成的前台通知
      * 
-     * @RequestMapping(value = "/payment/return/{payType}.htm")
+     * @RequestMapping(value = "/pay/return/{payType}.htm")
      * 
      * @return
      */
@@ -156,7 +195,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     /**
      * 支付完成的后台通知
      * 
-     * @RequestMapping(value = "/payment/notify/{payType}.htm")
+     * @RequestMapping(value = "/pay/notify/{payType}.htm")
      * 
      * @param payType
      * @param request
@@ -172,18 +211,18 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
 
             PaymentResolver paymentResolver = paymentResolverType.getInstance(payType);
 
-            paymentResolver.doPayNotify(payType, getDevice(request), request, response);
+            paymentResolver.doPayNotify(payType, request, response);
 
-        }catch (IllegalPaymentStateException | IOException e){
+        }catch (IllegalPaymentStateException | IOException | DocumentException e){
             LOGGER.error(e.getMessage(), e);
-        }
+        } 
 
     }
 
     /**
      * 支付成功页面
      * 
-     * @RequestMapping(value = "/payment/success.htm")
+     * @RequestMapping(value = "/pay/success.htm")
      * 
      * @param memberDetails
      * @param subOrdinate
@@ -237,7 +276,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     /**
      * 支付失败页面
      * 
-     * @RequestMapping(value = "/payment/failure.htm")
+     * @RequestMapping(value = "/pay/failure.htm")
      * 
      * @param memberDetails
      * @param subOrdinate
@@ -290,7 +329,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
     /**
      * 发起支付异常页面
      * 
-     * @RequestMapping(value = "/payment/error.htm")
+     * @RequestMapping(value = "/pay/error.htm")
      * 
      * @param memberDetails
      * @param subOrdinate
