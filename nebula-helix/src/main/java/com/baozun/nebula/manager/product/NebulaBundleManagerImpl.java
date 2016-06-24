@@ -39,7 +39,6 @@ import com.baozun.nebula.command.product.BundleCommand.BundleStatus;
 import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
-import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleElementDao;
@@ -594,13 +593,15 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 */
 	private BundleItemCommand packagingBundleItemCommandInfo(Long itemId, List<BundleSku> skus, BundleCommand bundle) {
 
-		BundleItemCommand bundleItemCommand = new BundleItemCommand();
 		Item item = itemDao.findItemById(itemId);
 		if (Validator.isNullOrEmpty(item)) {
 			LOG.error("get item is null by itemId : [{}] , bundleId : [{}] , {}. so set item lifecycle is 2", itemId,
 					bundle.getId(), new Date());
+			return null;
 		}
-		bundleItemCommand.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
+		
+		BundleItemCommand bundleItemCommand = new BundleItemCommand();
+		bundleItemCommand.setLifecycle(item.getLifecycle());
 		bundleItemCommand.setItemId(itemId);
 		bundleItemCommand.setItemCode(item.getCode());
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
@@ -627,11 +628,12 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
 			if (Validator.isNullOrEmpty(skuu)) {
-				LOG.error("get Sku is null by skuId : [{}] {}. so set sku lifecycle is " + Item.LIFECYCLE_DELETED, sku.getSkuId(), new Date());
+				LOG.error("get Sku is null by skuId : [{}] {}. ", sku.getSkuId(), new Date());
+				continue;
 			}
-			skuCommand.setProperties(skuu == null ? "" : skuu.getProperties());
-			skuCommand.setExtentionCode(skuu == null ? "" : skuu.getOutid());
-			skuCommand.setLifeCycle(skuu == null ? Item.LIFECYCLE_DELETED : skuu.getLifecycle());
+			skuCommand.setProperties(skuu.getProperties());
+			skuCommand.setExtentionCode(skuu.getOutid());
+			skuCommand.setLifeCycle(skuu.getLifecycle());
 
 			// 定制价格 一口价（）
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
@@ -640,10 +642,10 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			}
 			// 按照实际价格
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
-				skuCommand.setSalesPrice(skuu == null ? BigDecimal.ZERO : skuu.getSalePrice());
+				skuCommand.setSalesPrice(skuu.getSalePrice());
 			}
-			skuCommand.setOriginalSalesPrice(skuu == null ? BigDecimal.ZERO : skuu.getSalePrice());
-			skuCommand.setListPrice(skuu == null ? BigDecimal.ZERO : skuu.getListPrice());
+			skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
+			skuCommand.setListPrice(skuu.getListPrice());
 
 			Integer availableQty = bundle.getAvailableQty();
 			// 如果捆绑装单独维护了库存
