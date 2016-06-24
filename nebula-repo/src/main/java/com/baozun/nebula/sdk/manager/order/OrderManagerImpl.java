@@ -216,9 +216,6 @@ public class OrderManagerImpl implements OrderManager{
     			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
     			searchParam.get("sdkQueryType").equals("1");
         List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
-        boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
-    			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
-    			searchParam.get("sdkQueryType").equals("1");
         for (SalesOrderCommand cmd : salesOrderPage){
         	if(isDecrypt){
         		decryptSalesOrderCommand(cmd);
