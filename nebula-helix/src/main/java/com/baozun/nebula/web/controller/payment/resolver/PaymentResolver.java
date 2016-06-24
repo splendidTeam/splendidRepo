@@ -18,7 +18,7 @@ import com.baozun.nebula.web.MemberDetails;
 public interface PaymentResolver {
 	
 	String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
+			MemberDetails memberDetails, Device device, Map<String,String> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException;
 
 	String doPayReturn(String payType, Device device, String paySuccessRedirect, String payFailureRedirect,

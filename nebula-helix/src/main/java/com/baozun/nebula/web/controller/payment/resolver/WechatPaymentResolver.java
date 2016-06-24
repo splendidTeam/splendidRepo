@@ -72,7 +72,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request, 
+			MemberDetails memberDetails, Device device, Map<String,String> extra, HttpServletRequest request, 
 			HttpServletResponse response, Model model) throws IllegalPaymentStateException {
 		
 		//0.如果是公众号支付需要准备openid
@@ -217,7 +217,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	
 	//获取统一下单的参数
 	private WechatPayParamCommand buildWechatPayParamCommand(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
-			MemberDetails memberDetails, Device device, Map<String,Object> extra, HttpServletRequest request) {
+			MemberDetails memberDetails, Device device, Map<String,String> extra, HttpServletRequest request) {
 		
 		WechatPayParamCommand wechatPayParamCommand = new WechatPayParamCommand();
 		

@@ -82,7 +82,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
                     PayInfoLog payInfoLog,
                     MemberDetails memberDetails,
                     Device device,
-                    Map<String, Object> extra,
+                    Map<String, String> extra,
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model) throws IllegalPaymentStateException{

@@ -377,7 +377,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         validateSalesOrder(salesOrder, memberDetails);
         
         PaymentResolver paymentResolver = paymentResolverType.getInstance(payInfoLog.getPayType().toString());
-        Map<String, Object> extraPayParams = getExtraPayParams(salesOrder, payInfoLog, memberDetails, getDevice(request), request);
+        Map<String, String> extraPayParams = getExtraPayParams(salesOrder, payInfoLog, memberDetails, getDevice(request), request);
         return paymentResolver.buildPayUrl(salesOrder, payInfoLog, memberDetails, getDevice(request), extraPayParams, request, response, model);
     }
     
@@ -395,10 +395,10 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
      * 
      * @return
      */
-    protected Map<String, Object> getExtraPayParams(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
+    protected Map<String, String> getExtraPayParams(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
 			MemberDetails memberDetails, Device device, HttpServletRequest request) {
 
-        Map<String, Object> extra = new HashMap<String, Object>();
+        Map<String, String> extra = new HashMap<String, String>();
 
         //默认即时到账，非扫码
         extra.put("qrPayMode", null);
