@@ -15,10 +15,11 @@
 		<property name="maxPoolSize" value="30" />
 	</bean>
 
-	<!--  邮件发送器  -->
+	<!-- 邮件发送器 -->
 	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="#{meta['mail.host']}" />
-		<property name="port" value="#{meta['mail.port'] != null ? meta['mail.port'] : -1}" />
+		<property name="port"
+			value="#{meta['mail.port'] != null ? meta['mail.port'] : -1}" />
 		<property name="username" value="#{meta['mail.username']}" />
 		<property name="password" value="#{meta['mail.password']}" />
 		<property name="defaultEncoding" value="#{meta['mail.defaultEncoding']}"></property>
@@ -26,7 +27,11 @@
 			<props>
 				<prop key="mail.smtp.auth"><![CDATA[#{meta['mail.smtp.auth']}]]></prop>
 				<prop key="mail.smtp.timeout"><![CDATA[#{meta['mail.smtp.timeout']}]]></prop>
-				<prop key="#{meta['mail.usessl'] == 'true' ? 'mail.smtp.socketFactory.class' : 'nebula.nonsense'}">javax.net.ssl.SSLSocketFactory</prop>
+				<prop
+					key="#{meta['mail.usessl'] == 'true' ? 'mail.smtp.socketFactory.class' : 'nebula.nonsense'}">javax.net.ssl.SSLSocketFactory</prop>
+				<prop
+					key="#{meta['mail.usetls'] == 'true' ? 'mail.smtp.starttls.enable' : 'nebula.nonsense.tls'}">true</prop>
+
 			</props>
 		</property>
 	</bean>

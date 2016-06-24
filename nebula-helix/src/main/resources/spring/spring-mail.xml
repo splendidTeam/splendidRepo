@@ -29,6 +29,9 @@
 				<prop key="mail.smtp.timeout"><![CDATA[#{meta['mail.smtp.timeout']}]]></prop>
 				<prop
 					key="#{meta['mail.usessl'] == 'true' ? 'mail.smtp.socketFactory.class' : 'nebula.nonsense'}">javax.net.ssl.SSLSocketFactory</prop>
+				<prop
+					key="#{meta['mail.usetls'] == 'true' ? 'mail.smtp.starttls.enable' : 'nebula.nonsense.tls'}">true</prop>
+
 			</props>
 		</property>
 	</bean>
