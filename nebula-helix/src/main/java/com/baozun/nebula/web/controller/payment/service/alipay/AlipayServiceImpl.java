@@ -1,12 +1,16 @@
 package com.baozun.nebula.web.controller.payment.service.alipay;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +39,9 @@ public class AlipayServiceImpl implements AlipayService {
 	
 	private static final String INPUT_CHARSET = "utf-8";
 
+	@Resource
+	private Map<String, String> payTypeConverterMap;
+	
 	@Override
 	public PaymentRequest createPayment(SalesOrderCommand order, Map<String, String> additionParams, Device device) {
 		// TODO Auto-generated method stub
@@ -65,31 +72,35 @@ public class AlipayServiceImpl implements AlipayService {
         }
     }
 	
-	Map<String, String> buildRequestMapForWap(SalesOrderCommand order, PaymentAdaptor paymentAdaptor) {
-		Map<String, String> createDirectParaMap = getCreateDirectParaMap(order);
+	private PaymentRequest createPaymentForWap(SalesOrderCommand order, Map<String, String> additionParams) throws UnsupportedEncodingException, DocumentException {
+		//获得nebula-utility中的支付方式
+		String reservedPayType = getPayType(order.getOnLinePaymentCommand().getPayType());
+		LOGGER.info("[CREATE_PAYMENT_FORWAP] get reserved pay type. orderCode:[{}], storePayType:[{}], reservedPayType:[{}]", order.getCode(), order.getOnLinePaymentCommand().getPayType(), reservedPayType);
+		
+		PaymentFactory paymentFactory = PaymentFactory.getInstance();
+		PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(reservedPayType);// 获得支付适配器
 		
 		//创建一个新的MOBILE端授权请求
+		Map<String, String> createDirectParaMap = getCreateDirectParaMap(order);
+		LOGGER.info("[CREATE_PAYMENT_FORWAP] build create direct paramap");
+		// 將支付所需的定制参数赋值给createDirectParaMap
+        if (null != additionParams) {
+        	createDirectParaMap.putAll(additionParams);
+        } 
+        
 		PaymentRequest paymentRequest = paymentAdaptor.newPaymentRequestForMobileCreateDirect(createDirectParaMap);
-		
 		String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(), HttpMethodType.GET, INPUT_CHARSET);
+		Map<String,String> map = queryString2Map(URLDecoder.decode(result, INPUT_CHARSET));
 		
-		Map<String,String> map = new HashMap<String,String>();
-		try {
-			if(Validator.isNotNullOrEmpty(result)){
-				result = java.net.URLDecoder.decode(result, INPUT_CHARSET);
-				String[] params = result.split("&");
-				if(Validator.isNotNullOrEmpty(params)){
-					for(String param:params){
-						String key = param.split("=")[0].toString();
-						String val = param.replace(param.split("=")[0].toString()+"=", "");
-						map.put(key, val);
-					}
-				}
-			}
-			
-		} catch (UnsupportedEncodingException e) {
-			LOGGER.error("newPaymentRequestForMobileCreateDirect error: "+e.toString(), e);
-			return null;
+		//手机WAP端授权结果
+		PaymentResult paymentResult = paymentAdaptor.getPaymentResultForMobileCreateDirect(map);
+		
+		if(paymentResult.getPaymentServiceSatus().equals(PaymentServiceStatus.SUCCESS)){
+			Map<String, String> resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
+			//创建一个新的MOBILE端交易请求
+			paymentRequest = paymentAdaptor.newPaymentRequestForMobileAuthAndExecute(resultMap);
+			LOGGER.info(paymentRequest.getRequestURL());
+			return paymentRequest;
 		}
 		
 		return null;
@@ -172,6 +183,7 @@ public class AlipayServiceImpl implements AlipayService {
 		return paraMap;
 	}
     
+    //FIXME
     private String getPayType(Integer payType) {
     	if(SalesOrder.SO_PAYMENT_TYPE_ALIPAY.equals(payType.toString())) {
     		return PaymentFactory.PAY_TYPE_ALIPAY;
@@ -185,5 +197,24 @@ public class AlipayServiceImpl implements AlipayService {
     		throw new IllegalArgumentException("not an valide alipay type. payType:[" + payType + "]");
     	}
 	}
+    
+    /**
+     * 将类似于url中的queryString转化为map
+     * @param queryString
+     * @return
+     */
+    private Map<String, String> queryString2Map(String queryString) {
+    	Map<String,String> map = new HashMap<String,String>();
+    	
+    	String[] params = queryString.split("&");
+		if(Validator.isNotNullOrEmpty(params)){
+			for(String param : params){
+				String key = param.split("=")[0].toString();
+				String val = param.replace(param.split("=")[0].toString() + "=", "");
+				map.put(key, val);
+			}
+		}
+		return map;
+    }
 
 }

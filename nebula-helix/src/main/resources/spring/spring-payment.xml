@@ -7,6 +7,30 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd	
 		">
 		
+	<bean id="payTypeConverterMap" class="java.util.HashMap">
+	    <constructor-arg>
+	        <map>
+	            <entry key="#{T(com.baozun.nebula.model.salesorder.SalesOrder).SO_PAYMENT_TYPE_ALIPAY}" 
+	                value="#{T(com.baozun.nebula.utilities.integration.payment.PaymentFactory).PAY_TYPE_ALIPAY}"></entry>
+	                
+	            <entry key="#{T(com.baozun.nebula.model.salesorder.SalesOrder).SO_PAYMENT_TYPE_NETPAY}" 
+	                value="#{T(com.baozun.nebula.utilities.integration.payment.PaymentFactory).PAY_TYPE_ALIPAY_BANK}"></entry>
+	                
+	            <entry key="#{T(com.baozun.nebula.model.salesorder.SalesOrder).SO_PAYMENT_TYPE_ALIPAY_CREDIT}" 
+	                value="#{T(com.baozun.nebula.utilities.integration.payment.PaymentFactory).PAY_TYPE_ALIPAY_CREDIT}"></entry>
+	                
+	            <entry key="#{T(com.baozun.nebula.model.salesorder.SalesOrder).SO_PAYMENT_TYPE_INTERNATIONALCARD}" 
+	                value="#{T(com.baozun.nebula.utilities.integration.payment.PaymentFactory).PAY_TYPE_ALIPAY_CREDIT_INT}"></entry>
+	                
+	            <entry key="#{T(com.baozun.nebula.model.salesorder.SalesOrder).SO_PAYMENT_TYPE_UNIONPAY}" 
+	                value="#{T(com.baozun.nebula.utilities.integration.payment.PaymentFactory).PAY_TYPE_UNIONPAY}"></entry>
+	                
+	            <entry key="#{T(com.baozun.nebula.model.salesorder.SalesOrder).SO_PAYMENT_TYPE_WECHAT}" 
+	                value="#{T(com.baozun.nebula.utilities.integration.payment.PaymentFactory).PAY_TYPE_WECHAT}"></entry>
+	        </map>
+	    </constructor-arg>
+	</bean>
+	
 	<bean id="paymentResolverType" class="com.baozun.nebula.web.controller.payment.resolver.PaymentResolverType">
 		<property name="paymentResolverTypes">
 			<map>
