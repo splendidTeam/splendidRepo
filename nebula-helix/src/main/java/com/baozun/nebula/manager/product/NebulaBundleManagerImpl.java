@@ -46,6 +46,7 @@ import com.baozun.nebula.dao.product.BundleSkuDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.bundle.BundleElement;
@@ -482,6 +483,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		if (Validator.isNullOrEmpty(item)) {
 			LOG.error("find item is null by itemId : [{}] , bundleId : [{}] {}. so set item lifecycle is 2",
 					bundle.getItemId(), bundle.getId(), new Date());
+			throw new BusinessException("bundle item is null : [itemId=" + bundle.getItemId() + "]");
 		}
 		// 如果item == null 就设置为逻辑删除的状态 2
 		bundle.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
@@ -597,7 +599,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		if (Validator.isNullOrEmpty(item)) {
 			LOG.error("get item is null by itemId : [{}] , bundleId : [{}] , {}. so set item lifecycle is 2", itemId,
 					bundle.getId(), new Date());
-			return null;
+			throw new BusinessException("item is null : [itemId=" + itemId + "]");
 		}
 		
 		BundleItemCommand bundleItemCommand = new BundleItemCommand();
@@ -710,7 +712,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 		if (Validator.isNullOrEmpty(bundle)) {
 			LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] bundle is null: bundleItemId={}", bundleItemId);
-			return bundle;
+			throw new BusinessException("bundle extension information for item (itemId = '" + bundleItemId + "') is null!");
 		}
 		
 		fillBundleCommand(bundle);
