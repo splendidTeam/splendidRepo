@@ -44,6 +44,8 @@ import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.PaymentResultType;
 import com.baozun.nebula.web.constants.Constants;
+import com.baozun.nebula.web.controller.payment.service.alipay.AlipayService;
+import com.baozun.nebula.web.controller.payment.service.alipay.command.AlipayPayParamCommand;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -54,39 +56,36 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     private static final Logger LOGGER          = LoggerFactory.getLogger(AlipayPaymentResolver.class);
     
     @Autowired
-    private SdkPaymentManager   sdkPaymentManager;
+    private SdkPaymentManager sdkPaymentManager;
 
     @Autowired
-    private PaymentManager      paymentManager;
+    private PaymentManager paymentManager;
 
     @Autowired
-    private PayManager          payManager;
+    private PayManager payManager;
 
     @Autowired
-    private OrderManager        sdkOrderManager;
+    private OrderManager sdkOrderManager;
 
     @Autowired
-    private EventPublisher      eventPublisher;
+    private EventPublisher eventPublisher;
     
     @Autowired
-	private MataInfoManager     mataInfoManager;
+	private MataInfoManager mataInfoManager;
+    
+    @Autowired
+    private AlipayService alipayService;
     
     @Override
     public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog,
             MemberDetails memberDetails, Device device, Map<String, String> extra, HttpServletRequest request, 
-            HttpServletResponse response, Model model) throws IllegalPaymentStateException{
+            HttpServletResponse response, Model model) throws IllegalPaymentStateException {
 
 		//构造支付参数
-		SalesOrderCommand payParams = buildPayParams(originalSalesOrder, payInfoLog, request);
+    	AlipayPayParamCommand payParamCommand = buildPayParams(originalSalesOrder, payInfoLog, request);
 		
 		//获取支付请求( url)链接对象
-		PaymentRequest paymentRequest = null;
-		
-		if (device.isMobile()){
-		    paymentRequest = paymentManager.createPaymentForWap(payParams);
-		}else{
-		    paymentRequest = paymentManager.createPayment(payParams, extra);
-		}
+		PaymentRequest paymentRequest = alipayService.createPayment(payParamCommand, extra, device);
 		
 		if (null == paymentRequest){
 		    throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
@@ -95,7 +94,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		if (StringUtils.isNotBlank(paymentRequest.getRequestURL())){
 		    try{
 		        //记录日志和跳转到支付宝支付页面
-		        payManager.savePayInfos(payParams, paymentRequest, memberDetails.getLoginName());
+		        payManager.savePayInfos(buildSavePayLogParams(originalSalesOrder, payInfoLog), paymentRequest, memberDetails.getLoginName());
 		        response.sendRedirect(paymentRequest.getRequestURL());
 		    } catch (IOException e) {
 		    	LOGGER.error("[BUILD_PAY_URL] build alipay url error. subOrdinate:[" + payInfoLog.getSubOrdinate() + "]", e);
@@ -281,29 +280,22 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
      * @return
      * @throws IllegalPaymentStateException
      */
-    private SalesOrderCommand buildPayParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog,
+    private AlipayPayParamCommand buildPayParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog,
             HttpServletRequest request) throws IllegalPaymentStateException {
-    	
-        SalesOrderCommand so = new SalesOrderCommand();
-        so.setCode(payInfoLog.getSubOrdinate());
-        so.setTotal(payInfoLog.getPayMoney());
-        
-        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
-		onLinePaymentCommand.setBankCode(payInfoLog.getBankCode());
-		onLinePaymentCommand.setCustomerIp(RequestUtil.getClientIp(request));
-		onLinePaymentCommand.setPayTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
-		onLinePaymentCommand.setItBPay(getItBPay(salesOrder.getCreateTime()));
-		
-		onLinePaymentCommand.setPayType(payInfoLog.getPayType());
-		if(SalesOrder.SO_PAYMENT_TYPE_INTERNATIONALCARD.equals(payInfoLog.getPayType().toString())) {
-			onLinePaymentCommand.setIsInternationalCard(true);
+    	AlipayPayParamCommand payParam = new AlipayPayParamCommand();
+    	payParam.setOrderNo(payInfoLog.getSubOrdinate());
+    	payParam.setTotalFee(payInfoLog.getPayMoney());
+    	payParam.setDefaultBank(payInfoLog.getBankCode());
+    	payParam.setCustomerIp(RequestUtil.getClientIp(request));
+    	payParam.setPaymentTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+    	payParam.setItBPay(getItBPay(salesOrder.getCreateTime()));
+    	payParam.setPaymentType(payInfoLog.getPayType().toString());
+    	if(SalesOrder.SO_PAYMENT_TYPE_INTERNATIONALCARD.equals(payInfoLog.getPayType().toString())) {
+    		payParam.setIsInternationalCard(true);
 		} else {
-			onLinePaymentCommand.setIsInternationalCard(false);
+			payParam.setIsInternationalCard(false);
 		}
-        
-        so.setOnLinePaymentCommand(onLinePaymentCommand);
-        
-        return so;
+        return payParam;
     }
     
     /**
@@ -326,5 +318,23 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		
 		return itBPay.toString() + "m";
 	}
+	
+	/**
+	 * 为保存paylog构造对象
+	 * @param salesOrder
+	 * @param payInfoLog
+	 * @return
+	 */
+	private SalesOrderCommand buildSavePayLogParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog) {
+    	
+        SalesOrderCommand so = new SalesOrderCommand();
+        so.setCode(payInfoLog.getSubOrdinate());
+        
+        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
+		onLinePaymentCommand.setPayType(payInfoLog.getPayType());
+        so.setOnLinePaymentCommand(onLinePaymentCommand);
+        
+        return so;
+    }
 	
 }
