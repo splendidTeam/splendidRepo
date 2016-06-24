@@ -15,7 +15,6 @@
  */
 package com.baozun.nebula.manager.product;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
