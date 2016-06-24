@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +26,8 @@ import com.baozun.nebula.exception.IllegalPaymentStateException.IllegalPaymentSt
 import com.baozun.nebula.manager.system.MataInfoManager;
 import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
+import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
@@ -34,7 +35,6 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.RequestMapUtil;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
@@ -44,7 +44,6 @@ import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.PaymentResultType;
 import com.baozun.nebula.web.constants.Constants;
-import com.baozun.nebula.web.controller.payment.NebulaPaymentController;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -52,8 +51,8 @@ import com.feilong.tools.jsonlib.JsonUtil;
 public class AlipayPaymentResolver extends BasePaymentResolver implements PaymentResolver{
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER          = LoggerFactory.getLogger(NebulaPaymentController.class);
-
+    private static final Logger LOGGER          = LoggerFactory.getLogger(AlipayPaymentResolver.class);
+    
     @Autowired
     private SdkPaymentManager   sdkPaymentManager;
 
@@ -73,83 +72,38 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 	private MataInfoManager     mataInfoManager;
     
     @Override
-    public String buildPayUrl(
-                    SalesOrderCommand originalSalesOrder,
-                    PayInfoLog payInfoLog,
-                    MemberDetails memberDetails,
-                    Device device,
-                    Map<String, Object> extra,
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    Model model) throws IllegalPaymentStateException{
+    public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog,
+            MemberDetails memberDetails, Device device, Map<String, String> extra, HttpServletRequest request, 
+            HttpServletResponse response, Model model) throws IllegalPaymentStateException{
 
-        String itBPay = getItBPay(originalSalesOrder.getCreateTime());
-
-        // 超时校验
-        if (itBPay.equals("0m")){
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME);
-        }
-
-        // 获取各种参数
-        String payInfo = payInfoLog.getPayInfo();
-
-        Properties pro = ProfileConfigUtil.findCommonPro("config/payMentInfo.properties");
-        String payTypeStr = pro.getProperty(payInfo + ".payType");
-        String bankCode = pro.getProperty(payInfo + ".bankcode");
-
-        Integer payType = null;
-
-        if (Validator.isNotNullOrEmpty(payTypeStr)){
-            payType = Integer.parseInt(payTypeStr.trim());
-        }
-
-        if (Validator.isNotNullOrEmpty(bankCode)){
-            bankCode = bankCode.trim();
-        }
-
-        String subOrdinate = payInfoLog.getSubOrdinate();
-
-        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
-
-        String qrPayMode = "";
-
-        if (extra.get("qrPayMode") != null){
-            qrPayMode = extra.get("qrPayMode").toString();
-        }
-
-        // 参数封装
-        SalesOrderCommand so = new SalesOrderCommand();
-        so.setCode(subOrdinate);
-        so.setTotal(pc.getPayMoney());
-        so.setOmsCode(String.valueOf(System.currentTimeMillis()));
-        so.setOnLinePaymentCommand(getOnLinePaymentCommand(bankCode, payType, itBPay, qrPayMode, request));
-
-        // 获取支付请求( url)链接对象
-        PaymentRequest paymentRequest = null;
-
-        if (device.isMobile()){
-            paymentRequest = paymentManager.createPaymentForWap(so);
-        }else{
-            paymentRequest = paymentManager.createPayment(so);
-        }
-
-        if (null == paymentRequest){
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
-        }else{
-            String url = paymentRequest.getRequestURL();
-            if (StringUtils.isNotBlank(url)){
-                try{
-                    // 记录日志和跳转到支付宝支付页面
-                    payManager.savePayInfos(so, paymentRequest, memberDetails.getLoginName());
-                    response.sendRedirect(url);
-                }catch (IOException e){
-                    e.printStackTrace();
-                } 
-            }
-        }
-
-        return null;
-    }
+		//构造支付参数
+		SalesOrderCommand payParams = buildPayParams(originalSalesOrder, payInfoLog, request);
+		
+		//获取支付请求( url)链接对象
+		PaymentRequest paymentRequest = null;
+		
+		if (device.isMobile()){
+		    paymentRequest = paymentManager.createPaymentForWap(payParams);
+		}else{
+		    paymentRequest = paymentManager.createPayment(payParams, extra);
+		}
+		
+		if (null == paymentRequest){
+		    throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
+		}
+		
+		if (StringUtils.isNotBlank(paymentRequest.getRequestURL())){
+		    try{
+		        //记录日志和跳转到支付宝支付页面
+		        payManager.savePayInfos(payParams, paymentRequest, memberDetails.getLoginName());
+		        response.sendRedirect(paymentRequest.getRequestURL());
+		    } catch (IOException e) {
+		    	LOGGER.error("[BUILD_PAY_URL] build alipay url error. subOrdinate:[" + payInfoLog.getSubOrdinate() + "]", e);
+		    }
+		}
+		
+		return null;
+	}
 
     @Override
     public String doPayReturn(String payType, Device device, String paySuccessRedirect, String payFailureRedirect, 
@@ -299,49 +253,6 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         }
     }
     
-    /**
-	 * 获取支付信息
-	 * @param bankCode
-	 * @param payType
-	 * @return
-	 */
-	protected OnLinePaymentCommand getOnLinePaymentCommand(String bankCode, Integer payType, String itBPay, String qrPayMode, HttpServletRequest request) {
-		OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
-		onLinePaymentCommand.setBankCode(bankCode);
-		onLinePaymentCommand.setCustomerIp(RequestUtil.getClientIp(request));
-		onLinePaymentCommand.setPayTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
-		onLinePaymentCommand.setItBPay(itBPay);
-		if (payType == ReservedPaymentType.ALIPAY_CREDIT_INT_M || payType == ReservedPaymentType.ALIPAY_CREDIT_INT_V) {
-			onLinePaymentCommand.setIsInternationalCard(true);
-		} else {
-			onLinePaymentCommand.setIsInternationalCard(false);
-		}
-		onLinePaymentCommand.setPayType(payType);
-		onLinePaymentCommand.setQrPayMode(qrPayMode);
-		return onLinePaymentCommand;
-	}
-
-    /**
-	 * 获取过期时间
-	 * @param orderCreateDate
-	 * @return
-	 * @throws IllegalPaymentStateException
-	 */
-	private String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
-		String payExpiryTime = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
-		Date now = new Date();
-		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  
-		if (payExpiryTime == null) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
-		}
-		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
-		if (itBPay <= 0L) {
-			return "0m";
-		} else {
-			return itBPay.toString() + "m";
-		}
-	}
-	
 	/**
 	 * 从通知请求中解析交易流水号（支付宝异步通知用）
 	 * 
@@ -361,12 +272,59 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		}
 		return request.getParameter("out_trade_no");
 	}
-
-
-
-    //TODO
-    //注意这里的paytype要设置成
-    //order.getOnLinePaymentCancelCommand().getPayType()
-    //OnLinePaymentCancelCommand的payType用ReservedPaymentType里的常量
-
+	
+    /**
+     * 构造支付参数
+     * @param salesOrder
+     * @param payInfoLog
+     * @param request
+     * @return
+     * @throws IllegalPaymentStateException
+     */
+    private SalesOrderCommand buildPayParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog,
+            HttpServletRequest request) throws IllegalPaymentStateException {
+    	
+        SalesOrderCommand so = new SalesOrderCommand();
+        so.setCode(payInfoLog.getSubOrdinate());
+        so.setTotal(payInfoLog.getPayMoney());
+        
+        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
+		onLinePaymentCommand.setBankCode(payInfoLog.getBankCode());
+		onLinePaymentCommand.setCustomerIp(RequestUtil.getClientIp(request));
+		onLinePaymentCommand.setPayTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+		onLinePaymentCommand.setItBPay(getItBPay(salesOrder.getCreateTime()));
+		
+		onLinePaymentCommand.setPayType(payInfoLog.getPayType());
+		if(SalesOrder.SO_PAYMENT_TYPE_INTERNATIONALCARD.equals(payInfoLog.getPayType().toString())) {
+			onLinePaymentCommand.setIsInternationalCard(true);
+		} else {
+			onLinePaymentCommand.setIsInternationalCard(false);
+		}
+        
+        so.setOnLinePaymentCommand(onLinePaymentCommand);
+        
+        return so;
+    }
+    
+    /**
+	 * 获取过期时间
+	 * @param orderCreateDate
+	 * @return
+	 * @throws IllegalPaymentStateException
+	 */
+	private String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
+		String payExpiryTime = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
+		
+		Date now = new Date();
+		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  
+		
+		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
+		
+		if (itBPay <= 0L) {
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME);
+		}
+		
+		return itBPay.toString() + "m";
+	}
+	
 }
