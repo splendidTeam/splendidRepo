@@ -27,8 +27,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.constant.EmailConstants;
 import com.baozun.nebula.constant.EmailType;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodesFoo;
@@ -43,6 +47,8 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.constants.CommonUrlConstants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.feilong.core.Validator;
 
 /**
@@ -85,6 +91,7 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 	@Value("#{meta['page.base']}")
 	private String  pageUrlBase = "";
 	
+	
 	/**
 	 * 发送激活邮件,成功后跳转到提示用户激活页面,默认推荐配置如下
 	 * <ol>
@@ -93,6 +100,7 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 	 * <li>model.addAttribute("sendEmail", e.getWebsite());将该邮箱的源地址传递到前台.便于直接跳转到该邮箱</li>
 	 * <li>注册成功后,绑定第三方和商城账户,并保存行为数据,重新构建MemberDetails以及Status</li>
 	 * </ol>
+	 * 
 	 * 
 	 * @RequestMapping(value = "/member/sendRegEmail", method =RequestMethod.GET)
 	 * 
@@ -128,7 +136,36 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 		LOG.info("begin sendActiveEmail");
 		//发送邮件获取响应码 
 		SendEmailResultCode resultCode=memberEmailManager.sendActiveEmail(memberId, path,email);
+		if(resultCode==SendEmailResultCode.SUCESS){
+			return "redirect:/member/activeEmailPage";
+		}
+		return "redirect:/";
+	}
+	
+	
+	
+	/**
+	 * 激活邮件发送成功后跳转页面 此方法用于给上面激活的方法redirect
+	 * 跳转到 VIEW_MEMBER_REGISTER_ACTIVE_EMAIL
+	 * @RequestMapping(value = "/member/activeEmailPage", method =RequestMethod.GET)
+	 * 
+	 * @param memberDetails
+	 * @param httpRequest
+	 * @param httpResponse
+	 * @param model
+	 * @return
+	 */
+	public String sendActiveEmailSuccessPage(@LoginMember MemberDetails memberDetails,
+			   HttpServletRequest httpRequest, 
+			   HttpServletResponse httpResponse,
+			   Model model) {
 		
+		//判断是否登录
+		if(Validator.isNullOrEmpty(memberDetails)){
+			return "redirect:/member/login";
+		}
+
+		String email=memberDetails.getLoginEmail();
 		//********************************************************************************
 		//获取跳转地址
 		EmailType e = EmailUtil.getEmailType(email); 
@@ -137,12 +174,58 @@ public class NebulaEmailAccountActivationController extends NebulaAbstractLoginC
 		} else {
 			model.addAttribute("sendEmail", "");
 		}
-		
-		model.addAttribute("emailAdd", email);
-		model.addAttribute("resultCode", resultCode);
-		
 		return VIEW_MEMBER_REGISTER_ACTIVE_EMAIL;
 	}
+	
+	
+	/**
+	 * 重新发送激活邮件 需要判断次数 以及 发送时间间隔
+	 * 
+	 * @ResponseBody
+	 * @RequestMapping(value = "/member/reSendRegEmail.json", method =RequestMethod.GET)
+	 * 
+	 * @param memberDetails 
+	 * @param request
+	 * @param response
+	 * @param model
+	 */
+	public NebulaReturnResult reSendRegEmail(@LoginMember MemberDetails memberDetails,
+							   HttpServletRequest httpRequest, 
+							   HttpServletResponse httpResponse,
+							   Model model) {
+		
+		DefaultReturnResult defaultReturnResult=new DefaultReturnResult();
+		defaultReturnResult.setResult(false);
+		
+		LOG.info("valid or get loginEmail  start");
+		Long memberId=null;
+		String email="";
+		//判断memberId是否为空 如为空通过session中存的loginemail获取email地址
+		if(memberDetails!=null){
+			memberId = memberDetails.getMemberId();
+			email = memberDetails.getLoginEmail();
+		}else{
+			String loginEmail = (String)httpRequest.getSession().getAttribute(SessionKeyConstants.MEMBER_REG_EMAIL_URL);
+			MemberCommand member = sdkMemberManager.findMemberByLoginEmail(loginEmail);
+			memberId = member.getId();
+			email =  member.getLoginEmail();
+		}
+		LOG.info("valid or get loginEmail   end");
+		
+		//拼接发送地址
+		String path=getRegEmailValidPath(httpRequest);
+		
+		//调用方法,发送邮件
+		LOG.info("begin sendActiveEmail");
+		//发送邮件获取响应码 
+		SendEmailResultCode resultCode=memberEmailManager.sendActiveEmail(memberId, path,email);
+		if(resultCode==SendEmailResultCode.SUCESS){
+			defaultReturnResult.setResult(true);
+		}
+		
+		return defaultReturnResult;
+	}
+	
 	
 	
 	/**

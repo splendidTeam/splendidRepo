@@ -56,8 +56,13 @@
 	<bean id="zkWatcherControl" class="com.baozun.nebula.curator.watcher.ZkWatcherControl">
 		<property name="watchers">
 			<list>
-				<ref local="scheduleTaskWatch" />
+				<ref local="engineWatch" />
+				<ref local="freightWatch" />
+				<ref local="i18nLangwatch" />
+				<ref local="moduleMapWatch" />
+				<ref local="urlMapWatch" />
 				<ref local="systemConfigWatch" />
+				<ref local="scheduleTaskWatch" />
 			</list>
 		</property>
 	</bean>

@@ -144,6 +144,15 @@ public class SalesOrder extends BaseModel{
 
     /** 22 信用卡支付. */
     public static final String SO_PAYMENT_TYPE_CREDIT_CARD                  = "22";
+    
+    /** 710 Paypal */
+	public static final String	SO_PAYMENT_TYPE_PAYPAL						= "710";
+    
+    /** 720 PayDoolar */
+	public static final String	SO_PAYMENT_TYPE_PAYDOOLAR					= "720";
+	
+	/** 131 支付宝-国际卡 */
+	public static final String	SO_PAYMENT_TYPE_INTERNATIONALCARD		    = "131";
 
     /** 商城正常下单. */
     public static final int    SO_SOURCE_NORMAL                             = 1;

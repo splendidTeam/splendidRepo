@@ -15,7 +15,6 @@
  */
 package com.baozun.nebula.manager.product;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +38,6 @@ import com.baozun.nebula.command.product.BundleCommand.BundleStatus;
 import com.baozun.nebula.command.product.BundleElementCommand;
 import com.baozun.nebula.command.product.BundleItemCommand;
 import com.baozun.nebula.command.product.BundleSkuCommand;
-import com.baozun.nebula.command.product.BundleSkuPriceCommand;
 import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.product.BundleDao;
 import com.baozun.nebula.dao.product.BundleElementDao;
@@ -47,6 +45,7 @@ import com.baozun.nebula.dao.product.BundleSkuDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
+import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.bundle.BundleElement;
@@ -483,6 +482,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 		if (Validator.isNullOrEmpty(item)) {
 			LOG.error("find item is null by itemId : [{}] , bundleId : [{}] {}. so set item lifecycle is 2",
 					bundle.getItemId(), bundle.getId(), new Date());
+			throw new BusinessException("bundle item is null : [itemId=" + bundle.getItemId() + "]");
 		}
 		// 如果item == null 就设置为逻辑删除的状态 2
 		bundle.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
@@ -594,13 +594,15 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 	 */
 	private BundleItemCommand packagingBundleItemCommandInfo(Long itemId, List<BundleSku> skus, BundleCommand bundle) {
 
-		BundleItemCommand bundleItemCommand = new BundleItemCommand();
 		Item item = itemDao.findItemById(itemId);
 		if (Validator.isNullOrEmpty(item)) {
 			LOG.error("get item is null by itemId : [{}] , bundleId : [{}] , {}. so set item lifecycle is 2", itemId,
 					bundle.getId(), new Date());
+			throw new BusinessException("item is null : [itemId=" + itemId + "]");
 		}
-		bundleItemCommand.setLifecycle(item == null ? Item.LIFECYCLE_DELETED : item.getLifecycle());
+		
+		BundleItemCommand bundleItemCommand = new BundleItemCommand();
+		bundleItemCommand.setLifecycle(item.getLifecycle());
 		bundleItemCommand.setItemId(itemId);
 		bundleItemCommand.setItemCode(item.getCode());
 		List<BundleSkuCommand> skuCommands = packagingBundleSkuCommands(skus, bundle);
@@ -627,11 +629,12 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 			Sku skuu = skuDao.findSkuById(sku.getSkuId());
 			if (Validator.isNullOrEmpty(skuu)) {
-				LOG.error("get Sku is null by skuId : [{}] {}. so set sku lifecycle is " + Item.LIFECYCLE_DELETED, sku.getSkuId(), new Date());
+				LOG.error("get Sku is null by skuId : [{}] {}. ", sku.getSkuId(), new Date());
+				continue;
 			}
-			skuCommand.setProperties(skuu == null ? "" : skuu.getProperties());
-			skuCommand.setExtentionCode(skuu == null ? "" : skuu.getOutid());
-			skuCommand.setLifeCycle(skuu == null ? Item.LIFECYCLE_DELETED : skuu.getLifecycle());
+			skuCommand.setProperties(skuu.getProperties());
+			skuCommand.setExtentionCode(skuu.getOutid());
+			skuCommand.setLifeCycle(skuu.getLifecycle());
 
 			// 定制价格 一口价（）
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_CUSTOMPRICE
@@ -640,10 +643,10 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 			}
 			// 按照实际价格
 			if (bundle.getPriceType().intValue() == Bundle.PRICE_TYPE_REALPRICE) {
-				skuCommand.setSalesPrice(skuu == null ? BigDecimal.ZERO : skuu.getSalePrice());
+				skuCommand.setSalesPrice(skuu.getSalePrice());
 			}
-			skuCommand.setOriginalSalesPrice(skuu == null ? BigDecimal.ZERO : skuu.getSalePrice());
-			skuCommand.setListPrice(skuu == null ? BigDecimal.ZERO : skuu.getListPrice());
+			skuCommand.setOriginalSalesPrice(skuu.getSalePrice());
+			skuCommand.setListPrice(skuu.getListPrice());
 
 			Integer availableQty = bundle.getAvailableQty();
 			// 如果捆绑装单独维护了库存
@@ -708,7 +711,7 @@ public class NebulaBundleManagerImpl implements NebulaBundleManager {
 
 		if (Validator.isNullOrEmpty(bundle)) {
 			LOG.debug("[GET_BUNDLE_BY_BUNDLE_ITEM_ID] bundle is null: bundleItemId={}", bundleItemId);
-			return bundle;
+			throw new BusinessException("bundle extension information for item (itemId = '" + bundleItemId + "') is null!");
 		}
 		
 		fillBundleCommand(bundle);

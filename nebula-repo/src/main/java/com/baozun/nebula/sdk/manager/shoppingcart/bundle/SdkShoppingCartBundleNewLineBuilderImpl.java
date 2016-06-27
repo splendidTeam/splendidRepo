@@ -119,7 +119,7 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
         String skuProperties = sku.getProperties();
         List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
         if (Validator.isNotNullOrEmpty(skuPros)){
-            shoppingCartLineCommand.setSkuPropertys(skuPros);
+        	newShoppingCartLineCommand.setSkuPropertys(skuPros);
         }
 
         return newShoppingCartLineCommand;

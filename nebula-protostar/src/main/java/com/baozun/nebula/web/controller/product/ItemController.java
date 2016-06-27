@@ -2475,7 +2475,7 @@ public class ItemController extends BaseController {
 	/**
 	 * 保存普通商品
 	 */
-	@RequestMapping("/i18n/item/saveSimpleItem.json")
+	@RequestMapping("/item/saveSimpleItem.json")
 	@ResponseBody
 	public Object saveSimpleItem(@ModelAttribute() ItemCommand itemCommand,
 			@ArrayCommand(dataBind = true) Long[] propertyValueIds, // 商品动态属性
@@ -2891,4 +2891,5 @@ public class ItemController extends BaseController {
 		
 		return null;
 	}
+	
 }
