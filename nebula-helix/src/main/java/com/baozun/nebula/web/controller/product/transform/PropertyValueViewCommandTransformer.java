@@ -102,6 +102,7 @@ public class PropertyValueViewCommandTransformer implements Transformer<ItemProp
         propertyValueViewCommand.setImageUrl(colorswatch == null ? "" : colorswatch.getUrl());
         propertyValueViewCommand.setPropertyDisplayValue(colorswatch == null ? "" : colorswatch.getDescription());
         propertyValueViewCommand.setPropertyValueThumb(itemPropertiesCommand.getThumb());
+        propertyValueViewCommand.setSortNo(itemPropertiesCommand.getProSort());
         return propertyValueViewCommand;
 	}
 

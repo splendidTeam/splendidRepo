@@ -399,15 +399,20 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 			propertyValueMap.put(propertyValue.getId(), propertyValue);
 		}
 		
-		Map<Long,Integer> propertySortMap =new HashMap<Long, Integer>();
+		Map<Long,Integer> propertyValueSortMap =new HashMap<Long, Integer>();
 		for (PropertyValue propertyValue : propertyValueList) {
-			propertySortMap.put(propertyValue.getId(), propertyValue.getSortNo());
+			propertyValueSortMap.put(propertyValue.getId(), propertyValue.getSortNo());
 		}
-		
 
 		ItemPropertiesCommand tempConvertIp =null;
 		boolean isNotNullPropertyValue =false;
-		
+		//DB未设值属性值排序时，根据保存到数据库里的itemProperties，依次设值排序,
+		//初始值为避免跟已经设置的排序重叠，设置一个最大值，暂取10000
+		Map<Long, Integer> pvSortMap =new HashMap<Long, Integer>();
+		for (Property property : propertyList) {
+			pvSortMap.put(property.getId(), 10000);
+		}
+		Integer tmpsort =null;
 		for (Property property : propertyList) {
 			Boolean isSaleProp = property.getIsSaleProp();
 			// 分离销售属性与一般属性
@@ -417,19 +422,25 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 				itemPropertiesList = new ArrayList<ItemPropertiesCommand>();
 				for (ItemProperties itemProperties : dbItemPropertiesList) {
 					if (itemProperties.getPropertyId().equals(property.getId())) {
-						if (itemProperties.getPropertyValueId() == null) {
-							itemPropertiesList.add(itemPropertiesToCommand(itemProperties));
-						} else {
-							isNotNullPropertyValue =Validator.isNotNullOrEmpty(propertyValueMap.get(itemProperties.getPropertyValueId()));
+						isNotNullPropertyValue =Validator.isNotNullOrEmpty(propertyValueMap.get(itemProperties.getPropertyValueId()));
+						if (itemProperties.getPropertyValueId() != null) {
+							//非自定义多选 重新设值
 							itemProperties.setPropertyValue(isNotNullPropertyValue ? 
 									propertyValueMap.get(itemProperties.getPropertyValueId()).getValue() : "");
-							//非自定义多选 设置排序
-							tempConvertIp =itemPropertiesToCommand(itemProperties);
-							tempConvertIp.setProSort(propertySortMap.get(itemProperties.getPropertyValueId()));
-							tempConvertIp.setThumb(isNotNullPropertyValue ? 
-									propertyValueMap.get(itemProperties.getPropertyValueId()).getThumb() : "");
-							itemPropertiesList.add(tempConvertIp);
 						}
+						tempConvertIp =itemPropertiesToCommand(itemProperties);
+						//由于最新版本里添加了为每一个属性值都可设值缩略图的功能，此处设置缩略图
+						tempConvertIp.setThumb(isNotNullPropertyValue ? 
+								propertyValueMap.get(itemProperties.getPropertyValueId()).getThumb() : "");
+						//排序的设置
+						if(Validator.isNotNullOrEmpty(propertyValueSortMap.get(itemProperties.getPropertyValueId()))){
+							tempConvertIp.setProSort(propertyValueSortMap.get(itemProperties.getPropertyValueId())); 
+						}else{
+							tmpsort =pvSortMap.get(property.getId());
+							tempConvertIp.setProSort(tmpsort);
+							pvSortMap.put(property.getId(), tmpsort + 1);
+						}
+						itemPropertiesList.add(tempConvertIp);
 					}
 				}
 				// 当商品属性只有一个属性值时, 就将其加到DynamicPropertyCommand对象中的itemProperties字段中
@@ -447,17 +458,25 @@ public class ItemDetailManagerImpl implements ItemDetailManager {
 				itemPropertiesList = new ArrayList<ItemPropertiesCommand>();
 				for (ItemProperties itemProperties : dbItemPropertiesList) {
 					if (itemProperties.getPropertyId().equals(property.getId())) {
-						if (itemProperties.getPropertyValueId() == null) {
-							itemPropertiesList.add(itemPropertiesToCommand(itemProperties));
-						} else {
-							isNotNullPropertyValue =Validator.isNotNullOrEmpty(propertyValueMap.get(itemProperties.getPropertyValueId()));
+						isNotNullPropertyValue =Validator.isNotNullOrEmpty(propertyValueMap.get(itemProperties.getPropertyValueId()));
+						if (itemProperties.getPropertyValueId() != null) {
+							//非自定义多选 重新设值
 							itemProperties.setPropertyValue(isNotNullPropertyValue ? 
 									propertyValueMap.get(itemProperties.getPropertyValueId()).getValue() : "");
-							tempConvertIp =itemPropertiesToCommand(itemProperties);
-							tempConvertIp.setThumb(isNotNullPropertyValue ? 
-									propertyValueMap.get(itemProperties.getPropertyValueId()).getThumb() : "");
-							itemPropertiesList.add(tempConvertIp);
 						}
+						tempConvertIp =itemPropertiesToCommand(itemProperties);
+						//由于最新版本里添加了为每一个属性值都可设值缩略图的功能，此处设置缩略图
+						tempConvertIp.setThumb(isNotNullPropertyValue ? 
+								propertyValueMap.get(itemProperties.getPropertyValueId()).getThumb() : "");
+						//排序的设置
+						if(Validator.isNotNullOrEmpty(propertyValueSortMap.get(itemProperties.getPropertyValueId()))){
+							tempConvertIp.setProSort(propertyValueSortMap.get(itemProperties.getPropertyValueId())); 
+						}else{
+							tmpsort =pvSortMap.get(property.getId());
+							tempConvertIp.setProSort(tmpsort);
+							pvSortMap.put(property.getId(), tmpsort + 1);
+						}
+						itemPropertiesList.add(tempConvertIp);
 					}
 				}
 				// 当商品属性只有一个属性值时, 就将其加到DynamicPropertyCommand对象中的itemProperties字段中
