@@ -56,6 +56,9 @@ public class PropertyValueViewCommand extends BaseViewCommand {
     
     /** 颜色属性值的图片[属性管理里的属性图片值] */
 	private String propertyValueThumb;
+	
+	/** 属性值排序号*/
+	private Integer sortNo;
 
 	public Long getItemPropertiesId() {
 		return itemPropertiesId;
@@ -118,7 +121,19 @@ public class PropertyValueViewCommand extends BaseViewCommand {
 	public void setPropertyValueThumb(String propertyValueThumb) {
 		this.propertyValueThumb = propertyValueThumb;
 	}
-	
-	
 
+	/**
+	 * @return the sortNo
+	 */
+	public Integer getSortNo() {
+		return sortNo;
+	}
+
+	/**
+	 * @param sortNo the sortNo to set
+	 */
+	public void setSortNo(Integer sortNo) {
+		this.sortNo = sortNo;
+	}
+	
 }
