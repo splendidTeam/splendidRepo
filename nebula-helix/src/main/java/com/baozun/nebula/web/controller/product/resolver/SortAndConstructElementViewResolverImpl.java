@@ -140,7 +140,7 @@ public class SortAndConstructElementViewResolverImpl implements SortAndConstruct
         if (Validator.isNotNullOrEmpty(propertyValueViewSubCommands)){
             //排序
             //这里不能按照 proSort 来排序,其实 proSort 是个理想的设想,但是属性是不断的新增的, 没有人时刻会来维护这里的排序
-            Collections.sort(propertyValueViewSubCommands, new PropertyComparator<PropertyValueViewCommand>("propertyValue"));
+            Collections.sort(propertyValueViewSubCommands, new PropertyComparator<PropertyValueViewCommand>("sortNo"));
         }
         return propertyValueViewSubCommands;
     }
