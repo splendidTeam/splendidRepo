@@ -512,13 +512,43 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		List<ItemCommand> itemCommands  = sdkItemManager.findItemCommandByItemIds(browsingHistoryItemIds);
 		setImageData(browsingHistoryItemIds, itemCommands);
 		List<RelationItemViewCommand> browsingHistory = relationItemViewCommandConverter.convert(itemCommands);
-		
+		browsingHistory = sortBrowsingHistory(browsingHistoryItemIds,browsingHistory);
 		//把当前商品放入历史记录
 		constructBrowsingHistory(itemId, request, response);
 		
 		return browsingHistory;
 	}
 	
+	/**
+	 * 对历史记录重新正确排序
+	 * @param browsingHistoryItemIds
+	 * @param browsingHistory
+	 */
+	private List<RelationItemViewCommand> sortBrowsingHistory(LinkedList<Long> ids,
+			List<RelationItemViewCommand> browsingHistory) {
+		
+		List<RelationItemViewCommand> relationItemViewCommands = new ArrayList<RelationItemViewCommand>();
+		
+		if(Validator.isNotNullOrEmpty(ids) && Validator.isNotNullOrEmpty(browsingHistory)){
+			Map<Long,RelationItemViewCommand> map = new HashMap<Long,RelationItemViewCommand>();
+			
+			for(RelationItemViewCommand relationItemViewCommand:browsingHistory){
+				map.put(relationItemViewCommand.getItemId(), relationItemViewCommand);
+			}
+			
+			for(Long id:ids){
+				RelationItemViewCommand relationItemViewCommand = map.get(id);
+				if(relationItemViewCommand !=null ){
+					relationItemViewCommands.add(relationItemViewCommand);
+				}
+				
+			}
+		}
+		
+		return relationItemViewCommands;
+	}
+	
+
 	/**
 	 * 更新最近浏览的商品信息
 	 * @param itemId
