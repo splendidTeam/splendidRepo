@@ -3610,6 +3610,11 @@ public class ItemManagerImpl implements ItemManager{
 					/** 商品item **/
 					item = new Item();
 					item.setCode(impItemCommand.getCode());
+					// 如果上传的商品类型未指定，则默认为普通商品
+					// TODO 要实现指定上传商品的类型，需要修改商品上传模板并且修改相关的业务逻辑
+					if(impItemCommand.getType() == null) {
+						item.setType(Item.ITEM_TYPE_SIMPLE);
+					}
 					// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
 					item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
 					item.setCreateTime(new Date());
