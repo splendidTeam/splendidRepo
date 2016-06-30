@@ -195,7 +195,7 @@ public class NebulaForgetPasswordController extends BaseController{
 	/**
 	 * 点击重置密码按钮， 重置密码 注意点：需要判断是否是同一用户的操作，防止越过验证层，直接到修改密码层操作，或者伪造数据
 	 * 
-	 * @RequestMapping(value = "/member/resetpassword", method =RequestMethod.POST)
+	 * @RequestMapping(value = "/member/resetpassword.json", method =RequestMethod.POST)
 	 * @param request
 	 * @param response
 	 * @param model
