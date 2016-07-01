@@ -3481,6 +3481,8 @@ public class ItemManagerImpl implements ItemManager{
 					// TODO 要实现指定上传商品的类型，需要修改商品上传模板并且修改相关的业务逻辑
 					if(impItemCommand.getType() == null) {
 						item.setType(Item.ITEM_TYPE_SIMPLE);
+					} else {
+						item.setType(impItemCommand.getType());
 					}
 					// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
 					item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
@@ -3751,6 +3753,8 @@ public class ItemManagerImpl implements ItemManager{
 					// TODO 要实现指定上传商品的类型，需要修改商品上传模板并且修改相关的业务逻辑
 					if(impItemCommand.getType() == null) {
 						item.setType(Item.ITEM_TYPE_SIMPLE);
+					} else {
+						item.setType(impItemCommand.getType());
 					}
 					// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
 					item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
