@@ -185,14 +185,14 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 		Collections.sort(cmdList, new Comparator<SearchCondition>() {
             public int compare(SearchCondition o1, SearchCondition o2) {
               if(Validator.isNullOrEmpty(o1.getNavigationId())){
-            	  return 1;
-              }
-              
-              if(Validator.isNullOrEmpty(o2.getNavigationId())){
             	  return -1;
               }
               
-              return navSortMap.get(o1.getNavigationId()) - navSortMap.get(o2.getNavigationId());
+              if(Validator.isNullOrEmpty(o2.getNavigationId())){
+            	  return 1;
+              }
+              
+              return  navSortMap.get(o2.getNavigationId())-navSortMap.get(o1.getNavigationId());
             }
         });
 
