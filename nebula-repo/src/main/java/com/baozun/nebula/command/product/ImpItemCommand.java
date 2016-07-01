@@ -52,8 +52,19 @@ public class ImpItemCommand implements Command {
   	private String subTitle;
   	//商品分类
   	private String itemType;
+  	/**
+  	 * 商品类型
+  	 * @see com.baozun.nebula.model.product.Item#type
+  	 */
+  	private Integer type;
   	
   	
+	public Integer getType() {
+		return type;
+	}
+	public void setType(Integer type) {
+		this.type = type;
+	}
 	public String getSubTitle() {
 		return subTitle;
 	}
