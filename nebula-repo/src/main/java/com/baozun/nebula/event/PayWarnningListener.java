@@ -48,7 +48,6 @@ public class PayWarnningListener implements ApplicationListener<PayWarnningEvent
              sdkPayWarnningLogManager.savePayWarnningLog(payWarnningLog);
 		} 
 		catch(Exception e){
-			e.printStackTrace();
 			logger.error("error:"+event.getOrderCode()+event.getResult());
 		}
 	}
