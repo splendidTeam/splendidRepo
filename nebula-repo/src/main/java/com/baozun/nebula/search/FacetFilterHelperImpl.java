@@ -517,20 +517,28 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
 
 		boolean isHasNavId=searchCommand.getNavigationId()!=null;
-		SearchConditionCommand searchObj=null;		
-		for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
-			SearchConditionCommand searchConditionCommand=entry.getValue();			
-			if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())){
-				if(isHasNavId){
-					if(searchCommand.getNavigationId().equals(searchConditionCommand.getNavigationId())){
-						searchObj=searchConditionCommand;
-						break;
-					}
-				}else{
-					if(searchConditionCommand.getNavigationId()==null){
-						searchObj=searchConditionCommand;
-						break;
-					}
+		SearchConditionCommand searchObj=null;
+		
+		//如果有navId,筛选项type必须为价格区间类型，且筛选项的navId和页面传来的一致
+		if(isHasNavId){
+			for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+				SearchConditionCommand searchConditionCommand=entry.getValue();
+				if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())
+						&&searchCommand.getNavigationId().equals(searchConditionCommand.getNavigationId())){
+					searchObj=searchConditionCommand;
+					break;
+				}
+			}
+		}
+		
+		//如果没有navId或者没有通navId匹配的筛选项,筛选项type必须为价格区间类型，且筛选项的navId必须要为空
+		if(!isHasNavId || searchObj==null){
+			for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+				SearchConditionCommand searchConditionCommand=entry.getValue();
+				if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())
+						&&searchConditionCommand.getNavigationId()==null){
+					searchObj=searchConditionCommand;
+					break;
 				}
 			}
 		}
