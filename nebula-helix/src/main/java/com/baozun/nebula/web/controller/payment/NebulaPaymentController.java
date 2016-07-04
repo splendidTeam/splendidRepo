@@ -401,7 +401,7 @@ public class NebulaPaymentController extends NebulaBasePaymentController{
         Map<String, String> extra = new HashMap<String, String>();
 
         //默认即时到账，非扫码
-        extra.put("qrPayMode", null);
+        extra.put("qr_pay_mode", null);
 
         return extra;
     }

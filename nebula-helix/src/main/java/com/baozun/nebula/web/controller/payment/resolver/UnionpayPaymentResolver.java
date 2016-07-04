@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,19 +28,19 @@ import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
-import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.payment.NebulaPaymentController;
+import com.baozun.nebula.web.controller.payment.service.common.command.CommonPayParamCommand;
+import com.baozun.nebula.web.controller.payment.service.unionpay.UnionpayService;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -62,9 +61,6 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
     private SdkPaymentManager   sdkPaymentManager;
 
     @Autowired
-    private PaymentManager      paymentManager;
-
-    @Autowired
     private PayManager          payManager;
 
     @Autowired
@@ -76,6 +72,10 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
     @Autowired
 	private MataInfoManager     mataInfoManager;
     
+    @Autowired
+    private UnionpayService     unionpayService;
+    
+    
     @Override
     public String buildPayUrl(
                     SalesOrderCommand originalSalesOrder,
@@ -86,68 +86,29 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model) throws IllegalPaymentStateException{
+  
+        //构造支付参数
+    	CommonPayParamCommand payParamCommand = buildPayParams(originalSalesOrder, payInfoLog, request);
+		
+		//获取支付请求( url)链接对象
+		PaymentRequest paymentRequest = unionpayService.createPayment(payParamCommand, extra);
+		
+		if (null == paymentRequest){
+		    throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
+		}
+		
+		if (StringUtils.isNotBlank(paymentRequest.getRequestHtml())){
+		    try{
+		        //记录日志和跳转到支付宝支付页面
+		        payManager.savePayInfos(buildSavePayLogParams(originalSalesOrder, payInfoLog), paymentRequest, memberDetails.getLoginName());
+		        response.getWriter().write(paymentRequest.getRequestHtml());
+		    } catch (IOException e) {
+		    	LOGGER.error("[BUILD_PAY_URL] build alipay url error. subOrdinate:[" + payInfoLog.getSubOrdinate() + "]", e);
+		    }
+		}
+		
+		return null;
 
-        String itBPay = getItBPay(originalSalesOrder.getCreateTime());
-
-        // 超时校验
-        if (itBPay.equals("0")){
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME);
-        }
-
-        // 获取各种参数
-        String payInfo = payInfoLog.getPayInfo();
-
-        Properties pro = ProfileConfigUtil.findCommonPro("config/payMentInfo.properties");
-        String payTypeStr = pro.getProperty(payInfo + ".payType");
-        String bankCode = pro.getProperty(payInfo + ".bankcode");
-
-        Integer payType = null;
-
-        if (Validator.isNotNullOrEmpty(payTypeStr)){
-            payType = Integer.parseInt(payTypeStr.trim());
-        }
-
-        if (Validator.isNotNullOrEmpty(bankCode)){
-            bankCode = bankCode.trim();
-        }
-
-        String subOrdinate = payInfoLog.getSubOrdinate();
-
-        PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
-
-        String qrPayMode = "";
-
-        if (extra.get("qrPayMode") != null){
-            qrPayMode = extra.get("qrPayMode").toString();
-        }
-
-        // 参数封装
-        SalesOrderCommand so = new SalesOrderCommand();
-        so.setCode(subOrdinate);
-        so.setTotal(pc.getPayMoney());
-        so.setOmsCode(String.valueOf(System.currentTimeMillis()));
-        so.setOnLinePaymentCommand(getOnLinePaymentCommand(bankCode, payType, itBPay, qrPayMode, request));
-
-        // 获取支付请求( url)链接对象
-        PaymentRequest paymentRequest =  paymentManager.createPayment(so);
-
-        if (null == paymentRequest){
-            throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
-        }else{
-            String url = paymentRequest.getRequestHtml();
-            if (StringUtils.isNotBlank(url)){
-                try{
-                    // 记录日志和跳转到支付宝支付页面
-                    payManager.savePayInfos(so, paymentRequest, memberDetails.getLoginName());
-                    //response.sendRedirect(url);
-                    response.getWriter().write(url);
-                }catch (IOException e){
-                    e.printStackTrace();
-                } 
-            }
-        }
-
-        return null;
     }
 
     @Override
@@ -174,7 +135,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
             String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.UNIONPAY);
             
             // 获取异步通知
-            PaymentResult paymentResult =  paymentManager.getPaymentResultForAsy(request, paymentType);
+            PaymentResult paymentResult =  unionpayService.getPaymentResultForAsy(request, paymentType);
             
             LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 
@@ -260,24 +221,59 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
 	 * @throws IllegalPaymentStateException
 	 */
 	private String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
-		String payExpiryTime = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
+        String payExpiryTime = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
+		
+    	if(null == payExpiryTime){
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_EXPIRYTIME_ISNULL);
+		}
+        
 		Date now = new Date();
 		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  
-		if (payExpiryTime == null) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAID);
-		}
+		
 		Long itBPay = Long.valueOf(payExpiryTime) - minutes;
+		
 		if (itBPay <= 0L) {
-			return "0";
-		} else {
-			return itBPay.toString();
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME);
 		}
+		
+		return itBPay.toString();
 	}
 
 
-    //TODO
-    //注意这里的paytype要设置成
-    //order.getOnLinePaymentCancelCommand().getPayType()
-    //OnLinePaymentCancelCommand的payType用ReservedPaymentType里的常量
+	
+	/**
+	 * 为保存paylog构造对象
+	 * @param salesOrder
+	 * @param payInfoLog
+	 * @return
+	 */
+	private SalesOrderCommand buildSavePayLogParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog) {
+    	
+        SalesOrderCommand so = new SalesOrderCommand();
+        so.setCode(payInfoLog.getSubOrdinate());
+        
+        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
+		onLinePaymentCommand.setPayType(payInfoLog.getPayType());
+        so.setOnLinePaymentCommand(onLinePaymentCommand);
+        
+        return so;
+    }
+	
+    /**
+     * 构造支付参数
+     * @param salesOrder
+     * @param payInfoLog
+     * @param request
+     * @return
+     * @throws IllegalPaymentStateException
+     */
+    private CommonPayParamCommand buildPayParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog,
+            HttpServletRequest request) throws IllegalPaymentStateException {
+    	CommonPayParamCommand payParam = new CommonPayParamCommand();
+    	payParam.setOrderNo(payInfoLog.getSubOrdinate());
+    	payParam.setTotalFee(payInfoLog.getPayMoney());
+    	payParam.setPaymentType(payInfoLog.getPayType().toString());
+        return payParam;
+    }
 
 }

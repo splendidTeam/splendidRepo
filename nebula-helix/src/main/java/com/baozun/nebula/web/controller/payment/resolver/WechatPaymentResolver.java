@@ -43,6 +43,7 @@ import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.payment.service.wechat.WechatService;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -54,9 +55,6 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 
 	@Autowired
 	private SdkPaymentManager sdkPaymentManager;
-	
-	@Autowired
-	private PaymentManager paymentManager;
 
 	@Autowired
 	private PayManager payManager;
@@ -69,6 +67,9 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	
 	@Autowired
 	private EventPublisher eventPublisher;
+	
+	@Autowired
+	private WechatService  wechatService;
 	
 	@Override
 	public String buildPayUrl(SalesOrderCommand originalSalesOrder, PayInfoLog payInfoLog, 
@@ -83,7 +84,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	
 		//1. 统一下单
 		WechatPayParamCommand wechatPayParamCommand = buildWechatPayParamCommand(originalSalesOrder, payInfoLog, memberDetails, device, extra, request);
-		PaymentResult paymentResult = paymentManager.unifiedOrder(wechatPayParamCommand, String.valueOf(ReservedPaymentType.WECHAT));
+		PaymentResult paymentResult = wechatService.unifiedOrder(wechatPayParamCommand, payInfoLog.getPayType().toString());
 		
 		if(PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus())) {
 			//2.根据不同的交易类型跳转到不同的处理页面
@@ -119,7 +120,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 		    String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.WECHAT);
 		
 		    // 获取异步通知
-	        PaymentResult paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
+	        PaymentResult paymentResult = wechatService.getPaymentResultForAsy(request, paymentType);
 	        
 	        String subOrdinate = null;
 	        

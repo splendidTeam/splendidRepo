@@ -267,7 +267,6 @@ public class WechatPayParamCommand implements Serializable {
 	public void setOpenid(String openid) {
 		this.openid = openid;
 	}
-	
-	
+
 
 }
