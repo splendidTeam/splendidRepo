@@ -136,7 +136,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		}
 
 		// 页面左侧筛选项
-		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());
+		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand);
 
 		// 设置facetGroup是否显示
 		setExcludeFacetGroup(collection, facetGroups);
@@ -211,7 +211,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			}
 			
 			// 页面左侧筛选项
-			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());
+			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand);
 			// 设置facetGroup是否显示
 			setExcludeFacetGroup(collection, facetGroups);
 

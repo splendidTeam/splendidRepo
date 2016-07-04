@@ -112,6 +112,7 @@
 					con.id as id,
 					con.property_id as propertyId,
 					con.type as type,
+					con.navigation_id as navigationId,
 					conLang.name as name,
 					con.sort as sortNo
 				from
