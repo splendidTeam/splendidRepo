@@ -103,51 +103,17 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     @Override
     public String doPayReturn(String payType, Device device, String paySuccessRedirect, String payFailureRedirect, 
     		HttpServletRequest request, HttpServletResponse response) throws IllegalPaymentStateException{
-        String subOrdinate = request.getParameter("out_trade_no");
-
-        LOGGER.info("[DO_PAY_RETURN] get sync notifications before , subOrdinate: {}", subOrdinate);
+    	
+    	//支付流水号
+    	String subOrdinate = request.getParameter("out_trade_no");
         
-    	// 查询支付订单号信息
-		PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
-		
-		if (Validator.isNullOrEmpty(pc)) {
-			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS, subOrdinate, "交易流水不存在");
-		}
-        
-        // 判断交易是否已有成功 防止重复调用 。
-        PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
-
-        if (Validator.isNotNullOrEmpty(payCode)){
-        	return "redirect:" + paySuccessRedirect + "?subOrdinate=" + subOrdinate;
-        }
-
-        LOGGER.debug("[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+    	//数据校验
+    	validatePayCode(payType, paySuccessRedirect, subOrdinate);
 
         // 获取同步付款通知
-        PaymentResult paymentResult = null;
-
-        String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
-
-        if (device.isMobile()){
-            paymentResult = alipayService.getPaymentResultForSynOfWap(request, paymentType);
-        }else{
-            paymentResult = alipayService.getPaymentResultForSyn(request, paymentType);
-        }
-        if (null == paymentResult){
-            // 返回失败
-            return "redirect:" + payFailureRedirect + "?subOrdinate=" + subOrdinate;
-        }
-        LOGGER.info("[DO_PAY_RETURN] sync notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
-
-      	if(device.isMobile() && PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus())){
-    		// 因为同步通知手机端返回的是SUCCESS,所以此处需要将alipay pc端返回码设进去
-    		paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
-    	}
+        PaymentResult paymentResult = getPaymentResult(device, request,response,payFailureRedirect,subOrdinate);
         
-        // 获取支付状态
-        String payStatus = paymentResult.getPaymentServiceSatus().toString();
-
-        if (PAYMENT_SUCCESS.equals(payStatus)){
+        if (PAYMENT_SUCCESS.equals(paymentResult.getPaymentServiceSatus().toString())){
             // 获取通知成功，修改支付及订单信息
             payManager.updatePayInfos(paymentResult, null, Integer.valueOf(payType), true, request);
         }else{
@@ -158,21 +124,13 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 
         return "redirect:" + paySuccessRedirect + "?subOrdinate=" + subOrdinate;
     }
-
+    
     @Override
     public void doPayNotify(String payType, HttpServletRequest request, 
     		HttpServletResponse response) throws IllegalPaymentStateException,IOException, DocumentException{
-    	boolean isMobile = false;
-    	
-		String aliPayMobileReturnData = request.getParameter("notify_data");
-		
-		if (Validator.isNotNullOrEmpty(aliPayMobileReturnData)) {
-			isMobile = true;
-		}
+    	boolean isMobile =  getDevice(request);
 		
         String subOrdinate = getSubOrdinate(request, isMobile);
-
-        LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
 
         // 判断交易是否已有成功 防止重复调用 。
         PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
@@ -180,21 +138,10 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         if (Validator.isNotNullOrEmpty(payCode)){
             response.getWriter().write(PaymentResultType.SUCCESS);
         }else{
-            LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
-
+          
             // 获取异步通知
-            PaymentResult paymentResult = null;
-
-            String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
-
-			if (isMobile) {
-				 paymentResult = alipayService.getPaymentResultForAsyOfWap(request, paymentType);
-			}else{
-				 paymentResult = alipayService.getPaymentResultForAsy(request, paymentType);
-			}
-
-            LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
-
+            PaymentResult paymentResult = getPaymentResult(request,isMobile);
+            
             if (null == paymentResult){
                 //log
                 sdkPaymentManager.savePaymentLog(
@@ -208,15 +155,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
                 // 获取支付状态
                 String responseStatus = paymentResult.getPaymentServiceSatus().toString();
 
-                //添加订单查询：支付状态为1 物流状态为1||3
-                Map<String, Object> paraMap = new HashMap<String, Object>();
-                paraMap.put("subOrdinate", subOrdinate);
-                List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-                SalesOrderCommand salesOrderCommand = null;
-                if (Validator.isNotNullOrEmpty(payInfoLogs)){
-                    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
-                }
+                SalesOrderCommand salesOrderCommand = getSalesOrderCommand(subOrdinate);
 
                 if (canUpdatePayInfos(responseStatus, salesOrderCommand)){
                     // 获取通知成功，修改支付及订单信息
@@ -247,6 +186,99 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
             }
         }
     }
+
+	private SalesOrderCommand getSalesOrderCommand(String subOrdinate) {
+		//添加订单查询：支付状态为1 物流状态为1||3
+		Map<String, Object> paraMap = new HashMap<String, Object>();
+		paraMap.put("subOrdinate", subOrdinate);
+		List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+		SalesOrderCommand salesOrderCommand = null;
+		if (Validator.isNotNullOrEmpty(payInfoLogs)){
+		    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
+		}
+		return salesOrderCommand;
+	}
+
+	private PaymentResult getPaymentResult(HttpServletRequest request,
+			boolean isMobile) {
+		
+		LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+
+		PaymentResult paymentResult;
+		String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
+
+		if (isMobile) {
+			 paymentResult = alipayService.getPaymentResultForAsyOfWap(request, paymentType);
+		}else{
+			 paymentResult = alipayService.getPaymentResultForAsy(request, paymentType);
+		}
+		
+		LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+		
+		return paymentResult;
+	}
+
+	private boolean getDevice(HttpServletRequest request) {
+		if (Validator.isNotNullOrEmpty(request.getParameter("notify_data"))) {
+			return true;
+		}
+		return false;
+	}
+
+	private PaymentResult getPaymentResult(Device device,HttpServletRequest request,HttpServletResponse response,
+			String payFailureRedirect,String subOrdinate) {
+		
+		LOGGER.debug("[DO_PAY_RETURN] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+		
+		PaymentResult paymentResult;
+		
+		String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
+
+        if (device.isMobile()){
+            paymentResult = alipayService.getPaymentResultForSynOfWap(request, paymentType);
+        }else{
+            paymentResult = alipayService.getPaymentResultForSyn(request, paymentType);
+        }
+        
+        if (null == paymentResult){
+            try {
+				response.sendRedirect(payFailureRedirect + "?subOrdinate=" + subOrdinate);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+        
+        LOGGER.info("[DO_PAY_RETURN] sync notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+
+      	if(paymentResult!=null && device.isMobile() && PaymentServiceStatus.SUCCESS.equals(paymentResult.getPaymentServiceSatus())){
+    		// 因为同步通知手机端返回的是SUCCESS,所以此处需要将alipay pc端返回码设进去
+    		paymentResult.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+    	}
+        
+        return paymentResult;
+	}
+	
+
+	private String validatePayCode(String payType, String paySuccessRedirect,
+			String subOrdinate) throws IllegalPaymentStateException {
+		// 查询支付订单号信息
+		PayCode pc = sdkPaymentManager.findPayCodeBySubOrdinate(subOrdinate);
+		
+		if (Validator.isNullOrEmpty(pc)) {
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_SUBORDINATE_NOT_EXISTS, subOrdinate, "交易流水不存在");
+		}
+        
+        // 判断交易是否已有成功 防止重复调用 。
+        PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
+
+        if (Validator.isNotNullOrEmpty(payCode)){
+        	return "redirect:" + paySuccessRedirect + "?subOrdinate=" + subOrdinate;
+        }
+        
+        return null;
+	}
+
     
 	/**
 	 * 从通知请求中解析交易流水号（支付宝异步通知用）
