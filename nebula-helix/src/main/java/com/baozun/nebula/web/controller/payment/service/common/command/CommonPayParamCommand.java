@@ -1,4 +1,4 @@
-package com.baozun.nebula.web.controller.payment.service.alipay.command;
+package com.baozun.nebula.web.controller.payment.service.common.command;
 
 import java.math.BigDecimal;
 
@@ -8,7 +8,7 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.utilities.common.command.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 
-public class AlipayPayParamCommand implements BasePayParamCommandAdaptor {
+public class CommonPayParamCommand implements BasePayParamCommandAdaptor {
 	
     public static final String BUY = "buy";
 	
@@ -35,7 +35,7 @@ public class AlipayPayParamCommand implements BasePayParamCommandAdaptor {
 	/** 交易号 */
 	private String tradeNo;
 
-	/** 支付支付类型 */
+	/** 支付类型 */
 	private String paymentType;
 	
 	/** 交易时间 */

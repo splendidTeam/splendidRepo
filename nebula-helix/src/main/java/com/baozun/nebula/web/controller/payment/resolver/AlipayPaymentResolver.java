@@ -29,7 +29,6 @@ import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
-import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
@@ -45,7 +44,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.PaymentResultType;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.payment.service.alipay.AlipayService;
-import com.baozun.nebula.web.controller.payment.service.alipay.command.AlipayPayParamCommand;
+import com.baozun.nebula.web.controller.payment.service.common.command.CommonPayParamCommand;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -57,9 +56,6 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     
     @Autowired
     private SdkPaymentManager sdkPaymentManager;
-
-    @Autowired
-    private PaymentManager paymentManager;
 
     @Autowired
     private PayManager payManager;
@@ -82,7 +78,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
             HttpServletResponse response, Model model) throws IllegalPaymentStateException {
 
 		//构造支付参数
-    	AlipayPayParamCommand payParamCommand = buildPayParams(originalSalesOrder, payInfoLog, request);
+    	CommonPayParamCommand payParamCommand = buildPayParams(originalSalesOrder, payInfoLog, request);
 		
 		//获取支付请求( url)链接对象
 		PaymentRequest paymentRequest = alipayService.createPayment(payParamCommand, extra, device);
@@ -133,9 +129,9 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
         String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
 
         if (device.isMobile()){
-            paymentResult = paymentManager.getPaymentResultForSynOfWap(request, paymentType);
+            paymentResult = alipayService.getPaymentResultForSynOfWap(request, paymentType);
         }else{
-            paymentResult = paymentManager.getPaymentResultForSyn(request, paymentType);
+            paymentResult = alipayService.getPaymentResultForSyn(request, paymentType);
         }
         if (null == paymentResult){
             // 返回失败
@@ -192,9 +188,9 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
             String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.ALIPAY);
 
 			if (isMobile) {
-				 paymentResult = paymentManager.getPaymentResultForAsyOfWap(request, paymentType);
+				 paymentResult = alipayService.getPaymentResultForAsyOfWap(request, paymentType);
 			}else{
-				 paymentResult = paymentManager.getPaymentResultForAsy(request, paymentType);
+				 paymentResult = alipayService.getPaymentResultForAsy(request, paymentType);
 			}
 
             LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
@@ -280,9 +276,9 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
      * @return
      * @throws IllegalPaymentStateException
      */
-    private AlipayPayParamCommand buildPayParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog,
+    private CommonPayParamCommand buildPayParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog,
             HttpServletRequest request) throws IllegalPaymentStateException {
-    	AlipayPayParamCommand payParam = new AlipayPayParamCommand();
+    	CommonPayParamCommand payParam = new CommonPayParamCommand();
     	payParam.setOrderNo(payInfoLog.getSubOrdinate());
     	payParam.setTotalFee(payInfoLog.getPayMoney());
     	payParam.setDefaultBank(payInfoLog.getBankCode());
@@ -290,6 +286,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     	payParam.setPaymentTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
     	payParam.setItBPay(getItBPay(salesOrder.getCreateTime()));
     	payParam.setPaymentType(payInfoLog.getPayType().toString());
+    	
     	if(SalesOrder.SO_PAYMENT_TYPE_INTERNATIONALCARD.equals(payInfoLog.getPayType().toString())) {
     		payParam.setIsInternationalCard(true);
 		} else {
@@ -306,6 +303,10 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 	 */
 	private String getItBPay(Date orderCreateDate) throws IllegalPaymentStateException {
 		String payExpiryTime = mataInfoManager.findValue(MataInfo.PAYMENT_EXPIRY_TIME);
+		
+		if(null == payExpiryTime){
+			throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_ILLEGAL_ORDER_PAYMENT_EXPIRYTIME_ISNULL);
+		}
 		
 		Date now = new Date();
 		long minutes = (now.getTime() - orderCreateDate.getTime()) / 1000 / 60;  

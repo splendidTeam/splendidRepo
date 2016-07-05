@@ -86,6 +86,9 @@ public class IllegalPaymentStateException extends Exception {
 		/** 订单超过支付时间 */
 		PAYMENT_ILLEGAL_ORDER_PAYMENT_OVERTIME,
 		
+		/** 订单超时间是为空 */
+		PAYMENT_ILLEGAL_ORDER_PAYMENT_EXPIRYTIME_ISNULL,
+		
 		/** 非当前用户的订单 */
 		PAYMENT_ILLEGAL_ORDER_INVALID_OWNER,
 		
