@@ -59,4 +59,7 @@
 		id="solr" encryptor="configurationEncryptor" location="classpath:config/solr.properties" />
 	<encryption:encryptable-properties
 		id="redis" encryptor="configurationEncryptor" location="classpath:config/redis.properties" />
+	<encryption:encryptable-properties
+		id="wechat" encryptor="configurationEncryptor" location="classpath:config/wechat.properties" />
+		
 </beans>
