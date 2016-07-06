@@ -12,6 +12,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import loxia.dao.Sort;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,7 @@ import com.baozun.nebula.solr.manager.ItemSolrManager;
 import com.baozun.nebula.utils.InputStreamCacher;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
 
 /**
  * 商品的导出和导入
@@ -64,8 +67,9 @@ public class ItemExportImportController extends BaseController {
 	 */
 	@RequestMapping(value = "/item/itemExportImport.htm", method = RequestMethod.GET)
 	public String itemExprotImport(Model model) {
-		Long shopId = shopManager.getShopId(getUserDetails());
-		List<Industry> industryList = shopManager.findAllEnabledIndustryByShopId(shopId);
+		Sort[] sorts = Sort.parse("id desc");
+		// 获取行业信息
+		List<Industry> industryList = shopManager.findAllIndustryList(sorts);
 		model.addAttribute("industryList", industryList);
 		return "product/item/item-export-import";
 	}
@@ -80,10 +84,23 @@ public class ItemExportImportController extends BaseController {
 	@ResponseBody
 	public BackWarnEntity findPropertyByIndustryId(@RequestParam("industryId") Long industryId) {
 		BackWarnEntity result = new BackWarnEntity(true, null);
-		Long shopId = shopManager.getShopId(getUserDetails());
-		List<Property> propertyList = shopManager.findPropertyListByIndustryIdAndShopId(industryId, shopId, null);
+		Sort[] sorts = new Sort[1];
+		sorts[0] = new Sort("p.id", "asc");
+		List<Property> propertyList = shopManager.findPropertyListByIndustryId(industryId, sorts);
+		
+		List<Property> notSalesList = new ArrayList<Property>();
+		
+		if (Validator.isNotNullOrEmpty(propertyList)){
+			for (Property property : propertyList){
+				if (!property.getIsSaleProp()){
+					notSalesList.add(property);
+				}
+			}
+		}
+		
 		result.setDescription(propertyList);
 		return result;
+
 	}
 
 	/**
