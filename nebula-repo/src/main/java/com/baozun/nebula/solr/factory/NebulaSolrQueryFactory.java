@@ -293,14 +293,20 @@ public class NebulaSolrQueryFactory{
 			type="{!tag=lastFilterTag}"+type;
 		}
 		
-		StringBuffer sb=new StringBuffer();		
-		for (int i = 0; i < priceAreaWords.size(); i++){
-			if(i==priceAreaWords.size()-1){
-				sb.append(type+":"+priceAreaWords.get(i));
-			}else{
-				sb.append(type+":"+priceAreaWords.get(i)+" OR ");
+		StringBuffer sb=new StringBuffer();
+		if(priceAreaWords.size()>0){
+			sb.append(type+":(");
+			for (int i = 0; i < priceAreaWords.size(); i++){
+				if(i==priceAreaWords.size()-1){
+					sb.append(priceAreaWords.get(i));
+				}else{
+					sb.append(priceAreaWords.get(i)+" OR ");
+				}
 			}
-		}		
+			sb.append(type+")");
+		}
+		
+		
 		String fq_keyword=sb.toString();
 		if (Validator.isNotNullOrEmpty(fq_keyword))
 			solrQuery.addFilterQuery(fq_keyword);
