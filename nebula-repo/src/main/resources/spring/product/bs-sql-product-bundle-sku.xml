@@ -48,7 +48,7 @@
 			<value>
 				<![CDATA[
 					SELECT  
-						b.id bundleId, b.item_id bundleItemId, bs.sku_id skuId, s.list_price listPrice, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end salesPrice 
+						b.id bundleId, b.item_id bundleItemId, bs.sku_id skuId, s.list_price listPrice, s.sale_price originalSalesPrice, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end salesPrice 
 					FROM 
 						t_pd_bundle b
 					INNER JOIN 
@@ -74,7 +74,7 @@
 			<value>
 				<![CDATA[
 					SELECT  
-						b.id bundleId, b.item_id bundleItemId, bs.sku_id skuId, s.list_price listPrice, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end salesPrice
+						b.id bundleId, b.item_id bundleItemId, bs.sku_id skuId, s.list_price listPrice, s.sale_price originalSalesPrice, case b.price_type when 1 then s.sale_price when 2 then be.sales_price when 3 then bs.sales_price else s.sale_price end salesPrice
 					FROM 
 						t_pd_bundle b
 					INNER JOIN 
