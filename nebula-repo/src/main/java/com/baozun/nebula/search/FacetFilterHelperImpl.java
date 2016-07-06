@@ -19,6 +19,7 @@ package com.baozun.nebula.search;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -278,7 +279,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			if (Validator.isNotNullOrEmpty(searchConditions)) {
 				searchConditionMetaMap = new LinkedHashMap<Long, SearchConditionCommand>();
 				for (SearchConditionCommand searchConditionCommand : searchConditions){
-					searchConditionMetaMap.put(searchConditionCommand.getPropertyId(), searchConditionCommand);
+					searchConditionMetaMap.put(searchConditionCommand.getId(), searchConditionCommand);
 				}
 			}
 		}
@@ -319,7 +320,14 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		Map<Long, MetaDataCommand> propertyMetaMap = facetFilterMetaData.getPropertyMetaMap();
 
 		// 属性和价格范围
-		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();		
+		Map<Long, SearchConditionCommand> allSearchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();		
+		List<SearchConditionCommand> cmdList = searchManager.findConditionByNavigationWithCache(searchCommand.getNavigationId());
+		Map<Long, SearchConditionCommand> searchConditionMetaMap = new HashMap<Long,SearchConditionCommand>(cmdList.size());
+		for(SearchConditionCommand command : cmdList){
+			searchConditionMetaMap.put(command.getId(), allSearchConditionMetaMap.get(command.getId()));
+		}		
+		facetFilterMetaData.setSearchConditionMetaMap(searchConditionMetaMap);
+		
 		for (Entry<Long, SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
 			SearchConditionCommand searchConditionCommand = entry.getValue();
 			Long propertyId = searchConditionCommand.getPropertyId();
@@ -428,8 +436,16 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			List<FacetParameter> facetParameters){
 		Map<Long, MetaDataCommand> propertyValueMetaMap = facetFilterMetaData.getPropertyValueMetaMap();
 		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
-
-		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId());
+		
+		SearchConditionCommand searchObj =null;
+		for (Entry<Long, SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+			SearchConditionCommand searchConditionCommand=entry.getValue();
+			if(searchConditionCommand.getPropertyId()!=null&&searchConditionCommand.getPropertyId().equals(facetGroup.getId())){
+				searchObj=searchConditionCommand;
+				break;
+			}
+		}
+		
 		if (searchObj != null)
 			facetGroup.setTitle(searchObj.getName());
 
@@ -474,8 +490,14 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 			List<FacetParameter> facetParameters){
 		
 		Map<Long, SearchConditionCommand> searchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();
-
-		SearchConditionCommand searchObj = searchConditionMetaMap.get(facetGroup.getId());
+		SearchConditionCommand searchObj =null;
+		for (Entry<Long, SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+			SearchConditionCommand searchConditionCommand=entry.getValue();
+			if(searchConditionCommand.getPropertyId()!=null&&searchConditionCommand.getPropertyId().equals(facetGroup.getId())){
+				searchObj=searchConditionCommand;
+				break;
+			}
+		}		
 		if (searchObj != null)
 			facetGroup.setTitle(searchObj.getName());
 
@@ -518,25 +540,13 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		boolean isHasNavId=searchCommand.getNavigationId()!=null;
 		SearchConditionCommand searchObj=null;
-		
-		//如果有navId,筛选项type必须为价格区间类型，且筛选项的navId和页面传来的一致
-		if(isHasNavId){
-			for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
-				SearchConditionCommand searchConditionCommand=entry.getValue();
-				if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())
-						&&searchCommand.getNavigationId().equals(searchConditionCommand.getNavigationId())){
+		for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
+			SearchConditionCommand searchConditionCommand=entry.getValue();
+			if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())){
+				if(isHasNavId&&searchCommand.getNavigationId().equals(searchConditionCommand.getNavigationId())){
 					searchObj=searchConditionCommand;
 					break;
-				}
-			}
-		}
-		
-		//如果没有navId或者没有通navId匹配的筛选项,筛选项type必须为价格区间类型，且筛选项的navId必须要为空
-		if(!isHasNavId || searchObj==null){
-			for (Entry<Long,SearchConditionCommand> entry : searchConditionMetaMap.entrySet()){
-				SearchConditionCommand searchConditionCommand=entry.getValue();
-				if(SearchCondition.SALE_PRICE_TYPE.equals(searchConditionCommand.getType())
-						&&searchConditionCommand.getNavigationId()==null){
+				}else if(searchConditionCommand.getNavigationId()==null){
 					searchObj=searchConditionCommand;
 					break;
 				}
@@ -567,6 +577,10 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 					Integer max = scItemCmd.getAreaMax();
 					if (null != min && null != max && min <= max) {
 						String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
+						if(FacetTagType.RANGE.equals(searchCommand.getFacetTagType())){
+							sb.append("{!ex=lastFilterTag}");
+						}
+						
 						sb.append(SkuItemParam.sale_price).append(":").append(areaStr);
 					}
 					
@@ -584,6 +598,9 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 							List<String> paramValues=facetParameter.getValues();
 							for (String paramValue : paramValues){							
 								String param=SkuItemParam.sale_price + ":"+paramValue;
+								if(FacetTagType.RANGE.equals(searchCommand.getFacetTagType())){
+									param="{!ex=lastFilterTag}"+param;
+								}
 								if(value.equals(param)){
 									facet.setSelected(true);
 									break;
