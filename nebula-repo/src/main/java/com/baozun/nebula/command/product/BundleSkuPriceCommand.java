@@ -50,6 +50,8 @@ public class BundleSkuPriceCommand implements Serializable {
 	
 	private BigDecimal listPrice;
 	
+	private BigDecimal originalSalesPrice;
+	
 	private BigDecimal salesPrice;
 
 	public Long getBundleItemId() {
@@ -82,6 +84,14 @@ public class BundleSkuPriceCommand implements Serializable {
 
 	public void setListPrice(BigDecimal listPrice) {
 		this.listPrice = listPrice;
+	}
+
+	public BigDecimal getOriginalSalesPrice() {
+		return originalSalesPrice;
+	}
+
+	public void setOriginalSalesPrice(BigDecimal originalSalesPrice) {
+		this.originalSalesPrice = originalSalesPrice;
 	}
 
 	public BigDecimal getSalesPrice() {
