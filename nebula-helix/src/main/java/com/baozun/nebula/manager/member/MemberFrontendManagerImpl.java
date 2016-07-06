@@ -39,11 +39,10 @@ import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.sdk.utils.SdkDateUtils;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.feilong.core.DatePattern;
-import com.feilong.core.text.DateFormatUtil;
+import com.feilong.core.date.DateUtil;
 
 @Transactional
 @Service("MemberFrontendManager")
@@ -139,7 +138,7 @@ public class MemberFrontendManagerImpl implements MemberFrontendManager {
 		}
 		dataCommand.setEmail(retMemberCommand.getLoginEmail());
 		dataCommand.setSex(retMemberCommand.getSex());
-		dataCommand.setBirthday(DateFormatUtil.parse(retMemberCommand.getBirthday(), DatePattern.COMMON_DATE));
+		dataCommand.setBirthday(DateUtil.toDate(retMemberCommand.getBirthday(), DatePattern.COMMON_DATE));
 		dataCommand.setLocalRealName(retMemberCommand.getRealName());
 		sdkMemberManager.saveMemberPersonDataCommand(dataCommand);
 	}
