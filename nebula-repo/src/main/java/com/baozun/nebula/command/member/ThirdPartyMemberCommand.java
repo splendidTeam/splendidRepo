@@ -13,6 +13,11 @@ public class ThirdPartyMemberCommand {
 	private String openId;
 	
 	/**
+	 * 集团用户ID, 常用于微信
+	 */
+	private String unionId;
+	
+	/**
 	 * Email
 	 */
 	private String email;
@@ -111,6 +116,14 @@ public class ThirdPartyMemberCommand {
 	
 	public void setAvatar(String avatar){
 		this.avatar = avatar;
+	}
+
+	public String getUnionId() {
+		return unionId;
+	}
+
+	public void setUnionId(String unionId) {
+		this.unionId = unionId;
 	}
 	
 	
