@@ -303,7 +303,7 @@ public class NebulaSolrQueryFactory{
 					sb.append(priceAreaWords.get(i)+" OR ");
 				}
 			}
-			sb.append(type+")");
+			sb.append(")");
 		}
 		
 		
