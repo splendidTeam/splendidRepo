@@ -97,6 +97,9 @@ public class RegisterForm extends BaseForm{
 	 */
 	private String              mobile;
 	
+	/** 手机短信验证码*/
+	private String				smsCode;
+	
 	
 
 	/**
@@ -384,5 +387,21 @@ public class RegisterForm extends BaseForm{
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
 	}
+
+	/**
+	 * @return the smsCode
+	 */
+	public String getSmsCode() {
+		return smsCode;
+	}
+
+	/**
+	 * @param smsCode the smsCode to set
+	 */
+	public void setSmsCode(String smsCode) {
+		this.smsCode = smsCode;
+	}
+	
+	
 	
 }

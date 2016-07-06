@@ -49,11 +49,12 @@ import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.constants.ForgetPasswordSendVCodeConstant;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
+import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.member.event.RegisterSuccessEvent;
 import com.baozun.nebula.web.controller.member.form.RegisterForm;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormMobileValidator;
-import com.baozun.nebula.web.controller.member.validator.RegisterFormNormalValidator;
+import com.baozun.nebula.web.controller.member.validator.RegisterFormValidator;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
 import com.feilong.core.util.RegexUtil;
@@ -109,7 +110,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	@Autowired
 	@Qualifier("registerFormNormalValidator")
-	private RegisterFormNormalValidator			registerFormNormalValidator;
+	private RegisterFormValidator			registerFormNormalValidator;
 
 	/**
 	 * Mobile <br/>
@@ -117,7 +118,7 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	@Autowired
 	@Qualifier("registerFormMobileValidator")
-	private RegisterFormMobileValidator			registerFormMobileValidator;
+	private RegisterFormValidator			registerFormMobileValidator;
 
 	/**
 	 * botdetect captcha validate
@@ -329,11 +330,9 @@ public class NebulaRegisterController extends NebulaLoginController{
 			/**
 			 * 检查验证码
 			 */
-			boolean result = registerCaptchaValidate(request);
+			defaultReturnResult = registerCaptchaValidate(request, registerForm);
 
-			if (!result){
-				defaultReturnResult.setResult(false);
-				defaultReturnResult.setStatusCode("reigster.captcha.validate.errors");
+			if (!defaultReturnResult.isResult()){
 				return defaultReturnResult;
 			}
 
@@ -379,17 +378,25 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 * @param request
 	 * @return
 	 */
-	protected boolean registerCaptchaValidate(HttpServletRequest request){
+	protected DefaultReturnResult registerCaptchaValidate(HttpServletRequest request,
+			RegisterForm registerForm){
 		Device device = getDevice(request);
 		boolean result = false;
+		DefaultReturnResult defaultReturnResult =new DefaultReturnResult();
 		if (device.isMobile()){
 			result = CaptchaUtil.validate(registerSMSCaptchaContainerAndValidateConfig, request);
 		}else{
 		        CaptchaValidateConfig captchaValidateConfig = registerCaptchaContainerAndValidateConfig.getCaptchaValidateConfig();
 			result = CaptchaUtil.validate(captchaValidateConfig, request);
 		}
-
-		return result;
+		defaultReturnResult.setResult(result);
+		if(!result){
+			DefaultResultMessage message = new DefaultResultMessage();
+			message.setMessage("register.captcha.validate.errors");
+			defaultReturnResult.getExtraResultMessages().add(message);
+			defaultReturnResult.setResultMessage(defaultReturnResult.getExtraResultMessages().get(0));
+		}
+		return defaultReturnResult;
 	}
 
 	/**
@@ -425,11 +432,12 @@ public class NebulaRegisterController extends NebulaLoginController{
 	 */
 	protected NebulaReturnResult onRegisterSuccess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
 
-		// 给发送激活邮件使用
+		// 给发送激活邮件使用(这个移到RegisterSuccessEvent监听器里实现?)
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_REG_MEMBID, memberDetails.getMemberId());
 		request.getSession().setAttribute(SessionKeyConstants.MEMBER_REG_EMAIL_URL, memberDetails.getLoginEmail());
-
-		// eventPublisher.publish(new RegisterSuccessEvent(memberDetails, getClientContext(request, response)));
+		
+		//注册成功时的事件
+		eventPublisher.publish(new RegisterSuccessEvent(memberDetails, getClientContext(request, response)));
 
 		// 注册成功后是否需要自动登录
 		// if (isAutoLoginAfterRegister()){
