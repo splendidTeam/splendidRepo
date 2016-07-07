@@ -289,15 +289,21 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 	 * @throws DocumentException
 	 */
 	private String getSubOrdinate(HttpServletRequest request, boolean isMobile) throws DocumentException {
+		String subOrdinate = null;
 		if (isMobile) {
 			Map<String, String> responseMap = new HashMap<String, String>();
 			RequestMapUtil.requestConvert(request, responseMap);
 			LOGGER.info("[DO_PAY_NOTIFY]request notify_data is [{}]", responseMap.get("notify_data"));
 			Map<String, String> resultMap = MapAndStringConvertor
 					.convertResultToMap(responseMap.get("notify_data"));
-			return resultMap.get("out_trade_no");
+			subOrdinate =  resultMap.get("out_trade_no");
+		}else{
+			subOrdinate =  request.getParameter("out_trade_no");
 		}
-		return request.getParameter("out_trade_no");
+		
+		LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
+	       
+		return subOrdinate;
 	}
 	
     /**

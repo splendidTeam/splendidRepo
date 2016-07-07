@@ -120,9 +120,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
     @Override
     public void doPayNotify(String payType, HttpServletRequest request, 
     		HttpServletResponse response) throws IllegalPaymentStateException,IOException, DocumentException{
-        String subOrdinate = request.getParameter("orderId");
-
-        LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
+        String subOrdinate = getSubOrdinate(request);
 
         // 判断交易是否已有成功 防止重复调用 。
         PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
@@ -130,14 +128,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
         if (Validator.isNotNullOrEmpty(payCode)){
         	response.getWriter().write(UNIONSUCCESS);
         }else{
-            LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
-
-            String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.UNIONPAY);
-            
-            // 获取异步通知
-            PaymentResult paymentResult =  unionpayService.getPaymentResultForAsy(request, paymentType);
-            
-            LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+            PaymentResult paymentResult = getPaymentResult(request);
 
             if (null == paymentResult){
                 //log
@@ -152,15 +143,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
                 // 获取支付状态
                 String responseStatus = paymentResult.getPaymentServiceSatus().toString();
 
-                //添加订单查询：支付状态为1 物流状态为1||3
-                Map<String, Object> paraMap = new HashMap<String, Object>();
-                paraMap.put("subOrdinate", subOrdinate);
-                List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-                SalesOrderCommand salesOrderCommand = null;
-                if (Validator.isNotNullOrEmpty(payInfoLogs)){
-                    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
-                }
+                SalesOrderCommand salesOrderCommand = getSalesOrderCommand(subOrdinate);
 
                 if (canUpdatePayInfos(responseStatus, salesOrderCommand)){
                     // 获取通知成功，修改支付及订单信息
@@ -191,6 +174,38 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
             }
         }
     }
+
+	private String getSubOrdinate(HttpServletRequest request) {
+		String subOrdinate = request.getParameter("orderId");
+
+        LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
+		return subOrdinate;
+	}
+
+	private SalesOrderCommand getSalesOrderCommand(String subOrdinate) {
+		//添加订单查询：支付状态为1 物流状态为1||3
+		Map<String, Object> paraMap = new HashMap<String, Object>();
+		paraMap.put("subOrdinate", subOrdinate);
+		List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+		SalesOrderCommand salesOrderCommand = null;
+		if (Validator.isNotNullOrEmpty(payInfoLogs)){
+		    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
+		}
+		return salesOrderCommand;
+	}
+
+	private PaymentResult getPaymentResult(HttpServletRequest request) {
+		LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+
+		String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.UNIONPAY);
+		
+		// 获取异步通知
+		PaymentResult paymentResult =  unionpayService.getPaymentResultForAsy(request, paymentType);
+		
+		LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+		return paymentResult;
+	}
     
     /**
 	 * 获取支付信息
