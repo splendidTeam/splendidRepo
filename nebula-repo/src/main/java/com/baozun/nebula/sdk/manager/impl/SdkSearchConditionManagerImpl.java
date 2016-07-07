@@ -25,9 +25,11 @@ import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.model.product.SearchConditionLang;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
+import com.baozun.nebula.search.Facet;
 import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.command.MetaDataCommand;
 import com.feilong.core.Validator;
+import com.feilong.core.util.comparator.PropertyComparator;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -198,7 +200,6 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 
 		List<SearchConditionCommand> resultList = new ArrayList<SearchConditionCommand>();
 		if(null!=cmdList){
-			
 			//利用map的特性，将相同名称的筛选条件去除掉
 			Map<String,SearchCondition> tmpSearchConditionMap = new HashMap<String,SearchCondition>();
 			for(SearchCondition s:cmdList){
@@ -211,8 +212,10 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 				cmd.setPropertyId(entry.getValue().getPropertyId());
 				resultList.add(cmd);
 			}
-			
 		}
+		
+		//根据sort字段排序
+		Collections.sort(resultList, new PropertyComparator<SearchConditionCommand>("sort"));		
 		return resultList;
 	}
 
