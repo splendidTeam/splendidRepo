@@ -92,9 +92,12 @@ public class ShoppingCartLineCommandPackBundleBehaviour extends AbstractShopping
         Map<String, BigDecimal> sumMap = CollectionsUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice", "originalSalesPrice");
 
         BigDecimal originalSalesPriceSum = sumMap.get("originalSalesPrice");
-        BigDecimal disCountSum = originalSalesPriceSum.subtract(sumMap.get("salesPrice"));
+        BigDecimal salesPriceSum = sumMap.get("salesPrice");
+        //BigDecimal disCountSum = originalSalesPriceSum.subtract(salesPriceSum);
+        BigDecimal disCountSum = BigDecimal.ZERO;
 
-        shoppingCartLineCommand.setSalePrice(originalSalesPriceSum);
+        //        shoppingCartLineCommand.setSalePrice(originalSalesPriceSum);
+        shoppingCartLineCommand.setSalePrice(salesPriceSum);
         shoppingCartLineCommand.setListPrice(sumMap.get("listPrice"));
         shoppingCartLineCommand.setDiscount(NumberUtil.getMultiplyValue(disCountSum, quantity, 2));
     }

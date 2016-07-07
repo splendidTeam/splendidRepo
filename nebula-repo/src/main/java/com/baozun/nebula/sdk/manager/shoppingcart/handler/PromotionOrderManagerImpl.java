@@ -186,6 +186,8 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = inputShoppingCartCommand.getShoppingCartLineCommands();// 有效的购物车行
         Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
 
+        //**************************************************************************************************
+
         ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
 
         shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
