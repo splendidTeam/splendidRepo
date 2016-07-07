@@ -29,7 +29,6 @@ import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
-import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
@@ -116,24 +115,11 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	@Override
 	public void doPayNotify(String payType, HttpServletRequest request,
 			HttpServletResponse response) throws IllegalPaymentStateException, IOException, DocumentException{
-		
-		    String paymentType = PayTypeConvertUtil.getPayType(ReservedPaymentType.WECHAT);
-		
 		    // 获取异步通知
-	        PaymentResult paymentResult = wechatService.getPaymentResultForAsy(request, paymentType);
+	        PaymentResult paymentResult = getPaymentResult(request);
 	        
-	        String subOrdinate = null;
+	        String subOrdinate = getSubOrdinate(paymentResult);
 	        
-	        if(paymentResult!=null &&  paymentResult.getPaymentStatusInformation()!=null){
-	        	subOrdinate = paymentResult.getPaymentStatusInformation().getOrderNo();
-	        }
-	        
-	        if(subOrdinate == null) return;
-
-	        LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
-	        
-	        LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
-
 	        // 判断交易是否已有成功 防止重复调用 。
 	        PayCode payCode = sdkPaymentManager.findPayCodeByCodeAndPayTypeAndPayStatus(subOrdinate, Integer.valueOf(payType), true);
 
@@ -142,8 +128,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	        	responseNotifyOrder(response);
 	        	
 	        }else{
-	            LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
-
+	           
 	            if (null == paymentResult){
 	                //log
 	                sdkPaymentManager.savePaymentLog(
@@ -155,15 +140,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	                // 获取支付状态
 	                String responseStatus = paymentResult.getPaymentServiceSatus().toString();
 
-	                //添加订单查询：支付状态为1 物流状态为1||3
-	                Map<String, Object> paraMap = new HashMap<String, Object>();
-	                paraMap.put("subOrdinate", subOrdinate);
-	                List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
-
-	                SalesOrderCommand salesOrderCommand = null;
-	                if (Validator.isNotNullOrEmpty(payInfoLogs)){
-	                    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
-	                }
+	                SalesOrderCommand salesOrderCommand = getSalesOrderCommand(subOrdinate);
 
 	                if (canUpdatePayInfos(responseStatus, salesOrderCommand)){
 	                    // 获取通知成功，修改支付及订单信息
@@ -195,6 +172,42 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 	            }
 	        }
 		
+	}
+
+	private SalesOrderCommand getSalesOrderCommand(String subOrdinate) {
+		//添加订单查询：支付状态为1 物流状态为1||3
+		Map<String, Object> paraMap = new HashMap<String, Object>();
+		paraMap.put("subOrdinate", subOrdinate);
+		List<PayInfoLog> payInfoLogs = sdkPaymentManager.findPayInfoLogListByQueryMap(paraMap);
+
+		SalesOrderCommand salesOrderCommand = null;
+		if (Validator.isNotNullOrEmpty(payInfoLogs)){
+		    salesOrderCommand = sdkOrderManager.findOrderById(payInfoLogs.get(0).getOrderId(), 1);
+		}
+		return salesOrderCommand;
+	}
+
+	private PaymentResult getPaymentResult(HttpServletRequest request) {
+		
+		LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
+		
+		PaymentResult paymentResult = wechatService.getPaymentResultForAsy(request, PayTypeConvertUtil.getPayType(ReservedPaymentType.WECHAT));
+		
+		LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
+		
+		return paymentResult;
+	}
+
+	private String getSubOrdinate(PaymentResult paymentResult) {
+		String subOrdinate = null;
+		
+		if(paymentResult!=null &&  paymentResult.getPaymentStatusInformation()!=null){
+			subOrdinate = paymentResult.getPaymentStatusInformation().getOrderNo();
+		}
+		
+	    LOGGER.info("[DO_PAY_NOTIFY] get sync notifications before , subOrdinate: {}", subOrdinate);
+		
+		return subOrdinate;
 	}
 	/**
 	 * 微信支付异步通知处理成功时发送此response给微信，否则无需发送，微信会以一定的频率继续通知到商城
