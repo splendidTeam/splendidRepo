@@ -190,7 +190,7 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
 
         shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
 
-        BigDecimal originPayAmount = getOriginPayAmount(shoppingCartLineCommandList);
+        BigDecimal originPayAmount = ShoppingCartUtil.getOriginPayAmount(shoppingCartLineCommandList);
         shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount); // 应付小计
         shopCartCommandByShop.setSumCurrentPayAmount(originPayAmount); // 应付合计
 
@@ -282,26 +282,4 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
         return shoppingCartLineCommand;
     }
 
-    /**
-     * 计算应付金额.
-     * 
-     * <p>
-     * 自动去除 gift 以及 isCaptionLine
-     * </p>
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the origin pay amount
-     */
-    private BigDecimal getOriginPayAmount(List<ShoppingCartLineCommand> shoppingCartLines){
-        BigDecimal originPayAmount = new BigDecimal(0);
-        for (ShoppingCartLineCommand cartLine : shoppingCartLines){
-            if (cartLine.isGift() || cartLine.isCaptionLine()){
-                continue;
-            }
-            BigDecimal multiplyValue = NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice(),2);
-            originPayAmount = originPayAmount.add(multiplyValue);
-        }
-        return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
 }

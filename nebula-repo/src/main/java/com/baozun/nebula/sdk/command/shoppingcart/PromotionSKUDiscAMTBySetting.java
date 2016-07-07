@@ -112,6 +112,13 @@ public class PromotionSKUDiscAMTBySetting implements Command{
     private String            state;
 
     /**
+     * 
+     */
+    public PromotionSKUDiscAMTBySetting(){
+        super();
+    }
+
+    /**
      * 获得 促销类型.
      *
      * @return the 促销类型

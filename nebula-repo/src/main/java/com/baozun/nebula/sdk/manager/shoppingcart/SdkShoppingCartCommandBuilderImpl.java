@@ -409,7 +409,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         ShoppingCartCommand shoppingCartCommand = new ShoppingCartCommand();// 购物车对象
 
         // 设置应付金额
-        shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(validedLines));
+        shoppingCartCommand.setOriginPayAmount(ShoppingCartUtil.getOriginPayAmount(validedLines));
 
         // 购物车行信息
         shoppingCartCommand.setShoppingCartLineCommands(validedLines);
@@ -430,29 +430,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         }
 
         return shoppingCartCommand;
-    }
-
-    /**
-     * 计算应付金额.
-     * 
-     * <p>
-     * 自动去除 gift 以及 isCaptionLine
-     * </p>
-     *
-     * @param shoppingCartLines
-     *            the shopping cart lines
-     * @return the origin pay amount
-     */
-    private BigDecimal getOriginPayAmount(List<ShoppingCartLineCommand> shoppingCartLines){
-        BigDecimal originPayAmount = new BigDecimal(0);
-        for (ShoppingCartLineCommand cartLine : shoppingCartLines){
-            if (cartLine.isGift() || cartLine.isCaptionLine()){
-                continue;
-            }
-            BigDecimal multiplyValue = NumberUtil.getMultiplyValue(cartLine.getQuantity(), cartLine.getSalePrice(),2);
-            originPayAmount = originPayAmount.add(multiplyValue);
-        }
-        return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     /**
@@ -505,7 +482,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     List<ShopCartCommandByShop> summaryShopCartList,
                     List<ShoppingCartLineCommand> allShoppingCartLines){
         // 设置应付金额
-        shoppingCartCommand.setOriginPayAmount(getOriginPayAmount(allShoppingCartLines));
+        shoppingCartCommand.setOriginPayAmount(ShoppingCartUtil.getOriginPayAmount(allShoppingCartLines));
 
         Map<String, BigDecimal> priceMap = CollectionsUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
 
@@ -605,7 +582,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shopCartCommandByShop.setOriginShoppingFee(originShippingFee);
 
         // 应付小计
-        shopCartCommandByShop.setSubtotalCurrentPayAmount(getOriginPayAmount(shoppingCartLineCommandList));
+        shopCartCommandByShop.setSubtotalCurrentPayAmount(ShoppingCartUtil.getOriginPayAmount(shoppingCartLineCommandList));
 
         // 应付合计(应付小计+应付运费)
         BigDecimal sumCurrentPayAmt = originShippingFee.add(shopCartCommandByShop.getSubtotalCurrentPayAmount());

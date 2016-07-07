@@ -16,8 +16,11 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.createline;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,8 +65,62 @@ public class ShoppingCartLineCommandCreateLineBundleBehaviour extends AbstractSh
         for (Long skuId : skuIds){
             ShoppingCartLineCommand newShoppingCartLineCommand = sdkShoppingCartBundleNewLineBuilder
                             .buildNewShoppingCartLineCommand(relatedItemId, skuId, quantity, shoppingCartLineCommand);
-            saveCommonLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, newShoppingCartLineCommand);
+
+            saveCommonLine(
+                            orderId,
+                            couponCodes,
+                            rebuildPromotionSKUDiscAMTBySettingList(
+                                            promotionSKUDiscAMTBySettingList,
+                                            newShoppingCartLineCommand,
+                                            relatedItemId),
+                            newShoppingCartLineCommand);
         }
+    }
+
+    /**
+     * Rebuild promotion sku disc amt by setting list.
+     *
+     * @param promotionSKUDiscAMTBySettingList
+     *            the promotion sku disc amt by setting list
+     * @param newShoppingCartLineCommand
+     *            the new shopping cart line command
+     * @param relatedItemId
+     * @return the list
+     * @since 5.3.1.6
+     */
+    private List<PromotionSKUDiscAMTBySetting> rebuildPromotionSKUDiscAMTBySettingList(
+                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
+                    ShoppingCartLineCommand newShoppingCartLineCommand,
+                    Long relatedItemId){
+
+        List<PromotionSKUDiscAMTBySetting> useList = ObjectUtils
+                        .defaultIfNull(promotionSKUDiscAMTBySettingList, new ArrayList<PromotionSKUDiscAMTBySetting>());
+
+        BigDecimal discount = newShoppingCartLineCommand.getDiscount();
+
+        boolean hasDiscount = discount.compareTo(BigDecimal.ZERO) > 0;
+        if (hasDiscount){
+            PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting = new PromotionSKUDiscAMTBySetting();
+
+            promotionSKUDiscAMTBySetting = new PromotionSKUDiscAMTBySetting();
+            promotionSKUDiscAMTBySetting.setGiftMark(false);
+            promotionSKUDiscAMTBySetting.setFreeShippingMark(false);
+            promotionSKUDiscAMTBySetting.setSkuId(newShoppingCartLineCommand.getSkuId());
+
+            //TODO 系统中不存在的促销 并且通常达不到这个数量级
+            promotionSKUDiscAMTBySetting.setPromotionId(100000000 + relatedItemId);
+
+            //Normal常规Step阶Choice选购NormalStep常规加阶梯NormalChoice常规加选购
+            promotionSKUDiscAMTBySetting.setPromotionType("bundle" + relatedItemId);
+            promotionSKUDiscAMTBySetting.setPromotionName("bundle" + relatedItemId);
+
+            promotionSKUDiscAMTBySetting.setDiscountAmount(discount);
+            promotionSKUDiscAMTBySetting.setBaseOrder(false);
+
+            useList.add(promotionSKUDiscAMTBySetting);
+        }
+
+        return useList;
     }
 
 }

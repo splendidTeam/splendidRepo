@@ -61,6 +61,28 @@ public final class ShoppingCartUtil{
     }
 
     /**
+     * 计算应付金额.
+     * 
+     * <p>
+     * 自动去除 gift 以及 isCaptionLine
+     * </p>
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @return the origin pay amount
+     */
+    public static BigDecimal getOriginPayAmount(List<ShoppingCartLineCommand> shoppingCartLines){
+        BigDecimal originPayAmount = new BigDecimal(0);
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLines){
+            if (shoppingCartLineCommand.isGift() || shoppingCartLineCommand.isCaptionLine()){
+                continue;
+            }
+            originPayAmount = originPayAmount.add(getSubTotalAmt(shoppingCartLineCommand));
+        }
+        return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    /**
      * 订单行小计.
      *
      * @param shoppingCartLineCommand
@@ -81,7 +103,9 @@ public final class ShoppingCartUtil{
 
         BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice, 2).subtract(discount);
         BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt;
-        LOGGER.debug("salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}]", salePrice, quantity, discount, subTotalAmt);
+
+        String message = "salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
+        LOGGER.debug(message, salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
         return subTotalAmt;
     }
 

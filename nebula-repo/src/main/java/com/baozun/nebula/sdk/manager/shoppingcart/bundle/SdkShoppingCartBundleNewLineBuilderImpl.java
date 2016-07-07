@@ -19,6 +19,8 @@ package com.baozun.nebula.sdk.manager.shoppingcart.bundle;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.lang.NumberUtil;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * The Class SdkShoppingCartBundleNewLineBuilderImpl.
@@ -48,6 +51,9 @@ import com.feilong.core.lang.NumberUtil;
 @Transactional
 @Service("sdkShoppingCartBundleNewLineBuilder")
 public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartBundleNewLineBuilder{
+
+    /** The Constant log. */
+    private static final Logger             LOGGER = LoggerFactory.getLogger(SdkShoppingCartBundleNewLineBuilderImpl.class);
 
     /** The sdk order line dao. */
     @Autowired
@@ -114,12 +120,12 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
         newShoppingCartLineCommand.setType(type);
         // 分组号
         newShoppingCartLineCommand.setLineGroup(lineGroup);
-        
+
         // 销售属性
         String skuProperties = sku.getProperties();
         List<SkuProperty> skuPros = sdkSkuManager.getSkuPros(skuProperties);
         if (Validator.isNotNullOrEmpty(skuPros)){
-        	newShoppingCartLineCommand.setSkuPropertys(skuPros);
+            newShoppingCartLineCommand.setSkuPropertys(skuPros);
         }
 
         return newShoppingCartLineCommand;
@@ -139,19 +145,28 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
      */
     private void setLinePrices(ShoppingCartLineCommand newShoppingCartLineCommand,Long relatedItemId,Long skuId,Integer quantity){
         BundleSkuPriceCommand bundleSkuPriceCommand = sdkBundleManager.getBundleSkuPrice(relatedItemId, skuId);
+
+        if (LOGGER.isDebugEnabled()){
+            LOGGER.debug(
+                            "relatedItemId:{},skuId:{},bundleSkuPriceCommand:{}",
+                            relatedItemId,
+                            skuId,
+                            JsonUtil.format(bundleSkuPriceCommand));
+        }
+
         BigDecimal listPrice = bundleSkuPriceCommand.getListPrice();
         BigDecimal salePrice = bundleSkuPriceCommand.getSalesPrice();
+        BigDecimal originalSalesPrice = bundleSkuPriceCommand.getOriginalSalesPrice();
 
-        //FIXME feilong bundle商品金额 计算折扣
-        BigDecimal discount = new BigDecimal(0);
         // 原销售单价
         newShoppingCartLineCommand.setListPrice(listPrice);
 
         // 现销售单价
-        newShoppingCartLineCommand.setSalePrice(salePrice);
+        newShoppingCartLineCommand.setSalePrice(originalSalesPrice);
 
         // 折扣、行类型
-        newShoppingCartLineCommand.setDiscount(discount);
+        BigDecimal disCount = NumberUtil.getMultiplyValue(originalSalesPrice.subtract(salePrice), quantity, 2);
+        newShoppingCartLineCommand.setDiscount(disCount); //FIXME feilong bundle商品金额 计算折扣
 
         // 行小计
         newShoppingCartLineCommand.setSubTotalAmt(ShoppingCartUtil.getSubTotalAmt(newShoppingCartLineCommand));
