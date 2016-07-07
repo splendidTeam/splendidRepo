@@ -322,7 +322,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 		// 属性和价格范围
 		Map<Long, SearchConditionCommand> allSearchConditionMetaMap = facetFilterMetaData.getSearchConditionMetaMap();		
 		List<SearchConditionCommand> cmdList = searchManager.findConditionByNavigationWithCache(searchCommand.getNavigationId());
-		Map<Long, SearchConditionCommand> searchConditionMetaMap = new HashMap<Long,SearchConditionCommand>(cmdList.size());
+		Map<Long, SearchConditionCommand> searchConditionMetaMap = new LinkedHashMap<Long, SearchConditionCommand>(cmdList.size());
 		for(SearchConditionCommand command : cmdList){
 			searchConditionMetaMap.put(command.getId(), allSearchConditionMetaMap.get(command.getId()));
 		}		
