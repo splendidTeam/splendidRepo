@@ -45,6 +45,7 @@ import com.baozun.nebula.utilities.integration.payment.exception.PaymentInitialF
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.baozun.nebula.utilities.integration.payment.exception.RequestTypeNotSupporttedException;
 import com.baozun.nebula.utilities.integration.payment.param.PaymentRequestParam;
+import com.feilong.tools.jsonlib.JsonUtil;
 import com.baozun.nebula.utilities.common.Md5Encrypt;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
@@ -399,8 +400,12 @@ public class AlipayPaymentRequest implements PaymentRequest, Serializable {
 
 	@Override
 	public String getRequestURL() {
-		return URIUtil.getEncodedUrl(this.getPaymentParameters(),
-				_input_charset);
+		Map<String, String> paymentParameters2 = this.getPaymentParameters();
+        String encodedUrl = URIUtil.getEncodedUrl(paymentParameters2,_input_charset);
+        if (logger.isInfoEnabled()){
+            logger.info("encodedUrl:[{}],paymentParameters2:{}",encodedUrl,JsonUtil.format(paymentParameters2));
+        }
+        return encodedUrl;
 	}
 
 	@Override

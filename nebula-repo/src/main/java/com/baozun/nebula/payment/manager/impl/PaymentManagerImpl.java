@@ -233,7 +233,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			
 			//创建一个新的MOBILE端授权请求
 			paymentRequest = paymentAdaptor.newPaymentRequestForMobileCreateDirect(addition);
-			
+			log.info("RequestForMobileCreateDirect:{}",paymentRequest.getRequestURL());
 			String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(),HttpMethodType.GET,_INPUT_CHARSET);
 			
 			Map<String,String> map = new HashMap<String,String>();
