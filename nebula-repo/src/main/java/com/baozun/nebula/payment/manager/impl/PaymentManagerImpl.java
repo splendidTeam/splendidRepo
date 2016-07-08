@@ -19,7 +19,6 @@ import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
@@ -36,6 +35,7 @@ import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;
+import com.feilong.core.Validator;
 
 @Service("PaymentManager")
 public class PaymentManagerImpl implements PaymentManager {

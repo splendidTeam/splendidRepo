@@ -35,18 +35,16 @@ public class CommonPayServiceImpl implements CommonPayService{
 	}
 	
 	@Override
-	public PaymentResult getPaymentResultForSyn(HttpServletRequest request,
-			String paymentType) {
-		PaymentFactory paymentFactory = PaymentFactory.getInstance();
-		PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentType);//获得支付适配器
+	public PaymentResult getPaymentResultForSyn(HttpServletRequest request, String paymentType) {
+		//获得支付适配器
+		PaymentAdaptor paymentAdaptor = PaymentFactory.getInstance().getPaymentAdaptor(paymentType);
 		return paymentAdaptor.getPaymentResult(request);
 	}
 
 	@Override
-	public PaymentResult getPaymentResultForAsy(HttpServletRequest request,
-			String paymentType) {
-		PaymentFactory paymentFactory = PaymentFactory.getInstance();
-		PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(paymentType);//获得支付适配器
+	public PaymentResult getPaymentResultForAsy(HttpServletRequest request, String paymentType) {
+		//获得支付适配器
+		PaymentAdaptor paymentAdaptor = PaymentFactory.getInstance().getPaymentAdaptor(paymentType);
 		return paymentAdaptor.getPaymentResultFromNotification(request);
 	}
 	
