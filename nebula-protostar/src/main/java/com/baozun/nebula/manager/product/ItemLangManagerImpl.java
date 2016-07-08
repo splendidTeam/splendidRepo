@@ -100,7 +100,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	public Item createOrUpdateItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds,
 			ItemPropertiesCommand[] iProperties,
-			SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception {
+			SkuPropertyMUtlLangCommand[] skuPropertyCommand,
+			Long defCategroyId) throws Exception {
 
 		// 保存商品
 		itemCommand.setItemType(Item.ITEM_TYPE_SIMPLE);
@@ -123,7 +124,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		createOrUpdateItemInfo(itemCommand, item.getId());
 
 		// 处理商品分类
-		itemCategoryHandle(itemCommand, item, categoriesIds);
+		itemCategoryHandle(itemCommand, item, categoriesIds,defCategroyId);
 		
 		return item;
 	}
@@ -1243,9 +1244,9 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		return item;
 	}
 	
-	private void itemCategoryHandle(ItemInfoCommand itemCommand, Item item, Long[] categoriesIds){
+	private void itemCategoryHandle(ItemInfoCommand itemCommand, Item item, Long[] categoriesIds, Long defCategroyId){
 		if (categoriesIds != null && categoriesIds.length > 0) {
-			Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
+			Long defaultId = defCategroyId;//itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
 
 			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
 			int index = 0;

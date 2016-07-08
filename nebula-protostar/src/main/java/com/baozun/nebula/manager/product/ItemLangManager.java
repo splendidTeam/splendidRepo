@@ -30,7 +30,7 @@ import com.baozun.nebula.model.product.Item;
 public interface ItemLangManager extends BaseManager {
 
 	Item createOrUpdateItem(ItemInfoCommand itemCommand, Long[] propertyValueIds, Long[] categoriesIds,
-			ItemPropertiesCommand[] iProperties, SkuPropertyMUtlLangCommand[] skuPropertyCommand) throws Exception;
+			ItemPropertiesCommand[] iProperties, SkuPropertyMUtlLangCommand[] skuPropertyCommand, Long defCategroyId) throws Exception;
 
 	Integer validateItemCode(String code, Long shopId);
 

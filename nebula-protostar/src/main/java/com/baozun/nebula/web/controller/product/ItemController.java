@@ -437,6 +437,7 @@ public class ItemController extends BaseController{
 			@ArrayCommand(dataBind = true) Long[] propertyIds,// 用户填写的商品属性值的属性Id
 			@ArrayCommand(dataBind = true) String[] propertyValueInputs,// 用户输入的 商品销售属性的 属性值 （对于多选来说 是 pvId,pvId 对于自定义多选来说是 aa||bb）-自定义多选
 			@ArrayCommand(dataBind = true) String[] propertyValueInputIds,// --多选
+			Long defCategroyId,
 			HttpServletRequest request) throws Exception{
 		// 查询orgId
 		UserDetails userDetails = this.getUserDetails();
@@ -459,7 +460,7 @@ public class ItemController extends BaseController{
 				propertyValueInputIds);
 //		List<ItemProValGroupRelation> groupRelation = getItemProValueGroupRelation(request,propertyIds);
 		// 保存商品
-		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray);
+		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray,defCategroyId);
 
 		if (item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){
 			List<Long> itemIdsForSolr = new ArrayList<Long>();
