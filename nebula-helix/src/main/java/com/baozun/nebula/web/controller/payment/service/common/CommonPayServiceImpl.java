@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mobile.device.Device;
 
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor;
@@ -16,13 +17,22 @@ import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.web.controller.payment.service.common.command.CommonPayParamCommand;
 
 
-public class CommonPayServiceImpl implements  CommonPayService{
+public class CommonPayServiceImpl implements CommonPayService{
 	
 	/** The Constant LOGGER. */
     private static final Logger LOGGER          = LoggerFactory.getLogger(CommonPayServiceImpl.class);
 	
 	public static final String INPUT_CHARSET = "utf-8";
 
+	@Override
+	public PaymentRequest createPayment(CommonPayParamCommand payParamCommand, Map<String, String> extraParams, Device device) {
+		try {
+			return createPayment(payParamCommand, extraParams);
+		} catch (Exception e) {
+			LOGGER.error("[CREATEPAYMENT] create payment error.", e);
+		}
+		return null;
+	}
 	
 	@Override
 	public PaymentResult getPaymentResultForSyn(HttpServletRequest request,
@@ -40,7 +50,6 @@ public class CommonPayServiceImpl implements  CommonPayService{
 		return paymentAdaptor.getPaymentResultFromNotification(request);
 	}
 	
-
 	protected PaymentRequest createPayment(CommonPayParamCommand payParamCommand, Map<String, String> additionParams) throws Exception {
 		//获得支付适配器
         PaymentFactory paymentFactory = PaymentFactory.getInstance();

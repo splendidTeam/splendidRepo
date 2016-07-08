@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mobile.device.Device;
 import org.springframework.ui.Model;
 
-import com.baozun.nebula.command.OnLinePaymentCommand;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.event.PayWarnningEvent;
 import com.baozun.nebula.exception.IllegalPaymentStateException;
@@ -357,23 +356,5 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		
 		return itBPay.toString() + "m";
 	}
-	
-	/**
-	 * 为保存paylog构造对象
-	 * @param salesOrder
-	 * @param payInfoLog
-	 * @return
-	 */
-	private SalesOrderCommand buildSavePayLogParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog) {
-    	
-        SalesOrderCommand so = new SalesOrderCommand();
-        so.setCode(payInfoLog.getSubOrdinate());
-        
-        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
-		onLinePaymentCommand.setPayType(payInfoLog.getPayType());
-        so.setOnLinePaymentCommand(onLinePaymentCommand);
-        
-        return so;
-    }
 	
 }

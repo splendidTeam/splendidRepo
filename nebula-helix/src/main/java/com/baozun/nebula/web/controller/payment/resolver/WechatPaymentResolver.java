@@ -29,16 +29,15 @@ import com.baozun.nebula.model.payment.PayCode;
 import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.payment.manager.PayManager;
-import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
+import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
-import com.baozun.nebula.utils.convert.PayTypeConvertUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.constants.SessionKeyConstants;
@@ -191,7 +190,7 @@ public class WechatPaymentResolver extends BasePaymentResolver implements Paymen
 		
 		LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
 		
-		PaymentResult paymentResult = wechatService.getPaymentResultForAsy(request, PayTypeConvertUtil.getPayType(ReservedPaymentType.WECHAT));
+		PaymentResult paymentResult = wechatService.getPaymentResultForAsy(request, PaymentFactory.PAY_TYPE_WECHAT);
 		
 		LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 		

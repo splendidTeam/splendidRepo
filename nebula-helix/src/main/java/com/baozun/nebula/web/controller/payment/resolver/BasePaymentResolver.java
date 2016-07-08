@@ -18,6 +18,8 @@ package com.baozun.nebula.web.controller.payment.resolver;
 
 import java.util.Objects;
 
+import com.baozun.nebula.command.OnLinePaymentCommand;
+import com.baozun.nebula.model.salesorder.PayInfoLog;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
@@ -44,5 +46,23 @@ public abstract class BasePaymentResolver {
                         && Objects.equals(
                                         SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT,
                                         financialStatus);
+    }
+    
+    /**
+	 * 为保存paylog构造对象
+	 * @param salesOrder
+	 * @param payInfoLog
+	 * @return
+	 */
+    protected SalesOrderCommand buildSavePayLogParams(SalesOrderCommand salesOrder, PayInfoLog payInfoLog) {
+    	
+        SalesOrderCommand so = new SalesOrderCommand();
+        so.setCode(payInfoLog.getSubOrdinate());
+        
+        OnLinePaymentCommand onLinePaymentCommand = new OnLinePaymentCommand();
+		onLinePaymentCommand.setPayType(payInfoLog.getPayType());
+        so.setOnLinePaymentCommand(onLinePaymentCommand);
+        
+        return so;
     }
 }
