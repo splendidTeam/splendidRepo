@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.web.controller.payment.service.common.CommonPayService;
 
-public interface AlipayService extends CommonPayService{
+public interface AlipayService extends CommonPayService {
 	
 	
 	/**
@@ -14,7 +14,7 @@ public interface AlipayService extends CommonPayService{
 	 * @param paymentType
 	 * @return
 	 */
-	public PaymentResult getPaymentResultForSynOfWap(HttpServletRequest request,String paymentType);
+	public PaymentResult getPaymentResultForSynOfWap(HttpServletRequest request, String paymentType);
 	
 	
 	/**
@@ -23,6 +23,6 @@ public interface AlipayService extends CommonPayService{
 	 * @param paymentType
 	 * @return
 	 */
-	public PaymentResult getPaymentResultForAsyOfWap(HttpServletRequest request,String paymentType);
+	public PaymentResult getPaymentResultForAsyOfWap(HttpServletRequest request, String paymentType);
 
 }

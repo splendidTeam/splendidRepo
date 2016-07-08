@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mobile.device.Device;
+import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor;
@@ -16,8 +17,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.web.controller.payment.service.common.command.CommonPayParamCommand;
 
-
-public class CommonPayServiceImpl implements CommonPayService{
+@Service
+public class CommonPayServiceImpl implements CommonPayService {
 	
 	/** The Constant LOGGER. */
     private static final Logger LOGGER          = LoggerFactory.getLogger(CommonPayServiceImpl.class);

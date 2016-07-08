@@ -35,8 +35,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.payment.NebulaPaymentController;
+import com.baozun.nebula.web.controller.payment.service.common.CommonPayService;
 import com.baozun.nebula.web.controller.payment.service.common.command.CommonPayParamCommand;
-import com.baozun.nebula.web.controller.payment.service.unionpay.UnionpayService;
 import com.feilong.core.Validator;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -69,7 +69,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
 	private MataInfoManager     mataInfoManager;
     
     @Autowired
-    private UnionpayService     unionpayService;
+    private CommonPayService     commonPayService;
     
     
     @Override
@@ -87,7 +87,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
     	CommonPayParamCommand payParamCommand = buildPayParams(originalSalesOrder, payInfoLog, request);
 		
 		//获取支付请求( url)链接对象
-		PaymentRequest paymentRequest = unionpayService.createPayment(payParamCommand, extra, device);
+		PaymentRequest paymentRequest = commonPayService.createPayment(payParamCommand, extra, device);
 		
 		if (null == paymentRequest){
 		    throw new IllegalPaymentStateException(IllegalPaymentState.PAYMENT_GETURL_ERROR, "获取跳转地址失败");
@@ -195,7 +195,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
 		LOGGER.debug("[DO_PAY_NOTIFY] RequestInfoMapForLog:{}", JsonUtil.format(RequestUtil.getRequestInfoMapForLog(request)));
 
 		// 获取异步通知
-		PaymentResult paymentResult =  unionpayService.getPaymentResultForAsy(request, PaymentFactory.PAY_TYPE_UNIONPAY);
+		PaymentResult paymentResult =  commonPayService.getPaymentResultForAsy(request, PaymentFactory.PAY_TYPE_UNIONPAY);
 		
 		LOGGER.info("[DO_PAY_NOTIFY] async notifications return value: " + MapConvertUtils.transPaymentResultToString(paymentResult));
 		return paymentResult;
@@ -214,7 +214,7 @@ public class UnionpayPaymentResolver extends BasePaymentResolver implements Paym
     	CommonPayParamCommand payParam = new CommonPayParamCommand();
     	payParam.setOrderNo(payInfoLog.getSubOrdinate());
     	payParam.setTotalFee(payInfoLog.getPayMoney());
-    	payParam.setPaymentType(payInfoLog.getPayType().toString());
+    	payParam.setPaymentType(PaymentFactory.PAY_TYPE_UNIONPAY);
         return payParam;
     }
 

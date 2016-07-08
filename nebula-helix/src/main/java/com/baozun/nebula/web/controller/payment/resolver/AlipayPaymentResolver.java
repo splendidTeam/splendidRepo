@@ -35,6 +35,7 @@ import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.utils.MapConvertUtils;
 import com.baozun.nebula.utilities.common.RequestMapUtil;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
+import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
@@ -322,7 +323,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     	payParam.setCustomerIp(RequestUtil.getClientIp(request));
     	payParam.setPaymentTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
     	payParam.setItBPay(getItBPay(salesOrder.getCreateTime()));
-    	payParam.setPaymentType(payInfoLog.getPayType().toString());
+    	payParam.setPaymentType(parsePaymentType(payInfoLog.getPayType().toString()));
     	
     	if(SalesOrder.SO_PAYMENT_TYPE_INTERNATIONALCARD.equals(payInfoLog.getPayType().toString())) {
     		payParam.setIsInternationalCard(true);
@@ -357,4 +358,22 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		return itBPay.toString() + "m";
 	}
 	
+	/**
+	 * 将官方商城的支付方式转换成nebula Utility中的支付方式
+	 * @param paymentType
+	 * @return
+	 */
+	private String parsePaymentType(String paymentType) {
+		if(SalesOrder.SO_PAYMENT_TYPE_ALIPAY.equals(paymentType)) {
+    		return PaymentFactory.PAY_TYPE_ALIPAY;
+    	} else if(SalesOrder.SO_PAYMENT_TYPE_NETPAY.equals(paymentType)) {
+    		return PaymentFactory.PAY_TYPE_ALIPAY_BANK;
+    	} else if(SalesOrder.SO_PAYMENT_TYPE_ALIPAY_CREDIT.equals(paymentType)) {
+    		return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
+    	} else if(SalesOrder.SO_PAYMENT_TYPE_INTERNATIONALCARD.equals(paymentType)) {
+    		return PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+    	} else {
+    		throw new IllegalArgumentException("not an valide alipay type. payType:[" + paymentType + "]");
+    	}
+	}
 }
