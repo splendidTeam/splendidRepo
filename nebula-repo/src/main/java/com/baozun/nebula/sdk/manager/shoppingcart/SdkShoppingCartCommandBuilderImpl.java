@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
 
@@ -204,10 +205,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             if (null != tempShopLine){
                 List<ShoppingCartLineCommand> list = shopIdAndShoppingCartLineCommandListMap.get(shopId);
                 if (list == null){
-                    List<ShoppingCartLineCommand> shopNewLines = new ArrayList<ShoppingCartLineCommand>();
-                    shopNewLines.add(tempShopLine);
-
-                    shopIdAndShoppingCartLineCommandListMap.put(shopId, shopNewLines);
+                    shopIdAndShoppingCartLineCommandListMap.put(shopId, toList(tempShopLine));
                 }else{
                     list.add(tempShopLine);
                 }

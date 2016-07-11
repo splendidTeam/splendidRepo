@@ -119,7 +119,7 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
                     List<PromotionBrief> promotionBriefList){
         Date beginDate = new Date();
 
-        PromotionResultCommand promotionResultCommand = promotionResultCommandBuilder.build(promotionBriefList);
+        PromotionResultCommand promotionResultCommand = buildPromotionResultCommand(inputShoppingCartCommand, promotionBriefList);
 
         //******************************************************************************************************
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = inputShoppingCartCommand.getShoppingCartLineCommands();// 有效的购物车行
@@ -138,6 +138,33 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
 
         LOGGER.info("use time:{}", getIntervalForView(beginDate, new Date()));
         return shopCartCommandByShop;
+    }
+
+    /**
+     * Builds the promotion result command.
+     *
+     * @param inputShoppingCartCommand
+     *            the input shopping cart command
+     * @param promotionBriefList
+     *            the promotion brief list
+     * @return the promotion result command
+     * @since 5.3.1.6
+     */
+    private PromotionResultCommand buildPromotionResultCommand(
+                    ShoppingCartCommand inputShoppingCartCommand,
+                    List<PromotionBrief> promotionBriefList){
+        PromotionResultCommand promotionResultCommand = promotionResultCommandBuilder.build(promotionBriefList);
+
+        List<ShoppingCartLineCommand> shoppingCartLineCommands = inputShoppingCartCommand.getShoppingCartLineCommands();
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommands){
+            Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
+
+            //TODO feilong 需要提炼
+            if (null != relatedItemId){
+                promotionResultCommand.setDisAmtOnOrder(shoppingCartLineCommand.getDiscount());
+            }
+        }
+        return promotionResultCommand;
     }
 
     /**
