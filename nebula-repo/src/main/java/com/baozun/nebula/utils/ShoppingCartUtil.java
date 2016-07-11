@@ -16,6 +16,10 @@
  */
 package com.baozun.nebula.utils;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static java.math.BigDecimal.ROUND_HALF_UP;
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
@@ -77,9 +81,11 @@ public final class ShoppingCartUtil{
             if (shoppingCartLineCommand.isGift() || shoppingCartLineCommand.isCaptionLine()){
                 continue;
             }
-            originPayAmount = originPayAmount.add(getSubTotalAmt(shoppingCartLineCommand));
+            //getSubTotalAmt(shoppingCartLineCommand)
+            originPayAmount = originPayAmount.add(
+                            NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice(), 2));
         }
-        return originPayAmount = originPayAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
+        return originPayAmount = originPayAmount.setScale(2, ROUND_HALF_UP);
     }
 
     /**
@@ -102,7 +108,7 @@ public final class ShoppingCartUtil{
         Validate.isTrue(quantity > 0, "quantity must >0");
 
         BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice, 2).subtract(discount);
-        BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt;
+        BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(ZERO) < 0 ? ZERO : lineSubTotalAmt;
 
         String message = "salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
         LOGGER.debug(message, salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
@@ -155,8 +161,7 @@ public final class ShoppingCartUtil{
      * @see com.feilong.core.util.CollectionsUtil#sum(java.util.Collection, String)
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
-                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
+        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
     }
 
     /**

@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import static java.math.BigDecimal.ROUND_HALF_UP;
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,8 +54,6 @@ import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionOrderManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
-import com.feilong.core.date.DateExtensionUtil;
-import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -310,7 +311,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
                 ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
                 shopCartCommandByShop.setQty(0);
-                shopCartCommandByShop.setRealPayAmount(BigDecimal.ZERO);
+                shopCartCommandByShop.setRealPayAmount(ZERO);
                 shopCartCommandByShop.setShopId(shopId);
 
                 List<ShopCartCommandByShop> summaryShopCartList = new ArrayList<ShopCartCommandByShop>();
@@ -405,7 +406,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     UserDetails userDetails,
                     List<String> coupons,
                     List<ShoppingCartLineCommand> validedLines){
-
         ShoppingCartCommand shoppingCartCommand = new ShoppingCartCommand();// 购物车对象
 
         // 设置应付金额
@@ -487,10 +487,10 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         Map<String, BigDecimal> priceMap = CollectionsUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
 
         // 实际支付金额
-        shoppingCartCommand.setCurrentPayAmount(priceMap.get("realPayAmount").setScale(2, BigDecimal.ROUND_HALF_UP));
+        shoppingCartCommand.setCurrentPayAmount(priceMap.get("realPayAmount").setScale(2, ROUND_HALF_UP));
 
         // 应付运费
-        shoppingCartCommand.setOriginShoppingFee(priceMap.get("originShoppingFee").setScale(2, BigDecimal.ROUND_HALF_UP));
+        shoppingCartCommand.setOriginShoppingFee(priceMap.get("originShoppingFee").setScale(2, ROUND_HALF_UP));
 
         // 运费优惠
         BigDecimal offersShippingAmount = priceMap.get("offersShipping");
@@ -498,7 +498,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         // 计算实付运费
         BigDecimal originShoppingFee = shoppingCartCommand.getOriginShoppingFee();
         BigDecimal currentShippingAmountByShopCart = originShoppingFee.compareTo(offersShippingAmount) >= 0
-                        ? originShoppingFee.subtract(offersShippingAmount) : BigDecimal.ZERO;
+                        ? originShoppingFee.subtract(offersShippingAmount) : ZERO;
         // 实付运费
         shoppingCartCommand.setCurrentShippingFee(currentShippingAmountByShopCart);
     }
@@ -582,17 +582,18 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shopCartCommandByShop.setOriginShoppingFee(originShippingFee);
 
         // 应付小计
-        shopCartCommandByShop.setSubtotalCurrentPayAmount(ShoppingCartUtil.getOriginPayAmount(shoppingCartLineCommandList));
+        BigDecimal originPayAmount = ShoppingCartUtil.getOriginPayAmount(shoppingCartLineCommandList);
+        shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount);
 
         // 应付合计(应付小计+应付运费)
-        BigDecimal sumCurrentPayAmt = originShippingFee.add(shopCartCommandByShop.getSubtotalCurrentPayAmount());
+        BigDecimal sumCurrentPayAmt = originShippingFee.add(originPayAmount);
         shopCartCommandByShop.setSumCurrentPayAmount(sumCurrentPayAmt);
-
-        // 应付金额
-        shoppingCartCommand.setOriginPayAmount(sumCurrentPayAmt);
 
         // 实付合计
         shopCartCommandByShop.setRealPayAmount(sumCurrentPayAmt);
+
+        // 应付金额
+        shoppingCartCommand.setOriginPayAmount(sumCurrentPayAmt);
         // 实付金额
         shoppingCartCommand.setCurrentPayAmount(sumCurrentPayAmt);
 
