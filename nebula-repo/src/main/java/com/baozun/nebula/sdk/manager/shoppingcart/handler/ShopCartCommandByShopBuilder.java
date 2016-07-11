@@ -16,7 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
+import java.util.List;
+
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
@@ -31,22 +34,6 @@ public interface ShopCartCommandByShopBuilder{
     /**
      * Builds the.
      *
-     * @param inputShoppingCartCommand
-     *            the input shopping cart command
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param promotionResultCommand
-     *            the promotion result command
-     * @return the shop cart command by shop
-     */
-    ShopCartCommandByShop build(
-                    ShoppingCartCommand inputShoppingCartCommand,
-                    CalcFreightCommand calcFreightCommand,
-                    PromotionResultCommand promotionResultCommand);
-
-    /**
-     * Builds the.
-     *
      * @param shopId
      *            the shop id
      * @param shoppingCartCommand
@@ -56,5 +43,10 @@ public interface ShopCartCommandByShopBuilder{
      * @return the shop cart command by shop
      */
     ShopCartCommandByShop build(Long shopId,ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand);
+
+    ShopCartCommandByShop build(
+                    ShoppingCartCommand inputShoppingCartCommand,
+                    CalcFreightCommand calcFreightCommand,
+                    List<PromotionBrief> promotionBriefList);
 
 }

@@ -51,10 +51,10 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
-import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionOrderManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShopCartCommandByShopBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
+import com.feilong.core.bean.ConvertUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -97,10 +97,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     /** The promotion brief builder. */
     @Autowired
     private PromotionBriefBuilder                      promotionBriefBuilder;
-
-    /** The promotion order manager. */
-    @Autowired
-    private PromotionOrderManager                      promotionOrderManager;
 
     /*
      * (non-Javadoc)
@@ -314,10 +310,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                 shopCartCommandByShop.setRealPayAmount(ZERO);
                 shopCartCommandByShop.setShopId(shopId);
 
-                List<ShopCartCommandByShop> summaryShopCartList = new ArrayList<ShopCartCommandByShop>();
-                summaryShopCartList.add(shopCartCommandByShop);
-
-                shoppingCartCommand.setSummaryShopCartList(summaryShopCartList);
+                shoppingCartCommand.setSummaryShopCartList(ConvertUtil.toList(shopCartCommandByShop));
             }
         }
     }
@@ -551,8 +544,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     List<PromotionBrief> promotionBriefList){
         if (isNotNullOrEmpty(promotionBriefList)){
             // 计算分店铺的优惠.只计算有效的购物车行
-            ShopCartCommandByShop shopCartCommandByShop = promotionOrderManager
-                            .buildShopCartCommandByShop(shoppingCartCommand, calcFreightCommand, promotionBriefList);
+            ShopCartCommandByShop shopCartCommandByShop = shopCartCommandByShopBuilder
+                            .build(shoppingCartCommand, calcFreightCommand, promotionBriefList);
 
             shoppingCartCommand.setShoppingCartLineCommands(
                             sdkShoppingCartGroupManager

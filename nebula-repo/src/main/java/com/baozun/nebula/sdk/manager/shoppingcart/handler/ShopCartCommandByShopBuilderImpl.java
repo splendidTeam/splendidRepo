@@ -16,21 +16,28 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
+import static com.feilong.core.date.DateExtensionUtil.getIntervalForView;
 import static java.math.BigDecimal.ZERO;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
+import com.feilong.core.bean.ConvertUtil;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * The Class ShopCartCommandByShopBuilderImpl.
@@ -42,10 +49,27 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 @Service("shopCartCommandByShopBuilder")
 public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBuilder{
 
+    /** The Constant log. */
+    private static final Logger           LOGGER = LoggerFactory.getLogger(ShopCartCommandByShopBuilderImpl.class);
+
     /** The sdk freight fee manager. */
     @Autowired
-    private SdkFreightFeeManager sdkFreightFeeManager;
+    private SdkFreightFeeManager          sdkFreightFeeManager;
 
+    /** The promotion result command builder. */
+    @Autowired
+    private PromotionResultCommandBuilder promotionResultCommandBuilder;
+
+    /** The share discount to line manager. */
+    @Autowired
+    private ShareDiscountToLineManager    shareDiscountToLineManager;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.handler.ShopCartCommandByShopBuilder#build(java.lang.Long,
+     * com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand, com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand)
+     */
     @Override
     public ShopCartCommandByShop build(Long shopId,ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
@@ -86,11 +110,48 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
      * 
      * @see
      * com.baozun.nebula.sdk.manager.shoppingcart.handler.ShopCartCommandByShopBuilder#build(com.baozun.nebula.sdk.command.shoppingcart.
-     * ShoppingCartCommand, com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand,
-     * com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionResultCommand)
+     * ShoppingCartCommand, com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand, java.util.List)
      */
     @Override
     public ShopCartCommandByShop build(
+                    ShoppingCartCommand inputShoppingCartCommand,
+                    CalcFreightCommand calcFreightCommand,
+                    List<PromotionBrief> promotionBriefList){
+        Date beginDate = new Date();
+
+        PromotionResultCommand promotionResultCommand = promotionResultCommandBuilder.build(promotionBriefList);
+
+        //******************************************************************************************************
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = inputShoppingCartCommand.getShoppingCartLineCommands();// 有效的购物车行
+        Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
+
+        //***************************************************************************************
+        ShopCartCommandByShop shopCartCommandByShop = buildInner(inputShoppingCartCommand, calcFreightCommand, promotionResultCommand);
+
+        //XXX feilong 原来是这里加礼品的
+        CollectionsUtil.addAllIgnoreNull(shoppingCartLineCommandList, promotionResultCommand.getGiftList());// 将礼品放入购物车当中
+
+        inputShoppingCartCommand.setShoppingCartLineCommands(shoppingCartLineCommandList);
+        inputShoppingCartCommand.setOriginPayAmount(shopCartCommandByShop.getSumCurrentPayAmount());// 应付金额
+        inputShoppingCartCommand.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount()); // 实付金额
+        inputShoppingCartCommand.setShoppingCartLineCommands(updateLines(shopId, inputShoppingCartCommand, promotionBriefList));
+
+        LOGGER.info("use time:{}", getIntervalForView(beginDate, new Date()));
+        return shopCartCommandByShop;
+    }
+
+    /**
+     * Builds the inner.
+     *
+     * @param inputShoppingCartCommand
+     *            the input shopping cart command
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @param promotionResultCommand
+     *            the promotion result command
+     * @return the shop cart command by shop
+     */
+    private ShopCartCommandByShop buildInner(
                     ShoppingCartCommand inputShoppingCartCommand,
                     CalcFreightCommand calcFreightCommand,
                     PromotionResultCommand promotionResultCommand){
@@ -161,5 +222,32 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
 
         shopCartCommandByShop.setShopId(shopId);
         return shopCartCommandByShop;
+    }
+
+    /**
+     * Update.
+     *
+     * @param shopId
+     *            the shop id
+     * @param inputShoppingCartCommand
+     *            the input shopping cart command
+     * @param promotionBriefList
+     *            the promotion brief list
+     * @return the list
+     * @since 5.3.1.6
+     */
+    private List<ShoppingCartLineCommand> updateLines(
+                    Long shopId,
+                    ShoppingCartCommand inputShoppingCartCommand,
+                    List<PromotionBrief> promotionBriefList){
+        // 封装数据
+        ShoppingCartCommand shoppingCartCommand = new ShoppingCartCommand();
+        shoppingCartCommand.setShoppingCartLineCommands(inputShoppingCartCommand.getShoppingCartLineCommands());
+        shoppingCartCommand.setShoppingCartByShopIdMap(ConvertUtil.toMap(shopId, inputShoppingCartCommand));
+
+        // 设置 行小计 为 行小计减去 整单分摊到行上的小计 的值
+        shareDiscountToLineManager.shareDiscountToLine(shoppingCartCommand, promotionBriefList);
+
+        return shoppingCartCommand.getShoppingCartLineCommands();
     }
 }
