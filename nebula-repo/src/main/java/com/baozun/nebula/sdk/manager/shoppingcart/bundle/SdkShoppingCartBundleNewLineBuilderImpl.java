@@ -147,11 +147,8 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
         BundleSkuPriceCommand bundleSkuPriceCommand = sdkBundleManager.getBundleSkuPrice(relatedItemId, skuId);
 
         if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(
-                            "relatedItemId:{},skuId:{},bundleSkuPriceCommand:{}",
-                            relatedItemId,
-                            skuId,
-                            JsonUtil.format(bundleSkuPriceCommand));
+            String pattern = "relatedItemId:{},skuId:{},bundleSkuPriceCommand:{}";
+            LOGGER.debug(pattern, relatedItemId, skuId, JsonUtil.format(bundleSkuPriceCommand));
         }
 
         BigDecimal listPrice = bundleSkuPriceCommand.getListPrice();
@@ -165,8 +162,8 @@ public class SdkShoppingCartBundleNewLineBuilderImpl implements SdkShoppingCartB
         newShoppingCartLineCommand.setSalePrice(originalSalesPrice);
 
         // 折扣、行类型
-        BigDecimal disCount = NumberUtil.getMultiplyValue(originalSalesPrice.subtract(salePrice), quantity, 2);
-        newShoppingCartLineCommand.setDiscount(disCount); //FIXME feilong bundle商品金额 计算折扣
+        BigDecimal discount = NumberUtil.getMultiplyValue(originalSalesPrice.subtract(salePrice), quantity, 2);
+        newShoppingCartLineCommand.setDiscount(discount); //FIXME feilong bundle商品金额 计算折扣
 
         // 行小计
         newShoppingCartLineCommand.setSubTotalAmt(ShoppingCartUtil.getSubTotalAmt(newShoppingCartLineCommand));

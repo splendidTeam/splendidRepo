@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -184,33 +186,33 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
                     BigDecimal offersShippingDisAmt){
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = inputShoppingCartCommand.getShoppingCartLineCommands();// 有效的购物车行
-        Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
 
         //**************************************************************************************************
-
         ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
-
         shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));// 商品数量
 
         BigDecimal originPayAmount = ShoppingCartUtil.getOriginPayAmount(shoppingCartLineCommandList);
         shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount); // 应付小计
         shopCartCommandByShop.setSumCurrentPayAmount(originPayAmount); // 应付合计
 
-        BigDecimal shopCartAllDisAmt = disAmtOnOrder.add(baseOnOrderDisAmt);// 购物车的所有优惠(不包含运费)
+        shopCartCommandByShop.setOffersShipping(ZERO);// 计算运费
+        shopCartCommandByShop.setOriginShoppingFee(ZERO);// 源运费
 
-        shopCartCommandByShop.setOffersShipping(BigDecimal.ZERO);// 计算运费
-        shopCartCommandByShop.setOriginShoppingFee(BigDecimal.ZERO);// 源运费
-
-        BigDecimal originShippingFee = BigDecimal.ZERO; // 应付运费
-        BigDecimal currentShippingFee = BigDecimal.ZERO;// 实付运费
+        BigDecimal originShippingFee = ZERO; // 应付运费
+        BigDecimal currentShippingFee = ZERO;// 实付运费
 
         if (null != calcFreightCommand){
+            Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
             originShippingFee = sdkFreightFeeManager.getFreightFee(shopId, calcFreightCommand, shoppingCartLineCommandList);
+
             shopCartCommandByShop.setOriginShoppingFee(originShippingFee); // 应付运费
             shopCartCommandByShop.setOffersShipping(
                             originShippingFee.compareTo(offersShippingDisAmt) >= 0 ? offersShippingDisAmt : originShippingFee); // 运费优惠
+
             inputShoppingCartCommand.setOriginShoppingFee(originShippingFee); // 应付运费
-            currentShippingFee = shopCartCommandByShop.getOriginShoppingFee().subtract(shopCartCommandByShop.getOffersShipping()); // 实付运费
+
+            // 实付运费
+            currentShippingFee = shopCartCommandByShop.getOriginShoppingFee().subtract(shopCartCommandByShop.getOffersShipping());
             inputShoppingCartCommand.setCurrentShippingFee(currentShippingFee);
         }
 
@@ -218,9 +220,10 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
         if (shopCartCommandByShop.getSumCurrentPayAmount().compareTo(disAmtOnOrder) < 0){
             shopCartCommandByShop.setOffersTotal(shopCartCommandByShop.getSubtotalCurrentPayAmount());
             shopCartCommandByShop.setDisAmtOnOrder(shopCartCommandByShop.getSubtotalCurrentPayAmount());
-            shopCartCommandByShop.setOffersShipping(BigDecimal.ZERO);
-            shopCartCommandByShop.setDisAmtSingleOrder(BigDecimal.ZERO);
+            shopCartCommandByShop.setOffersShipping(ZERO);
+            shopCartCommandByShop.setDisAmtSingleOrder(ZERO);
         }else{
+            BigDecimal shopCartAllDisAmt = disAmtOnOrder.add(baseOnOrderDisAmt);// 购物车的所有优惠(不包含运费)
             // 当应付合计金额 小于优惠合计时
             if (shopCartCommandByShop.getSumCurrentPayAmount().compareTo(shopCartAllDisAmt) < 0){
                 shopCartCommandByShop.setOffersTotal(shopCartCommandByShop.getSumCurrentPayAmount());
@@ -283,5 +286,4 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
 
         return shoppingCartLineCommand;
     }
-
 }

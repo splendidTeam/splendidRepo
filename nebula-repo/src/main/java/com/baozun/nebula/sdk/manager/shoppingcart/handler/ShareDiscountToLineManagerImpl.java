@@ -74,9 +74,8 @@ public class ShareDiscountToLineManagerImpl implements ShareDiscountToLineManage
             if (shoppingCartLineCommand.isGift()){
                 continue;
             }
-            BigDecimal discount = getLineDiscount(shoppingCartLineCommand, promotionSKUDiscAMTBySettingList);
-            shoppingCartLineCommand.setDiscount(discount);
 
+            shoppingCartLineCommand.setDiscount(getLineDiscount(shoppingCartLineCommand, promotionSKUDiscAMTBySettingList));
             shoppingCartLineCommand.setSubTotalAmt(ShoppingCartUtil.getSubTotalAmt(shoppingCartLineCommand));
         }
     }
