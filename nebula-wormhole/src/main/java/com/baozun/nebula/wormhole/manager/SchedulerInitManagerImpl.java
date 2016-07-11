@@ -14,39 +14,32 @@ import com.baozun.nebula.model.system.SchedulerTask;
 import com.baozun.nebula.sdk.manager.SdkSchedulerTaskManager;
 
 @Service("schedulerInitManager")
-public class SchedulerInitManagerImpl implements SchedulerInitManager {
-	
-	private Logger logger = LoggerFactory.getLogger(getClass());
+public class SchedulerInitManagerImpl implements SchedulerInitManager{
 
-	@Autowired
-	private SchedulerManager schedulerManager;
-	
-	@Autowired
-	private SdkSchedulerTaskManager sdkSchedulerTaskManager;
-	
-	@Autowired
-	private ApplicationContext applicationContext;
-	
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-		List<SchedulerTask> taskList= sdkSchedulerTaskManager.findAllEffectSchedulerTaskList();
-		
-		for(SchedulerTask st:taskList){
-			
-			Object taskInstance=applicationContext.getBean(st.getBeanName());
-			
-			try {
-				schedulerManager.addTask(taskInstance, st.getMethodName(), st.getTimeExp(), st.getCode());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				//
-				logger.error("scheduler init task error");
-				throw new BusinessException(1);
-			}
-			
-		}
-	}
+    private Logger                  logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private SchedulerManager        schedulerManager;
+
+    @Autowired
+    private SdkSchedulerTaskManager sdkSchedulerTaskManager;
+
+    @Autowired
+    private ApplicationContext      applicationContext;
+
+    @Override
+    public void init(){
+        List<SchedulerTask> taskList = sdkSchedulerTaskManager.findAllEffectSchedulerTaskList();
+
+        for (SchedulerTask st : taskList){
+            Object taskInstance = applicationContext.getBean(st.getBeanName());
+            try{
+                schedulerManager.addTask(taskInstance, st.getMethodName(), st.getTimeExp(), st.getCode());
+            }catch (Exception e){
+                logger.error("scheduler init task error", e);
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 
 }
