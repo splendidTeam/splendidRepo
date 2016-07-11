@@ -366,7 +366,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 							bq.append("id:" + itemId + "^" + score);
 
-							if (i > itemIdStrs.length - 1) {
+							if (i < itemIdStrs.length - 1) {
 								bq.append(" OR ");
 							}
 						}
