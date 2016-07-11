@@ -589,13 +589,13 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         BigDecimal sumCurrentPayAmt = originShippingFee.add(originPayAmount);
         shopCartCommandByShop.setSumCurrentPayAmount(sumCurrentPayAmt);
 
-        // 实付合计
-        shopCartCommandByShop.setRealPayAmount(sumCurrentPayAmt);
-
         // 应付金额
         shoppingCartCommand.setOriginPayAmount(sumCurrentPayAmt);
         // 实付金额
         shoppingCartCommand.setCurrentPayAmount(sumCurrentPayAmt);
+
+        // 实付合计
+        shopCartCommandByShop.setRealPayAmount(sumCurrentPayAmt);
 
         //********************************************************************************* 
 

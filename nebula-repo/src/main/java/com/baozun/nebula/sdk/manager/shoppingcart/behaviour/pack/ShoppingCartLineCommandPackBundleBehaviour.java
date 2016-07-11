@@ -84,21 +84,21 @@ public class ShoppingCartLineCommandPackBundleBehaviour extends AbstractShopping
      */
     private void packPriceInfo(Long relatedItemId,ShoppingCartLineCommand shoppingCartLineCommand){
         Long[] skuIds = shoppingCartLineCommand.getSkuIds();
-
         Integer quantity = shoppingCartLineCommand.getQuantity();
-
         List<BundleSkuPriceCommand> bundleSkuPriceCommandList = sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
 
         Map<String, BigDecimal> sumMap = CollectionsUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice", "originalSalesPrice");
 
+        //*******************************************************************************************
         BigDecimal originalSalesPriceSum = sumMap.get("originalSalesPrice");
         BigDecimal salesPriceSum = sumMap.get("salesPrice");
-        //BigDecimal disCountSum = originalSalesPriceSum.subtract(salesPriceSum);
-        BigDecimal disCountSum = BigDecimal.ZERO;
 
-        //        shoppingCartLineCommand.setSalePrice(originalSalesPriceSum);
-        shoppingCartLineCommand.setSalePrice(salesPriceSum);
         shoppingCartLineCommand.setListPrice(sumMap.get("listPrice"));
+        shoppingCartLineCommand.setSalePrice(originalSalesPriceSum);//salesPriceSum
+
+        BigDecimal disCountSum = originalSalesPriceSum.subtract(salesPriceSum);
+        // BigDecimal disCountSum = BigDecimal.ZERO;
+
         shoppingCartLineCommand.setDiscount(NumberUtil.getMultiplyValue(disCountSum, quantity, 2));
     }
 

@@ -19,7 +19,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 import static java.math.BigDecimal.ZERO;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,19 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
-import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
-import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.Validator;
 import com.feilong.core.date.DateExtensionUtil;
-import com.feilong.core.lang.NumberUtil;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * The Class PromotionOrderManagerImpl.
@@ -58,19 +51,19 @@ import com.feilong.core.lang.NumberUtil;
 public class PromotionOrderManagerImpl implements PromotionOrderManager{
 
     /** The Constant LOGGER. */
-    private static final Logger                        LOGGER = LoggerFactory.getLogger(PromotionOrderManagerImpl.class);
+    private static final Logger           LOGGER = LoggerFactory.getLogger(PromotionOrderManagerImpl.class);
 
     /** The share discount to line manager. */
     @Autowired
-    private ShareDiscountToLineManager                 shareDiscountToLineManager;
+    private ShareDiscountToLineManager    shareDiscountToLineManager;
 
     /** The sdk freight fee manager. */
     @Autowired
-    private SdkFreightFeeManager                       sdkFreightFeeManager;
+    private SdkFreightFeeManager          sdkFreightFeeManager;
 
-    /** The sdk shopping cart line command behaviour factory. */
+    /** The promotion result command builder. */
     @Autowired
-    private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
+    private PromotionResultCommandBuilder promotionResultCommandBuilder;
 
     /*
      * (non-Javadoc)
@@ -87,58 +80,19 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
 
         Date beginDate = new Date();
 
-        BigDecimal disAmtOnOrder = BigDecimal.ZERO;// 商品行优惠金额
-        BigDecimal baseOnOrderDisAmt = BigDecimal.ZERO;// 整单优惠金额
-        BigDecimal offersShippingDisAmt = BigDecimal.ZERO;// 运费整单优惠金额
+        PromotionResultCommand promotionResultCommand = promotionResultCommandBuilder.build(promotionBriefList);
 
-        List<ShoppingCartLineCommand> giftList = new ArrayList<ShoppingCartLineCommand>();// 礼品行
-        if (Validator.isNotNullOrEmpty(promotionBriefList)){
-
-            for (PromotionBrief promotionBrief : promotionBriefList){
-                List<PromotionSettingDetail> promotionSettingDetailList = promotionBrief.getDetails();
-                if (Validator.isNullOrEmpty(promotionSettingDetailList)){
-                    continue;
-                }
-
-                for (PromotionSettingDetail promotionSettingDetail : promotionSettingDetailList){
-                    List<PromotionSKUDiscAMTBySetting> affectPromotionSKUDiscAMTBySettingList = promotionSettingDetail
-                                    .getAffectSKUDiscountAMTList();
-
-                    if (Validator.isNotNullOrEmpty(affectPromotionSKUDiscAMTBySettingList)){
-                        for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : affectPromotionSKUDiscAMTBySettingList){
-                            // 如果是礼品
-                            if (promotionSKUDiscAMTBySetting.getGiftMark()){
-                                giftList.add(toGiftShoppingCartLineCommand(promotionSKUDiscAMTBySetting));
-                            }else{
-                                BigDecimal skuDisAmt = promotionSKUDiscAMTBySetting.getDiscountAmount();
-                                disAmtOnOrder = disAmtOnOrder.add(skuDisAmt);// 非礼品才算优惠
-                            }
-                        }
-                    }else{
-                        BigDecimal disAmt = promotionSettingDetail.getDiscountAmount();// 基于整单的
-                        if (promotionSettingDetail.getFreeShippingMark()){
-                            offersShippingDisAmt = offersShippingDisAmt.add(disAmt); // 运费优惠
-                        }else{
-                            baseOnOrderDisAmt = baseOnOrderDisAmt.add(disAmt);
-                        }
-                    }
-                }
-            }
-        }
+        //******************************************************************************************************
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = inputShoppingCartCommand.getShoppingCartLineCommands();// 有效的购物车行
         Long shopId = shoppingCartLineCommandList.get(0).getShopId();// 店铺id
 
         //***************************************************************************************
-        ShopCartCommandByShop shopCartCommandByShop = build(
-                        inputShoppingCartCommand,
-                        calcFreightCommand,
-                        disAmtOnOrder,
-                        baseOnOrderDisAmt,
-                        offersShippingDisAmt);
+        ShopCartCommandByShop shopCartCommandByShop = build(inputShoppingCartCommand, calcFreightCommand, promotionResultCommand);
 
         //XXX feilong 原来是这里加礼品的
-        shoppingCartLineCommandList.addAll(giftList); // 将礼品放入购物车当中
+        CollectionsUtil.addAllIgnoreNull(shoppingCartLineCommandList, promotionResultCommand.getGiftList());// 将礼品放入购物车当中
+
         inputShoppingCartCommand.setShoppingCartLineCommands(shoppingCartLineCommandList);
 
         inputShoppingCartCommand.setOriginPayAmount(shopCartCommandByShop.getSumCurrentPayAmount());// 应付金额
@@ -181,9 +135,11 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
     private ShopCartCommandByShop build(
                     ShoppingCartCommand inputShoppingCartCommand,
                     CalcFreightCommand calcFreightCommand,
-                    BigDecimal disAmtOnOrder,
-                    BigDecimal baseOnOrderDisAmt,
-                    BigDecimal offersShippingDisAmt){
+                    PromotionResultCommand promotionResultCommand){
+
+        BigDecimal disAmtOnOrder = promotionResultCommand.getDisAmtOnOrder();
+        BigDecimal baseOnOrderDisAmt = promotionResultCommand.getBaseOnOrderDisAmt();
+        BigDecimal offersShippingDisAmt = promotionResultCommand.getOffersShippingDisAmt();
 
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = inputShoppingCartCommand.getShoppingCartLineCommands();// 有效的购物车行
 
@@ -246,44 +202,4 @@ public class PromotionOrderManagerImpl implements PromotionOrderManager{
         return shopCartCommandByShop;
     }
 
-    /**
-     * 封装礼品购物车行.
-     *
-     * @param promotionSKUDiscAMTBySetting
-     *            the pro sku
-     * @return the gift shopping cart line command
-     */
-    private ShoppingCartLineCommand toGiftShoppingCartLineCommand(PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting){
-        Integer qty = promotionSKUDiscAMTBySetting.getQty();
-        Long settingId = promotionSKUDiscAMTBySetting.getSettingId();
-
-        ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
-
-        shoppingCartLineCommand.setItemId(promotionSKUDiscAMTBySetting.getItemId());
-        shoppingCartLineCommand.setItemName(promotionSKUDiscAMTBySetting.getItemName());
-        shoppingCartLineCommand.setQuantity(qty);
-        shoppingCartLineCommand.setGift(promotionSKUDiscAMTBySetting.getGiftMark());
-        shoppingCartLineCommand.setShopId(promotionSKUDiscAMTBySetting.getShopId());
-        shoppingCartLineCommand.setType(Constants.ITEM_TYPE_PREMIUMS);
-        shoppingCartLineCommand.setSkuId(promotionSKUDiscAMTBySetting.getSkuId());
-
-        if (settingId != null){
-            shoppingCartLineCommand.setLineGroup(settingId);
-        }
-        //XXX feilong what logic?
-        shoppingCartLineCommand.setStock(qty);
-        // 赠品都设置为有效
-        shoppingCartLineCommand.setValid(true);
-
-        ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                        .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
-        shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLineCommand); // 封装购物车行信息
-
-        shoppingCartLineCommand.setPromotionId(promotionSKUDiscAMTBySetting.getPromotionId());
-        shoppingCartLineCommand.setSettingId(settingId);
-        shoppingCartLineCommand.setGiftChoiceType(promotionSKUDiscAMTBySetting.getGiftChoiceType());
-        shoppingCartLineCommand.setGiftCountLimited(promotionSKUDiscAMTBySetting.getGiftCountLimited());
-
-        return shoppingCartLineCommand;
-    }
 }
