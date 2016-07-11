@@ -16,6 +16,10 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.date.DateExtensionUtil.getIntervalForView;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,18 +98,17 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
     public List<ShoppingCartLineCommand> groupShoppingCartLinesToDisplayByLinePromotionResult(
                     ShoppingCartCommand shoppingCartCommand,
                     List<PromotionBrief> promotionBriefList){
-
         Date beginDate = new Date();
 
         // 无优惠，直接返回
         List<ShoppingCartLineCommand> shoppingCartLineCommands = shoppingCartCommand.getShoppingCartLineCommands();
-        if (Validator.isNullOrEmpty(promotionBriefList)){
+        if (isNullOrEmpty(promotionBriefList)){
             return shoppingCartLineCommands;
         }
 
         // 无行优惠，也直接返回
         List<PromotionCommand> promotionCommandList = getAllLinePromotionsBySKUSettingList(promotionBriefList);
-        if (Validator.isNullOrEmpty(promotionCommandList)){
+        if (isNullOrEmpty(promotionCommandList)){
             return shoppingCartLineCommands;
         }
 
@@ -175,19 +178,19 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         List<ShoppingCartLineCommand> returnList = new ArrayList<ShoppingCartLineCommand>();
         // 可以调整显示循序
         // 套餐行
-        if (Validator.isNotNullOrEmpty(allSuitLines)){
+        if (isNotNullOrEmpty(allSuitLines)){
             // 需要按照活动再分组
             returnList.addAll(appendCaptionLinesToGroupedLines(allSuitLines));
         }
         // 行减
-        if (Validator.isNotNullOrEmpty(allNormalAMTLines)){
+        if (isNotNullOrEmpty(allNormalAMTLines)){
             // 原行赠品，和行减，与套餐和整单赠品，是有区别的
             // 取行上活动最多的行，按这些活动，分在一组。循环执行以上动作，直至所有行分组完毕
             // 最终Caption Line后面，跟的lineGroup值，可能不一样
             returnList.addAll(appendCaptionLinesByMaxPromotions(allNormalAMTLines));
         }
         // 整单赠品
-        if (Validator.isNotNullOrEmpty(allOrderGiftLines)){
+        if (isNotNullOrEmpty(allOrderGiftLines)){
             // 需要按照活动再分组
             returnList.addAll(appendCaptionLinesToGroupedLines(allOrderGiftLines));
         }
@@ -206,7 +209,7 @@ public class SdkShoppingCartGroupManagerImpl implements SdkShoppingCartGroupMana
         returnList = setShoppingCartLineOutOfStockBySKUId(returnList, promotionCommandList);
         logLines(returnList);
 
-        LOGGER.info("use time:{}", DateExtensionUtil.getIntervalForView(beginDate, new Date()));
+        LOGGER.info("use time:{}", getIntervalForView(beginDate, new Date()));
         return returnList;
     }
 

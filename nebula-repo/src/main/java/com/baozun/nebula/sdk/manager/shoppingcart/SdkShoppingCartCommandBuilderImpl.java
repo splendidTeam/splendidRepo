@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
 
@@ -46,12 +47,12 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkEngineManager;
-import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionOrderManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShopCartCommandByShopBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
@@ -90,9 +91,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkMataInfoManager                         sdkMataInfoManager;
 
-    /** The sdk freight fee manager. */
     @Autowired
-    private SdkFreightFeeManager                       sdkFreightFeeManager;
+    private ShopCartCommandByShopBuilder               shopCartCommandByShopBuilder;
 
     /** The promotion brief builder. */
     @Autowired
@@ -428,7 +428,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         if (null == shoppingCartCommand.getCurrentTime()){
             shoppingCartCommand.setCurrentTime(new Date());
         }
-
         return shoppingCartCommand;
     }
 
@@ -550,91 +549,18 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     ShoppingCartCommand shoppingCartCommand,
                     CalcFreightCommand calcFreightCommand,
                     List<PromotionBrief> promotionBriefList){
-        if (Validator.isNotNullOrEmpty(promotionBriefList)){
-            return doWithPromotion(shopId, shoppingCartCommand, calcFreightCommand, promotionBriefList);
+        if (isNotNullOrEmpty(promotionBriefList)){
+            // 计算分店铺的优惠.只计算有效的购物车行
+            ShopCartCommandByShop shopCartCommandByShop = promotionOrderManager
+                            .buildShopCartCommandByShop(shoppingCartCommand, calcFreightCommand, promotionBriefList);
+
+            shoppingCartCommand.setShoppingCartLineCommands(
+                            sdkShoppingCartGroupManager
+                                            .groupShoppingCartLinesToDisplayByLinePromotionResult(shoppingCartCommand, promotionBriefList));
+            return shopCartCommandByShop;
         }
 
-        return doWithNoPromotion(shopId, shoppingCartCommand, calcFreightCommand);
-    }
-
-    /**
-     * Do with no promotion.
-     *
-     * @param shopId
-     *            the shop id
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @return the shop cart command by shop
-     * @since 5.3.1
-     */
-    private ShopCartCommandByShop doWithNoPromotion(
-                    Long shopId,
-                    ShoppingCartCommand shoppingCartCommand,
-                    CalcFreightCommand calcFreightCommand){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
-        BigDecimal originShippingFee = sdkFreightFeeManager.getFreightFee(shopId, calcFreightCommand, shoppingCartLineCommandList);
-
-        //*****************************************************************************************
-        ShopCartCommandByShop shopCartCommandByShop = new ShopCartCommandByShop();
-        // 应付运费
-        shopCartCommandByShop.setOriginShoppingFee(originShippingFee);
-
-        // 应付小计
-        BigDecimal originPayAmount = ShoppingCartUtil.getOriginPayAmount(shoppingCartLineCommandList);
-        shopCartCommandByShop.setSubtotalCurrentPayAmount(originPayAmount);
-
-        // 应付合计(应付小计+应付运费)
-        BigDecimal sumCurrentPayAmt = originShippingFee.add(originPayAmount);
-        shopCartCommandByShop.setSumCurrentPayAmount(sumCurrentPayAmt);
-
-        // 应付金额
-        shoppingCartCommand.setOriginPayAmount(sumCurrentPayAmt);
-        // 实付金额
-        shoppingCartCommand.setCurrentPayAmount(sumCurrentPayAmt);
-
-        // 实付合计
-        shopCartCommandByShop.setRealPayAmount(sumCurrentPayAmt);
-
-        //********************************************************************************* 
-
-        // 该店铺的商品数量
-        shopCartCommandByShop.setQty(ShoppingCartUtil.getSumQuantity(shoppingCartLineCommandList));
-        shopCartCommandByShop.setShopId(shopId);
-        return shopCartCommandByShop;
-    }
-
-    /**
-     * Do with promotion.
-     *
-     * @param shopId
-     *            the shop id
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param promotionBriefList
-     *            the promotion brief list
-     * @return the shop cart command by shop
-     * @since 5.3.1
-     */
-    private ShopCartCommandByShop doWithPromotion(
-                    Long shopId,
-                    ShoppingCartCommand shoppingCartCommand,
-                    CalcFreightCommand calcFreightCommand,
-                    List<PromotionBrief> promotionBriefList){
-
-        // 计算分店铺的优惠.只计算有效的购物车行
-        ShopCartCommandByShop shopCartCommandByShop = promotionOrderManager
-                        .buildShopCartCommandByShop(shoppingCartCommand, calcFreightCommand, promotionBriefList);
-
-        shoppingCartCommand.setShoppingCartLineCommands(
-                        sdkShoppingCartGroupManager
-                                        .groupShoppingCartLinesToDisplayByLinePromotionResult(shoppingCartCommand, promotionBriefList));
-
-        shopCartCommandByShop.setShopId(shopId);
-        return shopCartCommandByShop;
+        return shopCartCommandByShopBuilder.build(shopId, shoppingCartCommand, calcFreightCommand);
     }
 
     /**
