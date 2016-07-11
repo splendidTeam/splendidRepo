@@ -159,7 +159,7 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommands){
             Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
 
-            //TODO feilong 需要提炼
+            //TODO feilong 这里使用简单粗暴的手段,对bundle强行处理,需要提炼
             if (null != relatedItemId){
                 promotionResultCommand.setDisAmtOnOrder(shoppingCartLineCommand.getDiscount());
             }
