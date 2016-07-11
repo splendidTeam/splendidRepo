@@ -49,7 +49,7 @@ public class MailServiceImpl implements MailService {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	public void sendMail(EmailCommand email) {
-		email.setFrom(mailFrom);
+		//email.setFrom(mailFrom);
 		this.sendMailTask(email);
 	}
 
