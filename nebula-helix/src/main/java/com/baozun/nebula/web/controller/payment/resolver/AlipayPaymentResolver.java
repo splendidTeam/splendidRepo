@@ -128,7 +128,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
     @Override
     public void doPayNotify(String payType, HttpServletRequest request, 
     		HttpServletResponse response) throws IllegalPaymentStateException,IOException, DocumentException{
-    	boolean isMobile =  getDevice(request);
+    	boolean isMobile =  isMobile(request);
 		
         String subOrdinate = getSubOrdinate(request, isMobile);
 
@@ -219,7 +219,7 @@ public class AlipayPaymentResolver extends BasePaymentResolver implements Paymen
 		return paymentResult;
 	}
 
-	private boolean getDevice(HttpServletRequest request) {
+	private boolean isMobile(HttpServletRequest request) {
 		if (Validator.isNotNullOrEmpty(request.getParameter("notify_data"))) {
 			return true;
 		}
