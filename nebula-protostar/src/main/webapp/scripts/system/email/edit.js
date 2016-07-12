@@ -47,6 +47,8 @@ $j(document).ready(function() {
 		 var type = $j(".email-content #type").val();
 		 var subject = $j(".email-content .subject").val();
 		 var body = $j(".email-content .body").val();
+		 var senderEmail = $j(".email-content #senderEmail").val();
+		 var senderAlias = $j(".email-content #senderAlias").val();
 		 var json;
 		 if(id==null || id==""){
 			 json = {
@@ -55,7 +57,9 @@ $j(document).ready(function() {
 					 'description':description,
 					 'type':type,
 					 'subject':subject,
-					 'body':body
+					 'body':body,
+					 'senderEmail':senderEmail,
+					 'senderAlias':senderAlias
 			      };
 		 }else{
 			 json = {
@@ -64,7 +68,9 @@ $j(document).ready(function() {
 					 'description':description,
 					 'type':type,
 					 'subject':subject,
-					 'body':body
+					 'body':body,
+					 'senderEmail':senderEmail,
+					 'senderAlias':senderAlias
 			      }; 
 		 }
 		 //保存操作
