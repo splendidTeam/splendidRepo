@@ -46,6 +46,11 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     private Long                     id;
 
+    /**
+     * 状态
+     */
+    private Status                   status;
+
     /** 添加时间,此处的时间通常用于页面购物车行的排序,仅此而已. */
     private Date                     addTime;
 
@@ -399,5 +404,20 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
 
     public void setPropertiesMap(Map<String, SkuProperty> propertiesMap){
         this.propertiesMap = propertiesMap;
+    }
+
+    /**
+     * @return the status
+     */
+    public Status getStatus(){
+        return status;
+    }
+
+    /**
+     * @param status
+     *            the status to set
+     */
+    public void setStatus(Status status){
+        this.status = status;
     }
 }

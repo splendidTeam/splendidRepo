@@ -161,27 +161,11 @@ public class ShoppingCartLineCommand extends BaseModel{
     /** 是套餐行 t是套餐行，f不是套餐行 *. */
     private boolean                    isSuitLine;
 
-    /**
-     * 是否可见 1可见 /0不可见 *.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private Integer                    visibleMark;
-
     /** 是否限购 1限购 0不限购 *. */
     private Integer                    limitMark;
 
     /** 限购数量 *. */
     private Integer                    limit;
-
-    /**
-     * 是否有库存 1有库存 0无库存 *.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private Integer                    stockMark;
 
     /**
      * 库存数量.
@@ -192,56 +176,11 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     /** ***** 扩展engine所需要的字段begin ******. */
 
-    /**
-     * The lable ids.
-     * 
-     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
-     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
-     *             feilong 2016-05-13
-     */
-    @Deprecated
-    private List<Long>                 lableIds;
-
     /** The category list. */
     private List<Long>                 categoryList;
 
-    /**
-     * The brand id.
-     * 
-     * @deprecated 没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private String                     brandId;
-
-    /**
-     * The store id.
-     * 
-     * @deprecated 目前值就＝ {@link #shopId},重复了,而且没有引用, by feilong 2016-05-13
-     */
-    @Deprecated
-    private long                       storeId;
-
-    /**
-     * The indstry id.
-     * 
-     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
-     */
-    @Deprecated
-    private Long                       indstryId;
-
-    /** The state. */
-    private String                     state;
-
     /** 行促销(此商口多个数量的促销总和) 折扣-包含整单优惠分摊. */
     private BigDecimal                 discount         = BigDecimal.ZERO;
-
-    /**
-     * 折扣单价-不包含整单优惠分摊.
-     * 
-     * @deprecated 感觉没有用到
-     */
-    @Deprecated
-    private BigDecimal                 discountPrice    = BigDecimal.ZERO;
 
     /** 套餐、行赠品类型，只有一个PromotionId 其他类型可能有多个活动 *. */
     private List<PromotionCommand>     promotionList;
@@ -283,16 +222,90 @@ public class ShoppingCartLineCommand extends BaseModel{
 
     //***************************************************************************************************
 
-    /** 库房id *. */
-    private Long                       wareHoseId;
+    /** 商城自定义参数，nebula不控制. */
+    private Map<String, Object>        customParamMap;
 
-    /** 库房名称 *. */
-    private String                     wareHoseName;
+    //**********************************************************************************************
+    /**
+     * 是否可见 1可见 /0不可见 *.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
+    private Integer                    visibleMark;
+
+    /**
+     * 是否有库存 1有库存 0无库存 *.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
+    private Integer                    stockMark;
+
+    /**
+     * 折扣单价-不包含整单优惠分摊.
+     * 
+     * @deprecated 感觉没有用到
+     */
+    @Deprecated
+    private BigDecimal                 discountPrice    = BigDecimal.ZERO;
+
+    /**
+     * The lable ids.
+     * 
+     * @deprecated 目前存放的是 {@link com.baozun.nebula.model.product.ItemTagRelation#getTagId()}的集合,参见
+     *             {@link com.baozun.nebula.sdk.manager.impl.SdkEngineManagerImpl#packShoppingCartLine(ShoppingCartLineCommand)},不过没有什么用, by
+     *             feilong 2016-05-13
+     */
+    @Deprecated
+    private List<Long>                 lableIds;
+
+    /**
+     * The brand id.
+     * 
+     * @deprecated 没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
+    private String                     brandId;
+
+    /**
+     * The store id.
+     * 
+     * @deprecated 目前值就＝ {@link #shopId},重复了,而且没有引用, by feilong 2016-05-13
+     */
+    @Deprecated
+    private long                       storeId;
+
+    /**
+     * The indstry id.
+     * 
+     * @deprecated 单词写错了, 应该是 industryId ,这种历史原因 先标注deprecated 不建议使用这个字段 , by feilong 2016-05-13
+     */
+    @Deprecated
+    private Long                       indstryId;
+
+    /**
+     * The state.
+     * 
+     * @deprecated 没有用到, by feilong 2016-07-13
+     */
+    private String                     state;
 
     //***************************************************************************************************
 
-    /** 商城自定义参数，nebula不控制. */
-    private Map<String, Object>        customParamMap;
+    /**
+     * 库房id .
+     * 
+     * @deprecated 没有引用, by feilong 2016-07-13
+     */
+    private Long                       wareHoseId;
+
+    /**
+     * 库房名称 .
+     * 
+     * @deprecated 没有引用, by feilong 2016-07-13
+     */
+    private String                     wareHoseName;
 
     /**
      * 获得 promotion ids.
@@ -716,6 +729,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 state.
      *
      * @return the state
+     * @deprecated 没有用到, by feilong 2016-07-13
      */
     public String getState(){
         return state;
@@ -726,6 +740,7 @@ public class ShoppingCartLineCommand extends BaseModel{
      *
      * @param state
      *            the state
+     * @deprecated 没有用到, by feilong 2016-07-13
      */
     public void setState(String state){
         this.state = state;
@@ -794,35 +809,39 @@ public class ShoppingCartLineCommand extends BaseModel{
      * 获得 库房id.
      *
      * @return the 库房id
+     * @deprecated 没有引用, by feilong 2016-07-13
      */
     public Long getWareHoseId(){
         return wareHoseId;
     }
 
     /**
-     * 设置 库房id *.
+     * 设置 库房id .
      *
      * @param wareHoseId
-     *            the new 库房id *
+     *            the new 库房id
+     * @deprecated 没有引用, by feilong 2016-07-13
      */
     public void setWareHoseId(Long wareHoseId){
         this.wareHoseId = wareHoseId;
     }
 
     /**
-     * 获得 库房名称 *.
+     * 获得 库房名称 .
      *
-     * @return the 库房名称 *
+     * @return the 库房名称
+     * @deprecated 没有引用, by feilong 2016-07-13
      */
     public String getWareHoseName(){
         return wareHoseName;
     }
 
     /**
-     * 设置 库房名称 *.
+     * 设置 库房名称 .
      *
      * @param wareHoseName
-     *            the new 库房名称 *
+     *            the new 库房名称
+     * @deprecated 没有引用, by feilong 2016-07-13
      */
     public void setWareHoseName(String wareHoseName){
         this.wareHoseName = wareHoseName;
