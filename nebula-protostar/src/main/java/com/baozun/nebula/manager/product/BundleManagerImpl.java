@@ -337,11 +337,15 @@ public class BundleManagerImpl implements BundleManager {
 	public String getSkuPropertyStrForBundle(Sku sku) {
 		// 拼接sku属性字符串
 		List<SkuProperty> skuProperties = sdkSkuManager.getSkuPros(sku.getProperties());
-		StringBuilder sb = new StringBuilder();
-		for (SkuProperty property : skuProperties) {
-			sb.append(property.getValue()).append("-");
+		if(skuProperties != null) {
+			StringBuilder sb = new StringBuilder();
+			for (SkuProperty property : skuProperties) {
+				sb.append(property.getValue()).append("-");
+			}
+			return sb.toString().replaceAll("-$", "");
+		} else {
+			return null;
 		}
-		return sb.toString().replaceAll("-$", "");
 	}
 
 }
