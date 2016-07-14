@@ -105,7 +105,7 @@ $j(document).ready(function(){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
     			}
     		});
-    	}else if($j("input[name='priceType']:checked").val() == 3){
+    	}else if($j("input[name='priceType']:checked").val() == 3 || $j("input[name='priceType']:checked").val() == 1){
     		var flag = true;
     		$j('.tr-product').each(function(){
     			var _flag = false;
