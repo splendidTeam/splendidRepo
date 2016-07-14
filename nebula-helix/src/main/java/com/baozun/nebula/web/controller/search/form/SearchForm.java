@@ -30,7 +30,7 @@ public class SearchForm extends BaseForm{
 
 	/**
 	 * 过滤条件参数顺序，用户页面点击筛选项时候的顺序。 记录这个顺序用于后面facet tag作用<br/>
-	 * 参数格式：c分类id,P属性id,P属性id,c分类id......
+	 * 参数格式：c分类id,r价格,p属性id,p属性id,c分类id,r价格......
 	 */
 	private String				filterParamOrder;
 

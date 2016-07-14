@@ -62,6 +62,7 @@ public class NebulaWeChatLoginController extends NebulaOAuthLoginController{
 		// 组装微信用户信息
 		ThirdPartyMemberCommand numberCommand = new ThirdPartyMemberCommand();
 		numberCommand.setOpenId(member.getUid());
+		numberCommand.setUnionId(member.getUnionId());
 		numberCommand.setNickName(member.getNickName());
 		numberCommand.setSource(Member.MEMBER_SOURCE_WECHAT);
 		

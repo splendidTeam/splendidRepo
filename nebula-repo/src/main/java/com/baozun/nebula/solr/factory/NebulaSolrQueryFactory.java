@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.search.FacetParameter;
+import com.baozun.nebula.search.FacetTagType;
 import com.baozun.nebula.search.FacetType;
 import com.baozun.nebula.search.command.ExcludeSearchCommand;
 import com.baozun.nebula.search.command.SearchCommand;
@@ -25,9 +26,6 @@ public class NebulaSolrQueryFactory{
 
 	/** 属性 */
 	private static final String	PROPERTY_VARIABLE	= "p";
-
-	/** 分类 */
-	private static final String	CATEGORY_VARIABLE	= "c";
 
 	/**
 	 * 创建查询SolrQuery 将SearchCommand组合成SOLR查询语句
@@ -46,25 +44,9 @@ public class NebulaSolrQueryFactory{
 		}
 
 		// 最后一个点击的过滤条件
-		String lastFilerStr = "";
-
-		// 点击顺序
-		String filterParamOrder = searchCommand.getFilterParamOrder();
-		if (filterParamOrder != null) {
-			String[] strs = filterParamOrder.split(",");
-			lastFilerStr = strs[strs.length - 1];
-		}
-
-		String variable = "";
-		if (Validator.isNotNullOrEmpty(lastFilerStr)) {
-			if (lastFilerStr.indexOf(CATEGORY_VARIABLE) > -1) {
-				variable = CATEGORY_VARIABLE;
-			}
-			if (lastFilerStr.indexOf(PROPERTY_VARIABLE) > -1) {
-				variable = PROPERTY_VARIABLE;
-			}
-		}
-
+		String lastFilerStr = searchCommand.getLastFilter();
+		FacetTagType facetTagType=searchCommand.getFacetTagType();
+		
 		List<FacetParameter> facetParameters = searchCommand.getFacetParameters();
 		if (Validator.isNotNullOrEmpty(facetParameters)) {
 			for (int i = 0; i < facetParameters.size(); i++){
@@ -75,19 +57,23 @@ public class NebulaSolrQueryFactory{
 
 				// 如果是价格范围的条件
 				if (FacetType.RANGE.equals(facetType)) {
-					addFqForPriceArea(solrQuery, values, name);
+					addFqForPriceArea(solrQuery, values, name,FacetTagType.RANGE.equals(facetTagType));
 				}else if (FacetType.CATEGORY.equals(facetType)) {
 					// 如果是分类
-					if (CATEGORY_VARIABLE.equals(variable)) {
+					if(FacetTagType.CATEGORY.equals(facetTagType)){
 						addFqAccurateForStringListWithTag(solrQuery, values, name);
 					}else{
 						addFqAccurateForStringList(solrQuery, values, name);
 					}
 				}else if (FacetType.PROPERTY.equals(facetType)) {
 					// 如果是属性
-					String filter = variable + name.replace(SkuItemParam.dynamicCondition, "");
-					if (filter.equals(filterParamOrder)) {
-						addFqAccurateForStringListWithTag(solrQuery, values, name);
+					if(FacetTagType.PROPERTY.equals(facetTagType)){
+						String filter = PROPERTY_VARIABLE + name.replace(SkuItemParam.dynamicCondition, "");
+						if (filter.equals(lastFilerStr)) {
+							addFqAccurateForStringListWithTag(solrQuery, values, name);
+						}else{
+							addFqAccurateForStringList(solrQuery, values, name);
+						}
 					}else{
 						addFqAccurateForStringList(solrQuery, values, name);
 					}
@@ -302,30 +288,24 @@ public class NebulaSolrQueryFactory{
 	 * @author 冯明雷
 	 * @time 2016年4月29日下午4:29:55
 	 */
-	public static void addFqForPriceArea(SolrQuery solrQuery,List<String> priceAreaWords,String type){
-//		String fq_keyword = type;
-//		try{
-//			Integer max_price = null;
-//			Integer min_price = null;
-//			min_price = Integer.parseInt(priceAreaWords.get(0));
-//			max_price = Integer.parseInt(priceAreaWords.get(1));
-//			if (min_price < 1) {
-//				min_price = 1;
-//			}
-//			fq_keyword += ":[" + min_price + " TO " + max_price + "]";
-//		}catch (Exception e){
-//			LOG.error(e.getMessage());
-//			fq_keyword += ":[0 TO *]";
-//		}
-		
-		StringBuffer sb=new StringBuffer();		
-		for (int i = 0; i < priceAreaWords.size(); i++){
-			if(i==priceAreaWords.size()-1){
-				sb.append(type+":"+priceAreaWords.get(i));
-			}else{
-				sb.append(type+":"+priceAreaWords.get(i)+" OR ");
-			}
+	public static void addFqForPriceArea(SolrQuery solrQuery,List<String> priceAreaWords,String type,Boolean isTag){
+		if(isTag){
+			type="{!tag=lastFilterTag}"+type;
 		}
+		
+		StringBuffer sb=new StringBuffer();
+		if(priceAreaWords.size()>0){
+			sb.append(type+":(");
+			for (int i = 0; i < priceAreaWords.size(); i++){
+				if(i==priceAreaWords.size()-1){
+					sb.append(priceAreaWords.get(i));
+				}else{
+					sb.append(priceAreaWords.get(i)+" OR ");
+				}
+			}
+			sb.append(")");
+		}
+		
 		
 		String fq_keyword=sb.toString();
 		if (Validator.isNotNullOrEmpty(fq_keyword))

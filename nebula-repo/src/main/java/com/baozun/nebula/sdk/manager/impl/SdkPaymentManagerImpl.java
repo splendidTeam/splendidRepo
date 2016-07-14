@@ -205,7 +205,7 @@ public class SdkPaymentManagerImpl implements SdkPaymentManager{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<PayInfoLog> findPayInfoLogListByQueryMap(Map<String, Object> paraMap){
         return payInfoLogDao.findPayInfoLogListByQueryMap(paraMap);
     }

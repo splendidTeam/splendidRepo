@@ -22,6 +22,7 @@ import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberFactory;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
+import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.RequestUtil;
 
@@ -115,9 +116,9 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Model model){
-
+		
 		// 查询是否存在该用户登录信息，如果用户信息存在，则取出的是目前已有的完整信息
-		Member member = skdMemeberManager.findThirdMemberByThirdIdAndSource(thirdPartyMember.getOpenId(), thirdPartyMember.getSource());
+		Member member = skdMemeberManager.findThirdMemberByThirdIdAndSource(getThirdPartyId(thirdPartyMember), thirdPartyMember.getSource());
 
 		// 首次登录
 		if (member == null) {
@@ -148,8 +149,9 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 
 		MemberFrontendCommand frontendCommand = new MemberFrontendCommand();
 
+		
 		// 第三方登录openId
-		frontendCommand.setThirdPartyIdentify(thirdPartyMember.getOpenId());
+		frontendCommand.setThirdPartyIdentify(getThirdPartyId(thirdPartyMember));
 
 		// 第三方登录来源
 		frontendCommand.setSource(thirdPartyMember.getSource());
@@ -192,7 +194,6 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 	 */
 	protected String doLogin(HttpServletRequest request,HttpServletResponse response,Model model,Member member){
 
-		// 同步购物车 暂时省略
 		MemberDetails memberDetails = getMemberDetails(member,request);
 
 		// 登录成功后处理
@@ -211,6 +212,14 @@ public abstract class NebulaOAuthLoginController extends NebulaAbstractLoginCont
 		MemberCommand command = new MemberCommand();
 		PropertyUtil.copyProperties(command, member);
 		return constructMemberDetails(command,request);
+	}
+	/**
+	 * 集团ID,非空的情况下使用集团ID，用来处理集团微信等情况
+	 * @return
+	 */
+	private String getThirdPartyId(ThirdPartyMemberCommand thirdPartyMember) {
+		return Validator.isNotNullOrEmpty(thirdPartyMember.getUnionId()) ? thirdPartyMember.getUnionId() : thirdPartyMember.getOpenId();
+
 	}
 
 }

@@ -16,6 +16,10 @@
  */
 package com.baozun.nebula.utils;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static java.math.BigDecimal.ROUND_HALF_UP;
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
@@ -61,6 +65,30 @@ public final class ShoppingCartUtil{
     }
 
     /**
+     * 计算应付金额.
+     * 
+     * <p>
+     * 自动去除 gift 以及 isCaptionLine
+     * </p>
+     *
+     * @param shoppingCartLines
+     *            the shopping cart lines
+     * @return the origin pay amount
+     */
+    public static BigDecimal getOriginPayAmount(List<ShoppingCartLineCommand> shoppingCartLines){
+        BigDecimal originPayAmount = new BigDecimal(0);
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLines){
+            if (shoppingCartLineCommand.isGift() || shoppingCartLineCommand.isCaptionLine()){
+                continue;
+            }
+            //getSubTotalAmt(shoppingCartLineCommand)
+            originPayAmount = originPayAmount.add(
+                            NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice(), 2));
+        }
+        return originPayAmount = originPayAmount.setScale(2, ROUND_HALF_UP);
+    }
+
+    /**
      * 订单行小计.
      *
      * @param shoppingCartLineCommand
@@ -80,8 +108,10 @@ public final class ShoppingCartUtil{
         Validate.isTrue(quantity > 0, "quantity must >0");
 
         BigDecimal lineSubTotalAmt = NumberUtil.getMultiplyValue(quantity, salePrice, 2).subtract(discount);
-        BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : lineSubTotalAmt;
-        LOGGER.debug("salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}]", salePrice, quantity, discount, subTotalAmt);
+        BigDecimal subTotalAmt = lineSubTotalAmt.compareTo(ZERO) < 0 ? ZERO : lineSubTotalAmt;
+
+        String message = "salesprice:[{}],qty:[{}],discount:[{}],subTotalAmt:[{}*{}-{}={}]";
+        LOGGER.debug(message, salePrice, quantity, discount, salePrice, quantity, discount, subTotalAmt);
         return subTotalAmt;
     }
 
@@ -131,8 +161,7 @@ public final class ShoppingCartUtil{
      * @see com.feilong.core.util.CollectionsUtil#sum(java.util.Collection, String)
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0
-                        : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
+        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
     }
 
     /**

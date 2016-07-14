@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.promotion;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -113,6 +114,8 @@ public class SdkOrderPromotionManagerImpl implements SdkOrderPromotionManager{
         }
 
         toOrderPromotion(promotionSKUDiscAMTBySetting, orderPromotion);
+
+        orderPromotion.setVersion(new Date());
         sdkOrderPromotionDao.save(orderPromotion);
     }
 
@@ -128,10 +131,12 @@ public class SdkOrderPromotionManagerImpl implements SdkOrderPromotionManager{
         orderPromotion.setPromotionNo(promotionId.toString());
         // 促销类型
         orderPromotion.setPromotionType(promotionSKUDiscAMTBySetting.getPromotionType());
-        // 折扣金额
-        orderPromotion.setDiscountAmount(promotionSKUDiscAMTBySetting.getDiscountAmount());
         // 描述 ...name
         orderPromotion.setDescribe(promotionSKUDiscAMTBySetting.getPromotionName());
+
+        // 折扣金额
+        orderPromotion.setDiscountAmount(promotionSKUDiscAMTBySetting.getDiscountAmount());
+
         // 是否基于整单
         orderPromotion.setBaseOrder(promotionSKUDiscAMTBySetting.getBaseOrder());
     }

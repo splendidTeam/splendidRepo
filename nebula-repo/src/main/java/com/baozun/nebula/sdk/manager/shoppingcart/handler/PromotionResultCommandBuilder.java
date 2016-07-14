@@ -18,32 +18,23 @@ package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
 import java.util.List;
 
-import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
-import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 
 /**
- * The Interface PromotionOrderManager.
+ * The Interface PromotionResultCommandBuilder.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.1
+ * @since 5.3.1.6
  */
-public interface PromotionOrderManager{
+public interface PromotionResultCommandBuilder{
 
     /**
-     * 构造用于购物车页面促销信息显示的数据.
+     * 计算促销结果
      *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param calcFreightCommand
-     *            the calc freight command
      * @param promotionBriefList
      *            the promotion brief list
-     * @return the shop cart command by shop
+     * @return the promotion result command
      */
-    ShopCartCommandByShop buildShopCartCommandByShop(
-                    ShoppingCartCommand shoppingCartCommand,
-                    CalcFreightCommand calcFreightCommand,
-                    List<PromotionBrief> promotionBriefList);
+    PromotionResultCommand build(List<PromotionBrief> promotionBriefList);
+
 }

@@ -25,9 +25,11 @@ import com.baozun.nebula.model.product.SearchCondition;
 import com.baozun.nebula.model.product.SearchConditionLang;
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.sdk.manager.SdkSearchConditionManager;
+import com.baozun.nebula.search.Facet;
 import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.command.MetaDataCommand;
 import com.feilong.core.Validator;
+import com.feilong.core.util.comparator.PropertyComparator;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -185,20 +187,19 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 		Collections.sort(cmdList, new Comparator<SearchCondition>() {
             public int compare(SearchCondition o1, SearchCondition o2) {
               if(Validator.isNullOrEmpty(o1.getNavigationId())){
-            	  return 1;
-              }
-              
-              if(Validator.isNullOrEmpty(o2.getNavigationId())){
             	  return -1;
               }
               
-              return navSortMap.get(o1.getNavigationId()) - navSortMap.get(o2.getNavigationId());
+              if(Validator.isNullOrEmpty(o2.getNavigationId())){
+            	  return 1;
+              }
+              
+              return  navSortMap.get(o2.getNavigationId())-navSortMap.get(o1.getNavigationId());
             }
         });
 
 		List<SearchConditionCommand> resultList = new ArrayList<SearchConditionCommand>();
 		if(null!=cmdList){
-			
 			//利用map的特性，将相同名称的筛选条件去除掉
 			Map<String,SearchCondition> tmpSearchConditionMap = new HashMap<String,SearchCondition>();
 			for(SearchCondition s:cmdList){
@@ -211,8 +212,10 @@ public class SdkSearchConditionManagerImpl implements SdkSearchConditionManager 
 				cmd.setPropertyId(entry.getValue().getPropertyId());
 				resultList.add(cmd);
 			}
-			
 		}
+		
+		//根据sort字段排序
+		Collections.sort(resultList, new PropertyComparator<SearchConditionCommand>("sort"));		
 		return resultList;
 	}
 

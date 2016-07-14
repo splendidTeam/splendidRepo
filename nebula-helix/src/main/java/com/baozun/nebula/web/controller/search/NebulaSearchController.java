@@ -88,6 +88,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		// 将页面传来的参数searchForm转换为 searchCommand
 		SearchCommand searchCommand = new SearchCommand();
 		PropertyUtil.copyProperties(searchCommand, searchForm);
+		searchCommand.setFacetTagType(getLastFilterTagType(searchCommand.getFilterParamOrder()));
 
 		ItemCollection collection = null;
 		Long navigationId = searchCommand.getNavigationId();
@@ -135,7 +136,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 		}
 
 		// 页面左侧筛选项
-		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());
+		List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand);
 
 		// 设置facetGroup是否显示
 		setExcludeFacetGroup(collection, facetGroups);
@@ -176,6 +177,8 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			searchCommand.setCategoryConditionStr(request.getParameter("categoryConditionStr"));
 			searchCommand.setNavigationConditionStr(request.getParameter("navigationConditionStr"));
 			searchCommand.setFilterParamOrder(request.getParameter("filterParamOrder"));
+			searchCommand.setFacetTagType(getLastFilterTagType(searchCommand.getFilterParamOrder()));
+			
 
 			// ***************** 下面这些查询和searchPage是一致的
 			// 创建solrquery对象
@@ -208,7 +211,7 @@ public class NebulaSearchController extends NebulaAbstractSearchController{
 			}
 			
 			// 页面左侧筛选项
-			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand.getFacetParameters());
+			List<FacetGroup> facetGroups = facetFilterHelper.createFilterResult(searchResultPage, searchCommand);
 			// 设置facetGroup是否显示
 			setExcludeFacetGroup(collection, facetGroups);
 

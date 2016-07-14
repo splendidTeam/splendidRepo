@@ -22,7 +22,6 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -33,7 +32,8 @@ import com.baozun.nebula.command.EmailAttachmentCommand;
 import com.baozun.nebula.command.EmailCommand;
 
 /**
- * @author songdianchao 邮件服务
+ * 邮件服务
+ * @author D.C 
  */
 @Service
 public class MailServiceImpl implements MailService {
@@ -43,13 +43,9 @@ public class MailServiceImpl implements MailService {
 	@Resource
 	TaskExecutor taskExecutor;// 注入Spring封装的异步执行器
 
-	@Value("#{meta['mail.username']}")
-	private String mailFrom;
-
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	public void sendMail(EmailCommand email) {
-		email.setFrom(mailFrom);
 		this.sendMailTask(email);
 	}
 

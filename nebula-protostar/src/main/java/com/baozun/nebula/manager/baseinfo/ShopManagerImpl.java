@@ -460,4 +460,10 @@ public class ShopManagerImpl implements ShopManager{
 		return count == 0;
 	}
 
+	@Override
+	public List<Property> findPropertyListByIndustryId(Long industryId,
+			Sort[] sorts) {
+		return shopDao.findPropertyListByIndustryId(industryId, sorts);
+	}
+
 }
