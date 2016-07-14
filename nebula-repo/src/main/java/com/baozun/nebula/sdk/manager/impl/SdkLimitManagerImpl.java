@@ -301,7 +301,7 @@ public class SdkLimitManagerImpl implements SdkLimitManager{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public void publishLimit(Date currentDate){
         List<LimitCommand> list = limitHeadDao.findActiveOrEffectiveLimitCommandList(currentDate);
 
