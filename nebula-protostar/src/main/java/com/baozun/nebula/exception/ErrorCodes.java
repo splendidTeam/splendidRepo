@@ -645,4 +645,13 @@ public interface ErrorCodes {
 	
 	/** bundle商品的item重复 */
 	public static final Integer	ITEM_BUNDLE_PRODUCT_CODE_REPEAT				= 25013;
+	
+	/** bundle商品的捆绑成员缺失 */
+	public static final Integer	ITEM_BUNDLE_ELEMENT_LOST					= 25014;
+	
+	/** bundle商品的捆绑成员商品缺失 */
+	public static final Integer	ITEM_BUNDLE_ELEMENT_ITEM_LOST				= 25015;
+	
+	/** bundle商品的捆绑成员sku缺失 */
+	public static final Integer	ITEM_BUNDLE_ELEMENT_SKU_LOST				= 25016;
 }
