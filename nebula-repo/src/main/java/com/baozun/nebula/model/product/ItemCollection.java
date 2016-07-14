@@ -23,6 +23,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -120,7 +121,8 @@ public class ItemCollection extends BaseModel {
 		this.name = name;
 	}
 
-	@Column(name = "FACET_PARAMETERS",length=1000)
+	@Lob
+	@Column(name = "FACET_PARAMETERS")
 	public String getFacetParameters() {
 		return facetParameters;
 	}
@@ -129,6 +131,7 @@ public class ItemCollection extends BaseModel {
 		this.facetParameters = facetParameters;
 	}
 
+	@Lob
 	@Column(name = "SEQUENCE")
 	public String getSequence() {
 		return sequence;
