@@ -105,7 +105,7 @@ $j(document).ready(function(){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
     			}
     		});
-    	}else if($j("input[name='priceType']:checked").val() == 3){
+    	}else if($j("input[name='priceType']:checked").val() == 3 || $j("input[name='priceType']:checked").val() == 1){
     		var flag = true;
     		$j('.tr-product').each(function(){
     			var _flag = false;
@@ -513,7 +513,7 @@ function loadBundleElements(editable, showDefaultValue, elements){
 				_html += '<td>' + sku.property + '</td>';
 				_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" ' + (sku.isParticipation ? 'checked="checked"' : '') + ' /></td>';
 				_html += '<td>' + sku.originalSalesPrice + '</td>';
-				_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.salesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
+				_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + (sku.salesPrice == null ? sku.originalSalesPrice : sku.salesPrice) + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
 					+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].skuId" value="' + sku.skuId + '" /></td>';
 				_html += '</tr>';
 			});
