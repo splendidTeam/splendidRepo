@@ -153,7 +153,7 @@ public class BundleManagerImpl implements BundleManager {
 		List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
 		// bundle商品必须由一个主卖品和至少一个以上的捆绑成员组成
 		if(bundleElementCommands == null || bundleElementCommands.size() < 2) {
-			throw new BusinessException(25014);
+			throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_LOST);
 		}
 		
 		for(BundleElementCommand bec : bundleElementCommands) {
@@ -169,14 +169,14 @@ public class BundleManagerImpl implements BundleManager {
 			List<BundleItemCommand> bundleItemCommands = bec.getItems();
 			// 每个捆绑成员必须包含至少一个商品
 			if(bundleItemCommands == null || bundleItemCommands.size() == 0) {
-				throw new BusinessException(25015);
+				throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_ITEM_LOST);
 			}
 			
 			for(BundleItemCommand bc : bundleItemCommands) {
 				List<BundleSkuCommand> bundleSkuCommands = bc.getBundleSkus();
 				// 每个捆绑成员必须包含至少一个sku
 				if(bundleSkuCommands == null || bundleSkuCommands.size() == 0) {
-					throw new BusinessException(25016);
+					throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_SKU_LOST);
 				}
 				
 				for(BundleSkuCommand bsc : bundleSkuCommands) {
