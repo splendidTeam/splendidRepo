@@ -70,7 +70,7 @@
 	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="1" <c:if test="${bundleViewCommand.priceType == 1 }">checked="checked"</c:if>> <spring:message code="item.common.onBundleTotalPrice" />  </label>
 	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="2" <c:if test="${bundleViewCommand.priceType == 2 }">checked="checked"</c:if>> <spring:message code="item.common.fixPrice" />  </label>
 	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="3" <c:if test="${bundleViewCommand.priceType == 3 }">checked="checked"</c:if>> <spring:message code="item.common.customPrice" />   </label>
-	   		<label class="label-line block pb10"> <spring:message code="item.common.bundleTotalPrice" /> <input type="text" readonly placeholder="900" value=""> </label>
+	   		<!-- <label class="label-line block pb10"> <spring:message code="item.common.bundleTotalPrice" /> <input type="text" readonly placeholder="900" value=""> </label> -->
 		</div>
 	   	<table class="inform-person product-table" style="display:none">
 			<thead>

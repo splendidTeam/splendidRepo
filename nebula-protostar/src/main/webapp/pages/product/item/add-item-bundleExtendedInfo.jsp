@@ -41,7 +41,7 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="1" checked="checked"> <spring:message code="item.common.onBundleTotalPrice" />  </label>
 	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="2"> <spring:message code="item.common.fixPrice" />  </label>
 	   		<label class="label-line block pb10"> <input type="radio" name="priceType" value="3"> <spring:message code="item.common.customPrice" />     </label>
-	   		<label class="label-line block pb10"> <spring:message code="item.common.bundleTotalPrice" /> <input type="text" readonly placeholder="900"> </label>
+	   		<!-- <label class="label-line block pb10"> <spring:message code="item.common.bundleTotalPrice" /> <input type="text" readonly placeholder="900"> </label> -->
 		</div>
 	   	<table class="inform-person product-table" style="display:none">
 			<thead>
