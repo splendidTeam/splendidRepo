@@ -2730,7 +2730,7 @@ public class ItemController extends BaseController {
 				List<BundleSkuCommand> bundleSkus = new ArrayList<BundleSkuCommand>();
 				List<BundleSkuViewCommand> bsvcs = bivc.getBundleSkuViewCommands();
 				for (BundleSkuViewCommand bsvc : bsvcs) {
-					if (!bsvc.getisParticipation()) {
+					if (!bsvc.getIsParticipation()) {
 						continue;
 					}
 
@@ -2875,12 +2875,14 @@ public class ItemController extends BaseController {
 			
 			if(bevc.getIsMainElement()) {
 				model.addAttribute("mainElement", bevc);
+				model.addAttribute("mainElementStr", JsonUtil.format(bevc));
 			} else {
 				bevcs.add(bevc);
 			}
 		}
 		
 		model.addAttribute("elements", bevcs);
+		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
 	}
 	
 	private String getItemImageByPLP(Long itemId){

@@ -11,7 +11,10 @@
 <script type="text/javascript">
 var categoryDisplayMode = "${categoryDisplayMode}";
 $j(document).ready(function(){
-	initBundleElement(${bundleViewCommand.priceType});
+	var allElements = [];
+	allElements.push(${mainElementStr});
+	allElements = allElements.concat(${elementsStr});
+	initBundleElement(${bundleViewCommand.priceType}, allElements);
 });
 </script>
 </head>

@@ -468,60 +468,65 @@ function fillProductTable(data){
 /**
  * 装填“定制”表格数据
  */
-function loadBundleElements(editable, showDefaultValue){
-	getElements();
-	if(fillForm()) {
-		var f = loxia._getForm("bundle_element_form");
-		loxia.lockPage();
-		var data = nps.syncXhr("/item/loadBundleElements.json", f);
-		loxia.unlockPage();
-		
-		// 如果是一口价，装填“一口价”表格数据
-		if($j("input[name='priceType']:checked").val() == 2){
-			fillProductTable(data);
+function loadBundleElements(editable, showDefaultValue, elements){
+	var data = null;
+	if(elements) {
+		data = elements
+	} else {
+		getElements();
+		if(fillForm()) {
+			var f = loxia._getForm("bundle_element_form");
+			loxia.lockPage();
+			data = nps.syncXhr("/item/loadBundleElements.json", f);
+			loxia.unlockPage();
 		}
-		
-		var _html = '';
-		var _a = new Array();
-		var num = 0;
-		$j(data).each(function(idx, element){
-			_html += '<tr class="tr-product" data-product="' + idx + '">';
-			_html += '<td rowspan="##' + idx + '##">' + (idx + 1) + '</td>'
-				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].isMainElement" value="' + element.isMainElement + '" />'
-				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].sort" value="' + element.sort + '" />'
-				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].styleCode" value="' + element.styleCode + '" />'
-				+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].itemCode" value="' + element.itemCode + '" />';
-			var bundleItems = element.bundleItemViewCommands;
-			var rowspan = 0;
-			$j(bundleItems).each(function(m, item){
-				_html += '<td>商品</td>';
-				_html += '<td>' + item.itemCode + '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].itemId" value="' + item.itemId + '" /></td>';
-				_html += '<td></td>';
-				_html += '<td></td>';
-				_html += '</tr>';
-				rowspan ++;
-				var bundleSkus = item.bundleSkuViewCommands;
-				$j(bundleSkus).each(function(n, sku){
-					rowspan ++;
-					_html += '<tr class="tr-sku odd" data-sku="' + idx + '">';
-					_html += '<td>' + sku.property + '</td>';
-					_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" checked=checked /></td>';
-					_html += '<td>' + sku.originalSalesPrice + '</td>';
-					_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.originalSalesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
-						+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].skuId" value="' + sku.skuId + '" /></td>';
-					_html += '</tr>';
-				});
-			});
-			_a.push(rowspan);
-		}); 
-		
-		for(var i = 0; i < _a.length; i++) {
-			_html = _html.replace('##' + i + '##', _a[i]);
-		}
-		
-		$j('.sku-table > tbody').html(_html);
-		isRefresh = true;
 	}
+	
+	// 如果是一口价，装填“一口价”表格数据
+	if($j("input[name='priceType']:checked").val() == 2){
+		fillProductTable(data);
+	}
+	
+	var _html = '';
+	var _a = new Array();
+	var num = 0;
+	$j(data).each(function(idx, element){
+		_html += '<tr class="tr-product" data-product="' + idx + '">';
+		_html += '<td rowspan="##' + idx + '##">' + (idx + 1) + '</td>'
+			+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].isMainElement" value="' + element.isMainElement + '" />'
+			+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].sort" value="' + element.sort + '" />'
+			+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].styleCode" value="' + element.styleCode + '" />'
+			+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].itemCode" value="' + element.itemCode + '" />';
+		var bundleItems = element.bundleItemViewCommands;
+		var rowspan = 0;
+		$j(bundleItems).each(function(m, item){
+			_html += '<td>商品</td>';
+			_html += '<td>' + item.itemCode + '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].itemId" value="' + item.itemId + '" /></td>';
+			_html += '<td></td>';
+			_html += '<td></td>';
+			_html += '</tr>';
+			rowspan ++;
+			var bundleSkus = item.bundleSkuViewCommands;
+			$j(bundleSkus).each(function(n, sku){
+				rowspan ++;
+				_html += '<tr class="tr-sku odd" data-sku="' + idx + '">';
+				_html += '<td>' + sku.property + '</td>';
+				_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" ' + (sku.isParticipation ? 'checked="checked"' : '') + ' /></td>';
+				_html += '<td>' + sku.originalSalesPrice + '</td>';
+				_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.originalSalesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
+					+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].skuId" value="' + sku.skuId + '" /></td>';
+				_html += '</tr>';
+			});
+		});
+		_a.push(rowspan);
+	}); 
+	
+	for(var i = 0; i < _a.length; i++) {
+		_html = _html.replace('##' + i + '##', _a[i]);
+	}
+	
+	$j('.sku-table > tbody').html(_html);
+	isRefresh = true;
 }
 
 function fillForm(){
@@ -612,11 +617,11 @@ function getElements(){
 	});
 }
 
-function initBundleElement(priceType){
+function initBundleElement(priceType, elements){
 	switch(priceType) {
-	case 1 : loadBundleElements(false, true);break;
-	case 2 : loadBundleElements(false, false);break;
-	case 3 : loadBundleElements(true);break;
+	case 1 : loadBundleElements(false, true, elements);break;
+	case 2 : loadBundleElements(false, false, elements);break;
+	case 3 : loadBundleElements(true, false, elements);break;
 	}
 }
 

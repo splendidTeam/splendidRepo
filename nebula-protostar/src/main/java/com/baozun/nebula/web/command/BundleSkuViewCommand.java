@@ -76,7 +76,7 @@ public class BundleSkuViewCommand implements Serializable,Comparable<BundleSkuVi
 		this.salesPrice = salesPrice;
 	}
 
-	public boolean getisParticipation() {
+	public boolean getIsParticipation() {
 		return isParticipation;
 	}
 
