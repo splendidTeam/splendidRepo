@@ -67,6 +67,7 @@ import com.baozun.nebula.utils.InputStreamCacher;
 import com.baozun.nebula.utils.JsonFormatUtil;
 import com.feilong.core.Validator;
 
+import loxia.dao.Sort;
 import loxia.support.excel.ExcelKit;
 import loxia.support.excel.ExcelManipulatorFactory;
 import loxia.support.excel.ExcelReader;
@@ -214,7 +215,10 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager {
 		// 行业信息
 		Industry industry = industryManager.findIndustryById(industryId);
 		// 行业属性
-		List<Property> propertyList = shopManager.findPropertyListByIndustryIdAndShopId(industry.getId(), shopCommand.getShopid(), null);
+		//List<Property> propertyList = shopManager.findPropertyListByIndustryIdAndShopId(industry.getId(), shopCommand.getShopid(), null);
+		Sort[] sorts = new Sort[1];
+		sorts[0] = new Sort("p.id", "asc");
+		List<Property> propertyList = shopManager.findPropertyListByIndustryId(industry.getId(),sorts);
 
 		// 销售属性集合 现在不可以修改销售属性,以后添加
 		// List<Property> salesPropertyList = new ArrayList<Property>();
@@ -870,7 +874,11 @@ public class ItemExportImportManagerImpl implements ItemExportImportManager {
 		}
 
 		// 检查行业属性
-		List<Property> propertyList = shopManager.findPropertyListByIndustryIdAndShopId(industryId, shopId, null);
+		//List<Property> propertyList = shopManager.findPropertyListByIndustryIdAndShopId(industryId, shopId, null);
+        Sort[] sorts = new Sort[1];
+		sorts[0] = new Sort("p.id", "asc");
+		List<Property> propertyList = shopManager.findPropertyListByIndustryId(industryId, sorts);
+		
 		// 拆分成 销售属性List 非销售属性
 		List<Long> notSalePropIdList = new ArrayList<Long>();
 

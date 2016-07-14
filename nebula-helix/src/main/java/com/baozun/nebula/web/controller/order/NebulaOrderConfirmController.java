@@ -227,17 +227,36 @@ public class NebulaOrderConfirmController extends BaseController{
                 newShoppingCartLineCommands.add(shoppingCartLineCommand);
 
             }else{
-                Long[] skuIds = shoppingCartLineCommand.getSkuIds();
-                Integer quantity = shoppingCartLineCommand.getQuantity();
-
-                for (Long skuId : skuIds){
-                    ShoppingCartLineCommand newShoppingCartLineCommand = sdkShoppingCartBundleNewLineBuilder
-                                    .buildNewShoppingCartLineCommand(relatedItemId, skuId, quantity, shoppingCartLineCommand);
-                    newShoppingCartLineCommands.add(newShoppingCartLineCommand);
-                }
+                doWithBundle(newShoppingCartLineCommands, shoppingCartLineCommand, relatedItemId, shoppingCartCommand);
             }
         }
         return newShoppingCartLineCommands;
+    }
+
+    /**
+     * @param newShoppingCartLineCommands
+     * @param oldShoppingCartLineCommand
+     * @param relatedItemId
+     * @param shoppingCartCommand
+     * @since 5.3.1.6
+     */
+    private void doWithBundle(
+                    List<ShoppingCartLineCommand> newShoppingCartLineCommands,
+                    ShoppingCartLineCommand oldShoppingCartLineCommand,
+                    Long relatedItemId,
+                    ShoppingCartCommand shoppingCartCommand){
+        Long[] skuIds = oldShoppingCartLineCommand.getSkuIds();
+        Integer quantity = oldShoppingCartLineCommand.getQuantity();
+
+        for (Long skuId : skuIds){
+            ShoppingCartLineCommand newShoppingCartLineCommand = sdkShoppingCartBundleNewLineBuilder
+                            .buildNewShoppingCartLineCommand(relatedItemId, skuId, quantity, oldShoppingCartLineCommand);
+            newShoppingCartLineCommands.add(newShoppingCartLineCommand);
+        }
+        
+        
+        //        shoppingCartCommand.getCurrentPayAmount()-
+
     }
 
     /**
@@ -327,7 +346,6 @@ public class NebulaOrderConfirmController extends BaseController{
 
         CalcFreightCommand calcFreightCommand = toCalcFreightCommand(contactCommandList);
 
-        //优惠券
         ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
                         .buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
 

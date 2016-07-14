@@ -45,6 +45,12 @@
 		  <div class="ui-block-line p5">
 	       <label ><spring:message code="navigation.list.type"/></label><opt:select id="type"  loxiaType="select" expression="chooseOption.EMAIL_TEMPLATE_TYPE" defaultValue="${email.type}" />
 	       </div>
+	        <div class="ui-block-line p5">
+           <label>发件人</label><input class="input_add" style="width: 300px"  type="text" loxiaType="input" id ="senderEmail" value="${email.senderEmail}"  >
+          </div>
+           <div class="ui-block-line p5">
+           <label>发件人别名</label><input class="input_add" style="width: 300px"  type="text" loxiaType="input"  id="senderAlias" value="${email.senderAlias}"  >
+          </div>
 		  <div class="ui-block-line p5">
            <label><spring:message code="email.edit.subject"/></label><input class="input_add subject" style="width: 300px"  type="text" loxiaType="input"  mandatory="true" value="${email.subject}"  >
           </div>

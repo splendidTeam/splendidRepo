@@ -717,15 +717,6 @@ $j(document).ready(function(){
 		$j("#update-type").prepend("<option value='5'>商品集合链接</option>");
 	}
 	
-	if ($j("#update-type").find("option:selected").val() == 5) {
-		$j("#update-type").parent().siblings(".navi-param").show();
-		//重置排序链接
-		$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
-		
-	}else{
-		$j("#toItemSort").css('visibility','hidden');
-		$j("#update-type").parent().siblings(".navi-param").hide();
-	}
 	
 	
 });
@@ -1017,6 +1008,19 @@ function onClick(event, treeId, treeNode)  {
 		
 		//页面“新窗口”显示
 		$j("#update-newWindow").prop("checked", treeNode.diy_isNewWin);
+		
+		
+		if ($j("#update-type").find("option:selected").val() == 5) {
+			$j("#update-type").parent().siblings(".navi-param").show();
+			//重置排序链接
+			$j("#toItemSort").attr("href","/navigation/itemSort.htm?navigationId="+treeNode.id).css('visibility','visible');
+			
+		}else{
+			$j("#toItemSort").css('visibility','hidden');
+			$j("#update-type").parent().siblings(".navi-param").hide();
+		}
+		
+		
 		
 	}
 }

@@ -42,7 +42,6 @@ public class EmailEventListener implements ApplicationListener<EmailEvent> {
 			emailTemplateManager.sendEmail(event.getReceiverEmail(), event.getCode(), event.getDataMap(),event.getAttachmentList());
 		} 
 		catch(Exception e){
-			e.printStackTrace();
 			logger.error("email send error:"+event.getReceiverEmail());
 		}
 	}

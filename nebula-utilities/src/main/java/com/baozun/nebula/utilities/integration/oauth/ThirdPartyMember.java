@@ -7,6 +7,10 @@ public class ThirdPartyMember implements Serializable{
 	private static final long	serialVersionUID	= -3362531392821219816L;
 
 	private String				uid;
+	/**
+	 * 集团用户ID, 常用于微信
+	 */
+	private String unionId;
 
 	private String				userName;
 
@@ -80,6 +84,14 @@ public class ThirdPartyMember implements Serializable{
 
 	public void setSex(String sex){
 		this.sex = sex;
+	}
+
+	public String getUnionId() {
+		return unionId;
+	}
+
+	public void setUnionId(String unionId) {
+		this.unionId = unionId;
 	}
 
 }

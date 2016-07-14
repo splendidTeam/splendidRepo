@@ -21,6 +21,7 @@ import java.util.Map;
 
 import com.baozun.nebula.sdk.command.SearchConditionCommand;
 import com.baozun.nebula.search.command.MetaDataCommand;
+import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.search.command.SearchResultPage;
 import com.baozun.nebula.solr.command.ItemForSolrCommand;
 
@@ -75,9 +76,9 @@ public interface FacetFilterHelper{
 	 * 
 	 * @return List<FacetGroup>
 	 * @param pagination solr查询出来的数据
-	 * @param facetParameters	搜索条件，用来设置facet的selected顺序宁
+	 * @param searchCommand	搜索条件，用来设置facet的selected顺序宁
 	 * @author 冯明雷
 	 * @time 2016年5月3日下午3:28:21
 	 */
-	List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrCommand> pagination,List<FacetParameter> facetParameters);
+	List<FacetGroup> createFilterResult(SearchResultPage<ItemForSolrCommand> pagination,SearchCommand searchCommand);
 }

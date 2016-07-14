@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.converter;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,132 +36,198 @@ import com.baozun.nebula.web.controller.UnsupportDataTypeException;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShopSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.Status;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.util.CollectionsUtil;
+import com.feilong.tools.slf4j.Slf4jUtil;
 
 /**
- * 购物车convert
- * 
- * @author hengheng.wang
+ * 购物车convert.
  *
+ * @author hengheng.wang
  */
-public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCartViewCommand> {
+public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCartViewCommand>{
 
-	@Autowired
-	private ShopManager shopManager;
+    /** The Constant serialVersionUID. */
+    private static final long serialVersionUID         = -7415881959809156733L;
 
-	/**
-	 * 地址簿默认行数
-	 */
-	public static final int MEMBERADDRESSDEFAULTSIZE = 5;
+    /** The shop manager. */
+    @Autowired
+    private ShopManager       shopManager;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7415881959809156733L;
+    /** 地址簿默认行数. */
+    public static final int   MEMBERADDRESSDEFAULTSIZE = 5;
 
-	public ShoppingCartViewCommand convert(Object data) {
-		if (data == null)
-			return null;
-		if (data instanceof ShoppingCartCommand) {
-			ShoppingCartCommand shoppingCartCommand = (ShoppingCartCommand) data;
-			// 转换的对象
-			ShoppingCartViewCommand shoppingCartViewCommand = new ShoppingCartViewCommand();
-			return convertToViewCommand(shoppingCartCommand, shoppingCartViewCommand);
-		} else {
-			throw new UnsupportDataTypeException(
-					data.getClass() + " cannot convert to " + ContactCommand.class + "yet.");
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.BaseConverter#convert(java.lang.Object)
+     */
+    @Override
+    public ShoppingCartViewCommand convert(Object data){
+        if (data == null)
+            return null;
+        if (data instanceof ShoppingCartCommand){
+            ShoppingCartCommand shoppingCartCommand = (ShoppingCartCommand) data;
+            // 转换的对象
+            ShoppingCartViewCommand shoppingCartViewCommand = new ShoppingCartViewCommand();
+            return convertToViewCommand(shoppingCartCommand, shoppingCartViewCommand);
+        }else{
+            throw new UnsupportDataTypeException(data.getClass() + " cannot convert to " + ContactCommand.class + "yet.");
+        }
 
-	}
+    }
 
-	/**
-	 * 封装页面viewcommand
-	 * 
-	 * @param cartCommand
-	 * @param shoppingCartViewCommand
-	 */
-	protected ShoppingCartViewCommand convertToViewCommand(ShoppingCartCommand cartCommand,
-			ShoppingCartViewCommand shoppingCartViewCommand) {
+    /**
+     * 封装页面viewcommand.
+     *
+     * @param shoppingCartCommand
+     *            the shopping cart command
+     * @param shoppingCartViewCommand
+     *            the shopping cart view command
+     * @return the shopping cart view command
+     */
+    protected ShoppingCartViewCommand convertToViewCommand(
+                    ShoppingCartCommand shoppingCartCommand,
+                    ShoppingCartViewCommand shoppingCartViewCommand){
+        Map<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>> shopAndShoppingCartLineSubViewCommandListMap = buildShopAndShoppingCartLineSubViewCommandListMap(
+                        shoppingCartCommand);
+        shoppingCartViewCommand.setShopAndShoppingCartLineSubViewCommandListMap(shopAndShoppingCartLineSubViewCommandListMap);
 
-		Map<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>> shopAndShoppingCartLineSubViewCommandListMap = new HashMap<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>>();
+        // TODO feilong 页面显示时候店铺和购物车行排序
+        return shoppingCartViewCommand;
+    }
 
-		// 获取店铺级别的购物车
-		Map<Long, ShoppingCartCommand> shoppingCartByShopIdMap = cartCommand.getShoppingCartByShopIdMap();
+    /**
+     * Builds the.
+     *
+     * @param shoppingCartCommand
+     *            the shopping cart command
+     * @return the map
+     * @since 5.3.1.6
+     */
+    private Map<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>> buildShopAndShoppingCartLineSubViewCommandListMap(
+                    ShoppingCartCommand shoppingCartCommand){
+        // 获取店铺级别的购物车
+        Map<Long, ShoppingCartCommand> shoppingCartByShopIdMap = shoppingCartCommand.getShoppingCartByShopIdMap();
 
-		// 查询店铺信息
-		List<Long> shopIds = new ArrayList<Long>();
-		shopIds.addAll(shoppingCartByShopIdMap.keySet());
-		List<ShopCommand> shopList = shopManager.findByShopIds(shopIds);
-		// 店铺信息转成map形式 key是shopId
-		Map<Long, ShopCommand> shopMap = CollectionsUtil.groupOne(shopList, "shopid");
+        // 查询店铺信息
+        List<Long> shopIds = new ArrayList<Long>();
+        shopIds.addAll(shoppingCartByShopIdMap.keySet());
 
-		for (Long id : shopIds) {
-			// 当前店铺购物车行信息
-			List<ShoppingCartLineCommand> lineList = shoppingCartByShopIdMap.get(id).getShoppingCartLineCommands();
-			// 当前店铺店铺信息
-			ShopCommand shopCommand = shopMap.get(id);
-			// ***********************************************创建ShopSubViewCommand******************创建ShoppingCartLineSubViewCommands
-			shopAndShoppingCartLineSubViewCommandListMap.put(createShopSubViewCommand(shopCommand),
-					createShoppingCartLineSubViewCommands(lineList));
-		}
-		shoppingCartViewCommand
-				.setShopAndShoppingCartLineSubViewCommandListMap(shopAndShoppingCartLineSubViewCommandListMap);
+        List<ShopCommand> shopList = shopManager.findByShopIds(shopIds);
+        // 店铺信息转成map形式 key是shopId
+        Map<Long, ShopCommand> shopMap = CollectionsUtil.groupOne(shopList, "shopid");
 
-		// TODO feilong 页面显示时候店铺和购物车行排序
+        //********************************************************************************************************
 
-		return shoppingCartViewCommand;
-	}
+        Map<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>> shopAndShoppingCartLineSubViewCommandListMap = new HashMap<>();
+        for (Long id : shopIds){
+            // 当前店铺购物车行信息
+            List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartByShopIdMap.get(id).getShoppingCartLineCommands();
 
-	/**
-	 * 创建ShopSubViewCommand
-	 * 
-	 * @param shopCommand
-	 * @return
-	 */
-	private ShopSubViewCommand createShopSubViewCommand(ShopCommand shopCommand) {
-		ShopSubViewCommand viewCommand = new ShopSubViewCommand();
-		viewCommand.setCode(shopCommand.getShopcode());
-		viewCommand.setId(shopCommand.getShopid());
-		viewCommand.setLifecycle(shopCommand.getLifecycle());
-		viewCommand.setName(shopCommand.getShopname());
-		return viewCommand;
-	}
+            // 当前店铺店铺信息
+            ShopCommand shopCommand = shopMap.get(id);
 
-	/**
-	 * 创建List<ShoppingCartLineSubViewCommand>
-	 * 
-	 * @param shopCommand
-	 * @return
-	 */
-	private List<ShoppingCartLineSubViewCommand> createShoppingCartLineSubViewCommands(
-			List<ShoppingCartLineCommand> lineList) {
+            ShopSubViewCommand shopSubViewCommand = toShopSubViewCommand(shopCommand);
+            List<ShoppingCartLineSubViewCommand> shoppingCartLineSubViewCommandList = toShoppingCartLineSubViewCommandList(
+                            shoppingCartLineCommandList);
+            shopAndShoppingCartLineSubViewCommandListMap.put(shopSubViewCommand, shoppingCartLineSubViewCommandList);
+        }
+        return shopAndShoppingCartLineSubViewCommandListMap;
+    }
 
-		List<ShoppingCartLineSubViewCommand> result = new ArrayList<ShoppingCartLineSubViewCommand>();
+    /**
+     * To shop sub view command.
+     *
+     * @param shopCommand
+     *            the shop command
+     * @return the shop sub view command
+     */
+    private ShopSubViewCommand toShopSubViewCommand(ShopCommand shopCommand){
+        ShopSubViewCommand viewCommand = new ShopSubViewCommand();
+        viewCommand.setCode(shopCommand.getShopcode());
+        viewCommand.setId(shopCommand.getShopid());
+        viewCommand.setLifecycle(shopCommand.getLifecycle());
+        viewCommand.setName(shopCommand.getShopname());
+        return viewCommand;
+    }
 
-		for (ShoppingCartLineCommand command : lineList) {
-			// 过滤赠品标题行
-			if(Validator.isNotNullOrEmpty(command.getLineCaption())) {
-				continue;
-			}
-			ShoppingCartLineSubViewCommand viewCommand = new ShoppingCartLineSubViewCommand();
-			if(Validator.isNotNullOrEmpty(command.getSettlementState())) {
-				viewCommand.setChecked(command.getSettlementState() == 0 ? false : true);
-			} else {
-				viewCommand.setChecked(false);
-			}
-			viewCommand.setIsGift(command.isGift());
-			viewCommand.setItemCode(command.getProductCode());
-			viewCommand.setAddTime(command.getCreateTime());
-			PropertyUtil.copyProperties(viewCommand, command, "extentionCode", "itemId", "itemName", "listPrice",
-					"quantity", "salePrice", "skuId", "itemPic", "id","subTotalAmt");
+    /**
+     * 创建List<ShoppingCartLineSubViewCommand>.
+     *
+     * @param lineList
+     *            the line list
+     * @return the list
+     */
+    private List<ShoppingCartLineSubViewCommand> toShoppingCartLineSubViewCommandList(List<ShoppingCartLineCommand> lineList){
+        List<ShoppingCartLineSubViewCommand> result = new ArrayList<ShoppingCartLineSubViewCommand>();
+        for (ShoppingCartLineCommand command : lineList){
+            // 过滤赠品标题行
+            if (Validator.isNotNullOrEmpty(command.getLineCaption())){
+                continue;
+            }
+            result.add(toShoppingCartLineSubViewCommand(command));
+        }
+        return result;
+    }
 
-			Map<String, SkuProperty> map = CollectionsUtil.groupOne(command.getSkuPropertys(), "pName");
-			viewCommand.setPropertiesMap(map);
-			result.add(viewCommand);
-		}
+    /**
+     * To shopping cart line sub view command.
+     *
+     * @param command
+     *            the command
+     * @return the shopping cart line sub view command
+     * @since 5.3.1.6
+     */
+    private ShoppingCartLineSubViewCommand toShoppingCartLineSubViewCommand(ShoppingCartLineCommand command){
+        ShoppingCartLineSubViewCommand viewCommand = new ShoppingCartLineSubViewCommand();
 
-		return result;
-	}
+        Integer settlementState = command.getSettlementState();
+        boolean checked = isNotNullOrEmpty(settlementState) ? settlementState != 0 : false;
+        viewCommand.setChecked(checked);
+
+        viewCommand.setIsGift(command.isGift());
+        viewCommand.setItemCode(command.getProductCode());
+        viewCommand.setAddTime(command.getCreateTime());
+        PropertyUtil.copyProperties(
+                        viewCommand,
+                        command,
+                        "extentionCode",
+                        "itemId",
+                        "itemName",
+                        "listPrice",
+                        "quantity",
+                        "salePrice",
+                        "skuId",
+                        "itemPic",
+                        "id",
+                        "subTotalAmt");
+
+        Map<String, SkuProperty> map = CollectionsUtil.groupOne(command.getSkuPropertys(), "pName");
+        viewCommand.setPropertiesMap(map);
+
+        viewCommand.setStatus(toStatus(command));
+        return viewCommand;
+    }
+
+    private Status toStatus(ShoppingCartLineCommand command){
+        if (command.isValid()){
+            return Status.NORMAL;
+        }
+
+        //目前 看到底层只实现了这两种， 以后要扩展
+        //******************************************************************
+        Integer validType = command.getValidType();
+        if (validType == 1){
+            return Status.ITEM_LIFECYCLE_OFF_SHELF;
+        }else if (validType == 2){
+            return Status.OUT_OF_STOCK;
+        }
+        //TODO 待扩展
+
+        String messagePattern = "validType:[{}] not support!";
+        throw new UnsupportedOperationException(Slf4jUtil.format(messagePattern, validType));
+    }
 }

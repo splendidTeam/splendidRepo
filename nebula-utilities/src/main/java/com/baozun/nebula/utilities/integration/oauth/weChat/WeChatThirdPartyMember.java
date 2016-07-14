@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.Validator;
-import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.AbstractThirdPartyMemberAdaptor;
+import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMember;
 import com.baozun.nebula.utilities.integration.oauth.ThirdPartyMemberAdaptor;
 import com.baozun.nebula.utilities.integration.oauth.exception.RequestInfoException;
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
@@ -105,14 +105,11 @@ public class WeChatThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 		tokenMap.put("appid", appId);
 		String tokenUrl = AbstractThirdPartyMemberAdaptor.createRequestUrl(tokenMap, thirdPartyTokenUrl);
 		String tokenInfo = "";
-		//String openid = "";
 		Map<String, String> jsonMap = null;
 		try {
 			tokenInfo = HttpClientUtil.getHttpMethodResponseBodyAsString(tokenUrl, HttpMethodType.GET);
 
 			// 通过code获取access_token
-			// String accessToken =
-			// getAccessToken(tokenInfo).get("access_token");
 			TypeReference<Map<String, String>> idReference = new TypeReference<Map<String, String>>() {};
 
 			Map<String, String> openIdMap = objectMapper.readValue(tokenInfo.substring(tokenInfo.indexOf('{'),tokenInfo.indexOf('}') + 1), idReference);
@@ -158,6 +155,7 @@ public class WeChatThirdPartyMember extends AbstractThirdPartyMemberAdaptor impl
 		
 		// 头像
 		member.setAvatar(jsonMap.get("headimgurl"));
+		member.setUnionId(jsonMap.get("unionid"));
 		
 		//性别  普通用户性别，1为男性，2为女性
 		//member.setSex(jsonMap.get("sex")+"");

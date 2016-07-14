@@ -22,6 +22,7 @@ import com.baozun.nebula.sdk.command.SearchConditionItemCommand;
 import com.baozun.nebula.search.Boost;
 import com.baozun.nebula.search.FacetGroup;
 import com.baozun.nebula.search.FacetParameter;
+import com.baozun.nebula.search.FacetTagType;
 import com.baozun.nebula.search.FacetType;
 import com.baozun.nebula.search.command.SearchCommand;
 import com.baozun.nebula.search.manager.SearchManager;
@@ -47,6 +48,9 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 	/** 分类 */
 	private static final String	CATEGORY_VARIABLE		= "c";
+
+	/** 价格范围 */
+	private static final String	PRICE_VARIABLE			= "r";
 
 	@Autowired
 	private SearchManager		searchManager;
@@ -116,29 +120,15 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 	protected void setFacet(SolrQuery solrQuery,SearchCommand searchCommand){
 		// facetFileds，set防止重复数据
 		Set<String> facetFields = new HashSet<String>();
-
-		// 最后一个点击的过滤条件
-		String lastFilerStr = "";
-		// 点击顺序
-		String filterParamOrder = searchCommand.getFilterParamOrder();
-		if (filterParamOrder != null) {
-			String[] strs = filterParamOrder.split(",");
-			lastFilerStr = strs[strs.length - 1];
-		}
-
-		String variable = "";
-		if (Validator.isNotNullOrEmpty(lastFilerStr)) {
-			if (lastFilerStr.indexOf(CATEGORY_VARIABLE) > -1) {
-				variable = CATEGORY_VARIABLE;
-			}
-			if (lastFilerStr.indexOf(PROPERTY_VARIABLE) > -1) {
-				variable = PROPERTY_VARIABLE;
-			}
-		}
+		
+		//最后一次点击的筛选项
+		String lastFilerStr=searchCommand.getLastFilter();
 
 		// ***************************************************设置分类的facet
-		// 如果最后点击的是分类
-		if (CATEGORY_VARIABLE.equals(variable)) {
+		FacetTagType facetTagType = searchCommand.getFacetTagType();
+		
+		// 如果最后点击的是分类		
+		if(FacetTagType.CATEGORY.equals(facetTagType)){
 			facetFields.add("{!ex=lastFilterTag}" + SkuItemParam.category_tree);
 		}else{
 			facetFields.add(SkuItemParam.category_tree);
@@ -146,7 +136,6 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 		// **************************************************设置属性的facet
 		List<SearchConditionCommand> cmdList = searchManager.findConditionByNavigationWithCache(searchCommand.getNavigationId());
-//		List<SearchConditionCommand> cmdList = searchManager.findConditionByCategoryIdsWithCache(new ArrayList<Long>());
 		// 如果为null或数量小于1
 		if (null == cmdList || cmdList.size() < 1) {
 			return;
@@ -157,9 +146,9 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 			if (SearchCondition.NORMAL_TYPE.equals(cmd.getType())) {
 				// 筛选条件对应的属性id
 				Long propertyId = cmd.getPropertyId();
-
+				
 				// 如果最后点击的是属性
-				if (PROPERTY_VARIABLE.equals(variable)) {
+				if(FacetTagType.PROPERTY.equals(facetTagType)){
 					String filter = PROPERTY_VARIABLE + propertyId;
 					if (lastFilerStr.equals(filter)) {
 						facetFields.add("{!ex=lastFilterTag}" + SkuItemParam.dynamicCondition + propertyId);
@@ -171,10 +160,8 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 				}
 			}else if (SearchCondition.SALE_PRICE_TYPE.equals(cmd.getType())) {
 				// 如果筛选条件是价格区间类型
-
 				// 根据筛选条件查询筛选条件项
-				List<SearchConditionItemCommand> searchConditionItemCommands = searchManager
-						.findCoditionItemByCoditionIdWithCache(cmd.getId());
+				List<SearchConditionItemCommand> searchConditionItemCommands = searchManager.findCoditionItemByCoditionIdWithCache(cmd.getId());
 
 				// 循环各个筛选条件项，用facetQuery获得数量
 				for (SearchConditionItemCommand scItemCmd : searchConditionItemCommands){
@@ -184,7 +171,11 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 						if (null != min && null != max && min <= max) {
 							String areaStr = FilterUtil.paramConverToArea(min.toString(), max.toString());
 							StringBuilder sb = new StringBuilder();
-							sb.append(SkuItemParam.sale_price).append(":").append(areaStr);
+							if(FacetTagType.RANGE.equals(facetTagType)){
+								sb.append("{!ex=lastFilterTag}"+SkuItemParam.sale_price).append(":").append(areaStr);
+							}else{
+								sb.append(SkuItemParam.sale_price).append(":").append(areaStr);
+							}
 							facetFields.add(sb.toString());
 						}
 					}
@@ -325,21 +316,21 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 		// 如果范围筛选条件不为空
 		if (Validator.isNotNullOrEmpty(rangeConditionStr)) {
 			List<String> values = new ArrayList<String>();
-			
-			String[] strs=rangeConditionStr.split(SEPARATORCHARS_COMMA);
+
+			String[] strs = rangeConditionStr.split(SEPARATORCHARS_COMMA);
 			for (String rangeStr : strs){
-				String min=StringUtils.substringBeforeLast(rangeStr, SEPARATORCHARS_MINUS);
-				String max=StringUtils.substringAfterLast(rangeStr, SEPARATORCHARS_MINUS);
+				String min = StringUtils.substringBeforeLast(rangeStr, SEPARATORCHARS_MINUS);
+				String max = StringUtils.substringAfterLast(rangeStr, SEPARATORCHARS_MINUS);
 				String areaStr = FilterUtil.paramConverToArea(min, max);
-				
+
 				values.add(areaStr);
 			}
-			
+
 			FacetParameter facetParameter = new FacetParameter(SkuItemParam.sale_price);
 			facetParameter.setValues(values);
 			facetParameter.setFacetType(FacetType.RANGE);
 
-			facetParameters.add(facetParameter);			
+			facetParameters.add(facetParameter);
 		}
 
 		return facetParameters;
@@ -375,7 +366,7 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 
 							bq.append("id:" + itemId + "^" + score);
 
-							if (i > itemIdStrs.length - 1) {
+							if (i < itemIdStrs.length - 1) {
 								bq.append(" OR ");
 							}
 						}
@@ -499,6 +490,32 @@ public abstract class NebulaAbstractSearchController extends BaseController{
 				}
 			}
 		}
+	}
+
+	/**
+	 * 判断哪一个facet属性打tag
+	 * 
+	 * @return FacetTagType
+	 * @param searchCommand
+	 * @author 冯明雷
+	 * @time 2016年6月30日下午2:06:04
+	 */
+	protected FacetTagType getLastFilterTagType(String filterParamOrder){
+		if (Validator.isNotNullOrEmpty(filterParamOrder)) {
+			// 最后一个点击的过滤条件
+			// 点击顺序
+			String[] strs = filterParamOrder.split(",");
+			String lastFilerStr = strs[strs.length - 1];
+
+			if (lastFilerStr.indexOf(PRICE_VARIABLE) == 0) {
+				return FacetTagType.RANGE;
+			}else if (lastFilerStr.indexOf(CATEGORY_VARIABLE) == 0) {
+				return FacetTagType.CATEGORY;
+			}else if (lastFilerStr.indexOf(PROPERTY_VARIABLE) == 0) {
+				return FacetTagType.PROPERTY;
+			}
+		}
+		return null;
 	}
 
 }

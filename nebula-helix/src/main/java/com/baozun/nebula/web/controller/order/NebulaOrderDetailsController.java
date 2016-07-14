@@ -295,7 +295,8 @@ public class NebulaOrderDetailsController extends BaseController{
         String[] split = TrackingDescription.split("<br/>");
         for (String string : split){
             LogisticsInfoBarRecordSubViewCommand logisticsInfoBarRecordSubViewCommand = new LogisticsInfoBarRecordSubViewCommand();
-            String date = StringUtils.substring(string, 0, 17);
+            //String date =  StringUtils.substring(string, 0, 17) ;
+             String date = StringUtils.trimToEmpty(StringUtils.substring(string, 0, 17));
             logisticsInfoBarRecordSubViewCommand.setBarScanDate(DateUtil.toDate(date, DatePattern.COMMON_DATE_AND_TIME_WITHOUT_SECOND));
             logisticsInfoBarRecordSubViewCommand.setRemark(StringUtils.substring(string, 17));
             list.add(logisticsInfoBarRecordSubViewCommand);

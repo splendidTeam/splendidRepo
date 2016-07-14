@@ -132,6 +132,9 @@ public class EmailTemplateManagerImpl implements EmailTemplateManager {
 			model.setName(emailTemplate.getName());
 			model.setSubject(emailTemplate.getSubject());
 			model.setType(emailTemplate.getType());
+			//增加SenderAlias  &  SenderEmail
+			model.setSenderAlias(emailTemplate.getSenderAlias());
+			model.setSenderEmail(emailTemplate.getSenderEmail());
 			emailTemplateDao.save(model);
 		} else {
 			//验证编码是否重复

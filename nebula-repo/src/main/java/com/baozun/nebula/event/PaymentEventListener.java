@@ -44,7 +44,6 @@ public class PaymentEventListener implements ApplicationListener<PaymentEvent> {
 			payManager.savePaymentResultPaymentLog(event.getPaymentResult(), event.getOperator(), event.getType());
 		} 
 		catch(Exception e){
-			e.printStackTrace();
 			logger.error("error:"+event.getPaymentResult()+event.getOperator());
 		}
 	}

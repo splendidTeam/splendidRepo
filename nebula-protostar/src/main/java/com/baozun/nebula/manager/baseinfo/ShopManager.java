@@ -252,5 +252,12 @@ public interface ShopManager extends BaseManager{
 	 * @return
 	 */
 	List<Industry> findAllEnabledIndustryByShopId(Long shopId);
+	/**
+	 * 根据行业查询属性
+	 * @param industryId
+	 * @param sorts
+	 * @return
+	 */
+	List<Property> findPropertyListByIndustryId(Long industryId,Sort[] sorts);
 	
 }

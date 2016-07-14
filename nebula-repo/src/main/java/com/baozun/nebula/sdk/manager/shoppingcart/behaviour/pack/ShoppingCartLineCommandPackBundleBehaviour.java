@@ -29,6 +29,7 @@ import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
+import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -61,13 +62,7 @@ public class ShoppingCartLineCommandPackBundleBehaviour extends AbstractShopping
         Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
         Item item = itemDao.findItemById(relatedItemId);
 
-        Long[] skuIds = shoppingCartLineCommand.getSkuIds();
-
-        List<BundleSkuPriceCommand> bundleSkuPriceCommandList = sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
-
-        Map<String, BigDecimal> sumMap = CollectionsUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice");
-        shoppingCartLineCommand.setSalePrice(sumMap.get("salesPrice"));
-        shoppingCartLineCommand.setListPrice(sumMap.get("listPrice"));
+        packPriceInfo(relatedItemId, shoppingCartLineCommand);
 
         //封装 店铺和 行业信息
         packShopAndIndustry(shoppingCartLineCommand, item);
@@ -76,6 +71,35 @@ public class ShoppingCartLineCommandPackBundleBehaviour extends AbstractShopping
         packItemInfo(shoppingCartLineCommand, item);
 
         packCategoryAndLables(shoppingCartLineCommand, item.getId());
+    }
+
+    /**
+     * 封装价格信息.
+     *
+     * @param relatedItemId
+     *            the related item id
+     * @param shoppingCartLineCommand
+     *            the shopping cart line command
+     * @since 5.3.1.6
+     */
+    private void packPriceInfo(Long relatedItemId,ShoppingCartLineCommand shoppingCartLineCommand){
+        Long[] skuIds = shoppingCartLineCommand.getSkuIds();
+        Integer quantity = shoppingCartLineCommand.getQuantity();
+        List<BundleSkuPriceCommand> bundleSkuPriceCommandList = sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
+
+        Map<String, BigDecimal> sumMap = CollectionsUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice", "originalSalesPrice");
+
+        //*******************************************************************************************
+        BigDecimal originalSalesPriceSum = sumMap.get("originalSalesPrice");
+        BigDecimal salesPriceSum = sumMap.get("salesPrice");
+
+        shoppingCartLineCommand.setListPrice(sumMap.get("listPrice"));
+        shoppingCartLineCommand.setSalePrice(originalSalesPriceSum);//salesPriceSum
+
+        BigDecimal disCountSum = originalSalesPriceSum.subtract(salesPriceSum);
+        // BigDecimal disCountSum = BigDecimal.ZERO;
+
+        shoppingCartLineCommand.setDiscount(NumberUtil.getMultiplyValue(disCountSum, quantity, 2));
     }
 
 }

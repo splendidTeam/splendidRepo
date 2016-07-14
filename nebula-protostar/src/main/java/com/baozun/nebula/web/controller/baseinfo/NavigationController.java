@@ -78,6 +78,7 @@ import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * 菜单导航管理
@@ -115,6 +116,12 @@ public class NavigationController extends BaseController{
 	
 	@Value("#{meta['solrQueryConvert.class']}")
 	private String				SOL_RQUERY_CONVERT_STRING	= "";
+	
+	/**
+	 * 前端菜单导航，分类勾选名称默认值
+	 */
+	
+	private  static final String CATEGORY_TREE_NAME = "category_tree";
 	/***
 	 * 未排序标志
 	 */
@@ -495,7 +502,65 @@ public class NavigationController extends BaseController{
 
 			types.add(facetParameter);
 		}
-		return types;
+		
+		
+		//逻辑调整，ROOT节点 一下级，为树根节点，根节点内部 为或，不同根节点之前为且
+		List<FacetParameter> facetParameters = new ArrayList<FacetParameter>();
+		if(Validator.isNotNullOrEmpty(types)){
+			// 存在所有分类ID所在分类树路径
+			List<String> categroyIds = new ArrayList<String>();
+			for (FacetParameter curFacetParameter : types){
+				if (FacetType.CATEGORY == curFacetParameter.getFacetType()){
+					categroyIds.addAll(curFacetParameter.getValues());
+				}else{
+					//属性直接加入
+					facetParameters.add(curFacetParameter);
+				}
+			}
+			
+			if (Validator.isNotNullOrEmpty(categroyIds)){
+				
+				Map<String,List<String>> allIds = new HashMap<String,List<String>>();
+				
+				for (String ids : categroyIds){
+					if (Validator.isNotNullOrEmpty(ids)){
+						
+						String topId = null;
+						int indexOfStrike = ids.indexOf("-");
+						// 未找到中划线，为根节点
+						if (indexOfStrike < 0){
+							topId = ids;
+						}else{
+							topId  = ids.substring(0,indexOfStrike);
+						}
+						
+						List<String> values = allIds.get(topId);
+						
+						if(values==null){
+							values = new ArrayList<String>();
+							values.add(ids);
+							allIds.put(topId, values);
+							
+						}else{
+							values.add(ids);
+						}
+					}
+				}
+				
+				if(Validator.isNotNullOrEmpty(allIds)){
+					for(String topId:allIds.keySet()){
+						FacetParameter facetParameter = new FacetParameter(CATEGORY_TREE_NAME);
+						facetParameter.setFacetType(FacetType.CATEGORY);
+						facetParameter.setValues(allIds.get(topId));
+						
+						facetParameters.add(facetParameter);
+						
+					}
+				}
+			}
+		}
+		LOG.warn(JsonUtil.format(facetParameters));
+		return facetParameters;
 	}
 
 	

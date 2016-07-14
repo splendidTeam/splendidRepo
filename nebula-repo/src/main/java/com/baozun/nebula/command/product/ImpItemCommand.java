@@ -53,8 +53,8 @@ public class ImpItemCommand implements Command {
   	//商品分类
   	private String itemType;
   	/**
-  	 *  商品类型 
-  	 *  @see com.baozun.nebula.model.product.Item#type
+  	 * 商品类型
+  	 * @see com.baozun.nebula.model.product.Item#type
   	 */
   	private Integer type;
   	
