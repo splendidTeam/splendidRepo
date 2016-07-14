@@ -101,6 +101,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	private BundleManager bundleManager;
 	
 	@Override
+	@Transactional
 	public Item createOrUpdateSimpleItem(ItemInfoCommand itemCommand,
 			Long[] propertyValueIds, Long[] categoriesIds, Long defaultCategoryId,
 			ItemPropertiesCommand[] iProperties,
@@ -136,6 +137,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	 * @see com.baozun.nebula.manager.product.ItemLangManager#createOrUpdateBundleItem(com.baozun.nebula.command.product.ItemInfoCommand, com.baozun.nebula.command.product.BundleCommand, java.lang.Long[])
 	 */
 	@Override
+	@Transactional
 	public Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
 			throws Exception {
 		
@@ -247,6 +249,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 
 		return returnList;
 	}
+	
 	private List<Sku> saveSkus(ItemInfoCommand itemCommand, Long itemId, SkuPropertyMUtlLangCommand[] skuPropertyCommandArray, List<ItemPropertiesCommand> savedItemProperties) {
 		List<Sku> returnList = new ArrayList<Sku>();
 		if (skuPropertyCommandArray != null && skuPropertyCommandArray.length > 0) {
