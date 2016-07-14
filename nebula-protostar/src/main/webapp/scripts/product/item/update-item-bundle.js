@@ -513,7 +513,7 @@ function loadBundleElements(editable, showDefaultValue, elements){
 				_html += '<td>' + sku.property + '</td>';
 				_html += '<td><input class="check-sku" type="checkbox" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].isParticipation" ' + (sku.isParticipation ? 'checked="checked"' : '') + ' /></td>';
 				_html += '<td>' + sku.originalSalesPrice + '</td>';
-				_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.originalSalesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
+				_html += '<td><input class="sku-price" type="text" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].salesPrice" ' + (editable ? 'value="' + sku.salesPrice + '"' : (showDefaultValue ? 'value="' + sku.originalSalesPrice + '" readonly=readonly' : 'readonly=readonly')) + ' />'
 					+ '<input type="hidden" name="bundleElementViewCommands[' + idx + '].bundleItemViewCommands[' + m + '].bundleSkuViewCommands[' + n + '].skuId" value="' + sku.skuId + '" /></td>';
 				_html += '</tr>';
 			});

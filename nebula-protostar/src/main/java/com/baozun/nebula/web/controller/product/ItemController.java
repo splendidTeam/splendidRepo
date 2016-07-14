@@ -2858,7 +2858,7 @@ public class ItemController extends BaseController {
 							BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
 							bsvc.setIsParticipation(false);
 							bsvc.setOriginalSalesPrice(sku.getSalePrice());
-							bsvc.setSalesPrice(bsvc.getSalesPrice());
+							bsvc.setSalesPrice(sku.getSalePrice());
 							bsvc.setSkuId(sku.getId());
 							bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
 							

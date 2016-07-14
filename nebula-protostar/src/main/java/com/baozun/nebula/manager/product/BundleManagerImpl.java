@@ -284,10 +284,10 @@ public class BundleManagerImpl implements BundleManager {
 						
 						BundleSkuCommand bsc = new BundleSkuCommand();
 						bsc.setBundleElementId(sku.getBundleElementId());
-						bsc.setBundleId(bsc.getBundleId());
+						bsc.setBundleId(sku.getBundleId());
 						bsc.setId(sku.getId());
 						bsc.setItemId(sku.getItemId());
-						bsc.setSalesPrice(bsc.getSalesPrice());
+						bsc.setSalesPrice(sku.getSalesPrice());
 						bsc.setSkuId(sku.getSkuId());
 						bscs.add(bsc);
 						bic.getBundleSkus().addAll(bscs);
@@ -304,10 +304,10 @@ public class BundleManagerImpl implements BundleManager {
 					for(BundleSku sku : bundleSkus) {
 						BundleSkuCommand bsc = new BundleSkuCommand();
 						bsc.setBundleElementId(sku.getBundleElementId());
-						bsc.setBundleId(bsc.getBundleId());
+						bsc.setBundleId(sku.getBundleId());
 						bsc.setId(sku.getId());
 						bsc.setItemId(sku.getItemId());
-						bsc.setSalesPrice(bsc.getSalesPrice());
+						bsc.setSalesPrice(sku.getSalesPrice());
 						bsc.setSkuId(sku.getSkuId());
 						bscs.add(bsc);
 					}
