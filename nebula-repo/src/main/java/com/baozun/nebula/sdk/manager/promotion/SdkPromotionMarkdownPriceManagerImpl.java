@@ -16,7 +16,7 @@ public class SdkPromotionMarkdownPriceManagerImpl implements SdkPromotionMarkdow
 	private PromotionMarkdownPriceDao markdownPriceDao;
 	
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly=false)
 	public List<PromotionMarkdownPrice> getPromotionMarkdownPriceList() {
 		return markdownPriceDao.getPromotionMarkdownPriceList();
 	}
