@@ -249,6 +249,7 @@ public class BundleManagerImpl implements BundleManager {
 					bsvc.setSkuId(sku.getId());
 					bsvc.setOriginalSalesPrice(sku.getSalePrice());
 					bsvc.setProperty(getSkuPropertyStrForBundle(sku));
+					bsvc.setIsParticipation(true);
 					
 					bundleSkuViewCommands.add(bsvc);
 				}
