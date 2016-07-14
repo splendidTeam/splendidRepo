@@ -212,9 +212,7 @@ public class OrderManagerImpl implements OrderManager{
         if (null == salesOrderPage){
             return null;
         }
-        boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
-    			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
-    			searchParam.get("sdkQueryType").equals("1");
+
         List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
         boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
     			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
