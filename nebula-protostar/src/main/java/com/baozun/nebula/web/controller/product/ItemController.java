@@ -293,8 +293,6 @@ public class ItemController extends BaseController {
 	/**
 	 * @author 何波 @Description: 处理描述中输入的图片链接 @param itemCommand void @throws
 	 */
-Long defCategroyId,
-		Item item = itemLangManager.createOrUpdateItem(itemCommand, propertyValueIds, categoriesIds, iProperties, skuPropertyCommandArray,defCategroyId);
 	private void dealDescImgUrl(ItemInfoCommand itemCommand) {
 		LangProperty langPropertyDesc = itemCommand.getDescription();
 		boolean i18n = LangProperty.getI18nOnOff();
