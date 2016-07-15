@@ -17,7 +17,7 @@
 package com.baozun.nebula.sdk.manager.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.i18n.LangProperty;
-import com.baozun.nebula.dao.product.ItemPropertiesDao;
 import com.baozun.nebula.dao.product.PropertyDao;
-import com.baozun.nebula.dao.product.PropertyValueDao;
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.dao.product.SkuDao;
 import com.baozun.nebula.exception.BusinessException;
@@ -94,7 +92,7 @@ public class SdkSkuManagerImpl implements SdkSkuManager{
         if (StringUtils.isNotBlank(properties)){
             List<Long> ids = new Gson().fromJson(properties, new TypeToken<List<Long>>(){}.getType());
             if (null != ids && ids.size() > 0){
-                List<SkuProperty> skuPros = new ArrayList<SkuProperty>();
+                List<SkuProperty> skuPros = new LinkedList<SkuProperty>();
                 List<ItemProperties> itemProList = sdkItemManager.findItemPropertiesByIds(ids);
                 for (ItemProperties itemPropertie : itemProList){
                     SkuProperty skuPro = new SkuProperty();
