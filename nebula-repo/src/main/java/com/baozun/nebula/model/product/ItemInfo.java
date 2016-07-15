@@ -243,7 +243,7 @@ public class ItemInfo extends BaseModel{
 		this.subTitle = subTitle;
 	}
 
-	@Column(name = "SKETCH")
+	@Column(name = "SKETCH", length=2000)
 	public String getSketch(){
 		return sketch;
 	}
@@ -316,7 +316,7 @@ public class ItemInfo extends BaseModel{
 		this.lastSelectPropertyValueId = lastSelectPropertyValueId;
 	}
 
-	@Column(name = "SEODESCRIPTION")
+	@Column(name = "SEODESCRIPTION", length=2000)
 	public String getSeoDescription(){
 		return seoDescription;
 	}
