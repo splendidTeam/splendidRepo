@@ -117,7 +117,6 @@ public class BundleManagerImpl implements BundleManager {
 			
 			b = bundleDao.getByPrimaryKey(id);
 			b.setAvailableQty(bundle.getAvailableQty());
-			b.setCreateTime(bundle.getCreateTime());
 			b.setItemId(bundle.getItemId());
 			b.setModifyTime(new Date());
 			b.setPriceType(bundle.getPriceType());
