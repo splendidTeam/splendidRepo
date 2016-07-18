@@ -150,7 +150,7 @@
 					inner join 
 						t_pd_item i on i.id = ii.item_id and i.lifecycle in (0, 1)
 					where 
-						i.shop_id = :shopId
+						i.shop_id = :shopId and ii.style is not null and ii.style <> ''
 						#if($code)
 		       				and ii.style like :code
 		       			#end
