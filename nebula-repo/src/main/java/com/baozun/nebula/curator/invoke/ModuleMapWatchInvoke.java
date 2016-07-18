@@ -1,5 +1,7 @@
 package com.baozun.nebula.curator.invoke;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class ModuleMapWatchInvoke implements IWatcherInvoke {
 	public void invoke(String path, byte[] data) {
 		LOG.info(path+":invoke");
 		try {
-			Thread.sleep(2000);
+			TimeUnit.SECONDS.sleep(3);
 		} catch (InterruptedException e) {
 			LOG.error(e.getMessage());
 		}
