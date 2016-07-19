@@ -19,7 +19,13 @@
 					from t_pd_item it LEFT JOIN t_pd_iteminfo itf on it.id=itf.item_id LEFT JOIN 
 					(select id,name,sort_no from t_pd_industry where lifecycle='1') ind on it.industry_id=ind.id
 					LEFT JOIN (select shop.id,org.name from t_ma_shop shop LEFT JOIN t_au_organization org ON shop.org_id=org.id) shopInfo ON shopInfo.id=it.shop_id
-					where it.lifecycle='1' and (itf.type<>0 or itf.type is null) and it.id in (#foreach($itemid in $itemIds)
+					where it.type in (#foreach($type in $types)
+										$type,
+									#end
+									-1) 
+					and it.lifecycle='1' 
+					and (itf.type<>0 or itf.type is null) 
+					and it.id in (#foreach($itemid in $itemIds)
 										$itemid,
 									#end
 									-1)
@@ -43,7 +49,12 @@
 					from t_pd_item it LEFT JOIN t_pd_iteminfo itf on it.id=itf.item_id LEFT JOIN 
 					(select id,name,sort_no from t_pd_industry where lifecycle='1') ind on it.industry_id=ind.id
 					LEFT JOIN (select shop.id,org.name from t_ma_shop shop LEFT JOIN t_au_organization org ON shop.org_id=org.id) shopInfo ON shopInfo.id=it.shop_id
-					where it.lifecycle='1' and (itf.type<>0 or itf.type is null)
+					where it.type in (#foreach($type in $types)
+										$type,
+									#end
+									-1) 
+					and it.lifecycle='1' 
+					and (itf.type<>0 or itf.type is null)
                  ]]>
 			</value>
 		</constructor-arg>
