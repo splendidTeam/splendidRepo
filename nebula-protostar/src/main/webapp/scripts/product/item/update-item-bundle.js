@@ -220,7 +220,6 @@ $j(document).ready(function(){
 			$j('.product-table > tbody').html('');
 			loadBundleElements(false, true);
 		} else if(currVal == '2'){//一口价
-			$j('.product-table').show();
 			loadBundleElements(false, false);
 		} else if(currVal == '3'){//定制
 			$j('.product-table').hide();
@@ -462,6 +461,7 @@ function fillProductTable(data){
 		}
 	}); 
 	$j('.product-table > tbody').html(_html);
+	$j('.product-table').show();
 	isRefresh = true;
 }
 

@@ -106,17 +106,17 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 	private PropertyValueDao propertyValueDao;
 	
 	@Override 
-	public List<ItemSolrCommand> findItemCommandByItemId(List<Long> itemIds) {
-		return setItemSolrCommand(itemIds);
+	public List<ItemSolrCommand> findItemCommandByItemId(Integer[] itemTypes, List<Long> itemIds) {
+		return setItemSolrCommand(itemTypes, itemIds);
 	}
 
 	@Override
-	public List<ItemSolrCommand> findItemCommand() {
-		return setItemSolrCommand(null);
+	public List<ItemSolrCommand> findItemCommand(Integer[] itemTypes) {
+		return setItemSolrCommand(itemTypes, null);
 	}
 	@Override
 	@Transactional(readOnly=true)
-	public List<ItemSolrCommand> setItemSolrCommand(List<Long> itemIds){
+	public List<ItemSolrCommand> setItemSolrCommand(Integer[] itemTypes, List<Long> itemIds){
 		List<ItemSolrCommand> itemCommandList = new ArrayList<ItemSolrCommand>();
 		
 		List<BaseItemForSolrCommand> baseItemForSolrCommandList = new ArrayList<BaseItemForSolrCommand>();
@@ -134,7 +134,7 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 		 */
 		List<ItemSortScore> scoreList = sdkItemSortScoreManager.findAllEffectItemSortScoreList();
 		if(null!=itemIds && itemIds.size()>0){
-			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommandByItemId(itemIds);
+			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommandByItemId(itemTypes, itemIds);
 			itemPropertiesCommandForSearchList = baseItemForSolrPorpertiesCommandDao.findItemPropertiesByItemIdForSearch(itemIds);
 			itemForCategoryCommandList = baseItemForSolrCategoryCommandDao.findItemCategoryByItemId(itemIds);
 			itemTagCommandList = baseItemForSolrTagCommandDao.findItemTagByItemId(itemIds);
@@ -145,7 +145,7 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 			itemFavouriteCountForSolrCommandList = itemForSolrFavouritedCountCommandDao.findItemCountById(itemIds);
 			itemPropertiesCommandWithOutSearchList = baseItemForSolrPorpertiesCommandDao.findItemPropertiesByItemIdWithOutSearch(itemIds);
 		}else{
-			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommand();
+			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommand(itemTypes);
 			itemPropertiesCommandForSearchList = baseItemForSolrPorpertiesCommandDao.findItemPropertiesForSearch();
 			itemForCategoryCommandList = baseItemForSolrCategoryCommandDao.findItemCategory();
 			itemImageCommandList = baseItemForSolrImageCommandDao.findItemImage(ItemImage.IMG_TYPE_LIST);
@@ -1014,12 +1014,11 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 	}
 
 	@Override
-	public List<ItemSolrI18nCommand> findItemCommandByItemIdI18n(
-			List<Long> itemIds) {
-		return setItemSolrCommandI18n(itemIds);
+	public List<ItemSolrI18nCommand> findItemCommandByItemIdI18n(Integer[] itemTypes, List<Long> itemIds) {
+		return setItemSolrCommandI18n(itemTypes, itemIds);
 	}
 	
-	public List<ItemSolrI18nCommand> setItemSolrCommandI18n(List<Long> itemIds){
+	public List<ItemSolrI18nCommand> setItemSolrCommandI18n(Integer[] itemTypes, List<Long> itemIds){
 		List<ItemSolrI18nCommand> itemCommandList = new ArrayList<ItemSolrI18nCommand>();
 		
 		List<BaseItemForSolrCommand> baseItemForSolrCommandList = new ArrayList<BaseItemForSolrCommand>();
@@ -1037,7 +1036,7 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 		 */
 		List<ItemSortScore> scoreList = sdkItemSortScoreManager.findAllEffectItemSortScoreList();
 		if(null!=itemIds && itemIds.size()>0){
-			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommandByItemId(itemIds);
+			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommandByItemId(itemTypes, itemIds);
 			//商品属性国际化
 			itemPropertiesCommandForSearchList = findItemPropertiesByItemIdForSearchI18n(itemIds);
 			//TODO 国际化分类
@@ -1052,7 +1051,7 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 			itemFavouriteCountForSolrCommandList = itemForSolrFavouritedCountCommandDao.findItemCountById(itemIds);
 			itemPropertiesCommandWithOutSearchList = baseItemForSolrPorpertiesCommandDao.findItemPropertiesByItemIdWithOutSearch(itemIds);
 		}else{
-			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommand();
+			baseItemForSolrCommandList = baseItemForSolrCommandDao.findItemCommand(itemTypes);
 			//商品属性国际化
 			itemPropertiesCommandForSearchList =findItemPropertiesByItemIdForSearchI18n(null);
 			//TODO 国际化分类
@@ -1557,5 +1556,6 @@ public class ItemInfoManagerImpl implements ItemInfoManager {
 		}
 		return itemSolrCommand;
 	}
+
 	
 }
