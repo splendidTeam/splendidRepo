@@ -21,7 +21,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"ITEM_TYPE_GROUP" : "搭配商品",
 	"ITEM_TYPE_VIRTUAL" : "虚拟商品",
 	"PRICE-IS-NULL" : "现销售价不能为空",
-	"CHECK-MEMBER-SKU" : "每个商品必须有一个sku被选中",
+	"MEMBER-SKU-SELECTED" : "每个商品必须有一个sku被选中",
 	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空",
 	"REFRESH-TABLE" : "请点击‘刷新’更新表格数据"
 });
@@ -124,7 +124,7 @@ $j(document).ready(function(){
     		});
     		
     		if(!flag){
-    			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECK-MEMBER-SKU"));
+    			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-SKU-SELECTED"));
     		}
     		
     		
