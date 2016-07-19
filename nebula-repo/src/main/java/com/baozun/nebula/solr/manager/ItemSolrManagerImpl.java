@@ -41,8 +41,8 @@ import com.baozun.nebula.solr.command.SuggestDetailCommand;
 import com.baozun.nebula.solr.convert.CommandConvert;
 import com.baozun.nebula.solr.factory.SolrQueryFactory;
 import com.baozun.nebula.solr.utils.SolrOrderSort;
+import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utils.spring.SpringUtil;
-import com.feilong.core.Validator;
 
 @Service("itemSolrManager")
 @Transactional
@@ -171,19 +171,8 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 
 	@Override
 	public Boolean saveOrUpdateItem(List<Long> itemIds) {
-		// 目前仅普通商品需要刷新solr
-		// changed by yue.ch in 2016-6-22
-		Iterator<Long> iterator = itemIds.iterator();
-		while (iterator.hasNext()) {
-			Long itemId = iterator.next();
-			Item item = itemDao.findItemById(itemId);
-			if (item == null || !Item.ITEM_TYPE_SIMPLE.equals(item.getType())) {
-				iterator.remove();
-			}
-		}
-				
 		List<ItemSolrCommand> itemCommandList = itemInfoManager
-				.findItemCommandByItemId(itemIds);
+				.findItemCommandByItemId(new Integer[]{Item.ITEM_TYPE_SIMPLE}, itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
 			//找不到说明是非卖品上架，不需要刷新索引。
 			return true;
@@ -219,19 +208,8 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 	* @throws
 	 */
 	public Boolean saveOrUpdateItemI18n(List<Long> itemIds) {
-		// 目前仅普通商品需要刷新solr
-		// changed by yue.ch in 2016-6-22
-		Iterator<Long> iterator = itemIds.iterator();
-		while (iterator.hasNext()) {
-			Long itemId = iterator.next();
-			Item item = itemDao.findItemById(itemId);
-			if (item == null || !Item.ITEM_TYPE_SIMPLE.equals(item.getType())) {
-				iterator.remove();
-			}
-		}
-				
 		//修改成把所有国际化语言查询出来
-		List<ItemSolrI18nCommand> itemCommandList = itemInfoManager.findItemCommandByItemIdI18n(itemIds);
+		List<ItemSolrI18nCommand> itemCommandList = itemInfoManager.findItemCommandByItemIdI18n(new Integer[]{Item.ITEM_TYPE_SIMPLE}, itemIds);
 		if (null == itemCommandList || itemCommandList.size() < 1) {
 			//找不到说明是非卖品上架，不需要刷新索引。
 			return true;
@@ -258,8 +236,7 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 	}
 	@Override
 	public Boolean reRefreshAllItem() {
-		List<ItemSolrCommand> itemCommandList = itemInfoManager
-				.findItemCommand();
+		List<ItemSolrCommand> itemCommandList = itemInfoManager.findItemCommand(new Integer[]{Item.ITEM_TYPE_SIMPLE});
 		if (null == itemCommandList || itemCommandList.size() < 1) {
 			return false;
 		}

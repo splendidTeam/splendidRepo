@@ -11,9 +11,9 @@ import com.baozun.nebula.command.BaseItemForSolrCommand;
 public interface BaseItemForSolrCommandDao extends GenericEntityDao<BaseItemForSolrCommand, Long> {
 
 	@NativeQuery(model = BaseItemForSolrCommand.class)
-	List<BaseItemForSolrCommand> findItemCommandByItemId(@QueryParam("itemIds") List<Long> itemId);
+	List<BaseItemForSolrCommand> findItemCommandByItemId(@QueryParam("type") Integer[] types, @QueryParam("itemIds") List<Long> itemId);
 	
 	@NativeQuery(model = BaseItemForSolrCommand.class)
-	List<BaseItemForSolrCommand> findItemCommand();
+	List<BaseItemForSolrCommand> findItemCommand(@QueryParam("type") Integer[] types);
 	
 }
