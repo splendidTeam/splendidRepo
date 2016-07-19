@@ -85,11 +85,11 @@ $j(document).ready(function(){
 	var bundleExtInfoValidator = new FormValidator('', 30, function(){
 		
 		// 校验主卖品是否存在
-		if($j(".setMainProduct").find(".validate-code").text() == null){
+		if($j(".setMainProduct").find(".validate-code").text() == null || $j(".setMainProduct").find(".validate-code").text() == ""){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
 		}
 		// 校验成员是否存在至少一个
-		if($j(".setMemberProduct").find(".validate-code").text() == null){
+		if($j(".setMemberProduct").find(".validate-code").text() == null || $j(".setMemberProduct").find(".validate-code").text() == ""){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
 		}
 		
@@ -101,7 +101,7 @@ $j(document).ready(function(){
 		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
     	if($j("input[name='priceType']:checked").val() == 2){
     		$j('.fix-price').each(function(){
-    			if($j(this).val() == null){
+    			if($j(this).val() == null || $j(this).val() == ""){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
     			}
     		});
@@ -127,7 +127,7 @@ $j(document).ready(function(){
     		
     		
     		$j('.check-sku:checked').each(function(){
-    			if($j(this).parent().next().next().find('.sku-price').val() == null){
+    			if($j(this).parent().next().next().find('.sku-price').val() == null || $j(this).parent().next().next().find('.sku-price').val() == ""){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECKED-PRICE-IS-NULL"));
     			}
     		});
@@ -151,7 +151,7 @@ $j(document).ready(function(){
 			}
 		});
 		//判断是否选择了商品
-		if(element.val() != null){
+		if(element.val() != null || element.val() != ""){
 			if(!hasRepeat){
 				//关闭弹出层
 				$j(".proto-dialog .dialog-close").click();
@@ -359,7 +359,7 @@ function radioTemplate(data, args, idx) {
 	var _type = loxia.getObject("type", data);
 	var _itemImageList = loxia.getObject("itemImageList", data);
 	var _itemImage = null;
-	if( _itemImageList != null ){
+	if( _itemImageList != null || _itemImageList != ""){
 		for(var i = 0; i < _itemImageList.length; i++) {
 			var imgType = _itemImageList[i].type;
 			if( imgType == "1" ){
@@ -572,7 +572,7 @@ function getElements(){
 	
 	//主商品
 	var mainProductCode = $j(".setMainProduct").find(".validate-code");
-	if(mainProductCode.text() != null){
+	if(mainProductCode.text() != null || mainProductCode.text() != ""){
 		if(mainProductCode.attr("data-type") == "product"){
 			mainElement = {
 					isMainElement : true,
@@ -594,7 +594,7 @@ function getElements(){
 	var memberProductCode = null;
 	var _sort = 1;
 	$j(".setMemberProduct").find(".validate-code").each(function(){
-		if($j(this).text() != null){
+		if($j(this).text() != null || $j(this).text() !=""){
 			_sort++;
 			if($j(this).attr("data-type") == "product"){
 				bundleElement = {
