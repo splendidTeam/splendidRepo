@@ -328,7 +328,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
             throw new IllegalItemStateException(IllegalItemState.ITEM_BEFORE_ACTIVE_TIME);
         }
 		
-		if(Constants.ITEM_TYPE_PREMIUMS == itemBaseInfo.getType()) {
+		if(Constants.ITEM_TYPE_PREMIUMS.equals(itemBaseInfo.getType())) {
 			// 商品是赠品
 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item is gift. itemCode:{}, type:{}.", itemCode, itemBaseInfo.getType());
             throw new IllegalItemStateException(IllegalItemState.ITEM_ILLEGAL_TYPE_GIFT);
