@@ -61,7 +61,7 @@
 		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.setRepertory" /></div>
 		<div class="ui-block-content border-grey">
 	   		<label class="label-line block pb10"> <spring:message code="item.common.repertoryNumber" /> <input type="text" name="availableQty" value="${bundleViewCommand.availableQty }" /> </label>
-	   		<label class="label-line block pb10"> <spring:message code="item.common.isSynchronization" /> <input type="radio" name="syncWithInv" value="1" <c:if test="${bundleViewCommand.syncWithInv == true }">checked="checked"</c:if>><spring:message code="shop.property.true" />   <input type="radio" name="syncWithInv" value="0" <c:if test="${bundleViewCommand.syncWithInv == false }">checked="checked"</c:if>><spring:message code="shop.property.false" /> </label>
+	   		<label class="label-line block pb10"> <spring:message code="item.common.isSynchronization" /> <input type="radio" name="syncWithInv" value="1" <c:if test="${bundleViewCommand.syncWithInv == true || bundleViewCommand.syncWithInv == null}">checked="checked"</c:if>><spring:message code="shop.property.true" />   <input type="radio" name="syncWithInv" value="0" <c:if test="${bundleViewCommand.syncWithInv == false }">checked="checked"</c:if>><spring:message code="shop.property.false" /> </label>
 		</div>
 	</div>
 	<div class="ui-block">
