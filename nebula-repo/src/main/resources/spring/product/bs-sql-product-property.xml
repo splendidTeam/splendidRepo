@@ -740,7 +740,7 @@
 				<![CDATA[  
 		       		SELECT property.* FROM t_pd_property property
 					LEFT JOIN t_pd_industry_property_relation relation ON property.id = relation.property_id
-					WHERE relation.industry_id =:industryId 
+					WHERE relation.industry_id =:industryId and property.lifecycle =1
                  ]]>
 			</value>
 		</constructor-arg>
