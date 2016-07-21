@@ -358,7 +358,7 @@ function radioTemplate(data, args, idx) {
 	var _type = loxia.getObject("type", data);
 	var _itemImageList = loxia.getObject("itemImageList", data);
 	var _itemImage = null;
-	if( _itemImageList != null || _itemImageList != ""){
+	if( _itemImageList != null ){
 		for(var i = 0; i < _itemImageList.length; i++) {
 			var imgType = _itemImageList[i].type;
 			if( imgType == "1" ){
@@ -572,7 +572,7 @@ function getElements(){
 	
 	//主商品
 	var mainProductCode = $j(".setMainProduct").find(".validate-code");
-	if(mainProductCode.text() != null || mainProductCode.text() != ""){
+	if(mainProductCode.text() != null){
 		if(mainProductCode.attr("data-type") == "product"){
 			mainElement = {
 					isMainElement : true,
@@ -594,7 +594,7 @@ function getElements(){
 	var memberProductCode = null;
 	var _sort = 1;
 	$j(".setMemberProduct").find(".validate-code").each(function(){
-		if($j(this).text() != null || $j(this).text() !=""){
+		if($j(this).text() != null){
 			_sort++;
 			if($j(this).attr("data-type") == "product"){
 				bundleElement = {
