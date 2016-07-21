@@ -37,7 +37,6 @@ var mainElement = null;
 var isRefresh = true;
 
 $j(document).ready(function(){
-	
 	refreshItemData([]);
 	
 	/*==================================     bundle扩展信息    ==========================*/
@@ -97,35 +96,21 @@ $j(document).ready(function(){
     	if(!isRefresh){
     		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("REFRESH-TABLE"));
     	}
-		// 一口价时    只校验‘商品表’每个价格是否有值
+		// 一口价时    校验‘商品表’每个价格是否有值,sku是否有一个被选中
 		// 定制时     校验‘sku表’中某个成员里面是否有至少一个sku参与 并且选中的价格是否有值
     	if($j("input[name='priceType']:checked").val() == 2){
+    		checkSku();
+    		var priceFlag = true;
     		$j('.fix-price').each(function(){
     			if($j(this).val() == null || $j(this).val() == ""){
-    				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
+    				priceFlag = false;
     			}
     		});
-    	}else if($j("input[name='priceType']:checked").val() == 3 || $j("input[name='priceType']:checked").val() == 1){
-    		var flag = true;
-    		$j('.tr-product').each(function(){
-    			var _flag = false;
-    			var _data = $j(this).attr("data-product")
-    			$j('.tr-sku').each(function(){
-    				if($j(this).attr("data-sku") == _data && $j(this).find('.check-sku').is(':checked')){
-    					_flag = true;
-    				}	
-    			});
-    			
-    			if(!_flag){
-    				flag = false;
-    			}
-    		});
-    		
-    		if(!flag){
-    			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECK-MEMBER-SKU"));
+    		if(!priceFlag){
+    			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("PRICE-IS-NULL"));
     		}
-    		
-    		
+    	}else if($j("input[name='priceType']:checked").val() == 3 || $j("input[name='priceType']:checked").val() == 1){
+    		checkSku();
     		$j('.check-sku:checked').each(function(){
     			if($j(this).parent().next().next().find('.sku-price').val() == null || $j(this).parent().next().next().find('.sku-price').val() == ""){
     				return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECKED-PRICE-IS-NULL"));
@@ -625,3 +610,24 @@ function initBundleElement(priceType, elements){
 	}
 }
 
+
+function checkSku(){
+	var flag = true;
+	$j('.tr-product').each(function(){
+		var _flag = false;
+		var _data = $j(this).attr("data-product")
+		$j('.tr-sku').each(function(){
+			if($j(this).attr("data-sku") == _data && $j(this).find('.check-sku').is(':checked')){
+				_flag = true;
+			}	
+		});
+		
+		if(!_flag){
+			flag = false;
+		}
+	});
+	
+	if(!flag){
+		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("CHECK-MEMBER-SKU"));
+	}
+}

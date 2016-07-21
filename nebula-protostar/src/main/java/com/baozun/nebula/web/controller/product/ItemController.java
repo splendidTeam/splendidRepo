@@ -2253,6 +2253,7 @@ public class ItemController extends BaseController {
 		
 		Item item = itemManager.findItemById(itemId);
 		if(item != null) {
+			model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
 			Integer type = item.getType();
 			switch(type){
 			case 1 : return updateSimpleItem(model, item);
