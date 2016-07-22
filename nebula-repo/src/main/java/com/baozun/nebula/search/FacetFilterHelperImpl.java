@@ -62,30 +62,6 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 	private static final Logger			LOG								= LoggerFactory.getLogger(FacetFilterHelperImpl.class);
 
-	/** 分类元数据在缓存中的key，完整的key还要加上语言 
-	 * @see CacheKeyConstant.categoryMetaCacheKey
-	 *  */
-	@Deprecated
-	private final static String			categoryMetaCacheKey			= "categoryMetaCacheKey_";
-
-	/** 属性元数据在缓存中的key，完整的key还要加上语言 
-	 * @see CacheKeyConstant.propertyMetaCacheKey
-	 * */
-	@Deprecated
-	private final static String			propertyMetaCacheKey			= "propertyMetaCacheKey_";
-
-	/** 属性值元数据在缓存中的key，完整的key还要加上语言 
-	 * @see CacheKeyConstant.propertyValueMetaCacheKey
-	 * */
-	@Deprecated
-	private final static String			propertyValueMetaCacheKey		= "propertyValueMetaCacheKey_";
-
-	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 
-	 * @see CacheKeyConstant.searchConditionMetaCacheKey
-	 * */
-	@Deprecated
-	private final static String			searchConditionMetaCacheKey		= "searchConditionMetaCacheKey_";
-
 	@Autowired
 	private CacheManager				cacheManager;
 
