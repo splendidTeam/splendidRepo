@@ -62,16 +62,28 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 	private static final Logger			LOG								= LoggerFactory.getLogger(FacetFilterHelperImpl.class);
 
-	/** 分类元数据在缓存中的key，完整的key还要加上语言 */
+	/** 分类元数据在缓存中的key，完整的key还要加上语言 
+	 * @see CacheKeyConstant.categoryMetaCacheKey
+	 *  */
+	@Deprecated
 	private final static String			categoryMetaCacheKey			= "categoryMetaCacheKey_";
 
-	/** 属性元数据在缓存中的key，完整的key还要加上语言 */
+	/** 属性元数据在缓存中的key，完整的key还要加上语言 
+	 * @see CacheKeyConstant.propertyMetaCacheKey
+	 * */
+	@Deprecated
 	private final static String			propertyMetaCacheKey			= "propertyMetaCacheKey_";
 
-	/** 属性值元数据在缓存中的key，完整的key还要加上语言 */
+	/** 属性值元数据在缓存中的key，完整的key还要加上语言 
+	 * @see CacheKeyConstant.propertyValueMetaCacheKey
+	 * */
+	@Deprecated
 	private final static String			propertyValueMetaCacheKey		= "propertyValueMetaCacheKey_";
 
-	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 */
+	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 
+	 * @see CacheKeyConstant.searchConditionMetaCacheKey
+	 * */
+	@Deprecated
 	private final static String			searchConditionMetaCacheKey		= "searchConditionMetaCacheKey_";
 
 	@Autowired
@@ -157,7 +169,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 先从缓存中获取数据
 		try{
-			categoryMetaMap = cacheManager.getObject(categoryMetaCacheKey + lang);
+			categoryMetaMap = cacheManager.getObject(CacheKeyConstant.categoryMetaCacheKey + lang);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
 		}
@@ -179,7 +191,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
+			cacheManager.setObject(CacheKeyConstant.categoryMetaCacheKey + lang, categoryMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -195,7 +207,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 先从缓存中获取数据
 		try{
-			propertyMetaMap = cacheManager.getObject(propertyMetaCacheKey + lang);
+			propertyMetaMap = cacheManager.getObject(CacheKeyConstant.propertyMetaCacheKey + lang);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
 		}
@@ -216,7 +228,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
+			cacheManager.setObject(CacheKeyConstant.propertyMetaCacheKey + lang, propertyMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -231,7 +243,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 先从缓存中获取数据
 		try{
-			propertyValueMetaMap = cacheManager.getObject(propertyValueMetaCacheKey + lang);
+			propertyValueMetaMap = cacheManager.getObject(CacheKeyConstant.propertyValueMetaCacheKey + lang);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
 		}
@@ -252,7 +264,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
+			cacheManager.setObject(CacheKeyConstant.propertyValueMetaCacheKey + lang, propertyValueMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
@@ -267,7 +279,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 先从缓存中获取数据
 		try{
-			searchConditionMetaMap = cacheManager.getObject(searchConditionMetaCacheKey + lang);
+			searchConditionMetaMap = cacheManager.getObject(CacheKeyConstant.searchConditionMetaCacheKey + lang);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager getObect() error. time:{}", new Date());
 		}
@@ -286,7 +298,7 @@ public class FacetFilterHelperImpl implements FacetFilterHelper{
 
 		// 把值重新设置到缓存当中
 		try{
-			cacheManager.setObject(searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
+			cacheManager.setObject(CacheKeyConstant.searchConditionMetaCacheKey + lang, searchConditionMetaMap, TimeInterval.SECONDS_PER_HOUR/2);
 		}catch (Exception e){
 			LOG.error("[SOLR_LOADFACETFILTERMETADATA] cacheManager setObect() error. time:{}", new Date());
 		}
