@@ -25,6 +25,8 @@ import java.util.Map;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,8 +35,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.baseinfo.NavigationManager;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.IndustryManager;
@@ -61,6 +65,8 @@ import com.baozun.nebula.web.controller.BaseController;
  **/
 @Controller
 public class SearchConditionController extends BaseController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SearchConditionController.class);
 
     @Autowired
     private SdkSearchConditionManager searchConditionManager;
@@ -79,6 +85,9 @@ public class SearchConditionController extends BaseController {
     
 	@Autowired
 	private NavigationManager			navigationManager;
+	
+	@Autowired
+	private CacheManager	cacheManager;
     
     
     @RequestMapping("/item/itemSearchCondition/manager.htm")
@@ -164,6 +173,7 @@ public class SearchConditionController extends BaseController {
     @RequestMapping("/item/itemSearchCondition/endisableSearchCondition.json")
     @ResponseBody
     public void endisableSearchCondition(@RequestParam Long id,@RequestParam Integer activeMark){
+    	cleanCache();
         if(activeMark==0){
             searchConditionManager.disableSearchCondition(id);
         }else if(activeMark==1){
@@ -174,12 +184,14 @@ public class SearchConditionController extends BaseController {
     @RequestMapping("/item/itemSearchCondition/removeSearchCondition.json")
     @ResponseBody
     public void removeSearchCondition(@RequestParam Long id){
+    	cleanCache();
         searchConditionManager.removeSearchCondition(id);
     }
     
     @RequestMapping("/item/itemSearchCondition/removeSearchConditionByIds.json")
     @ResponseBody
     public Map<String,Object> removeSearchConditionByIds(String ids){
+    	cleanCache();
         Map<String,Object> map=new HashMap<String, Object>();
         
         String[] array=ids.split(",");
@@ -233,6 +245,7 @@ public class SearchConditionController extends BaseController {
     @RequestMapping("/item/itemSearchCondition/endisableSearchConditionItem.json")
     @ResponseBody
     public void endisableSearchConditionItem(@RequestParam Long id,@RequestParam Integer activeMark){
+    	cleanCache();
         if(activeMark==0){
             searchConditionItemManager.disableSearchConditionItem(id);
         }else if(activeMark==1){
@@ -243,12 +256,14 @@ public class SearchConditionController extends BaseController {
     @RequestMapping("/item/itemSearchCondition/removeSearchConditionItem.json")
     @ResponseBody
     public void removeSearchConditionItem(@RequestParam Long id){
+    	cleanCache();
         searchConditionItemManager.removeSearchConditionItemById(id);
     }
     
     @RequestMapping("/item/itemSearchCondition/removeSearchConditionItemByIds.json")
     @ResponseBody
     public Map<String,Object> removeSearchConditionItemByIds(String ids){
+    	cleanCache();
         Map<String,Object> map=new HashMap<String, Object>();
         
         String[] array=ids.split(",");
@@ -317,6 +332,7 @@ public class SearchConditionController extends BaseController {
     
     @RequestMapping("/item/itemSearchCondition/managerSaveCondition.htm")
     public String itemSearchConditionManagerSave(Model model,SearchCondition condition) {
+    	cleanCache();
         searchConditionManager.createOrUpdateSearchCondition(condition);
         
         return "redirect:/item/itemSearchCondition/manager.htm?keepfilter=true";
@@ -324,6 +340,7 @@ public class SearchConditionController extends BaseController {
     
     @RequestMapping("/i18n/item/itemSearchCondition/managerSaveCondition.htm")
     public String itemSearchConditionManagerSaveI18n(Model model,@I18nCommand com.baozun.nebula.command.product.SearchConditionCommand condition) {
+    	cleanCache();
         searchConditionManager.createOrUpdateSearchCondition(condition);
         
         return "redirect:/item/itemSearchCondition/manager.htm?keepfilter=true";
@@ -358,7 +375,7 @@ public class SearchConditionController extends BaseController {
     
     @RequestMapping(value="/item/itemSearchCondition/managerSaveConditionItem.htm", method=RequestMethod.POST)
     public String managerSaveConditionItem(Model model,SearchConditionItem searchConditionItem,@RequestParam Long pid) {
-        
+    	cleanCache();
         searchConditionItemManager.createOrUpdateConditionItem(searchConditionItem);
         
         return "redirect:/item/itemSearchCondition/managerSetting.htm?pid="+pid+"&keepfilter=true";
@@ -367,7 +384,7 @@ public class SearchConditionController extends BaseController {
     
     @RequestMapping(value="/i18n/item/itemSearchCondition/managerSaveConditionItem.htm", method=RequestMethod.POST)
     public String managerSaveConditionItemI18n(Model model,@I18nCommand com.baozun.nebula.command.product.SearchConditionItemCommand searchConditionItem,@RequestParam Long pid) {
-        
+    	cleanCache();
         searchConditionItemManager.createOrUpdateConditionItem(searchConditionItem);
         
         return "redirect:/item/itemSearchCondition/managerSetting.htm?pid="+pid+"&keepfilter=true";
@@ -399,5 +416,21 @@ public class SearchConditionController extends BaseController {
         }
         
         return "product/item/addSearchConditionItem";
+    }
+    
+    private void cleanCache(){
+    	try{
+    		//清理筛选条件缓存
+    		int delNum = cacheManager.removeByPrefix(CacheKeyConstant.CONDITION_NAV_CACHEKEY);
+    		LOGGER.info("remove " + CacheKeyConstant.CONDITION_NAV_CACHEKEY + " cache, count : " + delNum);
+    		
+    		//清理导航筛选条件
+    		int earchConditionNum = cacheManager.removeByPrefix(CacheKeyConstant.searchConditionMetaCacheKey);
+    		LOGGER.info("remove " + CacheKeyConstant.searchConditionMetaCacheKey + " cache, count : " + earchConditionNum);
+    		
+    		
+    	}catch(Exception e){
+    		LOGGER.error("clean cache error ",e);
+    	}
     }
 }
