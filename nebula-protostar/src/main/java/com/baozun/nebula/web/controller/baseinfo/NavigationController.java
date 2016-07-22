@@ -106,17 +106,13 @@ public class NavigationController extends BaseController{
 	
 	@Autowired
 	private SearchManager				searchManager;
-	
-	//protostar只提供默认转定，每个商城需要自定义转换类
-	private  SolrQueryConvert		solrQueryConvert =null;
-	
-//	protected  String CONFIG = "config/metainfo.properties";
-//	
-//	protected  String SOL_RQUERY_CONVERT_STRING = ProfileConfigUtil.findPro(CONFIG).getProperty("solrQueryConvert.class");
-	
+
+	// protostar只提供默认转定，每个商城需要自定义转换类
+	private SolrQueryConvert			solrQueryConvert;
+
 	@Value("#{meta['solrQueryConvert.class']}")
-	private String				SOL_RQUERY_CONVERT_STRING	= "";
-	
+	private String						SOL_RQUERY_CONVERT_STRING;
+
 	/**
 	 * 前端菜单导航，分类勾选名称默认值
 	 */
@@ -405,11 +401,11 @@ public class NavigationController extends BaseController{
 			result.setIsSuccess(false);
 			result.setDescription("商品编码不在该导航下");
 		}
-		if(!navigationManager.AddSortedItemCodeById(navigationId,itemCodeArray)){
-			result.setIsSuccess(false);
-			result.setDescription("添加失败");
-		}else{
-			result.setDescription(itemCodeArray);
+		if (result.getIsSuccess()){
+			result = navigationManager.AddSortedItemCodeById(navigationId, itemCodeArray);
+			if (result.getIsSuccess()){
+				result.setDescription(itemCodeArray);
+			}
 		}
 		return result;
 	}
@@ -434,9 +430,8 @@ public class NavigationController extends BaseController{
 			result.setIsSuccess(false);
 			result.setDescription("商品编码不在该导航下");
 		}
-		if(!navigationManager.removeSortedItemCodeById(navigationId, itemCodes.split(","))){
-			result.setIsSuccess(false);
-			result.setDescription("删除失败");
+		if (result.getIsSuccess()){
+			result = navigationManager.removeSortedItemCodeById(navigationId,codes);
 		}
 		return result;
 	}

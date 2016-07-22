@@ -19,10 +19,13 @@ package com.baozun.nebula.manager.baseinfo;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import loxia.dao.Sort;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -50,8 +53,10 @@ import com.baozun.nebula.model.baseinfo.NavigationLang;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
 import com.baozun.nebula.search.FacetParameter;
+import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.utilities.DateUtil;
 import com.feilong.core.Validator;
+import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
  * 菜单导航管理
@@ -77,7 +82,6 @@ public class NavigationManagerImpl implements NavigationManager{
 	@Autowired
 	private ItemDao					itemDao;
 
-	@SuppressWarnings("unused")
 	private static final Logger		logger	= LoggerFactory.getLogger(NavigationManagerImpl.class);
 
 	@Override
@@ -556,116 +560,135 @@ public class NavigationManagerImpl implements NavigationManager{
 		ItemCollection itemCollection = itemCollectionDao.getByPrimaryKey(itemCollectionId);
 
 		String[] CodeArray = sequence.split(",");
-		StringBuffer buffer = new StringBuffer();
+		LinkedHashSet<String> allIdSet = new LinkedHashSet<String>();
 		for (String itemCode : CodeArray){
 			// 检验商品是否存在
 			ItemCommand itemCommand = itemDao.findItemCommandByCode(itemCode);
-			if (itemCommand == null){
+			if (null == itemCommand){
 				return null;
 			}
-			buffer.append(itemCommand.getId() + ",");
+			allIdSet.add(itemCommand.getId().toString());
 		}
 
-		// 删除最后一个逗号
-		buffer.deleteCharAt(buffer.length() - 1);
-		itemCollection.setSequence(buffer.toString());
+		// 重新拼接排序商品
+		itemCollection.setSequence(joinItemCollectionSeqence(allIdSet));
 		return itemCollectionDao.save(itemCollection);
-
 	}
 
 	@Override
-	public Boolean AddSortedItemCodeById(Long navigationId,String[] codes){
+	public BackWarnEntity AddSortedItemCodeById(Long navigationId,String[] codes){
+
+		BackWarnEntity result = new BackWarnEntity();
+		result.setIsSuccess(true);
+
 		ItemCollection itemCollection = itemCollectionDao.findItemCollectionByNavigationId(navigationId);
-		if (itemCollection == null){
-			return false;
+		if (null == itemCollection){
+			result.setIsSuccess(false);
+			result.setDescription("商品排序记录不存在");
+			logger.info("[商品添加排序-商品排序字段为空,navigationId:{},待添加商品编号集合:{}]", navigationId, JsonUtil.format(codes));
+			return result;
 		}
 
-		StringBuffer buffer = new StringBuffer();
+		LinkedHashSet<String> allIdSet = new LinkedHashSet<String>();
 
 		String sequence = itemCollection.getSequence();
 
 		String[] ids = null;
 		if (sequence != null){
 			ids = sequence.split(",");
-
+			// 添加已排序商品
+			CollectionUtils.addAll(allIdSet, ids);
 		}
 
 		for (String code : codes){
 			// 检验商品是否存在
 			ItemCommand itemCommand = itemDao.findItemCommandByCode(code);
-			if (itemCommand == null){
-				return false;
+			if (null == itemCommand){
+				result.setIsSuccess(false);
+				result.setDescription("商品编号" + code + "不存在");
+				logger.info("[商品添加排序-商品编号{}不存在,navigationId:{}]", navigationId, code);
+				return result;
 			}
-			// 存在排序中
-			if (null != ids){
-				if (ArrayUtils.contains(ids, itemCommand.getId())){
-					return false;
+			// 检验是否已存在排序中
+			if (Validator.isNotNullOrEmpty(ids)){
+				if (ArrayUtils.contains(ids, itemCommand.getId().toString())){
+					result.setIsSuccess(false);
+					result.setDescription("商品编号" + code + "已存在排序中");
+					logger.info("[商品添加排序-商品编号{}已存在排序中,navigationId:{}]",code ,navigationId);
+					return result;
 				}
 			}
-
-			buffer.append(itemCommand.getId() + ",");
+			allIdSet.add(itemCommand.getId().toString());
 		}
 
-		// 非空判断
-		if (buffer.length() > 0){
-			// 删除最后一个逗号
-			buffer.deleteCharAt(buffer.length() - 1);
-		}
-		if (itemCollection.getSequence() == null || itemCollection.getSequence().length() == 0){
-			itemCollection.setSequence(buffer.toString());
-		}else{
-			itemCollection.setSequence(itemCollection.getSequence() + "," + buffer.toString());
-		}
+		// 重新拼接排序商品
+		itemCollection.setSequence(joinItemCollectionSeqence(allIdSet));
 
 		itemCollection = itemCollectionDao.save(itemCollection);
-		return itemCollection != null;
+		return result;
 	}
 
 	@Override
-	public Boolean removeSortedItemCodeById(Long navigationId,String[] codes){
+	public BackWarnEntity removeSortedItemCodeById(Long navigationId,String[] codes){
+
+		BackWarnEntity result = new BackWarnEntity(Boolean.TRUE.booleanValue(), "删除成功");
 
 		// 验证导航集合存在
 		ItemCollection itemCollection = itemCollectionDao.findItemCollectionByNavigationId(navigationId);
-		if (itemCollection == null || itemCollection.getSequence() == null || itemCollection.getSequence().length() == 0){
-			return false;
+		if (Validator.isNullOrEmpty(itemCollection) || Validator.isNullOrEmpty(itemCollection.getSequence())){
+			result.setIsSuccess(false);
+			result.setDescription("商品排序为空,删除失败");
+			logger.info("[商品删除排序-商品排序为空,删除失败,navigationId:{},待删除商品编号:{}]", navigationId, JsonUtil.format(codes));
+			return result;
 		}
 
 		// 验证待删除排序的商品存在并存在排序中
-		String sequence = itemCollection.getSequence();
+		String[] existIds = itemCollection.getSequence().split(",");
 
-		String[] ids = null;
-		if (sequence != null){
-			ids = sequence.split(",");
-
-		}
-
-		List<Long> newIdList = new ArrayList<Long>();
+		LinkedHashSet<String> remvoeIdSet = new LinkedHashSet<String>();
 		for (String code : codes){
 			ItemCommand itemCommand = itemDao.findItemCommandByCode(code);
-
 			// 商品不存在|| 不存在排序中
-			if (null == itemCommand || !ArrayUtils.contains(ids, itemCommand.getId())){
-				return false;
+			if (null == itemCommand || !ArrayUtils.contains(existIds, itemCommand.getId().toString())){
+				result.setIsSuccess(false);
+				result.setDescription("商品编号" + code + "不存在已排序中");
+				logger.info("[商品删除排序-商品编号{}不存在已排序中,navigationId:{},待删除商品编号:{}]", code, navigationId, JsonUtil.format(codes));
 			}
-
-			newIdList.add(itemCommand.getId());
+			remvoeIdSet.add(itemCommand.getId().toString());
 		}
 
-		// 重置排序
-		String[] existIds = sequence.split(",");
-		// 拼接
+		LinkedHashSet<String> allIdSet = new LinkedHashSet<String>();
+
+		// 增加原先已排序商品
+		CollectionUtils.addAll(allIdSet, existIds);
+		
+		// 去掉待删除排序商品
+		allIdSet.removeAll(remvoeIdSet);
+
+		// 重新拼接排序商品
+		itemCollection.setSequence(joinItemCollectionSeqence(allIdSet));
+		itemCollection = itemCollectionDao.save(itemCollection);
+
+		return result;
+	}
+
+	@Override
+	public Navigation findByItemCollectionId(Long itemCollectionId){
+		return navigationDao.findByItemCollectionId(itemCollectionId);
+	}
+	
+	
+	/**
+	 * 重新拼接商品排列序列
+	 * @param idSet
+	 * @return
+	 */
+	protected String joinItemCollectionSeqence(LinkedHashSet<String> idSet){
 		StringBuffer buffer = new StringBuffer();
-		for (String existId : existIds){
-			if (existId.length() > 0){
-				// 删除标志
-				boolean deleteFlg = false;
-				for (Long itemId : newIdList){
-					if (itemId.toString().equals(existId)){
-						deleteFlg = true;
-						break;
-					}
-				}
-				if (!deleteFlg){
+
+		if (Validator.isNotNullOrEmpty(idSet)){
+			for (String existId : idSet){
+				if (Validator.isNotNullOrEmpty(existId)){
 					buffer.append(existId + ",");
 				}
 			}
@@ -676,16 +699,8 @@ public class NavigationManagerImpl implements NavigationManager{
 			// 删除最后一个逗号
 			buffer.deleteCharAt(buffer.length() - 1);
 		}
-		itemCollection.setSequence(buffer.toString());
 
-		itemCollection = itemCollectionDao.save(itemCollection);
-
-		return itemCollection != null;
-	}
-
-	@Override
-	public Navigation findByItemCollectionId(Long itemCollectionId){
-		return navigationDao.findByItemCollectionId(itemCollectionId);
+		return buffer.toString();
 	}
 
 }
