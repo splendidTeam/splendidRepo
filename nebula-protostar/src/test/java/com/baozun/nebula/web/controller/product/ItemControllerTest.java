@@ -194,7 +194,7 @@ public class ItemControllerTest {
 		
 		Long shopId=256L;
 		
-		EasyMock.expect(itemManager.findItemListByQueryMap(new Page(), sorts, paraMap, shopId)).andReturn(mockResult);
+		EasyMock.expect(itemManager.findItemListByQueryMap(new Page(), sorts, paraMap, shopId, null)).andReturn(mockResult);
 		
 		// 将mock对象由Recode状态转为Replay状态
 		control.replay();

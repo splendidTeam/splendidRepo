@@ -1629,8 +1629,9 @@ public class ItemController extends BaseController {
 			sorts[0] = sort;
 		}
 
+		// TODO 由于每个店铺的图片定义可能不一致，这里图片类型参数需要自行修改
 		Pagination<ItemCommand> args = itemManager.findItemListByQueryMap(queryBean.getPage(), sorts,
-				queryBean.getParaMap(), shopId);
+				queryBean.getParaMap(), shopId, ItemImage.IMG_TYPE_LIST);
 
 		return args;
 	}

@@ -154,10 +154,11 @@ public interface ItemManager extends BaseManager {
 	 * @param Page
 	 * @param Map
 	 * @param shopId
+	 * @imageType 加载默认的图片类型，如果为空，则不加载图片信息
 	 * @return
 	 */
 	Pagination<ItemCommand> findItemListByQueryMap(Page page, Sort[] sorts,
-			Map<String, Object> paraMap, Long shopId);
+			Map<String, Object> paraMap, Long shopId, String imageType);
 
 	/**
 	 * 分页获取所有有效的商品列表(lifecycle != 2)
