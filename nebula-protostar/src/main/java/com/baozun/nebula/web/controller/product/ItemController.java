@@ -98,6 +98,7 @@ import com.baozun.nebula.manager.product.ItemLangManager;
 import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.ItemPresaleInfoManager;
 import com.baozun.nebula.manager.product.PropertyManager;
+import com.baozun.nebula.manager.system.ChooseOptionManager;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
@@ -109,6 +110,7 @@ import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
@@ -197,6 +199,9 @@ public class ItemController extends BaseController {
 	
 	@Autowired
 	private SdkItemManager sdkItemManager;
+	
+	@Autowired
+	private ChooseOptionManager	chooseOptionManager;
 
 	/**
 	 * 上传图片的域名
@@ -204,6 +209,9 @@ public class ItemController extends BaseController {
 	@Value("#{meta['upload.img.domain.base']}")
 	private String UPLOAD_IMG_DOMAIN = "";
 
+	/** 缩略图规格 */
+	private static final String	THUMBNAIL_CONFIG		= "THUMBNAIL_CONFIG";
+	
 	private static Map<String, HSSFWorkbook> userExcelFile = new ConcurrentHashMap<String, HSSFWorkbook>();
 
 	@Autowired
@@ -2796,10 +2804,11 @@ public class ItemController extends BaseController {
 				bivc.setItemId(itemId);
 				bivc.setItemCode(bic.getItemCode());
 				// 商品的原销售价不会冗余到bundle，需要从商品扩展信息表中获取
+				String config = getItemConfig();
 				ItemInfo itemInfo = itemManager.findItemInfoByItemId(bic.getItemId());
 				bivc.setSalesPrice(itemInfo.getSalePrice());
 				bivc.setTitle(itemInfo.getTitle());
-				bivc.setPicUrl(getItemImageByPLP(itemId));
+				bivc.setPicUrl(getItemImageByPLP(itemId,config));
 				
 				List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
 				List<BundleSkuCommand> bscs = bic.getBundleSkus();
@@ -2886,13 +2895,33 @@ public class ItemController extends BaseController {
 		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
 	}
 	
-	private String getItemImageByPLP(Long itemId){
+	private String getItemImageByPLP(Long itemId,String config){
 		List<ItemImage> itemImages = sdkItemManager.findItemImageByItemIds(Arrays.asList(itemId), ItemImage.IMG_TYPE_LIST);
-		if(itemImages != null && !itemImages.isEmpty()) {
-			return UPLOAD_IMG_DOMAIN + itemImages.get(0).getPicUrl();
+		
+		if(itemImages != null && !itemImages.isEmpty() && config != null && !config.isEmpty()) {
+			return UPLOAD_IMG_DOMAIN + itemImages.get(0).getPicUrl() + "_"+config+".jpg";
 		}
 		
 		return null;
+	}
+	
+	
+	private String getItemConfig(){
+		// 缩略图规格
+		List<ChooseOption> thumbnailConfig = chooseOptionManager.findEffectChooseOptionListByGroupCode(THUMBNAIL_CONFIG);
+		ChooseOption chooseOption = null;
+		for(ChooseOption config : thumbnailConfig){
+			if(config.getOptionLabel().equals(ItemImage.IMG_TYPE_LIST)){
+				chooseOption = config;
+			}
+		}
+		
+		String[] s = null ;
+		if(Validator.isNotNullOrEmpty(chooseOption)){
+			s = chooseOption.getOptionValue().split("\\|");
+		}
+		
+		return s[0];
 	}
 	
 }
