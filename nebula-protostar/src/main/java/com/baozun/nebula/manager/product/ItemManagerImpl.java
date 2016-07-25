@@ -4497,12 +4497,11 @@ public class ItemManagerImpl implements ItemManager{
 			ExcelCell prop = new ExcelCell();
 			// values
 			prop = new ExcelCell();
-			prop.setCol(startCol);
+			prop.setCol(++startCol);
 			prop.setRow(startRow);
 			prop.setDataName("propValues.pv" + pId);
 			prop.setType("string");
 			blockDefinition.addCell(prop);
-			startCol++;
 		}
 
 	}
