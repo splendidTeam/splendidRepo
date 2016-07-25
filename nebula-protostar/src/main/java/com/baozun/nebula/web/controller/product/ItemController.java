@@ -2805,11 +2805,10 @@ public class ItemController extends BaseController {
 				bivc.setItemId(itemId);
 				bivc.setItemCode(bic.getItemCode());
 				// 商品的原销售价不会冗余到bundle，需要从商品扩展信息表中获取
-				String config = getItemConfig();
 				ItemInfo itemInfo = itemManager.findItemInfoByItemId(bic.getItemId());
 				bivc.setSalesPrice(itemInfo.getSalePrice());
 				bivc.setTitle(itemInfo.getTitle());
-				bivc.setPicUrl(getItemImageByPLP(itemId,config));
+				bivc.setPicUrl(getItemImageByPLP(itemId));
 				
 				List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
 				List<BundleSkuCommand> bscs = bic.getBundleSkus();
@@ -2896,38 +2895,13 @@ public class ItemController extends BaseController {
 		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
 	}
 	
-	private String getItemImageByPLP(Long itemId,String config){
+	private String getItemImageByPLP(Long itemId){
 		List<ItemImage> itemImages = sdkItemManager.findItemImageByItemIds(Arrays.asList(itemId), ItemImage.IMG_TYPE_LIST);
 		
-		if(itemImages != null && !itemImages.isEmpty() && config != null && !config.isEmpty()) {
-			return UPLOAD_IMG_DOMAIN + itemImages.get(0).getPicUrl() + "_"+config+".jpg";
+		if(itemImages != null && !itemImages.isEmpty()) {
+			return UPLOAD_IMG_DOMAIN + itemImages.get(0).getPicUrl();
 		}
 		
 		return null;
 	}
-	
-	
-	private String getItemConfig(){
-		// 缩略图规格
-		List<ChooseOption> thumbnailConfig = chooseOptionManager.findEffectChooseOptionListByGroupCode(THUMBNAIL_CONFIG);
-		ChooseOption chooseOption = null;
-		if(Validator.isNotNullOrEmpty(thumbnailConfig)){
-			for(ChooseOption config : thumbnailConfig){
-				if(config.getOptionLabel().equals(ItemImage.IMG_TYPE_LIST)){
-					chooseOption = config;
-				}
-			}
-		}
-		
-		String[] s = null ;
-		if(Validator.isNotNullOrEmpty(chooseOption)){
-			s = chooseOption.getOptionValue().split("\\|");
-		}
-		if(s != null && s.length > 0){
-			return s[0];
-		}else{
-			return null;
-		}
-	}
-	
 }
