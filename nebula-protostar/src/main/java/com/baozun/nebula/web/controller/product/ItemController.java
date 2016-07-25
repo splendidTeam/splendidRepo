@@ -2921,8 +2921,11 @@ public class ItemController extends BaseController {
 		if(Validator.isNotNullOrEmpty(chooseOption)){
 			s = chooseOption.getOptionValue().split("\\|");
 		}
-		
-		return s[0];
+		if(s.length > 0 && !s[0].isEmpty() && s[0] != ""){
+			return s[0];
+		}else{
+			return null;
+		}
 	}
 	
 }
