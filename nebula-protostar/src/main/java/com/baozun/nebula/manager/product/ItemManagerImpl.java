@@ -486,7 +486,7 @@ public class ItemManagerImpl implements ItemManager{
 
 	// 获取店铺所有的商品信息
 	@Transactional(readOnly = true)
-	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId){
+	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId, String imageType){
 
 		Pagination<ItemCommand> ItemList = itemDao.findItemListByQueryMap(page, sorts, paraMap, shopId);
 
@@ -529,14 +529,11 @@ public class ItemManagerImpl implements ItemManager{
 
 			itemIds.add(items.get(i).getId());
 			
-			/*
-			 * 图片类型
-			 * 1为列表页
-			 * 2为内容页
-			 */
-			List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(),"1");
-			if(Validator.isNotNullOrEmpty(imageList)){
-				items.get(i).setItemImageList(imageList);
+			if(StringUtils.isNotBlank(imageType)) {
+				List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(), imageType);
+				if(Validator.isNotNullOrEmpty(imageList)){
+					items.get(i).setItemImageList(imageList);
+				}
 			}
 
 		}

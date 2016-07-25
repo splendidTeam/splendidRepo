@@ -201,7 +201,7 @@ public class ItemImageController extends BaseController {
 			model.addAttribute("propertyValueMapByProperty", propertyValueMapByProperty);
 		}
 		String isImageTypeGroupStr = sdkMataInfoManager.findValue(IS_IMAGE_TYPE_GROUP);
-		model.addAttribute("isImageTypeGroup", isImageTypeGroupStr);
+		model.addAttribute("isImageTypeGroup", Boolean.valueOf(isImageTypeGroupStr));
 		
 		model.addAttribute("imageListByTypeByItemPropertiesId", imageListByTypeByItemPropertiesId);
 		model.addAttribute("thumbnailConfig", thumbnailConfig);
@@ -327,7 +327,7 @@ public class ItemImageController extends BaseController {
 			model.addAttribute("propertyValueMapByProperty", propertyValueMapByProperty);
 		}
 		String isImageTypeGroupStr = sdkMataInfoManager.findValue(IS_IMAGE_TYPE_GROUP);
-		model.addAttribute("isImageTypeGroup", isImageTypeGroupStr);
+		model.addAttribute("isImageTypeGroup", Boolean.valueOf(isImageTypeGroupStr));
 		
 		model.addAttribute("imageListByTypeByItemPropertiesId", imageListByTypeByItemPropertiesId);
 		model.addAttribute("thumbnailConfig", thumbnailConfig);

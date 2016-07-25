@@ -178,7 +178,7 @@ public class ItemManagerTest{
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("code", "%20%");
 			Long shopId =256L;
-			Pagination<ItemCommand> page = itemManager.findItemListByQueryMap(p, sorts, map,shopId);
+			Pagination<ItemCommand> page = itemManager.findItemListByQueryMap(p, sorts, map,shopId, null);
 			log.info("@@@@@@@@@@@@++++++++++++++++:::{},{}", JsonFormatUtil.format(page));
 	  }
 	 
