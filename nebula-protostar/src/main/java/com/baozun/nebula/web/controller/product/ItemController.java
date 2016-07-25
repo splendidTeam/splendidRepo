@@ -2911,9 +2911,11 @@ public class ItemController extends BaseController {
 		// 缩略图规格
 		List<ChooseOption> thumbnailConfig = chooseOptionManager.findEffectChooseOptionListByGroupCode(THUMBNAIL_CONFIG);
 		ChooseOption chooseOption = null;
-		for(ChooseOption config : thumbnailConfig){
-			if(config.getOptionLabel().equals(ItemImage.IMG_TYPE_LIST)){
-				chooseOption = config;
+		if(Validator.isNotNullOrEmpty(thumbnailConfig)){
+			for(ChooseOption config : thumbnailConfig){
+				if(config.getOptionLabel().equals(ItemImage.IMG_TYPE_LIST)){
+					chooseOption = config;
+				}
 			}
 		}
 		
@@ -2921,7 +2923,7 @@ public class ItemController extends BaseController {
 		if(Validator.isNotNullOrEmpty(chooseOption)){
 			s = chooseOption.getOptionValue().split("\\|");
 		}
-		if(s.length > 0){
+		if(s != null && s.length > 0){
 			return s[0];
 		}else{
 			return null;
