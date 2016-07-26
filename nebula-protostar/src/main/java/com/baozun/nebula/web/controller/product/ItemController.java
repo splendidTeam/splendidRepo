@@ -98,6 +98,7 @@ import com.baozun.nebula.manager.product.ItemLangManager;
 import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.ItemPresaleInfoManager;
 import com.baozun.nebula.manager.product.PropertyManager;
+import com.baozun.nebula.manager.system.ChooseOptionManager;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
@@ -109,6 +110,7 @@ import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
+import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
@@ -197,6 +199,9 @@ public class ItemController extends BaseController {
 	
 	@Autowired
 	private SdkItemManager sdkItemManager;
+	
+	@Autowired
+	private ChooseOptionManager	chooseOptionManager;
 
 	/**
 	 * 上传图片的域名
@@ -204,6 +209,9 @@ public class ItemController extends BaseController {
 	@Value("#{meta['upload.img.domain.base']}")
 	private String UPLOAD_IMG_DOMAIN = "";
 
+	/** 缩略图规格 */
+	private static final String	THUMBNAIL_CONFIG		= "THUMBNAIL_CONFIG";
+	
 	private static Map<String, HSSFWorkbook> userExcelFile = new ConcurrentHashMap<String, HSSFWorkbook>();
 
 	@Autowired
@@ -2889,11 +2897,11 @@ public class ItemController extends BaseController {
 	
 	private String getItemImageByPLP(Long itemId){
 		List<ItemImage> itemImages = sdkItemManager.findItemImageByItemIds(Arrays.asList(itemId), ItemImage.IMG_TYPE_LIST);
+		
 		if(itemImages != null && !itemImages.isEmpty()) {
 			return UPLOAD_IMG_DOMAIN + itemImages.get(0).getPicUrl();
 		}
 		
 		return null;
 	}
-	
 }
