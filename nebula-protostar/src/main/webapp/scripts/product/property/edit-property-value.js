@@ -140,8 +140,9 @@ $j(document).ready(function(){
 	$j('.addPropertyValueGroup').click(function(data){
 		var propertyId = $j('#propertyId').val();
 		var selectedGroupId = $j('.selectedGroupId').find("option:selected").val();
+		var propertyName = $j("#propertyName").val();
 		console.log(propertyId, selectedGroupId);
-		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?propertyId="+propertyId +"&groupId="+selectedGroupId +"&type=0";
+		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?propertyId="+propertyId +"&groupId="+selectedGroupId +"&type=0" +"&propertyName="+propertyName;
 	});
 	
 
@@ -150,6 +151,7 @@ $j(document).ready(function(){
 	 */
 	$j('.updatePropertyValueGroup').click(function(data){
 		var propertyId = $j('#propertyId').val();
+		var propertyName = $j("#propertyName").val();
 		var selectedGroupId = $j('.selectedGroupId').find("option:selected").val();
 		
 		if(null == selectedGroupId || "" == selectedGroupId || undefined == selectedGroupId){
@@ -158,7 +160,7 @@ $j(document).ready(function(){
 			return;
 		}
 		
-		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?propertyId="+propertyId +"&groupId="+selectedGroupId +"&type=1";
+		window.location.href = base + "/i18n/property/showAddOrUpdateGroup.htm?propertyId="+propertyId +"&groupId="+selectedGroupId +"&type=1"+"&propertyName="+propertyName;
 	});
 	
 	/**

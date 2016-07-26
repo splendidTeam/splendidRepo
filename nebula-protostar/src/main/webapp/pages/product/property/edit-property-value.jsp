@@ -51,6 +51,7 @@ tbody input[type="text"]{
 		</div>
 		<input type="hidden" id="propertyId" value="${property.id}" />
 		<input type="hidden" value="${pageContext.session.id }" id="session-id">
+		<input type="hidden" id="propertyName" value="${property.name}" />
 		
 		<div class="ui-block ui-block-fleft" style="width: 400px;">
 			<div class="ui-block-content ui-block-content-lb" <c:if test="${property.editingType != 4 }">style="display:none;" </c:if>>

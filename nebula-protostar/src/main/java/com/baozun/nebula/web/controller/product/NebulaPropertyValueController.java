@@ -232,7 +232,8 @@ public class NebulaPropertyValueController extends BaseController{
 			Model model,
 			@RequestParam(value = "type",required = true) int type,
 			@RequestParam(value = "groupId",required = false) Long groupId,
-			@RequestParam(value = "propertyId",required = true) Long propertyId){
+			@RequestParam(value = "propertyId",required = true) Long propertyId,
+			@RequestParam(value = "propertyName",required = true) String propertyName){
 
 		if (type == 0){
 			// 新建
@@ -251,6 +252,7 @@ public class NebulaPropertyValueController extends BaseController{
 			model.addAttribute("proValueGroup", proValueGroup);
 		}
 		model.addAttribute("propertyId", propertyId);
+		model.addAttribute("propertyName", propertyName);
 
 		return "/product/property/property-value-group";
 	}
