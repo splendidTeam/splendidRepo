@@ -6367,8 +6367,19 @@ public class ItemManagerImpl implements ItemManager{
 	private void itemCategoryHandle(ItemCommand itemCommand, Item item, Long[] categoriesIds, Long defaultCategoryId){
 		if (categoriesIds != null && categoriesIds.length > 0) {
 			// 绑定附加分类
-			itemCategoryManager.createOrUpdateItemCategory(itemCommand,
-					item.getId(), categoriesIds);
+			if(categoriesIds.length != 1){
+				Long[] simpleCategoriesIds =new Long[categoriesIds.length - 1];
+				int t =0;
+				for(int i = 0 ; i < categoriesIds.length ; i++){
+					if( !categoriesIds[i].equals(defaultCategoryId)){
+						simpleCategoriesIds[t]=categoriesIds[i];
+						t++;
+					}
+					
+				}
+				itemCategoryManager.createOrUpdateItemCategory(itemCommand,
+						item.getId(), simpleCategoriesIds);
+			}
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,
 					item.getId(), defaultCategoryId);

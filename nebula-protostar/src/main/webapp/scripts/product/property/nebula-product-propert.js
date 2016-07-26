@@ -45,7 +45,8 @@ $j.extend(loxia.regional['zh-CN'],{
     "LABEL_PROPERTY_INDUSTRYNAME":"所属行业",
     "LABEL_PROPERTY_LIFECYCLE":"状态",
     "LABEL_PROPERTY_OPERATE":"操作",
-    "LABEL_PROPERTY_GROUP":"所属分组"
+    "LABEL_PROPERTY_GROUP":"所属分组",
+    "LABEL_PROPERTY_CHECKED" : "请选中要删除的属性"
 });
 //商品属性列表
 var propertyListUrl = base+'/property/nebulaPropertyList.json';
@@ -237,6 +238,8 @@ var setting = {
 			 }); 
 			  if(data!=""){
 				  data=data.substr(0,data.length-1);
+			  }else{
+				  return nps.info(nps.i18n("PROPERT_OPERATOR_TIP"),nps.i18n("LABEL_PROPERTY_CHECKED"));
 			  }  
 				var json={"propertyIds":data}; 
 			  	 nps.asyncXhrPost(removepropertyUrl, json,{successHandler:function(data, textStatus){
