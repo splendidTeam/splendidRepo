@@ -1290,6 +1290,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 				}
 				itemCategoryManager.createOrUpdateItemCategory(itemCommand,
 						item.getId(), simpleCategoriesIds);
+			}else{
+				itemCategoryManager.deleteItemCategoryByItemId(itemCommand.getId());
 			}
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,
