@@ -6379,6 +6379,8 @@ public class ItemManagerImpl implements ItemManager{
 				}
 				itemCategoryManager.createOrUpdateItemCategory(itemCommand,
 						item.getId(), simpleCategoriesIds);
+			}else{
+				itemCategoryManager.deleteItemCategoryByItemId(itemCommand.getId());
 			}
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,

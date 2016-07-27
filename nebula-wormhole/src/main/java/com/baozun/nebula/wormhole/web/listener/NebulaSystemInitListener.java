@@ -25,8 +25,8 @@ public class NebulaSystemInitListener implements ServletContextListener {
 	
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		initZkWatcher(sce);
 		initScheduler(sce);
+		initZkWatcher(sce);
 		extendProcess(sce);
 	}
 	
