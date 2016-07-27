@@ -152,7 +152,7 @@ $j(document).ready(function(){
 		var element = $j(':input[name="bundle_element"]:checked');
 		//校验是否有重复选择商品
 		$j(".validate-code").each(function(){
-			if( element.parent().next().html() == $j(this).html() ){
+			if( element.parent().next().text() == $j(this).text() ){
 				hasRepeat = true;
 			}
 		});
