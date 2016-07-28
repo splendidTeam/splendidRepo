@@ -573,7 +573,24 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		SELECT property.* FROM
+		       		SELECT 
+		       			property.id as id,
+		       			property_lang.name as name,
+		       			property_lang.group_name as groupName,
+		       			property.lifecycle as lifecycle,
+		       			property.editing_type as editingType,
+		       			property.value_type as valueType,
+		       			property.is_salep_rop as isSaleProp,
+		       			property.is_color_prop as isColorProp,
+		       			property.required as required,
+		       			property.searchable as searchable,
+		       			property.hasthumb as hasThumb,
+		       			property.industry_id as industry_id,
+		       			property.is_common_industry as is_common_industry,
+		       			property.sort_no as sort_no,
+		       			property.create_time as create_time,
+		       			property.modify_time as modify_time
+		       		FROM
 						t_pd_property property,
 						t_pd_property_lang property_lang
 					WHERE
