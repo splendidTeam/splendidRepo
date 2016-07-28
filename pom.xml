@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.baozun.nebula</groupId>
 	<artifactId>nebula</artifactId>
-	<version>5.3.1.7</version>
+	<version>5.3.1.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>nebula-repo</module>
@@ -15,7 +15,7 @@
 	</modules>
 
 	<properties>
-		<version.nebula>5.3.1.7</version.nebula>
+		<version.nebula>5.3.1.8-SNAPSHOT</version.nebula>
 		<!-- 让整个项目统一字符集编码 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
