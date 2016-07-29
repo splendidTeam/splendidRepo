@@ -44,6 +44,7 @@ var  industry_ZNodes = [
          <input type="button" value="<spring:message code="btn.all.bottomcarriage"/>" class="button butch disable2"   title="<spring:message code="btn.all.bottomcarriage"/>"/>
          <input type="button" value="<spring:message code="btn.all.topcarriage"/>" class="button butch enable"   title="<spring:message code="btn.all.topcarriage"/>"/>
           
+           <input type="button" value="批量修改价格" class="button orange" onclick="javascript:location.href='/item/toImportUpdatePrice.htm'"  title="批量修改价格"/>
          <input type="button" value="<spring:message code='item.list.create'/>" class="button orange new"   title="<spring:message code='item.list.create'/>"/>
          <input type="button" value="<spring:message code="item.list.importItem"/>" class="button orange" onclick="javascript:location.href='/item/toImportSku.htm'"  title="<spring:message code="item.list.importItem"/>"/>
          <input type="button" value="<spring:message code="item.list.import.export"/>" class="button orange itemExportImport" title="<spring:message code="item.list.import.export"/>"/>

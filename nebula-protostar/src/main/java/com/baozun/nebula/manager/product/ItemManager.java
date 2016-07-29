@@ -26,11 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.command.ItemCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
-import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
@@ -386,5 +386,38 @@ public interface ItemManager extends BaseManager {
 	 * @time 2016年4月7日下午4:07:42
 	 */
 	Integer findItemCountByPropertyId(Long propertyId);
+	
+	
+	/**
+	 * 查询出所有的可用的商品 用于导出修改价格
+	 * 需求字段  商品编号 商品名称 吊牌价 销售价 skuId
+	 * @return
+	 */
+	List<ItemUpdatePriceCommand> findAllItemSkuToExport();
+	
+	
+	/**
+	 * 查询出所有的可用的商品 用于导出修改价格
+	 * 需求字段  商品编号 商品名称 吊牌价 销售价 skuId
+	 * @return
+	 */
+	List<ItemUpdatePriceCommand> findAllItemToExport();
+	
+	
+	public Map<String,List<ItemUpdatePriceCommand>> importItemUpdatePrice(InputStream is) throws BusinessException;
+	
+	/**
+	 * 通过导入修改 iteminfo
+	 * @param itemUpdatePriceCommand
+	 * @return
+	 */
+	Integer updateItemInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand);
+	
+	/**
+	 * 通过导入修改 sku
+	 * @param itemUpdatePriceCommand
+	 * @return
+	 */
+	Integer updateSkuInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand);
 	
 }
