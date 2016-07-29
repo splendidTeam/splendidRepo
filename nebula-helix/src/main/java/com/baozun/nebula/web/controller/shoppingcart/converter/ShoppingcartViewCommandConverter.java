@@ -176,25 +176,26 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
     /**
      * To shopping cart line sub view command.
      *
-     * @param command
+     * @param shoppingCartLineCommand
      *            the command
      * @return the shopping cart line sub view command
      * @since 5.3.1.6
      */
-    private ShoppingCartLineSubViewCommand toShoppingCartLineSubViewCommand(ShoppingCartLineCommand command){
-        ShoppingCartLineSubViewCommand viewCommand = new ShoppingCartLineSubViewCommand();
+    private ShoppingCartLineSubViewCommand toShoppingCartLineSubViewCommand(ShoppingCartLineCommand shoppingCartLineCommand){
+        ShoppingCartLineSubViewCommand shoppingCartLineSubViewCommand = new ShoppingCartLineSubViewCommand();
 
-        Integer settlementState = command.getSettlementState();
+        Integer settlementState = shoppingCartLineCommand.getSettlementState();
         boolean checked = isNotNullOrEmpty(settlementState) ? settlementState != 0 : false;
-        viewCommand.setChecked(checked);
+        shoppingCartLineSubViewCommand.setChecked(checked);
 
-        viewCommand.setIsGift(command.isGift());
-        viewCommand.setItemCode(command.getProductCode());
-        viewCommand.setAddTime(command.getCreateTime());
+        shoppingCartLineSubViewCommand.setIsGift(shoppingCartLineCommand.isGift());
+        shoppingCartLineSubViewCommand.setItemCode(shoppingCartLineCommand.getProductCode());
+        shoppingCartLineSubViewCommand.setAddTime(shoppingCartLineCommand.getCreateTime());
         PropertyUtil.copyProperties(
-                        viewCommand,
-                        command,
+                        shoppingCartLineSubViewCommand,
+                        shoppingCartLineCommand,
                         "extentionCode",
+                        "stock",// since 5.3.1.8
                         "itemId",
                         "itemName",
                         "listPrice",
@@ -205,11 +206,11 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
                         "id",
                         "subTotalAmt");
 
-        Map<String, SkuProperty> map = CollectionsUtil.groupOne(command.getSkuPropertys(), "pName");
-        viewCommand.setPropertiesMap(map);
+        Map<String, SkuProperty> map = CollectionsUtil.groupOne(shoppingCartLineCommand.getSkuPropertys(), "pName");
+        shoppingCartLineSubViewCommand.setPropertiesMap(map);
 
-        viewCommand.setStatus(toStatus(command));
-        return viewCommand;
+        shoppingCartLineSubViewCommand.setStatus(toStatus(shoppingCartLineCommand));
+        return shoppingCartLineSubViewCommand;
     }
 
     private Status toStatus(ShoppingCartLineCommand command){
