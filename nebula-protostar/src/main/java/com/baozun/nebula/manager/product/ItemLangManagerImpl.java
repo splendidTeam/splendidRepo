@@ -115,17 +115,17 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		// 保存Sku
 		createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand,savedItemProperties);
 		
-		// 执行扩展点
-		if(null != itemExtendManager) {
-			itemExtendManager.extendAfterCreateOrUpdateItemI18n(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand, itemI18nCommand);
-		}
-		
 		// 保存商品扩展信息
 		createOrUpdateItemInfo(itemCommand, item.getId());
 
 		// 处理商品分类
 		itemCategoryHandle(itemCommand, item, categoriesIds,defCategroyId);
 		
+		// 执行扩展点
+		if(null != itemExtendManager) {
+			itemExtendManager.extendAfterCreateOrUpdateItemI18n(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand, itemI18nCommand);
+		}
+			
 		return item;
 	}
 	
