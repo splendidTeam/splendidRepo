@@ -46,9 +46,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     private Long                     id;
 
-    /**
-     * 状态
-     */
+    /** 状态. */
     private Status                   status;
 
     /** 添加时间,此处的时间通常用于页面购物车行的排序,仅此而已. */
@@ -59,8 +57,7 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      * <p>
      * 但是我们要实现,两行记录,每行的数量是1, 因为可能其中的一个sku是bundle里面的,另外一个不是
      * </p>
-     * 
-     * 此处主要是为了区分按组显示
+     * 此处主要是为了区分按组显示.
      */
     private Integer                  group;
 
@@ -90,6 +87,14 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
 
     /** 数量几个. */
     private Integer                  quantity;
+    
+    /**
+     * 库存数量.
+     * 
+     * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
+     * @since 5.3.1.8
+     */
+    private Integer                    stock;
 
     //**************************************************************
 
@@ -123,15 +128,26 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     /** 吊牌价(原单价). */
     private BigDecimal               listPrice;
 
-    /** 购物车行 金额小计 **/
+    /** 购物车行 金额小计 *. */
     private BigDecimal               subTotalAmt      = BigDecimal.ZERO;
 
     //***********************************************************************************
 
+    /**
+     * 获得 购物车行 金额小计 *.
+     *
+     * @return the 购物车行 金额小计 *
+     */
     public BigDecimal getSubTotalAmt(){
         return subTotalAmt;
     }
 
+    /**
+     * 设置 购物车行 金额小计 *.
+     *
+     * @param subTotalAmt
+     *            the new 购物车行 金额小计 *
+     */
     public void setSubTotalAmt(BigDecimal subTotalAmt){
         this.subTotalAmt = subTotalAmt;
     }
@@ -384,6 +400,12 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     }
 
     /**
+     * 获得 哪一个组,以往相同sku添加到购物车,那么购物车是一行记录,数量是2;
+     * <p>
+     * 但是我们要实现,两行记录,每行的数量是1, 因为可能其中的一个sku是bundle里面的,另外一个不是
+     * </p>
+     * 此处主要是为了区分按组显示.
+     *
      * @return the group
      */
     public Integer getGroup(){
@@ -391,6 +413,12 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     }
 
     /**
+     * 设置 哪一个组,以往相同sku添加到购物车,那么购物车是一行记录,数量是2;
+     * <p>
+     * 但是我们要实现,两行记录,每行的数量是1, 因为可能其中的一个sku是bundle里面的,另外一个不是
+     * </p>
+     * 此处主要是为了区分按组显示.
+     *
      * @param group
      *            the group to set
      */
@@ -398,15 +426,28 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
         this.group = group;
     }
 
+    /**
+     * 获得 map.
+     *
+     * @return the map
+     */
     public Map<String, SkuProperty> getPropertiesMap(){
         return propertiesMap;
     }
 
+    /**
+     * 设置 map.
+     *
+     * @param propertiesMap
+     *            the new map
+     */
     public void setPropertiesMap(Map<String, SkuProperty> propertiesMap){
         this.propertiesMap = propertiesMap;
     }
 
     /**
+     * 获得 状态.
+     *
      * @return the status
      */
     public Status getStatus(){
@@ -414,10 +455,35 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     }
 
     /**
+     * 设置 状态.
+     *
      * @param status
      *            the status to set
      */
     public void setStatus(Status status){
         this.status = status;
+    }
+
+    
+    /**
+     * 获得 库存数量.
+     *
+     * @return the stock
+     * @since 5.3.1.8
+     */
+    public Integer getStock(){
+        return stock;
+    }
+
+    
+    /**
+     * 设置 库存数量.
+     *
+     * @param stock
+     *            the stock to set
+     * @since 5.3.1.8
+     */
+    public void setStock(Integer stock){
+        this.stock = stock;
     }
 }

@@ -73,6 +73,7 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.ItemPropertyCommand;
 import com.baozun.nebula.command.ItemTagRelationCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
@@ -83,7 +84,6 @@ import com.baozun.nebula.command.product.ImpSkuCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemInfoExcelCommand;
-import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -6425,6 +6425,157 @@ public class ItemManagerImpl implements ItemManager{
 	public Integer findItemCountByPropertyId(Long propertyId){
 		Integer count = itemPropertiesDao.findItemCountByPropertyId(propertyId);
 		return count == null ? 0 : count;
+	}
+	
+	
+
+	@Override
+	public List<ItemUpdatePriceCommand> findAllItemSkuToExport() {
+		return itemDao.findAllItemSkuToExport();
+	}
+	
+	@Override
+	public List<ItemUpdatePriceCommand> findAllItemToExport() {
+		return itemDao.findAllItemToExport();
+	}
+
+	@Override
+	public Map<String,List<ItemUpdatePriceCommand>> importItemUpdatePrice(InputStream is) throws BusinessException {
+		BusinessException topE = null, currE = null;
+
+		Map<String,List<ItemUpdatePriceCommand>> result=new HashMap<String,List<ItemUpdatePriceCommand>>();
+		
+		
+		/** 字节流存到内存方便多次读取 **/
+		InputStreamCacher cacher = null;
+		try{
+			cacher = new InputStreamCacher(is);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				is.close();
+			}catch (IOException e){
+				e.printStackTrace();
+			}
+		}
+		
+		
+		Map<String, Object> itemMap = new HashMap<String, Object>();
+		List<ItemUpdatePriceCommand> itemList = new ArrayList<ItemUpdatePriceCommand>();
+		itemMap.put("importItemList", itemList);
+		List<String> errorList = new ArrayList<String>();
+		
+		Map<String, Object> skuMap = new HashMap<String, Object>();
+		List<ItemUpdatePriceCommand> skuList = new ArrayList<ItemUpdatePriceCommand>();
+		skuMap.put("importSkuList", skuList);
+		
+		ExcelReader itemInfoReader = excelFactory.createExcelReader("importItemInfo");
+		ExcelReader itemSkuReader = excelFactory.createExcelReader("importItemSku");
+		ReadStatus status = itemInfoReader.readSheet(cacher.getInputStream(), 0, itemMap);
+		ReadStatus skuStatus = itemSkuReader.readSheet(cacher.getInputStream(), 1, skuMap);
+		
+		
+		if (status.getStatus() != ReadStatus.STATUS_SUCCESS ) {
+			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(status, Locale.SIMPLIFIED_CHINESE);
+			for (String message : messageList) {
+				BusinessException e = new BusinessException(message);
+				if (topE == null) {
+					topE = e; // b-101 : Cell{}错误, new Object[]{ExcelUtil.getCell(1,2)}
+					currE = e;
+				} else {
+					currE.setLinkedException(e);
+					currE = e;
+				}
+
+			}
+		}
+		
+		if (skuStatus.getStatus() != ReadStatus.STATUS_SUCCESS ) {
+			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(skuStatus, Locale.SIMPLIFIED_CHINESE);
+			for (String message : messageList) {
+				BusinessException e = new BusinessException(message);
+				if (topE == null) {
+					topE = e; // b-101 : Cell{}错误, new Object[]{ExcelUtil.getCell(1,2)}
+					currE = e;
+				} else {
+					currE.setLinkedException(e);
+					currE = e;
+				}
+
+			}
+		}
+		
+		if (topE != null)
+			throw topE;
+
+		result=importDataValidateAndSave(itemList, skuList);
+
+		return result;
+	}
+
+	
+	/**
+	 * 校验数据正确性
+	 * @param itemList
+	 * @param skuList
+	 * @return
+	 */
+	public Map<String,List<ItemUpdatePriceCommand>> importDataValidateAndSave(List<ItemUpdatePriceCommand> itemList,List<ItemUpdatePriceCommand> skuList){
+		Map<String,List<ItemUpdatePriceCommand>> result=new HashMap<String,List<ItemUpdatePriceCommand>>();
+		
+		List<ItemUpdatePriceCommand> resultList=new ArrayList<ItemUpdatePriceCommand>();
+		List<ItemUpdatePriceCommand> errorList=new ArrayList<ItemUpdatePriceCommand>();
+		
+		for (ItemUpdatePriceCommand item:itemList) {
+			if (com.feilong.core.Validator.isNullOrEmpty(item.getItemListPrice())||item.getItemListPrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if (com.feilong.core.Validator.isNullOrEmpty(item.getItemSalePrice())||item.getItemSalePrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if(item.getItemSalePrice().compareTo(item.getItemListPrice())==1){
+				errorList.add(item);
+				continue;
+			}else{
+				resultList.add(item);
+			}
+		}
+		result.put("itemResultList", resultList);
+		result.put("itemErrorList", errorList);
+		
+		resultList=new ArrayList<ItemUpdatePriceCommand>();
+		errorList=new ArrayList<ItemUpdatePriceCommand>();
+		
+		for (ItemUpdatePriceCommand item:skuList) {
+			if (com.feilong.core.Validator.isNullOrEmpty(item.getListPrice())||item.getListPrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if (com.feilong.core.Validator.isNullOrEmpty(item.getSalePrice())||item.getSalePrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if(item.getSalePrice().compareTo(item.getListPrice())==1){
+				errorList.add(item);
+				continue;
+			}else{
+				resultList.add(item);
+			}
+		}
+		
+		result.put("skuResultList", resultList);
+		result.put("skuErrorList", errorList);
+		
+		return result;
+	}
+
+	@Override
+	public Integer updateItemInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand) {
+		return itemDao.updateItemItemInfo(itemUpdatePriceCommand);
+	}
+
+	@Override
+	public Integer updateSkuInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand) {
+		return itemDao.updateItemSkuInfo(itemUpdatePriceCommand);
 	}
 	
 }

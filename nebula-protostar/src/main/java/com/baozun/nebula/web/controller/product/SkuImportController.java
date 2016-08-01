@@ -28,20 +28,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import loxia.dao.Sort;
+import loxia.support.excel.ExcelManipulatorFactory;
+import loxia.support.excel.ExcelWriter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMapping;  
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.ShopCommand;
+import com.baozun.nebula.command.product.ConsultantCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.product.IndustryManager;
@@ -79,6 +84,14 @@ public class SkuImportController extends BaseController{
 	
 	@Autowired
 	private IndustryManager		industryManager;
+	
+	@Autowired
+	@Qualifier("allSkuItemWriter")
+	private ExcelWriter allSkuItemWriter;
+	
+	
+	@Autowired
+	private ExcelManipulatorFactory excelFactory;
 
 	
 
@@ -131,6 +144,52 @@ public class SkuImportController extends BaseController{
 		model.addAttribute("industryList", industryList);
 		return "/product/item/import-sku";
 	}
+	
+	/**
+	 * 批量修改价格跳转页面
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/item/toImportUpdatePrice.htm")
+	public String toUpdatePrice(Model model){
+		return "/product/item/import-update-price";
+	}
+	
+	
+	/**
+	 * 导出所有的商品列表 
+	 * <ol>
+	 * <li>所有的未删除商品 lifeclye!=2</li>
+	 * <li>在excel文件夹中添加skuItem-list-export.xlsx 模板</li>
+	 * <li>在excelconfig文件夹中的excel-template.xml配置模板的 对应字段</li>
+	 * <li>在spring-excel中配置writer 注意 @Autowired 的时候使用@Qualifier</li>
+	 * </ol>
+	 * 
+	 * @param response
+	 * @param model
+	 */
+	@RequestMapping(value = "/item/skuItem-list.xlsx", method = RequestMethod.GET)
+	public void downloadAllItemToExport(Model model,HttpServletResponse response){
+		List<ItemUpdatePriceCommand> skulist=itemManager.findAllItemSkuToExport();
+		List<ItemUpdatePriceCommand> itemlist=itemManager.findAllItemToExport();
+		
+		String path = "excel/skuItem-list-export.xls";
+		Map<String, Object> beans = new HashMap<String, Object>();
+		beans.put("exportItemList", itemlist);
+		beans.put("exportSkuList", skulist);
+		try {
+			response.setHeader("Content-type", "application/force-download");
+			response.setHeader("Content-Transfer-Encoding", "Binary");
+			response.setHeader("Content-Type", "application/octet-stream");
+			response.setHeader("Content-Disposition", "attachment; filename=\""+ "product-list.xls\"");
+			allSkuItemWriter.write(path, response.getOutputStream(), beans);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	private List<DynamicPropertyCommand> getSalesProp(Long industryId){
 		List<DynamicPropertyCommand> dynamicPropertyCommandList = this.findDynamicPropertisByShopIdAndIndustryId(industryId);
 		//销售属性
