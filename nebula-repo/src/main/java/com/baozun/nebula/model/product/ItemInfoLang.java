@@ -137,7 +137,7 @@ public class ItemInfoLang extends BaseModel {
 		this.subTitle = subTitle;
 	}
 
-	@Column(name = "SKETCH")
+	@Column(name = "SKETCH", length=2000)
 	public String getSketch() {
 		return sketch;
 	}
@@ -156,7 +156,7 @@ public class ItemInfoLang extends BaseModel {
 		this.description = description;
 	}
 
-	@Column(name = "SEODESCRIPTION")
+	@Column(name = "SEODESCRIPTION", length=2000)
 	public String getSeoDescription() {
 		return seoDescription;
 	}

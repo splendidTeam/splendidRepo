@@ -37,36 +37,38 @@ import com.feilong.core.bean.BeanUtil;
  */
 @Transactional
 @Service("OrderLineManager")
-public class OrderLineManagerImpl implements OrderLineManager {
-	
-	@Autowired
-	private SdkOrderLineManager lineManager;
-	
-	@Autowired
-        private SdkSkuManager sdkSkuManager;
+public class OrderLineManagerImpl implements OrderLineManager{
 
-	@Override
-	public OrderLine findByPk(Long id) {
-		return lineManager.findByPk(id);
-	}
+    @Autowired
+    private SdkOrderLineManager lineManager;
+
+    @Autowired
+    private SdkSkuManager sdkSkuManager;
 
     @Override
-    public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId) {
-        List<OrderLineCommand> findOrderLinesByOrderId = lineManager.findOrderLinesByOrderId(orderId);
-        List<SimpleOrderLineSubViewCommand> list=new ArrayList<SimpleOrderLineSubViewCommand>();
-        for (OrderLineCommand orderLineCommand : findOrderLinesByOrderId) {
+    public OrderLine findByPk(Long id){
+        return lineManager.findByPk(id);
+    }
+
+    @Override
+    public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId){
+        List<OrderLineCommand> orderLineCommandList = lineManager.findOrderLinesByOrderId(orderId);
+        List<SimpleOrderLineSubViewCommand> returnList = new ArrayList<SimpleOrderLineSubViewCommand>();
+
+        for (OrderLineCommand orderLineCommand : orderLineCommandList){
             String properties = orderLineCommand.getSaleProperty();
             List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
             orderLineCommand.setSkuPropertys(propList);
-             SimpleOrderLineSubViewCommand slsv=new SimpleOrderLineSubViewCommand();
-             BeanUtil.copyProperties(slsv, orderLineCommand);
-             slsv.setListPrice(orderLineCommand.getMSRP());
-             slsv.setQuantity(orderLineCommand.getCount());
-             slsv.setSubTotalAmt(orderLineCommand.getSubtotal());
-             slsv.setItemCode(orderLineCommand.getProductCode());
-             list.add(slsv);
+
+            SimpleOrderLineSubViewCommand simpleOrderLineSubViewCommand = new SimpleOrderLineSubViewCommand();
+            BeanUtil.copyProperties(simpleOrderLineSubViewCommand, orderLineCommand);
+            simpleOrderLineSubViewCommand.setListPrice(orderLineCommand.getMSRP());
+            simpleOrderLineSubViewCommand.setQuantity(orderLineCommand.getCount());
+            simpleOrderLineSubViewCommand.setSubTotalAmt(orderLineCommand.getSubtotal());
+            simpleOrderLineSubViewCommand.setItemCode(orderLineCommand.getProductCode());
+            returnList.add(simpleOrderLineSubViewCommand);
         }
-        return list;
+        return returnList;
     }
 
 }

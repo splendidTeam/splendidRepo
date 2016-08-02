@@ -67,9 +67,7 @@ public class OrderLineSubViewCommand extends BaseViewCommand{
     /** The map. */
     private Map<String, SkuProperty> propertiesMap;
 
-   /**
-    * 销售属性 
-    */
+   /** 销售属性. */
     private List<SkuProperty>                   skuPropertys;
     /** 数量几个. */
     private Integer                  quantity;
@@ -78,6 +76,11 @@ public class OrderLineSubViewCommand extends BaseViewCommand{
 
     /** 商品图片. */
     private String                   itemPic;
+    
+    /** 行类型. 
+     * @since 5.3.1.8
+     * */
+    private Integer                     type;
 
     //***********************价格信息*****************************************************
 
@@ -337,12 +340,46 @@ public class OrderLineSubViewCommand extends BaseViewCommand{
         this.subTotalAmt = subTotalAmt;
     }
 
+    /**
+     * 获得 销售属性.
+     *
+     * @return the 销售属性
+     */
     public List<SkuProperty> getSkuPropertys() {
         return skuPropertys;
     }
 
+    /**
+     * 设置 销售属性.
+     *
+     * @param skuPropertys
+     *            the new 销售属性
+     */
     public void setSkuPropertys(List<SkuProperty> skuPropertys) {
         this.skuPropertys = skuPropertys;
+    }
+
+    
+    /**
+     * 获得 行类型.
+     *
+     * @return the type
+     * @since 5.3.1.8
+     */
+    public Integer getType(){
+        return type;
+    }
+
+    
+    /**
+     * 设置 行类型.
+     *
+     * @param type
+     *            the type to set
+     *@since 5.3.1.8            
+     */
+    public void setType(Integer type){
+        this.type = type;
     }
 
 }

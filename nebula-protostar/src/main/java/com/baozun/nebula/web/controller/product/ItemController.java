@@ -2904,4 +2904,98 @@ public class ItemController extends BaseController {
 		
 		return null;
 	}
+
+
+	/**
+	 * 导入商品
+	 * 
+	 * @param request
+	 * @param model
+	 * @param response
+	 */
+	@RequestMapping(value = "/sku/skuUploadUpdatePrice.json",method = RequestMethod.POST)
+	public void skuUploadUpdatePrice(HttpServletRequest request,Model model,HttpServletResponse response){
+		// 清除用户错误信息文件
+		claerUserFile();
+		response.setContentType("text/html;charset=UTF-8");
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		MultipartFile file = multipartRequest.getFile("Filedata");
+		String name = file.getOriginalFilename();
+		InputStreamCacher cacher = null;
+		try{
+			cacher = new InputStreamCacher(file.getInputStream());
+		}catch (IOException e1){
+			e1.printStackTrace();
+		}
+		Map<String, Object> rs = new HashMap<String, Object>();
+
+		try{
+			Map<String,List<ItemUpdatePriceCommand>> result= itemManager.importItemUpdatePrice(file.getInputStream());
+			List<ItemUpdatePriceCommand> errorItemList=result.get("itemErrorList");
+			List<ItemUpdatePriceCommand> errorSkuList=result.get("skuErrorList");
+			if(errorItemList.size()>0||errorSkuList.size()>0){
+				List<String> itemStr=CollectionsUtil.getPropertyValueList(errorItemList, "code");
+				List<String> skuStr=CollectionsUtil.getPropertyValueList(errorSkuList, "extentionCode");
+				
+				rs.put("isSuccess", false);
+				rs.put("description", "数据错误");
+				rs.put("itemErrorIds", itemStr);
+				rs.put("skuErrorIds", skuStr);
+				
+				returnRes(response, rs);
+			}else{
+				List<ItemUpdatePriceCommand> itemList=result.get("itemResultList");
+				List<ItemUpdatePriceCommand> skuList=result.get("skuResultList");
+				
+				for (ItemUpdatePriceCommand ipc : itemList) {
+					itemManager.updateItemInfoByImport(ipc);
+				}
+				
+				List<Long> strList=CollectionsUtil.getPropertyValueList(itemList, "itemId");
+				
+				itemSolrManager.saveOrUpdateItem(strList);
+				itemSolrManager.saveOrUpdateItemI18n(strList);
+				
+				for (ItemUpdatePriceCommand ipc : skuList) {
+					itemManager.updateSkuInfoByImport(ipc);
+				}
+			}
+			
+		}catch (BusinessException e){
+			e.printStackTrace();
+			Boolean flag = true;
+			List<String> errorMessages = new ArrayList<String>();
+			BusinessException linkedException = e;
+			while (flag){
+				String message = "";
+				if (linkedException.getErrorCode() == 0){
+					message = linkedException.getMessage();
+				}else{
+					if (null == linkedException.getArgs()){
+						message = getMessage(linkedException.getErrorCode());
+					}else{
+						message = getMessage(linkedException.getErrorCode(), linkedException.getArgs());
+					}
+
+				}
+				errorMessages.add(message);
+
+				if (null == linkedException.getLinkedException()){
+					flag = false;
+				}else{
+					linkedException = linkedException.getLinkedException();
+				}
+			}
+			String userFilekey = addErrorInfo(errorMessages, cacher, response, name);
+			// 返回值
+			rs.put("isSuccess", false);
+			rs.put("description", errorMessages);
+			rs.put("userFilekey", userFilekey);
+			returnRes(response, rs);
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		rs.put("isSuccess", true);
+		returnRes(response, rs);
+	}
 }

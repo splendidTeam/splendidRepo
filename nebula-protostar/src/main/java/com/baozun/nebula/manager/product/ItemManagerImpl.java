@@ -73,20 +73,17 @@ import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPropertiesCommand;
 import com.baozun.nebula.command.ItemPropertyCommand;
 import com.baozun.nebula.command.ItemTagRelationCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
-import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ImpItemCommand;
 import com.baozun.nebula.command.product.ImpSkuCommand;
-import com.baozun.nebula.command.product.ItemI18nCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemInfoExcelCommand;
-import com.baozun.nebula.command.product.ItemStyleCommand;
-import com.baozun.nebula.command.promotion.SkuPropertyMUtlLangCommand;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -245,9 +242,6 @@ public class ItemManagerImpl implements ItemManager{
 	
 	@Autowired
 	private ItemOperateLogDao itemOperateLogDao;
-	
-	@Autowired
-	private BundleManager bundleManager;
 
 	private ByteArrayOutputStream		byteArrayOutputStream						= null;
 
@@ -389,62 +383,128 @@ public class ItemManagerImpl implements ItemManager{
 	}
 
 	@Override
-	public Item createOrUpdateSimpleItem(ItemCommand itemCommand, Long[] propertyValueIds, // 动态属性
-			Long[] categoriesIds, // 商品分类Id
-			Long defaultCategoryId, // 默认分类ID
-			ItemProperties[] iProperties, // 普通商品属性
+	public Item createOrUpdateItem(ItemCommand itemCommand,Long[] propertyValueIds, // 动态属性
+			Long[] categoriesIds,// 商品分类Id
+			ItemProperties[] iProperties,// 普通商品属性
 			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
-	) throws Exception {
+	) throws Exception{
 
-		// 保存商品
-		itemCommand.setItemType(Item.ITEM_TYPE_SIMPLE);
-		Item item = createOrUpdateItem(itemCommand, categoriesIds);
+		// 分类校验
+		// categoriesIds not empty
+		// 1. categoriesIds包含defaultCategoryId
+		// 2.defaultCategoryId不为空
+		// 3.defaultCategoryId对应分类存在
+		if (Validator.isNotNullOrEmpty(categoriesIds)){
 
-		ItemI18nCommand itemI18nCommand = new ItemI18nCommand();
-		itemI18nCommand.setItem(item);
-
-		// 商品所有的属性值集合
-		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds,
-				iProperties, item.getId(), skuPropertyCommand);
-
-		// 保存Sku
-		createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand, savedItemProperties);
-
-		// 执行扩展点
-		if (null != itemExtendManager) {
-			itemExtendManager.extendAfterCreateOrUpdateItem(item, itemCommand, categoriesIds, savedItemProperties,
-					skuPropertyCommand);
+			if (Validator.isNotNullOrEmpty(itemCommand.getDefCategroyId())){
+				List<Long> tempCateList = Arrays.asList(categoriesIds);
+				if (tempCateList.contains(itemCommand.getDefCategroyId())){
+					Category tempCategory = categoryDao.findEnableCategoryById(itemCommand.getDefCategroyId());
+					if (tempCategory == null){
+						throw new BusinessException(ErrorCodes.ITEM_UPDATE_DEFCATE_NOT_EXISTS);
+					}
+				}else{
+					throw new BusinessException(ErrorCodes.ITEM_UPDATE_CATE_NOT_CONTAIN_DEF);
+				}
+			}else{
+				throw new BusinessException(ErrorCodes.ITEM_UPDATE_DEFCATE_NOT_EXISTS);
+			}
 		}
 
-		// 保存商品扩展信息
-		createOrUpdateItemInfo(itemCommand, item.getId());
+		// boolean isUpdateSolr =false;
 
-		// 处理商品分类
-		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+		Item item = null;
+		if (itemCommand.getId() != null){// 更新
+			item = itemDao.getByPrimaryKey(itemCommand.getId());
+			item.setModifyTime(new Date());
+			item.setCode(itemCommand.getCode());
+			if (categoriesIds != null && categoriesIds.length > 0){
+				item.setIsaddcategory(1);
+			}else{
+				item.setIsaddcategory(0);
+			}
+			item = itemDao.save(item);
+			/*
+			 * if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){ isUpdateSolr =true; }
+			 */
+		}else{// 新增
 
-		return item;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.manager.product.ItemManager#createOrUpdateBundleItem(com.baozun.nebula.command.product.ItemInfoCommand, com.baozun.nebula.command.product.BundleCommand, java.lang.Long[], java.lang.Long)
-	 */
-	@Override
-	public Item createOrUpdateBundleItem(ItemCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds,
-			Long defaultCategoryId) throws Exception {
-		// 保存商品
-		itemCommand.setItemType(Item.ITEM_TYPE_BUNDLE);
-		Item item = createOrUpdateItem(itemCommand, categoriesIds);
+			if (itemCommand.getId() == null){
+				Integer count = validateItemCode(itemCommand.getCode(), itemCommand.getShopId());
 
-		// 保存bundle扩展信息
-		bundleCommand.setItemId(item.getId());
-		bundleManager.createOrUpdate(bundleCommand);
+				if (count > 0){
+					throw new BusinessException(ErrorCodes.PRODUCT_CODE_REPEAT);
+				}
+			}
+			item = new Item();
+			item.setCode(itemCommand.getCode());
+			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
+			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
+			item.setCreateTime(new Date());
+			item.setShopId(itemCommand.getShopId());
+			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
 
-		// 保存商品扩展信息
-		createOrUpdateItemInfo(itemCommand, item.getId());
+			if (categoriesIds != null && categoriesIds.length > 0){
+				item.setIsaddcategory(1);
+			}else{
+				item.setIsaddcategory(0);
+			}
+			item.setIsAddTag(0);
+			item = itemDao.save(item);
+		}
 
-		// 处理商品分类
-		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+		// 商品所有的属性值集合
+		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(
+				itemCommand,
+				propertyValueIds,
+				iProperties,
+				item.getId(),
+				skuPropertyCommand);
 
+		// 保存Sku
+		this.createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand, savedItemProperties);
+
+		// 保存商品信息
+		this.createOrUpdateItemInfo(itemCommand, item.getId());
+
+		if (categoriesIds != null && categoriesIds.length > 0){
+			// Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
+			Long defaultId = itemCommand.getDefCategroyId();
+
+			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
+			int index = 0;
+			for (Long id : categoriesIds){
+				if (!defaultId.equals(id)){
+					categoryIdArray[index] = id;
+					index++;
+				}
+			}
+
+			// 绑定附加分类
+			itemCategoryManager.createOrUpdateItemCategory(itemCommand, item.getId(), categoryIdArray);
+
+			// 绑定默认分类
+			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand, item.getId(), defaultId);
+
+		}else{
+			List<ItemCategory> ctgList = itemCategoryManager.findItemCategoryListByItemId(item.getId());
+			Long[] itemIds = new Long[1];
+			itemIds[0] = item.getId();
+			for (ItemCategory ic : ctgList){
+				List<Long> itemIdList = new ArrayList<Long>();
+				itemIdList.add(item.getId());
+				itemCategoryManager.unBindItemCategory(itemIds, ic.getCategoryId());
+
+			}
+		}
+		// 执行扩展点
+		if (null != itemExtendManager){
+			itemExtendManager.extendAfterCreateOrUpdateItem(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand);
+		}
+		/*
+		 * //刷新索引 if(isUpdateSolr){ List<Long> itemIdsForSolr =new ArrayList<Long>(); itemIdsForSolr.add(item.getId());
+		 * itemSolrManager.saveOrUpdateItem(itemIdsForSolr); }
+		 */
 		return item;
 	}
 
@@ -453,6 +513,78 @@ public class ItemManagerImpl implements ItemManager{
 		Arrays.sort(categoriesIds);
 
 		return categoriesIds[0];
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.ItemManager#createOrUpdateItem(ItemCommand itemCommand,Long shopId,Long[] categoriesIds,Long[]
+	 * propertyValueIds,String[] codes,ItemProperties[] iProperties)
+	 */
+	@Override
+	public Item createOrUpdateItem(
+			ItemCommand itemCommand,
+			Long shopId,
+			Long[] categoriesIds,
+			Long[] propertyValueIds,
+			String[] codes,
+			BigDecimal[] salePrices,
+			BigDecimal[] listPrices,
+			ItemProperties[] iProperties,
+			String changePropertyJson,
+			Long defaultCategoryId) throws Exception{
+		Item item = null;
+		if (itemCommand.getId() != null){
+			item = itemDao.getByPrimaryKey(itemCommand.getId());
+			item.setModifyTime(new Date());
+			item.setCode(itemCommand.getCode());
+			if (categoriesIds != null && categoriesIds.length > 0){
+				item.setIsaddcategory(1);
+			}else{
+				item.setIsaddcategory(0);
+			}
+			item = itemDao.save(item);
+		}else{
+			item = new Item();
+			item.setCode(itemCommand.getCode());
+			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
+			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
+			item.setCreateTime(new Date());
+			item.setShopId(shopId);
+			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
+			if (categoriesIds != null && categoriesIds.length > 0){
+				item.setIsaddcategory(1);
+			}else{
+				item.setIsaddcategory(0);
+			}
+			item.setIsAddTag(0);
+			item = itemDao.save(item);
+		}
+
+		// 保存商品属性值
+		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(
+				itemCommand,
+				propertyValueIds,
+				item.getId(),
+				iProperties);
+
+		// 保存Sku
+		this.createOrUpdateSku(itemCommand, item.getId(), codes, salePrices, listPrices, savedItemProperties);
+
+		// 保存商品信息
+		this.createOrUpdateItemInfo(itemCommand, item.getId());
+
+		// 绑定附加分类
+		int result = itemCategoryManager.createOrUpdateItemCategory(itemCommand, item.getId(), categoriesIds);
+		// 绑定默认分类
+		int data = itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand, item.getId(), defaultCategoryId);
+
+		// 保存商品图片
+		// if(Validator.isNotNullOrEmpty(changePropertyJson)){
+		// this.createOrUpdateItemImage(changePropertyJson, item.getId(),
+		// savedItemProperties );
+		// }
+
+		return item;
 	}
 
 	/*
@@ -486,7 +618,7 @@ public class ItemManagerImpl implements ItemManager{
 
 	// 获取店铺所有的商品信息
 	@Transactional(readOnly = true)
-	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId, String imageType){
+	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId){
 
 		Pagination<ItemCommand> ItemList = itemDao.findItemListByQueryMap(page, sorts, paraMap, shopId);
 
@@ -529,11 +661,14 @@ public class ItemManagerImpl implements ItemManager{
 
 			itemIds.add(items.get(i).getId());
 			
-			if(StringUtils.isNotBlank(imageType)) {
-				List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(), imageType);
-				if(Validator.isNotNullOrEmpty(imageList)){
-					items.get(i).setItemImageList(imageList);
-				}
+			/*
+			 * 图片类型
+			 * 1为列表页
+			 * 2为内容页
+			 */
+			List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(),"1");
+			if(Validator.isNotNullOrEmpty(imageList)){
+				items.get(i).setItemImageList(imageList);
 			}
 
 		}
@@ -4362,12 +4497,11 @@ public class ItemManagerImpl implements ItemManager{
 			ExcelCell prop = new ExcelCell();
 			// values
 			prop = new ExcelCell();
-			prop.setCol(startCol);
+			prop.setCol(++startCol);
 			prop.setRow(startRow);
 			prop.setDataName("propValues.pv" + pId);
 			prop.setType("string");
 			blockDefinition.addCell(prop);
-			startCol++;
 		}
 
 	}
@@ -6293,7 +6427,158 @@ public class ItemManagerImpl implements ItemManager{
 		return count == null ? 0 : count;
 	}
 	
-	/* (non-Javadoc)
+	
+
+	@Override
+	public List<ItemUpdatePriceCommand> findAllItemSkuToExport() {
+		return itemDao.findAllItemSkuToExport();
+	}
+	
+	@Override
+	public List<ItemUpdatePriceCommand> findAllItemToExport() {
+		return itemDao.findAllItemToExport();
+	}
+
+	@Override
+	public Map<String,List<ItemUpdatePriceCommand>> importItemUpdatePrice(InputStream is) throws BusinessException {
+		BusinessException topE = null, currE = null;
+
+		Map<String,List<ItemUpdatePriceCommand>> result=new HashMap<String,List<ItemUpdatePriceCommand>>();
+		
+		
+		/** 字节流存到内存方便多次读取 **/
+		InputStreamCacher cacher = null;
+		try{
+			cacher = new InputStreamCacher(is);
+		}catch (Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				is.close();
+			}catch (IOException e){
+				e.printStackTrace();
+			}
+		}
+		
+		
+		Map<String, Object> itemMap = new HashMap<String, Object>();
+		List<ItemUpdatePriceCommand> itemList = new ArrayList<ItemUpdatePriceCommand>();
+		itemMap.put("importItemList", itemList);
+		List<String> errorList = new ArrayList<String>();
+		
+		Map<String, Object> skuMap = new HashMap<String, Object>();
+		List<ItemUpdatePriceCommand> skuList = new ArrayList<ItemUpdatePriceCommand>();
+		skuMap.put("importSkuList", skuList);
+		
+		ExcelReader itemInfoReader = excelFactory.createExcelReader("importItemInfo");
+		ExcelReader itemSkuReader = excelFactory.createExcelReader("importItemSku");
+		ReadStatus status = itemInfoReader.readSheet(cacher.getInputStream(), 0, itemMap);
+		ReadStatus skuStatus = itemSkuReader.readSheet(cacher.getInputStream(), 1, skuMap);
+		
+		
+		if (status.getStatus() != ReadStatus.STATUS_SUCCESS ) {
+			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(status, Locale.SIMPLIFIED_CHINESE);
+			for (String message : messageList) {
+				BusinessException e = new BusinessException(message);
+				if (topE == null) {
+					topE = e; // b-101 : Cell{}错误, new Object[]{ExcelUtil.getCell(1,2)}
+					currE = e;
+				} else {
+					currE.setLinkedException(e);
+					currE = e;
+				}
+
+			}
+		}
+		
+		if (skuStatus.getStatus() != ReadStatus.STATUS_SUCCESS ) {
+			List<String> messageList = ExcelKit.getInstance().getReadStatusMessages(skuStatus, Locale.SIMPLIFIED_CHINESE);
+			for (String message : messageList) {
+				BusinessException e = new BusinessException(message);
+				if (topE == null) {
+					topE = e; // b-101 : Cell{}错误, new Object[]{ExcelUtil.getCell(1,2)}
+					currE = e;
+				} else {
+					currE.setLinkedException(e);
+					currE = e;
+				}
+
+			}
+		}
+		
+		if (topE != null)
+			throw topE;
+
+		result=importDataValidateAndSave(itemList, skuList);
+
+		return result;
+	}
+
+	
+	/**
+	 * 校验数据正确性
+	 * @param itemList
+	 * @param skuList
+	 * @return
+	 */
+	public Map<String,List<ItemUpdatePriceCommand>> importDataValidateAndSave(List<ItemUpdatePriceCommand> itemList,List<ItemUpdatePriceCommand> skuList){
+		Map<String,List<ItemUpdatePriceCommand>> result=new HashMap<String,List<ItemUpdatePriceCommand>>();
+		
+		List<ItemUpdatePriceCommand> resultList=new ArrayList<ItemUpdatePriceCommand>();
+		List<ItemUpdatePriceCommand> errorList=new ArrayList<ItemUpdatePriceCommand>();
+		
+		for (ItemUpdatePriceCommand item:itemList) {
+			if (com.feilong.core.Validator.isNullOrEmpty(item.getItemListPrice())||item.getItemListPrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if (com.feilong.core.Validator.isNullOrEmpty(item.getItemSalePrice())||item.getItemSalePrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if(item.getItemSalePrice().compareTo(item.getItemListPrice())==1){
+				errorList.add(item);
+				continue;
+			}else{
+				resultList.add(item);
+			}
+		}
+		result.put("itemResultList", resultList);
+		result.put("itemErrorList", errorList);
+		
+		resultList=new ArrayList<ItemUpdatePriceCommand>();
+		errorList=new ArrayList<ItemUpdatePriceCommand>();
+		
+		for (ItemUpdatePriceCommand item:skuList) {
+			if (com.feilong.core.Validator.isNullOrEmpty(item.getListPrice())||item.getListPrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if (com.feilong.core.Validator.isNullOrEmpty(item.getSalePrice())||item.getSalePrice().equals(BigDecimal.ZERO)) {
+				errorList.add(item);
+				continue;
+			}else if(item.getSalePrice().compareTo(item.getListPrice())==1){
+				errorList.add(item);
+				continue;
+			}else{
+				resultList.add(item);
+			}
+		}
+		
+		result.put("skuResultList", resultList);
+		result.put("skuErrorList", errorList);
+		
+		return result;
+	}
+
+	@Override
+	public Integer updateItemInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand) {
+		return itemDao.updateItemItemInfo(itemUpdatePriceCommand);
+	}
+
+	@Override
+	public Integer updateSkuInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand) {
+		return itemDao.updateItemSkuInfo(itemUpdatePriceCommand);
+	}
+	
+/* (non-Javadoc)
 	 * @see com.baozun.nebula.manager.product.ItemManager#findStyleListByCode(loxia.dao.Page, loxia.dao.Sort[], java.lang.String, java.lang.Long)
 	 */
 	@Override

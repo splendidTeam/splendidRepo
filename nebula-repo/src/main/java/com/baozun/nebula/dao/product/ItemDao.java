@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.command.ItemCommand;
-import com.baozun.nebula.command.product.ItemStyleCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.product.ProductInventoryCommand;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
@@ -299,7 +299,28 @@ public interface ItemDao extends GenericEntityDao<Item, Long> {
 	
 	@NativeQuery(model = Item.class)
 	Item findItemByExtentionCode(@QueryParam("extentionCode") String extentionCode);
-	
+
 	@NativeQuery(model = ItemStyleCommand.class)
 	Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap, @QueryParam("shopId") Long shopId);
+
+	
+	/**
+	 * 查询出所有的可用的商品Sku信息 用于导出修改价格
+	 * @return
+	 */
+	@NativeQuery(model = ItemUpdatePriceCommand.class)
+	List<ItemUpdatePriceCommand> findAllItemSkuToExport();
+	
+	/**
+	 * 查询出所有的商品Item信息用于导出修改价格
+	 */
+	@NativeQuery(model = ItemUpdatePriceCommand.class)
+	List<ItemUpdatePriceCommand> findAllItemToExport();
+	
+	
+	@NativeUpdate
+	Integer updateItemSkuInfo(@QueryParam("obj") ItemUpdatePriceCommand obj);
+	
+	@NativeUpdate
+	Integer updateItemItemInfo(@QueryParam("obj") ItemUpdatePriceCommand obj);
 }

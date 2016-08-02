@@ -1,6 +1,7 @@
 package com.baozun.nebula.curator.invoke;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,11 @@ public class EngineWatchInvoke implements IWatcherInvoke {
 	@Override
 	public void invoke(String path, byte[] data) {
 		LOG.info(path+":invoke");
+		try {
+			TimeUnit.SECONDS.sleep(3);
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+		}
 		//促销规则
 		sdkPromotionManager.publishPromotion(new Date());
 		//限购规则

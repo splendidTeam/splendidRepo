@@ -37,6 +37,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
+import com.feilong.core.lang.ObjectUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
 
@@ -82,8 +83,7 @@ public final class ShoppingCartUtil{
                 continue;
             }
             //getSubTotalAmt(shoppingCartLineCommand)
-            originPayAmount = originPayAmount.add(
-                            NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice(), 2));
+            originPayAmount = originPayAmount.add(NumberUtil.getMultiplyValue(shoppingCartLineCommand.getQuantity(), shoppingCartLineCommand.getSalePrice(), 2));
         }
         return originPayAmount = originPayAmount.setScale(2, ROUND_HALF_UP);
     }
@@ -122,12 +122,9 @@ public final class ShoppingCartUtil{
      *            the shopping cart line command list
      * @return the main shopping cart line command list
      */
-    public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+    public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 主賣品(剔除 促銷行 贈品)
-        Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(
-                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false),
-                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("gift", false));
+        Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false), new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("gift", false));
         return CollectionsUtil.select(shoppingCartLineCommandList, andPredicate);
     }
 
@@ -140,9 +137,7 @@ public final class ShoppingCartUtil{
      *            true表示 从中获取选中的, false 表示不选中
      * @return the main shopping cart line command list with check status
      */
-    public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandListWithCheckStatus(
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    boolean checkStatus){
+    public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandListWithCheckStatus(List<ShoppingCartLineCommand> shoppingCartLineCommandList,boolean checkStatus){
         // 主賣品(剔除 促銷行 贈品)
         Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils.<ShoppingCartLineCommand> allPredicate(
                         new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false),
@@ -185,6 +180,31 @@ public final class ShoppingCartUtil{
      */
     public static boolean isNoNeedChoiceGift(ShoppingCartLineCommand shoppingCartLineCommand){
         return shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
+    }
+
+    /**
+     * 累加 行内 discount小计(仅限 bundle商品).
+     *
+     * @param shoppingCartLineCommands
+     *            the shopping cart line commands
+     * @return 如果没有bundle商品, 那么返回 0
+     * @since 5.3.1.8
+     */
+    public static BigDecimal getBundleDiscount(List<ShoppingCartLineCommand> shoppingCartLineCommands){
+        BigDecimal sumBundleDiscount = CollectionsUtil.sum(shoppingCartLineCommands, "discount", new Predicate<ShoppingCartLineCommand>(){
+
+            @Override
+            public boolean evaluate(ShoppingCartLineCommand shoppingCartLineCommand){
+
+                //TODO feilong 这里使用简单粗暴的手段,对bundle强行处理,需要提炼
+                Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
+                return null != relatedItemId;
+            }
+        });
+
+        sumBundleDiscount = ObjectUtil.defaultIfNullOrEmpty(sumBundleDiscount, ZERO);
+        LOGGER.debug("sumBundleDiscount:[{}]", sumBundleDiscount);
+        return sumBundleDiscount;
     }
 
     /**

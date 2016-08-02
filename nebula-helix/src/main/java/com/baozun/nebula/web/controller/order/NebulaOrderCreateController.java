@@ -301,7 +301,7 @@ public class NebulaOrderCreateController extends BaseController{
         return DefaultReturnResult.SUCCESS;
     }
 
-    private SalesOrderReturnObject createReturnObject(String subOrdinate){
+    protected SalesOrderReturnObject createReturnObject(String subOrdinate){
         // 通過支付流水號查詢訂單
         SalesOrderCommand salesOrderCommand = salesOrderResolver.getSalesOrderCommand(subOrdinate);
         SalesOrderReturnObject salesOrderReturnObject = new SalesOrderReturnObject();

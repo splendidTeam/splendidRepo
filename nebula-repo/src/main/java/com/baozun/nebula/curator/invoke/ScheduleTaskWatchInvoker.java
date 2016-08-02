@@ -17,6 +17,7 @@
 package com.baozun.nebula.curator.invoke;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,11 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 
 	@Override
 	public void invoke(String path, byte[] data) {
+		try {
+			TimeUnit.SECONDS.sleep(3);
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+		}
 		try {
 			byte[] datas = zkOperator.getData(path);
 			Long id = Long.parseLong(new String(datas));

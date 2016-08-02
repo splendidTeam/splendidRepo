@@ -44,11 +44,11 @@ import com.feilong.core.Validator;
 public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour implements ShoppingCartLineCommandCreateLineBehaviour{
 
     /** The Constant log. */
-    private static final Logger      LOGGER = LoggerFactory.getLogger(AbstractShoppingCartLineCommandCreateLineBehaviour.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractShoppingCartLineCommandCreateLineBehaviour.class);
 
     /** The sdk order line dao. */
     @Autowired
-    private SdkOrderLineDao          sdkOrderLineDao;
+    private SdkOrderLineDao sdkOrderLineDao;
 
     /** The sdk order promotion manager. */
     @Autowired
@@ -61,11 +61,7 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
      * com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand)
      */
     @Override
-    public void saveOrderLine(
-                    Long orderId,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    ShoppingCartLineCommand shoppingCartLineCommand){
+    public void saveOrderLine(Long orderId,List<CouponCodeCommand> couponCodes,List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,ShoppingCartLineCommand shoppingCartLineCommand){
         saveCommonLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
     }
 
@@ -82,15 +78,10 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
      *            the shopping cart line command
      */
     //XXX feilong  这里的参数 shoppingCartLineCommand 最好是单独定制 一个额外的类 这样不会影响原来的对象
-    protected void saveCommonLine(
-                    Long orderId,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    ShoppingCartLineCommand shoppingCartLineCommand){
+    protected void saveCommonLine(Long orderId,List<CouponCodeCommand> couponCodes,List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,ShoppingCartLineCommand shoppingCartLineCommand){
         //直推赠品(送完即止) 1：如果数量为零 该行不存入数据库 :2：如果库存量小于购买量时 存入库存量
         //是否是不需要用户选择的礼品
-        boolean noNeedChoiceGift = shoppingCartLineCommand.isGift()
-                        && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
+        boolean noNeedChoiceGift = shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
         if (noNeedChoiceGift){
             // 下架
             boolean isOffsale = !shoppingCartLineCommand.isValid() && shoppingCartLineCommand.getValidType() == 1;
@@ -140,11 +131,7 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
      * @param orderLine
      *            the order line
      */
-    protected void savaOrderLinePromotions(
-                    Long orderId,
-                    List<CouponCodeCommand> couponCodes,
-                    List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,
-                    OrderLine orderLine){
+    protected void savaOrderLinePromotions(Long orderId,List<CouponCodeCommand> couponCodes,List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,OrderLine orderLine){
 
         // 非免运费
         Long orderLineSkuId = orderLine.getSkuId();
@@ -200,12 +187,13 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
 
         //设置价格信息
         setPrice(orderLine, shoppingCartLineCommand, isGift);
-        orderLine.setType(isGift ? ItemInfo.TYPE_GIFT : ItemInfo.TYPE_MAIN);
 
         // 销售属性信息
         orderLine.setSaleProperty(shoppingCartLineCommand.getSaleProperty());
+
         // 行类型
-        orderLine.setType(shoppingCartLineCommand.getType());
+        orderLine.setType(isGift ? ItemInfo.TYPE_GIFT : ItemInfo.TYPE_MAIN);
+        //orderLine.setType(shoppingCartLineCommand.getType());
         // 分组号
         Long lineGroup = shoppingCartLineCommand.getLineGroup();
         if (Validator.isNotNullOrEmpty(lineGroup)){

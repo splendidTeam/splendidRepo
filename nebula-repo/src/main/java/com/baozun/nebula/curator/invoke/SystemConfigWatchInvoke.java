@@ -1,5 +1,7 @@
 package com.baozun.nebula.curator.invoke;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,9 @@ public class SystemConfigWatchInvoke implements IWatcherInvoke {
 	public void invoke(String path, byte[] data) {
 		LOG.info(path+":invoke");
 		//获取metainfo数据载入到内存中
-		//有时候pts修改的事务还未提交，这里就接到通知了，所以取urlmap时，这里先暂停两秒
+		//有时候pts修改的事务还未提交，这里就接到通知了，所以取urlmap时，这里先暂停3秒
 		try {
-			Thread.sleep(2000);
+			TimeUnit.SECONDS.sleep(3);
 		} catch (InterruptedException e) {
 			LOG.error(e.getMessage());
 		}

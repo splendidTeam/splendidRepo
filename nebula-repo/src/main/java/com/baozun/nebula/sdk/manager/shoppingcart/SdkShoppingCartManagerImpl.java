@@ -209,7 +209,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#findShoppingCartLinesByMemberId(java.lang.Long, java.lang.Integer)
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ShoppingCartLineCommand> findShoppingCartLinesByMemberId(Long memberId,Integer callType){
         List<ShoppingCartLineCommand> shoppingCartLines = null;
         if (callType == Constants.CHECKED_CHOOSE_STATE){// 查询选中状态的购物车数据

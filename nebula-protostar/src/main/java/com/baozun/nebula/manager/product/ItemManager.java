@@ -26,12 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.command.ItemCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
-import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
-import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
@@ -81,6 +80,25 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	List<DynamicPropertyCommand> findDynamicPropertisByIndustryId(Long industryId);
+	/**
+	 * 保存商品
+	 * 
+	 * @param itemCommand
+	 * @param shopId
+	 * @param categoriesIds
+	 * @param propertyValueIds
+	 * @param codes
+	 * @param iProperties
+	 * @param changePropertyJson
+	 * @param defaultCategoryId
+	 * @return
+	 */
+
+	Item createOrUpdateItem(ItemCommand itemCommand, Long shopId,
+			Long[] categoriesIds, Long[] propertyValueIds, String[] codes,
+			BigDecimal[] salePrices, BigDecimal[] listPrices,
+			ItemProperties[] iProperties, String changePropertyJson,
+			Long defaultCategoryId) throws Exception;
 
 	/**
 	 * 根据商品id查询商品
@@ -154,11 +172,10 @@ public interface ItemManager extends BaseManager {
 	 * @param Page
 	 * @param Map
 	 * @param shopId
-	 * @imageType 加载默认的图片类型，如果为空，则不加载图片信息
 	 * @return
 	 */
 	Pagination<ItemCommand> findItemListByQueryMap(Page page, Sort[] sorts,
-			Map<String, Object> paraMap, Long shopId, String imageType);
+			Map<String, Object> paraMap, Long shopId);
 
 	/**
 	 * 分页获取所有有效的商品列表(lifecycle != 2)
@@ -232,16 +249,12 @@ public interface ItemManager extends BaseManager {
 	public Integer updateItemInfoLSPVIdByItemId(Long lastSelectPropertyValueId,
 			Long itemId);
 
-	public Item createOrUpdateSimpleItem(ItemCommand itemCommand,
+	public Item createOrUpdateItem(ItemCommand itemCommand,
 			Long[] propertyValueIds, // 动态
 			Long[] categoriesIds,// 商品分类Id
-			Long defaultCategoryId, // 默认分类ID
 			ItemProperties[] iProperties,// 普通商品属性
 			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
 	) throws Exception;
-	
-	public Item createOrUpdateBundleItem(ItemCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
-			throws Exception;
 
 	/**
 	 * 保存商品图片
@@ -289,13 +302,6 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	public ItemCommand findItemCommandByCode(String code, String customBaseUrl);
-	
-	/**
-	 * 根据款号查找同款商品
-	 * @param styleCode
-	 * @return
-	 */
-	public List<ItemCommand> findItemCommandsByStyle(String styleCode);
 
 	/**
 	 * 
@@ -386,4 +392,37 @@ public interface ItemManager extends BaseManager {
 	 */
 	Pagination<ItemStyleCommand> findStyleListByQueryMap(Page page, Sort[] sorts,
 			Map<String, Object> paraMap, Long shopId);
+	
+	/**
+	 * 查询出所有的可用的商品 用于导出修改价格
+	 * 需求字段  商品编号 商品名称 吊牌价 销售价 skuId
+	 * @return
+	 */
+	List<ItemUpdatePriceCommand> findAllItemSkuToExport();
+	
+	
+	/**
+	 * 查询出所有的可用的商品 用于导出修改价格
+	 * 需求字段  商品编号 商品名称 吊牌价 销售价 skuId
+	 * @return
+	 */
+	List<ItemUpdatePriceCommand> findAllItemToExport();
+	
+	
+	public Map<String,List<ItemUpdatePriceCommand>> importItemUpdatePrice(InputStream is) throws BusinessException;
+	
+	/**
+	 * 通过导入修改 iteminfo
+	 * @param itemUpdatePriceCommand
+	 * @return
+	 */
+	Integer updateItemInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand);
+	
+	/**
+	 * 通过导入修改 sku
+	 * @param itemUpdatePriceCommand
+	 * @return
+	 */
+	Integer updateSkuInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand);
+	
 }

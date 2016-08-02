@@ -679,7 +679,7 @@ public class OrderManagerImpl implements OrderManager{
      * @see com.baozun.nebula.sdk.manager.OrderManager#findOrderById(java.lang.Long, java.lang.Integer)
      */
     @Override
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     public SalesOrderCommand findOrderById(Long id,Integer type){
         // 包含订单基本信息和收货信息
         SalesOrderCommand salesOrderCommand = sdkOrderDao.findOrderById(id, type);
