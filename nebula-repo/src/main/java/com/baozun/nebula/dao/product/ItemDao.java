@@ -23,6 +23,7 @@ import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.product.ProductInventoryCommand;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
