@@ -79,11 +79,14 @@ import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
 import com.baozun.nebula.command.i18n.SingleLang;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ImpItemCommand;
 import com.baozun.nebula.command.product.ImpSkuCommand;
+import com.baozun.nebula.command.product.ItemI18nCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemInfoExcelCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.dao.product.ItemCategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
@@ -241,6 +244,9 @@ public class ItemManagerImpl implements ItemManager{
 	private ItemExtendManager			itemExtendManager;
 	
 	@Autowired
+	private BundleManager bundleManager;
+	
+	@Autowired
 	private ItemOperateLogDao itemOperateLogDao;
 
 	private ByteArrayOutputStream		byteArrayOutputStream						= null;
@@ -382,132 +388,70 @@ public class ItemManagerImpl implements ItemManager{
 
 	}
 
+
 	@Override
-	public Item createOrUpdateItem(ItemCommand itemCommand,Long[] propertyValueIds, // 动态属性
-			Long[] categoriesIds,// 商品分类Id
-			ItemProperties[] iProperties,// 普通商品属性
+	public Item createOrUpdateSimpleItem(ItemCommand itemCommand, Long[] propertyValueIds, // 动态属性
+			Long[] categoriesIds, // 商品分类Id
+			Long defaultCategoryId, // 默认分类ID
+			ItemProperties[] iProperties, // 普通商品属性
 			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
-	) throws Exception{
+	) throws Exception {
 
-		// 分类校验
-		// categoriesIds not empty
-		// 1. categoriesIds包含defaultCategoryId
-		// 2.defaultCategoryId不为空
-		// 3.defaultCategoryId对应分类存在
-		if (Validator.isNotNullOrEmpty(categoriesIds)){
+		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_SIMPLE);
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
 
-			if (Validator.isNotNullOrEmpty(itemCommand.getDefCategroyId())){
-				List<Long> tempCateList = Arrays.asList(categoriesIds);
-				if (tempCateList.contains(itemCommand.getDefCategroyId())){
-					Category tempCategory = categoryDao.findEnableCategoryById(itemCommand.getDefCategroyId());
-					if (tempCategory == null){
-						throw new BusinessException(ErrorCodes.ITEM_UPDATE_DEFCATE_NOT_EXISTS);
-					}
-				}else{
-					throw new BusinessException(ErrorCodes.ITEM_UPDATE_CATE_NOT_CONTAIN_DEF);
-				}
-			}else{
-				throw new BusinessException(ErrorCodes.ITEM_UPDATE_DEFCATE_NOT_EXISTS);
-			}
-		}
-
-		// boolean isUpdateSolr =false;
-
-		Item item = null;
-		if (itemCommand.getId() != null){// 更新
-			item = itemDao.getByPrimaryKey(itemCommand.getId());
-			item.setModifyTime(new Date());
-			item.setCode(itemCommand.getCode());
-			if (categoriesIds != null && categoriesIds.length > 0){
-				item.setIsaddcategory(1);
-			}else{
-				item.setIsaddcategory(0);
-			}
-			item = itemDao.save(item);
-			/*
-			 * if(item.getLifecycle().equals(Item.LIFECYCLE_ENABLE)){ isUpdateSolr =true; }
-			 */
-		}else{// 新增
-
-			if (itemCommand.getId() == null){
-				Integer count = validateItemCode(itemCommand.getCode(), itemCommand.getShopId());
-
-				if (count > 0){
-					throw new BusinessException(ErrorCodes.PRODUCT_CODE_REPEAT);
-				}
-			}
-			item = new Item();
-			item.setCode(itemCommand.getCode());
-			// Lifecycle状态： 0：无效 1：有效 2：删除 3：未激活
-			item.setLifecycle(Item.LIFECYCLE_UNACTIVE);
-			item.setCreateTime(new Date());
-			item.setShopId(itemCommand.getShopId());
-			item.setIndustryId(Long.valueOf(itemCommand.getIndustryId()));
-
-			if (categoriesIds != null && categoriesIds.length > 0){
-				item.setIsaddcategory(1);
-			}else{
-				item.setIsaddcategory(0);
-			}
-			item.setIsAddTag(0);
-			item = itemDao.save(item);
-		}
+		ItemI18nCommand itemI18nCommand = new ItemI18nCommand();
+		itemI18nCommand.setItem(item);
 
 		// 商品所有的属性值集合
-		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(
-				itemCommand,
-				propertyValueIds,
-				iProperties,
-				item.getId(),
-				skuPropertyCommand);
+		List<ItemProperties> savedItemProperties = this.createOrUpdateItemProperties(itemCommand, propertyValueIds,
+				iProperties, item.getId(), skuPropertyCommand);
 
 		// 保存Sku
-		this.createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand, savedItemProperties);
+		createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand, savedItemProperties);
 
-		// 保存商品信息
-		this.createOrUpdateItemInfo(itemCommand, item.getId());
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
 
-		if (categoriesIds != null && categoriesIds.length > 0){
-			// Long defaultId = itemCategoryManager.getDefaultItemCategoryId(categoriesIds);
-			Long defaultId = itemCommand.getDefCategroyId();
-
-			Long[] categoryIdArray = new Long[categoriesIds.length - 1];
-			int index = 0;
-			for (Long id : categoriesIds){
-				if (!defaultId.equals(id)){
-					categoryIdArray[index] = id;
-					index++;
-				}
-			}
-
-			// 绑定附加分类
-			itemCategoryManager.createOrUpdateItemCategory(itemCommand, item.getId(), categoryIdArray);
-
-			// 绑定默认分类
-			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand, item.getId(), defaultId);
-
-		}else{
-			List<ItemCategory> ctgList = itemCategoryManager.findItemCategoryListByItemId(item.getId());
-			Long[] itemIds = new Long[1];
-			itemIds[0] = item.getId();
-			for (ItemCategory ic : ctgList){
-				List<Long> itemIdList = new ArrayList<Long>();
-				itemIdList.add(item.getId());
-				itemCategoryManager.unBindItemCategory(itemIds, ic.getCategoryId());
-
-			}
-		}
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+				
 		// 执行扩展点
-		if (null != itemExtendManager){
-			itemExtendManager.extendAfterCreateOrUpdateItem(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand);
+		if (null != itemExtendManager) {
+			itemExtendManager.extendAfterCreateOrUpdateItem(item, itemCommand, categoriesIds, savedItemProperties,
+					skuPropertyCommand);
 		}
-		/*
-		 * //刷新索引 if(isUpdateSolr){ List<Long> itemIdsForSolr =new ArrayList<Long>(); itemIdsForSolr.add(item.getId());
-		 * itemSolrManager.saveOrUpdateItem(itemIdsForSolr); }
-		 */
+
+		
+
 		return item;
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.manager.product.ItemManager#createOrUpdateBundleItem(com.baozun.nebula.command.product.ItemInfoCommand, com.baozun.nebula.command.product.BundleCommand, java.lang.Long[], java.lang.Long)
+	 */
+	@Override
+	public Item createOrUpdateBundleItem(ItemCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds,
+			Long defaultCategoryId) throws Exception {
+		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_BUNDLE);
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
 
+		// 保存bundle扩展信息
+		bundleCommand.setItemId(item.getId());
+		bundleManager.createOrUpdate(bundleCommand);
+
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
+
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+
+		return item;
+	}
+	
+	
 	// 得到默认分类，目前是最小的
 	private Long getDefaultCategoryId(Long[] categoriesIds){
 		Arrays.sort(categoriesIds);
@@ -618,7 +562,7 @@ public class ItemManagerImpl implements ItemManager{
 
 	// 获取店铺所有的商品信息
 	@Transactional(readOnly = true)
-	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId){
+	public Pagination<ItemCommand> findItemListByQueryMap(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId, String imageType){
 
 		Pagination<ItemCommand> ItemList = itemDao.findItemListByQueryMap(page, sorts, paraMap, shopId);
 
@@ -666,9 +610,11 @@ public class ItemManagerImpl implements ItemManager{
 			 * 1为列表页
 			 * 2为内容页
 			 */
-			List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(),"1");
-			if(Validator.isNotNullOrEmpty(imageList)){
-				items.get(i).setItemImageList(imageList);
+			if(StringUtils.isNotBlank(imageType)) {
+				List<ItemImage> imageList = itemImageDao.findItemImageByItemId(items.get(i).getId(), imageType);
+				if(Validator.isNotNullOrEmpty(imageList)){
+					items.get(i).setItemImageList(imageList);
+				}
 			}
 
 		}

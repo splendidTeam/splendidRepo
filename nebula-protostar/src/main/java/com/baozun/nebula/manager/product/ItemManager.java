@@ -28,9 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
+import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
 import com.baozun.nebula.command.product.ItemInfoCommand;
 import com.baozun.nebula.command.product.ItemPropertiesCommand;
+import com.baozun.nebula.command.product.ItemStyleCommand;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.product.Item;
@@ -172,10 +174,11 @@ public interface ItemManager extends BaseManager {
 	 * @param Page
 	 * @param Map
 	 * @param shopId
+	 * @imageType 加载默认的图片类型，如果为空，则不加载图片信息
 	 * @return
 	 */
 	Pagination<ItemCommand> findItemListByQueryMap(Page page, Sort[] sorts,
-			Map<String, Object> paraMap, Long shopId);
+			Map<String, Object> paraMap, Long shopId, String imageType);
 
 	/**
 	 * 分页获取所有有效的商品列表(lifecycle != 2)
@@ -249,9 +252,10 @@ public interface ItemManager extends BaseManager {
 	public Integer updateItemInfoLSPVIdByItemId(Long lastSelectPropertyValueId,
 			Long itemId);
 
-	public Item createOrUpdateItem(ItemCommand itemCommand,
+	public Item createOrUpdateSimpleItem(ItemCommand itemCommand,
 			Long[] propertyValueIds, // 动态
 			Long[] categoriesIds,// 商品分类Id
+			Long defaultCategoryId, // 默认分类ID
 			ItemProperties[] iProperties,// 普通商品属性
 			SkuPropertyCommand[] skuPropertyCommand// sku 的信息，包含每个sku对应的价格
 	) throws Exception;
@@ -424,5 +428,15 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	Integer updateSkuInfoByImport(ItemUpdatePriceCommand itemUpdatePriceCommand);
+	
+	/**
+	 * 根据款号查找同款商品
+	 * @param styleCode
+	 * @return
+	 */
+	public List<ItemCommand> findItemCommandsByStyle(String styleCode);
+	
+	public Item createOrUpdateBundleItem(ItemCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
+			throws Exception;
 	
 }

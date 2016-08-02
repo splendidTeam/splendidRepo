@@ -72,6 +72,7 @@ import com.baozun.nebula.command.ItemCategoryCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPresalseInfoCommand;
 import com.baozun.nebula.command.ItemPropertyCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
@@ -134,6 +135,7 @@ import com.baozun.nebula.web.command.BundleViewCommand;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
+import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.gson.Gson;
 
