@@ -208,7 +208,7 @@ public class NebulaOrderDetailsController extends BaseController{
                         "receiptConsignee",
                         "receiptTelphone",
                         "receiptAddress");
-        // ordline信息
+        // orderline信息
         List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager.findByOrderID(salesOrderCommand.getId());
         List<OrderLineSubViewCommand> orderLineSubViewCommandlist = new ArrayList<OrderLineSubViewCommand>();
         for (SimpleOrderLineSubViewCommand simpleOrderLine : simpleOrderLineSubViewCommand){
@@ -229,6 +229,7 @@ public class NebulaOrderDetailsController extends BaseController{
                             "itemPic",
                             "salePrice",
                             "listPrice",
+                            "type",
                             "subTotalAmt");
             orderLineSubViewCommandlist.add(orderLineSubViewCommand);
         }
