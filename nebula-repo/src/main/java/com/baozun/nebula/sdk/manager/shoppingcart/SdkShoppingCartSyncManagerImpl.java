@@ -42,6 +42,9 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
     @Autowired
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
 
+    @Autowired
+    private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
+
     /*
      * (non-Javadoc)
      * 
@@ -66,27 +69,10 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
             ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
 
             if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
+                sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
             }else{
                 saveCartLine(memberId, shoppingCartLineCommand);
             }
-        }
-    }
-
-    /**
-     * Update cart line quantity by line id.
-     *
-     * @param memberId
-     *            the member id
-     * @param quantity
-     *            the quantity
-     * @param cartLineInDb
-     *            the cart line in db
-     */
-    private void updateCartLineQuantityByLineId(Long memberId,Long lineId,Integer quantity){
-        int result = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(memberId, lineId, quantity);
-        if (1 != result){
-            throw new NativeUpdateRowCountNotEqualException(1, result);
         }
     }
 
