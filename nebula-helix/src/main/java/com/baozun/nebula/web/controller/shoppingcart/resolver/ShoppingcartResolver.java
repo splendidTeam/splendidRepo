@@ -187,7 +187,17 @@ public interface ShoppingcartResolver{
      * <li>方便客户端直接调用,不需要些for 循环,额外的代码</li>
      * <li>关键的是,对于有些实现,比如 {@link GuestShoppingcartResolver},你如果用for 循环来操作,第二条获得的并不是第一条循环变更之后的数据,<br>
      * 原因在于,cookie获得的操作在同一个request请求里面都是取得 request header 里面的cookie字符串值,<br>
-     * 再次说明了一点,cookie并不太适合存放这种业务敏感的数据
+     * 再次说明了一点,cookie并不太适合存放这种业务敏感的数据,<br>
+     * 
+     * <p>
+     * 参见图例:
+     * </p>
+     * 
+     * <br>
+     * <img src="http://venusdrogon.github.io/feilong-platform/mysource/store/批量修改购物车数量1.png"/>
+     * 
+     * <br>
+     * <img src="http://venusdrogon.github.io/feilong-platform/mysource/store/批量修改购物车数量2.png"/>
      * </li>
      * </ol>
      * 
