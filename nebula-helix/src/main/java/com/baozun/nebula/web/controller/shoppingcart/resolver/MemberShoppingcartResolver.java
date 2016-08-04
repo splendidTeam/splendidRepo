@@ -16,7 +16,10 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.OPERATE_ERROR;
+
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.web.MemberDetails;
 
 /**
@@ -42,6 +46,9 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     /** The sdk shopping cart manager. */
     @Autowired
     private SdkShoppingCartManager sdkShoppingCartManager;
+
+    @Autowired
+    private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
 
     /*
      * (non-Javadoc)
@@ -63,16 +70,11 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doAddShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
+    protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
 
         boolean success = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
-        return success ? null : ShoppingcartResult.OPERATE_ERROR;
+        return success ? null : OPERATE_ERROR;
     }
 
     /*
@@ -83,16 +85,11 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doUpdateShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
+    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
 
         boolean success = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
-        return success ? null : ShoppingcartResult.OPERATE_ERROR;
+        return success ? null : OPERATE_ERROR;
     }
 
     /*
@@ -104,14 +101,9 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doDeleteShoppingCartLine(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
+    protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
         boolean success = sdkShoppingCartManager.removeShoppingCartLineById(memberDetails.getGroupId(), currentLine.getId());
-        return success ? null : ShoppingcartResult.OPERATE_ERROR;
+        return success ? null : OPERATE_ERROR;
 
     }
 
@@ -133,6 +125,18 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     HttpServletRequest request,
                     HttpServletResponse response){
         sdkShoppingCartManager.updateCartLineSettlementState(memberDetails.getGroupId(), extentionCodeList, checkStatus ? 1 : 0);
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.Map, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
+        sdkShoppingCartUpdateManager.updateCartLineQuantity(memberDetails.getGroupId(), shoppingcartLineIdAndCountMap);
         return null;
     }
 }
