@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
-import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 

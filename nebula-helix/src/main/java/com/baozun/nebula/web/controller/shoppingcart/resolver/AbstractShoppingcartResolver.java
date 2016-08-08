@@ -22,6 +22,8 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SUCCESS;
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,8 +48,11 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
+import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartOneLineMaxQuantityValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartTotalLineMaxSizeValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
-import com.feilong.core.Validator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartTotalLineMaxSizeValidator;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -79,6 +84,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Autowired
     private ShoppingcartLineOperateCommonValidator shoppingcartLineOperateCommonValidator;
 
+    /** The shoppingcart one line max quantity validator. */
+    @Autowired(required = false)
+    private ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
+
+    /** The shoppingcart total line max size validator. */
+    @Autowired(required = false)
+    private ShoppingcartTotalLineMaxSizeValidator shoppingcartTotalLineMaxSizeValidator;
+
     /*
      * (non-Javadoc)
      * 
@@ -90,38 +103,43 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         Validate.notNull(skuId, "skuId can't be null!");
         Validate.notNull(count, "count can't be null!");
 
-        Sku sku = sdkSkuManager.findSkuById(skuId);
-        ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
+        //********1. 校验************************************
 
-        if (null != commandValidateShoppingcartResult){
-            return commandValidateShoppingcartResult;
+        Sku sku = sdkSkuManager.findSkuById(skuId);
+        ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
+
+        if (null != commonValidateShoppingcartResult){
+            return commonValidateShoppingcartResult;
         }
 
         // ****************************************************************************************
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        if (null == shoppingCartLineCommandList){
-            shoppingCartLineCommandList = new ArrayList<>();
-        }
-
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+
+        // ****************************************************************************************
         ShoppingCartLineCommand currentShoppingCartLineCommand = findSameSkuShoppingCartLineCommand(mainLines, sku);
 
-        if (null != currentShoppingCartLineCommand){// 存在
-            Integer oneLineTotalCount = currentShoppingCartLineCommand.getQuantity() + count;
+        //是否已经在购物车里面有
+        Integer oneLineTotalCount = null != currentShoppingCartLineCommand ? currentShoppingCartLineCommand.getQuantity() + count : count;
 
-            currentShoppingCartLineCommand.setQuantity(oneLineTotalCount);
+        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = defaultIfNull(shoppingcartOneLineMaxQuantityValidator, new DefaultShoppingcartOneLineMaxQuantityValidator());
+        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
+            return ONE_LINE_MAX_THAN_COUNT;
+        }
 
-            if (oneLineTotalCount > Constants.SHOPPING_CART_SKU_ONE_LINE_COUNT){
-                return ONE_LINE_MAX_THAN_COUNT;
-            }
-
-        }else{
-            // 最大行数验证
-            // 校验是否超过购物车规定的商品行数
-            if ((mainLines.size() + 1) > Constants.SHOPPING_CART_SKU_MAX_COUNT){
+        // 最大行数验证
+        // 校验是否超过购物车规定的商品行数
+        if (null == currentShoppingCartLineCommand){
+            ShoppingcartTotalLineMaxSizeValidator useShoppingcartTotalLineMaxSizeValidator = defaultIfNull(shoppingcartTotalLineMaxSizeValidator, new DefaultShoppingcartTotalLineMaxSizeValidator());
+            if (useShoppingcartTotalLineMaxSizeValidator.isGreaterThanMaxSize(memberDetails, mainLines.size() + 1)){
                 return MAIN_LINE_MAX_THAN_COUNT;
             }
+        }
 
+        //***************************************************************************************
+        if (null != currentShoppingCartLineCommand){// 存在
+            currentShoppingCartLineCommand.setQuantity(oneLineTotalCount);
+        }else{
             // 构造一条 塞进去
             ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(sku.getId(), count, sku.getOutid());
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
@@ -129,10 +147,13 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             currentShoppingCartLineCommand = shoppingCartLineCommand;
         }
 
+        //***********************************************************************************************
+
         if (isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
             return MAX_THAN_INVENTORY;
         }
 
+        //***********************************************************************************************
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, currentShoppingCartLineCommand, request, response);
 
         if (null != addShoppingCartShoppingcartResult){
@@ -312,7 +333,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the main lines
      * @param sku
      *            the sku
-     * @return the shopping cart line command
+     * @return 如果 <code>mainLines</code>是null, 返回null<br>
+     *         如果 <code>mainLines</code>中没有相关元素的属性<code>skuId</code> 值是<code>sku.getId()</code>,返回null
+     * @see com.feilong.core.util.CollectionsUtil#find(Iterable, String, Long)
      */
     private ShoppingCartLineCommand findSameSkuShoppingCartLineCommand(List<ShoppingCartLineCommand> mainLines,Sku sku){
         //        return CollectionsUtil.find(mainLines, "extentionCode", sku.getOutid());
@@ -485,10 +508,10 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             // ********* 商品验证***********
             Long skuId = needChangeCheckedCommand.getSkuId();
             Sku sku = sdkSkuManager.findSkuById(skuId);
-            ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
+            ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
-            if (null != commandValidateShoppingcartResult){
-                return commandValidateShoppingcartResult;
+            if (null != commonValidateShoppingcartResult){
+                return commonValidateShoppingcartResult;
             }
 
             if (checkStatus && isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
@@ -527,9 +550,15 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     }
 
     /**
+     * Do update shopping cart count validator.
+     *
      * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
      * @param shoppingcartLineId
+     *            the shoppingcart line id
      * @param count
+     *            the count
+     * @return the shoppingcart result
      * @since 5.3.1.9
      */
     private ShoppingcartResult doUpdateShoppingCartCountValidator(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,Integer count){
@@ -542,10 +571,10 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //2.2 CommonValidator
         Sku sku = sdkSkuManager.findSkuById(currentShoppingCartLineCommand.getSkuId());
 
-        ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
+        ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
 
-        if (null != commandValidateShoppingcartResult){
-            return commandValidateShoppingcartResult;
+        if (null != commonValidateShoppingcartResult){
+            return commonValidateShoppingcartResult;
         }
 
         //2.3 库存校验

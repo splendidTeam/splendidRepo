@@ -38,7 +38,6 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
-import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 
 /**
