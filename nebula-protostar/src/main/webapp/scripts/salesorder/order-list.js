@@ -250,7 +250,7 @@ $j(document).ready(function() {
 			label:nps.i18n("LABEL_ORDER_DISCOUNT"),
 			width:"5%"
 		},	{
-			name:"total",
+			name:"actotal",
 			label:nps.i18n("LABEL_ORDER_TOTAL"),
 			width:"8%",
 			sort: ["o.total asc","o.total desc"]

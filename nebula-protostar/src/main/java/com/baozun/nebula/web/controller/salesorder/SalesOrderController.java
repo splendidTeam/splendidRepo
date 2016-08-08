@@ -195,6 +195,13 @@ public class SalesOrderController extends BaseController{
 
         Pagination<PtsSalesOrderCommand> result = salesOrderManager
                         .findOrderListByQueryMapWithPage(queryBean.getPage(), sorts, queryBean.getParaMap());
+        List<PtsSalesOrderCommand> list = result.getItems();
+        for (PtsSalesOrderCommand ptsSalesOrderCommand : list){
+            BigDecimal total = ptsSalesOrderCommand.getTotal();
+            BigDecimal actualFreight = ptsSalesOrderCommand.getActualFreight();
+            ptsSalesOrderCommand.setActotal(total.add(actualFreight));
+        }
+        result.setItems(list);
         return result;
     }
 
