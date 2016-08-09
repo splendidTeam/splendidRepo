@@ -3,37 +3,22 @@ package com.baozun.nebula.sdk.manager.impl;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.model.system.MataInfo;
-import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkSecretManager;
 import com.baozun.nebula.utilities.common.EncryptUtil;
 
 @Service("sdkSecretManager")
 @Transactional
 public class SdkSecretManagerImpl implements SdkSecretManager {
-
-	
-	@Autowired
-	private SdkMataInfoManager sdkMataInfoManager;
 	
 	/**
-	 * 是否需要加密解密
+	 * 默认开启加密解密
 	 * @return
 	 */
 	private boolean needEncrypt(){
-		
-		String value=sdkMataInfoManager.findValue(MataInfo.KEY_NEED_ENCRYPT_PERSON);
-		
-		if(value!=null&&value.equalsIgnoreCase("true")){
-			return true;
-			
-		}
-		
-		return false;
+		return true;
 	}
 	
 	@Override
