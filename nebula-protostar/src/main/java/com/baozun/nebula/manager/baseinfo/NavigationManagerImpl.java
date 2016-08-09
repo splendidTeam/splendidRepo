@@ -383,6 +383,10 @@ public class NavigationManagerImpl implements NavigationManager{
 
 		if (i18n){
 			MutlLang mutlLang = (MutlLang) navigationCommand.getName();
+			MutlLang seoTitle = (MutlLang) navigationCommand.getSeoTitle();
+			MutlLang seoKeyWords = (MutlLang) navigationCommand.getSeoKeyWords();
+			MutlLang seoDescription = (MutlLang) navigationCommand.getSeoDescription();
+			MutlLang extention = (MutlLang) navigationCommand.getExtention();
 			String[] values = mutlLang.getValues();
 			String[] langs = mutlLang.getLangs();
 			String defaultName = mutlLang.getDefaultValue();
@@ -431,7 +435,7 @@ public class NavigationManagerImpl implements NavigationManager{
 					}
 				}
 			}
-			// 更新navigationLang
+			// 保存navigationLang
 			for (int i = 0; i < values.length; i++){
 				String val = values[i];
 				String lang = langs[i];
@@ -440,6 +444,10 @@ public class NavigationManagerImpl implements NavigationManager{
 				navigationLang.setNavigationId(id);
 				navigationLang.setName(val);
 				navigationLang.setLang(lang);
+				navigationLang.setSeoTitle(seoTitle.getValues()[i]);
+				navigationLang.setSeoKeywords(seoKeyWords.getValues()[i]);
+				navigationLang.setSeoDescription(seoDescription.getValues()[i]);
+				navigationLang.setExtention(extention.getValues()[i]);
 				navigationLangDao.save(navigationLang);
 			}
 			return retNavigation;
