@@ -421,19 +421,19 @@ public class ShoppingCartLineCommand extends BaseModel{
     }
 
     /**
-     * 获得 购物数量 *.
+     * 获得 购物数量.
      *
-     * @return the 购物数量 *
+     * @return the 购物数量
      */
     public Integer getQuantity(){
         return quantity;
     }
 
     /**
-     * 设置 购物数量 *.
+     * 设置 购物数量.
      *
      * @param quantity
-     *            the new 购物数量 *
+     *            the new 购物数量
      */
     public void setQuantity(Integer quantity){
         this.quantity = quantity;

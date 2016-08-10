@@ -122,7 +122,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         //是否已经在购物车里面有
         Integer oneLineTotalCount = null != currentShoppingCartLineCommand ? currentShoppingCartLineCommand.getQuantity() + count : count;
 
-        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = defaultIfNull(shoppingcartOneLineMaxQuantityValidator, new DefaultShoppingcartOneLineMaxQuantityValidator());
+        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
         if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
             return ONE_LINE_MAX_THAN_COUNT;
         }
@@ -208,7 +208,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //2.校验****************************************************************
         //2.1 校验 shoppingcartLineId
-        ShoppingcartResult validatorShoppingcartResult = doUpdateShoppingCartCountValidator(shoppingCartLineCommandList, shoppingcartLineId, count);
+        ShoppingcartResult validatorShoppingcartResult = doUpdateShoppingCartCountValidator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, count);
         if (null != validatorShoppingcartResult){
             return validatorShoppingcartResult;
         }
@@ -243,7 +243,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             Long shoppingcartLineId = entry.getKey();
             Integer count = entry.getValue();
 
-            ShoppingcartResult validatorShoppingcartResult = doUpdateShoppingCartCountValidator(shoppingCartLineCommandList, shoppingcartLineId, count);
+            ShoppingcartResult validatorShoppingcartResult = doUpdateShoppingCartCountValidator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, count);
             if (null != validatorShoppingcartResult){
                 return validatorShoppingcartResult;
             }
@@ -552,6 +552,8 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     /**
      * Do update shopping cart count validator.
      *
+     * @param memberDetails
+     *            the member details
      * @param shoppingCartLineCommandList
      *            the shopping cart line command list
      * @param shoppingcartLineId
@@ -561,9 +563,8 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @return the shoppingcart result
      * @since 5.3.1.9
      */
-    private ShoppingcartResult doUpdateShoppingCartCountValidator(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,Integer count){
+    private ShoppingcartResult doUpdateShoppingCartCountValidator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,Integer count){
         ShoppingCartLineCommand currentShoppingCartLineCommand = CollectionsUtil.find(shoppingCartLineCommandList, "id", shoppingcartLineId);
-
         if (null == currentShoppingCartLineCommand){
             return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
@@ -572,12 +573,17 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         Sku sku = sdkSkuManager.findSkuById(currentShoppingCartLineCommand.getSkuId());
 
         ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
-
         if (null != commonValidateShoppingcartResult){
             return commonValidateShoppingcartResult;
         }
 
-        //2.3 库存校验
+        //2.3 单行最大数量 校验
+        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
+        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, currentShoppingCartLineCommand.getSkuId(), count)){
+            return ONE_LINE_MAX_THAN_COUNT;
+        }
+
+        //2.4 库存校验
         currentShoppingCartLineCommand.setQuantity(count);
 
         if (isMoreThanInventory(shoppingCartLineCommandList, currentShoppingCartLineCommand.getSkuId(), sku.getOutid())){
@@ -585,6 +591,16 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         }
 
         return null;
+    }
+
+    /**
+     * 如果有配置 {@link #shoppingcartOneLineMaxQuantityValidator},那么使用他;如果没有,那么使用默认的 {@link DefaultShoppingcartOneLineMaxQuantityValidator}.
+     *
+     * @return the use shoppingcart one line max quantity validator
+     * @since 5.3.1.9
+     */
+    private ShoppingcartOneLineMaxQuantityValidator getUseShoppingcartOneLineMaxQuantityValidator(){
+        return defaultIfNull(shoppingcartOneLineMaxQuantityValidator, new DefaultShoppingcartOneLineMaxQuantityValidator());
     }
 
     /**
