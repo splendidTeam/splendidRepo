@@ -55,4 +55,6 @@ public interface SdkSchedulerTaskManager extends BaseManager{
 	SchedulerTask findSchedulerTaskById(Long id);
 	
 	SchedulerTask saveSchedulerTask(SchedulerTask schedulerTask);
+	
+	SchedulerTask findSchedulerTaskByMethodName(String methodName);
 }

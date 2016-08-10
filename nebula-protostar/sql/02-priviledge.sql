@@ -284,3 +284,8 @@ insert into "t_au_privilege"("id","group_name","acl","name","description","lifec
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/sysAuditLog/list.htm','审计日志查询列表',currval('s_t_au_privilege'));
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/sysAuditLog/page.json','审计日志查询列表',currval('s_t_au_privilege'));
 
+-- 定时任务运行日志
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营管理','ACL_BACKLOG_SCHEDULERLOG','定时任务运行日志','定时任务运行日志',1,now(),2);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/schedulerLog/list.htm','定时任务运行日志',currval('s_t_au_privilege'));
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/schedulerLog/list.json','定时任务运行日志',currval('s_t_au_privilege'));
+
