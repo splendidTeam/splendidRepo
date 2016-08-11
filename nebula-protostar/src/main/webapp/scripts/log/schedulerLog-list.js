@@ -16,9 +16,9 @@ $j(function(){
 				{name:"description",label:"任务描述",width:"10%"},
 				{name:"beanName",label:"Bean Name",width:"10%"},
 				{name:"methodName",label:"方法名称",width:"15%"},
-				{name:"beginTime",label:"开始时间",formatter:"formatDate",width:"10%"},
-				{name:"endTime",label:"结束时间",formatter:"formatDate",width:"10%"},
-				{name:"executionTime",label:"执行时长(ms)",width:"10%"}
+				{name:"beginTime",label:"开始时间",formatter:"formatDate",sort : [ "log.begin_time asc", "log.begin_time desc" ],width:"10%"},
+				{name:"endTime",label:"结束时间",formatter:"formatDate",sort : [ "log.end_time asc", "log.end_time desc" ],width:"10%"},
+				{name:"executionTime",label:"执行时长(ms)",sort : [ "log.execution_time asc", "log.execution_time desc" ],width:"10%"}
 				],
 		dataurl : base + "/backlog/schedulerLog/list.json"
 	});
