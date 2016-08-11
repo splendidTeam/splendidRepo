@@ -87,7 +87,7 @@
 					
 		       			
 		       				#if($receiver)
-		       					and RECEIVER=:receiver
+		       					and RECEIVER like :receiver
 		       				#end
 
 		       			
