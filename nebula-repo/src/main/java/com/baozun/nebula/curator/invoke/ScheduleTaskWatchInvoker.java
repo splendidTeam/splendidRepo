@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.watcher.IWatcherInvoke;
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.SchedulerManager;
 import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.system.SchedulerTask;
@@ -41,6 +42,9 @@ import com.feilong.core.Validator;
 public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	private Logger LOG = LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
 	
+	//定时任务列表缓存key
+	private static final String SCHEDULERTASKS = "schedulerLogAspect_tasks";
+	
 	@Autowired
 	private SchedulerManager schedulerManager;
 	
@@ -50,6 +54,8 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	@Autowired
 	private ZkOperator zkOperator;
 
+	@Autowired
+	private CacheManager cacheManager;
 	
 	private void handleTask(SchedulerTask schedulerTask) throws Exception{
 		Integer lifeCycle = schedulerTask.getLifecycle();
@@ -104,6 +110,8 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 					}
 				}
 			}
+			//删除缓存
+			cacheManager.remove(SCHEDULERTASKS);
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 		}

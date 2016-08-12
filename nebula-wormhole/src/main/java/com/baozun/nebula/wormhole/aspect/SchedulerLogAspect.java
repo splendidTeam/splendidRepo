@@ -17,39 +17,70 @@
 package com.baozun.nebula.wormhole.aspect;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.logs.SchedulerLog;
 import com.baozun.nebula.model.system.SchedulerTask;
 import com.baozun.nebula.sdk.manager.SchedulerLogManager;
 import com.baozun.nebula.sdk.manager.SdkSchedulerTaskManager;
+import com.feilong.core.Validator;
 
+@SuppressWarnings("all")
 @Aspect
 public class SchedulerLogAspect {
-	
+
+	private static final String SCHEDULERTASKS = "schedulerLogAspect_tasks";
+
+	private static final Integer TASKS_CACHE_EXPIRESECONDS = 60 * 60 * 24;
+
 	@Autowired
-    private SdkSchedulerTaskManager sdkSchedulerTaskManager;
-	
+	private SdkSchedulerTaskManager sdkSchedulerTaskManager;
+
 	@Autowired
 	private SchedulerLogManager schedulerLogManager;
-	
+
+	@Autowired
+	private CacheManager cacheManager;
+
 	@Around("execution(* com.baozun.nebula.wormhole.scm.timing..*.*(..))")
-	public Object saveLog(ProceedingJoinPoint pjp) throws Throwable{
+	public Object saveLog(ProceedingJoinPoint pjp) throws Throwable {
 		String methodName = pjp.getSignature().getName();
-		SchedulerTask task = sdkSchedulerTaskManager.findSchedulerTaskByMethodName(methodName);
-		if(task==null)
+		SchedulerTask task = getTasks().get(methodName);
+		if (task == null)
 			return pjp.proceed();
 		SchedulerLog log = new SchedulerLog();
 		log.setTaskId(task.getId());
 		log.setBeginTime(new Date());
 		Object result = pjp.proceed();
 		log.setEndTime(new Date());
-		log.setExecutionTime(log.getEndTime().getTime()-log.getBeginTime().getTime());
+		log.setExecutionTime(log.getEndTime().getTime() - log.getBeginTime().getTime());
 		schedulerLogManager.saveSchedulerLog(log);
 		return result;
+	}
+
+	private Map<String, SchedulerTask> getTasks() {
+		Map<String, SchedulerTask> tasks = (HashMap<String, SchedulerTask>) cacheManager.getObject(SCHEDULERTASKS);
+		if (Validator.isNullOrEmpty(tasks)) {
+			List<SchedulerTask> taskList = sdkSchedulerTaskManager.findAllEffectSchedulerTaskList();
+			tasks = new HashMap<String, SchedulerTask>();
+			if (Validator.isNotNullOrEmpty(taskList)) {
+				for (SchedulerTask task : taskList) {
+					if (tasks != null && !tasks.containsKey(task.getMethodName())) {
+						tasks.put(task.getMethodName(), task);
+					} else
+						continue;
+				}
+				cacheManager.setObject(SCHEDULERTASKS, tasks, TASKS_CACHE_EXPIRESECONDS);
+			}
+		}
+		return tasks;
 	}
 }
