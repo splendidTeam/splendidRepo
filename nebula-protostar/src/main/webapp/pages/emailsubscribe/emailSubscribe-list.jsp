@@ -35,6 +35,7 @@
 	    </table>
     	<div class="button-line1">
         	<a href="javascript:void(0);" class="func-button search" title="<spring:message code='item.searchCodition.search'/>"><spring:message code='item.searchCodition.search'/></a>
+        	<a href="javascript:void(0);" id="exportExcel" class="func-button" title="<spring:message code='item.searchCodition.export'/>"><spring:message code='item.searchCodition.export'/></a>
         </div>
     </div>
     </div>

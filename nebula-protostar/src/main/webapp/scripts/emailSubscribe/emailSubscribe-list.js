@@ -28,6 +28,9 @@ function categoryHideMenu() {
 }
 //商品组合查询
 var searchConditionUrl = base+'/email/subscribe/list.json';
+
+//导出邮件订阅
+var exportConditionUrl = base+'/email/subscribe/export.xlsx';
   
 var endisableSearchConditionUrl= base+'/system/schedulerTask/enableSchedulerTaskByIds.json';
 var unendisableSearchConditionUrl = base+'/system/schedulerTask/unEnableSchedulerTaskByIds.json';
@@ -183,6 +186,17 @@ $j(document).ready(function() {
 			 $j("#table1").data().uiLoxiasimpletable.options.currentPage=1;
 			 refreshData();
 	   }); 
+	 
+	 //邮件订阅导出
+	 $j("#exportExcel").click(function() {
+			var form = document.getElementById("searchForm");
+			var param = {};
+			for (var i = 0; i < form.length; i ++) {
+				param[form.elements[i].name] = form.elements[i].value;
+			}
+			var paramStr = $j.param(param);
+			window.location.href = base + exportConditionUrl + "?" + paramStr;
+		});
 	
  	 $j(".button.orange.addCondition").click(function(){
 	        window.location.href=addConditionUrl;

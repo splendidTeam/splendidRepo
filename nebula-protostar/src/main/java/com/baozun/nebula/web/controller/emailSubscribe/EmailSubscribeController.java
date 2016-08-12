@@ -2,9 +2,14 @@ package com.baozun.nebula.web.controller.emailSubscribe;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +27,7 @@ import com.baozun.utilities.DateUtil;
 
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
+import loxia.support.excel.ExcelWriter;
 
 /**
  * 邮件订阅管理
@@ -33,6 +39,10 @@ public class EmailSubscribeController extends BaseController{
 
 		@Autowired
 	    private SdkEmailSubscribeManager sdkEmailSubscribeManager; 
+		
+		@Autowired
+		@Qualifier("emailSubscribeWriter")
+		private ExcelWriter emailSubscribeWriter;
 		
 	    /**
 	     * 
@@ -127,4 +137,29 @@ public class EmailSubscribeController extends BaseController{
 	        
 	        return "redirect:/email/subscribe/manager.htm?keepfilter=true";
 	    }
+	    
+	    /**
+	     * 邮件订阅导出功能
+	     * @param model
+	     * @param schedulerTask
+	     * @return
+	     */
+	    @RequestMapping("/email/subscribe/export.xlsx")
+	    public void export(@QueryBeanParam QueryBean queryBean, HttpServletResponse response) {
+			String path = "excel/emailSubscribe-list-export.xlsx";
+			Map<String, Object> beans = new HashMap<String, Object>();
+			List<EmailSubscribe> list = sdkEmailSubscribeManager.findEmailSubscribeListByQueryMap(queryBean.getParaMap());
+			beans.put("emailSubscribeList", list);
+			try {
+				response.setHeader("Content-type", "application/force-download");
+				response.setHeader("Content-Transfer-Encoding", "Binary");
+				response.setHeader("Content-Type", "application/octet-stream");
+				response.setHeader("Content-Disposition", "attachment; filename=\""
+						+ "emailSubscribe-list.xlsx\"");
+
+				emailSubscribeWriter.write(path, response.getOutputStream(), beans);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 }

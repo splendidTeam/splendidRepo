@@ -103,6 +103,18 @@
 		</block>
 	</sheet>
 	
+	<!-- 邮件订阅导出 -->
+	<sheet name="emailSubscribeExport">
+		<block start="A4" end="F4" dataName="emailSubscribeList" loop="true" loopClass="com.baozun.nebula.model.system.EmailSubscribe">
+			<cell position="A4" dataName="id" />
+			<cell position="B4" dataName="receiver" />
+			<cell position="C4" dataName="templateCode" />
+			<cell position="D4" dataName="data" />
+			<cell position="E4" dataName="date" />
+			<cell position="F4" dataName="type" />
+		</block>
+	</sheet>
+	
 	<!-- 运费表导出 -->
 	<sheet name="shippingExport">
 		<block start="A1" end="I1" dataName="expTemplateName" loop="true" loopClass="com.baozun.nebula.freight.command.ExpShippingFeeCommand">
