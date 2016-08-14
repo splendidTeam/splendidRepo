@@ -155,4 +155,70 @@
 		</constructor-arg>
 	</bean>	
 	
+	
+	<bean id="MsgSendRecord.findMsgSendRecordAndContentListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select record.id as id,
+					       record.create_time AS createTime,
+					       record.ext as ext,
+					       record.feedback_time as feedbackTime,
+					       record.if_identify as ifIdentify,
+					       record.send_count as sendCount,
+					       record.send_time as sendTime,
+					       record.target_id as targetId,
+					       record.version as version,
+					       content.msg_body as msgBody
+					from T_SYS_MSG_SEND_RECORD record 
+					     LEFT JOIN t_sys_msg_send_content content ON record.id=content.id 
+                    where 
+		       		
+		       			1=1	
+		       		
+					
+		       			
+		       				#if($ifIdentify)
+		       					and IF_IDENTIFY like:ifIdentify
+		       				#end
+
+		       			
+		       				#if($targetId)
+		       					and TARGET_ID like:targetId
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($feedbackTime)
+		       					and FEEDBACK_TIME >= :feedbackTimeStart
+		       				#end
+		       				#if($feedbackTime)
+		       					and FEEDBACK_TIME <= :feedbackTimeEnd
+		       				#end
+
+		       			
+		       				#if($sendCount)
+		       					and SEND_COUNT=:sendCount
+		       				#end
+
+		       			
+		       				#if($createTime)
+		       					and CREATE_TIME >= :createTimeStart
+		       				#end
+		       				#if($createTime)
+		       					and CREATE_TIME <= :createTimeEnd
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 </beans>

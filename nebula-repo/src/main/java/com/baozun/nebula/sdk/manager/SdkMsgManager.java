@@ -23,6 +23,7 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
+import com.baozun.nebula.command.product.MsgSendRecordCommand;
 import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.model.system.MsgReceiveContent;
 import com.baozun.nebula.model.system.MsgSendContent;
@@ -206,4 +207,30 @@ public interface SdkMsgManager extends BaseManager{
 	 * @param ids
 	 */
 	void updateMsgRecContIsProByIds(List<Long> ids);
-}
+	
+	/**
+	 * 分页获取MsgSendRecord MsgSendRecord列表
+	 * @param page
+	 * @param sorts
+	 * @param paraMap
+	 * @return
+	 */
+	Pagination<MsgSendRecordCommand> findMsgSendRecordAndContentListByQueryMapWithPage(Page page, Sort[] sorts,Map<String, Object> paraMap);
+
+	/**	 * 分页获取MsgReceiveContent列表
+	 * like 条件查询
+	 * @param page
+	 * @param sorts
+	 * @param paraMap
+	 * @return
+	 */
+	Pagination<MsgReceiveContent> findMsgReceiveContentListByPage(Page page, Sort[] sorts, Map<String, Object> paraMap);
+
+	/**	 * 分页获取MsgReceiveContent列表
+	 * @param page
+	 * @param sorts
+	 * @param paraMap
+	 * @return
+	 */
+//	Pagination<MsgReceiveContent> findMsgReceiveContentListByPage(Page page, Sort[] sorts, Map<String, Object> paraMap);
+    }

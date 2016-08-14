@@ -116,6 +116,47 @@
 		</constructor-arg>
 	</bean>	
 
+<bean id="MsgReceiveContent.findMsgReceiveContentListByPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT * FROM T_SYS_MSG_RECEIVE_CONTENT where 
+		       		
+		       			1=1	
+		       			
+		       				#if($ifIdentify)
+		       					and IF_IDENTIFY like :ifIdentify
+		       				#end
+
+		       			
+		       				#if($sendTime)
+		       					and SEND_TIME >= :sendTimeStart
+		       				#end
+		       				#if($sendTime)
+		       					and SEND_TIME <= :sendTimeEnd
+		       				#end
+
+		       			
+		       				#if($msgId)
+		       					and MSG_ID like :msgId
+		       				#end
+
+		       			
+		       				#if($msgBody)
+		       					and MSG_BODY like :msgBody
+		       				#end
+
+		       			
+		       				#if($isProccessed)
+		       					and IS_PROCCESSED like :isProccessed
+		       				#end
+		       				
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+
 	<bean id="MsgReceiveContent.updateMsgRecContIsProByIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>
 		<constructor-arg>
