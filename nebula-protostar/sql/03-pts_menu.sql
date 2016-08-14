@@ -123,3 +123,6 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (810, 1, 1, '/backlog/skuInventoryChangeLog/list.htm', now(), 8, null, '库存变更日志管理');
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (811, 1, 2, '/backlog/sysAuditLog/list.htm', now(), 8, null, '审计日志查询列表');
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (nextval('s_t_au_menu'), 1, 4, '/backlog/schedulerLog/list.htm', now(), 14, null, '定时任务运行日志');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (813, 1, 1, '', now(),14, 'system', 'SCM消息日志');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (814, 1, 1, '/backlog/scmSendLog/list.htm', now(), 813, null, 'SCM发送消息日志');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (815, 1, 2, '/backlog/scmReceivedLog/list.htm', now(), 813, null, 'SCM接收消息日志');

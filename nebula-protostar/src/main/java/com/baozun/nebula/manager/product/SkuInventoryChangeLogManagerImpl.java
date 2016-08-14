@@ -51,8 +51,7 @@ import com.feilong.core.Validator;
 
 @Service
 @Transactional
-public class SkuInventoryChangeLogManagerImpl implements
-		SkuInventoryChangeLogManager {
+public class SkuInventoryChangeLogManagerImpl implements SkuInventoryChangeLogManager {
 	
 	@Autowired
 	private SdkSkuInventoryChangeLogManager 		sdkSkuInventoryChangeLogManager;
@@ -73,12 +72,9 @@ public class SkuInventoryChangeLogManagerImpl implements
 	 * @see com.baozun.nebula.manager.product.SkuInventoryChangeLogManager#findSkuInventoryChangeLogListByQueryMapWithPage(loxia.dao.Page, loxia.dao.Sort[], java.util.Map)
 	 */
 	@Override
-	public Pagination<SkuInventoryChangeLogCommand> findSkuInventoryChangeLogListByQueryMapWithPage(
-			Page page, Sort[] sorts, Map<String, Object> paraMap) {
-		Pagination<SkuInventoryChangeLogCommand> result =sdkSkuInventoryChangeLogManager.
-				findSkuInventoryChangeLogListByQueryMapWithPage(page, sorts, paraMap);
-		if(Validator.isNotNullOrEmpty(result)&&
-				Validator.isNotNullOrEmpty(result.getItems())){
+	public Pagination<SkuInventoryChangeLogCommand> findSkuInventoryChangeLogListByQueryMapWithPage(Page page, Sort[] sorts, Map<String, Object> paraMap) {
+		Pagination<SkuInventoryChangeLogCommand> result =sdkSkuInventoryChangeLogManager.findSkuInventoryChangeLogListByQueryMapWithPage(page, sorts, paraMap);
+		if(Validator.isNotNullOrEmpty(result)&&Validator.isNotNullOrEmpty(result.getItems())){
 			List<String> upcs =new ArrayList<String>();
 			List<Long> frontUserIds =new ArrayList<Long>();
 			List<Long> backUserIds =new ArrayList<Long>();
@@ -144,13 +140,11 @@ public class SkuInventoryChangeLogManagerImpl implements
 						continue ;
 					}
 					if(command.getSource().equals(SkuInventoryChangeLog.SOURCE_FRONTEND)){
-						if(Validator.isNotNullOrEmpty(frontIdAndInfoMap)&&
-								Validator.isNotNullOrEmpty(frontIdAndInfoMap.get(command.getOperator()))){
+						if(Validator.isNotNullOrEmpty(frontIdAndInfoMap)&&Validator.isNotNullOrEmpty(frontIdAndInfoMap.get(command.getOperator()))){
 							command.setOperatorLabel(frontIdAndInfoMap.get(command.getOperator()).getLoginEmail());
 						}
 					}else if(command.getSource().equals(SkuInventoryChangeLog.SOURCE_PTS)){
-						if(Validator.isNotNullOrEmpty(backIdAndInfoMap)&&
-								Validator.isNotNullOrEmpty(backIdAndInfoMap.get(command.getOperator()))){
+						if(Validator.isNotNullOrEmpty(backIdAndInfoMap)&&Validator.isNotNullOrEmpty(backIdAndInfoMap.get(command.getOperator()))){
 									command.setOperatorLabel(backIdAndInfoMap.get(command.getOperator()).getUserName());
 						}
 					}
