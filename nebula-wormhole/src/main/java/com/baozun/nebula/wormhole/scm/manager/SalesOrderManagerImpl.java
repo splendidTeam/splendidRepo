@@ -17,6 +17,9 @@
 package com.baozun.nebula.wormhole.scm.manager;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,17 +31,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MsgReceiveContent;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.EmailTemplateManager;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.utils.Validator;
 import com.baozun.nebula.wormhole.constants.OrderStatusV5Constants;
 import com.baozun.nebula.wormhole.mq.entity.order.OrderStatusV5;
 import com.baozun.nebula.wormhole.scm.handler.SyncSalesOrderHandler;
 import com.baozun.nebula.wormhole.scm.timing.SyncCommonManager;
+import com.baozun.nebula.wormhole.utils.JacksonUtils;
+import com.baozun.utilities.EncryptUtil;
+import com.feilong.core.Validator;
+import com.feilong.core.bean.BeanUtil;
+import com.feilong.core.bean.PropertyUtil;
 
 /**
  * @author yfxie
@@ -76,27 +84,69 @@ public class SalesOrderManagerImpl implements SalesOrderManager{
     @Transactional
     public void syncSoStatus(MsgReceiveContent content,List<Long> msgIdList){
         List<OrderStatusV5> orderSV5List = syncCommonManager.queryMsgBody(content.getMsgBody(), OrderStatusV5.class);
-        if (Validator.isNotNullOrEmpty(orderSV5List)){
-            boolean result = syncSoStatus(orderSV5List);
-            if (null != syncSalesOrderHandler){
-                syncSalesOrderHandler.syncSoStatus(orderSV5List);
-            }
-            if (result){
-                logger.info("订单状态同步信息：" + content.getId() + "同步完成！");
-            }else{
-                //发送告警邮件
-                try{
-                    Map<String, Object> dataMap = new HashMap<String, Object>();
-                    dataMap.put("desc", "订单状态同步失败，失败信息的id为：" + content.getMsgId());
-                    emailTemplateManager.sendWarningEmail("EMAIL_WARNING", "order_status_sync-" + content.getId(), dataMap);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                logger.error("订单状态同步信息：" + content.getId() + "同步失败！");
-            }
-            sdkMsgManager.updateMsgRecContIsProByIds(msgIdList);
+    	if (Validator.isNullOrEmpty(orderSV5List)){
+			sdkMsgManager.updateMsgRecContIsProByIds(msgIdList);
+		}
+
+		if (content.getMsgId().indexOf("-s")==-1 && orderSV5List.size()>1){
+			logger.info("同步订单消息拆分开始 content.getMsgId() " + content.getMsgId());
+			splitMsg(orderSV5List, content);
+			sdkMsgManager.updateMsgRecContIsProByIds(msgIdList);
+		}
+		
+        boolean result = syncSoStatus(orderSV5List);
+        if (null != syncSalesOrderHandler){
+            syncSalesOrderHandler.syncSoStatus(orderSV5List);
         }
+        if (result){
+            logger.info("订单状态同步信息：" + content.getId() + "同步完成！");
+        }else{
+            //发送告警邮件
+            try{
+                Map<String, Object> dataMap = new HashMap<String, Object>();
+                dataMap.put("desc", "订单状态同步失败，失败信息的id为：" + content.getMsgId());
+                emailTemplateManager.sendWarningEmail("EMAIL_WARNING", "order_status_sync-" + content.getId(), dataMap);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            logger.error("订单状态同步信息：" + content.getId() + "同步失败！");
+        }
+        sdkMsgManager.updateMsgRecContIsProByIds(msgIdList);
     }
+    
+    /**
+	 * 针对一条MsgReceiveContent中对一条订单多次更新时，将其拆分成多条Msg
+	 */
+	private void splitMsg(List<OrderStatusV5> orderSV5List,MsgReceiveContent content){
+		try{
+			// 对MQ对列的消息解析后的orderSV5List进行时间排序，避免状态更新顺序不对
+			Collections.sort(orderSV5List, new Comparator<OrderStatusV5>(){
+
+				@Override
+				public int compare(OrderStatusV5 o1,OrderStatusV5 o2){
+					return o1.getOpTime().compareTo(o2.getOpTime());
+				}
+			});
+
+			List<OrderStatusV5> saveOrderSV5List = null;
+			for (int i = 0; i < orderSV5List.size(); i++){
+				// 单独隔离每条订单状态信息存入MsgReceiveContent中
+				saveOrderSV5List = new ArrayList<OrderStatusV5>();
+				saveOrderSV5List.add(orderSV5List.get(i));
+
+				MsgReceiveContent mrc = new MsgReceiveContent();
+				
+				PropertyUtil.copyProperties(mrc, content, "ifIdentify","sendTime","isProccessed","version");
+				mrc.setMsgBody(EncryptUtil.getInstance().encrypt(JacksonUtils.getObjectMapper().writeValueAsString(saveOrderSV5List)));
+				// msgId 追加标识，方便区分
+				mrc.setMsgId(content.getMsgId() + "-s" + i);
+				sdkMsgManager.saveMsgReceiveContent(mrc);
+			}
+		}catch (Exception e){
+			throw new RuntimeException(String.format("O1-1 订单状态同步：拆分MsgReceiveContent时异常（msgId = %s）", content.getMsgId()), e);
+		}
+
+	}
 
     /**
      * 逐条处理订单信息
