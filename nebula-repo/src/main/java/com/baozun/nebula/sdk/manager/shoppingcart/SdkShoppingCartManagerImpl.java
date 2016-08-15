@@ -2660,7 +2660,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             BigDecimal lineShareDisc = callDiscAMT.multiply(lineNeedPay).divide(callNeedPay, 2,
                     BigDecimal.ROUND_HALF_EVEN);
             tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
-            if(tempDiscAmt.compareTo(lineShareDisc)==1){
+            if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
                 settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
             }else{
                 settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.subtract(lineShareDisc)));
