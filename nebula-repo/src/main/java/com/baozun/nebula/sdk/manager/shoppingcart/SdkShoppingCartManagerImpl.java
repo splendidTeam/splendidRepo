@@ -2663,7 +2663,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
                 settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
             }else{
-                settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.subtract(lineShareDisc)));
+                settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
             }
         }
         return settingList;
