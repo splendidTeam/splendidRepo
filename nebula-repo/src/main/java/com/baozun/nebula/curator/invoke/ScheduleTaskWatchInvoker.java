@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baozun.nebula.constant.SchedulerConstants;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.manager.CacheManager;
@@ -41,9 +42,6 @@ import com.feilong.core.Validator;
  */
 public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	private Logger LOG = LoggerFactory.getLogger(ScheduleTaskWatchInvoker.class);
-	
-	//定时任务列表缓存key
-	private static final String SCHEDULERTASKS = "schedulerLogAspect_tasks";
 	
 	@Autowired
 	private SchedulerManager schedulerManager;
@@ -111,7 +109,7 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 				}
 			}
 			//删除缓存
-			cacheManager.remove(SCHEDULERTASKS);
+			cacheManager.remove(SchedulerConstants.SCHEDULERTASKS);
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 		}

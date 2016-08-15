@@ -26,6 +26,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baozun.nebula.constant.SchedulerConstants;
 import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.model.logs.SchedulerLog;
 import com.baozun.nebula.model.system.SchedulerTask;
@@ -36,10 +37,6 @@ import com.feilong.core.Validator;
 @SuppressWarnings("all")
 @Aspect
 public class SchedulerLogAspect {
-
-	private static final String SCHEDULERTASKS = "schedulerLogAspect_tasks";
-
-	private static final Integer TASKS_CACHE_EXPIRESECONDS = 60 * 60 * 24;
 
 	@Autowired
 	private SdkSchedulerTaskManager sdkSchedulerTaskManager;
@@ -67,7 +64,7 @@ public class SchedulerLogAspect {
 	}
 
 	private Map<String, SchedulerTask> getTasks() {
-		Map<String, SchedulerTask> tasks = (HashMap<String, SchedulerTask>) cacheManager.getObject(SCHEDULERTASKS);
+		Map<String, SchedulerTask> tasks = (HashMap<String, SchedulerTask>) cacheManager.getObject(SchedulerConstants.SCHEDULERTASKS);
 		if (Validator.isNullOrEmpty(tasks)) {
 			List<SchedulerTask> taskList = sdkSchedulerTaskManager.findAllEffectSchedulerTaskList();
 			tasks = new HashMap<String, SchedulerTask>();
@@ -78,7 +75,7 @@ public class SchedulerLogAspect {
 					} else
 						continue;
 				}
-				cacheManager.setObject(SCHEDULERTASKS, tasks, TASKS_CACHE_EXPIRESECONDS);
+				cacheManager.setObject(SchedulerConstants.SCHEDULERTASKS, tasks, SchedulerConstants.TASKS_CACHE_EXPIRESECONDS);
 			}
 		}
 		return tasks;
