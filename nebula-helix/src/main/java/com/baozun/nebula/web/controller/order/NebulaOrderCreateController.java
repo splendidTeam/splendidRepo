@@ -212,7 +212,7 @@ public class NebulaOrderCreateController extends BaseController{
         shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
 
         // 封装订单信息
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.buildSalesOrderCommand(memberDetails, orderForm, request);
+        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
         List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
 
         CalcFreightCommand calcFreightCommand = salesOrderCommand.getCalcFreightCommand();

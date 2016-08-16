@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.sdk.manager.impl;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +64,7 @@ public class SdkConsigneeManagerImpl implements SdkConsigneeManager{
         ConvertUtils.convertFromTarget(consignee, salesOrderCommand);
         List<String> appointTimeQuantums = salesOrderCommand.getAppointTimeQuantums();
         // 设置指定时间段
-        if (Validator.isNotNullOrEmpty(appointTimeQuantums)){
+        if (isNotNullOrEmpty(appointTimeQuantums)){
             for (String appointTimeQuantum : appointTimeQuantums){
                 // String a = "shopid||value"
                 String[] strs = appointTimeQuantum.split(SEPARATOR_FLAG);
@@ -73,7 +75,7 @@ public class SdkConsigneeManagerImpl implements SdkConsigneeManager{
         }
         // 设置指定日期
         List<String> appointTimes = salesOrderCommand.getAppointTimes();
-        if (Validator.isNotNullOrEmpty(appointTimes)){
+        if (isNotNullOrEmpty(appointTimes)){
             for (String appointTime : appointTimes){
                 // String a = "shopid||value"
                 String[] strs = appointTime.split(SEPARATOR_FLAG);
@@ -84,7 +86,7 @@ public class SdkConsigneeManagerImpl implements SdkConsigneeManager{
         }
         // 设置指定类型
         List<String> appointTypes = salesOrderCommand.getAppointTypes();
-        if (Validator.isNotNullOrEmpty(appointTypes)){
+        if (isNotNullOrEmpty(appointTypes)){
             for (String appointType : appointTypes){
                 // String a = "shopid||value"
                 String[] strs = appointType.split(SEPARATOR_FLAG);
