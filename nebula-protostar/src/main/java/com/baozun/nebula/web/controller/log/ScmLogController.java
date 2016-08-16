@@ -82,7 +82,6 @@ public class ScmLogController extends  BaseController{
 			sorts = new Sort[1];
 			sorts[0] = sort;
 		}
-		//return  sdkMsgManager.findMsgReceiveContentListByQueryMapWithPage(queryBean.getPage(),sorts, queryBean.getParaMap());
 		return  sdkMsgManager.findMsgReceiveContentListByPage(queryBean.getPage(),sorts, queryBean.getParaMap());
 	}
 		
