@@ -95,7 +95,7 @@ public interface MsgSendRecordDao extends GenericEntityDao<MsgSendRecord, Long>{
      * @return
      */
     @NativeQuery(model=MsgSendRecordCommand.class)
-	Pagination<MsgSendRecordCommand> findMsgSendRecordAndContentListByQueryMapWithPage(Page page, Sort[] sorts,Map<String, Object> paraMap);
+	Pagination<MsgSendRecordCommand> findMsgSendRecordAndContentListByQueryMapWithPage(Page page, Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 
    
 }

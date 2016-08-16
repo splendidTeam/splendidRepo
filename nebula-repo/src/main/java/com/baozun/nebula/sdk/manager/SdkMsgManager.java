@@ -226,11 +226,4 @@ public interface SdkMsgManager extends BaseManager{
 	 */
 	Pagination<MsgReceiveContent> findMsgReceiveContentListByPage(Page page, Sort[] sorts, Map<String, Object> paraMap);
 
-	/**	 * 分页获取MsgReceiveContent列表
-	 * @param page
-	 * @param sorts
-	 * @param paraMap
-	 * @return
-	 */
-//	Pagination<MsgReceiveContent> findMsgReceiveContentListByPage(Page page, Sort[] sorts, Map<String, Object> paraMap);
     }

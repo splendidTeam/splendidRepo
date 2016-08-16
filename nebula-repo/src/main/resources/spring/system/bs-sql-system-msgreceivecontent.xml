@@ -121,37 +121,37 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		SELECT * FROM T_SYS_MSG_RECEIVE_CONTENT where 
+		       	SELECT * FROM T_SYS_MSG_RECEIVE_CONTENT where 
 		       		
 		       			1=1	
 		       			
 		       				#if($ifIdentify)
-		       					and IF_IDENTIFY like :ifIdentify
+		       					and if_identify like :ifIdentify
 		       				#end
 
-		       			
-		       				#if($sendTime)
-		       					and SEND_TIME >= :sendTimeStart
-		       				#end
-		       				#if($sendTime)
-		       					and SEND_TIME <= :sendTimeEnd
-		       				#end
-
-		       			
 		       				#if($msgId)
-		       					and MSG_ID like :msgId
+		       					and msg_id like :msgId
 		       				#end
 
-		       			
 		       				#if($msgBody)
-		       					and MSG_BODY like :msgBody
-		       				#end
-
-		       			
-		       				#if($isProccessed)
-		       					and IS_PROCCESSED like :isProccessed
+		       					and msg_body like :msgBody
 		       				#end
 		       				
+		       				#if($sendTimeStart)
+		       					and send_time >= :sendTimeStart
+		       				#end
+		       				
+		       				#if($sendTimeEnd)
+		       					and send_time <= :sendTimeEnd
+		       				#end
+		       				
+		       				#if($isProccessed == true)
+	       					and IS_PROCCESSED=:isProccessed
+	       				    #end
+
+	       				    #if($isProccessed == false)
+	       					and IS_PROCCESSED=:isProccessed
+	       				    #end
                  ]]>
 			</value>
 		</constructor-arg>

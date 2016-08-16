@@ -161,7 +161,7 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		select record.id as id,
+		           select record.id as id,
 					       record.create_time AS createTime,
 					       record.ext as ext,
 					       record.feedback_time as feedbackTime,
@@ -174,49 +174,43 @@
 					from T_SYS_MSG_SEND_RECORD record 
 					     LEFT JOIN t_sys_msg_send_content content ON record.id=content.id 
                     where 
-		       		
-		       			1=1	
-		       		
-					
-		       			
+		       			 1=1	
 		       				#if($ifIdentify)
-		       					and IF_IDENTIFY like:ifIdentify
+		       					and record.if_identify  like :ifIdentify
 		       				#end
 
-		       			
 		       				#if($targetId)
-		       					and TARGET_ID like:targetId
+		       					and record.target_id =:targetId
 		       				#end
-
 		       			
-		       				#if($sendTime)
-		       					and SEND_TIME >= :sendTimeStart
+		       				#if($sendTimeStart)
+		       					and record.send_time >= :sendTimeStart
 		       				#end
-		       				#if($sendTime)
-		       					and SEND_TIME <= :sendTimeEnd
+		       				#if($sendTimeEnd)
+		       					and record.send_time <= :sendTimeEnd
 		       				#end
-
 		       			
-		       				#if($feedbackTime)
-		       					and FEEDBACK_TIME >= :feedbackTimeStart
+		       				#if($feedbackTimeStart)
+		       					and record.feedback_time >= :feedbackTimeStart
 		       				#end
-		       				#if($feedbackTime)
-		       					and FEEDBACK_TIME <= :feedbackTimeEnd
+		       				#if($feedbackTimeEnd)
+		       					and record.feedback_time <= :feedbackTimeEnd
 		       				#end
-
 		       			
 		       				#if($sendCount)
-		       					and SEND_COUNT=:sendCount
+		       					and record.send_count =:sendCount
 		       				#end
-
+                           
+                            #if($msgBody)
+		       					and content.msg_body like :msgBody
+		       				#end
 		       			
-		       				#if($createTime)
-		       					and CREATE_TIME >= :createTimeStart
+		       				#if($createTimeStart)
+		       					and record.create_time >= :createTimeStart
 		       				#end
-		       				#if($createTime)
-		       					and CREATE_TIME <= :createTimeEnd
+		       				#if($createTimeEnd)
+		       					and record.create_time <= :createTimeEnd
 		       				#end
-		       				
                  ]]>
 			</value>
 		</constructor-arg>
