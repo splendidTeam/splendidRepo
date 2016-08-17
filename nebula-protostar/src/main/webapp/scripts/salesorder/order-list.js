@@ -9,7 +9,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"LABEL_ORDER_FINANCIAL":"财务状态",
 	"LABEL_ORDER_QUANTITY":"总数量",
 	"LABEL_ORDER_DISCOUNT":"折扣",
-	"LABEL_ORDER_TOTAL":"总价",
+	"LABEL_ORDER_TOTAL":"订单总金额",
 	"LABEL_ORDER_CREATETIME":"创建时间",
 	"LABEL_ORDER_REMARK":"备注"
 });
@@ -28,6 +28,11 @@ function drawOrder(data, args, idx){
 	
 	return "<a style='cursor:pointer;' onclick=\"loxia.openPage('" +tempUrl+
 			"');\">"+loxia.getObject("code", data)+"</a>";
+}
+
+//计算订单总金额
+function calTotalAmount(data){
+	return data.total+data.actualFreight;
 }
 
 //支付方式
@@ -250,9 +255,10 @@ $j(document).ready(function() {
 			label:nps.i18n("LABEL_ORDER_DISCOUNT"),
 			width:"5%"
 		},	{
-			name:"total",
+			/*name:"total",*/
 			label:nps.i18n("LABEL_ORDER_TOTAL"),
 			width:"8%",
+			template:"calTotalAmount",
 			sort: ["o.total asc","o.total desc"]
 		},	{
 			name:"createTime",
