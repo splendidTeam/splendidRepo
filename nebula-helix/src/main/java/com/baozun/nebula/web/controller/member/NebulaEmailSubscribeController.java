@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
 package com.baozun.nebula.web.controller.member;
 
 import java.util.HashMap;
@@ -5,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 
 import com.baozun.nebula.model.system.EmailSubscribe;
 import com.baozun.nebula.sdk.manager.SdkEmailSubscribeManager;
@@ -15,13 +30,14 @@ import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
 
 /**
+ * @Controller
  * 邮件订阅功能
  * 取消邮件订阅
  * @author zhaojun.fang
+ * @Time 2016年8月17日
  *
  */
 
-@Controller
 public class NebulaEmailSubscribeController extends BaseController{
 	
 	@Autowired
