@@ -100,7 +100,8 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (120, 1, 12, '/item/sortScore.htm', now(), 1, null, '默认排序引擎管理');
 --邮件模板管理
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (615, 1, 10, '/email/list.htm', now(), 6, null, '邮件模板管理');
-
+--邮件订阅管理
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (21, 1, 3, '/email/subscribe/manager.htm', now(), 5, null, '邮件订阅管理');
 
 --告警设置
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (720, 1, 20, '/warningConfig/list.htm', now(), 7, null, '告警设置');

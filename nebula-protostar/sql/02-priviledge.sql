@@ -298,4 +298,8 @@ insert into "t_au_privilege"("id","group_name","acl","name","description","lifec
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/scmSendLog/list.htm','SCM发送消息日志',currval('s_t_au_privilege'));
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/scmSendLog/page.json','SCM发送消息日志',currval('s_t_au_privilege'));
 
+--邮件订阅管理
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_SYS_EMAILSUBSCRIBE_MANAGE','邮件订阅管理','邮件订阅管理',1,now(),1);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/email/subscribe/manager.htm','邮件订阅管理',currval('s_t_au_privilege'));
+
 
