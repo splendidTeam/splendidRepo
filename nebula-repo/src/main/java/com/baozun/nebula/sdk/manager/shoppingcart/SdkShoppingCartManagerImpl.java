@@ -2658,7 +2658,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
             
             BigDecimal lineShareDisc = callDiscAMT.multiply(lineNeedPay).divide(callNeedPay, 2,
-                    BigDecimal.ROUND_HALF_EVEN);
+                    BigDecimal.ROUND_UP);
             tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
             if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
                 settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
@@ -3119,7 +3119,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
                 
                 lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2,
-    					BigDecimal.ROUND_HALF_EVEN);
+    					BigDecimal.ROUND_UP);
     				tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
     				if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
     					settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
