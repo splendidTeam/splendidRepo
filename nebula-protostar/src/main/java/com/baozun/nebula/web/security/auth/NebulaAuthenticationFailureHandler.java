@@ -40,19 +40,21 @@ public class NebulaAuthenticationFailureHandler implements AuthenticationFailure
 	
 	private static final Logger	LOGGER	= LoggerFactory.getLogger(NebulaAuthenticationFailureHandler.class);
 	
-	private String defaultFailureUrl = "/login.htm?type=";
+	private String defaultFailureUrl;
+	
+	private String userDisabledUrl;
 	
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-		Integer type = 1;
+		String redirectUrl = defaultFailureUrl;
 		if(exception.getCause() instanceof LockedException)
-			type = 2;
+			redirectUrl = userDisabledUrl;
 		request.getSession().setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
-		LOGGER.debug("Redirecting to {}" , defaultFailureUrl);
-		redirectStrategy.sendRedirect(request, response, defaultFailureUrl+type.toString());
+		LOGGER.debug("Redirecting to {}" , redirectUrl);
+		redirectStrategy.sendRedirect(request, response, redirectUrl);
 	}
 
 	public String getDefaultFailureUrl() {
@@ -61,6 +63,14 @@ public class NebulaAuthenticationFailureHandler implements AuthenticationFailure
 
 	public void setDefaultFailureUrl(String defaultFailureUrl) {
 		this.defaultFailureUrl = defaultFailureUrl;
+	}
+	
+	public String getUserDisabledUrl() {
+		return userDisabledUrl;
+	}
+
+	public void setUserDisabledUrl(String userDisabledUrl) {
+		this.userDisabledUrl = userDisabledUrl;
 	}
 
 	public RedirectStrategy getRedirectStrategy() {
