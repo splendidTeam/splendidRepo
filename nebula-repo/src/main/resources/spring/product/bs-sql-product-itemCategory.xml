@@ -170,7 +170,7 @@
 			<value>
 				<![CDATA[  
 					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
-						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName, '' as categoryName,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName,
 						tpit.lifecycle as lifecycle,tpifo.sale_price as salePrice, tpifo.list_price as listPrice,
 						tpifo.title as title
 						#if($categoryId)
@@ -231,7 +231,13 @@
 		       				#if($type==0)
 		       					and tpifo.type = 0
 		       				#end
-						
+						GROUP BY tpit.id,tpit.code,tpit.create_time,tpit.list_time,
+								  tpit.modify_time,tpit.version,tpid.name,
+								  tpit.lifecycle,tpifo.sale_price, tpifo.list_price,
+								  tpifo.title
+							#if($categoryId)
+									, tpic.is_default 
+						    #end  
                  ]]>
 			</value>
 		</constructor-arg>
