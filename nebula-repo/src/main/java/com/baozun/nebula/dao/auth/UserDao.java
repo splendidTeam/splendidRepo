@@ -109,4 +109,12 @@ public interface UserDao extends GenericEntityDao<User,Long>{
 	 */
 	@NativeUpdate 
 	public int modifyPwd(@QueryParam("userId") Long userId, @QueryParam("oldPwd")String oldPwd, @QueryParam("newPwd")String newPwd);
+	
+	/**
+	 * 通过登录名称和生命周期获取用户
+	 * @param loginName
+	 * @return
+	 */
+	@NativeQuery(model = User.class)
+	User findByUserNameAndLifecycle(@QueryParam("userName") String userName,@QueryParam("lifecycle") Integer lifecycle);
 }

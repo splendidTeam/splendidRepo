@@ -2,6 +2,7 @@ if(top != this) {
 	window.parent.location.href = window.location.href;
 }
 $j.extend(loxia.regional['zh-CN'],{
+	"USER_DISABLED":"该账号已被禁用！",
 	"LOGIN_FAILURE":"账号或密码不正确，请重新登录！",
 });
 $j(document).ready(function(){
@@ -21,8 +22,10 @@ $j(document).ready(function(){
 	$j(".orange.submit").click(function(){
 		loxia.submitForm("login-form");
 	});
-
-	if( $j("#type").val() == "1") {
-		nps.info(nps.i18n("LOGIN_FAILURE"));
+	
+	switch($j("#type").val()){
+		case "1": nps.info(nps.i18n("LOGIN_FAILURE"));break;
+		case "2": nps.info(nps.i18n("USER_DISABLED"));break;
+		default:break;
 	}
 });

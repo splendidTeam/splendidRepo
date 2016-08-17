@@ -11,10 +11,12 @@
 	<http pattern="/**/*.gif" security="none" />
 	<http pattern="/**/*.ico" security="none" />
 	<http pattern="/login.htm" security="none" />
-
+	
+	<beans:bean id="nebulaAuthenticationFailureHandler" class="com.baozun.nebula.web.security.auth.NebulaAuthenticationFailureHandler" />
+	
 	<http use-expressions="true" auto-config="false" access-denied-page="/access-denied.htm" entry-point-ref="authenticationProcessingFilterEntryPoint">
 		<intercept-url pattern="/**" access="isFullyAuthenticated()" />
-		<form-login login-page="/login.htm" default-target-url='/index.htm' always-use-default-target="true" authentication-failure-url="/login.htm?type=1"
+		<form-login login-page="/login.htm" default-target-url='/index.htm' always-use-default-target="true" authentication-failure-handler-ref="nebulaAuthenticationFailureHandler"
 			authentication-success-handler-ref="myAuthenticationSuccessHandler" />
 		<logout invalidate-session="true" logout-success-url="/login.htm" logout-url="/logout.htm" />
 

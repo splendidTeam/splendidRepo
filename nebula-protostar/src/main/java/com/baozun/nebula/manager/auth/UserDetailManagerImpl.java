@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,8 +55,13 @@ public class UserDetailManagerImpl implements UserDetailsService{
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException,DataAccessException{
 		User user = userDao.findByUserName(username);
-		if (user == null)
-			throw new UsernameNotFoundException(username + " is not existed.");
+		if (user == null){
+			user  = userDao.findByUserNameAndLifecycle(username, BaseModel.LIFECYCLE_DISABLE);
+			if(user!=null){
+				throw new LockedException(username + " is disabled.");
+			}else
+				throw new UsernameNotFoundException(username + " is not existed.");
+		}	
 		return constructUserDetails(user);
 	}
 

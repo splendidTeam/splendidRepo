@@ -167,5 +167,15 @@
 			</value>
 		</constructor-arg>
 	</bean>	
-		
+	
+	<bean id="User.findByUserNameAndLifecycle" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过登录名称和生命周期获取用户</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from t_au_user where user_name=:userName and lifecycle=:lifecycle
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 </beans>
