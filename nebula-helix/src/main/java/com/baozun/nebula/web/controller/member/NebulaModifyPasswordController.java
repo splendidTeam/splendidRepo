@@ -40,7 +40,6 @@ import com.baozun.nebula.web.controller.member.validator.MemberPasswordFormValid
  * @author Wanrong.Wang 2016/03/31
  * @Controller NebulaModifyPasswordController
  */
-@Controller
 public class NebulaModifyPasswordController extends BaseController{
 
 	private static final Logger			LOG						= LoggerFactory.getLogger(NebulaModifyPasswordController.class);
