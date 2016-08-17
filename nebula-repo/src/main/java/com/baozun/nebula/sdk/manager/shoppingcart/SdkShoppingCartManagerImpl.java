@@ -3090,6 +3090,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         BigDecimal comboDiscAMT = BigDecimal.ZERO;
         comboDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
+        BigDecimal tempDiscAmt = comboDiscAMT;
 
         BigDecimal comboOriginal = getNeedToPayAmountInShoppingCartByComboId(lines, comboId);
         BigDecimal comboPreviousDisc = sdkPromotionSettingManager
@@ -3116,9 +3117,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     continue;
                 else
                     lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
+                
+                lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2,
+    					BigDecimal.ROUND_HALF_EVEN);
+    				tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
+    				if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
+    					settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
+    				}else{
+    					settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
+    				}
 
-                lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2, BigDecimal.ROUND_HALF_EVEN);
-                settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
             }
         }
         return settingList;
