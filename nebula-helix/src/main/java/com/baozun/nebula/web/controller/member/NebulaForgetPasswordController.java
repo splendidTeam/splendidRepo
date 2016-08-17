@@ -31,7 +31,6 @@ import com.baozun.nebula.web.controller.member.validator.ForgetPasswordFormValid
  * @Date 2016/03/31
  * @Controller NebulaForgetPasswordController
  */
-@Controller
 public class NebulaForgetPasswordController extends BaseController{
 
 	private static final Logger			LOG							= LoggerFactory.getLogger(NebulaForgetPasswordController.class);
