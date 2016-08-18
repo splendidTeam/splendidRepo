@@ -145,6 +145,51 @@ public class BundleManagerImpl implements BundleManager {
 		return bundle;
 	}
 	
+	@Override
+	@Transactional
+	public Bundle createOrUpdateGroup(BundleCommand bundle) {
+		if(bundle == null) {
+			throw new BusinessException(ErrorCodes.ITEM_BUNDLE_EXPANDINFO_NULL);
+		}
+		
+		Bundle b = null;
+		
+		Long id = bundle.getId();
+		if(id != null) { // update
+			// 清空从表数据
+			bundleElementDao.deleteByBundleId(id);
+			bundleSkuDao.deleteByBundleId(id);
+			
+			b = bundleDao.getByPrimaryKey(id);
+			b.setAvailableQty(bundle.getAvailableQty());
+			b.setItemId(bundle.getItemId());
+			b.setModifyTime(new Date());
+			b.setPriceType(bundle.getPriceType());
+			b.setSyncWithInv(bundle.getSyncWithInv());
+		} else { // create
+			Long itemId = bundle.getItemId();
+			
+			// 校验指定的item是否已经存在bundle扩展信息
+			if(bundleDao.findBundleByBundleItemId(itemId, null) != null) {
+				throw new BusinessException(ErrorCodes.ITEM_BUNDLE_PRODUCT_CODE_REPEAT, new Object[]{itemId});
+			}
+			
+			b = new Bundle();
+			b.setItemId(itemId);
+			b.setAvailableQty(bundle.getAvailableQty());
+			b.setPriceType(bundle.getPriceType());
+			b.setSyncWithInv(bundle.getSyncWithInv());
+			b.setCreateTime(new Date());
+		}
+		
+		bundleDao.save(b);
+		bundle.setId(b.getId());
+		
+		saveGroupElementAndSku(bundle);
+		
+		return bundle;
+	}
+	
 	private void saveBundleElementAndSku(BundleCommand bundle) {
 		
 		Long id = bundle.getId();
@@ -152,6 +197,59 @@ public class BundleManagerImpl implements BundleManager {
 		List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
 		// bundle商品必须由一个主卖品和至少一个以上的捆绑成员组成
 		if(bundleElementCommands == null || bundleElementCommands.size() < 2) {
+			throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_LOST);
+		}
+		
+		for(BundleElementCommand bec : bundleElementCommands) {
+			bec.setBundleId(id);
+			BundleElement be = new BundleElement();
+			be.setBundleId(bundle.getId());
+			be.setIsMainElement(bec.getIsMainElement());
+			be.setSalesPrice(bec.getSalesPrice());
+			be.setSortNo(bec.getSortNo());
+			bundleElementDao.save(be);
+			bec.setId(be.getId());
+			
+			List<BundleItemCommand> bundleItemCommands = bec.getItems();
+			// 每个捆绑成员必须包含至少一个商品
+			if(bundleItemCommands == null || bundleItemCommands.size() == 0) {
+				throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_ITEM_LOST);
+			}
+			
+			for(BundleItemCommand bc : bundleItemCommands) {
+				List<BundleSkuCommand> bundleSkuCommands = bc.getBundleSkus();
+				// 每个捆绑成员必须包含至少一个sku
+				if(bundleSkuCommands == null || bundleSkuCommands.size() == 0) {
+					throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_SKU_LOST);
+				}
+				
+				for(BundleSkuCommand bsc : bundleSkuCommands) {
+					bsc.setBundleElementId(bec.getId());
+					bsc.setBundleId(id);
+					bsc.setItemId(bc.getItemId());
+					// 如果成员是款
+					if(bec.getIsStyle()) {
+						if(bec.getStyle() == null) {
+							throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_STYLE_LOST);
+						} else {
+							bsc.setStyle(bec.getStyle());
+						}
+					}
+					BundleSku bs = (BundleSku) ConvertUtils.convertTwoObject(new BundleSku(), bsc);
+					bundleSkuDao.save(bs);
+					bsc.setId(bs.getId());
+				}
+			}
+		}
+	}
+	
+	private void saveGroupElementAndSku(BundleCommand bundle) {
+		
+		Long id = bundle.getId();
+		
+		List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
+		// bundle商品必须由一个主卖品和至少一个以上的捆绑成员组成
+		if(bundleElementCommands == null || bundleElementCommands.size() < 1) {
 			throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_LOST);
 		}
 		

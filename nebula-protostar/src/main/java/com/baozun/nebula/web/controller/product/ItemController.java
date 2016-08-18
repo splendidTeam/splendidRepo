@@ -100,6 +100,7 @@ import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.ItemPresaleInfoManager;
 import com.baozun.nebula.manager.product.PropertyManager;
 import com.baozun.nebula.manager.system.ChooseOptionManager;
+import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
@@ -2231,7 +2232,8 @@ public class ItemController extends BaseController {
 
 		return "/product/item/add-item-simple";
 	}
-
+	
+	
 	/**
 	 * 新建bundle商品页面
 	 * 
@@ -2254,6 +2256,29 @@ public class ItemController extends BaseController {
 	}
 	
 	/**
+	 * 新建组商品页面
+	 * @author zhaojun.fang
+	 * @param industryId
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/item/createGroupItem.htm")
+	public String createGroupItem(@RequestParam("industryId") Long industryId, Model model) {
+		
+		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(industryId);
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
+
+		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
+		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
+		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
+		
+		return "/product/item/add-item-group";
+	}
+
+	
+	/**
 	 * 页面跳转 修改商品
 	 * 
 	 * @param model
@@ -2269,8 +2294,8 @@ public class ItemController extends BaseController {
 			switch(type){
 			case 1 : return updateSimpleItem(model, item);
 			case 3 : return updateBundleItem(model, item);
-			// TODO 组商品、虚拟商品
-//			case 5 : return updateGroupItem(model, item);
+			case 5 : return updateGroupItem(model, item);
+			// TODO 虚拟商品
 //			case 7 : return updateVirturlItem(model, item);
 			default : throw new BusinessException("Unknown item type '" + type + "'!");
 			}
@@ -2364,6 +2389,34 @@ public class ItemController extends BaseController {
 		fillBundleViewCommand(model, bundleCommand);
 
 		return "/product/item/update-item-bundle";
+	}
+	
+	/**
+	 * 修改组商品
+	 * @author zhaojun.fang
+	 * @param model
+	 * @param item
+	 * @return
+	 */
+	private String updateGroupItem(Model model, Item item) {
+		
+		// 装载公共信息
+		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(item.getIndustryId());
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
+
+		// 装载商品所属分类信息
+		getCategoryInfoForUpdateItem(model, item);
+
+		// 装载商品扩展信息
+		getItemInfoByUpdateItem(model, item, industry);
+		
+		// 装载bundle信息
+		BundleCommand bundleCommand = bundleManager.findBundleCommandByBundleItemId(item.getId());
+		fillBundleViewCommand(model, bundleCommand);
+
+		return "/product/item/update-item-group";
 	}
 	
 	private void getCommonInfoForCreateOrUpdateItem(Model model) {
@@ -2655,6 +2708,44 @@ public class ItemController extends BaseController {
 
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateBundleItem(itemCommand, command, categoriesIds, defaultCategoryId);
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+	}
+	
+	/**
+	 * 保存组商品
+	 */
+	@RequestMapping("/i18n/item/saveGroupItem.json")
+	@ResponseBody
+	public Object saveGroupItemI18n(@I18nCommand ItemInfoCommand itemCommand,
+			@ArrayCommand(dataBind = true) Long[] categoriesIds, // 商品分类Id
+			Long defaultCategoryId, // 默认分类
+			BundleViewCommand bundle, HttpServletRequest request) throws Exception {
+		
+		bundle.setPriceType(Bundle.PRICE_TYPE_REALPRICE);
+
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null) {
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		dealDescImgUrl(itemCommand);
+
+		// BundleViewCommand -> BundleCommand
+		BundleCommand command = convertToBundleCommand(bundle);
+
+		// 保存商品
+		Item item = itemLangManager.createOrUpdateGroupItem(itemCommand, command, categoriesIds, defaultCategoryId);
 
 		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
 		backWarnEntity.setErrorCode(item.getId().intValue());

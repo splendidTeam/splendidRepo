@@ -53,6 +53,13 @@ public interface BundleManager extends BaseManager {
 	Bundle createOrUpdate(BundleCommand bundle);
 	
 	/**
+	 * 保存group扩展信息
+	 * @param bundle
+	 * @return
+	 */
+	Bundle createOrUpdateGroup(BundleCommand bundle);
+	
+	/**
 	 * 加载bundle成员信息
 	 * @param commands
 	 * @return

@@ -161,6 +161,28 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	}
 	
 	@Override
+	@Transactional
+	public Item createOrUpdateGroupItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
+			throws Exception {
+		
+		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_GROUP);
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
+		
+		// 保存bundle扩展信息
+		bundleCommand.setItemId(item.getId());
+		bundleManager.createOrUpdateGroup(bundleCommand);
+		
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
+		
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+		
+		return item;
+	}
+	
+	@Override
 	@Transactional(readOnly = true)
 	public Integer validateItemCode(String code, Long shopId) {
 		return itemDao.validateItemCode(code, shopId);
