@@ -261,9 +261,13 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 				"postCode" });
 	}
 
+	/**
+	 * 去除加密的字段"loginEmail", "loginMobile", "realName"
+	 * @param memberCommand
+	 */
 	private void encrypt(MemberCommand memberCommand){
 
-		sdkSecretManager.encrypt(memberCommand, new String[] { "loginEmail", "loginMobile", "realName" });
+		sdkSecretManager.encrypt(memberCommand, new String[] {  });
 	}
 
 	
@@ -348,7 +352,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return memberCommand;
@@ -365,13 +369,13 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			member = memberDao.findMemberById(memberCommand.getId());
 		}
 		// 敏感信息加密存储
-		encrypt(memberCommand);
+		//encrypt(memberCommand);
 		member = convertMemberCommandToMember(memberCommand, member);
 		member = memberDao.save(member);
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -387,7 +391,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -403,7 +407,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -417,7 +421,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -1334,7 +1338,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}	
 		return null;
@@ -1386,7 +1390,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			if (null != member){
 				memberCommand = convertMemberToMemberCommand(member);
 				// 敏感信息加密存储完后，解密传输至Controller
-				decrypt(memberCommand);
+				//decrypt(memberCommand);
 				memberCommands.add(memberCommand);
 			}
 		}
