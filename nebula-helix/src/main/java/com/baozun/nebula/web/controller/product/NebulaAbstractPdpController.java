@@ -127,6 +127,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 	/** 商品的推荐数据的缓存key */
 	public static final String 		CACHE_KEY_ITEM_RECOMMEND 			= "nebula_cache_item_recommend";
 	
+	private Boolean viewOffSale=false;
 	
 	@Autowired
 	private ItemRecommandManager itemRecommandManager;
@@ -315,7 +316,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 			// 商品新建状态
 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item status new. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_NEW);
-		} else if(Item.LIFECYCLE_DISABLE.equals(lifecycle)) {
+		} else if(!viewOffSale&&Item.LIFECYCLE_DISABLE.equals(lifecycle)) {
 			// 商品未上架
 			LOG.error("[PDP_BUILD_VALIDATE_ITEM_BASEINFO_COMMAND] Item status offSale. itemCode:{}, lifecycle:{}.", itemCode, lifecycle);
             throw new IllegalItemStateException(IllegalItemState.ITEM_LIFECYCLE_OFFSALE);
@@ -670,4 +671,14 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		}
 		return cacheKey;
 	}
+
+	/**
+	pdp页面查看下架商品开关<br>
+	默认值为false，查看下架商品时抛出异常<br>
+	如需查看下架商品，且不抛出异常，请设置为true<br>
+	*/
+	protected void setViewOffSale(Boolean viewOffSale) {
+		this.viewOffSale = viewOffSale;
+	}
+	
 }

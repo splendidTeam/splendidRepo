@@ -103,8 +103,8 @@ import com.feilong.core.TimeInterval;
  * <li>{@link #getPdpView(Long, HttpServletRequest, HttpServletResponse, Model)} : 获取pdp的View，ajax请求返回{@link NebulaAbstractPdpController#VIEW_PRODUCT_DETAIL_QUICKVIEW} ，页面请求返回{@link NebulaAbstractPdpController#VIEW_PRODUCT_DETAIL}</li>
  * </ul>
  * 
+ * <p>默认pdp展示下架商品会抛出异常，如需正常查看下架商品，请调用setViewOffSale方法设置</p>
  * <p>其他的proteced的方法，项目可以根据自己的逻辑重写。</p>
- * 
  * @author yimin.qiao
  * @version 1.0
  * @time 2016年4月14日  上午10:15:30
