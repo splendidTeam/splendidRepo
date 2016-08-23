@@ -7,6 +7,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	 "LABEL_ITEM_CATEGORY":"所属分类",
 	 "LABEL_ITEM_SALE_PRICE":"标价",
 	 "LABEL_ITEM_LIST_PRICE":"贴牌价",
+	 "NO_CATEGORY":"无",
 	 "EXIST_MESSAGE":"已包含此项，不必重复添加",
 	"INFO_NO_NAME":"请输入组合名称",
 	"INFO_NO_DATA":"包含列表不能为空",

@@ -23,6 +23,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"PRICE-IS-NULL" : "现销售价不能为空",
 	"MEMBER-SKU-SELECTED" : "每个商品必须有一个sku被选中",
 	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空",
+	"NO_CATEGORY":"无",
 	"REFRESH-TABLE" : "请点击‘刷新’更新表格数据"
 });
 

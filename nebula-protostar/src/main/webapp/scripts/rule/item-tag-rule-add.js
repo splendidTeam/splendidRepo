@@ -17,7 +17,8 @@ $j.extend(loxia.regional['zh-CN'],{
 	"TEXT_EXCLUDE":"排除",
 	"TEXT_STAFF":"全体",
 	"TEXT_ITEM":"商品",
-	"TEXT_CATEGORY":"分类"
+	"TEXT_CATEGORY":"分类",
+	"NO_CATEGORY":"无"
 });
 
 /* ------------------------------------------------- URL ------------------------------------------------- */
