@@ -183,7 +183,6 @@
 							#end
 					where tpit.id=tpifo.item_id 
 						and tpid.id=tpit.industry_id
-						and tpit.isaddcategory=1
 						and tpit.shop_id =:shopId
 						and tpit.LIFECYCLE!=2
 						
