@@ -144,7 +144,7 @@ public interface ItemCategoryDao extends GenericEntityDao<ItemCategory, Long> {
 	 */
 
 	@NativeQuery(model = ItemCommand.class)
-	Pagination<ItemCommand> findItemListEmptyCategoryByQueryMapWithPage(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap, @QueryParam("shopId") Long shopId);
+	Pagination<ItemCommand> findItemListCategoryByQueryMapWithPage(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap, @QueryParam("shopId") Long shopId);
 	
 	@NativeQuery(model = ItemCommand.class)
 	Pagination<ItemCommand> findItemListEmptyCategoryByQueryMapWithPageNoShopid(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap);

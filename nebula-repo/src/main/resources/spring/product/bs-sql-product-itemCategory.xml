@@ -165,7 +165,7 @@
 
 	<bean id="ItemCategory.findItemListEmptyCategoryByQueryMapWithPage"
 		class="loxia.dao.support.DynamicQueryHolder">
-		<description>已分类商品</description>
+		<description>所有商品</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
@@ -362,7 +362,7 @@
 
 
 	<bean id="ItemCategory.findItemNoctListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
-		<description>可考虑和findItemListEmptyCategoryByQueryMapWithPage合并
+		<description>可考虑和findItemListCategoryByQueryMapWithPage合并
 		</description>
 		<constructor-arg>
 			<value>
@@ -656,4 +656,83 @@
 		</constructor-arg>
 	</bean>
 	
+	
+	<bean id="ItemCategory.findItemListCategoryByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description>已分类商品</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select tpit.id as id,tpit.code as code,tpit.create_time as createTime,tpit.list_time as listTime,
+						tpit.modify_time as modifyTime,tpit.version,tpid.name as industryName,
+						tpit.lifecycle as lifecycle,tpifo.sale_price as salePrice, tpifo.list_price as listPrice,
+						tpifo.title as title
+						#if($categoryId)
+							, tpic.is_default as isDefault
+						#end
+					from t_pd_item tpit,t_pd_iteminfo tpifo,
+						t_pd_industry tpid 
+							#if($categoryId)
+								,t_pd_item_category tpic 
+							#end
+					where tpit.id=tpifo.item_id 
+						and tpid.id=tpit.industry_id
+						and tpit.shop_id =:shopId
+						and tpit.isaddcategory=1
+						and tpit.LIFECYCLE!=2
+						
+							#if($code)
+		       					and tpit.code like :code
+		       				#end
+							#if($title)
+		       					and tpifo.title like :title
+		       				#end
+		       				
+		       				#if($lifecycle)
+		       					and tpit.LIFECYCLE=:lifecycle
+		       				#end
+							
+							#if($industryId)
+		       					and tpit.industry_id=:industryId
+		       				#end
+							#if($createStartDate)
+		       					and tpit.create_time >= :createStartDate
+		       				#end
+		       				#if($createEndDate)
+		       					and tpit.create_time <= :createEndDate
+		       				#end
+		       			
+		       				#if($listStartDate)
+		       					and tpit.list_time >= :listStartDate
+		       				#end
+		       				#if($listEndDate)
+		       					and tpit.list_time <= :listEndDate
+		       				#end
+		       				#if($categoryId)
+		       					and tpit.id = tpic.item_id 
+		       					and tpic.category_id = :categoryId
+		       				#end
+		       				
+		       				#if($minPrice)
+		       					and tpifo.sale_price >= :minPrice
+		       				#end
+		       				#if($maxPrice)
+		       					and tpifo.sale_price <= :maxPrice
+		       				#end
+		       				#if($type==1)
+		       					and (tpifo.type = 1 or tpifo.type is null)
+		       				#end
+		       				#if($type==0)
+		       					and tpifo.type = 0
+		       				#end
+						GROUP BY tpit.id,tpit.code,tpit.create_time,tpit.list_time,
+								  tpit.modify_time,tpit.version,tpid.name,
+								  tpit.lifecycle,tpifo.sale_price, tpifo.list_price,
+								  tpifo.title
+							#if($categoryId)
+									, tpic.is_default 
+						    #end  
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>
