@@ -88,6 +88,11 @@
 						      	<label>  ￥ ${orderCommand.salesOrderCommand.discount }<spring:message code="order.detail.unit"/></label>
 						    </div>
 						    
+						     <div class="ui-block-line ui-block-line-37">
+						        <label>  <spring:message code="order.detail.actotalAmount"/></label>
+						      	<label>  ￥ ${orderCommand.salesOrderCommand.total+orderCommand.salesOrderCommand.actualFreight}<spring:message code="order.detail.unit"/></label>
+						    </div>
+						    
 						    <div class="ui-block-line ui-block-line-37">
 						        <label>  <spring:message code="order.detail.logisticStatus"/></label>
 						      	<label>   ${orderCommand.logisticsInfo }

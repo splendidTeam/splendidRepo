@@ -38,6 +38,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.bean.ConvertUtil;
+import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.lang.ObjectUtil;
 import com.feilong.core.util.CollectionsUtil;
 
@@ -141,7 +142,7 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
         inputShoppingCartCommand.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount()); // 实付金额
         inputShoppingCartCommand.setShoppingCartLineCommands(updateLines(shopId, inputShoppingCartCommand, promotionBriefList));
 
-        LOGGER.info("use time:{}", getIntervalForView(beginDate, new Date()));
+        LOGGER.info("build ShopCartCommandByShop use time:[{}]", getIntervalForView(beginDate, new Date()));
         return shopCartCommandByShop;
     }
 
@@ -157,7 +158,8 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
      */
     private PromotionResultCommand buildPromotionResultCommand(ShoppingCartCommand inputShoppingCartCommand,List<PromotionBrief> promotionBriefList){
         PromotionResultCommand promotionResultCommand = promotionResultCommandBuilder.build(promotionBriefList);
-        promotionResultCommand.setDisAmtOnOrder(ShoppingCartUtil.getBundleDiscount(inputShoppingCartCommand.getShoppingCartLineCommands()));
+        BigDecimal sumDisAmtOnOrder = NumberUtil.getAddValue(promotionResultCommand.getDisAmtOnOrder(), ShoppingCartUtil.getBundleDiscount(inputShoppingCartCommand.getShoppingCartLineCommands()));
+        promotionResultCommand.setDisAmtOnOrder(sumDisAmtOnOrder);
         return promotionResultCommand;
     }
 

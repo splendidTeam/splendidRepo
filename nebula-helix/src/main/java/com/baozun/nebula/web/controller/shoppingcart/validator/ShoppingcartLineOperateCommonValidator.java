@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
-import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
@@ -39,7 +38,7 @@ public interface ShoppingcartLineOperateCommonValidator{
      * <li>sku必须不为null</li>
      * <li>sku.getLifecycle() 必须 等于 {@link Sku#LIFE_CYCLE_ENABLE}</li>
      * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS}</li>
-     * <li>判断 {@link #checkActiveBeginTime(ItemCommand)} 激活时间</li>
+     * <li>判断 <code>checkActiveBeginTime</code> 激活时间</li>
      * <li>判断商品是非赠品</li>
      * </ol>
      * </blockquote>

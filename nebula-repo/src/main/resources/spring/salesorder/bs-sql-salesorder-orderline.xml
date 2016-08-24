@@ -66,7 +66,7 @@
 	    					$id,
 						 #end
 		       		 	-1)
-		       		 	order by so.GROUP_ID,so.TYPE desc;
+		       		 	order by so.GROUP_ID,so.TYPE
                  ]]>
 			</value>
 		</constructor-arg>

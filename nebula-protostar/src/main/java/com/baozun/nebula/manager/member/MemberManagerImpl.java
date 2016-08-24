@@ -279,7 +279,7 @@ public class MemberManagerImpl implements MemberManager {
 	
 	private void decrypt(MemberCommand memberCommand){
 
-		sdkSecretManager.decrypt(memberCommand, new String[] { "loginName", "nickName"});
+		sdkSecretManager.decrypt(memberCommand, new String[] {"nickName"});
 	}
 	
 	private void decrypt(MemberPersonalDataCommand mpdc){
@@ -296,7 +296,9 @@ public class MemberManagerImpl implements MemberManager {
 				"area",
 				"address",
 				"credentialsNo",
-				"postCode" });
+				"postCode",
+				"mobile",
+				"email"});
 	}
 	
 }

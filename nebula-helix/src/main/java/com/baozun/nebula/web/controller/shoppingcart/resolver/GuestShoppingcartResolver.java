@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +29,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * 游客操作购物车.
@@ -64,16 +66,8 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doAddShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-        // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        guestShoppingcartPersister.save(mainLines, request, response);
-        return null;
+    protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+        return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 
     /*
@@ -84,16 +78,8 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doUpdateShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-        // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
-        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        guestShoppingcartPersister.save(mainLines, request, response);
-        return null;
+    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+        return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 
     /*
@@ -105,16 +91,8 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doDeleteShoppingCartLine(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        // 将修改后的购物车保存cookie
-        guestShoppingcartPersister.save(mainLines, request, response);
-        return null;
+    protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+        return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 
     /*
@@ -134,8 +112,45 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
+        return commonUpdate(shoppingCartLineCommandList, request, response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.Map, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
+        for (Map.Entry<Long, Integer> entry : shoppingcartLineIdAndCountMap.entrySet()){
+            Long shoppingcartLineId = entry.getKey();
+            Integer count = entry.getValue();
+
+            ShoppingCartLineCommand shoppingCartLineCommand = CollectionsUtil.find(shoppingCartLineCommandList, "id", shoppingcartLineId);
+            shoppingCartLineCommand.setQuantity(count);
+        }
+
+        return commonUpdate(shoppingCartLineCommandList, request, response);
+    }
+
+    /**
+     * 目前游客使用 全量更新的操作形式.
+     *
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     * @since 5.3.1.9
+     */
+    private ShoppingcartResult commonUpdate(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
+        // 主賣品(剔除 促銷行 贈品) 剔除之后 下次load会补全最新促销信息 只有游客需要有这个动作 所以放在这里
+        List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 将修改后的购物车保存cookie
-        guestShoppingcartPersister.save(shoppingCartLineCommandList, request, response);
+        guestShoppingcartPersister.save(mainLines, request, response);
         return null;
     }
 }
