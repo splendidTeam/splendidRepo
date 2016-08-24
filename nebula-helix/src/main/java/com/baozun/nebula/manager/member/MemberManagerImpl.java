@@ -49,8 +49,10 @@ import com.baozun.nebula.utils.EmailParamEnciphermentUtil;
 import com.baozun.nebula.web.command.MemberFrontendCommand;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.feilong.core.Alphabet;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.Validator;
+import com.feilong.core.util.RandomUtil;
 import com.feilong.core.util.RegexUtil;
 
 import loxia.dao.Page;
@@ -305,11 +307,28 @@ public class MemberManagerImpl implements MemberManager{
         if (member == null){
             throw new UserNotExistsException();
         }
-
-        String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
-        if (!encodePassword.equals(member.getPassword())){
-            throw new PasswordNotMatchException();
-        }
+      //盐值为空时走原来验证逻辑，验证通过使用新的加密算法生成新的密码，然后保存盐值和新密码 add by ruichao.gao
+    	if(Validator.isNullOrEmpty(member.getSalt())){
+    		 String encodePassword = EncryptUtil.getInstance().hash(memberCommand.getPassword(), member.getLoginName());
+    	        if (!encodePassword.equals(member.getPassword())){
+    	            throw new PasswordNotMatchException();
+    	        }
+    	        
+    	      //生成新的盐值，用新的加密算法进行加密，
+    			String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+    			String pwd = EncryptUtil.getInstance().hashSalt(memberCommand.getPassword(), salt);
+    			//保存密码和盐值
+    			Member mem = memberDao.findMemberById(member.getId());
+    			mem.setSalt(salt);
+    			mem.setPassword(pwd);
+    			memberDao.save(mem);
+    	}else{
+    		String encodePassword = EncryptUtil.getInstance().hashSalt(memberCommand.getPassword(), member.getSalt());
+    		 if (!encodePassword.equals(member.getPassword())){
+ 	            throw new PasswordNotMatchException();
+ 	        }
+    	}
+       
         // 保存用户行为信息
         saveLoginMemberConduct(memberCommand.getMemberConductCommand(), member.getId());
         return member;

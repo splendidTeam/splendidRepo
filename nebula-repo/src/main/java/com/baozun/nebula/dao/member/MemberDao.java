@@ -182,6 +182,9 @@ public interface MemberDao extends GenericEntityDao<Member, Long>{
 
 	@NativeUpdate
 	Integer updatePasswd(@QueryParam("memberId") Long memberId,@QueryParam("newPwd") String newPwd);
+	
+	@NativeUpdate
+	Integer updatePasswdAndSalt(@QueryParam("memberId") Long memberId,@QueryParam("newPwd") String newPwd,@QueryParam("salt") String salt);
 
 	/** 查询第三方会员 */
 	@NativeQuery(model = Member.class)

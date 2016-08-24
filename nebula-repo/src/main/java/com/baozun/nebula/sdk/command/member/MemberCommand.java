@@ -28,6 +28,13 @@ public class MemberCommand implements Command {
 	 * 登录手机
 	 */
 	private String loginMobile;
+	
+	/**
+	 * 盐值
+	 * 密码加密使用了新的迭代加盐hash算法进行加密
+	 * 这里需要将盐值进行存储
+	 */
+	private String salt;
 
 	/**
 	 * 密码
@@ -122,6 +129,14 @@ public class MemberCommand implements Command {
 
 	public void setLoginMobile(String loginMobile) {
 		this.loginMobile = loginMobile;
+	}
+	
+	public String getSalt() {
+		return salt;
+	}
+	
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 
 	public String getPassword() {

@@ -39,6 +39,7 @@ public class ConfigurationUtil {
 	public static final String RANDOM_ALGORITHM_KEY = "nebula.random.algorithm";
 	public static final String HASH_ALGORITHM_KEY = "nebula.hash.algorithm";
 	public static final String DIGEST_ALGORITHM_KEY = "nebula.digest.algorithm";
+	public static final String HASHSALT_ALGORITHM_KEY = "nebula.hashSalt.algorithm";
 	
 	public static final String DEFAULT_ENCODING = "UTF-8";
 	

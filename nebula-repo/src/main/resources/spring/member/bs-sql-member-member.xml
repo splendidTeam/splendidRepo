@@ -27,6 +27,18 @@
 			</value>
 		</constructor-arg>
 	</bean>	
+	
+	<bean id="Member.updatePasswdAndSalt" class="loxia.dao.support.DynamicQueryHolder">
+		<description>盐值为空时更新密码和盐值</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		update T_MEM_MEMBER  set PASSWORD =:newPwd ,salt =:salt
+		       			 where id=:memberId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 		
 	<bean id="Member.findMemberListByIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>

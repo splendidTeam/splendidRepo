@@ -13,6 +13,7 @@ import com.baozun.nebula.sdk.command.member.MemberCommand;
  * @author <a href="xinyuan.guo@baozun.cn">郭馨元</a>
  * 
  */
+@Deprecated
 public interface FindbackManager extends BaseManager{
 
 	void confirmAccount(String loginName, String vcode, HttpSession session);

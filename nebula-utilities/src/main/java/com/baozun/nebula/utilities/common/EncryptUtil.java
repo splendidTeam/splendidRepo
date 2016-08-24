@@ -20,8 +20,13 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -43,12 +48,15 @@ public class EncryptUtil {
 	public static final String ENCRYPTORS = "encryptors";
 	
 	public static final int DEFAULT_ITERATIONS = 1024;
+	public static final int DEFAULT_KEYLENGTH = 512;
 	
 	public static final String DEFAULT_ENCRYPT_ALGORITHM = "AES";
 	public static final String DEFAULT_SIGNATURE_ALGORITHM = "SHA1withDSA";
 	public static final String DEFAULT_RANDOM_ALGORITHM = "SHA1PRNG";
 	public static final String DEFAULT_HASH_ALGORITHM = "SHA-512";
 	public static final String DEFAULT_DIGEST_ALGORITHM = "MD5";
+	public static final String DEFAULT_HASHSALT_ALGORITHM = "PBKDF2WithHmacSHA1";
+	
 	
 	private static EncryptUtil instance = null;
 	
@@ -94,6 +102,32 @@ public class EncryptUtil {
 		return hash(plainText, salt, DEFAULT_ITERATIONS);
 	}
 	
+	/**
+	 * 密码加密使用了新的迭代加盐hash算法进行加密
+	 * add by ruichao.gao
+	 * @param password
+	 * @param salt
+	 * @return
+	 */
+	
+   public String hashSalt( String password, String salt) {
+	   String hashAlgorithm = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ConfigurationUtil.HASHSALT_ALGORITHM_KEY);
+       try {
+           SecretKeyFactory skf = SecretKeyFactory.getInstance(hashAlgorithm == null? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm );
+           PBEKeySpec spec = new PBEKeySpec( password.toCharArray(), salt.getBytes(ConfigurationUtil.DEFAULT_ENCODING), DEFAULT_ITERATIONS, DEFAULT_KEYLENGTH );
+           SecretKey key = skf.generateSecret(spec);
+            byte[] encoded = key.getEncoded();
+           return  base64Convertor.format(encoded);
+ 
+       } catch( NoSuchAlgorithmException | InvalidKeySpecException | UnsupportedEncodingException e ) {
+    		LOG.error("No algorithm found for digest with name {}", 
+					hashAlgorithm == null? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm);
+			
+			LOG.error("Get Bytes error with UTF-8");
+			throw new RuntimeException("Get Bytes error with UTF-8");
+       }
+   }
+   
 	/**
 	 * 取得Hash值
 	 * @param plainText
