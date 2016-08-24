@@ -681,4 +681,13 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
 		this.viewOffSale = viewOffSale;
 	}
 	
+	/**
+	 * false，查看下架商品时抛出异常<br>
+	 * true， 查看下架商品时不抛出异常<br>
+	 * @return
+	 */
+	protected Boolean getViewOffSale() {
+		return viewOffSale;
+	}
+	
 }
