@@ -2414,7 +2414,7 @@ public class ItemController extends BaseController {
 		
 		// 装载bundle信息
 		BundleCommand bundleCommand = bundleManager.findBundleCommandByBundleItemId(item.getId());
-		fillBundleViewCommand(model, bundleCommand);
+		fillGroupViewCommand(model, bundleCommand);
 
 		return "/product/item/update-item-group";
 	}
@@ -2987,6 +2987,143 @@ public class ItemController extends BaseController {
 		model.addAttribute("elements", bevcs);
 		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
 	}
+	
+	
+	/**
+	 * 根据group业务模型填充视图模型
+	 * @param bundleCommand
+	 * @return
+	 */
+	private void fillGroupViewCommand(Model model, BundleCommand bundleCommand) {
+		BundleViewCommand bundleViewCommand = new BundleViewCommand();
+		bundleViewCommand.setId(bundleCommand.getId());
+		bundleViewCommand.setItemId(bundleCommand.getItemId());
+		bundleViewCommand.setAvailableQty(bundleCommand.getAvailableQty());
+		bundleViewCommand.setPriceType(bundleCommand.getPriceType());
+		bundleViewCommand.setSyncWithInv(bundleCommand.getSyncWithInv());
+		bundleViewCommand.setCreateTime(bundleCommand.getCreateTime());
+		
+		model.addAttribute("bundleViewCommand", bundleViewCommand);
+		
+		List<BundleElementCommand> becs = bundleCommand.getBundleElementCommands();
+		List<BundleElementViewCommand> bevcs = new ArrayList<BundleElementViewCommand>();
+		List<BundleElementViewCommand> mbevcs = new ArrayList<BundleElementViewCommand>();
+		for(BundleElementCommand bec : becs) {
+			BundleElementViewCommand bevc = new BundleElementViewCommand();
+			bevc.setIsMainElement(bec.getIsMainElement());
+			bevc.setSalesPrice(bec.getSalesPrice());
+			bevc.setSort(bec.getSortNo());
+			boolean isStyle = bec.getIsStyle();
+			if(isStyle) {
+				bevc.setStyleCode(bec.getStyle());
+			} else {
+				bevc.setItemCode(bec.getItems().get(0).getItemCode());
+			}
+			
+			List<BundleItemCommand> bics = bec.getItems();
+			List<BundleItemViewCommand> bivcs = new ArrayList<BundleItemViewCommand>();
+			List<Long> currentItemIds = new ArrayList<Long>();
+			for(BundleItemCommand bic : bics) {
+				BundleItemViewCommand bivc = new BundleItemViewCommand();
+				Long itemId = bic.getItemId();
+				if(isStyle) {
+					currentItemIds.add(itemId);
+				}
+				bivc.setItemId(itemId);
+				bivc.setItemCode(bic.getItemCode());
+				// 商品的原销售价不会冗余到bundle，需要从商品扩展信息表中获取
+				ItemInfo itemInfo = itemManager.findItemInfoByItemId(bic.getItemId());
+				bivc.setSalesPrice(itemInfo.getSalePrice());
+				bivc.setTitle(itemInfo.getTitle());
+				bivc.setPicUrl(getItemImageByPLP(itemId));
+				
+				List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
+				List<BundleSkuCommand> bscs = bic.getBundleSkus();
+				List<Long> currentSkuIds = new ArrayList<Long>();
+				for(BundleSkuCommand bsc : bscs) {
+					Long skuId = bsc.getSkuId();
+					Sku sku = sdkSkuManager.findSkuById(skuId);
+					if(sku == null) {
+						continue;
+					}
+					currentSkuIds.add(skuId);
+					BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+					bsvc.setSkuId(skuId);
+					bsvc.setIsParticipation(true);
+					bsvc.setOriginalSalesPrice(sku.getSalePrice());
+					bsvc.setSalesPrice(bsc.getSalesPrice());
+					bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+					
+					bsvcs.add(bsvc);
+				}
+				
+				// bundle中仅包含参与捆绑的sku，所以在编辑的时候，需要把未参与的sku也包括进来
+				List<Sku> skus = itemManager.findSkuByItemId(itemId);
+				for(Sku sku : skus) {
+					Long skuId = sku.getId();
+					if(!currentSkuIds.contains(skuId)) {
+						BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+						bsvc.setSkuId(skuId);
+						bsvc.setIsParticipation(false);
+						bsvc.setOriginalSalesPrice(sku.getSalePrice());
+						bsvc.setSalesPrice(sku.getSalePrice());
+						bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+						
+						bsvcs.add(bsvc);
+					}
+				}
+				Collections.sort(bsvcs);
+				bivc.setBundleSkuViewCommands(bsvcs);
+				
+				bivcs.add(bivc);
+			}
+			
+			// 如果捆绑成员是基于款号配置的，在编辑的时候需要检查该款号下是否有新增的商品
+			if(isStyle){
+				List<ItemCommand> itemCommands = itemManager.findItemCommandsByStyle(bec.getStyle());
+				for(ItemCommand command : itemCommands) {
+					Long itemId = command.getId();
+					if(!currentItemIds.contains(itemId)) {
+						BundleItemViewCommand bivc = new BundleItemViewCommand();
+						bivc.setItemId(itemId);
+						bivc.setItemCode(command.getCode());
+						bivc.setSalesPrice(command.getSalePrice());
+						
+						List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
+						List<Sku> skus = itemManager.findSkuByItemId(itemId);
+						for(Sku sku : skus) {
+							BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+							bsvc.setIsParticipation(false);
+							bsvc.setOriginalSalesPrice(sku.getSalePrice());
+							bsvc.setSalesPrice(sku.getSalePrice());
+							bsvc.setSkuId(sku.getId());
+							bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+							
+							bsvcs.add(bsvc);
+						}
+						bivc.setBundleSkuViewCommands(bsvcs);
+						
+						bivcs.add(bivc);
+					}
+				}
+			}
+			Collections.sort(bivcs);
+			bevc.setBundleItemViewCommands(bivcs);
+			
+			if(bevc.getIsMainElement()) {
+				mbevcs.add(bevc);
+			} else {
+				bevcs.add(bevc);
+			}
+		}
+		
+		model.addAttribute("mainElements", mbevcs);
+		model.addAttribute("mainElementsStr", JsonUtil.format(mbevcs));
+		model.addAttribute("elements", bevcs);
+		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
+	}
+	
+	
 	
 	private String getItemImageByPLP(Long itemId){
 		List<ItemImage> itemImages = sdkItemManager.findItemImageByItemIds(Arrays.asList(itemId), ItemImage.IMG_TYPE_LIST);

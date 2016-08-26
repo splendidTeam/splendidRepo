@@ -10,14 +10,14 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 </div>
 
 <div class="ui-block-content border-grey">
-	<%-- <div class="ui-block">
+	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.mainProduct" /></div>
 		<div class="ui-block-content border-grey">
 			<ul class="clearfix setMainProduct">
-				<li class="main-pro pro-empty" id="selectPro"><spring:message code="item.common.setMainProduct" /></li>
+				<li class="main-pro pro-empty" id="selectPro"><spring:message code="item.common.addMainProduct" /></li>
 			</ul>
 		</div>
-	</div> --%>
+	</div>
 	<div class="ui-block">
 		<div class="ui-block-title1 ui-block-title"><spring:message code="item.group.memberProduct" /></div>
 		<div class="ui-block-content border-grey">

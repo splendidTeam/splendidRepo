@@ -33,17 +33,18 @@ var findStyleInfoListJsonUrl = base + "/item/styleList.json";
 var selectStoreyType = '';
 
 var elements = new Array();
-var mainElement = null;
+var mainElement = new Array();
 var isRefresh = true;
 
 $j(document).ready(function(){
 	refreshItemData([]);
 	initBundleElement();
+	$j("#selectPro").show();
 	
 	/*==================================     bundle扩展信息    ==========================*/
 	/*==================================     弹出层    ==========================*/
 	//点击'设置主卖品'弹出对应弹层
-	/*$j("#selectPro").hover(function(){
+	$j("#selectPro").hover(function(){
 		$j(this).attr("style","text-decoration: underline");
 	},function(){
 		$j(this).attr("style","");
@@ -53,7 +54,7 @@ $j(document).ready(function(){
 		selectStoreyType = 1;
 		$j('.select-pro-layer').dialogff({type:'open',close:'in',width:'900px', height:'500px'});	
 		$j('#bundle_dialog_title').html(nps.i18n("BUNDLE_DIALOG_TITLE_MAIN"));
-	});	*/
+	});	
 	
 	//点击'+新成员'弹出对应弹层
 	$j("#selectStyle").hover(function(){
@@ -85,9 +86,9 @@ $j(document).ready(function(){
 	var bundleExtInfoValidator = new FormValidator('', 30, function(){
 		
 		// 校验主卖品是否存在
-		/*if($j(".setMainProduct").find(".validate-code").text() == null || $j(".setMainProduct").find(".validate-code").text() == ""){
+		if($j(".setMainProduct").find(".validate-code").text() == null || $j(".setMainProduct").find(".validate-code").text() == ""){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MAIN-PRODUCT-NOT-EXIST"));
-		}*/
+		}
 		// 校验成员是否存在至少一个
 		if($j(".setMemberProduct").find(".validate-code").text() == null || $j(".setMemberProduct").find(".validate-code").text() == ""){
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-PRODUCT-NOT-EXIST"));
@@ -167,10 +168,10 @@ $j(document).ready(function(){
 				if(selectStoreyType == 1){
 					if(_type == "product") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src="'+$j("#baseImageUrl").val()+element.attr("data-src") +'"><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="product">'+element.parent().next().html()+'</p><p class="sub-title">'+element.parent().next().next().html()+'</p></li>');
-						$j("#selectPro").hide();
+						//$j("#selectPro").hide();
 					} else if(_type == "style") {
 						$j("#selectPro").before('<li class="main-pro"><a class="showpic"><img src=""><span class="dialog-close">X</span></a><p class="title p10 validate-code" data-type="style">'+element.parent().next().text()+'</p></li>');
-						$j("#selectPro").hide();
+						//$j("#selectPro").hide();
 					}
 				}else if(selectStoreyType == 2){
 					if(_type == "product") {
@@ -253,10 +254,10 @@ $j(document).ready(function(){
  *给关闭图标绑定点击事件 
  */
 function bindClose(){
-	/*$j(".setMainProduct .dialog-close").bind("click",function(){
+	$j(".setMainProduct .dialog-close").bind("click",function(){
 		$j("#selectPro").show();
 		isRefresh = false;
-	})*/
+	})
 	$j(".setMemberProduct .dialog-close").bind("click",function(){
 		isRefresh = false;
 	})
@@ -479,7 +480,7 @@ function fillProductTable(data){
 function loadBundleElements(editable, showDefaultValue, elements){
 	var data = null;
 	if(elements) {
-		data = elements
+		data = elements;
 	} else {
 		getElements();
 		if(fillForm()) {
@@ -544,12 +545,12 @@ function fillForm(){
 	var _e = new Array();
 	
 	// 校验主卖品
-	/*if(mainElement ) {
-		_e.push(mainElement )
+	if(mainElement ) {
+		_e = _e.concat(mainElement);
 	} else {
 		nps.info(nps.i18n('MAIN-PRODUCT-NOT-EXIST'));
 		return false;
-	}*/
+	}
 	
 	// 校验捆绑成员
 	if(elements && elements.length > 0) {
@@ -574,12 +575,12 @@ function fillForm(){
 //获取主商品和成员商品的对象
 function getElements(){
 	
-	mainElement = null;
+	mainElement = new Array();
 	elements = new Array();
     bundleElement = null;
 	
 	//主商品
-	var mainProductCode = $j(".setMainProduct").find(".validate-code");
+	/*var mainProductCode = $j(".setMainProduct").find(".validate-code");
 	if(mainProductCode.text() != null){
 		if(mainProductCode.attr("data-type") == "product"){
 			mainElement = {
@@ -596,11 +597,38 @@ function getElements(){
 					itemCode : ''
 				};
 		}
-	}
+	}*/
 	
+  //mystart
+    var memberProductCode = null;
+	var _sort = 0;
+	$j(".setMainProduct").find(".validate-code").each(function(){
+		if($j(this).text() != null){
+			_sort++;
+			if($j(this).attr("data-type") == "product"){
+				bundleElement = {
+						isMainElement : true,
+						sort : _sort,
+						styleCode : '',
+						itemCode : $j(this).text()
+					};
+				mainElement.push(bundleElement);
+			}else if($j(this).attr("data-type") == "style"){
+				bundleElement = {
+						isMainElement : true,
+						sort : _sort,
+						styleCode : $j(this).text(),
+						itemCode : ''
+					};
+				mainElement.push(bundleElement);
+			}
+		}
+	});
+    //myend
+    
 	//成员商品
 	var memberProductCode = null;
-	var _sort = 1;
+	//var _sort = 1;
 	$j(".setMemberProduct").find(".validate-code").each(function(){
 		if($j(this).text() != null){
 			_sort++;

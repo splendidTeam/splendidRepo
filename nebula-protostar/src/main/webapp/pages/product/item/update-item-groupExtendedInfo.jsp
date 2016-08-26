@@ -9,25 +9,27 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 
 <div class="ui-block-content border-grey">
 	<div class="ui-block">
-		<%-- <div class="ui-block-title1 ui-block-title"><spring:message code="item.common.mainProduct" /></div>
+		<div class="ui-block-title1 ui-block-title"><spring:message code="item.common.mainProduct" /></div>
 		<div class="ui-block-content border-grey">
 			<ul class="clearfix setMainProduct">
+			<c:forEach var="mainEle" items="${mainElements }" varStatus="status">
 				<li class="main-pro">
 					<c:choose>
-						<c:when test="${mainElement.styleCode != null}">
+						<c:when test="${mainEle.styleCode != null}">
 							<a class="showpic"><img src=""><span class="dialog-close">X</span></a>
-							<p class="title p10 validate-code" data-type="style"><span title="${mainElement.styleCode }">${mainElement.styleCode }</span></p>
+							<p class="title p10 validate-code" data-type="style"><span title="${mainEle.styleCode }">${mainEle.styleCode }</span></p>
 						</c:when>
 						<c:otherwise>
-							<a class="showpic"><img src="${mainElement.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
-							<p class="title p10 validate-code" data-type="product"><span title="${mainElement.itemCode }">${mainElement.itemCode }</span></p>
-							<p class="sub-title"><span title="${mainElement.bundleItemViewCommands[0].title }">${mainElement.bundleItemViewCommands[0].title }</span></p>
+							<a class="showpic"><img src="${mainEle.bundleItemViewCommands[0].picUrl }"><span class="dialog-close">X</span></a>
+							<p class="title p10 validate-code" data-type="product"><span title="${mainEle.itemCode }">${mainEle.itemCode }</span></p>
+							<p class="sub-title"><span title="${mainEle.bundleItemViewCommands[0].title }">${mainEle.bundleItemViewCommands[0].title }</span></p>
 						</c:otherwise>
 					</c:choose>
 				</li>
-				<li class="main-pro pro-empty" id="selectPro" style="display:none"><spring:message code="item.common.setMainProduct" /></li>
+				</c:forEach>
+				<li class="main-pro pro-empty" id="selectPro" style="display:none"><spring:message code="item.common.addMainProduct" /></li>
 			</ul>
-		</div> --%>
+		</div>
 	</div>
 	<c:choose>
 		<c:when test=""></c:when>

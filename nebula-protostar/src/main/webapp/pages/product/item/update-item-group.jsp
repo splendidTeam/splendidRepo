@@ -10,7 +10,7 @@
 <script type="text/javascript" src="${base}/scripts/product/item/update-item-group.js"></script>
 <script type="text/javascript">
 $j(document).ready(function(){
-	mainElement = ${mainElementStr};
+	mainElement = ${mainElementsStr};
 	elements = ${elementsStr};
 	initBundleElement(${bundleViewCommand.priceType}, new Array().concat(mainElement).concat(elements));
 });
