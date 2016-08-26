@@ -23,8 +23,8 @@
 			        <div class="ui-block-content ui-block-content-lb ui-subtitle">
 			            <table>
 			                <tr>
-			                    <td><label><spring:message code="item.update.selectedIndustry"/></label></td>
-			                    <td><span id="chooseIndustry">${industry.name }</span></td>
+			                    <%-- <td><label><spring:message code="item.update.selectedIndustry"/></label></td>
+			                    <td><span id="chooseIndustry">${industry.name }</span></td> --%>
 			                    
 			                </tr>
 			            </table>
