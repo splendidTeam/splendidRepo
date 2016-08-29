@@ -248,8 +248,8 @@ public class BundleManagerImpl implements BundleManager {
 		Long id = bundle.getId();
 		
 		List<BundleElementCommand> bundleElementCommands = bundle.getBundleElementCommands();
-		// bundle商品必须由一个主卖品和至少一个以上的捆绑成员组成
-		if(bundleElementCommands == null || bundleElementCommands.size() < 1) {
+		// group商品必须由一个以上主卖品和至少一个以上的组成员组成
+		if(bundleElementCommands == null || bundleElementCommands.size() < 2) {
 			throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_LOST);
 		}
 		
@@ -264,14 +264,14 @@ public class BundleManagerImpl implements BundleManager {
 			bec.setId(be.getId());
 			
 			List<BundleItemCommand> bundleItemCommands = bec.getItems();
-			// 每个捆绑成员必须包含至少一个商品
+			// 每个组成员必须包含至少一个商品
 			if(bundleItemCommands == null || bundleItemCommands.size() == 0) {
 				throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_ITEM_LOST);
 			}
 			
 			for(BundleItemCommand bc : bundleItemCommands) {
 				List<BundleSkuCommand> bundleSkuCommands = bc.getBundleSkus();
-				// 每个捆绑成员必须包含至少一个sku
+				// 每个组成员必须包含至少一个sku
 				if(bundleSkuCommands == null || bundleSkuCommands.size() == 0) {
 					throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_SKU_LOST);
 				}
