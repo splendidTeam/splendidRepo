@@ -273,7 +273,7 @@ public class BundleManagerImpl implements BundleManager {
 				List<BundleSkuCommand> bundleSkuCommands = bc.getBundleSkus();
 				// 每个组成员必须包含至少一个sku
 				if(bundleSkuCommands == null || bundleSkuCommands.size() == 0) {
-					throw new BusinessException(ErrorCodes.ITEM_BUNDLE_ELEMENT_SKU_LOST);
+					throw new BusinessException(ErrorCodes.ITEM_GROUP_ELEMENT_SKU_LOST);
 				}
 				
 				for(BundleSkuCommand bsc : bundleSkuCommands) {

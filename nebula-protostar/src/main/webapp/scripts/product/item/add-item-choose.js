@@ -190,6 +190,14 @@ $j(document).ready(function(){
 	
 //	$j(".select-btn input[type='radio']").trigger('change');
 	
+	if($j("#bundleItem").attr("checked")){
+		$j(".pro-modal").hide();
+	}
+	
+	if($j("#groupItem").attr("checked")){
+		$j(".pro-modal").hide();
+	}
+	
 	$j(".normalpro").click(function(){
 		$j(".pro-modal").show();
 	});

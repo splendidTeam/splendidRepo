@@ -99,7 +99,7 @@ $j(document).ready(function(){
     	}
     	
     	var flag = true;
-    	/*$j('.tr-product').each(function(){
+    	$j('.tr-product').each(function(){
     		var _flag = false;
     		var _data = $j(this).attr("data-product")
     		$j('.tr-sku').each(function(){
@@ -111,7 +111,7 @@ $j(document).ready(function(){
     		if(!_flag){
     			flag = false;
     		}
-    	});*/
+    	});
     	
     	if(!flag){
     		return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("MEMBER-SKU-SELECTED"));
