@@ -207,13 +207,15 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
                         "cityId",
                         "areaId",
                         "townId",
-
                         "address",
                         "postcode",
                         "mobile",
                         "tel",
                         "email",
-                        "name");
+                        "name",
+                        "appointType",
+                        "buyerName",
+                        "buyerTel");
 
         //地址名称
         Address country = AddressUtil.getAddressById(shippingInfoSubForm.getCountryId());
