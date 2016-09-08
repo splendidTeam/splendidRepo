@@ -184,14 +184,14 @@ $j(document).ready(function(){
 		}else{
 			return nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("SELECT-PRODUCT"));
 		}
-		isRefresh = false;
+		changeRefreshFlag(false);
 		$j(".setMemberProduct").sortable();
 		$j(".remove").disableSelection();
 	});
 	
 	 $j(".setMemberProduct").sortable({
 		  beforeStop: function( event, ui ) {
-			  isRefresh = false;
+			  changeRefreshFlag(false);
 		  }
 	});  
 	
@@ -254,10 +254,10 @@ $j(document).ready(function(){
 function bindClose(){
 	$j(".setMainProduct .dialog-close").bind("click",function(){
 		$j("#selectPro").show();
-		isRefresh = false;
+		changeRefreshFlag(false);
 	})
 	$j(".setMemberProduct .dialog-close").bind("click",function(){
-		isRefresh = false;
+		changeRefreshFlag(false);
 	})
 	
 	//关闭图标
@@ -266,6 +266,14 @@ function bindClose(){
 	})
 }
 
+function changeRefreshFlag(flag) {
+	isRefresh = flag;
+	if(flag) {
+		$j('#refresh_alert').hide();
+	} else {
+		$j('#refresh_alert').show();
+	}
+}
 
 //刷新商品表格数据
 function refreshItemData(dataUrl){
@@ -469,7 +477,7 @@ function fillProductTable(data){
 		}
 	}); 
 	$j('.product-table > tbody').html(_html);
-	isRefresh = true;
+	changeRefreshFlag(true);
 }
 
 /**
@@ -527,7 +535,7 @@ function loadBundleElements(editable, showDefaultValue){
 		}
 		
 		$j('.sku-table > tbody').html(_html);
-		isRefresh = true;
+		changeRefreshFlag(true);
 	}
 }
 

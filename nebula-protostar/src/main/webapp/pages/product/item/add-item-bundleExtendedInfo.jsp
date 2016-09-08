@@ -25,7 +25,7 @@ var categoryDisplayMode = "${categoryDisplayMode}";
 				<div class="setMemberProduct"></div>
 				<li class="main-pro pro-empty" id="selectStyle"><spring:message code="item.common.addMemberProduct" /></li>
 			</ul>
-			<a class="user-refresh" id="refresh-table"><spring:message code="refresh" /></a>
+			<a class="user-refresh" id="refresh-table"><spring:message code="refresh" /></a><span id="refresh_alert" style="color:red;padding-left:10px;display:none;"><spring:message code="item.common.bundle.alert" /></span>
 		</div>
 	</div>
 	<div class="ui-block">
