@@ -24,6 +24,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"PRICE-IS-NULL" : "现销售价不能为空",
 	"CHECK-MEMBER-SKU" : "每个商品必须有一个sku被选中",
 	"CHECKED-PRICE-IS-NULL" : "被选中的sku,'现销售价'不能为空",
+	"NO_CATEGORY":"无",
 	"REFRESH-TABLE" : "请点击‘刷新’更新表格数据"
 });
 
@@ -152,7 +153,7 @@ $j(document).ready(function(){
 		var element = $j(':input[name="bundle_element"]:checked');
 		//校验是否有重复选择商品
 		$j(".validate-code").each(function(){
-			if( element.parent().next().html() == $j(this).html() ){
+			if( element.parent().next().text() == $j(this).text() ){
 				hasRepeat = true;
 			}
 		});
