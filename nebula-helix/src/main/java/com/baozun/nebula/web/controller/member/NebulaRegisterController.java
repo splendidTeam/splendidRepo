@@ -310,6 +310,14 @@ public class NebulaRegisterController extends NebulaLoginController{
 			Model model){
 
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+		
+		// 密码解密，密码传输通过RSA做了加密，此处需要解密
+		// 由于registerFormValidate需要校验Password和Repassword是否一致，需要提前解密
+		registerForm.setPassword(decryptSensitiveDataEncryptedByJs(registerForm.getPassword(), request));
+		if(Validator.isNotNullOrEmpty(registerForm.getRepassword())){
+			registerForm.setRepassword(decryptSensitiveDataEncryptedByJs(registerForm.getRepassword(), request));
+		}
+		
 		/** 数据校验 */
 		Device device = getDevice(request);
 		defaultReturnResult = (DefaultReturnResult) registerFormValidate(device, registerForm, bindingResult);
@@ -319,11 +327,6 @@ public class NebulaRegisterController extends NebulaLoginController{
 			return defaultReturnResult;
 		}
 		
-		LOGGER.info("----------------------------------");
-
-		// 密码解密，密码传输通过RSA做了加密，此处需要解密
-		registerForm.setPassword(decryptSensitiveDataEncryptedByJs(registerForm.getPassword(), request));
-
 		try{
 
 			MemberFrontendCommand memberFrontendCommand = registerForm.toMemberFrontendCommand();
