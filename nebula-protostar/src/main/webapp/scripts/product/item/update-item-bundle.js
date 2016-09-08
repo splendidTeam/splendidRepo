@@ -449,7 +449,7 @@ function fillProductTable(data){
 				_html += '<td>' + item.itemCode + '</td>';
 				_html += '<td>' + item.salesPrice + '</td>';
 				if(i == 0) {
-					_html += '<td rowspan="' + bundleItems.length + '"><input type="text" class="fix-price" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + item.salesPrice + '" /></td>';
+					_html += '<td rowspan="' + bundleItems.length + '"><input type="text" class="fix-price" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + (element.salesPrice == null ? item.salesPrice : element.salesPrice) + '" /></td>';
 				}
 				_html += '</tr>';
 				if(i < bundleItems.length - 1) {
@@ -462,7 +462,7 @@ function fillProductTable(data){
 			_html += '<td>' + (idx + 1) + '</td>';
 			_html += '<td>' + element.itemCode + '</td>';
 			_html += '<td>' + element.bundleItemViewCommands[0].salesPrice + '</td>';
-			_html += '<td><input type="text" class="fix-price" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + element.bundleItemViewCommands[0].salesPrice + '" /></td>';
+			_html += '<td><input type="text" class="fix-price" name="bundleElementViewCommands[' + idx + '].salesPrice" value="' + (element.salesPrice == null ? element.bundleItemViewCommands[0].salesPrice : element.salesPrice) + '" /></td>';
 			_html += '</tr>';
 		}
 	}); 
