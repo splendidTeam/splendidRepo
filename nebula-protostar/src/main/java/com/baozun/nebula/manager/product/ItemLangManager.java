@@ -35,6 +35,9 @@ public interface ItemLangManager extends BaseManager {
 	
 	Item createOrUpdateBundleItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
 			throws Exception;
+	
+	Item createOrUpdateGroupItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
+			throws Exception;
 
 	Integer validateItemCode(String code, Long shopId);
 

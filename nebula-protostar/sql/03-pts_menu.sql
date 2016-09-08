@@ -100,7 +100,8 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (120, 1, 12, '/item/sortScore.htm', now(), 1, null, '默认排序引擎管理');
 --邮件模板管理
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (615, 1, 10, '/email/list.htm', now(), 6, null, '邮件模板管理');
-
+--邮件订阅管理
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (21, 1, 3, '/email/subscribe/manager.htm', now(), 5, null, '邮件订阅管理');
 
 --告警设置
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (720, 1, 20, '/warningConfig/list.htm', now(), 7, null, '告警设置');
@@ -122,3 +123,7 @@ INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id",
 -- 日志管理
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (810, 1, 1, '/backlog/skuInventoryChangeLog/list.htm', now(), 8, null, '库存变更日志管理');
 INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (811, 1, 2, '/backlog/sysAuditLog/list.htm', now(), 8, null, '审计日志查询列表');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (nextval('s_t_au_menu'), 1, 4, '/backlog/schedulerLog/list.htm', now(), 14, null, '定时任务运行日志');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (813, 1, 1, '', now(),14, 'system', 'SCM消息日志');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (814, 1, 1, '/backlog/scmSendLog/list.htm', now(), 813, null, 'SCM发送消息日志');
+INSERT INTO "t_au_menu"("id" ,"lifecycle","sort_no","url","version","parent_id","icon","label") VALUES (815, 1, 2, '/backlog/scmReceivedLog/list.htm', now(), 813, null, 'SCM接收消息日志');

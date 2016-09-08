@@ -37,7 +37,7 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
  * 
  * <tr valign="top">
  * <td>
- * {@link #buildSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm, HttpServletRequest request)
+ * {@link #toSalesOrderCommand(MemberDetails memberDetails, OrderForm orderForm, HttpServletRequest request)
  * buildeSalesOrderCommand}</td>
  * <td>封装订单信息</td>
  * </tr>
@@ -92,7 +92,7 @@ public interface SalesOrderResolver{
      *            the request
      * @return 返回封装之后的SalesOrderCommand
      */
-    SalesOrderCommand buildSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request);
+    SalesOrderCommand toSalesOrderCommand(MemberDetails memberDetails,OrderForm orderForm,HttpServletRequest request);
 
     /**
      * 通过支付流水号查询订单

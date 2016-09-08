@@ -16,9 +16,19 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SUCCESS;
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,8 +48,11 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
+import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartOneLineMaxQuantityValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.DefaultShoppingcartTotalLineMaxSizeValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
-import com.feilong.core.Validator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartTotalLineMaxSizeValidator;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -53,22 +66,31 @@ import com.feilong.core.util.CollectionsUtil;
 public abstract class AbstractShoppingcartResolver implements ShoppingcartResolver{
 
     /** The Constant log. */
-    private static final Logger                    LOGGER = LoggerFactory.getLogger(AbstractShoppingcartResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractShoppingcartResolver.class);
 
     /** The sdk sku manager. */
     @Autowired
-    private SdkSkuManager                          sdkSkuManager;
+    private SdkSkuManager sdkSkuManager;
 
     /** The sdk item manager. */
     @Autowired
-    private SdkItemManager                         sdkItemManager;
+    private SdkItemManager sdkItemManager;
 
     /** The shoppingcart count persister. */
     @Autowired
-    private ShoppingcartCountPersister             shoppingcartCountPersister;
+    private ShoppingcartCountPersister shoppingcartCountPersister;
 
+    /** The shoppingcart line operate common validator. */
     @Autowired
     private ShoppingcartLineOperateCommonValidator shoppingcartLineOperateCommonValidator;
+
+    /** The shoppingcart one line max quantity validator. */
+    @Autowired(required = false)
+    private ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
+
+    /** The shoppingcart total line max size validator. */
+    @Autowired(required = false)
+    private ShoppingcartTotalLineMaxSizeValidator shoppingcartTotalLineMaxSizeValidator;
 
     /*
      * (non-Javadoc)
@@ -77,49 +99,47 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * java.lang.Long, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public ShoppingcartResult addShoppingCart(
-                    MemberDetails memberDetails,
-                    Long skuId,
-                    Integer count,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-
+    public ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long skuId,Integer count,HttpServletRequest request,HttpServletResponse response){
         Validate.notNull(skuId, "skuId can't be null!");
         Validate.notNull(count, "count can't be null!");
 
-        Sku sku = sdkSkuManager.findSkuById(skuId);
-        ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
+        //********1. 校验************************************
 
-        if (null != commandValidateShoppingcartResult){
-            return commandValidateShoppingcartResult;
+        Sku sku = sdkSkuManager.findSkuById(skuId);
+        ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
+
+        if (null != commonValidateShoppingcartResult){
+            return commonValidateShoppingcartResult;
         }
 
         // ****************************************************************************************
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
-        if (null == shoppingCartLineCommandList){
-            shoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();
-        }
-
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
+
+        // ****************************************************************************************
         ShoppingCartLineCommand currentShoppingCartLineCommand = findSameSkuShoppingCartLineCommand(mainLines, sku);
 
-        if (null != currentShoppingCartLineCommand){// 存在
-        	
-        	Integer oneLineTotalCount = currentShoppingCartLineCommand.getQuantity() + count;
-        	
-            currentShoppingCartLineCommand.setQuantity(oneLineTotalCount);
-            
-            if (oneLineTotalCount > Constants.SHOPPING_CART_SKU_ONE_LINE_COUNT) {
-            	return ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
-            }
-            
-        }else{
-            // 最大行数验证
-            // 校验是否超过购物车规定的商品行数
-            if ((mainLines.size() + 1) > Constants.SHOPPING_CART_SKU_MAX_COUNT){
-                return ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
-            }
+        //是否已经在购物车里面有
+        Integer oneLineTotalCount = null != currentShoppingCartLineCommand ? currentShoppingCartLineCommand.getQuantity() + count : count;
 
+        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
+        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, skuId, oneLineTotalCount)){
+            return ONE_LINE_MAX_THAN_COUNT;
+        }
+
+        // 最大行数验证
+        // 校验是否超过购物车规定的商品行数
+        if (null == currentShoppingCartLineCommand){
+            ShoppingcartTotalLineMaxSizeValidator useShoppingcartTotalLineMaxSizeValidator = defaultIfNull(shoppingcartTotalLineMaxSizeValidator, new DefaultShoppingcartTotalLineMaxSizeValidator());
+            if (useShoppingcartTotalLineMaxSizeValidator.isGreaterThanMaxSize(memberDetails, mainLines.size() + 1)){
+                return MAIN_LINE_MAX_THAN_COUNT;
+            }
+        }
+
+        //***************************************************************************************
+        if (null != currentShoppingCartLineCommand){// 存在
+            currentShoppingCartLineCommand.setQuantity(oneLineTotalCount);
+        }else{
             // 构造一条 塞进去
             ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(sku.getId(), count, sku.getOutid());
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
@@ -127,22 +147,20 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             currentShoppingCartLineCommand = shoppingCartLineCommand;
         }
 
+        //***********************************************************************************************
+
         if (isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
-            return ShoppingcartResult.MAX_THAN_INVENTORY;
+            return MAX_THAN_INVENTORY;
         }
 
-        ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(
-                        memberDetails,
-                        shoppingCartLineCommandList,
-                        currentShoppingCartLineCommand,
-                        request,
-                        response);
+        //***********************************************************************************************
+        ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, currentShoppingCartLineCommand, request, response);
 
         if (null != addShoppingCartShoppingcartResult){
             return addShoppingCartShoppingcartResult;
         }
         afterMergeShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-        return ShoppingcartResult.SUCCESS;
+        return SUCCESS;
     }
 
     //**************************************************************************************
@@ -153,37 +171,26 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * MemberDetails, java.lang.Long, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public ShoppingcartResult deleteShoppingCartLine(
-                    MemberDetails memberDetails,
-                    Long shoppingcartLineId,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-
+    public ShoppingcartResult deleteShoppingCartLine(MemberDetails memberDetails,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response){
         // 获取购物车行信息
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
 
         ShoppingCartLineCommand currentShoppingCartLineCommand = CollectionsUtil.find(mainlines, "id", shoppingcartLineId);
-        if (Validator.isNullOrEmpty(currentShoppingCartLineCommand)){
-            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        if (isNullOrEmpty(currentShoppingCartLineCommand)){
+            return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
         shoppingCartLineCommandList = CollectionsUtil.remove(shoppingCartLineCommandList, currentShoppingCartLineCommand);
 
-        ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(
-                        memberDetails,
-                        shoppingCartLineCommandList,
-                        currentShoppingCartLineCommand,
-                        request,
-                        response);
+        ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(memberDetails, shoppingCartLineCommandList, currentShoppingCartLineCommand, request, response);
 
         if (null != deleteShoppingCartResult){
             return deleteShoppingCartResult;
         }
 
         afterMergeShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-
-        return ShoppingcartResult.SUCCESS;
+        return SUCCESS;
     }
 
     //**************************************************************************************
@@ -195,54 +202,84 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * MemberDetails, java.lang.Long, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public ShoppingcartResult updateShoppingCartCount(
-                    MemberDetails memberDetails,
-                    Long shoppingcartLineId,
-                    Integer count,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-
+    public ShoppingcartResult updateShoppingCartCount(MemberDetails memberDetails,Long shoppingcartLineId,Integer count,HttpServletRequest request,HttpServletResponse response){
+        //1.取到原来的数据
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
 
-        // 找不到 就抛
-        ShoppingCartLineCommand currentShoppingCartLineCommand = CollectionsUtil
-                        .find(shoppingCartLineCommandList, "id", shoppingcartLineId);
-
-        if (null == currentShoppingCartLineCommand){
-            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        //2.校验****************************************************************
+        //2.1 校验 shoppingcartLineId
+        ShoppingcartResult validatorShoppingcartResult = doUpdateShoppingCartCountValidator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, count);
+        if (null != validatorShoppingcartResult){
+            return validatorShoppingcartResult;
         }
 
-        Long skuId = currentShoppingCartLineCommand.getSkuId();
-        Sku sku = sdkSkuManager.findSkuById(skuId);
-
-        ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
-
-        if (null != commandValidateShoppingcartResult){
-            return commandValidateShoppingcartResult;
-        }
-
-        // ****************************************************************************************
-        currentShoppingCartLineCommand.setQuantity(count);
-
-        if (isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
-            return ShoppingcartResult.MAX_THAN_INVENTORY;
-        }
-
-        ShoppingcartResult updateShoppingcartResult = doUpdateShoppingCart(
-                        memberDetails,
-                        shoppingCartLineCommandList,
-                        currentShoppingCartLineCommand,
-                        request,
-                        response);
+        //3.不同方法的实现****************************************************************
+        ShoppingCartLineCommand currentShoppingCartLineCommand = CollectionsUtil.find(shoppingCartLineCommandList, "id", shoppingcartLineId);
+        ShoppingcartResult updateShoppingcartResult = doUpdateShoppingCart(memberDetails, shoppingCartLineCommandList, currentShoppingCartLineCommand, request, response);
 
         if (null != updateShoppingcartResult){
             return updateShoppingcartResult;
         }
 
+        //4.afterMergeShoppingCart****************************************
         afterMergeShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
-
-        return ShoppingcartResult.SUCCESS;
+        return SUCCESS;
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#updateShoppingCartCount(com.baozun.nebula.web.MemberDetails, java.util.Map, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult updateShoppingCartCount(MemberDetails memberDetails,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
+        Validate.notEmpty(shoppingcartLineIdAndCountMap, "shoppingcartLineIdAndCountMap can't be null/empty!");
+
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
+
+        //2.校验****************************************************************
+
+        for (Map.Entry<Long, Integer> entry : shoppingcartLineIdAndCountMap.entrySet()){
+            Long shoppingcartLineId = entry.getKey();
+            Integer count = entry.getValue();
+
+            ShoppingcartResult validatorShoppingcartResult = doUpdateShoppingCartCountValidator(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, count);
+            if (null != validatorShoppingcartResult){
+                return validatorShoppingcartResult;
+            }
+        }
+
+        //3.不同方法的实现****************************************************************
+        ShoppingcartResult updateShoppingcartResult = doUpdateShoppingCart(memberDetails, shoppingCartLineCommandList, shoppingcartLineIdAndCountMap, request, response);
+
+        if (null != updateShoppingcartResult){
+            return updateShoppingcartResult;
+        }
+
+        //4.afterMergeShoppingCart****************************************
+        afterMergeShoppingCart(memberDetails, shoppingCartLineCommandList, request, response);
+        return SUCCESS;
+    }
+
+    //******************************************************************************************************
+
+    /**
+     * 批量修改购物车行的不同实现.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param shoppingcartLineIdAndCountMap
+     *            the shoppingcart line id and count map
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return the shoppingcart result
+     * @since 5.3.1.9
+     */
+    protected abstract ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response);
 
     /*
      * (non-Javadoc)
@@ -252,28 +289,16 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * MemberDetails, java.lang.Long, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public ShoppingcartResult toggleShoppingCartLineCheckStatus(
-                    MemberDetails memberDetails,
-                    Long shoppingcartLineId,
-                    boolean checkStatus,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-
+    public ShoppingcartResult toggleShoppingCartLineCheckStatus(MemberDetails memberDetails,Long shoppingcartLineId,boolean checkStatus,HttpServletRequest request,HttpServletResponse response){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        if (Validator.isNullOrEmpty(mainlines)){
-            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        if (isNullOrEmpty(mainlines)){
+            return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
         // 找到实际需要操作的行
         List<ShoppingCartLineCommand> needChangeCheckedCommandList = CollectionsUtil.select(mainlines, "id", shoppingcartLineId);
-        return toggleShoppingCartLineCheckStatus(
-                        memberDetails,
-                        shoppingCartLineCommandList,
-                        needChangeCheckedCommandList,
-                        checkStatus,
-                        request,
-                        response);
+        return toggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, needChangeCheckedCommandList, checkStatus, request, response);
     }
 
     /*
@@ -284,17 +309,12 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * web.MemberDetails, java.lang.Integer, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    public ShoppingcartResult toggleAllShoppingCartLineCheckStatus(
-                    MemberDetails memberDetails,
-                    boolean checkStatus,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
-
+    public ShoppingcartResult toggleAllShoppingCartLineCheckStatus(MemberDetails memberDetails,boolean checkStatus,HttpServletRequest request,HttpServletResponse response){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 找不到 就抛
-        if (Validator.isNullOrEmpty(mainlines)){
-            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        if (isNullOrEmpty(mainlines)){
+            return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
         return toggleShoppingCartLineCheckStatus(
@@ -313,7 +333,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the main lines
      * @param sku
      *            the sku
-     * @return the shopping cart line command
+     * @return 如果 <code>mainLines</code>是null, 返回null<br>
+     *         如果 <code>mainLines</code>中没有相关元素的属性<code>skuId</code> 值是<code>sku.getId()</code>,返回null
+     * @see com.feilong.core.util.CollectionsUtil#find(Iterable, String, Long)
      */
     private ShoppingCartLineCommand findSameSkuShoppingCartLineCommand(List<ShoppingCartLineCommand> mainLines,Sku sku){
         //        return CollectionsUtil.find(mainLines, "extentionCode", sku.getOutid());
@@ -334,14 +356,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the request
      * @param response
      *            the response
-     * @return 如果没有操作过程中没有错,那么返回null
+     * @return 如果操作过程中没有错,那么返回null
      */
-    protected abstract ShoppingcartResult doAddShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
+    protected abstract ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response);
 
     /**
      * Do update shopping cart.
@@ -356,14 +373,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the request
      * @param response
      *            the response
-     * @return 如果没有操作过程中没有错,那么返回null
+     * @return 如果操作过程中没有错,那么返回null
      */
-    protected abstract ShoppingcartResult doUpdateShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
+    protected abstract ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response);
 
     /**
      * 每个实现类具体的实现.
@@ -378,14 +390,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the request
      * @param response
      *            the response
-     * @return 如果没有操作过程中没有错,那么返回null
+     * @return 如果操作过程中没有错,那么返回null
      */
-    protected abstract ShoppingcartResult doDeleteShoppingCartLine(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    ShoppingCartLineCommand currentLine,
-                    HttpServletRequest request,
-                    HttpServletResponse response);
+    protected abstract ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response);
 
     /**
      * Do select shopping cart line.
@@ -404,7 +411,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      *            the request
      * @param response
      *            the response
-     * @return 如果没有操作过程中没有错,那么返回null
+     * @return 如果操作过程中没有错,那么返回null
      */
     protected abstract ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
@@ -457,11 +464,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      * @param response
      *            the response
      */
-    private void afterMergeShoppingCart(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
-                    HttpServletRequest request,
-                    HttpServletResponse response){
+    private void afterMergeShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request,HttpServletResponse response){
         shoppingcartCountPersister.save(shoppingCartLineCommandList, request, response);
     }
 
@@ -489,11 +492,11 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        if (Validator.isNullOrEmpty(needChangeCheckedCommandList)){
-            return ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        if (isNullOrEmpty(needChangeCheckedCommandList)){
+            return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        //TODO feilong 这个目前会员购物车更新状态 需要这个参数
+        //XXX feilong 这个目前会员购物车更新状态 需要这个参数
         List<String> extentionCodeList = new ArrayList<String>();
 
         for (ShoppingCartLineCommand needChangeCheckedCommand : needChangeCheckedCommandList){
@@ -505,15 +508,14 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             // ********* 商品验证***********
             Long skuId = needChangeCheckedCommand.getSkuId();
             Sku sku = sdkSkuManager.findSkuById(skuId);
-            ShoppingcartResult commandValidateShoppingcartResult = shoppingcartLineOperateCommonValidator
-                            .validate(sku, needChangeCheckedCommand.getQuantity());
+            ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
-            if (null != commandValidateShoppingcartResult){
-                return commandValidateShoppingcartResult;
+            if (null != commonValidateShoppingcartResult){
+                return commonValidateShoppingcartResult;
             }
 
             if (checkStatus && isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
-                return ShoppingcartResult.MAX_THAN_INVENTORY;
+                return MAX_THAN_INVENTORY;
             }
 
             extentionCodeList.add(needChangeCheckedCommand.getExtentionCode());
@@ -521,25 +523,17 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         }
 
-        if (Validator.isNullOrEmpty(extentionCodeList)){
-            return ShoppingcartResult.SUCCESS;
+        if (isNullOrEmpty(extentionCodeList)){
+            return SUCCESS;
         }
 
         // ********* 改变选中状态***********
-        ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(
-                        memberDetails,
-                        extentionCodeList,
-                        shoppingCartLineCommandList,
-                        needChangeCheckedCommandList,
-                        checkStatus,
-                        request,
-                        response);
+        ShoppingcartResult toggleShoppingcartResult = doToggleShoppingCartLineCheckStatus(memberDetails, extentionCodeList, shoppingCartLineCommandList, needChangeCheckedCommandList, checkStatus, request, response);
 
         if (null != toggleShoppingcartResult){
             return toggleShoppingcartResult;
         }
-
-        return ShoppingcartResult.SUCCESS;
+        return SUCCESS;
     }
 
     /**
@@ -553,6 +547,60 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     private boolean isSameCheckStatus(Integer settlementState,boolean checkStatus){
         return checkStatus ? settlementState.equals(1) : settlementState.equals(0);
+    }
+
+    /**
+     * Do update shopping cart count validator.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @param shoppingcartLineId
+     *            the shoppingcart line id
+     * @param count
+     *            the count
+     * @return the shoppingcart result
+     * @since 5.3.1.9
+     */
+    private ShoppingcartResult doUpdateShoppingCartCountValidator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,Integer count){
+        ShoppingCartLineCommand currentShoppingCartLineCommand = CollectionsUtil.find(shoppingCartLineCommandList, "id", shoppingcartLineId);
+        if (null == currentShoppingCartLineCommand){
+            return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+        }
+
+        //2.2 CommonValidator
+        Sku sku = sdkSkuManager.findSkuById(currentShoppingCartLineCommand.getSkuId());
+
+        ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
+        if (null != commonValidateShoppingcartResult){
+            return commonValidateShoppingcartResult;
+        }
+
+        //2.3 单行最大数量 校验
+        ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
+        if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, currentShoppingCartLineCommand.getSkuId(), count)){
+            return ONE_LINE_MAX_THAN_COUNT;
+        }
+
+        //2.4 库存校验
+        currentShoppingCartLineCommand.setQuantity(count);
+
+        if (isMoreThanInventory(shoppingCartLineCommandList, currentShoppingCartLineCommand.getSkuId(), sku.getOutid())){
+            return MAX_THAN_INVENTORY;
+        }
+
+        return null;
+    }
+
+    /**
+     * 如果有配置 {@link #shoppingcartOneLineMaxQuantityValidator},那么使用他;如果没有,那么使用默认的 {@link DefaultShoppingcartOneLineMaxQuantityValidator}.
+     *
+     * @return the use shoppingcart one line max quantity validator
+     * @since 5.3.1.9
+     */
+    private ShoppingcartOneLineMaxQuantityValidator getUseShoppingcartOneLineMaxQuantityValidator(){
+        return defaultIfNull(shoppingcartOneLineMaxQuantityValidator, new DefaultShoppingcartOneLineMaxQuantityValidator());
     }
 
     /**

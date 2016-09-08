@@ -23,6 +23,7 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.web.constants.ForgetPasswordSendVCodeConstant;
 import com.baozun.nebula.web.controller.member.form.ForgetPasswordForm;
 import com.feilong.core.Alphabet;
+import com.feilong.core.Validator;
 import com.feilong.core.util.RandomUtil;
 
 /**
@@ -202,11 +203,19 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		}
 		// 如果对应的用户都是存在的，则执行如下的方法
 		if (memberCommand != null){
-			// 加密新密码
-			String codePassword = EncryptUtil.getInstance().hash(password, memberCommand.getLoginName());
-			// 重置密码
 			LOG.info("[The member try to reset password,memberId: ] {} [{}]", memberCommand.getId(), new Date());
-			resetPassword = sdkMemberManager.resetPasswd(memberCommand.getId(), codePassword);
+				//生成新的盐值，用新的加密算法进行加密，(仅适用于更新加密算法之后，第一次重置密码) add by ruichao.gao
+			if(Validator.isNullOrEmpty(memberCommand.getSalt())){
+				String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+				String encodePassword = EncryptUtil.getInstance().hashSalt(password, salt);
+				resetPassword = sdkMemberManager.resetPasswdWithSalt(memberCommand.getId(), encodePassword, salt);
+			}else{
+				// 重置密码
+				String encodePassword = EncryptUtil.getInstance().hashSalt(password, memberCommand.getSalt());
+				resetPassword = sdkMemberManager.resetPasswd(memberCommand.getId(), encodePassword);
+			}
+			
+			
 		}
 		return resetPassword;
 	}
@@ -219,9 +228,16 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 		// 根据用户id查询出数据库里的密码信息
 		MemberCommand memberCommand = sdkMemberManager.findMemberById(memberId);
 		String dbPassword = memberCommand.getPassword();
-
-		// 对页面传过来的密码进行解密加密，再两者进行比较
-		String codePassword = EncryptUtil.getInstance().hash(oldPassword, memberCommand.getLoginName());
+		String codePassword = null;
+		//如果盐值为空，对密码验证走老的加密验证逻辑 add by ruichao.gao
+		if(Validator.isNullOrEmpty(memberCommand.getSalt())){
+			// 对页面传过来的密码进行解密加密，再两者进行比较
+			 codePassword = EncryptUtil.getInstance().hash(oldPassword, memberCommand.getLoginName());
+		}else{
+			//新的加密算法加密
+			codePassword = EncryptUtil.getInstance().hashSalt(oldPassword, memberCommand.getSalt());
+		}
+		
 
 		// 确认数据库里查询到的密码的存在性
 		if (dbPassword != null && StringUtils.isNotEmpty(dbPassword)){

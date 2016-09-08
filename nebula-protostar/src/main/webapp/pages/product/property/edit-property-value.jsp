@@ -106,30 +106,38 @@ tbody input[type="text"]{
 					<div>
 						<form name="propertyForm" action="/i18n/property/addOrUpdatePropertyValue.json" method="POST">
 							<input type="hidden" name="groupId" id="groupId" value="" />
-						
 							<input type="hidden" name="propertyValues.id" value=""/>
 							<input type="hidden" name="propertyValues.propertyId" value="${property.id}" class="propertyValues-propertyId" />
 							<input type="hidden" name="propertyValues.sortNo" value="">
-							
+							<input type="hidden" name="propertyValues.thumb" value="">
 						 <c:forEach items="${i18nLangs}" var="i18nLang" varStatus="status">
 						   <div class="ui-block-line propertyValueInput">
-					         
 							<input id="input3" lang="${i18nLang.key}"
 								name="propertyValues.value.values[${status.index}]" placeholder="<spring:message code='system.propertyvalue'/>"
 							  value=""  style='width: 200px' mandatory="true" type="text" class="name" loxiaType="input" trim="true"/>
-							
 							<input name="propertyValues.value.langs[${status.index}]"  value="${i18nLang.key}" 
 							 	mandatory="true" class="i18n-lang" type="text" loxiaType="input" trim="true" />
-						   
-						   
 						   	<span>${i18nLang.value}</span>		 
-						  
 						   </div>
-						   
-						   
 						 </c:forEach>
 						</form>
 					</div>
+					<img alt="" src="" id="colorPropertyImgUrl">
+				</div>
+				<div class="ui-block-line">
+					<label>属性图片</label>
+					<div id="propertyImage-upload"></div>
+					<a href="javascript:void(0)" class="func-button" id="image-upload-ok">确认上传图片</a>
+					<a href="javascript:void(0)" class="func-button" id="image-upload-cancel">取消上传图片</a>
+					<p style="margin-top: 5px; font-size: 14px; font-weight: bold;"><span id="upload-image-result"></span></p>
+					<div class="upload-message" id="propertyImage-upload-message"></div>
+					<div id="errorUploadTip" style="display: none">
+				      	<div style="margin-top: 10px;" ></div>
+						<div class="ui-block-content border-grey">
+							  <div class="ui-block-line showUploadError" style="color: red">
+							  </div>		
+					    </div>
+				    </div>
 				</div>
 				<div class="button-line1">
 					<a href="javascript:void(0);" class="func-button refreshPropertyValue" title="<spring:message code='refresh'/>">

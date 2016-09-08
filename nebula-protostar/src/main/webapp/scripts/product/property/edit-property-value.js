@@ -11,11 +11,9 @@ $j.extend(loxia.regional['zh-CN'],{
 	"IMP_SUCCESS":"导入成功"
 });
 
-
 var SWF_URL = base + '/scripts/uploadify3/uploadify.swf';
 var UPLOAD_URL = base + '/sku/propertyValueUpload.json;jsessionid=';
-
-
+var IMAGE_UPLOAD_URL = base + '/property/propertyImageUpload.json;jsessionid=';
 
 function refreshData(){
 	$j("#table2").loxiasimpletable("refresh");
@@ -53,7 +51,6 @@ function refreshPropertyValueSection(){
 		var targetElement = $j(this);
 		targetElement.find("input[id='input3']").val("");
 	});
-	
 	$j("input[name='propertyValues.id']").val('');
 	$j("input[name='propertyValues.sortNo']").val('');
 }
@@ -227,6 +224,12 @@ $j(document).ready(function(){
 		$j("input[name='propertyValues.propertyId']").val(tdData.propertyId);
 		$j("input[name='propertyValues.sortNo']").val(tdData.sortNo);
 		
+		if(tdData.thumb){
+			$j("#colorPropertyImgUrl").attr("src", baseImageUrl + tdData.thumb);
+		}else{
+			$j("#colorPropertyImgUrl").attr("src", "");
+		}
+		
 		$j('.propertyValueInput').each(function(index,data){
 			var targetElement = $j(this);
 			var _lang = targetElement.find("input[name='propertyValues.value.langs["+ index+"]']").val();
@@ -388,6 +391,59 @@ $j(document).ready(function(){
 	$j("#btn-cancel").click(function() {
 		$j("#errorTip").hide();
 		$j('#propertyValue-upload').uploadify("cancel");
+	});
+	
+		//解决uploadify对于火狐浏览器的丢失session
+	IMAGE_UPLOAD_URL += $j("#session-id").val();	
+	var tokenValue2 = $j("meta[name='_csrf']").attr("content");
+	if(typeof(tokenValue2) != "undefined") {
+		IMAGE_UPLOAD_URL += "?_csrf="+tokenValue2;
+	}
+	
+	//导入属性图片
+	$j("#propertyImage-upload").uploadify({
+		'swf'        		: SWF_URL, 
+		'uploader'          : IMAGE_UPLOAD_URL,
+		'button_image_url'	: base + '/scripts/uploadify3/none.png',
+		'auto'				: false,
+		'buttonText'		: '浏  览',
+		'fileTypeDesc'		: '支持文件：',
+		'fileTypeExts'		: '*.gif; *.jpg; *.png',
+		'multi'				: false,
+		'queueSizeLimit'	: 1,
+		'successTimeout'  	: 1200,	//响应时间（秒），为大数据量预留足够时间
+		'removeTimeout'		: 1,
+		'onSelectError'		: function(){
+			alert("每次只能上传一个文件！");
+		},
+		'onUploadSuccess' 	: function(file, data, response) {
+			var result = eval('('+data+')');
+			if(result.isSuccess){
+				$j("input[name='propertyValues.thumb']").val(result.description);
+				$j("#colorPropertyImgUrl").attr('src',baseImageUrl + result.description);
+				$j("#errorUploadTip").hide();
+				nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("IMP_SUCCESS"));
+			}else{
+				$j(".showUploadError").html(result.description);
+				$j("#errorUploadTip").show();	
+			}
+        }
+        
+	});	
+	
+	// ‘确认’按钮
+	$j("#image-upload-ok").click(function() {
+		if (! checkImport('#propertyImage-upload-queue')) return;
+		$j(".showUploadError").html("正在处理数据，请稍后...");
+		$j("#errorUploadTip").show();
+		
+		$j('#propertyImage-upload').uploadify('upload');
+	});
+
+	//‘取消’按钮
+	$j("#image-upload-cancel").click(function() {
+		$j("#errorUploadTip").hide();
+		$j('#propertyImage-upload').uploadify("cancel");
 	});
 });
 

@@ -70,4 +70,10 @@ public class SdkSchedulerTaskManagerImpl implements SdkSchedulerTaskManager {
         return result;
     }
 
+	@Override
+	@Transactional(readOnly=true)
+	public SchedulerTask findSchedulerTaskByMethodName(String methodName) {
+		return schedulerTaskDao.findSchedulerTaskByMethodName(methodName);
+	}
+
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.configuration.ConfigurationKey;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +27,7 @@ import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.SerializableUtil;
+import com.feilong.core.Validator;
 
 @Service("dataCacheManager")
 public class CacheManagerImpl implements CacheManager {
@@ -834,4 +836,43 @@ public class CacheManagerImpl implements CacheManager {
 		}
 		return false;
 	}
+
+	@Override
+	public int removeByPrefix(String key) {
+		// TODO Auto-generated method stub
+		String cleanKey = "";
+		Properties pro = ProfileConfigUtil.findPro("config/redis.properties");
+		String confKeyStart = pro.getProperty(REDIS_KEY_START, null);
+		if(Validator.isNullOrEmpty(confKeyStart)){
+			cleanKey = key+"*";
+		}else{
+			
+			//因为setObject 这个方法 保存的cache的可以是 keyStart_keyStart_key,
+			//setValue 的key 是keystart_key
+			//所以这里根据key来删除就拼成 keystart*key* 这种
+			cleanKey = confKeyStart+"*"+key+"*";
+		}
+		
+		Jedis jredis = null;
+		int delCount = 0;
+		try{
+			jredis = this.getJedis();
+			Set<String> delKeys = jredis.keys(cleanKey);
+			if(Validator.isNotNullOrEmpty(delKeys)){
+				for(String delkey: delKeys){
+					jredis.del(delkey);
+					delCount ++ ;
+				}
+			}
+		}catch (Exception e) {
+			jedisPool.returnBrokenResource(jredis);
+			log.error(EXCEPTION_ERROR_MSG);
+			return delCount;
+		} finally {
+			returnResource(jredis);
+		}
+		
+		return delCount;
+	}
+	
 }

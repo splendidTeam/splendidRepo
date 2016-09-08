@@ -326,7 +326,7 @@ public class SdkItemTagRuleManagerImpl implements SdkItemTagRuleManager {
 	}
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly=false)
 	public List<ItemTagRuleCommand> findAllAvailableCustomProductComboList() {
 		return itemTagRuleDao.findAllAvailableCustomProductComboList();
 	}

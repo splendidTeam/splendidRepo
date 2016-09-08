@@ -64,7 +64,6 @@ public class SkuInventoryChangeLogController extends BaseController{
 			sorts = new Sort[1];
 			sorts[0] = sort;
 		}
-		return  skuInventoryChangeLogManager.findSkuInventoryChangeLogListByQueryMapWithPage(queryBean.getPage(),
-				sorts, queryBean.getParaMap());
+		return  skuInventoryChangeLogManager.findSkuInventoryChangeLogListByQueryMapWithPage(queryBean.getPage(),sorts, queryBean.getParaMap());
 	}
 }

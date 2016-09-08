@@ -21,7 +21,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,102 +42,96 @@ import com.feilong.core.Validator;
  */
 @Transactional
 @Service("commonEmailManager")
-public class CommonEmailManagerImpl implements CommonEmailManager {
+public class CommonEmailManagerImpl implements CommonEmailManager{
 
-	private static final Logger log = LoggerFactory.getLogger(CommonEmailManagerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonEmailManagerImpl.class);
 
-	
-	//发送邮件event注入
-	@Autowired
-	private EventPublisher eventPublisher;
+    // 发送邮件event注入
+    @Autowired
+    private EventPublisher eventPublisher;
 
-	//策略控制类
-	@Autowired
-	private TokenManager tokenManager;
-	
-	//通过value注解获取properties的value
-	@Value("#{meta['send.mail.key']}")
-	private String sendMailKey;
+    // 策略控制类
+    @Autowired
+    private TokenManager tokenManager;
 
-	//通过value注解获取properties的value
-	@Value("#{meta['send.mail.maxSendNumber']}")
-	private Long maxSendNumber;
+    // 通过value注解获取properties的value
+    @Value("#{meta['send.mail.key']}")
+    private String sendMailKey;
 
-	//通过value注解获取properties的value
-	@Value("#{meta['send.mail.intervalTime']}")
-	private Long intervalTime;
-	
-	//通过value注解获取properties的value
-	@Value("#{meta['send.mail.emailCacheExpireTime']}")
-	private Long emailCacheExpireTime;
+    //邮件发送设置类
+    private static SendEmailConfig sendEmailConfig=new SendEmailConfig();
 
-	
-	/**
-	 * 发送邮件方法 要点如下
-	 * <ol>
-	 * <li>1.email不可为空,为空返回失败</li>
-	 * <li>2.模板code不能为空,不能错误.错误也返回失败</li>
-	 * <li>3.sendEmailConfig 属性为{@link com.baozun.nebula.manager.member.entity.SendEmailConfig}中</li>
-	 * <li>4.当调用时默认传sendEmailConfig为null调用配置文件中获取的值,当有特殊需求时,可以自己new一个该对象,set具体的值</li>
-	 * </ol>
-	 * 
-	 * 
-	 * @param email 
-	 * @param emailTemplateCode
-	 * @param dataMap
-	 * @param sendEmailConfig
-	 */
-	public SendEmailResultCode sendEmail(String email, String emailTemplateCode, Map<String, Object> dataMap,
-			SendEmailConfig sendEmailConfig) {
+    static{
+       if(!sendEmailConfig.getIsValidIntervalTime()&&!sendEmailConfig.getIsValidMaxSendNumber()){
+           sendEmailConfig=null;
+       }
+    }
+    /**
+     * 发送邮件方法 要点如下
+     * <ol>
+     * <li>1.email不可为空,为空返回失败</li>
+     * <li>2.模板code不能为空,不能错误.错误也返回失败</li>
+     * <li>3.sendEmailConfig 属性为
+     * {@link com.baozun.nebula.manager.member.entity.SendEmailConfig}中</li>
+     * <li>4.当调用时默认传sendEmailConfig为null调用配置文件中获取的值,当有特殊需求时,可以自己new一个该对象,set具体的值
+     * </li>
+     * </ol>
+     * 
+     * 
+     * @param email
+     * @param emailTemplateCode
+     * @param dataMap
+     * @param sendEmailConfig
+     */
+    public SendEmailResultCode sendEmail(String email,String emailTemplateCode,Map<String, Object> dataMap,SendEmailConfig sendEmailConfig){
 
-		sendEmailConfig =new SendEmailConfig();
-		sendEmailConfig.setIsValidIntervalTime(false);
-		sendEmailConfig.setIsValidMaxSendNumber(true);
-		sendEmailConfig.setMaxSendNumber(maxSendNumber);
-		sendEmailConfig.setIntervalTime(intervalTime);
-		sendEmailConfig.setEmailCacheExpireTime(emailCacheExpireTime);
-		
-		// 判断邮箱是否为空 如为空则返回失败
-		if (Validator.isNullOrEmpty(email)) {
-			log.info("email can not be null");
-			return SendEmailResultCode.FAILURE;
-		}
-		
+        // 判断邮箱是否为空 如为空则返回失败
+        if (Validator.isNullOrEmpty(email)){
+            log.info("email can not be null");
+            return SendEmailResultCode.FAILURE;
+        }
 
-		// 判断是否开启最大次数验证 如开启 组装访问策略pojo
-		// RollingTimeWindow limit 为最大发送数 ,window为该窗口有效期
-		if (sendEmailConfig.getIsValidMaxSendNumber()) {
-			RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(sendEmailConfig.getMaxSendNumber(),sendEmailConfig.getEmailCacheExpireTime());
-			VerifyResult resultcode = tokenManager.verifyAccess("validEmailMaxSendNum"+emailTemplateCode, email, rollingTimeWindow);
-			log.debug("validate result is" + resultcode);
-			//判断结果
-			if (resultcode == VerifyResult.LIMITED) {
-				return SendEmailResultCode.MAXSENDNUMBERERROR;
-			}
-		}
+        if (sendEmailConfig != null){
+//            sendEmailConfig.setIsValidIntervalTime(false);
+//            sendEmailConfig.setIsValidMaxSendNumber(true);
+//            sendEmailConfig.setMaxSendNumber(maxSendNumber);
+//            sendEmailConfig.setIntervalTime(intervalTime);
+//            sendEmailConfig.setEmailCacheExpireTime(emailCacheExpireTime);
 
-		// 判断是否开始期间间隔验证 如开启 组装访问策略pojo
-		// RollingTimeWindow limit为时间间隔 ,window为该窗口有效期
-		if (sendEmailConfig.getIsValidIntervalTime()) {
-			RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(1L,sendEmailConfig.getIntervalTime());
-			VerifyResult resultcode = tokenManager.verifyAccess("validEmailIntervalTime"+emailTemplateCode, email, rollingTimeWindow);
-			log.debug("validate result is" + resultcode);
-			//判断结果
-			if (resultcode == VerifyResult.LIMITED) {
-				return SendEmailResultCode.INTERVALTIMEERROR;
-			}
-		}
+            // 判断是否开启最大次数验证 如开启 组装访问策略pojo
+            // RollingTimeWindow limit 为最大发送数 ,window为该窗口有效期
+            if (sendEmailConfig.getIsValidMaxSendNumber()){
+                RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(sendEmailConfig.getMaxSendNumber(), sendEmailConfig.getEmailCacheExpireTime());
+                VerifyResult resultcode = tokenManager.verifyAccess("validEmailMaxSendNum" + emailTemplateCode, email, rollingTimeWindow);
+                log.debug("validate result is" + resultcode);
+                // 判断结果
+                if (resultcode == VerifyResult.LIMITED){
+                    return SendEmailResultCode.MAXSENDNUMBERERROR;
+                }
+            }
 
-		String lang = LangUtil.getCurrentLang();
-		dataMap.put("lang", lang);
-		EmailEvent emailEvent = new EmailEvent(this, email, emailTemplateCode, dataMap);
-		eventPublisher.publish(emailEvent);
-		return SendEmailResultCode.SUCESS;
-	}
+            // 判断是否开始期间间隔验证 如开启 组装访问策略pojo
+            // RollingTimeWindow limit为时间间隔 ,window为该窗口有效期
+            if (sendEmailConfig.getIsValidIntervalTime()){
+                RollingTimeWindow rollingTimeWindow = new RollingTimeWindow(1L, sendEmailConfig.getIntervalTime());
+                VerifyResult resultcode = tokenManager.verifyAccess("validEmailIntervalTime" + emailTemplateCode, email, rollingTimeWindow);
+                log.debug("validate result is" + resultcode);
+                // 判断结果
+                if (resultcode == VerifyResult.LIMITED){
+                    return SendEmailResultCode.INTERVALTIMEERROR;
+                }
+            }
+        }
+        String lang = LangUtil.getCurrentLang();
+        dataMap.put("lang", lang);
+        EmailEvent emailEvent = new EmailEvent(this, email, emailTemplateCode, dataMap);
+        eventPublisher.publish(emailEvent);
+        return SendEmailResultCode.SUCESS;
+    }
 
-	@Override
-	public SendEmailResultCode sendEmail(String email, String emailTemplateCode, Map<String, Object> dataMap) {
-		return sendEmail(email, emailTemplateCode, dataMap, null);
-	}
+    @Override
+    public SendEmailResultCode sendEmail(String email,String emailTemplateCode,Map<String, Object> dataMap){
+        return sendEmail(email, emailTemplateCode, dataMap, sendEmailConfig);
+    }
 
 }

@@ -521,7 +521,7 @@ public class ItemCategoryManagerImpl implements ItemCategoryManager {
 			Map<String, Object> paraMap, Long shopId) {
 		// TODO Auto-generated method stub
 
-		Pagination<ItemCommand> itemList = itemCategoryDao.findItemListEmptyCategoryByQueryMapWithPage(page,
+		Pagination<ItemCommand> itemList = itemCategoryDao.findItemListCategoryByQueryMapWithPage(page,
 				sorts, paraMap, shopId);
 
 		List<ItemCategoryCommand> itemCategory = itemCategoryDao.findAllItemCategoryList();

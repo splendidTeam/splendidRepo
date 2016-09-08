@@ -44,7 +44,7 @@ public class ShippingInfoSubForm implements Serializable{
     /** The buyer tel. */
     private String            buyerTel;
 
-    //********************这里之所以只使用 id,因为需要支持国际化,在订单显示以及传输到后端的时候，需要转换*********************************************************
+    //********************这里之所以只使用 id,因为需要支持国际化,在订单显示以及传输到后端的时候，需要转换****************************
 
     /** 国家id. */
     private Long              countryId;
@@ -304,7 +304,7 @@ public class ShippingInfoSubForm implements Serializable{
     }
 
     /**
-     * 获得 指定时间段,参见 {@link com.
+     * 获得 指定时间段.
      *
      * @return the appointTimeQuantum
      */
@@ -313,7 +313,7 @@ public class ShippingInfoSubForm implements Serializable{
     }
 
     /**
-     * 设置 指定时间段,参见 {@link com.
+     * 设置 指定时间段.
      *
      * @param appointTimeQuantum
      *            the appointTimeQuantum to set
@@ -323,7 +323,7 @@ public class ShippingInfoSubForm implements Serializable{
     }
 
     /**
-     * 获得 指定日期,参见 {@link com.
+     * 获得 指定日期.
      *
      * @return the appointTime
      */
@@ -332,7 +332,7 @@ public class ShippingInfoSubForm implements Serializable{
     }
 
     /**
-     * 设置 指定日期,参见 {@link com.
+     * 设置 指定日期.
      *
      * @param appointTime
      *            the appointTime to set
@@ -342,7 +342,7 @@ public class ShippingInfoSubForm implements Serializable{
     }
 
     /**
-     * 获得 指定类型 ,参见 {@link com.
+     * 获得 指定类型 .
      *
      * @return the appointType
      */
@@ -351,7 +351,7 @@ public class ShippingInfoSubForm implements Serializable{
     }
 
     /**
-     * 设置 指定类型 ,参见 {@link com.
+     * 设置 指定类型 .
      *
      * @param appointType
      *            the appointType to set

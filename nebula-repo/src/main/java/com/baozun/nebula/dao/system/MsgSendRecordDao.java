@@ -26,6 +26,9 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 import loxia.dao.Page;
+
+import com.baozun.nebula.command.product.MsgSendRecordCommand;
+import com.baozun.nebula.model.system.MsgReceiveContent;
 import com.baozun.nebula.model.system.MsgSendRecord;
 
 /**
@@ -81,5 +84,18 @@ public interface MsgSendRecordDao extends GenericEntityDao<MsgSendRecord, Long>{
      */
     @NativeQuery(model = MsgSendRecord.class)
     Pagination<MsgSendRecord> findMsgSendRecordListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+    
+    /**
+     * 分页获取MsgSendRecord and MsgSendContend列表
+     * 
+     * @param start
+     * @param size
+     * @param paraMap
+     * @param sorts
+     * @return
+     */
+    @NativeQuery(model=MsgSendRecordCommand.class)
+	Pagination<MsgSendRecordCommand> findMsgSendRecordAndContentListByQueryMapWithPage(Page page, Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 
+   
 }

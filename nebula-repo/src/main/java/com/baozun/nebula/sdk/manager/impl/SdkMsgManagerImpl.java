@@ -8,10 +8,13 @@ import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.command.product.MsgSendRecordCommand;
 import com.baozun.nebula.dao.system.MsgReceiveContentDao;
 import com.baozun.nebula.dao.system.MsgSendContentDao;
 import com.baozun.nebula.dao.system.MsgSendRecordDao;
@@ -19,11 +22,14 @@ import com.baozun.nebula.model.system.MsgReceiveContent;
 import com.baozun.nebula.model.system.MsgSendContent;
 import com.baozun.nebula.model.system.MsgSendRecord;
 import com.baozun.nebula.sdk.manager.SdkMsgManager;
+import com.feilong.core.Validator;
+import com.baozun.nebula.utilities.common.encryptor.AESEncryptor;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 
 @Service("sdkMsgManager")
 @Transactional
 public class SdkMsgManagerImpl implements SdkMsgManager{
-
+	private static final Logger	            LOG	                  = LoggerFactory.getLogger(SdkMsgManagerImpl.class);
     @Autowired
     private MsgReceiveContentDao msgReceiveContentDao;
 
@@ -69,7 +75,17 @@ public class SdkMsgManagerImpl implements SdkMsgManager{
     @Override
     @Transactional(readOnly = true)
     public Pagination<MsgReceiveContent> findMsgReceiveContentListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap){
-        return msgReceiveContentDao.findMsgReceiveContentListByQueryMapWithPage(page, sorts, paraMap);
+    	Pagination<MsgReceiveContent> result = msgReceiveContentDao.findMsgReceiveContentListByQueryMapWithPage(page, sorts, paraMap);
+    	for (MsgReceiveContent content:result.getItems()) {
+    		try {
+				String aesString = new AESEncryptor().decrypt(content.getMsgBody());
+				content.setMsgBody(aesString);
+			} catch (EncryptionException e) {
+				LOG.error("decode is error",e);
+				e.printStackTrace();
+			}
+		}
+    	return result;
     }
 
     @Override
@@ -164,5 +180,39 @@ public class SdkMsgManagerImpl implements SdkMsgManager{
         msgSendRecord.setExt(ext);
         return msgSendRecordDao.save(msgSendRecord);
     }
+
+	@Override
+    @Transactional(readOnly = true)
+	public Pagination<MsgSendRecordCommand> findMsgSendRecordAndContentListByQueryMapWithPage(Page page, Sort[] sorts,Map<String, Object> paraMap) {
+		 Pagination<MsgSendRecordCommand> result = msgSendRecordDao.findMsgSendRecordAndContentListByQueryMapWithPage(page, sorts, paraMap);
+	 for (MsgSendRecordCommand command:result.getItems()) {
+			 if(Validator.isNotNullOrEmpty(command.getMsgBody())){	
+			 try {
+					String aesString = new AESEncryptor().decrypt(command.getMsgBody());
+					command.setMsgBody(aesString);
+				} catch (EncryptionException e) {
+					LOG.error("decode is error",e);
+				}
+			}
+		}
+		 return result;
+	}
+  
+	@Override
+	@Transactional(readOnly = true)
+	public Pagination<MsgReceiveContent> findMsgReceiveContentListByPage(Page page, Sort[] sorts,Map<String, Object> paraMap) {
+		 Pagination<MsgReceiveContent> result = msgReceiveContentDao.findMsgReceiveContentListByPage(page, sorts, paraMap);
+		 for (MsgReceiveContent content:result.getItems()) {
+				 if(Validator.isNotNullOrEmpty(content.getMsgBody())){	
+				 try {
+						String aesString = new AESEncryptor().decrypt(content.getMsgBody());
+						content.setMsgBody(aesString);
+					} catch (EncryptionException e) {
+						LOG.error("decode is error",e);
+					}
+				}
+			}
+			 return result;
+	}
 
 }

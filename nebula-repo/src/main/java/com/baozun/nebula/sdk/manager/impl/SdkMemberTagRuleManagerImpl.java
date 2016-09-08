@@ -98,7 +98,7 @@ public class SdkMemberTagRuleManagerImpl implements SdkMemberTagRuleManager {
 	 */
 
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly=false)
 	public List<MemberTagRuleCommand> findAllAvailableMemberTagRuleCommandList() {
 		return memberTagRuleDao.findAllAvailableMemberTagRuleCommandList();
 	}

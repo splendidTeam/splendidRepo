@@ -59,6 +59,8 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKU
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.solr.utils.JsonFormatUtil;
+import com.baozun.nebula.utilities.common.EncryptUtil;
+import com.baozun.nebula.utilities.common.encryptor.EncryptionException;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.utils.query.bean.QueryBean;
@@ -192,11 +194,36 @@ public class SalesOrderController extends BaseController{
             sorts = new Sort[1];
             sorts[0] = sort;
         }
-
+        encryptName(queryBean);
         Pagination<PtsSalesOrderCommand> result = salesOrderManager
                         .findOrderListByQueryMapWithPage(queryBean.getPage(), sorts, queryBean.getParaMap());
+        List<PtsSalesOrderCommand> list = result.getItems();
+        for (PtsSalesOrderCommand ptsSalesOrderCommand : list){
+            BigDecimal total = ptsSalesOrderCommand.getTotal();
+            BigDecimal actualFreight = ptsSalesOrderCommand.getActualFreight();
+            ptsSalesOrderCommand.setActotal(total.add(actualFreight));
+        }
+        result.setItems(list);
         return result;
     }
+    
+    /**
+     * 加密收货人信息进行查询
+     * @param queryBean
+     */
+	private void encryptName(QueryBean queryBean) {
+		Map<String, Object> paraMap = queryBean.getParaMap();
+        String name = (String)paraMap.get("name");
+        if(paraMap.get("name")!=null){
+        	String temp = name.replace("%", "");
+        	try {
+        		name=name.replace(temp, EncryptUtil.getInstance().encrypt(temp));
+			} catch (EncryptionException e) {
+				e.printStackTrace();
+			}
+        	paraMap.put("name", name);
+        }
+	}
 
     /**
      * 订单的详细信息

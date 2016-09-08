@@ -9,6 +9,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	 "LABEL_ITEM_TITLE":"商品名称",
 	 "LABEL_ITEM_SALE_PRICE":"标价",
 	 "LABEL_ITEM_LIST_PRICE":"贴牌价",
+	 "NO_CATEGORY":"无"
 	
 });
 function drawCheckbox(data, args, idx){

@@ -72,6 +72,7 @@ import com.baozun.nebula.command.ItemCategoryCommand;
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemPresalseInfoCommand;
 import com.baozun.nebula.command.ItemPropertyCommand;
+import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.ShopCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
@@ -99,6 +100,7 @@ import com.baozun.nebula.manager.product.ItemManager;
 import com.baozun.nebula.manager.product.ItemPresaleInfoManager;
 import com.baozun.nebula.manager.product.PropertyManager;
 import com.baozun.nebula.manager.system.ChooseOptionManager;
+import com.baozun.nebula.model.bundle.Bundle;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Industry;
@@ -134,6 +136,7 @@ import com.baozun.nebula.web.command.BundleViewCommand;
 import com.baozun.nebula.web.command.DynamicPropertyCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
+import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.gson.Gson;
 
@@ -2229,7 +2232,8 @@ public class ItemController extends BaseController {
 
 		return "/product/item/add-item-simple";
 	}
-
+	
+	
 	/**
 	 * 新建bundle商品页面
 	 * 
@@ -2252,6 +2256,29 @@ public class ItemController extends BaseController {
 	}
 	
 	/**
+	 * 新建组商品页面
+	 * @author zhaojun.fang
+	 * @param industryId
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/item/createGroupItem.htm")
+	public String createGroupItem(@RequestParam("industryId") Long industryId, Model model) {
+		
+		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(industryId);
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
+
+		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
+		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
+		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
+		
+		return "/product/item/add-item-group";
+	}
+
+	
+	/**
 	 * 页面跳转 修改商品
 	 * 
 	 * @param model
@@ -2267,8 +2294,8 @@ public class ItemController extends BaseController {
 			switch(type){
 			case 1 : return updateSimpleItem(model, item);
 			case 3 : return updateBundleItem(model, item);
-			// TODO 组商品、虚拟商品
-//			case 5 : return updateGroupItem(model, item);
+			case 5 : return updateGroupItem(model, item);
+			// TODO 虚拟商品
 //			case 7 : return updateVirturlItem(model, item);
 			default : throw new BusinessException("Unknown item type '" + type + "'!");
 			}
@@ -2362,6 +2389,34 @@ public class ItemController extends BaseController {
 		fillBundleViewCommand(model, bundleCommand);
 
 		return "/product/item/update-item-bundle";
+	}
+	
+	/**
+	 * 修改组商品
+	 * @author zhaojun.fang
+	 * @param model
+	 * @param item
+	 * @return
+	 */
+	private String updateGroupItem(Model model, Item item) {
+		
+		// 装载公共信息
+		getCommonInfoForCreateOrUpdateItem(model);
+		
+		Industry industry = industryManager.findIndustryById(item.getIndustryId());
+		getIndustryInfoForCreateOrUpdateItem(model, industry);
+
+		// 装载商品所属分类信息
+		getCategoryInfoForUpdateItem(model, item);
+
+		// 装载商品扩展信息
+		getItemInfoByUpdateItem(model, item, industry);
+		
+		// 装载bundle信息
+		BundleCommand bundleCommand = bundleManager.findBundleCommandByBundleItemId(item.getId());
+		fillGroupViewCommand(model, bundleCommand);
+
+		return "/product/item/update-item-group";
 	}
 	
 	private void getCommonInfoForCreateOrUpdateItem(Model model) {
@@ -2658,6 +2713,44 @@ public class ItemController extends BaseController {
 		backWarnEntity.setErrorCode(item.getId().intValue());
 		return backWarnEntity;
 	}
+	
+	/**
+	 * 保存组商品
+	 */
+	@RequestMapping("/i18n/item/saveGroupItem.json")
+	@ResponseBody
+	public Object saveGroupItemI18n(@I18nCommand ItemInfoCommand itemCommand,
+			@ArrayCommand(dataBind = true) Long[] categoriesIds, // 商品分类Id
+			Long defaultCategoryId, // 默认分类
+			BundleViewCommand bundle, HttpServletRequest request) throws Exception {
+		
+		bundle.setPriceType(Bundle.PRICE_TYPE_REALPRICE);
+
+		// 查询orgId
+		UserDetails userDetails = this.getUserDetails();
+		ShopCommand shopCommand = null;
+		Long shopId = 0L;
+		Long currentOrgId = userDetails.getCurrentOrganizationId();
+		// 根据orgId查询shopId
+		if (currentOrgId != null) {
+			shopCommand = shopManager.findShopByOrgId(currentOrgId);
+			shopId = shopCommand.getShopid();
+		}
+
+		itemCommand.setShopId(shopId);
+		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
+		dealDescImgUrl(itemCommand);
+
+		// BundleViewCommand -> BundleCommand
+		BundleCommand command = convertToBundleCommand(bundle);
+
+		// 保存商品
+		Item item = itemLangManager.createOrUpdateGroupItem(itemCommand, command, categoriesIds, defaultCategoryId);
+
+		BackWarnEntity backWarnEntity = new BackWarnEntity(true, null);
+		backWarnEntity.setErrorCode(item.getId().intValue());
+		return backWarnEntity;
+	}
 
 	/**
 	 * 动态获取款号
@@ -2895,6 +2988,143 @@ public class ItemController extends BaseController {
 		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
 	}
 	
+	
+	/**
+	 * 根据group业务模型填充视图模型
+	 * @param bundleCommand
+	 * @return
+	 */
+	private void fillGroupViewCommand(Model model, BundleCommand bundleCommand) {
+		BundleViewCommand bundleViewCommand = new BundleViewCommand();
+		bundleViewCommand.setId(bundleCommand.getId());
+		bundleViewCommand.setItemId(bundleCommand.getItemId());
+		bundleViewCommand.setAvailableQty(bundleCommand.getAvailableQty());
+		bundleViewCommand.setPriceType(bundleCommand.getPriceType());
+		bundleViewCommand.setSyncWithInv(bundleCommand.getSyncWithInv());
+		bundleViewCommand.setCreateTime(bundleCommand.getCreateTime());
+		
+		model.addAttribute("bundleViewCommand", bundleViewCommand);
+		
+		List<BundleElementCommand> becs = bundleCommand.getBundleElementCommands();
+		List<BundleElementViewCommand> bevcs = new ArrayList<BundleElementViewCommand>();
+		List<BundleElementViewCommand> mbevcs = new ArrayList<BundleElementViewCommand>();
+		for(BundleElementCommand bec : becs) {
+			BundleElementViewCommand bevc = new BundleElementViewCommand();
+			bevc.setIsMainElement(bec.getIsMainElement());
+			bevc.setSalesPrice(bec.getSalesPrice());
+			bevc.setSort(bec.getSortNo());
+			boolean isStyle = bec.getIsStyle();
+			if(isStyle) {
+				bevc.setStyleCode(bec.getStyle());
+			} else {
+				bevc.setItemCode(bec.getItems().get(0).getItemCode());
+			}
+			
+			List<BundleItemCommand> bics = bec.getItems();
+			List<BundleItemViewCommand> bivcs = new ArrayList<BundleItemViewCommand>();
+			List<Long> currentItemIds = new ArrayList<Long>();
+			for(BundleItemCommand bic : bics) {
+				BundleItemViewCommand bivc = new BundleItemViewCommand();
+				Long itemId = bic.getItemId();
+				if(isStyle) {
+					currentItemIds.add(itemId);
+				}
+				bivc.setItemId(itemId);
+				bivc.setItemCode(bic.getItemCode());
+				// 商品的原销售价不会冗余到bundle，需要从商品扩展信息表中获取
+				ItemInfo itemInfo = itemManager.findItemInfoByItemId(bic.getItemId());
+				bivc.setSalesPrice(itemInfo.getSalePrice());
+				bivc.setTitle(itemInfo.getTitle());
+				bivc.setPicUrl(getItemImageByPLP(itemId));
+				
+				List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
+				List<BundleSkuCommand> bscs = bic.getBundleSkus();
+				List<Long> currentSkuIds = new ArrayList<Long>();
+				for(BundleSkuCommand bsc : bscs) {
+					Long skuId = bsc.getSkuId();
+					Sku sku = sdkSkuManager.findSkuById(skuId);
+					if(sku == null) {
+						continue;
+					}
+					currentSkuIds.add(skuId);
+					BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+					bsvc.setSkuId(skuId);
+					bsvc.setIsParticipation(true);
+					bsvc.setOriginalSalesPrice(sku.getSalePrice());
+					bsvc.setSalesPrice(bsc.getSalesPrice());
+					bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+					
+					bsvcs.add(bsvc);
+				}
+				
+				// bundle中仅包含参与捆绑的sku，所以在编辑的时候，需要把未参与的sku也包括进来
+				List<Sku> skus = itemManager.findSkuByItemId(itemId);
+				for(Sku sku : skus) {
+					Long skuId = sku.getId();
+					if(!currentSkuIds.contains(skuId)) {
+						BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+						bsvc.setSkuId(skuId);
+						bsvc.setIsParticipation(false);
+						bsvc.setOriginalSalesPrice(sku.getSalePrice());
+						bsvc.setSalesPrice(sku.getSalePrice());
+						bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+						
+						bsvcs.add(bsvc);
+					}
+				}
+				Collections.sort(bsvcs);
+				bivc.setBundleSkuViewCommands(bsvcs);
+				
+				bivcs.add(bivc);
+			}
+			
+			// 如果捆绑成员是基于款号配置的，在编辑的时候需要检查该款号下是否有新增的商品
+			if(isStyle){
+				List<ItemCommand> itemCommands = itemManager.findItemCommandsByStyle(bec.getStyle());
+				for(ItemCommand command : itemCommands) {
+					Long itemId = command.getId();
+					if(!currentItemIds.contains(itemId)) {
+						BundleItemViewCommand bivc = new BundleItemViewCommand();
+						bivc.setItemId(itemId);
+						bivc.setItemCode(command.getCode());
+						bivc.setSalesPrice(command.getSalePrice());
+						
+						List<BundleSkuViewCommand> bsvcs = new ArrayList<BundleSkuViewCommand>();
+						List<Sku> skus = itemManager.findSkuByItemId(itemId);
+						for(Sku sku : skus) {
+							BundleSkuViewCommand bsvc = new BundleSkuViewCommand();
+							bsvc.setIsParticipation(false);
+							bsvc.setOriginalSalesPrice(sku.getSalePrice());
+							bsvc.setSalesPrice(sku.getSalePrice());
+							bsvc.setSkuId(sku.getId());
+							bsvc.setProperty(bundleManager.getSkuPropertyStrForBundle(sku));
+							
+							bsvcs.add(bsvc);
+						}
+						bivc.setBundleSkuViewCommands(bsvcs);
+						
+						bivcs.add(bivc);
+					}
+				}
+			}
+			Collections.sort(bivcs);
+			bevc.setBundleItemViewCommands(bivcs);
+			
+			if(bevc.getIsMainElement()) {
+				mbevcs.add(bevc);
+			} else {
+				bevcs.add(bevc);
+			}
+		}
+		
+		model.addAttribute("mainElements", mbevcs);
+		model.addAttribute("mainElementsStr", JsonUtil.format(mbevcs));
+		model.addAttribute("elements", bevcs);
+		model.addAttribute("elementsStr", JsonUtil.format(bevcs));
+	}
+	
+	
+	
 	private String getItemImageByPLP(Long itemId){
 		List<ItemImage> itemImages = sdkItemManager.findItemImageByItemIds(Arrays.asList(itemId), ItemImage.IMG_TYPE_LIST);
 		
@@ -2903,5 +3133,99 @@ public class ItemController extends BaseController {
 		}
 		
 		return null;
+	}
+
+
+	/**
+	 * 导入商品
+	 * 
+	 * @param request
+	 * @param model
+	 * @param response
+	 */
+	@RequestMapping(value = "/sku/skuUploadUpdatePrice.json",method = RequestMethod.POST)
+	public void skuUploadUpdatePrice(HttpServletRequest request,Model model,HttpServletResponse response){
+		// 清除用户错误信息文件
+		claerUserFile();
+		response.setContentType("text/html;charset=UTF-8");
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		MultipartFile file = multipartRequest.getFile("Filedata");
+		String name = file.getOriginalFilename();
+		InputStreamCacher cacher = null;
+		try{
+			cacher = new InputStreamCacher(file.getInputStream());
+		}catch (IOException e1){
+			e1.printStackTrace();
+		}
+		Map<String, Object> rs = new HashMap<String, Object>();
+
+		try{
+			Map<String,List<ItemUpdatePriceCommand>> result= itemManager.importItemUpdatePrice(file.getInputStream());
+			List<ItemUpdatePriceCommand> errorItemList=result.get("itemErrorList");
+			List<ItemUpdatePriceCommand> errorSkuList=result.get("skuErrorList");
+			if(errorItemList.size()>0||errorSkuList.size()>0){
+				List<String> itemStr=CollectionsUtil.getPropertyValueList(errorItemList, "code");
+				List<String> skuStr=CollectionsUtil.getPropertyValueList(errorSkuList, "extentionCode");
+				
+				rs.put("isSuccess", false);
+				rs.put("description", "数据错误");
+				rs.put("itemErrorIds", itemStr);
+				rs.put("skuErrorIds", skuStr);
+				
+				returnRes(response, rs);
+			}else{
+				List<ItemUpdatePriceCommand> itemList=result.get("itemResultList");
+				List<ItemUpdatePriceCommand> skuList=result.get("skuResultList");
+				
+				for (ItemUpdatePriceCommand ipc : itemList) {
+					itemManager.updateItemInfoByImport(ipc);
+				}
+				
+				List<Long> strList=CollectionsUtil.getPropertyValueList(itemList, "itemId");
+				
+				itemSolrManager.saveOrUpdateItem(strList);
+				itemSolrManager.saveOrUpdateItemI18n(strList);
+				
+				for (ItemUpdatePriceCommand ipc : skuList) {
+					itemManager.updateSkuInfoByImport(ipc);
+				}
+			}
+			
+		}catch (BusinessException e){
+			e.printStackTrace();
+			Boolean flag = true;
+			List<String> errorMessages = new ArrayList<String>();
+			BusinessException linkedException = e;
+			while (flag){
+				String message = "";
+				if (linkedException.getErrorCode() == 0){
+					message = linkedException.getMessage();
+				}else{
+					if (null == linkedException.getArgs()){
+						message = getMessage(linkedException.getErrorCode());
+					}else{
+						message = getMessage(linkedException.getErrorCode(), linkedException.getArgs());
+					}
+
+				}
+				errorMessages.add(message);
+
+				if (null == linkedException.getLinkedException()){
+					flag = false;
+				}else{
+					linkedException = linkedException.getLinkedException();
+				}
+			}
+			String userFilekey = addErrorInfo(errorMessages, cacher, response, name);
+			// 返回值
+			rs.put("isSuccess", false);
+			rs.put("description", errorMessages);
+			rs.put("userFilekey", userFilekey);
+			returnRes(response, rs);
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		rs.put("isSuccess", true);
+		returnRes(response, rs);
 	}
 }

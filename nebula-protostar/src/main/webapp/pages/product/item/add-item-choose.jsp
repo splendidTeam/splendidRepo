@@ -43,8 +43,8 @@ var zNodes =
 				   <div class="addpro-title font20 pb10"><spring:message code="item.add.addItem" /></div>
 				   <div class="form-group select-btn">
 				   		<label> <input type="radio" class="normalpro" name="newPro" value="1" checked="checked" /><spring:message code="item.type.simple" /> </label>
-				   		<label> <input type="radio" name="newPro" value="3" /><spring:message code="item.type.bundle" /> </label>
-				   		<label> <input type="radio" name="newPro" value="5" /><spring:message code="item.type.group" /></label>
+				   		<label> <input type="radio" id="bundleItem" name="newPro" value="3" /><spring:message code="item.type.bundle" /> </label>
+				   		<label> <input type="radio" id="groupItem" name="newPro" value="5" /><spring:message code="item.type.group" /></label>
 				   		<label> <input type="radio" class="virtualpro" name="newPro" value="7" /><spring:message code="item.type.virturl" /></label>
 				   </div>
 				   <div class="pro-modal pt10 pb10 none-normal" style="display:block;">

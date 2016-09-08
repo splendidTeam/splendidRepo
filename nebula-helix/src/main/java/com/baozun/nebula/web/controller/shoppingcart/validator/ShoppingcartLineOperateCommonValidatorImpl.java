@@ -16,6 +16,14 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ITEM_IS_GIFT;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ITEM_NOT_ACTIVE_TIME;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_ENABLE;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_EXIST;
+import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND;
+import static com.feilong.core.Validator.isNullOrEmpty;
+
 import java.util.Date;
 
 import org.apache.commons.lang3.Validate;
@@ -30,8 +38,6 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
-import com.feilong.core.DatePattern;
-import com.feilong.core.Validator;
 import com.feilong.core.date.DateUtil;
 
 /**
@@ -49,7 +55,7 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
 
     /** The sdk item manager. */
     @Autowired
-    private SdkItemManager      sdkItemManager;
+    private SdkItemManager sdkItemManager;
 
     /*
      * (non-Javadoc)
@@ -63,17 +69,17 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
         Validate.isTrue(count >= 1, "count:%s can not <1", count);
 
         //===============② 判断sku是否存在===============
-        if (Validator.isNullOrEmpty(sku)){
+        if (isNullOrEmpty(sku)){
             //XXX feilong change to exception
             LOGGER.error("sku not exist!!!!!!");
-            return ShoppingcartResult.SKU_NOT_EXIST;
+            return SKU_NOT_EXIST;
         }
 
         //===============③ 判断sku生命周期===============
         Integer skuLifecycle = sku.getLifecycle();
         if (!skuLifecycle.equals(Sku.LIFE_CYCLE_ENABLE)){
             LOGGER.error("sku's lifecycle is:{},return SKU_NOT_ENABLE", skuLifecycle);
-            return ShoppingcartResult.SKU_NOT_ENABLE;
+            return SKU_NOT_ENABLE;
         }
 
         ItemCommand itemCommand = sdkItemManager.findItemCommandById(sku.getItemId());
@@ -82,9 +88,8 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
 
         //===============④  判断item的生命周期===============
         if (!Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
-            Long id = itemCommand.getId();
-            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", id, lifecycle);
-            return ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
+            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", itemCommand.getId(), lifecycle);
+            return ITEM_STATUS_NOT_ENABLE;
         }
 
         //===============⑤  还没上架===============
@@ -92,18 +97,14 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
         Date now = new Date();
         String itemCode = itemCommand.getCode();
         if (null != activeBeginTime && DateUtil.isAfter(activeBeginTime, now)){
-            LOGGER.warn(
-                            "now is :[{}],but item:[{}]'s activeBeginTime is:{},return ITEM_NOT_ACTIVE_TIME",
-                            DateUtil.toString(now, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND),
-                            itemCode,
-                            DateUtil.toString(activeBeginTime, DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND));
-            return ShoppingcartResult.ITEM_NOT_ACTIVE_TIME;
+            LOGGER.warn("now is :[{}],but item:[{}]'s activeBeginTime is:{},return ITEM_NOT_ACTIVE_TIME", DateUtil.toString(now, COMMON_DATE_AND_TIME_WITH_MILLISECOND), itemCode, DateUtil.toString(activeBeginTime, COMMON_DATE_AND_TIME_WITH_MILLISECOND));
+            return ITEM_NOT_ACTIVE_TIME;
         }
 
         //===============⑥ 赠品验证===============
         if (ItemInfo.TYPE_GIFT.equals(itemCommand.getType())){
             LOGGER.warn("item:[{}] is gift don't need operate,return ITEM_IS_GIFT", itemCode);
-            return ShoppingcartResult.ITEM_IS_GIFT;
+            return ITEM_IS_GIFT;
         }
         return null;
     }

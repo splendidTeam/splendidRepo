@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import com.baozun.nebula.model.product.PropertyValueGroup;
 import com.baozun.nebula.model.product.PropertyValueLang;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utils.InputStreamCacher;
 import com.baozun.nebula.utils.query.bean.QueryBean;
 import com.baozun.nebula.web.bind.I18nCommand;
@@ -688,5 +690,52 @@ public class NebulaPropertyValueController extends BaseController{
 		}
 		return cellValue;
 	}
+	
+	/**
+	 * 
+	 * @Description 上传属性图片
+	 * @param request
+	 * @param model
+	 * @param response
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-8-22
+	 */
+	@RequestMapping(value = "/property/propertyImageUpload.json", method = RequestMethod.POST)
+	@ResponseBody
+	public BackWarnEntity propertyImageUpload(
+			HttpServletRequest request, Model model,
+			HttpServletResponse response) {
+		boolean isSuccess = true;
+		response.setContentType("text/html;charset=UTF-8");
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		MultipartFile file = multipartRequest.getFile("Filedata");
 
+		String fileName = file.getOriginalFilename();
+		String fileType = fileName.substring(fileName.lastIndexOf("."),
+				fileName.length());
+		String imageZipPath = ProfileConfigUtil.findPro(
+				"config/metainfo.properties").getProperty("upload.img.base");
+		Calendar calendar = Calendar.getInstance();
+		String userDefinedPath = calendar.get(Calendar.YEAR) + "/"
+				+ (calendar.get(Calendar.MONTH) + 1) + "/"
+				+ calendar.get(Calendar.DAY_OF_MONTH) + "/" + "propertyImage"
+				+ "/";
+		String ranStr = System.currentTimeMillis() + fileType;
+		if (!file.isEmpty()) {
+			File imageDir = new File(imageZipPath + userDefinedPath);
+			if (!imageDir.exists()) {
+				imageDir.mkdirs();
+			}
+			File targetFile = new File(imageZipPath + userDefinedPath + ranStr);
+			try {
+				file.transferTo(targetFile);
+			} catch (Exception e) {
+
+			}
+		}
+		String imageUrl = userDefinedPath + ranStr;
+		BackWarnEntity backWarnEntity= new BackWarnEntity(isSuccess, imageUrl);
+		return backWarnEntity;
+	}
 }

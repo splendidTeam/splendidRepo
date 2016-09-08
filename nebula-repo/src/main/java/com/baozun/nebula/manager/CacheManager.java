@@ -374,6 +374,13 @@ public interface CacheManager{
 	 */
 	public boolean applyRollingTimeWindow(String key, long limit, long window);
 	
+	/**
+	 * 根据前缀删除缓存信息，只针对对象。文本，不包含map的删除
+	 * @param key
+	 * @return 删除的条数
+	 */
+	public int removeByPrefix(String key);
+	
 	
 	
 }

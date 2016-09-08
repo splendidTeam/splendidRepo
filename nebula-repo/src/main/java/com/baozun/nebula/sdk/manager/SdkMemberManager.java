@@ -296,6 +296,16 @@ public interface SdkMemberManager extends BaseManager{
 	 * @return
 	 */
 	public boolean resetPasswd(Long memberId,String newPwd);
+	/**
+	 * 重置密码
+	 * 新增盐值
+	 * 
+	 * @param memberId
+	 * @param newPwd
+	 * @return
+	 */
+	
+	boolean resetPasswdWithSalt(Long memberId, String newPwd, String salt);
 
 	/**
 	 * 修改密码
@@ -639,4 +649,6 @@ public interface SdkMemberManager extends BaseManager{
 	 * @return
 	 */
 	void deleteMemberBehaviorByMemberIdAndType(Long memberId,Long thirdPartyId,String type);
+
+	
 }

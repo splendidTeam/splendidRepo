@@ -78,4 +78,18 @@ public class CacheKeyConstant{
 	 * 基于搜索导航的搜索条件缓存
 	 */
 	public final static String				CONDITION_NAV_CACHEKEY		= "CONDITION_NAV_CACHEKEY_";
+	
+	
+	/** 分类元数据在缓存中的key，完整的key还要加上语言 */
+	public final static String			categoryMetaCacheKey			= "categoryMetaCacheKey_";
+
+	/** 属性元数据在缓存中的key，完整的key还要加上语言 */
+	public final static String			propertyMetaCacheKey			= "propertyMetaCacheKey_";
+
+	/** 属性值元数据在缓存中的key，完整的key还要加上语言 */
+	public final static String			propertyValueMetaCacheKey		= "propertyValueMetaCacheKey_";
+
+	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 */
+	public final static String			searchConditionMetaCacheKey		= "searchConditionMetaCacheKey_";
+
 }

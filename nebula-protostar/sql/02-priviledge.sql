@@ -284,3 +284,22 @@ insert into "t_au_privilege"("id","group_name","acl","name","description","lifec
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/sysAuditLog/list.htm','审计日志查询列表',currval('s_t_au_privilege'));
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/sysAuditLog/page.json','审计日志查询列表',currval('s_t_au_privilege'));
 
+-- 定时任务运行日志
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营管理','ACL_BACKLOG_SCHEDULERLOG','定时任务运行日志','定时任务运行日志',1,now(),2);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/schedulerLog/list.htm','定时任务运行日志',currval('s_t_au_privilege'));
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/schedulerLog/list.json','定时任务运行日志',currval('s_t_au_privilege'));
+
+--SCM消息日志
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_BACKLOG_RECEIVELOG','SCM接收消息日志','SCM接收消息日志',1,now(),2);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/scmReceivedLog/list.htm','SCM接收消息日志',currval('s_t_au_privilege'));
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/scmReceivedLog/page.json','SCM接收消息日志',currval('s_t_au_privilege'));
+
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_BACKLOG_SENDLOG','SCM发送消息日志','SCM发送消息日志',1,now(),2);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/scmSendLog/list.htm','SCM发送消息日志',currval('s_t_au_privilege'));
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/backlog/scmSendLog/page.json','SCM发送消息日志',currval('s_t_au_privilege'));
+
+--邮件订阅管理
+insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_SYS_EMAILSUBSCRIBE_MANAGE','邮件订阅管理','邮件订阅管理',1,now(),1);
+insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/email/subscribe/manager.htm','邮件订阅管理',currval('s_t_au_privilege'));
+
+

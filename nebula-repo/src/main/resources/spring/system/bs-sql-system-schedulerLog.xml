@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="SchedulerLog.findSchedulerLogListByQueryBeanWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		SELECT
+						task.code,
+						task.description,
+						task.bean_name beanName,
+						task.method_name methodName,
+						log.id,
+						log.begin_time beginTime,
+						log.end_time endTime,
+						log.execution_time executionTime  
+					FROM
+						t_sys_schedulerlog log
+					LEFT JOIN t_sys_scheduler_task task ON log.task_id = task. ID
+					where 1=1
+					#if($code)
+       					and task.code like :code
+       				#end
+       				#if($beanName)
+       					and task.bean_name like :beanName
+       				#end
+       				#if($methodName)
+       					and task.method_name like :methodName
+       				#end
+       				#if($beginTime)
+       					and log.begin_time >= :beginTime
+       				#end
+       				#if($endTime)
+       					and log.end_time <= :endTime
+       				#end
+       				#if($min)
+       					and log.execution_time >= :min
+       				#end
+       				#if($max)
+       					and log.execution_time <= :max
+       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
+	
+</beans>

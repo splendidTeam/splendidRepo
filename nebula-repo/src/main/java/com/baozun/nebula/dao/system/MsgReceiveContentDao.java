@@ -77,4 +77,16 @@ public interface MsgReceiveContentDao extends GenericEntityDao<MsgReceiveContent
 	@NativeUpdate
 	void updateMsgRecContIsProByIds(@QueryParam("ids")List<Long> ids);
 	
+	/**
+	 * 分页获取MsgReceiveContent列表
+	 * like 条件查询
+	 * @param start
+	 * @param size
+	 * @param paraMap
+	 * @param sorts 
+	 * @return
+	 */
+	@NativeQuery(model = MsgReceiveContent.class)
+	Pagination<MsgReceiveContent> findMsgReceiveContentListByPage(Page page, Sort[] sorts, @QueryParam Map<String, Object> paraMap);
+	
 }

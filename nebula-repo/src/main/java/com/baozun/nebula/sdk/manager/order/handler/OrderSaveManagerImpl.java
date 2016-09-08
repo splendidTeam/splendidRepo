@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager.order.handler;
 
+import static com.baozun.nebula.model.salesorder.SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT;
+import static com.baozun.nebula.model.salesorder.SalesOrder.SALES_ORDER_STATUS_NEW;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -93,9 +96,9 @@ public class OrderSaveManagerImpl implements OrderSaveManager{
         salesOrder.setQuantity(shopCartCommandByShop.getQty());
 
         // 财务状态
-        salesOrder.setFinancialStatus(SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT);
+        salesOrder.setFinancialStatus(SALES_ORDER_FISTATUS_NO_PAYMENT);
         // 物流状态
-        salesOrder.setLogisticsStatus(SalesOrder.SALES_ORDER_STATUS_NEW);
+        salesOrder.setLogisticsStatus(SALES_ORDER_STATUS_NEW);
 
         setRemark(shopId, salesOrderCommand, salesOrder);
         setLogisticsProviderInfo(shopId, salesOrderCommand, salesOrder);

@@ -119,16 +119,18 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		// 保存Sku
 		createOrUpdateSku(itemCommand, item.getId(), skuPropertyCommand,savedItemProperties);
 		
-		// 执行扩展点
-		if(null != itemExtendManager) {
-			itemExtendManager.extendAfterCreateOrUpdateItemI18n(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand, itemI18nCommand);
-		}
+		
 		
 		// 保存商品扩展信息
 		createOrUpdateItemInfo(itemCommand, item.getId());
 
 		// 处理商品分类
 		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+
+		// 执行扩展点
+		if(null != itemExtendManager) {
+			itemExtendManager.extendAfterCreateOrUpdateItemI18n(item, itemCommand, categoriesIds, savedItemProperties, skuPropertyCommand, itemI18nCommand);
+		}
 		
 		return item;
 	}
@@ -155,6 +157,28 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		// 处理商品分类
 		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
 				
+		return item;
+	}
+	
+	@Override
+	@Transactional
+	public Item createOrUpdateGroupItem(ItemInfoCommand itemCommand, BundleCommand bundleCommand, Long[] categoriesIds, Long defaultCategoryId)
+			throws Exception {
+		
+		// 保存商品
+		itemCommand.setItemType(Item.ITEM_TYPE_GROUP);
+		Item item = createOrUpdateItem(itemCommand, categoriesIds);
+		
+		// 保存bundle扩展信息
+		bundleCommand.setItemId(item.getId());
+		bundleManager.createOrUpdateGroup(bundleCommand);
+		
+		// 保存商品扩展信息
+		createOrUpdateItemInfo(itemCommand, item.getId());
+		
+		// 处理商品分类
+		itemCategoryHandle(itemCommand, item, categoriesIds, defaultCategoryId);
+		
 		return item;
 	}
 	
@@ -1290,6 +1314,8 @@ public class ItemLangManagerImpl implements ItemLangManager {
 				}
 				itemCategoryManager.createOrUpdateItemCategory(itemCommand,
 						item.getId(), simpleCategoriesIds);
+			}else{
+				itemCategoryManager.deleteItemCategoryByItemId(itemCommand.getId());
 			}
 			// 绑定默认分类
 			itemCategoryManager.createOrUpdateItemDefaultCategory(itemCommand,

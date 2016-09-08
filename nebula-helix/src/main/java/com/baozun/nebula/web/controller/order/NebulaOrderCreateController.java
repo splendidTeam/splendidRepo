@@ -212,7 +212,7 @@ public class NebulaOrderCreateController extends BaseController{
         shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
 
         // 封装订单信息
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.buildSalesOrderCommand(memberDetails, orderForm, request);
+        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
         List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
 
         CalcFreightCommand calcFreightCommand = salesOrderCommand.getCalcFreightCommand();
@@ -301,7 +301,7 @@ public class NebulaOrderCreateController extends BaseController{
         return DefaultReturnResult.SUCCESS;
     }
 
-    private SalesOrderReturnObject createReturnObject(String subOrdinate){
+    protected SalesOrderReturnObject createReturnObject(String subOrdinate){
         // 通過支付流水號查詢訂單
         SalesOrderCommand salesOrderCommand = salesOrderResolver.getSalesOrderCommand(subOrdinate);
         SalesOrderReturnObject salesOrderReturnObject = new SalesOrderReturnObject();

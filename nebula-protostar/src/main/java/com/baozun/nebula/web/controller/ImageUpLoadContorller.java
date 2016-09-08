@@ -48,8 +48,6 @@ public class ImageUpLoadContorller extends BaseController{
 
 	private final String		IMG_ROLE			= "IMG_ROLE";
 
-	private final String		DEFAULT_ROLE		= "250X300";
-
 	@Autowired
 	private ChooseOptionManager	chooseOptionManager;
 
@@ -85,7 +83,7 @@ public class ImageUpLoadContorller extends BaseController{
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException{
 		List<ChooseOption> optList = chooseOptionManager.findEffectChooseOptionListByGroupCode(IMG_ROLE);
-		String role = DEFAULT_ROLE;
+		String role = "";
 		if (optList.size() > 0){
 			ChooseOption co = optList.get(0);
 			role = co.getOptionValue();
@@ -112,16 +110,16 @@ public class ImageUpLoadContorller extends BaseController{
 			}
 			// 后缀
 			String exp = ImageOpeartion.getExp(fileName);
-			distFileName = picName + "_" + role + exp;
 			srcFileName = picName + exp;
 			// retDistUrl += distFileName;
-			distStr = path + "/" + distFileName;
 			srcStr = path + "/" + srcFileName;
 			// 原图
 			File file = new File(srcStr);
 			mFile.getFileItem().write(file);
 
 			if (Validator.isNotNullOrEmpty(role)){
+				distFileName = picName + "_" + role + exp;
+				distStr = path + "/" + distFileName;
 				// 缩略图
 				String[] strs = role.split("X");
 				ImageOpeartion.reduceImg(file, distStr, Integer.parseInt(strs[0]), Integer.parseInt(strs[1]), "BK");

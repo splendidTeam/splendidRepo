@@ -121,6 +121,8 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 邮编. */
     private String                      postcode;
+    
+    //***********************************************************
 
     /** 指定时间段. */
     private String                      appointTimeQuantum;
@@ -130,6 +132,8 @@ public class SalesOrderCommand extends BaseModel{
 
     /** 指定类型. */
     private String                      appointType;
+    
+    //***********************************************************
 
     /** 收货信息修改时间. */
     private Date                        consigneeModifyTime;
@@ -269,7 +273,7 @@ public class SalesOrderCommand extends BaseModel{
 
     //*********************************************************************************************
 
-    /** 多语言 */
+    /** 多语言. */
     private String                      lang;
 
     /**
@@ -1016,19 +1020,19 @@ public class SalesOrderCommand extends BaseModel{
     }
 
     /**
-     * 获得 收货信息平铺.
+     * 获得 姓名.
      *
-     * @return the 收货信息平铺
+     * @return the 姓名
      */
     public String getName(){
         return name;
     }
 
     /**
-     * 设置 收货信息平铺.
+     * 设置 姓名.
      *
      * @param name
-     *            the new 收货信息平铺
+     *            the new 姓名
      */
     public void setName(String name){
         this.name = name;
@@ -1604,34 +1608,78 @@ public class SalesOrderCommand extends BaseModel{
         this.buyerTel = buyerTel;
     }
 
+    /**
+     * 获得 发票收货人.
+     *
+     * @return the 发票收货人
+     */
     public String getReceiptConsignee(){
         return receiptConsignee;
     }
 
+    /**
+     * 设置 发票收货人.
+     *
+     * @param receiptConsignee
+     *            the new 发票收货人
+     */
     public void setReceiptConsignee(String receiptConsignee){
         this.receiptConsignee = receiptConsignee;
     }
 
+    /**
+     * 获得 发票收货人联系方式.
+     *
+     * @return the 发票收货人联系方式
+     */
     public String getReceiptTelphone(){
         return receiptTelphone;
     }
 
+    /**
+     * 设置 发票收货人联系方式.
+     *
+     * @param receiptTelphone
+     *            the new 发票收货人联系方式
+     */
     public void setReceiptTelphone(String receiptTelphone){
         this.receiptTelphone = receiptTelphone;
     }
 
+    /**
+     * 获得 发票收货地址.
+     *
+     * @return the 发票收货地址
+     */
     public String getReceiptAddress(){
         return receiptAddress;
     }
 
+    /**
+     * 设置 发票收货地址.
+     *
+     * @param receiptAddress
+     *            the new 发票收货地址
+     */
     public void setReceiptAddress(String receiptAddress){
         this.receiptAddress = receiptAddress;
     }
 
+    /**
+     * 获得 多语言.
+     *
+     * @return the 多语言
+     */
     public String getLang(){
         return lang;
     }
 
+    /**
+     * 设置 多语言.
+     *
+     * @param lang
+     *            the new 多语言
+     */
     public void setLang(String lang){
         this.lang = lang;
     }

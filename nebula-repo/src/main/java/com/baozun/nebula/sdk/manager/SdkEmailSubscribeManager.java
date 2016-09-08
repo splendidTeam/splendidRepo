@@ -53,5 +53,23 @@ public interface SdkEmailSubscribeManager extends BaseManager{
 	 */
 
 	Pagination<EmailSubscribe> findEmailSubscribeListByQueryMapWithPage(Page page,Sort[] sorts,Map<String, Object> paraMap);
+
+	/**
+	 * 根据主键id查询EmailSubscribe对象
+	 * @param id
+	 * @return
+	 */
+	EmailSubscribe getEmailSubscribeById(Long id);
+
+	/**
+	 * 根据主键id集合批量删除EmailSubscribe
+	 * @param idList
+	 */
+	void deleteAllByPrimaryKey(List<Long> ids);
+	/**
+	 * 根据主键id删除EmailSubscribe
+	 * @param idList
+	 */
+	void deleteEmailSubscribeByPrimaryKey(Long id);
 	
 }

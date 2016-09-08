@@ -155,4 +155,64 @@
 		</constructor-arg>
 	</bean>	
 	
+	
+	<bean id="MsgSendRecord.findMsgSendRecordAndContentListByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		           select record.id as id,
+					       record.create_time AS createTime,
+					       record.ext as ext,
+					       record.feedback_time as feedbackTime,
+					       record.if_identify as ifIdentify,
+					       record.send_count as sendCount,
+					       record.send_time as sendTime,
+					       record.target_id as targetId,
+					       record.version as version,
+					       content.msg_body as msgBody
+					from T_SYS_MSG_SEND_RECORD record 
+					     LEFT JOIN t_sys_msg_send_content content ON record.id=content.id 
+                    where 
+		       			 1=1	
+		       				#if($ifIdentify)
+		       					and record.if_identify  like :ifIdentify
+		       				#end
+
+		       				#if($targetId)
+		       					and record.target_id =:targetId
+		       				#end
+		       			
+		       				#if($sendTimeStart)
+		       					and record.send_time >= :sendTimeStart
+		       				#end
+		       				#if($sendTimeEnd)
+		       					and record.send_time <= :sendTimeEnd
+		       				#end
+		       			
+		       				#if($feedbackTimeStart)
+		       					and record.feedback_time >= :feedbackTimeStart
+		       				#end
+		       				#if($feedbackTimeEnd)
+		       					and record.feedback_time <= :feedbackTimeEnd
+		       				#end
+		       			
+		       				#if($sendCount)
+		       					and record.send_count =:sendCount
+		       				#end
+                           
+                            #if($msgBody)
+		       					and content.msg_body like :msgBody
+		       				#end
+		       			
+		       				#if($createTimeStart)
+		       					and record.create_time >= :createTimeStart
+		       				#end
+		       				#if($createTimeEnd)
+		       					and record.create_time <= :createTimeEnd
+		       				#end
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>	
 </beans>

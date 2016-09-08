@@ -18,6 +18,7 @@
 package com.baozun.nebula.web.controller.member;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -360,6 +361,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 			// 页面传来的密码必须和默认密码相同
 			if (loginForm.getPassword().equals(autoLoginPassword) && loginName.equals(loginForm.getLoginName())) {
 				LOG.debug("Auto login password is same with saved one, will check whether it is expired.");
+				//盐值为空时走原来验证逻辑，通过之后使用新的加密算法保存盐值和新密码 add by ruichao.gao
 				return loginForm.getPassword().equals(generateAutoLoginPassword(loginForm,memberCommand));
 			}else{
 				LOG.debug("Auto Login Password is not valid from Input for {}", loginForm.getLoginName());
@@ -517,17 +519,20 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		String loginEmail = memberCommand.getLoginEmail();
 		String loginMobile = memberCommand.getLoginMobile();
 		
-		// 如果登录名是loginName的话用loginName去进行加密
-		if (loginForm.getLoginName().equals(loginName)) {
-			pwd = EncryptUtil.getInstance().hash(loginName, memberCommand.getPassword());
-		}else if (loginForm.getLoginName().equals(loginEmail)) {
-			// 如果登录名是email的话用LoginEmail去进行加密
-			pwd = EncryptUtil.getInstance().hash(loginEmail, memberCommand.getPassword());
-		}else if (loginForm.getLoginName().equals(memberCommand.getLoginMobile())) {
-			// 如果登录名是mobile的话用loginMobile去进行加密
-			pwd = EncryptUtil.getInstance().hash(loginMobile, memberCommand.getPassword());
+		if(Validator.isNullOrEmpty(memberCommand.getSalt())){
+			// 如果登录名是loginName的话用loginName去进行加密
+			if (loginForm.getLoginName().equals(loginName)) {
+				pwd = EncryptUtil.getInstance().hash(loginName, memberCommand.getPassword());
+			}else if (loginForm.getLoginName().equals(loginEmail)) {
+				// 如果登录名是email的话用LoginEmail去进行加密
+				pwd = EncryptUtil.getInstance().hash(loginEmail, memberCommand.getPassword());
+			}else if (loginForm.getLoginName().equals(memberCommand.getLoginMobile())) {
+				// 如果登录名是mobile的话用loginMobile去进行加密
+				pwd = EncryptUtil.getInstance().hash(loginMobile, memberCommand.getPassword());
+			}
+		}else{
+			pwd = memberCommand.getPassword();
 		}
-
 		// 如果用户名和密码hash之后的值为null，抛出一个RuntimeException
 		if (pwd == null)
 			throw new RuntimeException("generateAutoLoginPassword Encrypt hash fail.");

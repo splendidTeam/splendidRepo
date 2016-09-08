@@ -897,4 +897,78 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
+	
+		
+	<bean id="Item.findAllItemSkuToExport" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出未删除的商品Sku信息 用于导出修改价格</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select sku.out_id as extentionCode,
+						   sku.list_price as listPrice,
+						   sku.sale_price as salePrice,
+						   item.code as code
+						from t_pd_sku sku 
+						LEFT JOIN t_pd_item item on sku.item_id=item.id
+						where item.lifecycle !=2 and item.type =1  order by item.id
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.findAllItemToExport" class="loxia.dao.support.DynamicQueryHolder">
+		<description>查询出未删除的商品 用于导出修改价格</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					select item.id as itemId,
+						   item.code as code,
+						   iteminfo.title as title,
+						   iteminfo.style as style,
+						   iteminfo.sub_title as subTitle,
+						   iteminfo.list_price as itemListPrice,
+						   iteminfo.sale_price as itemSalePrice
+						from 
+							t_pd_item item
+							LEFT JOIN t_pd_iteminfo iteminfo on item.id=iteminfo.item_id 
+						where item.lifecycle !=2 and item.type =1  order by item.id
+
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="Item.updateItemItemInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>单条修改 item 标题 副标题 销售价和吊牌价</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_iteminfo set 
+								title=:obj.title,
+								sub_title=:obj.subTitle,
+								style=:obj.style,
+								list_price =:obj.itemListPrice ,
+								sale_price=:obj.itemSalePrice 
+								where id=:obj.itemId 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Item.updateItemSkuInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>单条修改 sku 销售价和吊牌价</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					update t_pd_sku set 
+						list_price =:obj.listPrice ,
+						sale_price=:obj.salePrice 
+						where out_id=:obj.extentionCode 
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

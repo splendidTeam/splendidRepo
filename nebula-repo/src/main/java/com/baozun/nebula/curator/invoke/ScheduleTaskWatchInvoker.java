@@ -17,13 +17,16 @@
 package com.baozun.nebula.curator.invoke;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baozun.nebula.constant.SchedulerConstants;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.watcher.IWatcherInvoke;
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.SchedulerManager;
 import com.baozun.nebula.model.BaseModel;
 import com.baozun.nebula.model.system.SchedulerTask;
@@ -49,6 +52,8 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 	@Autowired
 	private ZkOperator zkOperator;
 
+	@Autowired
+	private CacheManager cacheManager;
 	
 	private void handleTask(SchedulerTask schedulerTask) throws Exception{
 		Integer lifeCycle = schedulerTask.getLifecycle();
@@ -71,6 +76,11 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 
 	@Override
 	public void invoke(String path, byte[] data) {
+		try {
+			TimeUnit.SECONDS.sleep(3);
+		} catch (InterruptedException e) {
+			LOG.error(e.getMessage());
+		}
 		try {
 			byte[] datas = zkOperator.getData(path);
 			Long id = Long.parseLong(new String(datas));
@@ -98,6 +108,8 @@ public class ScheduleTaskWatchInvoker implements IWatcherInvoke {
 					}
 				}
 			}
+			//删除缓存
+			cacheManager.remove(SchedulerConstants.SCHEDULERTASKS);
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 		}

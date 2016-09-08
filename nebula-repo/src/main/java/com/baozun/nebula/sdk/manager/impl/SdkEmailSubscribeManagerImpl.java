@@ -51,4 +51,22 @@ public class SdkEmailSubscribeManagerImpl implements SdkEmailSubscribeManager {
 		return emailSubscribeDao.findEmailSubscribeListByQueryMapWithPage(page, sorts, paraMap);
 	}
 
+	@Override
+	@Transactional(readOnly=true)
+	public EmailSubscribe getEmailSubscribeById(Long id) {
+		return emailSubscribeDao.getByPrimaryKey(id);
+	}
+
+	@Override
+	public void deleteAllByPrimaryKey(List<Long> ids) {
+		emailSubscribeDao.deleteAllByPrimaryKey(ids);
+		
+	}
+
+	@Override
+	public void deleteEmailSubscribeByPrimaryKey(Long id) {
+		emailSubscribeDao.deleteByPrimaryKey(id);
+		
+	}
+
 }

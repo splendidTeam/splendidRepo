@@ -190,6 +190,28 @@ $j(document).ready(function(){
 	
 //	$j(".select-btn input[type='radio']").trigger('change');
 	
+	if($j("#bundleItem").attr("checked")){
+		$j(".pro-modal").hide();
+	}
+	
+	if($j("#groupItem").attr("checked")){
+		$j(".pro-modal").hide();
+	}
+	
+	$j(".normalpro").click(function(){
+		$j(".pro-modal").show();
+	});
+	$j(".virtualpro").click(function(){
+		$j(".pro-modal").show();
+	});
+	$j("#bundleItem").click(function(){
+		$j(".pro-modal").hide();
+	});
+	$j("#groupItem").click(function(){
+		$j(".pro-modal").hide();
+	});
+	
+	
 	// 初使化普通商品/虚拟商品行业选择树
 	$j.fn.zTree.init($j("#industrytreeDemo"), setting, zNodes);
     

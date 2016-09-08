@@ -325,4 +325,15 @@
 		</constructor-arg>
 	</bean>	
 	
+	<bean id="SchedulerTask.findSchedulerTaskByMethodName" class="loxia.dao.support.DynamicQueryHolder">
+		<description></description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+		       		select * from T_SYS_SCHEDULER_TASK where lifecycle=1 and method_name=:methodName limit 1
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 </beans>

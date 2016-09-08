@@ -209,7 +209,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#findShoppingCartLinesByMemberId(java.lang.Long, java.lang.Integer)
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<ShoppingCartLineCommand> findShoppingCartLinesByMemberId(Long memberId,Integer callType){
         List<ShoppingCartLineCommand> shoppingCartLines = null;
         if (callType == Constants.CHECKED_CHOOSE_STATE){// 查询选中状态的购物车数据
@@ -2624,30 +2624,22 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 全场优惠，计算全场下的累计金额.
-     *
+     * 全场优惠，计算全场下的累计金额
+     * 
      * @param lines
-     *            the lines
      * @param discAmount
-     *            the disc amount
-     * @param factor
-     *            the factor
-     * @param briefListPrevious
-     *            the brief list previous
-     * @return the discount amtcall per order by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(List<ShoppingCartLineCommand> lines,
+            BigDecimal discAmount, Integer factor, List<PromotionBrief> briefListPrevious) {
         if (null == lines || lines.size() == 0)
             return null;
 
         BigDecimal callDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
+        BigDecimal tempDiscAmt = callDiscAMT;
         BigDecimal callOriginal = getNeedToPayAmountInShoppingCartByAll(lines);
-        BigDecimal callPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsByCall(briefListPrevious);
+        BigDecimal callPreviousDisc = sdkPromotionSettingManager
+                .getDiscAMTFromPromotionResultBriefsByCall(briefListPrevious);
         BigDecimal callNeedPay = callOriginal.subtract(callPreviousDisc);
 
         if (callNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -2655,18 +2647,24 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
 
-        for (ShoppingCartLineCommand line : lines){
+        for (ShoppingCartLineCommand line : lines) {
             // 如果行上现有的优惠已经超过行实付时，跳到下一个行
             BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                            .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
             BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
             if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                 continue;
             else
                 lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
-
-            BigDecimal lineShareDisc = callDiscAMT.multiply(lineNeedPay).divide(callNeedPay, 2, BigDecimal.ROUND_HALF_EVEN);
-            settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
+            
+            BigDecimal lineShareDisc = callDiscAMT.multiply(lineNeedPay).divide(callNeedPay, 2,
+                    BigDecimal.ROUND_UP);
+            tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
+            if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
+                settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
+            }else{
+                settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
+            }
         }
         return settingList;
     }
@@ -3092,6 +3090,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         BigDecimal comboDiscAMT = BigDecimal.ZERO;
         comboDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
+        BigDecimal tempDiscAmt = comboDiscAMT;
 
         BigDecimal comboOriginal = getNeedToPayAmountInShoppingCartByComboId(lines, comboId);
         BigDecimal comboPreviousDisc = sdkPromotionSettingManager
@@ -3118,9 +3117,16 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     continue;
                 else
                     lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
+                
+                lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2,
+    					BigDecimal.ROUND_UP);
+    				tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
+    				if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
+    					settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
+    				}else{
+    					settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
+    				}
 
-                lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2, BigDecimal.ROUND_HALF_EVEN);
-                settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
             }
         }
         return settingList;

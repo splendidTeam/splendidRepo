@@ -654,4 +654,7 @@ public interface ErrorCodes {
 	
 	/** bundle商品的捆绑成员sku缺失 */
 	public static final Integer	ITEM_BUNDLE_ELEMENT_SKU_LOST				= 25016;
+	
+	/** bundle商品的捆绑成员sku缺失 */
+	public static final Integer	ITEM_GROUP_ELEMENT_SKU_LOST				    = 25017;
 }

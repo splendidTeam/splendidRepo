@@ -103,6 +103,18 @@
 		</block>
 	</sheet>
 	
+	<!-- 邮件订阅导出 -->
+	<sheet name="emailSubscribeExport">
+		<block start="A4" end="F4" dataName="emailSubscribeList" loop="true" loopClass="com.baozun.nebula.model.system.EmailSubscribe">
+			<cell position="A4" dataName="id" />
+			<cell position="B4" dataName="receiver" />
+			<cell position="C4" dataName="templateCode" />
+			<cell position="D4" dataName="data" />
+			<cell position="E4" dataName="date" />
+			<cell position="F4" dataName="type" />
+		</block>
+	</sheet>
+	
 	<!-- 运费表导出 -->
 	<sheet name="shippingExport">
 		<block start="A1" end="I1" dataName="expTemplateName" loop="true" loopClass="com.baozun.nebula.freight.command.ExpShippingFeeCommand">
@@ -159,7 +171,7 @@
 			<cell position="H3" dataName="subTitle" />
 		</block>
 	</sheet>
-	
+	   
 	<!-- 商品国际化信息导入  -->
 	<sheet name="itemImportI18n">
 		<block start="A5" end="A5" dataName="impItemCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpItemCommand">
@@ -167,4 +179,51 @@
 		</block>
 	</sheet>
 	
+	
+	<!-- 商品item信息导出 和下面的sku导出到一个excel中 -->
+	<sheet name="exportItemInfo">
+		<block start="A3" end="G3" dataName="exportItemList" loop="true">
+			<cell position="A3" dataName="itemId" />
+			<cell position="B3" dataName="code"/>
+			<cell position="C3" dataName="style" />
+			<cell position="D3" dataName="title" />  
+			<cell position="E3" dataName="subTitle" />
+			<cell position="F3" dataName="itemListPrice" />
+			<cell position="G3" dataName="itemSalePrice" />
+		</block>
+	</sheet>
+	
+	<!-- 商品Sku信息导出和上面的 item信息一个excel -->
+	<sheet name="exportItemSku">
+		<block start="A3" end="D3" dataName="exportSkuList"  loop="true">
+			<cell position="A3" dataName="code" />
+			<cell position="B3" dataName="extentionCode"/>
+			<cell position="C3" dataName="listPrice" />  
+			<cell position="D3" dataName="salePrice" />
+		</block>
+	</sheet>
+	
+	
+	<!-- 商品item信息导入 和下面的sku导出到一个excel中 -->
+	<sheet name="importItemInfo">
+		<block start="A3" end="G3" dataName="importItemList" loop="true" loopClass="com.baozun.nebula.command.ItemUpdatePriceCommand">
+			<cell position="A3" dataName="itemId" mandatory="true" type="long"/>
+			<cell position="B3" dataName="code" mandatory="false" type="string"/>
+			<cell position="C3" dataName="style" mandatory="false" type="string"/>
+			<cell position="D3" dataName="title" mandatory="false" type="string"/>  
+			<cell position="E3" dataName="subTitle" mandatory="false" type="string"/>
+			<cell position="F3" dataName="itemListPrice" mandatory="false" type="bigdecimal"/>
+			<cell position="G3" dataName="itemSalePrice" mandatory="false" type="bigdecimal"/>
+		</block>
+	</sheet>
+	
+	<!-- 商品Sku信息导入和上面的 item信息一个excel -->
+	<sheet name="importItemSku">
+		<block start="A3" end="D3" dataName="importSkuList"  loop="true" loopClass="com.baozun.nebula.command.ItemUpdatePriceCommand">
+			<cell position="A3" dataName="code" mandatory="false" type="string"/>
+			<cell position="B3" dataName="extentionCode" mandatory="true" type="string"/>
+			<cell position="C3" dataName="listPrice"  mandatory="false" type="bigdecimal"/>  
+			<cell position="D3" dataName="salePrice"  mandatory="false" type="bigdecimal"/>
+		</block>
+	</sheet>
 </sheets>

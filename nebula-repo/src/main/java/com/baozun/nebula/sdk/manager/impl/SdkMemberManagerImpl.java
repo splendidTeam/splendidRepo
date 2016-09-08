@@ -67,7 +67,9 @@ import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
+import com.feilong.core.Alphabet;
 import com.feilong.core.Validator;
+import com.feilong.core.util.RandomUtil;
 
 import loxia.dao.Page;
 import loxia.dao.Pagination;
@@ -261,11 +263,14 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 				"postCode" });
 	}
 
+	/**
+	 * 去除加密的字段"loginEmail", "loginMobile", "realName"
+	 * @param memberCommand
+	 */
 	private void encrypt(MemberCommand memberCommand){
 
-		sdkSecretManager.encrypt(memberCommand, new String[] { "loginEmail", "loginMobile", "realName" });
+		sdkSecretManager.encrypt(memberCommand, new String[] {  });
 	}
-
 	
 	/**
 	 * 去除解密的字段"loginEmail", "loginMobile", "realName"
@@ -348,7 +353,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return memberCommand;
@@ -365,13 +370,13 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			member = memberDao.findMemberById(memberCommand.getId());
 		}
 		// 敏感信息加密存储
-		encrypt(memberCommand);
+		//encrypt(memberCommand);
 		member = convertMemberCommandToMember(memberCommand, member);
 		member = memberDao.save(member);
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -387,7 +392,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -403,7 +408,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -417,7 +422,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}
 		return null;
@@ -574,6 +579,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		MemberCommand memberCommand = new MemberCommand();
 
 		memberCommand.setLoginName(member.getLoginName());
+		memberCommand.setSalt(member.getSalt());//新增盐值字段
 		memberCommand.setPassword(member.getPassword());
 		memberCommand.setOldPassword(member.getOldPassword());// BrandStore迁移的历史密码
 		memberCommand.setLoginEmail(member.getLoginEmail());
@@ -595,6 +601,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 
 	private Member convertMemberCommandToMember(MemberCommand memberCommand,Member member){
 		member.setLoginName(memberCommand.getLoginName());
+		member.setSalt(memberCommand.getSalt());//保存盐值
 		member.setPassword(memberCommand.getPassword());
 		member.setLoginEmail(memberCommand.getLoginEmail());
 
@@ -936,8 +943,11 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	 */
 	@Override
 	public Member rewriteRegister(Member member){
-		// pwd处理为密文
-		String encodePassword = EncryptUtil.getInstance().hash(member.getPassword(), member.getLoginName());
+		 //生成新的盐值，用新的加密算法进行加密，
+		String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+		String encodePassword = EncryptUtil.getInstance().hashSalt(member.getPassword(), salt);
+		//保存密码和盐值
+		member.setSalt(salt);
 		member.setPassword(encodePassword);
 		member = memberDao.save(member);
 		return member;
@@ -1039,13 +1049,29 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			return true;
 		return false;
 	}
+	
+	@Override
+	public boolean resetPasswdWithSalt(Long memberId,String newPwd,String salt){
+		Integer res = memberDao.updatePasswdAndSalt(memberId, newPwd, salt);
+		if (res > 0)
+			return true;
+		return false;
+	}
 
 	@Override
 	public boolean updatePasswd(Long memberId,String pwd,String newPwd,String reNewPwd){
 		Member member = memberDao.findMemberById(memberId);
-
-		String encodePassword = EncryptUtil.getInstance().hash(pwd, member.getLoginName());
-		String encodeNewPassword = EncryptUtil.getInstance().hash(newPwd, member.getLoginName());
+		String salt = member.getSalt();
+		String encodePassword = null;
+		Integer res = 0;
+		String encodeNewPassword = null;
+		//如果盐值为空，对密码验证走老的加密验证逻辑 add by ruichao.gao
+		if(Validator.isNullOrEmpty(member.getSalt())){
+			 encodePassword = EncryptUtil.getInstance().hash(pwd, member.getLoginName());
+		}else{
+			encodePassword = EncryptUtil.getInstance().hashSalt(pwd, salt);
+		}
+		
 		if (!encodePassword.equals(member.getPassword())){
 			throw new BusinessException(Constants.OLDPASSWORD_ISWRONG_ERROR);
 		}
@@ -1055,7 +1081,17 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (!newPwd.equals(reNewPwd)){
 			throw new BusinessException(Constants.RENEWPASSWORD_NOTSAMEAS_NEWPASSWORD_ERROR);
 		}
-		Integer res = memberDao.updatePasswd(memberId, encodeNewPassword);
+		if(Validator.isNullOrEmpty(member.getSalt())){
+			//生成新的盐值，用新的加密算法进行加密，(仅适用于更新加密算法之后，第一次直接更改密码) add by ruichao.gao
+			String newSalt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+			encodeNewPassword = EncryptUtil.getInstance().hashSalt(newPwd, newSalt);
+			//更新保存盐值和新密码
+			res = memberDao.updatePasswdAndSalt(memberId, encodeNewPassword, newSalt);
+		}else{
+			 encodeNewPassword = EncryptUtil.getInstance().hashSalt(newPwd, salt);
+			 res = memberDao.updatePasswd(memberId, encodeNewPassword);
+		}
+		
 		if (res > 0)
 			return true;
 		return false;
@@ -1334,7 +1370,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 		if (null != member){
 			memberCommand = convertMemberToMemberCommand(member);
 			// 敏感信息加密存储完后，解密传输至Controller
-			decrypt(memberCommand);
+			//decrypt(memberCommand);
 			return memberCommand;
 		}	
 		return null;
@@ -1386,7 +1422,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			if (null != member){
 				memberCommand = convertMemberToMemberCommand(member);
 				// 敏感信息加密存储完后，解密传输至Controller
-				decrypt(memberCommand);
+				//decrypt(memberCommand);
 				memberCommands.add(memberCommand);
 			}
 		}

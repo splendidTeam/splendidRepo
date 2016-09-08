@@ -127,5 +127,8 @@ public interface SchedulerTaskDao extends GenericEntityDao<SchedulerTask,Long>{
 	@NativeQuery(model = SchedulerTask.class)
 	Pagination<SchedulerTask> findEffectSchedulerTaskListByQueryMapWithPage(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
+	@NativeQuery(model = SchedulerTask.class)
+	SchedulerTask findSchedulerTaskByMethodName(@QueryParam("methodName")String methodName);
+	
 	
 }

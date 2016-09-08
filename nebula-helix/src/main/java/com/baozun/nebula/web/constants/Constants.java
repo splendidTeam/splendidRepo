@@ -60,10 +60,15 @@ public class Constants {
 	
 	public static final String url = "url";
 	
-	/** 购物车中商品最大行数*/
+	/** 购物车中商品最大行数
+	 * 
+	 * @deprecated  不应该常量写死
+	 * */
 	public static final int SHOPPING_CART_SKU_MAX_COUNT	=	30;
 	
-	/** 购物车中单商品最大数量*/
+	/** 购物车中单商品最大数量
+	 * @deprecated   不应该常量写死
+	 * */
 	public static final int SHOPPING_CART_SKU_ONE_LINE_COUNT	=	8;
 	
 	/** 新增商品*/

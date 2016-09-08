@@ -11,6 +11,7 @@ $j.extend(loxia.regional['zh-CN'],{
 	"INFO_NO_NAME":"请输入组合名称",
 	"INFO_NO_DATA":"包含列表不能为空",
 	"INFO_SUCCESS":"创建成功",
+	"NO_CATEGORY":"无",
 	"INFO_REPEATED_NAME":"组合名称已被使用，请更换其他名称",
 	"INFO_SYSTEM_ERROR":"系统错误，请联系管理员",
 	"INFO_EXCLUDE_ALL":"不能排除全体，请重新选择",

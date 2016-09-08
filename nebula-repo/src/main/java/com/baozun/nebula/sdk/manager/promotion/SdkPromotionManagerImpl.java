@@ -183,7 +183,7 @@ public class SdkPromotionManagerImpl implements SdkPromotionManager{
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public List<PromotionCommand> publishPromotion(Date currentTime){
         List<PromotionCommand> promotionCommandList = promotionDao.findPromotionEnableList(currentTime);
         int defaultpriority = 1;
