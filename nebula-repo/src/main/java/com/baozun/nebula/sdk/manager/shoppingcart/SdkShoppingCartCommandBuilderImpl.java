@@ -56,8 +56,9 @@ import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShopCartCommandByShopB
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
+import com.feilong.core.util.AggregateUtil;
 import com.feilong.core.util.CollectionsUtil;
-import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
+import com.feilong.core.util.predicate.BeanPredicateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 
 /**
@@ -269,9 +270,9 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         if (null == tempShopLine){
             tempShopLine = CollectionsUtil.find(
                             newLines,
-                            PredicateUtils.andPredicate(
-                                            new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("id", lineId),
-                                            new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("shopId", shopId)));
+                            PredicateUtils.<ShoppingCartLineCommand>andPredicate(
+                                            BeanPredicateUtil.equalPredicate("id", lineId),
+                                            BeanPredicateUtil.equalPredicate("shopId", shopId)));
         }
         return tempShopLine;
     }
@@ -474,7 +475,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         // 设置应付金额
         shoppingCartCommand.setOriginPayAmount(ShoppingCartUtil.getOriginPayAmount(allShoppingCartLines));
 
-        Map<String, BigDecimal> priceMap = CollectionsUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
+        Map<String, BigDecimal> priceMap = AggregateUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
 
         // 实际支付金额
         shoppingCartCommand.setCurrentPayAmount(priceMap.get("realPayAmount").setScale(2, ROUND_HALF_UP));

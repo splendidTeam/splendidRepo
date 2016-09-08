@@ -329,7 +329,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     private Map<Long, List<ShoppingCartLineCommand>> buildShopIdAndShoppingCartLineCommandListMap(ShoppingCartCommand shoppingCartCommand){
         Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
         Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = MapUtil
-                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands", Long.class);
+                        .extractSubMap(shopIdAndShoppingCartCommandMap, "shoppingCartLineCommands");
         return shopIdAndShoppingCartLineCommandListMap;
     }
 

@@ -93,6 +93,6 @@ public class SdkPayInfoLogManagerImpl implements SdkPayInfoLogManager{
      * @return the pay type
      */
     private Integer getThirdPayType(String payInfoStr){
-        return ConvertUtil.toInteger(ResourceBundleUtil.getValue("config.payMentInfo", payInfoStr + ".payType"));
+        return ConvertUtil.toInteger(ResourceBundleUtil.getValue(ResourceBundleUtil.getResourceBundle("config.payMentInfo"), payInfoStr + ".payType"));
     }
 }

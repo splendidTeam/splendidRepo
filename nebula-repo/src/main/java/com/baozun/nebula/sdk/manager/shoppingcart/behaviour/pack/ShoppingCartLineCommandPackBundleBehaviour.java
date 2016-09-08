@@ -30,7 +30,7 @@ import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.product.SdkBundleManager;
 import com.feilong.core.lang.NumberUtil;
-import com.feilong.core.util.CollectionsUtil;
+import com.feilong.core.util.AggregateUtil;
 
 /**
  * bundle类商品的行为.
@@ -87,7 +87,7 @@ public class ShoppingCartLineCommandPackBundleBehaviour extends AbstractShopping
         Integer quantity = shoppingCartLineCommand.getQuantity();
         List<BundleSkuPriceCommand> bundleSkuPriceCommandList = sdkBundleManager.getBundleSkusPrice(relatedItemId, skuIds);
 
-        Map<String, BigDecimal> sumMap = CollectionsUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice", "originalSalesPrice");
+        Map<String, BigDecimal> sumMap = AggregateUtil.sum(bundleSkuPriceCommandList, "listPrice", "salesPrice", "originalSalesPrice");
 
         //*******************************************************************************************
         BigDecimal originalSalesPriceSum = sumMap.get("originalSalesPrice");

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -38,8 +39,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.feilong.core.Validator;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.lang.ObjectUtil;
+import com.feilong.core.util.AggregateUtil;
 import com.feilong.core.util.CollectionsUtil;
-import com.feilong.core.util.predicate.BeanPropertyValueEqualsPredicate;
+import com.feilong.core.util.predicate.BeanPredicateUtil;
 
 /**
  * 购物车工具类.
@@ -124,7 +126,9 @@ public final class ShoppingCartUtil{
      */
     public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         // 主賣品(剔除 促銷行 贈品)
-        Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false), new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("gift", false));
+        Predicate<ShoppingCartLineCommand> andPredicate = PredicateUtils.andPredicate(//
+                        BeanPredicateUtil.equalPredicate("captionLine", false), 
+                        BeanPredicateUtil.equalPredicate("gift", false));
         return CollectionsUtil.select(shoppingCartLineCommandList, andPredicate);
     }
 
@@ -140,9 +144,9 @@ public final class ShoppingCartUtil{
     public static List<ShoppingCartLineCommand> getMainShoppingCartLineCommandListWithCheckStatus(List<ShoppingCartLineCommand> shoppingCartLineCommandList,boolean checkStatus){
         // 主賣品(剔除 促銷行 贈品)
         Predicate<ShoppingCartLineCommand> allPredicate = PredicateUtils.<ShoppingCartLineCommand> allPredicate(
-                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("captionLine", false),
-                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("gift", false),
-                        new BeanPropertyValueEqualsPredicate<ShoppingCartLineCommand>("settlementState", checkStatus ? 1 : 0));
+                        BeanPredicateUtil.equalPredicate("captionLine", false),
+                        BeanPredicateUtil.equalPredicate("gift", false),
+                        BeanPredicateUtil.equalPredicate("settlementState", checkStatus ? 1 : 0));
         return CollectionsUtil.select(shoppingCartLineCommandList, allPredicate);
     }
 
@@ -156,7 +160,7 @@ public final class ShoppingCartUtil{
      * @see com.feilong.core.util.CollectionsUtil#sum(java.util.Collection, String)
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : CollectionsUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
+        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : AggregateUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
     }
 
     /**
@@ -191,7 +195,7 @@ public final class ShoppingCartUtil{
      * @since 5.3.1.8
      */
     public static BigDecimal getBundleDiscount(List<ShoppingCartLineCommand> shoppingCartLineCommands){
-        BigDecimal sumBundleDiscount = CollectionsUtil.sum(shoppingCartLineCommands, "discount", new Predicate<ShoppingCartLineCommand>(){
+        BigDecimal sumBundleDiscount = AggregateUtil.sum(shoppingCartLineCommands, "discount", new Predicate<ShoppingCartLineCommand>(){
 
             @Override
             public boolean evaluate(ShoppingCartLineCommand shoppingCartLineCommand){

@@ -18,7 +18,6 @@ package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.ObjectUtils;
@@ -35,8 +34,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.Validator;
-import com.feilong.core.lang.NumberUtil;
-import com.feilong.core.util.CollectionsUtil;
+import com.feilong.core.util.AggregateUtil;
 
 /**
  *
@@ -85,7 +83,7 @@ public class ShareDiscountToLineManagerImpl implements ShareDiscountToLineManage
                     List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList){
         final Long skuId = shoppingCartLineCommand.getSkuId();
         //TODO feilong 提取
-        BigDecimal discountAmountSum = CollectionsUtil
+        BigDecimal discountAmountSum = AggregateUtil
                         .sum(promotionSKUDiscAMTBySettingList, "discountAmount", new Predicate<PromotionSKUDiscAMTBySetting>(){
 
                             @Override

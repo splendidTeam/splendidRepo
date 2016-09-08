@@ -16,14 +16,12 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.handler;
 
-import static com.feilong.core.date.DateExtensionUtil.getIntervalForView;
 import static java.math.BigDecimal.ZERO;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.collections4.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +36,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkFreightFeeManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.feilong.core.bean.ConvertUtil;
+import com.feilong.core.date.DateExtensionUtil;
 import com.feilong.core.lang.NumberUtil;
-import com.feilong.core.lang.ObjectUtil;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -142,7 +140,7 @@ public class ShopCartCommandByShopBuilderImpl implements ShopCartCommandByShopBu
         inputShoppingCartCommand.setCurrentPayAmount(shopCartCommandByShop.getRealPayAmount()); // 实付金额
         inputShoppingCartCommand.setShoppingCartLineCommands(updateLines(shopId, inputShoppingCartCommand, promotionBriefList));
 
-        LOGGER.info("build ShopCartCommandByShop use time:[{}]", getIntervalForView(beginDate, new Date()));
+        LOGGER.info("build ShopCartCommandByShop use time:[{}]", DateExtensionUtil.formatDuration(beginDate, new Date()));
         return shopCartCommandByShop;
     }
 
