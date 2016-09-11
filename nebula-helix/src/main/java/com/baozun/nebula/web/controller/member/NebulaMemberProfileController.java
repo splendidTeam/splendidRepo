@@ -36,6 +36,7 @@ import com.baozun.nebula.manager.member.MemberManager;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.sdk.command.member.MemberCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.utilities.common.EncryptUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
@@ -47,6 +48,7 @@ import com.baozun.nebula.web.controller.member.converter.MemberViewCommandConver
 import com.baozun.nebula.web.controller.member.form.MemberProfileForm;
 import com.baozun.nebula.web.controller.member.validator.MemberProfileFormValidator;
 import com.baozun.nebula.web.controller.member.viewcommand.MemberViewCommand;
+import com.feilong.core.Validator;
 
 /**
  * 会员信息相关控制器，含显示会员信息和修改会员信息。
@@ -217,12 +219,21 @@ public class NebulaMemberProfileController extends BaseController {
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
+		//MemberProfileForm Password可能为两种情况：1，为修改即为MD5+RSA加密值；2，修改密码之后，为明文+RSA加密值
+		memberProfileForm.setPassword(decryptSensitiveDataEncryptedByJs(memberProfileForm.getPassword(), httpRequest));
+		if(Validator.isNotNullOrEmpty(memberProfileForm.getRepassword())){
+			memberProfileForm.setRepassword(decryptSensitiveDataEncryptedByJs(memberProfileForm.getRepassword(), httpRequest));
+		}
+		//oldPassword不为空时，即标示在修改密码
+		if(Validator.isNotNullOrEmpty(memberProfileForm.getOldPassword())){
+			memberProfileForm.setOldPassword(decryptSensitiveDataEncryptedByJs(memberProfileForm.getOldPassword(), httpRequest));
+		}
+		
 		LOG.debug("Start Validation input profile");
 		// 这里需要一个标准化的校验流程，和校验失败后的消息处理过程（是否和DefaultReturnResult整合？）
 		memberProfileFormValidator.validate(memberProfileForm, bindingResult);
 		if (bindingResult.hasErrors()) {
-			LOG.info(
-					"[MEM_EDIT_PROFILE] {} [{}] \"Validator memberProfileForm has Error\"",
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Validator memberProfileForm has Error\"",
 					memberDetails.getLoginName(), new Date());
 			defaultReturnResult.setResult(false);
 			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
@@ -231,19 +242,14 @@ public class NebulaMemberProfileController extends BaseController {
 		}
 		LOG.debug("input profile is validated");
 
-		memberProfileForm.setPassword(decryptSensitiveDataEncryptedByJs(
-				memberProfileForm.getPassword(), httpRequest));
-		memberProfileForm.setRepassword(decryptSensitiveDataEncryptedByJs(
-				memberProfileForm.getRepassword(), httpRequest));
-		memberProfileForm.setOldPassword(decryptSensitiveDataEncryptedByJs(
-				memberProfileForm.getOldPassword(), httpRequest));
-
 		// 获取会员信息
 		MemberCommand memberCommand = memberManager
 				.findMemberById(memberDetails.getMemberId());
 		MemberPersonalData memberProfile = sdkMemberManager
 				.findMemberPersonData(memberDetails.getMemberId());
-
+		
+		String encodeNewPassword = memberProfileFormValidator.validatePassword(memberProfileForm, memberCommand, bindingResult);
+		
 		memberProfile = memberProfileForm.toMemberPersonalData(memberProfile);
 
 		// 这里需要通过Form和会员信息来判断这些关键信息是否变化
@@ -251,8 +257,7 @@ public class NebulaMemberProfileController extends BaseController {
 		boolean isEmailChange = false;
 		boolean isMobileChange = false;
 
-		if (!memberCommand.getPassword()
-				.equals(memberProfileForm.getPassword())) {
+		if (Validator.isNotNullOrEmpty(encodeNewPassword) && !memberCommand.getPassword().equals(encodeNewPassword)) {
 			LOG.debug("memberProfile update Passwd.");
 			isPasswordChange = true;
 			memberManager.updatePasswd(memberDetails.getMemberId(),
