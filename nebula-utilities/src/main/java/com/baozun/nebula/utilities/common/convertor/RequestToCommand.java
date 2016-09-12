@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import net.sf.json.JSONObject;
 
 import com.baozun.nebula.utilities.common.ReflectionUtil;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
@@ -115,17 +116,19 @@ public class RequestToCommand{
         return UnionMap;
     }
 
-    public PaymentServiceReturnCommand alipaySynRequestToCommand(HttpServletRequest request){
+	public PaymentServiceReturnCommand alipaySynRequestToCommand(HttpServletRequest request){
         PaymentServiceReturnCommand paymentServiceReturnCommand = new PaymentServiceReturnCommand();
         Map<String, String[]> map = request.getParameterMap();
         Map<String, String> result = new HashMap<String, String>();
         for (Object objectkey : map.keySet()){
             result.put(objectkey.toString(), Arrays.toString((String[]) map.get(objectkey)).replace("[", "").replace("]", ""));
         }
+
         setParamValue(getAlipaySyn(), result, paymentServiceReturnCommand);
+        paymentServiceReturnCommand.setAllMessage(new JSONObject().fromObject(result).toString());
         return paymentServiceReturnCommand;
     }
-
+	
     public PaymentServiceReturnForMobileCommand alipaySynRequestToCommandForMobile(
                     HttpServletRequest request,
                     Map<String, String> otherValue){
@@ -139,6 +142,7 @@ public class RequestToCommand{
             result.putAll(otherValue);
         }
         setParamValue(getAlipaySyn(), result, paymentServiceReturnForMobileCommand);
+        paymentServiceReturnForMobileCommand.setAllMessage(new JSONObject().fromObject(result).toString());
         return paymentServiceReturnForMobileCommand;
     }
 
@@ -150,6 +154,7 @@ public class RequestToCommand{
             result.put(objectkey.toString(), Arrays.toString((String[]) map.get(objectkey)).replace("[", "").replace("]", ""));
         }
         setParamValue(getAlipayAsy(), result, paymentServiceReturnCommand);
+        paymentServiceReturnCommand.setAllMessage(new JSONObject().fromObject(result).toString());
         return paymentServiceReturnCommand;
     }
 
@@ -161,6 +166,7 @@ public class RequestToCommand{
             result.put(objectkey.toString(), Arrays.toString((String[]) map.get(objectkey)).replace("[", "").replace("]", ""));
         }
         setParamValue(getUnion(), result, paymentServiceReturnCommand);
+        paymentServiceReturnCommand.setAllMessage(new JSONObject().fromObject(result).toString());
         return paymentServiceReturnCommand;
     }
 
@@ -168,9 +174,9 @@ public class RequestToCommand{
                     Map<String, String> keyMap,
                     Map<String, String> valueMap,
                     PaymentServiceReturnCommand paymentServiceReturnCommand){
-        for (String key : valueMap.keySet()){
+        for (String key : keyMap.keySet()){
             try{
-                String mapKey = keyMap.get(key);
+                String mapKey = valueMap.get(key);
                 Method m = ReflectionUtil.getMethod(paymentServiceReturnCommand.getClass(), mapKey, String.class);
                 if (m != null)
                     ReflectionUtil.invoke(paymentServiceReturnCommand, m, valueMap.get(key));

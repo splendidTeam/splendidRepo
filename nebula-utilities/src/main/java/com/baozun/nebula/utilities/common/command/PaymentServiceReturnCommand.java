@@ -2,9 +2,9 @@ package com.baozun.nebula.utilities.common.command;
 
 import java.io.Serializable;
 
-
 /**
  * 该类只作为同步回传或异步回传信息的COMMAND
+ * 
  * @author jumbo
  *
  */
@@ -15,267 +15,273 @@ public class PaymentServiceReturnCommand implements Serializable {
 	 * 回传状态
 	 */
 	private String returnStatus;
-	
+
 	/**
 	 * 加密类型
 	 */
 	private String singType;
-	
+
 	/**
 	 * 加密字段
 	 */
 	private String sign;
-	
+
 	/**
 	 * 订单号
 	 */
 	private String orderNo;
-	
+
 	/**
 	 * 商品名称
 	 */
 	private String subject;
-	
+
 	/**
 	 * 支付类型
 	 */
 	private String paymentType;
-	
+
 	/**
 	 * 接口名称
 	 */
 	private String exterface;
-	
+
 	/**
 	 * 流水号
 	 */
 	private String tradeNo;
-	
+
 	/**
 	 * 交易状态
 	 */
 	private String tradeStatus;
-	
+
 	/**
 	 * 校验状态（如果有就填）
 	 */
 	private String notifyId;
-	
+
 	/**
 	 * 通知时间
 	 */
 	private String notiftTime;
-	
+
 	/**
 	 * 通知类型
 	 */
 	private String notifyType;
-	
+
 	/**
 	 * 卖家支付账号
 	 */
 	private String seller;
-	
+
 	/**
 	 * 买家账号
 	 */
 	private String buyer;
-	
+
 	/**
 	 * 卖家账号（ID）
 	 */
 	private String sellerId;
-	
+
 	/**
 	 * 卖家账号(ID)
 	 */
 	private String buyerId;
-	
+
 	/**
 	 * 交易金额
 	 */
 	private String totalFee;
-	
+
 	/**
 	 * 商品描述
 	 */
 	private String body;
-	
+
 	/**
 	 * 公用回传参数
 	 */
 	private String extraCommonParam;
-	
+
 	/**
 	 * 信用支付代理ID
 	 */
 	private String agentUserId;
-	
+
 	/**
 	 * 交易创建时间
 	 */
 	private String gmtCreate;
-	
+
 	/**
 	 * 交易付款时间
 	 */
 	private String gmtPayment;
-	
+
 	/**
 	 * 交易关闭时间
 	 */
 	private String gmtClose;
-	
+
 	/**
 	 * 退款状态
 	 */
 	private String refundStatus;
-	
+
 	/**
 	 * 退款时间
 	 */
 	private String gmtRefund;
-	
+
 	/**
 	 * 商品价格
 	 */
 	private String price;
-	
+
 	/**
 	 * 商品数量
 	 */
 	private String quantity;
-	
+
 	/**
 	 * 折扣
 	 */
 	private String discount;
-	
+
 	/**
 	 * 是否调整总价
 	 */
 	private String isTotalFeeAdjust;
-	
+
 	/**
 	 * 是否使用红包
 	 */
 	private String useCoupon;
-	
+
 	/**
 	 * 支付渠道
 	 */
 	private String outChannelType;
-	
+
 	/**
 	 * 渠道支付金额
 	 */
 	private String outChannelAmount;
-	
+
 	/**
 	 * 实际渠道支付金额
 	 */
 	private String outChannelInst;
-	
+
 	/**
 	 * 是否扫描码支付
 	 */
 	private String businessScene;
-	
+
 	/**
 	 * 支付回传响应信息
 	 */
 	private String responseMessage;
-	
+
 	/**
 	 * 交易币种
 	 */
 	private String orderCurrency;
-	
+
 	/**
 	 * 清算金额
 	 */
 	private String settleAmount;
-	
+
 	/**
 	 * 清算币种
 	 */
 	private String settleCurrency;
-	
+
 	/**
 	 * 清算日期
 	 */
 	private String settleDate;
-	
+
 	/**
 	 * 清算汇率
 	 */
 	private String exchangeRate;
-	
+
 	/**
 	 * 兑换日期
 	 */
 	private String exchangeDate;
-	
+
 	/**
 	 * 系统保留域（银联）
 	 */
 	private String cupReserved;
-	
+
 	/**
 	 * 版本号
+	 * 
 	 * @return
 	 */
 	private String version;
-	
+
 	/**
 	 * 字符编码
+	 * 
 	 * @return
 	 */
 	private String charset;
-	
+
 	/**
 	 * 响应信息
+	 * 
 	 * @return
 	 */
 	private String respMsg;
-	
+
 	/**
 	 * 跟踪单号
+	 * 
 	 * @return
 	 */
 	private String traceNumber;
-	
+
 	/**
 	 * 商户名称
+	 * 
 	 * @return
 	 */
 	private String merAbbr;
-	
+
 	/**
 	 * 商户代码
+	 * 
 	 * @return
 	 */
 	private String merId;
-	
+
 	/**
 	 * 跟踪时间
+	 * 
 	 * @return
 	 */
 	private String traceTime;
-	
+
 	/**
-	 * 网银流水
-	 * 2014-10-10 新增
+	 * 网银流水 2014-10-10 新增
 	 */
 	private String bank_seq_no;
-	
-	/****************************下面微信相关***************************************/
-	
+
+	/**************************** 下面微信相关 ***************************************/
+
 	/***
 	 * 返回状态码
 	 */
 	private String returnCode;
-	
+
 	/***
 	 * 返回信息
 	 */
@@ -298,38 +304,44 @@ public class PaymentServiceReturnCommand implements Serializable {
 	 * 随机字符串
 	 */
 	private String nonceStr;
-	
+
 	/**
 	 * 业务结果
 	 */
 	private String resultCode;
-	
+
 	/**
 	 * 错误代码
 	 */
 	private String errCode;
-	
+
 	/**
 	 * 错误代码描述
 	 */
 	private String errCodeDes;
-	
+
 	/**
 	 * 交易类型
 	 */
 	private String tradeType;
-	
+
 	/**
 	 * 预支付交易会话标识
 	 */
 	private String prepayId;
-	
+
 	/**
 	 * 二维码链接
 	 */
 	private String codeUrl;
-	
-	
+
+	/**
+	 * 完整返回信息
+	 * 
+	 * @return
+	 */
+	private String allMessage;
+
 	public String getReturnCode() {
 		return returnCode;
 	}
@@ -829,7 +841,13 @@ public class PaymentServiceReturnCommand implements Serializable {
 	public void setExchangeRate(String exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
-	
-	
-	
+
+	public String getAllMessage() {
+		return allMessage;
+	}
+
+	public void setAllMessage(String allMessage) {
+		this.allMessage = allMessage;
+	}
+
 }
