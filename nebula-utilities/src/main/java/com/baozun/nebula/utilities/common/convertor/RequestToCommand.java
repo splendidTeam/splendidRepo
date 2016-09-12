@@ -125,7 +125,7 @@ public class RequestToCommand{
         }
 
         setParamValue(getAlipaySyn(), result, paymentServiceReturnCommand);
-        paymentServiceReturnCommand.setAllMessage(new JSONObject().fromObject(result).toString());
+        paymentServiceReturnCommand.setAllMessage(JSONObject.fromObject(result).toString());
         return paymentServiceReturnCommand;
     }
 	
@@ -142,7 +142,7 @@ public class RequestToCommand{
             result.putAll(otherValue);
         }
         setParamValue(getAlipaySyn(), result, paymentServiceReturnForMobileCommand);
-        paymentServiceReturnForMobileCommand.setAllMessage(new JSONObject().fromObject(result).toString());
+        paymentServiceReturnForMobileCommand.setAllMessage(JSONObject.fromObject(result).toString());
         return paymentServiceReturnForMobileCommand;
     }
 
@@ -154,7 +154,7 @@ public class RequestToCommand{
             result.put(objectkey.toString(), Arrays.toString((String[]) map.get(objectkey)).replace("[", "").replace("]", ""));
         }
         setParamValue(getAlipayAsy(), result, paymentServiceReturnCommand);
-        paymentServiceReturnCommand.setAllMessage(new JSONObject().fromObject(result).toString());
+        paymentServiceReturnCommand.setAllMessage(JSONObject.fromObject(result).toString());
         return paymentServiceReturnCommand;
     }
 
@@ -166,7 +166,7 @@ public class RequestToCommand{
             result.put(objectkey.toString(), Arrays.toString((String[]) map.get(objectkey)).replace("[", "").replace("]", ""));
         }
         setParamValue(getUnion(), result, paymentServiceReturnCommand);
-        paymentServiceReturnCommand.setAllMessage(new JSONObject().fromObject(result).toString());
+        paymentServiceReturnCommand.setAllMessage(JSONObject.fromObject(result).toString());
         return paymentServiceReturnCommand;
     }
 
