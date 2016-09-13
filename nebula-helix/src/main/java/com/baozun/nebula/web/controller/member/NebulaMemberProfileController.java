@@ -216,7 +216,8 @@ public class NebulaMemberProfileController extends BaseController {
 		LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Start edit MemberProfile\"",
 				memberDetails.getLoginName(), new Date());
 
-		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
+		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+		defaultReturnResult.setResult(true);
 		DefaultResultMessage defaultResultMessage = new DefaultResultMessage();
 
 		//MemberProfileForm Password可能为两种情况：1，为修改即为MD5+RSA加密值；2，修改密码之后，为明文+RSA加密值
@@ -261,7 +262,7 @@ public class NebulaMemberProfileController extends BaseController {
 			LOG.debug("memberProfile update Passwd.");
 			isPasswordChange = true;
 			memberManager.updatePasswd(memberDetails.getMemberId(),
-					memberCommand.getPassword(),
+					memberProfileForm.getOldPassword(),
 					memberProfileForm.getPassword(),
 					memberProfileForm.getRepassword());
 		}
