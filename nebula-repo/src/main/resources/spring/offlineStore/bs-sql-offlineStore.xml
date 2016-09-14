@@ -85,8 +85,8 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[				  
-					insert into t_store_offlineStore (id,address,city,district,ename1,ename2,extension,full_address,hours,storeImage,mapImage,name,phone,province,ename)
-						values (nextval('S_t_store_offlineStore'),:address,:city,:district,:ename1,:ename2,:extension,:full_address,:hours,:storeImage,:mapImage,:name,:phone,:province,:ename)
+					insert into t_store_offlineStore (id,address,city,district,ename1,ename2,extension,full_address,hours,storeImage,mapImage,name,phone,province,ename,postcode)
+						values (nextval('S_t_store_offlineStore'),:address,:city,:district,:ename1,:ename2,:extension,:full_address,:hours,:storeImage,:mapImage,:name,:phone,:province,:ename,:postcode)
 				]]>
 			</value>
 		</constructor-arg>
@@ -98,7 +98,7 @@
 			<value>
 				<![CDATA[				  
 					update t_store_offlineStore set address=:address,city=:city,district=:district,ename1=:ename1,ename2=:ename2,extension=:extension,
-					full_address=:full_address,hours=:hours,storeImage=:storeImage,mapImage=:mapImage,name=:name,phone=:phone,province=:province,ename=:ename
+					full_address=:full_address,hours=:hours,storeImage=:storeImage,mapImage=:mapImage,name=:name,phone=:phone,province=:province,ename=:ename,postcode=:postcode
 					where id=:id
 				]]>
 			</value>

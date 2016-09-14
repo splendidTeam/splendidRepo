@@ -57,8 +57,9 @@ public class OfflineStore extends BaseModel{
 	
 	private String mapImage;
 	
-
-
+    /** 邮编 */
+    private String postcode;
+    
 	@Id
 	@Column(name = "ID")
 	@SequenceGenerator(name = "SEQ_T_STORE_OFFLINESTORE",sequenceName = "S_T_STORE_OFFLINESTORE",allocationSize = 1)
@@ -195,6 +196,21 @@ public class OfflineStore extends BaseModel{
 
 	public void setMapImage(String mapImage) {
 		this.mapImage = mapImage;
+	}
+
+	/**
+	 * @return the postcode
+	 */
+	@Column(name = "POSTCODE")
+	public String getPostcode() {
+		return postcode;
+	}
+
+	/**
+	 * @param postcode the postcode to set
+	 */
+	public void setPostcode(String postcode) {
+		this.postcode = postcode;
 	}
 
 

@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.member.validator;
 
-import java.util.regex.Pattern;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -61,19 +60,19 @@ public class MemberProfileFormValidator implements Validator {
 			MemberProfileForm command = (MemberProfileForm) target;
 
 			//验证邮箱，手机，密码，确认密码是否为空
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email","field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile","field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password","field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword","field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email","email.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile","mobile.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password","password.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword","repassword.required");
 
 			if (!errors.hasFieldErrors("password")
-					&& !errors.hasFieldErrors("passwordAgain")) {
+					&& !errors.hasFieldErrors("repassword")) {
 				if (com.feilong.core.Validator.isNotNullOrEmpty(command.getRepassword()) && !command.getPassword().equals(command.getRepassword())) {
-					errors.rejectValue("passwordAgain", "passwordAgain.error");
+					errors.rejectValue("repassword", "passwordAgain.error");
 				}
 				//oldPassword不为空时，即标示在修改密码
 				if (com.feilong.core.Validator.isNotNullOrEmpty(command.getOldPassword()) && command.getOldPassword().equals(command.getPassword())) {
-					errors.rejectValue("passwordAgain", "oldPasswordSame.error");
+					errors.rejectValue("repassword", "oldPasswordSame.error");
 				}
 			}
 
@@ -107,7 +106,7 @@ public class MemberProfileFormValidator implements Validator {
 					encodeOldPassword = EncryptUtil.getInstance().hashSalt(memberProfileForm.getOldPassword(), memberCommand.getSalt());
 				}
 				//校验OldPassword和持久化的Password是否一致
-				if(com.feilong.core.Validator.isNotNullOrEmpty(encodeOldPassword) && encodeOldPassword.equals(memberProfileForm.getPassword())){
+				if(com.feilong.core.Validator.isNotNullOrEmpty(encodeOldPassword) && encodeOldPassword.equals(memberCommand.getPassword())){
 					if(com.feilong.core.Validator.isNullOrEmpty(memberCommand.getSalt())){
 						encodeNewPassword = EncryptUtil.getInstance().hash(memberProfileForm.getPassword(), memberCommand.getLoginName());
 					}else{

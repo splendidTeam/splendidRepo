@@ -14,8 +14,6 @@ import loxia.dao.Pagination;
 
 public interface OfflineStoreDao extends GenericEntityDao<OfflineStore, Long>{
 	
-	 
-	
 	/**
 	 * 分页查询店铺 
 	 */

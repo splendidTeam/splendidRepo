@@ -28,7 +28,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +40,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.baozun.nebula.manager.offlineStore.OfflineStoreManager;
 import com.baozun.nebula.model.offlineStore.OfflineStore;
+import com.feilong.core.Validator;
 
 @Controller
 public class OfflineStoreController {
@@ -163,6 +163,7 @@ public class OfflineStoreController {
 		params.put("mapImage", request.getParameter("mapImagePath"));
 		params.put("phone", request.getParameter("detail_phone"));
 		params.put("hours", request.getParameter("detail_hours"));
+		params.put("postcode", request.getParameter("detail_postcode"));
 		
 		int result = offlineStoreManager.insertStore(params);
 		if (result == 1) {
@@ -205,6 +206,8 @@ public class OfflineStoreController {
 		params.put("mapImage", request.getParameter("mapImagePath"));
 		params.put("phone", request.getParameter("detail_phone"));
 		params.put("hours", request.getParameter("detail_hours"));
+		params.put("postcode", request.getParameter("detail_postcode"));
+		
 		int result = offlineStoreManager.updateStore(params);
 		if (result == 1) {
 			/**
@@ -473,19 +476,21 @@ public class OfflineStoreController {
         // get the folder list   
         File[] array = file.listFiles();   
         //System.out.println("一共文件数："+array.length+"*-*-*-"+path);
-        for(int i=0;i<array.length;i++){   
-            if(array[i].isFile()){   
-                // only take file name   
-                //System.out.println("^^^^^" + array[i].getName());
-                list.add(array[i].getName());
-//                // take file path and name   
-//                System.out.println("#####" + array[i]);   
-//                // take file path and name   
-//                System.out.println("*****" + array[i].getPath());   
-            } else if(array[i].isDirectory()){   
-                getFile(array[i].getPath());   
-            }   
-        } 
+        if(Validator.isNotNullOrEmpty(array)){
+            for(int i=0;i<array.length;i++){   
+                if(array[i].isFile()){   
+                    // only take file name   
+                    //System.out.println("^^^^^" + array[i].getName());
+                    list.add(array[i].getName());
+//                    // take file path and name   
+//                    System.out.println("#####" + array[i]);   
+//                    // take file path and name   
+//                    System.out.println("*****" + array[i].getPath());   
+                } else if(array[i].isDirectory()){   
+                    getFile(array[i].getPath());   
+                }   
+            } 
+        }
         return list;
     }
 	

@@ -9,7 +9,6 @@
 <script type="text/javascript">
 var $ = jQuery.noConflict();
 </script>
-<%-- <script type="text/javascript" src="${base}/scripts/jquery-1.6.2.min.js"></script> --%>
 <script type="text/javascript" src="${base}/scripts/uploadify/jquery.uploadify-3.1.js"></script>
 <script type="text/javascript" src="${base}/scripts/area.js"></script>
 <style type="text/css">  
@@ -116,6 +115,10 @@ var $ = jQuery.noConflict();
 							<td><input type="text" id="detail_name" name="detail_name" value="${store.name }"/>
 								<input type="hidden" id="detail_id" name="detail_id" value="${store.id }"/>
 							</td>
+						</tr>
+						<tr>
+							<td>店铺邮编</td>
+							<td><input id="detail_postcode" name="detail_postcode" value="${store.postcode}" /></td>
 						</tr>
 						<tr>
 							<td>详细地址</td>

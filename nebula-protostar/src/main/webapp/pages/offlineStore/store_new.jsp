@@ -25,7 +25,7 @@
 				<tr><td colspan="7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<input type="text" id="store_name" name="store_name" class="ui-loxia-default ui-corner-all" value="" /> 
 					 <a class="button orange" id="search_store" href="javascript:;">查询店铺</a> 
-					  <a class="button orange" id="add_store_new" href="javascript:;" onclick="toAddStore()">新增店铺</a>
+					  <a class="button orange" id="add_store_new" href="javascript:void(0);" onclick="toAddStore();">新增店铺</a>
 				</td></tr>
 				<tr class="editorheader">
 					<th nowrap="nowrap" width="100" sort="asc">店铺id</th>
