@@ -49,12 +49,14 @@ import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.ItemCategory;
 import com.baozun.nebula.model.product.ItemCollection;
 import com.baozun.nebula.model.product.ItemProperties;
+import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.sdk.command.CurmbCommand;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
 import com.baozun.nebula.sdk.manager.SdkItemCategoryManager;
 import com.baozun.nebula.sdk.manager.SdkItemCollectionManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.sdk.manager.SdkNavigationManager;
+import com.baozun.nebula.sdk.manager.product.SdkPropertyManager;
 import com.baozun.nebula.search.AutoCollection;
 import com.baozun.nebula.search.FacetFilterHelper;
 import com.baozun.nebula.search.ItemCollectionContext;
@@ -125,6 +127,8 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 	@Autowired
 	private CategoryDao												categoryDao;
 	
+	@Autowired
+	private SdkPropertyManager										sdkPropertyManager;
 	
 	/* 
 	 * @see com.baozun.nebula.manager.breadcrumb.BreadcrumbManager#loadNavItemCollectionMap()
@@ -454,22 +458,24 @@ public class BreadcrumbManagerImpl implements BreadcrumbManager {
 		}
 		//每一个属性下的itemProperties (用String类型为了以后可能会加自定义多选)
 		List<String> pvIds =null;
-		for(Map.Entry<Long, List<ItemProperties>> entry :itemPropertiesMap.entrySet()){
-			pvIds =null;
-			if(Validator.isNotNullOrEmpty(entry.getValue())){
-				pvIds =new ArrayList<String>();
-				for (ItemProperties itemProperties : entry.getValue()) {
-					if(Validator.isNotNullOrEmpty(itemProperties.getPropertyValueId())){
-						pvIds.add(itemProperties.getPropertyValueId().toString());
-					}else{
-						//自定义多选
-						//TODO
+		for (Map.Entry<Long, List<ItemProperties>> entry : itemPropertiesMap.entrySet()) {
+			pvIds = null;
+			Property property = sdkPropertyManager.findPropertyById(entry.getKey());
+			//判断是否为销售属性，即是否为颜色和尺码
+			//之后的面包屑，在精确判断时，是不应该判断尺码和颜色的，因为销售属性是sku纬度的;而面包屑只要item纬度的property
+			if(Validator.isNotNullOrEmpty(property.getIsSaleProp())&&!property.getIsSaleProp()){
+				if (Validator.isNotNullOrEmpty(entry.getValue())) {
+					pvIds = new ArrayList<String>();
+					for (ItemProperties itemProperties : entry.getValue()) {
+						if (Validator.isNotNullOrEmpty(itemProperties.getPropertyValueId())) {
+							pvIds.add(itemProperties.getPropertyValueId().toString());
+						}
 					}
-				}
-				if(Validator.isNotNullOrEmpty(pvIds)){
-					Collections.sort(pvIds);
-					for (String pvId : pvIds) {
-						results.add(pvId);
+					if (Validator.isNotNullOrEmpty(pvIds)) {
+						Collections.sort(pvIds);
+						for (String pvId : pvIds) {
+							results.add(pvId);
+						}
 					}
 				}
 			}
