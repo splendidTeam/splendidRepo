@@ -236,10 +236,7 @@ public class NebulaMemberProfileController extends BaseController {
 		if (bindingResult.hasErrors()) {
 			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Validator memberProfileForm has Error\"",
 					memberDetails.getLoginName(), new Date());
-			defaultReturnResult.setResult(false);
-			defaultResultMessage.setMessage(getMessage(bindingResult.getAllErrors().get(0).getDefaultMessage()));
-			defaultReturnResult.setResultMessage(defaultResultMessage);
-			return defaultReturnResult;
+			return getResultFromBindingResult(bindingResult);
 		}
 		LOG.debug("input profile is validated");
 
@@ -250,6 +247,11 @@ public class NebulaMemberProfileController extends BaseController {
 				.findMemberPersonData(memberDetails.getMemberId());
 		
 		String encodeNewPassword = memberProfileFormValidator.validatePassword(memberProfileForm, memberCommand, bindingResult);
+		if (bindingResult.hasErrors()) {
+			LOG.info("[MEM_EDIT_PROFILE] {} [{}] \"Validator memberProfileForm has Error\"",
+					memberDetails.getLoginName(), new Date());
+			return getResultFromBindingResult(bindingResult);
+		}
 		
 		memberProfile = memberProfileForm.toMemberPersonalData(memberProfile);
 
