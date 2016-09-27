@@ -420,7 +420,7 @@ $j(document).ready(function(){
 			var result = eval('('+data+')');
 			if(result.isSuccess){
 				$j("input[name='propertyValues.thumb']").val(result.description);
-				$j("#colorPropertyImgUrl").attr('src',baseImageUrl + result.description);
+				$j("#colorPropertyImgUrl").attr('src', result.imageUrl);
 				$j("#errorUploadTip").hide();
 				nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("IMP_SUCCESS"));
 			}else{
