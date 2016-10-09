@@ -18,6 +18,7 @@ public class ForgetPasswordSendVCodeConstant{
 	/* 忘记密码发送验证码短信模板 */
 	public static final String	SMS_FORGET_PASSWORD_CAPTCHA;
 	
+	/* 忘记密码短信累心  */
 	private static CaptchaType captchaType;
 
 	static{
@@ -35,7 +36,7 @@ public class ForgetPasswordSendVCodeConstant{
 	/**
 	 * @return the captchaType
 	 */
-	public static CaptchaType getCaptchaType() {
+	public static CaptchaType getForgetPasswordCaptchaType() {
 		if(null==captchaType){
 			return CaptchaType.MIXED;
 		}
@@ -45,7 +46,7 @@ public class ForgetPasswordSendVCodeConstant{
 	/**
 	 * @param captchaType the captchaType to set
 	 */
-	public static void setCaptchaType(CaptchaType captchatype) {
+	public static void setForgetPasswordCaptchaType(CaptchaType captchatype) {
 		captchaType = captchatype;
 	}
 
