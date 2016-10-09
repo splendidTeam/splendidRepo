@@ -46,7 +46,6 @@ import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
-import com.baozun.nebula.web.controller.order.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResolver;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
@@ -56,6 +55,7 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommand
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
@@ -162,7 +162,7 @@ public class NebulaOrderCreateController extends BaseController{
     @Autowired
     private ShoppingcartOrderCreateSuccessHandler shoppingcartOrderCreateSuccessHandler;
     
-    @Autowired
+    @Autowired(required = false)
     private ShoppingCartOrderCreateBeforeHandler	shoppingCartOrderCreateBeforeHandler;
 
     @Autowired
@@ -239,8 +239,10 @@ public class NebulaOrderCreateController extends BaseController{
             return toNebulaReturnResult(salesorderResult);
         }
         
-        shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request);
-
+        if(null != shoppingCartOrderCreateBeforeHandler){
+        	shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request);
+        }
+        
         //********************************************************************************************************
         SalesOrderCreateOptions salesOrderCreateOptions = buildSalesOrderCreateOptions(key);
         // 新建订单
