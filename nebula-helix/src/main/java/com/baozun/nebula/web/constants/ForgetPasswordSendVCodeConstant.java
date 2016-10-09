@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.baozun.nebula.manager.system.SMSManager.CaptchaType;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 
 public class ForgetPasswordSendVCodeConstant{
@@ -16,8 +17,11 @@ public class ForgetPasswordSendVCodeConstant{
 
 	/* 忘记密码发送验证码短信模板 */
 	public static final String	SMS_FORGET_PASSWORD_CAPTCHA;
+	
+	private static CaptchaType captchaType;
 
 	static{
+		
 		Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
 
 		MAX_EXIST_TIME = Integer.valueOf(StringUtils.trim(pro.getProperty("sms.vcode.max.exist.time")));
@@ -26,6 +30,23 @@ public class ForgetPasswordSendVCodeConstant{
 
 		SMS_FORGET_PASSWORD_CAPTCHA = StringUtils.trim(pro.getProperty("sms.forget.password.captcha"));
 
+	}
+	
+	/**
+	 * @return the captchaType
+	 */
+	public static CaptchaType getCaptchaType() {
+		if(null==captchaType){
+			return CaptchaType.MIXED;
+		}
+		return captchaType;
+	}
+
+	/**
+	 * @param captchaType the captchaType to set
+	 */
+	public static void setCaptchaType(CaptchaType captchatype) {
+		captchaType = captchatype;
 	}
 
 }
