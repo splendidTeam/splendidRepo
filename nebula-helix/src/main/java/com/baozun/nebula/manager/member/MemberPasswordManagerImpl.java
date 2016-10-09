@@ -174,7 +174,7 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 发送验证码结束
 			boolean sendFailOrSuccess = smsManager.send(
 					smsCommand,
-					ForgetPasswordSendVCodeConstant.getCaptchaType(),
+					ForgetPasswordSendVCodeConstant.getForgetPasswordCaptchaType(),
 					ForgetPasswordSendVCodeConstant.VALIDATE_CODE_LENGTH,
 					ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME,BUSINESS_CODE);
 			flag = sendFailOrSuccess;
