@@ -66,7 +66,19 @@ public class EncryptUtil {
 	private ThreadLocal<MessageDigest> hasherContext = new ThreadLocal<MessageDigest>();
 	private ThreadLocal<MessageDigest> digesterContext = new ThreadLocal<MessageDigest>();
 	
+	private SecretKeyFactory secretKeyFactory;
+	
 	private EncryptUtil(){
+		//init SecretKeyFactory
+		String hashAlgorithm = null;
+		try {
+			hashAlgorithm = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ConfigurationUtil.HASHSALT_ALGORITHM_KEY);
+			secretKeyFactory = SecretKeyFactory.getInstance(hashAlgorithm == null? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm );
+		} catch (NoSuchAlgorithmException e1) {
+			LOG.error("No algorithm found for digest with name {}", 
+					hashAlgorithm == null? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm);
+		}
+		
 		//init encryptor
 		String[] encryptorArray = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ENCRYPTORS).split(",");
 		for(String strEnc: encryptorArray){
@@ -74,6 +86,7 @@ public class EncryptUtil {
 			String encryptClass = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(encryptClassKey);
 			assert encryptClass != null : "Cannot find Class Definition for Encryptor:" + strEnc;
 			try {
+
 				Encryptor e = (Encryptor)Class.forName(encryptClass).newInstance();
 				encryptors.put(strEnc, e);
 			} catch (Exception e) {
@@ -111,18 +124,12 @@ public class EncryptUtil {
 	 */
 	
    public String hashSalt( String password, String salt) {
-	   String hashAlgorithm = ConfigurationUtil.getInstance().getNebulaUtilityConfiguration(ConfigurationUtil.HASHSALT_ALGORITHM_KEY);
        try {
-           SecretKeyFactory skf = SecretKeyFactory.getInstance(hashAlgorithm == null? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm );
            PBEKeySpec spec = new PBEKeySpec( password.toCharArray(), salt.getBytes(ConfigurationUtil.DEFAULT_ENCODING), DEFAULT_ITERATIONS, DEFAULT_KEYLENGTH );
-           SecretKey key = skf.generateSecret(spec);
+           SecretKey key = secretKeyFactory.generateSecret(spec);
             byte[] encoded = key.getEncoded();
            return  base64Convertor.format(encoded);
- 
-       } catch( NoSuchAlgorithmException | InvalidKeySpecException | UnsupportedEncodingException e ) {
-    		LOG.error("No algorithm found for digest with name {}", 
-					hashAlgorithm == null? DEFAULT_HASHSALT_ALGORITHM : hashAlgorithm);
-			
+       } catch( InvalidKeySpecException | UnsupportedEncodingException e ) {
 			LOG.error("Get Bytes error with UTF-8");
 			throw new RuntimeException("Get Bytes error with UTF-8");
        }
