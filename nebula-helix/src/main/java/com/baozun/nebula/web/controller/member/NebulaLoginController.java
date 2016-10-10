@@ -227,7 +227,7 @@ public class NebulaLoginController extends NebulaAbstractLoginController{
 		}
 		
 		// 处理Form中数据的加解密
-		loginForm.setLoginName(decryptSensitiveDataEncryptedByJs(loginForm.getLoginName(), request));
+		loginForm.setLoginName(loginForm.getLoginName());
 		loginForm.setPassword(decryptSensitiveDataEncryptedByJs(loginForm.getPassword(), request));
 
 		// 校验输入数据
