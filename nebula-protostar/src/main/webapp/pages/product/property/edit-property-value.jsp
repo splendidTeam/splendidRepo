@@ -14,6 +14,7 @@
 <script src="${base}/scripts/jquery/shapeshift/jquery.shapeshift.js"></script>
 
 <script type="text/javascript">
+var baseImageUrl = "${baseImageUrl}";
 var $ = jQuery.noConflict();
 </script>
 <link rel="stylesheet" type="text/css" href="${base}/scripts/uploadify3/uploadify.css" media="screen" />
