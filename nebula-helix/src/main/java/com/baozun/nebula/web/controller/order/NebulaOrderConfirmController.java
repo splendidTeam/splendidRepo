@@ -50,12 +50,14 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
+import com.baozun.nebula.web.controller.order.handler.OrderConfirmBeforeHandler;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.bean.ConvertUtil;
@@ -161,6 +163,9 @@ public class NebulaOrderConfirmController extends BaseController{
     /** The sdk shopping cart bundle new line builder. */
     @Autowired
     private SdkShoppingCartBundleNewLineBuilder sdkShoppingCartBundleNewLineBuilder;
+    
+    @Autowired(required = false)
+    private OrderConfirmBeforeHandler 	confirmBeforeHandler;
 
     /**
      * 显示订单结算页面.
@@ -183,6 +188,10 @@ public class NebulaOrderConfirmController extends BaseController{
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
+        if(null != confirmBeforeHandler){
+        	confirmBeforeHandler.beforeOrderConfirm(shoppingCartCommand, memberDetails, request);
+        }
+        
         // 封装viewCommand
         OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
         orderConfirmViewCommand.setShoppingCartCommand(convertForShow(shoppingCartCommand));
