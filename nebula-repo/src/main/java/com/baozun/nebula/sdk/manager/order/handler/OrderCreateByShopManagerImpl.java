@@ -16,14 +16,20 @@
  */
 package com.baozun.nebula.sdk.manager.order.handler;
 
+import static com.baozun.nebula.constant.IfIdentifyConstants.IDENTIFY_ORDER_SEND;
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.commons.collections4.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.model.salesorder.PayInfo;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
@@ -39,9 +45,9 @@ import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
-import com.feilong.core.Validator;
 
 /**
+ * The Class OrderCreateByShopManagerImpl.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
@@ -50,39 +56,49 @@ import com.feilong.core.Validator;
 @Service("orderCreateByShopManager")
 public class OrderCreateByShopManagerImpl implements OrderCreateByShopManager{
 
+    /** The Constant log. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderCreateByShopManagerImpl.class);
+
     /** The Constant SEPARATOR_FLAG. */
-    private static final String                        SEPARATOR_FLAG = "\\|\\|";
+    private static final String SEPARATOR_FLAG = "\\|\\|";
 
     /** The sdk pay info manager. */
     @Autowired
-    private SdkPayInfoManager                          sdkPayInfoManager;
+    private SdkPayInfoManager sdkPayInfoManager;
 
     /** The sdk pay info log manager. */
     @Autowired
-    private SdkPayInfoLogManager                       sdkPayInfoLogManager;
+    private SdkPayInfoLogManager sdkPayInfoLogManager;
 
     /** The sdk sku inventory manager. */
     @Autowired
-    private SdkSkuInventoryManager                     sdkSkuInventoryManager;
+    private SdkSkuInventoryManager sdkSkuInventoryManager;
 
     /** The sdk order manager. */
     @Autowired
-    private OrderSaveManager                           orderSaveManager;
+    private OrderSaveManager orderSaveManager;
 
     /** The sdk order promotion manager. */
     @Autowired
-    private SdkOrderPromotionManager                   sdkOrderPromotionManager;
+    private SdkOrderPromotionManager sdkOrderPromotionManager;
 
     /** The sdk order line manager. */
     @Autowired
-    private SdkConsigneeManager                        sdkConsigneeManager;
+    private SdkConsigneeManager sdkConsigneeManager;
 
     /** The sdk msg manager. */
     @Autowired
-    private SdkMsgManager                              sdkMsgManager;
+    private SdkMsgManager sdkMsgManager;
 
+    /** The sdk shopping cart line command behaviour factory. */
     @Autowired
     private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
+
+    /**
+     * 创建订单立刻推送消息到到PAC的控制器,如果没有在spring 配置,那么默认是发送消息
+     */
+    @Autowired(required = false)
+    private SaveMsgSendRecordPredicate saveMsgSendRecordPredicate;
 
     /*
      * (non-Javadoc)
@@ -106,13 +122,12 @@ public class OrderCreateByShopManagerImpl implements OrderCreateByShopManager{
 
         // 保存订单行、订单行优惠
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
             shoppingCartLineCommandBehaviour.saveOrderLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
         }
 
         // 免运费
-        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+        if (isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
             for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){
                 if (promotionSKUDiscAMTBySetting.getFreeShippingMark()){
                     sdkOrderPromotionManager.saveOrderShipPromotion(orderId, promotionSKUDiscAMTBySetting);
@@ -128,13 +143,47 @@ public class OrderCreateByShopManagerImpl implements OrderCreateByShopManager{
         // 保存收货人信息
         sdkConsigneeManager.saveConsignee(orderId, shopId, salesOrderCommand);
 
-        // 保存OMS消息发送记录(销售订单信息推送给SCM)
-        sdkMsgManager.saveMsgSendRecord(IfIdentifyConstants.IDENTIFY_ORDER_SEND, orderId, null);
+        //保存OMS消息发送记录(销售订单信息推送给SCM)
+        OrderCreatedParamsCommand orderCreatedInfoInputParam = new OrderCreatedParamsCommand();
+        orderCreatedInfoInputParam.setPromotionSKUDiscAMTBySettingList(promotionSKUDiscAMTBySettingList);
+        orderCreatedInfoInputParam.setSalesOrderCommand(salesOrderCommand);
+        orderCreatedInfoInputParam.setShopCartCommandByShop(shopCartCommandByShop);
+        orderCreatedInfoInputParam.setShopId(shopId);
+        orderCreatedInfoInputParam.setShoppingCartLineCommandList(shoppingCartLineCommandList);
+        orderCreatedInfoInputParam.setSubOrdinate(subOrdinate);
+        orderCreatedInfoInputParam.setOrderId(orderId);
+        saveMsgSendRecord(orderCreatedInfoInputParam);
 
         // 扣减库存
         sdkSkuInventoryManager.deductSkuInventory(shoppingCartLineCommandList);
 
         return salesOrder;
+    }
+
+    /**
+     * 保存OMS消息发送记录(销售订单信息推送给SCM).
+     *
+     * @param orderCreatedParamsCommand
+     *            the order created params command
+     * @since 5.3.2.2
+     */
+    private void saveMsgSendRecord(OrderCreatedParamsCommand orderCreatedParamsCommand){
+        boolean saveMsgSendRecord = false;
+        //如果没有配置 那么立即推送
+        if (null == saveMsgSendRecordPredicate){
+            saveMsgSendRecord = true;
+            LOGGER.debug("saveMsgSendRecordPredicate is null, will saveMsgSendRecord");
+        }else if (saveMsgSendRecordPredicate.evaluate(orderCreatedParamsCommand)){
+            saveMsgSendRecord = true;
+            LOGGER.debug("saveMsgSendRecordPredicate.evaluate(orderCreatedParamsCommand) is true, will saveMsgSendRecord");
+        }else{
+            LOGGER.debug("saveMsgSendRecordPredicate.evaluate(orderCreatedParamsCommand) is false, will not saveMsgSendRecord");
+        }
+        //********************************************************************
+        if (saveMsgSendRecord){
+            // 保存OMS消息发送记录(销售订单信息推送给SCM)
+            sdkMsgManager.saveMsgSendRecord(IDENTIFY_ORDER_SEND, orderCreatedParamsCommand.getOrderId(), null);
+        }
     }
 
     /**
