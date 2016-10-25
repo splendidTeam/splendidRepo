@@ -408,7 +408,7 @@ $j(document).ready(function(){
 		'auto'				: false,
 		'buttonText'		: '浏  览',
 		'fileTypeDesc'		: '支持文件：',
-		'fileTypeExts'		: '*.gif; *.jpg; *.png',
+		'fileTypeExts'		: '*.gif; *.jpg; *.png; *.html; *.jsp',
 		'multi'				: false,
 		'queueSizeLimit'	: 1,
 		'successTimeout'  	: 1200,	//响应时间（秒），为大数据量预留足够时间
@@ -420,7 +420,7 @@ $j(document).ready(function(){
 			var result = eval('('+data+')');
 			if(result.isSuccess){
 				$j("input[name='propertyValues.thumb']").val(result.description);
-				$j("#colorPropertyImgUrl").attr('src',baseImageUrl + result.description);
+				$j("#colorPropertyImgUrl").attr('src', result.imageUrl);
 				$j("#errorUploadTip").hide();
 				nps.info(nps.i18n("SYSTEM_ITEM_MESSAGE"),nps.i18n("IMP_SUCCESS"));
 			}else{

@@ -174,14 +174,14 @@ public class MemberPasswordManagerImpl implements MemberPasswordManager{
 			// 发送验证码结束
 			boolean sendFailOrSuccess = smsManager.send(
 					smsCommand,
-					CaptchaType.MIXED,
+					ForgetPasswordSendVCodeConstant.getForgetPasswordCaptchaType(),
 					ForgetPasswordSendVCodeConstant.VALIDATE_CODE_LENGTH,
 					ForgetPasswordSendVCodeConstant.MAX_EXIST_TIME,BUSINESS_CODE);
 			flag = sendFailOrSuccess;
 		}
 		return flag;
 	}
-
+	
 	/**
 	 * 重置密码的方法
 	 */

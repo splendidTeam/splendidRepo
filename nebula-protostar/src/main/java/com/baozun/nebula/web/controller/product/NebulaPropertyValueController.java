@@ -90,6 +90,12 @@ public class NebulaPropertyValueController extends BaseController{
 	@Autowired
 	private SdkI18nLangManager	sdkI18nLangManager;
 
+	protected String CONFIG = "config/metainfo.properties";
+	
+	protected String UPLOAD_IMG_BASE = ProfileConfigUtil.findPro(CONFIG).getProperty("upload.img.base");
+	
+	protected String UPLOAD_IMG_DOMAIN_BASE = ProfileConfigUtil.findPro(CONFIG).getProperty("upload.img.domain.base");
+	
 	/**
 	 * 进入属性值编辑页面 ， 渲染选择属性下的属性值分组和属性值
 	 * 
@@ -115,7 +121,8 @@ public class NebulaPropertyValueController extends BaseController{
 
 		List<PropertyValue> propertyValueList = propertyManager.findPropertyValueList(propertyId);
 		model.addAttribute("propertyValueList", propertyValueList);
-
+		model.addAttribute("property" ,property);
+		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN_BASE);
 		return "/product/property/edit-property-value";
 
 	}
@@ -714,8 +721,7 @@ public class NebulaPropertyValueController extends BaseController{
 		String fileName = file.getOriginalFilename();
 		String fileType = fileName.substring(fileName.lastIndexOf("."),
 				fileName.length());
-		String imageZipPath = ProfileConfigUtil.findPro(
-				"config/metainfo.properties").getProperty("upload.img.base");
+		String imageZipPath = UPLOAD_IMG_BASE;
 		Calendar calendar = Calendar.getInstance();
 		String userDefinedPath = calendar.get(Calendar.YEAR) + "/"
 				+ (calendar.get(Calendar.MONTH) + 1) + "/"

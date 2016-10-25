@@ -491,6 +491,8 @@ public class MemberManagerImpl implements MemberManager{
     @Override
     public NebulaReturnResult checkRegisterData(MemberFrontendCommand mfc){
         DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
+        defaultReturnResult.setResult(true);
+        
         Map<String, String> returnObject = new HashMap<String, String>();
 
         // 验证email
@@ -521,7 +523,7 @@ public class MemberManagerImpl implements MemberManager{
                 returnObject.put("loginName", "register.loginname.unavailable");
             }
         }
-        defaultReturnResult.setResult(true);
+
         defaultReturnResult.setReturnObject(returnObject);
 
         return defaultReturnResult;

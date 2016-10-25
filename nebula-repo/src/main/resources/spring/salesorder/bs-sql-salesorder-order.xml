@@ -149,6 +149,7 @@
 						
 						sc.NAME,
 						sc.buyer_name as buyerName,
+						sc.buyer_tel as buyerTel,
 						sc.COUNTRY,
 						sc.PROVINCE,
 						sc.CITY,

@@ -55,6 +55,7 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommand
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
@@ -160,6 +161,9 @@ public class NebulaOrderCreateController extends BaseController{
 
     @Autowired
     private ShoppingcartOrderCreateSuccessHandler shoppingcartOrderCreateSuccessHandler;
+    
+    @Autowired(required = false)
+    private ShoppingCartOrderCreateBeforeHandler	shoppingCartOrderCreateBeforeHandler;
 
     @Autowired
     private SalesOrderCreateValidator             salesOrderCreateValidator;
@@ -234,7 +238,11 @@ public class NebulaOrderCreateController extends BaseController{
                             couponCode);
             return toNebulaReturnResult(salesorderResult);
         }
-
+        
+        if(null != shoppingCartOrderCreateBeforeHandler){
+        	shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request);
+        }
+        
         //********************************************************************************************************
         SalesOrderCreateOptions salesOrderCreateOptions = buildSalesOrderCreateOptions(key);
         // 新建订单

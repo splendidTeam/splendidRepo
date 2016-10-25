@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.member.validator;
 
-import java.util.regex.Pattern;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -61,10 +60,10 @@ public class MemberProfileFormValidator implements Validator {
 			MemberProfileForm command = (MemberProfileForm) target;
 
 			//验证邮箱，手机，密码，确认密码是否为空
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email","field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile","field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password","field.required");
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword","field.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email","email.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobile","mobile.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password","password.required");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repassword","repassword.required");
 
 			if (!errors.hasFieldErrors("password")
 					&& !errors.hasFieldErrors("repassword")) {
@@ -115,7 +114,7 @@ public class MemberProfileFormValidator implements Validator {
 					}
 					return encodeNewPassword;
 				}else {
-					errors.rejectValue("oldPassword", "oldPasswordAgain.error");
+					errors.rejectValue("oldPassword", "encodeOldPassword.noteq.memberpassword");
 				}
 			}
 		}
