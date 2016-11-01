@@ -302,4 +302,6 @@ insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextv
 insert into "t_au_privilege"("id","group_name","acl","name","description","lifecycle","version","org_type_id") values(nextval('s_t_au_privilege'),'运营服务','ACL_SYS_EMAILSUBSCRIBE_MANAGE','邮件订阅管理','邮件订阅管理',1,now(),1);
 insert into "t_au_privilege_url"("id","url","description","pri_id") values(nextval('s_t_au_privilege_url'),'/email/subscribe/manager.htm','邮件订阅管理',currval('s_t_au_privilege'));
 
-
+--物流配送方式管理
+insert into t_au_privilege(id,acl,lifecycle,name,version,org_type_id,description) values (nextval('s_t_au_privilege'),'ACL_SYS_AREA_LOGISTICS_MANAGE_NEW',1,'物流配送方式管理',now(),1,'物流配送方式管理');
+insert into t_au_privilege_url(id,url,pri_id,description) values (nextval('s_t_au_privilege_url'),'/logistics/areaDeliverMode/manager.htm',currval('s_t_au_privilege'),'物流配送方式管理');

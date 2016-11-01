@@ -1,0 +1,389 @@
+$j.extend(loxia.regional["zh-CN"], {
+    ALERT_SELECT_CATEGORY_EMPTY: "请先选择一个地区",
+    CONFIRM_DELETE: "确认删除",
+    CONFIRM_DELETE_AGAIN: "再次确认删除",
+    CONFIRM_DELETE_CATEGORY: "确定要删除选定的 {0} 地区的物流信息吗？",
+    CONFIRM_DELETE_CATEGORY_ITEM: "确定要删除选定的 {0} 地区物流信息吗？",
+    INFO_DELETE_CATEGORY: "删除 {0} 地区物流信息成功",
+    INFO_UPDATE_CATEGORY: "更新 {0} 地区物流信息成功",
+    INFO_COMMONDELIVERY_TIME_EMPTY: "普通配送时间不能为空",
+    INFO_FIRSTDELIVERY_TIME_EMPTY: "当日达配送时间不能为空",
+    INFO_SECONDDELIVERY_TIME_EMPTY: "次日达配送时间不能为空",
+    INFO_LOGISTICS_EMPTY:"物流编号和公司不能为空",
+    INFO_COMMONDELIVERY_TIME_UNEMPTY:"普通配送时间不必填写",
+    INFO_SECONDDELIVERY_TIME_UNEMPTY:"次日达配送时间不必填写",
+    INFO_FIRSTDELIVERY_TIME_UNEMPTY:"当日达配送时间不必填写"
+    
+});
+var s=base+"/logistics/areaDeliverMode/findDeliveryAreaModeByAreaId.json";
+function deleteCategory(c, b,z) {
+	var  a = base + "/logistics/areaDeliverMode/deleteDeliveryAreaModeById.json";
+    nps.asyncXhrPost(a, {
+        id: z
+    },
+    {
+        successHandler: function(f, h) {
+            var e = c.getNextNode();
+            var g = c.getPreNode();
+            var d = c.getParentNode();
+            if (null != e) {
+                $j("#" + e.tId + "_span").click()
+            } else {
+                if (null != g) {
+                    $j("#" + g.tId + "_span").click()
+                } else {
+                    $j("#" + d.tId + "_span").click()
+                }
+            }
+            nps.info(nps.i18n("INFO_TITLE"), nps.i18n("INFO_DELETE_CATEGORY", [c.name]))
+        }
+    })
+}
+
+function fnPromptDelCategory(d, a,z) {
+    var b = {
+        areaId: d.id
+    };
+    var c = nps.syncXhrPost(s, b);
+    if (c != "" && c != null) {
+        nps.confirm(nps.i18n("CONFIRM_DELETE_AGAIN"), nps.i18n("CONFIRM_DELETE_CATEGORY_ITEM", [d.name]), function() {
+            deleteCategory(d, a,z)
+        });
+    } else {
+    	nps.info(nps.i18n("INFO_TITLE_DATA"), "选择的物流信息已经不存在了");
+    }
+}
+//空字符
+function isNull(val) {
+
+	if (val == null || val.trim() == '') {
+		return true;
+	}
+	return false;
+}
+//获取日期时间
+function formatDateTime(date) {  
+    if (!date) return;  
+    var format = "yyyy-MM-dd HH:mm:ss";  
+    switch(typeof date) {  
+        case "string":  
+            date = new Date(date.replace(/-/, "/"));  
+            break;  
+        case "number":  
+            date = new Date(date);  
+            break;  
+    }   
+    if (!date instanceof Date) return;  
+    var dict = {  
+        "yyyy": date.getFullYear(),  
+        "M": date.getMonth() + 1,  
+        "d": date.getDate(),  
+        "H": date.getHours(),  
+        "m": date.getMinutes(),  
+        "s": date.getSeconds(),  
+        "MM": ("" + (date.getMonth() + 101)).substr(1),  
+        "dd": ("" + (date.getDate() + 100)).substr(1),  
+        "HH": ("" + (date.getHours() + 100)).substr(1),  
+        "mm": ("" + (date.getMinutes() + 100)).substr(1),  
+        "ss": ("" + (date.getSeconds() + 100)).substr(1)  
+    };      
+    return format.replace(/(yyyy|MM?|dd?|HH?|ss?|mm?)/g, function() {  
+        return dict[arguments[0]];  
+    });                  
+}
+
+var treeCategory = {
+    ztreeElementId: "categoryTree",
+    ztreeSearchElementSelector: "#key",
+    highlightNodeList: [],
+    highlightNodes: function(c, b) {
+        for (var d = 0, a = this.highlightNodeList.length; d < a; d++) {
+            var e = this.highlightNodeList[d];
+            e.highlight = b;
+            c.updateNode(e)
+        }
+    }
+};
+var setting = {
+    edit: {
+        enable: true,
+        showRemoveBtn: false,
+        showRenameBtn: false
+    },
+    view: {
+        showLine: true,
+        showIcon: false,
+        nameIsHTML: true,
+        selectedMulti: false,
+        fontCss: getFontCss
+    },
+    data: {
+        keep: {
+            parent: false,
+            leaf: false
+        },
+        key: {
+            title: "name"
+        },
+        simpleData: {
+            enable: true
+        }
+    },
+    callback: {
+        onClick: function(d, g, f, c) {
+            nps.error();
+            var b = f.code;
+            var a = ("ROOT" == b);
+            $j("#insertSibling,#save_node,#remove_element").attr("disabled", a ? "disabled" : false);
+            if (a) {
+                $j("#tree_code").val("");
+                $j("#tree_name_zh_cn").val("")
+            } else {
+                $j("#tree_code").val(f.code);
+                var h = f.id;
+                if (h == 0) {
+                    return
+                }
+                var e = nps.syncXhrPost(base + "/logistics/areaDeliverMode/findDeliveryAreaModeByAreaId.json", {
+                    areaId: h
+                });
+                if (e == null) {
+                    nps.info(nps.i18n("INFO_TITLE_DATA"), "选择数据已经不存在了");
+                    return
+                }
+                if (i18nOnOff) {
+                	$j("#modeId").val(e.id);
+                	$j("#areaId").val(f.id);
+                    $j("#logisticsCode").val(e.logisticsCode);
+                    $j("#logisticsCompany").val(e.logisticsCompany);
+                    $j("#commonDelivery").val(e.commonDelivery=='Y'?'true':'false');
+                    $j("#commomStartTime").val(e.commonDeliveryStartTime);
+                    $j("#commomEndTime").val(e.commonDeliveryEndTime);
+                    $j("#firstDayDelivery").val(e.firstDayDelivery=='Y'?'true':'false');
+                    $j("#firstStartTime").val(e.firstDeliveryStartTime);
+                    $j("#firstEndTime").val(e.firstDeliveryEndTime);
+                    $j("#secondDayDelivery").val(e.secondDayDelivery=='Y'?'true':'false');
+                    $j("#secondStartTime").val(e.secondDeliveryStartTime);
+                    $j("#secondEndTime").val(e.secondDeliveryEndTime);
+                    $j("#remark").val(e.remark);
+                    $j("#createTime").val(formatDateTime(e.createTime));
+                    $j("#modifyTime").val(formatDateTime(e.modifyTime));
+                    $j("#version").val(formatDateTime(e.version));
+                    $j("#supportcod").val(e.support_COD=='Y'?'true':'false');
+                } 
+            }
+        },
+
+    }
+};
+var key, lastValue = "",
+    nodeList = [],
+    fontCss = {};
+
+function getFontCss(b, a) {
+    return (!!a.highlight) ? {
+        color: "#333",
+        "background-color": "yellow"
+    } : {
+        color: "#333",
+        "font-weight": "normal",
+        "background-color": ""
+    }
+}
+
+function focusKey(a) {
+    if (key.hasClass("empty")) {
+        key.removeClass("empty")
+    }
+}
+
+function blurKey(a) {
+    if (key.get(0).value === "") {
+        key.addClass("empty")
+    }
+}
+
+function searchNode(c) {
+    var a = $j.fn.zTree.getZTreeObj("categoryTree");
+    var b = $j.trim(key.get(0).value);
+    if (b == "") {
+        $j("#search_result").html("");
+        updateCategoryNodes(false)
+    }
+    if (key.hasClass("empty")) {
+        b = ""
+    }
+    if (lastValue === b) {
+        return
+    }
+    lastValue = b;
+    if (b === "") {
+        return
+    }
+    updateCategoryNodes(false);
+    nodeList = a.getNodesByParamFuzzy("name", b);
+    $j("#search_result").html(nps.i18n("INFO_CATEGORY_SEARCH_RESULT", [nodeList.length]));
+    if (nodeList.length > 0) {
+        $j.each(nodeList, function(d, e) {
+            a.expandNode(e.getParentNode(), true, true, true)
+        })
+    }
+    updateCategoryNodes(true);
+    $j("#key").focus()
+}
+
+function updateCategoryNodes(b) {
+    var c = $j.fn.zTree.getZTreeObj("categoryTree");
+    for (var d = 0, a = nodeList.length; d < a; d++) {
+        nodeList[d].highlight = b;
+        c.updateNode(nodeList[d])
+    }
+}
+
+$j(function() {
+    $j.fn.zTree.init($j("#" + treeCategory.ztreeElementId), setting, zNodes);
+    $j("#" + treeCategory.ztreeElementId + "_1_span").click();
+    key = $j("#key");
+    key.bind("focus", focusKey).bind("blur", blurKey).bind("propertychange", searchNode).bind("input", searchNode);
+    $j("#delete_node").click(function() {
+        nps.error();
+        var zTree = $j.fn.zTree.getZTreeObj(treeCategory.ztreeElementId);
+        var selectedNodes = zTree.getSelectedNodes();
+        if (selectedNodes.length == 0) {
+            nps.error(nps.i18n("ERROR_INFO"), nps.i18n("ALERT_SELECT_CATEGORY_EMPTY"));
+            return
+        }
+        var selectTreeNode = selectedNodes[0];
+        var id= $j("#modeId").val();
+        nps.confirm(nps.i18n("CONFIRM_DELETE"), nps.i18n("CONFIRM_DELETE_CATEGORY", [selectTreeNode.name]),
+        function() {
+            setTimeout(function() {
+            	fnPromptDelCategory(selectTreeNode, zTree,id);
+            },
+            500)
+        })
+    });
+    
+    $j("#save_node").click(function() {
+        nps.error();
+        var zTree = $j.fn.zTree.getZTreeObj(treeCategory.ztreeElementId);
+        var selectedNodes = zTree.getSelectedNodes();
+        if (selectedNodes.length == 0) {
+            nps.error(nps.i18n("ERROR_INFO"), nps.i18n("ALERT_SELECT_CATEGORY_EMPTY"));
+            return
+        }
+        var id= $j("#modeId").val();
+        var areaId= $j("#areaId").val();
+        var logisticsCode= $j("#logisticsCode").val();
+        var logisticsCompany=$j("#logisticsCompany").val();
+        var commonDelivery=$j("#commonDelivery").val()=='true'?'Y':'N';
+        var commomStartTime= $j("#commomStartTime").val();
+        var commomEndTime=$j("#commomEndTime").val();
+        var firstDayDelivery= $j("#firstDayDelivery").val()=='true'?'Y':'N';
+        var firstStartTime=  $j("#firstStartTime").val();
+        var firstEndTime= $j("#firstEndTime").val();
+        var secondDayDelivery=$j("#secondDayDelivery").val()=='true'?'Y':'N';
+        var supportcod= $j("#supportcod").val()=='true'?'Y':'N';
+        var secondStartTime=$j("#secondStartTime").val();
+        var secondEndTime=$j("#secondEndTime").val();
+        var remark= $j("#remark").val();
+        //如果物流选择为否，则不需要填写相应的时间
+        if((commonDelivery=='N')&&(!isNull(commomStartTime)||!isNull(commomEndTime))){
+       	 nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_COMMONDELIVERY_TIME_UNEMPTY"));
+            $j("#tree_code").focus();
+            return
+       }
+       if((firstDayDelivery=='N')&&(!isNull(firstStartTime)||!isNull(firstEndTime))){
+    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_FIRSTDELIVERY_TIME_UNEMPTY"));
+           $j("#tree_code").focus();
+           return
+       }
+       if((secondDayDelivery=='N')&&(!isNull(secondStartTime)||!isNull(secondEndTime))){
+    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_SECONDDELIVERY_TIME_UNEMPTY"));
+           $j("#tree_code").focus();
+           return
+       }
+       //如果物流选择为是，则必须填写对应的起始时间和关闭时间
+       if((commonDelivery!='N')&&(isNull(commomStartTime)||isNull(commomEndTime))){
+    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_COMMONDELIVERY_TIME_EMPTY"));
+           $j("#tree_code").focus();
+           return
+       }
+       if((firstDayDelivery!='N')&&(isNull(firstStartTime)||isNull(firstEndTime))){
+    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_FIRSTDELIVERY_TIME_EMPTY"));
+           $j("#tree_code").focus();
+           return
+       }
+       if((logisticsCode==""||isNull(logisticsCode)||isNull(logisticsCompany))){
+    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_LOGISTICS_EMPTY"));
+           $j("#tree_code").focus();
+           return
+       }
+       if((secondDayDelivery!='N')&&(isNull(secondStartTime)||secondEndTime==null||secondStartTime==""||secondEndTime=="")){
+    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_SECONDDELIVERY_TIME_EMPTY"));
+           $j("#tree_code").focus();
+           return
+       }
+        var url = base + "/logistics/areaDeliverMode/updateDeliveryAreaModeByAreaId.json";
+        var data = {};
+        if (i18nOnOff) {
+            $j(".cate-update .mutl-lang").each(function(i, dom) {
+                var me = $j(this);
+                var val = me.val();
+                if (null == val || "" == val) {
+                    validate = true
+                }
+            });
+            var multlangs = '{"id":"' + id + '"';
+            multlangs += ',"areaId":"' + areaId + '"';
+            multlangs += ',"logisticsCode":"' + logisticsCode + '"';
+            multlangs += ',"logisticsCompany":"' + logisticsCompany + '"';
+            multlangs += ',"commonDelivery":"' + commonDelivery + '"';
+            multlangs += ',"commonDeliveryStartTime":"' + commomStartTime + '"';
+            multlangs += ',"commonDeliveryEndTime":"' + commomEndTime + '"';
+            multlangs += ',"firstDayDelivery":"' + firstDayDelivery + '"';
+            multlangs += ',"firstDeliveryStartTime":"' + firstStartTime + '"';
+            multlangs += ',"firstDeliveryEndTime":"' + firstEndTime + '"';
+            multlangs += ',"secondDayDelivery":"' + secondDayDelivery + '"';
+            multlangs += ',"secondDeliveryStartTime":"' + secondStartTime + '"';
+            multlangs += ',"secondDeliveryEndTime":"' + secondEndTime + '"';
+            multlangs += ',"remark":"' + remark + '"';
+            multlangs +=',"support_COD":"' + supportcod + '"';
+            multlangs += "}";
+            data = eval("(" + multlangs + ")")
+        } else {
+            if (null == tree_name_zh_cn || "" == tree_name_zh_cn) {
+                nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_CATEGORY_NAME_EMPTY"));
+                $j("#tree_name_zh_cn").focus();
+                return
+            }
+            data = {
+            		 "id":id,
+            		 "areaId":areaId,
+                     "logisticsCode":logisticsCode,
+                     "logisticsCompany":logisticsCompany ,
+                      "commonDelivery":commonDelivery ,
+                     "commonDeliveryStartTime":commomStartTime ,
+                     "commonDeliveryEndTime":commomEndTime,
+                      "firstDayDelivery":firstDayDelivery ,
+                      "firstStartTime":firstStartTime ,
+                      "firstEndTime":firstEndTime ,
+                      "secondDayDelivery": secondDayDelivery ,
+                      "secondDeliveryStartTime": secondStartTime ,
+                      "secondDeliveryEndTime": secondEndTime,
+                      "support_COD": supportcod,
+                      "remark":  remark 
+            }
+        }
+        nps.asyncXhrPost(url, data, {
+            successHandler: function(data, textStatus) {
+            	 nps.info(nps.i18n("INFO_TITLE_DATA"), "保存成功");
+            }
+        });
+        
+        var e = nps.syncXhrPost(base + "/logistics/areaDeliverMode/findDeliveryAreaModeByAreaId.json", {
+            areaId: areaId
+        });
+    	$j("#modeId").val(e.id);
+    });
+});

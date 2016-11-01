@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="AreaDeliveryMode.findAreaDeliveryModeByAreaId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据areaId查询该地区的配送信息</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM T_SF_AREA_DELIVERY_MODE 
+					WHERE area_id = :areaId
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="AreaDeliveryMode.updateAreaDeliveryMode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新areaDeliveryMode</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+						update t_sf_area_delivery_mode
+					set 
+						version = now(),
+						modify_time=now()
+					#if($commonDelivery)
+						,commondelivery = :commonDelivery
+					#end
+					#if($commonEndTime)
+						,common_delivery_endtime = :commonEndTime
+					#end
+					#if($commonStartTime)
+						,common_delivery_starttime = :commonStartTime
+					#end
+					#if($firstDelivery)
+						,firstdaydelivery  =:firstDelivery
+					#end
+					#if($firstEndTime)
+						,first_delivery_endtime   =:firstEndTime
+					#end
+					#if($firstStartTime)
+						,  first_delivery_starttime   =:firstStartTime
+					#end
+					#if($logisticsCode)
+						, logistics_code    =:logisticsCode
+					#end
+					#if($logisticsCompany)
+						, logistics_company    =:logisticsCompany
+					#end
+					#if($remark)
+						,  remark   =:remark
+					#end
+					#if($secondDelivery)
+						,  seconddaydelivery   =:secondDelivery
+					#end
+					#if($secondEndTime)
+						,second_delivery_endtime     =:secondEndTime
+					#end
+					#if($secondStartTime)
+						,second_delivery_starttime     =:secondStartTime
+					#end
+					#if($supportCod)
+						,support_cod    =:supportCod
+					#end
+					where
+						id = :id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="DeliveryArea.findDeliveryAreaByParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据parentId查询</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM t_sf_delivery_area  
+						WHERE  status= '1'
+						#if($parentId)
+							and parent_id = :parentId 
+						#end
+					ORDER BY sort_no
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="DeliveryArea.findIdByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>
+			通过area的code查询id
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT ID as id FROM T_SF_DELIVERY_AREA as area where code=:code
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="DeliveryArea.findEnableDeliveryAreaList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>
+			通过areaDelivery
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM T_SF_DELIVERY_AREA where status = '1'
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="DeliveryArea.findEnableDeliveryAreaByCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过code查询DeliveryArea
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM t_sf_delivery_area 
+   					WHERE code = :code AND status = '1'
+					ORDER BY sort_no 
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="DeliveryArea.findAreaDeliveryModeByAreaId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>通过areaId查询AreaDeliveryMode
+		</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM t_sf_area_delivery_mode
+   					WHERE area_id=:id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	<bean id="DeliveryArea.findDeliveryAreaByNameAndParentId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据父类id和名称来查询当前区域</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM t_sf_delivery_area
+   					WHERE parent_id=:parentId and area=:name
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>
