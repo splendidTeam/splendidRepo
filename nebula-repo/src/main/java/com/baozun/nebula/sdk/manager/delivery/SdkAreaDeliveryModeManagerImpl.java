@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager.delivery;
+package com.baozun.nebula.sdk.manager.delivery;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 
 @Transactional
 @Service("areaDeliveryModeManager")
-public class AreaDeliveryModeManagerImpl implements AreaDeliveryModeManager {
+public class SdkAreaDeliveryModeManagerImpl implements SdkAreaDeliveryModeManager {
 
 	@Autowired
 	private AreaDeliveryModeDao areaDeliveryModeDao;

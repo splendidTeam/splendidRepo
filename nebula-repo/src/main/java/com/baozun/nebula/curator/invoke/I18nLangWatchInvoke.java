@@ -1,5 +1,6 @@
 package com.baozun.nebula.curator.invoke;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
+import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
+import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 
 /**
@@ -23,7 +26,11 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 	
 	@Autowired
 	private SdkI18nLangManager sdkI18nLangManager;
-
+	@Autowired
+	private SdkMataInfoManager sdkMataInfoManager;
+	@Autowired
+	private SdkDeliveryAreaManager deliveryAreaManager;
+	
 	@Override
 	public void invoke(String path, byte[] data) {
 		LOG.info(path+":invoke");
@@ -36,8 +43,19 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 		
 		// 设置要加载的地址信息
 		AddressUtil.setI18nOffOn(LangProperty.getI18nOnOff());
-		AddressUtil.setLanguageList(sdkI18nLangManager.getAllEnabledI18nKeyList());
-		AddressUtil.init();
+		List<String> languageList = sdkI18nLangManager.getAllEnabledI18nKeyList();
+		AddressUtil.setLanguageList(languageList);
+		
+		
+		String delivery_mode_on_off = sdkMataInfoManager.findValue("delivery_mode_on_off");
+		if(delivery_mode_on_off == null || delivery_mode_on_off.equals("false") || !delivery_mode_on_off.equals("true")){
+			AddressUtil.init();
+		}else{
+			for(String language : languageList){
+				//AddressUtil.initDeliveryArea(map);
+			}
+		}
+		
 	}
 
 

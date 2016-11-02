@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager.delivery;
+package com.baozun.nebula.sdk.manager.delivery;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import com.feilong.core.Validator;
 
 @Transactional
 @Service("deliveryAreaManager")
-public class DeliveryAreaManagerImpl implements DeliveryAreaManager {
+public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 
 	@Autowired
 	private DeliveryAreaDao deliveryAreaDao;

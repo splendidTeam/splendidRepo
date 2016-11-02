@@ -17,16 +17,22 @@
 package com.baozun.nebula.utilities.library.address;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -34,8 +40,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.ResourceUtil;
+import com.feilong.core.Validator;
 
 /**
  * 快递地址常用工具 通过读取nebula/full-address.json来获取 省市县以及街道的地址信息
@@ -98,10 +107,6 @@ public class AddressUtil {
 
 	/** 用于保存地址的信息,名称以及idList **/
 	private static Map<String, Map<String, List<Address>>> addressNameLangMap = new HashMap<String, Map<String, List<Address>>>();
-
-	// static {
-	// init();
-	// }
 
 	/**
 	 * 根据pid来获取该pid对应区域下的子区域。 eg: 传入pid 0(代表中国) ,返回 中国的所有省份信息
@@ -252,6 +257,37 @@ public class AddressUtil {
 		return mapper.writeValueAsString(outmap);
 	}
 
+	public static void generateJsFile(String jsPath, Map<String, Map<String, String>> map){
+		JSONObject json = (JSONObject) JSONObject.toJSON(map);
+		String jsonString = Validator.isNotNullOrEmpty(json) ? json.toJSONString() : "{}";
+		StringBuilder content = new StringBuilder();
+		content.append("var districtJson = ").append(jsonString).append(";");
+		File file = new File(jsPath);
+		BufferedWriter bw = null;
+		try {
+			// 创建文件夹
+			if (!file.getParentFile().exists()) {
+				file.getParentFile().mkdirs();
+			}
+			// 创建js文件
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			// 写入内容
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+			bw.write(content.toString());
+			bw.flush();
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		} finally {
+			try {
+				bw.close();
+			} catch (IOException e) {
+				log.error(e.getMessage());
+			}
+		}
+	}
+	
 	/**
 	 * 生成js文件
 	 * 
@@ -306,8 +342,7 @@ public class AddressUtil {
 			}
 
 			for (String language : languageList) {
-				json = getFileContent(
-						LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
+				json = getFileContent(LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
 				loadI18n(json, language);
 			}
 		} else {
@@ -317,6 +352,22 @@ public class AddressUtil {
 
 		if (log.isDebugEnabled()) {
 			log.debug("Address util initialization is completed!");
+		}
+	}
+	
+	public static void initDeliveryArea(Map<String, Map<String, String>> map) {
+		Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
+		String jsPath = StringUtils.trim(pro.getProperty("delivery.area.zh.min.js"));
+		if (i18nOffOn) {
+			if (languageList == null || languageList.isEmpty()) {
+				log.error("languageList is not set");
+				throw new RuntimeException("languageList is not set");
+			}
+			for (String language : languageList) {
+				generateJsFile( jsPath+"area."+language+".min.js", map );
+			}
+		} else {
+			generateJsFile(jsPath+"area.min.js", map);
 		}
 	}
 

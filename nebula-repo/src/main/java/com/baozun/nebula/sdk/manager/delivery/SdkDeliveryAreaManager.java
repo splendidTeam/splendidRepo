@@ -1,4 +1,4 @@
-package com.baozun.nebula.manager.delivery;
+package com.baozun.nebula.sdk.manager.delivery;
 
 import java.util.List;
 import java.util.Map;
@@ -7,7 +7,7 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.model.delivery.DeliveryArea;
 
-public interface DeliveryAreaManager {
+public interface SdkDeliveryAreaManager {
 
 	/**
 	 * 保存area信息，

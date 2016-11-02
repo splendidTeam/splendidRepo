@@ -66,6 +66,11 @@ public class DeliveryArea extends BaseModel {
 	 * 是否有效
 	 */
 	private Integer status;
+	
+	/**
+	 * 语言标识
+	 */
+	private String lang;
 
 	/**
 	 * 创建时间
@@ -243,6 +248,21 @@ public class DeliveryArea extends BaseModel {
 	 */
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	/**
+	 * @return the lang
+	 */
+	@Column(name = "LANG")
+	public String getLang() {
+		return lang;
+	}
+
+	/**
+	 * @param lang the lang to set
+	 */
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 
 }

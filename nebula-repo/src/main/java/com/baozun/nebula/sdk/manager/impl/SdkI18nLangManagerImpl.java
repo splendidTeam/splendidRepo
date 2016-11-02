@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
 import com.baozun.nebula.curator.invoke.I18nLangWatchInvoke;
-import com.baozun.nebula.curator.invoke.ModuleMapWatchInvoke;
 import com.baozun.nebula.dao.i18n.I18nLangDao;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
