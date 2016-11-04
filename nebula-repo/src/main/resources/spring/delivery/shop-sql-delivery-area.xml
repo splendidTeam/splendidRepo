@@ -71,6 +71,7 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	
 	<bean id="DeliveryArea.findDeliveryAreaByNameAndParentId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据父类id和名称来查询当前区域</description>
 		<constructor-arg>
@@ -78,6 +79,18 @@
 				<![CDATA[
 					SELECT * FROM t_sf_delivery_area
    					WHERE parent_id=:parentId and area=:name
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="DeliveryArea.findDeliveryAreaByLang" class="loxia.dao.support.DynamicQueryHolder">
+		<description>按语言查询所有省市区</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+					SELECT * FROM t_sf_delivery_area
+   					WHERE LANG=:lang order SORT_NO
 				]]>
 			</value>
 		</constructor-arg>

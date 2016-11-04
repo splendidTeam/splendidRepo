@@ -28,10 +28,8 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	@Override
 	public void saveArea(String areaData) {
 		JSONObject jsonObject = JSONObject.fromObject(areaData);
-
 		Map<String, List<Map<String, String>>> mapJson = JSONObject
 				.fromObject(jsonObject);
-
 		for (Entry<String, List<Map<String, String>>> entry : mapJson
 				.entrySet()) {
 
@@ -89,10 +87,18 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	}
 
 	@Override
-	public Map<String, Map<String, String>> findAllSubDeliveryAreaByParentId(
-			Long parentId) {
-		List<DeliveryArea> parentDeliveryArea = deliveryAreaDao
-				.findDeliveryAreaByParentId(parentId);
+	public Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language){
+		List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findDeliveryAreaByLang(language);
+		return findAllSubDeliveryAreaByParentDeliveryArea(parentDeliveryArea);
+	}
+	
+	@Override
+	public Map<String, Map<String, String>> findAllSubDeliveryAreaByParentId(Long parentId) {
+		List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findDeliveryAreaByParentId(parentId);
+		return findAllSubDeliveryAreaByParentDeliveryArea(parentDeliveryArea);
+	}
+	
+	private Map<String, Map<String, String>> findAllSubDeliveryAreaByParentDeliveryArea(List<DeliveryArea> parentDeliveryArea){
 		Map<String, Map<String, String>> map = null;
 		if (Validator.isNotNullOrEmpty(parentDeliveryArea)) {
 			map = new HashMap<String, Map<String, String>>();
@@ -101,10 +107,11 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 				findAllSubDeliveryAreaByParentId(area, map);
 				countryMap.put(area.getCode(), area.getArea());
 			}
-			map.put("abc", countryMap);
+			map.put("0", countryMap);
 		}
 		return map;
 	}
+	
 
 	private void findAllSubDeliveryAreaByParentId(
 			DeliveryArea parentDeliveryArea,

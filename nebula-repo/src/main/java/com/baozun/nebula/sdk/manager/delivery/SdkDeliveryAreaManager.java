@@ -27,14 +27,30 @@ public interface SdkDeliveryAreaManager {
 
 	DeliveryArea findEnableDeliveryAreaByCode(String code);
 
-	Map<String, Map<String, String>> findAllSubDeliveryAreaByParentId(
-			Long parentId);
+	Map<String, Map<String, String>> findAllSubDeliveryAreaByParentId(Long parentId);
 	
 	/**
 	 * 根据父类id和名称来查询当前区域
 	 */
-	public DeliveryArea findDeliveryAreaByNameAndParentId(String name, Long parentId);
+	DeliveryArea findDeliveryAreaByNameAndParentId(String name, Long parentId);
 	
-	public DeliveryArea findDeliveryAreaById(Long id);
+	/**
+	 * 
+	 * @Description
+	 * @param id
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-4
+	 */
+	DeliveryArea findDeliveryAreaById(Long id);
+
+	/**
+	 * @Description
+	 * @param language
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-4
+	 */
+	Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language);
 
 }

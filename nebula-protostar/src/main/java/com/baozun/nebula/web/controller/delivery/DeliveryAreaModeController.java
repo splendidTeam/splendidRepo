@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.baozun.nebula.manager.delivery.AreaDeliveryModeManager;
-import com.baozun.nebula.manager.delivery.DeliveryAreaManager;
+import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.ItemCategoryManager;
 import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
+import com.baozun.nebula.sdk.manager.delivery.SdkAreaDeliveryModeManager;
+import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.web.controller.BaseController;
 
 @Controller
@@ -38,10 +40,10 @@ public class DeliveryAreaModeController extends BaseController{
 	private ItemCategoryManager	itemCategoryManager;
 	
 	@Autowired
-	private DeliveryAreaManager deliveryAreaManager;
+	private SdkDeliveryAreaManager deliveryAreaManager;
 	
 	@Autowired
-	private AreaDeliveryModeManager areaDeliveryModeManager;
+	private SdkAreaDeliveryModeManager areaDeliveryModeManager;
 	
 	/**
 	 * 物流管理
@@ -101,6 +103,7 @@ public class DeliveryAreaModeController extends BaseController{
 			map.put("secondEndTime", areaDeliveryMode.getSecondDeliveryEndTime());
 			map.put("secondStartTime", areaDeliveryMode.getSecondDeliveryStartTime());
 			map.put("supportCod", areaDeliveryMode.getSupport_COD());
+			map.put("lang", LangUtil.getCurrentLang());
 			areaDeliveryModeManager.updateDeliveryMode(map);
 		}else{
 			areaDeliveryMode.setCreateTime(new Date());

@@ -1,6 +1,7 @@
 package com.baozun.nebula.curator.invoke;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -46,13 +47,13 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 		List<String> languageList = sdkI18nLangManager.getAllEnabledI18nKeyList();
 		AddressUtil.setLanguageList(languageList);
 		
-		
 		String delivery_mode_on_off = sdkMataInfoManager.findValue("delivery_mode_on_off");
 		if(delivery_mode_on_off == null || delivery_mode_on_off.equals("false") || !delivery_mode_on_off.equals("true")){
 			AddressUtil.init();
 		}else{
 			for(String language : languageList){
-				//AddressUtil.initDeliveryArea(map);
+				Map<String, Map<String, String>> map = deliveryAreaManager.findAllDeliveryAreaByLang(language);
+				AddressUtil.initDeliveryArea(map);
 			}
 		}
 		

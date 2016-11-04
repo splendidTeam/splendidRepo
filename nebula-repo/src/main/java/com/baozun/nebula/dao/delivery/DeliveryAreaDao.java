@@ -61,4 +61,14 @@ public interface DeliveryAreaDao extends GenericEntityDao<DeliveryArea, Long> {
 	@NativeQuery(model = DeliveryArea.class)
 	DeliveryArea findDeliveryAreaByNameAndParentId(@QueryParam("name")String name, @QueryParam("parentId")Long parentId);
 
+	/**
+	 * 
+	 * @Description
+	 * @param name
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-4
+	 */
+	@NativeQuery(model = DeliveryArea.class)
+	List<DeliveryArea> findDeliveryAreaByLang(@QueryParam("lang")String name);
 }

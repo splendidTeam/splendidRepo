@@ -229,8 +229,7 @@ public class AddressUtil {
 
 		String json = "";
 		if (i18nOffOn) {
-			json = getFileContent(
-					LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
+			json = getFileContent(LANGUAGE_CONFIG_PATH + LANGUAGE_CONFIG_FILE_PREFIX + language + LANGUAGE_CONFIG_FILE_SUFFIX);
 		} else {
 			json = getFileContent(CONFIG_PATH);
 		}
@@ -267,11 +266,15 @@ public class AddressUtil {
 		try {
 			// 创建文件夹
 			if (!file.getParentFile().exists()) {
-				file.getParentFile().mkdirs();
+				if(!file.getParentFile().mkdirs()){
+					throw new RuntimeException("make dir Parent File Fail !");
+				}
 			}
 			// 创建js文件
 			if (!file.exists()) {
-				file.createNewFile();
+				if(!file.createNewFile()){
+					throw new RuntimeException("create New File Fail !");
+				}
 			}
 			// 写入内容
 			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
@@ -357,7 +360,10 @@ public class AddressUtil {
 	
 	public static void initDeliveryArea(Map<String, Map<String, String>> map) {
 		Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
-		String jsPath = StringUtils.trim(pro.getProperty("delivery.area.zh.min.js"));
+		String jsPath = "";
+		if(Validator.isNotNullOrEmpty(pro)){
+			jsPath = StringUtils.trim(pro.getProperty("delivery.area.zh.min.js"));
+		}
 		if (i18nOffOn) {
 			if (languageList == null || languageList.isEmpty()) {
 				log.error("languageList is not set");
