@@ -56,6 +56,7 @@ import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewC
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
+import com.baozun.store.web.controller.shoppingcart.form.ShoppingCartCouponForm;
 import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
@@ -169,7 +170,10 @@ public class NebulaOrderCreateController extends BaseController{
     private SalesOrderCreateValidator             salesOrderCreateValidator;
 
     /**
-     * 创建订单.
+     * @Description 创建订单.
+     * <ol>
+     * <li>订单物流配送方式（当日达，次日达等）放在OrderForm.ShippingInfoSubForm.AppointType字段上</li>
+     * </ol>
      *
      * @param memberDetails
      *            the member details
@@ -223,12 +227,13 @@ public class NebulaOrderCreateController extends BaseController{
 
         ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
                         .buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
-
+        
         //********************************************************************************************************
         // 校验购物车信息和促销
         //TODO feilong 多张优惠券
         String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
         SalesOrderResult salesorderResult = salesOrderCreateValidator.validate(shoppingCartCommand, couponCode);
+        
         // 如果校验失败，返回错误
         if (salesorderResult != SalesOrderResult.SUCCESS){
             LOGGER.error(

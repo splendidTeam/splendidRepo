@@ -43,6 +43,14 @@ import com.baozun.nebula.model.BaseModel;
 public class Consignee extends BaseModel{
 
     private static final long serialVersionUID = -8782230075078229172L;
+    
+	public static final String CONSIGNEE_APPOINT_COMMON_TYPE = "1";
+	
+	public static final String CONSIGNEE_APPOINT_FIRSTDAY_TYPE = "5";
+	
+	public static final String CONSIGNEE_APPOINT_SECONDDAY_TYPE = "6";
+	
+	public static final String CONSIGNEE_APPOINT_THIRDDAY_TYPE = "7";
 
     /** PK. */
     private Long              id;
