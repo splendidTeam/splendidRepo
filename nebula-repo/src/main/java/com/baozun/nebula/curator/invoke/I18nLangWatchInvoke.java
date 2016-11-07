@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import loxia.dao.Sort;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.curator.watcher.IWatcherInvoke;
+import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 
 /**
@@ -52,7 +56,9 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 			AddressUtil.init();
 		}else{
 			for(String language : languageList){
-				Map<String, Map<String, String>> map = deliveryAreaManager.findAllDeliveryAreaByLang(language);
+				// 顺序 ,一般先有父 再有 子
+				Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
+				Map<String, Map<String, String>> map = deliveryAreaManager.findAllDeliveryAreaByLang(language,sorts);
 				AddressUtil.initDeliveryArea(map);
 			}
 		}

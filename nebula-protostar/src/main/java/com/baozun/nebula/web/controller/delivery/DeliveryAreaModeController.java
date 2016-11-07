@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.ItemCategoryManager;
 import com.baozun.nebula.model.delivery.AreaDeliveryMode;
@@ -58,7 +57,7 @@ public class DeliveryAreaModeController extends BaseController{
 		// 顺序 ,一般先有父 再有 子
 		Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
 		//查询所有中国内的地区信息
-		List<DeliveryArea> areaList=deliveryAreaManager.findEnableDeliveryAreaList(sorts);
+		List<DeliveryArea> areaList = deliveryAreaManager.findEnableDeliveryAreaList(LangUtil.getCurrentLang(),sorts);
 		model.addAttribute("areaList", areaList);
 		return "delivery/delivery-mode";
 	}

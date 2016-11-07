@@ -40,7 +40,11 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[
-					SELECT * FROM T_SF_DELIVERY_AREA where status = '1'
+					SELECT * FROM T_SF_DELIVERY_AREA 
+						where status = '1' 
+							#if($lang)
+								AND LANG=:lang
+							#end
 				]]>
 			</value>
 		</constructor-arg>
@@ -84,15 +88,4 @@
 		</constructor-arg>
 	</bean>
 	
-		<bean id="DeliveryArea.findDeliveryAreaByLang" class="loxia.dao.support.DynamicQueryHolder">
-		<description>按语言查询所有省市区</description>
-		<constructor-arg>
-			<value>
-				<![CDATA[
-					SELECT * FROM t_sf_delivery_area
-   					WHERE LANG=:lang order SORT_NO
-				]]>
-			</value>
-		</constructor-arg>
-	</bean>
 </beans>

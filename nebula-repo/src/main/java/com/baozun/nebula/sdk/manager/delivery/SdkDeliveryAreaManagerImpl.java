@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.delivery.DeliveryAreaDao;
 import com.baozun.nebula.model.delivery.DeliveryArea;
+import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
 
 @Transactional
@@ -48,7 +49,6 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 			for (Map.Entry<String, String> ety : mapJsonObjectStrval1
 					.entrySet()) {
 				Date date = new Date();
-
 				// 获得自己的Code
 				String code = ety.getKey();
 				DeliveryArea deliverArea = new DeliveryArea();
@@ -61,9 +61,7 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 				deliverArea.setStatus(1);
 				deliverArea.setVersion(date);
 				// 当前地区的级别为其父区域级别+1
-				deliverArea.setLevel(deliveryAreaDao.getByPrimaryKey(parentId) == null ? null
-								: deliveryAreaDao.getByPrimaryKey(parentId)
-										.getLevel() + 1);
+				deliverArea.setLevel(deliveryAreaDao.getByPrimaryKey(parentId) == null ? null : deliveryAreaDao.getByPrimaryKey(parentId) .getLevel() + 1);
 				deliveryAreaDao.save(deliverArea);
 				sortNo++;
 			}
@@ -71,9 +69,8 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	}
 
 	@Override
-	public List<DeliveryArea> findEnableDeliveryAreaList(Sort[] sort) {
-		List<DeliveryArea> list = deliveryAreaDao.findEnableDeliveryAreaList(sort);
-		return list;
+	public List<DeliveryArea> findEnableDeliveryAreaList(String lang, Sort[] sort) {
+		return deliveryAreaDao.findEnableDeliveryAreaList(lang , sort);
 	}
 
 	@Override
@@ -87,8 +84,8 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	}
 
 	@Override
-	public Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language){
-		List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findDeliveryAreaByLang(language);
+	public Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language, Sort[] sort){
+		List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findEnableDeliveryAreaList(LangUtil.getCurrentLang() , sort);
 		return findAllSubDeliveryAreaByParentDeliveryArea(parentDeliveryArea);
 	}
 	

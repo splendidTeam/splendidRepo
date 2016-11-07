@@ -21,7 +21,7 @@ public interface SdkDeliveryAreaManager {
 	 * 查询地区级别查询地区
 	 * 
 	 */
-	List<DeliveryArea> findEnableDeliveryAreaList(Sort[] sort);
+	List<DeliveryArea> findEnableDeliveryAreaList(String lang, Sort[] sort);
 
 	List<DeliveryArea> findDeliveryAreaByParentId(Long parentId);
 
@@ -51,6 +51,6 @@ public interface SdkDeliveryAreaManager {
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-11-4
 	 */
-	Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language);
+	Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language, Sort[] sort);
 
 }
