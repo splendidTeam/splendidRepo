@@ -5,6 +5,7 @@ import java.util.Map;
 
 import loxia.dao.Sort;
 
+import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
 import com.baozun.nebula.model.delivery.DeliveryArea;
 
 public interface SdkDeliveryAreaManager {
@@ -52,5 +53,14 @@ public interface SdkDeliveryAreaManager {
 	 * @version 2016-11-4
 	 */
 	Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language, Sort[] sort);
+
+	/**
+	 * @Description
+	 * @param code
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-8
+	 */
+	ContactDeliveryCommand findContactDeliveryByDeliveryAreaId(Long id);
 
 }

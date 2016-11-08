@@ -64,8 +64,7 @@ public class NebulaAreaDeliveryController extends BaseController {
 	private void judgeDelivery(String areaCode,
 			DefaultReturnResult defaultReturnResult) {
 		boolean flag = false;
-		DeliveryArea area = deliveryareaManager
-				.findEnableDeliveryAreaByCode(areaCode);
+		DeliveryArea area = deliveryareaManager.findEnableDeliveryAreaByCode(areaCode);
 		DeliveryAreaViewCommand areaViewCommand = (DeliveryAreaViewCommand) ConvertUtils
 				.convertTwoObject(new DeliveryAreaViewCommand(), area);
 		if (Validator.isNotNullOrEmpty(area)) {

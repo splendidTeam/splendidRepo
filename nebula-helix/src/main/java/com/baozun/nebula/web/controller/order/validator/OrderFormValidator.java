@@ -16,16 +16,28 @@
  */
 package com.baozun.nebula.web.controller.order.validator;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
+import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
+import com.baozun.nebula.model.salesorder.Consignee;
+import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
+import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.feilong.core.RegexPattern;
 import com.feilong.core.util.RegexUtil;
 
@@ -42,6 +54,8 @@ public class OrderFormValidator implements Validator{
 	
 	@Autowired
 	private OrderManager orderManager;
+	@Autowired
+	private SdkDeliveryAreaManager	deliveryAreaManager;
 	
     /*
      * (non-Javadoc)
@@ -108,6 +122,78 @@ public class OrderFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.postcode", "postcode.field.required");// 邮编
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.mobile", "mobile.field.required");// 收货人手机
 		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.email", "email.field.required");// 收货人邮箱
+		
+		ContactDeliveryCommand deliveryCommand = deliveryAreaManager.findContactDeliveryByDeliveryAreaId(getDeliveryAreaCode(orderForm.getShippingInfoSubForm()));
+		String appointType = orderForm.getShippingInfoSubForm().getAppointType();
+		DateFormat df = new SimpleDateFormat("HH:mm:ss");
+		Date now = new Date();
+		try {
+			now = df.parse(df.format(now));
+			if(Consignee.CONSIGNEE_APPOINT_COMMON_TYPE.equals(appointType)){
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getCommonDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getCommonDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getCommonDeliveryEndTime())) {
+					// 时间是否允许
+					if((now.before(df.parse(deliveryCommand.getCommonDeliveryStartTime())))
+							&& (now.after(df.parse(deliveryCommand.getCommonDeliveryEndTime())))){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "common.delivery.not.in.time");
+					}
+				}else{
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.common");
+				}
+			}
+			
+			if(Consignee.CONSIGNEE_APPOINT_FIRSTDAY_TYPE.equals(appointType)){
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getFirstDayDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getFirstDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getFirstDeliveryEndTime())) {
+					// 时间是否允许
+					if((now.before(df.parse(deliveryCommand.getFirstDeliveryEndTime())))
+							&& (now.after(df.parse(deliveryCommand.getFirstDeliveryStartTime())))){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "firstday.delivery.not.in.time");
+					}
+				}else{
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.firstday");
+				}
+			}
+			
+
+			if(Consignee.CONSIGNEE_APPOINT_SECONDDAY_TYPE.equals(appointType)){
+				// 是否支持次日达
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getSecondDayDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getSecondDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getSecondDeliveryEndTime())) {
+					// 时间是否允许
+					if((now.before(df.parse(deliveryCommand.getSecondDeliveryStartTime())))
+							&& (now.after(df.parse(deliveryCommand.getSecondDeliveryEndTime())))){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "second.delivery.not.in.time");
+					}
+				}else{
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.second");
+				}
+			}
+
+			if(Consignee.CONSIGNEE_APPOINT_THIRDDAY_TYPE.equals(appointType)){
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getThirdDayDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getThirdDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getThirdDeliveryEndTime())) {
+					// 时间是否允许
+					if((now.before(df.parse(deliveryCommand.getThirdDeliveryStartTime())))
+							&& (now.after(df.parse(deliveryCommand.getThirdDeliveryEndTime())))){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "third.delivery.not.in.time");
+					}
+				}else{
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.third");
+				}
+			}
+			
+			if(SalesOrder.SO_PAYMENT_TYPE_COD.equals(orderForm.getPaymentInfoSubForm().getPaymentType())
+					&& !AreaDeliveryMode.YES.equals(deliveryCommand.getSupport_COD())){
+				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "cod.not.support");
+			}
+		} catch (ParseException e) {
+		}
+		
     }
     
     protected void validateCouponInfoSubForm(OrderForm orderForm,Errors errors){
@@ -144,5 +230,9 @@ public class OrderFormValidator implements Validator{
  			}
 		}
     }  
+    
+    protected Long getDeliveryAreaCode(ShippingInfoSubForm shippingInfoSubForm){
+    	return shippingInfoSubForm.getAreaId();
+    }
 
 }

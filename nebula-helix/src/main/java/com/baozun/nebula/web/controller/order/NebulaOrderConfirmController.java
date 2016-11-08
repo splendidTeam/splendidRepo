@@ -33,6 +33,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
 import com.baozun.nebula.model.delivery.AreaDeliveryMode;
@@ -372,16 +373,15 @@ public class NebulaOrderConfirmController extends BaseController{
     	List<ContactCommand> contactCommands = null == memberDetails ? null : sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
     	
     	for(ContactCommand contactCommand : contactCommands){
-    		DeliveryArea deliveryArea = deliveryAreaManager.findEnableDeliveryAreaByCode(contactCommand.getCity());
-    		if(Validator.isNullOrEmpty(deliveryArea)){
-    			AreaDeliveryMode areaDeliveryMode = areaDeliveryModeManager.findAreaDeliveryModeByAreaId(deliveryArea.getId());
-        		ContactDeliveryCommand contactDeliveryCommand =  new ContactDeliveryCommand();
-        		PropertyUtil.copyProperties(contactDeliveryCommand, areaDeliveryMode, "logisticsCode", "logisticsCompany", "commonDelivery", "areaId", "townId");
-        		contactCommand.setContactDeliveryCommand(contactDeliveryCommand);
-    		}
+    		ContactDeliveryCommand deliveryCommand = deliveryAreaManager.findContactDeliveryByDeliveryAreaId(getDeliveryAreaCode(contactCommand));
+    		contactCommand.setContactDeliveryCommand(deliveryCommand);
     	}
     	
         return contactCommands;
+    }
+    
+    protected Long getDeliveryAreaCode(ContactCommand contactCommand){
+    	return contactCommand.getAreaId();
     }
 
     /**

@@ -13,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baozun.nebula.api.utils.ConvertUtils;
+import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
 import com.baozun.nebula.dao.delivery.DeliveryAreaDao;
+import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
@@ -25,6 +28,9 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	@Autowired
 	private DeliveryAreaDao deliveryAreaDao;
 	
+	@Autowired
+	private SdkAreaDeliveryModeManager areaDeliveryModeManager;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void saveArea(String areaData) {
@@ -33,7 +39,6 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 				.fromObject(jsonObject);
 		for (Entry<String, List<Map<String, String>>> entry : mapJson
 				.entrySet()) {
-
 			// 获取parentCode
 			String parentCode = entry.getKey();
 			// 通过parentCode获取parentId
@@ -84,6 +89,16 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	}
 
 	@Override
+	public DeliveryArea findDeliveryAreaByNameAndParentId(String name,Long parentId) {
+		return deliveryAreaDao.findDeliveryAreaByNameAndParentId(name, parentId);
+	}
+	
+	@Override
+	public DeliveryArea findDeliveryAreaById(Long id){
+		return deliveryAreaDao.getByPrimaryKey(id);
+	}
+	
+	@Override
 	public Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language, Sort[] sort){
 		List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findEnableDeliveryAreaList(LangUtil.getCurrentLang() , sort);
 		return findAllSubDeliveryAreaByParentDeliveryArea(parentDeliveryArea);
@@ -109,7 +124,6 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 		return map;
 	}
 	
-
 	private void findAllSubDeliveryAreaByParentId(
 			DeliveryArea parentDeliveryArea,
 			Map<String, Map<String, String>> areaMap) {
@@ -127,11 +141,13 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 	}
 
 	@Override
-	public DeliveryArea findDeliveryAreaByNameAndParentId(String name,Long parentId) {
-		return deliveryAreaDao.findDeliveryAreaByNameAndParentId(name, parentId);
-	}
-	
-	public DeliveryArea findDeliveryAreaById(Long id){
-		return deliveryAreaDao.getByPrimaryKey(id);
+	public ContactDeliveryCommand findContactDeliveryByDeliveryAreaId(Long id){
+		ContactDeliveryCommand contactDeliveryCommand =  new ContactDeliveryCommand();
+		DeliveryArea deliveryArea = findDeliveryAreaById(id);
+		if(Validator.isNullOrEmpty(deliveryArea)){
+			AreaDeliveryMode areaDeliveryMode = areaDeliveryModeManager.findAreaDeliveryModeByAreaId(deliveryArea.getId());
+    		ConvertUtils.convertTwoObject(contactDeliveryCommand, areaDeliveryMode);
+		}
+		return contactDeliveryCommand;
 	}
 }
