@@ -56,7 +56,6 @@ import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewC
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
-import com.baozun.store.web.controller.shoppingcart.form.ShoppingCartCouponForm;
 import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
@@ -206,8 +205,7 @@ public class NebulaOrderCreateController extends BaseController{
         orderFormValidator.validate(orderForm, bindingResult);
         // 如果校验失败，返回错误
         if (bindingResult.hasErrors()){
-            LOGGER.error(
-                            "[ORDER_CREATEORDER] {} [{}] orderForm validation error. \"\"",
+            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm validation error. \"\"",
                             memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
                             new Date());
             return getResultFromBindingResult(bindingResult);

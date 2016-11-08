@@ -34,11 +34,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
+import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
+import com.baozun.nebula.model.delivery.AreaDeliveryMode;
+import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
+import com.baozun.nebula.sdk.manager.delivery.SdkAreaDeliveryModeManager;
+import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.bundle.SdkShoppingCartBundleNewLineBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
@@ -166,6 +171,12 @@ public class NebulaOrderConfirmController extends BaseController{
     
     @Autowired(required = false)
     private OrderConfirmBeforeHandler 	confirmBeforeHandler;
+    
+	@Autowired
+	private SdkDeliveryAreaManager	deliveryAreaManager;
+	
+	@Autowired
+	private SdkAreaDeliveryModeManager areaDeliveryModeManager;
 
     /**
      * 显示订单结算页面.
@@ -358,7 +369,19 @@ public class NebulaOrderConfirmController extends BaseController{
      *         SdkMemberManager.findAllContactListByMemberId(Long)}
      */
     private List<ContactCommand> getContactCommandList(MemberDetails memberDetails){
-        return null == memberDetails ? null : sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
+    	List<ContactCommand> contactCommands = null == memberDetails ? null : sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
+    	
+    	for(ContactCommand contactCommand : contactCommands){
+    		DeliveryArea deliveryArea = deliveryAreaManager.findEnableDeliveryAreaByCode(contactCommand.getCity());
+    		if(Validator.isNullOrEmpty(deliveryArea)){
+    			AreaDeliveryMode areaDeliveryMode = areaDeliveryModeManager.findAreaDeliveryModeByAreaId(deliveryArea.getId());
+        		ContactDeliveryCommand contactDeliveryCommand =  new ContactDeliveryCommand();
+        		PropertyUtil.copyProperties(contactDeliveryCommand, areaDeliveryMode, "logisticsCode", "logisticsCompany", "commonDelivery", "areaId", "townId");
+        		contactCommand.setContactDeliveryCommand(contactDeliveryCommand);
+    		}
+    	}
+    	
+        return contactCommands;
     }
 
     /**
@@ -378,6 +401,7 @@ public class NebulaOrderConfirmController extends BaseController{
 
         //否则 将 shippingInfoSubForm --> contactCommand--->组装成list 返回
         ContactCommand contactCommand = toContactCommand(shippingInfoSubForm);
+        
         return toList(contactCommand);
     }
 

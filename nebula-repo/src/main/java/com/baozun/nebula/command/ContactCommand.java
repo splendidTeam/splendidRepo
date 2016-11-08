@@ -2,6 +2,8 @@ package com.baozun.nebula.command;
 
 import java.util.Date;
 
+import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
+
 
 public class ContactCommand implements Command{
 	private static final long serialVersionUID = -2247833530922765508L;
@@ -60,8 +62,6 @@ public class ContactCommand implements Command{
 	/** 手机 */
 	private String 				mobile;
 	
- 
-	
 	/**
 	 * 是否为默认地址
 	 * false 非默认地址
@@ -76,6 +76,8 @@ public class ContactCommand implements Command{
 	private Long 				memberId;
 	
 	private Date 				modifyTime;
+	
+	private ContactDeliveryCommand	contactDeliveryCommand;
 	
 	public Date getModifyTime() {
 		return modifyTime;
@@ -265,5 +267,19 @@ public class ContactCommand implements Command{
 				+ ", isDefault=" + isDefault + ", email=" + email
 				+ ", ifReceiveMail=" + ifReceiveMail + ", memberId=" + memberId
 				+ "]";
+	}
+
+	/**
+	 * @return the contactDeliveryCommand
+	 */
+	public ContactDeliveryCommand getContactDeliveryCommand() {
+		return contactDeliveryCommand;
+	}
+
+	/**
+	 * @param contactDeliveryCommand the contactDeliveryCommand to set
+	 */
+	public void setContactDeliveryCommand(ContactDeliveryCommand contactDeliveryCommand) {
+		this.contactDeliveryCommand = contactDeliveryCommand;
 	}
 }

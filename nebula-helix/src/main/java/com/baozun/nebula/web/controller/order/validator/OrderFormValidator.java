@@ -95,7 +95,6 @@ public class OrderFormValidator implements Validator{
 		}
     }
     
-    
     protected void validateShippingInfoSubForm(OrderForm orderForm,Errors errors){
     	// 地址信息数据
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.name", "name.field.required");// 收货人姓名
