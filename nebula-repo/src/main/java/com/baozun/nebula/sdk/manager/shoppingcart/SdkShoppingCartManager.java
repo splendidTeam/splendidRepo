@@ -18,6 +18,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 /**
  * 
  * @deprecated since5.3.1 这个类太巨无霸了 十分难以维护,违背了太多的原则,许出不许进,不要再加什么的方法了 --by feilong
+ * @see  SdkShoppingCartUpdateManager
  */
 @Deprecated
 public interface SdkShoppingCartManager extends BaseManager{
