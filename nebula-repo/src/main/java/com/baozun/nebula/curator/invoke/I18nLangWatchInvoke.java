@@ -61,7 +61,7 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 			Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
 			String jsPath = "";
 			if(Validator.isNotNullOrEmpty(pro)){
-				jsPath = StringUtils.trim(pro.getProperty("delivery.area.zh.min.js"));
+				jsPath = StringUtils.trim(pro.getProperty("delivery.area.js"));
 			}
 			for(String language : languageList){
 				// 顺序 ,一般先有父 再有 子
