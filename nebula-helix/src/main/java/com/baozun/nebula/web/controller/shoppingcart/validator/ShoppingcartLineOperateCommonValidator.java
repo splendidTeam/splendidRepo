@@ -36,8 +36,8 @@ public interface ShoppingcartLineOperateCommonValidator{
      * <ol>
      * <li>count必须 {@code >=} 1</li>
      * <li>sku必须不为null</li>
-     * <li>sku.getLifecycle() 必须 等于 {@link Sku#LIFE_CYCLE_ENABLE}</li>
-     * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS}</li>
+     * <li>sku.getLifecycle() 必须等于 {@link Sku#LIFE_CYCLE_ENABLE}</li>
+     * <li>itemCommand.getLifecycle() 必须是 {@link com.baozun.nebula.sdk.constants.Constants#ITEM_ADDED_VALID_STATUS ITEM_ADDED_VALID_STATUS}</li>
      * <li>判断 <code>checkActiveBeginTime</code> 激活时间</li>
      * <li>判断商品是非赠品</li>
      * </ol>
