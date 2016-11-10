@@ -22,8 +22,8 @@ import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.ItemCategoryManager;
 import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
-import com.baozun.nebula.sdk.manager.delivery.SdkAreaDeliveryModeManager;
-import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
+import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
+import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.web.controller.BaseController;
 

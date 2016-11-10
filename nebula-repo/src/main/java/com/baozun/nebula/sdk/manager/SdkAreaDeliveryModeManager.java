@@ -1,4 +1,4 @@
-package com.baozun.nebula.sdk.manager.delivery;
+package com.baozun.nebula.sdk.manager;
 
 import java.util.Map;
 
