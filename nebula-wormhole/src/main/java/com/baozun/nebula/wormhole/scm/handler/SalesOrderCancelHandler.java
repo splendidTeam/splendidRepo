@@ -23,4 +23,6 @@ public interface SalesOrderCancelHandler {
 	 * @version 2016-11-10
 	 */
 	public void cancelSalesOrder(List<SalesOrderCommand> salesOrderCommandList);
+	
+	public List<SalesOrderCommand> findCustomCancelOrder();
 }

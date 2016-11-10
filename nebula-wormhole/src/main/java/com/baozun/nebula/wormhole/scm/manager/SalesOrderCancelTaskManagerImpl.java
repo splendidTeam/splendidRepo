@@ -98,7 +98,14 @@ public class SalesOrderCancelTaskManagerImpl implements SalesOrderCancelTaskMana
 		// 第一步,加载待取消的订单列表.
 		List<SalesOrderCommand> salesOrderCommandList = new ArrayList<SalesOrderCommand>();
 		salesOrderCommandList.addAll(loadToBeCancelSalesOrderCommandList());
-
+		
+        if (null != salesOrderCancelHandler){
+        	List<SalesOrderCommand> customCancelOrderList = salesOrderCancelHandler.findCustomCancelOrder();
+        	if(Validator.isNotNullOrEmpty(customCancelOrderList)){
+        		salesOrderCommandList.addAll(customCancelOrderList);
+        	}
+        }
+		
 		if (Validator.isNullOrEmpty(salesOrderCommandList)) {
 			LOGGER.info("salesOrderCommandList is null or empty~~,maybe no order need to be cancel");
 			return;
