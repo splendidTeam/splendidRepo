@@ -100,10 +100,7 @@ public class SalesOrderCancelTaskManagerImpl implements SalesOrderCancelTaskMana
 		salesOrderCommandList.addAll(loadToBeCancelSalesOrderCommandList());
 		
         if (null != salesOrderCancelHandler){
-        	List<SalesOrderCommand> customCancelOrderList = salesOrderCancelHandler.findCustomCancelOrder();
-        	if(Validator.isNotNullOrEmpty(customCancelOrderList)){
-        		salesOrderCommandList.addAll(customCancelOrderList);
-        	}
+        	salesOrderCancelHandler.findCustomCancelOrder(salesOrderCommandList);
         }
 		
 		if (Validator.isNullOrEmpty(salesOrderCommandList)) {
