@@ -34,7 +34,7 @@ import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.model.salesorder.Consignee;
 import com.baozun.nebula.model.salesorder.SalesOrder;
-import com.baozun.nebula.sdk.manager.delivery.SdkDeliveryAreaManager;
+import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
