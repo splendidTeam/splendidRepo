@@ -16,6 +16,9 @@
  */
 package com.baozun.nebula.command;
 
+import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
+
 /**
  * 取消订单
  * @author lxy
@@ -101,4 +104,43 @@ public class BeforePaymentCancelOrderCommand  implements Command{
 		this.cancelType = cancelType;
 	}
 	
+    /**
+     * 取消订单定时任务使用.
+     *
+     * @param salesOrderCommand
+     *            the sales order command
+     * @return the before payment cancel order command
+     */
+	public static BeforePaymentCancelOrderCommand buildForCancelOrderTask(SalesOrderCommand salesOrderCommand){
+        BeforePaymentCancelOrderCommand beforePaymentCancelOrderCommand = new BeforePaymentCancelOrderCommand();
+
+        beforePaymentCancelOrderCommand.setOrderId(salesOrderCommand.getId());
+        beforePaymentCancelOrderCommand.setCode(salesOrderCommand.getCode());
+        beforePaymentCancelOrderCommand.setIsOMS(false);
+        beforePaymentCancelOrderCommand.setCancelType(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED);
+
+        beforePaymentCancelOrderCommand.setClientIp(null);
+        beforePaymentCancelOrderCommand.setOperatorName(null);
+        return beforePaymentCancelOrderCommand;
+    }
+
+    /**
+     * oms同步订单状态到商城端时候.
+     *
+     * @param salesOrderCommand
+     *            the sales order command
+     * @return the before payment cancel order command
+     */
+    public static BeforePaymentCancelOrderCommand buildForCancelOrderByOMS(SalesOrderCommand salesOrderCommand){
+        BeforePaymentCancelOrderCommand beforePaymentCancelOrderCommand = new BeforePaymentCancelOrderCommand();
+
+        beforePaymentCancelOrderCommand.setOrderId(salesOrderCommand.getId());
+        beforePaymentCancelOrderCommand.setCode(salesOrderCommand.getCode());
+        beforePaymentCancelOrderCommand.setIsOMS(true);
+        beforePaymentCancelOrderCommand.setCancelType(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED);
+
+        beforePaymentCancelOrderCommand.setClientIp(null);
+        beforePaymentCancelOrderCommand.setOperatorName(null);
+        return beforePaymentCancelOrderCommand;
+    }
 }

@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.constant.IfIdentifyConstants;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MsgReceiveContent;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
@@ -45,7 +44,6 @@ import com.baozun.nebula.wormhole.scm.timing.SyncCommonManager;
 import com.baozun.nebula.wormhole.utils.JacksonUtils;
 import com.baozun.utilities.EncryptUtil;
 import com.feilong.core.Validator;
-import com.feilong.core.bean.BeanUtil;
 import com.feilong.core.bean.PropertyUtil;
 
 /**
