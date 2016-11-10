@@ -157,7 +157,7 @@ public final class ShoppingCartUtil{
      *            the shopping cart lines
      * @return 如果 <code>shoppingCartLineCommandList</code> 是null或者empty,返回0<br>
      *         否则累加 每个元素的 quantity属性之和
-     * @see com.feilong.core.util.CollectionsUtil#sum(java.util.Collection, String)
+     * @see com.feilong.core.util.AggregateUtil#sum(java.util.Collection, String)
      */
     public static int getSumQuantity(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : AggregateUtil.sum(shoppingCartLineCommandList, "quantity").intValue();
