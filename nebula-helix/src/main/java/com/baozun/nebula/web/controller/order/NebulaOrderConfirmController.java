@@ -373,15 +373,14 @@ public class NebulaOrderConfirmController extends BaseController{
     	List<ContactCommand> contactCommands = null == memberDetails ? null : sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
     	
     	for(ContactCommand contactCommand : contactCommands){
-    		ContactDeliveryCommand deliveryCommand = deliveryAreaManager.findContactDeliveryByDeliveryAreaId(getDeliveryAreaCode(contactCommand));
+    		ContactDeliveryCommand deliveryCommand = deliveryAreaManager.findContactDeliveryByDeliveryAreaCode(getDeliveryAreaCode(contactCommand));
     		contactCommand.setContactDeliveryCommand(deliveryCommand);
     	}
-    	
         return contactCommands;
     }
     
-    protected Long getDeliveryAreaCode(ContactCommand contactCommand){
-    	return contactCommand.getAreaId();
+    protected String getDeliveryAreaCode(ContactCommand contactCommand){
+    	return contactCommand.getAreaId() + "";
     }
 
     /**

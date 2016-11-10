@@ -61,6 +61,6 @@ public interface SdkDeliveryAreaManager {
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-11-8
 	 */
-	ContactDeliveryCommand findContactDeliveryByDeliveryAreaId(Long id);
+	ContactDeliveryCommand findContactDeliveryByDeliveryAreaCode(String code);
 
 }

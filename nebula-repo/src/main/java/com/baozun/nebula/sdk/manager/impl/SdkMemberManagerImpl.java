@@ -943,13 +943,15 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	 */
 	@Override
 	public Member rewriteRegister(Member member){
-		if(Validator.isNotNullOrEmpty(member) && Validator.isNotNullOrEmpty(member.getPassword())){
-			//生成新的盐值，用新的加密算法进行加密，
-			String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
-			String encodePassword = EncryptUtil.getInstance().hashSalt(member.getPassword(), salt);
-			//保存密码和盐值
-			member.setSalt(salt);
-			member.setPassword(encodePassword);
+		if(Validator.isNotNullOrEmpty(member)){
+			if(Validator.isNotNullOrEmpty(member.getPassword())){
+				//生成新的盐值，用新的加密算法进行加密，
+				String salt = RandomUtil.createRandomFromString(Alphabet.DECIMAL_AND_LETTERS, 88);
+				String encodePassword = EncryptUtil.getInstance().hashSalt(member.getPassword(), salt);
+				//保存密码和盐值
+				member.setSalt(salt);
+				member.setPassword(encodePassword);
+			}
 			member = memberDao.save(member);
 		}
 		return member;
