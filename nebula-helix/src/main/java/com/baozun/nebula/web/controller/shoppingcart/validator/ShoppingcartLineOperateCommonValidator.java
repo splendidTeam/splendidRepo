@@ -20,7 +20,7 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
- * 购物车行操作的公共校验,常用于 add update 以及立即购买.
+ * 购物车行操作的公共校验,常用于 add/update/立即购买等操作.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午4:47:07

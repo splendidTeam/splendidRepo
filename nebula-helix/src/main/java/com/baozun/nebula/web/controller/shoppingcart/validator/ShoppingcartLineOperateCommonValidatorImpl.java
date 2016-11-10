@@ -78,7 +78,7 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
         //===============③ 判断sku生命周期===============
         Integer skuLifecycle = sku.getLifecycle();
         if (!skuLifecycle.equals(Sku.LIFE_CYCLE_ENABLE)){
-            LOGGER.error("sku's lifecycle is:{},return SKU_NOT_ENABLE", skuLifecycle);
+            LOGGER.error("sku's lifecycle is:[{}],return [SKU_NOT_ENABLE]", skuLifecycle);
             return SKU_NOT_ENABLE;
         }
 
@@ -88,7 +88,7 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
 
         //===============④  判断item的生命周期===============
         if (!Constants.ITEM_ADDED_VALID_STATUS.equals(String.valueOf(lifecycle))){
-            LOGGER.error("item id:{}, status is :{} can not operate in shoppingcart", itemCommand.getId(), lifecycle);
+            LOGGER.error("item id:[{}], status is :[{}] can't operate in shoppingcart", itemCommand.getId(), lifecycle);
             return ITEM_STATUS_NOT_ENABLE;
         }
 
@@ -97,13 +97,17 @@ public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartL
         Date now = new Date();
         String itemCode = itemCommand.getCode();
         if (null != activeBeginTime && DateUtil.isAfter(activeBeginTime, now)){
-            LOGGER.warn("now is :[{}],but item:[{}]'s activeBeginTime is:{},return ITEM_NOT_ACTIVE_TIME", DateUtil.toString(now, COMMON_DATE_AND_TIME_WITH_MILLISECOND), itemCode, DateUtil.toString(activeBeginTime, COMMON_DATE_AND_TIME_WITH_MILLISECOND));
+            LOGGER.warn(
+                            "now is :[{}],but item:[{}]'s activeBeginTime is:[{}],return [ITEM_NOT_ACTIVE_TIME]",
+                            DateUtil.toString(now, COMMON_DATE_AND_TIME_WITH_MILLISECOND),
+                            itemCode,
+                            DateUtil.toString(activeBeginTime, COMMON_DATE_AND_TIME_WITH_MILLISECOND));
             return ITEM_NOT_ACTIVE_TIME;
         }
 
         //===============⑥ 赠品验证===============
         if (ItemInfo.TYPE_GIFT.equals(itemCommand.getType())){
-            LOGGER.warn("item:[{}] is gift don't need operate,return ITEM_IS_GIFT", itemCode);
+            LOGGER.warn("item:[{}] is gift don't need operate,return [ITEM_IS_GIFT]", itemCode);
             return ITEM_IS_GIFT;
         }
         return null;
