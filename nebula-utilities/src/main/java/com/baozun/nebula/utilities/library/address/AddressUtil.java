@@ -358,12 +358,7 @@ public class AddressUtil {
 		}
 	}
 	
-	public static void initDeliveryArea(Map<String, Map<String, String>> map) {
-		Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
-		String jsPath = LANGUAGE_CONFIG_PATH;
-		if(Validator.isNotNullOrEmpty(pro)){
-			jsPath = StringUtils.trim(pro.getProperty("delivery.area.zh.min.js"));
-		}
+	public static void initDeliveryArea(Map<String, Map<String, String>> map ,String jsPath) {
 		if (i18nOffOn) {
 			if (languageList == null || languageList.isEmpty()) {
 				log.error("languageList is not set");
