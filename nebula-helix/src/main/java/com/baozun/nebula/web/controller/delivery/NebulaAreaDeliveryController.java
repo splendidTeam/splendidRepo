@@ -52,7 +52,7 @@ public class NebulaAreaDeliveryController extends BaseController {
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-11-7
 	 */
-	public DefaultReturnResult supportDistributionInfo(String areaCode,
+	public DefaultReturnResult supportDistributionInfo(Long areaCode,
 			Model model) {
 		DefaultReturnResult defaultReturnResult = new DefaultReturnResult();
 		defaultReturnResult.setResult(true);
@@ -61,10 +61,10 @@ public class NebulaAreaDeliveryController extends BaseController {
 	}
 
 	// 判断是否支持当日达和COD
-	private void judgeDelivery(String areaCode,
+	private void judgeDelivery(Long areaCode,
 			DefaultReturnResult defaultReturnResult) {
 		boolean flag = false;
-		DeliveryArea area = deliveryareaManager.findEnableDeliveryAreaByCode(areaCode);
+		DeliveryArea area = deliveryareaManager.findEnableDeliveryAreaByCode(areaCode+"");
 		DeliveryAreaViewCommand areaViewCommand = (DeliveryAreaViewCommand) ConvertUtils
 				.convertTwoObject(new DeliveryAreaViewCommand(), area);
 		if (Validator.isNotNullOrEmpty(area)) {

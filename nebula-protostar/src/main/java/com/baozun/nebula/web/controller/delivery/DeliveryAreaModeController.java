@@ -156,11 +156,11 @@ public class DeliveryAreaModeController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = { "/logistics/areaDeliverMode/insertLeafDelivery.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
-	public DeliveryArea insertLeafDeliveryArea(@RequestParam(value="id", required=true) Long id, @RequestParam(value="code", required=true) String code, @RequestParam(value="area", required=true) String area) throws Exception {
+	public DeliveryArea insertLeafDeliveryArea(@RequestParam(value="id", required=true) Long id, @RequestParam(value="code", required=true) Long code, @RequestParam(value="area", required=true) String area) throws Exception {
 		DeliveryArea deliveryArea = deliveryAreaManager.findDeliveryAreaById(id);
 		DeliveryArea newArea=new DeliveryArea();
 		newArea.setArea(area);
-		newArea.setCode(code);
+		newArea.setCode(code+"");
 		newArea.setLevel(deliveryArea.getLevel()+1);
 		newArea.setParentId(deliveryArea.getId());
 		newArea.setSortNo(deliveryArea.getSortNo()+1);
@@ -184,11 +184,11 @@ public class DeliveryAreaModeController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value = { "/logistics/areaDeliverMode/insertSiblingDelivery.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
-	public DeliveryArea insertSilbingDeliveryArea(@RequestParam(value="id", required=true) Long id, @RequestParam(value="code", required=true) String code, @RequestParam(value="area", required=true) String area) throws Exception {
+	public DeliveryArea insertSilbingDeliveryArea(@RequestParam(value="id", required=true) Long id, @RequestParam(value="code", required=true) Long code, @RequestParam(value="area", required=true) String area) throws Exception {
 		DeliveryArea deliveryArea = deliveryAreaManager.findDeliveryAreaById(id);
 		DeliveryArea newArea=new DeliveryArea();
 		newArea.setArea(area);
-		newArea.setCode(code);
+		newArea.setCode(code+"");
 		newArea.setLevel(deliveryArea.getLevel());
 		newArea.setParentId(deliveryArea.getParentId());
 		newArea.setSortNo(deliveryArea.getSortNo()+1);
