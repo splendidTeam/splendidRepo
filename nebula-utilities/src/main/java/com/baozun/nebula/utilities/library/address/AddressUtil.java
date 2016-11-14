@@ -30,9 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -42,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baozun.nebula.utilities.common.LangUtil;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.ResourceUtil;
 import com.feilong.core.Validator;
 
@@ -95,6 +92,9 @@ public class AddressUtil {
 
 	/** 多语言开关, 默认为不开启国际化, 设置为false时, languageList无效 **/
 	private static Boolean i18nOffOn = false;
+	
+	/** 物流配送地址开关，默认不开启；开启后获取地址信息方式切换至从DB获取  **/
+	private static Boolean deliveryModeOn = false;
 
 	/** 语言集合 **/
 	private static List<String> languageList = null;
@@ -358,18 +358,49 @@ public class AddressUtil {
 		}
 	}
 	
-	public static void initDeliveryArea(Map<String, Map<String, String>> map ,String jsPath) {
+	public static void initDeliveryArea(Map<String, Map<String, String>> map, String language, String jsPath) {
+		setDeliveryModeOn(true);
+		String path = jsPath+"area.min.js";
 		if (i18nOffOn) {
 			if (languageList == null || languageList.isEmpty()) {
 				log.error("languageList is not set");
 				throw new RuntimeException("languageList is not set");
 			}
-			for (String language : languageList) {
-				generateJsFile( jsPath+"/area."+language+".min.js", map );
-			}
-		} else {
-			generateJsFile(jsPath+"area.min.js", map);
+			path = jsPath+"/area."+language+".min.js";
 		}
+		generateJsFile( path, map );
+		
+		Map<Long, List<Address>> tmpSubAddressMap = new HashMap<Long, List<Address>>();
+		Map<Long, Address> tmpAddressMap = new HashMap<Long, Address>();
+		Map<String, List<Address>> tmpAddressNameMap = new HashMap<String, List<Address>>();
+		
+		for (String parentId : map.keySet()) {
+			for(String key : map.get(parentId).keySet()){
+				Address address = new Address();
+				address.setId(Long.parseLong(key));
+				address.setName(map.get(parentId).get(key));
+				address.setpId(Long.parseLong(parentId));
+				address.setSpelling(key+"");
+				
+				gatherSubAddressMap(tmpSubAddressMap, address);
+
+				tmpAddressMap.put(address.getId(), address);
+
+				List<Address> addressList = tmpAddressNameMap.get(address.getName());
+				// 如果找不到，则新增
+				if (addressList == null) {
+					addressList = new ArrayList<Address>();
+					addressList.add(address);
+				} else {
+					// 如果找到了，则追加
+					addressList.add(address);
+				}
+				tmpAddressNameMap.put(address.getName(), addressList);
+			}
+		}
+		subAddressLangMap.put(language, tmpSubAddressMap);
+		addressLangMap.put(language, tmpAddressMap);
+		addressNameLangMap.put(language, tmpAddressNameMap);
 	}
 
 	/**
@@ -516,7 +547,7 @@ public class AddressUtil {
 		if (null != map.get(pid)) {
 			map.get(pid).add(address);
 		} else {
-			List<Address> list = new ArrayList<Address>(20);
+			List<Address> list = new ArrayList<Address>();
 			list.add(address);
 			map.put(pid, list);
 		}
@@ -530,11 +561,24 @@ public class AddressUtil {
 		AddressUtil.languageList = languageList;
 	}
 
-	public static void main(String[] args) throws Exception {
-
-		List<String> langList = new ArrayList<String>();
-		langList.add("zh_CN");
-		langList.add("en_US");
-		generateJsFile("d://adddress.js", false, langList);
+	/**
+	 * @return the deliveryModeOn
+	 */
+	public static Boolean getDeliveryModeOn() {
+		return deliveryModeOn;
 	}
+
+	/**
+	 * @param deliveryModeOn the deliveryModeOn to set
+	 */
+	public static void setDeliveryModeOn(Boolean deliveryModeOn) {
+		AddressUtil.deliveryModeOn = deliveryModeOn;
+	}
+
+//	public static void main(String[] args) throws Exception {
+//		List<String> langList = new ArrayList<String>();
+//		langList.add("zh_CN");
+//		langList.add("en_US");
+//		generateJsFile("d://adddress.js", false, langList);
+//	}
 }

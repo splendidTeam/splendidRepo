@@ -58,6 +58,7 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 		if(delivery_mode_on_off == null || delivery_mode_on_off.equals("false") || !delivery_mode_on_off.equals("true")){
 			AddressUtil.init();
 		}else{
+			AddressUtil.setDeliveryModeOn(true);
 			Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
 			String jsPath = "";
 			if(Validator.isNotNullOrEmpty(pro)){
@@ -67,7 +68,7 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 				// 顺序 ,一般先有父 再有 子
 				Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
 				Map<String, Map<String, String>> map = deliveryAreaManager.findAllDeliveryAreaByLang(language,sorts);
-				AddressUtil.initDeliveryArea(map,jsPath);
+				AddressUtil.initDeliveryArea(map, language, jsPath);
 			}
 		}
 		
