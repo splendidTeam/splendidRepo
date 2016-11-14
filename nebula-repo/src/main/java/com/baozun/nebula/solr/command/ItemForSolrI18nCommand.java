@@ -214,10 +214,8 @@ public class ItemForSolrI18nCommand implements Serializable {
 	/**
 	 * 通过activeBeanTime来判断是否显示
 	 */
-//	@Field
+	@Field
 	private Boolean itemIsDisplay;
-
-
 
 	/**
 	 * 下架时间
@@ -788,8 +786,4 @@ public class ItemForSolrI18nCommand implements Serializable {
 	public void setNavigationTree(List<String> navigationTree) {
 		this.navigationTree = navigationTree;
 	}
-	
-	
-	
-
 }

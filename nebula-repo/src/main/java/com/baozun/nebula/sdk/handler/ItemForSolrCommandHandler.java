@@ -28,11 +28,11 @@ public interface ItemForSolrCommandHandler extends HandlerBase {
 	/**
 	 * 非国际化商城的扩展点
 	 */
-	void setCustomItemForSolrCommand(ItemForSolrCommand itemForSolrCommand);
+	ItemForSolrCommand setCustomItemForSolrCommand(ItemForSolrCommand itemForSolrCommand);
 	
 	/**
 	 * 多语言商城的扩展点
 	 */
-	void setCustomItemForSolrCommandI18n(ItemForSolrI18nCommand itemForSolrI18nCommand);
+	ItemForSolrI18nCommand setCustomItemForSolrCommandI18n(ItemForSolrI18nCommand itemForSolrI18nCommand);
 
 }

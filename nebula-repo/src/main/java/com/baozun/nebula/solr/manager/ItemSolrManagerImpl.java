@@ -188,12 +188,14 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 			 */
 			if(null != customizeItemForSolrHandler){
 				try {
-						customizeItemForSolrHandler.setCustomItemForSolrCommand(itemForSolrCommand);
+					itemForSolrCommand = customizeItemForSolrHandler.setCustomItemForSolrCommand(itemForSolrCommand);
 				} catch(Exception e){
 					log.error(e.getMessage(), e);
 				}
-			}			
-			itemForSolrCommandList.add(itemForSolrCommand);
+			}
+			if(null!=itemForSolrCommand){
+				itemForSolrCommandList.add(itemForSolrCommand);
+			}
 		}
 		return solrManager.updateItemCommandToSolr(itemForSolrCommandList);
 	}
@@ -223,14 +225,14 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 			 */
 			if(null != customizeItemForSolrHandler){
 				try {
-						customizeItemForSolrHandler.setCustomItemForSolrCommandI18n(itemForSolrI18nCommand);
+					itemForSolrI18nCommand = customizeItemForSolrHandler.setCustomItemForSolrCommandI18n(itemForSolrI18nCommand);
 				} catch(Exception e){
 					log.error(e.getMessage(), e);
 				}
 			}	
-			
-			itemForSolrCommandList.add(itemForSolrI18nCommand);
-			
+			if(null!=itemForSolrI18nCommand){
+				itemForSolrCommandList.add(itemForSolrI18nCommand);
+			}
 		}
 		return solrManager.updateItemCommandToSolrI18n(itemForSolrCommandList);
 	}
@@ -251,12 +253,14 @@ public class ItemSolrManagerImpl<T> implements ItemSolrManager {
 			 */
 			if(null != customizeItemForSolrHandler){
 				try {
-						customizeItemForSolrHandler.setCustomItemForSolrCommand(itemForSolrCommand);
+					itemForSolrCommand = customizeItemForSolrHandler.setCustomItemForSolrCommand(itemForSolrCommand);
 				} catch(Exception e){
 					e.printStackTrace();
 				}
-			}	
-			itemForSolrCommandList.add(itemForSolrCommand);
+			}
+			if(null!=itemForSolrCommand){
+				itemForSolrCommandList.add(itemForSolrCommand);
+			}
 		}
 		return solrManager.batchUpdateItemCommandToSolr(itemForSolrCommandList);
 	}
