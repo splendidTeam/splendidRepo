@@ -88,4 +88,25 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="DeliveryArea.updateDeliveryArea" class="loxia.dao.support.DynamicQueryHolder">
+		<description>更新DeliveryArea</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[
+						update t_sf_delivery_area
+					set 
+						version = now(),
+						modify_time=now()
+					#if($code)
+						,code = :code
+					#end
+					#if($area)
+						,area = :area
+					#end
+					where
+						id = :id
+				]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

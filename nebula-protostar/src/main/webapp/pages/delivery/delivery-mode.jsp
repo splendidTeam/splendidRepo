@@ -36,7 +36,7 @@ var zNodes = [
 	<div></div>
     <div class="content-box width-percent100">
        
-	       <div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/tag.png">物流信息管理</div>
+	       <div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/tag.png">物流配送方式管理</div>
            <div class="ui-block ui-block-fleft w240">
                     <div class="ui-block-content ui-block-content-lb">
                         <div class="tree-control">
@@ -66,7 +66,7 @@ var zNodes = [
 				        </div>
 				        </c:forEach>
 			        </c:if>
-			        <c:if test="${i18nOnOff == false}">
+			         <c:if test="${i18nOnOff == false}">
 			          <div class="ui-block-line">
 				           <label><spring:message code="delivery.area.logisticsCompany"/></label>
 				            <input type="text" id="logisticsCompany"  loxiatype="input" placeholder="<spring:message code="delivery.area.logisticsCompany"/>" />
@@ -141,6 +141,71 @@ var zNodes = [
 				</div>
 	         </div>
            
+     
+            <div class="ui-block ml240 cate-add" style="padding-left: 10px;">
+	            <div class="ui-block-title1"><spring:message code="area.property.lable.category"/></div>
+		           <div id="currentNodeDiv" class="ui-block-content border-grey" style="margin-bottom: 10px;">
+			          <div class="ui-block-line">
+				         <label><spring:message code="delivery.area.code"/></label>
+				           <input type="text" id="tree_code" loxiatype="input" placeholder="<spring:message code="delivery.area.code"/>"  />
+			         </div>
+			         <c:if test="${i18nOnOff == true}">
+			          	<c:forEach items="${i18nLangs}" var="i18nLang">
+				         <div class="ui-block-line">
+					            <label><spring:message code="delivery.area.name"/></label>
+					            <input type="text" id="tree_name_zh_cn" class="mutl-lang" lang="${i18nLang.key}" loxiatype="input" placeholder="<spring:message code="delivery.area.name"/>" />
+					            <span>${i18nLang.value}</span>
+				        </div>
+				        </c:forEach>
+			        </c:if>
+			         <c:if test="${i18nOnOff == false}">
+			          <div class="ui-block-line">
+				           <label><spring:message code="delivery.area.name"/></label>
+				            <input type="text" id="tree_name_zh_cn"  loxiatype="input" placeholder="<spring:message code="delivery.area.name"/>" />
+			        </div>
+			          </c:if>
+			        <div class="button-line1">
+			               <a href="javascript:void(0);" class="func-button persist" id="save_area" title="<spring:message code="btn.save"/>"><spring:message code="btn.save"/></a>
+			                <a href="javascript:void(0);" class="func-button delete" id="remove_area" title="<spring:message code="btn.delete"/>"><spring:message code="btn.delete"/></a>
+			        </div>
+
+	               </div>
+	         </div>
+             
+             
+             <div class="ui-block ml240 area-insert" style="padding-left: 10px;">
+                  <div class="ui-block-title1"><spring:message code="area.property.lable.insert"/></div>
+		          <div id="separateDiv" class="ui-block-content border-grey" style="margin-bottom: 10px;">
+		                <div class="ui-block-line">
+				            <label><spring:message code="delivery.area.code"/></label>
+				            <input type="text" id="add_code" loxiatype="input" placeholder="<spring:message code="delivery.area.code"/>"  />
+			            </div>
+			            <c:if test="${i18nOnOff == true}">
+				            <c:forEach items="${i18nLangs}" var="i18nLang">
+				            <div class="ui-block-line">
+					            <label><spring:message code="delivery.area.name"/></label>
+					            <input type="text" id="add_name_zh_cn"  class="mutl-lang" lang="${i18nLang.key}" loxiatype="input" placeholder="<spring:message code="delivery.area.name"/>" />
+				            	<span>${i18nLang.value}</span>
+				            </div>
+				            </c:forEach>
+			            </c:if>
+			            <c:if test="${i18nOnOff == false}">
+			               <div class="ui-block-line">
+				            <label><spring:message code="delivery.area.name"/></label>
+				            <input type="text" id="add_name_zh_cn" loxiatype="input" placeholder="<spring:message code="delivery.area.name"/>" />
+			               </div>
+			            </c:if>
+                        <div class="button-line1">
+			               <a  href="javascript:void(0);" class="func-button insert" id="insertSibling" title="" />
+			                  <spring:message code="product.property.lable.add"/>
+			               </a>
+			  
+                           <a  href="javascript:void(0);" class="func-button insertLeaf" id="addLeaf" title="" />
+                              <spring:message code="product.property.lable.addchild"/>
+                           </a>
+                         </div>
+                      </div>
+		     </div>
 		     <div class='error-information' style="display:none;"><h5></h5><p></p></div>
 
       </div>

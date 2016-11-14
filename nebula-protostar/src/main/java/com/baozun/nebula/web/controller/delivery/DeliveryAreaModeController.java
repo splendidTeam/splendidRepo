@@ -25,6 +25,7 @@ import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 
 @Controller
@@ -123,4 +124,94 @@ public class DeliveryAreaModeController extends BaseController{
 		areaDeliveryModeManager.deleteDeliveryModeById(id);
 	}
 	
+	/**
+	 * 修改或保存areaDelivery
+	 * @param areaDeliveryMode
+	 * @throws Exception 
+	 */
+	@ResponseBody
+	@RequestMapping(value = { "/logistics/areaDeliverMode/updateDelivery.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
+	public BackWarnEntity updateDeliveryArea(@ModelAttribute("AreaDeliveryMode") DeliveryArea deliveryArea) throws Exception {
+		//id不为空，表示是更新操作,否则为新增
+		if(null!=deliveryArea.getId()){
+			Map<String, Object> map=new HashMap<String, Object>();
+			map.put("id", deliveryArea.getId());
+			map.put("code", deliveryArea.getCode());
+			map.put("area", deliveryArea.getArea());
+			//根据code查询area。然后在将获得的area的id跟deliveryArea的id比较，如果不相等，不能更新
+			DeliveryArea area=deliveryAreaManager.findEnableDeliveryAreaByCode(deliveryArea.getCode());
+			if(null!=area&&area.getId().longValue()!=deliveryArea.getId()){
+				return FAILTRUE;
+			}
+			deliveryAreaManager.updateDeliveryArea(map);
+			return SUCCESS;
+		}
+		return FAILTRUE;
+	}
+	
+	/**
+	 * 插入子地区
+	 * @param areaDelivery
+	 * @throws Exception 
+	 */
+	@ResponseBody
+	@RequestMapping(value = { "/logistics/areaDeliverMode/insertLeafDelivery.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
+	public DeliveryArea insertLeafDeliveryArea(@RequestParam(value="id", required=true) Long id, @RequestParam(value="code", required=true) String code, @RequestParam(value="area", required=true) String area) throws Exception {
+		DeliveryArea deliveryArea = deliveryAreaManager.findDeliveryAreaById(id);
+		DeliveryArea newArea=new DeliveryArea();
+		newArea.setArea(area);
+		newArea.setCode(code);
+		newArea.setLevel(deliveryArea.getLevel()+1);
+		newArea.setParentId(deliveryArea.getId());
+		newArea.setSortNo(deliveryArea.getSortNo()+1);
+		Date date=new Date();
+		newArea.setCreateTime(date);
+		newArea.setModifyTime(date);
+		newArea.setVersion(date);
+		newArea.setStatus(1);
+		DeliveryArea dArea = deliveryAreaManager.insertDeliveryArea(newArea);
+		if(null==dArea){
+			return null;
+		}
+		return dArea;
+	}
+	
+	
+	/**
+	 * 插入同级新地区
+	 * @param areaDelivery
+	 * @throws Exception 
+	 */
+	@ResponseBody
+	@RequestMapping(value = { "/logistics/areaDeliverMode/insertSiblingDelivery.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
+	public DeliveryArea insertSilbingDeliveryArea(@RequestParam(value="id", required=true) Long id, @RequestParam(value="code", required=true) String code, @RequestParam(value="area", required=true) String area) throws Exception {
+		DeliveryArea deliveryArea = deliveryAreaManager.findDeliveryAreaById(id);
+		DeliveryArea newArea=new DeliveryArea();
+		newArea.setArea(area);
+		newArea.setCode(code);
+		newArea.setLevel(deliveryArea.getLevel());
+		newArea.setParentId(deliveryArea.getParentId());
+		newArea.setSortNo(deliveryArea.getSortNo()+1);
+		Date date=new Date();
+		newArea.setCreateTime(date);
+		newArea.setModifyTime(date);
+		newArea.setVersion(date);
+		newArea.setStatus(1);
+		DeliveryArea dArea = deliveryAreaManager.insertDeliveryArea(newArea);
+		if(null==dArea){
+			return null;
+		}
+		return dArea;
+	}
+	
+	
+	/**
+	 * 根据id删除DeliveryArea
+	 * @param id
+	 */
+	@ResponseBody
+	@RequestMapping(value = { "/logistics/areaDeliver/deleteDeliveryAreaById.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
+	public void deleteDeliveryAreaById(@RequestParam(value = "id", required = true) Long id) {
+		deliveryAreaManager.deleteDeliveryAreaById(id);
+	}
 }

@@ -63,4 +63,29 @@ public interface SdkDeliveryAreaManager {
 	 */
 	ContactDeliveryCommand findContactDeliveryByDeliveryAreaCode(String code);
 
+	/**
+	 * @Description
+	 * @param map
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-14
+	 */
+	void updateDeliveryArea(Map<String, Object> map);
+
+	/**
+	 * @Description
+	 * @param deliveryArea
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-14
+	 */
+	DeliveryArea insertDeliveryArea(DeliveryArea deliveryArea);
+
+	/**
+	 * @Description
+	 * @param id
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-14
+	 */
+	void deleteDeliveryAreaById(Long id);
+
 }

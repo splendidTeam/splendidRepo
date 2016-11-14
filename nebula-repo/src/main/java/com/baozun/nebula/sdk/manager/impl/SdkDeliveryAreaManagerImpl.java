@@ -152,4 +152,28 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager {
 		}
 		return contactDeliveryCommand;
 	}
+	
+	@Override
+	public void updateDeliveryArea(Map<String, Object> map) {
+		deliveryAreaDao.updateDeliveryArea(map);
+	}
+	
+	@Override
+	public DeliveryArea insertDeliveryArea(DeliveryArea deliveryArea) {
+		DeliveryArea area = deliveryAreaDao.findEnableDeliveryAreaByCode(deliveryArea.getCode());
+		if(null!=area){
+			return area;
+		}
+		return deliveryAreaDao.save(deliveryArea);
+	}
+	
+	@Override
+	public void deleteDeliveryAreaById(Long id) {
+		//删除父地区时要先删除子地区
+		List<DeliveryArea> deleteList=deliveryAreaDao.findDeliveryAreaByParentId(id);
+		DeliveryArea parentArea=deliveryAreaDao.getByPrimaryKey(id);
+		deleteList.add(parentArea);
+		//删除父地区以及子地区
+		deliveryAreaDao.deleteAll(deleteList);
+	}
 }

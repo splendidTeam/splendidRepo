@@ -1,10 +1,12 @@
 package com.baozun.nebula.dao.delivery;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baozun.nebula.model.delivery.DeliveryArea;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 import loxia.dao.Sort;
@@ -61,4 +63,9 @@ public interface DeliveryAreaDao extends GenericEntityDao<DeliveryArea, Long> {
 	@NativeQuery(model = DeliveryArea.class)
 	DeliveryArea findDeliveryAreaByNameAndParentId(@QueryParam("name")String name, @QueryParam("parentId")Long parentId);
 
+	/**
+	 * 更新DeliveryArea
+	 */
+	@NativeUpdate
+	void updateDeliveryArea(@QueryParam Map<String, Object> paraMap);
 }
