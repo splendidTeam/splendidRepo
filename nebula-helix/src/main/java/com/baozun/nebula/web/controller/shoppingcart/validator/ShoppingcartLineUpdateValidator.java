@@ -41,7 +41,7 @@ public interface ShoppingcartLineUpdateValidator{
      * <li>如果 shoppingCartLineCommandList 中找不到 id 值是 shoppingcartLineId的行,那么返回 {@link ShoppingcartResult#SHOPPING_CART_LINE_COMMAND_NOT_FOUND}</li>
      * <li>进行 sku 校验{@link ShoppingcartLineOperateCommonValidator#validate(Sku, Integer)}</li>
      * <li>单行最大数量 校验</li>
-     * <li>如果需要合并购物车行,那么校验将count和已有skuid行数量总和</li>
+     * <li>如果需要合并购物车行,那么校验 count和需要被合并行count的总和</li>
      * <li>库存校验</li>
      * </ol>
      * </blockquote>
