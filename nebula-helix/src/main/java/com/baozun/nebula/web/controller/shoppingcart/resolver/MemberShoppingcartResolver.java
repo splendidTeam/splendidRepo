@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.OPERATE_ERROR;
+import static com.feilong.core.util.CollectionsUtil.find;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.web.MemberDetails;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * 会员购物车操作.
@@ -47,6 +49,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Autowired
     private SdkShoppingCartManager sdkShoppingCartManager;
 
+    /** The sdk shopping cart update manager. */
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
 
@@ -80,16 +83,37 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.
-     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
-     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.lang.Long, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
-        currentLine.setMemberId(memberDetails.getGroupId());
+    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response){
+        Long groupId = memberDetails.getGroupId();
 
-        boolean success = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
-        return success ? null : OPERATE_ERROR;
+        List<ShoppingCartLineCommand> shoppingCartLineCommandListDB = getShoppingCartLineCommandList(memberDetails, request);
+        ShoppingCartLineCommand shoppingCartLineCommandInDB = find(shoppingCartLineCommandListDB, "id", shoppingcartLineId);
+        Long skuIdInDB = shoppingCartLineCommandInDB.getSkuId();
+
+        ShoppingCartLineCommand currentShoppingCartLineCommand = find(shoppingCartLineCommandList, "id", shoppingcartLineId);
+        if (null != currentShoppingCartLineCommand){//表示 是修改当前行   //如果不需要合并,那么仅修改当前行数据 
+            //相等 表示 不需要修改sku信息,不相等表示需要修改sku信息 
+            Long newSkuId = skuIdInDB == currentShoppingCartLineCommand.getSkuId() ? null : currentShoppingCartLineCommand.getSkuId();
+            sdkShoppingCartUpdateManager.updateCartLineSkuInfo(groupId, shoppingcartLineId, newSkuId, currentShoppingCartLineCommand.getQuantity());
+        }else{//表示当前行已经被删除了        //如果需要合并,那么当前行删掉合并到需要合并的行 
+
+            List<ShoppingCartLineCommand> sameSkuIdLineList = CollectionsUtil.select(shoppingCartLineCommandList, "skuId", skuIdInDB);
+            //找到被合并行
+            for (ShoppingCartLineCommand shoppingCartLineCommand : sameSkuIdLineList){
+                Long updateLineId = shoppingCartLineCommand.getId();
+                ShoppingCartLineCommand find = find(shoppingCartLineCommandListDB, "id", updateLineId);
+                Integer quantity = shoppingCartLineCommand.getQuantity();
+                if (find.getQuantity() != quantity){
+                    sdkShoppingCartUpdateManager.updateCartLineQuantityAndDeleteOtherLineId(groupId, updateLineId, quantity, shoppingcartLineId);
+                    break;
+                }
+            }
+        }
+        return null;
     }
 
     /*
@@ -135,7 +159,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
+    protected ShoppingcartResult doBatchUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
         sdkShoppingCartUpdateManager.updateCartLineQuantity(memberDetails.getGroupId(), shoppingcartLineIdAndCountMap);
         return null;
     }

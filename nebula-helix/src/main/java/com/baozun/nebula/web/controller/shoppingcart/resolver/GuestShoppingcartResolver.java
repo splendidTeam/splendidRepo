@@ -78,7 +78,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response){
         return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 
@@ -122,7 +122,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
      * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
+    protected ShoppingcartResult doBatchUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
         for (Map.Entry<Long, Integer> entry : shoppingcartLineIdAndCountMap.entrySet()){
             Long shoppingcartLineId = entry.getKey();
             Integer count = entry.getValue();

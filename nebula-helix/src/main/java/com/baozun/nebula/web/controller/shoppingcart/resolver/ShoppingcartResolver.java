@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 
 /**
@@ -166,8 +167,36 @@ public interface ShoppingcartResolver{
      *            the response
      * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
      *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @see #updateShoppingCartLine(MemberDetails, Long, ShoppingCartLineUpdateSkuForm, HttpServletRequest, HttpServletResponse)
      */
     ShoppingcartResult updateShoppingCartCount(MemberDetails memberDetails,Long shoppingcartLineId,Integer count,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 更新指定的购物车行<code>shoppingcartLineId</code>的相关参数.
+     * 
+     * <h3>说明:</h3>
+     * <blockquote>
+     * <ol>
+     * <li>参数count是全量数量</li>
+     * </ol>
+     * </blockquote>
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param shoppingcartLineId
+     *            指定的购物车行id,以前可能直接通过skuid来进行操作,现在用户的购物车可能相同的skuid存在不同的购物车行里面(比如bundle)
+     * @param shoppingCartLineUpdateSkuForm
+     *            需要修改的参数
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @see <a href="http://jira.baozun.cn/browse/NB-367">NB-367</a>
+     * @since 5.3.2.3
+     */
+    ShoppingcartResult updateShoppingCartLine(MemberDetails memberDetails,Long shoppingcartLineId,ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm,HttpServletRequest request,HttpServletResponse response);
 
     /**
      * 支持批量更新购物车行<code>shoppingcartLineId</code>的数量<code>count</code>.

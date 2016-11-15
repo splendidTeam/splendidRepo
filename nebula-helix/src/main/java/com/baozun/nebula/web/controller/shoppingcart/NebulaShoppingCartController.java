@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
@@ -39,6 +40,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
@@ -90,8 +92,8 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * <td>修改购物车数量</td>
  * </tr>
  * <tr valign="top">
- * <td>//XXX feilong</td>
- * <td>修改商品销售属性</td>
+ * <td>{@link #updateShoppingCartLine(MemberDetails, Long, ShoppingCartLineUpdateSkuForm, HttpServletRequest, HttpServletResponse, Model) updateShoppingCartSku}</td>
+ * <td>修改商品销售属性(sku)</td>
  * </tr>
  * <tr valign="top" style="background-color:#eeeeff">
  * <td>
@@ -146,14 +148,15 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
 public class NebulaShoppingCartController extends BaseController{
 
     /** The Constant log. */
-    private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
 
+    /** The shopping cart command builder. */
     @Autowired
-    private ShoppingCartCommandBuilder       shoppingCartCommandBuilder;
+    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
     /** The shoppingcart factory. */
     @Autowired
-    private ShoppingcartFactory              shoppingcartFactory;
+    private ShoppingcartFactory shoppingcartFactory;
 
     /** The shoppingcart view command converter. */
     @Autowired
@@ -214,7 +217,7 @@ public class NebulaShoppingCartController extends BaseController{
                     @RequestParam(value = "count",required = true) Integer count,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
@@ -253,10 +256,9 @@ public class NebulaShoppingCartController extends BaseController{
                     @RequestParam(value = "shoppingcartLineId",required = true) Long shoppingcartLineId,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult shoppingcartResult = shoppingcartResolver
-                        .deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.deleteShoppingCartLine(memberDetails, shoppingcartLineId, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -284,8 +286,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @param model
      *            the model
      * @return the nebula return result
-     * @RequestMapping(value = "/shoppingcart/update", method =
-     *                       RequestMethod.POST)
+     * @RequestMapping(value = "/shoppingcart/update", method = RequestMethod.POST)
      */
     public NebulaReturnResult updateShoppingCartCount(
                     @LoginMember MemberDetails memberDetails,
@@ -293,10 +294,51 @@ public class NebulaShoppingCartController extends BaseController{
                     @RequestParam(value = "count",required = true) Integer count,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult shoppingcartResult = shoppingcartResolver
-                        .updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.updateShoppingCartCount(memberDetails, shoppingcartLineId, count, request, response);
+        return toNebulaReturnResult(shoppingcartResult);
+    }
+
+    /**
+     * 修改用户购物车行销售属性(sku).
+     * 
+     * <h3>说明:</h3>
+     * <blockquote>
+     * <ol>
+     * <li>注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
+     * <br>
+     * 比如一个属于bundle 一个属于单买的;或者 一个是购买的,一个属于赠品;将来需要区分</li>
+     * <li>通常用来相同款商品修改销售属性,比如修改尺码;</li>
+     * </ol>
+     * </blockquote>
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingcartLineId
+     *            the shoppingcartline id
+     * @param shoppingCartLineUpdateSkuForm
+     *            the shopping cart line update form
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @see <a href="http://jira.baozun.cn/browse/NB-367">NB-367</a>
+     * @since 5.3.2.3
+     * @RequestMapping(value = "/shoppingcart/updateline", method = RequestMethod.POST)
+     */
+    public NebulaReturnResult updateShoppingCartLine(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "shoppingcartLineId",required = true) Long shoppingcartLineId,
+                    @ModelAttribute("shoppingCartLineUpdateSkuForm") ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    @SuppressWarnings("unused") Model model){
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.updateShoppingCartLine(memberDetails, shoppingcartLineId, shoppingCartLineUpdateSkuForm, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -333,10 +375,9 @@ public class NebulaShoppingCartController extends BaseController{
                     @RequestParam(value = "checked",required = true) boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult shoppingcartResult = shoppingcartResolver
-                        .toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.toggleShoppingCartLineCheckStatus(memberDetails, shoppingcartLineId, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
 
@@ -362,10 +403,9 @@ public class NebulaShoppingCartController extends BaseController{
                     @RequestParam(value = "checked",required = true) boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult shoppingcartResult = shoppingcartResolver
-                        .toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.toggleAllShoppingCartLineCheckStatus(memberDetails, checkStatus, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
 
