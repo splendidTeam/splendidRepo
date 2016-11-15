@@ -45,6 +45,36 @@ public interface SdkShoppingCartUpdateManager{
     void updateCartLineQuantityByLineId(Long memberId,Long lineId,Integer quantity);
 
     /**
+     * 修改某行数据数量并且删除另外的一行(通常用于修改购物车行销售属性的时合并购物车行的场景).
+     *
+     * @param memberId
+     *            the member id
+     * @param updateLineId
+     *            修改行id
+     * @param quantity
+     *            the quantity
+     * @param deleteLineId
+     *            删除行id
+     * @since 5.3.2.3
+     */
+    void updateCartLineQuantityAndDeleteOtherLineId(Long memberId,Long updateLineId,Integer quantity,Long deleteLineId);
+
+    /**
+     * 修改订单行 sku 信息.
+     * 
+     * @param memberId
+     *            哪个会员
+     * @param cartLineId
+     *            哪个订单行
+     * @param newSkuId
+     *            新sku id,如果是null,那么不修改sku 信息
+     * @param quantity
+     *            数量是多少
+     * @since 5.3.2.3
+     */
+    void updateCartLineSkuInfo(Long memberId,Long cartLineId,Long newSkuId,Integer quantity);
+
+    /**
      * 批量更新指定会员 指定购物车行的数量.
      *
      * @param memberId

@@ -188,6 +188,26 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
                     @QueryParam("memberId") Long memberId,
                     @QueryParam("cartLineId") Long cartLineId,
                     @QueryParam("quantity") Integer quantity);
+    /**
+     * 修改订单行 sku 信息.
+     * 
+     * @param memberId
+     *            哪个会员
+     * @param cartLineId
+     *            哪个订单行
+     * @param newSkuId
+     *            新sku id,如果是null,那么不修改sku 信息
+     * @param quantity
+     *            数量是多少
+     * @return 影响的行数
+     * @since 5.3.2.3
+     */
+    @NativeUpdate
+    Integer updateCartLineSkuInfo(
+                    @QueryParam("memberId") Long memberId,
+                    @QueryParam("cartLineId") Long cartLineId,
+                    @QueryParam("newSkuId")  Long newSkuId,
+                    @QueryParam("quantity") Integer quantity);
 
     /**
      * 根据lineGrop和skuId获取购物车行

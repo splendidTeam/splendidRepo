@@ -52,8 +52,8 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
      */
     @Override
     public void updateCartLineQuantityByLineId(Long memberId,Long lineId,Integer quantity){
-        Validate.notNull(memberId, "quantity can't be null!");
-        Validate.notNull(lineId, "quantity can't be null!");
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(lineId, "lineId can't be null!");
         Validate.notNull(quantity, "quantity can't be null!");
 
         int result = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(memberId, lineId, quantity);
@@ -77,6 +77,46 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
             Integer quantity = entry.getValue();
 
             updateCartLineQuantityByLineId(memberId, lineId, quantity);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLineQuantityAndDeleteOtherLineId(java.lang.Long, java.lang.Long, java.lang.Integer, java.lang.Long)
+     */
+    @Override
+    public void updateCartLineQuantityAndDeleteOtherLineId(Long memberId,Long updateLineId,Integer quantity,Long deleteLineId){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(updateLineId, "updateLineId can't be null!");
+        Validate.notNull(quantity, "quantity can't be null!");
+        Validate.notNull(deleteLineId, "deleteLineId can't be null!");
+
+        updateCartLineQuantityByLineId(memberId, updateLineId, quantity);
+        int result = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, deleteLineId);
+
+        if (1 != result){
+            LOGGER.error("delete:[{}],lineId:[{}] ,result is:[{}], not expected 1", memberId, deleteLineId, result);
+            throw new NativeUpdateRowCountNotEqualException(1, result);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLineSkuInfo(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Integer)
+     */
+    @Override
+    public void updateCartLineSkuInfo(Long memberId,Long cartLineId,Long newSkuId,Integer quantity){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(cartLineId, "cartLineId can't be null!");
+        Validate.notNull(quantity, "quantity can't be null!");
+
+        int result = sdkShoppingCartLineDao.updateCartLineSkuInfo(memberId, cartLineId, newSkuId, quantity);
+
+        if (1 != result){
+            LOGGER.error("updateCartLineSkuInfo:[{}],lineId:[{}],result is:[{}], not expected 1", memberId, cartLineId, result);
+            throw new NativeUpdateRowCountNotEqualException(1, result);
         }
     }
 }

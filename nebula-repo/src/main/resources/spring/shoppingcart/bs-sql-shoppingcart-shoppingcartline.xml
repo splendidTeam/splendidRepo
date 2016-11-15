@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
@@ -156,8 +155,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="ShoppingCartLine.deleteByExtentionCodeAndMemberId"
-		class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="ShoppingCartLine.deleteByExtentionCodeAndMemberId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据购物车memberId和sku删除购物车行</description>
 		<constructor-arg>
 			<value>
@@ -216,6 +214,28 @@
 		</constructor-arg>
 	</bean>
 
+	<!-- 修改购物车行 -->
+	<bean id="ShoppingCartLine.updateCartLineSkuInfo" class="loxia.dao.support.DynamicQueryHolder">
+		<description>修改购物车行</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					update t_sc_shoppingcartline
+					set
+						quantity		=	:quantity
+						
+					#if($newSkuId)
+		       			,sku_Id			=	:newSkuId
+		       			,extention_Code	=	(select OUT_ID from t_pd_sku where id=:newSkuId)
+		       		#end
+					
+					where member_id = :memberId
+					and id = :cartLineId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+
 	<bean id="ShoppingCartLine.insertShoppingCartLine" class="loxia.dao.support.DynamicQueryHolder">
 		<description>保存购物车行</description>
 		<constructor-arg>
@@ -231,8 +251,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="ShoppingCartLine.insertShoppingCartLineWithLineGroup"
-		class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="ShoppingCartLine.insertShoppingCartLineWithLineGroup" class="loxia.dao.support.DynamicQueryHolder">
 		<description>保存购物车行</description>
 		<constructor-arg>
 			<value>
@@ -281,8 +300,7 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="ShoppingCartLine.findShopCartLineByLineGroupAndSkuId"
-		class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="ShoppingCartLine.findShopCartLineByLineGroupAndSkuId" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据分组id和skuId获取购物车行</description>
 		<constructor-arg>
 			<value>
