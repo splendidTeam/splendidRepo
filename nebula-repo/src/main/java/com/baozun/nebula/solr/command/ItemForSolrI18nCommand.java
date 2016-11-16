@@ -214,7 +214,7 @@ public class ItemForSolrI18nCommand implements Serializable {
 	/**
 	 * 通过activeBeanTime来判断是否显示
 	 */
-	@Field
+	//@Field
 	private Boolean itemIsDisplay;
 
 	/**

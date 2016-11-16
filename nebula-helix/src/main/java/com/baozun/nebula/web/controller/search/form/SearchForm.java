@@ -1,5 +1,8 @@
 package com.baozun.nebula.web.controller.search.form;
 
+import java.util.List;
+
+import com.baozun.nebula.search.command.ExcludeSearchCommand;
 import com.baozun.nebula.web.controller.BaseForm;
 
 public class SearchForm extends BaseForm{
@@ -59,6 +62,11 @@ public class SearchForm extends BaseForm{
 	 * 第几页 zero based
 	 */
 	private Integer				pageNumber;
+	
+	/**
+	 * 排除字段查询语句 这里传入的应该是直接写好的fq。如：-id:45,排除id为45的数据
+	 */
+	private List<ExcludeSearchCommand>	excludeList;
 
 	public String getSearchWord(){
 		return searchWord;
@@ -158,6 +166,20 @@ public class SearchForm extends BaseForm{
 	 */
 	public void setPriceRangeConditionStr(String priceRangeConditionStr){
 		this.priceRangeConditionStr = priceRangeConditionStr;
+	}
+
+	/**
+	 * @return the excludeList
+	 */
+	public List<ExcludeSearchCommand> getExcludeList() {
+		return excludeList;
+	}
+
+	/**
+	 * @param excludeList the excludeList to set
+	 */
+	public void setExcludeList(List<ExcludeSearchCommand> excludeList) {
+		this.excludeList = excludeList;
 	}
 
 }
