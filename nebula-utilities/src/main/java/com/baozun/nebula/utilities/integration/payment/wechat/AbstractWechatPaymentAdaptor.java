@@ -380,4 +380,11 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor {
 		paymentResult.setPaymentStatusInformation(resultCommand);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.integration.payment.PaymentAdaptor#getCreateResponseToken()
+	 */
+	@Override
+	public PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest) {
+		return paymentRequest;
+	}
 }

@@ -1,6 +1,7 @@
 package com.baozun.nebula.utilities.common.command;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 标准值适配器
@@ -68,5 +69,14 @@ public interface BasePayParamCommandAdaptor {
 	 * 扫码支付方式
 	 */
 	public String getQrPayMode();
+
+	/**
+	 * 
+	 * @Description 扩展如Unionpay等其他不在上列参数之内的参数
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-16
+	 */
+	Map<String, Object> getRequestParams();
 
 }

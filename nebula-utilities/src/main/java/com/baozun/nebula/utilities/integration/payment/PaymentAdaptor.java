@@ -47,6 +47,10 @@ public interface PaymentAdaptor{
 
 	public static final String	BANK_CCB				= "PaymentServiceProvider:Ccb";
 	
+	public static final String	_INPUT_CHARSET 			= "utf-8";
+	
+	public static final String	CHAR_SET				= "encoding";
+	
 	/**
 	 * 获取服务提供方编码
 	 * 
@@ -171,6 +175,17 @@ public interface PaymentAdaptor{
 	 * @param addition
 	 * @return
 	 */
+	@Deprecated
 	PaymentResult unifiedOrder(Map<String,String> addition);
+	
+	/**
+	 * 
+	 * @Description Alipay WAP 支付需要拼接完参数之后，再获取一次token
+	 * @param paymentRequest
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-17
+	 */
+	PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest);
 	
 }

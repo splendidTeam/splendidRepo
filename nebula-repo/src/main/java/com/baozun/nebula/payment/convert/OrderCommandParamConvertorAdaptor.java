@@ -1,6 +1,7 @@
 package com.baozun.nebula.payment.convert;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +13,8 @@ import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor {
 
 	private SalesOrderCommand salesOrderCommand;
+	
+	private Map<String,Object> requestParams;
 	
 	public static final String BUY = "buy";
 	
@@ -113,6 +116,22 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	@Override
 	public String getQrPayMode() {
 		return salesOrderCommand.getOnLinePaymentCommand().getQrPayMode();
+	}
+
+	/**
+	 * @return the requestParams
+	 */
+	@Override
+	public Map<String,Object> getRequestParams() {
+		return requestParams;
+	}
+
+	/**
+	 * @param requestParams the requestParams to set
+	 */
+	@Override
+	public void setRequestParams(Map<String,Object> requestParams) {
+		this.requestParams = requestParams;
 	}
 
 }

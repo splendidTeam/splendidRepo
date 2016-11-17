@@ -96,8 +96,14 @@ public abstract class AbstractChinaPnRPaymentAdaptor implements PaymentAdaptor {
 	
 	@Override
 	public PaymentResult unifiedOrder(Map<String, String> addition) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.integration.payment.PaymentAdaptor#getCreateResponseToken()
+	 */
+	@Override
+	public PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest) {
+		return paymentRequest;
+	}
 }

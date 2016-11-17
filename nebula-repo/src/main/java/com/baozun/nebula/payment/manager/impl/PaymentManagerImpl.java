@@ -1,6 +1,6 @@
 package com.baozun.nebula.payment.manager.impl;
 
-import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,6 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,10 +18,10 @@ import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.payment.manager.ReservedPaymentType;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.utilities.common.ReflectionUtil;
 import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
-import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
 import com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
@@ -33,8 +32,6 @@ import com.baozun.nebula.utilities.integration.payment.UnionPayBase;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
-import com.baozun.nebula.utilities.io.http.HttpClientUtil;
-import com.baozun.nebula.utilities.io.http.HttpMethodType;
 import com.feilong.core.Validator;
 
 @Service("PaymentManager")
@@ -43,9 +40,6 @@ public class PaymentManagerImpl implements PaymentManager {
 	private static final Logger log = LoggerFactory
 			.getLogger(PaymentManagerImpl.class);
 	
-	private static final String _INPUT_CHARSET = "utf-8";
-
-
 	@Override
 	public PaymentRequest createPayment(SalesOrderCommand order) {
 		PaymentRequest paymentRequest = null;
@@ -53,22 +47,24 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(getPayType(order.getOnLinePaymentCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
+            Map<String, Object> params = new HashMap<String, Object>(); 
+            for (int i = 0; i < SalesOrderCommand.class.getFields().length; i++) { 
+                Field field = SalesOrderCommand.class.getFields()[i]; 
+                params.put(field.getName(), ReflectionUtil.getFieldValue(order, field.getName())); 
+            } 
+            payParamCommandAdaptor.setRequestParams(params);
 			PaymentFactory paymentFactory = PaymentFactory.getInstance();
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());//获得支付适配器
 			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
-			paymentRequest = paymentFactory.getPaymentResult(payParamCommandAdaptor.getPaymentType());//获得对应的结果类
 			Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);
-			paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);
-		} catch (PaymentParamErrorException e) {
-			log.error("CreatePayment error: "+e.toString(), e);
-			return null;
-		}catch(Exception ex){
-			log.error("CreatePayment error: "+ex.toString(), ex);
+			paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);//获得对应的结果类
+		} catch (Exception ex){
+			log.error("CreatePayment error: {}", ex);
 			return null;
 		}
 		return paymentRequest;
 	}
-
+	
     /**
      * 创建支付链接（定制传参）
      * @author 江家雷
@@ -89,24 +85,19 @@ public class PaymentManagerImpl implements PaymentManager {
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());//获得支付适配器
             PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
-            paymentRequest = paymentFactory.getPaymentResult(payParamCommandAdaptor.getPaymentType());//获得对应的结果类
             Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
             // 將支付所需的定制参数赋值给addition，例如定制化参数 qr_pay_mode
             if (null != additionParams) {
                 addition.putAll(additionParams);
             }          
             paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);
-        } catch (PaymentParamErrorException e) {
-            log.error("CreatePayment error: "+e.toString(), e);
-            return null;
-        }catch(Exception ex){
+        } catch (Exception ex){
             log.error("CreatePayment error: "+ex.toString(), ex);
             return null;
         }
         return paymentRequest;
     }
-
-
+    
 	@Override
 	public PaymentResult getPaymentResultForSyn(HttpServletRequest request,String paymentType) {
 		PaymentFactory paymentFactory = PaymentFactory.getInstance();
@@ -137,24 +128,13 @@ public class PaymentManagerImpl implements PaymentManager {
 			if(paymentAdaptor.isSupportClosePaymentRequest()){
 				PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
 				Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCaneclOrder(payParamCommandAdaptor);
-				if(PaymentFactory.PAY_TYPE_WECHAT.equals(payParamCommandAdaptor.getPaymentType())){
-					addition.clear();
-					getCloseOrderParaMap(order, addition);
-				}else if(PaymentFactory.PAY_TYPE_UNIONPAY.equals(payParamCommandAdaptor.getPaymentType())){
-					addition.clear();
-					getOrderQueryParmMapOfUnion(order, addition);
-				}
 				result = paymentAdaptor.closePaymentRequest(addition);
 			}else{
 				result.setMessage("not support");
 				result.setPaymentServiceSatus(PaymentServiceStatus.NOT_SUPPORT);
 			}
-		}catch (PaymentParamErrorException e) {
-			log.error("cancelPayment error: "+e.toString(), e);
-			result.setMessage(e.toString());
-			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-		}catch(Exception ex){
-			log.error("cancelPayment error: "+ex.toString(), ex);
+		} catch (Exception ex){
+			log.error("cancelPayment error: {}", ex);
 			result.setMessage(ex.toString());
 			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
 		}
@@ -196,17 +176,15 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(getPayType(order.getOnLinePaymentCancelCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
+            Map<String, Object> params = new HashMap<String, Object>(); 
+            for (int i = 0; i < SalesOrderCommand.class.getFields().length; i++) { 
+                Field field = SalesOrderCommand.class.getFields()[i]; 
+                params.put(field.getName(), ReflectionUtil.getFieldValue(order, field.getName())); 
+            } 
+            payParamCommandAdaptor.setRequestParams(params);
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());// 获得支付适配器
-			
-			Map<String, String> addition = new HashMap<String, String>();
-			addition.put("out_trade_no", order.getCode());
-			if(PaymentFactory.PAY_TYPE_WECHAT.equals(payParamCommandAdaptor.getPaymentType())){
-				addition.clear();
-				getOrderQueryParaMapOfWechat(order, addition);
-			}else if(PaymentFactory.PAY_TYPE_UNIONPAY.equals(payParamCommandAdaptor.getPaymentType())){
-				addition.clear();
-				getOrderQueryParmMapOfUnion(order, addition);
-			}
+			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
+			Map<String, String> addition = payParamConvertorAdaptor.commandConvertorToMapForOrderInfo(payParamCommandAdaptor);
 			result = paymentAdaptor.getOrderInfo(addition);
 			
 		} catch (Exception ex) {
@@ -226,54 +204,21 @@ public class PaymentManagerImpl implements PaymentManager {
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(getPayType(order.getOnLinePaymentCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());// 获得支付适配器
-		
-			Map<String, String> addition = new HashMap<String, String>();
-			
-			getParaMap(order, payParamCommandAdaptor, addition);
-			
+            Map<String, Object> salesOrderParams = new HashMap<String, Object>(); 
+            for (int i = 0; i < SalesOrderCommand.class.getFields().length; i++) { 
+                Field field = SalesOrderCommand.class.getFields()[i]; 
+                salesOrderParams.put(field.getName(), ReflectionUtil.getFieldValue(order, field.getName())); 
+            } 
+            payParamCommandAdaptor.setRequestParams(salesOrderParams);
+            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
+			Map<String, String> addition = payParamConvertorAdaptor.commandConvertorToMapForMobileCreatUrl(payParamCommandAdaptor);
 			//创建一个新的MOBILE端授权请求
 			paymentRequest = paymentAdaptor.newPaymentRequestForMobileCreateDirect(addition);
 			log.info("RequestForMobileCreateDirect:{}",paymentRequest.getRequestURL());
-			String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(),HttpMethodType.GET,_INPUT_CHARSET);
 			
-			Map<String,String> map = new HashMap<String,String>();
-			try {
-				if(Validator.isNotNullOrEmpty(result)){
-					result = java.net.URLDecoder.decode(result,_INPUT_CHARSET);
-					String[] params = result.split("&");
-					if(Validator.isNotNullOrEmpty(params)){
-						for(String param:params){
-							String key = param.split("=")[0].toString();
-							String val = param.replace(param.split("=")[0].toString()+"=", "");
-							map.put(key, val);
-						}
-					}
-				}
-				
-			} catch (UnsupportedEncodingException e) {
-				log.error("newPaymentRequestForMobileCreateDirect error: "+e.toString(), e);
-				return null;
-			}
-			
-			if(Validator.isNotNullOrEmpty(map)){
-				//手机WAP端授权结果
-				PaymentResult paymentResult = paymentAdaptor.getPaymentResultForMobileCreateDirect(map);
-				if(paymentResult.getPaymentServiceSatus().equals(PaymentServiceStatus.SUCCESS)){
-					Map<String, String> resultMap;
-					try {
-						resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
-						//创建一个新的MOBILE端交易请求
-						paymentRequest = paymentAdaptor.newPaymentRequestForMobileAuthAndExecute(resultMap);
-						log.info(paymentRequest.getRequestURL());
-					} catch (DocumentException e) {
-						log.error("newPaymentRequestForMobileAuthAndExecute error: "+e.toString(), e);
-						return null;
-					}
-				}else{
-					log.error("newPaymentRequestForMobileAuthAndExecute error: "+paymentResult.getMessage()+paymentResult.getPaymentServiceSatus());
-					return null;
-				}
-			}
+			//Alipay WAP 支付需要拼接完参数之后，再获取一次token
+			paymentRequest = paymentAdaptor.getCreateResponseToken(paymentRequest);
+
 		}catch(Exception ex){
 			log.error("CreatePayment error: "+ex.toString(), ex);
 			return null;
@@ -282,6 +227,7 @@ public class PaymentManagerImpl implements PaymentManager {
 		return paymentRequest;
 	}
 
+	@Deprecated
 	private void getParaMap(SalesOrderCommand order,
 			PayParamCommandAdaptor payParamCommandAdaptor,
 			Map<String, String> addition) throws PaymentParamErrorException {
@@ -363,6 +309,8 @@ public class PaymentManagerImpl implements PaymentManager {
 		}
 		return paymentResult;
 	}
+	
+	@Deprecated
 	private void getCloseOrderParaMap(SalesOrderCommand order,Map<String, String> addition)
 			throws PaymentParamErrorException {	
 		addition.put("appid", WechatConfig.APP_ID);
@@ -372,10 +320,9 @@ public class PaymentManagerImpl implements PaymentManager {
 		if(Validator.isNotNullOrEmpty(order.getCode())){
 			addition.put("out_trade_no", order.getCode());
  		}
-		
-		
 	}
 	
+	@Deprecated
 	private void getOrderQueryParaMapOfWechat(SalesOrderCommand order,Map<String, String> addition)
 			throws PaymentParamErrorException {	
 		addition.put("appid", WechatConfig.APP_ID);
@@ -391,6 +338,7 @@ public class PaymentManagerImpl implements PaymentManager {
  		}
 	}
 	
+	@Deprecated
 	private void getOrderQueryParmMapOfUnion(SalesOrderCommand order,Map<String, String> addition){
 		java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyyMMddHHmmss");
 		java.util.Date currentTime = new java.util.Date();// 得到当前系统时间
@@ -441,7 +389,7 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getBody())){
 			addition.put("body", wechatPayParamCommand.getBody());
- 		}else{
+ 		} else {
  			throw new PaymentParamErrorException("unifiedOrder parameter error: body can't be null/empty!");
  		}
 		
@@ -451,7 +399,7 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getOut_trade_no())){
 			addition.put("out_trade_no", wechatPayParamCommand.getOut_trade_no());
- 		}else{
+ 		} else {
  			throw new PaymentParamErrorException("unifiedOrder parameter error: out_trade_no can't be null/empty!");
  		}
 		
@@ -466,12 +414,12 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getTotal_fee())){
 			addition.put("total_fee", wechatPayParamCommand.getTotal_fee().toString());
- 		}else{
+ 		} else {
  			throw new PaymentParamErrorException("unifiedOrder parameter error: total_fee can't be null/empty!");
  		}
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getSpbill_create_ip())){
 			addition.put("spbill_create_ip", wechatPayParamCommand.getSpbill_create_ip());
- 		}else{
+ 		} else {
  			throw new PaymentParamErrorException("unifiedOrder parameter error: spbill_create_ip can't be null/empty!");
  		}
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getTime_start())){
@@ -482,7 +430,7 @@ public class PaymentManagerImpl implements PaymentManager {
  		} 
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getTrade_type())){
 			addition.put("trade_type", wechatPayParamCommand.getTrade_type());
- 		}else{
+ 		} else {
  			throw new PaymentParamErrorException("unifiedOrder parameter error: trade_type can't be null/empty!");
  		}
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getGoods_tag())){
@@ -491,7 +439,7 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getProduct_id())){
 			addition.put("product_id", wechatPayParamCommand.getProduct_id());
- 		}else{
+ 		} else {
  			if(wechatPayParamCommand.getTrade_type().equals(WechatResponseKeyConstants.TRADE_TYPE_NATIVE)){
  				throw new PaymentParamErrorException("unifiedOrder parameter error: when the trade_type value is 'NATIVE' product_id can't be null/empty!");
  			}
@@ -499,7 +447,7 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 		if(Validator.isNotNullOrEmpty(wechatPayParamCommand.getOpenid())){
 			addition.put("openid", wechatPayParamCommand.getOpenid());
- 		}else{
+ 		} else {
  			if(wechatPayParamCommand.getTrade_type().equals(WechatResponseKeyConstants.TRADE_TYPE_JSAPI)){
  				throw new PaymentParamErrorException("unifiedOrder parameter error: when the trade_type value is 'JSAPI' openid can't be null/empty!");
  			}

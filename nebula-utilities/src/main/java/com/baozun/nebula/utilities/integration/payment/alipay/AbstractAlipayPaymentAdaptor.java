@@ -18,6 +18,7 @@ package com.baozun.nebula.utilities.integration.payment.alipay;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -33,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import com.baozun.nebula.utilities.common.Md5Encrypt;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.RequestMapUtil;
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnForMobileCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
@@ -48,6 +48,7 @@ import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentException;
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;
+import com.feilong.core.Validator;
 
 public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 
@@ -545,5 +546,49 @@ public abstract class AbstractAlipayPaymentAdaptor implements PaymentAdaptor {
 		PaymentResult paymentResult  = new PaymentResult();
 		return paymentResult;
 	}
+	
 
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.integration.payment.PaymentAdaptor#getCreateResponseToken()
+	 */
+	@Override
+	public PaymentRequest getCreateResponseToken(PaymentRequest paymentRequest) {
+		String result = HttpClientUtil.getHttpMethodResponseBodyAsStringIgnoreCharSet(paymentRequest.getRequestURL(),HttpMethodType.GET,_INPUT_CHARSET);
+		Map<String,String> map = new HashMap<String,String>();
+					
+		if(Validator.isNotNullOrEmpty(result)){
+			try {
+				result = java.net.URLDecoder.decode(result,_INPUT_CHARSET);
+				String[] params = result.split("&");
+				if(Validator.isNotNullOrEmpty(params)){
+					for(String param:params){
+						String key = param.split("=")[0].toString();
+						String val = param.replace(param.split("=")[0].toString()+"=", "");
+						map.put(key, val);
+					}
+				}
+				
+				if(Validator.isNotNullOrEmpty(map)){
+					//手机WAP端授权结果
+					PaymentResult paymentResult = getPaymentResultForMobileCreateDirect(map);
+					if(paymentResult.getPaymentServiceSatus().equals(PaymentServiceStatus.SUCCESS)){
+						Map<String, String> resultMap;
+						resultMap = MapAndStringConvertor.convertResultToMap(map.get("res_data").toString());
+						//创建一个新的MOBILE端交易请求
+						paymentRequest = newPaymentRequestForMobileAuthAndExecute(resultMap);
+						logger.info("newPaymentRequestForMobileAuthAndExecute URL:{}",paymentRequest.getRequestURL());
+					}else{
+						logger.error("newPaymentRequestForMobileAuthAndExecute error:{}",paymentResult.getMessage()+paymentResult.getPaymentServiceSatus());
+					}
+				}
+			} catch (DocumentException e) {
+				logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+				return null;
+			} catch (UnsupportedEncodingException e) {
+				logger.error("newPaymentRequestForMobileAuthAndExecute error:{}", e);
+			}
+		}
+		return paymentRequest;
+	}
+	
 }

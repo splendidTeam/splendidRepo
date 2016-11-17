@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utilities.common.command.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
+import com.feilong.core.Validator;
 
 public class PayParamConvertorForAlipayAdaptor implements PayParamConvertorAdaptor{
 	
@@ -92,6 +92,65 @@ public class PayParamConvertorForAlipayAdaptor implements PayParamConvertorAdapt
 		}
 		
 		return requestParam;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor#commandConvertorToMapForMobileCreatUrl(com.baozun.nebula.utilities.common.command.BasePayParamCommandAdaptor)
+	 */
+	@Override
+	public Map<String, String> commandConvertorToMapForMobileCreatUrl(
+			BasePayParamCommandAdaptor payParamCommand)
+			throws PaymentParamErrorException {
+		Map<String,String> requestParam = new HashMap<String,String>();
+		if(Validator.isNotNullOrEmpty(payParamCommand.getOrderNo())){//铁定不能为空的
+			requestParam.put("out_trade_no", payParamCommand.getOrderNo());
+		}else{
+			throw new PaymentParamErrorException("out_trade_no can't be null/empty!");
+		}
+		
+		if(Validator.isNotNullOrEmpty(payParamCommand.getRequestParams().get("omsCode"))){
+			requestParam.put("req_id", String.valueOf(payParamCommand.getRequestParams().get("omsCode")));
+		}else{
+			throw new PaymentParamErrorException("req_id can't be null/empty!");
+		}
+		
+		BigDecimal minPay = new BigDecimal(0.01f);
+		BigDecimal maxPay = new BigDecimal(100000000);
+		
+		BigDecimal total = new BigDecimal(String.valueOf(payParamCommand.getRequestParams().get("total")));
+		if (Validator.isNotNullOrEmpty(total)) {
+			requestParam.put("total_fee", String.valueOf(total));
+		} else if (total.compareTo(minPay) == -1
+				|| total.compareTo(maxPay) == 1) {
+			throw new PaymentParamErrorException("total_fee:" + total
+					+ " can't < " + minPay + " or > " + maxPay);
+		}else {
+			throw new PaymentParamErrorException("total_fee can't be null/empty!");
+		}
+
+		//可为空，但项目不允许传空的超时时间
+		if(Validator.isNotNullOrEmpty(payParamCommand.getIt_b_pay())){
+			requestParam.put("pay_expire", payParamCommand.getIt_b_pay());
+		}else {
+			throw new PaymentParamErrorException(
+					"it_b_pay can't be null/empty!");
+		}
+		
+		if(Validator.isNotNullOrEmpty(payParamCommand.getRequestParams().get("name"))){
+			requestParam.put("out_user", String.valueOf(payParamCommand.getRequestParams().get("name")));
+		}
+		return requestParam;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor#commandConvertorToMapForOrderInfo(com.baozun.nebula.utilities.common.command.BasePayParamCommandAdaptor)
+	 */
+	@Override
+	public Map<String, String> commandConvertorToMapForOrderInfo(
+			BasePayParamCommandAdaptor payParamCommand) {
+		Map<String, String> addition = new HashMap<String, String>();
+		addition.put("out_trade_no", String.valueOf(payParamCommand.getRequestParams().get("code")));
+		return addition;
 	}
 	
 	
