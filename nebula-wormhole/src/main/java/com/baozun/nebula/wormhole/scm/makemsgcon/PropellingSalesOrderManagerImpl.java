@@ -218,7 +218,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         deliveryInfoV5.setReceiverPhone(salesOrderCommand.getTel());
         deliveryInfoV5.setAppointShipDate(salesOrderCommand.getAppointShipDate());
 
-        //派件时间类型（快递附加服务）【logisticsServiceType】：1：普通5：当日6：次日
+        //派件时间类型（快递附加服务）【logisticsServiceType】：1：普通5：当日6：次日 7 次晨达
         deliveryInfoV5.setLogisticsServiceType(salesOrderCommand.getAppointType());
         deliveryInfoV5.setRemark(null);
         return deliveryInfoV5;
