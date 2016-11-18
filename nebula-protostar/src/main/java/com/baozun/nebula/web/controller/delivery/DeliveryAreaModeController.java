@@ -102,6 +102,9 @@ public class DeliveryAreaModeController extends BaseController{
 			map.put("secondDelivery", areaDeliveryMode.getSecondDayDelivery());
 			map.put("secondEndTime", areaDeliveryMode.getSecondDeliveryEndTime());
 			map.put("secondStartTime", areaDeliveryMode.getSecondDeliveryStartTime());
+			map.put("thirdDayDelivery", areaDeliveryMode.getThirdDayDelivery());
+			map.put("thirdDeliveryStartTime", areaDeliveryMode.getThirdDeliveryStartTime());
+			map.put("thirdDeliveryEndTime", areaDeliveryMode.getThirdDeliveryEndTime());
 			map.put("supportCod", areaDeliveryMode.getSupport_COD());
 			map.put("lang", LangUtil.getCurrentLang());
 			areaDeliveryModeManager.updateDeliveryMode(map);

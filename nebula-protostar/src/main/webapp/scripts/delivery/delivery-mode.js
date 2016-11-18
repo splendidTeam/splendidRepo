@@ -203,20 +203,20 @@ var setting = {
                 	$j("#areaId").val(f.id);
                     $j("#logisticsCode").val(e.logisticsCode);
                     $j("#logisticsCompany").val(e.logisticsCompany);
-                    $j("#commonDelivery").val(e.commonDelivery=='是'?'true':'false');
+                    $j("#commonDelivery").val(e.commonDelivery=='Y'?'true':'false');
                     $j("#commomStartTime").val(e.commonDeliveryStartTime);
                     $j("#commomEndTime").val(e.commonDeliveryEndTime);
-                    $j("#firstDayDelivery").val(e.firstDayDelivery=='是'?'true':'false');
+                    $j("#firstDayDelivery").val(e.firstDayDelivery=='Y'?'true':'false');
                     $j("#firstStartTime").val(e.firstDeliveryStartTime);
                     $j("#firstEndTime").val(e.firstDeliveryEndTime);
-                    $j("#secondDayDelivery").val(e.secondDayDelivery=='是'?'true':'false');
+                    $j("#secondDayDelivery").val(e.secondDayDelivery=='Y'?'true':'false');
                     $j("#secondStartTime").val(e.secondDeliveryStartTime);
                     $j("#secondEndTime").val(e.secondDeliveryEndTime);
                     $j("#remark").val(e.remark);
                     $j("#createTime").val(formatDateTime(e.createTime));
                     $j("#modifyTime").val(formatDateTime(e.modifyTime));
                     $j("#version").val(formatDateTime(e.version));
-                    $j("#supportcod").val(e.support_COD=='是'?'true':'false');
+                    $j("#supportcod").val(e.support_COD=='Y'?'true':'false');
                 } 
             }
         },
@@ -401,40 +401,43 @@ $j(function() {
         var areaId= $j("#areaId").val();
         var logisticsCode= $j("#logisticsCode").val();
         var logisticsCompany=$j("#logisticsCompany").val();
-        var commonDelivery=$j("#commonDelivery").val()=='true'?'是':'否';
+        var commonDelivery=$j("#commonDelivery").val()=='true'?'Y':'N';
         var commomStartTime= $j("#commomStartTime").val();
         var commomEndTime=$j("#commomEndTime").val();
-        var firstDayDelivery= $j("#firstDayDelivery").val()=='true'?'是':'否';
+        var firstDayDelivery= $j("#firstDayDelivery").val()=='true'?'Y':'N';
         var firstStartTime=  $j("#firstStartTime").val();
         var firstEndTime= $j("#firstEndTime").val();
-        var secondDayDelivery=$j("#secondDayDelivery").val()=='true'?'是':'否';
-        var supportcod= $j("#supportcod").val()=='true'?'是':'否';
+        var secondDayDelivery=$j("#secondDayDelivery").val()=='true'?'Y':'N';
         var secondStartTime=$j("#secondStartTime").val();
         var secondEndTime=$j("#secondEndTime").val();
+        var thirdDayDelivery=$j("#thirdDayDelivery").val()=='true'?'Y':'N';
+        var thirdDeliveryStartTime=$j("#thirdDeliveryStartTime").val();
+        var thirdDeliveryEndTime=$j("#thirdDeliveryEndTime").val();
+        var supportcod= $j("#supportcod").val()=='true'?'Y':'N';
         var remark= $j("#remark").val();
         //如果物流选择为否，则不需要填写相应的时间
-        if((commonDelivery=='否')&&(!isNull(commomStartTime)||!isNull(commomEndTime))){
+        if((commonDelivery=='N')&&(!isNull(commomStartTime)||!isNull(commomEndTime))){
        	 nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_COMMONDELIVERY_TIME_UNEMPTY"));
             $j("#tree_code").focus();
             return
        }
-       if((firstDayDelivery=='否')&&(!isNull(firstStartTime)||!isNull(firstEndTime))){
+       if((firstDayDelivery=='N')&&(!isNull(firstStartTime)||!isNull(firstEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_FIRSTDELIVERY_TIME_UNEMPTY"));
            $j("#tree_code").focus();
            return
        }
-       if((secondDayDelivery=='否')&&(!isNull(secondStartTime)||!isNull(secondEndTime))){
+       if((secondDayDelivery=='N')&&(!isNull(secondStartTime)||!isNull(secondEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_SECONDDELIVERY_TIME_UNEMPTY"));
            $j("#tree_code").focus();
            return
        }
        //如果物流选择为是，则必须填写对应的起始时间和关闭时间
-       if((commonDelivery!='否')&&(isNull(commomStartTime)||isNull(commomEndTime))){
+       if((commonDelivery!='N')&&(isNull(commomStartTime)||isNull(commomEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_COMMONDELIVERY_TIME_EMPTY"));
            $j("#tree_code").focus();
            return
        }
-       if((firstDayDelivery!='否')&&(isNull(firstStartTime)||isNull(firstEndTime))){
+       if((firstDayDelivery!='N')&&(isNull(firstStartTime)||isNull(firstEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_FIRSTDELIVERY_TIME_EMPTY"));
            $j("#tree_code").focus();
            return
@@ -444,7 +447,7 @@ $j(function() {
            $j("#tree_code").focus();
            return
        }
-       if((secondDayDelivery!='否')&&(isNull(secondStartTime)||secondEndTime==null||secondStartTime==""||secondEndTime=="")){
+       if((secondDayDelivery!='N')&&(isNull(secondStartTime)||secondEndTime==null||secondStartTime==""||secondEndTime=="")){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_SECONDDELIVERY_TIME_EMPTY"));
            $j("#tree_code").focus();
            return
@@ -477,6 +480,9 @@ $j(function() {
             multlangs += ',"secondDayDelivery":"' + secondDayDelivery + '"';
             multlangs += ',"secondDeliveryStartTime":"' + secondStartTime + '"';
             multlangs += ',"secondDeliveryEndTime":"' + secondEndTime + '"';
+            multlangs += ',"thirdDayDelivery":"' + thirdDayDelivery + '"';
+            multlangs += ',"thirdDeliveryStartTime":"' + thirdDeliveryStartTime + '"';
+            multlangs += ',"thirdDeliveryEndTime":"' + thirdDeliveryEndTime + '"';
             multlangs += ',"remark":"' + remark + '"';
             multlangs +=',"support_COD":"' + supportcod + '"';
             multlangs += "}";
@@ -501,6 +507,9 @@ $j(function() {
                       "secondDayDelivery": secondDayDelivery ,
                       "secondDeliveryStartTime": secondStartTime ,
                       "secondDeliveryEndTime": secondEndTime,
+                      "thirdDayDelivery": thirdDayDelivery ,
+                      "thirdDeliveryStartTime": thirdDeliveryStartTime ,
+                      "thirdDeliveryEndTime": thirdDeliveryEndTime,
                       "support_COD": supportcod,
                       "remark":  remark 
             }

@@ -36,7 +36,7 @@ var zNodes = [
 	<div></div>
     <div class="content-box width-percent100">
        
-	       <div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/tag.png">物流配送方式管理</div>
+	       <div class="ui-title1"><img src="${base}/images/wmi/blacks/32x32/tag.png"><spring:message code="delivery.area"/></div>
            <div class="ui-block ui-block-fleft w240">
                     <div class="ui-block-content ui-block-content-lb">
                         <div class="tree-control">
@@ -90,12 +90,14 @@ var zNodes = [
            			  
 			          <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.commonDeliveryStartTime"/></label>
-				           <input type="text" id="commomStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.commonDeliveryStartTime"/>"  />
+				         <input type="text" id="commomStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.commonDeliveryStartTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
 			         </div>
 			         
 			          <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.commonDeliveryEndTime"/></label>
-				           <input type="text" id="commomEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.commonDeliveryEndTime"/>"  />
+				         <input type="text" id="commomEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.commonDeliveryEndTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>
 			         </div>
 			         
 			          <div class="ui-block-line">
@@ -107,11 +109,13 @@ var zNodes = [
            			  
 			          <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.firstDeliveryStartTime"/></label>
-				           <input type="text" id="firstStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.firstDeliveryStartTime"/>"  />
+				         <input type="text" id="firstStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.firstDeliveryStartTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
 			         </div>
 			          <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.firstDeliveryEndTime"/></label>
-				           <input type="text" id="firstEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.firstDeliveryEndTime"/>"  />
+				         <input type="text" id="firstEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.firstDeliveryEndTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
 			         </div>
 			       
 			          <div class="ui-block-line">
@@ -123,17 +127,40 @@ var zNodes = [
            			 
 			          <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.secondDeliveryStartTime"/></label>
-				           <input type="text" id="secondStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.secondDeliveryStartTime"/>"  />
+				         <input type="text" id="secondStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.secondDeliveryStartTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
 			         </div>
 			         
 			         <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.secondDeliveryEndTime"/></label>
-				           <input type="text" id="secondEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.secondDeliveryEndTime"/>"  />
+				         <input type="text" id="secondEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.secondDeliveryEndTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
 			         </div>
+			         
+			          <div class="ui-block-line">
+             			 <label>
+              				 <spring:message code="delivery.area.thirdDayDelivery"/>
+             				 </label>
+             				 <opt:select id="thirdDayDelivery" name="thirdDayDelivery" loxiaType="select" expression="chooseOption.TRUE_OR_FALSE" />
+           			  </div>
+           			 
+			          <div class="ui-block-line">
+				         <label><spring:message code="delivery.area.thirdDeliveryStartTime"/></label>
+				         <input type="text" id="thirdDeliveryStartTime" loxiatype="input" placeholder="<spring:message code="delivery.area.thirdDeliveryStartTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
+			         </div>
+			         
+			         <div class="ui-block-line">
+				         <label><spring:message code="delivery.area.thirdDeliveryEndTime"/></label>
+				         <input type="text" id="thirdDeliveryEndTime" loxiatype="input" placeholder="<spring:message code="delivery.area.thirdDeliveryEndTime"/>"  />
+				         <span><spring:message code="delivery.area.timeformat"/></span>  
+			         </div>			         
+			         
 			         <div class="ui-block-line">
 				         <label><spring:message code="delivery.area.remark"/></label>
 				           <input type="text" id="remark" loxiatype="input" placeholder="<spring:message code="delivery.area.remark"/>"  />
 			         </div>
+			         
 			        <div class="button-line1">
 			               <a href="javascript:void(0);" class="func-button persist" id="save_node" title="<spring:message code="btn.save"/>"><spring:message code="btn.save"/></a>
                            <a href="javascript:void(0);" class="func-button delete" id="delete_node" title="<spring:message code="btn.delete"/>"><spring:message code="btn.delete"/></a>
