@@ -86,6 +86,7 @@ public class DeliveryInfoV5 implements Serializable {
      * 1：普通
      * 5：当日
      * 6：次日
+     * 7 次晨达
      */
     private String logisticsServiceType;
     

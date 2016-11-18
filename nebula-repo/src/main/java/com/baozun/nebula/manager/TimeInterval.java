@@ -1,12 +1,6 @@
 package com.baozun.nebula.manager;
 /**
- * 时间间隔(一般以秒为单位) <br>
- * Integer.MAX_VALUE:2147483647<br>
- * Integer.MIN_VALUE-2147483648<br>
- * 一年数据为 31536000,所以 Integer 最大为 68.096259734906 年
- * 
- * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 1.0 2012-5-18 下午2:57:14
+ * @deprecated pls use {@link com.feilong.core.TimeInterval}
  */
 public final class TimeInterval{
 
