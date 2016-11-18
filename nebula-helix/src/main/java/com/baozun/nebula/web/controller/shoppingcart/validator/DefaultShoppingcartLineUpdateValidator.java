@@ -25,8 +25,6 @@ import static com.feilong.core.util.CollectionsUtil.find;
 import static com.feilong.core.util.predicate.BeanPredicateUtil.equalPredicate;
 import static org.apache.commons.collections4.PredicateUtils.notPredicate;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.PredicateUtils;
