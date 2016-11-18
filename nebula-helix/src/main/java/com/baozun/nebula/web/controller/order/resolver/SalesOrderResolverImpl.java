@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.order.resolver;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toLong;
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
@@ -28,7 +29,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,6 @@ import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.PaymentInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
-import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.servlet.http.RequestUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
@@ -223,7 +222,7 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         Address city = AddressUtil.getAddressById(shippingInfoSubForm.getCityId());
         Address area = AddressUtil.getAddressById(shippingInfoSubForm.getAreaId());
         Address town = AddressUtil.getAddressById(shippingInfoSubForm.getTownId());
-        
+
         salesOrderCommand.setCountry(country == null ? EMPTY : country.getName());
         salesOrderCommand.setProvince(province == null ? EMPTY : province.getName());
         salesOrderCommand.setCity(city == null ? EMPTY : city.getName());
@@ -265,13 +264,39 @@ public class SalesOrderResolverImpl implements SalesOrderResolver{
         calcFreightCommand.setCityId(salesOrderCommand.getCityId());
         calcFreightCommand.setCountyId(salesOrderCommand.getAreaId());
         calcFreightCommand.setTownId(salesOrderCommand.getTownId());
-        // 设置默认的物流方式
-        String modeId = mataInfoManager.findValue(MetaInfoConstants.DISTRIBUTION_MODE_ID);
-        if (modeId != null){
-            calcFreightCommand.setDistributionModeId(Long.parseLong(modeId));
-        }
+
+        calcFreightCommand.setDistributionModeId(buildDistributionModeId(salesOrderCommand));
+
         LOGGER.debug("calcFreightCommand is {}", JsonUtil.format(calcFreightCommand));
         salesOrderCommand.setCalcFreightCommand(calcFreightCommand);
+    }
+
+    /**
+     * 解析生成 物流方式.
+     *
+     * @param salesOrderCommand
+     *            the sales order command
+     * @return 如果有设置参数 {@link com.baozun.nebula.sdk.command.SalesOrderCommand#getAppointType()}, 那么直接转成 long<br>
+     *         如果没有传递参数,那么读取db(cache) 默认配置 {@link com.baozun.nebula.constants.MetaInfoConstants#DISTRIBUTION_MODE_ID}<br>
+     *         如果还没有,那么返回null
+     * @see <a href="http://jira.baozun.cn/browse/NB-377">NB-377</a>
+     * @since 5.3.2.3
+     */
+    private Long buildDistributionModeId(SalesOrderCommand salesOrderCommand){
+        //如果有设置参数, 那么直接转成 long
+        String appointType = salesOrderCommand.getAppointType();
+        if (isNotNullOrEmpty(appointType)){
+            return toLong(appointType);
+        }
+
+        //如果没有传递参数,那么读取db(cache) 默认配置
+        String modeId = mataInfoManager.findValue(MetaInfoConstants.DISTRIBUTION_MODE_ID);// 设置默认的物流方式
+        if (isNotNullOrEmpty(modeId)){
+            return toLong(modeId);
+        }
+
+        //如果还没有,那么返回null
+        return null;
     }
 
     /**
