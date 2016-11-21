@@ -4,9 +4,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import loxia.dao.Sort;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.Watcher.Event.EventType;
+import org.apache.zookeeper.data.ACL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +23,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.baozun.nebula.curator.ZKWatchPath;
+import com.baozun.nebula.curator.ZkOperator;
+import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
+import com.baozun.nebula.curator.invoke.I18nLangWatchInvoke;
+import com.baozun.nebula.curator.watcher.AbstractWatcher;
+import com.baozun.nebula.curator.watcher.IWatcher;
+import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.manager.product.CategoryManager;
 import com.baozun.nebula.manager.product.ItemCategoryManager;
 import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
+import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.utilities.common.LangUtil;
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
+import com.feilong.core.Validator;
 
 @Controller
 public class DeliveryAreaModeController extends BaseController{
@@ -44,6 +60,15 @@ public class DeliveryAreaModeController extends BaseController{
 	
 	@Autowired
 	private SdkAreaDeliveryModeManager areaDeliveryModeManager;
+	
+	@Autowired
+	private SdkMataInfoManager sdkMataInfoManager;
+	
+	@Autowired
+	private ZkOperator zkOperator;
+	
+	@Autowired
+	private ZKWatchPath zkWatchPath;
 	
 	/**
 	 * 物流管理
@@ -173,10 +198,11 @@ public class DeliveryAreaModeController extends BaseController{
 		newArea.setVersion(date);
 		newArea.setStatus(1);
 		DeliveryArea dArea = deliveryAreaManager.insertDeliveryArea(newArea);
-		if(null==dArea){
-			return null;
+		if(null!=dArea){
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(I18nLangWatchInvoke.class));
+			return dArea;
 		}
-		return dArea;
+		return null;
 	}
 	
 	
@@ -201,10 +227,11 @@ public class DeliveryAreaModeController extends BaseController{
 		newArea.setVersion(date);
 		newArea.setStatus(1);
 		DeliveryArea dArea = deliveryAreaManager.insertDeliveryArea(newArea);
-		if(null==dArea){
-			return null;
+		if(null!=dArea){
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(I18nLangWatchInvoke.class));
+			return dArea;
 		}
-		return dArea;
+		return null;
 	}
 	
 	
@@ -216,5 +243,6 @@ public class DeliveryAreaModeController extends BaseController{
 	@RequestMapping(value = { "/logistics/areaDeliver/deleteDeliveryAreaById.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
 	public void deleteDeliveryAreaById(@RequestParam(value = "id", required = true) Long id) {
 		deliveryAreaManager.deleteDeliveryAreaById(id);
+		zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(I18nLangWatchInvoke.class));
 	}
 }

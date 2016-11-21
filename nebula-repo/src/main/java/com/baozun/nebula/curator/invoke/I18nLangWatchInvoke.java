@@ -55,7 +55,7 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 		AddressUtil.setLanguageList(languageList);
 		
 		String delivery_mode_on_off = sdkMataInfoManager.findValue("delivery_mode_on_off");
-		if(delivery_mode_on_off == null || delivery_mode_on_off.equals("false") || !delivery_mode_on_off.equals("true")){
+		if(null == delivery_mode_on_off || delivery_mode_on_off.equals("false") || !delivery_mode_on_off.equals("true")){
 			AddressUtil.init();
 		}else{
 			AddressUtil.setDeliveryModeOn(true);

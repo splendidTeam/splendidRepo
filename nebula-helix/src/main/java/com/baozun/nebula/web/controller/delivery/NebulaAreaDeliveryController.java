@@ -23,6 +23,7 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.delivery.viewcommand.DeliveryAreaViewCommand;
 import com.feilong.core.Validator;
+import com.feilong.core.date.DateUtil;
 
 /**
  * @Description 三级下拉省市区，物流配送控制层
@@ -61,72 +62,50 @@ public class NebulaAreaDeliveryController extends BaseController {
 	}
 
 	// 判断是否支持当日达和COD
-	private void judgeDelivery(Long areaCode,
-			DefaultReturnResult defaultReturnResult) {
+	private void judgeDelivery(Long areaCode, DefaultReturnResult defaultReturnResult) {
 		boolean flag = false;
 		DeliveryArea area = deliveryareaManager.findEnableDeliveryAreaByCode(areaCode+"");
 		DeliveryAreaViewCommand areaViewCommand = (DeliveryAreaViewCommand) ConvertUtils
 				.convertTwoObject(new DeliveryAreaViewCommand(), area);
 		if (Validator.isNotNullOrEmpty(area)) {
-			AreaDeliveryMode areaMode = areaModeManager
-					.findAreaDeliveryModeByAreaId(area.getId());
+			AreaDeliveryMode areaMode = areaModeManager.findAreaDeliveryModeByAreaId(area.getId());
 			if (null != areaMode) {
-				areaViewCommand = (DeliveryAreaViewCommand) ConvertUtils
-						.convertTwoObject(areaViewCommand, areaMode);
+				areaViewCommand = (DeliveryAreaViewCommand) ConvertUtils.convertTwoObject(areaViewCommand, areaMode);
 				defaultReturnResult.setReturnObject(areaMode);
-				DateFormat df = new SimpleDateFormat("HH:mm:ss");
-				Date now = new Date();
-				try {
-					now = df.parse(df.format(now));
-					if (areaViewCommand.getFirstDayDelivery().equals(
-							AreaDeliveryMode.YES)
-							&& Validator.isNotNullOrEmpty(areaViewCommand
-									.getFirstDeliveryStartTime())
-							&& Validator.isNotNullOrEmpty(areaViewCommand
-									.getFirstDeliveryEndTime())) {
-						// 时间是否允许
-						now = df.parse(df.format(now));
-						flag = (now.before(df.parse(areaMode
-								.getFirstDeliveryEndTime())))
-								&& (now.after(df.parse(areaMode
-										.getFirstDeliveryStartTime())));
-						defaultReturnResult.setResult(flag);
+				String dateFormat = "HH:mm:ss";
+				Date now = DateUtil.toDate(DateUtil.toString(new Date(), dateFormat), dateFormat);
+				if (AreaDeliveryMode.YES.equals(areaViewCommand.getFirstDayDelivery())
+						&& Validator.isNotNullOrEmpty(areaViewCommand.getFirstDeliveryStartTime())
+						&& Validator.isNotNullOrEmpty(areaViewCommand.getFirstDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(areaViewCommand.getFirstDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(areaViewCommand.getFirstDeliveryEndTime(),dateFormat);
+					flag = DateUtil.isInTime(now, beginTime, endTime);
+					defaultReturnResult.setResult(flag);
 
-					}
-
-					// 是否支持次日达
-					if (areaMode.getSecondDayDelivery().equals(
-							AreaDeliveryMode.YES)
-							&& Validator.isNotNullOrEmpty(areaMode
-									.getSecondDeliveryStartTime())
-							&& Validator.isNotNullOrEmpty(areaMode
-									.getSecondDeliveryEndTime())) {
-						// 时间是否允许
-						now = df.parse(df.format(now));
-						flag = (now.before(df.parse(areaMode
-								.getSecondDeliveryEndTime())))
-								&& (now.after(df.parse(areaMode
-										.getSecondDeliveryStartTime())));
-						defaultReturnResult.setResult(flag);
-					}
-
-					if (areaMode.getThirdDayDelivery().equals(
-							AreaDeliveryMode.YES)
-							&& Validator.isNotNullOrEmpty(areaMode
-									.getThirdDeliveryStartTime())
-							&& Validator.isNotNullOrEmpty(areaMode
-									.getThirdDeliveryEndTime())) {
-						// 时间是否允许
-						flag = (now.before(df.parse(areaMode
-								.getSecondDeliveryEndTime())))
-								&& (now.after(df.parse(areaMode
-										.getSecondDeliveryStartTime())));
-						defaultReturnResult.setResult(flag);
-					}
-					defaultReturnResult.setReturnObject(areaViewCommand);
-				} catch (ParseException e) {
-					LOGGER.error("DateFormat Format ERROR !", e);
 				}
+
+				// 是否支持次日达
+				if (AreaDeliveryMode.YES.equals(areaViewCommand.getSecondDayDelivery())
+						&& Validator.isNotNullOrEmpty(areaViewCommand.getSecondDeliveryStartTime())
+						&& Validator.isNotNullOrEmpty(areaViewCommand.getSecondDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(areaViewCommand.getSecondDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(areaViewCommand.getSecondDeliveryEndTime(),dateFormat);
+					flag = DateUtil.isInTime(now, beginTime, endTime);
+					defaultReturnResult.setResult(flag);
+				}
+
+				if (AreaDeliveryMode.YES.equals(areaViewCommand.getThirdDayDelivery())
+						&& Validator.isNotNullOrEmpty(areaViewCommand.getThirdDeliveryStartTime())
+						&& Validator.isNotNullOrEmpty(areaViewCommand.getThirdDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(areaViewCommand.getThirdDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(areaViewCommand.getThirdDeliveryEndTime(),dateFormat);
+					flag = DateUtil.isInTime(now, beginTime, endTime);
+					defaultReturnResult.setResult(flag);
+				}
+				defaultReturnResult.setReturnObject(areaViewCommand);
 			} else {
 				defaultReturnResult.setResult(false);
 				defaultReturnResult.setStatusCode("deliveryArea.has.not.areamode");
@@ -136,4 +115,5 @@ public class NebulaAreaDeliveryController extends BaseController {
 			defaultReturnResult.setStatusCode("deliveryArea.not.exist");
 		}
 	}
+	
 }
