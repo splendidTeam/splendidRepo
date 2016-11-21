@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.order;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
+import static com.feilong.core.bean.ConvertUtil.toLong;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,12 +172,15 @@ public class NebulaOrderConfirmController extends BaseController{
     @Autowired
     private SdkShoppingCartBundleNewLineBuilder sdkShoppingCartBundleNewLineBuilder;
 
+    /** The confirm before handler. */
     @Autowired(required = false)
     private OrderConfirmBeforeHandler confirmBeforeHandler;
 
+    /** The delivery area manager. */
     @Autowired
     private SdkDeliveryAreaManager deliveryAreaManager;
 
+    /** The area delivery mode manager. */
     @Autowired
     private SdkAreaDeliveryModeManager areaDeliveryModeManager;
 
@@ -197,12 +201,7 @@ public class NebulaOrderConfirmController extends BaseController{
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/check", method = RequestMethod.GET)
      */
-    public String showTransactionCheck(
-                    @LoginMember MemberDetails memberDetails,
-                    @RequestParam(value = "key",required = false) String key,
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    Model model){
+    public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,HttpServletResponse response,Model model){
         List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
@@ -277,8 +276,7 @@ public class NebulaOrderConfirmController extends BaseController{
         Integer quantity = oldShoppingCartLineCommand.getQuantity();
 
         for (Long skuId : skuIds){
-            ShoppingCartLineCommand newShoppingCartLineCommand = sdkShoppingCartBundleNewLineBuilder
-                            .buildNewShoppingCartLineCommand(relatedItemId, skuId, quantity, oldShoppingCartLineCommand);
+            ShoppingCartLineCommand newShoppingCartLineCommand = sdkShoppingCartBundleNewLineBuilder.buildNewShoppingCartLineCommand(relatedItemId, skuId, quantity, oldShoppingCartLineCommand);
             newShoppingCartLineCommands.add(newShoppingCartLineCommand);
         }
     }
@@ -328,12 +326,30 @@ public class NebulaOrderConfirmController extends BaseController{
         }
 
         //地址
-        List<ContactCommand> addressList = toAddressList(orderForm.getShippingInfoSubForm());
+        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(orderForm);
 
-        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, addressList, toList(couponCode), request);
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, calcFreightCommand, toList(couponCode), request);
         shoppingCartCommand = convertForShow(shoppingCartCommand);
         return toNebulaReturnResult(shoppingCartCommand);
 
+    }
+
+    /**
+     * To calc freight command.
+     *
+     * @param orderForm
+     *            the order form
+     * @return the calc freight command
+     * @see <a href="http://jira.baozun.cn/browse/NB-384?filter=10744">NB-384</a>
+     * @since 5.3.2.3
+     */
+    private CalcFreightCommand toCalcFreightCommand(OrderForm orderForm){
+        ShippingInfoSubForm shippingInfoSubForm = orderForm.getShippingInfoSubForm();
+        List<ContactCommand> addressList = toAddressList(shippingInfoSubForm);
+
+        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(addressList);
+        calcFreightCommand.setDistributionModeId(toLong(shippingInfoSubForm.getAppointType()));
+        return calcFreightCommand;
     }
 
     /**
@@ -351,22 +367,35 @@ public class NebulaOrderConfirmController extends BaseController{
      *            the request
      * @return the shopping cart command
      */
-    private ShoppingCartCommand buildShoppingCartCommand(
-                    MemberDetails memberDetails,
-                    String key,
-                    List<ContactCommand> contactCommandList,
-                    List<String> couponList,
-                    HttpServletRequest request){
+    private ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,String key,List<ContactCommand> contactCommandList,List<String> couponList,HttpServletRequest request){
+        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(contactCommandList);
+        return buildShoppingCartCommand(memberDetails, key, calcFreightCommand, couponList, request);
+    }
+
+    /**
+     * Builds the shopping cart command.
+     *
+     * @param memberDetails
+     *            the member details
+     * @param key
+     *            the key
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @param couponList
+     *            the coupon list
+     * @param request
+     *            the request
+     * @return the shopping cart command
+     * @since 5.3.2.3
+     */
+    private ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,String key,CalcFreightCommand calcFreightCommand,List<String> couponList,HttpServletRequest request){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
         shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
 
         //购物行为空，抛出异常
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
-        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(contactCommandList);
-
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
-                        .buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
 
         //购物车为空，抛出异常
         Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
@@ -394,6 +423,13 @@ public class NebulaOrderConfirmController extends BaseController{
         return contactCommands;
     }
 
+    /**
+     * Gets the delivery area code.
+     *
+     * @param contactCommand
+     *            the contact command
+     * @return the delivery area code
+     */
     protected String getDeliveryAreaCode(ContactCommand contactCommand){
         return contactCommand.getAreaId() + "";
     }
@@ -438,8 +474,7 @@ public class NebulaOrderConfirmController extends BaseController{
      * @since 5.3.1.9
      */
     protected boolean isNeedReferToCalcFreight(ShippingInfoSubForm shippingInfoSubForm){
-        return shippingInfoSubForm != null && shippingInfoSubForm.getProvinceId() != null && shippingInfoSubForm.getCityId() != null
-                        && shippingInfoSubForm.getAreaId() != null;
+        return shippingInfoSubForm != null && shippingInfoSubForm.getProvinceId() != null && shippingInfoSubForm.getCityId() != null && shippingInfoSubForm.getAreaId() != null;
     }
 
     /**
