@@ -1,4 +1,4 @@
-INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'cancelOrderTaskManager', 'cancel_orders', '45分钟取消订单', 1, 'cancelOrders', '0 0/5 * * * ?', NULL);
+INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'salesOrderCancelTaskManager', 'cancel_orders', '45分钟取消订单', 1, 'cancelOrders', '0 0/5 * * * ?', NULL);
 INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'syncInventoryManager', 'sync_inventory_inc', '库存增量同步', 1, 'syncIncrementInventory', '0 3/5 * * * ?', NULL);
 INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'syncSalesOrderManager', 'sync_order_status', 'oms订单状态同步到商城', 1, 'syncSoStatus', '0 4/5 * * * ?', NULL);
 INSERT INTO "t_sys_scheduler_task" VALUES (nextval('S_T_SYS_SCHEDULER_TASK'), 'messageCompensateManager', 'message_Compensate', '消息补偿机制', 1, 'timeMessageCompensate', '0 0/5 * * * ?', NULL);

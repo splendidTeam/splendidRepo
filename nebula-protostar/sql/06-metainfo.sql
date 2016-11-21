@@ -16,3 +16,6 @@ INSERT INTO "t_sys_mata_info" VALUES (nextval('S_T_SYS_MATA_INFO'), 'product.vis
 
 --国际化开关
 INSERT INTO "t_sys_mata_info" VALUES (nextval('S_T_SYS_MATA_INFO'), 'i18n.on.off', 1, 'false', now());
+
+--物流配送方式管理开关
+INSERT INTO "t_sys_mata_info" VALUES (nextval('S_T_SYS_MATA_INFO'), 'delivery_mode_on_off', 1, 'true', now());
