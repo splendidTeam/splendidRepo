@@ -1,5 +1,8 @@
 package com.baozun.nebula.sdk.manager.impl;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.find;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,36 +60,37 @@ import com.baozun.nebula.sdk.manager.LogisticsManager;
 import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utilities.library.address.Address;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
+import com.feilong.core.util.CollectionsUtil;
 
 @Transactional
 @Service("logisticsManager")
 public class LogisticsManagerImpl implements LogisticsManager{
 
-    private static final Logger          log = LoggerFactory.getLogger(LogisticsManagerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(LogisticsManagerImpl.class);
 
     @Autowired
-    private FreightMemoryManager         freigthMemoryManager;
+    private FreightMemoryManager freigthMemoryManager;
 
     @Autowired
-    private SdkLogisticsDao              sdkLogisticsDao;
+    private SdkLogisticsDao sdkLogisticsDao;
 
     @Autowired
-    private ShippingFeeConfigDao         shippingFeeConfigDao;
+    private ShippingFeeConfigDao shippingFeeConfigDao;
 
     @Autowired
-    private ShippingTemeplateDao         shippingTemeplateDao;
+    private ShippingTemeplateDao shippingTemeplateDao;
 
     @Autowired
-    private ProductShippingTemeplateDao  productShippingFeeTemeplateDao;
+    private ProductShippingTemeplateDao productShippingFeeTemeplateDao;
 
     @Autowired
-    private ShippingProviderDao          shippingProviderDao;
+    private ShippingProviderDao shippingProviderDao;
 
     @Autowired
-    private SupportedAreaDao             supportedAreaDao;
+    private SupportedAreaDao supportedAreaDao;
 
     @Autowired
-    private DistributionModeDao          distributionModeDao;
+    private DistributionModeDao distributionModeDao;
 
     @Autowired
     private TemeplateDistributionModeDao temeplateDistributionModeDao;
@@ -306,12 +310,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
         if (shippingTemeplateCmd.isDefault()){// 设置其他为非默认
             shippingTemeplateDao.updateShippingTemeplateByShopId(shippingTemeplateCmd.getShopId(), ShippingTemeplate.NOTDEFAULT);
         }
-        int effectedRows = shippingTemeplateDao.updateShippingTemeplate(
-                        shippingTemeplateCmd.getId(),
-                        shippingTemeplateCmd.getName(),
-                        shippingTemeplateCmd.getCalculationType(),
-                        shippingTemeplateCmd.isDefault(),
-                        shippingTemeplateCmd.getDefaultFee());
+        int effectedRows = shippingTemeplateDao.updateShippingTemeplate(shippingTemeplateCmd.getId(), shippingTemeplateCmd.getName(), shippingTemeplateCmd.getCalculationType(), shippingTemeplateCmd.isDefault(), shippingTemeplateCmd.getDefaultFee());
         if (effectedRows != 1){
             throw new BusinessException(Constants.SHIPPING_TEMEPLATE_UPDATE_FAILURE);
         }
@@ -514,8 +513,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
                             // 看 市 县 乡 是不是在黑名单中 ，如果都不在黑名单中 ，说明 此物流方式支持该地址 TODO
                             // 如果 coutnId 不存在 就不判断 isAreaInBlackList countyId 和
                             // townId
-                            if (!(isAreaInBlackList(cityId, blackList) || isAreaInBlackList(countyId, blackList)
-                                            || isAreaInBlackList(townId, blackList))){
+                            if (!(isAreaInBlackList(cityId, blackList) || isAreaInBlackList(countyId, blackList) || isAreaInBlackList(townId, blackList))){
 
                                 modeList.add(getDistributionMode(modeId, modeName));
                                 break;
@@ -624,14 +622,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
      * java.lang.Long, java.lang.Long)
      */
     @Override
-    public BigDecimal findFreight(
-                    List<ItemFreightInfoCommand> itemList,
-                    Long distributionModeId,
-                    Long shopId,
-                    Long provienceId,
-                    Long cityId,
-                    Long countyId,
-                    Long townId){
+    public BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,Long distributionModeId,Long shopId,Long provienceId,Long cityId,Long countyId,Long townId){
         // 获得 店铺运费模板Map
         ShopShippingTemeplateMap shopShippingTemeplateMap = freigthMemoryManager.getShopShippingTemeplateMap();
 
@@ -695,13 +686,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            乡id
      * @return
      */
-    private ShippingFeeConfigCommand getFeeConfig(
-                    ShippingTemeplateCommand shippingTemeplate,
-                    Long distributionModeId,
-                    Long provienceId,
-                    Long cityId,
-                    Long countyId,
-                    Long townId){
+    private ShippingFeeConfigCommand getFeeConfig(ShippingTemeplateCommand shippingTemeplate,Long distributionModeId,Long provienceId,Long cityId,Long countyId,Long townId){
         ShippingFeeConfigCommand feeCmd = null;
 
         if (shippingTemeplate != null){
@@ -713,8 +698,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
 
             // 模板id-物流方式id-目的地id为key
             StringBuilder keyPrefixSb = new StringBuilder();
-            keyPrefixSb.append(temeplateId).append(ShippingFeeConfigMap.KEY_CONNECTOR).append(distributionModeId)
-                            .append(ShippingFeeConfigMap.KEY_CONNECTOR);
+            keyPrefixSb.append(temeplateId).append(ShippingFeeConfigMap.KEY_CONNECTOR).append(distributionModeId).append(ShippingFeeConfigMap.KEY_CONNECTOR);
 
             if (null != townId){
                 StringBuilder key = new StringBuilder(keyPrefixSb).append(townId);
@@ -863,26 +847,17 @@ public class LogisticsManagerImpl implements LogisticsManager{
     @Override
     public Boolean hasDistributionMode(CalcFreightCommand calcFreightCommand,Long shopId){
         // 通过收货地址获取支持的物流方式
-        List<DistributionMode> distributionModeList = findDistributeMode(
-                        shopId,
-                        calcFreightCommand.getProvienceId(),
-                        calcFreightCommand.getCityId(),
-                        calcFreightCommand.getCountyId(),
-                        calcFreightCommand.getTownId());
+        List<DistributionMode> distributionModeList = findDistributeMode(shopId, calcFreightCommand.getProvienceId(), calcFreightCommand.getCityId(), calcFreightCommand.getCountyId(), calcFreightCommand.getTownId());
 
-        Boolean flag = false;
-        if (Validator.isNotNullOrEmpty(distributionModeList)){
-            if (null != calcFreightCommand.getDistributionModeId()){
-                for (DistributionMode distributionMode : distributionModeList){
-                    if (distributionMode.getId().equals(calcFreightCommand.getDistributionModeId())){
-                        flag = true;
-                    }
-                }
-            }else{
-                flag = true;
-            }
+        if (isNullOrEmpty(distributionModeList)){
+            return false;
         }
-        return flag;
+
+        if (isNullOrEmpty(calcFreightCommand.getDistributionModeId())){
+            return true;
+        }
+
+        return null != find(distributionModeList, "id", calcFreightCommand.getDistributionModeId());
     }
 
     /*
