@@ -25,58 +25,61 @@ import com.baozun.nebula.freight.memory.ShopShippingTemeplateMap;
 
 /**
  * 运费内存管理memory
+ * 
  * @author Tianlong.Zhang
  *
  */
-public interface FreightMemoryManager {
-	
-	/**
-	 * 将数据库的 载物流列表 ，运费模板 ，店铺运费模板 ，运费配置信息加载到内存中
-	 * 
-	 */
-	public void loadFreightInfosFromDB();
-	
-	/**
-	 * 从数据库中加载物流列表
-	 */
-	public void loadDistributionList();
-	
-	/**
-	 * 从数据库中加载运费模板 map
-	 * 
-	 */
-	public void loadShippingTemeplateMap();
-	
-	/**
-	 * 从数据库中加载 店铺运费模板map
-	 * 
-	 */
-	public void loadShopShippingTemeplateMap();
-	
-	/**
-	 * 从数据库中加载运费配置信息Map
-	 */
-	public void loadShippingFeeConfigMap();
-	
-	/**
-	 * 从内存中获得物流列表
-	 * @return the cmdList
-	 */
-	public List<DistributionCommand> getDistributionList();
+public interface FreightMemoryManager{
 
-	/**
-	 * 从内存中获得运费模板 map
-	 * @return the shippingTemeplateMap
-	 */
-	public ShippingTemeplateMap getShippingTemeplateMap();
+    /**
+     * 将数据库的 载物流列表 ，运费模板 ，店铺运费模板 ，运费配置信息加载到内存中
+     * 
+     */
+    void loadFreightInfosFromDB();
 
-	/**
-	 * 从内存中获得 店铺运费模板map
-	 */
-	public ShopShippingTemeplateMap getShopShippingTemeplateMap();
+    /**
+     * 从数据库中加载物流列表
+     */
+    void loadDistributionList();
 
-	/**
-	 *从内存中获得 运费配置map
-	 */
-	public ShippingFeeConfigMap getShippingFeeConfigMap();
+    /**
+     * 从数据库中加载运费模板 map
+     * 
+     */
+    void loadShippingTemeplateMap();
+
+    /**
+     * 从数据库中加载 店铺运费模板map
+     * 
+     */
+    void loadShopShippingTemeplateMap();
+
+    /**
+     * 从数据库中加载运费配置信息Map
+     */
+    void loadShippingFeeConfigMap();
+
+    /**
+     * 从内存中获得物流列表
+     * 
+     * @return the cmdList
+     */
+    List<DistributionCommand> getDistributionList();
+
+    /**
+     * 从内存中获得运费模板 map
+     * 
+     * @return the shippingTemeplateMap
+     */
+    ShippingTemeplateMap getShippingTemeplateMap();
+
+    /**
+     * 从内存中获得 店铺运费模板map
+     */
+    ShopShippingTemeplateMap getShopShippingTemeplateMap();
+
+    /**
+     * 从内存中获得 运费配置map
+     */
+    ShippingFeeConfigMap getShippingFeeConfigMap();
 }

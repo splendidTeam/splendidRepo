@@ -8,7 +8,8 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		SELECT * from t_sf_temeplate_distribution_mode where shipping_tmp_id = :temeplateId
+		       		SELECT * from t_sf_temeplate_distribution_mode 
+		       		where shipping_tmp_id = :temeplateId
                  ]]>
 			</value>
 		</constructor-arg>

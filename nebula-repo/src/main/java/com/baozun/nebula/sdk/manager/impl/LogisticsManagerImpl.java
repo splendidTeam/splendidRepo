@@ -1,7 +1,27 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
 package com.baozun.nebula.sdk.manager.impl;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.util.CollectionsUtil.find;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueSet;
+import static com.feilong.core.util.CollectionsUtil.select;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -9,10 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import loxia.dao.Page;
-import loxia.dao.Pagination;
-import loxia.dao.Sort;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,133 +69,79 @@ import com.baozun.nebula.model.salesorder.Logistics;
 import com.baozun.nebula.sdk.command.logistics.DistributionModeCommand;
 import com.baozun.nebula.sdk.command.logistics.ItemFreightInfoCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
-import com.baozun.nebula.sdk.command.logistics.ShippingProviderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.LogisticsManager;
-import com.baozun.nebula.utilities.common.Validator;
-import com.baozun.nebula.utilities.library.address.Address;
-import com.baozun.nebula.utilities.library.address.AddressUtil;
-import com.feilong.core.util.CollectionsUtil;
+import com.feilong.core.Validator;
+import com.feilong.core.bean.ConvertUtil;
 
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
+/**
+ * The Class LogisticsManagerImpl.
+ */
 @Transactional
 @Service("logisticsManager")
 public class LogisticsManagerImpl implements LogisticsManager{
 
+    /** The Constant log. */
     private static final Logger log = LoggerFactory.getLogger(LogisticsManagerImpl.class);
 
+    /** The freigth memory manager. */
     @Autowired
     private FreightMemoryManager freigthMemoryManager;
 
+    /** The sdk logistics dao. */
     @Autowired
     private SdkLogisticsDao sdkLogisticsDao;
 
+    /** The shipping fee config dao. */
     @Autowired
     private ShippingFeeConfigDao shippingFeeConfigDao;
 
+    /** The shipping temeplate dao. */
     @Autowired
     private ShippingTemeplateDao shippingTemeplateDao;
 
+    /** The product shipping fee temeplate dao. */
     @Autowired
     private ProductShippingTemeplateDao productShippingFeeTemeplateDao;
 
+    /** The shipping provider dao. */
     @Autowired
     private ShippingProviderDao shippingProviderDao;
 
+    /** The supported area dao. */
     @Autowired
     private SupportedAreaDao supportedAreaDao;
 
+    /** The distribution mode dao. */
     @Autowired
     private DistributionModeDao distributionModeDao;
 
+    /** The temeplate distribution mode dao. */
     @Autowired
     private TemeplateDistributionModeDao temeplateDistributionModeDao;
 
-    @Override
-    public List<Address> findProvinceList(){
-        return AddressUtil.getProviences();
-    }
-
-    @Override
-    public List<Address> findCities(Long provinceId){
-        return AddressUtil.getCities(provinceId);
-    }
-
-    @Override
-    public List<Address> findCounties(Long cityId){
-        return AddressUtil.getCounties(cityId);
-    }
-
-    @Override
-    public List<Address> findTowns(Long areaId){
-        return AddressUtil.getTowns(areaId);
-    }
-
-    // @Override
-    // public BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,
-    // String areaId, Integer shippingProviderId) {
-    //
-    // /**
-    // * 首件单位 3
-    // 续件单位 2
-    // 首件价格 10
-    // 续件价格 5
-    //
-    // 买7件 价格 10 + （(7-3)/2）*5 要注意续件 如果不是整除的话 加上一个续件价格
-    // */
-    //
-    // BigDecimal result = BigDecimal.ZERO;
-    //
-    // for(ItemFreightInfoCommand ifiCmd :itemList){
-    // Long count = ifiCmd.getCount();
-    //
-    // if(count<1){
-    // throw new IllegalArgumentException();
-    // }
-    //
-    //
-    // ShippingFeeConfig cfg =
-    // productShippingFeeTemeplateDao.findProductShippingTemeplateByItemIdCityId(ifiCmd.getItemId(),areaId,shippingProviderId);
-    //
-    // if(cfg == null){//如果不是城市的话，看是否配置该城市对应的省份信息
-    // Address address = AddressUtil.getAddressById(Long.parseLong(areaId));
-    // if(address == null){
-    // throw new IllegalArgumentException();
-    // }
-    // cfg =
-    // productShippingFeeTemeplateDao.findProductShippingTemeplateByItemIdProvienceId(ifiCmd.getItemId(),
-    // String.valueOf(address.getpId()), shippingProviderId);
-    // if(cfg == null){
-    // throw new BusinessException(Constants.ADDRESS_NOT_EXISTS);
-    // }
-    // }
-    // BigDecimal firstPartPrice = cfg.getFirstPartPrice();//首件价格
-    // Integer firstPartUnit = cfg.getFirstPartUnit();//首件单位 意思是 首件价格 的的数量。eg
-    // 按件的话，首件是两件，价格是5
-    // BigDecimal subsequentPartPrice = cfg.getSubsequentPartPrice();//续件价格
-    // Integer subsequentPartUnit = cfg.getSubsequentPartUnit();//续件单位
-    //
-    // result = firstPartPrice;
-    // if(count > firstPartUnit){
-    // Long last = count - firstPartUnit;
-    // Long a =
-    // (last%subsequentPartUnit==0)?(last/subsequentPartUnit):((last/subsequentPartUnit)+1);
-    // BigDecimal d= subsequentPartPrice.multiply(new BigDecimal(a));
-    // result = result.add(d);
-    // }
-    // }
-    //
-    // return result;
-    // }
-
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#findLogisticsByOrderId(java.lang.Long)
+     */
     @Override
     public LogisticsCommand findLogisticsByOrderId(Long orderId){
         return sdkLogisticsDao.findLogisticsByOrderId(orderId);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#saveShippingTemeplate(com.baozun.nebula.freight.command.ShippingTemeplateCommand)
+     */
     @Override
     public ShippingTemeplateCommand saveShippingTemeplate(ShippingTemeplateCommand shippingTemeplateCmd){
-
         // 保存基本 运费模板的基本信息
         ShippingTemeplate st = new ShippingTemeplate();
         st = (ShippingTemeplate) ConvertUtils.convertTwoObject(st, shippingTemeplateCmd);
@@ -227,13 +189,14 @@ public class LogisticsManagerImpl implements LogisticsManager{
     }
 
     /**
-     * 
+     * Save shipping to distribution mode.
+     *
      * @author 何波
-     * @Description: 保存运费模板与物流方式关系
      * @param dbmIds
+     *            the dbm ids
      * @param temeplateId
-     * void
-     * @throws
+     *            void
+     * @Description: 保存运费模板与物流方式关系
      */
     private void saveShippingToDistributionMode(List<Long> dbmIds,Long temeplateId){
         if (dbmIds != null && temeplateId != null){
@@ -247,14 +210,27 @@ public class LogisticsManagerImpl implements LogisticsManager{
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#findShippingTemeplateCommandById(java.lang.Long)
+     */
     @Override
     public ShippingTemeplateCommand findShippingTemeplateCommandById(Long temeplateId){
         ShippingTemeplate temeplate = shippingTemeplateDao.getByPrimaryKey(temeplateId);
         List<ShippingFeeConfigCommand> configList = shippingFeeConfigDao.findShippingFeeConfigsByTemeplateId(temeplateId);
-
         return getShippingTemeplateCommand(temeplate, configList);
     }
 
+    /**
+     * Gets the shipping temeplate command.
+     *
+     * @param temeplate
+     *            the temeplate
+     * @param configList
+     *            the config list
+     * @return the shipping temeplate command
+     */
     private ShippingTemeplateCommand getShippingTemeplateCommand(ShippingTemeplate temeplate,List<ShippingFeeConfigCommand> configList){
         if (null == temeplate){
             return null;
@@ -270,40 +246,29 @@ public class LogisticsManagerImpl implements LogisticsManager{
             }
         }
         tmpCmd.setFeeConfigs(configList);
-
         return tmpCmd;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#removeShippingTemeplate(java.lang.Long)
+     */
     @Override
     public boolean removeShippingTemeplate(Long temeplateId){
-        // //先查看这个模板是否关联了 具体的商品，如果有，则不能删除，抛出异常
-        // Integer count =
-        // productShippingFeeTemeplateDao.findUsedCountByTemeplateId(temeplateId);
-        // if(count>0){
-        // throw new
-        // BusinessException(Constants.PRODUCT_SHIPPING_FEE_CONNECTED);
-        // }
-        //
-        // //如果没有 ,删除 (不用删除 商品运费表里的信息，因为上一步已经确定了没有该记录)
-        //
-        // //删除 模板基本信息
-        // shippingTemeplateDao.deleteByPrimaryKey(temeplateId);
-        //
-        // //删除 模板里的运费配置
-        // shippingFeeConfigDao.deleteShippingFeeConfigsByTemeplateId(temeplateId);
-        //
-        // //删除 商品运费表里所有此Id 的数据
-        // productShippingFeeTemeplateDao.removeAllShippingFeeConfigsByTemeplateId(temeplateId);
-
         // 删除 运费模板表中的数据
         shippingTemeplateDao.deleteByPrimaryKey(temeplateId);
 
         // 删除 运费配置表中的数据
         shippingFeeConfigDao.deleteShippingFeeConfigsByTemeplateId(temeplateId);
-
         return true;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#updateShippingTemeplate(com.baozun.nebula.freight.command.ShippingTemeplateCommand)
+     */
     @Override
     public boolean updateShippingTemeplate(ShippingTemeplateCommand shippingTemeplateCmd){
         long tmpId = shippingTemeplateCmd.getId();
@@ -334,292 +299,243 @@ public class LogisticsManagerImpl implements LogisticsManager{
                 if (null != feeConfig){
                     savedCount++;
                 }
-
             }
 
             if (savedCount != configList.size()){
                 throw new BusinessException(Constants.SAVE_SHIPPING_CONFIG_FAILURE);
             }
         }
-
         return true;
-    }
-
-    @Override
-    public boolean applyItemShippingTemeplate(Long itemId,Long temeplateId){
-        ProductShippingTemeplate ptmp = productShippingFeeTemeplateDao.findProductShippingTemeplate(itemId, temeplateId);
-
-        // 如果没有，则新增
-        if (null == ptmp){
-            ptmp = new ProductShippingTemeplate();
-            ptmp.setItemId(itemId);
-            ptmp.setShippingTemeplateId(temeplateId);
-
-            if (null == productShippingFeeTemeplateDao.save(ptmp)){
-                throw new BusinessException(Constants.Apply_PRODUCT_TEMEPLATE_FAILURE);
-            }
-        }else{// 如果有该商品的记录则修改
-            if (1 != productShippingFeeTemeplateDao.updateProductShippingTemeplate(itemId, temeplateId)){
-                // 应该只有一条记录被修改，如果不是，则抛出异常
-                throw new BusinessException(Constants.Apply_PRODUCT_TEMEPLATE_FAILURE);
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public Pagination<ShippingTemeplate> findShippingTemeplateList(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId){
-        return shippingTemeplateDao.findShippingTemeplateList(page, sorts, paraMap, shopId);
-    }
-
-    @Override
-    public boolean removeItemShippingTemeplate(Long itemId){
-        Integer result = productShippingFeeTemeplateDao.removeItemShippingTemeplate(itemId);
-        log.info("removeItemShippingTemeplate result :" + result);
-        return true;
-    }
-
-    @Override
-    public List<ShippingProviderCommand> findLogisticsTypes(Long itemId,String areaId){
-        return shippingProviderDao.findLogisticsTypes(itemId, areaId);
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.sdk.manager.LogisticsManager#findDistributeMode(java
-     * .lang.Long, java.lang.Long, java.lang.Long, java.lang.Long)
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#findShippingTemeplateList(loxia.dao.Page, loxia.dao.Sort[], java.util.Map, java.lang.Long)
      */
     @Override
-    public List<DistributionMode> findDistributeMode(Long shopId,Long provienceId,Long cityId,Long countyId,Long townId){
-
-        // 拿到所有的物流方式 列表
-        List<DistributionCommand> distributionCommandList = freigthMemoryManager.getDistributionList();
-
-        // 拿到店铺运费模板的map
-        ShopShippingTemeplateMap shopShippingTemeplateMap = freigthMemoryManager.getShopShippingTemeplateMap();
-
-        // 当前店铺 的物流方式Id set
-        Set<Long> distributionModeIdSet = new HashSet<Long>();
-
-        if (null != shopShippingTemeplateMap){
-
-            // 获得当前店铺的map
-            ShopShippingTemeplateCommand sstCmd = shopShippingTemeplateMap.get(shopId);
-
-            // 支持当前店铺的物流方式的结果列表
-            List<DistributionModeCommand> distributionModeList = null;
-
-            // 当前店铺 的模板列表
-            List<ShippingTemeplateCommand> shippingTemeplateList = null;
-
-            // if(null!=sstCmd){
-            // distributionModeList = sstCmd.getDistributionModeList();
-            // }
-            //
-            // if(Validator.isNotNullOrEmpty(distributionModeList)){
-            // for(DistributionModeCommand dmCmd : distributionModeList){
-            // distributionModeIdSet.add(dmCmd.getId());
-            // }
-            // }else{
-            // return null;
-            // }
-
-            if (null != sstCmd){
-                shippingTemeplateList = sstCmd.getShippingTemeplateList();
-            }else{
-                return null;
-            }
-
-            // 根据当前模板，找到支持该模板的物流方式
-            if (Validator.isNotNullOrEmpty(shippingTemeplateList)){
-
-                // XXX 目前仅考虑店铺只有一个模板
-                ShippingTemeplateCommand spCmd = shippingTemeplateList.get(0);
-                //查找默认运费模板
-                for (ShippingTemeplateCommand stc : shippingTemeplateList){
-                    if (stc.isDefault()){
-                        spCmd = stc;
-                    }
-                }
-                //ShippingTemeplateCommand spCmd = shippingTemeplateList.get(0);
-                Long stId = spCmd.getId();
-                List<TemeplateDistributionMode> tdmList = temeplateDistributionModeDao.getDistributionModeByTemeplateId(stId);
-
-                if (Validator.isNotNullOrEmpty(tdmList)){
-                    for (TemeplateDistributionMode tdCmd : tdmList){
-                        distributionModeIdSet.add(tdCmd.getDistributionModeId());
-                    }
-                }else{
-                    return null;
-                }
-
-            }else{
-                return null;
-            }
-
-        }else{
-            return null;
-        }
-
-        // 根据 物流方式ID 找出 支持本商铺的 DistributionCommand
-        List<DistributionCommand> curShopDistributionCommandList = null;
-        if (Validator.isNotNullOrEmpty(distributionModeIdSet)){
-            curShopDistributionCommandList = new ArrayList<DistributionCommand>();
-
-            for (Long modeId : distributionModeIdSet){
-                for (DistributionCommand distributionCmd : distributionCommandList){
-                    if (modeId.equals(distributionCmd.getDistributionModeId())){
-                        curShopDistributionCommandList.add(distributionCmd);
-                    }
-                }
-            }
-
-        }else{
-            return null;
-        }
-
-        if (null != curShopDistributionCommandList && curShopDistributionCommandList.size() > 0){// 遍历
-                                                                                                     // 支持
-                                                                                                 // 本商铺的
-                                                                                                 // 物流列表
-
-            List<DistributionMode> modeList = new ArrayList<DistributionMode>();
-
-            // 遍历 支持 本商铺的 物流列表
-            for (DistributionCommand distributionCommand : curShopDistributionCommandList){// 遍历
-                                                                                               // 支持
-                                                                                           // 本商铺的
-                                                                                           // 物流列表
-                                                                                           // 开始
-
-                Long modeId = distributionCommand.getDistributionModeId();
-                String modeName = distributionCommand.getDistributionModeName();
-                List<SupportedAreaCommand> whiteList = distributionCommand.getWhiteAreaList();
-                Map<Long, List<SupportedAreaCommand>> curBlackMap = distributionCommand.getBlackAreaListMap();
-
-                for (SupportedAreaCommand saCmd : whiteList){// 遍历 单个物流 的白名单开始
-
-                    Long groupNo = saCmd.getGroupNo();
-                    List<SupportedAreaCommand> blackList = curBlackMap.get(groupNo);
-
-                    if (provienceId != null){
-                        if (saCmd.getAreaId().equals(provienceId.toString())){// 看省
-                                                                                  // 是不是在
-                                                                              // whiteList里
-
-                            // 看 市 县 乡 是不是在黑名单中 ，如果都不在黑名单中 ，说明 此物流方式支持该地址 TODO
-                            // 如果 coutnId 不存在 就不判断 isAreaInBlackList countyId 和
-                            // townId
-                            if (!(isAreaInBlackList(cityId, blackList) || isAreaInBlackList(countyId, blackList) || isAreaInBlackList(townId, blackList))){
-
-                                modeList.add(getDistributionMode(modeId, modeName));
-                                break;
-                            }
-
-                        }
-                    }
-
-                    if (cityId != null){
-                        if (saCmd.getAreaId().equals(cityId.toString())){// 看 市
-                                                                             // 是不是在whiteList
-                                                                         // 看 县 是不是在黑名单中
-                                                                         // 看 乡 是不是在黑名单中
-
-                            if (!(isAreaInBlackList(countyId, blackList) || isAreaInBlackList(townId, blackList))){
-
-                                modeList.add(getDistributionMode(modeId, modeName));
-                                break;
-                            }
-
-                        }
-                    }
-
-                    if (null != countyId){
-                        if (saCmd.getAreaId().equals(countyId.toString())){// 看县
-                                                                               // 是不是在whiteList
-                                                                           // 看 乡 是不是在黑名单中
-                            if (!(isAreaInBlackList(townId, blackList))){
-
-                                modeList.add(getDistributionMode(modeId, modeName));
-                                break;
-                            }
-
-                        }
-                    }
-
-                    if (null != townId){
-                        if (saCmd.getAreaId().equals(townId.toString())){// 看乡是不是在whiteList
-                            modeList.add(getDistributionMode(modeId, modeName));
-                            break;
-                        }
-                    }
-
-                }// 遍历 单个物流 的白名单结束
-
-            }// 遍历 支持 本商铺的 物流列表 结束
-
-            if (modeList.size() > 0){
-                return modeList;
-            }else{
-                return null;
-            }
-
-        }else{
-            return null;
-        }
-
-    }
-
-    private DistributionMode getDistributionMode(Long modeId,String modeName){
-        DistributionMode supportedMode = new DistributionMode();
-        supportedMode.setId(modeId);
-        supportedMode.setName(modeName);
-
-        return supportedMode;
+    public Pagination<ShippingTemeplate> findShippingTemeplateList(Page page,Sort[] sorts,Map<String, Object> paraMap,Long shopId){
+        return shippingTemeplateDao.findShippingTemeplateList(page, sorts, paraMap, shopId);
     }
 
     /**
-     * 判断区域Id 是否在 黑名单里
-     * 
-     * @param areaId
-     * @param blackList
+     * Find distribute mode.
+     *
+     * @param shopId
+     *            the shop id
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @return the list
+     * @since 5.3.2.4
+     */
+    private List<DistributionMode> findDistributeMode(Long shopId,CalcFreightCommand calcFreightCommand){
+        //优化 see http://jira.baozun.cn/browse/NB-388
+
+        //获得当前店铺的物流方式列表
+        List<DistributionCommand> currentShopDistributionCommandList = getCurrentShopDistributionCommandList(shopId, calcFreightCommand);
+        return buildDistributionModeList(calcFreightCommand, currentShopDistributionCommandList);
+    }
+
+    /**
+     * 获得当前店铺的物流方式列表.
+     *
+     * @param shopId
+     *            the shop id
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @return the current shop distribution command list
+     * @since 5.3.2.4
+     */
+    private List<DistributionCommand> getCurrentShopDistributionCommandList(Long shopId,CalcFreightCommand calcFreightCommand){
+        Set<Long> distributionModeIdSet = buildDistributionModeIdSet(shopId, calcFreightCommand);
+
+        //---------------------------------------------------------------------------
+        // 拿到所有的物流方式 列表
+        List<DistributionCommand> distributionCommandList = freigthMemoryManager.getDistributionList();
+
+        // 根据 物流方式ID 找出 支持本商铺的 DistributionCommand
+        List<DistributionCommand> curShopDistributionCommandList = select(distributionCommandList, "distributionModeId", distributionModeIdSet);
+        if (isNullOrEmpty(curShopDistributionCommandList)){
+            return null;
+        }
+        return curShopDistributionCommandList;
+    }
+
+    /**
+     * @param shopId
+     * @param calcFreightCommand
      * @return
+     * @since 5.3.2.4
+     */
+    private Set<Long> buildDistributionModeIdSet(Long shopId,CalcFreightCommand calcFreightCommand){
+        Long distributionModeId = calcFreightCommand.getDistributionModeId();
+        if (isNotNullOrEmpty(distributionModeId)){
+            return new HashSet<>(ConvertUtil.toList(distributionModeId));
+        }
+
+        Long shippingTemeplateCommandId = getDefaultShippingTemeplateCommandId(shopId);
+
+        List<TemeplateDistributionMode> temeplateDistributionModeList = temeplateDistributionModeDao.getDistributionModeByTemeplateId(shippingTemeplateCommandId);
+        if (isNullOrEmpty(temeplateDistributionModeList)){
+            return null;
+        }
+        //---------------------------------------------------------------------------
+        // 当前店铺 的物流方式Id set
+        return getPropertyValueSet(temeplateDistributionModeList, "distributionModeId");
+    }
+
+    /**
+     * Gets the default shipping temeplate command id.
+     *
+     * @param shopId
+     *            the shop id
+     * @return the default shipping temeplate command id
+     * @since 5.3.2.4
+     */
+    private Long getDefaultShippingTemeplateCommandId(Long shopId){
+        // 拿到店铺运费模板的map
+        ShopShippingTemeplateMap shopShippingTemeplateMap = freigthMemoryManager.getShopShippingTemeplateMap();
+        if (isNullOrEmpty(shopShippingTemeplateMap)){
+            return null;
+        }
+
+        // 获得当前店铺的map
+        ShopShippingTemeplateCommand shopShippingTemeplateCommand = shopShippingTemeplateMap.get(shopId);
+        if (isNullOrEmpty(shopShippingTemeplateCommand)){
+            return null;
+        }
+        //---------------------------------------------------------------------------
+
+        // 当前店铺 的模板列表
+        List<ShippingTemeplateCommand> shippingTemeplateCommandList = shopShippingTemeplateCommand.getShippingTemeplateList();
+        if (isNullOrEmpty(shippingTemeplateCommandList)){
+            return null;
+        }
+
+        //根据当前模板,找到支持该模板的物流方式
+        //查找默认运费模板
+        for (ShippingTemeplateCommand shippingTemeplateCommand : shippingTemeplateCommandList){
+            if (shippingTemeplateCommand.isDefault()){
+                return shippingTemeplateCommand.getId();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Builds the distribution mode list.
+     *
+     * @param calcFreightCommand
+     *            the calc freight command
+     * @param curShopDistributionCommandList
+     *            the cur shop distribution command list
+     * @return the list
+     * @since 5.3.2.4
+     */
+    private List<DistributionMode> buildDistributionModeList(CalcFreightCommand calcFreightCommand,List<DistributionCommand> curShopDistributionCommandList){
+        // 遍历支持本商铺的物流列表
+        List<DistributionMode> supportDistributionModeList = new ArrayList<>();
+
+        Long provienceId = calcFreightCommand.getProvienceId();
+        Long cityId = calcFreightCommand.getCityId();
+        Long countyId = calcFreightCommand.getCountyId();
+        Long townId = calcFreightCommand.getTownId();
+
+        // 遍历支持本商铺的 物流列表
+        for (DistributionCommand distributionCommand : curShopDistributionCommandList){
+            Long modeId = distributionCommand.getDistributionModeId();
+            String modeName = distributionCommand.getDistributionModeName();
+            List<SupportedAreaCommand> whiteSupportedAreaCommandList = distributionCommand.getWhiteAreaList();
+            Map<Long, List<SupportedAreaCommand>> curBlackMap = distributionCommand.getBlackAreaListMap();
+
+            DistributionMode buildDistributionMode = buildDistributionMode(modeId, modeName);
+            for (SupportedAreaCommand supportedAreaCommand : whiteSupportedAreaCommandList){
+                Long groupNo = supportedAreaCommand.getGroupNo();
+                List<SupportedAreaCommand> blackSupportedAreaCommandList = curBlackMap.get(groupNo);
+
+                String areaId = supportedAreaCommand.getAreaId();
+
+                if (provienceId != null && areaId.equals(provienceId.toString())){// 看省 是不是在 whiteList里
+                    // 看 市 县 乡 是不是在黑名单中 ，如果都不在黑名单中 ，说明 此物流方式支持该地址 
+                    // 如果 coutnId 不存在 就不判断 isAreaInBlackList countyId 和  townId
+                    if (!(isAreaInBlackList(cityId, blackSupportedAreaCommandList) || isAreaInBlackList(countyId, blackSupportedAreaCommandList) || isAreaInBlackList(townId, blackSupportedAreaCommandList))){
+                        supportDistributionModeList.add(buildDistributionMode);
+                        break;
+                    }
+                }
+
+                if (cityId != null && areaId.equals(cityId.toString())){// 看 市 是不是在whiteList
+                    // 看县 是不是在黑名单中
+                    // 看 乡 是不是在黑名单中
+                    if (!(isAreaInBlackList(countyId, blackSupportedAreaCommandList) || isAreaInBlackList(townId, blackSupportedAreaCommandList))){
+                        supportDistributionModeList.add(buildDistributionMode);
+                        break;
+                    }
+                }
+
+                if (null != countyId && areaId.equals(countyId.toString())){// 看县是不是在whiteList
+                    if (!(isAreaInBlackList(townId, blackSupportedAreaCommandList))){ // 看 乡 是不是在黑名单中
+                        supportDistributionModeList.add(buildDistributionMode);
+                        break;
+                    }
+                }
+
+                if (null != townId && areaId.equals(townId.toString())){// 看乡是不是在whiteList
+                    supportDistributionModeList.add(buildDistributionMode);
+                    break;
+                }
+            }
+        }
+        return supportDistributionModeList;
+    }
+
+    /**
+     * Builds the distribution mode.
+     *
+     * @param modeId
+     *            the mode id
+     * @param modeName
+     *            the mode name
+     * @return the distribution mode
+     */
+    private DistributionMode buildDistributionMode(Long modeId,String modeName){
+        DistributionMode distributionMode = new DistributionMode();
+        distributionMode.setId(modeId);
+        distributionMode.setName(modeName);
+        return distributionMode;
+    }
+
+    /**
+     * 判断区域Id 是否在 黑名单里.
+     *
+     * @param areaId
+     *            the area id
+     * @param blackList
+     *            the black list
+     * @return true, if is area in black list
      */
     private boolean isAreaInBlackList(Long areaId,List<SupportedAreaCommand> blackList){
-
         if (null == areaId){
             return false;
         }
-
         if (null == blackList || blackList.size() < 1){
             return false;
         }
-
         for (SupportedAreaCommand blackArea : blackList){
-
             // AreaId
             String blackAreaId = blackArea.getAreaId();
             if (blackAreaId != null && blackAreaId.equals(areaId.toString())){
                 return true;
             }
-
             // TODO designate
-
         }
-
         return false;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.sdk.manager.LogisticsManager#findFreight(java.util.
-     * List, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long,
-     * java.lang.Long, java.lang.Long)
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#findFreight(java.util.List, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Long)
      */
     @Override
     public BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,Long distributionModeId,Long shopId,Long provienceId,Long cityId,Long countyId,Long townId){
@@ -634,7 +550,8 @@ public class LogisticsManagerImpl implements LogisticsManager{
 
         //如果没有传物流方式 设置默认物流方式
         if (null == distributionModeId){
-            List<DistributionMode> distributeModelList = findDistributeMode(shopId, provienceId, cityId, countyId, townId);
+            CalcFreightCommand calcFreightCommand = new CalcFreightCommand(distributionModeId, provienceId, cityId, countyId, townId);
+            List<DistributionMode> distributeModelList = findDistributeMode(shopId, calcFreightCommand);
             distributionModeId = distributeModelList.get(0).getId();
         }
 
@@ -653,25 +570,25 @@ public class LogisticsManagerImpl implements LogisticsManager{
         if (feeCmd == null){
             return temeplate.getDefaultFee();
         }else{
-            String calType = temeplate.getCalculationType();
+            String calculationType = temeplate.getCalculationType();
 
-            FreightStrategy strategy = null;
+            FreightStrategy freightStrategy = null;
 
             // 根据不同的type 选择不同的算法
-            if (ShippingTemeplate.CAL_TYPE_BY_UNIT.equals(calType)){
-                strategy = new UnitFreightStrategy();
-            }else if (ShippingTemeplate.CAL_TYPE_BY_WEIGHT.equals(calType)){
-                strategy = new WeightFreightStrategy();
-            }else if (ShippingTemeplate.CAL_TYPE_BY_BASE.equals(calType)){
-                strategy = new BaseFreightStrategy();
+            if (ShippingTemeplate.CAL_TYPE_BY_UNIT.equals(calculationType)){
+                freightStrategy = new UnitFreightStrategy();
+            }else if (ShippingTemeplate.CAL_TYPE_BY_WEIGHT.equals(calculationType)){
+                freightStrategy = new WeightFreightStrategy();
+            }else if (ShippingTemeplate.CAL_TYPE_BY_BASE.equals(calculationType)){
+                freightStrategy = new BaseFreightStrategy();
             }
-            return strategy.cal(feeCmd, itemList);
+            return freightStrategy.cal(feeCmd, itemList);
         }
     }
 
     /**
-     * 根据 运费模板，物流方式id ,省id ,cityId ，countyId，townId 来获取符合条件的运费配置信息
-     * 
+     * 根据 运费模板，物流方式id ,省id ,cityId ，countyId，townId 来获取符合条件的运费配置信息.
+     *
      * @param shippingTemeplate
      *            运费模板
      * @param distributionModeId
@@ -684,7 +601,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            县id
      * @param townId
      *            乡id
-     * @return
+     * @return the fee config
      */
     private ShippingFeeConfigCommand getFeeConfig(ShippingTemeplateCommand shippingTemeplate,Long distributionModeId,Long provienceId,Long cityId,Long countyId,Long townId){
         ShippingFeeConfigCommand feeCmd = null;
@@ -742,35 +659,24 @@ public class LogisticsManagerImpl implements LogisticsManager{
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.sdk.manager.LogisticsManager#saveSupportedArea(com.
-     * baozun.nebula.freight.memory.SupportedAreaCommand)
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#saveSupportedAreas(java.util.List)
      */
     @Override
     public List<SupportedAreaCommand> saveSupportedAreas(List<SupportedAreaCommand> supportedAreaCommandList){
-
-        List<SupportedAreaCommand> savedList = new ArrayList<SupportedAreaCommand>();
+        List<SupportedAreaCommand> savedList = new ArrayList<>();
 
         // 分组号 不在 manager 里边定，因为可能涉及到 批量保存多个分组的情况
         // Long groupNo = System.currentTimeMillis();
 
         for (SupportedAreaCommand supportedAreaCommand : supportedAreaCommandList){
-
             SupportedArea sa = new SupportedArea();
             sa = (SupportedArea) ConvertUtils.convertFromTarget(sa, supportedAreaCommand);
-            // sa.setGroupNo(groupNo);
             SupportedArea savedArea = supportedAreaDao.save(sa);
 
             supportedAreaCommand = (SupportedAreaCommand) ConvertUtils.convertFromTarget(supportedAreaCommand, savedArea);
             savedList.add(supportedAreaCommand);
         }
-
-        if (savedList.size() > 0){
-            return savedList;
-        }else{
-            return null;
-        }
-
+        return savedList;
     }
 
     /*
@@ -783,10 +689,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
     @Override
     public boolean deleteSupportedAreas(List<Long> ids){
         Integer rows = supportedAreaDao.deleteSupportedAreas(ids);
-        if (rows.equals(ids.size())){
-            return true;
-        }
-        return false;
+        return rows.equals(ids.size());
     }
 
     /*
@@ -834,21 +737,37 @@ public class LogisticsManagerImpl implements LogisticsManager{
         return rows.equals(1);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#saveLogistics(com.baozun.nebula.model.salesorder.Logistics)
+     */
     @Override
     public Logistics saveLogistics(Logistics logistics){
         return sdkLogisticsDao.save(logistics);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#findLogisticsListByQueryMap(java.util.Map)
+     */
     @Override
     public List<LogisticsCommand> findLogisticsListByQueryMap(Map<String, Object> queryMap){
         return sdkLogisticsDao.findLogisticsListByQueryMap(queryMap);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.LogisticsManager#hasDistributionMode(com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand, java.lang.Long)
+     */
     @Override
     public Boolean hasDistributionMode(CalcFreightCommand calcFreightCommand,Long shopId){
-        // 通过收货地址获取支持的物流方式
-        List<DistributionMode> distributionModeList = findDistributeMode(shopId, calcFreightCommand.getProvienceId(), calcFreightCommand.getCityId(), calcFreightCommand.getCountyId(), calcFreightCommand.getTownId());
+        //优化 see http://jira.baozun.cn/browse/NB-386
 
+        // 通过收货地址获取支持的物流方式
+        List<DistributionMode> distributionModeList = findDistributeMode(shopId, calcFreightCommand);
         if (isNullOrEmpty(distributionModeList)){
             return false;
         }

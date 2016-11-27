@@ -27,6 +27,7 @@ import com.baozun.nebula.sdk.command.logistics.DistributionModeCommand;
  * @author Tianlong.Zhang
  *
  */
+//类名字写错了,应该是 template template template 模板  -- by feilong
 public class ShippingTemeplateCommand extends BaseModel{
 	/**
 	 * 

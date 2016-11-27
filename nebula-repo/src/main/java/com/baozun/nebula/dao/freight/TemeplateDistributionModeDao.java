@@ -29,10 +29,11 @@ import com.baozun.nebula.model.freight.TemeplateDistributionMode;
  * @author Tianlong.Zhang
  *
  */
-public interface TemeplateDistributionModeDao  extends GenericEntityDao<TemeplateDistributionMode, Long> {
-	@NativeQuery(model=TemeplateDistributionMode.class)
-	List<TemeplateDistributionMode> getDistributionModeByTemeplateId(@QueryParam("temeplateId")Long temeplateId);
-	
-	@NativeUpdate
-	public Integer deleteTemeplateDistributionByTemeplateId(@QueryParam("temeplateId") Long temeplateId);
+public interface TemeplateDistributionModeDao extends GenericEntityDao<TemeplateDistributionMode, Long>{
+
+    @NativeQuery(model = TemeplateDistributionMode.class)
+    List<TemeplateDistributionMode> getDistributionModeByTemeplateId(@QueryParam("temeplateId") Long temeplateId);
+
+    @NativeUpdate
+    Integer deleteTemeplateDistributionByTemeplateId(@QueryParam("temeplateId") Long temeplateId);
 }

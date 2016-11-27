@@ -7,15 +7,12 @@ import java.util.Map;
 import com.baozun.nebula.freight.command.ShippingTemeplateCommand;
 import com.baozun.nebula.freight.memory.SupportedAreaCommand;
 import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.model.freight.DistributionMode;
 import com.baozun.nebula.model.freight.ShippingTemeplate;
 import com.baozun.nebula.model.salesorder.Logistics;
 import com.baozun.nebula.sdk.command.logistics.DistributionModeCommand;
 import com.baozun.nebula.sdk.command.logistics.ItemFreightInfoCommand;
 import com.baozun.nebula.sdk.command.logistics.LogisticsCommand;
-import com.baozun.nebula.sdk.command.logistics.ShippingProviderCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
-import com.baozun.nebula.utilities.library.address.Address;
 
 import loxia.annotation.QueryParam;
 import loxia.dao.Page;
@@ -23,58 +20,6 @@ import loxia.dao.Pagination;
 import loxia.dao.Sort;
 
 public interface LogisticsManager extends BaseManager{
-
-    /**
-     * 查询省级列表
-     * 
-     * @return
-     */
-    List<Address> findProvinceList();
-
-    /**
-     * 查询市级列表
-     * 
-     * @param provinceId
-     * @return
-     */
-    List<Address> findCities(Long provinceId);
-
-    /**
-     * 查询区域(县/区)
-     * 
-     * @param provinceId
-     * @param cityId
-     * @return
-     */
-    List<Address> findCounties(Long cityId);
-
-    /**
-     * 查询乡镇（街道）
-     * 
-     * @param areaId
-     * @return
-     */
-    List<Address> findTowns(Long areaId);
-
-    /**
-     * (new)
-     * 通过收货地址获取支持的物流方式 ,
-     * 参数：省、市、区、镇
-     * 返回：物流方式列表
-     * 
-     * @return
-     */
-    List<DistributionMode> findDistributeMode(Long shopId,Long provienceId,Long cityId,Long countyId,Long townId);
-
-    /**
-     * 查询到达某个地方支持的物流方式
-     * 已废弃（请用 findDistributeMode 代替）
-     * 
-     * @param areaId
-     * @return
-     */
-    @Deprecated
-    List<ShippingProviderCommand> findLogisticsTypes(Long itemId,String areaId);
 
     /**
      * 计算运费
@@ -95,47 +40,14 @@ public interface LogisticsManager extends BaseManager{
      *            乡id
      * @return
      */
-    BigDecimal findFreight(
-                    List<ItemFreightInfoCommand> itemList,
-                    Long distributionModeId,
-                    Long shopId,
-                    Long provienceId,
-                    Long cityId,
-                    Long countyId,
-                    Long townId);
+    BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,Long distributionModeId,Long shopId,Long provienceId,Long cityId,Long countyId,Long townId);
 
     /**
      * 根据订单id查询物流跟踪信息
      */
     LogisticsCommand findLogisticsByOrderId(Long orderId);
 
-    /**
-     * 商品绑定运费模板
-     * 
-     * @param itemId
-     *            商品Id
-     * @param temeplateId
-     *            运费模板Id
-     * @return
-     */
-    @Deprecated
-    boolean applyItemShippingTemeplate(Long itemId,Long temeplateId);
-
-    /**
-     * 解除该商品运费模板的绑定
-     * (当删除一个商品时候，删除对应的冗余运费信息)
-     * 
-     * @param itemId
-     * @return
-     */
-    @Deprecated
-    boolean removeItemShippingTemeplate(Long itemId);
-
-    public Pagination<ShippingTemeplate> findShippingTemeplateList(
-                    Page page,
-                    Sort[] sorts,
-                    @QueryParam Map<String, Object> paraMap,
-                    Long shopId);
+    Pagination<ShippingTemeplate> findShippingTemeplateList(Page page,Sort[] sorts,@QueryParam Map<String, Object> paraMap,Long shopId);
 
     //********************* 运费模板
 
@@ -183,9 +95,6 @@ public interface LogisticsManager extends BaseManager{
      * @return
      */
     List<SupportedAreaCommand> saveSupportedAreas(List<SupportedAreaCommand> supportedAreaCommandList);
-
-    // 不提供 单个 支持的物流区域的方法。   修改一个支持的物流区域 没有意义。  因为只能 修改 areaId 或者代称。这样在物理意义上其实对应了删除和新增。
-    //	boolean updateSupportedArea(SupportedAreaCommand supportedAreaCommand);
 
     /**
      * 删除物流方式支持的区域

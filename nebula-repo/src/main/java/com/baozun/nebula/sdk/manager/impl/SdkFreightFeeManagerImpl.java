@@ -46,7 +46,7 @@ public class SdkFreightFeeManagerImpl implements SdkFreightFeeManager{
 
     /** The logistics manager. */
     @Autowired
-    private LogisticsManager    logisticsManager;
+    private LogisticsManager logisticsManager;
 
     /**
      * 无促销情况下计算运费.
@@ -68,20 +68,13 @@ public class SdkFreightFeeManagerImpl implements SdkFreightFeeManager{
         }
 
         Boolean flag = logisticsManager.hasDistributionMode(calcFreightCommand, shopId);
-
         if (!flag){
             return BigDecimal.ZERO;
         }
 
-        List<ItemFreightInfoCommand> itemList = toItemFreightInfoCommandList(validLines);
-        return logisticsManager.findFreight(
-                        itemList,
-                        calcFreightCommand.getDistributionModeId(),
-                        shopId,
-                        calcFreightCommand.getProvienceId(),
-                        calcFreightCommand.getCityId(),
-                        calcFreightCommand.getCountyId(),
-                        calcFreightCommand.getTownId());
+        List<ItemFreightInfoCommand> itemFreightInfoCommandList = toItemFreightInfoCommandList(validLines);
+        return logisticsManager
+                        .findFreight(itemFreightInfoCommandList, calcFreightCommand.getDistributionModeId(), shopId, calcFreightCommand.getProvienceId(), calcFreightCommand.getCityId(), calcFreightCommand.getCountyId(), calcFreightCommand.getTownId());
     }
 
     /**
@@ -93,10 +86,9 @@ public class SdkFreightFeeManagerImpl implements SdkFreightFeeManager{
      */
     private List<ItemFreightInfoCommand> toItemFreightInfoCommandList(List<ShoppingCartLineCommand> validShoppingCartLineCommandList){
         // 无促销情况下统计金额小计
-        List<ItemFreightInfoCommand> itemFreightInfoCommandList = new ArrayList<ItemFreightInfoCommand>();
+        List<ItemFreightInfoCommand> itemFreightInfoCommandList = new ArrayList<>();
         for (ShoppingCartLineCommand shoppingCartLineCommand : validShoppingCartLineCommandList){
-            ItemFreightInfoCommand itemFreightInfoCommand = toItemFreightInfoCommand(shoppingCartLineCommand);
-            itemFreightInfoCommandList.add(itemFreightInfoCommand);
+            itemFreightInfoCommandList.add(toItemFreightInfoCommand(shoppingCartLineCommand));
         }
         return itemFreightInfoCommandList;
     }
