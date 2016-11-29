@@ -27,7 +27,6 @@ import com.baozun.nebula.freight.memory.ShopShippingTemeplateMap;
  * 运费内存管理memory
  * 
  * @author Tianlong.Zhang
- *
  */
 public interface FreightMemoryManager{
 
@@ -37,27 +36,7 @@ public interface FreightMemoryManager{
      */
     void loadFreightInfosFromDB();
 
-    /**
-     * 从数据库中加载物流列表
-     */
-    void loadDistributionList();
-
-    /**
-     * 从数据库中加载运费模板 map
-     * 
-     */
-    void loadShippingTemeplateMap();
-
-    /**
-     * 从数据库中加载 店铺运费模板map
-     * 
-     */
-    void loadShopShippingTemeplateMap();
-
-    /**
-     * 从数据库中加载运费配置信息Map
-     */
-    void loadShippingFeeConfigMap();
+    //**********************************************************************************
 
     /**
      * 从内存中获得物流列表
