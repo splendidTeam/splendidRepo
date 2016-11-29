@@ -23,12 +23,11 @@ import com.baozun.nebula.freight.command.ShippingTemeplateCommand;
 
 /**
  * 运费模板ID为KEY 运费模板对象为value
+ * 
  * @author Tianlong.Zhang
  *
  */
-public class ShippingTemeplateMap  extends HashMap<Long, ShippingTemeplateCommand> implements Command{
+public class ShippingTemeplateMap extends HashMap<Long, ShippingTemeplateCommand> implements Command{
 
-	private static final long serialVersionUID = -8154073773710365759L;
-
-	
+    private static final long serialVersionUID = -8154073773710365759L;
 }

@@ -22,18 +22,14 @@ import com.baozun.nebula.command.Command;
 import com.baozun.nebula.freight.command.ShippingFeeConfigCommand;
 
 /**
- * 模板id-物流方式id-目的地id为key    value为物流对像
+ * 模板id-物流方式id-目的地id为key value为物流对像
  * 
  * @author Tianlong.Zhang
  *
  */
 public class ShippingFeeConfigMap extends HashMap<String, ShippingFeeConfigCommand> implements Command{
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 396619284737318006L;
-	
-	public static final String KEY_CONNECTOR = "-";
+    private static final long serialVersionUID = 396619284737318006L;
 
+    public static final String KEY_CONNECTOR = "-";
 }

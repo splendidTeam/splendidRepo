@@ -17,10 +17,8 @@
 package com.baozun.nebula.freight.memory;
 
 import java.util.HashMap;
-import java.util.List;
 
 import com.baozun.nebula.command.Command;
-import com.baozun.nebula.freight.command.ShippingTemeplateCommand;
 
 /**
  * 店铺ID为KEY 运费模板对象为value

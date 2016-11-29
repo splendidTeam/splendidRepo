@@ -271,30 +271,6 @@ public class LogisticsManagerTest{
         }
     }
 
-    @Test
-    public void findFreight(){
-
-        this.freightMemoryManager.loadFreightInfosFromDB();
-
-        List<ItemFreightInfoCommand> cmdList = new ArrayList<ItemFreightInfoCommand>();
-
-        cmdList.add(getItemFreightInfoCommand(333L, 3, 2.0));
-        cmdList.add(getItemFreightInfoCommand(334L, 15, 5.0));
-        Long distributionModeId = 3L;
-        Long shopId = 273L;
-
-        Long provienceId = 310000L;// 上海
-        Long cityId = 310100L;// 上海市
-        //		Long countyId = 310101L;// 黄浦区
-        Long countyId = 310230L;//310230  崇明
-
-        Long townId = 310101013L;// 外滩街道 
-
-        BigDecimal result = logisticsManager.findFreight(cmdList, distributionModeId, shopId, provienceId, cityId, countyId, townId);
-
-        System.out.println("result is " + result.toString());
-    }
-
     private ItemFreightInfoCommand getItemFreightInfoCommand(Long itemId,Integer count,Double weight){
         ItemFreightInfoCommand cmd = new ItemFreightInfoCommand();
         cmd.setItemId(itemId);
