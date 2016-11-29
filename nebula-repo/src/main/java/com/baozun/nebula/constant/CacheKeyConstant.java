@@ -69,6 +69,12 @@ public class CacheKeyConstant{
 	public static final  String	CACHE_FIELD_FILTER_NAV = "cache_field_filter_nav";
 	
 	/**
+	 *  RecommandItem 商品推荐模块 中缓存 cache key
+	 *  @see nebula protostar com.baozun.nebula.manager.product.RecommandItemManagerImpl.removeRecommandItemCache(Integer type, Long param)
+	 */
+	public static final  String	CACHE_KEY_RECOMMANDITEM = "cache_field_recommand_item";
+	
+	/**
 	 * 导航元数据在缓存中的key，完整的key还要加上语言
 	 * @see com.baozun.nebula.search.FacetFilterHelperImpl.loadFacetFilterMetaData()
 	 */
@@ -91,5 +97,8 @@ public class CacheKeyConstant{
 
 	/** 搜索条件元数据在缓存中的key，完整的key还要加上语言 */
 	public final static String			searchConditionMetaCacheKey		= "searchConditionMetaCacheKey_";
+	
+	/** 公共推荐缓存key */
+	public final static String CACHE_KEY_SHOP_RECOMMAND_ITEM_LIST = "recommandItemListCacheKey_";
 
 }

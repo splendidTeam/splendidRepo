@@ -233,6 +233,7 @@ $j(document).ready(function(){
 		    	$j(".nav-update .seoExtntion").each(function(i,dom){
 		    		var me = $j(this);
 		    		var val = me.val();
+		    		val =  val.replace(/\"/g, '\\"');
 		    		var lang = me.attr("lang");
 		    		if(defaultlang==lang){
 		    			defualt = val;
@@ -522,6 +523,7 @@ $j(document).ready(function(){
 		    	$j(".nav-add .seoExtntion").each(function(i,dom){
 		    		var me = $j(this);
 		    		var val = me.val();
+		    		val =  val.replace(/\"/g, '\\"');
 		    		var lang = me.attr("lang");
 		    		if(defaultlang==lang){
 		    			defualt = val;

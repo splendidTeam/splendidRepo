@@ -40,6 +40,7 @@ import com.baozun.nebula.web.controller.order.form.InvoiceInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.feilong.core.RegexPattern;
+import com.feilong.core.date.DateUtil;
 import com.feilong.core.util.RegexUtil;
 
 /**
@@ -128,76 +129,75 @@ public class OrderFormValidator implements Validator{
 		
 		ContactDeliveryCommand deliveryCommand = deliveryAreaManager.findContactDeliveryByDeliveryAreaCode(getDeliveryAreaCode(orderForm.getShippingInfoSubForm()));
 		String appointType = orderForm.getShippingInfoSubForm().getAppointType();
-		DateFormat df = new SimpleDateFormat("HH:mm:ss");
-		Date now = new Date();
-		try {
-			now = df.parse(df.format(now));
-			if(com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand)){
-				if(Consignee.CONSIGNEE_APPOINT_COMMON_TYPE.equals(appointType)){
-					if (AreaDeliveryMode.YES.equals(deliveryCommand.getCommonDelivery()) 
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getCommonDeliveryStartTime())
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getCommonDeliveryEndTime())) {
-						// 时间是否允许
-						if((now.before(df.parse(deliveryCommand.getCommonDeliveryStartTime())))
-								&& (now.after(df.parse(deliveryCommand.getCommonDeliveryEndTime())))){
-							ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "common.delivery.not.in.time");
-						}
-					}else{
-						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.common");
+		String dateFormat = "HH:mm:ss";
+		Date now = DateUtil.toDate(DateUtil.toString(new Date(), dateFormat), dateFormat);
+		if(com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand)){
+			if(Consignee.CONSIGNEE_APPOINT_COMMON_TYPE.equals(appointType)){
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getCommonDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getCommonDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getCommonDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(deliveryCommand.getCommonDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(deliveryCommand.getCommonDeliveryEndTime(),dateFormat);
+					if (!DateUtil.isInTime(now, beginTime, endTime)){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "common.delivery.not.in.time");
 					}
-				}
-				
-				if(Consignee.CONSIGNEE_APPOINT_FIRSTDAY_TYPE.equals(appointType)){
-					if (AreaDeliveryMode.YES.equals(deliveryCommand.getFirstDayDelivery()) 
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getFirstDeliveryStartTime())
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getFirstDeliveryEndTime())) {
-						// 时间是否允许
-						if((now.before(df.parse(deliveryCommand.getFirstDeliveryEndTime())))
-								&& (now.after(df.parse(deliveryCommand.getFirstDeliveryStartTime())))){
-							ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "firstday.delivery.not.in.time");
-						}
-					}else{
-						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.firstday");
-					}
-				}
-				
-	
-				if(Consignee.CONSIGNEE_APPOINT_SECONDDAY_TYPE.equals(appointType)){
-					// 是否支持次日达
-					if (AreaDeliveryMode.YES.equals(deliveryCommand.getSecondDayDelivery()) 
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getSecondDeliveryStartTime())
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getSecondDeliveryEndTime())) {
-						// 时间是否允许
-						if((now.before(df.parse(deliveryCommand.getSecondDeliveryStartTime())))
-								&& (now.after(df.parse(deliveryCommand.getSecondDeliveryEndTime())))){
-							ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "second.delivery.not.in.time");
-						}
-					}else{
-						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.second");
-					}
-				}
-	
-				if(Consignee.CONSIGNEE_APPOINT_THIRDDAY_TYPE.equals(appointType)){
-					if (AreaDeliveryMode.YES.equals(deliveryCommand.getThirdDayDelivery()) 
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getThirdDeliveryStartTime())
-							&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getThirdDeliveryEndTime())) {
-						// 时间是否允许
-						if((now.before(df.parse(deliveryCommand.getThirdDeliveryStartTime())))
-								&& (now.after(df.parse(deliveryCommand.getThirdDeliveryEndTime())))){
-							ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "third.delivery.not.in.time");
-						}
-					}else{
-						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.third");
-					}
-				}
-				
-				if(SalesOrder.SO_PAYMENT_TYPE_COD.equals(orderForm.getPaymentInfoSubForm().getPaymentType())
-						&& !AreaDeliveryMode.YES.equals(deliveryCommand.getSupport_COD())){
-					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "cod.not.support");
+				} else {
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.common");
 				}
 			}
-		} catch (ParseException e) {
-			LOGGER.error("DateFormat Format ERROR !", e);
+			
+			if(Consignee.CONSIGNEE_APPOINT_FIRSTDAY_TYPE.equals(appointType)){
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getFirstDayDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getFirstDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getFirstDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(deliveryCommand.getFirstDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(deliveryCommand.getFirstDeliveryEndTime(),dateFormat);
+					if (!DateUtil.isInTime(now, beginTime, endTime)){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "firstday.delivery.not.in.time");
+					}
+				} else {
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.firstday");
+				}
+			}
+			
+
+			if(Consignee.CONSIGNEE_APPOINT_SECONDDAY_TYPE.equals(appointType)){
+				// 是否支持次日达
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getSecondDayDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getSecondDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getSecondDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(deliveryCommand.getSecondDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(deliveryCommand.getSecondDeliveryEndTime(),dateFormat);
+					if (!DateUtil.isInTime(now, beginTime, endTime)){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "second.delivery.not.in.time");
+					}
+				} else {
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.second");
+				}
+			}
+
+			if(Consignee.CONSIGNEE_APPOINT_THIRDDAY_TYPE.equals(appointType)){
+				if (AreaDeliveryMode.YES.equals(deliveryCommand.getThirdDayDelivery()) 
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getThirdDeliveryStartTime())
+						&& com.feilong.core.Validator.isNotNullOrEmpty(deliveryCommand.getThirdDeliveryEndTime())) {
+					// 时间是否允许
+					Date beginTime = DateUtil.toDate(deliveryCommand.getThirdDeliveryStartTime(),dateFormat);
+					Date endTime = DateUtil.toDate(deliveryCommand.getThirdDeliveryEndTime(),dateFormat);
+					if (!DateUtil.isInTime(now, beginTime, endTime)){
+						ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "third.delivery.not.in.time");
+					}
+				} else {
+					ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "appointType.not.support.third");
+				}
+			}
+			
+			if(SalesOrder.SO_PAYMENT_TYPE_COD.equals(orderForm.getPaymentInfoSubForm().getPaymentType())
+					&& !AreaDeliveryMode.YES.equals(deliveryCommand.getSupport_COD())){
+				ValidationUtils.rejectIfEmptyOrWhitespace(errors, "shippingInfoSubForm.appointType", "cod.not.support");
+			}
 		}
 		
     }

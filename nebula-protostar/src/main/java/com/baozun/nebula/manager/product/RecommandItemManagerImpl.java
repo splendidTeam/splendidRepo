@@ -32,9 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.product.RecommandItemCommand;
+import com.baozun.nebula.constant.CacheKeyConstant;
 import com.baozun.nebula.dao.product.CategoryDao;
 import com.baozun.nebula.dao.product.ItemDao;
 import com.baozun.nebula.dao.product.RecommandItemDao;
+import com.baozun.nebula.manager.CacheManager;
 import com.baozun.nebula.manager.system.ChooseOptionManager;
 import com.baozun.nebula.model.product.Category;
 import com.baozun.nebula.model.product.Item;
@@ -62,6 +64,9 @@ public class RecommandItemManagerImpl implements RecommandItemManager {
 
 	@Autowired
 	private CategoryDao			categoryDao;
+	
+	@Autowired
+	private CacheManager 		cacheManager;
 
 	/** 推荐类型 */
 	private final static String	RT_GROUP_CODE	= "RECOMMAND_TYPE";
@@ -191,7 +196,7 @@ public class RecommandItemManagerImpl implements RecommandItemManager {
 				removeRecItemIds.add(recId);
 			} else {
 				if(checkRecommandItemInfo(recommandItemCommand, recommandItem)){
-					System.out.println("-->>> ");
+					//System.out.println("-->>> ");
 					recommandItemDao.updateRecommandItemById(recId, recommandItem.getItemId(), param, type, recommandItem.getSort(), userId);
 				}
 			}
@@ -200,6 +205,8 @@ public class RecommandItemManagerImpl implements RecommandItemManager {
 		if (null != removeRecItemIds && removeRecItemIds.size() > 0) {
 			recommandItemDao.removeRecommandItemByIds(removeRecItemIds);
 		}
+		/** 清除推荐缓存 **/
+		removeRecommandItemCache(type, param);
 	}
 
 	/**
@@ -234,6 +241,7 @@ public class RecommandItemManagerImpl implements RecommandItemManager {
 		List<Long> ids = new ArrayList<Long>();
 		ids.add(id);
 		recommandItemDao.removeRecommandItemByIds(ids);
+		
 	}
 
 	@Override
@@ -281,5 +289,10 @@ public class RecommandItemManagerImpl implements RecommandItemManager {
 			}
 		}
 		return list;
+	}
+	
+	public void removeRecommandItemCache(Integer type, Long param){
+		String key = CacheKeyConstant.CACHE_KEY_SHOP_RECOMMAND_ITEM_LIST + "_" + type + "_" + param;
+		cacheManager.removeMapValue(key, CacheKeyConstant.CACHE_KEY_RECOMMANDITEM);
 	}
 }
