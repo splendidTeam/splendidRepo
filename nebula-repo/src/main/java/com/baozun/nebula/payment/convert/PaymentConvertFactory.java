@@ -43,8 +43,6 @@ public class PaymentConvertFactory {
 		// 微信
 		paymentConvertMap.put(PaymentFactory.PAY_TYPE_WECHAT,
 				new OrderCommandParamConvertorAdaptor());
-		
-		
 	}
 
 }
