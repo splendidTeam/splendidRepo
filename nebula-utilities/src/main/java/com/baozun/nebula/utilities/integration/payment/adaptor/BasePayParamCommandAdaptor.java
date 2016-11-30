@@ -1,4 +1,4 @@
-package com.baozun.nebula.utilities.common.command;
+package com.baozun.nebula.utilities.integration.payment.adaptor;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -77,6 +77,14 @@ public interface BasePayParamCommandAdaptor {
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-11-16
 	 */
-	Map<String, Object> getRequestParams();
+	public Map<String, Object> getRequestParams();
+	
+	/**
+	 * @Description
+	 * @param requestParams
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-16
+	 */
+	public void setRequestParams(Map<String, Object> requestParams);
 
 }

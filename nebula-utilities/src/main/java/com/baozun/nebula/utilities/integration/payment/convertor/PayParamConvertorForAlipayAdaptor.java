@@ -1,11 +1,11 @@
-package com.baozun.nebula.utilities.common.convertor;
+package com.baozun.nebula.utilities.integration.payment.convertor;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 
-import com.baozun.nebula.utilities.common.command.BasePayParamCommandAdaptor;
+import com.baozun.nebula.utilities.integration.payment.adaptor.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.feilong.core.Validator;
 

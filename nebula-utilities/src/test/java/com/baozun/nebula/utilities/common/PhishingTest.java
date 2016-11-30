@@ -1,18 +1,17 @@
 package com.baozun.nebula.utilities.common;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
-import com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor;
-import com.baozun.nebula.utilities.common.convertor.RequestToCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
+import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorAdaptor;
+import com.baozun.nebula.utilities.integration.payment.convertor.RequestToCommand;
 
 
 public class PhishingTest {

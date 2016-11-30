@@ -70,5 +70,16 @@ public interface PaymentManager {
 	 * @return
 	 */
 	public PaymentResult unifiedOrder(WechatPayParamCommand wechatPayParamCommand,String paymentType);
-	
+
+	/**
+	 * 
+	 * @Description 使用com.baozun.nebula.utilities.integration.payment.PaymentFactory.getPayType(Integer) 获取SalesOrderCommand.payType所对应的PaymentFactory.payType
+	 * @param additionParams
+	 * @param payType 
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-11-29
+	 */
+	public PaymentRequest createPayment(Map<String, String> additionParams, String payType);
+
 }

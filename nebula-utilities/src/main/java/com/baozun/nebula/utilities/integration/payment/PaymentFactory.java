@@ -8,15 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.convertor.PayParamConvertorAdaptor;
-import com.baozun.nebula.utilities.common.convertor.PayParamConvertorForAlipayAdaptor;
-import com.baozun.nebula.utilities.common.convertor.PayParamConvertorForUnionPayAdaptor;
-import com.baozun.nebula.utilities.common.convertor.PayParamConvertorForWechatAdaptor;
 import com.baozun.nebula.utilities.integration.payment.alipay.AlipayBankPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.alipay.AlipayCreditCardPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.alipay.AlipayInternationalCreditCardPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.alipay.AlipayPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.alipay.AlipayPaymentRequest;
+import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorAdaptor;
+import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForAlipayAdaptor;
+import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForUnionPayAdaptor;
+import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorForWechatAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentAdaptorInitialFailureException;
 import com.baozun.nebula.utilities.integration.payment.unionpay.UnionPaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.unionpay.UnionPaymentRequest;
@@ -27,6 +27,30 @@ public class PaymentFactory {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(PaymentFactory.class);
+	
+	/** 支付宝 */
+	public static final int ALIPAY = 1;
+	
+	/** 支付宝网银 */
+	public static final int ALIPAY_BANK = 3;
+	
+	/** 支付宝信用卡 */
+	public static final int ALIPAY_CREDIT = 14;
+	
+	/** 支付宝国际卡 */
+	public static final int ALIPAY_CREDIT_INT_V = 131;
+	
+	/** 支付宝国际卡 */
+	public static final int ALIPAY_CREDIT_INT_M = 141;
+	
+	/** 微信支付 */
+	public static final int WECHAT = 4;
+	
+	/** 汇付天下 */
+	public static final int CHINAPNR = 151;
+	
+	/** 银联支付 */
+	public static final int UNIONPAY = 161;
 
 	public static final String PAY_TYPE_ALIPAY = "Alipay";
 
@@ -300,4 +324,31 @@ public class PaymentFactory {
 		return new WechatPaymentAdaptor();
 	}
 
+	public String getPayType(Integer payType) {
+		String type = PaymentFactory.PAY_TYPE_ALIPAY;
+		switch (payType) {
+		case ALIPAY:
+			type = PaymentFactory.PAY_TYPE_ALIPAY;
+			break;
+		case ALIPAY_BANK:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_BANK;
+			break;
+		case ALIPAY_CREDIT:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT;
+			break;
+		case ALIPAY_CREDIT_INT_V:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+			break;
+		case ALIPAY_CREDIT_INT_M:
+			type = PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT;
+			break;
+		case WECHAT:
+			type = PaymentFactory.PAY_TYPE_WECHAT;
+			break;
+		case UNIONPAY:
+			type = PaymentFactory.PAY_TYPE_UNIONPAY;
+			break;
+		}
+		return type;
+	}
 }

@@ -2,7 +2,17 @@ package com.baozun.nebula.utils.convert;
 
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 
+/**
+ * 
+ * @Description 建议使用PaymentManagerImpl.getPayType(Integer payType)
+ * @see nebula-repo com.baozun.nebula.payment.manager.impl.PaymentManagerImpl.getPayType(Integer payType)
+ * @author  <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+ * @version 2016-11-29
+ */
+@Deprecated
 public class PayTypeConvertUtil {
+	
+	@Deprecated
 	public static String getPayType(Integer payType) {
 		String type = PaymentFactory.PAY_TYPE_ALIPAY;
 		switch (payType) {
