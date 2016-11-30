@@ -21,34 +21,35 @@ import java.util.List;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.freight.command.ExpShippingFeeCommand;
-import com.baozun.nebula.freight.command.ImpShippingFeeCommand;
-import com.baozun.nebula.freight.command.ShippingFeeConfigCommand;
 
 /**
  * @author jumbo
  *
  */
-public interface ShippingManager {
+public interface ShippingManager{
 
-	/**
-	 * 批量(删除)运费模板
-	 * @param ids
-	 */
-	void removeShippingTemplateByIds(List<Long> ids);
-	
-	/**
-	 * 导入运费表
-	 * @param is
-	 * @param templateId
-	 * @throws BusinessException
-	 */
-	public void importShippingFeeFile(InputStream is, Long templateId);
-	
-	/**
-	 * 导出运费表
-	 * @param is
-	 * @param templateId
-	 * @throws BusinessException
-	 */
-	public List<ExpShippingFeeCommand> exportShippingFeeConfigCommandList(Long templateId);
+    /**
+     * 批量(删除)运费模板
+     * 
+     * @param ids
+     */
+    void removeShippingTemplateByIds(List<Long> ids);
+
+    /**
+     * 导入运费表
+     * 
+     * @param is
+     * @param templateId
+     * @throws BusinessException
+     */
+    void importShippingFeeFile(InputStream is,Long templateId);
+
+    /**
+     * 导出运费表
+     * 
+     * @param is
+     * @param templateId
+     * @throws BusinessException
+     */
+    List<ExpShippingFeeCommand> exportShippingFeeConfigCommandList(Long templateId);
 }
