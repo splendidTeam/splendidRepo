@@ -32,84 +32,74 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
  * @author chuanyang.zheng
  * 
  */
-public class ConvertUtils {
+public class ConvertUtils{
 
-	public static Object convertTwoObject(Object target, Object sourse) {
-		if (sourse == null) {
-			return null;
-		}
-		try {
-			BeanInfo beanInfo = Introspector.getBeanInfo(sourse.getClass());
-			PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-			for (PropertyDescriptor pd : pds) {
-				Method getMethod = pd.getReadMethod();
-				if (getMethod.invoke(sourse) != null) {
-					BeanUtils.setProperty(target, pd.getName(),
-							getMethod.invoke(sourse));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return target;
-	}
+    public static Object convertTwoObject(Object target,Object sourse){
+        if (sourse == null){
+            return null;
+        }
+        try{
+            BeanInfo beanInfo = Introspector.getBeanInfo(sourse.getClass());
+            PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor pd : pds){
+                Method getMethod = pd.getReadMethod();
+                if (getMethod.invoke(sourse) != null){
+                    BeanUtils.setProperty(target, pd.getName(), getMethod.invoke(sourse));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return target;
+    }
 
-	public static Object convertModelToApi(Object target, Object sourse) {
-		if (sourse == null) {
-			return null;
-		}
-		try {
-			BeanUtils.copyProperties(target, sourse);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return target;
-	}
+    public static Object convertModelToApi(Object target,Object sourse){
+        if (sourse == null){
+            return null;
+        }
+        try{
+            BeanUtils.copyProperties(target, sourse);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return target;
+    }
 
-	
-	public static Object convertFromTarget(Object target, Object sourse) {
-		if (target == null) {
-			return null;
-		}
-		try {
-			BeanInfo beanInfo = Introspector.getBeanInfo(sourse.getClass());
-			PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
-			for (PropertyDescriptor pd : pds) {
-				Method getMethod = pd.getReadMethod();
-				try {					
-					if (getMethod.invoke(sourse) != null) {
-						BeanUtils.setProperty(target, pd.getName(),
-								getMethod.invoke(sourse));
-					}else{
-						BeanUtils.setProperty(target, pd.getName(),
-								null);
-					}
-				} catch (Exception e) {
-					continue;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return target;
-	}
-	
-	
-	
-	public static void main(String[] args) {
-		SalesOrderCommand salesOrderCommand =new SalesOrderCommand();
-		salesOrderCommand.setAddress("测试地址");
-		salesOrderCommand.setEmail("test");
-		ConsigneeCommand consigneeCommand = new ConsigneeCommand();
-		consigneeCommand = (ConsigneeCommand)convertFromTarget(consigneeCommand,salesOrderCommand);
-		System.out.println("==="+consigneeCommand.getAddress());
-		System.out.println("==="+consigneeCommand.getArea());
-		
-	}
-	
-	
-	
+    public static Object convertFromTarget(Object target,Object sourse){
+        if (target == null){
+            return null;
+        }
+        try{
+            BeanInfo beanInfo = Introspector.getBeanInfo(sourse.getClass());
+            PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
+            for (PropertyDescriptor pd : pds){
+                Method getMethod = pd.getReadMethod();
+                try{
+                    if (getMethod.invoke(sourse) != null){
+                        BeanUtils.setProperty(target, pd.getName(), getMethod.invoke(sourse));
+                    }else{
+                        BeanUtils.setProperty(target, pd.getName(), null);
+                    }
+                }catch (Exception e){
+                    continue;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return target;
+    }
+
+    public static void main(String[] args){
+        SalesOrderCommand salesOrderCommand = new SalesOrderCommand();
+        salesOrderCommand.setAddress("测试地址");
+        salesOrderCommand.setEmail("test");
+        ConsigneeCommand consigneeCommand = new ConsigneeCommand();
+        consigneeCommand = (ConsigneeCommand) convertFromTarget(consigneeCommand, salesOrderCommand);
+        System.out.println("===" + consigneeCommand.getAddress());
+        System.out.println("===" + consigneeCommand.getArea());
+    }
 }

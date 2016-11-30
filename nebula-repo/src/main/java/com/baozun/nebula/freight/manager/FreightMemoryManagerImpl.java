@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.freight.manager;
 
+import static com.baozun.nebula.freight.memory.ShippingFeeConfigMap.KEY_CONNECTOR;
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
 
@@ -48,7 +49,6 @@ import com.baozun.nebula.model.freight.ShippingFeeConfig;
 import com.baozun.nebula.model.freight.ShippingTemeplate;
 import com.baozun.nebula.model.freight.SupportedArea;
 import com.baozun.nebula.sdk.command.logistics.DistributionModeCommand;
-import com.feilong.core.Validator;
 
 /**
  * The Class FreightMemoryManagerImpl.
@@ -70,6 +70,8 @@ public class FreightMemoryManagerImpl implements FreightMemoryManager{
 
     /** The shipping fee config map. */
     private ShippingFeeConfigMap shippingFeeConfigMap;
+
+    //*********************************************************************
 
     /** The supported area dao. */
     @Autowired
@@ -95,37 +97,38 @@ public class FreightMemoryManagerImpl implements FreightMemoryManager{
     @Override
     public void loadFreightInfosFromDB(){
         //从数据库中加载物流列表.
-        buildDistributionCommandList();
+        this.distributionList = buildAllDistributionCommandList();
 
         //从数据库中加载运费配置信息Map.
-        loadShippingFeeConfigMap();
+        this.shippingFeeConfigMap = buildShippingFeeConfigMap();
 
         //从数据库中加载运费模板 map.
-        loadShippingTemeplateMap();
+        this.shippingTemeplateMap = buildShippingTemeplateMap();
 
         //从数据库中加载 店铺运费模板map.
-        loadShopShippingTemeplateMap();
+        this.shopShippingTemeplateMap = buildShopShippingTemeplateMap();
     }
 
+    //***********************************************************************************
+
     /**
-     * 从数据库中加载物流列表.
+     * @return
+     * @since 5.3.2.4
      */
-    private void buildDistributionCommandList(){
+    private List<DistributionCommand> buildAllDistributionCommandList(){
         //获取所有的物流方式
         List<DistributionMode> distributionModeList = distributionModeDao.getAllDistributionMode();
-
         if (isNullOrEmpty(distributionModeList)){
-            distributionList = null;
-            return;
+            return null;
         }
+
         List<DistributionCommand> distributionCommandList = new ArrayList<>();
 
         List<SupportedArea> supporedAreaList = supportedAreaDao.getAllSuppoertedArea();
-        for (DistributionMode distributionMode : distributionModeList){//遍历所有的物流方式
-            DistributionCommand distributionCommand = buildDistributionCommand(supporedAreaList, distributionMode);
-            distributionCommandList.add(distributionCommand);
+        for (DistributionMode distributionMode : distributionModeList){
+            distributionCommandList.add(buildDistributionCommand(supporedAreaList, distributionMode));
         }
-        distributionList = distributionCommandList;
+        return distributionCommandList;
     }
 
     /**
@@ -139,32 +142,38 @@ public class FreightMemoryManagerImpl implements FreightMemoryManager{
 
         List<SupportedAreaCommand> whiteAreaList = new ArrayList<>();
         Map<Long, List<SupportedAreaCommand>> blackAreaListMap = new HashMap<>();
-        for (SupportedArea supportedArea : supporedAreaList){// 便利所有的 支持区域。
-            SupportedAreaCommand areaCmd = new SupportedAreaCommand();
-            areaCmd = (SupportedAreaCommand) ConvertUtils.convertFromTarget(areaCmd, supportedArea);
-            if (supportedArea.getDistributionModeId().equals(distributionModeId)){// 根据支持区域的 物流方式Id 进行匹配
+
+        for (SupportedArea supportedArea : supporedAreaList){
+
+            if (supportedArea.getDistributionModeId().equals(distributionModeId)){//根据支持区域的物流方式Id 进行匹配
+
+                SupportedAreaCommand supportedAreaCommand = new SupportedAreaCommand();
+                supportedAreaCommand = (SupportedAreaCommand) ConvertUtils.convertFromTarget(supportedAreaCommand, supportedArea);
+
                 if (SupportedArea.WHITE_TYPE.equals(supportedArea.getType())){ // 白名单
-                    whiteAreaList.add(areaCmd);
+                    whiteAreaList.add(supportedAreaCommand);
                 }
 
                 if (SupportedArea.BLACK_TYPE.equals(supportedArea.getType())){//黑名单
                     Long groupNo = supportedArea.getGroupNo();
-                    List<SupportedAreaCommand> blackAreaCmdList = blackAreaListMap.get(groupNo);
-                    if (blackAreaCmdList != null){// 如果 期号 已经在map中存在，那么修改 blackAreaCmdList 内容
+                    List<SupportedAreaCommand> blackSupportedAreaCommandList = blackAreaListMap.get(groupNo);
+                    if (blackSupportedAreaCommandList != null){// 如果 期号 已经在map中存在，那么修改 blackAreaCmdList 内容
                         if (SupportedArea.BLACK_TYPE.equals(supportedArea.getType())){
-                            blackAreaCmdList.add(areaCmd);
+                            blackSupportedAreaCommandList.add(supportedAreaCommand);
                         }
                     }else{// 如果不存在， 创建 blackAreaCmdList ，将area放入 list 之后，再将list put 入map中
-                        blackAreaCmdList = new ArrayList<>();
+                        blackSupportedAreaCommandList = new ArrayList<>();
 
                         if (SupportedArea.BLACK_TYPE.equals(supportedArea.getType())){
-                            blackAreaCmdList.add(areaCmd);
+                            blackSupportedAreaCommandList.add(supportedAreaCommand);
                         }
-                        blackAreaListMap.put(groupNo, blackAreaCmdList);
+                        blackAreaListMap.put(groupNo, blackSupportedAreaCommandList);
                     }
                 }
             }
         }
+
+        //---------------------------------------------------------------------------
 
         DistributionCommand distributionCommand = new DistributionCommand();
         distributionCommand.setDistributionModeId(distributionModeId);
@@ -175,71 +184,75 @@ public class FreightMemoryManagerImpl implements FreightMemoryManager{
     }
 
     /**
-     * 从数据库中加载运费模板 map.
+     * @return
+     * @since 5.3.2.4
      */
-    private void loadShippingTemeplateMap(){
-        List<ShippingTemeplate> tmpList = shippingTemeplateDao.findAllShippingTemeplate();
-        if (Validator.isNotNullOrEmpty(tmpList)){
-            ShippingTemeplateMap shippingTemeplateMap1 = new ShippingTemeplateMap();
+    private ShippingTemeplateMap buildShippingTemeplateMap(){
+        List<ShippingTemeplate> shippingTemeplateList = shippingTemeplateDao.findAllShippingTemeplate();
 
-            for (ShippingTemeplate tmp : tmpList){
-                ShippingTemeplateCommand cmd = new ShippingTemeplateCommand();
-                cmd = (ShippingTemeplateCommand) ConvertUtils.convertFromTarget(cmd, tmp);
+        ShippingTemeplateMap shippingTemeplateMap1 = null;
+        if (isNotNullOrEmpty(shippingTemeplateList)){
+            shippingTemeplateMap1 = new ShippingTemeplateMap();
 
-                Long templateId = tmp.getId();
-                List<ShippingFeeConfigCommand> cfgList = shippingFeeConfigDao.findShippingFeeConfigsByTemeplateId(templateId);
+            for (ShippingTemeplate shippingTemeplate : shippingTemeplateList){
+                ShippingTemeplateCommand shippingTemeplateCommand = new ShippingTemeplateCommand();
+                shippingTemeplateCommand = (ShippingTemeplateCommand) ConvertUtils.convertFromTarget(shippingTemeplateCommand, shippingTemeplate);
 
-                cmd.setFeeConfigs(cfgList);
+                Long templateId = shippingTemeplate.getId();
+                List<ShippingFeeConfigCommand> shippingFeeConfigCommandList = shippingFeeConfigDao.findShippingFeeConfigsByTemeplateId(templateId);
+                shippingTemeplateCommand.setFeeConfigs(shippingFeeConfigCommandList);
 
-                setDistributionModeCommandList(cmd);
+                setDistributionModeCommandList(shippingTemeplateCommand);
 
-                shippingTemeplateMap1.put(tmp.getId(), cmd);
+                shippingTemeplateMap1.put(shippingTemeplate.getId(), shippingTemeplateCommand);
             }
-
-            this.shippingTemeplateMap = shippingTemeplateMap1;
         }
-
+        return shippingTemeplateMap1;
     }
 
     /**
-     * 从数据库中加载 店铺运费模板map.
+     * @return
+     * @since 5.3.2.4
      */
-    private void loadShopShippingTemeplateMap(){
-        List<ShippingTemeplate> tmpList = shippingTemeplateDao.findAllShippingTemeplate();
+    private ShopShippingTemeplateMap buildShopShippingTemeplateMap(){
+        List<ShippingTemeplate> shippingTemeplateList = shippingTemeplateDao.findAllShippingTemeplate();
 
-        if (Validator.isNotNullOrEmpty(tmpList)){
-            ShopShippingTemeplateMap shopShippingTemeplateMap1 = new ShopShippingTemeplateMap();
+        ShopShippingTemeplateMap shopShippingTemeplateMap1 = null;
 
-            for (ShippingTemeplate tmp : tmpList){
-                Long shopId = tmp.getShopId();
-                Long templateId = tmp.getId();
-                List<ShippingFeeConfigCommand> cfgList = shippingFeeConfigDao.findShippingFeeConfigsByTemeplateId(templateId);
+        if (isNotNullOrEmpty(shippingTemeplateList)){
+            shopShippingTemeplateMap1 = new ShopShippingTemeplateMap();
 
-                ShippingTemeplateCommand cmd = new ShippingTemeplateCommand();
-                cmd = (ShippingTemeplateCommand) ConvertUtils.convertFromTarget(cmd, tmp);
-                cmd.setFeeConfigs(cfgList);
-                setDistributionModeCommandList(cmd);
+            for (ShippingTemeplate shippingTemeplate : shippingTemeplateList){
+                Long shopId = shippingTemeplate.getShopId();
+                Long templateId = shippingTemeplate.getId();
+                List<ShippingFeeConfigCommand> shippingFeeConfigCommandList = shippingFeeConfigDao.findShippingFeeConfigsByTemeplateId(templateId);
 
-                ShopShippingTemeplateCommand sstCmd = shopShippingTemeplateMap1.get(shopId);
-                if (null != sstCmd){
-                    List<ShippingTemeplateCommand> cmdList = sstCmd.getShippingTemeplateList();
+                ShippingTemeplateCommand shippingTemeplateCommand = new ShippingTemeplateCommand();
+                shippingTemeplateCommand = (ShippingTemeplateCommand) ConvertUtils.convertFromTarget(shippingTemeplateCommand, shippingTemeplate);
+                shippingTemeplateCommand.setFeeConfigs(shippingFeeConfigCommandList);
+                setDistributionModeCommandList(shippingTemeplateCommand);
+
+                ShopShippingTemeplateCommand shopShippingTemeplateCommand = shopShippingTemeplateMap1.get(shopId);
+                if (null != shopShippingTemeplateCommand){
+                    List<ShippingTemeplateCommand> cmdList = shopShippingTemeplateCommand.getShippingTemeplateList();
 
                     if (cmdList != null){
-                        cmdList.add(cmd);
+                        cmdList.add(shippingTemeplateCommand);
                     }else{
                         cmdList = new ArrayList<ShippingTemeplateCommand>();
-                        cmdList.add(cmd);
+                        cmdList.add(shippingTemeplateCommand);
 
-                        sstCmd.setShippingTemeplateList(cmdList);
-                        shopShippingTemeplateMap1.put(shopId, sstCmd);
+                        shopShippingTemeplateCommand.setShippingTemeplateList(cmdList);
+                        shopShippingTemeplateMap1.put(shopId, shopShippingTemeplateCommand);
                     }
                 }else{
-                    sstCmd = new ShopShippingTemeplateCommand();
-                    List<ShippingTemeplateCommand> cmdList = new ArrayList<ShippingTemeplateCommand>();
-                    cmdList.add(cmd);
+                    shopShippingTemeplateCommand = new ShopShippingTemeplateCommand();
 
-                    sstCmd.setShippingTemeplateList(cmdList);
-                    shopShippingTemeplateMap1.put(shopId, sstCmd);
+                    List<ShippingTemeplateCommand> shippingTemeplateCommandList = new ArrayList<>();
+                    shippingTemeplateCommandList.add(shippingTemeplateCommand);
+
+                    shopShippingTemeplateCommand.setShippingTemeplateList(shippingTemeplateCommandList);
+                    shopShippingTemeplateMap1.put(shopId, shopShippingTemeplateCommand);
                 }
 
             }
@@ -248,118 +261,129 @@ public class FreightMemoryManagerImpl implements FreightMemoryManager{
             List<DistributionCommand> distributionCommandList = getDistributionList();
 
             for (Long shopId : shopShippingTemeplateMap1.keySet()){
-                ShopShippingTemeplateCommand sstCmd = shopShippingTemeplateMap1.get(shopId);
+                ShopShippingTemeplateCommand shopShippingTemeplateCommand = shopShippingTemeplateMap1.get(shopId);
 
-                List<ShippingTemeplateCommand> temeplateCmdList = sstCmd.getShippingTemeplateList();
+                List<ShippingTemeplateCommand> shippingTemeplateCommandList = shopShippingTemeplateCommand.getShippingTemeplateList();
 
-                if (null != temeplateCmdList){
-                    Set<Long> distributionModeIdSet = new HashSet<Long>();
+                if (null != shippingTemeplateCommandList){
+                    Set<Long> distributionModeIdSet = new HashSet<>();
 
-                    for (ShippingTemeplateCommand stCmd : temeplateCmdList){
-
+                    for (ShippingTemeplateCommand shippingTemeplateCommand : shippingTemeplateCommandList){
                         // 获取单个店铺下 每个模板的 物流方式Id
-                        List<DistributionModeCommand> modeList = stCmd.getDistributionModes();
+                        List<DistributionModeCommand> distributionModeCommandList = shippingTemeplateCommand.getDistributionModes();
 
-                        if (Validator.isNotNullOrEmpty(modeList)){
-                            for (DistributionModeCommand dmCmd : modeList){
-                                Long distributionModeId = dmCmd.getId();
+                        if (isNotNullOrEmpty(distributionModeCommandList)){
+                            for (DistributionModeCommand distributionModeCommand : distributionModeCommandList){
+                                Long distributionModeId = distributionModeCommand.getId();
                                 distributionModeIdSet.add(distributionModeId);
                             }
-
                         }
                     }
 
-                    // 根据 物流方式ID 找出 支持本店铺的 DistributionModeCommand
+                    // 根据 物流方式ID 找出支持本店铺的 DistributionModeCommand
                     List<DistributionModeCommand> curShopDistributionModeCommandList = null;
 
-                    if (Validator.isNotNullOrEmpty(distributionModeIdSet)){
+                    if (isNotNullOrEmpty(distributionModeIdSet)){
 
-                        curShopDistributionModeCommandList = new ArrayList<DistributionModeCommand>();
+                        curShopDistributionModeCommandList = new ArrayList<>();
                         for (Long modeId : distributionModeIdSet){
                             for (DistributionCommand distributionCmd : distributionCommandList){
                                 if (modeId.equals(distributionCmd.getDistributionModeId())){
-                                    DistributionModeCommand dmCmd = new DistributionModeCommand();
-                                    dmCmd.setId(distributionCmd.getDistributionModeId());
-                                    dmCmd.setName(distributionCmd.getDistributionModeName());
-                                    curShopDistributionModeCommandList.add(dmCmd);
+
+                                    DistributionModeCommand distributionModeCommand = new DistributionModeCommand();
+                                    distributionModeCommand.setId(distributionCmd.getDistributionModeId());
+                                    distributionModeCommand.setName(distributionCmd.getDistributionModeName());
+                                    curShopDistributionModeCommandList.add(distributionModeCommand);
                                 }
                             }
                         }
-
                     }
-
-                    sstCmd.setDistributionModeList(curShopDistributionModeCommandList);
+                    shopShippingTemeplateCommand.setDistributionModeList(curShopDistributionModeCommandList);
                 }
             }
-
-            this.shopShippingTemeplateMap = shopShippingTemeplateMap1;
         }
+        return shopShippingTemeplateMap1;
     }
 
     /**
      * Sets the distribution mode command list.
      *
-     * @param stCmd
+     * @param shippingTemeplateCommand
      *            the new distribution mode command list
      */
-    private void setDistributionModeCommandList(ShippingTemeplateCommand stCmd){
-
-        Set<Long> distributionModeIdSet = new HashSet<Long>();
-        List<ShippingFeeConfigCommand> cfgList = stCmd.getFeeConfigs();
+    private void setDistributionModeCommandList(ShippingTemeplateCommand shippingTemeplateCommand){
+        Set<Long> distributionModeIdSet = new HashSet<>();
+        List<ShippingFeeConfigCommand> shippingFeeConfigCommandList = shippingTemeplateCommand.getFeeConfigs();
         List<DistributionCommand> distributionCommandList = getDistributionList();
 
         // 收集物流方式ID
-        if (Validator.isNotNullOrEmpty(cfgList)){
-            for (ShippingFeeConfigCommand cfgCmd : cfgList){
+        if (isNotNullOrEmpty(shippingFeeConfigCommandList)){
+            for (ShippingFeeConfigCommand cfgCmd : shippingFeeConfigCommandList){
                 Long distributionModeId = cfgCmd.getDistributionModeId();
                 distributionModeIdSet.add(distributionModeId);
             }
 
-            List<DistributionModeCommand> result = new ArrayList<DistributionModeCommand>();
+            List<DistributionModeCommand> distributionModeCommandList = new ArrayList<DistributionModeCommand>();
 
             for (Long modeId : distributionModeIdSet){
                 for (DistributionCommand distributionCmd : distributionCommandList){
                     if (modeId.equals(distributionCmd.getDistributionModeId())){
-                        //						curShopDistributionCommandList.add(distributionCmd);
-                        DistributionModeCommand dmCmd = new DistributionModeCommand();
-                        dmCmd.setId(modeId);
-                        dmCmd.setName(distributionCmd.getDistributionModeName());
-                        result.add(dmCmd);
+                        DistributionModeCommand distributionModeCommand = new DistributionModeCommand();
+                        distributionModeCommand.setId(modeId);
+                        distributionModeCommand.setName(distributionCmd.getDistributionModeName());
+                        distributionModeCommandList.add(distributionModeCommand);
                     }
                 }
             }
-
-            stCmd.setDistributionModes(result);
+            shippingTemeplateCommand.setDistributionModes(distributionModeCommandList);
         }
-
     }
 
     /**
-     * 从数据库中加载运费配置信息Map.
+     * @return
+     * @since 5.3.2.4
      */
-    public void loadShippingFeeConfigMap(){
-        List<ShippingFeeConfig> configList = shippingFeeConfigDao.findAllShippingFeeConfig();
-        ShippingFeeConfigMap map = new ShippingFeeConfigMap();
-        if (Validator.isNotNullOrEmpty(configList)){
+    private ShippingFeeConfigMap buildShippingFeeConfigMap(){
+        List<ShippingFeeConfig> shippingFeeConfigList = shippingFeeConfigDao.findAllShippingFeeConfig();
 
-            for (ShippingFeeConfig cfg : configList){
-                String areaId = cfg.getDestAreaId();
-                Long distributionModeId = cfg.getDistributionModeId();
-                Long spId = cfg.getShippingTemeplateId();
+        ShippingFeeConfigMap buildShippingFeeConfigMap = new ShippingFeeConfigMap();
+        if (isNotNullOrEmpty(shippingFeeConfigList)){
+
+            for (ShippingFeeConfig shippingFeeConfig : shippingFeeConfigList){
+                String areaId = shippingFeeConfig.getDestAreaId();
+                Long distributionModeId = shippingFeeConfig.getDistributionModeId();
+                Long shippingTemeplateId = shippingFeeConfig.getShippingTemeplateId();
+
+                ShippingFeeConfigCommand shippingFeeConfigCommand = new ShippingFeeConfigCommand();
+                shippingFeeConfigCommand = (ShippingFeeConfigCommand) ConvertUtils.convertFromTarget(shippingFeeConfigCommand, shippingFeeConfig);
 
                 //模板id-物流方式id-目的地id为key  
-
-                StringBuilder sb = new StringBuilder();
-                sb.append(spId).append(ShippingFeeConfigMap.KEY_CONNECTOR).append(distributionModeId).append(ShippingFeeConfigMap.KEY_CONNECTOR).append(areaId);
-
-                ShippingFeeConfigCommand cmd = new ShippingFeeConfigCommand();
-                cmd = (ShippingFeeConfigCommand) ConvertUtils.convertFromTarget(cmd, cfg);
-
-                map.put(sb.toString(), cmd);
+                String key = buildKey(areaId, distributionModeId, shippingTemeplateId);
+                buildShippingFeeConfigMap.put(key, shippingFeeConfigCommand);
             }
         }
-        this.shippingFeeConfigMap = map;
+        return buildShippingFeeConfigMap;
     }
+
+    /**
+     * @param areaId
+     * @param distributionModeId
+     * @param shippingTemeplateId
+     * @return
+     * @since 5.3.2.4
+     */
+    private String buildKey(String areaId,Long distributionModeId,Long shippingTemeplateId){
+        //模板id-物流方式id-目的地id为key  
+        StringBuilder sb = new StringBuilder();
+        sb.append(shippingTemeplateId);
+        sb.append(KEY_CONNECTOR);
+        sb.append(distributionModeId);
+        sb.append(KEY_CONNECTOR);
+        sb.append(areaId);
+        return sb.toString();
+    }
+
+    //*************************************************************************************************
 
     /**
      * Gets the distribution list.
@@ -400,5 +424,4 @@ public class FreightMemoryManagerImpl implements FreightMemoryManager{
     public ShippingFeeConfigMap getShippingFeeConfigMap(){
         return shippingFeeConfigMap;
     }
-
 }
