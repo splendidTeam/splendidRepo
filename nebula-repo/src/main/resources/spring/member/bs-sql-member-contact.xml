@@ -58,20 +58,17 @@
 			<value>
 				<![CDATA[  
 		       		update T_MEM_CONTACT set IS_DEFAULT =false 
-		       			 where 1=1
+		       			where 
+		       			IS_DEFAULT=:isDefault
 		       			#if($memberId)
 	       		     		and MEMBER_ID =:memberId
 	       		  		#end  
-	       		  		and IS_DEFAULT=true
-	       		  		
-		       			
-		       			 
                  ]]>
 			</value>
 		</constructor-arg>
 	</bean>	
 	
-		<bean id="Contact.updateContactByContactId" class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="Contact.updateContactByContactId" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>
 		<constructor-arg>
 			<value>
@@ -80,11 +77,11 @@
 		       			 where 
 		       			 ID =:contactId
 		       			 and member_id =:memberId
-		       			 
                  ]]>
 			</value>
 		</constructor-arg>
 	</bean>	
+	
 	<bean id="Contact.findContactByQueryMapWithPage" class="loxia.dao.support.DynamicQueryHolder">
 		<description></description>
 		<constructor-arg>

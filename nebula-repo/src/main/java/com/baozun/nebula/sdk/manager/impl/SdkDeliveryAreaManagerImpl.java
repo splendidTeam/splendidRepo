@@ -136,10 +136,11 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager{
 
     @Override
     public ContactDeliveryCommand findContactDeliveryByDeliveryAreaCode(String code){
-        ContactDeliveryCommand contactDeliveryCommand = new ContactDeliveryCommand();
+        ContactDeliveryCommand contactDeliveryCommand = null;
         DeliveryArea deliveryArea = findEnableDeliveryAreaByCode(code);
         if (Validator.isNotNullOrEmpty(deliveryArea)){
             AreaDeliveryMode areaDeliveryMode = areaDeliveryModeManager.findAreaDeliveryModeByAreaId(deliveryArea.getId());
+            contactDeliveryCommand = new ContactDeliveryCommand();
             ConvertUtils.convertTwoObject(contactDeliveryCommand, areaDeliveryMode);
         }
         return contactDeliveryCommand;
