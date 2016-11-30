@@ -59,8 +59,10 @@
 				<![CDATA[  
 		       		update T_MEM_CONTACT set IS_DEFAULT =false 
 		       			where 
-       		     		and MEMBER_ID = :memberId
-	       		  		and IS_DEFAULT= :isDefault
+		       			IS_DEFAULT=:isDefault
+		       			#if($memberId)
+	       		     		and MEMBER_ID =:memberId
+	       		  		#end  
                  ]]>
 			</value>
 		</constructor-arg>
