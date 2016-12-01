@@ -26,9 +26,9 @@ import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
-import com.baozun.nebula.utilities.integration.payment.UnionPayBase;
 import com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
+import com.baozun.nebula.utilities.integration.payment.unionpay.acp.sdk.UnionPayBase;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.feilong.core.Validator;
@@ -352,7 +352,7 @@ public class PaymentManagerImpl implements PaymentManager {
 		addition.put("version", UnionPayBase.version);// M
 
 		// 默认取值：UTF-8
-		addition.put("encoding", UnionPayBase.encoding);// M
+		addition.put("encoding", UnionPayBase.encoding_UTF8);// M
 
 		addition.put("signMethod", "01");// M
 

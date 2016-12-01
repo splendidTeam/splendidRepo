@@ -10,7 +10,6 @@ import java.util.Properties;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.Validator;
 import com.baozun.nebula.utilities.common.condition.RequestCurrencyUnionPay;
-import com.baozun.nebula.utilities.integration.payment.UnionPayBase;
 import com.baozun.nebula.utilities.integration.payment.adaptor.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.feilong.core.lang.NumberUtil;
