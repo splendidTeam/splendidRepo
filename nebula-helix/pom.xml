@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>com.captcha</groupId>
 			<artifactId>botdetect</artifactId>
-			<version>4.1.baozun.RELEASE</version>
+			<version>4.2.baozun.RELEASE</version>
 		</dependency>
 	</dependencies>
 </project>
