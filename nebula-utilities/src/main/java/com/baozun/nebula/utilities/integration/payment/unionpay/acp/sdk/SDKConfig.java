@@ -167,7 +167,7 @@ public class SDKConfig {
 	 */
 	public void loadPropertiesFromPath(String rootPath) {
 		if (StringUtils.isNotBlank(rootPath)) {
-			File file = new File(rootPath + File.separator + FILE_NAME);
+			File file = new File(rootPath);
 			InputStream in = null;
 			if (file.exists()) {
 				try {

@@ -48,6 +48,10 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 	public AbstractUnionPaymentAdaptor(){
 		SDKConfig.getConfig().loadPropertiesFromPath("config/unionpay.properties");
 	}
+	
+	static{
+		SDKConfig.getConfig().loadPropertiesFromPath("config/unionpay.properties");
+	}
 
 	@Override
 	public String getServiceProvider() {
