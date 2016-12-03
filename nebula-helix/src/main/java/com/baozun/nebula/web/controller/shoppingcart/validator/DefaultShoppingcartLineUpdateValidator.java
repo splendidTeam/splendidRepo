@@ -115,7 +115,7 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
                 int totalQuantity = sameTypeAndSkuNeedCombinedShoppingCartLineCommand.getQuantity() + count;
                 sameTypeAndSkuNeedCombinedShoppingCartLineCommand.setQuantity(totalQuantity);
 
-                shoppingCartLineCommandList = CollectionsUtil.remove(shoppingCartLineCommandList, currentShoppingCartLineCommand);
+                shoppingCartLineCommandList.remove(currentShoppingCartLineCommand);
                 if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, skuId, totalQuantity)){
                     return ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
                 }
