@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -167,13 +168,12 @@ public class SDKConfig {
 	 */
 	public void loadPropertiesFromPath(String rootPath) {
 		if (StringUtils.isNotBlank(rootPath)) {
-			File file = new File(rootPath);
+			URL url = Thread.currentThread().getContextClassLoader().getResource(rootPath);
 			InputStream in = null;
-			if (file.exists()) {
+			if (null != url) {
 				try {
-					in = new FileInputStream(file);
-					BufferedReader bf = new BufferedReader(
-							new InputStreamReader(in, "utf-8"));
+					in = url.openStream();
+					BufferedReader bf = new BufferedReader(new InputStreamReader(in, "utf-8"));
 					properties = new Properties();
 					properties.load(bf);
 					loadProperties(properties);
@@ -192,7 +192,7 @@ public class SDKConfig {
 				}
 			} else {
 				// 由于此时可能还没有完成LOG的加载，因此采用标准输出来打印日志信息
-				System.out.println(rootPath + FILE_NAME + "不存在,加载参数失败");
+				System.out.println(rootPath + "不存在,加载参数失败");
 			}
 		} else {
 			loadPropertiesFromSrc();
