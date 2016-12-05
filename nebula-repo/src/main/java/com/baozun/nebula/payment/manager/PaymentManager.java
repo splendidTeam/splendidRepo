@@ -16,11 +16,6 @@ public interface PaymentManager {
 	 */
 	public PaymentRequest createPayment(SalesOrderCommand order);
     
-    /**
-     * 创建支付链接(新增接口，shopdog使用)
-     */
-    public PaymentRequest createPayment(SalesOrderCommand order, Map<String,String> additionParams);
-	
 	/**
 	 * 同步方式获取返回结果
 	 */
@@ -80,6 +75,6 @@ public interface PaymentManager {
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-11-29
 	 */
-	public PaymentRequest createPayment(Map<String, String> additionParams, String payType);
+	public PaymentRequest createPayment(Map<String, Object> additionParams, String payType);
 
 }

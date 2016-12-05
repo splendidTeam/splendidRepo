@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.payment.convert.PayParamCommandAdaptor;
 import com.baozun.nebula.payment.convert.PaymentConvertFactory;
+import com.baozun.nebula.payment.convert.SalesOrderCommandToPaymentParamsConverter;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
@@ -47,12 +49,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
-            Map<String, Object> params = new HashMap<String, Object>(); 
-            for (int i = 0; i < SalesOrderCommand.class.getFields().length; i++) { 
-                Field field = SalesOrderCommand.class.getFields()[i]; 
-                params.put(field.getName(), ReflectionUtil.getFieldValue(order, field.getName())); 
-            } 
-            payParamCommandAdaptor.setRequestParams(params);
+            payParamCommandAdaptor.setRequestParams(SalesOrderCommandToPaymentParamsConverter.convert(order));
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());//获得支付适配器
 			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
 			Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);
@@ -64,43 +61,8 @@ public class PaymentManagerImpl implements PaymentManager {
 		return paymentRequest;
 	}
 	
-    /**
-     * 创建支付链接（定制传参）
-     * @author 江家雷
-     * @date 2016年6月3日 下午5:35:18
-     * @param order
-     * @param additionParams
-     * @return
-     * @see com.baozun.nebula.payment.manager.PaymentManager#createPayment(com.baozun.nebula.sdk.command.SalesOrderCommand, java.util.Map)
-     * @since
-     */
     @Override
-    public PaymentRequest createPayment(SalesOrderCommand order, Map<String, String> additionParams) {
-        PaymentRequest paymentRequest = null;
-        try {
-        	PaymentFactory paymentFactory = PaymentFactory.getInstance();
-            PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
-            PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCommand().getPayType()));
-            payParamCommandAdaptor.setSalesOrderCommand(order);
-            //获得支付适配器
-            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
-            //获得对应的参数转换器
-            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());
-            Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
-            // 將支付所需的定制参数赋值给addition，例如定制化参数 qr_pay_mode
-            if (null != additionParams) {
-                addition.putAll(additionParams);
-            }          
-            paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);
-        } catch (Exception ex){
-            log.error("CreatePayment error: "+ex.toString(), ex);
-            return null;
-        }
-        return paymentRequest;
-    }
-    
-    @Override
-    public PaymentRequest createPayment(Map<String, String> additionParams, String payType) {
+    public PaymentRequest createPayment(Map<String, Object> additionParams, String payType) {
         PaymentRequest paymentRequest = null;
         try {
             PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(payType);
@@ -112,7 +74,7 @@ public class PaymentManagerImpl implements PaymentManager {
             Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
             // 將支付所需的定制参数赋值给addition
             if (null != additionParams) {
-                addition.putAll(additionParams);
+                addition.putAll(convertToStringParamsMap(additionParams));
             }          
             paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);
         } catch (Exception ex){
@@ -121,6 +83,8 @@ public class PaymentManagerImpl implements PaymentManager {
         }
         return paymentRequest;
     }
+    
+
     
 	@Override
 	public PaymentResult getPaymentResultForSyn(HttpServletRequest request,String paymentType) {
@@ -306,7 +270,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			log.error("unifiedOrder error: "+e.toString());
 			paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
 			paymentResult.setMessage(e.toString());
-		}catch(Exception ex){
+		} catch (Exception ex){
 			log.error("unifiedOrder error: "+ex.toString());
 			paymentResult.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
 			paymentResult.setMessage(ex.toString());
@@ -459,4 +423,16 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 	}
 	
+	private Map<String, String> convertToStringParamsMap(Map<String, Object> params) {
+		Map<String, String> res = new HashMap<String, String>();
+		Set<String> keySet = params.keySet();
+		for(String key : keySet){
+			Object val = params.get(key);
+			if(null!=val){
+				String paramVal = val+"";
+				res.put(key, paramVal);
+			}
+		}
+		return res;
+	}
 }
