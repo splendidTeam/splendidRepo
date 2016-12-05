@@ -24,49 +24,53 @@ import com.baozun.nebula.sdk.command.logistics.ItemFreightInfoCommand;
 
 /**
  * 计件类型的运费计算
+ * 
  * @author Tianlong.Zhang
- *
+ * @deprecated 之前有考虑过几种运费模式：简单模式，就是保底价加上续重单价，计重模式，就是单位重量单价等等。但是这些都不合用。<br>
+ *             主要原因是如果这个用于前端计算运费逻辑不合适，如果用于后端计算运费逻辑又太简单
+ *             <p>
+ *             本来要直接删除的,但是看到pts 里面也有相关功能,暂做 deprecated处理,在未来一版整体优化时,干掉
  */
+@Deprecated
 public class UnitFreightStrategy implements FreightStrategy{
 
-	@Override
-	public BigDecimal cal(ShippingFeeConfigCommand feeCmd,
-			List<ItemFreightInfoCommand> itemList) {
-		BigDecimal result = BigDecimal.ZERO;
-		
-		Integer totalCount = 0;
-		
-		//算出商品的总件数
-		for(ItemFreightInfoCommand freightInfoCmd : itemList){
-			Integer curCount = freightInfoCmd.getCount();
-			totalCount += curCount;
-		}
-		
-		Integer firstPartUnit = feeCmd.getFirstPartUnit();
-		BigDecimal firstPartPrice = feeCmd.getFirstPartPrice();
-		
-		Integer subsequentPartUnit = feeCmd.getSubsequentPartUnit();
-		BigDecimal subsequentPartPrice = feeCmd.getSubsequentPartPrice();
-		
-		if(totalCount <= firstPartUnit){// 未超出 首 件 运费单位的，按照首件运费的来算
-			result = firstPartPrice;
-		}else{
-			result = result.add(firstPartPrice);
-			Integer subCount = totalCount - firstPartUnit;// 剩下的件数
-			
-			Integer subPartCount = subCount/subsequentPartUnit; // 剩下的 件数 / 续件单位 = 要续件的数量
-			
-			if(subCount%subsequentPartUnit!=0){// 如果有余数， 要续件的数量+1
-				subPartCount ++;
-			}
-			
-			BigDecimal subPrice = subsequentPartPrice.multiply(new BigDecimal(subPartCount));
-			
-			result = result.add(subPrice);
-		}
-		
-		result = result.setScale(2);
-		return result;
-	}
+    @Override
+    public BigDecimal cal(ShippingFeeConfigCommand feeCmd,List<ItemFreightInfoCommand> itemList){
+        BigDecimal result = BigDecimal.ZERO;
+
+        Integer totalCount = 0;
+
+        //算出商品的总件数
+        for (ItemFreightInfoCommand freightInfoCmd : itemList){
+            Integer curCount = freightInfoCmd.getCount();
+            totalCount += curCount;
+        }
+
+        Integer firstPartUnit = feeCmd.getFirstPartUnit();
+        BigDecimal firstPartPrice = feeCmd.getFirstPartPrice();
+
+        Integer subsequentPartUnit = feeCmd.getSubsequentPartUnit();
+        BigDecimal subsequentPartPrice = feeCmd.getSubsequentPartPrice();
+
+        if (totalCount <= firstPartUnit){// 未超出 首 件 运费单位的，按照首件运费的来算
+            result = firstPartPrice;
+        }else{
+            result = result.add(firstPartPrice);
+            Integer subCount = totalCount - firstPartUnit;// 剩下的件数
+
+            Integer subPartCount = subCount / subsequentPartUnit; // 剩下的 件数 / 续件单位 = 要续件的数量
+
+            if (subCount % subsequentPartUnit != 0){// 如果有余数， 要续件的数量+1
+                subPartCount++;
+            }
+
+            BigDecimal subPrice = subsequentPartPrice.multiply(new BigDecimal(subPartCount));
+
+            result = result.add(subPrice);
+        }
+
+        result = result.setScale(2);
+        return result;
+    }
 
 }

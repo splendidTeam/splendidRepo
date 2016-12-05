@@ -24,16 +24,20 @@ import com.baozun.nebula.sdk.command.logistics.ItemFreightInfoCommand;
 
 /**
  * 运费计算接口
+ * 
  * @author Tianlong.Zhang
  *
  */
-public interface FreightStrategy {
-	
-	/**
-	 * 计算运费
-	 * @param feeCmd   运费配置
-	 * @param itemList 要计算运费的商品列表
-	 * @return
-	 */
-	BigDecimal cal(ShippingFeeConfigCommand feeCmd,List<ItemFreightInfoCommand> itemList);
+public interface FreightStrategy{
+
+    /**
+     * 计算运费
+     * 
+     * @param feeCmd
+     *            运费配置
+     * @param itemList
+     *            要计算运费的商品列表
+     * @return
+     */
+    BigDecimal cal(ShippingFeeConfigCommand feeCmd,List<ItemFreightInfoCommand> itemList);
 }
