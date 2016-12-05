@@ -57,12 +57,8 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[  
-		       		update T_MEM_CONTACT set IS_DEFAULT =false 
-		       			where 
-		       			IS_DEFAULT=:isDefault
-		       			#if($memberId)
-	       		     		and MEMBER_ID =:memberId
-	       		  		#end  
+		       		update T_MEM_CONTACT set IS_DEFAULT =:isDefault
+		       			where MEMBER_ID =:memberId
                  ]]>
 			</value>
 		</constructor-arg>

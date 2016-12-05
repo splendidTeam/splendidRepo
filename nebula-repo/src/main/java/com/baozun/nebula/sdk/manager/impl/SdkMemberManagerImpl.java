@@ -715,7 +715,7 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 			con = convertContactCommandToContact(command, con);
 			encryptContact(con);
 			if (command.getIsDefault()){// 设置其他为非默认
-				contactDao.updateContactByMemberId(command.getMemberId(), Contact.NOTDEFAULT);
+			    updateContactIsDefault(command.getMemberId(), command.getId(), Contact.ISDEFAULT);
 			}
 			con = contactDao.save(con);
 
