@@ -36,118 +36,70 @@ import com.baozun.nebula.utils.history.FilterHistoryUtils;
 import com.baozun.nebula.web.command.BackWarnEntity;
 
 @Controller
-public class CommonController extends BaseController {
-	
+public class CommonController extends BaseController{
 
-	
-	
-	private static final Logger log = LoggerFactory
-			.getLogger(CommonController.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonController.class);
 
-	@RequestMapping(value = "/errors/{errorCode}")
-	public String errors(@PathVariable("errorCode") String errorCode) {
-		return "errors/" + errorCode;
-	}
-	
-	@RequestMapping(value = "/error/mail.htm")
-	@ResponseBody
-	public String errorMail(@RequestParam("errorCode") String errorCode, @RequestParam("error") String error, @RequestParam("msg") String msg) {
-		EmailCommand email = new EmailCommand();
-		email.setAddress("xx@qq.com");
-		email.setSubject("[" + errorCode +"] [" + error + "]");
-		email.setContent(msg);
-	//	publisher.publish(new EmailEvent(this, email));
-		return "1";
-	}
-	@RequestMapping(value = "/test.htm")
-	public void test(HttpServletResponse response) {
-/*//		int a = 1 / 0;
-		String path = "/instance/page/esprit";
-		String precompileByPath = precompilePage.precompileByPath(path).getPrecompiledTemplateContent();
-		response.setCharacterEncoding("utf-8");
-		try{
-			response.getWriter().write(precompileByPath);
-		}catch (IOException e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-	}
-	
-	@RequestMapping(value = "/common/saveSearchFilter.json")
-	@ResponseBody
-	public BackWarnEntity saveSearchFilter(HttpServletRequest request) {
-		
-		FilterHistoryUtils.saveFilterParam(request);
-		
-		return SUCCESS;
-	}
-	
-	@RequestMapping(value = "/common/readSearchFilter.json")
-	@ResponseBody
-	public Map<String,String> readSearchFilter(HttpServletRequest request) {
-		
-		Map<String,String> paramMap=FilterHistoryUtils.readFilterParamMap(request);
-		
-		return paramMap;
-	}
-	
-	
-	@RequestMapping(value = "/common/clearSearchFilter.json")
-	@ResponseBody
-	public BackWarnEntity clearSearchFilter(HttpServletRequest request) {
-		
-		FilterHistoryUtils.clearFilterParam(request);
-		
-		return SUCCESS;
-	}
+    @RequestMapping(value = "/errors/{errorCode}")
+    public String errors(@PathVariable("errorCode") String errorCode){
+        return "errors/" + errorCode;
+    }
 
-	
-	
+    @RequestMapping(value = "/error/mail.htm")
+    @ResponseBody
+    public String errorMail(@RequestParam("errorCode") String errorCode,@RequestParam("error") String error,@RequestParam("msg") String msg){
+        EmailCommand email = new EmailCommand();
+        email.setAddress("xx@qq.com");
+        email.setSubject("[" + errorCode + "] [" + error + "]");
+        email.setContent(msg);
+        return "1";
+    }
 
-/*/**
-	 * 获取模版中的属性字段
-	 * @param
-	 * @author Qiang.yang
-	 *//*	
-	@RequestMapping(value="/cms/getDynamicPropertyFields.json",method= RequestMethod.GET)
-	@ResponseBody
-	public String getTemplateFields(String templatePath){
-		TemplateDefinition templateDefinition=definitionManager.findTemplateDefinitionByPath(templatePath);
-		
-		if(templateDefinition!=null){
-			if(null !=templateDefinition.getDialogPath()){
-				Dialog dialog =instanceManager.findDialogByPath(templateDefinition.getDialogPath());
-				 List<DialogField> dialogFields=dialog.getFields();
-					JSONArray jsonArray=new JSONArray(dialogFields);
-					return jsonArray.toString();
-			}
-		}
-		return null;
-			
-	}*/
+    @RequestMapping(value = "/test.htm")
+    public void test(HttpServletResponse response){
 
-	/**
-	 * 
-	* @author 何波
-	* @Description:设置语言
-	* @param request
-	* @param response
-	* @param lang
-	* @return   
-	* BackWarnEntity   
-	* @throws
-	 */
-	@RequestMapping("/i18n/switchI18nLang.json")
-	@ResponseBody
-	public BackWarnEntity switchI18nLocale(HttpServletRequest request,HttpServletResponse response,String lang) {
-		if(lang != null){
-			CookieUtil.setCookie(request, response,LangUtil.I18_LANG_KEY,  lang);
-		}else{
-			CookieUtil.setCookie(request, response,LangUtil.I18_LANG_KEY,LangUtil.ZH_CN);
-		}
-		return SUCCESS;
-	}
+    }
 
+    @RequestMapping(value = "/common/saveSearchFilter.json")
+    @ResponseBody
+    public BackWarnEntity saveSearchFilter(HttpServletRequest request){
+        FilterHistoryUtils.saveFilterParam(request);
+        return SUCCESS;
+    }
 
+    @RequestMapping(value = "/common/readSearchFilter.json")
+    @ResponseBody
+    public Map<String, String> readSearchFilter(HttpServletRequest request){
+        Map<String, String> paramMap = FilterHistoryUtils.readFilterParamMap(request);
+        return paramMap;
+    }
+
+    @RequestMapping(value = "/common/clearSearchFilter.json")
+    @ResponseBody
+    public BackWarnEntity clearSearchFilter(HttpServletRequest request){
+        FilterHistoryUtils.clearFilterParam(request);
+        return SUCCESS;
+    }
+
+    /**
+     * 
+     * @author 何波
+     * @Description:设置语言
+     * @param request
+     * @param response
+     * @param lang
+     * @return
+     * BackWarnEntity
+     * @throws
+     */
+    @RequestMapping("/i18n/switchI18nLang.json")
+    @ResponseBody
+    public BackWarnEntity switchI18nLocale(HttpServletRequest request,HttpServletResponse response,String lang){
+        if (lang != null){
+            CookieUtil.setCookie(request, response, LangUtil.I18_LANG_KEY, lang);
+        }else{
+            CookieUtil.setCookie(request, response, LangUtil.I18_LANG_KEY, LangUtil.ZH_CN);
+        }
+        return SUCCESS;
+    }
 }
