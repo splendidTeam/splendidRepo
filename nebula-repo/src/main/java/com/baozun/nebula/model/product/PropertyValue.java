@@ -158,7 +158,8 @@ public class PropertyValue extends BaseModel implements Command{
 		this.propertyId = propertyId;
 	}
 	
-	@Index(name = "IDX_COMMON_PROPERTY_ID")
+	//see http://jira.baozun.cn/browse/NB-420
+	//@Index(name = "IDX_COMMON_PROPERTY_ID")
 	@Column(name = "COMMON_PROPERTY_ID")
 	public Long getCommonPropertyId(){
 		return commonPropertyId;
