@@ -13,8 +13,8 @@
 		       				#if($name)
 		       					and NAME like :name
 		       				#end
-		       				#if($desc)
-		       					and "desc" like :desc
+		       				#if($description)
+		       					and "description" like :description
 		       				#end
 		       				
                  ]]>

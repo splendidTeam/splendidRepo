@@ -27,7 +27,7 @@
 			            </td>
 			      		<td><label><spring:message code="redis.cache.desc"/></label></td>
 			            <td>
-			                <span id="searchkeytext"><input type="text" name="q_sl_desc" loxiaType="input" mandatory="false" placeholder="<spring:message code='redis.cache.desc'/>"></input></span>
+			                <span id="searchkeytext"><input type="text" name="q_sl_description" loxiaType="input" mandatory="false" placeholder="<spring:message code='redis.cache.desc'/>"></input></span>
 			            </td>
 			        </tr>
 			    </table>

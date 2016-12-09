@@ -43,136 +43,139 @@ import com.baozun.nebula.model.BaseModel;
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class CacheConfig extends BaseModel implements Command{
 
-	private static final long	serialVersionUID	= -5583054777213608558L;
+    private static final long serialVersionUID = -5583054777213608558L;
 
-	/**
-	 * PK
-	 */
-	private BigInteger			id;
+    /**
+     * PK
+     */
+    private BigInteger id;
 
-	/**
-	 * 缓存项名称
-	 */
-	private String				name;
+    /**
+     * 缓存项名称
+     */
+    private String name;
 
-	/**
-	 * 页面截图
-	 */
-	private String				img;
+    /**
+     * 页面截图
+     */
+    private String img;
 
-	/**
-	 * 缓存项描述信息
-	 */
-	private String				desc;
+    /**
+     * 缓存项描述信息
+     */
+    //rename desc to description see http://jira.baozun.cn/browse/NB-421
+    private String description;
 
-	/**
-	 * 对应的redis键值
-	 */
-	private String				key;
+    /**
+     * 对应的redis键值
+     */
+    private String key;
 
-	/**
-	 * 生命周期
-	 */
-	private Integer				lifecycle;
+    /**
+     * 生命周期
+     */
+    private Integer lifecycle;
 
-	/**
-	 * 创建时间
-	 */
-	private Timestamp			create_time;
+    /**
+     * 创建时间
+     */
+    private Timestamp create_time;
 
-	/**
-	 * 修改时间
-	 */
-	private Timestamp			modify_time;
+    /**
+     * 修改时间
+     */
+    private Timestamp modify_time;
 
-	/**
-	 * 版本
-	 */
-	private Timestamp			version;
+    /**
+     * 版本
+     */
+    private Timestamp version;
 
-	@Id
-	@Column(name = "ID")
-	@SequenceGenerator(name = "SEQ_T_SYS_CACHE_CONFIG",sequenceName = "S_T_SYS_CACHE_CONFIG",allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SYS_CACHE_CONFIG")
-	public BigInteger getId(){
-		return id;
-	}
+    @Id
+    @Column(name = "ID")
+    @SequenceGenerator(name = "SEQ_T_SYS_CACHE_CONFIG",sequenceName = "S_T_SYS_CACHE_CONFIG",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_T_SYS_CACHE_CONFIG")
+    public BigInteger getId(){
+        return id;
+    }
 
-	public void setId(BigInteger id){
-		this.id = id;
-	}
+    public void setId(BigInteger id){
+        this.id = id;
+    }
 
-	@Column(name = "NAME",length = 50)
-	public String getName(){
-		return name;
-	}
+    @Column(name = "NAME",length = 50)
+    public String getName(){
+        return name;
+    }
 
-	public void setName(String name){
-		this.name = name;
-	}
+    public void setName(String name){
+        this.name = name;
+    }
 
-	@Column(name = "IMG",length = 50)
-	public String getImg(){
-		return img;
-	}
+    @Column(name = "IMG",length = 50)
+    public String getImg(){
+        return img;
+    }
 
-	public void setImg(String img){
-		this.img = img;
-	}
+    public void setImg(String img){
+        this.img = img;
+    }
 
-	@Column(name = "DESC",length = 50)
-	public String getDesc(){
-		return desc;
-	}
+    //rename desc to description see http://jira.baozun.cn/browse/NB-421
+    @Column(name = "DESCRIPTION",length = 50)
+    public String getDescription(){
+        return description;
+    }
 
-	public void setDesc(String desc){
-		this.desc = desc;
-	}
+    //rename desc to description see http://jira.baozun.cn/browse/NB-421
+    public void setDescription(String description){
+        this.description = description;
+    }
 
-	@Column(name = "KEY",length = 50)
-	public String getKey(){
-		return key;
-	}
+    @Column(name = "KEY",length = 50)
+    public String getKey(){
+        return key;
+    }
 
-	public void setKey(String key){
-		this.key = key;
-	}
+    public void setKey(String key){
+        this.key = key;
+    }
 
-	@Column(name = "LIFECYCLE",length = 50)
-	public Integer getLifecycle(){
-		return lifecycle;
-	}
+    @Column(name = "LIFECYCLE",length = 50)
+    public Integer getLifecycle(){
+        return lifecycle;
+    }
 
-	public void setLifecycle(Integer lifecycle){
-		this.lifecycle = lifecycle;
-	}
+    public void setLifecycle(Integer lifecycle){
+        this.lifecycle = lifecycle;
+    }
 
-	@Column(name = "CREATE_TIME",length = 50)
-	public Timestamp getCreate_time(){
-		return create_time;
-	}
+    @Column(name = "CREATE_TIME",length = 50)
+    public Timestamp getCreate_time(){
+        return create_time;
+    }
 
-	public void setCreate_time(Timestamp create_time){
-		this.create_time = create_time;
-	}
+    public void setCreate_time(Timestamp create_time){
+        this.create_time = create_time;
+    }
 
-	@Column(name = "MODIFY_TIME",length = 50)
-	public Timestamp getModify_time(){
-		return modify_time;
-	}
+    @Column(name = "MODIFY_TIME",length = 50)
+    public Timestamp getModify_time(){
+        return modify_time;
+    }
 
-	public void setModify_time(Timestamp modify_time){
-		this.modify_time = modify_time;
-	}
+    public void setModify_time(Timestamp modify_time){
+        this.modify_time = modify_time;
+    }
 
-	@Version
-	@Column(name = "VERSION")
-	public Timestamp getVersion(){
-		return version;
-	}
+    @Version
+    @Column(name = "VERSION")
+    public Timestamp getVersion(){
+        return version;
+    }
 
-	public void setVersion(Timestamp version){
-		this.version = version;
-	}
+    public void setVersion(Timestamp version){
+        this.version = version;
+    }
 
 }

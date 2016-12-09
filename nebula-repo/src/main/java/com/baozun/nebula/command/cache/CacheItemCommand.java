@@ -40,7 +40,7 @@ public class CacheItemCommand implements Command{
 	/**
 	 * 缓存项描述信息
 	 */
-	private String				desc;
+	private String				description;
 
 	/**
 	 * 缓存项key
@@ -63,12 +63,12 @@ public class CacheItemCommand implements Command{
 		this.img = img;
 	}
 
-	public String getDesc(){
-		return desc;
+	public String getDescription(){
+		return description;
 	}
 
-	public void setDesc(String desc){
-		this.desc = desc;
+	public void setDescription(String desc){
+		this.description = desc;
 	}
 
 	public String getKey(){
