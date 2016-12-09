@@ -198,7 +198,7 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 				                  <label><b>基本信息</b></label>
 				                  <div>
 				                    <label class="normal"><input type="checkbox" name="selectCodes" value="code" checked="checked" onclick="return false">商品编码</label>
-				                    <label class="normal"><input type="checkbox" name="selectCodes" value="upc">UPC编码</label>
+				                    <label class="normal"><input type="checkbox" name="selectCodes" value="upc" checked="checked" onclick="return false">UPC编码</label>
 				                   <label class="normal"><input type="checkbox" name="selectCodes" value="salePrice">销售价</label>
 				                    <label class="normal"><input type="checkbox" name="selectCodes" value="listPrice">挂牌价</label>
 				                  </div>
