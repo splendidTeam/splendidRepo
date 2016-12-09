@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemUpdatePriceCommand;
+import com.baozun.nebula.command.SkuExportCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.product.BundleCommand;
 import com.baozun.nebula.command.product.ItemImageLangCommand;
@@ -372,6 +373,14 @@ public interface ItemManager extends BaseManager {
 	 * @return
 	 */
 	List<ItemCommand> findItemCommandByQueryMap(Map<String, Object> paramMap, List<String> itemCodeList);
+	
+	
+	/**
+	 * 查询商品信息
+	 * @param paramMap
+	 * @return
+	 */
+	List<SkuExportCommand> findSkuExportCommandByQueryMap(Map<String, Object> paramMap, List<String> itemCodeList);
 	
 	/**
 	 * 查询商品信息(国际化)

@@ -848,6 +848,38 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="Item.findSkuExportCommandByQueryMapAndItemCodes" class="loxia.dao.support.DynamicQueryHolder">
+		<description> </description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select item.id as id, item.code as code, sku.out_id as upc, 
+						sku.list_price as listPrice, 
+						sku.sale_price as salePrice ,sku.properties as properties 
+					from t_pd_sku sku 
+					LEFT JOIN t_pd_item item on sku.item_id = item.id
+					where item.lifecycle != 2
+					
+					#if($shopId)
+						and item.shop_id = :shopId
+					#end
+					
+					#if($industryId)
+						and item.industry_id = :industryId
+					#end
+					
+					and item.code in (
+						#foreach($itemCode in $itemCodeList)
+							'$itemCode',
+						#end
+						'-1')
+					
+					order by item.create_time
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 	<bean id="Item.findItemCommandByQueryMapAndItemCodesI18n" class="loxia.dao.support.DynamicQueryHolder">
 		<description> </description>
 		<constructor-arg>

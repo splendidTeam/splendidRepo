@@ -17,6 +17,7 @@ package com.baozun.nebula.command.product;
  */
 
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,9 @@ public class ImpSkuCommand implements Command {
 	private String  code;
 	//upc 
 	private String upc;
+	private BigDecimal listPrice;
+	private BigDecimal salePrice;
+	
 	//动态销售属性
 	private Map<String, String> props = new LinkedHashMap<String, String>();
 	
@@ -89,6 +93,18 @@ public class ImpSkuCommand implements Command {
 	}
 	public void setPropsI18n(Map<String, String> propsI18n) {
 		this.propsI18n = propsI18n;
+	}
+	public BigDecimal getListPrice() {
+		return listPrice;
+	}
+	public void setListPrice(BigDecimal listPrice) {
+		this.listPrice = listPrice;
+	}
+	public BigDecimal getSalePrice() {
+		return salePrice;
+	}
+	public void setSalePrice(BigDecimal salePrice) {
+		this.salePrice = salePrice;
 	}
 	
 }

@@ -263,4 +263,15 @@ public interface PropertyValueDao extends GenericEntityDao<PropertyValue, Long>{
 	 */
 	@NativeQuery(model = MetaDataCommand.class)
 	List<MetaDataCommand> findPropertyValueMetaDataByLang(@QueryParam("lang")String lang);
+	
+	
+	/**
+	 * 根据国际化和Value查询属性对象
+	 * @param propertyId
+	 * @param value
+	 * @param lang
+	 * @return
+	 */
+	@NativeQuery(model = PropertyValue.class)
+	PropertyValue findPropertyI18nByValue(@QueryParam("propertyId") Long propertyId,@QueryParam("value") String value,@QueryParam("lang") String lang);
 }

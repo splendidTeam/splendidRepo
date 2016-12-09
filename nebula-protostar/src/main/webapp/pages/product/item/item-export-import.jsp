@@ -40,6 +40,8 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 				<ul class="tag-change-ul" style="font-size:16px">
 					<li class="memberbase">STEP 1. 商品的导出</li>
 					<li class="memberbase">STEP 2. 商品的导入</li>
+					<li class="memberbase">SKU 1. 商品的导出</li>
+					<li class="memberbase">SKU 2. 商品的导入</li>
 				</ul>
 				<div class="tag-change-content">
 					<div class="tag-change-in">
@@ -168,6 +170,95 @@ label.selected { font-weight:bold; padding:3px 6px 3px; margin-right:12px; backg
 					        </form>
 					        <div class="button-line leftlocation">
 					          <input type="button" value="确定导入" title="" class="button orange import"/>
+					          <input type="button" value="返回" title="" class="button back"/>
+					        </div>
+					</div>
+					
+					
+					<div class="tag-change-in">
+					      <form id="exportSkuForm" action="${ pagebase }/sku/skuExport.htm" method="post">
+				          <input type="hidden" name="skuIndustryId" id="skuIndustryId" value="" />
+				          <div class="ui-block">
+				            <div class="infocustom">此处商品的修改，采用先导出，然后编辑，再次导入的模式。不采用自行创建Excel表的导入。</div>
+				            <div class="ui-block-content">
+				              <div class="ui-block-line">
+				                <label><b>商品所属行业</b></label>
+				                <div>
+				                  <select id="skuIndustry" class="ui-loxia-default ui-corner-all">
+				                    <c:forEach items="${ industryList }" var="industry">
+										<option value="${ industry.id  }">${ industry.name }</option>
+				                    </c:forEach>
+				                  </select>
+				                  <span class="red">首先切换商品所属行业！</span>
+				                  <%-- <div style=" padding:12px 0;"><a href="javascript:void(0)" id="downLoadTmplOfSkuInfo" class="func-button">下载该行业模板</a></div> --%>
+				                </div>
+				              </div>
+				              <div class="dashedwp">
+				                <div class="ui-block-line">
+				                  <label><b>基本信息</b></label>
+				                  <div>
+				                    <label class="normal"><input type="checkbox" name="selectCodes" value="code" checked="checked" onclick="return false">商品编码</label>
+				                    <label class="normal"><input type="checkbox" name="selectCodes" value="upc">UPC编码</label>
+				                   <label class="normal"><input type="checkbox" name="selectCodes" value="salePrice">销售价</label>
+				                    <label class="normal"><input type="checkbox" name="selectCodes" value="listPrice">挂牌价</label>
+				                  </div>
+				                </div>
+				               
+				                <div class="ui-block-line">
+				                  <label><b>销售属性信息</b></label>
+				                  <div class="salesProperty">
+				                  	<c:forEach items="${ propertyList }" var="property">
+					                    <label class="normal"><input type="checkbox" name="selectCodes" value="${property.id }">${property.name }</label>
+				                  	</c:forEach>
+				                  </div>
+				                </div>
+				                
+				              </div>
+				              <div class="dashedwp">
+				                <div class="ui-block-line">
+				                  <label><b>具体商品编码</b></label>
+				                  <div style="position:relative;">
+				                    <textarea name="itemCodes" class="ui-loxia-default ui-corner-all" style="width:400px; height:200px;"></textarea>
+				                    <div class="textarea_info"> <span class="red">非必填项！</span><br>
+				                      <br>为空，导出部分只有字段标题，没有数据。<br>填写商品编码，导出部分含有商品的已有数据。<br>
+				                      <br>
+				                      <strong>最多填写100条数据</strong>，每条编码换行填写，格式如下：<br>
+				                      Nb_Sample_Code_001<br>
+				                      Nb_Sample_Code_002<br>
+				                      Nb_Sample_Code_003<br>
+				                      Nb_Sample_Code_004<br>
+				                      Nb_Sample_Code_005
+				                    </div>
+				                  </div>
+				                </div>
+				              </div>
+				            </div>
+				          </div>
+				        </form>
+				        <div class="button-line leftlocation">
+				          <input type="button" value="确定导出" title="" class="button orange skuexport"/>
+				          <input type="button" value="返回" title="" class="button back"/>
+				        </div>
+					</div>
+					<div class="tag-change-in">
+					        <form id="importSkuForm" method="post" enctype="multipart/form-data">
+					          <div class="ui-block">
+					            <div class="infocustom">此处商品的修改，采用先导出，然后编辑，再次导入的模式。不采用自行创建Excel表的导入。</div>
+					            <div class="ui-block-content">
+					              
+					              <div <%--class="dashedwp"--%>>
+					                <div class="ui-block-line ">
+					                  <label><b>商品上传</b></label>
+					                  <div style="margin-top:6px;">
+					                    <input type="file" name="skuExcelFile" value="选择文件">
+					                  </div>
+					                </div>
+					              </div>
+					            </div>
+					          </div>
+					        </form>
+					        <div class="button-line leftlocation">
+					          <input type="button" value="确定导入" title="" class="button orange skuImport"/>
 					          <input type="button" value="返回" title="" class="button back"/>
 					        </div>
 					</div>

@@ -7,7 +7,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.baozun.nebula.command.i18n.LangProperty;
+import com.baozun.nebula.dao.product.PropertyDao;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.exception.ErrorCodes;
 import com.baozun.nebula.manager.baseinfo.ShopManager;
@@ -58,6 +61,9 @@ public class ItemExportImportController extends BaseController {
 
 	@Autowired
 	private ItemSolrManager			itemSolrManager;
+	
+	@Autowired
+	private PropertyDao propertyDao;
 
 	/**
 	 * 转到商品导出和导入页面
@@ -70,7 +76,13 @@ public class ItemExportImportController extends BaseController {
 		Sort[] sorts = Sort.parse("id desc");
 		// 获取行业信息
 		List<Industry> industryList = shopManager.findAllIndustryList(sorts);
+		
+		Map<String,Object> map=new HashMap<String, Object>();
+		map.put("isSaleProp", true);
+		List<Property>  propertyList = propertyDao.findEffectPropertyListByQueryMap(map);
+		
 		model.addAttribute("industryList", industryList);
+		model.addAttribute("propertyList", propertyList);
 		return "product/item/item-export-import";
 	}
 
