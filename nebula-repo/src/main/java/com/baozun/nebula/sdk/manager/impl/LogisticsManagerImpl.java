@@ -501,6 +501,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            乡id
      * @return the big decimal
      */
+    @Override
     public BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,Long distributionModeId,Long shopId,Long provienceId,Long cityId,Long countyId,Long townId){
         //如果没有传物流方式 设置默认物流方式
         if (null == distributionModeId){
@@ -509,7 +510,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
             distributionModeId = distributeModelList.get(0).getId();
         }
         ShippingTemeplateCommand shippingTemeplateCommand = getShippingTemeplateCommand(shopId, distributionModeId);
-        Validate.notNull(shippingTemeplateCommand, "shippingTemeplateCommand can't be null!");
+        Validate.notNull(shippingTemeplateCommand, "shippingTemeplateCommand can't be null!,shopId:[%s],distributionModeId:[%s]", shopId, distributionModeId);
 
         // 根据
         ShippingFeeConfigCommand shippingFeeConfigCommand = buildShippingFeeConfigCommand(shippingTemeplateCommand.getId(), distributionModeId, provienceId, cityId, countyId, townId);
