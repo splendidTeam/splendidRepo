@@ -824,6 +824,7 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 			 }
 			 
 			 //循环修改数据
+			 Map<String, ItemProperties> proMap = new HashMap<String, ItemProperties>();
 			 for (Iterator i = map.keySet().iterator(); i.hasNext();) {
 				 String key =  (String) i.next();
 				 
@@ -880,15 +881,26 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 					 
 					 ItemProperties itemProperties = new ItemProperties();
 
-			        itemProperties.setItemId(sku.getItemId());
-			        itemProperties.setPropertyId(Long.valueOf(propKey));
+			         itemProperties.setItemId(sku.getItemId());
+			         itemProperties.setPropertyId(Long.valueOf(propKey));
 			        itemProperties.setPropertyValueId(Long.valueOf(propValue));
 
 			        Date now = new Date();
 			        itemProperties.setCreateTime(now);
 			        itemProperties.setVersion(now);
 			        // 创建商品属性关联
-			        itemProperties = itemPropertiesDao.save(itemProperties);
+			        if(proMap.isEmpty()){
+			        	itemProperties = itemPropertiesDao.save(itemProperties);
+			        	proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
+			        }else{
+			        	String proMapKey = itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId();
+			        	if(proMap.containsKey(proMapKey)){
+			        		itemProperties = proMap.get(proMapKey);
+			        	}else{
+			        		itemProperties = itemPropertiesDao.save(itemProperties);
+				        	proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
+			        	}
+			        }
 			        
 			        //拼接sku的skuProperties
 			        skuProperties = skuProperties + itemProperties.getId()+",";
