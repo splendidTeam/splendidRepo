@@ -858,6 +858,21 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 					 sku.setSalePrice(impSkuCommand.getSalePrice());
 					 sku.setListPrice(impSkuCommand.getListPrice());
 					 
+					 //验证sku数据是否完整
+					 List<Sku> skuList = skuDao.findSkuByItemId(sku.getItemId());
+					 if(Validator.isNotNullOrEmpty(skuList)){
+						 for(Sku skuObject : skuList){
+							 if(map.containsKey(skuObject.getOutid())){
+								 continue;
+							 }else{
+								 //导入的UPC数据不正确
+								 throw new BusinessException(ErrorCodes.IMPORT_SKU_UPC_COUNT_ERROR);
+							 }
+						 }
+					 }else{
+						 //导入的UPC数据不正确
+						 throw new BusinessException(ErrorCodes.IMPORT_SKU_UPC_ERROR);
+					 }
 				 }
 				 
 				 

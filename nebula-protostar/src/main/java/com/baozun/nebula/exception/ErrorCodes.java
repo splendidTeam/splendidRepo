@@ -671,4 +671,5 @@ public interface ErrorCodes {
 	public static final Integer	IMPORT_CODE_UPC_ERROR						= 180015;
 	public static final Integer	IMPORT_SKU_LISTPRICE_ERROR					= 180016;
 	public static final Integer	IMPORT_SKU_SALEPRICE_ERROR					= 180017;
+	public static final Integer	IMPORT_SKU_UPC_COUNT_ERROR					= 180018;
 }
