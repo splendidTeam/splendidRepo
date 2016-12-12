@@ -212,6 +212,9 @@ var setting = {
                     $j("#secondDayDelivery").val(e.secondDayDelivery=='Y'?'true':'false');
                     $j("#secondStartTime").val(e.secondDeliveryStartTime);
                     $j("#secondEndTime").val(e.secondDeliveryEndTime);
+                    $j("#thirdDayDelivery").val(e.thirdDayDelivery=='Y'?'true':'false');
+                    $j("#thirdDeliveryStartTime").val(e.thirdDeliveryStartTime);
+                    $j("#thirdDeliveryEndTime").val(e.thirdDeliveryEndTime);
                     $j("#remark").val(e.remark);
                     $j("#createTime").val(formatDateTime(e.createTime));
                     $j("#modifyTime").val(formatDateTime(e.modifyTime));
@@ -437,7 +440,7 @@ $j(function() {
            $j("#tree_code").focus();
            return
        }
-       if((firstDayDelivery!='N')&&(isNull(firstStartTime)||isNull(firstEndTime))){
+       if((thirdDayDelivery!='N')&&(isNull(thirdDeliveryStartTime)||isNull(thirdDeliveryEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_FIRSTDELIVERY_TIME_EMPTY"));
            $j("#tree_code").focus();
            return
@@ -447,11 +450,7 @@ $j(function() {
            $j("#tree_code").focus();
            return
        }
-       if((secondDayDelivery!='N')&&(isNull(secondStartTime)||secondEndTime==null||secondStartTime==""||secondEndTime=="")){
-    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_SECONDDELIVERY_TIME_EMPTY"));
-           $j("#tree_code").focus();
-           return
-       }
+       
         var url = base + "/logistics/areaDeliverMode/updateDeliveryAreaModeByAreaId.json";
         var data = {};
         if (i18nOnOff) {
