@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.payment.convert.PayParamCommandAdaptor;
 import com.baozun.nebula.payment.convert.PaymentConvertFactory;
-import com.baozun.nebula.payment.convert.SalesOrderCommandToPaymentParamsConverter;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
@@ -34,6 +33,7 @@ import com.baozun.nebula.utilities.integration.payment.unionpay.acp.sdk.UnionPay
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.feilong.core.Validator;
+import com.feilong.core.bean.PropertyUtil;
 
 @Service("PaymentManager")
 public class PaymentManagerImpl implements PaymentManager {
@@ -49,7 +49,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
-            payParamCommandAdaptor.setRequestParams(SalesOrderCommandToPaymentParamsConverter.convert(order));
+            payParamCommandAdaptor.setRequestParams(PropertyUtil.describe(order));
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());//获得支付适配器
 			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
 			Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);
@@ -62,15 +62,15 @@ public class PaymentManagerImpl implements PaymentManager {
 	}
 	
     @Override
-    public PaymentRequest createPayment(Map<String, Object> additionParams, String payType) {
+    public PaymentRequest createPayment(Map<String, Object> additionParams, Integer payType) {
         PaymentRequest paymentRequest = null;
         try {
-            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(payType);
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
+            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(paymentFactory.getPayType(Integer.valueOf(payType)));
             //获得支付适配器
-            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payType);
+            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
             //获得对应的参数转换器
-            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payType);
+            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());
             Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
             // 將支付所需的定制参数赋值给addition
             if (null != additionParams) {
@@ -139,12 +139,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCancelCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
-            Map<String, Object> params = new HashMap<String, Object>(); 
-            for (int i = 0; i < SalesOrderCommand.class.getFields().length; i++) { 
-                Field field = SalesOrderCommand.class.getFields()[i]; 
-                params.put(field.getName(), ReflectionUtil.getFieldValue(order, field.getName())); 
-            }
-            payParamCommandAdaptor.setRequestParams(params);
+            payParamCommandAdaptor.setRequestParams(PropertyUtil.describe(order));
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());// 获得支付适配器
 			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
 			Map<String, String> addition = payParamConvertorAdaptor.commandConvertorToMapForOrderInfo(payParamCommandAdaptor);
@@ -168,12 +163,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			payParamCommandAdaptor.setSalesOrderCommand(order);
 			// 获得支付适配器
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
-            Map<String, Object> salesOrderParams = new HashMap<String, Object>(); 
-            for (int i = 0; i < SalesOrderCommand.class.getFields().length; i++) { 
-                Field field = SalesOrderCommand.class.getFields()[i]; 
-                salesOrderParams.put(field.getName(), ReflectionUtil.getFieldValue(order, field.getName())); 
-            } 
-            payParamCommandAdaptor.setRequestParams(salesOrderParams);
+			payParamCommandAdaptor.setRequestParams(PropertyUtil.describe(order));
             //获得对应的参数转换器
             PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());
 			Map<String, String> addition = payParamConvertorAdaptor.commandConvertorToMapForMobileCreatUrl(payParamCommandAdaptor);

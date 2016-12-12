@@ -75,6 +75,6 @@ public interface PaymentManager {
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-11-29
 	 */
-	public PaymentRequest createPayment(Map<String, Object> additionParams, String payType);
+	public PaymentRequest createPayment(Map<String, Object> additionParams, Integer payType);
 
 }
