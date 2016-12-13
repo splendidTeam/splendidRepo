@@ -66,7 +66,7 @@ public class PaymentManagerImpl implements PaymentManager {
         PaymentRequest paymentRequest = null;
         try {
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
-            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(paymentFactory.getPayType(Integer.valueOf(payType)));
+            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(paymentFactory.getPayType(payType));
             //获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
             //获得对应的参数转换器
