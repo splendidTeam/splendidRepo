@@ -911,6 +911,9 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 			        	String proMapKey = itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId();
 			        	if(proMap.containsKey(proMapKey)){
 			        		itemProperties = proMap.get(proMapKey);
+			        		  //拼接sku的skuProperties
+					        skuProperties = skuProperties + itemProperties.getId()+",";
+					        continue;
 			        	}else{
 			        		itemProperties = itemPropertiesDao.save(itemProperties);
 				        	proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
