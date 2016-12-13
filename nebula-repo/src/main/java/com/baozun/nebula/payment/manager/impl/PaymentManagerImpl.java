@@ -1,6 +1,5 @@
 package com.baozun.nebula.payment.manager.impl;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,6 @@ import com.baozun.nebula.payment.convert.PaymentConvertFactory;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.common.ReflectionUtil;
 import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
@@ -66,11 +64,12 @@ public class PaymentManagerImpl implements PaymentManager {
         PaymentRequest paymentRequest = null;
         try {
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
-            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(paymentFactory.getPayType(payType));
+            String type = paymentFactory.getPayType(payType);
+            PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
             //获得支付适配器
-            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());
+            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
             //获得对应的参数转换器
-            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());
+            PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
             Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
             // 將支付所需的定制参数赋值给addition
             if (null != additionParams) {

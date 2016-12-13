@@ -68,7 +68,7 @@ public interface PaymentManager {
 
 	/**
 	 * 
-	 * @Description 使用com.baozun.nebula.utilities.integration.payment.PaymentFactory.getPayType(Integer) 获取SalesOrderCommand.payType所对应的PaymentFactory.payType
+	 * @Description SalesOrderCommand.getOnLinePaymentCommand().getPayType()所对应的PaymentFactory.payType
 	 * @param additionParams
 	 * @param payType 
 	 * @return
