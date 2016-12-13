@@ -66,15 +66,16 @@ public class PaymentManagerImpl implements PaymentManager {
             PaymentFactory paymentFactory = PaymentFactory.getInstance();
             String type = paymentFactory.getPayType(payType);
             PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
-            //获得支付适配器
-            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
+            payParamCommandAdaptor.setRequestParams(additionParams);
             //获得对应的参数转换器
             PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
-            Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);         
+            Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);  
             // 將支付所需的定制参数赋值给addition
             if (null != additionParams) {
                 addition.putAll(convertToStringParamsMap(additionParams));
             }          
+            //获得支付适配器
+            PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
             paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);
         } catch (Exception ex){
             log.error("CreatePayment error: "+ex.toString(), ex);
