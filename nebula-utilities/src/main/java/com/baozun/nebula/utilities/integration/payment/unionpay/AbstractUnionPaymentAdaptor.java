@@ -20,10 +20,10 @@ import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
-import com.baozun.nebula.utilities.integration.payment.unionpay.acp.sdk.AcpService;
-import com.baozun.nebula.utilities.integration.payment.unionpay.acp.sdk.SDKConfig;
-import com.baozun.nebula.utilities.integration.payment.unionpay.acp.sdk.SDKConstants;
-import com.baozun.nebula.utilities.integration.payment.unionpay.acp.sdk.UnionPayBase;
+import com.unionpay.acp.sdk.AcpService;
+import com.unionpay.acp.sdk.SDKConfig;
+import com.unionpay.acp.sdk.SDKConstants;
+import com.unionpay.acp.sdk.UnionPayBase;
 
 public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 
