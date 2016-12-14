@@ -39,7 +39,7 @@ public interface ShoppingCartCommandBuilder{
      *            the member details
      * @param shoppingCartLines
      *            the shopping cart lines
-     * @return 如果 shoppingCartLines 是null或者 empty,返回 null
+     * @return 如果 <code>shoppingCartLines</code> 是null或者 empty,返回 null
      * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder#buildShoppingCartCommand(Long, List,
      *      com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand, List, java.util.Set)
      */
@@ -56,11 +56,7 @@ public interface ShoppingCartCommandBuilder{
      *            the calc freight command
      * @param coupons
      *            the coupons
-     * @return the shopping cart command
+     * @return 如果 <code>shoppingCartLines</code> 是null或者 empty,返回 null
      */
-    ShoppingCartCommand buildShoppingCartCommand(
-                    MemberDetails memberDetails,
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    CalcFreightCommand calcFreightCommand,
-                    List<String> coupons);
+    ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLines,CalcFreightCommand calcFreightCommand,List<String> coupons);
 }

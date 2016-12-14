@@ -20,6 +20,7 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SUCCESS;
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
 import static com.feilong.core.util.CollectionsUtil.find;
 import static com.feilong.core.util.CollectionsUtil.select;
@@ -280,6 +281,17 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     @Override
     public ShoppingcartResult toggleShoppingCartLineCheckStatus(MemberDetails memberDetails,Long shoppingcartLineId,boolean checkStatus,HttpServletRequest request,HttpServletResponse response){
+        return toggleShoppingCartLinesCheckStatus(memberDetails, toList(shoppingcartLineId), checkStatus, request, response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#toggleShoppingCartLinesCheckStatus(com.baozun.nebula.web.MemberDetails, java.util.List, boolean, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult toggleShoppingCartLinesCheckStatus(MemberDetails memberDetails,List<Long> shoppingcartLineIdList,boolean checkStatus,HttpServletRequest request,HttpServletResponse response){
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         if (isNullOrEmpty(mainlines)){
@@ -287,7 +299,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         }
 
         // 找到实际需要操作的行
-        List<ShoppingCartLineCommand> needChangeCheckedCommandList = select(mainlines, "id", shoppingcartLineId);
+        List<ShoppingCartLineCommand> needChangeCheckedCommandList = select(mainlines, "id", shoppingcartLineIdList);
         return toggleShoppingCartLineCheckStatus(memberDetails, shoppingCartLineCommandList, needChangeCheckedCommandList, checkStatus, request, response);
     }
 
@@ -484,4 +496,5 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     private boolean isSameCheckStatus(Integer settlementState,boolean checkStatus){
         return checkStatus ? settlementState.equals(1) : settlementState.equals(0);
     }
+
 }

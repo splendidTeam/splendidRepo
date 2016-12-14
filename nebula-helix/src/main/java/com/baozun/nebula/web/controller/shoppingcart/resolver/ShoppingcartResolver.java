@@ -330,6 +330,29 @@ public interface ShoppingcartResolver{
     ShoppingcartResult toggleShoppingCartLineCheckStatus(MemberDetails memberDetails,Long shoppingcartLineId,boolean checkStatus,HttpServletRequest request,HttpServletResponse response);
 
     /**
+     * 切换指定购物车行的选中状态.
+     * 
+     * <p>
+     * 参数 <code>checkStatus</code>,用来标识选中还是不选中,true为将当前行选中,false为将当前行不选中
+     * </p>
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param shoppingcartLineIdList
+     *            指定的购物车行
+     * @param checkStatus
+     *            true为将当前行选中,false为将当前行不选中
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @since 5.3.2.6
+     */
+    ShoppingcartResult toggleShoppingCartLinesCheckStatus(MemberDetails memberDetails,List<Long> shoppingcartLineIdList,boolean checkStatus,HttpServletRequest request,HttpServletResponse response);
+
+    /**
      * 切换所有购物车行的选中状态.
      * 
      * <p>
