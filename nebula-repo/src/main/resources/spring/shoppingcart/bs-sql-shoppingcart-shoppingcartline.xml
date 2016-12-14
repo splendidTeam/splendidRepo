@@ -9,17 +9,17 @@
 			<value>
 				<![CDATA[  
 					select 
-					ss.ID,
-					ss.SKU_ID as skuId,
-					ss.QUANTITY,
-					ss.EXTENTION_CODE as extentionCode,
-					ss.MEMBER_ID as memberId,
-					ss.CREATE_TIME as createTime,
-					ss.SETTLEMENT_STATE as settlementState,
-					ss.SHOP_ID as shopId,
-					ss.is_gift as isGift,
-					ss.line_group as lineGroup,
-					ss.promotion_id as promotionId
+						ss.ID,
+						ss.SKU_ID as skuId,
+						ss.QUANTITY,
+						ss.EXTENTION_CODE as extentionCode,
+						ss.MEMBER_ID as memberId,
+						ss.CREATE_TIME as createTime,
+						ss.SETTLEMENT_STATE as settlementState,
+						ss.SHOP_ID as shopId,
+						ss.is_gift as isGift,
+						ss.line_group as lineGroup,
+						ss.promotion_id as promotionId
 					from t_sc_shoppingcartline as ss
 					where 
 					 ss.MEMBER_ID = :memberId 

@@ -59,7 +59,8 @@ public interface ShoppingcartFactory{
      * @param memberDetails
      *            the member details
      * @param key
-     *            如果key是null 或者 empty,那么就直接调用 {@link #getShoppingCartLineCommandList(MemberDetails, HttpServletRequest)}
+     *            如果key是null 或者 empty,那么就直接调用 {@link #getShoppingCartLineCommandList(MemberDetails, HttpServletRequest)}<br>
+     *            如果key不是null或者empty,那么表示是立即购买途径
      * @param request
      *            the request
      * @return the shopping cart line command list
