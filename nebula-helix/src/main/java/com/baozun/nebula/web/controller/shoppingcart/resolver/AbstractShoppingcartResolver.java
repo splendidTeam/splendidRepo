@@ -456,14 +456,19 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
             // ********* 商品验证***********
             Long skuId = needChangeCheckedCommand.getSkuId();
             Sku sku = sdkSkuManager.findSkuById(skuId);
-            ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
-            if (null != commonValidateShoppingcartResult){
-                return commonValidateShoppingcartResult;
-            }
+            if (checkStatus){
+                //公共校验
+                ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
-            if (checkStatus && shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
-                return MAX_THAN_INVENTORY;
+                if (null != commonValidateShoppingcartResult){
+                    return commonValidateShoppingcartResult;
+                }
+
+                //校验库存
+                if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
+                    return MAX_THAN_INVENTORY;
+                }
             }
 
             extentionCodeList.add(needChangeCheckedCommand.getExtentionCode());

@@ -16,18 +16,11 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
-import static com.feilong.core.Validator.isNullOrEmpty;
-import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
-
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.PredicateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +28,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.ServletWebRequest;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -51,16 +41,10 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommand
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
+import com.baozun.nebula.web.controller.shoppingcart.handler.UncheckedInvalidStateShoppingCartLineHandler;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
-import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShopSubViewCommand;
-import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
-import com.baozun.nebula.web.controller.shoppingcart.viewcommand.Status;
-import com.feilong.core.util.CollectionsUtil;
-import com.feilong.core.util.predicate.BeanPredicateUtil;
-import com.feilong.tools.jsonlib.JsonUtil;
-import com.google.common.collect.Iterables;
 
 /**
  * 购物车控制器.
@@ -180,6 +164,9 @@ public class NebulaShoppingCartController extends BaseController{
     @Qualifier("shoppingcartViewCommandConverter")
     private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
+    @Autowired
+    private UncheckedInvalidStateShoppingCartLineHandler uncheckedInvalidStateShoppingCartLineHandler;
+
     //**********************************showShoppingCart************************************************
 
     /**
@@ -198,7 +185,7 @@ public class NebulaShoppingCartController extends BaseController{
         ShoppingCartViewCommand shoppingCartViewCommand = buildShoppingCartViewCommand(memberDetails, request);
 
         //将状态不对的 选中状态的订单行 变成不选中. 
-        uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand, request);
+        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand);
 
         model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
         return "shoppingcart.shoppingcart";
@@ -221,63 +208,6 @@ public class NebulaShoppingCartController extends BaseController{
 
         // 封装viewCommand
         return shoppingcartViewCommandConverter.convert(shoppingCartCommand);
-    }
-
-    /**
-     * 将状态不对的 选中状态的订单行 变成不选中.
-     * 
-     * <h3>说明:</h3>
-     * <blockquote>
-     * <ol>
-     * <li>如果 shoppingCartViewCommand 是null,什么都不做</li>
-     * <li>提取所有的 ShoppingCartLineSubViewCommand list,如果是null或者empty 什么都不做</li>
-     * <li>找出list中,状态是不正常,且选中状态 非礼品的行,提取 id list</li>
-     * <li>将这些 id list,设置为 不选中</li>
-     * </ol>
-     * </blockquote>
-     *
-     * @param memberDetails
-     *            the member details
-     * @param shoppingCartViewCommand
-     *            the shopping cart view command
-     * @param request
-     *            the request
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#toggleShoppingCartLinesCheckStatus(MemberDetails, List, boolean, HttpServletRequest, HttpServletResponse)
-     * @since 5.3.2.6
-     */
-    private void uncheckedInvalidStateShoppingCartLine(MemberDetails memberDetails,ShoppingCartViewCommand shoppingCartViewCommand,HttpServletRequest request){
-        if (null == shoppingCartViewCommand){
-            return;
-        }
-
-        Map<ShopSubViewCommand, List<ShoppingCartLineSubViewCommand>> shopAndShoppingCartLineSubViewCommandListMap = shoppingCartViewCommand.getShopAndShoppingCartLineSubViewCommandListMap();
-        List<ShoppingCartLineSubViewCommand> list = IterableUtils.toList(Iterables.concat(shopAndShoppingCartLineSubViewCommandListMap.values()));
-
-        if (isNullOrEmpty(list)){
-            return;
-        }
-
-        //***********************************将状态不对的 选中状态的订单行 变成不选中************************
-        Predicate<ShoppingCartLineSubViewCommand> invalidStateAndCheckedPredicate = PredicateUtils.allPredicate(//
-                        PredicateUtils.notPredicate(BeanPredicateUtil.equalPredicate("status", Status.NORMAL)),
-                        BeanPredicateUtil.equalPredicate("isGift", false),
-                        BeanPredicateUtil.equalPredicate("checked", true));
-        List<ShoppingCartLineSubViewCommand> invalidStateShoppingCartLineSubViewCommandList = CollectionsUtil.select(list, invalidStateAndCheckedPredicate);
-        if (isNullOrEmpty(invalidStateShoppingCartLineSubViewCommandList)){
-            LOGGER.debug("no invalidState and checked shopping cart lines");
-            return;
-        }
-        List<Long> invalidStateIdList = getPropertyValueList(invalidStateShoppingCartLineSubViewCommandList, "id");
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("{} status not valid and checked,", JsonUtil.format(invalidStateIdList));
-        }
-
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        ServletWebRequest servletWebRequest = new ServletWebRequest(servletRequestAttributes.getRequest());
-
-        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult toggleShoppingCartLinesCheckStatus = shoppingcartResolver.toggleShoppingCartLinesCheckStatus(memberDetails, invalidStateIdList, false, request, servletWebRequest.getResponse());
-        LOGGER.info("{}", toggleShoppingCartLinesCheckStatus);
     }
 
     //**********************************addShoppingCart************************************************
