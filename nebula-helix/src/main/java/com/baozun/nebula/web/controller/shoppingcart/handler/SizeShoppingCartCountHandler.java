@@ -16,10 +16,11 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.handler;
 
+import static com.feilong.core.Validator.isNullOrEmpty;
+
 import java.util.List;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.feilong.core.Validator;
 
 /**
  * 计算 shoppingCartLineCommandList size的 QuantityShoppingCartCountHandler.
@@ -36,6 +37,6 @@ public class SizeShoppingCartCountHandler implements ShoppingCartCountHandler{
      */
     @Override
     public int buildCount(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        return Validator.isNullOrEmpty(shoppingCartLineCommandList) ? 0 : shoppingCartLineCommandList.size();
+        return isNullOrEmpty(shoppingCartLineCommandList) ? 0 : shoppingCartLineCommandList.size();
     }
 }
