@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
@@ -95,13 +96,31 @@ public class DefaultUncheckedInvalidStateShoppingCartLineHandler implements Unch
             LOGGER.debug("{} status not valid and checked", JsonUtil.format(invalidStateIdList));
         }
 
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = servletRequestAttributes.getRequest();
-        ServletWebRequest servletWebRequest = new ServletWebRequest(request);
+        HttpServletRequest request = getRequest();
+        HttpServletResponse response = getResponse();
 
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult toggleShoppingCartLinesCheckStatus = shoppingcartResolver.toggleShoppingCartLinesCheckStatus(memberDetails, invalidStateIdList, false, request, servletWebRequest.getResponse());
+        ShoppingcartResult toggleShoppingCartLinesCheckStatus = shoppingcartResolver.toggleShoppingCartLinesCheckStatus(memberDetails, invalidStateIdList, false, request, response);
         LOGGER.info("{}", toggleShoppingCartLinesCheckStatus);
 
+    }
+
+    /**
+     * @return
+     * @since 5.3.2.6
+     */
+    private static HttpServletRequest getRequest(){
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return servletRequestAttributes.getRequest();
+    }
+
+    /**
+     * @return
+     * @since 5.3.2.6
+     */
+    private static HttpServletResponse getResponse(){
+        HttpServletRequest request = getRequest();
+        ServletWebRequest servletWebRequest = new ServletWebRequest(request);
+        return servletWebRequest.getResponse();
     }
 }
