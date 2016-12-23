@@ -657,4 +657,19 @@ public interface ErrorCodes {
 	
 	/** bundle商品的捆绑成员sku缺失 */
 	public static final Integer	ITEM_GROUP_ELEMENT_SKU_LOST				    = 25017;
+	
+	
+	
+	
+	/** 导入商品SKU数据errorCode */
+	public static final Integer	IMPORT_SKU_IL8N_CLOSE				    	= 180010;
+	public static final Integer	IMPORT_SKU_PORP_NOT_COMPLETE			    = 180011;
+	public static final Integer	IMPORT_SKU_IL8N_PORP_NOT_COMPLETE		    = 180012;
+	public static final Integer	IMPORT_SKU_PROPERTYS_NOT_COMPLETE			= 180013;
+	
+	public static final Integer	IMPORT_SKU_UPC_ERROR						= 180014;
+	public static final Integer	IMPORT_CODE_UPC_ERROR						= 180015;
+	public static final Integer	IMPORT_SKU_LISTPRICE_ERROR					= 180016;
+	public static final Integer	IMPORT_SKU_SALEPRICE_ERROR					= 180017;
+	public static final Integer	IMPORT_SKU_UPC_COUNT_ERROR					= 180018;
 }

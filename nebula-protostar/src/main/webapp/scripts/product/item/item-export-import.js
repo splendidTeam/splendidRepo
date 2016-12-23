@@ -13,6 +13,7 @@ var itemListUrl = base + '/item/itemList.htm';
 var findPropertyByIndustryIdUrl = base + '/item/findPropertyByIndustryId.json';
 // 商品导入
 var itemImportUrl = base + '/item/itemImport.json';
+var skuImportUrl = base + '/sku/skuImport.json';
 
 /**
  * 加载行业属性
@@ -60,6 +61,18 @@ function fnComplete(data){
 		nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("PROCESS_FAILTRUE", [data.description]));
 	}
 	$j('input[name="excelFile"]').val('');
+	$j('.skuImport').attr("class","button orange skuImport");
+	$j('.skuImport').val("确定导入");
+	$j('.skuImport').removeAttr("disabled");
+}
+
+function fnSkuComplete(data){
+	if(data.isSuccess){
+		nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("PROCESS_SUCCESS"));
+	}else{
+		nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("PROCESS_FAILTRUE", [data.description]));
+	}
+	$j('input[name="skuExcelFile"]').val('');
 	$j('.import').attr("class","button orange import");
 	$j('.import').val("确定导入");
 	$j('.import').removeAttr("disabled");
@@ -114,6 +127,24 @@ $j(document).ready(function(){
 		$j('#industryId').val($j("#industry").val());
 		$j('#exportItemForm').submit();
 	});
+	
+	// 确定导出
+	$j('.skuexport').click(function(){
+		var selectedObj = $j('.dashedwp').find('.normal.selected');
+		if(selectedObj.length <= 0){
+			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("CHOICE_NEED_EXPORT_COLUMN"));
+			return;
+		}
+		
+		var itemCodes = $j('textarea[name="itemCodes"]').val();
+		if(itemCodes.split('\n').length > 100){
+			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("EXPORT_ITEM_OUT_COUNT"));
+			return;
+		}
+		
+		$j('#skuIndustryId').val($j("#skuIndustry").val());
+		$j('#exportSkuForm').submit();
+	});
 
 	/*******************************导入******************************************/
 	
@@ -136,5 +167,29 @@ $j(document).ready(function(){
 		$j('.import').val("正在导入");
 		$j('.import').attr("disabled","disabled");
 		$j('#importItemForm').submit();
+	});
+	
+	
+	function fnSkuError(data){
+		alert(11);
+	}
+	
+	$j('#importSkuForm').ajaxForm({
+    	url: skuImportUrl,
+    	dataType: 'json',
+    	beforeSubmit: fnBeforeSubmit,
+        success: fnSkuComplete
+   });
+	// 确定导入
+	$j('.skuImport').click(function(){
+		var file = $j('input[name="skuExcelFile"]').val();
+		if(!file){
+			nps.info(nps.i18n("SYSTEM_MESSAGE"), nps.i18n("UPLOAD_NEED_FILE"));
+			return;
+		}
+		$j('.skuImport').attr("class","button import");
+		$j('.skuImport').val("正在导入");
+		$j('.skuImport').attr("disabled","disabled");
+		$j('#importSkuForm').submit();
 	});
 });

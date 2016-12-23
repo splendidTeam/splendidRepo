@@ -49,6 +49,35 @@
 		</block>
 	</sheet>
 	
+	<sheet name="skuImportI18n">
+		<block start="A1" end="A1">
+			<cell position="A1" dataName="defaultLang" type="string"/>
+		</block>
+		<block start="A5" end="D5" dataName="ImpSkuCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpSkuCommand" >
+			<cell position="A5" dataName="code" mandatory="true" type="string"/>
+			<cell position="B5" dataName="upc" mandatory="true" type="string"/>
+			<cell position="C5" dataName="listPrice" mandatory="true" type="string"/>
+			<cell position="D5" dataName="salePrice" mandatory="true" type="string"/>
+		<!-- 	<cell position="E9" dataName="props" mandatory="true" type="string"/>
+			<cell position="F9" dataName="props" mandatory="true" type="string"/> -->
+		</block>
+	</sheet>
+	<sheet name="skuImport">
+		<block start="A5" end="C5">
+			<cell position="A5" dataName="shopId" type="long"/>
+			<cell position="B5" dataName="industryId" type="long"/>
+			<cell position="C5" dataName="defaultLang" type="string"/>
+		</block>
+		<block start="A9" end="D9" dataName="ImpSkuCommand" loop="true" loopClass="com.baozun.nebula.command.product.ImpSkuCommand" >
+			<cell position="A9" dataName="code" mandatory="true" type="string"/>
+			<cell position="B9" dataName="upc" mandatory="true" type="string"/>
+			<cell position="C9" dataName="listPrice" mandatory="true" type="string"/>
+			<cell position="D9" dataName="salePrice" mandatory="true" type="string"/>
+		<!-- 	<cell position="E9" dataName="props" mandatory="true" type="string"/>
+			<cell position="F9" dataName="props" mandatory="true" type="string"/> -->
+		</block>
+	</sheet>
+	
 	
 	<!-- 优惠券导入 -->
 	<sheet name="couponImport">

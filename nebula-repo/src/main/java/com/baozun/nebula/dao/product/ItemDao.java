@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.baozun.nebula.command.ItemCommand;
 import com.baozun.nebula.command.ItemUpdatePriceCommand;
+import com.baozun.nebula.command.SkuExportCommand;
 import com.baozun.nebula.command.product.ProductInventoryCommand;
 import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.sdk.command.ItemBaseCommand;
@@ -285,6 +286,17 @@ public interface ItemDao extends GenericEntityDao<Item, Long> {
 	 */
 	@NativeQuery(model = ItemCommand.class)
 	List<ItemCommand> findItemCommandByQueryMapAndItemCodes(@QueryParam Map<String, Object> paraMap, @QueryParam("itemCodeList") List<String> itemCodeList);
+	
+	/**
+	 * 查询商品sku信息
+	 * 
+	 * @param page
+	 * @param sort
+	 * @param Map
+	 * @param shopId
+	 */
+	@NativeQuery(model = SkuExportCommand.class)
+	List<SkuExportCommand> findSkuExportCommandByQueryMapAndItemCodes(@QueryParam Map<String, Object> paraMap, @QueryParam("itemCodeList") List<String> itemCodeList);
 
 	/**
 	 *  查询商品信息(可国际化的字段数据)

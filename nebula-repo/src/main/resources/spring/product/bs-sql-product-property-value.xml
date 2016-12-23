@@ -148,5 +148,18 @@
 		</constructor-arg>
 	</bean>
 
+	<bean id="PropertyValue.findPropertyI18nByValue" class="loxia.dao.support.DynamicQueryHolder">
+		<constructor-arg>
+			<value>
+            <![CDATA[ 
+                  select aaa.* from t_pd_property_value aaa 
+					LEFT JOIN t_pd_property_value_lang bbb on aaa.id = bbb.property_value_id
+					WHERE aaa.property_id =:propertyId and  bbb.value =:value and bbb.lang =:lang
+            ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+	
 	
 </beans>

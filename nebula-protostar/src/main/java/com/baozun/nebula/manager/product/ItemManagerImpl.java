@@ -75,6 +75,7 @@ import com.baozun.nebula.command.ItemPropertyCommand;
 import com.baozun.nebula.command.ItemTagRelationCommand;
 import com.baozun.nebula.command.ItemUpdatePriceCommand;
 import com.baozun.nebula.command.ShopCommand;
+import com.baozun.nebula.command.SkuExportCommand;
 import com.baozun.nebula.command.SkuPropertyCommand;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.command.i18n.MutlLang;
@@ -6359,6 +6360,11 @@ public class ItemManagerImpl implements ItemManager{
 	@Override
 	public List<ItemCommand> findItemCommandByQueryMap(Map<String, Object> paramMap,List<String> itemCodeList){
 		return itemDao.findItemCommandByQueryMapAndItemCodes(paramMap, itemCodeList);
+	}
+	
+	@Override
+	public List<SkuExportCommand> findSkuExportCommandByQueryMap(Map<String, Object> paramMap,List<String> itemCodeList){
+		return itemDao.findSkuExportCommandByQueryMapAndItemCodes(paramMap, itemCodeList);
 	}
 
 	@Override

@@ -347,13 +347,13 @@
 						item.code as itemCode,
 						itemProperties.id as id,
 						property.id as propertyId,
-						commonProperty.editing_type as type,
+						property.editing_type as type,
 						property.name as propertyName,
 						(case when itemProperties.propertyvalue_id is not null then propertyValue.value
 							else itemProperties.property_value end) as propertyValue
 					from t_pd_item_properties itemProperties 
 					left join t_pd_property property on itemProperties.property_id = property.id
-					left join t_pd_common_property commonProperty on property.common_property_id = commonProperty.id
+					--left join t_pd_common_property commonProperty on property.common_property_id = commonProperty.id
 					left join t_pd_property_value propertyValue on itemProperties.propertyvalue_id = propertyValue.id
 					left join t_pd_item item on itemProperties.item_id = item.id 
 					where item.shop_id = :shopId 
