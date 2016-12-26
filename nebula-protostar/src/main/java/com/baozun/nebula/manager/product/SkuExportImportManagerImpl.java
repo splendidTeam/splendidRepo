@@ -683,6 +683,7 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 			itemBeansI18n.put(defaultLang, itemBeans);
 		}
 		
+		
 //		sheet = importXls.getSheetAt(2);
 		if(importXls.getNumberOfSheets() >= 2){
 			//循环获取其他语言
@@ -716,6 +717,11 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 					}
 				}
 			}
+		}
+		
+		//判断是否读入数据异常
+		if (topException != null) {
+			throw topException;
 		}
 		
 		// 判断系统是否开启国际化
