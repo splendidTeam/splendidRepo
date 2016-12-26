@@ -136,17 +136,10 @@
 			<version>${version.feilong-platform}</version>
 		</dependency>
 
-		<!--feilong-spring-web -->
+		<!--feilong-spring-all -->
 		<dependency>
 			<groupId>com.feilong.platform.spring</groupId>
-			<artifactId>feilong-spring-web</artifactId>
-			<version>${version.feilong-platform}</version>
-		</dependency>
-
-		<!--feilong-spring-mobile -->
-		<dependency>
-			<groupId>com.feilong.platform.spring</groupId>
-			<artifactId>feilong-spring-mobile</artifactId>
+			<artifactId>feilong-spring-all</artifactId>
 			<version>${version.feilong-platform}</version>
 		</dependency>
 
