@@ -36,7 +36,7 @@ public class MemberPasswordFormValidator implements Validator{
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "field.required");
 
 		// 新密码规则的校验（必须为数字和字母的组合：此规则可以自己重新定义）
-		RegexUtil.matches(RegexPattern.AN, newPassword);
+//		RegexUtil.matches(RegexPattern.AN, newPassword);
 
 		// 还需要校验两次输入密码的一致性（service层最终进行修改密码的时候也进行了校验，不知道此处的校验还需要否？）
 		// if (!errors.hasFieldErrors("newPassword") && !errors.hasFieldErrors("confirmPassword")){
