@@ -858,7 +858,7 @@
 						sku.sale_price as salePrice ,sku.properties as properties 
 					from t_pd_sku sku 
 					LEFT JOIN t_pd_item item on sku.item_id = item.id
-					where item.lifecycle != 2
+					where item.lifecycle != 2 and sku.lifecycle = 1
 					
 					#if($shopId)
 						and item.shop_id = :shopId

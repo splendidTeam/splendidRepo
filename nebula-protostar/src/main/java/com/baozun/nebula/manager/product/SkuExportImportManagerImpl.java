@@ -855,7 +855,7 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 					 
 					 if(impSkuCommand.getListPrice().compareTo(itemInfoCommand.getListPrice()) > 0){
 						//listPrice过大
-						 throw new BusinessException(ErrorCodes.IMPORT_SKU_UPC_ERROR);
+						 throw new BusinessException(ErrorCodes.IMPORT_SKU_LISTPRICE_ERROR);
 					 }
 					 if(impSkuCommand.getSalePrice().compareTo(itemInfoCommand.getSalePrice()) > 0){
 						 //salePrice过大
