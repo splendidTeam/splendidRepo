@@ -132,8 +132,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         Map<Long, Long> lineIdAndShopIdMapList = CollectionsUtil.getPropertyValueMap(shoppingCartLineCommandList, "id", "shopId");
 
         //*******************************************************************************************************
-        List<ShoppingCartLineCommand> chooseLinesShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();// 被选中的购物车行
-        List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList = new ArrayList<ShoppingCartLineCommand>();// 未选中的购物车行
+        List<ShoppingCartLineCommand> chooseLinesShoppingCartLineCommandList = new ArrayList<>();// 被选中的购物车行
+        List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList = new ArrayList<>();// 未选中的购物车行
         // 判断是否是被选中的购物车行
         splitByCalcLevel(shoppingCartLineCommandList, chooseLinesShoppingCartLineCommandList, noChooseShoppingCartLineCommandList);
 
@@ -186,9 +186,9 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     Map<Long, Long> lineIdAndShopIdMapList,
                     Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
         // 所有门店商品行数据包括选中和不选中的
-        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = new HashMap<Long, List<ShoppingCartLineCommand>>();
+        Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandListMap = new HashMap<>();
 
-        List<ShoppingCartLineCommand> newLineList = new ArrayList<ShoppingCartLineCommand>();// 所有商品行数据包括选中和不选中的
+        List<ShoppingCartLineCommand> newLineList = new ArrayList<>();// 所有商品行数据包括选中和不选中的
 
         //************************************************************************************************
         for (Map.Entry<Long, Long> entry : lineIdAndShopIdMapList.entrySet()){
@@ -299,7 +299,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
             if (shoppingCartCommandByShopId == null){
                 shoppingCartCommandByShopId = new ShoppingCartCommand();
-                List<ShoppingCartLineCommand> sclcList = new ArrayList<ShoppingCartLineCommand>();
+                List<ShoppingCartLineCommand> sclcList = new ArrayList<>();
 
                 shoppingCartCommandByShopId.setShoppingCartLineCommands(sclcList);
                 shopIdAndShoppingCartCommandMap.put(shopId, shoppingCartCommandByShopId);
@@ -509,7 +509,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                     CalcFreightCommand calcFreightCommand,
                     Map<Long, List<PromotionBrief>> shopIdAndPromotionBriefListMap,
                     Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
-        List<ShopCartCommandByShop> summaryShopCartList = new ArrayList<ShopCartCommandByShop>();
+        List<ShopCartCommandByShop> summaryShopCartList = new ArrayList<>();
 
         for (Map.Entry<Long, ShoppingCartCommand> entry : shopIdAndShoppingCartCommandMap.entrySet()){
             List<PromotionBrief> promotionBriefList = shopIdAndPromotionBriefListMap.get(entry.getKey());
@@ -563,7 +563,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * @return the all shopping cart lines
      */
     private List<ShoppingCartLineCommand> getAllShoppingCartLines(Map<Long, ShoppingCartCommand> shopCartMap){
-        List<ShoppingCartLineCommand> allLines = new ArrayList<ShoppingCartLineCommand>();
+        List<ShoppingCartLineCommand> allLines = new ArrayList<>();
 
         for (Map.Entry<Long, ShoppingCartCommand> entry : shopCartMap.entrySet()){
             allLines.addAll(entry.getValue().getShoppingCartLineCommands());
@@ -587,7 +587,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         Map<Long, List<ShoppingCartLineCommand>> shopIdAndShoppingCartLineCommandMap = getShopIdAndShoppingCartLineCommandList(
                         shoppingCartLineCommandList);
 
-        Map<Long, ShoppingCartCommand> shopCartByShopIdMap = new HashMap<Long, ShoppingCartCommand>();
+        Map<Long, ShoppingCartCommand> shopCartByShopIdMap = new HashMap<>();
 
         UserDetails userDetails = shoppingCartCommand.getUserDetails();
         List<String> coupons = shoppingCartCommand.getCoupons();
