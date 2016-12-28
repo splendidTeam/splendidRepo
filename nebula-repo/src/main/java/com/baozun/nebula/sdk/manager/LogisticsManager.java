@@ -38,7 +38,7 @@ public interface LogisticsManager extends BaseManager{
      *            县id
      * @param townId
      *            乡id
-     * @return
+     * @return 如果没有配置运费模板,返回 {@link BigDecimal#ZERO};
      */
     BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,Long distributionModeId,Long shopId,Long provienceId,Long cityId,Long countyId,Long townId);
 

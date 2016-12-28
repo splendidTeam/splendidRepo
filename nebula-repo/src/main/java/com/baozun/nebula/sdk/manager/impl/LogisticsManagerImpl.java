@@ -362,6 +362,9 @@ public class LogisticsManagerImpl implements LogisticsManager{
         }
 
         ShippingTemeplateCommand defaultShippingTemeplateCommand = getShippingTemeplateCommand(shopId, null);
+        if (isNullOrEmpty(defaultShippingTemeplateCommand)){
+            return null;
+        }
         Long shippingTemeplateCommandId = defaultShippingTemeplateCommand.getId();
 
         List<TemeplateDistributionMode> temeplateDistributionModeList = temeplateDistributionModeDao.getDistributionModeByTemeplateId(shippingTemeplateCommandId);
@@ -482,25 +485,6 @@ public class LogisticsManagerImpl implements LogisticsManager{
         return false;
     }
 
-    /**
-     * 计算运费.
-     *
-     * @param itemList
-     *            货物信息
-     * @param distributionModeId
-     *            物流方式Id
-     * @param shopId
-     *            店铺Id
-     * @param provienceId
-     *            省id
-     * @param cityId
-     *            市id
-     * @param countyId
-     *            县id
-     * @param townId
-     *            乡id
-     * @return the big decimal
-     */
     @Override
     public BigDecimal findFreight(List<ItemFreightInfoCommand> itemList,Long distributionModeId,Long shopId,Long provienceId,Long cityId,Long countyId,Long townId){
         //如果没有传物流方式 设置默认物流方式
@@ -510,7 +494,9 @@ public class LogisticsManagerImpl implements LogisticsManager{
             distributionModeId = distributeModelList.get(0).getId();
         }
         ShippingTemeplateCommand shippingTemeplateCommand = getShippingTemeplateCommand(shopId, distributionModeId);
-        Validate.notNull(shippingTemeplateCommand, "shippingTemeplateCommand can't be null!,shopId:[%s],distributionModeId:[%s]", shopId, distributionModeId);
+        if (isNullOrEmpty(shippingTemeplateCommand)){
+            return BigDecimal.ZERO;
+        }
 
         // 根据
         ShippingFeeConfigCommand shippingFeeConfigCommand = buildShippingFeeConfigCommand(shippingTemeplateCommand.getId(), distributionModeId, provienceId, cityId, countyId, townId);
@@ -552,12 +538,17 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            the shop id
      * @param distributionModeId
      *            物流方式id, 如果传入 那么就去找对应的物流模板; 否则取默认的物流模板
-     * @return the default shipping temeplate command
+     * @return 如果没有配置运费模板,那么返回null
      * @since 5.3.2.4
      */
     private ShippingTemeplateCommand getShippingTemeplateCommand(Long shopId,Long distributionModeId){
         // 获得店铺运费模板Map
         ShopShippingTemeplateMap shopShippingTemeplateMap = freigthMemoryManager.getShopShippingTemeplateMap();
+
+        //since 5.3.2.7
+        if (null == shopShippingTemeplateMap){
+            return null;
+        }
 
         // 获得 该店铺的运费模板信息
         ShopShippingTemeplateCommand shopShippingTemeplateCommand = shopShippingTemeplateMap.get(shopId);
