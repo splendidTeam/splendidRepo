@@ -11,6 +11,7 @@
 		<module>nebula-helix</module>
 		<module>nebula-wormhole</module>
 		<module>nebula-wormhole-entity</module>
+		<module>nebula-helix-shopdog</module>
 	</modules>
 
 	<properties>

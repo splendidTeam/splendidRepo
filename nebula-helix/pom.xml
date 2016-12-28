@@ -24,11 +24,7 @@
 			<artifactId>nebula-repo</artifactId>
 			<version>${version.nebula}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.baozun.shopdog</groupId>
-			<artifactId>shopdog-helix</artifactId>
-			<version>1.0.6</version>
-		</dependency>
+
 		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>

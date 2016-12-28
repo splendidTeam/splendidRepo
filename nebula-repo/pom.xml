@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.baozun.nebula</groupId>
@@ -18,15 +17,19 @@
 		</dependency>
 		<!-- HUB -->
 		<dependency>
-		     <groupId>com.baozun.scm</groupId>
-		      <artifactId>bizhub-sdk-bs2notice</artifactId>
-		      <version>1.1.0</version>
-		      <exclusions>
-		      	<exclusion>
-		      		<artifactId>slf4j-log4j12</artifactId>
-		      		<groupId>org.slf4j</groupId>
-		      	</exclusion>
-		      </exclusions>
+			<groupId>com.baozun.scm</groupId>
+			<artifactId>bizhub-sdk-bs2notice</artifactId>
+			<version>1.1.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-log4j12</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+<!-- 				<exclusion>
+					<artifactId>common-utilities</artifactId>
+					<groupId>com.baozun</groupId>
+				</exclusion> -->
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>
