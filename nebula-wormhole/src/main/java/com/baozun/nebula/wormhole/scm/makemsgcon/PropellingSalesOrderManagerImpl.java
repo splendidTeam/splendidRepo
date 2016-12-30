@@ -25,8 +25,6 @@ import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.utilities.library.address.Address;
-import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.wormhole.constants.OrderStatusV5Constants;
 import com.baozun.nebula.wormhole.constants.PromotionTypeConstants;
 import com.baozun.nebula.wormhole.mq.entity.order.DeliveryInfoV5;
@@ -46,13 +44,13 @@ import com.feilong.core.bean.ConvertUtil;
 public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderManager{
 
     @Autowired
-    private OrderManager                sdkOrderService;
+    private OrderManager sdkOrderService;
 
     @Autowired
-    private PropellingCommonManager     propellingCommonManager;
+    private PropellingCommonManager propellingCommonManager;
 
     @Autowired
-    private SdkPaymentManager           paymentManager;
+    private SdkPaymentManager paymentManager;
 
     @Autowired(required = false)
     private PropellingSalesOrderHandler propellingSalesOrderHandler;
@@ -61,7 +59,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
      * 上传图片的域名
      */
     @Value("#{meta['upload.img.domain.base']}")
-    private String                      uploadImgDomain;
+    private String uploadImgDomain;
 
     @Override
     public MsgSendContent propellingSalesOrder(MsgSendRecord msgSendRecord){
@@ -197,20 +195,10 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
     private DeliveryInfoV5 getDeliveryInfoV5(SalesOrderCommand salesOrderCommand){
         DeliveryInfoV5 deliveryInfoV5 = new DeliveryInfoV5();
-        deliveryInfoV5.setCountry(null);
 
-        //        deliveryInfoV5.setProvince(salesOrderCommand.getProvince());
-        //        deliveryInfoV5.setCity(salesOrderCommand.getCity());
-        //        deliveryInfoV5.setDistrict(salesOrderCommand.getArea());
-        // 订单表不存省市区文字，只存ID 
-        Address province = AddressUtil.getAddressById(salesOrderCommand.getProvinceId(), salesOrderCommand.getLang());
-        Address city = AddressUtil.getAddressById(salesOrderCommand.getCityId(), salesOrderCommand.getLang());
-        Address area = AddressUtil.getAddressById(salesOrderCommand.getAreaId(), salesOrderCommand.getLang());
-        deliveryInfoV5.setProvince(province == null ? "" : province.getName());
-        deliveryInfoV5.setCity(city == null ? "" : city.getName());
-        deliveryInfoV5.setDistrict(area == null ? "" : area.getName());
+        //设置行政区划省市区等信息
+        packAdministrativeDivision(deliveryInfoV5, salesOrderCommand);
 
-        deliveryInfoV5.setTown(null);
         deliveryInfoV5.setAddress(salesOrderCommand.getAddress());
         deliveryInfoV5.setZipCode(salesOrderCommand.getPostcode());
         deliveryInfoV5.setReceiver(salesOrderCommand.getName());
@@ -222,6 +210,33 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         deliveryInfoV5.setLogisticsServiceType(salesOrderCommand.getAppointType());
         deliveryInfoV5.setRemark(null);
         return deliveryInfoV5;
+    }
+
+    /**
+     * 设置行政区划省市区等信息
+     * 
+     * @param deliveryInfoV5
+     * @param salesOrderCommand
+     * @since 5.3.2.8
+     */
+    private void packAdministrativeDivision(DeliveryInfoV5 deliveryInfoV5,SalesOrderCommand salesOrderCommand){
+        deliveryInfoV5.setCountry(null);
+
+        //*******************************************************
+        //
+        // 原先阿汤哥计划是 db 订单里面只存放地区 id,然后再使用多语言转换 , 
+        // 经过分析,实现的时候, db 订单地址里面已经有地区的 name (基于多语言的)
+        // so 其实可以直接传递,不需要再次转换
+        //
+        //*******************************************************
+
+        deliveryInfoV5.setProvince(salesOrderCommand.getProvince());
+        deliveryInfoV5.setCity(salesOrderCommand.getCity());
+        deliveryInfoV5.setDistrict(salesOrderCommand.getArea());
+
+        //*********************************************************
+
+        deliveryInfoV5.setTown(null);
     }
 
     private OrderMemberV5 getOrderMemberV5(SalesOrderCommand salesOrderCommand){
@@ -292,9 +307,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
                     if (!obj.getIsShipDiscount() && orderLine.getId().equals(obj.getOrderLineId())){
                         OrderPromotionV5 orderPromotionV5 = new OrderPromotionV5();
                         //促销类型值域由商城前端预定义(商城共用一套),维护进omsChooseOption
-                        orderPromotionV5.setType(
-                                        obj.getBaseOrder() ? PromotionTypeConstants.PROMOTION_ALLONLINE
-                                                        : PromotionTypeConstants.PROMOTION_LINE);
+                        orderPromotionV5.setType(obj.getBaseOrder() ? PromotionTypeConstants.PROMOTION_ALLONLINE : PromotionTypeConstants.PROMOTION_LINE);
                         //促销编码该字段目前在oms中无需备案,oms中仅记录该信息商城定义的活动编号
                         orderPromotionV5.setCode(obj.getActivityId().toString());
                         orderPromotionV5.setDescription(obj.getDescribe());
@@ -326,9 +339,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
                 paymentInfoV5.setPayTotal(payInfoCommand.getPayMoney());
                 paymentInfoV5.setPayNo(payInfoCommand.getSubOrdinate());
                 paymentInfoV5.setPaymentTime(payInfoCommand.getModifyTime());
-                if (payInfoCommand.getPayType() == payInfoCommand.getMainPayType() || Objects.equals(
-                                SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT,
-                                soCommand.getFinancialStatus())){
+                if (payInfoCommand.getPayType() == payInfoCommand.getMainPayType() || Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, soCommand.getFinancialStatus())){
                     paymentInfoV5.setAllComplete(true);
                 }else{
                     paymentInfoV5.setAllComplete(false);
@@ -358,8 +369,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
         OrderStatusLogCommand orderStatusLogCommand = sdkOrderService.findOrderStatusLogById(orderStatusLogId);
         orderStatusV5.setBsOrderCode(orderStatusLogCommand.getOrderCode());
         //目前 2:订单取消  后续加
-        if (orderStatusLogCommand.getAfterStatus().equals(SalesOrder.SALES_ORDER_STATUS_CANCELED)
-                        || orderStatusLogCommand.getAfterStatus().equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED)){
+        if (orderStatusLogCommand.getAfterStatus().equals(SalesOrder.SALES_ORDER_STATUS_CANCELED) || orderStatusLogCommand.getAfterStatus().equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED)){
             orderStatusV5.setOpType(OrderStatusV5Constants.ORDER_CANCEL);
         }
         orderStatusV5.setOpTime(orderStatusLogCommand.getCreateTime());
