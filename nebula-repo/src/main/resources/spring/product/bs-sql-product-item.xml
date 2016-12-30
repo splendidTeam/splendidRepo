@@ -62,7 +62,17 @@
 							coalesce(skuInventory.aty,0) as inventory,
 							coalesce(image.imageCount,0) as imageCount
 						from t_pd_item tpi left join (select item_id, count(*) as imageCount from t_pd_item_image GROUP BY item_id) image on tpi.id = image.item_id
-						    left join (select sku.item_id item_id , sum(inventory.available_qty) aty from t_pd_sku sku,t_pd_sku_inventory inventory where sku.out_id = inventory.extention_code GROUP BY sku.item_id) skuInventory on tpi.id = skuInventory.item_id,
+						    
+						    left join (
+							    select sku.item_id item_id , sum(inventory.available_qty) aty 
+							    from t_pd_sku sku,t_pd_sku_inventory inventory 
+							    where sku.out_id = inventory.extention_code
+							    and sku.lifecycle=1
+							    GROUP BY sku.item_id
+						    ) skuInventory 
+						    on tpi.id = skuInventory.item_id,
+						    
+						    
 						    t_pd_iteminfo tpifo,
 							t_pd_industry tpid 
 							#if($categoryId)
