@@ -420,21 +420,16 @@ $j(function() {
         var supportcod= $j("#supportcod").val()=='true'?'Y':'N';
         var remark= $j("#remark").val();
         //如果物流选择为否，则不需要填写相应的时间
-        if((commonDelivery=='N')&&(!isNull(commomStartTime)||!isNull(commomEndTime))){
+        if((commonDelivery!='N')&&(isNull(commomStartTime)||isNull(commomEndTime))){
        	 nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_COMMONDELIVERY_TIME_UNEMPTY"));
             return
        }
-       if((firstDayDelivery=='N')&&(!isNull(firstStartTime)||!isNull(firstEndTime))){
+       if((firstDayDelivery!='N')&&(isNull(firstStartTime)||isNull(firstEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_FIRSTDELIVERY_TIME_UNEMPTY"));
            return
        }
-       if((secondDayDelivery=='N')&&(!isNull(secondStartTime)||!isNull(secondEndTime))){
+       if((secondDayDelivery!='N')&&(isNull(secondStartTime)||isNull(secondEndTime))){
     	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_SECONDDELIVERY_TIME_UNEMPTY"));
-           return
-       }
-       //如果物流选择为是，则必须填写对应的起始时间和关闭时间
-       if((commonDelivery!='N')&&(isNull(commomStartTime)||isNull(commomEndTime))){
-    	   nps.error(nps.i18n("ERROR_INFO"), nps.i18n("INFO_COMMONDELIVERY_TIME_EMPTY"));
            return
        }
        if((thirdDayDelivery!='N')&&(isNull(thirdDeliveryStartTime)||isNull(thirdDeliveryEndTime))){
