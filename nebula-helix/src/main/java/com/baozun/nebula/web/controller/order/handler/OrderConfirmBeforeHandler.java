@@ -16,6 +16,16 @@ import com.baozun.nebula.web.MemberDetails;
  */
 public interface OrderConfirmBeforeHandler {
 
-	void beforeOrderConfirm(ShoppingCartCommand shoppingCartCommand,MemberDetails memberDetails,HttpServletRequest request);
+	/**
+	 * 
+	 * @Description 进入Checkout之前,自行扩展点.
+	 * @param shoppingCartCommand
+	 * @param memberDetails
+	 * @param request
+	 * @param key
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-10-9
+	 */
+	void beforeOrderConfirm(ShoppingCartCommand shoppingCartCommand,MemberDetails memberDetails,HttpServletRequest request, String key);
 	
 }

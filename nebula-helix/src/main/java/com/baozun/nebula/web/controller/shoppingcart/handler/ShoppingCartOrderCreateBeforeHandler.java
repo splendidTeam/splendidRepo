@@ -12,7 +12,7 @@ import com.baozun.nebula.web.controller.order.form.OrderForm;
 
 /**
  * @Description
- * @author  <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+ * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
  * @version 2016-10-9
  */
 public interface ShoppingCartOrderCreateBeforeHandler {
@@ -24,9 +24,10 @@ public interface ShoppingCartOrderCreateBeforeHandler {
 	 * @param orderForm
 	 * @param memberDetails
 	 * @param request
+	 * @param key
 	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
 	 * @version 2016-10-9
 	 */
-	void beforeCreateSalesOrder(ShoppingCartCommand shoppingCartCommand,OrderForm orderForm,MemberDetails memberDetails,HttpServletRequest request);
-	
+	void beforeCreateSalesOrder(ShoppingCartCommand shoppingCartCommand, OrderForm orderForm, MemberDetails memberDetails, HttpServletRequest request, String key);
+
 }

@@ -206,7 +206,7 @@ public class NebulaOrderConfirmController extends BaseController{
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
         if (null != confirmBeforeHandler){
-            confirmBeforeHandler.beforeOrderConfirm(shoppingCartCommand, memberDetails, request);
+            confirmBeforeHandler.beforeOrderConfirm(shoppingCartCommand, memberDetails, request, key);
         }
 
         // 封装viewCommand
