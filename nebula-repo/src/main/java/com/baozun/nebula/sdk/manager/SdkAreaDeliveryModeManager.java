@@ -20,11 +20,6 @@ public interface SdkAreaDeliveryModeManager {
 	AreaDeliveryMode findAreaDeliveryModeByAreaId(Long areaId);
 	
 	/**
-	 * 更新areaDeliveryMode
-	 */
-	void updateDeliveryMode(Map<String,Object> map);
-	
-	/**
 	 * 保存areaDeliveryMode
 	 * @param adm
 	 * @return 

@@ -1,9 +1,7 @@
 package com.baozun.nebula.dao.delivery;
 
-import java.util.Map;
 
 import loxia.annotation.NativeQuery;
-import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
@@ -23,11 +21,5 @@ public interface AreaDeliveryModeDao extends GenericEntityDao<AreaDeliveryMode, 
 	 */
 	@NativeQuery(model = AreaDeliveryMode.class, value = "AreaDeliveryMode.findAreaDeliveryModeByAreaId")
 	AreaDeliveryMode findAreaDeliveryModeByAreaId(@QueryParam("areaId") Long areaId);
-
-	/**
-	 * 更新AreaDeliveryMode
-	 */
-	@NativeUpdate
-	void updateAreaDeliveryMode(@QueryParam Map<String, Object> paraMap);
 
 }

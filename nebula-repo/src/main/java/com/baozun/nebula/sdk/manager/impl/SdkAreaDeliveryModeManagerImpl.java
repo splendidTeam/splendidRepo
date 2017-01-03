@@ -1,5 +1,4 @@
 package com.baozun.nebula.sdk.manager.impl;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +18,6 @@ public class SdkAreaDeliveryModeManagerImpl implements SdkAreaDeliveryModeManage
 	@Override
 	public AreaDeliveryMode findAreaDeliveryModeByAreaId(Long areaId) {
 		return areaDeliveryModeDao.findAreaDeliveryModeByAreaId(areaId);
-	}
-
-	@Override
-	public void updateDeliveryMode(Map<String,Object> map) {
-			areaDeliveryModeDao.updateAreaDeliveryMode(map);
 	}
 
 	@Override

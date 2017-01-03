@@ -38,7 +38,7 @@ public interface DeliveryAreaDao extends GenericEntityDao<DeliveryArea, Long> {
 	 * @version 2016-11-1
 	 */
 	@NativeQuery(model = DeliveryArea.class)
-	List<DeliveryArea> findEnableDeliveryAreaList(@QueryParam("lang")String name, Sort[] sort);
+	List<DeliveryArea> findEnableDeliveryAreaList(@QueryParam("lang")String lang, Sort[] sort);
 
 	/**
 	 * 

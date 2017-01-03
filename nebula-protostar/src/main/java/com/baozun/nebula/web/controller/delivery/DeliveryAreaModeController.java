@@ -4,14 +4,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import loxia.dao.Sort;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.Watcher.Event.EventType;
-import org.apache.zookeeper.data.ACL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,21 +20,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.curator.ZKWatchPath;
 import com.baozun.nebula.curator.ZkOperator;
-import com.baozun.nebula.curator.invoke.EngineWatchInvoke;
 import com.baozun.nebula.curator.invoke.I18nLangWatchInvoke;
-import com.baozun.nebula.curator.watcher.AbstractWatcher;
-import com.baozun.nebula.curator.watcher.IWatcher;
-import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.manager.product.CategoryManager;
-import com.baozun.nebula.manager.product.ItemCategoryManager;
 import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.utilities.common.LangUtil;
-import com.baozun.nebula.utilities.common.ProfileConfigUtil;
-import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.baozun.nebula.web.command.BackWarnEntity;
 import com.baozun.nebula.web.controller.BaseController;
 import com.feilong.core.Validator;
@@ -51,9 +39,6 @@ public class DeliveryAreaModeController extends BaseController{
 	
 	@Autowired
 	private CategoryManager  categoryManager;
-	
-	@Autowired
-	private ItemCategoryManager	itemCategoryManager;
 	
 	@Autowired
 	private SdkDeliveryAreaManager deliveryAreaManager;
@@ -111,35 +96,12 @@ public class DeliveryAreaModeController extends BaseController{
 	@RequestMapping(value = { "/logistics/areaDeliverMode/updateDeliveryAreaModeByAreaId.json" }, method = RequestMethod.POST, headers = HEADER_WITH_AJAX_SPRINGMVC)
 	public void updateDeliveryAreaModeByAreaId(@ModelAttribute("AreaDeliveryMode") AreaDeliveryMode areaDeliveryMode) {
 		//id不为空，表示是更新操作,否则为新增
-		
-		if(null!=areaDeliveryMode.getId()){
-			Map<String, Object> map=new HashMap<String, Object>();
-			map.put("id", areaDeliveryMode.getId());
-			map.put("commonDelivery", areaDeliveryMode.getCommonDelivery());
-			map.put("commonEndTime", areaDeliveryMode.getCommonDeliveryEndTime());
-			map.put("commonStartTime", areaDeliveryMode.getCommonDeliveryStartTime());
-			map.put("firstDelivery", areaDeliveryMode.getFirstDayDelivery());
-			map.put("firstEndTime", areaDeliveryMode.getFirstDeliveryEndTime());
-			map.put("firstStartTime", areaDeliveryMode.getFirstDeliveryStartTime());
-			map.put("logisticsCode", areaDeliveryMode.getLogisticsCode());
-			map.put("logisticsCompany", areaDeliveryMode.getLogisticsCompany());
-			map.put("remark", areaDeliveryMode.getRemark());
-			map.put("secondDelivery", areaDeliveryMode.getSecondDayDelivery());
-			map.put("secondEndTime", areaDeliveryMode.getSecondDeliveryEndTime());
-			map.put("secondStartTime", areaDeliveryMode.getSecondDeliveryStartTime());
-			map.put("thirdDayDelivery", areaDeliveryMode.getThirdDayDelivery());
-			map.put("thirdDeliveryStartTime", areaDeliveryMode.getThirdDeliveryStartTime());
-			map.put("thirdDeliveryEndTime", areaDeliveryMode.getThirdDeliveryEndTime());
-			map.put("supportCod", areaDeliveryMode.getSupport_COD());
-			map.put("lang", LangUtil.getCurrentLang());
-			areaDeliveryModeManager.updateDeliveryMode(map);
-		}else{
+		areaDeliveryMode.setModifyTime(new Date());
+		areaDeliveryMode.setVersion(new Date());
+		if(Validator.isNullOrEmpty(areaDeliveryMode.getId())){
 			areaDeliveryMode.setCreateTime(new Date());
-			areaDeliveryMode.setModifyTime(new Date());
-			areaDeliveryMode.setVersion(new Date());
-			areaDeliveryModeManager.saveDeliveryMode(areaDeliveryMode);
 		}
-		
+		areaDeliveryModeManager.saveDeliveryMode(areaDeliveryMode);
 	}
 
 	/**
@@ -172,6 +134,7 @@ public class DeliveryAreaModeController extends BaseController{
 				return FAILTRUE;
 			}
 			deliveryAreaManager.updateDeliveryArea(map);
+			zkOperator.noticeZkServer(zkWatchPath.getZKWatchPath(I18nLangWatchInvoke.class));
 			return SUCCESS;
 		}
 		return FAILTRUE;

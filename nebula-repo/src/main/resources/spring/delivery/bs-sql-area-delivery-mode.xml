@@ -15,59 +15,5 @@
 			</value>
 		</constructor-arg>
 	</bean>
-	<bean id="AreaDeliveryMode.updateAreaDeliveryMode" class="loxia.dao.support.DynamicQueryHolder">
-		<description>更新areaDeliveryMode</description>
-		<constructor-arg>
-			<value>
-				<![CDATA[
-						update t_sf_area_delivery_mode
-					set 
-						version = now(),
-						modify_time=now()
-					#if($commonDelivery)
-						,commondelivery = :commonDelivery
-					#end
-					#if($commonEndTime)
-						,common_delivery_endtime = :commonEndTime
-					#end
-					#if($commonStartTime)
-						,common_delivery_starttime = :commonStartTime
-					#end
-					#if($firstDelivery)
-						,firstdaydelivery  =:firstDelivery
-					#end
-					#if($firstEndTime)
-						,first_delivery_endtime   =:firstEndTime
-					#end
-					#if($firstStartTime)
-						,  first_delivery_starttime   =:firstStartTime
-					#end
-					#if($logisticsCode)
-						, logistics_code    =:logisticsCode
-					#end
-					#if($logisticsCompany)
-						, logistics_company    =:logisticsCompany
-					#end
-					#if($remark)
-						,  remark   =:remark
-					#end
-					#if($secondDelivery)
-						,  seconddaydelivery   =:secondDelivery
-					#end
-					#if($secondEndTime)
-						,second_delivery_endtime     =:secondEndTime
-					#end
-					#if($secondStartTime)
-						,second_delivery_starttime     =:secondStartTime
-					#end
-					#if($supportCod)
-						,support_cod    =:supportCod
-					#end
-					where
-						id = :id
-				]]>
-			</value>
-		</constructor-arg>
-	</bean>
 
 </beans>

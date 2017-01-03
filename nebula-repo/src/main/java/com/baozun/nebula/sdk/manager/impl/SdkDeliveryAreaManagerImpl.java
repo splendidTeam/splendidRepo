@@ -96,8 +96,8 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager{
     }
 
     @Override
-    public Map<String, Map<String, String>> findAllDeliveryAreaByLang(String language,Sort[] sort){
-        List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findEnableDeliveryAreaList(LangUtil.getCurrentLang(), sort);
+    public Map<String, Map<String, String>> findAllDeliveryAreaByLang(String lang,Sort[] sort){
+        List<DeliveryArea> parentDeliveryArea = deliveryAreaDao.findEnableDeliveryAreaList(lang, sort);
         return findAllSubDeliveryAreaByParentDeliveryArea(parentDeliveryArea);
     }
 
