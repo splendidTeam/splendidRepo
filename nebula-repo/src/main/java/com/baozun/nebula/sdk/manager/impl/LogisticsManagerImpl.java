@@ -25,6 +25,7 @@ import static com.feilong.core.util.CollectionsUtil.select;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -309,7 +310,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            the shop id
      * @param calcFreightCommand
      *            the calc freight command
-     * @return the list
+     * @return 如果没有运费模板 返回 {@link java.util.Collections#emptyList()}
      * @since 5.3.2.4
      */
     private List<DistributionMode> findDistributeMode(Long shopId,CalcFreightCommand calcFreightCommand){
@@ -317,7 +318,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
 
         //获得当前店铺的物流方式列表
         List<DistributionCommand> currentShopDistributionCommandList = getCurrentShopDistributionCommandList(shopId, calcFreightCommand);
-        return buildDistributionModeList(calcFreightCommand, currentShopDistributionCommandList);
+        return isNullOrEmpty(currentShopDistributionCommandList) ? Collections.<DistributionMode> emptyList() : buildDistributionModeList(calcFreightCommand, currentShopDistributionCommandList);
     }
 
     /**
@@ -327,12 +328,14 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            the shop id
      * @param calcFreightCommand
      *            the calc freight command
-     * @return the current shop distribution command list
+     * @return 如果没有运费模板 返回null
      * @since 5.3.2.4
      */
     private List<DistributionCommand> getCurrentShopDistributionCommandList(Long shopId,CalcFreightCommand calcFreightCommand){
         Set<Long> distributionModeIdSet = buildDistributionModeIdSet(shopId, calcFreightCommand);
-
+        if (isNullOrEmpty(distributionModeIdSet)){
+            return null;
+        }
         //---------------------------------------------------------------------------
         // 拿到所有的物流方式 列表
         List<DistributionCommand> distributionCommandList = freigthMemoryManager.getDistributionList();
@@ -352,7 +355,7 @@ public class LogisticsManagerImpl implements LogisticsManager{
      *            the shop id
      * @param calcFreightCommand
      *            the calc freight command
-     * @return the 设置
+     * @return 如果店铺没有运费模板 返回null
      * @since 5.3.2.4
      */
     private Set<Long> buildDistributionModeIdSet(Long shopId,CalcFreightCommand calcFreightCommand){
@@ -491,6 +494,11 @@ public class LogisticsManagerImpl implements LogisticsManager{
         if (null == distributionModeId){
             CalcFreightCommand calcFreightCommand = new CalcFreightCommand(distributionModeId, provienceId, cityId, countyId, townId);
             List<DistributionMode> distributeModelList = findDistributeMode(shopId, calcFreightCommand);
+
+            if (isNullOrEmpty(distributeModelList)){
+                return BigDecimal.ZERO;
+            }
+
             distributionModeId = distributeModelList.get(0).getId();
         }
         ShippingTemeplateCommand shippingTemeplateCommand = getShippingTemeplateCommand(shopId, distributionModeId);
