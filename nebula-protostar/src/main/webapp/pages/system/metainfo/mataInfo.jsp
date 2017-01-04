@@ -9,6 +9,14 @@
 <script type="text/javascript" src="${base}/scripts/search-filter.js"></script>
 <script type="text/javascript" src="${base}/scripts/main.js"></script>
 <script type="text/javascript" src="${base}/scripts/system/metaInfo/mataInfo.js"></script>
+
+<style type="text/css">
+td.col-2 span {
+    display: inline-block;
+    word-wrap: break-word;
+    word-break:break-all;
+}
+</style> 
 </head>
 <body>
 <div class="content-box width-percent100">

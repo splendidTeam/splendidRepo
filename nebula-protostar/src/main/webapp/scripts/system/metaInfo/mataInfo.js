@@ -185,12 +185,12 @@ $j(document).ready(function() {
 			{
 				name : "code",
 				label : nps.i18n("code"),
-				width : "10%"
+				width : "20%"
 			},
 			{
 				name : "value",
 				label : nps.i18n("value"),
-				width : "10%"
+				width : "50%"
 			},
 			{
 				name : "lifecycle",
@@ -200,7 +200,7 @@ $j(document).ready(function() {
 			},
 			{
 				label :nps.i18n("drawEditor"),
-				width : "15%", 			 
+				width : "20%", 			 
 				template:"drawEditor" 
 			}],
 		dataurl : urlList
