@@ -39,12 +39,12 @@ import com.baozun.nebula.utilities.common.command.PaymentServiceReturnForMobileC
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.common.condition.ResponseParam;
 import com.baozun.nebula.utilities.common.convertor.MapAndStringConvertor;
-import com.baozun.nebula.utilities.common.convertor.RequestToCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
 import com.baozun.nebula.utilities.integration.payment.PaymentFactory;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;
 import com.baozun.nebula.utilities.integration.payment.PaymentResult;
 import com.baozun.nebula.utilities.integration.payment.PaymentServiceStatus;
+import com.baozun.nebula.utilities.integration.payment.convertor.RequestToCommand;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentException;
 import com.baozun.nebula.utilities.io.http.HttpClientUtil;
 import com.baozun.nebula.utilities.io.http.HttpMethodType;

@@ -33,24 +33,38 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		String bankCode = salesOrderCommand.getOnLinePaymentCommand().getBankCode();
 		if(StringUtils.isNotEmpty(bankCode))
 			return bankCode;
+		else if(null!=requestParams.get("bankCode"))
+			return requestParams.get("bankCode").toString();
 		else
 			return null;
 	}
 
 	@Override
 	public String getOrderNo() {
-		return salesOrderCommand.getCode();
+		if(StringUtils.isNotEmpty(salesOrderCommand.getCode()))
+			return salesOrderCommand.getCode();
+		else if(null!=requestParams.get("code"))
+			return requestParams.get("code").toString();
+		else
+			return null;
 	}
 
 	@Override
 	public BigDecimal getTotalFee() {
-		return salesOrderCommand.getTotal();
+		if(null!=salesOrderCommand.getTotal())
+			return salesOrderCommand.getTotal();
+		else if(null!=requestParams.get("total"))
+			return new BigDecimal(requestParams.get("total").toString());
+		else
+			return null;
 	}
 
 	@Override
 	public boolean isInternationalCard() {
 		boolean isInternationalCard = salesOrderCommand.getOnLinePaymentCommand().getIsInternationalCard();
 		if(BooleanUtils.isTrue(isInternationalCard))
+			return true;
+		else if(null!=requestParams.get("isInternationalCard")&&Boolean.valueOf(requestParams.get("isInternationalCard").toString()))
 			return true;
 		else
 			return false;
@@ -61,6 +75,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		String body = salesOrderCommand.getDescribe();
 		if(StringUtils.isNotEmpty(body))
 			return body;
+		else if(null!=requestParams.get("describe"))
+			return requestParams.get("describe").toString();
 		else
 			return null;
 	}
@@ -68,6 +84,9 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	@Override
 	public String getTrade_role() {
 		String role = salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_role();
+		if(StringUtils.isEmpty(role)){
+			role = requestParams.get("trade_role").toString();
+		}
 		if(BUY.equals(role)){
 			return "B";
 		}
@@ -79,12 +98,20 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 
 	@Override
 	public String getTrade_no() {
-		return salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_no();
+		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_no()))
+			return salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_no();
+		else if(null!=requestParams.get("trade_no"))
+			return requestParams.get("trade_no").toString();
+		else
+			return null;
 	}
 
 	@Override
 	public String getPaymentType() {
 		Integer payType = salesOrderCommand.getOnLinePaymentCommand().getPayType();
+		if(null == payType){
+			payType = Integer.valueOf(requestParams.get("payType").toString());
+		}
 		String type = null;
 		switch(payType){
 			case ReservedPaymentType.ALIPAY : type = PaymentFactory.PAY_TYPE_ALIPAY;break;
@@ -100,22 +127,42 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 
 	@Override
 	public String getPaymentTime() {
-		return salesOrderCommand.getOnLinePaymentCommand().getPayTime();
+		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getPayTime()))
+			return salesOrderCommand.getOnLinePaymentCommand().getPayTime();
+		else if(null != requestParams.get("payTime"))
+			return requestParams.get("payTime").toString();
+		else
+			return null;
 	}
 
 	@Override
 	public String getCustomerIp() {
-		return salesOrderCommand.getOnLinePaymentCommand().getCustomerIp();
+		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getCustomerIp()))
+			return salesOrderCommand.getOnLinePaymentCommand().getCustomerIp();
+		else if(null != requestParams.get("customerIp"))
+			return requestParams.get("customerIp").toString();
+		else
+			return null;
 	}
 
 	@Override
 	public String getIt_b_pay() {
-		return salesOrderCommand.getOnLinePaymentCommand().getItBPay();
+		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getItBPay()))
+			return salesOrderCommand.getOnLinePaymentCommand().getItBPay();
+		else if(null != requestParams.get("itBPay"))
+			return requestParams.get("itBPay").toString();
+		else
+			return null;
 	}
 
 	@Override
 	public String getQrPayMode() {
-		return salesOrderCommand.getOnLinePaymentCommand().getQrPayMode();
+		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getQrPayMode()))
+			return salesOrderCommand.getOnLinePaymentCommand().getQrPayMode();
+		else if(null != requestParams.get("qrPayMode"))
+			return requestParams.get("qrPayMode").toString();
+		else
+			return null;
 	}
 
 	/**

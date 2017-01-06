@@ -3,6 +3,7 @@
 	<groupId>com.baozun.nebula</groupId>
 	<artifactId>nebula</artifactId>
 	<version>5.3.2.9-SNAPSHOT</version>
+
 	<packaging>pom</packaging>
 	<modules>
 		<module>nebula-repo</module>

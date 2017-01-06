@@ -36,17 +36,13 @@ public class PaymentConvertFactory {
 				new OrderCommandParamConvertorAdaptor());
 		paymentConvertMap.put(PaymentFactory.PAY_TYPE_ALIPAY_CREDIT_INT,
 				new OrderCommandParamConvertorAdaptor());
-		//TODO
 		paymentConvertMap.put(PaymentFactory.PAY_TYPE_CHINAPNR,
 				null);
 		paymentConvertMap.put(PaymentFactory.PAY_TYPE_UNIONPAY,
 				new OrderCommandParamConvertorAdaptor());
-		
 		// 微信
 		paymentConvertMap.put(PaymentFactory.PAY_TYPE_WECHAT,
 				new OrderCommandParamConvertorAdaptor());
-		
-		
 	}
 
 }

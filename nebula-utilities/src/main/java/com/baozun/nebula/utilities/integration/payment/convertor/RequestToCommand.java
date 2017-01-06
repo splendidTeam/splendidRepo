@@ -1,4 +1,4 @@
-package com.baozun.nebula.utilities.common.convertor;
+package com.baozun.nebula.utilities.integration.payment.convertor;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
