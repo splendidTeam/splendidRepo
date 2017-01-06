@@ -1,6 +1,7 @@
 package com.baozun.nebula.payment.convert;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -33,8 +34,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		String bankCode = salesOrderCommand.getOnLinePaymentCommand().getBankCode();
 		if(StringUtils.isNotEmpty(bankCode))
 			return bankCode;
-		else if(null!=requestParams.get("bankCode"))
-			return requestParams.get("bankCode").toString();
+		else if(null!=getRequestParams().get("bankCode"))
+			return getRequestParams().get("bankCode").toString();
 		else
 			return null;
 	}
@@ -43,8 +44,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getOrderNo() {
 		if(StringUtils.isNotEmpty(salesOrderCommand.getCode()))
 			return salesOrderCommand.getCode();
-		else if(null!=requestParams.get("code"))
-			return requestParams.get("code").toString();
+		else if(null!=getRequestParams().get("code"))
+			return getRequestParams().get("code").toString();
 		else
 			return null;
 	}
@@ -53,8 +54,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public BigDecimal getTotalFee() {
 		if(null!=salesOrderCommand.getTotal())
 			return salesOrderCommand.getTotal();
-		else if(null!=requestParams.get("total"))
-			return new BigDecimal(requestParams.get("total").toString());
+		else if(null!=getRequestParams().get("total"))
+			return new BigDecimal(getRequestParams().get("total").toString());
 		else
 			return null;
 	}
@@ -64,7 +65,7 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		boolean isInternationalCard = salesOrderCommand.getOnLinePaymentCommand().getIsInternationalCard();
 		if(BooleanUtils.isTrue(isInternationalCard))
 			return true;
-		else if(null!=requestParams.get("isInternationalCard")&&Boolean.valueOf(requestParams.get("isInternationalCard").toString()))
+		else if(null!=getRequestParams().get("isInternationalCard")&&Boolean.valueOf(getRequestParams().get("isInternationalCard").toString()))
 			return true;
 		else
 			return false;
@@ -75,8 +76,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 		String body = salesOrderCommand.getDescribe();
 		if(StringUtils.isNotEmpty(body))
 			return body;
-		else if(null!=requestParams.get("describe"))
-			return requestParams.get("describe").toString();
+		else if(null!=getRequestParams().get("describe"))
+			return getRequestParams().get("describe").toString();
 		else
 			return null;
 	}
@@ -85,7 +86,7 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getTrade_role() {
 		String role = salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_role();
 		if(StringUtils.isEmpty(role)){
-			role = requestParams.get("trade_role").toString();
+			role = getRequestParams().get("trade_role").toString();
 		}
 		if(BUY.equals(role)){
 			return "B";
@@ -100,8 +101,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getTrade_no() {
 		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_no()))
 			return salesOrderCommand.getOnLinePaymentCancelCommand().getTrade_no();
-		else if(null!=requestParams.get("trade_no"))
-			return requestParams.get("trade_no").toString();
+		else if(null!=getRequestParams().get("trade_no"))
+			return getRequestParams().get("trade_no").toString();
 		else
 			return null;
 	}
@@ -110,7 +111,7 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getPaymentType() {
 		Integer payType = salesOrderCommand.getOnLinePaymentCommand().getPayType();
 		if(null == payType){
-			payType = Integer.valueOf(requestParams.get("payType").toString());
+			payType = Integer.valueOf(getRequestParams().get("payType").toString());
 		}
 		String type = null;
 		switch(payType){
@@ -129,8 +130,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getPaymentTime() {
 		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getPayTime()))
 			return salesOrderCommand.getOnLinePaymentCommand().getPayTime();
-		else if(null != requestParams.get("payTime"))
-			return requestParams.get("payTime").toString();
+		else if(null != getRequestParams().get("payTime"))
+			return getRequestParams().get("payTime").toString();
 		else
 			return null;
 	}
@@ -139,8 +140,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getCustomerIp() {
 		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getCustomerIp()))
 			return salesOrderCommand.getOnLinePaymentCommand().getCustomerIp();
-		else if(null != requestParams.get("customerIp"))
-			return requestParams.get("customerIp").toString();
+		else if(null != getRequestParams().get("customerIp"))
+			return getRequestParams().get("customerIp").toString();
 		else
 			return null;
 	}
@@ -149,8 +150,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getIt_b_pay() {
 		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getItBPay()))
 			return salesOrderCommand.getOnLinePaymentCommand().getItBPay();
-		else if(null != requestParams.get("itBPay"))
-			return requestParams.get("itBPay").toString();
+		else if(null != getRequestParams().get("itBPay"))
+			return getRequestParams().get("itBPay").toString();
 		else
 			return null;
 	}
@@ -159,8 +160,8 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	public String getQrPayMode() {
 		if(StringUtils.isNotEmpty(salesOrderCommand.getOnLinePaymentCommand().getQrPayMode()))
 			return salesOrderCommand.getOnLinePaymentCommand().getQrPayMode();
-		else if(null != requestParams.get("qrPayMode"))
-			return requestParams.get("qrPayMode").toString();
+		else if(null != getRequestParams().get("qrPayMode"))
+			return getRequestParams().get("qrPayMode").toString();
 		else
 			return null;
 	}
@@ -170,6 +171,9 @@ public class OrderCommandParamConvertorAdaptor implements PayParamCommandAdaptor
 	 */
 	@Override
 	public Map<String,Object> getRequestParams() {
+		if(null == requestParams){
+			setRequestParams(new HashMap<String, Object>());
+		}
 		return requestParams;
 	}
 

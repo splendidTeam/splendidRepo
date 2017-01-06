@@ -4,7 +4,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.baozun.nebula.payment.convert.SalesOrderCommandToPaymentParamsConverter;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.integration.payment.PaymentRequest;

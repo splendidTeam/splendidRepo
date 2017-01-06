@@ -17,6 +17,7 @@ import com.baozun.nebula.payment.convert.PaymentConvertFactory;
 import com.baozun.nebula.payment.manager.PaymentManager;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
+import com.baozun.nebula.utilities.common.RequestMapUtil;
 import com.baozun.nebula.utilities.common.WechatUtil;
 import com.baozun.nebula.utilities.common.command.WechatPayParamCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
@@ -31,7 +32,7 @@ import com.baozun.nebula.utilities.integration.payment.wechat.WechatConfig;
 import com.baozun.nebula.utilities.integration.payment.wechat.WechatResponseKeyConstants;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
-import com.unionpay.acp.sdk.UnionPayBase;
+import com.unionpay.acp.sdk.SDKConstants;
 
 @Service("PaymentManager")
 public class PaymentManagerImpl implements PaymentManager {
@@ -78,12 +79,13 @@ public class PaymentManagerImpl implements PaymentManager {
             String type = paymentFactory.getPayType(payType);
             PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
             payParamCommandAdaptor.setRequestParams(additionParams);
+            log.error("RequestParams has : {}", additionParams);
             //获得对应的参数转换器
             PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
             Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);  
             // 將支付所需的定制参数赋值给addition
             if (null != additionParams) {
-                addition.putAll(convertToStringParamsMap(additionParams));
+                addition.putAll(RequestMapUtil.convertToStringParamsMap(additionParams));
             }          
             //获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
@@ -148,7 +150,6 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentConvertFactory paymentConvertFactory = PaymentConvertFactory.getInstance();
 			PayParamCommandAdaptor payParamCommandAdaptor = paymentConvertFactory.getConvertAdaptor(paymentFactory.getPayType(order.getOnLinePaymentCancelCommand().getPayType()));
 			payParamCommandAdaptor.setSalesOrderCommand(order);
-            payParamCommandAdaptor.setRequestParams(PropertyUtil.describe(order));
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(payParamCommandAdaptor.getPaymentType());// 获得支付适配器
 			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(payParamCommandAdaptor.getPaymentType());//获得对应的参数转换器
 			Map<String, String> addition = payParamConvertorAdaptor.commandConvertorToMapForOrderInfo(payParamCommandAdaptor);
@@ -312,10 +313,10 @@ public class PaymentManagerImpl implements PaymentManager {
 		String pDate = formatter.format(currentTime);
 
 		// 固定填写
-		addition.put("version", UnionPayBase.version);// M
+		addition.put("version", SDKConstants.VERSION);// M
 
 		// 默认取值：UTF-8
-		addition.put("encoding", UnionPayBase.encoding_UTF8);// M
+		addition.put("encoding", SDKConstants.UTF_8_ENCODING);// M
 
 		addition.put("signMethod", "01");// M
 
@@ -422,16 +423,4 @@ public class PaymentManagerImpl implements PaymentManager {
 		
 	}
 	
-	private Map<String, String> convertToStringParamsMap(Map<String, Object> params) {
-		Map<String, String> res = new HashMap<String, String>();
-		Set<String> keySet = params.keySet();
-		for(String key : keySet){
-			Object val = params.get(key);
-			if(null!=val){
-				String paramVal = val+"";
-				res.put(key, paramVal);
-			}
-		}
-		return res;
-	}
 }

@@ -95,7 +95,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// 前台通知地址 （需设置为外网能访问 http https均可），支付成功后的页面 点击“返回商户”按钮的时候将异步通知报文post到该地址
 		// 如果想要实现过几秒中自动跳转回商户页面权限，需联系银联业务申请开通自动返回商户权限
 		// 异步通知参数详见open.unionpay.com帮助中心 下载 产品接口规范 网关支付产品接口规范 消费交易 商户通知
-		addition.put("frontUrl", UnionPayBase.frontUrl);
+		addition.put("frontUrl", SDKConfig.getConfig().getFrontUrl());
 
 		// 后台通知地址（需设置为【外网】能访问 http
 		// https均可），支付成功后银联会自动将异步通知报文post到商户上送的该地址，失败的交易银联不会发送后台通知
@@ -104,7 +104,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// 4.如果银联通知服务器发送通知后10秒内未收到返回状态码或者应答码非http200，那么银联会间隔一段时间再次发送。总共发送5次，每次的间隔时间为0,1,2,4分钟。
 		// 5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d
 		// 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
-		addition.put("backUrl", UnionPayBase.backUrl);
+		addition.put("backUrl", SDKConfig.getConfig().getBackUrl());
 
 		// ////////////////////////////////////////////////
 		//
@@ -113,12 +113,11 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// ////////////////////////////////////////////////
 
 		/** 请求参数设置完毕，以下对请求参数进行签名并生成html表单，将表单写入浏览器跳转打开银联页面 **/
-		Map<String, String> submitFromData = AcpService.sign(addition,
-				UnionPayBase.encoding_UTF8); // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
+		Map<String, String> submitFromData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING); 
+		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
 
 		String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
-		String html = AcpService.createAutoFormHtml(requestFrontUrl,
-				submitFromData, UnionPayBase.encoding_UTF8); // 生成自动跳转的Html表单
+		String html = AcpService.createAutoFormHtml(requestFrontUrl,submitFromData, SDKConstants.UTF_8_ENCODING); // 生成自动跳转的Html表单
 
 		logger.info("打印请求HTML，此为请求报文，为联调排查问题的依据：" + html);
 		// 将生成的html写到浏览器中完成自动跳转打开银联支付页面；这里调用signData之后，将html写到浏览器跳转到银联页面之前均不能对html中的表单项的名称和值进行修改，如果修改会导致验签不通过
@@ -155,7 +154,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// 前台通知地址 （需设置为外网能访问 http https均可），支付成功后的页面 点击“返回商户”按钮的时候将异步通知报文post到该地址
 		// 如果想要实现过几秒中自动跳转回商户页面权限，需联系银联业务申请开通自动返回商户权限
 		// 异步通知参数详见open.unionpay.com帮助中心 下载 产品接口规范 网关支付产品接口规范 消费交易 商户通知
-		addition.put("frontUrl", UnionPayBase.frontUrl);
+		addition.put("frontUrl", SDKConfig.getConfig().getFrontUrl());
 
 		// 后台通知地址（需设置为【外网】能访问 http
 		// https均可），支付成功后银联会自动将异步通知报文post到商户上送的该地址，失败的交易银联不会发送后台通知
@@ -164,7 +163,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// 4.如果银联通知服务器发送通知后10秒内未收到返回状态码或者应答码非http200，那么银联会间隔一段时间再次发送。总共发送5次，每次的间隔时间为0,1,2,4分钟。
 		// 5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d
 		// 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
-		addition.put("backUrl", UnionPayBase.backUrl);
+		addition.put("backUrl", SDKConfig.getConfig().getBackUrl());
 
 		// ////////////////////////////////////////////////
 		//
@@ -173,12 +172,12 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// ////////////////////////////////////////////////
 
 		/** 请求参数设置完毕，以下对请求参数进行签名并生成html表单，将表单写入浏览器跳转打开银联页面 **/
-		Map<String, String> submitFromData = AcpService.sign(addition,
-				UnionPayBase.encoding_UTF8); // 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
+		Map<String, String> submitFromData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING); 
+		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
 
 		String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
-		String html = AcpService.createAutoFormHtml(requestFrontUrl,
-				submitFromData, UnionPayBase.encoding_UTF8); // 生成自动跳转的Html表单
+		String html = AcpService.createAutoFormHtml(requestFrontUrl, submitFromData, SDKConstants.UTF_8_ENCODING); 
+		// 生成自动跳转的Html表单
 
 		logger.info("打印请求HTML，此为请求报文，为联调排查问题的依据：" + html);
 		// 将生成的html写到浏览器中完成自动跳转打开银联支付页面；这里调用signData之后，将html写到浏览器跳转到银联页面之前均不能对html中的表单项的名称和值进行修改，如果修改会导致验签不通过
@@ -394,19 +393,19 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		PaymentResult result = new PaymentResult();
 
 		/** 请求参数设置完毕，以下对请求参数进行签名并发送http post请求，接收同步应答报文 **/
-		Map<String, String> reqData = AcpService.sign(addition,
-				UnionPayBase.encoding_UTF8);// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
-		String reqUrl = SDKConfig.getConfig().getBackRequestUrl();// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的
-																	// acpsdk.backTransUrl
+		Map<String, String> reqData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING);
+		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
+		String reqUrl = SDKConfig.getConfig().getBackRequestUrl();
+		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.backTransUrl
 
-		Map<String, String> rspData = AcpService.post(reqData, reqUrl,
-				UnionPayBase.encoding_UTF8);// 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
+		Map<String, String> rspData = AcpService.post(reqData, reqUrl, SDKConstants.UTF_8_ENCODING);
+		// 发送请求报文并接受同步应答（默认连接超时时间30秒，读取返回结果超时时间30秒）;这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
 
 		/** 对应答码的处理，请根据您的业务逻辑来编写程序,以下应答码处理逻辑仅供参考-------------> **/
 
 		// 应答码规范参考open.unionpay.com帮助中心 下载 产品接口规范 《平台接入接口规范-第5部分-附录》
 		if (!rspData.isEmpty()) {
-			if (AcpService.validate(rspData, UnionPayBase.encoding_UTF8)) {
+			if (AcpService.validate(rspData, SDKConstants.UTF_8_ENCODING)) {
 				logger.info("验证签名成功");
 				String respCode = rspData.get("respCode");
 				if ("00".equals(respCode)) {
@@ -485,20 +484,18 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 
 		/** 请求参数设置完毕，以下对请求参数进行签名并发送http post请求，接收同步应答报文-------------> **/
 		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
-		Map<String, String> reqData = AcpService.sign(addition,
-				UnionPayBase.encoding_UTF8);
+		Map<String, String> reqData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING);
 
 		// 交易请求url从配置文件读取对应属性文件acp_sdk.properties中的acpsdk.singleQueryUrl
 		String url = SDKConfig.getConfig().getSingleQueryUrl();
 
 		// 这里调用signData之后，调用submitUrl之前不能对submitFromData中的键值对做任何修改，如果修改会导致验签不通过
-		Map<String, String> rspData = AcpService.post(reqData, url,
-				UnionPayBase.encoding_UTF8);
+		Map<String, String> rspData = AcpService.post(reqData, url, SDKConstants.UTF_8_ENCODING);
 
 		/** 对应答码的处理，请根据您的业务逻辑来编写程序,以下应答码处理逻辑仅供参考-------------> **/
 		// 应答码规范参考open.unionpay.com帮助中心 下载 产品接口规范 《平台接入接口规范-第5部分-附录》
 		if (!rspData.isEmpty()) {
-			if (AcpService.validate(rspData, UnionPayBase.encoding_UTF8)) {
+			if (AcpService.validate(rspData, SDKConstants.UTF_8_ENCODING)) {
 				logger.info("验证签名成功");
 				if ("00".equals(rspData.get("respCode"))) {
 					// 如果查询交易成功
