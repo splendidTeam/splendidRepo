@@ -79,7 +79,7 @@ public class PaymentManagerImpl implements PaymentManager {
             String type = paymentFactory.getPayType(payType);
             PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
             payParamCommandAdaptor.setRequestParams(additionParams);
-            log.error("RequestParams has : {}", additionParams);
+            
             //获得对应的参数转换器
             PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
             Map<String,String> addition = payParamConvertorAdaptor.commandConvertorToMapForCreatUrl(payParamCommandAdaptor);  
@@ -87,6 +87,7 @@ public class PaymentManagerImpl implements PaymentManager {
             if (null != additionParams) {
                 addition.putAll(RequestMapUtil.convertToStringParamsMap(additionParams));
             }          
+            log.info("RequestParams has : {}", additionParams);
             //获得支付适配器
             PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
             paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, addition);

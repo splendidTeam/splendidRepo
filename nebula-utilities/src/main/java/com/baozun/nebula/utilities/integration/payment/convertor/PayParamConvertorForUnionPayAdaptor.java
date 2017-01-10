@@ -153,7 +153,7 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		addition.put("accessType", SDKConfig.getConfig().getAccessType());// M
 		
 		//商户订单号，8-40位数字字母，不能含“-”或“_”，可以自行定制规则，重新产生，不同于原消费		
-		addition.put("orderId", String.valueOf(payParamCommand.getRequestParams().get("code")));// M
+		addition.put("orderId", String.valueOf(payParamCommand.getOrderNo()));// M
 
 		//订单发送时间，格式为YYYYMMDDhhmmss，必须取当前时间，否则会报txnTime无效
 		addition.put("txnTime", UnionPayBase.getCurrentTime());// M
@@ -265,7 +265,7 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		
 		/***要调通交易以下字段必须修改***/
 		//****商户订单号，每次发交易测试需修改为被查询的交易的订单号
-		addition.put("orderId", String.valueOf(payParamCommand.getRequestParams().get("code")));// M
+		addition.put("orderId", String.valueOf(payParamCommand.getOrderNo()));// M
 
 		//****订单发送时间，每次发交易测试需修改为被查询的交易的订单发送时间
 		addition.put("txnTime", UnionPayBase.getCurrentTime());// M
