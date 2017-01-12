@@ -43,4 +43,9 @@ public interface PayParamConvertorAdaptor {
 	 * @version 2016-11-17
 	 */
 	public Map<String,String> commandConvertorToMapForOrderInfo(BasePayParamCommandAdaptor payParamCommand);
+	
+	/**
+	 * 
+	 */
+	public Map<String,String> extendCommandConvertorMap(Map<String,String> params,Map<String, Object> addition);
 }

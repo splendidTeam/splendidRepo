@@ -65,4 +65,13 @@ public class PayParamConvertorForWechatAdaptor implements
 		return addition;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorAdaptor#extendCommandConvertorMap(java.util.Map, java.util.Map)
+	 */
+	@Override
+	public Map<String, String> extendCommandConvertorMap(
+			Map<String, String> params, Map<String, Object> addition) {
+		return params;
+	}
+
 }

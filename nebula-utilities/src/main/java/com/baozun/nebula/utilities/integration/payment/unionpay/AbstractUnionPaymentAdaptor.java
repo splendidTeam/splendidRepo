@@ -92,64 +92,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 	public PaymentRequest newPaymentRequest(String httpType,
 			Map<String, String> map) {
 		UnionPaymentRequest unionPaymentRequest = new UnionPaymentRequest();
-		Map<String, String> addition = new HashMap<String, String>();
-		// 前台通知地址 （需设置为外网能访问 http https均可），支付成功后的页面 点击“返回商户”按钮的时候将异步通知报文post到该地址
-		// 如果想要实现过几秒中自动跳转回商户页面权限，需联系银联业务申请开通自动返回商户权限
-		// 异步通知参数详见open.unionpay.com帮助中心 下载 产品接口规范 网关支付产品接口规范 消费交易 商户通知
-		addition.put("frontUrl", SDKConfig.getConfig().getFrontUrl());
 
-		// 后台通知地址（需设置为【外网】能访问 http
-		// https均可），支付成功后银联会自动将异步通知报文post到商户上送的该地址，失败的交易银联不会发送后台通知
-		// 后台通知参数详见open.unionpay.com帮助中心 下载 产品接口规范 网关支付产品接口规范 消费交易 商户通知
-		// 注意:1.需设置为外网能访问，否则收不到通知 2.http https均可 3.收单后台通知后需要10秒内返回http200或302状态码
-		// 4.如果银联通知服务器发送通知后10秒内未收到返回状态码或者应答码非http200，那么银联会间隔一段时间再次发送。总共发送5次，每次的间隔时间为0,1,2,4分钟。
-		// 5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d
-		// 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
-		addition.put("backUrl", SDKConfig.getConfig().getBackUrl());
-
-		/***银联全渠道系统，产品参数，除了encoding自行选择外其他不需修改***/
-		//版本号
-		addition.put("version", SDKConfig.getConfig().getVersion());// M
-
-		//字符集编码 可以使用UTF-8,GBK两种方式
-		addition.put("encoding", SDKConfig.getConfig().getEncoding());// M
-		
-		//签名方法 目前只支持01-RSA方式证书加密
-		addition.put("signMethod", SDKConfig.getConfig().getSignMethod());// M
-
-		//交易类型 01-消费
-		addition.put("txnType", SDKConfig.getConfig().getTxnType());// M
-
-		//交易子类型 01-消费  01：自助消费，通过地址的方式区分前台消费和后台消费（含无跳转支付）03：分期付款
-		addition.put("txnSubType", SDKConfig.getConfig().getTxnSubType());// M
-
-		//业务类型 认证支付2.0
-		addition.put("bizType", SDKConfig.getConfig().getBizType());// M
-
-		/***商户接入参数***/
-		//商户号码（本商户号码仅做为测试调通交易使用，该商户号配置了需要对敏感信息加密）测试时请改成自己申请的商户号，【自己注册的测试777开头的商户号不支持代收产品】
-		addition.put("merId", SDKConfig.getConfig().getMerId());
-		
-		////接入类型，商户接入固定填0，不需修改; 0：普通商户直连接入2：平台类商户接入
-		addition.put("accessType", SDKConfig.getConfig().getAccessType());// M
-		
-		//商户订单号，8-40位数字字母，不能含“-”或“_”，可以自行定制规则
-		addition.put("orderId", map.get("code"));// M
-		
-		//订单发送时间，格式为YYYYMMDDhhmmss，必须取当前时间，否则会报txnTime无效
-		addition.put("txnTime", UnionPayBase.getCurrentTime());// M
-		
-		//交易币种（境内商户一般是156 人民币）
-		addition.put("currencyCode", SDKConfig.getConfig().getCurrencyCode());// M
-		
-		//交易金额，单位分，不要带小数点
-		addition.put("txnAmt", String.valueOf(new BigDecimal(map.get("total")).multiply(new BigDecimal(100)).intValue()));// M
-		
-		//账号类型: 后台类交易且卡号上送；跨行收单且收单机构收集银行卡信息时上送01：银行卡02：存折03：C卡默认取值：01取值“03”表示以IC终端发起的IC卡交易，IC作为普通银行卡进行支付时，此域填写为“01”
-		addition.put("accType", SDKConfig.getConfig().getAccType());// C
-		
-		// 渠道类型，07-PC，08-手机
-		addition.put("channelType", map.get("channelType"));
 		// ////////////////////////////////////////////////
 		//
 		// 报文中特殊用法请查看 PCwap网关跳转支付特殊用法.txt
@@ -157,7 +100,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// ////////////////////////////////////////////////
 
 		/** 请求参数设置完毕，以下对请求参数进行签名并生成html表单，将表单写入浏览器跳转打开银联页面 **/
-		Map<String, String> submitFromData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING); 
+		Map<String, String> submitFromData = AcpService.sign(map, SDKConstants.UTF_8_ENCODING); 
 		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
 		logger.info("submitFromData：" + submitFromData);
 		String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl
@@ -195,64 +138,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 	public PaymentRequest newPaymentRequestForMobileCreateDirect(
 			Map<String, String> map) {
 		UnionPaymentRequest unionPaymentRequest = new UnionPaymentRequest();
-		Map<String, String> addition = new HashMap<String, String>();
-		// 前台通知地址 （需设置为外网能访问 http https均可），支付成功后的页面 点击“返回商户”按钮的时候将异步通知报文post到该地址
-		// 如果想要实现过几秒中自动跳转回商户页面权限，需联系银联业务申请开通自动返回商户权限
-		// 异步通知参数详见open.unionpay.com帮助中心 下载 产品接口规范 网关支付产品接口规范 消费交易 商户通知
-		addition.put("frontUrl", SDKConfig.getConfig().getFrontUrl());
 
-		// 后台通知地址（需设置为【外网】能访问 http
-		// https均可），支付成功后银联会自动将异步通知报文post到商户上送的该地址，失败的交易银联不会发送后台通知
-		// 后台通知参数详见open.unionpay.com帮助中心 下载 产品接口规范 网关支付产品接口规范 消费交易 商户通知
-		// 注意:1.需设置为外网能访问，否则收不到通知 2.http https均可 3.收单后台通知后需要10秒内返回http200或302状态码
-		// 4.如果银联通知服务器发送通知后10秒内未收到返回状态码或者应答码非http200，那么银联会间隔一段时间再次发送。总共发送5次，每次的间隔时间为0,1,2,4分钟。
-		// 5.后台通知地址如果上送了带有？的参数，例如：http://abc/web?a=b&c=d
-		// 在后台通知处理程序验证签名之前需要编写逻辑将这些字段去掉再验签，否则将会验签失败
-		addition.put("backUrl", SDKConfig.getConfig().getBackUrl());
-
-		/***银联全渠道系统，产品参数，除了encoding自行选择外其他不需修改***/
-		//版本号
-		addition.put("version", SDKConfig.getConfig().getVersion());// M
-
-		//字符集编码 可以使用UTF-8,GBK两种方式
-		addition.put("encoding", SDKConfig.getConfig().getEncoding());// M
-		
-		//签名方法 目前只支持01-RSA方式证书加密
-		addition.put("signMethod", SDKConfig.getConfig().getSignMethod());// M
-
-		//交易类型 01-消费
-		addition.put("txnType", SDKConfig.getConfig().getTxnType());// M
-
-		//交易子类型 01-消费  01：自助消费，通过地址的方式区分前台消费和后台消费（含无跳转支付）03：分期付款
-		addition.put("txnSubType", SDKConfig.getConfig().getTxnSubType());// M
-
-		//业务类型 认证支付2.0
-		addition.put("bizType", SDKConfig.getConfig().getBizType());// M
-
-		/***商户接入参数***/
-		//商户号码（本商户号码仅做为测试调通交易使用，该商户号配置了需要对敏感信息加密）测试时请改成自己申请的商户号，【自己注册的测试777开头的商户号不支持代收产品】
-		addition.put("merId", SDKConfig.getConfig().getMerId());
-		
-		////接入类型，商户接入固定填0，不需修改; 0：普通商户直连接入2：平台类商户接入
-		addition.put("accessType", SDKConfig.getConfig().getAccessType());// M
-		
-		//商户订单号，8-40位数字字母，不能含“-”或“_”，可以自行定制规则
-		addition.put("orderId", map.get("code"));// M
-		
-		//订单发送时间，格式为YYYYMMDDhhmmss，必须取当前时间，否则会报txnTime无效
-		addition.put("txnTime", UnionPayBase.getCurrentTime());// M
-		
-		//交易币种（境内商户一般是156 人民币）
-		addition.put("currencyCode", SDKConfig.getConfig().getCurrencyCode());// M
-		
-		//交易金额，单位分，不要带小数点
-		addition.put("txnAmt", String.valueOf(new BigDecimal(map.get("total")).multiply(new BigDecimal(100)).intValue()));// M
-		
-		//账号类型: 后台类交易且卡号上送；跨行收单且收单机构收集银行卡信息时上送01：银行卡02：存折03：C卡默认取值：01取值“03”表示以IC终端发起的IC卡交易，IC作为普通银行卡进行支付时，此域填写为“01”
-		addition.put("accType", SDKConfig.getConfig().getAccType());// C
-		
-		// 渠道类型，07-PC，08-手机
-		addition.put("channelType", map.get("channelType"));
 		// ////////////////////////////////////////////////
 		//
 		// 报文中特殊用法请查看 PCwap网关跳转支付特殊用法.txt
@@ -260,7 +146,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 		// ////////////////////////////////////////////////
 
 		/** 请求参数设置完毕，以下对请求参数进行签名并生成html表单，将表单写入浏览器跳转打开银联页面 **/
-		Map<String, String> submitFromData = AcpService.sign(addition, SDKConstants.UTF_8_ENCODING); 
+		Map<String, String> submitFromData = AcpService.sign(map, SDKConstants.UTF_8_ENCODING); 
 		// 报文中certId,signature的值是在signData方法中获取并自动赋值的，只要证书配置正确即可。
 
 		String requestFrontUrl = SDKConfig.getConfig().getFrontRequestUrl(); // 获取请求银联的前台地址：对应属性文件acp_sdk.properties文件中的acpsdk.frontTransUrl

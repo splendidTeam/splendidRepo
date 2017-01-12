@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+
+
 import com.baozun.nebula.utilities.integration.payment.adaptor.BasePayParamCommandAdaptor;
 import com.baozun.nebula.utilities.integration.payment.exception.PaymentParamErrorException;
 import com.feilong.core.Validator;
@@ -152,6 +154,16 @@ public class PayParamConvertorForAlipayAdaptor implements PayParamConvertorAdapt
 		addition.put("out_trade_no", String.valueOf(payParamCommand.getRequestParams().get("code")));
 		return addition;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorAdaptor#extendCommandConvertorMap(java.util.Map, java.util.Map)
+	 */
+	@Override
+	public Map<String, String> extendCommandConvertorMap(
+			Map<String, String> params, Map<String, Object> addition) {
+		return params;
+	}
+
 	
 	
 }
