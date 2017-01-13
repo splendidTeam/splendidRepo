@@ -122,16 +122,18 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		addition.put(SDKConstants.param_signmethod, SDKConfig.getConfig().getSignMethod());// M
 		
 		//交易类型 31-消费撤销
-		addition.put(SDKConstants.param_txnType, SDKConfig.getConfig().getTxnType());
+		addition.put(SDKConstants.param_txnType, SDKConstants.TXNTYPE_CANECL);
 		
 		////交易子类型  默认00; 01：自助消费，通过地址的方式区分前台消费和后台消费（含无跳转支付）03：分期付款
-		addition.put(SDKConstants.param_txnSubType, SDKConfig.getConfig().getTxnSubType());// M
+		addition.put(SDKConstants.param_txnSubType, SDKConstants.TXNSUBTYPE_DEFAULT);// M
 
 		//业务类型
 		addition.put(SDKConstants.param_bizType, SDKConfig.getConfig().getBizType());
 		
 		//渠道类型，07-PC，08-手机
-		addition.put("channelType", payParamCommand.getRequestParams().get("channelType")+"");
+		if(Validator.isNotNullOrEmpty(payParamCommand.getRequestParams().get(SDKConstants.param_channelType))){
+			addition.put(SDKConstants.param_channelType, String.valueOf(payParamCommand.getRequestParams().get(SDKConstants.param_channelType)));
+		}
 		
 		/***商户接入参数***/
 		//商户号码，请改成自己申请的商户号或者open上注册得来的777商户号测试
@@ -157,7 +159,10 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		 
 		/***要调通交易以下字段必须修改***/
 		//【原始交易流水号】，原消费交易返回的的queryId，可以从消费交易后台通知接口中或者交易状态查询接口中获取
-		addition.put(SDKConstants.param_origQryId, payParamCommand.getOrderNo());   	
+		addition.put(SDKConstants.param_origQryId, payParamCommand.getOrderNo());   
+		
+		//交易金额，单位分，不要带小数点
+		addition.put(SDKConstants.param_txnAmt, String.valueOf(payParamCommand.getTotalFee().multiply(new BigDecimal(100)).intValue()));// M
 		
 		return addition;
 	}
@@ -257,6 +262,9 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 			//渠道类型07-PC
 			params.put(SDKConstants.param_channelType, String.valueOf(additionParams.get(SDKConstants.param_channelType)));
 		}
+		if(Validator.isNullOrEmpty(params.get(SDKConstants.param_channelType))){
+			params.put(SDKConstants.param_channelType, SDKConstants.CHANNELTYPE_PC);
+		}
 		
 		/***商户接入参数***/
 		if(Validator.isNotNullOrEmpty(additionParams.get(SDKConstants.param_merId))){
@@ -324,7 +332,6 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 			//contentData.put("reserved", "{customPage=true}");    
 			params.put(SDKConstants.param_reserved, String.valueOf(additionParams.get(SDKConstants.param_reserved)));     
 		}
-
 
 		if(Validator.isNotNullOrEmpty(additionParams.get(SDKConstants.param_orderTimeout))){
 			//订单接收超时时间 当距离交易发送时间超过该时间时，银联全渠道系统不再为该笔交易提供支付服务 （此参数传任何值报错400 可能需要开通该服务）
