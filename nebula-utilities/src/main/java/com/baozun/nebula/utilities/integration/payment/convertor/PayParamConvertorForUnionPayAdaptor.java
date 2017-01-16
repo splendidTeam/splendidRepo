@@ -221,8 +221,15 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		return addition;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.baozun.nebula.utilities.integration.payment.convertor.PayParamConvertorAdaptor#extendCommandConvertorMap(java.util.Map, java.util.Map)
+	/**
+	 * 
+	 * @Description 用于构建基本参数的ConvertorAdaptor方法之后，扩展基本参数ConvertorAdaptor对象的注入，可以覆盖配置文件的参数，亦可以扩展。</br>
+	 * 				主要应用于同一支付接口，根据参数区别，调用不同形态支付方式场景。</br>
+	 * @param params	基本参数容器	
+	 * @param addition	扩展参数容器
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @since 2017.1.12
 	 */
 	@Override
 	public Map<String, String> extendCommandConvertorMap(Map<String, String> params, Map<String, Object> additionParams) {
