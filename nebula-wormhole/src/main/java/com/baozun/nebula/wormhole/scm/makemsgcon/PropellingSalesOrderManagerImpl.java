@@ -217,7 +217,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
      * 
      * @param deliveryInfoV5
      * @param salesOrderCommand
-     * @since 5.3.2.8
+     * @since 5.3.2.10
      */
     private void packAdministrativeDivision(DeliveryInfoV5 deliveryInfoV5,SalesOrderCommand salesOrderCommand){
         deliveryInfoV5.setCountry(null);
@@ -338,6 +338,8 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
                 paymentInfoV5.setPaymentBank(null);
                 paymentInfoV5.setPayTotal(payInfoCommand.getPayMoney());
                 paymentInfoV5.setPayNo(payInfoCommand.getSubOrdinate());
+                //since 5.3.2.10
+                paymentInfoV5.setPaymentAccount(payInfoCommand.getThirdPayAccount());
                 paymentInfoV5.setPaymentTime(payInfoCommand.getModifyTime());
                 if (payInfoCommand.getPayType() == payInfoCommand.getMainPayType() || Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, soCommand.getFinancialStatus())){
                     paymentInfoV5.setAllComplete(true);

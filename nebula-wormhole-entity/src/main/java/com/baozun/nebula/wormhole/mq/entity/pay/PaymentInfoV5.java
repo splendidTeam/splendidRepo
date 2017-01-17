@@ -51,11 +51,19 @@ public class PaymentInfoV5 implements Serializable {
      */
     private BigDecimal payTotal;
     
+    
+    
     /**
      * 支付流水
      * 可以让财务获取到对应支付记录的交易流水号，理论上就是官方商城的交易流水号，会送完支付网关产生交易
      */
     private String payNo;
+    /**
+     * 买家的支付账号( 第三方支付帐号)
+     * 
+     * @since 5.3.2.10
+     */
+    private String   paymentAccount;
     
     /**
      * 付款时间
@@ -162,6 +170,29 @@ public class PaymentInfoV5 implements Serializable {
 	public void setBsPayInfoId(String bsPayInfoId) {
 		this.bsPayInfoId = bsPayInfoId;
 	}
+
+
+    
+    /**
+     * 买家的支付账号( 第三方支付帐号)
+     * 
+     * @since 5.3.2.10
+     * @return the paymentAccount
+     */
+    public String getPaymentAccount(){
+        return paymentAccount;
+    }
+
+
+    /**
+     * 买家的支付账号( 第三方支付帐号)
+     * 
+     * @since 5.3.2.10
+     * @param paymentAccount the paymentAccount to set
+     */
+    public void setPaymentAccount(String paymentAccount){
+        this.paymentAccount = paymentAccount;
+    }
 
    
 
