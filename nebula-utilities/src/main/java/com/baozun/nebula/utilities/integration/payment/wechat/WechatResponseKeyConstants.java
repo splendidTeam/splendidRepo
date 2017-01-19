@@ -42,6 +42,9 @@ public class WechatResponseKeyConstants {
 	/** 公众账号ID**/
 	public static final String    APPID          = "appid";
 	
+	/** 用户标识*/
+	public static final String    OPENID      =   "openid";
+	
 	/** 设备号**/
 	public static final String    DEVICE_INFO          = "device_info";
 	

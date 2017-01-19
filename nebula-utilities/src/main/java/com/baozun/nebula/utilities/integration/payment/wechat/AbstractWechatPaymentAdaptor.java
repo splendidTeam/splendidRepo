@@ -168,6 +168,7 @@ public abstract class AbstractWechatPaymentAdaptor implements PaymentAdaptor {
 			paymentServiceReturnCommand.setReturnMsg(responseMap.get(WechatResponseKeyConstants.RETURN_MSG));
 			paymentServiceReturnCommand.setOrderNo(subOrdinate);
 			paymentServiceReturnCommand.setTradeNo(billNo);
+			paymentServiceReturnCommand.setBuyer(responseMap.get(WechatResponseKeyConstants.OPENID));
 			result.setPaymentStatusInformation(paymentServiceReturnCommand);
 		} catch (IOException e) {
 			e.printStackTrace();
