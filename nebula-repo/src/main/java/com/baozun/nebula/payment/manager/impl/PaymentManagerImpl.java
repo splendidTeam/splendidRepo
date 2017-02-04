@@ -38,6 +38,10 @@ public class PaymentManagerImpl implements PaymentManager {
 	public PaymentRequest createPayment(SalesOrderCommand order) {
 		Map<String,Object> additionParams = PropertyUtil.describe(order);
 		additionParams.putAll(PropertyUtil.describe(order.getOnLinePaymentCommand()));
+		PaymentFactory paymentFactory = PaymentFactory.getInstance();
+		String type = paymentFactory.getPayType(order.getOnLinePaymentCommand().getPayType());
+		PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
+		payParamCommandAdaptor.setRequestParams(null);
 		PaymentRequest paymentRequest = createPayment(additionParams, order.getOnLinePaymentCommand().getPayType());
 		return paymentRequest;
 	}
