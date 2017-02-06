@@ -38,10 +38,6 @@ public class PaymentManagerImpl implements PaymentManager {
 	public PaymentRequest createPayment(SalesOrderCommand order) {
 		Map<String,Object> additionParams = PropertyUtil.describe(order);
 		additionParams.putAll(PropertyUtil.describe(order.getOnLinePaymentCommand()));
-		PaymentFactory paymentFactory = PaymentFactory.getInstance();
-		String type = paymentFactory.getPayType(order.getOnLinePaymentCommand().getPayType());
-		PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
-		payParamCommandAdaptor.setRequestParams(null);
 		PaymentRequest paymentRequest = createPayment(additionParams, order.getOnLinePaymentCommand().getPayType());
 		return paymentRequest;
 	}
@@ -71,6 +67,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			PaymentFactory paymentFactory = PaymentFactory.getInstance();
 			String type = paymentFactory.getPayType(payType);
 			PayParamCommandAdaptor payParamCommandAdaptor = PaymentConvertFactory.getInstance().getConvertAdaptor(type);
+			payParamCommandAdaptor.setSalesOrderCommand(null);
 			payParamCommandAdaptor.setRequestParams(orderParams);
 			// 获得对应的参数转换器
 			PayParamConvertorAdaptor payParamConvertorAdaptor = paymentFactory.getPaymentCommandToMapAdaptor(type);
@@ -80,8 +77,7 @@ public class PaymentManagerImpl implements PaymentManager {
 			log.info("RequestParams has : {}", orderParams);
 			// 获得支付适配器
 			PaymentAdaptor paymentAdaptor = paymentFactory.getPaymentAdaptor(type);
-			paymentRequest = paymentAdaptor.newPaymentRequest(
-					RequestParam.HTTP_TYPE_GET, params);
+			paymentRequest = paymentAdaptor.newPaymentRequest(RequestParam.HTTP_TYPE_GET, params);
 		} catch (Exception ex) {
 			log.error("CreatePayment error: " + ex.toString(), ex);
 			return paymentRequest;
