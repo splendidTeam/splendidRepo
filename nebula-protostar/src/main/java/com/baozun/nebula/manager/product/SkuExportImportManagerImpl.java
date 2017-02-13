@@ -55,7 +55,6 @@ import com.baozun.nebula.manager.baseinfo.ShopManager;
 import com.baozun.nebula.manager.extend.ItemExtendManager;
 import com.baozun.nebula.model.i18n.I18nLang;
 import com.baozun.nebula.model.product.Industry;
-import com.baozun.nebula.model.product.Item;
 import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemPropertiesLang;
 import com.baozun.nebula.model.product.Property;
@@ -749,7 +748,7 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 								 skuCommand.getProps().put(propKey, propValue);
 							 }else{
 								 //抛异常销售属性没有
-								 throw new BusinessException(ErrorCodes.IMPORT_SKU_PORP_NOT_COMPLETE);
+//								 throw new BusinessException(ErrorCodes.IMPORT_SKU_PORP_NOT_COMPLETE);
 							 }
 						 }
 						 
@@ -766,12 +765,12 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 									 impSkuCommand.getProps().put(propKey, propValue);
 								 }else{
 									 //抛异常销售属性没有
-									 throw new BusinessException(ErrorCodes.IMPORT_SKU_PORP_NOT_COMPLETE);
+//									 throw new BusinessException(ErrorCodes.IMPORT_SKU_PORP_NOT_COMPLETE);
 								 }
 							 }
 						 }else{
 							 //抛异常
-							 throw new BusinessException(ErrorCodes.IMPORT_SKU_PORP_NOT_COMPLETE);
+//							 throw new BusinessException(ErrorCodes.IMPORT_SKU_PORP_NOT_COMPLETE);
 						 }
 						 
 						 map.put(impSkuCommand.getUpc(), impSkuCommand);
@@ -885,80 +884,144 @@ public class SkuExportImportManagerImpl implements SkuExportImportManager {
 				 String skuProperties = sku.getProperties();
 				 skuProperties = skuProperties.replace("[", "").replace("]", "");
 				 String[] propertyIds = skuProperties.split(",");
+				 Map<String,String> originalIdMap = new HashMap<String, String>();//没有删除的ID，原来的ID
 				 if(Validator.isNotNullOrEmpty(propertyIds)){
 					 for(String propertyId : propertyIds){
 						 List<Long> ids = new ArrayList<Long>();
 						 ids.add(Long.valueOf(propertyId.trim()));
-						 itemPropertiesDao.deleteItemPropertiesLangByIds(ids);
-						 itemPropertiesDao.deleteItemPropertiesByIds(ids);
+						 //判断属性是否存在和相同
+						 List<ItemProperties> itemPropertiesList = itemPropertiesDao.findItemPropertiesByIds(ids);
+						 if(Validator.isNotNullOrEmpty(itemPropertiesList)){
+							 ItemProperties itemProperties = itemPropertiesList.get(0);
+							 String mapKey = "p"+itemProperties.getPropertyId();
+							 String mapvalue = "";
+							 String propsI18ns = impSkuCommand.getProps().get(mapKey);
+							 if(Validator.isNotNullOrEmpty(propsI18ns)){
+								 String[] props = propsI18ns.split(",");
+								 if(Validator.isNotNullOrEmpty(props)){
+									 for(String prop : props){
+										 String[] pros = prop.split("\\|");
+										 if(pros.length == 2){
+											 List<Long> pro_val_ids = new ArrayList<Long>();
+											 pro_val_ids.add( itemProperties.getPropertyValueId());
+											 List<PropertyValue> propertyValueList = propertyValueDao.findPropertyValueListByIdsI18n(pro_val_ids, pros[0]);
+											 if(Validator.isNotNullOrEmpty(propertyValueList)){
+												 PropertyValue propertyValue = propertyValueList.get(0);
+												 mapvalue += pros[0] +"|"+ propertyValue.getValue()+",";
+											 }
+										 }
+									 }
+								 }
+								 
+								 if(mapvalue.length() > 0){
+									 mapvalue = mapvalue.substring(0, mapvalue.length()-1);
+								 }
+								 //属性相同不删除这个ID
+								 if(mapvalue.equals(propsI18ns)){
+									 originalIdMap.put(String.valueOf(itemProperties.getPropertyId()), propertyId);//导入的属性，对应没有删除的ID
+								 }else{
+									 itemPropertiesDao.deleteItemPropertiesLangByIds(ids);
+									 itemPropertiesDao.deleteItemPropertiesByIds(ids);
+								 }
+							 }else{
+								 //没有导入这个属性
+								 //没有导入的属性，不用修改ID
+								 originalIdMap.put(String.valueOf(itemProperties.getPropertyId()), propertyId);
+							 }
+						 }
 					 }
 				 }
 				 
 				 skuProperties ="[";
-				 
-				 for (Iterator iter = impSkuCommand.getPropsI18n().keySet().iterator(); iter.hasNext();) {
-					 String propKey =  (String) iter.next();
-					 String propValue = impSkuCommand.getPropsI18n().get(propKey);
+				 //判断有没有导入属性
+				 if(Validator.isNotNullOrEmpty(impSkuCommand.getPropsI18n())){
+					 for (Iterator iter = impSkuCommand.getPropsI18n().keySet().iterator(); iter.hasNext();) {
+						 String propKey =  (String) iter.next();
+						 
+						 //判断导入的属性有一个还是两个
+						 if(impSkuCommand.getPropsI18n().size() < 2){
+							 if(originalIdMap.size() < 2){
+								 //导入的一个属性和原属性不同，则需要改动一个属性
+								if(originalIdMap.values().iterator().hasNext()){
+									skuProperties +=  originalIdMap.values().iterator().next()+",";
+								}
+							 }else{
+								 //如果导入的一个属性和原属性相同，则两个都不需要改动
+								 Iterator iterator = originalIdMap.values().iterator();
+								 while(iterator.hasNext()){
+									skuProperties += iterator.next()+",";
+								 }
+								 continue;
+							 }
+						 }else{
+							 //首先判断该ID是否使用的是原来的ID
+							 if(originalIdMap.containsKey(propKey)){
+								 skuProperties +=  originalIdMap.get(propKey)+",";
+								 continue;
+							 }
+						 }
+						 
+						 String propValue = impSkuCommand.getPropsI18n().get(propKey);
+						 
+						 ItemProperties itemProperties = new ItemProperties();
+						 
+						 itemProperties.setItemId(sku.getItemId());
+						 itemProperties.setPropertyId(Long.valueOf(propKey));
+						 itemProperties.setPropertyValueId(Long.valueOf(propValue));
+						 
+						 Date now = new Date();
+						 itemProperties.setCreateTime(now);
+						 itemProperties.setVersion(now);
+						 // 创建商品属性关联
+						 if(proMap.isEmpty()){
+							 itemProperties = itemPropertiesDao.save(itemProperties);
+							 proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
+						 }else{
+							 String proMapKey = itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId();
+							 if(proMap.containsKey(proMapKey)){
+								 itemProperties = proMap.get(proMapKey);
+								 //拼接sku的skuProperties
+								 skuProperties = skuProperties + itemProperties.getId()+",";
+								 continue;
+							 }else{
+								 itemProperties = itemPropertiesDao.save(itemProperties);
+								 proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
+							 }
+						 }
+						 
+						 //拼接sku的skuProperties
+						 skuProperties = skuProperties + itemProperties.getId()+",";
+						 
+						 List<I18nLang> i18nLangList = sdkI18nLangManager.geti18nLangCache();
+						 
+						 if (Validator.isNotNullOrEmpty(i18nLangList)){
+							 //国际化属性
+							 for (I18nLang lang : i18nLangList){
+								 ItemPropertiesLang itemPropertiesLang = new ItemPropertiesLang();
+								 itemPropertiesLang.setItemPropertiesId(itemProperties.getId());
+								 itemPropertiesLang.setLang(lang.getKey());
+								 itemPropertiesLangDao.save(itemPropertiesLang);
+							 }
+						 }
+					 }
 					 
-					 ItemProperties itemProperties = new ItemProperties();
-
-			         itemProperties.setItemId(sku.getItemId());
-			         itemProperties.setPropertyId(Long.valueOf(propKey));
-			        itemProperties.setPropertyValueId(Long.valueOf(propValue));
-
-			        Date now = new Date();
-			        itemProperties.setCreateTime(now);
-			        itemProperties.setVersion(now);
-			        // 创建商品属性关联
-			        if(proMap.isEmpty()){
-			        	itemProperties = itemPropertiesDao.save(itemProperties);
-			        	proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
-			        }else{
-			        	String proMapKey = itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId();
-			        	if(proMap.containsKey(proMapKey)){
-			        		itemProperties = proMap.get(proMapKey);
-			        		  //拼接sku的skuProperties
-					        skuProperties = skuProperties + itemProperties.getId()+",";
-					        continue;
-			        	}else{
-			        		itemProperties = itemPropertiesDao.save(itemProperties);
-				        	proMap.put(itemProperties.getItemId()+"_"+itemProperties.getPropertyValueId(), itemProperties);
-			        	}
-			        }
-			        
-			        //拼接sku的skuProperties
-			        skuProperties = skuProperties + itemProperties.getId()+",";
-			        
-			        List<I18nLang> i18nLangList = sdkI18nLangManager.geti18nLangCache();
-				 	
-			        if (Validator.isNotNullOrEmpty(i18nLangList)){
-			            //国际化属性
-			            for (I18nLang lang : i18nLangList){
-			                ItemPropertiesLang itemPropertiesLang = new ItemPropertiesLang();
-			                itemPropertiesLang.setItemPropertiesId(itemProperties.getId());
-			                itemPropertiesLang.setLang(lang.getKey());
-			                itemPropertiesLangDao.save(itemPropertiesLang);
-			            }
-			        }
-				 }
-				 
-				 //拼接sku表的属性组
-				 if(Validator.isNotNullOrEmpty(skuProperties)){
-					 skuProperties = skuProperties.substring(0, skuProperties.length()-1);
-					 skuProperties = skuProperties +"]";
-					 
-					 sku.setProperties(skuProperties);
-					 skuDao.save(sku);
+					 //拼接sku表的属性组
+					 if(Validator.isNotNullOrEmpty(skuProperties)){
+						 skuProperties = skuProperties.substring(0, skuProperties.length()-1);
+						 skuProperties = skuProperties +"]";
+						 
+						 sku.setProperties(skuProperties);
+						 skuDao.save(sku);
+					 }else{
+						 throw new BusinessException(ErrorCodes.IMPORT_SKU_PROPERTYS_NOT_COMPLETE);
+					 }
 				 }else{
-					 throw new BusinessException(ErrorCodes.IMPORT_SKU_PROPERTYS_NOT_COMPLETE);
+					 //没有导入属性，不用修改属性
+					 skuDao.save(sku);
 				 }
 				 
 			 }
 			 
-			 
-			 
-			
-			
 			
 		}
 
