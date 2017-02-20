@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.common.command.PaymentServiceReturnCommand;
 import com.baozun.nebula.utilities.common.condition.RequestParam;
 import com.baozun.nebula.utilities.integration.payment.PaymentAdaptor;
@@ -43,15 +44,15 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 	private static final String OTHERSTATUS = "OTHERSTATUS";
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractUnionPaymentAdaptor.class);
-	
+
 	protected Properties configs;
 	
 	public AbstractUnionPaymentAdaptor(){
-		SDKConfig.getConfig().loadPropertiesFromPath("config/unionpay.properties");
+		SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));
 	}
 	
 	static{
-		SDKConfig.getConfig().loadPropertiesFromPath("config/unionpay.properties");
+		SDKConfig.getConfig().loadProperties(ProfileConfigUtil.findCommonPro("config/unionpay.properties"));
 	}
 
 	@Override
@@ -220,21 +221,22 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 			}
 		} catch (UnsupportedEncodingException e) {
 			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+			result.setResponseValue(RequestParam.UNIONFAIL);
 			result.setMessage(respParam.get("respMsg"));
 			logger.error("getPaymentResult error : {}", e.getMessage());
 		}
 		if (!AcpService.validate(valideData, encoding)) {
 			page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>失败</td></tr>");
 			logger.info("验证签名结果[失败].");
-			result.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
 			result.setResponseValue(RequestParam.UNIONSUCCESS);
 			result.setMessage(valideData.get("respMsg"));
 		} else {
 			page.append("<tr><td width=\"30%\" align=\"right\">验证签名结果</td><td>成功</td></tr>");
 			logger.info("验证签名结果[成功].");
 			System.out.println(valideData.get("orderId")); // 其他字段也可用类似方式获取
-			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
-			result.setResponseValue(RequestParam.UNIONFAIL);
+			result.setPaymentServiceSatus(PaymentServiceStatus.PAYMENT_SUCCESS);
+			result.setResponseValue(RequestParam.UNIONSUCCESS);
 			result.setMessage(valideData.get("respMsg"));
 		}
 		request.setAttribute("result", page.toString());
@@ -314,6 +316,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 			}
 		} catch (UnsupportedEncodingException e) {
 			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+			result.setResponseValue(RequestParam.UNIONFAIL);
 			result.setMessage(reqParam.get("respMsg"));
 			logger.error("getPaymentResult error : {}", e.getMessage());
 		}
@@ -323,6 +326,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 			logger.info("验证签名结果[失败].");
 			// 验签失败，需解决验签问题
 			result.setPaymentServiceSatus(PaymentServiceStatus.FAILURE);
+			result.setResponseValue(RequestParam.UNIONSUCCESS);
 			result.setMessage(valideData.get("respMsg"));
 
 		} else {
@@ -577,7 +581,7 @@ public abstract class AbstractUnionPaymentAdaptor implements PaymentAdaptor {
 				String value = request.getParameter(en);
 				res.put(en, value);
 				// 在报文上送时，如果字段的值为空，则不上送<下面的处理为在获取所有参数数据时，判断若值为空，则删除这个字段>
-				logger.info("ServletUtil类247行  temp数据的键=="+en+"     值==="+value);
+				logger.debug("支付回调request temp数据，键：{}；值：{}",en,value);
 				if (null == res.get(en) || "".equals(res.get(en))) {
 					res.remove(en);
 				}
