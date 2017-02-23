@@ -33,6 +33,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
+import com.baozun.nebula.web.command.PackageInfoCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -142,8 +143,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月21日 下午6:18:53
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand
- * @see com.baozun.nebula.web.controller.shoppingcart.viewcommand.
- *      ShoppingCartViewCommand
+ * @see com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand
  * @since 5.3.1
  */
 public class NebulaShoppingCartController extends BaseController{
@@ -164,6 +164,7 @@ public class NebulaShoppingCartController extends BaseController{
     @Qualifier("shoppingcartViewCommandConverter")
     private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
+    /** The unchecked invalid state shopping cart line handler. */
     @Autowired
     private UncheckedInvalidStateShoppingCartLineHandler uncheckedInvalidStateShoppingCartLineHandler;
 
@@ -240,6 +241,56 @@ public class NebulaShoppingCartController extends BaseController{
                     HttpServletRequest request,
                     HttpServletResponse response,
                     @SuppressWarnings("unused") Model model){
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
+        return toNebulaReturnResult(shoppingcartResult);
+    }
+
+    /**
+     * 含包装信息的添加到购物车.
+     * 
+     * <p>
+     * 用户购买选定的sku,指定数量,以及包装信息加入到购物车
+     * </p>
+     * 
+     * <h3>说明:</h3>
+     * <blockquote>
+     * 
+     * 由于以下原因:
+     * 
+     * <ol>
+     * <li>此功能并不是每个store 都需要</li>
+     * <li>通常而言不同的商城其实包装信息不同</li>
+     * <li>价格等因子理论上都是内部计算(不可以通过url传输)</li>
+     * </ol>
+     * 所以此处设置为 protected 作用域, 此方法一般不直接mapping url 地址, 而是url地址解析到mapping方法,再调用这个方法
+     * </blockquote>
+     *
+     * @param memberDetails
+     *            一个用户
+     * @param skuId
+     *            买了哪个sku
+     * @param count
+     *            买了几个
+     * @param packageInfoCommand
+     *            用什么包装(如果需要的话)
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return the nebula return result
+     * @since 5.3.2.11-Personalise
+     */
+    protected NebulaReturnResult addShoppingCartWithPackageInfoCommand(//
+                    MemberDetails memberDetails,
+                    Long skuId,
+                    Integer count,
+                    PackageInfoCommand packageInfoCommand,//包装信息
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
         return toNebulaReturnResult(shoppingcartResult);
