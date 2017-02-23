@@ -33,7 +33,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.command.PackageInfoCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
@@ -41,6 +40,7 @@ import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.handler.UncheckedInvalidStateShoppingCartLineHandler;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
@@ -272,7 +272,7 @@ public class NebulaShoppingCartController extends BaseController{
      *            买了哪个sku
      * @param count
      *            买了几个
-     * @param packageInfoCommand
+     * @param packageInfoForm
      *            用什么包装(如果需要的话)
      * @param request
      *            the request
@@ -283,11 +283,11 @@ public class NebulaShoppingCartController extends BaseController{
      * @return the nebula return result
      * @since 5.3.2.11-Personalise
      */
-    protected NebulaReturnResult addShoppingCartWithPackageInfoCommand(//
+    protected NebulaReturnResult addShoppingCartWithPackageInfo(//
                     MemberDetails memberDetails,
                     Long skuId,
                     Integer count,
-                    PackageInfoCommand packageInfoCommand,//包装信息
+                    PackageInfoForm packageInfoForm,//包装信息
                     HttpServletRequest request,
                     HttpServletResponse response,
                     Model model){

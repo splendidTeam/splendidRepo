@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.command;
+package com.baozun.nebula.web.controller.shoppingcart.form;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -26,7 +26,7 @@ import java.math.BigDecimal;
  * @see "com.baozun.nebula.wormhole.mq.entity.order.ProductPackageV5"
  * @since 5.3.2.11-Personalise
  */
-public class PackageInfoCommand implements Serializable{
+public class PackageInfoForm implements Serializable{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -2063973670756502968L;
