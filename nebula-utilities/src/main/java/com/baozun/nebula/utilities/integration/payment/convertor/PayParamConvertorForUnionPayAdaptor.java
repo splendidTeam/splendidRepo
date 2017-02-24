@@ -197,13 +197,13 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		addition.put(SDKConstants.param_signmethod, SDKConfig.getConfig().getSignMethod());// M
 		
 		//交易类型 00-默认
-		addition.put(SDKConstants.param_txnType, SDKConfig.getConfig().getTxnType());// M
+		addition.put(SDKConstants.param_txnType, SDKConstants.TXNTYPE_DEFAULT);// M
 
 		// //交易子类型  默认00; 01：自助消费，通过地址的方式区分前台消费和后台消费（含无跳转支付）03：分期付款
-		addition.put(SDKConstants.param_txnSubType, SDKConfig.getConfig().getTxnSubType());// M
+		addition.put(SDKConstants.param_txnSubType, SDKConstants.TXNSUBTYPE_DEFAULT);// M
 
 		//业务类型
-		addition.put(SDKConstants.param_bizType, SDKConfig.getConfig().getBizType());// M
+		addition.put(SDKConstants.param_bizType, SDKConstants.BIZTYPE_QUERY);// M
 
 		/***商户接入参数***/
 		//商户号码，请改成自己申请的商户号或者open上注册得来的777商户号测试
@@ -215,7 +215,7 @@ public class PayParamConvertorForUnionPayAdaptor implements PayParamConvertorAda
 		/***要调通交易以下字段必须修改***/
 		//****商户订单号，每次发交易测试需修改为被查询的交易的订单号
 		addition.put(SDKConstants.param_orderId, String.valueOf(payParamCommand.getOrderNo()));// M
-
+		
 		//****订单发送时间，每次发交易测试需修改为被查询的交易的订单发送时间
 		addition.put(SDKConstants.param_txnTime, UnionPayBase.getCurrentTime());// M
 		

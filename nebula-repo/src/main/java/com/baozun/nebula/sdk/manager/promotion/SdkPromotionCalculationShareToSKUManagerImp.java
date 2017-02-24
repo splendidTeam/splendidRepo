@@ -95,8 +95,10 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
 
             // 按活动遍历
             for (PromotionBrief onePromotion : promotionBriefList){
-                if (onePromotion.getPromotionAmount() == null || onePromotion.getPromotionAmount().compareTo(BigDecimal.ZERO) <= 0)
+                // 判断promotion是否具有促销金额，或者当促销金额为0时，判断是否可以兑换Gift
+                if ((onePromotion.getPromotionAmount() == null || onePromotion.getPromotionAmount().compareTo(BigDecimal.ZERO) <= 0) && (!hasPromotionSettingGift(onePromotion))){
                     continue;
+                }
                 for (PromotionSettingDetail detail : onePromotion.getDetails()){
                     if (detail.getFreeShippingMark() || detail.getAffectSKUDiscountAMTList() == null
                                     || detail.getAffectSKUDiscountAMTList().size() == 0)
@@ -185,6 +187,25 @@ public class SdkPromotionCalculationShareToSKUManagerImp implements SdkPromotion
             }
         }
         return allPromotionShareBySKU;
+    }
+    
+    /**
+     * 判断promotion当促销金额为0时，判断是否可以兑换Gift
+     * @param promotion
+     * @return
+     * @since 2017年2月21日
+     */
+    private boolean hasPromotionSettingGift(PromotionBrief promotion){
+    	List<PromotionSettingDetail> promotionSettingDetails = promotion.getDetails();
+    	for(PromotionSettingDetail detail : promotionSettingDetails){
+    		List<PromotionSKUDiscAMTBySetting> amtBySettings = detail.getAffectSKUDiscountAMTList();
+    		for(PromotionSKUDiscAMTBySetting setting : amtBySettings){
+    			if(setting.getGiftMark()){
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
     }
 
     private List<PromotionSKUDiscAMTBySetting> convertLinePromotionSetting(
