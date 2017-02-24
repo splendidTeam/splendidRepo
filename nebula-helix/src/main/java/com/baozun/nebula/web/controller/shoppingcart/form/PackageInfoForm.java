@@ -20,10 +20,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 包装信息.
- *
+ * <p>
+ * 对于某些特殊商城,支持买家购买的时候使用不同的包装 (对于Reebok而言 就是支持定制球鞋秋衣,上面可以刻字)
+ * </p>
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see "com.baozun.nebula.wormhole.mq.entity.order.ProductPackageV5"
+ * @see com.baozun.nebula.model.packageinfo.PackageInfo
  * @since 5.3.2.11-Personalise
  */
 public class PackageInfoForm implements Serializable{

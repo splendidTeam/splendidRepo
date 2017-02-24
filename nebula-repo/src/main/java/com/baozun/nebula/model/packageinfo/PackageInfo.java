@@ -33,13 +33,29 @@ import com.baozun.nebula.model.BaseModel;
 
 /**
  * 包装信息.
- * 
  * <p>
  * 对于某些特殊商城,支持买家购买的时候使用不同的包装 (对于Reebok而言 就是支持定制球鞋秋衣,上面可以刻字)
  * </p>
+ * 
+ * <h3>说明:</h3>
+ * <blockquote>
+ * <ol>
+ * <li>对于同一条订单行或者购物车,可能会有多个包装信息, 比如上丝带,上精品包装</li>
+ * <li>对于同一条包装信息,可能会0个 1个 或者1+ 个购物车行/订单行, 如果固定的包装 那么就会有多条购物车行/订单行数据; 对于reebok定制球衣而言, 由于包装信息是动态生成的, 对reebok的数据业务,和购物车行/订单行的数据关系是1对1的</li>
+ * </ol>
+ * </blockquote>
+ * 
+ * <p>
+ * 对于reebok而言,包装信息可以被编辑, 可以被删除,可以新增;<br>
+ * 
+ * 某些商城可能会有固定的包装信息,具体视业务情况而定
+ * </p>
+ * 
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see "com.baozun.nebula.wormhole.mq.entity.order.ProductPackageV5"
+ * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo
+ * @see com.baozun.nebula.model.salesorder.OrderLinePackageInfo
  * @since 5.3.2.11-Personalise
  */
 @Entity
