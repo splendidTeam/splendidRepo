@@ -16,10 +16,12 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.form;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
+import com.baozun.nebula.web.controller.BaseForm;
+
 /**
+ * 包装信息子form.
  * <p>
  * 对于某些特殊商城,支持买家购买的时候使用不同的包装 (对于Reebok而言 就是支持定制球鞋秋衣,上面可以刻字)
  * </p>
@@ -29,7 +31,7 @@ import java.math.BigDecimal;
  * @see com.baozun.nebula.model.packageinfo.PackageInfo
  * @since 5.3.2.11-Personalise
  */
-public class PackageInfoForm implements Serializable{
+public class PackageInfoForm extends BaseForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -2063973670756502968L;

@@ -19,7 +19,7 @@ package com.baozun.nebula.web.controller.shoppingcart.form;
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
- * 购物车行修改sku的form.
+ * 购物车行 添加的form.
  * 
  * <h3>说明:</h3>
  * <blockquote>
@@ -30,40 +30,43 @@ import com.baozun.nebula.web.controller.BaseForm;
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine
- * @since 5.3.2.3
+ * @since 5.3.2.11-Personalise
  */
-public class ShoppingCartLineUpdateSkuForm extends BaseForm{
+public class ShoppingCartLineAddForm extends BaseForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -1175182005329799871L;
 
-    /** 订单行要修改成什么新的sku(如果是null,等同于仅修改数量). */
-    private Long newSkuId;
+    /** 买的哪个skuid(必填). */
+    private Long skuId;
 
-    /** 订单行最终修改的全量数量(必填). */
+    /** 买几个(必填). */
     private Integer count;
 
+    /** 包装信息. */
+    private PackageInfoForm packageInfoForm;
+
     /**
-     * 获得 订单行要修改成什么新的sku(如果是null,等同于仅修改数量).
+     * 获得 买的哪个skuid(必填).
      *
-     * @return the newSkuId
+     * @return the skuId
      */
-    public Long getNewSkuId(){
-        return newSkuId;
+    public Long getSkuId(){
+        return skuId;
     }
 
     /**
-     * 设置 订单行要修改成什么新的sku(如果是null,等同于仅修改数量).
+     * 设置 买的哪个skuid(必填).
      *
-     * @param newSkuId
-     *            the newSkuId to set
+     * @param skuId
+     *            the skuId to set
      */
-    public void setNewSkuId(Long newSkuId){
-        this.newSkuId = newSkuId;
+    public void setSkuId(Long skuId){
+        this.skuId = skuId;
     }
 
     /**
-     * 获得 订单行最终修改的全量数量(必填).
+     * 获得 买几个(必填).
      *
      * @return the count
      */
@@ -72,13 +75,32 @@ public class ShoppingCartLineUpdateSkuForm extends BaseForm{
     }
 
     /**
-     * 设置 订单行最终修改的全量数量(必填).
+     * 设置 买几个(必填).
      *
      * @param count
      *            the count to set
      */
     public void setCount(Integer count){
         this.count = count;
+    }
+
+    /**
+     * 获得 包装信息.
+     *
+     * @return the packageInfoForm
+     */
+    public PackageInfoForm getPackageInfoForm(){
+        return packageInfoForm;
+    }
+
+    /**
+     * 设置 包装信息.
+     *
+     * @param packageInfoForm
+     *            the packageInfoForm to set
+     */
+    public void setPackageInfoForm(PackageInfoForm packageInfoForm){
+        this.packageInfoForm = packageInfoForm;
     }
 
 }
