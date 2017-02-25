@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.form;
 
+import java.util.List;
+
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
@@ -44,7 +46,7 @@ public class ShoppingCartLineAddForm extends BaseForm{
     private Integer count;
 
     /** 包装信息. */
-    private PackageInfoForm packageInfoForm;
+    private List<PackageInfoForm> packageInfoFormList;
 
     /**
      * 获得 买的哪个skuid(必填).
@@ -87,20 +89,20 @@ public class ShoppingCartLineAddForm extends BaseForm{
     /**
      * 获得 包装信息.
      *
-     * @return the packageInfoForm
+     * @return the packageInfoFormList
      */
-    public PackageInfoForm getPackageInfoForm(){
-        return packageInfoForm;
+    public List<PackageInfoForm> getPackageInfoFormList(){
+        return packageInfoFormList;
     }
 
     /**
      * 设置 包装信息.
      *
-     * @param packageInfoForm
-     *            the packageInfoForm to set
+     * @param packageInfoFormList
+     *            the packageInfoFormList to set
      */
-    public void setPackageInfoForm(PackageInfoForm packageInfoForm){
-        this.packageInfoForm = packageInfoForm;
+    public void setPackageInfoFormList(List<PackageInfoForm> packageInfoFormList){
+        this.packageInfoFormList = packageInfoFormList;
     }
 
 }
