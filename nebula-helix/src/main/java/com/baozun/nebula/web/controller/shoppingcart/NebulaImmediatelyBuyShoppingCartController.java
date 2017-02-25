@@ -44,10 +44,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.CommonImmediately
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 
 /**
- * <p>
- * 主要由以下方法组成:
- * </p>
- * .
+ * 最常见的立即购买.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
@@ -55,16 +52,15 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
 public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractImmediatelyBuyShoppingCartController{
 
     /** The Constant log. */
-    private static final Logger                              LOGGER = LoggerFactory
-                    .getLogger(NebulaImmediatelyBuyShoppingCartController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaImmediatelyBuyShoppingCartController.class);
 
     /** The sdk sku manager. */
     @Autowired
-    private SdkSkuManager                                    sdkSkuManager;
+    private SdkSkuManager sdkSkuManager;
 
     /** The shoppingcart line operate common validator. */
     @Autowired
-    private ShoppingcartLineOperateCommonValidator           shoppingcartLineOperateCommonValidator;
+    private ShoppingcartLineOperateCommonValidator shoppingcartLineOperateCommonValidator;
 
     /** The immediately buy shopping cart line command list factory. */
     @Autowired
@@ -72,7 +68,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
 
     @Autowired
     @Qualifier("commonImmediatelyBuyFormValidator")
-    private CommonImmediatelyBuyFormValidator                commonImmediatelyBuyFormValidator;
+    private CommonImmediatelyBuyFormValidator commonImmediatelyBuyFormValidator;
 
     /**
      * (立即购买)不走普通购物车直接走购物通道.
@@ -115,8 +111,7 @@ public class NebulaImmediatelyBuyShoppingCartController extends NebulaAbstractIm
             return toNebulaReturnResult(shoppingcartResult);
         }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory
-                        .buildShoppingCartLineCommandList(commonImmediatelyBuyForm);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(commonImmediatelyBuyForm);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         // 跳转到订单确认页面的地址

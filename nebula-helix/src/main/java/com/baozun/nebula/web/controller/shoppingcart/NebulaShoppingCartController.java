@@ -146,7 +146,7 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * @see com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand
  * @since 5.3.1
  */
-public class NebulaShoppingCartController extends BaseController{
+public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCartController{
 
     /** The Constant log. */
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaShoppingCartController.class);
@@ -247,7 +247,7 @@ public class NebulaShoppingCartController extends BaseController{
     }
 
     /**
-     * 含包装信息的添加到购物车.
+     * 含一条包装信息的添加到购物车.
      * 
      * <p>
      * 用户购买选定的sku,指定数量,以及包装信息加入到购物车
@@ -273,7 +273,7 @@ public class NebulaShoppingCartController extends BaseController{
      * @param count
      *            买了几个
      * @param packageInfoForm
-     *            用什么包装(如果需要的话)
+     *            用哪一个包装(如果需要的话)
      * @param request
      *            the request
      * @param response
