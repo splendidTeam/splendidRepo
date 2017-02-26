@@ -20,12 +20,18 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * 所有购物车操作的base 校验.
+ * 
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
+ */
 public abstract class AbstractShoppingcartLineOperateValidator{
 
     /** The shoppingcart one line max quantity validator. */
     @Autowired(required = false)
     private ShoppingcartOneLineMaxQuantityValidator shoppingcartOneLineMaxQuantityValidator;
 
+    /** 购物车 sku 库存校验. */
     @Autowired
     protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
 

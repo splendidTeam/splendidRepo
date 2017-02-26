@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<!-- 根据订单行 查询包装信息 -->
+	<bean id="ShoppingCartLinePackageInfo.findShoppingCartLinePackageInfoCommandList" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单行 查询包装信息.</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					select 
+						shoppingCartLinePackageInfo.id                   as shoppingCartLinePackageInfoId,
+						shoppingCartLinePackageInfo.PACKAGEINFO_ID       as packageInfoId,
+						shoppingCartLinePackageInfo.SHOPPING_CARTLINE_ID as shoppingCartLineId,
+						
+						packageInfo.type                                 as type,
+						packageInfo.total                                as total,
+						packageInfo.FEATURE_INFO                         as featureInfo,
+						packageInfo.EXTEND_INFO                          as extendInfo,
+					
+					from T_SC_SHOPPING_CARTLINE_PACKAGE_INFO shoppingCartLinePackageInfo
+					join T_SC_SHOPPINGCARTLINE shoppingCartLine     on shoppingCartLine.id	=	shoppingCartLinePackageInfo.SHOPPING_CARTLINE_ID
+					join T_PI_PACKAGE_INFO     packageInfo 			on packageInfo.id		=	shoppingCartLinePackageInfo.PACKAGEINFO_ID
+					
+					where 
+						shoppingCartLinePackageInfo.SHOPPING_CARTLINE_ID in (
+						#foreach($shoppingCartLineId in $shoppingCartLineIdList )
+	    					$shoppingCartLineId,
+						#end
+			       		-1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+</beans>

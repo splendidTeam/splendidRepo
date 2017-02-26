@@ -19,6 +19,7 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 import java.util.Map;
 
 import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
+import com.baozun.nebula.manager.BaseManager;
 
 /**
  * 专门处理购物车更新操作的业务类.
@@ -26,7 +27,7 @@ import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1.9
  */
-public interface SdkShoppingCartUpdateManager{
+public interface SdkShoppingCartUpdateManager extends BaseManager{
 
     /**
      * 更新指定会员 指定购物车行的数量.

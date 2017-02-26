@@ -49,6 +49,35 @@ public class ShoppingCartLineAddForm extends BaseForm{
     private List<PackageInfoForm> packageInfoFormList;
 
     /**
+     * 
+     */
+    public ShoppingCartLineAddForm(){
+        super();
+    }
+
+    /**
+     * @param skuId
+     * @param count
+     */
+    public ShoppingCartLineAddForm(Long skuId, Integer count){
+        super();
+        this.skuId = skuId;
+        this.count = count;
+    }
+
+    /**
+     * @param skuId
+     * @param count
+     * @param packageInfoFormList
+     */
+    public ShoppingCartLineAddForm(Long skuId, Integer count, List<PackageInfoForm> packageInfoFormList){
+        super();
+        this.skuId = skuId;
+        this.count = count;
+        this.packageInfoFormList = packageInfoFormList;
+    }
+
+    /**
      * 获得 买的哪个skuid(必填).
      *
      * @return the skuId

@@ -81,7 +81,6 @@ import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.lang.NumberUtil;
 
 /**
  * The Class SdkShoppingCartManagerImpl.
@@ -94,96 +93,99 @@ import com.feilong.core.lang.NumberUtil;
 public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
     /** The Constant log. */
-    private static final Logger                        log             = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SdkShoppingCartManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer                       SUCCESS         = 1;
+    private static final Integer SUCCESS = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer                       FAILURE         = 0;
+    private static final Integer FAILURE = 0;
 
     /** The Constant CHECKED_STATE. */
-    private static final int                           CHECKED_STATE   = 1;
+    private static final int CHECKED_STATE = 1;
 
     /** 优惠设置是否按单件计算，是指按Qty计算，还是Qty为1来计算 *. */
-    private static final BigDecimal                    ONE_PIECE_QTY   = new BigDecimal(1);
+    private static final BigDecimal ONE_PIECE_QTY = new BigDecimal(1);
 
     /** 百分百 *. */
-    private static final BigDecimal                    HUNDRED_PERCENT = new BigDecimal(1);
+    private static final BigDecimal HUNDRED_PERCENT = new BigDecimal(1);
 
     /** The sdk shopping cart line dao. */
     @Autowired
-    private SdkShoppingCartLineDao                     sdkShoppingCartLineDao;
+    private SdkShoppingCartLineDao sdkShoppingCartLineDao;
 
     /** The item info dao. */
     @Autowired
-    private ItemInfoDao                                itemInfoDao;
+    private ItemInfoDao itemInfoDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao                                     skuDao;
+    private SkuDao skuDao;
 
     /** The item category dao. */
     @Autowired
-    private ItemCategoryDao                            itemCategoryDao;
+    private ItemCategoryDao itemCategoryDao;
 
     /** The sdk filter manager. */
     @Autowired
-    private SdkFilterManager                           sdkFilterManager;
+    private SdkFilterManager sdkFilterManager;
 
     /** The sdk engine manager. */
     @Autowired
-    private SdkEngineManager                           sdkEngineManager;
+    private SdkEngineManager sdkEngineManager;
 
     /** The sdk promotion calculation manager. */
     @Autowired
-    private SdkPromotionCalculationManager             sdkPromotionCalculationManager;
+    private SdkPromotionCalculationManager sdkPromotionCalculationManager;
 
     /** The sdk promotion rule filter manager. */
     @Autowired
-    private SdkPromotionRuleFilterManager              sdkPromotionRuleFilterManager;
+    private SdkPromotionRuleFilterManager sdkPromotionRuleFilterManager;
 
     /** The sdk order line dao. */
     @Autowired
-    private SdkOrderLineDao                            sdkOrderLineDao;
+    private SdkOrderLineDao sdkOrderLineDao;
 
     /** The sdk purchase rule filter manager. */
     @Autowired
-    private SdkPurchaseLimitRuleFilterManager          sdkPurchaseRuleFilterManager;
+    private SdkPurchaseLimitRuleFilterManager sdkPurchaseRuleFilterManager;
 
     /** The sdk effective manager. */
     @Autowired
-    private SdkEffectiveManager                        sdkEffectiveManager;
+    private SdkEffectiveManager sdkEffectiveManager;
 
     /** The sdk promotion coupon manager. */
     @Autowired
-    private SdkPromotionCouponManager                  sdkPromotionCouponManager;
+    private SdkPromotionCouponManager sdkPromotionCouponManager;
 
     /** The sdk promotion setting manager. */
     @Autowired
-    private SdkPromotionCalculationSettingManager      sdkPromotionSettingManager;
+    private SdkPromotionCalculationSettingManager sdkPromotionSettingManager;
 
     /** The sdk promotion guide manager. */
     @Autowired
-    private SdkPromotionGuideManager                   sdkPromotionGuideManager;
+    private SdkPromotionGuideManager sdkPromotionGuideManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager                         sdkMataInfoManager;
+    private SdkMataInfoManager sdkMataInfoManager;
 
     /** The sdk shopping cart lines manager. */
     @Autowired
-    private SdkShoppingCartLinesManager                sdkShoppingCartLinesManager;
+    private SdkShoppingCartLinesManager sdkShoppingCartLinesManager;
 
     /** The sdk promotion manager. */
     @Autowired
-    private SdkPromotionManager                        sdkPromotionManager;
+    private SdkPromotionManager sdkPromotionManager;
 
     @Autowired
-    private SdkShoppingCartCommandBuilder              sdkShoppingCartCommandBuilder;
+    private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
 
     @Autowired
     private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
+
+    @Autowired
+    private SdkShoppingCartAddManager sdkShoppingCartAddManager;
 
     /**
      * @param memberId
@@ -257,11 +259,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @param validedLines
      *            the valided lines
      */
-    private void packShoppingCartCommandBaseInfo(
-                    ShoppingCartCommand shoppingCartCommand,
-                    UserDetails userDetails,
-                    List<String> coupons,
-                    List<ShoppingCartLineCommand> validedLines){
+    private void packShoppingCartCommandBaseInfo(ShoppingCartCommand shoppingCartCommand,UserDetails userDetails,List<String> coupons,List<ShoppingCartLineCommand> validedLines){
 
         // 设置应付金额
         shoppingCartCommand.setOriginPayAmount(ShoppingCartUtil.getOriginPayAmount(validedLines));
@@ -425,16 +423,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 获取购物车行的itemComboIds
         Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(cart.getShoppingCartLineCommands());
 
-        cart = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(
-                        cart.getUserDetails().getMemberId(),
-                        cart.getShoppingCartLineCommands(),
-                        null,
-                        null,
-                        cart.getUserDetails().getMemComboList());
+        cart = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(cart.getUserDetails().getMemberId(), cart.getShoppingCartLineCommands(), null, null, cart.getUserDetails().getMemComboList());
 
         // 获取限购规则
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
-                        .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
+        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
         if (null == purchaseLimitationList || purchaseLimitationList.size() == 0)
             purchaseLimitationList = new ArrayList<LimitCommand>();
 
@@ -484,16 +476,10 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         // 获取购物车行的itemComboIds
         Set<String> itemComboIds = ShoppingCartUtil.getItemComboIds(cart.getShoppingCartLineCommands());
 
-        cart = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(
-                        cart.getUserDetails().getMemberId(),
-                        cart.getShoppingCartLineCommands(),
-                        null,
-                        null,
-                        cart.getUserDetails().getMemComboList());
+        cart = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(cart.getUserDetails().getMemberId(), cart.getShoppingCartLineCommands(), null, null, cart.getUserDetails().getMemComboList());
 
         // 获取限购规则
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager
-                        .getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
+        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(shopIds, memboIds, itemComboIds, new Date());
         if (null == purchaseLimitationList || purchaseLimitationList.size() == 0)
             purchaseLimitationList = new ArrayList<LimitCommand>();
 
@@ -579,47 +565,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     }
 
     /**
-     * 保存或更新购物行信息.
-     *
-     * @param shoppingCartLine
-     *            the shopping cart line
-     * @deprecated
-     */
-    @Deprecated
-    private void saveCartLine(ShoppingCartLineCommand shoppingCartLine){
-        if (null == shoppingCartLine){
-            return;
-        }
-        // 将command对象转换为entity
-        if (shoppingCartLine.getId() != null && shoppingCartLine.getId() > 0){
-            // 更新
-            Integer updateCount = sdkShoppingCartLineDao.updateCartLineQuantity(
-                            shoppingCartLine.getMemberId(),
-                            shoppingCartLine.getExtentionCode(),
-                            shoppingCartLine.getQuantity());
-            if (updateCount < 1){
-                // 修改的行数和期望的行数不一致，抛出运行时异常，事务回滚
-                Object[] args = { 0, 1 };
-                throw new BusinessException(Constants.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, args);
-            }
-        }else{
-            // 保存
-            sdkShoppingCartLineDao.insertShoppingCartLine(
-                            shoppingCartLine.getExtentionCode(),
-                            shoppingCartLine.getSkuId(),
-                            shoppingCartLine.getQuantity(),
-                            shoppingCartLine.getMemberId(),
-                            shoppingCartLine.getCreateTime(),
-                            shoppingCartLine.getSettlementState(),
-                            shoppingCartLine.getShopId(),
-                            shoppingCartLine.isGift(),
-                            shoppingCartLine.getPromotionId(),
-                            shoppingCartLine.getLineGroup());
-        }
-
-    }
-
-    /**
      * 新增或者修改购物车行.
      *
      * @param userId
@@ -678,12 +623,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     return SUCCESS;
                 }
             }else{// 不存在 添加
-                saveCartLine(shoppingCartLine);
+                sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
             }
 
         }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
                   // 保存 shoppingCartLine
-            saveCartLine(shoppingCartLine);
+            sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
         }
         return SUCCESS;
     }
@@ -746,72 +691,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     return SUCCESS;
                 }
             }else{// 不存在 添加
-                saveCartLine(shoppingCartLine);
+                sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
             }
         }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
                   // 保存 shoppingCartLine
-            saveCartLine(shoppingCartLine);
+            sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
         }
         return SUCCESS;
-    }
-
-    /**
-     * 新增或者修改购物车行.
-     *
-     * @param userId
-     *            the user id
-     * @param shoppingCartLine
-     *            the shopping cart line
-     * @return true, if merage shopping cart line by id
-     * @deprecated 乱七八糟的
-     */
-    @Override
-    @Deprecated
-    public boolean merageShoppingCartLineById(Long userId,ShoppingCartLineCommand shoppingCartLine){
-        String extentionCode = shoppingCartLine.getExtentionCode();
-        if (null == extentionCode){
-            return false;
-        }
-
-        // 先查询是否已经有购物车行的信息
-        List<ShoppingCartLineCommand> lines = findShoppingCartLinesByMemberId(userId, null);
-        boolean existFlag = false;
-        boolean updateResultFlag = false;
-
-        // 如果有，就修改数量
-        // 如果没有，就添加一条记录
-        if (null != lines && lines.size() > 0){// 如果有
-
-            // 判断加入的该商品是否已经在购物车中，
-            for (ShoppingCartLineCommand line : lines){
-                if (!line.isGift() && extentionCode.equals(line.getExtentionCode())){// 如果在的话，就修改数量
-                    existFlag = true;
-                    //如果sku在购物车行中已经存在  添加和修改都 全量修改数量
-                    Integer effectedRows = sdkShoppingCartLineDao
-                                    .updateCartLineQuantityByLineId(userId, line.getId(), shoppingCartLine.getQuantity());
-
-                    if (1 == effectedRows){
-                        updateResultFlag = true;
-                    }else{
-                        updateResultFlag = false;
-                    }
-                    break;
-                }
-            }
-
-            if (existFlag){
-                return updateResultFlag;
-            }else{// 不存在
-                      // 添加
-                saveCartLine(shoppingCartLine);
-            }
-
-        }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
-
-            // 保存 shoppingCartLine
-            saveCartLine(shoppingCartLine);
-        }
-        return true;
     }
 
     @Override
@@ -839,18 +725,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the integer
      */
     @Override
-    public Integer immediatelyBuy(
-                    Long memberId,
-                    Set<String> memCombos,
-                    ShoppingCartLineCommand shoppingCartLine,
-                    List<ShoppingCartLineCommand> lines){
+    public Integer immediatelyBuy(Long memberId,Set<String> memCombos,ShoppingCartLineCommand shoppingCartLine,List<ShoppingCartLineCommand> lines){
 
         try{
             Integer retval = SUCCESS;
             ShoppingCartCommand cart = new ShoppingCartCommand();
 
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(shoppingCartLine);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLine);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLine);
 
             // 检查商品有效性
@@ -931,11 +812,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<ShoppingCartLineCommand> lines = shopCart.getShoppingCartLineCommands();
         Set<String> memboSet = shopCart.getUserDetails().getMemComboList();
         // 获取人群和商品促销的交集
-        List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
-                        getShopIds(lines),
-                        memboSet,
-                        ShoppingCartUtil.getItemComboIds(lines),
-                        shopCart.getCurrentTime());
+        List<PromotionCommand> promotionList = sdkPromotionRuleFilterManager.getIntersectActivityRuleData(getShopIds(lines), memboSet, ShoppingCartUtil.getItemComboIds(lines), shopCart.getCurrentTime());
 
         if (null != promotionList && promotionList.size() > 0){
             // 通过购物车和促销集合计算商品促销
@@ -1282,10 +1159,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt order discount rate by rate
      */
     @Override
-    public BigDecimal getDiscountAMTOrderDiscountRateByRate(
-                    ShoppingCartCommand shopCart,
-                    BigDecimal discountRate,
-                    BigDecimal previousDiscAMTAll){
+    public BigDecimal getDiscountAMTOrderDiscountRateByRate(ShoppingCartCommand shopCart,BigDecimal discountRate,BigDecimal previousDiscAMTAll){
         if (null == shopCart)
             return BigDecimal.ZERO;
         // 应付金额
@@ -1317,12 +1191,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt gift by item id
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemID(
-                    long shopId,
-                    AtomicSetting setting,
-                    long itemId,
-                    Integer qty,
-                    Integer displayCountLimited){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemID(long shopId,AtomicSetting setting,long itemId,Integer qty,Integer displayCountLimited){
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         // 礼品不计价，只显示名称
         // long shopId,赠品要分店铺的
@@ -1350,11 +1219,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByCategoryID(
-                    long shopId,
-                    AtomicSetting setting,
-                    Integer qty,
-                    Integer displayCountLimited){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByCategoryID(long shopId,AtomicSetting setting,Integer qty,Integer displayCountLimited){
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         // 礼品不计价，只显示名称
         // long shopId,赠品要分店铺的
@@ -1378,12 +1243,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemList(
-                    List<Long> itemIdsLong,
-                    long shopId,
-                    AtomicSetting setting,
-                    Integer qty,
-                    Integer displayCountLimited){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemList(List<Long> itemIdsLong,long shopId,AtomicSetting setting,Integer qty,Integer displayCountLimited){
         PromotionSKUDiscAMTBySetting proSkuSetting = null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
 
@@ -1453,11 +1313,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByComboID(
-                    long shopId,
-                    AtomicSetting setting,
-                    Integer qty,
-                    Integer displayCountLimited){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByComboID(long shopId,AtomicSetting setting,Integer qty,Integer displayCountLimited){
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         // 礼品不计价，只显示名称
         // long shopId,赠品要分店铺的
@@ -1516,18 +1372,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         BigDecimal itemDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
         BigDecimal itemOriginal = getNeedToPayAmountInShoppingCartByItemId(lines, itemId);
-        BigDecimal itemPreviousDisc = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
+        BigDecimal itemPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
 
         BigDecimal itemNeedPay = itemOriginal.subtract(itemPreviousDisc);
         if (itemNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -1538,8 +1388,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // 只要购物车中有该item下的商品就进行金额优惠
             if (String.valueOf(line.getItemId()).equals(String.valueOf(itemId))){
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
@@ -1570,12 +1419,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal rate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByRate(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal rate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -1584,8 +1428,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, itemId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, itemId);
 
         BigDecimal itemOriginNeedToPay = itemNeedToPay;
         // BigDecimal totalOriginNeedToPay = getAllAmount(lines);
@@ -1606,8 +1449,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }else{
                     lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
                 }
-                BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                     continue;
                 // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -1637,19 +1479,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt item per item by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
         BigDecimal itemDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
         BigDecimal itemOriginal = getNeedToPayAmountInShoppingCartByItemId(lines, itemId);
-        BigDecimal itemPreviousDisc = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
+        BigDecimal itemPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
 
         BigDecimal itemNeedPay = itemOriginal.subtract(itemPreviousDisc);
         if (itemNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -1661,8 +1497,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // 判断line是否在itemid下
             if (String.valueOf(line.getItemId()).equals(String.valueOf(itemId))){
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
@@ -1683,20 +1518,13 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
         BigDecimal itemDiscAMT = BigDecimal.valueOf(factorDefault).multiply(discAmount);
         BigDecimal itemOriginal = getNeedToPayAmountInShoppingCartByItemId(lines, itemId);
-        BigDecimal itemPreviousDisc = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
+        BigDecimal itemPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
 
         BigDecimal itemNeedPay = itemOriginal.subtract(itemPreviousDisc);
         if (itemNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -1710,8 +1538,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 ItemFactor itemFactor = getItemInFactorList(itemFactorList, line.getItemId());
                 if (itemFactor != null){
                     // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                    BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                     BigDecimal lineOriginNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                     BigDecimal lineNeedPay = lineOriginNeedPay.subtract(skuPreviousDiscAMT);
                     if (lineNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -1775,12 +1602,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt item per item by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByRate(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -1789,8 +1611,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, itemId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, itemId);
 
         BigDecimal itemOriginNeedToPay = itemNeedToPay;
         // BigDecimal totalOriginNeedToPay = getAllAmount(lines);
@@ -1812,8 +1633,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }else{
                     lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
                 }
-                BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                     continue;
                 // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -1850,8 +1670,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
 
         BigDecimal itemOriginNeedToPay = itemNeedToPay;
         // BigDecimal totalOriginNeedToPay = getAllAmount(lines);
@@ -1871,16 +1690,14 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 if (itemFactor != null){
                     BigDecimal lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
                     BigDecimal lineOriginNeedToPay = lineNeedToPay;
-                    BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                     lineNeedToPay = lineOriginNeedToPay.subtract(previousDiscAMTSKU);
                     if (lineOriginNeedToPay.subtract(previousDiscAMTSKU).compareTo(BigDecimal.ZERO) <= 0)
                         continue;
                     BigDecimal lineDiscAMT = BigDecimal.ZERO;
                     if (onePieceMark){
                         factorDefault = factorDefault < itemFactor.getFactor() ? factorDefault : itemFactor.getFactor();
-                        lineDiscAMT = BigDecimal.valueOf(factorDefault).multiply(line.getSalePrice())
-                                        .multiply(HUNDRED_PERCENT.subtract(discRate));
+                        lineDiscAMT = BigDecimal.valueOf(factorDefault).multiply(line.getSalePrice()).multiply(HUNDRED_PERCENT.subtract(discRate));
                     }else{
                         lineDiscAMT = itemDiscAMT.multiply(lineNeedToPay).divide(itemOriginNeedToPay, 2, BigDecimal.ROUND_HALF_EVEN);
                     }
@@ -1911,12 +1728,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt item per pcs by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -1927,8 +1739,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             if (String.valueOf(line.getItemId()).equals(String.valueOf(itemId))){
                 BigDecimal curLineDiscAmount = BigDecimal.valueOf(line.getQuantity()).multiply(discAmount);
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
@@ -1953,13 +1764,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -1972,8 +1777,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 if (itemFactor != null){
                     factorDefault = factorDefault < itemFactor.getFactor() ? factorDefault : itemFactor.getFactor();
 
-                    BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                     BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                     if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                         continue;
@@ -2010,12 +1814,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt item per pcs by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByRate(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -2024,8 +1823,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
         BigDecimal itemOriginNeedToPay = itemNeedToPay;
         // BigDecimal totalOriginNeedToPay = getAllAmount(lines);
         // previousDiscAMT = previousDiscAMT.multiply(itemOriginNeedToPay).divide(totalOriginNeedToPay, 2,
@@ -2042,8 +1840,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             if (String.valueOf(line.getItemId()).equals(String.valueOf(itemId))){
                 BigDecimal lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
                 BigDecimal lineOriginNeedToPay = lineNeedToPay;
-                BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 // lineNeedToPay = lineOriginNeedToPay.subtract(previousDiscAMTSKU);
                 if (lineOriginNeedToPay.subtract(previousDiscAMTSKU).compareTo(BigDecimal.ZERO) <= 0)
                     continue;
@@ -2087,8 +1884,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByItemId(lines, briefListPrevious, itemId);
 
         BigDecimal itemOriginNeedToPay = itemNeedToPay;
         // BigDecimal totalOriginNeedToPay = getAllAmount(lines);
@@ -2109,16 +1905,14 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 if (itemFactor != null){
                     BigDecimal lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
                     BigDecimal lineOriginNeedToPay = lineNeedToPay;
-                    BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                     // lineNeedToPay = lineOriginNeedToPay.subtract(previousDiscAMTSKU);
                     if (lineOriginNeedToPay.subtract(previousDiscAMTSKU).compareTo(BigDecimal.ZERO) <= 0)
                         continue;
                     BigDecimal lineDiscAMT = BigDecimal.ZERO;
                     if (onePieceMark){
                         factorDefault = factorDefault < itemFactor.getFactor() ? factorDefault : itemFactor.getFactor();
-                        lineDiscAMT = BigDecimal.valueOf(factorDefault).multiply(line.getSalePrice())
-                                        .multiply(HUNDRED_PERCENT.subtract(discRate));
+                        lineDiscAMT = BigDecimal.valueOf(factorDefault).multiply(line.getSalePrice()).multiply(HUNDRED_PERCENT.subtract(discRate));
                     }else{
                         lineDiscAMT = itemDiscAMT.multiply(lineNeedToPay).divide(itemOriginNeedToPay, 2, BigDecimal.ROUND_HALF_EVEN);
                     }
@@ -2150,12 +1944,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt category per order by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByAMT(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         BigDecimal skuPreviousDiscAMT = BigDecimal.ZERO;
@@ -2165,8 +1954,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         BigDecimal categoryDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
 
         BigDecimal categoryOriginal = getNeedToPayAmountInShoppingCartByCategoryId(lines, categoryId);
-        BigDecimal categoryPreviousDisc = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(lines, briefListPrevious, categoryId);
+        BigDecimal categoryPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(lines, briefListPrevious, categoryId);
 
         BigDecimal categoryNeedPay = categoryOriginal.subtract(categoryPreviousDisc);
         if (categoryNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -2177,8 +1965,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // 只要购物车中有该category下的商品
             if (line.getCategoryList().contains(categoryId)){
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
@@ -2208,12 +1995,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt category per order by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal rate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByRate(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal rate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -2230,8 +2012,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(lines, briefListPrevious, categoryId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(lines, briefListPrevious, categoryId);
 
         categoryOriginNeedToPay = categoryNeedToPay;
         // totalOriginNeedToPay = getAllAmount(lines);
@@ -2253,8 +2034,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }else{
                     lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
                 }
-                previousDiscAMTSKU = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                     continue;
                 // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -2285,12 +2065,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt category per item by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByAMT(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
@@ -2328,13 +2103,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2357,12 +2126,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt category per item by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByRate(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -2380,8 +2144,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(lines, briefListPrevious, categoryId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(lines, briefListPrevious, categoryId);
 
         categoryOriginNeedToPay = categoryNeedToPay;
         // totalOriginNeedToPay = getAllAmount(lines);
@@ -2404,8 +2167,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 itemIds.add(line.getItemId());
 
                 lineOriginNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
-                previousDiscAMTSKU = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 // lineNeedToPay = lineOriginNeedToPay.subtract(previousDiscAMTSKU);
                 if (lineOriginNeedToPay.subtract(previousDiscAMTSKU).compareTo(BigDecimal.ZERO) <= 0)
                     continue;
@@ -2447,14 +2209,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2477,12 +2232,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt category per pcs by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByAMT(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         BigDecimal skuPreviousDiscAMT = BigDecimal.ZERO;
@@ -2494,8 +2244,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             if (line.getCategoryList().contains(categoryId)){
                 BigDecimal curLineDiscAmount = BigDecimal.valueOf(line.getQuantity()).multiply(discAmount);
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
@@ -2534,13 +2283,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2563,12 +2306,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt category per pcs by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByRate(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -2609,14 +2347,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2630,16 +2361,14 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @param discAmount
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(List<ShoppingCartLineCommand> lines,
-            BigDecimal discAmount, Integer factor, List<PromotionBrief> briefListPrevious) {
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
         BigDecimal callDiscAMT = BigDecimal.valueOf(factor).multiply(discAmount);
         BigDecimal tempDiscAmt = callDiscAMT;
         BigDecimal callOriginal = getNeedToPayAmountInShoppingCartByAll(lines);
-        BigDecimal callPreviousDisc = sdkPromotionSettingManager
-                .getDiscAMTFromPromotionResultBriefsByCall(briefListPrevious);
+        BigDecimal callPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsByCall(briefListPrevious);
         BigDecimal callNeedPay = callOriginal.subtract(callPreviousDisc);
 
         if (callNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -2647,20 +2376,18 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
 
-        for (ShoppingCartLineCommand line : lines) {
+        for (ShoppingCartLineCommand line : lines){
             // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-            BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+            BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
             BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
             if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                 continue;
             else
                 lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
-            
-            BigDecimal lineShareDisc = callDiscAMT.multiply(lineNeedPay).divide(callNeedPay, 2,
-                    BigDecimal.ROUND_UP);
+
+            BigDecimal lineShareDisc = callDiscAMT.multiply(lineNeedPay).divide(callNeedPay, 2, BigDecimal.ROUND_UP);
             tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
-            if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
+            if (tempDiscAmt.compareTo(BigDecimal.ZERO) == 1){
                 settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
             }else{
                 settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
@@ -2683,11 +2410,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amtcall per order by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByRate(List<ShoppingCartLineCommand> lines,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         BigDecimal orderNeedToPay = getAllAmount(lines);
@@ -2717,8 +2440,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
             }
 
-            BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                            .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+            BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
             if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                 continue;
             // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -2744,11 +2466,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amtcall per item by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         Set<Long> itemIds = getItemIdsFromShoppingCartByCall(lines);
@@ -2756,12 +2474,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getDiscountAMTItemPerItemByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factor,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getDiscountAMTItemPerItemByAMT(lines, itemId, discAmount, factor, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2775,12 +2488,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         Set<Long> itemIds = getItemIdsFromShoppingCartByCall(lines);
@@ -2788,13 +2496,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2816,11 +2518,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByRate(List<ShoppingCartLineCommand> lines,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -2853,8 +2551,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
             }
 
-            BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager
-                            .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+            BigDecimal previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
             if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                 continue;
             // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -2889,14 +2586,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2918,11 +2608,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -2930,8 +2616,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         for (ShoppingCartLineCommand line : lines){
             BigDecimal curLineDiscAmount = BigDecimal.valueOf(line.getQuantity()).multiply(discAmount);
             // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-            BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                            .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+            BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
             BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
             if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                 continue;
@@ -2958,12 +2643,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         Set<Long> itemIds = getItemIdsFromShoppingCartByCall(lines);
@@ -2971,13 +2651,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -2999,11 +2673,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByRate(List<ShoppingCartLineCommand> lines,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -3012,12 +2682,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getDiscountAMTItemPerPCSByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getDiscountAMTItemPerPCSByRate(lines, itemId, discRate, onePieceMark, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -3045,14 +2710,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -3075,12 +2733,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt combo per order by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -3093,8 +2746,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         BigDecimal tempDiscAmt = comboDiscAMT;
 
         BigDecimal comboOriginal = getNeedToPayAmountInShoppingCartByComboId(lines, comboId);
-        BigDecimal comboPreviousDisc = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, comboId);
+        BigDecimal comboPreviousDisc = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, comboId);
 
         BigDecimal comboNeedPay = comboOriginal.subtract(comboPreviousDisc);
         if (comboNeedPay.compareTo(BigDecimal.ZERO) <= 0)
@@ -3110,22 +2762,20 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // 判断是否是Combo下的行
             if (comboIds.contains(String.valueOf(comboId))){
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
                 else
                     lineNeedPay = lineNeedPay.subtract(skuPreviousDiscAMT);
-                
-                lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2,
-    					BigDecimal.ROUND_UP);
-    				tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
-    				if(tempDiscAmt.compareTo(BigDecimal.ZERO)==1){
-    					settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
-    				}else{
-    					settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
-    				}
+
+                lineShareDisc = comboDiscAMT.multiply(lineNeedPay).divide(comboNeedPay, 2, BigDecimal.ROUND_UP);
+                tempDiscAmt = tempDiscAmt.subtract(lineShareDisc);
+                if (tempDiscAmt.compareTo(BigDecimal.ZERO) == 1){
+                    settingList.add(getPromotionSkuAMTSetting(line, lineShareDisc));
+                }else{
+                    settingList.add(getPromotionSkuAMTSetting(line, tempDiscAmt.add(lineShareDisc)));
+                }
 
             }
         }
@@ -3146,11 +2796,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt combo per order by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discRate,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByRate(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discRate,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -3167,8 +2813,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, comboId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, comboId);
 
         comboOriginNeedToPay = comboNeedToPay;
         // totalOriginNeedToPay = getAllAmount(lines);
@@ -3192,8 +2837,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             if (comboIds.contains(Long.toString(comboId))){
                 lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
 
-                previousDiscAMTSKU = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                     continue;
                 // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -3311,12 +2955,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt combo per item by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
 
@@ -3342,13 +2981,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerItemByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         Set<Long> itemIds = getItemIdsFromShoppingCartByComboId(lines, comboId);
@@ -3356,13 +2989,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -3385,12 +3012,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt combo per item by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByRate(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -3407,8 +3029,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, comboId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByComboId(lines, briefListPrevious, comboId);
 
         comboOriginNeedToPay = comboNeedToPay;
         // totalOriginNeedToPay = getAllAmount(lines);
@@ -3438,8 +3059,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }else{
                     lineNeedToPay = new BigDecimal(line.getQuantity()).multiply(line.getSalePrice());
 
-                    previousDiscAMTSKU = sdkPromotionSettingManager
-                                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                     if (previousDiscAMTSKU.compareTo(lineNeedToPay) >= 0)
                         continue;
                     // lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
@@ -3469,12 +3089,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt combo per pcs by amt
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         BigDecimal skuPreviousDiscAMT = BigDecimal.ZERO;
@@ -3492,8 +3107,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             if (comboIds.contains(String.valueOf(comboId))){
                 BigDecimal curLineDiscAmount = BigDecimal.valueOf(line.getQuantity()).multiply(discAmount);
                 // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                skuPreviousDiscAMT = sdkPromotionSettingManager
-                                .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                 lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
                 if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0)
                     continue;
@@ -3518,13 +3132,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * java.math.BigDecimal, java.lang.Integer, java.util.List, java.util.List)
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         Set<Long> itemIds = getItemIdsFromShoppingCartByComboId(lines, comboId);
@@ -3532,13 +3140,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -3561,12 +3163,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt combo per pcs by rate
      */
     @Override
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByRate(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious){
         // 折扣优惠计算方式一样
         if (null == lines || lines.size() == 0)
             return null;
@@ -3607,14 +3204,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -3658,8 +3248,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         for (ShoppingCartLineCommand line : shoppingCartLines){
             if (line.getItemId() == itemId){
                 PromotionCouponCodeCommand couponOnLine = line.getCouponCodeOnLine();
-                if (couponOnLine != null && couponOnLine.getIsused() == 0 && couponOnLine.getCouponId() == couponTypeID
-                                && couponOnLine.getShopId() == shopId)
+                if (couponOnLine != null && couponOnLine.getIsused() == 0 && couponOnLine.getCouponId() == couponTypeID && couponOnLine.getShopId() == shopId)
                     return true;
             }
         }
@@ -3682,12 +3271,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return true, if check coupon by item id
      */
     @Override
-    public boolean checkCouponByItemId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long itemId,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId){
+    public boolean checkCouponByItemId(List<ShoppingCartLineCommand> shoppingCartLines,long itemId,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId){
         if (null == couponCodes || couponCodes.size() == 0 || null == shoppingCartLines || shoppingCartLines.size() == 0)
             return false;
         // TODO check coupon on line directly
@@ -3717,11 +3301,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return true, if check on line coupon by category id
      */
     @Override
-    public boolean checkOnLineCouponByCategoryId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long categoryId,
-                    long couponTypeID,
-                    long shopId){
+    public boolean checkOnLineCouponByCategoryId(List<ShoppingCartLineCommand> shoppingCartLines,long categoryId,long couponTypeID,long shopId){
         for (ShoppingCartLineCommand line : shoppingCartLines){
             if (line.getCategoryList().contains(Long.valueOf(categoryId))){
                 PromotionCouponCodeCommand couponOnLine = line.getCouponCodeOnLine();
@@ -3738,12 +3318,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkCouponByCategoryId(java.util.List, long, long, java.util.List, long)
      */
     @Override
-    public boolean checkCouponByCategoryId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long categoryId,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId){
+    public boolean checkCouponByCategoryId(List<ShoppingCartLineCommand> shoppingCartLines,long categoryId,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId){
         if (null == couponCodes || couponCodes.size() == 0 || null == shoppingCartLines || shoppingCartLines.size() == 0)
             return false;
         // TODO check coupon on line directly
@@ -3790,12 +3365,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @see com.baozun.nebula.sdk.manager.SdkShoppingCartManager#checkCouponByComboId(java.util.List, long, long, java.util.List, long)
      */
     @Override
-    public boolean checkCouponByComboId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long comboId,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId){
+    public boolean checkCouponByComboId(List<ShoppingCartLineCommand> shoppingCartLines,long comboId,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId){
         if (null == couponCodes || couponCodes.size() == 0 || null == shoppingCartLines || shoppingCartLines.size() == 0)
             return false;
         // 行Coupon优先，coupon在行上
@@ -3870,13 +3440,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the discount amt by call coupon
      */
     @Override
-    public Map<String, BigDecimal> getDiscountAMTByCALLCoupon(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    boolean onePieceMark,
-                    long shopId,
-                    BigDecimal previousDiscAMTAll){
+    public Map<String, BigDecimal> getDiscountAMTByCALLCoupon(List<ShoppingCartLineCommand> shoppingCartLines,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,boolean onePieceMark,long shopId,BigDecimal previousDiscAMTAll){
         if (null == couponCodes || couponCodes.size() == 0)
             return null;
         // 根据couponCodes、couponTypeToCheck获取金额
@@ -4027,10 +3591,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             lineDiscShare = previousDiscAMT.multiply(lineNeedToPay).divide(totalOriginNeedToPay, 2, BigDecimal.ROUND_HALF_EVEN);
             lineNeedToPay = lineNeedToPay.subtract(lineDiscShare);
 
-            previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(
-                            shoppingCartLines,
-                            briefListPrevious,
-                            maxLine.getSkuId());
+            previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(shoppingCartLines, briefListPrevious, maxLine.getSkuId());
 
             lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
 
@@ -4153,8 +3714,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         // BigDecimal previousDiscAMT =
         // sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsBaseOrder(briefListPrevious);
-        BigDecimal previousDiscAMT = sdkPromotionSettingManager
-                        .getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(shoppingCartLines, briefListPrevious, categoryId);
+        BigDecimal previousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedByCategoryId(shoppingCartLines, briefListPrevious, categoryId);
 
         ShoppingCartLineCommand maxLine = getMaxLineNeedToPayByCategoryId(shoppingCartLines, categoryId);
 
@@ -4174,10 +3734,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             lineDiscShare = previousDiscAMT.multiply(lineNeedToPay).divide(totalOriginNeedToPay, 2, BigDecimal.ROUND_HALF_EVEN);
             lineNeedToPay = lineNeedToPay.subtract(lineDiscShare);
 
-            previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(
-                            shoppingCartLines,
-                            briefListPrevious,
-                            maxLine.getSkuId());
+            previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(shoppingCartLines, briefListPrevious, maxLine.getSkuId());
 
             lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
 
@@ -4327,10 +3884,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             // BigDecimal.ROUND_HALF_EVEN);
             // lineNeedToPay = lineNeedToPay.subtract(lineDiscShare);
 
-            previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(
-                            shoppingCartLines,
-                            briefListPrevious,
-                            maxLine.getSkuId());
+            previousDiscAMTSKU = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(shoppingCartLines, briefListPrevious, maxLine.getSkuId());
 
             lineNeedToPay = lineNeedToPay.subtract(previousDiscAMTSKU);
             usedCouponList = getCouponTotalAmount(couponCodes, couponTypeId, lineNeedToPay, shopId);
@@ -4463,11 +4017,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @return the coupon total amount
      */
     @Override
-    public Map<String, BigDecimal> getCouponTotalAmount(
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long couponTypeId,
-                    BigDecimal totalPrice,
-                    long shopID){
+    public Map<String, BigDecimal> getCouponTotalAmount(List<PromotionCouponCodeCommand> couponCodes,long couponTypeId,BigDecimal totalPrice,long shopID){
         Map<String, BigDecimal> usedCouponList = new HashMap<String, BigDecimal>();
         BigDecimal totalAmount = new BigDecimal(0.0);
         BigDecimal rateDisc = new BigDecimal(0.0);
@@ -5364,10 +4914,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByCategoryId(
-                    ShoppingCartCommand shopCart,
-                    long categoryId,
-                    Integer qtyLimited){
+    public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByCategoryId(ShoppingCartCommand shopCart,long categoryId,Integer qtyLimited){
         Integer qty = 0;
         if (null == shopCart || null == shopCart.getShoppingCartLineCommands() || shopCart.getShoppingCartLineCommands().size() == 0)
             return null;
@@ -5550,8 +5097,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                 }
                 // 规则商品不为空查询商品数量
                 if (null != inItems && inItems.size() != 0){
-                    List<OrderLine> orderLineList = sdkOrderLineDao
-                                    .findHistoryOrderLinesByItemIds(new ArrayList<Long>(inItems), shopId, memberId);
+                    List<OrderLine> orderLineList = sdkOrderLineDao.findHistoryOrderLinesByItemIds(new ArrayList<Long>(inItems), shopId, memberId);
 
                     if (null != orderLineList && orderLineList.size() > 0){
                         List<Long> historyOrderItemIdList = new ArrayList<Long>();
@@ -5839,13 +5385,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Deprecated
-    public Integer addOrUpdateShoppingCart(
-                    Long memberId,
-                    String extentionCode,
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComboIds,
-                    boolean exist,
-                    boolean isReduce){
+    public Integer addOrUpdateShoppingCart(Long memberId,String extentionCode,List<ShoppingCartLineCommand> lines,Set<String> memComboIds,boolean exist,boolean isReduce){
         if (null == lines || lines.size() == 0)
             return FAILURE;
         Integer retval = SUCCESS;
@@ -5861,8 +5401,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             }
 
             // 封装购物车行数据
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(line);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
 
             if (extentionCode.equals(line.getExtentionCode())){
@@ -5928,13 +5467,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Deprecated
     @Override
-    public Integer addOrUpdateShoppingCart(
-                    Long memberId,
-                    Long lineId,
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComboIds,
-                    boolean exist,
-                    boolean isReduce){
+    public Integer addOrUpdateShoppingCart(Long memberId,Long lineId,List<ShoppingCartLineCommand> lines,Set<String> memComboIds,boolean exist,boolean isReduce){
         if (null == lines || lines.size() == 0)
             return FAILURE;
         Integer retval = SUCCESS;
@@ -5946,8 +5479,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         for (ShoppingCartLineCommand line : lines){
 
             // 封装购物车行数据
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(line);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
 
             if (line.getId().equals(lineId)){
@@ -6013,13 +5545,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Deprecated
     @Override
-    public Integer addOrUpdateShoppingCartById(
-                    Long memberId,
-                    String extentionCode,
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComboIds,
-                    boolean exist,
-                    boolean isReduce){
+    public Integer addOrUpdateShoppingCartById(Long memberId,String extentionCode,List<ShoppingCartLineCommand> lines,Set<String> memComboIds,boolean exist,boolean isReduce){
         if (null == lines || lines.size() == 0)
             return FAILURE;
         Integer retval = SUCCESS;
@@ -6030,22 +5556,17 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         for (ShoppingCartLineCommand line : lines){
             // 封装购物车行数据
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(line);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
 
             if (line.getExtentionCode().equals(extentionCode)){
                 // 检查商品有效性
                 if (new Integer(1).equals(line.getValidType()) && !line.isValid()){
                     // 有效性检验失败
-                    throw new BusinessException(
-                                    Constants.THE_ORDER_CONTAINS_NOTVALID_ITEM,
-                                    new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
+                    throw new BusinessException(Constants.THE_ORDER_CONTAINS_NOTVALID_ITEM, new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
                 }else if (new Integer(2).equals(line.getValidType()) && !line.isValid()){
                     // 库存不足
-                    throw new BusinessException(
-                                    Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM,
-                                    new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
+                    throw new BusinessException(Constants.THE_ORDER_CONTAINS_INVENTORY_SHORTAGE_ITEM, new Object[] { line.getItemName(), line.getProductCode(), line.getItemPic() });
                 }
                 shoppingCartLine = line;
             }
@@ -6119,17 +5640,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         // 封装购物车行数据
         for (ShoppingCartLineCommand line : lines){
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(line);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(line);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(line);
         }
 
         // 获取限购规则
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(
-                        getShopIds(lines),
-                        memboIds,
-                        ShoppingCartUtil.getItemComboIds(lines),
-                        new Date());
+        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(getShopIds(lines), memboIds, ShoppingCartUtil.getItemComboIds(lines), new Date());
 
         ShoppingCartCommand cart = new ShoppingCartCommand();
         // 设置购物车行
@@ -6601,14 +6117,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : itemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -6626,8 +6135,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
     public Integer manualBuy(BigDecimal buyPrice,ShoppingCartLineCommand shoppingCartLine,List<ShoppingCartLineCommand> lines){
         try{
             Integer retval = SUCCESS;
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(shoppingCartLine);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLine);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(shoppingCartLine);
 
             shoppingCartLine.setSalePrice(buyPrice);
@@ -6795,8 +6303,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
 
         for (int i = 0; i < lineGroups.length; i++){
             String lineGroup = lineGroups[i];
-            List<ShoppingCartLineCommand> shoppingCartLines = sdkShoppingCartLineDao
-                            .findShopCartLineByLineGroupAndSkuId(memberId, null, lineGroup);
+            List<ShoppingCartLineCommand> shoppingCartLines = sdkShoppingCartLineDao.findShopCartLineByLineGroupAndSkuId(memberId, null, lineGroup);
             /** 先删除现有行 */
             if (null != shoppingCartLines && shoppingCartLines.size() > 0){
                 sdkShoppingCartLineDao.deleteGiftLineByMemberIdAndPromotionId(memberId, promotionId);
@@ -6813,22 +6320,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             command.setGift(true);
             command.setPromotionId(promotionId);
 
-            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(command);
+            ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(command);
             shoppingCartLineCommandBehaviour.packShoppingCartLine(command);
 
             /** 添加赠品行 */
-            sdkShoppingCartLineDao.insertShoppingCartLineWithLineGroup(
-                            command.getExtentionCode(),
-                            skuId,
-                            1,
-                            memberId,
-                            new Date(),
-                            CHECKED_STATE,
-                            command.getShopId(),
-                            lineGroup,
-                            true,
-                            command.getPromotionId());
+            sdkShoppingCartLineDao.insertShoppingCartLineWithLineGroup(command.getExtentionCode(), skuId, 1, memberId, new Date(), CHECKED_STATE, command.getShopId(), lineGroup, true, command.getPromotionId());
         }
     }
 
@@ -6868,14 +6364,8 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public Map<Integer, List<ShoppingCartLineCommand>> checkGiftEffective(
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComIds,
-                    Long memberId,
-                    List<String> coupons,
-                    CalcFreightCommand calcFreightCommand){
-        ShoppingCartCommand shoppingCartCommand = sdkShoppingCartCommandBuilder
-                        .buildShoppingCartCommand(memberId, lines, calcFreightCommand, coupons, memComIds);
+    public Map<Integer, List<ShoppingCartLineCommand>> checkGiftEffective(List<ShoppingCartLineCommand> lines,Set<String> memComIds,Long memberId,List<String> coupons,CalcFreightCommand calcFreightCommand){
+        ShoppingCartCommand shoppingCartCommand = sdkShoppingCartCommandBuilder.buildShoppingCartCommand(memberId, lines, calcFreightCommand, coupons, memComIds);
         if (null == shoppingCartCommand){
             return null;
         }
@@ -6890,14 +6380,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         }
 
         // 获取限购规则
-        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(
-                        getShopIds(lines),
-                        memComIds,
-                        ShoppingCartUtil.getItemComboIds(lines),
-                        new Date());
+        List<LimitCommand> purchaseLimitationList = sdkPurchaseRuleFilterManager.getIntersectPurchaseLimitRuleData(getShopIds(lines), memComIds, ShoppingCartUtil.getItemComboIds(lines), new Date());
 
-        Map<Integer, List<ShoppingCartLineCommand>> ForceSendGiftMap = sdkShoppingCartLinesManager
-                        .getShoppingCartForceSendGiftLines(allShoppingCartLineList, purchaseLimitationList, shoppingCartCommand);
+        Map<Integer, List<ShoppingCartLineCommand>> ForceSendGiftMap = sdkShoppingCartLinesManager.getShoppingCartForceSendGiftLines(allShoppingCartLineList, purchaseLimitationList, shoppingCartCommand);
         return ForceSendGiftMap;
     }
 
@@ -6909,11 +6394,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public boolean checkSelectedGiftLimit(
-                    Long[] currentSkuIds,
-                    String[] lineGroups,
-                    Long promotionId,
-                    List<ShoppingCartLineCommand> beforeGiftLines){
+    public boolean checkSelectedGiftLimit(Long[] currentSkuIds,String[] lineGroups,Long promotionId,List<ShoppingCartLineCommand> beforeGiftLines){
 
         // 1, 通过promotionId查询该活动,查看活动中最多可以选中多少个赠品
         PromotionCommand promotionCommand = sdkPromotionGuideManager.getPromotionById(promotionId);
@@ -6932,8 +6413,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             selectedGiftSkuIdSet.addAll(Arrays.asList(currentSkuIds));
         }
         for (ShoppingCartLineCommand giftLine : beforeGiftLines){
-            if (giftLine.isGift() && Constants.CHECKED_CHOOSE_STATE.equals(giftLine.getSettlementState())
-                            && promotionId.equals(giftLine.getPromotionId())){
+            if (giftLine.isGift() && Constants.CHECKED_CHOOSE_STATE.equals(giftLine.getSettlementState()) && promotionId.equals(giftLine.getPromotionId())){
                 selectedGiftSkuIdSet.add(giftLine.getSkuId());
             }
         }
@@ -6962,13 +6442,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long customId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByAMT(List<ShoppingCartLineCommand> lines,long customId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         List<Long> customItemIds = new ArrayList<Long>();
@@ -6977,13 +6451,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : customItemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -7014,14 +6482,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : customItemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerItemByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -7036,13 +6497,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long customId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByAMT(List<ShoppingCartLineCommand> lines,long customId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious){
         if (null == lines || lines.size() == 0)
             return null;
         List<Long> customItemIds = new ArrayList<Long>();
@@ -7051,13 +6506,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : customItemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(
-                            lines,
-                            itemId,
-                            discAmount,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByAMT(lines, itemId, discAmount, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -7089,14 +6538,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
             return null;
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (Long itemId : customItemIds){
-            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(
-                            lines,
-                            itemId,
-                            discRate,
-                            onePieceMark,
-                            factorDefault,
-                            itemFactorList,
-                            briefListPrevious);
+            List<PromotionSKUDiscAMTBySetting> settingOne = getSinglePrdDiscountAMTItemPerPCSByRate(lines, itemId, discRate, onePieceMark, factorDefault, itemFactorList, briefListPrevious);
             if (null != settingOne)
                 settingList.addAll(settingOne);
         }
@@ -7179,12 +6621,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public boolean checkCouponByCustomItemIds(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    List<Long> itemIdList,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId){
+    public boolean checkCouponByCustomItemIds(List<ShoppingCartLineCommand> shoppingCartLines,List<Long> itemIdList,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId){
         if (null == couponCodes || couponCodes.size() == 0 || null == shoppingCartLines || shoppingCartLines.size() == 0)
             return false;
         // TODO check coupon on line directly
@@ -7235,11 +6672,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      *            the shop id
      * @return true, if check on line coupon by custom item ids
      */
-    private boolean checkOnLineCouponByCustomItemIds(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    List<Long> itemIdList,
-                    long couponTypeID,
-                    long shopId){
+    private boolean checkOnLineCouponByCustomItemIds(List<ShoppingCartLineCommand> shoppingCartLines,List<Long> itemIdList,long couponTypeID,long shopId){
         if (null == itemIdList || itemIdList.size() == 0)
             return false;
         for (ShoppingCartLineCommand line : shoppingCartLines){
@@ -7324,11 +6757,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByItemID(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByItemID(List<ShoppingCartLineCommand> lines,long itemId,Integer factorMultiplication,List<PromotionBrief> briefListPrevious){
         List<PromotionMarkdownPrice> markdownPriceList = sdkPromotionManager.getPromotionMarkdownPriceListByItemId(itemId);
 
         return generatePromotionSKUDiscAMTBySettingByMarkdownPrice(lines, markdownPriceList, briefListPrevious);
@@ -7344,11 +6773,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCategoryID(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCategoryID(List<ShoppingCartLineCommand> lines,long categoryId,Integer factorMultiplication,List<PromotionBrief> briefListPrevious){
         List<Long> itemIdList = new ArrayList<Long>();
 
         itemIdList = getItemIdListFromShoppingCartLinesByCategory(lines, categoryId);
@@ -7368,11 +6793,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByComboID(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByComboID(List<ShoppingCartLineCommand> lines,long comboId,Integer factorMultiplication,List<PromotionBrief> briefListPrevious){
         List<Long> itemIdList = new ArrayList<Long>();
         itemIdList = getItemIdListFromShoppingCartLinesByCombo(lines, comboId);
 
@@ -7391,11 +6812,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCustomItemIds(
-                    List<ShoppingCartLineCommand> lines,
-                    List<Long> customItemIds,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious){
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCustomItemIds(List<ShoppingCartLineCommand> lines,List<Long> customItemIds,Integer factorMultiplication,List<PromotionBrief> briefListPrevious){
         List<Long> itemIdListAllLines = new ArrayList<Long>();
         itemIdListAllLines = getItemIdListFromShoppingCartLinesByCall(lines);
         customItemIds.retainAll(itemIdListAllLines);
@@ -7414,10 +6831,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      *            the brief list previous
      * @return the list< promotion sku disc amt by setting>
      */
-    private List<PromotionSKUDiscAMTBySetting> generatePromotionSKUDiscAMTBySettingByMarkdownPrice(
-                    List<ShoppingCartLineCommand> lines,
-                    List<PromotionMarkdownPrice> markdownPriceList,
-                    List<PromotionBrief> briefListPrevious){
+    private List<PromotionSKUDiscAMTBySetting> generatePromotionSKUDiscAMTBySettingByMarkdownPrice(List<ShoppingCartLineCommand> lines,List<PromotionMarkdownPrice> markdownPriceList,List<PromotionBrief> briefListPrevious){
         if (null == markdownPriceList){
             return null;
         }
@@ -7426,11 +6840,9 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         List<PromotionSKUDiscAMTBySetting> settingList = new ArrayList<PromotionSKUDiscAMTBySetting>();
         for (PromotionMarkdownPrice markdown : markdownPriceList){
             for (ShoppingCartLineCommand line : lines){
-                if (line.getShopId().equals(markdown.getShopId()) && line.getItemId().equals(markdown.getItemId())
-                                && line.getSkuId().equals(markdown.getSkuId())){
+                if (line.getShopId().equals(markdown.getShopId()) && line.getItemId().equals(markdown.getItemId()) && line.getSkuId().equals(markdown.getSkuId())){
                     // 如果行上现有的优惠已经超过行实付时，跳到下一个行
-                    BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager
-                                    .getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
+                    BigDecimal skuPreviousDiscAMT = sdkPromotionSettingManager.getDiscAMTFromPromotionResultBriefsAfterSharedBySKUId(lines, briefListPrevious, line.getSkuId());
                     BigDecimal lineNeedPay = BigDecimal.valueOf(line.getQuantity()).multiply(line.getSalePrice());
 
                     if (skuPreviousDiscAMT.compareTo(lineNeedPay) >= 0){
@@ -7443,8 +6855,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                         continue;
                     }
 
-                    lineCurrentDiscAMT = lineCurrentNeedPay
-                                    .subtract(BigDecimal.valueOf(line.getQuantity()).multiply(markdown.getMarkDownPrice()));
+                    lineCurrentDiscAMT = lineCurrentNeedPay.subtract(BigDecimal.valueOf(line.getQuantity()).multiply(markdown.getMarkDownPrice()));
                     if (lineCurrentDiscAMT.compareTo(BigDecimal.ZERO) <= 0){
                         continue;
                     }
@@ -7568,10 +6979,7 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
      * @param notChooseLines
      *            the not choose lines
      */
-    private void splitByCalcLevel(
-                    List<ShoppingCartLineCommand> allLines,
-                    List<ShoppingCartLineCommand> chooseLines,
-                    List<ShoppingCartLineCommand> notChooseLines){
+    private void splitByCalcLevel(List<ShoppingCartLineCommand> allLines,List<ShoppingCartLineCommand> chooseLines,List<ShoppingCartLineCommand> notChooseLines){
         for (ShoppingCartLineCommand shoppingCartLine : allLines){
             // 判断有效.促销计算时只计算有效的、被选中的购物车行
             if (needContainsLineCalc(shoppingCartLine.getSettlementState(), shoppingCartLine.isValid())){

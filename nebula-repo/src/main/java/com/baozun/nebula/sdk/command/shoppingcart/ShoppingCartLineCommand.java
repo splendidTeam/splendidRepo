@@ -30,6 +30,16 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 /**
  * The Class ShoppingCartLineCommand.
  * 
+ * <h3>特殊说明:</h3>
+ * 
+ * <blockquote>
+ * <p>
+ * 理论上内存对象{@code --->} db,和{@code db---->}内存对象 两者使用的 command 应该是不一样的, <br>
+ * 不过历史到现在都是使用的这一个公用类,为了最大化的减少开发成本,暂时维持现状,<br>
+ * but 这不是最佳实践 -- by feilong
+ * </p>
+ * </blockquote>
+ * 
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand

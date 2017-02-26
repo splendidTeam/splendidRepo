@@ -241,11 +241,33 @@
 		<constructor-arg>
 			<value>
 				<![CDATA[
-				  
-		       		insert into t_sc_shoppingcartline(id,extention_code,sku_id,quantity, member_id,create_time, settlement_state,shop_id,
-		       		is_gift,promotion_id, line_group) values (nextval('S_T_SC_SHOPPINGCARTLINE'),:extentionCode,:skuId,:quantity,:memberId,
-		       		:createTime,:settlementState,:shopId,:isGift,:promotionId, :lineGroup)
-		       		
+		       		insert into t_sc_shoppingcartline
+		       		(
+			       		id,
+			       		extention_code,
+			       		sku_id,
+			       		quantity, 
+			       		member_id,
+			       		create_time, 
+			       		settlement_state,
+			       		shop_id,
+			       		is_gift,
+			       		promotion_id, 
+			       		line_group
+		       		) 
+		       		values (
+			       		nextval('S_T_SC_SHOPPINGCARTLINE'),
+			       		:extentionCode,
+			       		:skuId,
+			       		:quantity,
+			       		:memberId,
+			       		:createTime,
+			       		:settlementState,
+			       		:shopId,
+			       		:isGift,
+			       		:promotionId, 
+			       		:lineGroup
+		       		)
 		       		 ]]>
 			</value>
 		</constructor-arg>

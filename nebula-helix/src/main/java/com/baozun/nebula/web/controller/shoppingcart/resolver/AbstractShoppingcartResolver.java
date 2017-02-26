@@ -41,8 +41,10 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartSameLineExtractor;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
@@ -62,6 +64,10 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     /** The sdk sku manager. */
     @Autowired
     private SdkSkuManager sdkSkuManager;
+
+    /** 相同行提取器. */
+    @Autowired
+    private ShoppingCartSameLineExtractor shoppingCartSameLineExtractor;
 
     /** The shoppingcart count persister. */
     @Autowired
@@ -94,10 +100,29 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         Validate.notNull(skuId, "skuId can't be null!");
         Validate.notNull(count, "count can't be null!");
 
+        ShoppingCartLineAddForm shoppingCartLineAddForm = new ShoppingCartLineAddForm(skuId, count);
+        return addShoppingCart(memberDetails, shoppingCartLineAddForm, request, response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#addShoppingCart(com.baozun.nebula.web.MemberDetails, com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult addShoppingCart(MemberDetails memberDetails,ShoppingCartLineAddForm shoppingCartLineAddForm,HttpServletRequest request,HttpServletResponse response){
+        Validate.notNull(shoppingCartLineAddForm, "shoppingCartLineAddForm can't be null!");
+
+        final Long skuId = shoppingCartLineAddForm.getSkuId();
+        final Integer count = shoppingCartLineAddForm.getCount();
+
+        Validate.notNull(skuId, "skuId can't be null!");
+        Validate.notNull(count, "count can't be null!");
+
         //********1. 校验************************************
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = defaultIfNullOrEmpty(getShoppingCartLineCommandList(memberDetails, request), new ArrayList<ShoppingCartLineCommand>());
-
-        ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, skuId, count);
+        ShoppingcartResult validatorShoppingcartResult = shoppingcartLineAddValidator.validator(memberDetails, shoppingCartLineCommandList, shoppingCartLineAddForm);
 
         if (null != validatorShoppingcartResult){
             return validatorShoppingcartResult;
@@ -105,7 +130,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //待操作的购物车行
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = find(mainLines, "skuId", skuId);
+        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartSameLineExtractor.getSameLine(mainLines, shoppingCartLineAddForm);
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, toBeOperatedShoppingCartLineCommand, request, response);
 
         if (null != addShoppingCartShoppingcartResult){

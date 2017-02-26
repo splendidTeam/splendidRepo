@@ -91,19 +91,6 @@ public class ShoppingCartLine extends BaseModel{
 
     //********************************************************************************
 
-    /**
-     * 包装信息 id.
-     * 
-     * <p>
-     * 对于某些特殊商城,支持买家购买的时候使用不同的包装 (对于Reebok而言 就是支持定制球鞋秋衣,上面可以刻字)
-     * </p>
-     * 
-     * @see com.baozun.nebula.model.packageinfo.PackageInfo
-     * @since 5.3.2.11-Personalise
-     */
-    private Long packageInfoId;
-    //********************************************************************************
-
     /** 行分组. */
     private String lineGroup;
 
@@ -394,35 +381,5 @@ public class ShoppingCartLine extends BaseModel{
      */
     public void setRelatedItemId(Long relatedItemId){
         this.relatedItemId = relatedItemId;
-    }
-
-    
-    /**
-     * 获得 包装信息 id.
-     * <p>
-     * 对于某些特殊商城,支持买家购买的时候使用不同的包装 (对于Reebok而言 就是支持定制球鞋秋衣,上面可以刻字)
-     * </p>
-     *
-     * @return the packageInfoId
-     * @see com.baozun.nebula.model.packageinfo.PackageInfo
-     * @since 5.3.2.11-Personalise
-     */
-    public Long getPackageInfoId(){
-        return packageInfoId;
-    }
-    
-    /**
-     * 设置 包装信息 id.
-     * <p>
-     * 对于某些特殊商城,支持买家购买的时候使用不同的包装 (对于Reebok而言 就是支持定制球鞋秋衣,上面可以刻字)
-     * </p>
-     *
-     * @param packageInfoId
-     *            the packageInfoId to set
-     * @see com.baozun.nebula.model.packageinfo.PackageInfo
-     * @since 5.3.2.11-Personalise
-     */
-    public void setPackageInfoId(Long packageInfoId){
-        this.packageInfoId = packageInfoId;
     }
 }

@@ -19,33 +19,24 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 import java.util.List;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
- * 添加购物车行的校验.
- *
+ * 相同行提取器.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.2.3
+ * @since 5.3.2.11-Personalise
  */
-public interface ShoppingcartLineAddValidator{
+public interface ShoppingCartSameLineExtractor{
 
     /**
-     * 添加购物车的校验.
+     * 从主行list中查找相同行
      * 
-     * <p>
-     * 注意:此接口可能含融合操作
-     * </p>
-     *
-     * @param memberDetails
-     *            the member details
-     * @param shoppingCartLineCommandList
-     *            用户原来的购物车,如果没有那么构造empty list进来
+     * @param mainLines
+     *            已有的购物车主行
      * @param shoppingCartLineAddForm
-     *            购买表单
-     * @return 如果校验没有问题,返回null,否则返回 {@link ShoppingcartResult}
-     * @since 5.3.2.11-Personalise
+     *            现在的表单
+     * @return 如果找不到相同行,那么返回null
      */
-    ShoppingcartResult validator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineAddForm shoppingCartLineAddForm);
+    ShoppingCartLineCommand getSameLine(List<ShoppingCartLineCommand> mainLines,final ShoppingCartLineAddForm shoppingCartLineAddForm);
 }

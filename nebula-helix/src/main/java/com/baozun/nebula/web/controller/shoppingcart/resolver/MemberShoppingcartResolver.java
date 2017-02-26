@@ -17,7 +17,6 @@
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.OPERATE_ERROR;
-import static com.feilong.core.util.CollectionsUtil.find;
 
 import java.util.List;
 import java.util.Map;
@@ -25,16 +24,18 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.web.MemberDetails;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 会员购物车操作.
@@ -51,9 +52,15 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Autowired
     private SdkShoppingCartManager sdkShoppingCartManager;
 
+    @Autowired
+    private SdkShoppingCartAddManager sdkShoppingCartAddManager;
+
     /** The sdk shopping cart update manager. */
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
+
+    @Autowired
+    private SdkShoppingCartQueryManager sdkShoppingCartQueryManager;
 
     /*
      * (non-Javadoc)
@@ -64,7 +71,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
-        return sdkShoppingCartManager.findShoppingCartLinesByMemberId(memberDetails.getGroupId(), null);
+        return sdkShoppingCartQueryManager.findShoppingCartLineCommandList(memberDetails.getGroupId());
     }
 
     /*
@@ -77,9 +84,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Override
     protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
-
-        boolean success = sdkShoppingCartManager.merageShoppingCartLineById(memberDetails.getGroupId(), currentLine);
-        return success ? null : OPERATE_ERROR;
+        sdkShoppingCartAddManager.addCartLine(memberDetails.getGroupId(), currentLine);
+        return null;
     }
 
     /*

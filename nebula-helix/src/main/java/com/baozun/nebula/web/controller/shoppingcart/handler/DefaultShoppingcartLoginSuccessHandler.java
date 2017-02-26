@@ -32,7 +32,8 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver;
-import com.feilong.core.Validator;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
  * The Class DefaultShoppingcartLoginSuccessHandler.
@@ -54,7 +55,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
     /** The member shoppingcart resolver. */
     @Autowired
     @Qualifier("memberShoppingcartResolver")
-    private ShoppingcartResolver       memberShoppingcartResolver;
+    private ShoppingcartResolver memberShoppingcartResolver;
 
     /** The shoppingcart count persister. */
     @Autowired
@@ -75,7 +76,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         // 获取游客购物车数据
         List<ShoppingCartLineCommand> guestShoppingCartLineCommandList = guestShoppingcartPersister.load(request);
 
-        boolean hasGuestShoppingcart = Validator.isNotNullOrEmpty(guestShoppingCartLineCommandList);
+        boolean hasGuestShoppingcart = isNotNullOrEmpty(guestShoppingCartLineCommandList);
         if (hasGuestShoppingcart){
             //同步
             sdkShoppingCartSyncManager.syncShoppingCart(memberId, guestShoppingCartLineCommandList);
@@ -84,8 +85,7 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
         }
 
         //获得DB购物车总数量 设置count cookie 
-        List<ShoppingCartLineCommand> memberShoppingCartLineCommandList = memberShoppingcartResolver
-                        .getShoppingCartLineCommandList(memberDetails, request);
+        List<ShoppingCartLineCommand> memberShoppingCartLineCommandList = memberShoppingcartResolver.getShoppingCartLineCommandList(memberDetails, request);
         shoppingcartCountPersister.save(memberShoppingCartLineCommandList, request, response);
     }
 }

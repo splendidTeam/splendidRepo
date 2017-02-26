@@ -19,24 +19,30 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAIN_LINE_MAX_THAN_COUNT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
-import static com.feilong.core.util.CollectionsUtil.find;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
+import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.lang.reflect.ConstructorUtil;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * The Class DefaultShoppingcartLineAddValidator.
@@ -51,6 +57,10 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     @Autowired
     private SdkSkuManager sdkSkuManager;
 
+    /** 相同行提取器. */
+    @Autowired
+    private ShoppingCartSameLineExtractor shoppingCartSameLineExtractor;
+
     /** The shoppingcart total line max size validator. */
     @Autowired(required = false)
     private ShoppingcartTotalLineMaxSizeValidator shoppingcartTotalLineMaxSizeValidator;
@@ -62,10 +72,19 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator#validator(com.baozun.nebula.web.MemberDetails, java.util.List, java.lang.Long, java.lang.Integer)
+     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator#validator(com.baozun.nebula.web.MemberDetails, java.util.List, com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm)
      */
     @Override
-    public ShoppingcartResult validator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId,Integer count){
+    public ShoppingcartResult validator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineAddForm shoppingCartLineAddForm){
+        Validate.notNull(shoppingCartLineAddForm, "shoppingCartLineAddForm can't be null!");
+
+        final Long skuId = shoppingCartLineAddForm.getSkuId();
+        final Integer count = shoppingCartLineAddForm.getCount();
+
+        Validate.notNull(skuId, "skuId can't be null!");
+        Validate.notNull(count, "count can't be null!");
+
+        //--------------------1.common 校验--------------------------------------------
         Sku sku = sdkSkuManager.findSkuById(skuId);
         ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, count);
 
@@ -73,14 +92,15 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
             return commonValidateShoppingcartResult;
         }
 
-        // ****************************************************************************************
+        //----------------------------------------------------------------
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
 
         // ****************************************************************************************
         //待操作的购物车行
-        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = find(mainLines, "skuId", sku.getId());
+        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartSameLineExtractor.getSameLine(mainLines, shoppingCartLineAddForm);
 
-        //是否已经在购物车里面有
+        //------------2.单行 最大购买数校验-----------------------------------------------------------------------------------
+        //是否已经在购物车里面有,如果有,那么这一行累计数量进行校验; 如果没有那么仅仅校验传入的数量
         Integer oneLineTotalCount = null != toBeOperatedShoppingCartLineCommand ? toBeOperatedShoppingCartLineCommand.getQuantity() + count : count;
 
         ShoppingcartOneLineMaxQuantityValidator useShoppingcartOneLineMaxCountValidator = getUseShoppingcartOneLineMaxQuantityValidator();
@@ -88,8 +108,8 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
             return ONE_LINE_MAX_THAN_COUNT;
         }
 
-        // 最大行数验证
-        // 校验是否超过购物车规定的商品行数
+        // -----------3.最大行数验证-----------------------------------------------------------------------------
+        // 如果没有找到相同的行, 那么需要创建一个line,所以需要校验是否超过购物车规定的商品行数
         if (null == toBeOperatedShoppingCartLineCommand){
             ShoppingcartTotalLineMaxSizeValidator useShoppingcartTotalLineMaxSizeValidator = defaultIfNull(shoppingcartTotalLineMaxSizeValidator, new DefaultShoppingcartTotalLineMaxSizeValidator());
             if (useShoppingcartTotalLineMaxSizeValidator.isGreaterThanMaxSize(memberDetails, mainLines.size() + 1)){
@@ -99,42 +119,81 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
 
         //***************************************************************************************
         if (null != toBeOperatedShoppingCartLineCommand){// 存在
+
+            //引用对象 重新赋予新值
             toBeOperatedShoppingCartLineCommand.setQuantity(oneLineTotalCount);
         }else{
             // 构造一条 塞进去
-            ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(sku.getId(), count, sku.getOutid());
+            ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(shoppingCartLineAddForm, sku.getOutid());
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
 
-            toBeOperatedShoppingCartLineCommand = shoppingCartLineCommand;
         }
 
-        //***********************************************************************************************
-
+        //************4.统计购物车所有相同 skuid 库存校验***********************************************************************************
         if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
             return MAX_THAN_INVENTORY;
         }
         return null;
     }
 
+    //------------------------------------------------------------------------------------------------
+
     /**
      * 转换为ShoppingCartLineCommand对象.
      *
-     * @param skuId
-     *            the sku id
-     * @param quantity
-     *            the quantity
-     * @param extensionCode
-     *            the extension code
+     * @param shoppingCartLineAddForm
+     *            购物车添加表单
+     * @param extentionCode
+     *            extentionCode
      * @return the shopping cart line command
+     * @since 5.3.2.11-Personalise
      */
-    private ShoppingCartLineCommand buildShoppingCartLineCommand(Long skuId,Integer quantity,String extensionCode){
+    private static ShoppingCartLineCommand buildShoppingCartLineCommand(ShoppingCartLineAddForm shoppingCartLineAddForm,String extentionCode){
         ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
-        shoppingCartLineCommand.setSkuId(skuId);
-        shoppingCartLineCommand.setExtentionCode(extensionCode);
-        shoppingCartLineCommand.setQuantity(quantity);
+        shoppingCartLineCommand.setSkuId(shoppingCartLineAddForm.getSkuId());
+        shoppingCartLineCommand.setExtentionCode(extentionCode);
+        shoppingCartLineCommand.setQuantity(shoppingCartLineAddForm.getCount());
+
+        shoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(toShoppingCartLinePackageInfoCommandList(shoppingCartLineAddForm.getPackageInfoFormList()));
+
         shoppingCartLineCommand.setCreateTime(new Date());
         shoppingCartLineCommand.setSettlementState(Constants.CHECKED_CHOOSE_STATE);
         return shoppingCartLineCommand;
     }
 
+    /**
+     * 转换.
+     *
+     * @param packageInfoFormList
+     * @return 如果 <code>packageInfoFormList</code> 是null或者empty,返回 {@link Collections#emptyList()}<br>
+     * @since 5.3.2.11-Personalise
+     */
+    private static List<ShoppingCartLinePackageInfoCommand> toShoppingCartLinePackageInfoCommandList(List<PackageInfoForm> packageInfoFormList){
+        return CollectionsUtil.collect(packageInfoFormList, transformer(ShoppingCartLinePackageInfoCommand.class));
+    }
+
+    /**
+     * 
+     *
+     * @param <I>
+     * @param <O>
+     * @param type
+     * @param includePropertyNames
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
+        return new Transformer<I, O>(){
+
+            @Override
+            public O transform(I inputBean){
+                Validate.notNull(inputBean, "inputBean can't be null!");
+
+                O outBean = ConstructorUtil.newInstance(type);
+
+                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
+                return outBean;
+            }
+        };
+    }
 }

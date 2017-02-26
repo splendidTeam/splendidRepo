@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
@@ -41,6 +40,9 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
     /** The sdk shopping cart line dao. */
     @Autowired
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
+
+    @Autowired
+    private SdkShoppingCartAddManager sdkShoppingCartAddManager;
 
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
@@ -66,38 +68,14 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
             Integer quantity = shoppingCartLineCommand.getQuantity();
             Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);
 
+            //**********************************************************************************************
             ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
 
             if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
                 sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
             }else{
-                saveCartLine(memberId, shoppingCartLineCommand);
+                sdkShoppingCartAddManager.addCartLine(memberId, shoppingCartLineCommand);
             }
-        }
-    }
-
-    /**
-     * 保存或更新购物行信息.
-     *
-     * @param shoppingCartLine
-     *            the shopping cart line
-     */
-    private void saveCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLine){
-        // 保存
-        int result = sdkShoppingCartLineDao.insertShoppingCartLine(
-                        shoppingCartLine.getExtentionCode(),
-                        shoppingCartLine.getSkuId(),
-                        shoppingCartLine.getQuantity(),
-                        memberId,
-                        shoppingCartLine.getCreateTime(),
-                        shoppingCartLine.getSettlementState(),
-                        shoppingCartLine.getShopId(),
-                        shoppingCartLine.isGift(),
-                        shoppingCartLine.getPromotionId(),
-                        shoppingCartLine.getLineGroup());
-
-        if (1 != result){
-            throw new NativeUpdateRowCountNotEqualException(1, result);
         }
     }
 }

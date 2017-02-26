@@ -1096,5 +1096,4 @@ public interface SdkShoppingCartManager extends BaseManager{
 
     public Integer doPromotionCheck(ShoppingCartCommand cart,Set<String> memboIds);
 
-    public boolean merageShoppingCartLineById(Long userId,ShoppingCartLineCommand shoppingCartLine);
 }

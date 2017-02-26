@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 
@@ -142,6 +143,36 @@ public interface ShoppingcartResolver{
      *             如果 <code>skuId</code> 是null,或者 <code>count</code>是null
      */
     ShoppingcartResult addShoppingCart(MemberDetails memberDetails,Long skuId,Integer count,HttpServletRequest request,HttpServletResponse response);
+
+    //***************************************************************************************
+    /**
+     * 将特定的<code>shoppingCartLineAddForm</code>,加入到用户的购物车里面去.
+     * 
+     * <h3>流程:</h3>
+     * 
+     * <blockquote>
+     * 
+     * <p>
+     * <img src="http://venusdrogon.github.io/feilong-platform/mysource/store/添加到购物车.png"/>
+     * </p>
+     * 
+     * </blockquote>
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param shoppingCartLineAddForm
+     *            购物车行 添加的form
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @throws NullPointerException
+     *             如果 <code>skuId</code> 是null,或者 <code>count</code>是null
+     * @since 5.3.2.11-Personalise
+     */
+    ShoppingcartResult addShoppingCart(MemberDetails memberDetails,ShoppingCartLineAddForm shoppingCartLineAddForm,HttpServletRequest request,HttpServletResponse response);
 
     /**
      * 更新指定的购物车行<code>shoppingcartLineId</code>的数量<code>count</code>.
