@@ -14,31 +14,26 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.dao.shoppingcart;
+package com.baozun.nebula.wormhole.scm.makemsgcon;
 
 import java.util.List;
 
-import com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
-
-import loxia.annotation.NativeQuery;
-import loxia.annotation.QueryParam;
-import loxia.dao.GenericEntityDao;
+import com.baozun.nebula.sdk.command.OrderLineCommand;
+import com.baozun.nebula.wormhole.mq.entity.order.ProductPackageV5;
 
 /**
+ * 订单行包装信息构造器.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public interface ShoppingCartLinePackageInfoDao extends GenericEntityDao<ShoppingCartLinePackageInfo, Long>{
+public interface OrderLineProductPackageV5Builder{
 
     /**
-     * 根据购物车行查询包装信息.
-     *
-     * @param shoppingCartLineIdList
-     * @return 根据购物车行查询包装信息.
+     * 构造包装信息.
+     * 
+     * @param orderLineCommand
+     * @return 如果 <code>orderLineCommand</code> 没有包装信息,返回 null<br>
      */
-    @NativeQuery(model = ShoppingCartLinePackageInfoCommand.class)
-    List<ShoppingCartLinePackageInfoCommand> findShoppingCartLinePackageInfoCommandList(@QueryParam("shoppingCartLineIdList") List<Long> shoppingCartLineIdList);
-
+    List<ProductPackageV5> buildProductPackageV5List(OrderLineCommand orderLineCommand);
 }

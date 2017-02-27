@@ -14,12 +14,12 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.dao.shoppingcart;
+package com.baozun.nebula.dao.salesorder;
 
 import java.util.List;
 
-import com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
+import com.baozun.nebula.model.salesorder.OrderLinePackageInfo;
+import com.baozun.nebula.sdk.command.OrderLinePackageInfoCommand;
 
 import loxia.annotation.NativeQuery;
 import loxia.annotation.QueryParam;
@@ -30,15 +30,15 @@ import loxia.dao.GenericEntityDao;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public interface ShoppingCartLinePackageInfoDao extends GenericEntityDao<ShoppingCartLinePackageInfo, Long>{
+public interface SdkOrderLinePackageInfoDao extends GenericEntityDao<OrderLinePackageInfo, Long>{
 
     /**
-     * 根据购物车行查询包装信息.
+     * 根据订单行 查询包装信息.
      *
-     * @param shoppingCartLineIdList
-     * @return 根据购物车行查询包装信息.
+     * @param orderLineIdList
+     * @return 根据订单行 查询包装信息.
      */
-    @NativeQuery(model = ShoppingCartLinePackageInfoCommand.class)
-    List<ShoppingCartLinePackageInfoCommand> findShoppingCartLinePackageInfoCommandList(@QueryParam("shoppingCartLineIdList") List<Long> shoppingCartLineIdList);
+    @NativeQuery(model = OrderLinePackageInfoCommand.class)
+    List<OrderLinePackageInfoCommand> findOrderLinePackageInfoCommandList(@QueryParam("orderLineIdList") List<Long> orderLineIdList);
 
 }

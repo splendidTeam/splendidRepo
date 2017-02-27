@@ -62,14 +62,7 @@ public class SdkShoppingCartQueryManagerImpl implements SdkShoppingCartQueryMana
     public List<ShoppingCartLineCommand> findShoppingCartLineCommandList(Long memberId){
         //该sql 其实返回的是主商品行 不带赠品的
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = sdkShoppingCartLineDao.findShopCartLineByMemberId(memberId, null);
-        if (isNullOrEmpty(shoppingCartLineCommandList)){
-            return Collections.emptyList();
-        }
-
-        List<Long> shoppingCartLineIdList = CollectionsUtil.getPropertyValueList(shoppingCartLineCommandList, "id");
-        List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = shoppingCartLinePackageInfoDao.findShoppingCartLinePackageInfoCommandList(shoppingCartLineIdList);
-
-        return handleShoppingCartLineCommandList(shoppingCartLineCommandList, shoppingCartLinePackageInfoCommandList);
+        return handleShoppingCartLineCommandList(shoppingCartLineCommandList);
     }
 
     /**
@@ -84,11 +77,17 @@ public class SdkShoppingCartQueryManagerImpl implements SdkShoppingCartQueryMana
      * @return
      * @since 5.3.2.11-Personalise
      */
-    private static List<ShoppingCartLineCommand> handleShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList,List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
+    private List<ShoppingCartLineCommand> handleShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        if (isNullOrEmpty(shoppingCartLineCommandList)){
+            return Collections.emptyList();
+        }
+        
+        List<Long> shoppingCartLineIdList = CollectionsUtil.getPropertyValueList(shoppingCartLineCommandList, "id");
+        List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = shoppingCartLinePackageInfoDao.findShoppingCartLinePackageInfoCommandList(shoppingCartLineIdList);
         if (isNullOrEmpty(shoppingCartLinePackageInfoCommandList)){
             return shoppingCartLineCommandList;
         }
-
+        
         //按照行分个组
         Map<Long, List<ShoppingCartLinePackageInfoCommand>> shoppingCartLineIdAndShoppingCartLinePackageInfoCommandListMap = CollectionsUtil.group(shoppingCartLinePackageInfoCommandList, "shoppingCartLineId");
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){

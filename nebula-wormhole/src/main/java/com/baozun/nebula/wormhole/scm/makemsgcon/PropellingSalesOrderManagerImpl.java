@@ -52,6 +52,9 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
     @Autowired
     private SdkPaymentManager paymentManager;
 
+    @Autowired
+    private OrderLineProductPackageV5Builder orderLineProductPackageV5Builder;
+
     @Autowired(required = false)
     private PropellingSalesOrderHandler propellingSalesOrderHandler;
 
@@ -263,7 +266,7 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
                 orderLineV5.setWarrantyMonths(null);
 
                 //订单行包装信息
-                orderLineV5.setProductPackages(null);
+                orderLineV5.setProductPackages(orderLineProductPackageV5Builder.buildProductPackageV5List(orderLine));
                 //设置商品图片
                 orderLineV5.setItemPic(uploadImgDomain + orderLine.getItemPic());
 
