@@ -69,7 +69,7 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
             Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);
 
             //**********************************************************************************************
-            ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
+            ShoppingCartLineCommand cartLineInDb = findInDb(memberId, shoppingCartLineCommand);
 
             if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
                 sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
@@ -77,5 +77,18 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
                 sdkShoppingCartAddManager.addCartLine(memberId, shoppingCartLineCommand);
             }
         }
+    }
+
+    /**
+     * 在DB中查找
+     * 
+     * @param memberId
+     * @param extentionCode
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    protected ShoppingCartLineCommand findInDb(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
+        String extentionCode = shoppingCartLineCommand.getExtentionCode();
+        return sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
     }
 }

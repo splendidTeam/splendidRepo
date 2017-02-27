@@ -49,9 +49,11 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkShoppingCartAddManagerImpl.class);
 
+    /**  */
     @Autowired
     private PackageInfoDao packageInfoDao;
 
+    /**  */
     @Autowired
     private ShoppingCartLinePackageInfoDao shoppingCartLinePackageInfoDao;
 
@@ -59,6 +61,7 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     @Autowired
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
 
+    /**  */
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
 
@@ -82,9 +85,8 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         Validate.notBlank(extentionCode, "extentionCode can't be blank!");
 
         //-----------------如果指定了id--------------------------------------------------------------------
-        Long lineId = shoppingCartLineCommand.getId();
-        if (lineId != null && lineId > 0){ // 更新
-            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, lineId, shoppingCartLineCommand.getQuantity());
+        if (isUpdate(shoppingCartLineCommand)){ // 更新
+            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity());
             return;
         }
 
@@ -99,39 +101,66 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     }
 
     /**
-     * 保存包装信息
-     * 
-     * @param shoppingCartLineId
+     * 判断是否需要更新.
+     *
      * @param shoppingCartLineCommand
-     * 
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    protected boolean isUpdate(ShoppingCartLineCommand shoppingCartLineCommand){
+        Long lineId = shoppingCartLineCommand.getId();
+        return lineId != null && lineId > 0;
+    }
+
+    /**
+     * 保存包装信息.
+     *
+     * @param shoppingCartLineId
+     * @param shoppingCartLinePackageInfoCommandList
      * @since 5.3.2.11-Personalise
      */
     protected void savePackageInfo(Long shoppingCartLineId,List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
         for (ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand : shoppingCartLinePackageInfoCommandList){
-            final Date now = new Date();
-
             Long packageInfoId = shoppingCartLinePackageInfoCommand.getPackageInfoId();
             if (null == packageInfoId){//如果没有packageInfoId 那么就创建一个,如果有那么就使用传入的,这样支持固定的包装类型
-                PackageInfo packageInfo = new PackageInfo();
-
-                packageInfo.setExtendInfo(shoppingCartLinePackageInfoCommand.getExtendInfo());
-                packageInfo.setFeatureInfo(shoppingCartLinePackageInfoCommand.getFeatureInfo());
-                packageInfo.setTotal(shoppingCartLinePackageInfoCommand.getTotal());
-                packageInfo.setType(shoppingCartLinePackageInfoCommand.getType());
-                packageInfo.setCreateTime(now);
-
-                PackageInfo packageInfoDb = packageInfoDao.save(packageInfo);
+                PackageInfo packageInfoDb = packageInfoDao.save(toPackageInfo(shoppingCartLinePackageInfoCommand));
                 packageInfoId = packageInfoDb.getId();//新的id
             }
 
             //----------------------------------------------------------------------------
-            ShoppingCartLinePackageInfo shoppingCartLinePackageInfo = new ShoppingCartLinePackageInfo();
-            shoppingCartLinePackageInfo.setPackageInfoId(packageInfoId);
-            shoppingCartLinePackageInfo.setShoppingCartLineId(shoppingCartLineId);
-            shoppingCartLinePackageInfo.setCreateTime(now);
-
+            ShoppingCartLinePackageInfo shoppingCartLinePackageInfo = buildShoppingCartLinePackageInfo(shoppingCartLineId, packageInfoId);
             shoppingCartLinePackageInfoDao.save(shoppingCartLinePackageInfo);
         }
+    }
+
+    /**
+     * @param shoppingCartLineId
+     * @param packageInfoId
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    protected ShoppingCartLinePackageInfo buildShoppingCartLinePackageInfo(Long shoppingCartLineId,Long packageInfoId){
+        ShoppingCartLinePackageInfo shoppingCartLinePackageInfo = new ShoppingCartLinePackageInfo();
+        shoppingCartLinePackageInfo.setPackageInfoId(packageInfoId);
+        shoppingCartLinePackageInfo.setShoppingCartLineId(shoppingCartLineId);
+        shoppingCartLinePackageInfo.setCreateTime(new Date());
+        return shoppingCartLinePackageInfo;
+    }
+
+    /**
+     * @param shoppingCartLinePackageInfoCommand
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    protected PackageInfo toPackageInfo(ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand){
+        PackageInfo packageInfo = new PackageInfo();
+
+        packageInfo.setExtendInfo(shoppingCartLinePackageInfoCommand.getExtendInfo());
+        packageInfo.setFeatureInfo(shoppingCartLinePackageInfoCommand.getFeatureInfo());
+        packageInfo.setTotal(shoppingCartLinePackageInfoCommand.getTotal());
+        packageInfo.setType(shoppingCartLinePackageInfoCommand.getType());
+        packageInfo.setCreateTime(new Date());
+        return packageInfo;
     }
 
     /**
@@ -140,9 +169,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
      * <p>
      * 通常用于同步购物车,以及添加购物车的逻辑内
      * </p>
-     * 
+     *
      * @param memberId
      * @param shoppingCartLineCommand
+     * @return
      */
     private ShoppingCartLine saveShoppingCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
         // 保存 ShoppingCartLine

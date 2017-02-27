@@ -17,7 +17,7 @@
 						packageInfo.type                                 as type,
 						packageInfo.total                                as total,
 						packageInfo.FEATURE_INFO                         as featureInfo,
-						packageInfo.EXTEND_INFO                          as extendInfo,
+						packageInfo.EXTEND_INFO                          as extendInfo
 					
 					from T_SC_SHOPPING_CARTLINE_PACKAGE_INFO shoppingCartLinePackageInfo
 					join T_SC_SHOPPINGCARTLINE shoppingCartLine     on shoppingCartLine.id	=	shoppingCartLinePackageInfo.SHOPPING_CARTLINE_ID
