@@ -17,16 +17,13 @@
 package com.baozun.nebula.sdk.manager.order.handler;
 
 import static com.baozun.nebula.constant.IfIdentifyConstants.IDENTIFY_ORDER_SEND;
-import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.apache.commons.collections4.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +42,8 @@ import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
  * The Class OrderCreateByShopManagerImpl.
@@ -125,6 +124,8 @@ public class OrderCreateByShopManagerImpl implements OrderCreateByShopManager{
             ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
             shoppingCartLineCommandBehaviour.saveOrderLine(orderId, couponCodes, promotionSKUDiscAMTBySettingList, shoppingCartLineCommand);
         }
+
+        //------------------------------------------------------------------------------------------------
 
         // 免运费
         if (isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){

@@ -19,11 +19,6 @@ package com.baozun.nebula.web.controller.shoppingcart.resolver;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SUCCESS;
-import static com.feilong.core.Validator.isNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toList;
-import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
-import static com.feilong.core.util.CollectionsUtil.find;
-import static com.feilong.core.util.CollectionsUtil.select;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +39,18 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartSameLineExtractor;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartSameLineExtractor;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineUpdateValidator;
 import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
+import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.find;
+import static com.feilong.core.util.CollectionsUtil.select;
 
 /**
  * The Class AbstractShoppingcartResolver.

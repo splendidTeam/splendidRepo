@@ -44,6 +44,8 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.lang.reflect.ConstructorUtil;
 import com.feilong.core.util.CollectionsUtil;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
 /**
  * The Class DefaultShoppingcartLineAddValidator.
  *
@@ -83,6 +85,14 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
 
         Validate.notNull(skuId, "skuId can't be null!");
         Validate.notNull(count, "count can't be null!");
+
+        List<PackageInfoForm> packageInfoFormList = shoppingCartLineAddForm.getPackageInfoFormList();
+        if (isNotNullOrEmpty(packageInfoFormList)){
+            for (PackageInfoForm packageInfoForm : packageInfoFormList){
+                Validate.notNull(packageInfoForm.getType(), "packageInfoForm type can't be null!");
+                Validate.notNull(packageInfoForm.getTotal(), "packageInfoForm total can't be null!");
+            }
+        }
 
         //--------------------1.common 校验--------------------------------------------
         Sku sku = sdkSkuManager.findSkuById(skuId);

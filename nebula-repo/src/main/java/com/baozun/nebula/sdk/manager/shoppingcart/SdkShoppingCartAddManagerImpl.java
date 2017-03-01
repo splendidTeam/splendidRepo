@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.dao.packageinfo.PackageInfoDao;
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.dao.shoppingcart.ShoppingCartLinePackageInfoDao;
 import com.baozun.nebula.model.packageinfo.PackageInfo;
@@ -34,6 +33,7 @@ import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
+import com.baozun.nebula.sdk.manager.packageinfo.PackageInfoManager;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
@@ -51,9 +51,8 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
 
     /**  */
     @Autowired
-    private PackageInfoDao packageInfoDao;
+    private PackageInfoManager packageInfoManager;
 
-    /**  */
     @Autowired
     private ShoppingCartLinePackageInfoDao shoppingCartLinePackageInfoDao;
 
@@ -123,7 +122,7 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         for (ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand : shoppingCartLinePackageInfoCommandList){
             Long packageInfoId = shoppingCartLinePackageInfoCommand.getPackageInfoId();
             if (null == packageInfoId){//如果没有packageInfoId 那么就创建一个,如果有那么就使用传入的,这样支持固定的包装类型
-                PackageInfo packageInfoDb = packageInfoDao.save(toPackageInfo(shoppingCartLinePackageInfoCommand));
+                PackageInfo packageInfoDb = packageInfoManager.savePackageInfo(shoppingCartLinePackageInfoCommand);
                 packageInfoId = packageInfoDb.getId();//新的id
             }
 
@@ -145,22 +144,6 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
         shoppingCartLinePackageInfo.setShoppingCartLineId(shoppingCartLineId);
         shoppingCartLinePackageInfo.setCreateTime(new Date());
         return shoppingCartLinePackageInfo;
-    }
-
-    /**
-     * @param shoppingCartLinePackageInfoCommand
-     * @return
-     * @since 5.3.2.11-Personalise
-     */
-    protected PackageInfo toPackageInfo(ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand){
-        PackageInfo packageInfo = new PackageInfo();
-
-        packageInfo.setExtendInfo(shoppingCartLinePackageInfoCommand.getExtendInfo());
-        packageInfo.setFeatureInfo(shoppingCartLinePackageInfoCommand.getFeatureInfo());
-        packageInfo.setTotal(shoppingCartLinePackageInfoCommand.getTotal());
-        packageInfo.setType(shoppingCartLinePackageInfoCommand.getType());
-        packageInfo.setCreateTime(new Date());
-        return packageInfo;
     }
 
     /**
