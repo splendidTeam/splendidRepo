@@ -241,8 +241,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
                     HttpServletResponse response,
                     Model model){
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult shoppingcartResult = null;
-        //shoppingcartResolver.addShoppingCart(memberDetails, skuId, count, request, response);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.addShoppingCart(memberDetails, shoppingCartLineAddForm, request, response);
         return toNebulaReturnResult(shoppingcartResult);
     }
 

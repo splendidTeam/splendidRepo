@@ -97,6 +97,6 @@ public class SdkShoppingCartQueryManagerImpl implements SdkShoppingCartQueryMana
                 shoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(list);
             }
         }
-        return null;
+        return shoppingCartLineCommandList;
     }
 }
