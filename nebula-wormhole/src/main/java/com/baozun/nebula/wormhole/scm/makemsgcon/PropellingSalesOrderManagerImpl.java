@@ -2,31 +2,23 @@ package com.baozun.nebula.wormhole.scm.makemsgcon;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSON;
-import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.system.MsgSendContent;
 import com.baozun.nebula.model.system.MsgSendRecord;
-import com.baozun.nebula.sdk.command.OrderStatusLogCommand;
 import com.baozun.nebula.sdk.command.PayInfoCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.manager.SdkPaymentManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.wormhole.constants.OrderStatusV5Constants;
 import com.baozun.nebula.wormhole.mq.entity.order.OrderStatusV5;
 import com.baozun.nebula.wormhole.mq.entity.order.SalesOrderV5;
 import com.baozun.nebula.wormhole.mq.entity.pay.PaymentInfoV5;
 import com.baozun.nebula.wormhole.scm.handler.PropellingSalesOrderHandler;
-import com.feilong.core.Validator;
 import com.feilong.core.bean.ConvertUtil;
 
 @Transactional
@@ -56,6 +48,12 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
     @Autowired
     private OrderPromotionV5ListBuilder orderPromotionV5ListBuilder;
+
+    @Autowired
+    private OrderStatusV5ListBuilder orderStatusV5ListBuilder;
+
+    @Autowired
+    private PaymentInfoV5Builder paymentInfoV5Builder;
 
     @Autowired(required = false)
     private PropellingSalesOrderHandler propellingSalesOrderHandler;
@@ -133,60 +131,25 @@ public class PropellingSalesOrderManagerImpl implements PropellingSalesOrderMana
 
     @Override
     public MsgSendContent propellingPayment(MsgSendRecord msgSendRecord){
-        List<PaymentInfoV5> list = new ArrayList<>();
         Long orderId = msgSendRecord.getTargetId();
 
         List<PayInfoCommand> payInfoCommandList = paymentManager.findPayInfoCommandByOrderId(orderId);
-        SalesOrderCommand soCommand = sdkOrderService.findOrderById(orderId, 0);
-        if (payInfoCommandList != null){
-            for (PayInfoCommand payInfoCommand : payInfoCommandList){
-                PaymentInfoV5 paymentInfoV5 = new PaymentInfoV5();
-                //需要关联订单表
-                paymentInfoV5.setBsOrderCode(payInfoCommand.getOrderCode());
-                paymentInfoV5.setPaymentType(payInfoCommand.getPayType().toString());
-                paymentInfoV5.setPaymentBank(null);
-                paymentInfoV5.setPayTotal(payInfoCommand.getPayMoney());
-                paymentInfoV5.setPayNo(payInfoCommand.getSubOrdinate());
-                //since 5.3.2.10
-                paymentInfoV5.setPaymentAccount(payInfoCommand.getThirdPayAccount());
-                paymentInfoV5.setPaymentTime(payInfoCommand.getModifyTime());
-                if (payInfoCommand.getPayType() == payInfoCommand.getMainPayType() || Objects.equals(SalesOrder.SALES_ORDER_FISTATUS_FULL_PAYMENT, soCommand.getFinancialStatus())){
-                    paymentInfoV5.setAllComplete(true);
-                }else{
-                    paymentInfoV5.setAllComplete(false);
-                }
+        Validate.notEmpty(payInfoCommandList, "payInfoCommandList can't be null/empty!");
 
-                Map<String, String> remarkMap = new HashMap<>();
-                if (Validator.isNotNullOrEmpty(payInfoCommand.getPayInfo())){
-                    remarkMap.put("paydetail", payInfoCommand.getPayInfo());
-                }
+        SalesOrderCommand salesOrderCommand = sdkOrderService.findOrderById(orderId, 0);
+        Validate.notNull(salesOrderCommand, "salesOrderCommand can't be null!");
 
-                if (remarkMap.size() > 0){
-                    paymentInfoV5.setRemark(JSON.toJSONString(remarkMap));
-                }else{
-                    paymentInfoV5.setRemark(null);
-                }
-                list.add(paymentInfoV5);
-            }
+        List<PaymentInfoV5> paymentInfoV5LList = new ArrayList<>();
+        for (PayInfoCommand payInfoCommand : payInfoCommandList){
+            paymentInfoV5LList.add(paymentInfoV5Builder.buildPaymentInfoV5(payInfoCommand, salesOrderCommand));
         }
-        return propellingCommonManager.saveMsgBody(list, msgSendRecord.getId());
+        return propellingCommonManager.saveMsgBody(paymentInfoV5LList, msgSendRecord.getId());
     }
 
     @Override
     public MsgSendContent propellingSoStatus(MsgSendRecord msgSendRecord){
-        List<OrderStatusV5> orderStatusV5List = new ArrayList<OrderStatusV5>();
-        OrderStatusV5 orderStatusV5 = new OrderStatusV5();
         Long orderStatusLogId = msgSendRecord.getTargetId();
-
-        OrderStatusLogCommand orderStatusLogCommand = sdkOrderService.findOrderStatusLogById(orderStatusLogId);
-        orderStatusV5.setBsOrderCode(orderStatusLogCommand.getOrderCode());
-        //目前 2:订单取消  后续加
-        if (orderStatusLogCommand.getAfterStatus().equals(SalesOrder.SALES_ORDER_STATUS_CANCELED) || orderStatusLogCommand.getAfterStatus().equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED)){
-            orderStatusV5.setOpType(OrderStatusV5Constants.ORDER_CANCEL);
-        }
-        orderStatusV5.setOpTime(orderStatusLogCommand.getCreateTime());
-
-        orderStatusV5List.add(orderStatusV5);
+        List<OrderStatusV5> orderStatusV5List = orderStatusV5ListBuilder.buildOrderStatusV5List(orderStatusLogId);
         return propellingCommonManager.saveMsgBody(orderStatusV5List, msgSendRecord.getId());
     }
 
