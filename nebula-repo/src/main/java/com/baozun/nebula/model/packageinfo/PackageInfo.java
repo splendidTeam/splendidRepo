@@ -262,7 +262,7 @@ public class PackageInfo extends BaseModel{
      * 
      * @return the extendInfo
      */
-    @Column(name = "EXTEND_INFO",length = 1000)
+    @Column(name = "EXTEND_INFO",length = 4000)
     public String getExtendInfo(){
         return extendInfo;
     }
