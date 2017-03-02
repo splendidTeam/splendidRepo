@@ -65,6 +65,9 @@ public class PackageInfo extends BaseModel{
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -2063973670756502968L;
 
+    /** 特殊商品印刷 reebok定制商品. */
+    public static final int TYPE_SPECIAL_SKU_PRINT = 50;
+
     /** PK. */
     private Long id;
 
