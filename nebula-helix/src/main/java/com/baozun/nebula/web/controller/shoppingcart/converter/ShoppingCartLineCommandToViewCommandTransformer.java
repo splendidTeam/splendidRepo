@@ -1,0 +1,145 @@
+/**
+ * Copyright (c) 2010 Jumbomart All Rights Reserved.
+ *
+ * This software is the confidential and proprietary information of Jumbomart.
+ * You shall not disclose such Confidential Information and shall use it only in
+ * accordance with the terms of the license agreement you entered into
+ * with Jumbo.
+ *
+ * JUMBOMART MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
+ * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE, OR NON-INFRINGEMENT. JUMBOMART SHALL NOT BE LIABLE FOR ANY DAMAGES
+ * SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ *
+ */
+package com.baozun.nebula.web.controller.shoppingcart.converter;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.baozun.nebula.sdk.command.SkuProperty;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLinePackageInfoViewCommand;
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
+import com.baozun.nebula.web.controller.shoppingcart.viewcommand.Status;
+import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.lang.reflect.ConstructorUtil;
+import com.feilong.core.util.CollectionsUtil;
+import com.feilong.tools.slf4j.Slf4jUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+
+/**
+ * 将 {@link ShoppingCartLineCommand} 转成 {@link ShoppingCartLineSubViewCommand}.
+ * 
+ * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
+ * @since 5.3.2.11-Personalise
+ */
+public class ShoppingCartLineCommandToViewCommandTransformer implements Transformer<ShoppingCartLineCommand, ShoppingCartLineSubViewCommand>{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartLineCommandToViewCommandTransformer.class);
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.collections4.Transformer#transform(java.lang.Object)
+     */
+    @Override
+    public ShoppingCartLineSubViewCommand transform(ShoppingCartLineCommand shoppingCartLineCommand){
+        ShoppingCartLineSubViewCommand shoppingCartLineSubViewCommand = new ShoppingCartLineSubViewCommand();
+
+        Integer settlementState = shoppingCartLineCommand.getSettlementState();
+        boolean checked = isNotNullOrEmpty(settlementState) ? settlementState != 0 : false;
+        shoppingCartLineSubViewCommand.setChecked(checked);
+
+        shoppingCartLineSubViewCommand.setIsGift(shoppingCartLineCommand.isGift());
+        shoppingCartLineSubViewCommand.setItemCode(shoppingCartLineCommand.getProductCode());
+        shoppingCartLineSubViewCommand.setAddTime(shoppingCartLineCommand.getCreateTime());
+        PropertyUtil.copyProperties(
+                        shoppingCartLineSubViewCommand,
+                        shoppingCartLineCommand,
+                        "extentionCode",
+                        "stock", // since 5.3.1.8
+                        "itemId",
+                        "itemName",
+                        "listPrice",
+                        "quantity",
+                        "salePrice",
+                        "skuId",
+                        "itemPic",
+                        "id",
+                        "subTotalAmt");
+
+        Map<String, SkuProperty> map = CollectionsUtil.groupOne(shoppingCartLineCommand.getSkuPropertys(), "pName");
+        shoppingCartLineSubViewCommand.setPropertiesMap(map);
+
+        shoppingCartLineSubViewCommand.setStatus(toStatus(shoppingCartLineCommand));
+
+        List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList();
+        List<ShoppingCartLinePackageInfoViewCommand> shoppingCartLinePackageInfoViewCommandList = toShoppingCartLinePackageInfoViewCommandList(shoppingCartLinePackageInfoCommandList);
+        shoppingCartLineSubViewCommand.setShoppingCartLinePackageInfoViewCommandList(shoppingCartLinePackageInfoViewCommandList);
+
+        return shoppingCartLineSubViewCommand;
+    }
+
+    /**
+     * @param shoppingCartLinePackageInfoCommandList
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    private List<ShoppingCartLinePackageInfoViewCommand> toShoppingCartLinePackageInfoViewCommandList(List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
+        return CollectionsUtil.collect(shoppingCartLinePackageInfoCommandList, transformer(ShoppingCartLinePackageInfoViewCommand.class));
+    }
+
+    /**
+     * 
+     *
+     * @param <I>
+     * @param <O>
+     * @param type
+     * @param includePropertyNames
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
+        return new Transformer<I, O>(){
+
+            @Override
+            public O transform(I inputBean){
+                Validate.notNull(inputBean, "inputBean can't be null!");
+
+                O outBean = ConstructorUtil.newInstance(type);
+
+                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
+                return outBean;
+            }
+        };
+    }
+
+    private Status toStatus(ShoppingCartLineCommand shoppingCartLineCommand){
+        if (shoppingCartLineCommand.isValid()){
+            return Status.NORMAL;
+        }
+
+        //目前 看到底层只实现了这两种， 以后要扩展
+        //******************************************************************
+        Integer validType = shoppingCartLineCommand.getValidType();
+        if (validType == 1){
+            return Status.ITEM_LIFECYCLE_OFF_SHELF;
+        }else if (validType == 2){
+            return Status.OUT_OF_STOCK;
+        }
+        //TODO 待扩展
+
+        String messagePattern = "validType:[{}] not support!";
+        throw new UnsupportedOperationException(Slf4jUtil.format(messagePattern, validType));
+    }
+}

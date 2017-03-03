@@ -19,6 +19,7 @@ package com.baozun.nebula.web.controller.shoppingcart.viewcommand;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.model.product.Sku;
@@ -39,18 +40,18 @@ import com.baozun.nebula.sdk.command.SkuProperty;
 public class ShoppingCartLineSubViewCommand implements Serializable{
 
     /** The Constant serialVersionUID. */
-    private static final long        serialVersionUID = -6308223304441399376L;
+    private static final long serialVersionUID = -6308223304441399376L;
 
     /**
      * 购物车行的唯一标识,如果是会员购物车,那么此处的id={@link ShoppingCartLine#id},如果是游客的购物车,那么自己算出id,以遍对这个id进行删除/修改.
      */
-    private Long                     id;
+    private Long id;
 
     /** 状态. */
-    private Status                   status;
+    private Status status;
 
     /** 添加时间,此处的时间通常用于页面购物车行的排序,仅此而已. */
-    private Date                     addTime;
+    private Date addTime;
 
     /**
      * 哪一个组,以往相同sku添加到购物车,那么购物车是一行记录,数量是2;
@@ -59,24 +60,24 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      * </p>
      * 此处主要是为了区分按组显示.
      */
-    private Integer                  group;
+    private Integer group;
 
     //**************************************************************
 
     /** 买的什么商品id. */
-    private Long                     itemId;
+    private Long itemId;
 
     /** 买的什么商品code. */
-    private String                   itemCode;
+    private String itemCode;
 
     /** 商品名称是什么. */
-    private String                   itemName;
+    private String itemName;
 
     /** 买的哪个sku. */
-    private Long                     skuId;
+    private Long skuId;
 
     /** 外部编码 {@link Sku#outid},是扣减库存以及和后端对接数据的核心参数. */
-    private String                   extentionCode;
+    private String extentionCode;
 
     //XXX feilong 销售属性map 是什么,此处应该可以和 PDP 骨架里面的相关view Command 通用 
     //参见 stander架构里面的  Map<PropertySubViewCommand, List<PropertyValueSubViewCommand>> salesPropertiesMap  
@@ -86,20 +87,20 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
     private Map<String, SkuProperty> propertiesMap;
 
     /** 数量几个. */
-    private Integer                  quantity;
-    
+    private Integer quantity;
+
     /**
      * 库存数量.
      * 
      * @see com.baozun.nebula.sdk.command.SkuCommand#getAvailableQty()
      * @since 5.3.1.8
      */
-    private Integer                    stock;
+    private Integer stock;
 
     //**************************************************************
 
     /** 商品图片. */
-    private String                   itemPic;
+    private String itemPic;
     //**************************************************************
 
     /**
@@ -111,27 +112,34 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine#getSettlementState()
      * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand#getSettlementState()
      */
-    private boolean                  checked;
+    private boolean checked;
 
     /**
      * 是否是赠品.
      * 
      * 参见 {@link com.baozun.nebula.model.shoppingcart.ShoppingCartLine#isGift()}
      */
-    private boolean                  isGift;
+    private boolean isGift;
 
     //***********************价格信息*****************************************************
 
     /** 销售价. */
-    private BigDecimal               salePrice;
+    private BigDecimal salePrice;
 
     /** 吊牌价(原单价). */
-    private BigDecimal               listPrice;
+    private BigDecimal listPrice;
 
     /** 购物车行 金额小计 *. */
-    private BigDecimal               subTotalAmt      = BigDecimal.ZERO;
+    private BigDecimal subTotalAmt = BigDecimal.ZERO;
 
     //***********************************************************************************
+
+    /**
+     * 对应的包装信息.
+     * 
+     * @since 5.3.2.11-Personalise
+     */
+    private List<ShoppingCartLinePackageInfoViewCommand> shoppingCartLinePackageInfoViewCommandList;
 
     /**
      * 获得 购物车行 金额小计 *.
@@ -464,7 +472,6 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
         this.status = status;
     }
 
-    
     /**
      * 获得 库存数量.
      *
@@ -475,7 +482,6 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
         return stock;
     }
 
-    
     /**
      * 设置 库存数量.
      *
@@ -485,5 +491,26 @@ public class ShoppingCartLineSubViewCommand implements Serializable{
      */
     public void setStock(Integer stock){
         this.stock = stock;
+    }
+
+    /**
+     * 获得 对应的包装信息.
+     *
+     * @return the shoppingCartLinePackageInfoViewCommandList
+     * @since 5.3.2.11-Personalise
+     */
+    public List<ShoppingCartLinePackageInfoViewCommand> getShoppingCartLinePackageInfoViewCommandList(){
+        return shoppingCartLinePackageInfoViewCommandList;
+    }
+
+    /**
+     * 设置 对应的包装信息.
+     *
+     * @param shoppingCartLinePackageInfoViewCommandList
+     *            the shoppingCartLinePackageInfoViewCommandList to set
+     * @since 5.3.2.11-Personalise
+     */
+    public void setShoppingCartLinePackageInfoViewCommandList(List<ShoppingCartLinePackageInfoViewCommand> shoppingCartLinePackageInfoViewCommandList){
+        this.shoppingCartLinePackageInfoViewCommandList = shoppingCartLinePackageInfoViewCommandList;
     }
 }

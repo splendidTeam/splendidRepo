@@ -23,82 +23,89 @@ import com.baozun.nebula.model.BaseModel;
 
 public class OrderLineCommand extends BaseModel{
 
-    private static final long           serialVersionUID = 2120158298004887685L;
+    private static final long serialVersionUID = 2120158298004887685L;
 
-    private Long                        id;
+    private Long id;
 
     /** 订单id **/
-    private Long                        orderId;
+    private Long orderId;
 
     /** UPC */
-    private String                      extentionCode;
+    private String extentionCode;
 
     /** 商品id */
-    private Long                        itemId;
+    private Long itemId;
 
     /** skuid */
-    private Long                        skuId;
+    private Long skuId;
 
     /** 商品数量 */
-    private Integer                     count;
+    private Integer count;
 
     /** 原销售单价 */
-    private BigDecimal                  MSRP;
+    private BigDecimal MSRP;
 
     /** 现销售单价 */
-    private BigDecimal                  salePrice;
+    private BigDecimal salePrice;
 
     /** 行小计 */
-    private BigDecimal                  subtotal;
+    private BigDecimal subtotal;
 
     /** 折扣 */
-    private BigDecimal                  discount;
+    private BigDecimal discount;
 
     /** 商品名称 */
-    private String                      itemName;
+    private String itemName;
 
     /** 商品标签名称 */
-    private List<String>                propertyName;
+    private List<String> propertyName;
 
     /** 商品主图 */
-    private String                      itemPic;
+    private String itemPic;
 
     /** 销售属性信息 */
-    private String                      saleProperty;
+    private String saleProperty;
 
     /** 行类型 */
-    private Integer                     type;
+    private Integer type;
 
     /** 分组号 */
-    private Integer                     groupId;
+    private Integer groupId;
 
     /** 评价状态 */
-    private Integer                     evaluationStatus;
+    private Integer evaluationStatus;
 
     /** 商品快照版本 */
-    private Integer                     snapshot;
+    private Integer snapshot;
 
     /** 订单行促销信息 */
     private List<OrderPromotionCommand> orderPromotions;
 
     /** 销售属性 **/
-    private List<SkuProperty>           skuPropertys;
+    private List<SkuProperty> skuPropertys;
+
+    /**
+     * 对应的包装信息.
+     * 
+     * @since 5.3.2.11-Personalise
+     */
+    private List<OrderLinePackageInfoCommand> orderLinePackageInfoCommandList;
 
     /******* 扩展engine所需要的字段begin *******/
 
-    private String                      productCode;                            // 商品code
+    private String productCode; // 商品code
 
-    private List<Long>                  lableIds;
+    private List<Long> lableIds;
 
-    private String                      brandId;
+    private String brandId;
 
-    private List<Long>                  categoryList;
+    private List<Long> categoryList;
 
-    private Long                        storeId;
+    private Long storeId;
 
-    private Long                        indstryId;
+    private Long indstryId;
 
-    private String                      state;
+    private String state;
 
     /******** 扩展engine所需要的字段end **********/
 
@@ -325,6 +332,24 @@ public class OrderLineCommand extends BaseModel{
 
     public void setSkuId(Long skuId){
         this.skuId = skuId;
+    }
+
+    /**
+     * 对应的包装信息.
+     * 
+     * @since 5.3.2.11-Personalise
+     */
+    public List<OrderLinePackageInfoCommand> getOrderLinePackageInfoCommandList(){
+        return orderLinePackageInfoCommandList;
+    }
+
+    /**
+     * 对应的包装信息.
+     * 
+     * @since 5.3.2.11-Personalise
+     */
+    public void setOrderLinePackageInfoCommandList(List<OrderLinePackageInfoCommand> orderLinePackageInfoCommandList){
+        this.orderLinePackageInfoCommandList = orderLinePackageInfoCommandList;
     }
 
 }
