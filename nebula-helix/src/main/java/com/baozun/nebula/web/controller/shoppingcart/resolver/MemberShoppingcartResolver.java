@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
-import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.OPERATE_ERROR;
-
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Component;
 import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartDeleteManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
@@ -51,6 +50,9 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     /** The sdk shopping cart manager. */
     @Autowired
     private SdkShoppingCartManager sdkShoppingCartManager;
+
+    @Autowired
+    private SdkShoppingCartDeleteManager sdkShoppingCartDeleteManager;
 
     @Autowired
     private SdkShoppingCartAddManager sdkShoppingCartAddManager;
@@ -154,9 +156,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
-        boolean success = sdkShoppingCartManager.removeShoppingCartLineById(memberDetails.getGroupId(), currentLine.getId());
-        return success ? null : OPERATE_ERROR;
-
+        sdkShoppingCartDeleteManager.deleteShoppingCartLine(memberDetails.getGroupId(), currentLine.getId());
+        return null;
     }
 
     /*

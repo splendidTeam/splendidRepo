@@ -534,11 +534,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return retval;
     }
 
-    @Override
-    public boolean removeShoppingCartLineById(Long memberId,Long shoppingCartLineId){
-        return 1 == sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, shoppingCartLineId);
-    }
-
     /**
      * 清空购物车.
      *

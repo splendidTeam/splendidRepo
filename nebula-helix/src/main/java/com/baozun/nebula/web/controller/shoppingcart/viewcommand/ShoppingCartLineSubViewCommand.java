@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.viewcommand;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +24,7 @@ import java.util.Map;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
 import com.baozun.nebula.sdk.command.SkuProperty;
+import com.baozun.nebula.web.controller.BaseViewCommand;
 
 /**
  * 购物车里面的每行明细.
@@ -37,7 +37,7 @@ import com.baozun.nebula.sdk.command.SkuProperty;
  * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager#findShoppingCartLinesByMemberId(Long, Integer)
  * @since 5.3.1
  */
-public class ShoppingCartLineSubViewCommand implements Serializable{
+public class ShoppingCartLineSubViewCommand extends BaseViewCommand{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -6308223304441399376L;

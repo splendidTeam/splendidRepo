@@ -33,4 +33,18 @@
 			</value>
 		</constructor-arg>
 	</bean>
+ 
+ 
+<!-- 基于shoppingCartLineId 删除 对应的包装信息. -->
+	<bean id="ShoppingCartLinePackageInfo.deleteByShoppingCartLineId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>基于shoppingCartLineId 删除 对应的包装信息.</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+                   delete from T_SC_SHOPPING_CARTLINE_PACKAGE_INFO 
+                   where SHOPPING_CARTLINE_ID=:shoppingCartLineId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

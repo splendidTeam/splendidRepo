@@ -22,6 +22,7 @@ import com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 
 import loxia.annotation.NativeQuery;
+import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
 
@@ -41,4 +42,13 @@ public interface ShoppingCartLinePackageInfoDao extends GenericEntityDao<Shoppin
     @NativeQuery(model = ShoppingCartLinePackageInfoCommand.class)
     List<ShoppingCartLinePackageInfoCommand> findShoppingCartLinePackageInfoCommandList(@QueryParam("shoppingCartLineIdList") List<Long> shoppingCartLineIdList);
 
+    /**
+     * 基于shoppingCartLineId 删除 对应的包装信息.
+     * 
+     * @param shoppingCartLineId
+     *            购物车行id
+     * @return 可能影响多行信息
+     */
+    @NativeUpdate
+    Integer deleteByShoppingCartLineId(@QueryParam("shoppingCartLineId") Long shoppingCartLineId);
 }

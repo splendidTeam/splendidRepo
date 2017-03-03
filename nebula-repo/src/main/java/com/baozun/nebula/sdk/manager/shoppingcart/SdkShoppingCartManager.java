@@ -18,7 +18,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 /**
  * 
  * @deprecated since5.3.1 这个类太巨无霸了 十分难以维护,违背了太多的原则,许出不许进,不要再加什么的方法了 --by feilong
- * @see  SdkShoppingCartUpdateManager
+ * @see SdkShoppingCartUpdateManager
  */
 @Deprecated
 public interface SdkShoppingCartManager extends BaseManager{
@@ -69,13 +69,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @deprecated 不再调用 by feilong
      */
     @Deprecated
-    Integer addOrUpdateShoppingCart(
-                    Long memberId,
-                    Long lineId,
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComboIds,
-                    boolean exist,
-                    boolean isReduce);
+    Integer addOrUpdateShoppingCart(Long memberId,Long lineId,List<ShoppingCartLineCommand> lines,Set<String> memComboIds,boolean exist,boolean isReduce);
 
     /**
      * 
@@ -98,13 +92,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * 
      */
     @Deprecated
-    Integer addOrUpdateShoppingCart(
-                    Long memberId,
-                    String extentionCode,
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComboIds,
-                    boolean exist,
-                    boolean isReduce);
+    Integer addOrUpdateShoppingCart(Long memberId,String extentionCode,List<ShoppingCartLineCommand> lines,Set<String> memComboIds,boolean exist,boolean isReduce);
 
     /**
      * 
@@ -123,13 +111,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @deprecated 不再调用 by feilong
      */
     @Deprecated
-    Integer addOrUpdateShoppingCartById(
-                    Long memberId,
-                    String extentionCode,
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComboIds,
-                    boolean exist,
-                    boolean isReduce);
+    Integer addOrUpdateShoppingCartById(Long memberId,String extentionCode,List<ShoppingCartLineCommand> lines,Set<String> memComboIds,boolean exist,boolean isReduce);
 
     /**
      * 删除购物车中的一个商品
@@ -142,15 +124,6 @@ public interface SdkShoppingCartManager extends BaseManager{
      */
     @Deprecated
     Integer removeShoppingCartLine(Long memberId,String extentionCode);
-
-    /**
-     * 删除一条购物车行
-     * 
-     * @param memberId
-     * @param shoppingCartLineId
-     * @return true表示成功 false标识失败
-     */
-    boolean removeShoppingCartLineById(Long memberId,Long shoppingCartLineId);
 
     /**
      * 清空该会员的购物车
@@ -177,11 +150,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @param shoppingCartLine
      * @param lines
      */
-    Integer immediatelyBuy(
-                    Long memberId,
-                    Set<String> memCombos,
-                    ShoppingCartLineCommand shoppingCartLine,
-                    List<ShoppingCartLineCommand> lines);
+    Integer immediatelyBuy(Long memberId,Set<String> memCombos,ShoppingCartLineCommand shoppingCartLine,List<ShoppingCartLineCommand> lines);
 
     /**
      * 手工下单
@@ -261,10 +230,7 @@ public interface SdkShoppingCartManager extends BaseManager{
     // lines,BigDecimal discountAmount);
 
     // 按整单折扣率，计算累计折扣金额
-    public BigDecimal getDiscountAMTOrderDiscountRateByRate(
-                    ShoppingCartCommand shopCart,
-                    BigDecimal discountRate,
-                    BigDecimal previousDiscAMTAll);
+    public BigDecimal getDiscountAMTOrderDiscountRateByRate(ShoppingCartCommand shopCart,BigDecimal discountRate,BigDecimal previousDiscAMTAll);
 
     // 统计每个item的总金额
     public BigDecimal getItemAmount(ShoppingCartCommand shopCart,Long itemId);
@@ -280,46 +246,23 @@ public interface SdkShoppingCartManager extends BaseManager{
     // public List<PromotionSKUDiscAMTBySetting>
     // getDiscountAMTGiftByItemID(List<ShoppingCartLineCommand> lines,long
     // itemId,Integer qty);
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemID(
-                    long shopId,
-                    AtomicSetting setting,
-                    long itemId,
-                    Integer qty,
-                    Integer displayCountLimited);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemID(long shopId,AtomicSetting setting,long itemId,Integer qty,Integer displayCountLimited);
 
     // 计算礼品的累计金额,按CategoryID。一个Category下多个SKU，按不定顺序取足QTY返回优惠金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByCategoryID(
-                    long shopId,
-                    AtomicSetting setting,
-                    Integer qty,
-                    Integer displayCountLimited);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByCategoryID(long shopId,AtomicSetting setting,Integer qty,Integer displayCountLimited);
 
     // public List<PromotionSKUDiscAMTBySetting>
     // getDiscountAMTGiftByCategoryIDWithoutAMT(long shopId,long
     // categoryId,Integer qty);
 
     // 计算礼品的累计金额,按ComboID。一个Combo下多个SKU，按不定顺序取足QTY返回优惠金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByComboID(
-                    long shopId,
-                    AtomicSetting setting,
-                    Integer qty,
-                    Integer displayCountLimited);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByComboID(long shopId,AtomicSetting setting,Integer qty,Integer displayCountLimited);
 
     // 整单按Item，计算Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal rate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByRate(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal rate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     // 按Item，计算Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByRate(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -331,12 +274,7 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 按件，计算Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByRate(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -348,20 +286,10 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 整单按Category，计算Category下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal rate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByRate(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal rate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     // 单品按Category，计算Category下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByRate(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerItemByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -373,12 +301,7 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 单件按Category，计算Category下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByRate(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -390,18 +313,10 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 全场折扣，计算全场下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByRate(List<ShoppingCartLineCommand> lines,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     // 全场按Item折扣，计算全场下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByRate(List<ShoppingCartLineCommand> lines,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -412,11 +327,7 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 全场按件折扣，计算全场下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByRate(List<ShoppingCartLineCommand> lines,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -427,27 +338,13 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 组合折扣，计算该组合下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discRate,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByRate(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discRate,List<PromotionBrief> briefListPrevious);
 
     // 组合按Item折扣，计算该Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByRate(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     // 按组合按件折扣，计算该Combo下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByRate(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discRate,
-                    boolean onePieceMark,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByRate(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discRate,boolean onePieceMark,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -465,45 +362,19 @@ public interface SdkShoppingCartManager extends BaseManager{
     public boolean checkCouponByCALL(long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId);
 
     // 检查ItemCoupon,scpcoupon(1,pid:41)
-    public boolean checkCouponByItemId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long itemId,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId);
+    public boolean checkCouponByItemId(List<ShoppingCartLineCommand> shoppingCartLines,long itemId,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId);
 
     // 检查分类Coupon,scpcoupon(1,cid:41)
-    public boolean checkCouponByCategoryId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long categoryId,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId);
+    public boolean checkCouponByCategoryId(List<ShoppingCartLineCommand> shoppingCartLines,long categoryId,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId);
 
-    public boolean checkCouponByCustomItemIds(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    List<Long> itemIdList,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId);
+    public boolean checkCouponByCustomItemIds(List<ShoppingCartLineCommand> shoppingCartLines,List<Long> itemIdList,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId);
 
     // 检查ComboCoupon,scpcoupon(1,cmbid:41)
-    public boolean checkCouponByComboId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long comboId,
-                    long couponTypeID,
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long shopId);
+    public boolean checkCouponByComboId(List<ShoppingCartLineCommand> shoppingCartLines,long comboId,long couponTypeID,List<PromotionCouponCodeCommand> couponCodes,long shopId);
 
     // 获取整单Coupon金额
     // 根据CouponCodes List，检查当前Type的优惠券，计算出该Type的优惠金额
-    public Map<String, BigDecimal> getDiscountAMTByCALLCoupon(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long couponTypeId,
-                    List<PromotionCouponCodeCommand> coupons,
-                    boolean onePieceMark,
-                    long shopId,
-                    BigDecimal previousDiscAMTAll);
+    public Map<String, BigDecimal> getDiscountAMTByCALLCoupon(List<ShoppingCartLineCommand> shoppingCartLines,long couponTypeId,List<PromotionCouponCodeCommand> coupons,boolean onePieceMark,long shopId,BigDecimal previousDiscAMTAll);
 
     // 获取ItemCoupon金额
     // 根据CouponCodes List，检查当前Type的优惠券，计算出该Type下itemId的优惠金额
@@ -574,10 +445,7 @@ public interface SdkShoppingCartManager extends BaseManager{
     // 历史购买商品数，都有三种范围类型，PID,CID,CMBID
     public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByItemId(ShoppingCartCommand shopCart,long itemId,Integer qtyLimited);
 
-    public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByCategoryId(
-                    ShoppingCartCommand shopCart,
-                    long categoryId,
-                    Integer qtyLimited);
+    public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByCategoryId(ShoppingCartCommand shopCart,long categoryId,Integer qtyLimited);
 
     public List<ShoppingCartLineCommand> getHistoryOrderItemQtyByComboId(ShoppingCartCommand shopCart,long comboId,Integer qtyLimited);
 
@@ -750,11 +618,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @param shopId
      * @return
      */
-    public boolean checkOnLineCouponByCategoryId(
-                    List<ShoppingCartLineCommand> shoppingCartLines,
-                    long categoryId,
-                    long couponTypeID,
-                    long shopId);
+    public boolean checkOnLineCouponByCategoryId(List<ShoppingCartLineCommand> shoppingCartLines,long categoryId,long couponTypeID,long shopId);
 
     /**
      * 按照分组检查Online Coupon的有效性
@@ -768,60 +632,23 @@ public interface SdkShoppingCartManager extends BaseManager{
     public boolean checkOnLineCouponByComboId(List<ShoppingCartLineCommand> shoppingCartLines,long comboId,long couponTypeID,long shopId);
 
     // 组合优惠，计算该组合下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerOrderByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
     // 组合按Item优惠，计算该Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerItemByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerItemByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     // 按组合按件优惠，计算该Combo下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTComboPerPCSByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTComboPerPCSByAMT(List<ShoppingCartLineCommand> lines,long comboId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     // 整单按Category，计算Category下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerOrderByAMT(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
     // 单品按Category，计算Category下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerItemByAMT(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerItemByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -832,12 +659,7 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 单件按Category，计算Category下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCategoryPerPCSByAMT(List<ShoppingCartLineCommand> lines,long categoryId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCategoryPerPCSByAMT(
                     List<ShoppingCartLineCommand> lines,
@@ -848,79 +670,30 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<PromotionBrief> briefListPrevious);
 
     // 整单按Item，计算Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerOrderByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
     // 按Item，计算Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerItemByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerItemByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     // 按件，计算Item下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTItemPerPCSByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTItemPerPCSByAMT(List<ShoppingCartLineCommand> lines,long itemId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     // 全场优惠，计算全场下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerOrderByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
     // 全场按Item优惠，计算全场下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerItemByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerItemByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     // 全场按件优惠，计算全场下的累计金额
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factor,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTCALLPerPCSByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factor,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCALLPerPCSByAMT(List<ShoppingCartLineCommand> lines,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     public Set<Long> getItemIdsFromShoppingCartByComboId(List<ShoppingCartLineCommand> lines,long comboId);
 
@@ -977,12 +750,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      * @param calcFreightCommand
      * @return
      */
-    public Map<Integer, List<ShoppingCartLineCommand>> checkGiftEffective(
-                    List<ShoppingCartLineCommand> lines,
-                    Set<String> memComIds,
-                    Long memberId,
-                    List<String> coupons,
-                    CalcFreightCommand calcFreightCommand);
+    public Map<Integer, List<ShoppingCartLineCommand>> checkGiftEffective(List<ShoppingCartLineCommand> lines,Set<String> memComIds,Long memberId,List<String> coupons,CalcFreightCommand calcFreightCommand);
 
     /**
      * 检查用户选择赠品的个数是否大于活动中的赠品样数限制个数
@@ -995,11 +763,7 @@ public interface SdkShoppingCartManager extends BaseManager{
      *            :以前选中的赠品集合
      * @return
      */
-    public boolean checkSelectedGiftLimit(
-                    Long[] currentSkuIds,
-                    String[] lineGroups,
-                    Long promotionId,
-                    List<ShoppingCartLineCommand> beforeGiftLines);
+    public boolean checkSelectedGiftLimit(Long[] currentSkuIds,String[] lineGroups,Long promotionId,List<ShoppingCartLineCommand> beforeGiftLines);
 
     /**
      * 检查用户已选中的赠品
@@ -1011,13 +775,7 @@ public interface SdkShoppingCartManager extends BaseManager{
 
     public PromotionSKUDiscAMTBySetting getPromotionSkuAMTSetting(ShoppingCartLineCommand line,BigDecimal disAmt);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long customId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByAMT(List<ShoppingCartLineCommand> lines,long customId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerItemByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -1028,13 +786,7 @@ public interface SdkShoppingCartManager extends BaseManager{
                     List<ItemFactor> itemFactorList,
                     List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByAMT(
-                    List<ShoppingCartLineCommand> lines,
-                    long customId,
-                    BigDecimal discAmount,
-                    Integer factorDefault,
-                    List<ItemFactor> itemFactorList,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByAMT(List<ShoppingCartLineCommand> lines,long customId,BigDecimal discAmount,Integer factorDefault,List<ItemFactor> itemFactorList,List<PromotionBrief> briefListPrevious);
 
     public List<PromotionSKUDiscAMTBySetting> getSinglePrdDiscountAMTCustomPerPCSByRate(
                     List<ShoppingCartLineCommand> lines,
@@ -1055,42 +807,17 @@ public interface SdkShoppingCartManager extends BaseManager{
 
     public List<ShoppingCartLineCommand> getHistoryOrderQtyByCustomId(ShoppingCartCommand shopCart,long customId,Integer qtyLimited);
 
-    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemList(
-                    List<Long> itemIdsLong,
-                    long shopId,
-                    AtomicSetting setting,
-                    Integer qty,
-                    Integer displayCountLimited);
+    public List<PromotionSKUDiscAMTBySetting> getDiscountAMTGiftByItemList(List<Long> itemIdsLong,long shopId,AtomicSetting setting,Integer qty,Integer displayCountLimited);
 
-    public Map<String, BigDecimal> getCouponTotalAmount(
-                    List<PromotionCouponCodeCommand> couponCodes,
-                    long couponTypeId,
-                    BigDecimal totalPrice,
-                    long shopID);
+    public Map<String, BigDecimal> getCouponTotalAmount(List<PromotionCouponCodeCommand> couponCodes,long couponTypeId,BigDecimal totalPrice,long shopID);
 
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByItemID(
-                    List<ShoppingCartLineCommand> lines,
-                    long itemId,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByItemID(List<ShoppingCartLineCommand> lines,long itemId,Integer factorMultiplication,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCategoryID(
-                    List<ShoppingCartLineCommand> lines,
-                    long categoryId,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCategoryID(List<ShoppingCartLineCommand> lines,long categoryId,Integer factorMultiplication,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByComboID(
-                    List<ShoppingCartLineCommand> lines,
-                    long comboId,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByComboID(List<ShoppingCartLineCommand> lines,long comboId,Integer factorMultiplication,List<PromotionBrief> briefListPrevious);
 
-    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCustomItemIds(
-                    List<ShoppingCartLineCommand> lines,
-                    List<Long> customItemIds,
-                    Integer factorMultiplication,
-                    List<PromotionBrief> briefListPrevious);
+    public List<PromotionSKUDiscAMTBySetting> getMarkdownPriceByCustomItemIds(List<ShoppingCartLineCommand> lines,List<Long> customItemIds,Integer factorMultiplication,List<PromotionBrief> briefListPrevious);
 
     public BigDecimal getNeedToPayAmountInShoppingCartByAll(List<ShoppingCartLineCommand> lines);
 

@@ -69,7 +69,12 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
      */
     private ShoppingCartLineCommandToViewCommandTransformer shoppingCartLineCommandToViewCommandTransformer;
 
-    /** 地址簿默认行数. */
+    /**
+     * 地址簿默认行数.
+     * 
+     * @deprecated 这是什么东东,怎么放这里, 不只有有没有项目在使用,将来统计下 删掉
+     */
+    @Deprecated
     public static final int MEMBERADDRESSDEFAULTSIZE = 5;
 
     /*
