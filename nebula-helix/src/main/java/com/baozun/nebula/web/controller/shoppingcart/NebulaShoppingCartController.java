@@ -31,6 +31,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
+import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
@@ -44,80 +45,51 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
 /**
  * 购物车控制器.
  * 
- * <h3>定义:</h3>
- * 
- * <blockquote>
- * <p>
- * 网上商店所说的购物车是对现实的购物车而喻，买家可以像在超市里购物一样，随意添加、删除商品，选购完毕后，统一下单<br>
- * 网上商店的购物车要能过跟踪顾客所选的的商品，记录下所选商品，还要能随时更新，可以支付购买，能给顾客提供很大的方便
- * </p>
- * </blockquote>
- * 
  * <p>
  * 主要由以下方法组成:
  * </p>
  * 
  * <blockquote>
  * <table border="1" cellspacing="0" cellpadding="4">
+ * 
  * <tr style="background-color:#ccccff">
  * <th align="left">字段</th>
  * <th align="left">说明</th>
  * </tr>
+ * 
  * <tr valign="top">
- * <td>
- * {@link #showShoppingCart(MemberDetails, HttpServletRequest, Model)
- * showShoppingCart}</td>
+ * <td>{@link #showShoppingCart(MemberDetails, HttpServletRequest, Model) showShoppingCart}</td>
  * <td>显示购物车页面</td>
  * </tr>
- * <tr valign="top">
- * <td>
- * {@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
- * addShoppingCart}</td>
- * <td>加入购物车</td>
- * </tr>
+ * 
  * <tr valign="top" style="background-color:#eeeeff">
- * <td>
- * {@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model)
- * deleteShoppingCartLine}</td>
- * <td>删除购物车某个商品</td>
+ * <td>{@link #addShoppingCart(MemberDetails, ShoppingCartLineAddForm, HttpServletRequest, HttpServletResponse, Model) addShoppingCart}</td>
+ * <td>基于ShoppingCartLineAddForm 添加购物车</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
- * <td>
- * {@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model)
- * updateShoppingCartCount}</td>
- * <td>修改购物车数量</td>
- * </tr>
+ * 
  * <tr valign="top">
  * <td>{@link #updateShoppingCartLine(MemberDetails, Long, ShoppingCartLineUpdateSkuForm, HttpServletRequest, HttpServletResponse, Model) updateShoppingCartSku}</td>
- * <td>修改商品销售属性(sku)</td>
+ * <td>基于ShoppingCartLineUpdateSkuForm 修改购物车行</td>
  * </tr>
- * <tr valign="top" style="background-color:#eeeeff">
- * <td>
- * {@link #toggleShoppingCart(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse, Model)
- * toggleShoppingCartCount}</td>
- * <td>修改用户的购物车选中状态.</td>
- * </tr>
- * <tr valign="top">
- * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model)
- * toggleShoppingCartCountAll}</td>
- * <td>全选全不选</td>
- * </tr>
+ * 
  * </table>
  * </blockquote>
  * 
- * <h3>关于购物车数量:</h3> <blockquote>
+ * <h3>关于购物车数量:</h3>
+ * 
+ * <blockquote>
  * 
  * <p>
- * 通常每个页面的头部都会显示购物车数量,此处数量直接从Cookie中获取,比如页面使用
- * ${cookie.shoppingcartcount}来获取,不用每次都从后台获取;如果页面将来做静态化,可以使用javascript来赋值,比如$.
- * cookie('shoppingcartcount');
+ * 通常每个页面的头部都会显示购物车数量,此处数量直接从Cookie中获取,比如页面使用${cookie.shoppingcartcount}来获取,不用每次都从后台获取;如果页面将来做静态化,可以使用javascript来赋值,比如$.cookie('shoppingcartcount');
  * </p>
  * 
  * <p>
  * 注意:该cookie的设置是 非httponly的,以便js获取
  * </p>
  * 
- * <h4>那么如何保证这个cookie的安全:</h4> <blockquote> 没有保证这个cookie安全的必要,理由有2,
+ * <h4>那么如何保证这个cookie的安全:</h4>
+ * 
+ * <blockquote> 没有保证这个cookie安全的必要,理由有2,
  * <ol>
  * <li>这个cookie仅仅用作显示,用户修改这个cookie就和用户直接使用firedebug修改元素值是一样的</li>
  * <li>此cookie即使被捕获了,也没有什么影响,只是个数量</li>
@@ -128,12 +100,18 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
  * <ol>
  * <li>当购物车有任何变更,在merge的同时,都需要更新这个Cookie</li>
  * </ol>
- * </blockquote> </blockquote>
+ * </blockquote>
  * 
+ * </blockquote>
+ * 
+ * <h3>关于 购物车 {@link com.baozun.nebula.web.NeedLogin}</h3>
+ * 
+ * <blockquote>
  * <p>
  * 所有的请求游客都可以操作,所以不需要加 NeedLogin
  * </p>
- *
+ * </blockquote>
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年4月21日 下午6:18:53
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand
@@ -230,7 +208,8 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * 
      * @since 5.3.2.11-Personalise
      * @RequestMapping(value = "/shoppingcart/addcart", method = RequestMethod.POST)
      */
@@ -246,7 +225,7 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
     }
 
     /**
-     * 修改用户购物车行销售属性(sku).
+     * 基于ShoppingCartLineUpdateSkuForm 修改购物车行(可以买新的SKU).
      * 
      * <h3>说明:</h3>
      * <blockquote>
@@ -270,7 +249,8 @@ public class NebulaShoppingCartController extends NebulaAbstractCommonShoppingCa
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * 
      * @see <a href="http://jira.baozun.cn/browse/NB-367">NB-367</a>
      * @since 5.3.2.3
      * @RequestMapping(value = "/shoppingcart/updateline", method = RequestMethod.POST)

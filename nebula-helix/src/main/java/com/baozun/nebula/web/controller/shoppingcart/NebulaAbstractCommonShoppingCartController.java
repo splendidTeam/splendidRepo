@@ -38,12 +38,53 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
  * 购物车Base控制器.
  * 
  * <p>
+ * 此类存放购物车通用且无需大改造的方法:
+ * 
+ * <blockquote>
+ * <table border="1" cellspacing="0" cellpadding="4">
+ * 
+ * <tr style="background-color:#ccccff">
+ * <th align="left">字段</th>
+ * <th align="left">说明</th>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #addShoppingCart(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model) addShoppingCart}</td>
+ * <td>将指定的sku和数量加入购物车</td>
+ * </tr>
+ * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #deleteShoppingCartLine(MemberDetails, Long, HttpServletRequest, HttpServletResponse, Model) deleteShoppingCartLine}</td>
+ * <td>删除指定的购物车行</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #updateShoppingCartCount(MemberDetails, Long, Integer, HttpServletRequest, HttpServletResponse, Model) updateShoppingCartCount}</td>
+ * <td>修改指定购物车行数量</td>
+ * </tr>
+ * 
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>{@link #toggleShoppingCart(MemberDetails, Long, boolean, HttpServletRequest, HttpServletResponse, Model) toggleShoppingCart}</td>
+ * <td>修改指定购物车行选中状态.</td>
+ * </tr>
+ * 
+ * <tr valign="top">
+ * <td>{@link #toggleAllShoppingCartLineCheckStatus(MemberDetails, boolean, HttpServletRequest, HttpServletResponse, Model) toggleAllShoppingCartLineCheckStatus}</td>
+ * <td>全选全不选</td>
+ * </tr>
+ * 
+ * </table>
+ * </blockquote>
+ * </p>
+ * 
+ * <h3>Nebula常用的购物车体系:</h3>
+ * <blockquote>
  * 目前Nebula常用的购物车体系(即会到购物车页面)分为:
  * 
  * <ol>
  * <li>普通购物车 即 {@link NebulaShoppingCartController}</li>
  * </ol>
- * </p>
+ * </blockquote>
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand
@@ -78,7 +119,8 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * 
      * @RequestMapping(value = "/shoppingcart/add", method = RequestMethod.POST)
      */
     public NebulaReturnResult addShoppingCart(
@@ -116,7 +158,8 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * 
      * @RequestMapping(value = "/shoppingcart/update", method = RequestMethod.POST)
      */
     public NebulaReturnResult updateShoppingCartCount(
@@ -141,8 +184,7 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
      * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
      * 
      * <br>
-     * <span style="color:red">服务端必须同时拿shoppingcartLineId和groupId做参数,
-     * 否则可能会出现安全漏洞</span>
+     * <span style="color:red">服务端必须同时拿shoppingcartLineId和groupId做参数,否则可能会出现安全漏洞</span>
      * </p>
      *
      * @param memberDetails
@@ -155,9 +197,8 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
-     * @RequestMapping(value = "/shoppingcart/delete", method =
-     *                       RequestMethod.POST)
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * @RequestMapping(value = "/shoppingcart/delete", method =RequestMethod.POST)
      */
     public NebulaReturnResult deleteShoppingCartLine(
                     @LoginMember MemberDetails memberDetails,
@@ -174,28 +215,33 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
     /**
      * 修改用户的购物车选中状态.
      * 
-     * <p>
-     * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
+     * <h3>关于shoppingcartLineId参数:</h3>
+     * <blockquote>
      * 
-     * <br>
-     * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
-     * </p>
-     *
+     * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为会出现 一个用户购物车里面会出现相同的sku,
+     * 
+     * <ol>
+     * <li>比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分</li>
+     * <li>再如购买同样的SKU鞋子,一个是定制商品有包装信息(比如reebok鞋子刻字), 一个不需要刻字是普通商品;将来需要区分</li>
+     * </ol>
+     * <ol>
+     * 
+     * </blockquote>
+     * 
      * @param memberDetails
      *            the member details
      * @param shoppingcartLineId
-     *            the shoppingcartline id
+     *            指定的购物车行
      * @param checkStatus
-     *            the check status
+     *            选中不选中状态, true为将当前行选中,false为将当前行不选中
      * @param request
      *            the request
      * @param response
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
-     * @RequestMapping(value = "/shoppingcart/select", method =
-     *                       RequestMethod.POST)
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * @RequestMapping(value = "/shoppingcart/toggleshoppingcart", method =RequestMethod.POST)
      */
     public NebulaReturnResult toggleShoppingCart(
                     @LoginMember MemberDetails memberDetails,
@@ -215,16 +261,15 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
      * @param memberDetails
      *            the member details
      * @param checkStatus
-     *            the check status
+     *            用来标识选中还是不选中,true为将全部选中,false为全部不选中
      * @param request
      *            the request
      * @param response
      *            the response
      * @param model
      *            the model
-     * @return the nebula return result
-     * @RequestMapping(value = "/shoppingcart/select", method =
-     *                       RequestMethod.POST)
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * @RequestMapping(value = "/shoppingcart/toggleall", method =RequestMethod.POST)
      */
     public NebulaReturnResult toggleAllShoppingCartLineCheckStatus(
                     @LoginMember MemberDetails memberDetails,
