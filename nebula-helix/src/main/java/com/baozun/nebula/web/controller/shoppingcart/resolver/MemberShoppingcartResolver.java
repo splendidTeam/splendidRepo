@@ -29,10 +29,10 @@ import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartDeleteManager;
-import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.web.MemberDetails;
+import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.util.CollectionsUtil.find;
 
@@ -46,10 +46,6 @@ import static com.feilong.core.util.CollectionsUtil.find;
  */
 @Component("memberShoppingcartResolver")
 public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
-
-    /** The sdk shopping cart manager. */
-    @Autowired
-    private SdkShoppingCartManager sdkShoppingCartManager;
 
     @Autowired
     private SdkShoppingCartDeleteManager sdkShoppingCartDeleteManager;
@@ -171,13 +167,14 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Override
     protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
-                    List<String> extentionCodeList,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     List<ShoppingCartLineCommand> needChangeCheckedCommandList,
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        sdkShoppingCartManager.updateCartLineSettlementState(memberDetails.getGroupId(), extentionCodeList, checkStatus ? 1 : 0);
+        List<Long> cartLineIdList = CollectionsUtil.getPropertyValueList(needChangeCheckedCommandList, "id");
+        sdkShoppingCartUpdateManager.updateCartLineSettlementState(memberDetails.getGroupId(), cartLineIdList, checkStatus);
+
         return null;
     }
 

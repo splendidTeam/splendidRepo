@@ -19,13 +19,13 @@ package com.baozun.nebula.dao.shoppingcart;
 import java.util.Date;
 import java.util.List;
 
+import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
-
-import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
  * 购物车行信息Dao
@@ -42,9 +42,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @return
      */
     @NativeQuery(model = ShoppingCartLineCommand.class)
-    List<ShoppingCartLineCommand> findShopCartLineByMemberId(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("settlementState") Integer settlementState);
+    List<ShoppingCartLineCommand> findShopCartLineByMemberId(@QueryParam("memberId") Long memberId,@QueryParam("settlementState") Integer settlementState);
 
     /**
      * 获取当前会员的赠品行
@@ -54,9 +52,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @return
      */
     @NativeQuery(model = ShoppingCartLineCommand.class)
-    List<ShoppingCartLineCommand> findShopCartGiftLineByMemberId(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("settlementState") Integer settlementState);
+    List<ShoppingCartLineCommand> findShopCartGiftLineByMemberId(@QueryParam("memberId") Long memberId,@QueryParam("settlementState") Integer settlementState);
 
     /**
      * 根据shoppingCartLineIds查询购物车行的信息
@@ -76,10 +72,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @return
      */
     @NativeUpdate
-    Integer updateCartLineQuantity(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("extentionCode") String extentionCode,
-                    @QueryParam("quantity") Integer quantity);
+    Integer updateCartLineQuantity(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode,@QueryParam("quantity") Integer quantity);
 
     /**
      * 新增物品的数量
@@ -92,10 +85,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      */
     @Deprecated
     @NativeUpdate
-    Integer addCartLineQuantity(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("extentionCode") String extentionCode,
-                    @QueryParam("quantity") Integer quantity);
+    Integer addCartLineQuantity(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode,@QueryParam("quantity") Integer quantity);
 
     @NativeUpdate
     Integer deleteByMemberId(@QueryParam("memberId") Long memberId);
@@ -104,18 +94,19 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
     Integer deleteByExtentionCodeAndMemberId(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode);
 
     /**
-     * 修改购物车行的结算状态
+     * 更改购物车行的的选中不选中状态.
      * 
      * @param memberId
-     * @param extentionCodes
+     *            会员id
+     * @param cartLineIdList
+     *            购物车行list
      * @param settleState
+     *            选中不选中状态, 1 是选中,0是不选中
      * @return
+     * @since 5.3.2.11-Personalise
      */
     @NativeUpdate
-    Integer updateCartLineSettleState(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("extentionCodes") List<String> extentionCodes,
-                    @QueryParam("settleState") Integer settleState);
+    Integer updateCartLineSettlementState(@QueryParam("memberId") Long memberId,@QueryParam("cartLineIdList") List<Long> cartLineIdList,@QueryParam("settleState") Integer settleState);
 
     @NativeQuery(model = ShoppingCartLineCommand.class)
     ShoppingCartLineCommand findShopCartLine(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode);
@@ -184,10 +175,8 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @return
      */
     @NativeUpdate
-    Integer updateCartLineQuantityByLineId(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("cartLineId") Long cartLineId,
-                    @QueryParam("quantity") Integer quantity);
+    Integer updateCartLineQuantityByLineId(@QueryParam("memberId") Long memberId,@QueryParam("cartLineId") Long cartLineId,@QueryParam("quantity") Integer quantity);
+
     /**
      * 修改订单行 sku 信息.
      * 
@@ -203,11 +192,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @since 5.3.2.3
      */
     @NativeUpdate
-    Integer updateCartLineSkuInfo(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("cartLineId") Long cartLineId,
-                    @QueryParam("newSkuId")  Long newSkuId,
-                    @QueryParam("quantity") Integer quantity);
+    Integer updateCartLineSkuInfo(@QueryParam("memberId") Long memberId,@QueryParam("cartLineId") Long cartLineId,@QueryParam("newSkuId") Long newSkuId,@QueryParam("quantity") Integer quantity);
 
     /**
      * 根据lineGrop和skuId获取购物车行
@@ -218,10 +203,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @return
      */
     @NativeQuery(model = ShoppingCartLineCommand.class)
-    List<ShoppingCartLineCommand> findShopCartLineByLineGroupAndSkuId(
-                    @QueryParam("memberId") Long memberId,
-                    @QueryParam("skuId") Long skuId,
-                    @QueryParam("lineGroup") String lineGroup);
+    List<ShoppingCartLineCommand> findShopCartLineByLineGroupAndSkuId(@QueryParam("memberId") Long memberId,@QueryParam("skuId") Long skuId,@QueryParam("lineGroup") String lineGroup);
 
     /**
      * 更新促销信息
@@ -232,11 +214,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      * @param promotionId
      */
     @NativeUpdate
-    void updateCartLinePromotionInfo(
-                    @QueryParam("id") Long id,
-                    @QueryParam("lineGroup") Long lineGroup,
-                    @QueryParam("gift") boolean gift,
-                    @QueryParam("promotionId") Long promotionId);
+    void updateCartLinePromotionInfo(@QueryParam("id") Long id,@QueryParam("lineGroup") Long lineGroup,@QueryParam("gift") boolean gift,@QueryParam("promotionId") Long promotionId);
 
     /**
      * 通过用户ID和活动ID删除用户已选中的赠品行

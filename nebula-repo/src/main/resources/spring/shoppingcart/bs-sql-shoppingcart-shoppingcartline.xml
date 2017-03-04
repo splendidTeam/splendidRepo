@@ -179,22 +179,22 @@
 			</value>
 		</constructor-arg>
 	</bean>
-
-	<bean id="ShoppingCartLine.updateCartLineSettleState" class="loxia.dao.support.DynamicQueryHolder">
+<!-- 修改购物车行的选中状态 -->
+	<bean id="ShoppingCartLine.updateCartLineSettlementState" class="loxia.dao.support.DynamicQueryHolder">
 		<description>修改购物车行的选中状态</description>
 		<constructor-arg>
 			<value>
 				<![CDATA[  
 					update t_sc_shoppingcartline
 					set settlement_state = :settleState
-					where member_id = :memberId 
+					where member_id = :memberId
+     
 					and 
-					extention_code in (
-		       		#foreach($extention_code in $extentionCodes )
-    					'$extention_code',
+					id in (
+		       		#foreach($cartLineId in $cartLineIdList )
+    					$cartLineId,
 					 #end
-		       		 '-1')
-		       		 and (is_gift is null or is_gift = 'f')
+		       		 -1)
                  ]]>
 			</value>
 		</constructor-arg>

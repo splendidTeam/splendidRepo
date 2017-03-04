@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
@@ -90,4 +91,19 @@ public interface SdkShoppingCartUpdateManager extends BaseManager{
      *             如果 <code>shoppingcartLineIdAndCountMap</code> 是empty
      */
     void updateCartLineQuantity(Long memberId,Map<Long, Integer> shoppingcartLineIdAndCountMap);
+
+    //-------
+
+    /**
+     * 更改购物车行的的选中不选中状态.
+     *
+     * @param memberId
+     *            会员
+     * @param cartLineIdList
+     *            购物车行list
+     * @param settleState
+     *            true 为选中,false 为不选中
+     * @since 5.3.2.11-Personalise
+     */
+    void updateCartLineSettlementState(Long memberId,List<Long> cartLineIdList,boolean settleState);
 }

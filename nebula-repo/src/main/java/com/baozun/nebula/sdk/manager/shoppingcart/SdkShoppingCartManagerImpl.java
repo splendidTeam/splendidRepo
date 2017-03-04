@@ -695,17 +695,6 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
         return SUCCESS;
     }
 
-    @Override
-    public boolean updateCartLineSettlementState(Long memberId,List<String> extentionCodes,Integer settleState){
-        // 会员
-        Integer updateCount = sdkShoppingCartLineDao.updateCartLineSettleState(memberId, extentionCodes, settleState);
-        if (updateCount != extentionCodes.size()){
-            Object[] args = { 0, 1 };
-            throw new BusinessException(Constants.NATIVEUPDATE_ROWCOUNT_NOTEXPECTED, args);
-        }
-        return true;
-    }
-
     /**
      * 立即购买.
      *

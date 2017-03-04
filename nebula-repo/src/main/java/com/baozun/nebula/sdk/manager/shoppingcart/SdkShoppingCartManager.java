@@ -133,16 +133,6 @@ public interface SdkShoppingCartManager extends BaseManager{
     Integer emptyShoppingCart(Long memberId);
 
     /**
-     * 更改购物车中某些商品的的结算状态
-     * 
-     * @param memberId
-     * @param extentionCodes
-     * @param settleState
-     * @return true标识成功 false标识失败
-     */
-    boolean updateCartLineSettlementState(Long memberId,List<String> extentionCodes,Integer settleState);
-
-    /**
      * 立即购买
      * 
      * @param memberId

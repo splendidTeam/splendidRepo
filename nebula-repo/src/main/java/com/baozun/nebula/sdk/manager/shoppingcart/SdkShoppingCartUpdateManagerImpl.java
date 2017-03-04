@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.Validate;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
+import com.baozun.nebula.sdk.utils.ManagerValidate;
 
 /**
  * The Class SdkShoppingCartUpdateManagerImpl.
@@ -114,9 +116,20 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
 
         int result = sdkShoppingCartLineDao.updateCartLineSkuInfo(memberId, cartLineId, newSkuId, quantity);
 
-        if (1 != result){
-            LOGGER.error("updateCartLineSkuInfo:[{}],lineId:[{}],result is:[{}], not expected 1", memberId, cartLineId, result);
-            throw new NativeUpdateRowCountNotEqualException(1, result);
-        }
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}],update lineId:[{}],change to newSkuId:[{}],quantity:[{}]", memberId, cartLineId, newSkuId, quantity);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLineSettlementState(java.lang.Long, java.util.List, boolean)
+     */
+    @Override
+    public void updateCartLineSettlementState(Long memberId,List<Long> cartLineIdList,boolean settleState){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notEmpty(cartLineIdList, "cartLineIdList can't be null/empty!");
+
+        Integer updateCount = sdkShoppingCartLineDao.updateCartLineSettlementState(memberId, cartLineIdList, settleState ? 1 : 0);
+        ManagerValidate.isExpectedResult(cartLineIdList.size(), updateCount, "memberId:[{}],update lines:[{}]'s status:[{}]", memberId, cartLineIdList, settleState);
     }
 }

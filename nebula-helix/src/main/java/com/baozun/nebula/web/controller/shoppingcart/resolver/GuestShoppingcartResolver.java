@@ -106,7 +106,6 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     @Override
     protected ShoppingcartResult doToggleShoppingCartLineCheckStatus(
                     MemberDetails memberDetails,
-                    List<String> extentionCodeList,
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     List<ShoppingCartLineCommand> needChangeCheckedStatusShoppingCartLineCommandList,
                     boolean checkStatus,
