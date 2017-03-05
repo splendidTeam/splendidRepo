@@ -18,6 +18,21 @@
 		</constructor-arg>
 	</bean>
 	
+ <!--  根据skuid查询对应SkuInventory by feilong-->
+	<bean id="SkuInventory.findSkuInventoryBySkuId" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据skuid查询对应SkuInventory</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[ 
+					   select skuInventory.* 
+                       from t_pd_sku_inventory skuInventory
+                       join t_pd_sku sku on sku.out_id=skuInventory.extention_code
+                       where sku.id=:skuId
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
 	<bean id="SkuInventory.findSkuInventoryByExtentionCode" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据extentionCode查询SkuInventory</description>
 		<constructor-arg>
