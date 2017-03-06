@@ -53,6 +53,7 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     @Autowired
     private PackageInfoManager packageInfoManager;
 
+    /**  */
     @Autowired
     private ShoppingCartLinePackageInfoDao shoppingCartLinePackageInfoDao;
 
@@ -65,7 +66,7 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
 
     /**
-     * 添加到购物车.
+     * 添加或者更新购物车.
      * 
      * <p>
      * 如果有，就修改数量<br>
@@ -76,20 +77,42 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
      * @param shoppingCartLineCommand
      */
     @Override
-    public void addCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
+    public void addOrUpdateCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
         Validate.notNull(memberId, "memberId can't be null!");
         Validate.notNull(shoppingCartLineCommand, "shoppingCartLineCommand can't be null!");
 
-        String extentionCode = shoppingCartLineCommand.getExtentionCode();
-        Validate.notBlank(extentionCode, "extentionCode can't be blank!");
-
-        //-----------------如果指定了id--------------------------------------------------------------------
         if (isUpdate(shoppingCartLineCommand)){ // 更新
             sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, shoppingCartLineCommand.getId(), shoppingCartLineCommand.getQuantity());
-            return;
+        }else{
+            addCartLine(memberId, shoppingCartLineCommand);
         }
+    }
 
-        //-------------------------------------------------------------------------------------
+    /**
+     * 判断请求是都是更新请求.
+     * 
+     * <p>
+     * 目前的逻辑是,如果有 lineId 那么判断为更新;<br>
+     * 通常 新增的行是没有lineid的(游客的另说,游客登录同步请看{@link SdkShoppingCartSyncManager})<br>
+     * 那么有 lineId 的行就是修改了<br>
+     * 
+     * --上述逻辑是简单粗暴的做法
+     * </p>
+     *
+     * @param shoppingCartLineCommand
+     * @return
+     */
+    protected boolean isUpdate(ShoppingCartLineCommand shoppingCartLineCommand){
+        return null != shoppingCartLineCommand.getId();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager#addCartLine(java.lang.Long, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand)
+     */
+    @Override
+    public void addCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
         ShoppingCartLine shoppingCartLine = saveShoppingCartLine(memberId, shoppingCartLineCommand);
 
         // 保存 包装信息
@@ -100,23 +123,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     }
 
     /**
-     * 判断是否需要更新.
-     *
-     * @param shoppingCartLineCommand
-     * @return
-     * @since 5.3.2.11-Personalise
-     */
-    protected boolean isUpdate(ShoppingCartLineCommand shoppingCartLineCommand){
-        Long lineId = shoppingCartLineCommand.getId();
-        return lineId != null && lineId > 0;
-    }
-
-    /**
      * 保存包装信息.
      *
      * @param shoppingCartLineId
      * @param shoppingCartLinePackageInfoCommandList
-     * @since 5.3.2.11-Personalise
      */
     protected void savePackageInfo(Long shoppingCartLineId,List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
         for (ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand : shoppingCartLinePackageInfoCommandList){
@@ -136,7 +146,6 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
      * @param shoppingCartLineId
      * @param packageInfoId
      * @return
-     * @since 5.3.2.11-Personalise
      */
     protected ShoppingCartLinePackageInfo buildShoppingCartLinePackageInfo(Long shoppingCartLineId,Long packageInfoId){
         ShoppingCartLinePackageInfo shoppingCartLinePackageInfo = new ShoppingCartLinePackageInfo();
@@ -158,9 +167,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
      * @return
      */
     private ShoppingCartLine saveShoppingCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
-        // 保存 ShoppingCartLine
-        final String extentionCode = shoppingCartLineCommand.getExtentionCode();
+        String extentionCode = shoppingCartLineCommand.getExtentionCode();
+        Validate.notBlank(extentionCode, "extentionCode can't be blank!");
 
+        // 保存 ShoppingCartLine
         ShoppingCartLine shoppingCartLine = new ShoppingCartLine();
 
         shoppingCartLine.setCreateTime(new Date());

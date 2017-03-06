@@ -29,7 +29,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 public interface SdkShoppingCartAddManager extends BaseManager{
 
     /**
-     * 添加到购物车.
+     * 添加或者修改购物车.
      * 
      * <p>
      * 如果 lineId != null && lineId > 0 那么更新数量;<br>
@@ -39,9 +39,22 @@ public interface SdkShoppingCartAddManager extends BaseManager{
      * @param memberId
      *            会员
      * @param shoppingCartLineCommand
+     *            最终的购物车行,如果是修改会直接拿里面的count 直接覆盖修改
+     * @throws NativeUpdateRowCountNotEqualException
+     *             在sql操作返回的影响行数不是期待的结果,将会抛出异常
+     */
+    void addOrUpdateCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand) throws NativeUpdateRowCountNotEqualException;
+
+    /**
+     * 添加到购物车.
+     * 
+     * @param memberId
+     *            会员
+     * @param shoppingCartLineCommand
      *            购物车行
      * @throws NativeUpdateRowCountNotEqualException
      *             在sql操作返回的影响行数不是期待的结果,将会抛出异常
      */
     void addCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand) throws NativeUpdateRowCountNotEqualException;
+
 }

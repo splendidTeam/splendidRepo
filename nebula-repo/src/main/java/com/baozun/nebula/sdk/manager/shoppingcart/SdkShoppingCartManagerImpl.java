@@ -618,12 +618,12 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     return SUCCESS;
                 }
             }else{// 不存在 添加
-                sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
+                sdkShoppingCartAddManager.addOrUpdateCartLine(userId, shoppingCartLine);
             }
 
         }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
                   // 保存 shoppingCartLine
-            sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
+            sdkShoppingCartAddManager.addOrUpdateCartLine(userId, shoppingCartLine);
         }
         return SUCCESS;
     }
@@ -686,11 +686,11 @@ public class SdkShoppingCartManagerImpl implements SdkShoppingCartManager{
                     return SUCCESS;
                 }
             }else{// 不存在 添加
-                sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
+                sdkShoppingCartAddManager.addOrUpdateCartLine(userId, shoppingCartLine);
             }
         }else{// 如果表中没有购物车，那么 创建购物车,同时计算价格
                   // 保存 shoppingCartLine
-            sdkShoppingCartAddManager.addCartLine(userId, shoppingCartLine);
+            sdkShoppingCartAddManager.addOrUpdateCartLine(userId, shoppingCartLine);
         }
         return SUCCESS;
     }

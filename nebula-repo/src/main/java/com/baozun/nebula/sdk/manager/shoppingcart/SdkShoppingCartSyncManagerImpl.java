@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
@@ -44,10 +43,6 @@ import com.feilong.core.util.CollectionsUtil;
 @Transactional
 @Service("sdkShoppingCartSyncManager")
 public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManager{
-
-    /** The sdk shopping cart line dao. */
-    @Autowired
-    private SdkShoppingCartLineDao sdkShoppingCartLineDao;
 
     /**  */
     @Autowired

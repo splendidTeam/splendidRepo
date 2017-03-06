@@ -82,7 +82,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Override
     protected ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
         currentLine.setMemberId(memberDetails.getGroupId());
-        sdkShoppingCartAddManager.addCartLine(memberDetails.getGroupId(), currentLine);
+        sdkShoppingCartAddManager.addOrUpdateCartLine(memberDetails.getGroupId(), currentLine);
         return null;
     }
 
