@@ -32,6 +32,7 @@ import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.group;
 
 /**
  * 封装包装信息.
@@ -64,7 +65,7 @@ public class SdkOrderLinePackInfoManagerImpl implements SdkOrderLinePackInfoMana
         }
 
         //按照行分个组
-        Map<Long, List<OrderLinePackageInfoCommand>> orderLineIdAndOrderLinePackageInfoCommandListMap = CollectionsUtil.group(orderLinePackageInfoCommandList, "orderLineId");
+        Map<Long, List<OrderLinePackageInfoCommand>> orderLineIdAndOrderLinePackageInfoCommandListMap = group(orderLinePackageInfoCommandList, "orderLineId");
         for (OrderLineCommand orderLineCommand : orderLineCommandList){
             List<OrderLinePackageInfoCommand> list = orderLineIdAndOrderLinePackageInfoCommandListMap.get(orderLineCommand.getId());
 

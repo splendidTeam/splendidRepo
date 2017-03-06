@@ -14,31 +14,24 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
+package com.baozun.nebula.web.controller.order.builder;
 
-package com.baozun.nebula.sdk.manager.order;
-
-import java.util.Collections;
-import java.util.List;
-
-import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.sdk.command.OrderLineCommand;
+import com.baozun.nebula.web.command.OrderQueryCommand;
+import com.baozun.nebula.web.controller.order.form.OrderQueryForm;
 
 /**
- * 封装soline 包装信息.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public interface SdkOrderLinePackInfoManager extends BaseManager{
+public interface OrderQueryCommandBuilder{
 
     /**
-     * 完善包装信息.
-     *
-     * @param orderLines
-     * @return 如果 <code>orderLines</code> 是null或者empty,返回 {@link Collections#emptyList()}<br>
-     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManagerImpl#handleShoppingCartLineCommandList(List<ShoppingCartLineCommand>)
+     * 转换为OrderQueryCommand，前台条件转换
+     * 
+     * @param orderQueryForm
+     * @return
      * @since 5.3.2.11-Personalise
      */
-    List<OrderLineCommand> packOrderLinesPackageInfo(List<OrderLineCommand> orderLines);
-
+    OrderQueryCommand build(OrderQueryForm orderQueryForm);
 }

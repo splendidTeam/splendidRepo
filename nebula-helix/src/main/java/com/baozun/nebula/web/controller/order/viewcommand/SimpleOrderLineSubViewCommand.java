@@ -37,28 +37,28 @@ import com.baozun.nebula.web.controller.BaseViewCommand;
 public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
 
     /** The Constant serialVersionUID. */
-    private static final long        serialVersionUID = -4308131349902245508L;
+    private static final long serialVersionUID = -4308131349902245508L;
 
     /** orderline行的唯一标识,那么此处的id={@link OrderLine#id}. */
-    private Long                     id;
+    private Long id;
 
     /** 添加时间,此处的时间通常用于页面orderline行的排序,仅此而已. */
-    private Date                     addTime;
+    private Date addTime;
 
     /** 买的什么商品id. */
-    private Long                     itemId;
+    private Long itemId;
 
     /** 买的什么商品code. */
-    private String                   itemCode;
+    private String itemCode;
 
     /** 商品名称是什么. */
-    private String                   itemName;
+    private String itemName;
 
     /** 买的哪个sku. */
-    private Long                     skuId;
+    private Long skuId;
 
     /** 外部编码 {@link Sku#outid},是扣减库存以及和后端对接数据的核心参数. */
-    private String                   extentionCode;
+    private String extentionCode;
 
     //XXX feilong 销售属性map 是什么,此处应该可以和 PDP 骨架里面的相关view Command 通用 
     //参见 stander架构里面的  Map<PropertySubViewCommand, List<PropertyValueSubViewCommand>> salesPropertiesMap  
@@ -67,31 +67,45 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
     /** The map. */
     private Map<String, SkuProperty> propertiesMap;
 
-   /** 销售属性. */
-    private List<SkuProperty>                   skuPropertys;
+    /** 销售属性. */
+    private List<SkuProperty> skuPropertys;
+
     /** 数量几个. */
-    private Integer                  quantity;
+    private Integer quantity;
 
     //**************************************************************
 
     /** 商品图片. */
-    private String                   itemPic;
-    
-    /** 行类型. 
+    private String itemPic;
+
+    /**
+     * 行类型.
+     * 
      * @since 5.3.1.8
-     * */
-    private Integer                     type;
+     */
+    private Integer type;
 
     //***********************价格信息*****************************************************
 
     /** 销售价. */
-    private BigDecimal               salePrice;
+    private BigDecimal salePrice;
 
     /** 吊牌价(原单价). */
-    private BigDecimal               listPrice;
+    private BigDecimal listPrice;
 
     /** orderline行 金额小计 *. */
-    private BigDecimal               subTotalAmt      = BigDecimal.ZERO;
+    private BigDecimal subTotalAmt = BigDecimal.ZERO;
+
+    //-------------------------------------------
+
+    /**
+     * 订单行的包装信息.
+     * 
+     * @since 5.3.2.11-Personalise
+     */
+    private List<OrderLinePackageInfoViewCommand> orderLinePackageInfoViewCommandList;
+
+    //-------------------------------------------
 
     /**
      * 获得 orderline行的唯一标识,那么此处的id={@link OrderLine#id}.
@@ -345,7 +359,7 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
      *
      * @return the 销售属性
      */
-    public List<SkuProperty> getSkuPropertys() {
+    public List<SkuProperty> getSkuPropertys(){
         return skuPropertys;
     }
 
@@ -355,11 +369,10 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
      * @param skuPropertys
      *            the new 销售属性
      */
-    public void setSkuPropertys(List<SkuProperty> skuPropertys) {
+    public void setSkuPropertys(List<SkuProperty> skuPropertys){
         this.skuPropertys = skuPropertys;
     }
 
-    
     /**
      * 获得 行类型.
      *
@@ -370,7 +383,6 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
         return type;
     }
 
-    
     /**
      * 设置 行类型.
      *
@@ -380,6 +392,22 @@ public class SimpleOrderLineSubViewCommand extends BaseViewCommand{
      */
     public void setType(Integer type){
         this.type = type;
+    }
+
+    
+    /**
+     * @return the orderLinePackageInfoViewCommandList
+     */
+    public List<OrderLinePackageInfoViewCommand> getOrderLinePackageInfoViewCommandList(){
+        return orderLinePackageInfoViewCommandList;
+    }
+
+    
+    /**
+     * @param orderLinePackageInfoViewCommandList the orderLinePackageInfoViewCommandList to set
+     */
+    public void setOrderLinePackageInfoViewCommandList(List<OrderLinePackageInfoViewCommand> orderLinePackageInfoViewCommandList){
+        this.orderLinePackageInfoViewCommandList = orderLinePackageInfoViewCommandList;
     }
 
 }
