@@ -16,11 +16,6 @@
  */
 package com.baozun.nebula.web.controller.order;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toList;
-import static com.feilong.core.bean.ConvertUtil.toLong;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,29 +30,26 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.baozun.nebula.api.utils.ConvertUtils;
 import com.baozun.nebula.command.ContactCommand;
 import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
-import com.baozun.nebula.model.delivery.AreaDeliveryMode;
-import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
-import com.baozun.nebula.sdk.manager.shoppingcart.bundle.SdkShoppingCartBundleNewLineBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
+import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
+import com.baozun.nebula.web.controller.order.builder.OrderConfirmViewCommandBuilder;
+import com.baozun.nebula.web.controller.order.builder.ShoppingCartCommandShowBuilder;
 import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
-import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.baozun.nebula.web.controller.order.handler.OrderConfirmBeforeHandler;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
@@ -65,11 +57,9 @@ import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewComman
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
-import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
-import com.feilong.core.Validator;
-import com.feilong.core.bean.BeanUtil;
-import com.feilong.core.bean.ConvertUtil;
-import com.feilong.core.bean.PropertyUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
  * 订单确认控制器.
@@ -168,10 +158,6 @@ public class NebulaOrderConfirmController extends BaseController{
     @Autowired
     private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
-    /** The sdk shopping cart bundle new line builder. */
-    @Autowired
-    private SdkShoppingCartBundleNewLineBuilder sdkShoppingCartBundleNewLineBuilder;
-
     /** The confirm before handler. */
     @Autowired(required = false)
     private OrderConfirmBeforeHandler confirmBeforeHandler;
@@ -180,9 +166,14 @@ public class NebulaOrderConfirmController extends BaseController{
     @Autowired
     private SdkDeliveryAreaManager deliveryAreaManager;
 
-    /** The area delivery mode manager. */
     @Autowired
-    private SdkAreaDeliveryModeManager areaDeliveryModeManager;
+    private OrderConfirmViewCommandBuilder orderConfirmViewCommandBuilder;
+
+    @Autowired
+    private ShoppingCartCommandShowBuilder shoppingCartCommandShowBuilder;
+
+    @Autowired
+    private CalcFreightCommandBuilder calcFreightCommandBuilder;
 
     /**
      * 显示订单结算页面.
@@ -209,76 +200,30 @@ public class NebulaOrderConfirmController extends BaseController{
             confirmBeforeHandler.beforeOrderConfirm(shoppingCartCommand, memberDetails, request, key);
         }
 
-        // 封装viewCommand
-        OrderConfirmViewCommand orderConfirmViewCommand = new OrderConfirmViewCommand();
-        orderConfirmViewCommand.setShoppingCartCommand(convertForShow(shoppingCartCommand));
-        // 收获地址信息
-        orderConfirmViewCommand.setAddressList(contactCommandList);
+        OrderConfirmViewCommand orderConfirmViewCommand = orderConfirmViewCommandBuilder.build(contactCommandList, shoppingCartCommand);
 
         model.addAttribute("orderConfirmViewCommand", orderConfirmViewCommand);
         return "transaction.check";
     }
 
     /**
-     * Convert for show.
+     * Builds the shopping cart command.
      *
-     * @param shoppingCartCommand
-     *            the shopping cart command
+     * @param memberDetails
+     *            the member details
+     * @param key
+     *            the key
+     * @param contactCommandList
+     *            the contact command list
+     * @param couponList
+     *            the coupon list
+     * @param request
+     *            the request
      * @return the shopping cart command
      */
-    private ShoppingCartCommand convertForShow(ShoppingCartCommand shoppingCartCommand){
-        ShoppingCartCommand cloneShoppingCartCommand = BeanUtil.cloneBean(shoppingCartCommand);
-        List<ShoppingCartLineCommand> newShoppingCartLineCommands = buildNewShoppingCartLineCommands(shoppingCartCommand);
-        cloneShoppingCartCommand.setShoppingCartLineCommands(newShoppingCartLineCommands);
-        return cloneShoppingCartCommand;
-    }
-
-    /**
-     * Builds the new shopping cart line commands.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @return the list
-     * @since 5.3.1
-     */
-    private List<ShoppingCartLineCommand> buildNewShoppingCartLineCommands(ShoppingCartCommand shoppingCartCommand){
-        List<ShoppingCartLineCommand> newShoppingCartLineCommands = new ArrayList<>();
-
-        List<ShoppingCartLineCommand> shoppingCartLineCommands = shoppingCartCommand.getShoppingCartLineCommands();
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommands){
-            Long relatedItemId = shoppingCartLineCommand.getRelatedItemId();
-            if (null == relatedItemId){
-                newShoppingCartLineCommands.add(shoppingCartLineCommand);
-            }else{
-                doWithBundle(newShoppingCartLineCommands, shoppingCartLineCommand, relatedItemId);
-            }
-        }
-        return newShoppingCartLineCommands;
-    }
-
-    /**
-     * 打散 bundle 显示,bundle 单行是由 多个 skuIds 组成, 循环成新的newShoppingCartLineCommand.
-     * 
-     * <p>
-     * 目的是为了实现, 内存对象中,是一条购物车行, 但是显示的时候要拆散显示
-     * </p>
-     *
-     * @param newShoppingCartLineCommands
-     *            the new shopping cart line commands
-     * @param oldShoppingCartLineCommand
-     *            the old shopping cart line command
-     * @param relatedItemId
-     *            the related item id
-     * @since 5.3.1.6
-     */
-    private void doWithBundle(List<ShoppingCartLineCommand> newShoppingCartLineCommands,ShoppingCartLineCommand oldShoppingCartLineCommand,Long relatedItemId){
-        Long[] skuIds = oldShoppingCartLineCommand.getSkuIds();
-        Integer quantity = oldShoppingCartLineCommand.getQuantity();
-
-        for (Long skuId : skuIds){
-            ShoppingCartLineCommand newShoppingCartLineCommand = sdkShoppingCartBundleNewLineBuilder.buildNewShoppingCartLineCommand(relatedItemId, skuId, quantity, oldShoppingCartLineCommand);
-            newShoppingCartLineCommands.add(newShoppingCartLineCommand);
-        }
+    private ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,String key,List<ContactCommand> contactCommandList,List<String> couponList,HttpServletRequest request){
+        CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(contactCommandList);
+        return buildShoppingCartCommand(memberDetails, key, calcFreightCommand, couponList, request);
     }
 
     /**
@@ -326,50 +271,12 @@ public class NebulaOrderConfirmController extends BaseController{
         }
 
         //地址
-        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(orderForm);
+        CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(orderForm.getShippingInfoSubForm());
 
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, calcFreightCommand, toList(couponCode), request);
-        shoppingCartCommand = convertForShow(shoppingCartCommand);
+        shoppingCartCommand = shoppingCartCommandShowBuilder.build(shoppingCartCommand);
         return toNebulaReturnResult(shoppingCartCommand);
 
-    }
-
-    /**
-     * To calc freight command.
-     *
-     * @param orderForm
-     *            the order form
-     * @return the calc freight command
-     * @see <a href="http://jira.baozun.cn/browse/NB-384?filter=10744">NB-384</a>
-     * @since 5.3.2.3
-     */
-    private CalcFreightCommand toCalcFreightCommand(OrderForm orderForm){
-        ShippingInfoSubForm shippingInfoSubForm = orderForm.getShippingInfoSubForm();
-        List<ContactCommand> addressList = toAddressList(shippingInfoSubForm);
-
-        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(addressList);
-        calcFreightCommand.setDistributionModeId(toLong(shippingInfoSubForm.getAppointType()));
-        return calcFreightCommand;
-    }
-
-    /**
-     * Builds the shopping cart command.
-     *
-     * @param memberDetails
-     *            the member details
-     * @param key
-     *            the key
-     * @param contactCommandList
-     *            the contact command list
-     * @param couponList
-     *            the coupon list
-     * @param request
-     *            the request
-     * @return the shopping cart command
-     */
-    private ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,String key,List<ContactCommand> contactCommandList,List<String> couponList,HttpServletRequest request){
-        CalcFreightCommand calcFreightCommand = toCalcFreightCommand(contactCommandList);
-        return buildShoppingCartCommand(memberDetails, key, calcFreightCommand, couponList, request);
     }
 
     /**
@@ -432,101 +339,6 @@ public class NebulaOrderConfirmController extends BaseController{
      */
     protected String getDeliveryAreaCode(ContactCommand contactCommand){
         return contactCommand.getAreaId() + "";
-    }
-
-    /**
-     * To address list.
-     *
-     * @param shippingInfoSubForm
-     *            the shipping info sub form
-     * @return the list
-     */
-    private List<ContactCommand> toAddressList(ShippingInfoSubForm shippingInfoSubForm){
-        boolean isNeedReferToCalcFreight = isNeedReferToCalcFreight(shippingInfoSubForm);
-
-        //如果不需要(比如没有填写全,那么直接返回null)
-        if (!isNeedReferToCalcFreight){
-            return null;
-        }
-
-        //否则 将 shippingInfoSubForm --> contactCommand--->组装成list 返回
-        ContactCommand contactCommand = toContactCommand(shippingInfoSubForm);
-
-        return toList(contactCommand);
-    }
-
-    /**
-     * 是否需要参考计算运费.
-     * 
-     * <p>
-     * 这里当地区全部满足商城选择, 才会计算后面的运费信息<br>
-     * 由于不同的商城, 省市区的级别不一样, 有的到大厦,有的需要国家等<br>
-     * 有的 需要有 AreaId 才开始计算运费,有的不需要,等等
-     * </p>
-     * 
-     * <p>
-     * 该方法允许不同的商城重写
-     * </p>
-     *
-     * @param shippingInfoSubForm
-     *            the shipping info sub form
-     * @return true, if is need refer to calc freight
-     * @since 5.3.1.9
-     */
-    protected boolean isNeedReferToCalcFreight(ShippingInfoSubForm shippingInfoSubForm){
-        return shippingInfoSubForm != null && shippingInfoSubForm.getProvinceId() != null && shippingInfoSubForm.getCityId() != null && shippingInfoSubForm.getAreaId() != null;
-    }
-
-    /**
-     * To contact command.
-     *
-     * @param shippingInfoSubForm
-     *            the shipping info sub form
-     * @return the contact command
-     * @since 5.3.1.9
-     */
-    private ContactCommand toContactCommand(ShippingInfoSubForm shippingInfoSubForm){
-        ContactCommand contactCommand = new ContactCommand();
-        PropertyUtil.copyProperties(contactCommand, shippingInfoSubForm, "countryId", "provinceId", "cityId", "areaId", "townId");
-        return contactCommand;
-    }
-
-    /**
-     * Builds the calc freight command.
-     *
-     * @param addressList
-     *            the address list
-     * @return the calc freight command
-     */
-    private CalcFreightCommand toCalcFreightCommand(List<ContactCommand> addressList){
-        CalcFreightCommand calcFreightCommand = null;
-        if (addressList != null && !addressList.isEmpty()){
-            ContactCommand contactCommand = null;
-
-            //默认地址
-            for (ContactCommand curContactCommand : addressList){
-                if (curContactCommand.getIsDefault()){
-                    contactCommand = curContactCommand;
-                    break;
-                }
-            }
-            //无默认，取第一条
-            if (contactCommand == null){
-                contactCommand = addressList.get(0);
-            }
-            calcFreightCommand = new CalcFreightCommand();
-            calcFreightCommand.setProvienceId(contactCommand.getProvinceId());
-            calcFreightCommand.setCityId(contactCommand.getCityId());
-            calcFreightCommand.setCountyId(contactCommand.getAreaId());
-        }else{
-            //TODO 为毛是上海市黄浦区?
-            //在未选择地址的情况下   为了显示默认运费，初始设置一个临时地址，上海市黄浦区()
-            calcFreightCommand = new CalcFreightCommand();
-            calcFreightCommand.setProvienceId(310000L);
-            calcFreightCommand.setCityId(310100L);
-            calcFreightCommand.setCountyId(310101L);
-        }
-        return calcFreightCommand;
     }
 
     //**************************************************************
