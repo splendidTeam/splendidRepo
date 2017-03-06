@@ -14,19 +14,24 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.order.viewcommand;
+package com.baozun.nebula.web.controller.order.builder;
+
+import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderViewCommand;
 
 /**
- * 订单明细显示的显示数据.
- *
+ * OrderViewCommand 构造器
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @version 5.3.1 2016年5月6日 下午5:49:58
- * @see com.baozun.nebula.model.salesorder.OrderLine
- * @since 5.3.1
+ * @since 5.3.2.11-Personalise
  */
-public class OrderLineSubViewCommand extends AbstractOrderLineSubViewCommand{
+public interface OrderViewCommandBuilder{
 
-    /** The Constant serialVersionUID. */
-    private static final long serialVersionUID = -4308131349902245508L;
-
+    /**
+     * OrderViewCommand 构造器
+     * 
+     * @param salesOrderCommand
+     * @return
+     */
+    OrderViewCommand build(SalesOrderCommand salesOrderCommand);
 }
