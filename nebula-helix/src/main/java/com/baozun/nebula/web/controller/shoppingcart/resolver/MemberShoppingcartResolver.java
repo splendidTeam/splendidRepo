@@ -99,7 +99,6 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
 
         //----------------------------------------------------------------------------------------------------------
 
-        Long groupId = memberDetails.getGroupId();
         //修改行在db 里面的sku id
         Long skuIdInDB = shoppingCartLineCommandInDB.getSkuId();
 
@@ -111,12 +110,12 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
             //如果不需要合并,那么仅修改当前行数据 
             //相等表示不需要修改sku信息,不相等表示需要修改sku信息 
             Long newSkuId = skuIdInDB == currentShoppingCartLineCommand.getSkuId() ? null : currentShoppingCartLineCommand.getSkuId();
-            sdkShoppingCartUpdateManager.updateCartLineSkuInfo(groupId, shoppingcartLineId, newSkuId, currentShoppingCartLineCommand.getQuantity());
+            sdkShoppingCartUpdateManager.updateCartLineSkuInfo(memberDetails.getGroupId(), shoppingcartLineId, newSkuId, currentShoppingCartLineCommand.getQuantity());
         }
         //如果不存在,那么表示已经被合并了
         else{
             ShoppingCartLineCommand combinedShoppingCartLineCommand = findCombinedShoppingCartLineCommand(shoppingCartLineCommandListDB, shoppingCartLineCommandList);
-            sdkShoppingCartUpdateManager.updateCartLineQuantityAndDeleteOtherLineId(groupId, combinedShoppingCartLineCommand.getId(), combinedShoppingCartLineCommand.getQuantity(), shoppingcartLineId);
+            sdkShoppingCartUpdateManager.updateCartLineQuantityAndDeleteOtherLineId(memberDetails.getGroupId(), combinedShoppingCartLineCommand.getId(), combinedShoppingCartLineCommand.getQuantity(), shoppingcartLineId);
         }
         return null;
     }

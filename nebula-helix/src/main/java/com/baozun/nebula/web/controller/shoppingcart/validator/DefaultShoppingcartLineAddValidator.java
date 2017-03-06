@@ -44,8 +44,6 @@ import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.lang.reflect.ConstructorUtil;
 import com.feilong.core.util.CollectionsUtil;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-
 /**
  * The Class DefaultShoppingcartLineAddValidator.
  *
@@ -59,9 +57,9 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     @Autowired
     private SdkSkuManager sdkSkuManager;
 
-    /** 相同行提取器. */
+    /** 购物车添加的时候相同行提取器. */
     @Autowired
-    private ShoppingCartSameLineExtractor shoppingCartSameLineExtractor;
+    private ShoppingCartAddSameLineExtractor shoppingCartAddSameLineExtractor;
 
     /** The shoppingcart total line max size validator. */
     @Autowired(required = false)
@@ -70,6 +68,9 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     /** The shoppingcart line operate common validator. */
     @Autowired
     private ShoppingcartLineOperateCommonValidator shoppingcartLineOperateCommonValidator;
+
+    @Autowired
+    private ShoppingcartLinePackageInfoFormListValidator shoppingcartLinePackageInfoFormListValidator;
 
     /*
      * (non-Javadoc)
@@ -86,13 +87,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         Validate.notNull(skuId, "skuId can't be null!");
         Validate.notNull(count, "count can't be null!");
 
-        List<PackageInfoForm> packageInfoFormList = shoppingCartLineAddForm.getPackageInfoFormList();
-        if (isNotNullOrEmpty(packageInfoFormList)){
-            for (PackageInfoForm packageInfoForm : packageInfoFormList){
-                Validate.notNull(packageInfoForm.getType(), "packageInfoForm type can't be null!");
-                Validate.notNull(packageInfoForm.getTotal(), "packageInfoForm total can't be null!");
-            }
-        }
+        shoppingcartLinePackageInfoFormListValidator.validator(shoppingCartLineAddForm.getPackageInfoFormList());
 
         //--------------------1.common 校验--------------------------------------------
         Sku sku = sdkSkuManager.findSkuById(skuId);
@@ -107,7 +102,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
 
         // ****************************************************************************************
         //待操作的购物车行
-        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartSameLineExtractor.getSameLine(mainLines, shoppingCartLineAddForm);
+        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingCartLineAddForm);
 
         //------------2.单行 最大购买数校验-----------------------------------------------------------------------------------
         //是否已经在购物车里面有,如果有,那么这一行累计数量进行校验; 如果没有那么仅仅校验传入的数量
@@ -140,7 +135,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         }
 
         //************4.统计购物车所有相同 skuid 库存校验***********************************************************************************
-        if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
+        if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId)){
             return MAX_THAN_INVENTORY;
         }
         return null;

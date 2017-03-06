@@ -16,28 +16,24 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
-import java.util.List;
-
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 
 /**
- * 购物车 sku 库存校验.
- *
+ * {@link ShoppingcartUpdateDetermineSameLineElements} 构造器.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.2.3
+ * @since 5.3.2.11-Personalise
  */
-public interface ShoppingCartInventoryValidator{
+public interface ShoppingcartUpdateDetermineSameLineElementsBuilder{
 
     /**
-     * 校验购物车里面的指定的skuId(累加)是否超过库存量.
+     * 基于ShoppingCartLineCommand 和 ShoppingCartLineUpdateSkuForm 来构造 ShoppingcartUpdateDetermineSameLineElements.
      *
-     * @param shoppingCartLineCommandList
-     *            用户所有的购物车
-     * @param skuId
-     *            指定购买的sku id
-     * @return 如果超过库存量,返回true;否则返回false
-     * 
-     * @since 5.3.2.11-Personalise change method ,remove extentionCode param
+     * @param currentShoppingCartLineCommand
+     * @param shoppingCartLineUpdateSkuForm
+     * @return 如果 <code>currentShoppingCartLineCommand</code> 是null,抛出 {@link NullPointerException}<br>
+     *         如果 <code>shoppingCartLineUpdateSkuForm</code> 是blank,抛出 {@link IllegalArgumentException}<br>
      */
-    boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId);
+    ShoppingcartUpdateDetermineSameLineElements build(ShoppingCartLineCommand currentShoppingCartLineCommand,ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm);
 }

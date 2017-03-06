@@ -18,25 +18,25 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 
 import java.util.List;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
+import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 
 /**
- * 相同行提取器.
+ * 校验购物车行表单包装信息.
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public interface ShoppingCartSameLineExtractor{
+public interface ShoppingcartLinePackageInfoFormListValidator{
 
     /**
-     * 从主行list中查找相同行
+     * 校验购物车行表单包装信息.
      * 
-     * @param mainLines
-     *            已有的购物车主行
-     * @param shoppingCartLineAddForm
-     *            现在的表单
-     * @return 如果找不到相同行,那么返回null
+     * <p>
+     * 如果 <code>packageInfoFormList</code> 是null或者empty,nothing to do<br>
+     * 如果 <code>packageInfoFormList</code> 不是null,那么校验每个 PackageInfoForm 对象相关参数信息
+     * </p>
+     * 
+     * @param packageInfoFormList
      */
-    ShoppingCartLineCommand getSameLine(List<ShoppingCartLineCommand> mainLines,final ShoppingCartLineAddForm shoppingCartLineAddForm);
+    void validator(List<PackageInfoForm> packageInfoFormList);
 }

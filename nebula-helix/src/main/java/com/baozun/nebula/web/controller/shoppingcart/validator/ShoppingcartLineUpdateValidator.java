@@ -45,6 +45,10 @@ public interface ShoppingcartLineUpdateValidator{
      * <li>库存校验</li>
      * </ol>
      * </blockquote>
+     * 
+     * <p>
+     * 注意:此接口可能含融合操作
+     * </p>
      *
      * @param memberDetails
      *            the member details

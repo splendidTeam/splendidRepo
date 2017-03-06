@@ -19,25 +19,29 @@ package com.baozun.nebula.web.controller.shoppingcart.validator;
 import java.util.List;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 
 /**
- * 购物车 sku 库存校验.
- *
+ * 购物车添加的时候相同行提取器.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.2.3
+ * @since 5.3.2.11-Personalise
  */
-public interface ShoppingCartInventoryValidator{
+public interface ShoppingCartAddSameLineExtractor{
 
     /**
-     * 校验购物车里面的指定的skuId(累加)是否超过库存量.
-     *
-     * @param shoppingCartLineCommandList
-     *            用户所有的购物车
-     * @param skuId
-     *            指定购买的sku id
-     * @return 如果超过库存量,返回true;否则返回false
+     * 从主行list中提取相同行.
      * 
-     * @since 5.3.2.11-Personalise change method ,remove extentionCode param
+     * <p>
+     * <b>场景:</b> 在添加购物车行的时候,如果发现已经有相同的行(比如SKUid 相同,并且包装信息相同,那么后续流程可能需要合并数量,而不是无脑的增加行);<br>
+     * 如果找不到相同的行,那么后续流程可能就是新增一行了.
+     * </p>
+     * 
+     * @param mainLines
+     *            已有的购物车主行
+     * @param shoppingCartLineAddForm
+     *            现在的表单
+     * @return 如果找不到相同行,那么返回null
      */
-    boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId);
+    ShoppingCartLineCommand extractor(List<ShoppingCartLineCommand> mainLines,final ShoppingCartLineAddForm shoppingCartLineAddForm);
 }

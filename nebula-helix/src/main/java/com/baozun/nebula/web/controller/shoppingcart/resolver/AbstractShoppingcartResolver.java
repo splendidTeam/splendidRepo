@@ -40,7 +40,7 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddFor
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartSameLineExtractor;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineUpdateValidator;
@@ -68,7 +68,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
     /** 相同行提取器. */
     @Autowired
-    private ShoppingCartSameLineExtractor shoppingCartSameLineExtractor;
+    private ShoppingCartAddSameLineExtractor shoppingCartAddSameLineExtractor;
 
     /** The shoppingcart count persister. */
     @Autowired
@@ -131,7 +131,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //待操作的购物车行
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartSameLineExtractor.getSameLine(mainLines, shoppingCartLineAddForm);
+        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingCartLineAddForm);
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, toBeOperatedShoppingCartLineCommand, request, response);
 
         if (null != addShoppingCartShoppingcartResult){
@@ -489,7 +489,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
                 }
 
                 //校验库存
-                if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId, sku.getOutid())){
+                if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, skuId)){
                     return MAX_THAN_INVENTORY;
                 }
             }

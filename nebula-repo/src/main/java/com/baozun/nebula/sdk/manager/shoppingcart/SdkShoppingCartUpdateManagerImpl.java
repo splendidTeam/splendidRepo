@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.sdk.utils.ManagerValidate;
 
 /**
@@ -59,10 +58,7 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         Validate.notNull(quantity, "quantity can't be null!");
 
         int result = sdkShoppingCartLineDao.updateCartLineQuantityByLineId(memberId, lineId, quantity);
-        if (1 != result){
-            LOGGER.error("update:[{}],lineId:[{}] to quantity:[{}],result is:[{}], not expected 1", memberId, lineId, quantity, result);
-            throw new NativeUpdateRowCountNotEqualException(1, result);
-        }
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],update line:[{}] count:[{}]", memberId, lineId, quantity);
     }
 
     /*
@@ -97,10 +93,7 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
         updateCartLineQuantityByLineId(memberId, updateLineId, quantity);
         int result = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, deleteLineId);
 
-        if (1 != result){
-            LOGGER.error("delete:[{}],lineId:[{}] ,result is:[{}], not expected 1", memberId, deleteLineId, result);
-            throw new NativeUpdateRowCountNotEqualException(1, result);
-        }
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],delete line:[{}]", memberId, deleteLineId);
     }
 
     /*

@@ -29,7 +29,7 @@ import com.feilong.core.date.DateUtil;
 import com.feilong.core.util.RandomUtil;
 
 /**
- * The Class ToCookieShoppingCartLineTransformer.
+ * 将{@link ShoppingCartLineCommand} 转换成{@link CookieShoppingCartLine} 转换器.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see ToShoppingCartLineCommandTransformer
@@ -39,16 +39,17 @@ import com.feilong.core.util.RandomUtil;
 class ToCookieShoppingCartLineTransformer implements Transformer<ShoppingCartLineCommand, CookieShoppingCartLine>{
 
     /** The Constant LOGGER. */
-    private static final Logger   LOGGER              = LoggerFactory.getLogger(ToCookieShoppingCartLineTransformer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToCookieShoppingCartLineTransformer.class);
 
     /** The Constant COPY_PROPERTY_NAMES. */
-    private static final String[] COPY_PROPERTY_NAMES = {
+    private static final String[] COPY_PROPERTY_NAMES = { //
                                                           "skuId",
                                                           "extentionCode",
                                                           "quantity",
                                                           "createTime",
                                                           "settlementState",
-                                                          "lineGroup" };
+                                                          "lineGroup",
+                                                          "shoppingCartLinePackageInfoCommandList" };
 
     /*
      * (non-Javadoc)
@@ -81,6 +82,10 @@ class ToCookieShoppingCartLineTransformer implements Transformer<ShoppingCartLin
 
     /**
      * 创建 id.
+     * 
+     * <p>
+     * 游客的购物车行id 仅仅用于增删修改等操作,不会存储到DB
+     * </p>
      *
      * @return the long
      */

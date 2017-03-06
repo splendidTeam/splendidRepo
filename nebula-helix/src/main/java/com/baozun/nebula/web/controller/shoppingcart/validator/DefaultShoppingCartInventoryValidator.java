@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
-import static com.feilong.core.util.CollectionsUtil.select;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +23,10 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
+
+import static com.feilong.core.util.CollectionsUtil.select;
 
 /**
  * 购物车 sku 库存校验.
@@ -37,9 +37,8 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 @Component("shoppingCartInventoryValidator")
 public class DefaultShoppingCartInventoryValidator implements ShoppingCartInventoryValidator{
 
-    /** The sdk item manager. */
     @Autowired
-    private SdkItemManager sdkItemManager;
+    private SdkSkuInventoryManager sdkSkuInventoryManager;
 
     /*
      * (non-Javadoc)
@@ -47,8 +46,8 @@ public class DefaultShoppingCartInventoryValidator implements ShoppingCartInvent
      * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator#isMoreThanInventory(java.util.List, java.lang.Long, java.lang.String)
      */
     @Override
-    public boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId,String extentionCode){
-        SkuInventory inventoryInDb = sdkItemManager.getSkuInventoryByExtentionCode(extentionCode);
+    public boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId){
+        SkuInventory inventoryInDb = sdkSkuInventoryManager.findSkuInventoryBySkuId(skuId);
 
         //相同 skuId 所有的 lines
         List<ShoppingCartLineCommand> sameSkuIdLines = select(shoppingCartLineCommandList, "skuId", skuId);

@@ -29,7 +29,8 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.persister.GuestShoppingcartPersister;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * 游客操作购物车.
@@ -126,7 +127,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
             Long shoppingcartLineId = entry.getKey();
             Integer count = entry.getValue();
 
-            ShoppingCartLineCommand shoppingCartLineCommand = CollectionsUtil.find(shoppingCartLineCommandList, "id", shoppingcartLineId);
+            ShoppingCartLineCommand shoppingCartLineCommand = find(shoppingCartLineCommandList, "id", shoppingcartLineId);
             shoppingCartLineCommand.setQuantity(count);
         }
 

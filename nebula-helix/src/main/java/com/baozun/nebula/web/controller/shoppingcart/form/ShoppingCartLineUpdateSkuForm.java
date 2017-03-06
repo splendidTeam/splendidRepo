@@ -16,6 +16,8 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.form;
 
+import java.util.List;
+
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
@@ -42,6 +44,13 @@ public class ShoppingCartLineUpdateSkuForm extends BaseForm{
 
     /** 订单行最终修改的全量数量(必填). */
     private Integer count;
+
+    /**
+     * 包装信息.
+     * 
+     * @since 5.3.2.11-Personalise
+     */
+    private List<PackageInfoForm> packageInfoFormList;
 
     /**
      * 获得 订单行要修改成什么新的sku(如果是null,等同于仅修改数量).
@@ -79,6 +88,27 @@ public class ShoppingCartLineUpdateSkuForm extends BaseForm{
      */
     public void setCount(Integer count){
         this.count = count;
+    }
+
+    /**
+     * 获得 包装信息.
+     *
+     * @return the packageInfoFormList
+     * @since 5.3.2.11-Personalise
+     */
+    public List<PackageInfoForm> getPackageInfoFormList(){
+        return packageInfoFormList;
+    }
+
+    /**
+     * 设置 包装信息.
+     *
+     * @param packageInfoFormList
+     *            the packageInfoFormList to set
+     * @since 5.3.2.11-Personalise
+     */
+    public void setPackageInfoFormList(List<PackageInfoForm> packageInfoFormList){
+        this.packageInfoFormList = packageInfoFormList;
     }
 
 }
