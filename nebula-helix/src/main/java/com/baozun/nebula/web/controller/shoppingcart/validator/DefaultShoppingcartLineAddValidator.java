@@ -34,6 +34,7 @@ import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
@@ -72,6 +73,9 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     @Autowired
     private ShoppingcartLinePackageInfoFormListValidator shoppingcartLinePackageInfoFormListValidator;
 
+    @Autowired
+    private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
+
     /*
      * (non-Javadoc)
      * 
@@ -102,7 +106,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
 
         // ****************************************************************************************
         //待操作的购物车行
-        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingCartLineAddForm);
+        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
 
         //------------2.单行 最大购买数校验-----------------------------------------------------------------------------------
         //是否已经在购物车里面有,如果有,那么这一行累计数量进行校验; 如果没有那么仅仅校验传入的数量

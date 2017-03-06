@@ -16,19 +16,18 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-
 import java.util.List;
 
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
-import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartUpdateDetermineSameLineElements;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
-import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.lang.reflect.ConstructorUtil;
 import com.feilong.core.util.CollectionsUtil;
@@ -38,27 +37,22 @@ import com.feilong.core.util.CollectionsUtil;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-@Component("shoppingcartUpdateDetermineSameLineElementsBuilder")
-public class DefaultShoppingcartUpdateDetermineSameLineElementsBuilder implements ShoppingcartUpdateDetermineSameLineElementsBuilder{
+@Component("shoppingcartAddDetermineSameLineElementsBuilder")
+public class DefaultShoppingcartAddDetermineSameLineElementsBuilder implements ShoppingcartAddDetermineSameLineElementsBuilder{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartAddDetermineSameLineElementsBuilder.class);
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartUpdateDetermineSameLineElementsBuilder#buildShoppingcartUpdateDetermineSameLineElements(com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
-     * com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm)
+     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartAddDetermineSameLineElementsBuilder#build(com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm)
      */
     @Override
-    public ShoppingcartUpdateDetermineSameLineElements build(ShoppingCartLineCommand currentShoppingCartLineCommand,ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm){
-        Validate.notNull(currentShoppingCartLineCommand, "currentShoppingCartLineCommand can't be null!");
-        Validate.notNull(shoppingCartLineUpdateSkuForm, "shoppingCartLineUpdateSkuForm can't be null!");
-
-        ShoppingcartUpdateDetermineSameLineElements shoppingcartUpdateDetermineSameLineElements = new ShoppingcartUpdateDetermineSameLineElements();
-        shoppingcartUpdateDetermineSameLineElements.setCurrentLineId(currentShoppingCartLineCommand.getId());
-        shoppingcartUpdateDetermineSameLineElements.setLineGroup(currentShoppingCartLineCommand.getLineGroup());
-        shoppingcartUpdateDetermineSameLineElements.setPackageInfoElementList(toPackageInfoElementList(shoppingCartLineUpdateSkuForm.getPackageInfoFormList()));
-        shoppingcartUpdateDetermineSameLineElements.setRelatedItemId(currentShoppingCartLineCommand.getRelatedItemId());
-        shoppingcartUpdateDetermineSameLineElements.setSkuId(defaultIfNull(currentShoppingCartLineCommand.getSkuId(), currentShoppingCartLineCommand.getSkuId()));
-        return shoppingcartUpdateDetermineSameLineElements;
+    public ShoppingcartAddDetermineSameLineElements build(ShoppingCartLineAddForm shoppingCartLineAddForm){
+        ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements = new ShoppingcartAddDetermineSameLineElements();
+        shoppingcartAddDetermineSameLineElements.setSkuId(shoppingCartLineAddForm.getSkuId());
+        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(toPackageInfoElementList(shoppingCartLineAddForm.getPackageInfoFormList()));
+        return shoppingcartAddDetermineSameLineElements;
     }
 
     /**

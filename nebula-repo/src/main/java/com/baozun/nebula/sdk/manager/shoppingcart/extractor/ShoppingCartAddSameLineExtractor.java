@@ -14,31 +14,33 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.shoppingcart;
+package com.baozun.nebula.sdk.manager.shoppingcart.extractor;
 
 import java.util.List;
 
-import com.baozun.nebula.manager.BaseManager;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
- * 专门处理购物车查询的业务类.
- *
+ * 购物车添加的时候相同行提取器.
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public interface SdkShoppingCartQueryManager extends BaseManager{
+public interface ShoppingCartAddSameLineExtractor{
 
     /**
-     * 查询指定用户 <code>memberId</code> 的 购物车信息.
+     * 从主行list中提取相同行.
      * 
      * <p>
-     * 已经封装了明细行的<b>包装信息</b>
+     * <b>场景:</b> 在添加购物车行的时候,如果发现已经有相同的行(比如SKUid 相同,并且包装信息相同,那么后续流程可能需要合并数量,而不是无脑的增加行);<br>
+     * 如果找不到相同的行,那么后续流程可能就是新增一行了.
      * </p>
-     * 
-     * @param memberId
-     *            指定用户
-     * @return 如果没有购物车信息,返回null
+     *
+     * @param mainLines
+     *            已有的购物车主行
+     * @param shoppingcartAddDetermineSameLineElements
+     *            判断相同行的元素因子
+     * @return 如果找不到相同行,那么返回null
      */
-    List<ShoppingCartLineCommand> findShoppingCartLineCommandList(Long memberId);
+    ShoppingCartLineCommand extractor(List<ShoppingCartLineCommand> mainLines,ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements);
 }

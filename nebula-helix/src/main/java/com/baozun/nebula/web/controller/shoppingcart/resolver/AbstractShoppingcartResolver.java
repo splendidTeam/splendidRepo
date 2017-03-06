@@ -34,13 +34,14 @@ import org.springframework.ui.Model;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartAddSameLineExtractor;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartAddDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineUpdateValidator;
@@ -90,6 +91,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     @Autowired
     protected ShoppingCartInventoryValidator shoppingCartInventoryValidator;
 
+    @Autowired
+    private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
+
     /*
      * (non-Javadoc)
      * 
@@ -131,7 +135,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //待操作的购物车行
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
-        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingCartLineAddForm);
+        ShoppingCartLineCommand toBeOperatedShoppingCartLineCommand = shoppingCartAddSameLineExtractor.extractor(mainLines, shoppingcartAddDetermineSameLineElementsBuilder.build(shoppingCartLineAddForm));
         ShoppingcartResult addShoppingCartShoppingcartResult = doAddShoppingCart(memberDetails, shoppingCartLineCommandList, toBeOperatedShoppingCartLineCommand, request, response);
 
         if (null != addShoppingCartShoppingcartResult){

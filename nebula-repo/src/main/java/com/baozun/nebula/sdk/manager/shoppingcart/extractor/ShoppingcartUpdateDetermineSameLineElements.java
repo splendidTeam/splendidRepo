@@ -14,12 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
-
-import java.io.Serializable;
-import java.util.List;
-
-import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
+package com.baozun.nebula.sdk.manager.shoppingcart.extractor;
 
 /**
  * 购物车判断相同行要素.
@@ -31,18 +26,14 @@ import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public class ShoppingcartUpdateDetermineSameLineElements implements Serializable{
+public class ShoppingcartUpdateDetermineSameLineElements extends AbstractShoppingcartDetermineSameLineElements{
 
-    /**  */
     private static final long serialVersionUID = 288232184048495608L;
 
     /**
      * 当前行的id.
      */
     private Long currentLineId;
-
-    /** skuid. */
-    private Long skuId;
 
     /** 行分组 *. */
     private Long lineGroup;
@@ -57,11 +48,6 @@ public class ShoppingcartUpdateDetermineSameLineElements implements Serializable
      * </p>
      */
     private Long relatedItemId;
-
-    /**
-     * 包装信息.
-     */
-    private List<PackageInfoForm> packageInfoFormList;
 
     /**
      * 获得 当前行的id.
@@ -80,25 +66,6 @@ public class ShoppingcartUpdateDetermineSameLineElements implements Serializable
      */
     public void setCurrentLineId(Long currentLineId){
         this.currentLineId = currentLineId;
-    }
-
-    /**
-     * 获得 skuid.
-     *
-     * @return the skuId
-     */
-    public Long getSkuId(){
-        return skuId;
-    }
-
-    /**
-     * 设置 skuid.
-     *
-     * @param skuId
-     *            the skuId to set
-     */
-    public void setSkuId(Long skuId){
-        this.skuId = skuId;
     }
 
     /**
@@ -150,24 +117,4 @@ public class ShoppingcartUpdateDetermineSameLineElements implements Serializable
     public void setRelatedItemId(Long relatedItemId){
         this.relatedItemId = relatedItemId;
     }
-
-    /**
-     * 获得 包装信息.
-     *
-     * @return the packageInfoFormList
-     */
-    public List<PackageInfoForm> getPackageInfoFormList(){
-        return packageInfoFormList;
-    }
-
-    /**
-     * 设置 包装信息.
-     *
-     * @param packageInfoFormList
-     *            the packageInfoFormList to set
-     */
-    public void setPackageInfoFormList(List<PackageInfoForm> packageInfoFormList){
-        this.packageInfoFormList = packageInfoFormList;
-    }
-
 }

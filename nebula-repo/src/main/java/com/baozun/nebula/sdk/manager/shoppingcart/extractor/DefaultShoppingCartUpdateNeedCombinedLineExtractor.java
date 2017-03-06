@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
+package com.baozun.nebula.sdk.manager.shoppingcart.extractor;
 
 import static org.apache.commons.collections4.PredicateUtils.notPredicate;
 
@@ -50,7 +50,7 @@ public class DefaultShoppingCartUpdateNeedCombinedLineExtractor implements Shopp
                         equalPredicate("lineGroup", shoppingcartUpdateDetermineSameLineElements.getLineGroup()),
                         equalPredicate("relatedItemId", shoppingcartUpdateDetermineSameLineElements.getRelatedItemId()),
 
-                        new BeanPredicate<>("shoppingCartLinePackageInfoCommandList", new ShoppingCartLinePackageInfoPredicate(shoppingcartUpdateDetermineSameLineElements.getPackageInfoFormList())),
+                        new BeanPredicate<>("shoppingCartLinePackageInfoCommandList", new ShoppingCartLinePackageInfoPredicate(shoppingcartUpdateDetermineSameLineElements.getPackageInfoElementList())),
 
                         notPredicate(equalPredicate("id", shoppingcartUpdateDetermineSameLineElements.getCurrentLineId()))// 不是当前行
         ));

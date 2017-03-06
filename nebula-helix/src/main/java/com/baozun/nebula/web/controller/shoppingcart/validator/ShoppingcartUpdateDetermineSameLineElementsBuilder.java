@@ -17,6 +17,7 @@
 package com.baozun.nebula.web.controller.shoppingcart.validator;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartUpdateDetermineSameLineElements;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 
 /**

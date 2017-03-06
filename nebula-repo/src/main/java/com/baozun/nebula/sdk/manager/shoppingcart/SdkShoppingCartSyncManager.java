@@ -39,15 +39,15 @@ public interface SdkShoppingCartSyncManager extends BaseManager{
      * 
      * <ol>
      * <li>如果 memberId是null,抛出异常</li>
-     * <li>如果 shoppingLines是null,抛出异常</li>
+     * <li>如果 shoppingCartLineCommandList 是null,抛出异常</li>
      * <li>循环判断,如果数据库用户购物车存在相同的 extentioncode,那么累加;否则插入一条新的</li>
      * </ol>
      * </blockquote>
      *
      * @param memberId
-     *            the member id
-     * @param shoppingLines
-     *            the shopping lines
+     *            会员id
+     * @param shoppingCartLineCommandList
+     *            游客原来的购物车数据(maybe 存在cookie中)
      */
-    void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines);
+    void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingCartLineCommandList);
 }

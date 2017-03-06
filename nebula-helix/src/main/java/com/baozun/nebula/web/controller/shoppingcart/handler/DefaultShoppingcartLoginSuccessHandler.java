@@ -71,11 +71,10 @@ public class DefaultShoppingcartLoginSuccessHandler implements ShoppingcartLogin
     public void onLoginSuccess(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
         Validate.notNull(memberDetails, "memberDetails can't be null!");
 
-        Long memberId = memberDetails.getMemberId();
+        Long memberId = memberDetails.getGroupId();
 
         // 获取游客购物车数据
         List<ShoppingCartLineCommand> guestShoppingCartLineCommandList = guestShoppingcartPersister.load(request);
-
         boolean hasGuestShoppingcart = isNotNullOrEmpty(guestShoppingCartLineCommandList);
         if (hasGuestShoppingcart){
             //同步

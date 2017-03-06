@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
+package com.baozun.nebula.sdk.manager.shoppingcart.extractor;
 
 import java.util.List;
 
@@ -22,7 +22,6 @@ import org.apache.commons.collections4.PredicateUtils;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.feilong.core.util.predicate.BeanPredicate;
 
 import static com.feilong.core.util.CollectionsUtil.find;
@@ -40,14 +39,14 @@ public class DefaultShoppingCartAddSameLineExtractor implements ShoppingCartAddS
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.validator.SameLineExtractor#getSameLine(java.util.List, com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm)
+     * @see com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartAddSameLineExtractor#extractor(java.util.List, com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartAddDetermineSameLineElements)
      */
     @Override
-    public ShoppingCartLineCommand extractor(List<ShoppingCartLineCommand> mainLines,final ShoppingCartLineAddForm shoppingCartLineAddForm){
+    public ShoppingCartLineCommand extractor(List<ShoppingCartLineCommand> mainLines,ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements){
         return find(mainLines, PredicateUtils.<ShoppingCartLineCommand> allPredicate(//
-                        equalPredicate("skuId", shoppingCartLineAddForm.getSkuId()),
+                        equalPredicate("skuId", shoppingcartAddDetermineSameLineElements.getSkuId()),
 
-                        new BeanPredicate<>("shoppingCartLinePackageInfoCommandList", new ShoppingCartLinePackageInfoPredicate(shoppingCartLineAddForm.getPackageInfoFormList()))));
+                        new BeanPredicate<>("shoppingCartLinePackageInfoCommandList", new ShoppingCartLinePackageInfoPredicate(shoppingcartAddDetermineSameLineElements.getPackageInfoElementList()))));
 
     }
 }

@@ -14,31 +14,20 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.sdk.manager.shoppingcart;
-
-import java.util.List;
-
-import com.baozun.nebula.manager.BaseManager;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+package com.baozun.nebula.sdk.manager.shoppingcart.extractor;
 
 /**
- * 专门处理购物车查询的业务类.
- *
+ * 购物车添加的时候判断相同行要素.
+ * 
+ * <p>
+ * 判断的原则: 在购物车行list里面查找,相同 skuId, 且packageInfoFormList 相同
+ * </p>
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.11-Personalise
  */
-public interface SdkShoppingCartQueryManager extends BaseManager{
+public class ShoppingcartAddDetermineSameLineElements extends AbstractShoppingcartDetermineSameLineElements{
 
-    /**
-     * 查询指定用户 <code>memberId</code> 的 购物车信息.
-     * 
-     * <p>
-     * 已经封装了明细行的<b>包装信息</b>
-     * </p>
-     * 
-     * @param memberId
-     *            指定用户
-     * @return 如果没有购物车信息,返回null
-     */
-    List<ShoppingCartLineCommand> findShoppingCartLineCommandList(Long memberId);
+    private static final long serialVersionUID = 288232184048495608L;
+
 }
