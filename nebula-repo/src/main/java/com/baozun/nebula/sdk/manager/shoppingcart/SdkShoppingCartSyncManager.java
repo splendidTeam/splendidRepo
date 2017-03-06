@@ -40,7 +40,7 @@ public interface SdkShoppingCartSyncManager extends BaseManager{
      * <ol>
      * <li>如果 memberId是null,抛出异常</li>
      * <li>如果 shoppingCartLineCommandList 是null,抛出异常</li>
-     * <li>循环判断,如果数据库用户购物车存在相同的 extentioncode,那么累加;否则插入一条新的</li>
+     * <li>循环判断,如果数据库用户购物车存在相同的(skuid 相同,并且包装信息相同),那么累加;否则插入一条新的</li>
      * </ol>
      * </blockquote>
      *

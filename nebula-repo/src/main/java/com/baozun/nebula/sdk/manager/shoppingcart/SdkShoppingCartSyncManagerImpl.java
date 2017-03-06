@@ -18,6 +18,7 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.util.List;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
+import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.lang.reflect.ConstructorUtil;
+import com.feilong.core.util.CollectionsUtil;
 
 /**
  * The Class SdkShoppingCartSyncManagerImpl.
@@ -52,6 +60,9 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
     /**  */
     @Autowired
     private SdkShoppingCartQueryManager sdkShoppingCartQueryManager;
+
+    @Autowired
+    private ShoppingCartAddSameLineExtractor shoppingCartAddSameLineExtractor;
 
     /*
      * (non-Javadoc)
@@ -90,7 +101,7 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
         Integer quantity = shoppingCartLineCommand.getQuantity();
         Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);
 
-        ShoppingCartLineCommand cartLineInDb = findInDb(memberId, shoppingCartLineCommand, shoppingCartLineCommandListInDB);
+        ShoppingCartLineCommand cartLineInDb = findInDb(shoppingCartLineCommand, shoppingCartLineCommandListInDB);
         boolean isInDB = null != cartLineInDb;
 
         if (isInDB){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
@@ -102,14 +113,41 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
 
     /**
      * 在DB中查找.
-     *
-     * @param memberId
+     * 
      * @param shoppingCartLineCommand
      * @return
-     * @since 5.3.2.11-Personalise
      */
-    protected ShoppingCartLineCommand findInDb(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand,List<ShoppingCartLineCommand> shoppingCartLineCommandListInDB){
-        String extentionCode = shoppingCartLineCommand.getExtentionCode();
-        return sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
+    private ShoppingCartLineCommand findInDb(ShoppingCartLineCommand shoppingCartLineCommand,List<ShoppingCartLineCommand> shoppingCartLineCommandListInDB){
+        if (null == shoppingCartLineCommandListInDB){
+            return null;
+        }
+
+        ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements = new ShoppingcartAddDetermineSameLineElements();
+        shoppingcartAddDetermineSameLineElements.setSkuId(shoppingCartLineCommand.getSkuId());
+        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(toPackageInfoElementList(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList()));
+        return shoppingCartAddSameLineExtractor.extractor(shoppingCartLineCommandListInDB, shoppingcartAddDetermineSameLineElements);
+    }
+
+    /**
+     * @param packageInfoFormList
+     * @return
+     */
+    private List<PackageInfoElement> toPackageInfoElementList(List<ShoppingCartLinePackageInfoCommand> packageInfoFormList){
+        return CollectionsUtil.collect(packageInfoFormList, transformer(PackageInfoElement.class, "type", "featureInfo"));
+    }
+
+    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
+        return new Transformer<I, O>(){
+
+            @Override
+            public O transform(I inputBean){
+                Validate.notNull(inputBean, "inputBean can't be null!");
+
+                O outBean = ConstructorUtil.newInstance(type);
+
+                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
+                return outBean;
+            }
+        };
     }
 }
