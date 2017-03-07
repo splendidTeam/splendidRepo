@@ -24,6 +24,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.util.List;
 
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,10 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartUpdateD
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.feilong.core.bean.PropertyUtil;
+import com.feilong.core.lang.reflect.ConstructorUtil;
+import com.feilong.core.util.CollectionsUtil;
 
-import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
@@ -202,9 +205,21 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
      * @since 5.3.2.11-Personalise
      */
     private static List<ShoppingCartLinePackageInfoCommand> buildShoppingCartLinePackageInfoCommandList(List<PackageInfoForm> packageInfoFormList){
-        if (isNullOrEmpty(packageInfoFormList)){
-            return null;
-        }
-        return null;
+        return CollectionsUtil.collect(packageInfoFormList, transformer(ShoppingCartLinePackageInfoCommand.class, "type", "featureInfo", "total", "extendInfo"));
+    }
+
+    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
+        return new Transformer<I, O>(){
+
+            @Override
+            public O transform(I inputBean){
+                Validate.notNull(inputBean, "inputBean can't be null!");
+
+                O outBean = ConstructorUtil.newInstance(type);
+
+                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
+                return outBean;
+            }
+        };
     }
 }
