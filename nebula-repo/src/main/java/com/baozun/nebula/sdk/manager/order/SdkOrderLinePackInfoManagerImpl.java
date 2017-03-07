@@ -28,10 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.dao.salesorder.SdkOrderLinePackageInfoDao;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.OrderLinePackageInfoCommand;
-import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
 import static com.feilong.core.util.CollectionsUtil.group;
 
 /**
@@ -53,20 +53,24 @@ public class SdkOrderLinePackInfoManagerImpl implements SdkOrderLinePackInfoMana
      * @see com.baozun.nebula.sdk.manager.order.SdkOrderLineManager#packOrderLinesPackageInfo(java.util.List)
      */
     @Override
-    public List<OrderLineCommand> packOrderLinesPackageInfo(List<OrderLineCommand> orderLineCommandList){
+    public <T extends OrderLineCommand> List<T> packOrderLinesPackageInfo(List<T> orderLineCommandList){
         if (isNullOrEmpty(orderLineCommandList)){
             return Collections.emptyList();
         }
 
-        List<Long> orderLineIdList = CollectionsUtil.getPropertyValueList(orderLineCommandList, "id");
+        //----------------
+
+        List<Long> orderLineIdList = getPropertyValueList(orderLineCommandList, "id");
         List<OrderLinePackageInfoCommand> orderLinePackageInfoCommandList = sdkOrderLinePackageInfoDao.findOrderLinePackageInfoCommandList(orderLineIdList);
         if (isNullOrEmpty(orderLinePackageInfoCommandList)){
             return orderLineCommandList;
         }
 
+        //----------------
+
         //按照行分个组
         Map<Long, List<OrderLinePackageInfoCommand>> orderLineIdAndOrderLinePackageInfoCommandListMap = group(orderLinePackageInfoCommandList, "orderLineId");
-        for (OrderLineCommand orderLineCommand : orderLineCommandList){
+        for (T orderLineCommand : orderLineCommandList){
             List<OrderLinePackageInfoCommand> list = orderLineIdAndOrderLinePackageInfoCommandListMap.get(orderLineCommand.getId());
 
             if (isNotNullOrEmpty(list)){

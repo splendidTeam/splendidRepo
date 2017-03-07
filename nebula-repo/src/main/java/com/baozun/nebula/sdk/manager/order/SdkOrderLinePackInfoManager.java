@@ -33,12 +33,14 @@ public interface SdkOrderLinePackInfoManager extends BaseManager{
 
     /**
      * 完善包装信息.
+     * 
+     * @param <T>
      *
-     * @param orderLines
+     * @param orderLineCommandList
      * @return 如果 <code>orderLines</code> 是null或者empty,返回 {@link Collections#emptyList()}<br>
      * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManagerImpl#handleShoppingCartLineCommandList(List<ShoppingCartLineCommand>)
      * @since 5.3.2.11-Personalise
      */
-    List<OrderLineCommand> packOrderLinesPackageInfo(List<OrderLineCommand> orderLines);
+    <T extends OrderLineCommand> List<T> packOrderLinesPackageInfo(List<T> orderLineCommandList);
 
 }
