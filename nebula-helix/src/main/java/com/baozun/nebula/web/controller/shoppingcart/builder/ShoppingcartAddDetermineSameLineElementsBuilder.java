@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
+package com.baozun.nebula.web.controller.shoppingcart.builder;
 
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;

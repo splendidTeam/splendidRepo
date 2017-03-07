@@ -34,6 +34,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCom
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartUpdateNeedCombinedLineExtractor;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartUpdateDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
