@@ -46,7 +46,7 @@ public class ShoppingCartLineUpdateSkuForm extends BaseForm{
     private Integer count;
 
     /**
-     * 包装信息.
+     * 包装信息(全量最新的包装信息).
      * 
      * @since 5.3.2.11-Personalise
      */
@@ -91,7 +91,7 @@ public class ShoppingCartLineUpdateSkuForm extends BaseForm{
     }
 
     /**
-     * 获得 包装信息.
+     * 获得 包装信息(全量最新的包装信息).
      *
      * @return the packageInfoFormList
      * @since 5.3.2.11-Personalise
@@ -101,7 +101,7 @@ public class ShoppingCartLineUpdateSkuForm extends BaseForm{
     }
 
     /**
-     * 设置 包装信息.
+     * 设置 包装信息(全量最新的包装信息).
      *
      * @param packageInfoFormList
      *            the packageInfoFormList to set

@@ -25,16 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.baozun.nebula.exception.BusinessException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartAddManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartDeleteManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartQueryManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager;
 import com.baozun.nebula.web.MemberDetails;
-import com.feilong.core.util.CollectionsUtil;
 
-import static com.feilong.core.util.CollectionsUtil.find;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
 
 /**
  * 会员购物车操作.
@@ -94,51 +92,8 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
      */
     @Override
     protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response){
-        List<ShoppingCartLineCommand> shoppingCartLineCommandListDB = getShoppingCartLineCommandList(memberDetails, request);
-        ShoppingCartLineCommand shoppingCartLineCommandInDB = find(shoppingCartLineCommandListDB, "id", shoppingcartLineId);
-
-        //----------------------------------------------------------------------------------------------------------
-
-        //修改行在db 里面的sku id
-        Long skuIdInDB = shoppingCartLineCommandInDB.getSkuId();
-
-        //当前 shoppingcartLineId 在内存list中的对象
-        ShoppingCartLineCommand currentShoppingCartLineCommand = find(shoppingCartLineCommandList, "id", shoppingcartLineId);
-
-        //如果存在,那么表示不需要进行合并的动作
-        if (null != currentShoppingCartLineCommand){
-            //如果不需要合并,那么仅修改当前行数据 
-            //相等表示不需要修改sku信息,不相等表示需要修改sku信息 
-            Long newSkuId = skuIdInDB == currentShoppingCartLineCommand.getSkuId() ? null : currentShoppingCartLineCommand.getSkuId();
-            sdkShoppingCartUpdateManager.updateCartLineSkuInfo(memberDetails.getGroupId(), shoppingcartLineId, newSkuId, currentShoppingCartLineCommand.getQuantity());
-        }
-        //如果不存在,那么表示已经被合并了
-        else{
-            ShoppingCartLineCommand combinedShoppingCartLineCommand = findCombinedShoppingCartLineCommand(shoppingCartLineCommandListDB, shoppingCartLineCommandList);
-            sdkShoppingCartUpdateManager.updateCartLineQuantityAndDeleteOtherLineId(memberDetails.getGroupId(), combinedShoppingCartLineCommand.getId(), combinedShoppingCartLineCommand.getQuantity(), shoppingcartLineId);
-        }
+        sdkShoppingCartUpdateManager.updateCartLine(memberDetails.getGroupId(), shoppingCartLineCommandList, shoppingcartLineId);
         return null;
-    }
-
-    /**
-     * 找到被合并的行.
-     *
-     * @param shoppingCartLineCommandListDB
-     *            the shopping cart line command list DB
-     * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @return the shopping cart line command
-     * @since 5.3.2.4
-     */
-    private ShoppingCartLineCommand findCombinedShoppingCartLineCommand(List<ShoppingCartLineCommand> shoppingCartLineCommandListDB,List<ShoppingCartLineCommand> shoppingCartLineCommandList){
-        //循环内存list,如果发现数量和db不相同,那么返回这条数据
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
-            ShoppingCartLineCommand db = find(shoppingCartLineCommandListDB, "id", shoppingCartLineCommand.getId());
-            if (db.getQuantity() != shoppingCartLineCommand.getQuantity()){
-                return shoppingCartLineCommand;
-            }
-        }
-        throw new BusinessException("not find Combined ShoppingCartLineCommand");
     }
 
     /*
@@ -171,7 +126,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
                     boolean checkStatus,
                     HttpServletRequest request,
                     HttpServletResponse response){
-        List<Long> cartLineIdList = CollectionsUtil.getPropertyValueList(needChangeCheckedCommandList, "id");
+        List<Long> cartLineIdList = getPropertyValueList(needChangeCheckedCommandList, "id");
         sdkShoppingCartUpdateManager.updateCartLineSettlementState(memberDetails.getGroupId(), cartLineIdList, checkStatus);
 
         return null;

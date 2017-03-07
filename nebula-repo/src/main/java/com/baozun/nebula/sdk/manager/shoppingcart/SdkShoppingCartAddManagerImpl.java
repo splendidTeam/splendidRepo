@@ -27,13 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.dao.shoppingcart.ShoppingCartLinePackageInfoDao;
-import com.baozun.nebula.model.packageinfo.PackageInfo;
 import com.baozun.nebula.model.shoppingcart.ShoppingCartLine;
-import com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
-import com.baozun.nebula.sdk.manager.packageinfo.PackageInfoManager;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
@@ -49,14 +45,6 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkShoppingCartAddManagerImpl.class);
 
-    /**  */
-    @Autowired
-    private PackageInfoManager packageInfoManager;
-
-    /**  */
-    @Autowired
-    private ShoppingCartLinePackageInfoDao shoppingCartLinePackageInfoDao;
-
     /** The sdk shopping cart line dao. */
     @Autowired
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
@@ -64,6 +52,10 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     /**  */
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
+
+    /**  */
+    @Autowired
+    private ShoppingCartLinePackageInfoManager shoppingCartLinePackageInfoManager;
 
     /**
      * 添加或者更新购物车.
@@ -115,44 +107,11 @@ public class SdkShoppingCartAddManagerImpl implements SdkShoppingCartAddManager{
     public void addCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand){
         ShoppingCartLine shoppingCartLine = saveShoppingCartLine(memberId, shoppingCartLineCommand);
 
-        // 保存 包装信息
+        // 保存包装信息
         List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList();
         if (isNotNullOrEmpty(shoppingCartLinePackageInfoCommandList)){
-            savePackageInfo(shoppingCartLine.getId(), shoppingCartLinePackageInfoCommandList);
+            shoppingCartLinePackageInfoManager.savePackageInfo(shoppingCartLine.getId(), shoppingCartLinePackageInfoCommandList);
         }
-    }
-
-    /**
-     * 保存包装信息.
-     *
-     * @param shoppingCartLineId
-     * @param shoppingCartLinePackageInfoCommandList
-     */
-    protected void savePackageInfo(Long shoppingCartLineId,List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
-        for (ShoppingCartLinePackageInfoCommand shoppingCartLinePackageInfoCommand : shoppingCartLinePackageInfoCommandList){
-            Long packageInfoId = shoppingCartLinePackageInfoCommand.getPackageInfoId();
-            if (null == packageInfoId){//如果没有packageInfoId 那么就创建一个,如果有那么就使用传入的,这样支持固定的包装类型
-                PackageInfo packageInfoDb = packageInfoManager.savePackageInfo(shoppingCartLinePackageInfoCommand);
-                packageInfoId = packageInfoDb.getId();//新的id
-            }
-
-            //----------------------------------------------------------------------------
-            ShoppingCartLinePackageInfo shoppingCartLinePackageInfo = buildShoppingCartLinePackageInfo(shoppingCartLineId, packageInfoId);
-            shoppingCartLinePackageInfoDao.save(shoppingCartLinePackageInfo);
-        }
-    }
-
-    /**
-     * @param shoppingCartLineId
-     * @param packageInfoId
-     * @return
-     */
-    protected ShoppingCartLinePackageInfo buildShoppingCartLinePackageInfo(Long shoppingCartLineId,Long packageInfoId){
-        ShoppingCartLinePackageInfo shoppingCartLinePackageInfo = new ShoppingCartLinePackageInfo();
-        shoppingCartLinePackageInfo.setPackageInfoId(packageInfoId);
-        shoppingCartLinePackageInfo.setShoppingCartLineId(shoppingCartLineId);
-        shoppingCartLinePackageInfo.setCreateTime(new Date());
-        return shoppingCartLinePackageInfo;
     }
 
     /**

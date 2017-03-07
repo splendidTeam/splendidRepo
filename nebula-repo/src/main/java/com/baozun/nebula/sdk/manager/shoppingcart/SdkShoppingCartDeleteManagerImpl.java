@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.dao.shoppingcart.ShoppingCartLinePackageInfoDao;
 import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.sdk.utils.ManagerValidate;
 
@@ -44,7 +43,7 @@ public class SdkShoppingCartDeleteManagerImpl implements SdkShoppingCartDeleteMa
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
 
     @Autowired
-    private ShoppingCartLinePackageInfoDao shoppingCartLinePackageInfoDao;
+    private ShoppingCartLinePackageInfoManager shoppingCartLinePackageInfoManager;
 
     /*
      * (non-Javadoc)
@@ -56,11 +55,7 @@ public class SdkShoppingCartDeleteManagerImpl implements SdkShoppingCartDeleteMa
         Integer result = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, shoppingCartLineId);
         ManagerValidate.isExpectedResult(1, result, "delete ShoppingCartLine,memberId:[{}],shoppingCartLineId:[{}]", memberId, shoppingCartLineId);
 
-        //如果结果是0 表示没有对应的关系
-        //避免先 查询 带来的并发影响
-
-        //结果可能是多个对应关系 >=1
-        shoppingCartLinePackageInfoDao.deleteByShoppingCartLineId(shoppingCartLineId);
+        shoppingCartLinePackageInfoManager.deleteByShoppingCartLineId(shoppingCartLineId);
     }
 
 }

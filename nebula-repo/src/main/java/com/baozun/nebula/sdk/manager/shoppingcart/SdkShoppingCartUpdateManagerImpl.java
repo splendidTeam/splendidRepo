@@ -27,7 +27,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
+import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.utils.ManagerValidate;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.find;
 
 /**
  * The Class SdkShoppingCartUpdateManagerImpl.
@@ -45,6 +51,12 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
     /** The sdk shopping cart line dao. */
     @Autowired
     private SdkShoppingCartLineDao sdkShoppingCartLineDao;
+
+    @Autowired
+    private SdkShoppingCartQueryManager sdkShoppingCartQueryManager;
+
+    @Autowired
+    private ShoppingCartLinePackageInfoManager shoppingCartLinePackageInfoManager;
 
     /*
      * (non-Javadoc)
@@ -81,40 +93,6 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLineQuantityAndDeleteOtherLineId(java.lang.Long, java.lang.Long, java.lang.Integer, java.lang.Long)
-     */
-    @Override
-    public void updateCartLineQuantityAndDeleteOtherLineId(Long memberId,Long updateLineId,Integer quantity,Long deleteLineId){
-        Validate.notNull(memberId, "memberId can't be null!");
-        Validate.notNull(updateLineId, "updateLineId can't be null!");
-        Validate.notNull(quantity, "quantity can't be null!");
-        Validate.notNull(deleteLineId, "deleteLineId can't be null!");
-
-        updateCartLineQuantityByLineId(memberId, updateLineId, quantity);
-        int result = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, deleteLineId);
-
-        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],delete line:[{}]", memberId, deleteLineId);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLineSkuInfo(java.lang.Long, java.lang.Long, java.lang.Long, java.lang.Integer)
-     */
-    @Override
-    public void updateCartLineSkuInfo(Long memberId,Long cartLineId,Long newSkuId,Integer quantity){
-        Validate.notNull(memberId, "memberId can't be null!");
-        Validate.notNull(cartLineId, "cartLineId can't be null!");
-        Validate.notNull(quantity, "quantity can't be null!");
-
-        int result = sdkShoppingCartLineDao.updateCartLineSkuInfo(memberId, cartLineId, newSkuId, quantity);
-
-        ManagerValidate.isExpectedResult(1, result, "memberId:[{}],update lineId:[{}],change to newSkuId:[{}],quantity:[{}]", memberId, cartLineId, newSkuId, quantity);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLineSettlementState(java.lang.Long, java.util.List, boolean)
      */
     @Override
@@ -124,5 +102,123 @@ public class SdkShoppingCartUpdateManagerImpl implements SdkShoppingCartUpdateMa
 
         Integer updateCount = sdkShoppingCartLineDao.updateCartLineSettlementState(memberId, cartLineIdList, settleState ? 1 : 0);
         ManagerValidate.isExpectedResult(cartLineIdList.size(), updateCount, "memberId:[{}],update lines:[{}]'s status:[{}]", memberId, cartLineIdList, settleState);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartUpdateManager#updateCartLine(java.lang.Long, java.util.List, java.lang.Long)
+     */
+    @Override
+    public void updateCartLine(Long memberId,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(shoppingcartLineId, "shoppingcartLineId can't be null!");
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
+
+        //----------------------------------------------------------------------------------------------------------
+
+        List<ShoppingCartLineCommand> shoppingCartLineCommandListDB = sdkShoppingCartQueryManager.findShoppingCartLineCommandList(memberId);
+        Validate.notEmpty(shoppingCartLineCommandListDB, "shoppingCartLineCommandListDB can't be null/empty!");
+
+        //db 里面的操作的shoppingcartLineId 对应的ShoppingCartLineCommand
+        ShoppingCartLineCommand shoppingCartLineCommandInDB = find(shoppingCartLineCommandListDB, "id", shoppingcartLineId);
+        Validate.notNull(shoppingCartLineCommandInDB, "shoppingCartLineCommandInDB can't be null!");
+
+        //----------------------------------------------------------------------------------------------------------
+
+        //当前 shoppingcartLineId 在内存list中的对象
+        ShoppingCartLineCommand currentShoppingCartLineCommand = find(shoppingCartLineCommandList, "id", shoppingcartLineId);
+
+        //----------------------------------------------------------------------------------------------------------
+
+        //如果不存在,那么表示已经被合并了
+        //被合并,那么需要找到合并的老数据,并删掉当前行
+        if (null == currentShoppingCartLineCommand){
+
+            //找到合并的是哪条数据
+            ShoppingCartLineCommand combinedShoppingCartLineCommand = findCombinedShoppingCartLineCommand(shoppingCartLineCommandListDB, shoppingCartLineCommandList);
+            Validate.notNull(combinedShoppingCartLineCommand, "combinedShoppingCartLineCommand can't be null!");
+
+            //修改某行数据数量并且删除另外的一行(通常用于修改购物车行销售属性的时合并购物车行的场景).
+            updateCartLineQuantityAndDeleteOtherLineId(memberId, shoppingcartLineId, combinedShoppingCartLineCommand);
+
+        }
+        //如果存在,那么表示没有被合并,
+        //没有被合并,那么需要更新当前行,且包装信息(目前是全删全插入)
+        else{
+            //修改行在db 里面的sku id
+            Long skuIdInDB = shoppingCartLineCommandInDB.getSkuId();
+
+            //相等表示不需要修改sku信息,不相等表示需要修改sku信息 
+            Long newSkuId = skuIdInDB == currentShoppingCartLineCommand.getSkuId() ? null : currentShoppingCartLineCommand.getSkuId();
+            updateCartLineSkuInfo(memberId, shoppingcartLineId, newSkuId, currentShoppingCartLineCommand.getQuantity());
+
+            //delete 包装信息
+            shoppingCartLinePackageInfoManager.deleteByShoppingCartLineId(shoppingcartLineId);
+
+            //add 包装信息
+            List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = currentShoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList();
+            if (isNotNullOrEmpty(shoppingCartLinePackageInfoCommandList)){
+                shoppingCartLinePackageInfoManager.savePackageInfo(shoppingcartLineId, shoppingCartLinePackageInfoCommandList);
+            }
+        }
+    }
+
+    /**
+     * 修改某行数据数量并且删除另外的一行(通常用于修改购物车行销售属性的时合并购物车行的场景).
+     * 
+     * @param memberId
+     * @param deleteLineId
+     *            删掉那一行
+     * @param combinedShoppingCartLineCommand
+     *            更新这条数据
+     * @since 5.3.2.11-Personalise
+     */
+    private void updateCartLineQuantityAndDeleteOtherLineId(Long memberId,Long deleteLineId,ShoppingCartLineCommand combinedShoppingCartLineCommand){
+        updateCartLineQuantityByLineId(memberId, combinedShoppingCartLineCommand.getId(), combinedShoppingCartLineCommand.getQuantity());
+
+        int result = sdkShoppingCartLineDao.deleteByCartLineIdAndMemberId(memberId, deleteLineId);
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}}],delete line:[{}]", memberId, deleteLineId);
+    }
+
+    /**
+     * 找到被合并的行.
+     *
+     * @param shoppingCartLineCommandListDB
+     *            the shopping cart line command list DB
+     * @param shoppingCartLineCommandList
+     *            the shopping cart line command list
+     * @return the shopping cart line command
+     */
+    private ShoppingCartLineCommand findCombinedShoppingCartLineCommand(List<ShoppingCartLineCommand> shoppingCartLineCommandListDB,List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+        //循环内存list,如果发现数量和db不相同,那么返回这条数据
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
+            ShoppingCartLineCommand db = find(shoppingCartLineCommandListDB, "id", shoppingCartLineCommand.getId());
+            if (db.getQuantity() != shoppingCartLineCommand.getQuantity()){
+                return shoppingCartLineCommand;
+            }
+        }
+        throw new BusinessException("not find Combined ShoppingCartLineCommand");
+    }
+
+    /**
+     * 修改订单行 sku 信息.
+     * 
+     * @param memberId
+     *            哪个会员
+     * @param cartLineId
+     *            哪个订单行
+     * @param newSkuId
+     *            新sku id,如果是null,那么不修改sku 信息
+     * @param quantity
+     *            数量是多少
+     */
+    private void updateCartLineSkuInfo(Long memberId,Long cartLineId,Long newSkuId,Integer quantity){
+        Validate.notNull(memberId, "memberId can't be null!");
+        Validate.notNull(cartLineId, "cartLineId can't be null!");
+        Validate.notNull(quantity, "quantity can't be null!");
+
+        int result = sdkShoppingCartLineDao.updateCartLineSkuInfo(memberId, cartLineId, newSkuId, quantity);
+        ManagerValidate.isExpectedResult(1, result, "memberId:[{}],update lineId:[{}],change to newSkuId:[{}],quantity:[{}]", memberId, cartLineId, newSkuId, quantity);
     }
 }
