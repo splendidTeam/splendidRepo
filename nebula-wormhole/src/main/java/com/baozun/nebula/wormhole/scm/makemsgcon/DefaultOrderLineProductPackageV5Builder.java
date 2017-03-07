@@ -16,6 +16,7 @@
  */
 package com.baozun.nebula.wormhole.scm.makemsgcon;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class DefaultOrderLineProductPackageV5Builder implements OrderLineProduct
 
         List<ProductPackageV5> productPackageV5List = new ArrayList<>();
         for (OrderLinePackageInfoCommand orderLinePackageInfoCommand : orderLinePackageInfoCommandList){
-            productPackageV5List.add(toProductPackageV5(orderLinePackageInfoCommand));
+            productPackageV5List.add(toProductPackageV5(orderLinePackageInfoCommand, orderLineCommand));
         }
 
         return productPackageV5List;
@@ -66,11 +67,22 @@ public class DefaultOrderLineProductPackageV5Builder implements OrderLineProduct
      * @return
      * @since 5.3.2.11-Personalise
      */
-    protected ProductPackageV5 toProductPackageV5(OrderLinePackageInfoCommand orderLinePackageInfoCommand){
+    protected ProductPackageV5 toProductPackageV5(OrderLinePackageInfoCommand orderLinePackageInfoCommand,OrderLineCommand orderLineCommand){
         ProductPackageV5 productPackageV5 = new ProductPackageV5();
         productPackageV5.setRemark(orderLinePackageInfoCommand.getFeatureInfo());//reebok 约定
-        productPackageV5.setTotal(orderLinePackageInfoCommand.getTotal());
+        productPackageV5.setTotal(buildTotal(orderLinePackageInfoCommand, orderLineCommand));
         productPackageV5.setType(orderLinePackageInfoCommand.getType());
         return productPackageV5;
+    }
+
+    /**
+     * @param orderLinePackageInfoCommand
+     * @param orderLineCommand
+     * @return
+     * @since 5.3.2.11-Personalise
+     */
+    protected BigDecimal buildTotal(OrderLinePackageInfoCommand orderLinePackageInfoCommand,OrderLineCommand orderLineCommand){
+        return orderLinePackageInfoCommand.getTotal();
+        //return NumberUtil.getDivideValue(orderLinePackageInfoCommand.getTotal(), orderLineCommand.getCount(), 2);
     }
 }

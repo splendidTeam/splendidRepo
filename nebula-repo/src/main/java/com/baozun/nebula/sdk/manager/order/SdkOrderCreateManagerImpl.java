@@ -18,7 +18,6 @@ package com.baozun.nebula.sdk.manager.order;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +50,7 @@ import com.baozun.nebula.sdk.manager.SdkEngineManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkPayCodeManager;
 import com.baozun.nebula.sdk.manager.order.handler.OrderCreateByShopManager;
+import com.baozun.nebula.sdk.manager.payment.PayMoneyBuilder;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationShareToSKUManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCouponCodeManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartManager;
@@ -71,9 +71,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SdkOrderCreateManagerImpl.class);
-
-    /** The Constant SEPARATOR_FLAG. */
-    private static final String SEPARATOR_FLAG = "\\|\\|";
 
     /** The sdk pay code manager. */
     @Autowired
@@ -113,6 +110,9 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
     @Autowired
     private OrderCreateByShopManager orderCreateByShopManager;
+
+    @Autowired
+    private PayMoneyBuilder payMoneyBuilder;
 
     /*
      * (non-Javadoc)
@@ -259,8 +259,7 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
 
         //*************************************************************************************
         // 保存支付流水
-        BigDecimal paySum = getPaySum(shoppingCartCommand.getCurrentPayAmount(), salesOrderCommand.getSoPayMentDetails());
-        sdkPayCodeManager.savaPayCode(subOrdinate, paySum);
+        sdkPayCodeManager.savaPayCode(subOrdinate, payMoneyBuilder.build(salesOrderCommand, shoppingCartCommand));
 
         //*************************************************************************************
         // 优惠券状体置为已使用 isUsed = 1
@@ -324,27 +323,6 @@ public class SdkOrderCreateManagerImpl implements SdkOrderCreateManager{
     private boolean isSendEmail(){
         String isSendEmailConfig = sdkMataInfoManager.findValue(MataInfo.KEY_ORDER_EMAIL);
         return isSendEmailConfig != null && isSendEmailConfig.equals("true");
-    }
-
-    /**
-     * 获得 pay sum.
-     *
-     * @param paySum
-     *            the pay sum
-     * @param soPayMentDetails
-     *            the so pay ment details
-     * @return the pay sum
-     */
-    private BigDecimal getPaySum(BigDecimal paySum,List<String> soPayMentDetails){
-        if (soPayMentDetails != null){
-            for (String soPayMentDetail : soPayMentDetails){
-                // 支付方式 String格式：shopId||payMentType||金额
-                String[] strs = soPayMentDetail.split(SEPARATOR_FLAG);
-                BigDecimal payMoney = new BigDecimal(strs[2]);
-                paySum = paySum.subtract(payMoney);
-            }
-        }
-        return paySum;
     }
 
 }
