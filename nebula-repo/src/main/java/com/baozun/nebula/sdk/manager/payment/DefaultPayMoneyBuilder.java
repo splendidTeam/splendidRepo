@@ -29,6 +29,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.feilong.core.lang.NumberUtil;
 import com.feilong.core.util.CollectionsUtil;
+import com.google.common.collect.Iterables;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.util.AggregateUtil.sum;
@@ -81,11 +82,14 @@ public class DefaultPayMoneyBuilder implements PayMoneyBuilder{
         List<ShoppingCartLineCommand> shoppingCartLineCommands = shoppingCartCommand.getShoppingCartLineCommands();
         List<List<ShoppingCartLinePackageInfoCommand>> shoppingCartLinePackageInfoCommandListList = CollectionsUtil.getPropertyValueList(shoppingCartLineCommands, "shoppingCartLinePackageInfoCommandList");
 
+        shoppingCartLinePackageInfoCommandListList = CollectionsUtil.remove(shoppingCartLinePackageInfoCommandListList, null);
         if (isNullOrEmpty(shoppingCartLinePackageInfoCommandListList)){
             return BigDecimal.ZERO;
         }
+
+        //Iterables.concat 要求元素不能有null
         //平铺
-        Iterable<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = com.google.common.collect.Iterables.concat(shoppingCartLinePackageInfoCommandListList);
+        Iterable<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = Iterables.concat(shoppingCartLinePackageInfoCommandListList);
         return sum(shoppingCartLinePackageInfoCommandList, "total");
     }
 }
