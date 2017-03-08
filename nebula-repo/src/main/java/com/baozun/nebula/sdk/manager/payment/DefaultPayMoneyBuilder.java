@@ -17,6 +17,7 @@
 package com.baozun.nebula.sdk.manager.payment;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import com.feilong.core.util.CollectionsUtil;
 import com.google.common.collect.Iterables;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 import static com.feilong.core.util.AggregateUtil.sum;
 
 /**
@@ -82,7 +84,7 @@ public class DefaultPayMoneyBuilder implements PayMoneyBuilder{
         List<ShoppingCartLineCommand> shoppingCartLineCommands = shoppingCartCommand.getShoppingCartLineCommands();
         List<List<ShoppingCartLinePackageInfoCommand>> shoppingCartLinePackageInfoCommandListList = CollectionsUtil.getPropertyValueList(shoppingCartLineCommands, "shoppingCartLinePackageInfoCommandList");
 
-        shoppingCartLinePackageInfoCommandListList = CollectionsUtil.remove(shoppingCartLinePackageInfoCommandListList, null);
+        shoppingCartLinePackageInfoCommandListList = CollectionsUtil.removeAll(shoppingCartLinePackageInfoCommandListList, toList(null, Collections.<ShoppingCartLinePackageInfoCommand> emptyList()));
         if (isNullOrEmpty(shoppingCartLinePackageInfoCommandListList)){
             return BigDecimal.ZERO;
         }
