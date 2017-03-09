@@ -21,6 +21,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,6 +157,14 @@ public class NebulaMemberAddressController extends BaseController {
 		LOG.info("[MEM_ADD_ADDRESS] {} [{}] \"地址信息\"", memberDetails.getLoginName(), new Date());
 		
 		LOG.debug("[MEM_ADD_ADDRESS] 校验对象memberAddressForm的必需字段  --start");
+		
+		//http://jira.baozun.cn/browse/NB-500?filter=10744
+		//本来这段代码应该写在 memberAddressFormValidator ,但是这个校验器目前 add 和update 公用的
+        Validate.notNull(memberAddressForm, "memberAddressForm can't be null!");
+        Validate.isTrue(null==memberAddressForm.getId(), "when add address,memberAddressForm.getId() must be null!");
+        
+        //******************************
+		
 		//校验过程		
 		memberAddressFormValidator.validate(memberAddressForm, bindingResult);
 		if(bindingResult.hasErrors()){
@@ -167,6 +176,7 @@ public class NebulaMemberAddressController extends BaseController {
 		//Form转contact
 		ContactCommand contact = memberAddressForm.toContactCommand();
 		contact.setMemberId(memberDetails.getMemberId());
+
 		ContactCommand contactCommand = sdkMemberManager.createOrUpdateContact(contact);
 		if(Validator.isNotNullOrEmpty(contactCommand)){
 			defaultReturnResult.setResult(true);
@@ -197,6 +207,11 @@ public class NebulaMemberAddressController extends BaseController {
 			HttpServletResponse httpResponse, Model model) {
 		// 因为有NeedLogin控制，进来的一定是已经登录的有效用户
 		assert memberDetails != null : "Please Check NeedLogin Annotation";
+		
+	    //http://jira.baozun.cn/browse/NB-500?filter=10744
+        //本来这段代码应该写在 memberAddressFormValidator ,但是这个校验器目前 add 和update 公用的
+        Validate.notNull(memberAddressForm, "memberAddressForm can't be null!");
+        Validate.isTrue(null!=memberAddressForm.getId(), "when update address,memberAddressForm.getId() must not null!");
 
 		DefaultReturnResult defaultReturnResult = DefaultReturnResult.SUCCESS;
 

@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -706,30 +707,45 @@ public class SdkMemberManagerImpl implements SdkMemberManager{
 	 * @see com.baozun.nebula.sdk.manager.SdkMemberManager#createOrUpdateContact( com.baozun.nebula.command.ContactCommand)
 	 */
 	@Override
-	public ContactCommand createOrUpdateContact(ContactCommand command){
+	public ContactCommand createOrUpdateContact(ContactCommand contactCommand){
+        Validate.notNull(contactCommand, "command can't be null!");
+        
+        Long memberId = contactCommand.getMemberId();
+        Validate.notNull(memberId, "memberId can't be null!");
 
-		Contact con = null;
-		if (command.getId() == null || command.getId() == 0){
+		Contact contact = null;
+		Long id = contactCommand.getId();
+		
+		//新增
+        if (id == null || id == 0){
 			// 保存
-			con = new Contact();
-			con = convertContactCommandToContact(command, con);
-			encryptContact(con);
-			if (command.getIsDefault()){// 设置其他为非默认
-			    updateContactIsDefault(command.getMemberId(), command.getId(), Contact.ISDEFAULT);
+			contact = new Contact();
+			contact = convertContactCommandToContact(contactCommand, contact);
+			encryptContact(contact);
+			if (contactCommand.getIsDefault()){// 设置其他为非默认
+			    updateContactIsDefault(memberId, id, Contact.ISDEFAULT);
 			}
-			con = contactDao.save(con);
-
-		}else{
-			// 更新
-			con = contactDao.getByPrimaryKey(command.getId());
-			con = convertContactCommandToContact(command, con);
-			encryptContact(con);
-			if (command.getIsDefault()){
+			contact = contactDao.save(contact);
+		}
+     // 更新
+        else{
+            //by feilong 最小成本修补漏洞
+            //理论上是首先需要拆分 add 和 update 的方法,  其次应该是 memberId 和 contact id 一起查询来 sql 过滤掉不匹配的数据
+            
+			contact = contactDao.getByPrimaryKey(id);
+            Validate.notNull(contact, "contact can't be null!");
+            
+            //不是自己的数据, 可能被人为的修改了参数 http://jira.baozun.cn/browse/NB-500?filter=10744
+            Validate.isTrue(memberId.equals(contact.getMemberId()), "memberId:%s must equals contact.getMemberId():%s",memberId,contact.getMemberId());
+			
+			contact = convertContactCommandToContact(contactCommand, contact);
+			encryptContact(contact);
+			if (contactCommand.getIsDefault()){
 				// 设置其他为非默认
-				updateContactIsDefault(command.getMemberId(), command.getId(), Contact.ISDEFAULT);
+				updateContactIsDefault(memberId, id, Contact.ISDEFAULT);
 			}
 		}
-		return convertContactToContactCommand(con);
+		return convertContactToContactCommand(contact);
 	}
 
 	private ContactCommand convertContactToContactCommand(Contact con){
