@@ -49,9 +49,10 @@ public interface UncheckedInvalidStateShoppingCartLineHandler{
      *            the member details
      * @param shoppingCartViewCommand
      *            the shopping cart view command
-     * 
+     * @param request
+     * @param response
      * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#toggleShoppingCartLinesCheckStatus(MemberDetails, List, boolean, HttpServletRequest, HttpServletResponse)
      * @since 5.3.2.6
      */
-    void uncheckedInvalidStateShoppingCartLine(MemberDetails memberDetails,ShoppingCartViewCommand shoppingCartViewCommand);
+    void uncheckedInvalidStateShoppingCartLine(MemberDetails memberDetails,ShoppingCartViewCommand shoppingCartViewCommand,HttpServletRequest request,HttpServletResponse response);
 }

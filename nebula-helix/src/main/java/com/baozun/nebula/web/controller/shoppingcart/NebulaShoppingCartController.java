@@ -181,11 +181,11 @@ public class NebulaShoppingCartController extends BaseController{
      * @return the string
      * @RequestMapping(value = "/shoppingcart", method = RequestMethod.GET)
      */
-    public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,Model model){
+    public String showShoppingCart(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,Model model){
         ShoppingCartViewCommand shoppingCartViewCommand = buildShoppingCartViewCommand(memberDetails, request);
 
         //将状态不对的 选中状态的订单行 变成不选中. 
-        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand);
+        uncheckedInvalidStateShoppingCartLineHandler.uncheckedInvalidStateShoppingCartLine(memberDetails, shoppingCartViewCommand,request,response);
 
         model.addAttribute("shoppingCartViewCommand", shoppingCartViewCommand);
         return "shoppingcart.shoppingcart";
