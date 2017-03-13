@@ -16,26 +16,23 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.converter;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLinePackageInfoViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.Status;
 import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.lang.reflect.ConstructorUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.tools.slf4j.Slf4jUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * 将 {@link ShoppingCartLineCommand} 转成 {@link ShoppingCartLineSubViewCommand}.
@@ -80,51 +77,13 @@ public class ShoppingCartLineCommandToViewCommandTransformer implements Transfor
 
         Map<String, SkuProperty> map = CollectionsUtil.groupOne(shoppingCartLineCommand.getSkuPropertys(), "pName");
         shoppingCartLineSubViewCommand.setPropertiesMap(map);
-
         shoppingCartLineSubViewCommand.setStatus(toStatus(shoppingCartLineCommand));
-
-        List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList = shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList();
-        List<ShoppingCartLinePackageInfoViewCommand> shoppingCartLinePackageInfoViewCommandList = toShoppingCartLinePackageInfoViewCommandList(shoppingCartLinePackageInfoCommandList);
-        shoppingCartLineSubViewCommand.setShoppingCartLinePackageInfoViewCommandList(shoppingCartLinePackageInfoViewCommandList);
+        shoppingCartLineSubViewCommand.setShoppingCartLinePackageInfoViewCommandList(collect(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList(), ShoppingCartLinePackageInfoViewCommand.class));
 
         return shoppingCartLineSubViewCommand;
     }
 
-    /**
-     * @param shoppingCartLinePackageInfoCommandList
-     * @return
-     * @since 5.3.2.11-Personalise
-     */
-    private List<ShoppingCartLinePackageInfoViewCommand> toShoppingCartLinePackageInfoViewCommandList(List<ShoppingCartLinePackageInfoCommand> shoppingCartLinePackageInfoCommandList){
-        return CollectionsUtil.collect(shoppingCartLinePackageInfoCommandList, transformer(ShoppingCartLinePackageInfoViewCommand.class));
-    }
-
-    /**
-     * 
-     *
-     * @param <I>
-     * @param <O>
-     * @param type
-     * @param includePropertyNames
-     * @return
-     * @since 5.3.2.11-Personalise
-     */
-    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
-        return new Transformer<I, O>(){
-
-            @Override
-            public O transform(I inputBean){
-                Validate.notNull(inputBean, "inputBean can't be null!");
-
-                O outBean = ConstructorUtil.newInstance(type);
-
-                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
-                return outBean;
-            }
-        };
-    }
-
-    private Status toStatus(ShoppingCartLineCommand shoppingCartLineCommand){
+    private static Status toStatus(ShoppingCartLineCommand shoppingCartLineCommand){
         if (shoppingCartLineCommand.isValid()){
             return Status.NORMAL;
         }

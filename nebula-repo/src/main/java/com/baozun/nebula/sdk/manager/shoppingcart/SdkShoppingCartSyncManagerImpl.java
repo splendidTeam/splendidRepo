@@ -18,20 +18,17 @@ package com.baozun.nebula.sdk.manager.shoppingcart;
 
 import java.util.List;
 
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
-import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.lang.reflect.ConstructorUtil;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * The Class SdkShoppingCartSyncManagerImpl.
@@ -119,30 +116,10 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
 
         ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements = new ShoppingcartAddDetermineSameLineElements();
         shoppingcartAddDetermineSameLineElements.setSkuId(shoppingCartLineCommand.getSkuId());
-        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(toPackageInfoElementList(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList()));
+        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(//
+                        collect(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList(), PackageInfoElement.class, "type", "featureInfo"));
+
         return shoppingCartAddSameLineExtractor.extractor(shoppingCartLineCommandListInDB, shoppingcartAddDetermineSameLineElements);
     }
 
-    /**
-     * @param packageInfoFormList
-     * @return
-     */
-    private List<PackageInfoElement> toPackageInfoElementList(List<ShoppingCartLinePackageInfoCommand> packageInfoFormList){
-        return CollectionsUtil.collect(packageInfoFormList, transformer(PackageInfoElement.class, "type", "featureInfo"));
-    }
-
-    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
-        return new Transformer<I, O>(){
-
-            @Override
-            public O transform(I inputBean){
-                Validate.notNull(inputBean, "inputBean can't be null!");
-
-                O outBean = ConstructorUtil.newInstance(type);
-
-                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
-                return outBean;
-            }
-        };
-    }
 }

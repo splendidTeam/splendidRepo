@@ -16,21 +16,13 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.builder;
 
-import java.util.List;
-
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
-import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
-import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.lang.reflect.ConstructorUtil;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * 
@@ -39,8 +31,6 @@ import com.feilong.core.util.CollectionsUtil;
  */
 @Component("shoppingcartAddDetermineSameLineElementsBuilder")
 public class DefaultShoppingcartAddDetermineSameLineElementsBuilder implements ShoppingcartAddDetermineSameLineElementsBuilder{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartAddDetermineSameLineElementsBuilder.class);
 
     /*
      * (non-Javadoc)
@@ -51,30 +41,9 @@ public class DefaultShoppingcartAddDetermineSameLineElementsBuilder implements S
     public ShoppingcartAddDetermineSameLineElements build(ShoppingCartLineAddForm shoppingCartLineAddForm){
         ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements = new ShoppingcartAddDetermineSameLineElements();
         shoppingcartAddDetermineSameLineElements.setSkuId(shoppingCartLineAddForm.getSkuId());
-        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(toPackageInfoElementList(shoppingCartLineAddForm.getPackageInfoFormList()));
+        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(//
+                        collect(shoppingCartLineAddForm.getPackageInfoFormList(), PackageInfoElement.class, "type", "featureInfo"));
         return shoppingcartAddDetermineSameLineElements;
     }
 
-    /**
-     * @param packageInfoFormList
-     * @return
-     */
-    private List<PackageInfoElement> toPackageInfoElementList(List<PackageInfoForm> packageInfoFormList){
-        return CollectionsUtil.collect(packageInfoFormList, transformer(PackageInfoElement.class, "type", "featureInfo"));
-    }
-
-    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
-        return new Transformer<I, O>(){
-
-            @Override
-            public O transform(I inputBean){
-                Validate.notNull(inputBean, "inputBean can't be null!");
-
-                O outBean = ConstructorUtil.newInstance(type);
-
-                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
-                return outBean;
-            }
-        };
-    }
 }

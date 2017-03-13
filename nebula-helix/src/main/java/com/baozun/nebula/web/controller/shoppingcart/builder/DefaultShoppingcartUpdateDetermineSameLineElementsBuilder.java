@@ -18,20 +18,15 @@ package com.baozun.nebula.web.controller.shoppingcart.builder;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-import java.util.List;
-
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartUpdateDetermineSameLineElements;
-import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
-import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.lang.reflect.ConstructorUtil;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * 
@@ -55,32 +50,10 @@ public class DefaultShoppingcartUpdateDetermineSameLineElementsBuilder implement
         ShoppingcartUpdateDetermineSameLineElements shoppingcartUpdateDetermineSameLineElements = new ShoppingcartUpdateDetermineSameLineElements();
         shoppingcartUpdateDetermineSameLineElements.setCurrentLineId(currentShoppingCartLineCommand.getId());
         shoppingcartUpdateDetermineSameLineElements.setLineGroup(currentShoppingCartLineCommand.getLineGroup());
-        shoppingcartUpdateDetermineSameLineElements.setPackageInfoElementList(toPackageInfoElementList(shoppingCartLineUpdateSkuForm.getPackageInfoFormList()));
+        shoppingcartUpdateDetermineSameLineElements.setPackageInfoElementList(collect(shoppingCartLineUpdateSkuForm.getPackageInfoFormList(), PackageInfoElement.class, "type", "featureInfo"));
         shoppingcartUpdateDetermineSameLineElements.setRelatedItemId(currentShoppingCartLineCommand.getRelatedItemId());
         shoppingcartUpdateDetermineSameLineElements.setSkuId(defaultIfNull(currentShoppingCartLineCommand.getSkuId(), currentShoppingCartLineCommand.getSkuId()));
         return shoppingcartUpdateDetermineSameLineElements;
     }
 
-    /**
-     * @param packageInfoFormList
-     * @return
-     */
-    private List<PackageInfoElement> toPackageInfoElementList(List<PackageInfoForm> packageInfoFormList){
-        return CollectionsUtil.collect(packageInfoFormList, transformer(PackageInfoElement.class, "type", "featureInfo"));
-    }
-
-    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
-        return new Transformer<I, O>(){
-
-            @Override
-            public O transform(I inputBean){
-                Validate.notNull(inputBean, "inputBean can't be null!");
-
-                O outBean = ConstructorUtil.newInstance(type);
-
-                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
-                return outBean;
-            }
-        };
-    }
 }

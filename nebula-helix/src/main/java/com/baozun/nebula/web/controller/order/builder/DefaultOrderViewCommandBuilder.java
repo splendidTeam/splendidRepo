@@ -20,9 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +48,6 @@ import com.feilong.core.DatePattern;
 import com.feilong.core.Validator;
 import com.feilong.core.bean.PropertyUtil;
 import com.feilong.core.date.DateUtil;
-import com.feilong.core.lang.reflect.ConstructorUtil;
 import com.feilong.core.util.CollectionsUtil;
 
 /**
@@ -100,22 +97,7 @@ public class DefaultOrderViewCommandBuilder implements OrderViewCommandBuilder{
     protected List<OrderLineSubViewCommand> buildOrderLineSubViewCommandlist(SalesOrderCommand salesOrderCommand){
         // orderline信息
         List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommand = orderLineManager.findByOrderID(salesOrderCommand.getId());
-        return CollectionsUtil.collect(simpleOrderLineSubViewCommand, transformer(OrderLineSubViewCommand.class));
-    }
-
-    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
-        return new Transformer<I, O>(){
-
-            @Override
-            public O transform(I inputBean){
-                Validate.notNull(inputBean, "inputBean can't be null!");
-
-                O outBean = ConstructorUtil.newInstance(type);
-
-                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
-                return outBean;
-            }
-        };
+        return CollectionsUtil.collect(simpleOrderLineSubViewCommand, OrderLineSubViewCommand.class);
     }
 
     /**

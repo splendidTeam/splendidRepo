@@ -21,11 +21,9 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,12 +37,10 @@ import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.constants.Constants;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
-import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
-import com.feilong.core.bean.PropertyUtil;
-import com.feilong.core.lang.reflect.ConstructorUtil;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * The Class DefaultShoppingcartLineAddValidator.
@@ -164,46 +160,11 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         shoppingCartLineCommand.setExtentionCode(extentionCode);
         shoppingCartLineCommand.setQuantity(shoppingCartLineAddForm.getCount());
 
-        shoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(toShoppingCartLinePackageInfoCommandList(shoppingCartLineAddForm.getPackageInfoFormList()));
+        shoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(collect(shoppingCartLineAddForm.getPackageInfoFormList(), ShoppingCartLinePackageInfoCommand.class));
 
         shoppingCartLineCommand.setCreateTime(new Date());
         shoppingCartLineCommand.setSettlementState(Constants.CHECKED_CHOOSE_STATE);
         return shoppingCartLineCommand;
     }
 
-    /**
-     * 转换.
-     *
-     * @param packageInfoFormList
-     * @return 如果 <code>packageInfoFormList</code> 是null或者empty,返回 {@link Collections#emptyList()}<br>
-     * @since 5.3.2.11-Personalise
-     */
-    private static List<ShoppingCartLinePackageInfoCommand> toShoppingCartLinePackageInfoCommandList(List<PackageInfoForm> packageInfoFormList){
-        return CollectionsUtil.collect(packageInfoFormList, transformer(ShoppingCartLinePackageInfoCommand.class));
-    }
-
-    /**
-     * 
-     *
-     * @param <I>
-     * @param <O>
-     * @param type
-     * @param includePropertyNames
-     * @return
-     * @since 5.3.2.11-Personalise
-     */
-    private static <I, O> Transformer<I, O> transformer(final Class<O> type,final String...includePropertyNames){
-        return new Transformer<I, O>(){
-
-            @Override
-            public O transform(I inputBean){
-                Validate.notNull(inputBean, "inputBean can't be null!");
-
-                O outBean = ConstructorUtil.newInstance(type);
-
-                PropertyUtil.copyProperties(outBean, inputBean, includePropertyNames);
-                return outBean;
-            }
-        };
-    }
 }

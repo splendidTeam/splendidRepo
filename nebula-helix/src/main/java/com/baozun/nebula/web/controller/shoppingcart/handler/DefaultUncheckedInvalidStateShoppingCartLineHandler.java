@@ -16,11 +16,11 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.handler;
 
-import static com.feilong.core.Validator.isNullOrEmpty;
-import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
-
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
@@ -40,9 +40,11 @@ import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartVie
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.Status;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPredicateUtil;
-import com.feilong.spring.web.util.WebSpringUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
 import com.google.common.collect.Iterables;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
 
 /**
  *
@@ -64,7 +66,7 @@ public class DefaultUncheckedInvalidStateShoppingCartLineHandler implements Unch
      * com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand)
      */
     @Override
-    public void uncheckedInvalidStateShoppingCartLine(MemberDetails memberDetails,ShoppingCartViewCommand shoppingCartViewCommand){
+    public void uncheckedInvalidStateShoppingCartLine(MemberDetails memberDetails,ShoppingCartViewCommand shoppingCartViewCommand,HttpServletRequest request,HttpServletResponse response){
         if (null == shoppingCartViewCommand){
             return;
         }
@@ -92,7 +94,7 @@ public class DefaultUncheckedInvalidStateShoppingCartLineHandler implements Unch
         }
 
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
-        ShoppingcartResult toggleShoppingCartLinesCheckStatus = shoppingcartResolver.toggleShoppingCartLinesCheckStatus(memberDetails, invalidStateIdList, false, WebSpringUtil.getRequest(), WebSpringUtil.getResponse());
+        ShoppingcartResult toggleShoppingCartLinesCheckStatus = shoppingcartResolver.toggleShoppingCartLinesCheckStatus(memberDetails, invalidStateIdList, false, request, response);
         LOGGER.info("{}", toggleShoppingCartLinesCheckStatus);
 
     }
