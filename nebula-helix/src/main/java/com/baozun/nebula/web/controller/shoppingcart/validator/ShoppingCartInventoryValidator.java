@@ -32,12 +32,12 @@ public interface ShoppingCartInventoryValidator{
      * 校验购物车里面的指定的skuId(累加)是否超过库存量.
      *
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
+     *            用户所有的购物车
      * @param skuId
-     *            the sku id
-     * @param extentionCode
-     *            extentionCode
+     *            指定购买的sku id
      * @return 如果超过库存量,返回true;否则返回false
+     * 
+     * @since 5.3.2.13 change method ,remove extentionCode param
      */
-    boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId,String extentionCode);
+    boolean isMoreThanInventory(List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId);
 }

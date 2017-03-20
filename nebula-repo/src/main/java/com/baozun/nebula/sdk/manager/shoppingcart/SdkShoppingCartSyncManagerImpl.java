@@ -23,9 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baozun.nebula.dao.shoppingcart.SdkShoppingCartLineDao;
-import com.baozun.nebula.exception.NativeUpdateRowCountNotEqualException;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.PackageInfoElement;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
+import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingcartAddDetermineSameLineElements;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * The Class SdkShoppingCartSyncManagerImpl.
@@ -38,12 +41,20 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 @Service("sdkShoppingCartSyncManager")
 public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManager{
 
-    /** The sdk shopping cart line dao. */
+    /**  */
     @Autowired
-    private SdkShoppingCartLineDao sdkShoppingCartLineDao;
+    private SdkShoppingCartAddManager sdkShoppingCartAddManager;
 
+    /**  */
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
+
+    /**  */
+    @Autowired
+    private SdkShoppingCartQueryManager sdkShoppingCartQueryManager;
+
+    @Autowired
+    private ShoppingCartAddSameLineExtractor shoppingCartAddSameLineExtractor;
 
     /*
      * (non-Javadoc)
@@ -51,53 +62,64 @@ public class SdkShoppingCartSyncManagerImpl implements SdkShoppingCartSyncManage
      * @see com.baozun.nebula.sdk.manager.SdkShoppingCartSyncManager#syncShoppingCart(java.lang.Long, java.util.List)
      */
     @Override
-    public void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingLines){
+    public void syncShoppingCart(Long memberId,List<ShoppingCartLineCommand> shoppingCartLineCommandList){
         Validate.notNull(memberId, "memberId can't be null!");
-        Validate.notEmpty(shoppingLines, "shoppingLines can't be null!");
+        Validate.notEmpty(shoppingCartLineCommandList, "shoppingLines can't be null!");
 
-        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingLines){
+        //由于涉及到包装信息, 且是个list,直接查询不方便对比, 所以先把这哥们儿的所有购物车拿出来,使用java 来对比到底是要 插入还是更新
+
+        //关于 并发问题: 理论上是基于memberId 并发问题可能有(如果同时打开多个浏览器来操作),但是场景很少,
+        //出现并发问题的影响: 可能用户购物车会出现2条相同的数据, 影响是个人, 但也可个人删除
+
+        List<ShoppingCartLineCommand> shoppingCartLineCommandListInDB = sdkShoppingCartQueryManager.findShoppingCartLineCommandList(memberId);
+
+        for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
             if (shoppingCartLineCommand.isGift()){ // 不同步赠品数据
                 continue;
             }
-
-            String extentionCode = shoppingCartLineCommand.getExtentionCode();
-            Validate.notBlank(extentionCode, "extentionCode can't be null/empty!");
-
-            Integer quantity = shoppingCartLineCommand.getQuantity();
-            Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);
-
-            ShoppingCartLineCommand cartLineInDb = sdkShoppingCartLineDao.findShopCartLine(memberId, extentionCode);
-
-            if (null != cartLineInDb){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
-                sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
-            }else{
-                saveCartLine(memberId, shoppingCartLineCommand);
-            }
+            syncShoppingCart(memberId, shoppingCartLineCommand, shoppingCartLineCommandListInDB);
         }
     }
 
     /**
-     * 保存或更新购物行信息.
+     * 将一条购物车行 同步到DB.
      *
-     * @param shoppingCartLine
-     *            the shopping cart line
+     * @param memberId
+     * @param shoppingCartLineCommand
+     * @param shoppingCartLineCommandListInDB
+     * @since 5.3.2.13
      */
-    private void saveCartLine(Long memberId,ShoppingCartLineCommand shoppingCartLine){
-        // 保存
-        int result = sdkShoppingCartLineDao.insertShoppingCartLine(
-                        shoppingCartLine.getExtentionCode(),
-                        shoppingCartLine.getSkuId(),
-                        shoppingCartLine.getQuantity(),
-                        memberId,
-                        shoppingCartLine.getCreateTime(),
-                        shoppingCartLine.getSettlementState(),
-                        shoppingCartLine.getShopId(),
-                        shoppingCartLine.isGift(),
-                        shoppingCartLine.getPromotionId(),
-                        shoppingCartLine.getLineGroup());
+    private void syncShoppingCart(Long memberId,ShoppingCartLineCommand shoppingCartLineCommand,List<ShoppingCartLineCommand> shoppingCartLineCommandListInDB){
+        Integer quantity = shoppingCartLineCommand.getQuantity();
+        Validate.isTrue(quantity >= 0, "quantity must >= 0,but:%s", quantity);
 
-        if (1 != result){
-            throw new NativeUpdateRowCountNotEqualException(1, result);
+        ShoppingCartLineCommand cartLineInDb = findInDb(shoppingCartLineCommand, shoppingCartLineCommandListInDB);
+        boolean isInDB = null != cartLineInDb;
+
+        if (isInDB){ //如果数据库购物车表中会员有该商品，则将把该商品的数量相加
+            sdkShoppingCartUpdateManager.updateCartLineQuantityByLineId(memberId, cartLineInDb.getId(), cartLineInDb.getQuantity() + quantity);
+        }else{
+            sdkShoppingCartAddManager.addCartLine(memberId, shoppingCartLineCommand);
         }
     }
+
+    /**
+     * 在DB中查找.
+     * 
+     * @param shoppingCartLineCommand
+     * @return
+     */
+    private ShoppingCartLineCommand findInDb(ShoppingCartLineCommand shoppingCartLineCommand,List<ShoppingCartLineCommand> shoppingCartLineCommandListInDB){
+        if (null == shoppingCartLineCommandListInDB){
+            return null;
+        }
+
+        ShoppingcartAddDetermineSameLineElements shoppingcartAddDetermineSameLineElements = new ShoppingcartAddDetermineSameLineElements();
+        shoppingcartAddDetermineSameLineElements.setSkuId(shoppingCartLineCommand.getSkuId());
+        shoppingcartAddDetermineSameLineElements.setPackageInfoElementList(//
+                        collect(shoppingCartLineCommand.getShoppingCartLinePackageInfoCommandList(), PackageInfoElement.class, "type", "featureInfo"));
+
+        return shoppingCartAddSameLineExtractor.extractor(shoppingCartLineCommandListInDB, shoppingcartAddDetermineSameLineElements);
+    }
+
 }

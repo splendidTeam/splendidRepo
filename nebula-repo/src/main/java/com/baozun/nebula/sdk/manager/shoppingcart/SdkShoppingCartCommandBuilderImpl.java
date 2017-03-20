@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
-import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toList;
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
 
@@ -61,6 +59,9 @@ import com.feilong.core.util.AggregateUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPredicateUtil;
 import com.feilong.tools.jsonlib.JsonUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
  * 专门用来构建 ShoppingCartCommand.
@@ -460,7 +461,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * @param allShoppingCartLines
      *            the all shopping cart lines
      */
-    private void setShoppingCartCommandPrice(ShoppingCartCommand shoppingCartCommand,List<ShopCartCommandByShop> summaryShopCartList,List<ShoppingCartLineCommand> allShoppingCartLines){
+    private static void setShoppingCartCommandPrice(ShoppingCartCommand shoppingCartCommand,List<ShopCartCommandByShop> summaryShopCartList,List<ShoppingCartLineCommand> allShoppingCartLines){
         // 设置应付金额
         shoppingCartCommand.setOriginPayAmount(ShoppingCartUtil.getOriginPayAmount(allShoppingCartLines));
 

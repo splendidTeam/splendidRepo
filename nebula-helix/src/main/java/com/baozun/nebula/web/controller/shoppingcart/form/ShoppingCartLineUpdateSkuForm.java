@@ -16,7 +16,9 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.form;
 
-import java.io.Serializable;
+import java.util.List;
+
+import com.baozun.nebula.web.controller.BaseForm;
 
 /**
  * 购物车行修改sku的form.
@@ -32,7 +34,7 @@ import java.io.Serializable;
  * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine
  * @since 5.3.2.3
  */
-public class ShoppingCartLineUpdateSkuForm implements Serializable{
+public class ShoppingCartLineUpdateSkuForm extends BaseForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -1175182005329799871L;
@@ -42,6 +44,13 @@ public class ShoppingCartLineUpdateSkuForm implements Serializable{
 
     /** 订单行最终修改的全量数量(必填). */
     private Integer count;
+
+    /**
+     * 包装信息(全量最新的包装信息).
+     * 
+     * @since 5.3.2.13
+     */
+    private List<PackageInfoForm> packageInfoFormList;
 
     /**
      * 获得 订单行要修改成什么新的sku(如果是null,等同于仅修改数量).
@@ -79,6 +88,27 @@ public class ShoppingCartLineUpdateSkuForm implements Serializable{
      */
     public void setCount(Integer count){
         this.count = count;
+    }
+
+    /**
+     * 获得 包装信息(全量最新的包装信息).
+     *
+     * @return the packageInfoFormList
+     * @since 5.3.2.13
+     */
+    public List<PackageInfoForm> getPackageInfoFormList(){
+        return packageInfoFormList;
+    }
+
+    /**
+     * 设置 包装信息(全量最新的包装信息).
+     *
+     * @param packageInfoFormList
+     *            the packageInfoFormList to set
+     * @since 5.3.2.13
+     */
+    public void setPackageInfoFormList(List<PackageInfoForm> packageInfoFormList){
+        this.packageInfoFormList = packageInfoFormList;
     }
 
 }

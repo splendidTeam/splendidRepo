@@ -34,8 +34,8 @@ import com.baozun.nebula.model.BaseModel;
  * 购物车行信息.
  *
  * @author chuanyang.zheng
- * @creattime 2013-11-26
  * @see com.baozun.nebula.model.salesorder.OrderLine
+ * @creattime 2013-11-26
  */
 @Entity
 @Table(name = "t_sc_shoppingcartline")
@@ -46,27 +46,27 @@ public class ShoppingCartLine extends BaseModel{
     private static final long serialVersionUID = 2250754313263734498L;
 
     /** PK. */
-    private Long              id;
+    private Long id;
 
     //********************************************************************************
 
     /** 会员id. */
-    private Long              memberId;
+    private Long memberId;
 
     /** 店铺id *. */
-    private Long              shopId;
+    private Long shopId;
 
     /** 商品id 其实是sku表中的id. */
-    private Long              skuId;
+    private Long skuId;
 
     /** 商品条形码sku. */
-    private String            extentionCode;
+    private String extentionCode;
 
     /** 商品数量. */
-    private Integer           quantity;
+    private Integer quantity;
 
     /** 结算状态 0未选中结算 1选中结算. */
-    private Integer           settlementState;
+    private Integer settlementState;
 
     //********************************************************************************
     /**
@@ -74,7 +74,7 @@ public class ShoppingCartLine extends BaseModel{
      * 
      * @since 5.3.1
      */
-    private Long              itemId;
+    private Long itemId;
 
     /**
      * 对应关联关系的商品id.
@@ -87,23 +87,23 @@ public class ShoppingCartLine extends BaseModel{
      * 
      * @since 5.3.1
      */
-    private Long              relatedItemId;
+    private Long relatedItemId;
 
     //********************************************************************************
 
     /** 行分组. */
-    private String            lineGroup;
+    private String lineGroup;
 
     /** 促销号. */
-    private Long              promotionId;
+    private Long promotionId;
 
     /** 保存用户选择的赠品行，备选赠品行有引擎提供, 有行合并时，需要标识购物车更新. */
-    private boolean           isGift;
+    private boolean isGift;
 
     //********************************************************************************
 
     /** 加入时间. */
-    private Date              createTime;
+    private Date createTime;
 
     /**
      * 获得 pK.

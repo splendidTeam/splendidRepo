@@ -19,18 +19,28 @@ package com.baozun.nebula.dao.product;
 import java.util.Date;
 import java.util.List;
 
+import com.baozun.nebula.model.product.SkuInventory;
+
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
 import loxia.dao.GenericEntityDao;
-
-import com.baozun.nebula.model.product.SkuInventory;
 
 /**
  * @author Tianlong.Zhang
  * 
  */
 public interface SdkSkuInventoryDao extends GenericEntityDao<SkuInventory, Long>{
+
+    /**
+     * 根据 skuid 来查询库存.
+     * 
+     * @param skuId
+     * @return 如果查询不到返回null
+     * @since 5.3.2.13
+     */
+    @NativeQuery(model = SkuInventory.class)
+    SkuInventory findSkuInventoryBySkuId(@QueryParam("skuId") Long skuId);
 
     /**
      * 根据extentionCode查询Sku
@@ -85,11 +95,7 @@ public interface SdkSkuInventoryDao extends GenericEntityDao<SkuInventory, Long>
      * @param skuInv
      */
     @NativeUpdate
-    void updateInventoryById(
-                    @QueryParam("id") Long id,
-                    @QueryParam("availableQty") Integer availableQty,
-                    @QueryParam("lastSyncTime") Date lastSyncTime,
-                    @QueryParam("baselineTime") Date baselineTime);
+    void updateInventoryById(@QueryParam("id") Long id,@QueryParam("availableQty") Integer availableQty,@QueryParam("lastSyncTime") Date lastSyncTime,@QueryParam("baselineTime") Date baselineTime);
 
     /**
      * @param id
@@ -97,9 +103,6 @@ public interface SdkSkuInventoryDao extends GenericEntityDao<SkuInventory, Long>
      * @param lastSyncTime
      */
     @NativeUpdate
-    void addSkuInventoryById(
-                    @QueryParam("id") Long id,
-                    @QueryParam("availableQty") Integer availableQty,
-                    @QueryParam("lastSyncTime") Date lastSyncTime);
+    void addSkuInventoryById(@QueryParam("id") Long id,@QueryParam("availableQty") Integer availableQty,@QueryParam("lastSyncTime") Date lastSyncTime);
 
 }

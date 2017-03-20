@@ -26,11 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
-import com.baozun.nebula.sdk.command.SkuProperty;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.SdkOrderLineManager;
+import com.baozun.nebula.sdk.manager.order.SdkOrderLinePackInfoManager;
+import com.baozun.nebula.web.controller.order.viewcommand.OrderLinePackageInfoViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderLineSubViewCommand;
 import com.feilong.core.bean.BeanUtil;
+
+import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * @author - 项硕
@@ -40,35 +43,51 @@ import com.feilong.core.bean.BeanUtil;
 public class OrderLineManagerImpl implements OrderLineManager{
 
     @Autowired
-    private SdkOrderLineManager lineManager;
+    private SdkOrderLineManager sdkOrderLineManager;
 
     @Autowired
     private SdkSkuManager sdkSkuManager;
 
+    @Autowired
+    private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
+
     @Override
     public OrderLine findByPk(Long id){
-        return lineManager.findByPk(id);
+        return sdkOrderLineManager.findByPk(id);
     }
 
     @Override
     public List<SimpleOrderLineSubViewCommand> findByOrderID(Long orderId){
-        List<OrderLineCommand> orderLineCommandList = lineManager.findOrderLinesByOrderId(orderId);
-        List<SimpleOrderLineSubViewCommand> returnList = new ArrayList<SimpleOrderLineSubViewCommand>();
+        List<OrderLineCommand> orderLineCommandList = sdkOrderLineManager.findOrderLinesByOrderId(orderId);
+        orderLineCommandList = sdkOrderLinePackInfoManager.packOrderLinesPackageInfo(orderLineCommandList);
 
+        List<SimpleOrderLineSubViewCommand> simpleOrderLineSubViewCommandList = new ArrayList<>();
         for (OrderLineCommand orderLineCommand : orderLineCommandList){
-            String properties = orderLineCommand.getSaleProperty();
-            List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-            orderLineCommand.setSkuPropertys(propList);
-
-            SimpleOrderLineSubViewCommand simpleOrderLineSubViewCommand = new SimpleOrderLineSubViewCommand();
-            BeanUtil.copyProperties(simpleOrderLineSubViewCommand, orderLineCommand);
-            simpleOrderLineSubViewCommand.setListPrice(orderLineCommand.getMSRP());
-            simpleOrderLineSubViewCommand.setQuantity(orderLineCommand.getCount());
-            simpleOrderLineSubViewCommand.setSubTotalAmt(orderLineCommand.getSubtotal());
-            simpleOrderLineSubViewCommand.setItemCode(orderLineCommand.getProductCode());
-            returnList.add(simpleOrderLineSubViewCommand);
+            simpleOrderLineSubViewCommandList.add(toSimpleOrderLineSubViewCommand(orderLineCommand));
         }
-        return returnList;
+        return simpleOrderLineSubViewCommandList;
+    }
+
+    /**
+     * @param orderLineCommand
+     * @return
+     * @since 5.3.2.13
+     */
+    private SimpleOrderLineSubViewCommand toSimpleOrderLineSubViewCommand(OrderLineCommand orderLineCommand){
+        String properties = orderLineCommand.getSaleProperty();
+        orderLineCommand.setSkuPropertys(sdkSkuManager.getSkuPros(properties));
+
+        SimpleOrderLineSubViewCommand simpleOrderLineSubViewCommand = new SimpleOrderLineSubViewCommand();
+        BeanUtil.copyProperties(simpleOrderLineSubViewCommand, orderLineCommand);
+
+        simpleOrderLineSubViewCommand.setListPrice(orderLineCommand.getMSRP());
+        simpleOrderLineSubViewCommand.setQuantity(orderLineCommand.getCount());
+        simpleOrderLineSubViewCommand.setSubTotalAmt(orderLineCommand.getSubtotal());
+        simpleOrderLineSubViewCommand.setItemCode(orderLineCommand.getProductCode());
+
+        List<OrderLinePackageInfoViewCommand> orderLinePackageInfoViewCommandList = collect(orderLineCommand.getOrderLinePackageInfoCommandList(), OrderLinePackageInfoViewCommand.class);
+        simpleOrderLineSubViewCommand.setOrderLinePackageInfoViewCommandList(orderLinePackageInfoViewCommandList);
+        return simpleOrderLineSubViewCommand;
     }
 
 }

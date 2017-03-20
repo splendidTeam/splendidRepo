@@ -96,7 +96,5 @@ public class DefaultUncheckedInvalidStateShoppingCartLineHandler implements Unch
         ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
         ShoppingcartResult toggleShoppingCartLinesCheckStatus = shoppingcartResolver.toggleShoppingCartLinesCheckStatus(memberDetails, invalidStateIdList, false,request, response);
         LOGGER.info("{}", toggleShoppingCartLinesCheckStatus);
-
     }
-
 }

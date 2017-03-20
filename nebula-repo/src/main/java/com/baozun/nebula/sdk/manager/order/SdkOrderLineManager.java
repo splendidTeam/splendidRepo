@@ -31,5 +31,4 @@ public interface SdkOrderLineManager extends BaseManager{
     OrderLine findByPk(Long id);
 
     List<OrderLineCommand> findOrderLinesByOrderId(Long orderId);
-
 }

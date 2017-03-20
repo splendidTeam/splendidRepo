@@ -23,7 +23,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.feilong.core.bean.PropertyUtil;
 
 /**
- * The Class ToShoppingCartLineCommandTransformer.
+ * 将{@link CookieShoppingCartLine} 转换成{@link ShoppingCartLineCommand} 转换器.
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @see ToCookieShoppingCartLineTransformer
@@ -33,13 +33,14 @@ import com.feilong.core.bean.PropertyUtil;
 class ToShoppingCartLineCommandTransformer implements Transformer<CookieShoppingCartLine, ShoppingCartLineCommand>{
 
     /** The Constant COPY_PROPERTY_NAMES. */
-    private static final String[] COPY_PROPERTY_NAMES = {
+    private static final String[] COPY_PROPERTY_NAMES = { //
                                                           "skuId",
                                                           "extentionCode",
                                                           "quantity",
                                                           "createTime",
                                                           "settlementState",
-                                                          "lineGroup" };
+                                                          "lineGroup",
+                                                          "shoppingCartLinePackageInfoCommandList" };
 
     /*
      * (non-Javadoc)

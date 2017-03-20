@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
@@ -37,19 +36,31 @@ import com.feilong.accessor.AutoKeyAccessor;
 
 /**
  * nebula 立即购买 base ShoppingCart Controller类.
+ * 
+ * <h3>Nebula立即购买购物车体系:</h3>
+ * <blockquote>
+ * <p>
+ * 分为两类:
+ * 
+ * <ol>
+ * <li>普通的立即购买 即 {@link NebulaImmediatelyBuyShoppingCartController}</li>
+ * <li>bundle立即购买 即 {@link NebulaBundleShoppingCartController}</li>
+ * </ol>
+ * </p>
+ * </blockquote>
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.1
  */
-public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends BaseController{
+public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends NebulaAbstractShoppingCartController{
 
     /** The Constant log. */
-    private static final Logger              LOGGER = LoggerFactory.getLogger(NebulaAbstractImmediatelyBuyShoppingCartController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaAbstractImmediatelyBuyShoppingCartController.class);
 
     /** The auto key accessor. */
     @Autowired
     @Qualifier("immediatelyBuyAutoKeyAccessor")
-    protected AutoKeyAccessor                autoKeyAccessor;
+    protected AutoKeyAccessor autoKeyAccessor;
 
     /** The immediately buy checkout url handler. */
     @Autowired
@@ -85,10 +96,10 @@ public abstract class NebulaAbstractImmediatelyBuyShoppingCartController extends
      * @see com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactoryImpl#getFromAccessor(String, HttpServletRequest)
      */
     protected String saveToAccessor(List<ShoppingCartLineCommand> shoppingCartLineCommandList,HttpServletRequest request){
-//        String[] exclude = ConvertUtil.toArray("skuPropertys", "categoryList", "promotionList", "couponCodeOnLine", "lableIds");
-//        Serializable serializable = JsonUtil.format(shoppingCartLineCommandList, exclude, 0, 0);
-//        
-        Serializable serializable=(Serializable) shoppingCartLineCommandList;
+        //        String[] exclude = ConvertUtil.toArray("skuPropertys", "categoryList", "promotionList", "couponCodeOnLine", "lableIds");
+        //        Serializable serializable = JsonUtil.format(shoppingCartLineCommandList, exclude, 0, 0);
+        //        
+        Serializable serializable = (Serializable) shoppingCartLineCommandList;
         return autoKeyAccessor.save(serializable, request);
     }
 

@@ -85,57 +85,57 @@ import loxia.dao.Sort;
 public class OrderManagerImpl implements OrderManager{
 
     /** The Constant log. */
-    private static final Logger    LOGGER  = LoggerFactory.getLogger(OrderManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderManagerImpl.class);
 
     /** 程序返回结果 *. */
-    private static final Integer   SUCCESS = 1;
+    private static final Integer SUCCESS = 1;
 
     /** The Constant FAILURE. */
-    private static final Integer   FAILURE = 0;
+    private static final Integer FAILURE = 0;
 
     /** The sdk order email manager. */
     @Autowired
-    private SdkOrderEmailManager   sdkOrderEmailManager;
+    private SdkOrderEmailManager sdkOrderEmailManager;
 
     /** The sdk cancel order dao. */
     @Autowired
-    private SdkCancelOrderDao      sdkCancelOrderDao;
+    private SdkCancelOrderDao sdkCancelOrderDao;
 
     /** The sdk order dao. */
     @Autowired
-    private SdkOrderDao            sdkOrderDao;
+    private SdkOrderDao sdkOrderDao;
 
     /** The sdk order promotion dao. */
     @Autowired
-    private SdkOrderPromotionDao   sdkOrderPromotionDao;
+    private SdkOrderPromotionDao sdkOrderPromotionDao;
 
     /** The sdk order line dao. */
     @Autowired
-    private SdkOrderLineDao        sdkOrderLineDao;
+    private SdkOrderLineDao sdkOrderLineDao;
 
     /** The sdk pay info dao. */
     @Autowired
-    private PayInfoDao             sdkPayInfoDao;
+    private PayInfoDao sdkPayInfoDao;
 
     /** The sdk return order dao. */
     @Autowired
-    private SdkReturnOrderDao      sdkReturnOrderDao;
+    private SdkReturnOrderDao sdkReturnOrderDao;
 
     /** The sdk order status log dao. */
     @Autowired
-    private SdkOrderStatusLogDao   sdkOrderStatusLogDao;
+    private SdkOrderStatusLogDao sdkOrderStatusLogDao;
 
     /** The sku dao. */
     @Autowired
-    private SkuDao                 skuDao;
+    private SkuDao skuDao;
 
     /** The sdk consignee dao. */
     @Autowired
-    private SdkConsigneeDao        sdkConsigneeDao;
+    private SdkConsigneeDao sdkConsigneeDao;
 
     /** The distribution mode dao. */
     @Autowired
-    private DistributionModeDao    distributionModeDao;
+    private DistributionModeDao distributionModeDao;
 
     /** The promotion coupon code dao. */
     @Autowired
@@ -143,23 +143,26 @@ public class OrderManagerImpl implements OrderManager{
 
     /** The sdk sku manager. */
     @Autowired
-    private SdkSkuManager          sdkSkuManager;
+    private SdkSkuManager sdkSkuManager;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager     sdkMataInfoManager;
+    private SdkMataInfoManager sdkMataInfoManager;
 
     /** The sdk member manager. */
     @Autowired
-    private SdkMemberManager       sdkMemberManager;
+    private SdkMemberManager sdkMemberManager;
 
     /** The sdk msg manager. */
     @Autowired
-    private SdkMsgManager          sdkMsgManager;
+    private SdkMsgManager sdkMsgManager;
 
     /** The sdk secret manager. */
     @Autowired
-    private SdkSecretManager       sdkSecretManager;
+    private SdkSecretManager sdkSecretManager;
+
+    @Autowired
+    private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
 
     /*
      * (non-Javadoc)
@@ -214,13 +217,11 @@ public class OrderManagerImpl implements OrderManager{
         }
 
         List<Long> idList = new ArrayList<Long>(salesOrderPage.size());
-        boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
-    			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
-    			searchParam.get("sdkQueryType").equals("1");
+        boolean isDecrypt = Validator.isNotNullOrEmpty(searchParam) && Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType")) && searchParam.get("sdkQueryType").equals("1");
         for (SalesOrderCommand cmd : salesOrderPage){
-        	if(isDecrypt){
-        		decryptSalesOrderCommand(cmd);
-        	}
+            if (isDecrypt){
+                decryptSalesOrderCommand(cmd);
+            }
             idList.add(cmd.getId());
         }
 
@@ -255,13 +256,11 @@ public class OrderManagerImpl implements OrderManager{
         List<SalesOrderCommand> salesOrderCommandList = salesOrderPage.getItems();
         if (null != salesOrderCommandList){
             List<Long> idList = new ArrayList<Long>(salesOrderCommandList.size());
-            boolean isDecrypt =Validator.isNotNullOrEmpty(searchParam)&&
-        			Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType"))&&
-        			searchParam.get("sdkQueryType").equals("1");
+            boolean isDecrypt = Validator.isNotNullOrEmpty(searchParam) && Validator.isNotNullOrEmpty(searchParam.get("sdkQueryType")) && searchParam.get("sdkQueryType").equals("1");
             for (SalesOrderCommand cmd : salesOrderCommandList){
-            	if(isDecrypt){
-            		decryptSalesOrderCommand(cmd);
-            	}
+                if (isDecrypt){
+                    decryptSalesOrderCommand(cmd);
+                }
                 idList.add(cmd.getId());
             }
 
@@ -381,8 +380,7 @@ public class OrderManagerImpl implements OrderManager{
         SalesOrderCommand order = judgeOrderIfExist(cancelOrderCommand.getOrderCode());
         Integer orderStatus = order.getLogisticsStatus();
 
-        if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_CANCELED, orderStatus)
-                        || Objects.equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED, orderStatus)){
+        if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_CANCELED, orderStatus) || Objects.equals(SalesOrder.SALES_ORDER_STATUS_SYS_CANCELED, orderStatus)){
             throw new BusinessException(Constants.ORDER_ALREADY_CANCEL);
         }
         if (Objects.equals(SalesOrder.SALES_ORDER_STATUS_FINISHED, orderStatus)){
@@ -686,24 +684,23 @@ public class OrderManagerImpl implements OrderManager{
 
         if (null == salesOrderCommand || null == type){
             return salesOrderCommand;
-        }else{
-            if (type.equals(1)){
-                //type为1时将查处收货人信息，此时解密
-                decryptSalesOrderCommand(salesOrderCommand);
-            }
-            // 订单支付信息
-            List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
-            salesOrderCommand.setPayInfo(payInfos);
-            // 订单行信息
-            List<Long> orderIds = new ArrayList<Long>();
-            orderIds.add(salesOrderCommand.getId());
-
-            List<OrderLineCommand> orderLines = sdkOrderLineDao.findOrderDetailListByOrderIds(orderIds);
-            salesOrderCommand.setOrderLines(orderLines);
-            // 订单行促销
-            List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), null);
-            salesOrderCommand.setOrderPromotions(orderPrm);
         }
+        if (type.equals(1)){
+            //type为1时将查处收货人信息，此时解密
+            decryptSalesOrderCommand(salesOrderCommand);
+        }
+        // 订单支付信息
+        List<PayInfoCommand> payInfos = sdkPayInfoDao.findPayInfoCommandByOrderId(salesOrderCommand.getId());
+        salesOrderCommand.setPayInfo(payInfos);
+        // 订单行信息
+        List<Long> orderIds = new ArrayList<Long>();
+        orderIds.add(salesOrderCommand.getId());
+
+        List<OrderLineCommand> orderLines = sdkOrderLineDao.findOrderDetailListByOrderIds(orderIds);
+        salesOrderCommand.setOrderLines(sdkOrderLinePackInfoManager.packOrderLinesPackageInfo(orderLines));
+        // 订单行促销
+        List<OrderPromotionCommand> orderPrm = sdkOrderPromotionDao.findOrderProInfoByOrderId(salesOrderCommand.getId(), null);
+        salesOrderCommand.setOrderPromotions(orderPrm);
 
         return salesOrderCommand;
     }
@@ -927,13 +924,7 @@ public class OrderManagerImpl implements OrderManager{
      * java.lang.String, java.lang.String, java.util.Date)
      */
     @Override
-    public void updateLogisticsInfo(
-                    String orderCode,
-                    BigDecimal actualFreight,
-                    String logisticsProviderCode,
-                    String logisticsProviderName,
-                    String transCode,
-                    Date modifyTime){
+    public void updateLogisticsInfo(String orderCode,BigDecimal actualFreight,String logisticsProviderCode,String logisticsProviderName,String transCode,Date modifyTime){
         sdkOrderDao.updateLogisticsInfo(orderCode, actualFreight, logisticsProviderCode, logisticsProviderName, transCode, modifyTime);
     }
 
@@ -966,19 +957,6 @@ public class OrderManagerImpl implements OrderManager{
      *            the sales order command
      */
     private void decryptSalesOrderCommand(SalesOrderCommand salesOrderCommand){
-        sdkSecretManager.decrypt(salesOrderCommand, new String[] {
-                                                                   "name",
-                                                                   "buyerName",
-                                                                   "country",
-                                                                   "province",
-                                                                   "city",
-                                                                   "area",
-                                                                   "town",
-                                                                   "address",
-                                                                   "postcode",
-                                                                   "tel",
-                                                                   "buyerTel",
-                                                                   "mobile",
-                                                                   "email" });
+        sdkSecretManager.decrypt(salesOrderCommand, new String[] { "name", "buyerName", "country", "province", "city", "area", "town", "address", "postcode", "tel", "buyerTel", "mobile", "email" });
     }
 }

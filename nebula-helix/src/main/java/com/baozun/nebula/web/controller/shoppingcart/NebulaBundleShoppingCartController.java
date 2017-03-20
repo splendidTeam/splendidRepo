@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,12 +40,11 @@ import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult
 import com.baozun.nebula.web.controller.shoppingcart.validator.ImmediatelyBuyBundleFormValidator;
 
 /**
- * 基于bundle购物车控制器.
+ * 基于bundle购物车立即购买控制器.
  * 
  * <p>
- * 主要由以下方法组成:
+ * Nebula目前 bundle设计体系暂不支持正常的购物车通道(即和普通商品融合在一起),只能立即购买
  * </p>
- *
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月4日 下午7:23:19
@@ -58,12 +56,12 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ImmediatelyBuyBun
 public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatelyBuyShoppingCartController{
 
     /** The Constant log. */
-    private static final Logger                              LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaBundleShoppingCartController.class);
 
     /** The immediately buy bundle form validator. */
     @Autowired
     @Qualifier("immediatelyBuyBundleFormValidator")
-    private ImmediatelyBuyBundleFormValidator                immediatelyBuyBundleFormValidator;
+    private ImmediatelyBuyBundleFormValidator immediatelyBuyBundleFormValidator;
 
     /** The immediately buy shopping cart line command list factory. */
     @Autowired
@@ -86,12 +84,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
      * @NeedLogin(guest = true)
      * @RequestMapping(value = "/transaction/immediatelybuybundle", method = RequestMethod.POST)
      */
-    public NebulaReturnResult immediatelyBuyBundle(
-                    @LoginMember MemberDetails memberDetails,
-                    @ModelAttribute("bundleImmediatelyBuyForm") BundleImmediatelyBuyForm bundleImmediatelyBuyForm,
-                    BindingResult bindingResult,
-                    HttpServletRequest request,
-                    Model model){
+    public NebulaReturnResult immediatelyBuyBundle(@LoginMember MemberDetails memberDetails,@ModelAttribute("bundleImmediatelyBuyForm") BundleImmediatelyBuyForm bundleImmediatelyBuyForm,BindingResult bindingResult,HttpServletRequest request,Model model){
 
         immediatelyBuyBundleFormValidator.validate(bundleImmediatelyBuyForm, bindingResult);
 
@@ -105,8 +98,7 @@ public class NebulaBundleShoppingCartController extends NebulaAbstractImmediatel
         //            return toNebulaReturnResult(shoppingcartResult);
         //        }
 
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory
-                        .buildShoppingCartLineCommandList(bundleImmediatelyBuyForm);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = immediatelyBuyShoppingCartLineCommandListFactory.buildShoppingCartLineCommandList(bundleImmediatelyBuyForm);
         String key = saveToAccessor(shoppingCartLineCommandList, request);
 
         String checkoutUrl = getImmediatelyBuyCheckoutUrl(key, request);

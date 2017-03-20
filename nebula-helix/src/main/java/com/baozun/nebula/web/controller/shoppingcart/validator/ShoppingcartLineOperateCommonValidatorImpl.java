@@ -21,8 +21,6 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ITEM_STATUS_NOT_ENABLE;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_ENABLE;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SKU_NOT_EXIST;
-import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND;
-import static com.feilong.core.Validator.isNullOrEmpty;
 
 import java.util.Date;
 
@@ -39,6 +37,10 @@ import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 import com.feilong.core.date.DateUtil;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
+
+import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND;
 
 /**
  * The Class ShoppingcartLineOperateCommonValidatorImpl.

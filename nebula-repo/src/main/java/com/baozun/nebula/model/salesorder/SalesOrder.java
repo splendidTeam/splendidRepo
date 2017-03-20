@@ -212,6 +212,8 @@ public class SalesOrder extends BaseModel{
 
     /** 支付类型 1-全额付款（默认）, 2-分阶段付款. */
     private Integer            payType;
+    
+    //**********************************************************************
 
     /** 商品总数量. */
     private Integer            quantity;
@@ -221,6 +223,8 @@ public class SalesOrder extends BaseModel{
 
     /** 整单折扣 整单折扣-sum（行折扣）= 由于整单促销/商城积分形成的未分摊到行上的折扣总额. */
     private BigDecimal         discount;
+    
+    //------------------------------------------------------------------------------------------
 
     /** 物流状态. */
     private Integer            logisticsStatus;
@@ -230,12 +234,9 @@ public class SalesOrder extends BaseModel{
 
     /** 支付方式. */
     private Integer            payment;
+    
+  //------------------------------------------------------------------------------------------
 
-    /** 订单来源. */
-    private Integer            source;
-
-    /** 下单ip. */
-    private String             ip;
 
     /** 应付运费. */
     private BigDecimal         payableFreight;
@@ -286,6 +287,13 @@ public class SalesOrder extends BaseModel{
 
     /** COD类型. */
     private Integer            codPaymentType;
+    
+    //**********************************************************************
+    /** 订单来源. */
+    private Integer            source;
+
+    /** 下单ip. */
+    private String             ip;
 
     //**********************************************************************
 

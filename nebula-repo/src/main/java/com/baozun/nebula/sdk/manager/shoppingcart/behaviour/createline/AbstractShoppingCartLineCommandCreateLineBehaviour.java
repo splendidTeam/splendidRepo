@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart.behaviour.createline;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,13 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.calculateEngine.param.GiftChoiceType;
 import com.baozun.nebula.dao.salesorder.SdkOrderLineDao;
-import com.baozun.nebula.model.product.ItemInfo;
 import com.baozun.nebula.model.salesorder.OrderLine;
 import com.baozun.nebula.sdk.command.CouponCodeCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.promotion.SdkOrderPromotionManager;
-import com.feilong.core.Validator;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 
 /**
  * The Class AbstractShoppingCartLineCommandCreateLineBehaviour.
@@ -53,6 +51,12 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
     /** The sdk order promotion manager. */
     @Autowired
     private SdkOrderPromotionManager sdkOrderPromotionManager;
+
+    @Autowired
+    private OrderLineBuilder orderLineBuilder;
+
+    @Autowired
+    private OrderLinePackInfoCreateManager orderLinePackInfoCreateManager;
 
     /*
      * (non-Javadoc)
@@ -80,6 +84,7 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
     //XXX feilong  这里的参数 shoppingCartLineCommand 最好是单独定制 一个额外的类 这样不会影响原来的对象
     protected void saveCommonLine(Long orderId,List<CouponCodeCommand> couponCodes,List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList,ShoppingCartLineCommand shoppingCartLineCommand){
         //直推赠品(送完即止) 1：如果数量为零 该行不存入数据库 :2：如果库存量小于购买量时 存入库存量
+
         //是否是不需要用户选择的礼品
         boolean noNeedChoiceGift = shoppingCartLineCommand.isGift() && GiftChoiceType.NoNeedChoice.equals(shoppingCartLineCommand.getGiftChoiceType());
         if (noNeedChoiceGift){
@@ -99,24 +104,16 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
             }
         }
 
-        OrderLine orderLine = saveOrderLine(orderId, shoppingCartLineCommand);
-        if (Validator.isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+        //保存订单行
+        OrderLine orderLine = sdkOrderLineDao.save(orderLineBuilder.buildOrderLine(orderId, shoppingCartLineCommand));
+
+        //保存行促销
+        if (isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
             savaOrderLinePromotions(orderId, couponCodes, promotionSKUDiscAMTBySettingList, orderLine);
         }
-    }
 
-    /**
-     * Save order line.
-     *
-     * @param orderId
-     *            the order id
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @return the order line
-     */
-    private OrderLine saveOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
-        OrderLine orderLine = buildOrderLine(orderId, shoppingCartLineCommand);
-        return sdkOrderLineDao.save(orderLine);
+        //保存包装信息
+        orderLinePackInfoCreateManager.saveOrderLinePackInfo(orderLine, shoppingCartLineCommand);
     }
 
     /**
@@ -153,86 +150,4 @@ public abstract class AbstractShoppingCartLineCommandCreateLineBehaviour impleme
         }
     }
 
-    /**
-     * Builds the order line.
-     *
-     * @param orderId
-     *            the order id
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @return the order line
-     */
-    private OrderLine buildOrderLine(Long orderId,ShoppingCartLineCommand shoppingCartLineCommand){
-        boolean isGift = shoppingCartLineCommand.isGift();
-
-        OrderLine orderLine = new OrderLine();
-        // 订单id
-        orderLine.setOrderId(orderId);
-        // 商品数量
-        orderLine.setCount(shoppingCartLineCommand.getQuantity());
-
-        // skuId
-        orderLine.setSkuId(shoppingCartLineCommand.getSkuId());
-        // UPC
-        orderLine.setExtentionCode(shoppingCartLineCommand.getExtentionCode());
-        // 商品id
-        orderLine.setItemId(shoppingCartLineCommand.getItemId());
-        //对应关联关系的商品id.
-        orderLine.setRelatedItemId(shoppingCartLineCommand.getRelatedItemId());
-        // 商品名称
-        orderLine.setItemName(shoppingCartLineCommand.getItemName());
-        // 商品主图
-        orderLine.setItemPic(shoppingCartLineCommand.getItemPic());
-        //******************************************************************************************
-
-        //设置价格信息
-        setPrice(orderLine, shoppingCartLineCommand, isGift);
-
-        // 销售属性信息
-        orderLine.setSaleProperty(shoppingCartLineCommand.getSaleProperty());
-
-        // 行类型
-        orderLine.setType(isGift ? ItemInfo.TYPE_GIFT : ItemInfo.TYPE_MAIN);
-        //orderLine.setType(shoppingCartLineCommand.getType());
-        // 分组号
-        Long lineGroup = shoppingCartLineCommand.getLineGroup();
-        if (Validator.isNotNullOrEmpty(lineGroup)){
-            orderLine.setGroupId(lineGroup.intValue());
-        }
-        // 评价状态
-        orderLine.setEvaluationStatus(null);
-        // 商品快照版本
-        orderLine.setSnapshot(null);
-
-        orderLine.setVersion(new Date());
-        return orderLine;
-    }
-
-    /**
-     * 设置 price.
-     *
-     * @param orderLine
-     *            the order line
-     * @param shoppingCartLineCommand
-     *            the shopping cart line command
-     * @param isGift
-     *            the is gift
-     * @since 5.3.1
-     */
-    private void setPrice(OrderLine orderLine,ShoppingCartLineCommand shoppingCartLineCommand,boolean isGift){
-        // 原销售单价
-        BigDecimal listPrice = shoppingCartLineCommand.getListPrice();
-        orderLine.setMSRP(listPrice);
-        // 现销售单价
-        BigDecimal salePrice = shoppingCartLineCommand.getSalePrice();
-        orderLine.setSalePrice(salePrice);
-        // 行小计
-        BigDecimal subTotalAmt = shoppingCartLineCommand.getSubTotalAmt();
-        orderLine.setSubtotal(subTotalAmt);
-        // 折扣、行类型
-        BigDecimal discount = shoppingCartLineCommand.getDiscount();
-        orderLine.setDiscount(isGift ? salePrice : discount);
-
-        LOGGER.debug("orderLine msrp:{},salePrice:{},discount:{},subtotal:{}", listPrice, salePrice, discount, subTotalAmt);
-    }
 }

@@ -54,8 +54,8 @@ import com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidato
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.converter.ShoppingcartViewCommandConverter;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
-import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.feilong.accessor.AutoKeyAccessor;
 import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
@@ -132,47 +132,47 @@ import com.feilong.core.util.CollectionsUtil;
 public class NebulaOrderCreateController extends BaseController{
 
     /** The Constant log. */
-    private static final Logger                   LOGGER = LoggerFactory.getLogger(NebulaOrderCreateController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderCreateController.class);
 
     /** 订单提交的form 校验，需要在商城 spring 相关xml 里面进行配置. */
     @Autowired
     @Qualifier("orderFormValidator")
-    private OrderFormValidator                    orderFormValidator;
+    private OrderFormValidator orderFormValidator;
 
     @Autowired
     @Qualifier("shoppingcartViewCommandConverter")
-    private ShoppingcartViewCommandConverter      shoppingcartViewCommandConverter;
+    private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
     @Autowired
     @Qualifier("immediatelyBuyAutoKeyAccessor")
-    private AutoKeyAccessor                       autoKeyAccessor;
+    private AutoKeyAccessor autoKeyAccessor;
 
     @Autowired
-    private ShoppingcartFactory                   shoppingcartFactory;
+    private ShoppingcartFactory shoppingcartFactory;
 
     @Autowired
-    private SalesOrderResolver                    salesOrderResolver;
+    private SalesOrderResolver salesOrderResolver;
 
     @Autowired
-    private SdkOrderCreateManager                 sdkOrderCreateManager;
+    private SdkOrderCreateManager sdkOrderCreateManager;
 
     @Autowired
-    private ShoppingCartCommandBuilder            shoppingCartCommandBuilder;
+    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
     @Autowired
     private ShoppingcartOrderCreateSuccessHandler shoppingcartOrderCreateSuccessHandler;
-    
+
     @Autowired(required = false)
-    private ShoppingCartOrderCreateBeforeHandler	shoppingCartOrderCreateBeforeHandler;
+    private ShoppingCartOrderCreateBeforeHandler shoppingCartOrderCreateBeforeHandler;
 
     @Autowired
-    private SalesOrderCreateValidator             salesOrderCreateValidator;
+    private SalesOrderCreateValidator salesOrderCreateValidator;
 
     /**
      * @Description 创建订单.
-     * <ol>
-     * <li>订单物流配送方式（当日达，次日达等）放在OrderForm.ShippingInfoSubForm.AppointType字段上</li>
-     * </ol>
+     *              <ol>
+     *              <li>订单物流配送方式（当日达，次日达等）放在OrderForm.ShippingInfoSubForm.AppointType字段上</li>
+     *              </ol>
      *
      * @param memberDetails
      *            the member details
@@ -205,15 +205,12 @@ public class NebulaOrderCreateController extends BaseController{
         orderFormValidator.validate(orderForm, bindingResult);
         // 如果校验失败，返回错误
         if (bindingResult.hasErrors()){
-            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm validation error. \"\"",
-                            memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
-                            new Date());
+            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm validation error. \"\"", memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(), new Date());
             return getResultFromBindingResult(bindingResult);
         }
 
         // 获取购物车信息
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory
-                        .getShoppingCartLineCommandList(memberDetails, key, request);
+        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
 
         shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
 
@@ -223,29 +220,24 @@ public class NebulaOrderCreateController extends BaseController{
 
         CalcFreightCommand calcFreightCommand = salesOrderCommand.getCalcFreightCommand();
 
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder
-                        .buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
-        
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
+
         //********************************************************************************************************
         // 校验购物车信息和促销
         //TODO feilong 多张优惠券
         String couponCode = orderForm.getCouponInfoSubForm().getCouponCode();
         SalesOrderResult salesorderResult = salesOrderCreateValidator.validate(shoppingCartCommand, couponCode);
-        
+
         // 如果校验失败，返回错误
         if (salesorderResult != SalesOrderResult.SUCCESS){
-            LOGGER.error(
-                            "[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"",
-                            memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(),
-                            new Date(),
-                            couponCode);
+            LOGGER.error("[ORDER_CREATEORDER] {} [{}] orderForm coupon [{}] validation error. \"\"", memberDetails == null ? "Gueset" : memberDetails.getGroupId().toString(), new Date(), couponCode);
             return toNebulaReturnResult(salesorderResult);
         }
-        
-        if(null != shoppingCartOrderCreateBeforeHandler){
-        	shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request, key);
+
+        if (null != shoppingCartOrderCreateBeforeHandler){
+            shoppingCartOrderCreateBeforeHandler.beforeCreateSalesOrder(shoppingCartCommand, orderForm, memberDetails, request, key);
         }
-        
+
         //********************************************************************************************************
         SalesOrderCreateOptions salesOrderCreateOptions = buildSalesOrderCreateOptions(key);
         // 新建订单

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baozun.nebula.dao.product.SdkSkuInventoryDao;
 import com.baozun.nebula.exception.BusinessException;
+import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.constants.Constants;
 import com.baozun.nebula.sdk.manager.SdkSkuInventoryManager;
@@ -47,7 +48,7 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
 
     /** The sdk sku inventory dao. */
     @Autowired
-    private SdkSkuInventoryDao                         sdkSkuInventoryDao;
+    private SdkSkuInventoryDao sdkSkuInventoryDao;
 
     @Autowired
     private SdkShoppingCartLineCommandBehaviourFactory sdkShoppingCartLineCommandBehaviourFactory;
@@ -113,11 +114,20 @@ public class SdkSkuInventoryManagerImpl implements SdkSkuInventoryManager{
                     shoppingCartLineCommand.setQuantity(stock);
                 }
             }
-            ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory
-                            .getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
-            sdkShoppingCartLineCommandBehaviour
-                            .organizeExtentionCodeAndCountMapForDeductSkuInventory(shoppingCartLineCommand, extentionCodeAndCountMap);
+            ShoppingCartLineCommandBehaviour sdkShoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
+            sdkShoppingCartLineCommandBehaviour.organizeExtentionCodeAndCountMapForDeductSkuInventory(shoppingCartLineCommand, extentionCodeAndCountMap);
         }
         return extentionCodeAndCountMap;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.SdkSkuInventoryManager#findSkuInventoryBySkuId(java.lang.Long)
+     */
+    @Override
+    public SkuInventory findSkuInventoryBySkuId(Long skuId){
+        Validate.notNull(skuId, "skuId can't be null!");
+        return sdkSkuInventoryDao.findSkuInventoryBySkuId(skuId);
     }
 }

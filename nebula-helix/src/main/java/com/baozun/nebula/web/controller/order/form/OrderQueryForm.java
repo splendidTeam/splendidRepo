@@ -16,16 +16,7 @@
  */
 package com.baozun.nebula.web.controller.order.form;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import com.baozun.nebula.model.salesorder.SalesOrder;
-import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.baozun.nebula.web.controller.BaseForm;
-import com.feilong.core.Validator;
-import com.feilong.core.bean.PropertyUtil;
 
 /**
  * The Class OrderQueryForm.
@@ -38,26 +29,21 @@ public class OrderQueryForm extends BaseForm{
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 7412305764293905289L;
-    
-   /**
-    * 新建（未支付）
-    */
-    private static final String     orderStatus_new = "new";
 
     /** 商品名称. */
-    private String            itemName;
+    private String itemName;
 
     /** 商品code. */
-    private String            itemCode;
+    private String itemCode;
 
     /** 订单code. */
-    private String            orderCode;
+    private String orderCode;
 
     /** 订单状态 完成 等待付款 等待收获, 这里的值 在前端是允许定制的, 传入到后端 需要解析成 系统识别的 值(可能是是 财务状态+物流状态的组合). */
-    private String            orderStatus;
+    private String orderStatus;
 
     /** 订单的时间类型, 比如 3个月之前的订单, 最近的订单, 2015年的订单, 等等等. */
-    private String            orderTimeType;
+    private String orderTimeType;
 
     //********************************************************************
 
@@ -161,45 +147,9 @@ public class OrderQueryForm extends BaseForm{
         this.orderTimeType = orderTimeType;
     }
 
-    
-    /**
-     * 
-     * 说明：转换为OrderQueryCommand，前台条件转换
-     * 
-     * @param orderqueryform
-     * @return
-     * @author 张乃骐
-     * @throws ParseException
-     * @time：2016年5月9日 下午5:01:05
-     */
-    public OrderQueryCommand convertToOrderQueryCommand(OrderQueryCommand orderQueryCommand){
-        PropertyUtil.copyProperties(orderQueryCommand, this, "itemName", "itemCode", "orderCode");
-        //订单的时间类型判断及转换
-        String orderTimeType = this.getOrderTimeType();
-        if (Validator.isNotNullOrEmpty(orderTimeType)){
-            OrderTimeType orderTimeTypeEnum = OrderTimeType.getInstance(orderTimeType);
-            Date[] beginAndEndDate = orderTimeTypeEnum.getBeginAndEndDate();
-            orderQueryCommand.setStartDate(beginAndEndDate[0]);
-            orderQueryCommand.setEndDate(beginAndEndDate[1]);
-        }
-        //订单类型（未支付，发货中，以完成，取消）
-        String orderStatus = this.getOrderStatus();
-        if (Validator.isNotNullOrEmpty(orderStatus)){
-            List<Integer> financestatusList = new ArrayList<Integer>();
-            //未完成的订单
-            if (orderStatus.equals(orderStatus_new)){
-                financestatusList.add(SalesOrder.SALES_ORDER_FISTATUS_NO_PAYMENT);
-            }
-            //TODO 其他状态的判断
-        }
-        return orderQueryCommand;
+    @Override
+    public String toString(){
+        return "OrderQueryForm [itemName=" + itemName + ", itemCode=" + itemCode + ", orderCode=" + orderCode + ", orderStatus=" + orderStatus + ", orderTimeType=" + orderTimeType + "]";
     }
 
-    @Override
-    public String toString() {
-        return "OrderQueryForm [itemName=" + itemName + ", itemCode=" + itemCode + ", orderCode=" + orderCode
-                + ", orderStatus=" + orderStatus + ", orderTimeType=" + orderTimeType + "]";
-    }
-    
-    
 }

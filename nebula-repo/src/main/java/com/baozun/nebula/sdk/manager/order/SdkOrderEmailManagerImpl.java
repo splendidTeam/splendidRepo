@@ -16,6 +16,11 @@
  */
 package com.baozun.nebula.sdk.manager.order;
 
+import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_ALIPAY;
+import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_COD;
+import static com.baozun.nebula.model.salesorder.SalesOrder.SO_PAYMENT_TYPE_NETPAY;
+import static com.baozun.nebula.model.system.MataInfo.PAY_URL_PREFIX;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,7 +41,6 @@ import com.baozun.nebula.event.EmailEvent;
 import com.baozun.nebula.event.EventPublisher;
 import com.baozun.nebula.model.member.MemberPersonalData;
 import com.baozun.nebula.model.salesorder.SalesOrder;
-import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
@@ -46,6 +50,9 @@ import com.baozun.nebula.sdk.handler.SalesOrderHandler;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.feilong.core.Validator;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  * The Class SdkOrderCreateEmailManagerImpl.
@@ -63,31 +70,31 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
 
     /** The page url base. */
     @Value("#{meta['page.base']}")
-    private String              pageUrlBase;
+    private String pageUrlBase;
 
     /** The img domain url. */
     @Value("#{meta['upload.img.domain.base']}")
-    private String              imgDomainUrl;
+    private String imgDomainUrl;
 
     /** The frontend base url. */
     @Value("#{meta['frontend.url']}")
-    private String              frontendBaseUrl;
+    private String frontendBaseUrl;
 
     /** The sdk mata info manager. */
     @Autowired
-    private SdkMataInfoManager  sdkMataInfoManager;
+    private SdkMataInfoManager sdkMataInfoManager;
 
     /** The sdk member manager. */
     @Autowired
-    private SdkMemberManager    sdkMemberManager;
+    private SdkMemberManager sdkMemberManager;
 
     /** The sales order handler. */
     @Autowired(required = false)
-    private SalesOrderHandler   salesOrderHandler;
+    private SalesOrderHandler salesOrderHandler;
 
     /** The event publisher. */
     @Autowired
-    private EventPublisher      eventPublisher;
+    private EventPublisher eventPublisher;
 
     /*
      * (non-Javadoc)
@@ -96,7 +103,7 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
      */
     @Override
     public void sendEmailOfCreateOrder(List<Map<String, Object>> dataMapList){
-        if (Validator.isNotNullOrEmpty(dataMapList)){
+        if (isNotNullOrEmpty(dataMapList)){
             String createOrderSuccess = EmailConstants.CREATE_ORDER_SUCCESS;
             for (Map<String, Object> dataMap : dataMapList){
                 String email = dataMap.get("email").toString();
@@ -136,40 +143,38 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
 
         // 后台下单 并且填写了 邮件地址
         Long memberId = salesOrderCommand.getMemberId();
-        boolean isGuest = Validator.isNullOrEmpty(memberId);
+        boolean isGuest = isNullOrEmpty(memberId);
 
         String email = salesOrderCommand.getEmail();
         String nickName = salesOrderCommand.getName();
         if (!isGuest){
             MemberPersonalData memberPersonalData = sdkMemberManager.findMemberPersonData(salesOrder.getMemberId());
-
-            if (Validator.isNullOrEmpty(email)){
+            if (isNullOrEmpty(email)){
                 email = memberPersonalData.getEmail();
             }
-
             nickName = memberPersonalData.getNickname();
-            if (Validator.isNullOrEmpty(nickName)){
+            if (isNullOrEmpty(nickName)){
                 nickName = salesOrderCommand.getName();
             }
         }
 
-        if (Validator.isNullOrEmpty(email)){
+        if (isNullOrEmpty(email)){
             return null;
         }
 
         //***************************************************************************************
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日HH点mm分");
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy年MM月dd日");
 
-        Map<String, Object> dataMap = new HashMap<String, Object>();
+        //--------------
+
+        Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("nickName", nickName);
         dataMap.put("email", email);
 
         // 获取付款地址
-        if (salesOrderCreateOptions.getIsBackCreateOrder()
-                        && !salesOrderCommand.getPayment().toString().equals(SalesOrder.SO_PAYMENT_TYPE_COD)){
-            String payUrlPrefix = sdkMataInfoManager.findValue(MataInfo.PAY_URL_PREFIX);
+        if (salesOrderCreateOptions.getIsBackCreateOrder() && !salesOrderCommand.getPayment().toString().equals(SO_PAYMENT_TYPE_COD)){
+            String payUrlPrefix = sdkMataInfoManager.findValue(PAY_URL_PREFIX);
             String payUrl = frontendBaseUrl + payUrlPrefix + "?code=" + subOrdinate;
             dataMap.put("isShowPayButton", true);
             dataMap.put("payUrl", payUrl);
@@ -187,10 +192,7 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
 
         dataMap.put("address", salesOrderCommand.getAddress());
         String mobile = salesOrderCommand.getMobile();
-        dataMap.put(
-                        "mobile",
-                        Validator.isNotNullOrEmpty(mobile) ? mobile
-                                        : salesOrderCommand.getTel());
+        dataMap.put("mobile", isNotNullOrEmpty(mobile) ? mobile : salesOrderCommand.getTel());
 
         dataMap.put("payment", getPaymentName(salesOrderCommand.getPayment()));
 
@@ -205,16 +207,11 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
         dataMap.put("pageUrlBase", pageUrlBase);
         dataMap.put("imgDomainUrl", imgDomainUrl);
 
+        //---------------------
+
         /** 扩展点 如商城需要需要加入特殊字段 各自实现 **/
         if (null != salesOrderHandler){
-            dataMap = salesOrderHandler.getEmailDataOfCreateOrder(
-                            subOrdinate,
-                            salesOrder,
-                            salesOrderCommand,
-                            shoppingCartLineCommandList,
-                            shopCartCommandByShop,
-                            promotionSKUDiscAMTBySettingList,
-                            dataMap);
+            dataMap = salesOrderHandler.getEmailDataOfCreateOrder(subOrdinate, salesOrder, salesOrderCommand, shoppingCartLineCommandList, shopCartCommandByShop, promotionSKUDiscAMTBySettingList, dataMap);
         }
         return dataMap;
     }
@@ -228,11 +225,11 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
      */
     private String getPaymentName(Integer payment){
         String name = "支付宝";
-        if (payment == Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_COD)){
+        if (payment == Integer.parseInt(SO_PAYMENT_TYPE_COD)){
             name = "货到付款";
-        }else if (payment == Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_NETPAY)){
+        }else if (payment == Integer.parseInt(SO_PAYMENT_TYPE_NETPAY)){
             name = "网银在线";
-        }else if (payment == Integer.parseInt(SalesOrder.SO_PAYMENT_TYPE_ALIPAY)){
+        }else if (payment == Integer.parseInt(SO_PAYMENT_TYPE_ALIPAY)){
             name = "支付宝";
         }
         return name;
@@ -259,10 +256,7 @@ public class SdkOrderEmailManagerImpl implements SdkOrderEmailManager{
         dataMap.put("ssqStr", salesOrderCommand.getProvince() + salesOrderCommand.getCity() + salesOrderCommand.getArea());
         dataMap.put("address", salesOrderCommand.getAddress());
 
-        dataMap.put(
-                        "mobile",
-                        Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile()
-                                        : salesOrderCommand.getTel());
+        dataMap.put("mobile", Validator.isNotNullOrEmpty(salesOrderCommand.getMobile()) ? salesOrderCommand.getMobile() : salesOrderCommand.getTel());
 
         dataMap.put("sumItemFee", salesOrderCommand.getTotal().add(salesOrderCommand.getDiscount()));
         dataMap.put("shipFee", salesOrderCommand.getActualFreight());

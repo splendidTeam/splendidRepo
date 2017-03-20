@@ -35,6 +35,7 @@ import com.baozun.nebula.web.command.OrderQueryCommand;
 import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.PageForm;
+import com.baozun.nebula.web.controller.order.builder.OrderQueryCommandBuilder;
 import com.baozun.nebula.web.controller.order.converter.SimpleOrderViewCommandConverter;
 import com.baozun.nebula.web.controller.order.form.OrderQueryForm;
 import com.baozun.nebula.web.controller.order.validator.OrderQueryFormValidator;
@@ -66,14 +67,17 @@ import loxia.dao.Pagination;
  */
 public class NebulaOrderListController extends BaseController{
 
-    private static final Logger    LOGGER = LoggerFactory.getLogger(NebulaOrderListController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NebulaOrderListController.class);
 
     @Autowired
-    private SalesOrderManager               salesOrderManager;
+    private SalesOrderManager salesOrderManager;
+
+    @Autowired
+    private OrderQueryCommandBuilder orderQueryCommandBuilder;
 
     @Autowired
     @Qualifier("orderQueryFormValidator")
-    private OrderQueryFormValidator         orderQueryFormValidator;
+    private OrderQueryFormValidator orderQueryFormValidator;
 
     @Autowired
     @Qualifier("simpleOrderViewCommandConverter")
@@ -92,51 +96,44 @@ public class NebulaOrderListController extends BaseController{
      * @return
      * @NeedLogin (guest=false)
      * @RequestMapping(value = "/order/orderlist", method = RequestMethod.GET)
-     * @see com.baozun.nebula.sdk.manager.order.OrderManager#findOrders(loxia.dao.Page, loxia.dao.Sort[],
-     *      java.util.Map)
-     * @see com.baozun.nebula.dao.salesorder.SdkOrderDao#findOrders(loxia.dao.Page,
-     *      loxia.dao.Sort[], java.util.Map)
-     * 
+     * @see com.baozun.nebula.sdk.manager.order.OrderManager#findOrders(loxia.dao.Page, loxia.dao.Sort[], java.util.Map)
+     * @see com.baozun.nebula.dao.salesorder.SdkOrderDao#findOrders(loxia.dao.Page, loxia.dao.Sort[], java.util.Map)
      * @see com.baozun.nebula.web.controller.order.viewcommand.SimpleOrderViewCommand
      */
-    public String showOrderList(
-                    @LoginMember MemberDetails memberDetails,
-                    @ModelAttribute("orderQueryForm") OrderQueryForm orderQueryForm,
-                    BindingResult bindingResult,
-                    PageForm pageForm,
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    Model model){
+    public String showOrderList(@LoginMember MemberDetails memberDetails,@ModelAttribute("orderQueryForm") OrderQueryForm orderQueryForm,BindingResult bindingResult,PageForm pageForm,HttpServletRequest request,HttpServletResponse response,Model model){
         // 校验查询条件非空
-        if(LOGGER.isInfoEnabled()){
-            LOGGER.info("订单列表查询条件为orderQueryForm {} ",orderQueryForm); 
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("订单列表查询条件为orderQueryForm {} ", orderQueryForm);
         }
+
         orderQueryFormValidator.validate(orderQueryForm, bindingResult);
         if (bindingResult.hasErrors()){
             NebulaReturnResult resultFromBindingResult = super.getResultFromBindingResult(bindingResult);
-            if(LOGGER.isInfoEnabled()){
-                LOGGER.info("订单列表error {} ",resultFromBindingResult); 
+            if (LOGGER.isInfoEnabled()){
+                LOGGER.info("订单列表error {} ", resultFromBindingResult);
             }
             model.addAttribute("errors", resultFromBindingResult);
             return "order.orderlist";
         }
+
+        //----------------------------
+
         // queryform表单进行转换
-        OrderQueryCommand orderQueryCommand = new OrderQueryCommand();
-        orderQueryForm.convertToOrderQueryCommand(orderQueryCommand);
-        if(LOGGER.isInfoEnabled()){
-            LOGGER.info("订单列表查询orderQueryCommand {} ",orderQueryCommand); 
+        OrderQueryCommand orderQueryCommand = orderQueryCommandBuilder.build(orderQueryForm);
+
+        if (LOGGER.isInfoEnabled()){
+            LOGGER.info("订单列表查询orderQueryCommand {} ", orderQueryCommand);
         }
+
         // 当前页，每页10条
         Page page = new Page(pageForm.getCurrentPage(), pageForm.getSize());// 当前页，每页10条
         // 获取数据
-        Pagination<SimpleOrderCommand> simpleOrderCommandPagination = salesOrderManager
-                        .findSimpleOrderCommandPagination(memberDetails.getMemberId(), orderQueryCommand, page);
-        Pagination<SimpleOrderViewCommand> simpleOrderViewCommandPagination = simpleOrderViewCommandConverter
-                        .convert(simpleOrderCommandPagination);
+        Pagination<SimpleOrderCommand> simpleOrderCommandPagination = salesOrderManager.findSimpleOrderCommandPagination(memberDetails.getMemberId(), orderQueryCommand, page);
+        Pagination<SimpleOrderViewCommand> simpleOrderViewCommandPagination = simpleOrderViewCommandConverter.convert(simpleOrderCommandPagination);
+
         model.addAttribute("currentSimpleOrderViewCommandPagination", simpleOrderViewCommandPagination);
         model.addAttribute("orderQueryForm", orderQueryForm);
         return "order.orderlist";
     }
-
 
 }

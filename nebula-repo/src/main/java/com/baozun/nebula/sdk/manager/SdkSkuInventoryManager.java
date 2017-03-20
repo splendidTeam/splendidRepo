@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baozun.nebula.manager.BaseManager;
+import com.baozun.nebula.model.product.SkuInventory;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 
 /**
@@ -30,6 +31,16 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
  * @since 5.3.1
  */
 public interface SdkSkuInventoryManager extends BaseManager{
+
+    /**
+     * 根据 skuid 来查询库存.
+     * 
+     * @param skuId
+     * @return 如果 <code>skuId</code> 是null,抛出 {@link NullPointerException}<br>
+     *         如果查询不到返回null<br>
+     * @since 5.3.2.13
+     */
+    SkuInventory findSkuInventoryBySkuId(Long skuId);
 
     /**
      * 基于shoppingCartLineCommandList 来执行扣减库存的逻辑.

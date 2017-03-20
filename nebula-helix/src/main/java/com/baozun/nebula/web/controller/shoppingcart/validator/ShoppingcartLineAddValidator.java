@@ -20,6 +20,7 @@ import java.util.List;
 
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
@@ -32,16 +33,19 @@ public interface ShoppingcartLineAddValidator{
 
     /**
      * 添加购物车的校验.
+     * 
+     * <p>
+     * 注意:此接口可能含融合操作
+     * </p>
      *
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
-     * @param skuId
-     *            the sku id
-     * @param count
-     *            the count
+     *            用户原来的购物车,如果没有那么构造empty list进来
+     * @param shoppingCartLineAddForm
+     *            购买表单
      * @return 如果校验没有问题,返回null,否则返回 {@link ShoppingcartResult}
+     * @since 5.3.2.13
      */
-    ShoppingcartResult validator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long skuId,Integer count);
+    ShoppingcartResult validator(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineAddForm shoppingCartLineAddForm);
 }
