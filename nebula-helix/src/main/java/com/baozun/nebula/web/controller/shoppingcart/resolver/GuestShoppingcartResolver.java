@@ -50,9 +50,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#getShoppingCartLineCommandList(com.baozun.nebula.web.
-     * MemberDetails, javax.servlet.http.HttpServletRequest)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#getShoppingCartLineCommandList(com.baozun.nebula.web.MemberDetails, javax.servlet.http.HttpServletRequest)
      */
     @Override
     public List<ShoppingCartLineCommand> getShoppingCartLineCommandList(MemberDetails memberDetails,HttpServletRequest request){
@@ -62,8 +60,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.
-     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doAddShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
@@ -74,9 +71,8 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.
-     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
-     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.lang.Long, javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
      */
     @Override
     protected ShoppingcartResult doUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response){
@@ -86,22 +82,18 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doDeleteShoppingCartLine(com.baozun.nebula.web.
-     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
-     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doDeleteShoppingCartLine(com.baozun.nebula.web.MemberDetails, java.util.List, java.lang.Long[], javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
+    protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long[] shoppingcartLineIds,HttpServletRequest request,HttpServletResponse response){
         return commonUpdate(shoppingCartLineCommandList, request, response);
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doToggleShoppingCartLineCheckStatus(com.baozun.
-     * nebula.web.MemberDetails, java.util.List, java.util.List, boolean, javax.servlet.http.HttpServletRequest,
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doToggleShoppingCartLineCheckStatus(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.List, boolean, javax.servlet.http.HttpServletRequest,
      * javax.servlet.http.HttpServletResponse)
      */
     @Override
@@ -118,7 +110,7 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doUpdateShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.Map, javax.servlet.http.HttpServletRequest,
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doBatchUpdateShoppingCart(com.baozun.nebula.web.MemberDetails, java.util.List, java.util.Map, javax.servlet.http.HttpServletRequest,
      * javax.servlet.http.HttpServletResponse)
      */
     @Override
@@ -151,6 +143,17 @@ public class GuestShoppingcartResolver extends AbstractShoppingcartResolver{
         List<ShoppingCartLineCommand> mainLines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
         // 将修改后的购物车保存cookie
         guestShoppingcartPersister.save(mainLines, request, response);
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doClearShoppingCartLine(com.baozun.nebula.web.MemberDetails, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult doClearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
+        guestShoppingcartPersister.clear(request, response);
         return null;
     }
 }

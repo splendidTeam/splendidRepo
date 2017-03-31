@@ -102,6 +102,8 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  */
 public interface ShoppingcartResolver{
 
+    //------------------------------------------------------------------------------------------
+
     /**
      * 获得指定用户的购物车list(所有的包括选中的及没有选中的).
      *
@@ -173,6 +175,8 @@ public interface ShoppingcartResolver{
      * @since 5.3.2.13
      */
     ShoppingcartResult addShoppingCart(MemberDetails memberDetails,ShoppingCartLineAddForm shoppingCartLineAddForm,HttpServletRequest request,HttpServletResponse response);
+
+    //------------------------------------------------------------------------------------------
 
     /**
      * 更新指定的购物车行<code>shoppingcartLineId</code>的数量<code>count</code>.
@@ -322,6 +326,8 @@ public interface ShoppingcartResolver{
      */
     ShoppingcartResult updateShoppingCartCount(MemberDetails memberDetails,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response);
 
+    //------------------------------------------------------------------------------------------
+
     /**
      * 删除某个用户的某个特定 <code>shoppingcartLineId</code> 的购物车行.
      *
@@ -337,6 +343,36 @@ public interface ShoppingcartResolver{
      *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult deleteShoppingCartLine(MemberDetails memberDetails,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response);
+
+    /**
+     * 删除某个用户的某个特定 <code>shoppingcartLineIds</code> 的一批购物车行.
+     *
+     * @param memberDetails
+     *            memberDetails,通常实现只需要使用memberid,传入memberDetails一来便于controller调用,二来可能实现类需要记录一些日志,可以用到其他字段
+     * @param shoppingcartLineIds
+     *            批量指定的购物车行id,以前可能直接通过skuid来进行操作,现在用户的购物车可能相同的skuid存在不同的购物车行里面(比如bundle)
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @return 如果成功 返回 {@link ShoppingcartResult#SUCCESS},<br>
+     *         其他 返回 {@link ShoppingcartResult}其他枚举
+     * @since 5.3.2.14
+     */
+    ShoppingcartResult deleteShoppingCartLine(MemberDetails memberDetails,Long[] shoppingcartLineIds,HttpServletRequest request,HttpServletResponse response);
+
+    //------------------------------------------------------------------------------------------
+    /**
+     * 清空购物车.
+     * 
+     * @param memberDetails
+     * @param request
+     * @param response
+     * @return
+     * @since 5.3.2.14
+     */
+    ShoppingcartResult clearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
+    //------------------------------------------------------------------------------------------
 
     /**
      * 切换指定购物车行的选中状态.
@@ -402,4 +438,5 @@ public interface ShoppingcartResolver{
      *         其他 返回 {@link ShoppingcartResult}其他枚举
      */
     ShoppingcartResult toggleAllShoppingCartLineCheckStatus(MemberDetails memberDetails,boolean checkStatus,HttpServletRequest request,HttpServletResponse response);
+
 }

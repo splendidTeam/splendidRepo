@@ -45,9 +45,11 @@ import static com.feilong.core.util.CollectionsUtil.getPropertyValueList;
 @Component("memberShoppingcartResolver")
 public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
 
+    /**  */
     @Autowired
     private SdkShoppingCartDeleteManager sdkShoppingCartDeleteManager;
 
+    /**  */
     @Autowired
     private SdkShoppingCartAddManager sdkShoppingCartAddManager;
 
@@ -55,6 +57,7 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Autowired
     private SdkShoppingCartUpdateManager sdkShoppingCartUpdateManager;
 
+    /**  */
     @Autowired
     private SdkShoppingCartQueryManager sdkShoppingCartQueryManager;
 
@@ -99,14 +102,12 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doDeleteShoppingCartLine(com.baozun.nebula.web.
-     * MemberDetails, java.util.List, com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand,
-     * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.AbstractShoppingcartResolver#doDeleteShoppingCartLine(com.baozun.nebula.web.MemberDetails, java.util.List, java.lang.Long[], javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response){
-        sdkShoppingCartDeleteManager.deleteShoppingCartLine(memberDetails.getGroupId(), currentLine.getId());
+    protected ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Long[] shoppingcartLineIds,HttpServletRequest request,HttpServletResponse response){
+        sdkShoppingCartDeleteManager.deleteShoppingCartLine(memberDetails.getGroupId(), shoppingcartLineIds);
         return null;
     }
 
@@ -141,6 +142,17 @@ public class MemberShoppingcartResolver extends AbstractShoppingcartResolver{
     @Override
     protected ShoppingcartResult doBatchUpdateShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,Map<Long, Integer> shoppingcartLineIdAndCountMap,HttpServletRequest request,HttpServletResponse response){
         sdkShoppingCartUpdateManager.updateCartLineQuantity(memberDetails.getGroupId(), shoppingcartLineIdAndCountMap);
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#clearShoppingCartLine(com.baozun.nebula.web.MemberDetails, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult doClearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
+        // TODO Auto-generated method stub
         return null;
     }
 }

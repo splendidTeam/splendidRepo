@@ -32,6 +32,8 @@ import com.baozun.nebula.model.shoppingcart.ShoppingCartLinePackageInfo;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.packageinfo.PackageInfoManager;
 
+import static com.feilong.core.bean.ConvertUtil.toArray;
+
 /**
  * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
@@ -41,6 +43,7 @@ import com.baozun.nebula.sdk.manager.packageinfo.PackageInfoManager;
 @Service("shoppingCartLinePackageInfoManager")
 public class ShoppingCartLinePackageInfoManagerImpl implements ShoppingCartLinePackageInfoManager{
 
+    /**  */
     private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingCartLinePackageInfoManagerImpl.class);
 
     /**  */
@@ -92,12 +95,23 @@ public class ShoppingCartLinePackageInfoManagerImpl implements ShoppingCartLineP
      */
     @Override
     public void deleteByShoppingCartLineId(Long shoppingCartLineId){
-        Validate.notNull(shoppingCartLineId, "shoppingCartLineId can't be null!");
+        deleteByShoppingCartLineIds(toArray(shoppingCartLineId));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.sdk.manager.shoppingcart.ShoppingCartLinePackageInfoManager#deleteByShoppingCartLineIds(java.lang.Long[])
+     */
+    @Override
+    public void deleteByShoppingCartLineIds(Long[] shoppingCartLineIds){
+        Validate.notEmpty(shoppingCartLineIds, "shoppingCartLineIds can't be null!");
+        Validate.noNullElements(shoppingCartLineIds, "shoppingCartLineIds can't has empty element!");
 
         //如果结果是0 表示没有对应的关系
-        //避免先 查询 带来的并发影响
+        //避免先 查询带来的并发影响
 
         //结果可能是多个对应关系 >=1
-        shoppingCartLinePackageInfoDao.deleteByShoppingCartLineId(shoppingCartLineId);
+        shoppingCartLinePackageInfoDao.deleteByShoppingCartLineIds(shoppingCartLineIds);
     }
 }

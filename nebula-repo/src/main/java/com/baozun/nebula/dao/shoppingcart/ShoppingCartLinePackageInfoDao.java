@@ -51,4 +51,14 @@ public interface ShoppingCartLinePackageInfoDao extends GenericEntityDao<Shoppin
      */
     @NativeUpdate
     Integer deleteByShoppingCartLineId(@QueryParam("shoppingCartLineId") Long shoppingCartLineId);
+
+    /**
+     * 基于shoppingCartLineIds 删除 对应的包装信息.
+     * 
+     * @param shoppingCartLineIds
+     * @return
+     * @since 5.3.2.14
+     */
+    @NativeUpdate
+    Integer deleteByShoppingCartLineIds(@QueryParam("shoppingCartLineIds") Long[] shoppingCartLineIds);
 }

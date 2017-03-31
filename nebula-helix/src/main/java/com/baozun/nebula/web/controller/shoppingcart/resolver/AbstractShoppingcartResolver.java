@@ -18,6 +18,7 @@ package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
+import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_SIZE_NOT_EXPECT;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SUCCESS;
 
 import java.util.ArrayList;
@@ -48,9 +49,9 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineU
 import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toArray;
 import static com.feilong.core.bean.ConvertUtil.toList;
 import static com.feilong.core.lang.ObjectUtil.defaultIfNullOrEmpty;
-import static com.feilong.core.util.CollectionsUtil.find;
 import static com.feilong.core.util.CollectionsUtil.select;
 
 /**
@@ -154,18 +155,41 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
      */
     @Override
     public ShoppingcartResult deleteShoppingCartLine(MemberDetails memberDetails,Long shoppingcartLineId,HttpServletRequest request,HttpServletResponse response){
+        Validate.notNull(shoppingcartLineId, "shoppingcartLineId can't be null!");
+        return deleteShoppingCartLine(memberDetails, toArray(shoppingcartLineId), request, response);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#deleteShoppingCartLine(com.baozun.nebula.web.MemberDetails, java.lang.Long[], javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult deleteShoppingCartLine(MemberDetails memberDetails,Long[] shoppingcartLineIds,HttpServletRequest request,HttpServletResponse response){
+        Validate.notEmpty(shoppingcartLineIds, "shoppingcartLineIds can't be null/empty!");
+
+        //----------------------------------------------------------------------------------------
+
         // 获取购物车行信息
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = getShoppingCartLineCommandList(memberDetails, request);
         List<ShoppingCartLineCommand> mainlines = ShoppingCartUtil.getMainShoppingCartLineCommandList(shoppingCartLineCommandList);
 
-        ShoppingCartLineCommand currentShoppingCartLineCommand = find(mainlines, "id", shoppingcartLineId);
-        if (isNullOrEmpty(currentShoppingCartLineCommand)){
+        //----------------------------------------------------------------------------------------
+
+        List<ShoppingCartLineCommand> selectWillDeleteLines = select(mainlines, "id", shoppingcartLineIds);
+        if (isNullOrEmpty(selectWillDeleteLines)){
             return SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
-        shoppingCartLineCommandList = CollectionsUtil.remove(shoppingCartLineCommandList, currentShoppingCartLineCommand);
+        //可能重复提交, 或者其他窗口,或者其他浏览器中已经删除, 此时最好让用户刷新下界面 重新选择删除
+        if (selectWillDeleteLines.size() != shoppingcartLineIds.length){
+            return SHOPPING_CART_LINE_SIZE_NOT_EXPECT;
+        }
 
-        ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(memberDetails, shoppingCartLineCommandList, currentShoppingCartLineCommand, request, response);
+        //----------------------------------------------------------------------------------------
+        shoppingCartLineCommandList = CollectionsUtil.removeAll(shoppingCartLineCommandList, selectWillDeleteLines);
+
+        ShoppingcartResult deleteShoppingCartResult = doDeleteShoppingCartLine(memberDetails, shoppingCartLineCommandList, shoppingcartLineIds, request, response);
 
         if (null != deleteShoppingCartResult){
             return deleteShoppingCartResult;
@@ -175,7 +199,35 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         return SUCCESS;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResolver#clearShoppingCartLine(com.baozun.nebula.web.MemberDetails, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    public ShoppingcartResult clearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response){
+        ShoppingcartResult clearShoppingCartResult = doClearShoppingCartLine(memberDetails, request, response);
+
+        if (null != clearShoppingCartResult){
+            return clearShoppingCartResult;
+        }
+
+        afterOperateShoppingCart(memberDetails, null, request, response);
+        return SUCCESS;
+    }
+
     //**************************************************************************************
+
+    /**
+     * 处理清空.
+     * 
+     * @param memberDetails
+     * @param request
+     * @param response
+     * @return
+     * @since 5.3.2.14
+     */
+    protected abstract ShoppingcartResult doClearShoppingCartLine(MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response);
 
     /*
      * (non-Javadoc)
@@ -377,21 +429,27 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
     protected abstract ShoppingcartResult doAddShoppingCart(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response);
 
     /**
-     * 每个实现类具体的实现.
+     * 每个实现类具体的删除实现.
      *
      * @param memberDetails
      *            the member details
      * @param shoppingCartLineCommandList
-     *            用户所有的购物车list
-     * @param currentLine
-     *            需要被操作的行
+     *            用户所有的购物车list(已经剔除了删除之后的,比如便于游客cookie 直接操作)
+     * @param shoppingcartLineIds
+     *            需要被删除的行
      * @param request
      *            the request
      * @param response
      *            the response
      * @return 如果操作过程中没有错,那么返回null
+     * @since 5.3.2.14
      */
-    protected abstract ShoppingcartResult doDeleteShoppingCartLine(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLineCommandList,ShoppingCartLineCommand currentLine,HttpServletRequest request,HttpServletResponse response);
+    protected abstract ShoppingcartResult doDeleteShoppingCartLine(
+                    MemberDetails memberDetails,//
+                    List<ShoppingCartLineCommand> shoppingCartLineCommandList,
+                    Long[] shoppingcartLineIds,
+                    HttpServletRequest request,
+                    HttpServletResponse response);
 
     /**
      * Do select shopping cart line.

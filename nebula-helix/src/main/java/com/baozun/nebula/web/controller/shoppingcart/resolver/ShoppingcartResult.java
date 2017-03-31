@@ -57,12 +57,17 @@ public enum ShoppingcartResult{
     /** 超过库存数. */
     MAX_THAN_INVENTORY,
 
+    // ******************删除*************************************************
+
+    /** 基于 shoppingcart lines 查找SHOPPING_CART_LINE_COMMANDs 的大小和预期不匹配 可能已经被删掉了 （比如 打开了双窗口）. */
+    SHOPPING_CART_LINE_SIZE_NOT_EXPECT,
+
     // ******************修改*************************************************
 
     /** 基于 shoppingcart line 查找SHOPPING_CART_LINE_COMMAND 可能已经被删掉了 （比如 打开了双窗口）. */
     SHOPPING_CART_LINE_COMMAND_NOT_FOUND,
 
     /** 数据库层操作失败. */
-    OPERATE_ERROR
+    OPERATE_ERROR;
 
 }

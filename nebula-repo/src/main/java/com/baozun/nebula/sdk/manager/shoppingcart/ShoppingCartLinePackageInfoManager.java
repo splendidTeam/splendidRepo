@@ -37,6 +37,15 @@ public interface ShoppingCartLinePackageInfoManager{
     void deleteByShoppingCartLineId(Long shoppingCartLineId);
 
     /**
+     * 基于shoppingCartLineIds 删除 对应的包装信息.
+     * 
+     * @param shoppingCartLineIds
+     *            批量删除
+     * @since 5.3.2.14
+     */
+    void deleteByShoppingCartLineIds(Long[] shoppingCartLineIds);
+
+    /**
      * 保存包装信息.
      *
      * @param shoppingCartLineId

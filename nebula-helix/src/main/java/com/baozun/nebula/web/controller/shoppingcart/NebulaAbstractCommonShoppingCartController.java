@@ -211,6 +211,58 @@ public class NebulaAbstractCommonShoppingCartController extends NebulaAbstractSh
         return toNebulaReturnResult(shoppingcartResult);
     }
 
+    /**
+     * 删除购物车行.
+     * <p>
+     * 注意,此处参数设计为shoppingcartLineId 而不是 skuid,因为将来会出现 一个用户购物车里面会出现相同的sku,
+     * 
+     * <br>
+     * 比如一个属于bundle 一个属于单买的;或者 一个是购买的, 一个属于赠品;将来需要区分
+     * 
+     * <br>
+     * <span style="color:red">服务端必须同时拿shoppingcartLineId和groupId做参数,否则可能会出现安全漏洞</span>
+     * </p>
+     *
+     * @param memberDetails
+     *            the member details
+     * @param shoppingcartLineIds
+     *            the shoppingcartline id
+     * @param request
+     *            the request
+     * @param response
+     *            the response
+     * @param model
+     *            the model
+     * @return 如果操作成功返回 {@link DefaultReturnResult#SUCCESS},否则会基于{@link ShoppingcartResult} 构造 {@link DefaultReturnResult} 并返回
+     * @RequestMapping(value = "/shoppingcart/batchdelete", method =RequestMethod.POST)
+     */
+    public NebulaReturnResult batchDeleteShoppingCartLine(
+                    @LoginMember MemberDetails memberDetails,
+                    @RequestParam(value = "shoppingcartLineIds",required = true) Long[] shoppingcartLineIds,
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    @SuppressWarnings("unused") Model model){
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.deleteShoppingCartLine(memberDetails, shoppingcartLineIds, request, response);
+        return toNebulaReturnResult(shoppingcartResult);
+    }
+
+    /**
+     * 清空购物车.
+     * 
+     * @param memberDetails
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     * @since 5.3.2.14
+     */
+    public NebulaReturnResult clearShoppingCartLine(@LoginMember MemberDetails memberDetails,HttpServletRequest request,HttpServletResponse response,@SuppressWarnings("unused") Model model){
+        ShoppingcartResolver shoppingcartResolver = shoppingcartFactory.getShoppingcartResolver(memberDetails);
+        ShoppingcartResult shoppingcartResult = shoppingcartResolver.clearShoppingCartLine(memberDetails, request, response);
+        return toNebulaReturnResult(shoppingcartResult);
+    }
+
     //************************************选中不选中**********************************************************
     /**
      * 修改用户的购物车选中状态.

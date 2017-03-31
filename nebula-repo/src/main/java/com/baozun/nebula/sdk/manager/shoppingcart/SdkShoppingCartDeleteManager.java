@@ -28,6 +28,14 @@ import com.baozun.nebula.manager.BaseManager;
 public interface SdkShoppingCartDeleteManager extends BaseManager{
 
     /**
+     * 清空购物车.
+     * 
+     * @param memberId
+     * @since 5.3.2.14
+     */
+    void clearShoppingCart(Long memberId);
+
+    /**
      * 删除指定用户 memberId 的指定购物车行 shoppingCartLineId.
      * 
      * @param memberId
@@ -38,4 +46,17 @@ public interface SdkShoppingCartDeleteManager extends BaseManager{
      *             在sql操作返回的影响行数不是期待的结果,将会抛出异常
      */
     void deleteShoppingCartLine(Long memberId,Long shoppingCartLineId) throws NativeUpdateRowCountNotEqualException;
+
+    /**
+     * 删除指定用户 memberId 的指定购物车行 shoppingCartLineIds.
+     * 
+     * @param memberId
+     *            指定用户
+     * @param shoppingCartLineIds
+     *            指定的购物车行
+     * @throws NativeUpdateRowCountNotEqualException
+     *             在sql操作返回的影响行数不是期待的结果,将会抛出异常
+     * @since 5.3.2.14
+     */
+    void deleteShoppingCartLine(Long memberId,Long[] shoppingCartLineIds) throws NativeUpdateRowCountNotEqualException;
 }

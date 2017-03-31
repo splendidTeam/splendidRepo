@@ -87,12 +87,6 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
     @NativeUpdate
     Integer addCartLineQuantity(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode,@QueryParam("quantity") Integer quantity);
 
-    @NativeUpdate
-    Integer deleteByMemberId(@QueryParam("memberId") Long memberId);
-
-    @NativeUpdate
-    Integer deleteByExtentionCodeAndMemberId(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode);
-
     /**
      * 更改购物车行的的选中不选中状态.
      * 
@@ -159,14 +153,6 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
     Integer findShopCartLineCountByMemberId(@QueryParam("memberId") Long memberId,@QueryParam("settlementState") Integer settlementState);
 
     /**
-     * @param memberId
-     * @param shoppingCartLineId
-     * @return
-     */
-    @NativeUpdate
-    Integer deleteByCartLineIdAndMemberId(@QueryParam("memberId") Long memberId,@QueryParam("shoppingCartLineId") Long shoppingCartLineId);
-
-    /**
      * 根据购物车行修改
      * 
      * @param userId
@@ -216,6 +202,7 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
     @NativeUpdate
     void updateCartLinePromotionInfo(@QueryParam("id") Long id,@QueryParam("lineGroup") Long lineGroup,@QueryParam("gift") boolean gift,@QueryParam("promotionId") Long promotionId);
 
+    //--------删除------------------------------------------------------------------
     /**
      * 通过用户ID和活动ID删除用户已选中的赠品行
      * 
@@ -224,4 +211,32 @@ public interface SdkShoppingCartLineDao extends GenericEntityDao<ShoppingCartLin
      */
     @NativeUpdate
     void deleteGiftLineByMemberIdAndPromotionId(@QueryParam("memberId") Long memberId,@QueryParam("promotionId") Long promotionId);
+
+    @NativeUpdate
+    Integer deleteByMemberId(@QueryParam("memberId") Long memberId);
+
+    @NativeUpdate
+    Integer deleteByExtentionCodeAndMemberId(@QueryParam("memberId") Long memberId,@QueryParam("extentionCode") String extentionCode);
+
+    /**
+     * @param memberId
+     * @param shoppingCartLineId
+     * @return
+     */
+    @NativeUpdate
+    Integer deleteByCartLineIdAndMemberId(@QueryParam("memberId") Long memberId,@QueryParam("shoppingCartLineId") Long shoppingCartLineId);
+
+    /**
+     * 删除指定的购物车行(批量).
+     * 
+     * @param memberId
+     *            会员(切记不可少)
+     * @param shoppingCartLineIds
+     *            指定的购物车行
+     * @return
+     * @since 5.3.2.14
+     */
+    @NativeUpdate
+    Integer deleteLines(@QueryParam("memberId") Long memberId,@QueryParam("shoppingCartLineIds") Long[] shoppingCartLineIds);
+
 }

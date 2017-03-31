@@ -179,6 +179,29 @@
 			</value>
 		</constructor-arg>
 	</bean>
+
+
+<!-- 删除指定的购物车行(批量)  since 5.3.2.14-->
+	<bean id="ShoppingCartLine.deleteLines">
+		<description>删除指定的购物车行(批量)</description>
+		<constructor-arg>
+			<value>
+				<![CDATA[  
+					delete from t_sc_shoppingcartline
+					where MEMBER_ID = :memberId
+     
+					and 
+					id in (
+		       		#foreach($cartLineId in $shoppingCartLineIds )
+    					$cartLineId,
+					 #end
+		       		 -1)
+                 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+ 
+ 
 <!-- 修改购物车行的选中状态 -->
 	<bean id="ShoppingCartLine.updateCartLineSettlementState" class="loxia.dao.support.DynamicQueryHolder">
 		<description>修改购物车行的选中状态</description>
