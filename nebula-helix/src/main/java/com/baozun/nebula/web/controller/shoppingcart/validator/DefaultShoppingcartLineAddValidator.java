@@ -21,7 +21,6 @@ import static com.baozun.nebula.web.controller.shoppingcart.resolver.Shoppingcar
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
@@ -30,17 +29,14 @@ import org.springframework.stereotype.Component;
 
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLinePackageInfoCommand;
 import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameLineExtractor;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
-import com.baozun.nebula.web.constants.Constants;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartLineCommandBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
-
-import static com.feilong.core.util.CollectionsUtil.collect;
 
 /**
  * The Class DefaultShoppingcartLineAddValidator.
@@ -54,6 +50,9 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
     /** The sdk sku manager. */
     @Autowired
     private SdkSkuManager sdkSkuManager;
+
+    @Autowired
+    private ShoppingCartLineCommandBuilder shoppingCartLineCommandBuilder;
 
     /** 购物车添加的时候相同行提取器. */
     @Autowired
@@ -130,7 +129,7 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
             toBeOperatedShoppingCartLineCommand.setQuantity(oneLineTotalCount);
         }else{
             // 构造一条 塞进去
-            ShoppingCartLineCommand shoppingCartLineCommand = buildShoppingCartLineCommand(shoppingCartLineAddForm, sku.getOutid());
+            ShoppingCartLineCommand shoppingCartLineCommand = shoppingCartLineCommandBuilder.build(shoppingCartLineAddForm, sku.getOutid());
             shoppingCartLineCommandList.add(shoppingCartLineCommand);
 
         }
@@ -141,30 +140,4 @@ public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLin
         }
         return null;
     }
-
-    //------------------------------------------------------------------------------------------------
-
-    /**
-     * 转换为ShoppingCartLineCommand对象.
-     *
-     * @param shoppingCartLineAddForm
-     *            购物车添加表单
-     * @param extentionCode
-     *            extentionCode
-     * @return the shopping cart line command
-     * @since 5.3.2.13
-     */
-    private static ShoppingCartLineCommand buildShoppingCartLineCommand(ShoppingCartLineAddForm shoppingCartLineAddForm,String extentionCode){
-        ShoppingCartLineCommand shoppingCartLineCommand = new ShoppingCartLineCommand();
-        shoppingCartLineCommand.setSkuId(shoppingCartLineAddForm.getSkuId());
-        shoppingCartLineCommand.setExtentionCode(extentionCode);
-        shoppingCartLineCommand.setQuantity(shoppingCartLineAddForm.getCount());
-
-        shoppingCartLineCommand.setShoppingCartLinePackageInfoCommandList(collect(shoppingCartLineAddForm.getPackageInfoFormList(), ShoppingCartLinePackageInfoCommand.class));
-
-        shoppingCartLineCommand.setCreateTime(new Date());
-        shoppingCartLineCommand.setSettlementState(Constants.CHECKED_CHOOSE_STATE);
-        return shoppingCartLineCommand;
-    }
-
 }
