@@ -43,9 +43,9 @@ import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddFor
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingCartInventoryValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineAddValidator;
 import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
-import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineUpdateValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.add.ShoppingcartLineAddValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.update.ShoppingcartLineUpdateValidator;
 import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.Validator.isNullOrEmpty;

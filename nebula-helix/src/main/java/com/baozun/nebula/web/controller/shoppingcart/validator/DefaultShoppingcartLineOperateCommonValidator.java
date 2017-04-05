@@ -50,10 +50,10 @@ import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND
  * @since 5.3.1
  */
 @Component("shoppingcartLineOperateCommonValidator")
-public class ShoppingcartLineOperateCommonValidatorImpl implements ShoppingcartLineOperateCommonValidator{
+public class DefaultShoppingcartLineOperateCommonValidator implements ShoppingcartLineOperateCommonValidator{
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingcartLineOperateCommonValidatorImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultShoppingcartLineOperateCommonValidator.class);
 
     /** The sdk item manager. */
     @Autowired

@@ -14,53 +14,37 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
+package com.baozun.nebula.web.controller.shoppingcart.validator.update;
 
 import java.util.List;
 
-import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
-import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
 
 /**
- * 修改购物车行的校验.
- *
+ * 更新购物车行 校验器对应的可定制化得配置.
+ * 
+ * <p>
+ * 比如 在修改购物车行的时候,默认都是需要验证被修改行的库存,以及所有行相同sku的库存,<br>
+ * 但是 gucci有需求 <a href="http://jira.baozun.cn/browse/NB-509?filter=-1">不需要校验库存</a>,这时,你可以通过实现 ShoppingcartLineUpdateValidatorConfigBuilder 接口来构造 ShoppingcartLineUpdateValidatorConfig 来控制
+ * </p>
+ * 
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
- * @since 5.3.2.3
+ * @since 5.3.2.14
  */
-public interface ShoppingcartLineUpdateValidator{
+public interface ShoppingcartLineUpdateValidatorConfigBuilder{
 
     /**
-     * 修改购物车的校验(校验成功的话,会同时操作修改数据,比如可能会合并内存购物车行对象).
      * 
-     * <h3>说明:</h3>
-     * <blockquote>
-     * <ol>
-     * <li>如果 shoppingCartLineCommandList 中找不到 id 值是 shoppingcartLineId的行,那么返回 {@link ShoppingcartResult#SHOPPING_CART_LINE_COMMAND_NOT_FOUND}</li>
-     * <li>进行 sku 校验{@link ShoppingcartLineOperateCommonValidator#validate(Sku, Integer)}</li>
-     * <li>单行最大数量 校验</li>
-     * <li>如果需要合并购物车行,那么校验 count和需要被合并行count的总和</li>
-     * <li>库存校验</li>
-     * </ol>
-     * </blockquote>
-     * 
-     * <p>
-     * 注意:此接口可能含融合操作
-     * </p>
      *
      * @param memberDetails
-     *            the member details
      * @param shoppingCartLineCommandList
-     *            the shopping cart line command list
      * @param shoppingcartLineId
-     *            the shoppingcart line id
      * @param shoppingCartLineUpdateSkuForm
-     *            the shopping cart line update sku form
-     * @return 如果校验没有问题,返回null,否则返回 {@link ShoppingcartResult}
+     * @return
      */
-    ShoppingcartResult validator(
+    ShoppingcartLineUpdateValidatorConfig build(
                     MemberDetails memberDetails,//
                     List<ShoppingCartLineCommand> shoppingCartLineCommandList,
                     Long shoppingcartLineId,

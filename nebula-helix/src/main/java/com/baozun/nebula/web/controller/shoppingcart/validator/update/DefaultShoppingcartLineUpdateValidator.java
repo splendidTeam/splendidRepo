@@ -14,7 +14,7 @@
  * THIS SOFTWARE OR ITS DERIVATIVES.
  *
  */
-package com.baozun.nebula.web.controller.shoppingcart.validator;
+package com.baozun.nebula.web.controller.shoppingcart.validator.update;
 
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.ONE_LINE_MAX_THAN_COUNT;
@@ -38,6 +38,10 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartUpdateD
 import com.baozun.nebula.web.controller.shoppingcart.form.PackageInfoForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult;
+import com.baozun.nebula.web.controller.shoppingcart.validator.AbstractShoppingcartLineOperateValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineOperateCommonValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLinePackageInfoFormListValidator;
+import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartOneLineMaxQuantityValidator;
 
 import static com.feilong.core.util.CollectionsUtil.collect;
 import static com.feilong.core.util.CollectionsUtil.find;
@@ -67,6 +71,10 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
     @Autowired
     private ShoppingcartUpdateDetermineSameLineElementsBuilder shoppingcartUpdateDetermineSameLineElementsBuilder;
 
+    /**  */
+    @Autowired(required = false)
+    private ShoppingcartLineUpdateValidatorConfigBuilder shoppingcartLineUpdateValidatorConfigBuilder;
+
     /** 购物车修改的时候相同行提取器. */
     @Autowired
     private ShoppingCartUpdateNeedCombinedLineExtractor shoppingCartUpdateNeedCombinedLineExtractor;
@@ -85,6 +93,9 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
                     ShoppingCartLineUpdateSkuForm shoppingCartLineUpdateSkuForm){
         Validate.notNull(shoppingcartLineId, "shoppingcartLineId can't be null!");
         Validate.notNull(shoppingCartLineUpdateSkuForm, "shoppingCartLineUpdateSkuForm can't be null!");
+
+        ShoppingcartLineUpdateValidatorConfigBuilder useShoppingcartLineUpdateValidatorConfigBuilder = defaultIfNull(shoppingcartLineUpdateValidatorConfigBuilder, new DefaultShoppingcartLineUpdateValidatorConfigBuilder());
+        ShoppingcartLineUpdateValidatorConfig shoppingcartLineUpdateValidatorConfig = useShoppingcartLineUpdateValidatorConfigBuilder.build(memberDetails, shoppingCartLineCommandList, shoppingcartLineId, shoppingCartLineUpdateSkuForm);
 
         //--------------包装信息校验-------------------------------------------------------------------------
         shoppingcartLinePackageInfoFormListValidator.validator(shoppingCartLineUpdateSkuForm.getPackageInfoFormList());
@@ -131,7 +142,8 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
             updateCurrentShoppingCartLineCommand(currentShoppingCartLineCommand, shoppingCartLineUpdateSkuForm, currentSku);
         }else{
             int totalQuantity = needCombinedShoppingCartLineCommand.getQuantity() + count;
-            if (useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, currentSkuId, totalQuantity)){
+            //校验单行库存
+            if (shoppingcartLineUpdateValidatorConfig.getIsCheckSingleLineSkuInventory() && useShoppingcartOneLineMaxCountValidator.isGreaterThanMaxQuantity(memberDetails, currentSkuId, totalQuantity)){
                 return ONE_LINE_MAX_THAN_COUNT_AFTER_MERGED;
             }
             needCombinedShoppingCartLineCommand.setQuantity(totalQuantity);
@@ -142,8 +154,8 @@ public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcart
 
         //----------------------------------------------------
 
-        //2.4 库存校验
-        if (shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, currentSkuId)){
+        //2.4 相同的sku库存校验
+        if (shoppingcartLineUpdateValidatorConfig.getIsCheckTotalLineSameSkuInventory() && shoppingCartInventoryValidator.isMoreThanInventory(shoppingCartLineCommandList, currentSkuId)){
             return MAX_THAN_INVENTORY;
         }
 
