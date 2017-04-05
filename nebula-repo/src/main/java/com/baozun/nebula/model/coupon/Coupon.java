@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -55,6 +56,7 @@ public class Coupon extends BaseModel{
 	}
 	
 	@Column(name="CARD_NO")
+    @Index(name = "IDX_ACT_CARD_CARD_NO")
 	public String getCardNo() {
 		return cardNo;
 	}
@@ -79,6 +81,7 @@ public class Coupon extends BaseModel{
 	}
 	
 	@Column(name="CARD_TYPE_ID")
+    @Index(name = "IDX_ACT_CARD_CARD_TYPE_ID")
 	public Long getCardTypeId() {
 		return cardTypeId;
 	}
@@ -87,6 +90,7 @@ public class Coupon extends BaseModel{
 	}
 	
 	@Column(name="MEMBER_ID")
+    @Index(name = "IDX_ACT_CARD_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}

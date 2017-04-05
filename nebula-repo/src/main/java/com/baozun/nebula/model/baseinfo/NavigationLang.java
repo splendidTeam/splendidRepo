@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -55,6 +56,7 @@ public class NavigationLang extends BaseModel{
 	private String				extention;
 
 	@Column(name = "LANG")
+    @Index(name = "IDX_NAVIGATION_LANG_LANG")
 	public String getLang(){
 		return lang;
 	}
@@ -76,6 +78,7 @@ public class NavigationLang extends BaseModel{
 	}
 
 	@Column(name = "NAVIGATION_ID")
+    @Index(name = "IDX_NAVIGATION_LANG_NAVIGATION_ID")
 	public Long getNavigationId(){
 		return navigationId;
 	}

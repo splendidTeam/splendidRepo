@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -168,6 +169,7 @@ public class AreaDeliveryMode extends BaseModel {
 	 * @return the areaId
 	 */
 	@Column(name = "AREA_ID")
+    @Index(name = "IDX_AREA_DELIVERY_MODE_AREA_ID")
 	public Long getAreaId() {
 		return areaId;
 	}
