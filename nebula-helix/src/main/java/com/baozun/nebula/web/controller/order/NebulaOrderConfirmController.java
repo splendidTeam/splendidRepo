@@ -21,7 +21,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,13 +30,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.command.ContactCommand;
-import com.baozun.nebula.command.delivery.ContactDeliveryCommand;
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
-import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
-import com.baozun.nebula.sdk.manager.SdkMemberManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
@@ -46,6 +42,7 @@ import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
 import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
+import com.baozun.nebula.web.controller.order.builder.ContactCommandListBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderConfirmViewCommandBuilder;
 import com.baozun.nebula.web.controller.order.builder.ShoppingCartCommandShowBuilder;
 import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
@@ -142,10 +139,6 @@ public class NebulaOrderConfirmController extends BaseController{
     @Qualifier("shoppingcartViewCommandConverter")
     private ShoppingcartViewCommandConverter shoppingcartViewCommandConverter;
 
-    /** The sdk member manager. */
-    @Autowired
-    private SdkMemberManager sdkMemberManager;
-
     /** The shoppingcart factory. */
     @Autowired
     private ShoppingcartFactory shoppingcartFactory;
@@ -162,10 +155,6 @@ public class NebulaOrderConfirmController extends BaseController{
     @Autowired(required = false)
     private OrderConfirmBeforeHandler confirmBeforeHandler;
 
-    /** The delivery area manager. */
-    @Autowired
-    private SdkDeliveryAreaManager deliveryAreaManager;
-
     @Autowired
     private OrderConfirmViewCommandBuilder orderConfirmViewCommandBuilder;
 
@@ -174,6 +163,9 @@ public class NebulaOrderConfirmController extends BaseController{
 
     @Autowired
     private CalcFreightCommandBuilder calcFreightCommandBuilder;
+
+    @Autowired
+    private ContactCommandListBuilder contactCommandListBuilder;
 
     /**
      * 显示订单结算页面.
@@ -193,7 +185,7 @@ public class NebulaOrderConfirmController extends BaseController{
      * @RequestMapping(value = "/transaction/check", method = RequestMethod.GET)
      */
     public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,HttpServletResponse response,Model model){
-        List<ContactCommand> contactCommandList = getContactCommandList(memberDetails);
+        List<ContactCommand> contactCommandList = contactCommandListBuilder.build(memberDetails);
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 
         if (null != confirmBeforeHandler){
@@ -205,6 +197,8 @@ public class NebulaOrderConfirmController extends BaseController{
         model.addAttribute("orderConfirmViewCommand", orderConfirmViewCommand);
         return "transaction.check";
     }
+
+    //--------------------------------------------------------------------------------------------
 
     /**
      * Builds the shopping cart command.
@@ -307,38 +301,6 @@ public class NebulaOrderConfirmController extends BaseController{
         //购物车为空，抛出异常
         Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
         return shoppingCartCommand;
-    }
-
-    /**
-     * 获得用户的收货地址列表.
-     *
-     * @param memberDetails
-     *            the member details
-     * @return 如果 <code>memberDetails</code> 是null,返回null<br>
-     *         否则调用 {@link com.baozun.nebula.sdk.manager.SdkMemberManager#findAllContactListByMemberId(Long)
-     *         SdkMemberManager.findAllContactListByMemberId(Long)}
-     */
-    private List<ContactCommand> getContactCommandList(MemberDetails memberDetails){
-        List<ContactCommand> contactCommands = null == memberDetails ? null : sdkMemberManager.findAllContactListByMemberId(memberDetails.getGroupId());
-        if (CollectionUtils.isEmpty(contactCommands)){
-            return null;
-        }
-        for (ContactCommand contactCommand : contactCommands){
-            ContactDeliveryCommand deliveryCommand = deliveryAreaManager.findContactDeliveryByDeliveryAreaCode(getDeliveryAreaCode(contactCommand));
-            contactCommand.setContactDeliveryCommand(deliveryCommand);
-        }
-        return contactCommands;
-    }
-
-    /**
-     * Gets the delivery area code.
-     *
-     * @param contactCommand
-     *            the contact command
-     * @return the delivery area code
-     */
-    protected String getDeliveryAreaCode(ContactCommand contactCommand){
-        return contactCommand.getAreaId() + "";
     }
 
     //**************************************************************
