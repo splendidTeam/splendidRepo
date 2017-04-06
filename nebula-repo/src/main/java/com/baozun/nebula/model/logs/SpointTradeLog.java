@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 /**
@@ -93,6 +94,7 @@ public class SpointTradeLog{
 	}
 
 	@Column(name = "ORDERID")
+    @Index(name = "IDX_SPOINT_TRADE_ORDERID")
 	public Long getOrderId(){
 		return orderId;
 	}
@@ -111,6 +113,7 @@ public class SpointTradeLog{
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_SPOINT_TRADE_TYPE")
 	public String getType(){
 		return type;
 	}
@@ -120,6 +123,7 @@ public class SpointTradeLog{
 	}
 
 	@Column(name = "STATUS")
+    @Index(name = "IDX_SPOINT_TRADE_STATUS")
 	public String getStatus(){
 		return status;
 	}

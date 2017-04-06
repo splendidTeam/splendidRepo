@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -34,7 +35,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author 何波
  */
 @Entity
-@Table(name = "t_pd_category_lang")
+@Table(name = "T_PD_CATEGORY_LANG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class CategoryLang extends BaseModel{
 
@@ -87,6 +88,7 @@ public class CategoryLang extends BaseModel{
 
 	
 	@Column(name = "CATEGORY_ID")
+    @Index(name = "IDX_CATEGORY_LANG_CATEGORY_ID")
 	public Long getCategoryid() {
 		return categoryid;
 	}

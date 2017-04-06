@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -108,6 +109,7 @@ public class MemberBehaviorStatus extends BaseModel {
 	}
 
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_MEMBER_BEHAVIOR_STATUS_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -117,6 +119,7 @@ public class MemberBehaviorStatus extends BaseModel {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_MEMBER_BEHAVIOR_STATUS_TYPE")
 	public String getType() {
 		return type;
 	}

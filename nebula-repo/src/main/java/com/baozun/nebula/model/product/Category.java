@@ -38,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_category")
+@Table(name = "T_PD_CATEGORY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Category extends BaseModel{
 
@@ -204,6 +204,7 @@ public class Category extends BaseModel{
 	 * @return the 生命周期
 	 */
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_CATEGORY_LIFECYCLE")
 	public Integer getLifecycle(){
 		return lifecycle;
 	}
@@ -223,7 +224,7 @@ public class Category extends BaseModel{
 	 * 
 	 * @return the parentId
 	 */
-	@Index(name = "IDX_Category_parentId")
+	@Index(name = "IDX_CATEGORY_PARENTID")
 	@Column(name = "PARENT_ID")
 	public Long getParentId(){
 		return parentId;

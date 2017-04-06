@@ -26,6 +26,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @date 2015年11月9日 上午10:22:24
  */
 @Entity
-@Table(name = "t_pd_common_property")
+@Table(name = "T_PD_COMMON_PROPERTY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class CommonProperty extends BaseModel {
 
@@ -131,6 +132,7 @@ public class CommonProperty extends BaseModel {
 	 * @return the 名称
 	 */
 	@Column(name = "NAME", length = 100)
+    @Index(name = "IDX_COMMON_PROPERTY_NAME")
 	public String getName() {
 		return name;
 	}
@@ -157,6 +159,7 @@ public class CommonProperty extends BaseModel {
 	}
 
 	@Column(name = "EDITING_TYPE")
+    @Index(name = "IDX_COMMON_PROPERTY_EDITING_TYPE")
 	public Integer getEditingType() {
 		return editingType;
 	}
@@ -214,6 +217,7 @@ public class CommonProperty extends BaseModel {
 	}
 
 	@Column(name = "IS_SALEP_ROP")
+    @Index(name = "IDX_COMMON_PROPERTY_IS_SALEP_ROP")
 	public Boolean getIsSaleProp() {
 		return isSaleProp;
 	}
@@ -223,6 +227,7 @@ public class CommonProperty extends BaseModel {
 	}
 
 	@Column(name = "IS_COLOR_PROP")
+    @Index(name = "IDX_COMMON_PROPERTY_IS_COLOR_PROP")
 	public Boolean getIsColorProp() {
 		return isColorProp;
 	}

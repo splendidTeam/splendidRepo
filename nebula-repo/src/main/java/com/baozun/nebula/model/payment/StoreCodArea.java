@@ -25,6 +25,7 @@ import com.baozun.nebula.model.BaseModel;
  * 
  * @author
  */
+@Deprecated
 public class StoreCodArea extends BaseModel {
 
 	/** serialVersionUID. */

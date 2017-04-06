@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.model.payment;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -27,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -37,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_payWarnningLog")
+@Table(name = "T_SO_PAYWARNNINGLOG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PayWarnningLog extends BaseModel{
 
@@ -133,26 +133,27 @@ public class PayWarnningLog extends BaseModel{
 	}
 
 	@Column(name="PAYSTATE_SHOP")
+    @Index(name = "IDX_PAYWARNNINGLOG_PAYSTATE_SHOP")
 	public String getPaystate_shop() {
 		return paystate_shop;
 	}
-
 
 	public void setPaystate_shop(String paystate_shop) {
 		this.paystate_shop = paystate_shop;
 	}
 
 	@Column(name="PAYSTATE_PAYMENT")
+    @Index(name = "IDX_PAYWARNNINGLOG_PAYSTATE_PAYMENT")
 	public String getPaystate_payment() {
 		return paystate_payment;
 	}
-
 
 	public void setPaystate_payment(String paystate_payment) {
 		this.paystate_payment = paystate_payment;
 	}
 
 	@Column(name="ISSUPPORTQUERY")
+    @Index(name = "IDX_PAYWARNNINGLOG_ISSUPPORTQUERY")
 	public Boolean getIsSupportQuery() {
 		return isSupportQuery;
 	}
@@ -173,10 +174,10 @@ public class PayWarnningLog extends BaseModel{
 	}
 
 	@Column(name="ORDERCODE")
+    @Index(name = "IDX_PAYWARNNINGLOG_ORDERCODE")
 	public String getOrderCode() {
 		return orderCode;
 	}
-
 
 	public void setOrderCode(String orderCode) {
 		this.orderCode = orderCode;

@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -60,6 +61,7 @@ public class MemberFavorites extends BaseModel {
 	}
 
 	@Column(name = "MEMBER_ID")
+    @Index(name = "IDX_MEMBER_FAVORITES_MEMBER_ID")
 	public Long getMemberId() {
 		return memberId;
 	}
@@ -69,6 +71,7 @@ public class MemberFavorites extends BaseModel {
 	}
 
 	@Column(name = "ITEM_ID")
+    @Index(name = "IDX_MEMBER_FAVORITES_ITEM_ID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -107,6 +110,7 @@ public class MemberFavorites extends BaseModel {
 	}
 
 	@Column(name = "SKU_ID")
+    @Index(name = "IDX_MEMBER_FAVORITES_SKU_ID")
 	public Long getSkuId() {
 		return skuId;
 	}

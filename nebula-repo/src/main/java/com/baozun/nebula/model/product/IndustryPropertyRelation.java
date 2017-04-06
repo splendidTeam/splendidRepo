@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 import com.baozun.nebula.model.BaseModel;
 
 /**
@@ -15,7 +17,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author johnny.xia
  */
 @Entity
-@Table(name = "t_pd_industry_property_relation")
+@Table(name = "T_PD_INDUSTRY_PROPERTY_RELATION")
 public class IndustryPropertyRelation extends BaseModel{
 
 
@@ -53,6 +55,7 @@ public class IndustryPropertyRelation extends BaseModel{
 	}
 
 	@Column(name = "INDUSTRY_ID")
+    @Index(name = "IDX_INDUSTRY_PROPERTY_RELATION_INDUSTRY_ID")
 	public Long getIndustryId() {
 		return industryId;
 	}
@@ -62,6 +65,7 @@ public class IndustryPropertyRelation extends BaseModel{
 	}
 
 	@Column(name="PROPERTY_ID")
+    @Index(name = "IDX_INDUSTRY_PROPERTY_RELATION_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}

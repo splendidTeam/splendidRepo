@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -69,6 +70,7 @@ public class SchedulerLog  extends BaseModel {
 		this.id = id;
 	}
 	@Column(name="TASK_ID")
+    @Index(name = "IDX_SCHEDULERLOG_TASK_ID")
 	public Long getTaskId() {
 		return taskId;
 	}
