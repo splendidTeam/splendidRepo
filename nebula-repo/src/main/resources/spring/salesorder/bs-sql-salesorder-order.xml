@@ -1272,4 +1272,51 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	<bean id="SalesOrder.findOrderByMobileOrCode" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单号或者下单时下单者手机号查询订单信息</description>
+		<constructor-arg>
+			<value> <![CDATA[
+		               select o.ID,
+						o.ORDER_TYPE as orderType,
+						o.APPOINT_SHIP_DATE as appointShipDate,
+						o.PAY_TYPE as payType,
+						o.CODE,
+						o.OMS_CODE as omsCode,
+						o.MEMBER_ID as memberId,
+						o.MEMBER_NAME as memberName,
+						o.GUEST_IDENTIFY as guestIdentify,
+						o.QUANTITY ,
+						o.TOTAL ,
+						o.DISCOUNT,
+						o.LOGISTICS_STATUS as logisticsStatus,
+						o.logistics_provider_name as logisticsProviderName,
+						o.FINANCIAL_STATUS as financialStatus,
+						o.PAYMENT,
+						o.SOURCE,
+						o.IP,
+						o.PAYABLE_FREIGHT as payableFreight,
+						o.ACTUAL_FREIGHT  as actualFreight,
+						o.RECEIPT_CODE as receiptCode,
+						o.RECEIPT_TYPE as receiptType,
+						o.RECEIPT_TITLE as receiptTitle,
+						o.RECEIPT_CONTENT as receiptCotent,
+						o.RECEIPT_ADDRESS as receiptAddress,
+						o.RECEIPT_CONSIGNEE as receiptConsignee,
+						o.receipt_telphone as receiptTelphone,
+						o.REMARK,
+						o.TRANS_CODE as transCode,
+						o.MODIFY_TIME as modifyTime,
+						o.CREATE_TIME as createTime 
+						from t_so_salesorder o
+								where 1=1 
+								#if($code)
+									and o.code = :code
+								#end
+								#if($mobile)
+									and o.receipt_telphone = :mobile
+								#end
+			     ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

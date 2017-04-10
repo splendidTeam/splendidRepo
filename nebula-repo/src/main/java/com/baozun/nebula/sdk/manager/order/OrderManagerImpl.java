@@ -163,6 +163,8 @@ public class OrderManagerImpl implements OrderManager{
 
     @Autowired
     private SdkOrderLinePackInfoManager sdkOrderLinePackInfoManager;
+    
+    private SdkOrderDao orderDao;
 
     /*
      * (non-Javadoc)
@@ -963,7 +965,7 @@ public class OrderManagerImpl implements OrderManager{
 	@Override
 	public List<SalesOrderCommand> findOrderByMobileOrCode(String mobile,
 			String code) {
-		List<SalesOrderCommand> orderCommands = salesOrderSquenceDao.findOrderByMobileOrCode(code, mobile);
+		List<SalesOrderCommand> orderCommands = orderDao.findOrderByMobileOrCode(code, mobile);
 		for(SalesOrderCommand command : orderCommands){
 			List<OrderLineCommand> orderLineCommands = sdkOrderLineDao.findOrderDetailList(command.getId());
 			command.setOrderLines(orderLineCommands);
