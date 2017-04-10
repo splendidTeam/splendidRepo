@@ -1259,4 +1259,17 @@
 			</value>
 		</constructor-arg>
 	</bean>
+	<bean id="SalesOrder.findFinishedOrderById" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据订单id判断是不是 已经超过14天收货的订单（当天收货时间算在内 ）</description>
+		<constructor-arg>
+			<value> <![CDATA[
+		               select * from t_so_salesorder so
+								where so.modify_time is not null
+								      and so.id=:orderId
+								      and so.logistics_status=:logisticsStatus
+									  and (now() -so.modify_time)>INTERVAL'14 day'
+			     ]]>
+			</value>
+		</constructor-arg>
+	</bean>
 </beans>

@@ -232,4 +232,10 @@ public interface SdkOrderDao extends GenericEntityDao<SalesOrder, Long>{
         */
       @NativeQuery(model =SimpleOrderCommand.class)
       List<SimpleOrderCommand> findSimpleOrderListByOrderQueryCommand(@QueryParam Map<String, Object> paraMap);
+      
+  	/**
+  	 * 根据订单id判断是不是 已经超过14天收货的订单
+  	 */
+  	@NativeQuery(model = SalesOrder.class)
+  	SalesOrder findFinishedOrderById(@QueryParam("orderId") Long orderId,@QueryParam("logisticsStatus") Integer logisticsStatus);
 }
