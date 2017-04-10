@@ -493,4 +493,15 @@ public interface OrderManager extends BaseManager{
      * @return the all distribution mode
      */
     public List<DistributionMode> getAllDistributionMode();
+    
+	/**
+	 * 
+	 * @Description 根据订单号或者下单时下单者手机号查询订单信息
+	 * @param mobile
+	 * @param code
+	 * @return
+	 * @author <a href="mailto:yaohua.wang@baozun.cn">王耀华</a>
+	 * @version 2016-9-13
+	 */
+	List<SalesOrderCommand> findOrderByMobileOrCode(String mobile,String code);
 }

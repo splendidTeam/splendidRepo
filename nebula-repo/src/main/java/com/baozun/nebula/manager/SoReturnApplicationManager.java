@@ -1,7 +1,17 @@
 package com.baozun.nebula.manager;
 
+import java.util.List;
+import java.util.Map;
+
+import loxia.annotation.QueryParam;
+import loxia.dao.Page;
+import loxia.dao.Pagination;
+import loxia.dao.Sort;
+
+import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
+import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 public interface SoReturnApplicationManager {
@@ -28,5 +38,25 @@ public interface SoReturnApplicationManager {
 	 */
 	public SoReturnApplication findLastApplicationByOrderId(Long orderId);
 	
+	public Pagination<SoReturnApplication> findReturnByQueryMapWithPage(Page page, Sort[] sorts,@QueryParam Map<String, Object> paraMap);
 	
+	/** 查询退换货申请单  退换货applicationid */
+	public SoReturnApplication findByApplicationId(Long id);
+	
+	  /** 客服审核  Status==1退回 ； Status==2 通过 */
+	public SoReturnApplication auditSoReturnApplication(String returnCode,Integer Status,String description,String modifier,String omsCode,String returnAddress) throws Exception ;
+	
+	/**
+	 * 退货信息导出
+	 * @param paraMap
+	 * @return
+	 */
+	public List<OrderReturnCommand> findExpInfo(Sort[] sorts,@QueryParam Map<String, Object> paraMap);
+	
+	
+	/** 新增退换货申请单
+	 * @return */
+	public SoReturnApplication createReturnApplication(SoReturnApplication app, List<SoReturnLine> returnLine,SalesOrderCommand orderCommand) throws Exception;
+	
+
 }
