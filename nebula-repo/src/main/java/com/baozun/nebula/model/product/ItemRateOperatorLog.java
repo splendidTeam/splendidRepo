@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -52,6 +53,7 @@ public class ItemRateOperatorLog extends BaseModel{
 		this.id = id;
 	}
 	@Column(name="TYPE")
+    @Index(name = "IDX_ITEM_RATE_OPERATOR_LOG_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -66,6 +68,7 @@ public class ItemRateOperatorLog extends BaseModel{
 		this.note = note;
 	}
 	@Column(name="OPERATOR_ID")
+    @Index(name = "IDX_ITEM_RATE_OPERATOR_LOG_OPERATOR_ID")
 	public Long getOperatorId() {
 		return operatorId;
 	}
@@ -80,6 +83,7 @@ public class ItemRateOperatorLog extends BaseModel{
 		this.operatorTime = operatorTime;
 	}
 	@Column(name="RATE_ID")
+    @Index(name = "IDX_ITEM_RATE_OPERATOR_LOG_RATE_ID")
 	public Long getRateId() {
 		return rateId;
 	}
@@ -87,9 +91,4 @@ public class ItemRateOperatorLog extends BaseModel{
 		this.rateId = rateId;
 	}
 	
-
-	
-	
-	
-
 }

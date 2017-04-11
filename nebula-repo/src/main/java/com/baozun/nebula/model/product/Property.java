@@ -39,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_property")
+@Table(name = "T_PD_PROPERTY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class Property extends BaseModel{
 
@@ -203,6 +203,7 @@ public class Property extends BaseModel{
 	 * @return the 名称
 	 */
 	@Column(name = "NAME",length = 100)
+    @Index(name = "IDX_PROPERTY_NAME")
 	public String getName(){
 		return name;
 	}
@@ -329,11 +330,13 @@ public class Property extends BaseModel{
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_PROPERTY_LIFECYCLE")
 	public Integer getLifecycle(){
 		return lifecycle;
 	}
 
 	@Column(name = "IS_SALEP_ROP")
+    @Index(name = "IDX_PROPERTY_IS_SALEP_ROP")
 	public Boolean getIsSaleProp(){
 		return isSaleProp;
 	}
@@ -343,6 +346,7 @@ public class Property extends BaseModel{
 	}
 
 	@Column(name = "IS_COLOR_PROP")
+    @Index(name = "IDX_PROPERTY_IS_COLOR_PROP")
 	public Boolean getIsColorProp(){
 		return isColorProp;
 	}

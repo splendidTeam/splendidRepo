@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -37,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_item_image")
+@Table(name = "T_PD_ITEM_IMAGE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemImage extends BaseModel {
 	/** The Constant serialVersionUID. */
@@ -175,6 +176,7 @@ public class ItemImage extends BaseModel {
 		return modifyTime;
 	}
 	@Column(name = "ITEM_ID")
+    @Index(name = "IDX_ITEM_IMAGE_ITEM_ID")
 	public Long getItemId() {
 		return itemId;
 	}
@@ -199,6 +201,7 @@ public class ItemImage extends BaseModel {
 		this.position = position;
 	}
 	@Column(name = "PROPERTY_ID")
+    @Index(name = "IDX_ITEM_IMAGE_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}
@@ -216,6 +219,7 @@ public class ItemImage extends BaseModel {
 	}
 
 	@Column(name = "PROPERTY_VALUE_ID")
+    @Index(name = "IDX_ITEM_IMAGE_PROPERTY_VALUE_ID")
 	public Long getPropertyValueId(){
 		return propertyValueId;
 	}
@@ -225,6 +229,7 @@ public class ItemImage extends BaseModel {
 	}
 
 	@Column(name = "ITEM_PROPERTIES")	
+    @Index(name = "IDX_ITEM_IMAGE_PROPERTY_ITEM_PROPERTIES")
 	public Long getItemProperties(){
 		return itemProperties;
 	}
@@ -235,6 +240,7 @@ public class ItemImage extends BaseModel {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_ITEM_IMAGE_PROPERTY_TYPE")
 	public String getType() {
 		return type;
 	}

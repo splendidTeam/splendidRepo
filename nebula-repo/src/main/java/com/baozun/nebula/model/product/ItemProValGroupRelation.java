@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
+
 import com.baozun.nebula.model.BaseModel;
 
 /**
@@ -16,7 +18,7 @@ import com.baozun.nebula.model.BaseModel;
  *
  */
 @Entity
-@Table(name = "t_pd_itempro_valgroup_reation")
+@Table(name = "T_PD_ITEMPRO_VALGROUP_REATION")
 public class ItemProValGroupRelation extends BaseModel {
 
 	/**
@@ -46,11 +48,13 @@ public class ItemProValGroupRelation extends BaseModel {
 	}
 
 	@Column(name="ITEM_PROPERTY_ID")
+    @Index(name = "IDX_ITEMPRO_VALGROUP_REATION_ITEM_PROPERTY_ID")
 	public Long getItemPropertyId() {
 		return itemPropertyId;
 	}
 
 	@Column(name="PROPERTY_VALUE_GROUP_ID")
+    @Index(name = "IDX_ITEMPRO_VALGROUP_REATION_PROPERTY_VALUE_GROUP_ID")
 	public Long getPropertyValueGroupId() {
 		return propertyValueGroupId;
 	}

@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -23,11 +24,16 @@ import com.baozun.nebula.model.BaseModel;
 *
  */
 @Entity
-@Table(name = "t_pd_item_visibility")
+@Table(name = "T_PD_ITEM_VISIBILITY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemVisibility extends BaseModel {
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 3572601321417820791L;
+
+    /**
 	 * 
 	 */
 	private Long id;
@@ -60,6 +66,7 @@ public class ItemVisibility extends BaseModel {
 	}
 
 	@Column(name = "MEM_FILTER_ID")
+    @Index(name = "IDX_ITEM_VISIBILITY_MEM_FILTER_ID")
 	public Long getMemFilterId() {
 		return memFilterId;
 	}
@@ -69,6 +76,7 @@ public class ItemVisibility extends BaseModel {
 	}
 
 	@Column(name = "ITEM_FILTER_ID")
+    @Index(name = "IDX_ITEM_VISIBILITY_ITEM_FILTER_ID")
 	public Long getItemFilterId() {
 		return itemFilterId;
 	}

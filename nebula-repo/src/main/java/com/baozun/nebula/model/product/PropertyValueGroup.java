@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -21,7 +22,7 @@ import com.baozun.nebula.model.BaseModel;
  *
  */
 @Entity
-@Table(name = "t_pd_property_value_group")
+@Table(name = "T_PD_PROPERTY_VALUE_GROUP")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PropertyValueGroup extends BaseModel{
 
@@ -63,6 +64,7 @@ public class PropertyValueGroup extends BaseModel{
 	}
 
 	@Column(name="PROPERTY_ID")
+	@Index(name = "IDX_PROPERTY_VALUE_GROUP_PROPERTY_ID")
 	public Long getPropertyId() {
 		return propertyId;
 	}
@@ -97,9 +99,5 @@ public class PropertyValueGroup extends BaseModel{
 	public void setVersion(Date version) {
 		this.version = version;
 	}
-	
-	
-	
-	
 	
 }

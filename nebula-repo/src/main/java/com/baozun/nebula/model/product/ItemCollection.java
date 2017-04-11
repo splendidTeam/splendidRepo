@@ -39,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @since 2016年4月13日 下午1:26:23 
  */
 @Entity
-@Table(name = "t_pd_item_collection")
+@Table(name = "T_PD_ITEM_COLLECTION")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemCollection extends BaseModel {
 	private static final long serialVersionUID = 3088013871822587744L;
@@ -102,7 +102,7 @@ public class ItemCollection extends BaseModel {
 		this.type = type;
 	}
 
-	@Index(name = "IDX_ItemCollection_code")
+	@Index(name = "IDX_ITEMCOLLECTION_CODE")
 	@Column(name = "CODE")
 	public String getCode() {
 		return code;

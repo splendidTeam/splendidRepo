@@ -38,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author dianchao.song
  */
 @Entity
-@Table(name = "t_pd_item_category")
+@Table(name = "T_PD_ITEM_CATEGORY")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class ItemCategory extends BaseModel{
 
@@ -157,7 +157,7 @@ public class ItemCategory extends BaseModel{
 	/**
 	 * @return the itemId
 	 */
-	@Index(name = "IDX_ItemCategory_itemId")
+	@Index(name = "IDX_ITEMCATEGORY_ITEMID")
 	@Column(name = "ITEM_ID")
 	public Long getItemId(){
 		return itemId;
@@ -166,7 +166,7 @@ public class ItemCategory extends BaseModel{
 	/**
 	 * @return the categoryId
 	 */
-	@Index(name = "IDX_ItemCategory_categoryId")
+	@Index(name = "IDX_ITEMCATEGORY_CATEGORYID")
 	@Column(name = "CATEGORY_ID")
 	public Long getCategoryId(){
 		return categoryId;
