@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_sc_limit_audience")
+@Table(name = "T_SC_LIMIT_AUDIENCE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class LimitAudience extends BaseModel {
 
@@ -79,6 +80,7 @@ public class LimitAudience extends BaseModel {
 	}
 
 	@Column(name = "LIMIT_ID")
+    @Index(name = "IDX_LIMIT_AUDIENCE_LIMIT_ID")
 	public Long getLimitId() {
 		return limitId;
 	}
@@ -97,6 +99,7 @@ public class LimitAudience extends BaseModel {
 	}
 
 	@Column(name = "COMBO_ID")
+	@Index(name = "IDX_LIMIT_AUDIENCE_COMBO_ID")
 	public Long getComboId() {
 		return comboId;
 	}
@@ -106,6 +109,7 @@ public class LimitAudience extends BaseModel {
 	}
 
 	@Column(name = "COMBO_TYPE")
+    @Index(name = "IDX_LIMIT_AUDIENCE_COMBO_TYPE")
 	public Integer getComboType() {
 		return comboType;
 	}

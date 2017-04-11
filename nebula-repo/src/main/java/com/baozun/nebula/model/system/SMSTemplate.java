@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -106,6 +107,7 @@ public class SMSTemplate extends BaseModel  implements Command{
 
 	
 	@Column(name = "CODE",length = 50)
+    @Index(name = "IDX_SMS_TEMPLATE_CODE")
 	public String getCode() {
 		return code;
 	}
@@ -150,6 +152,7 @@ public class SMSTemplate extends BaseModel  implements Command{
 
 
 	@Column(name = "TYPE")
+	@Index(name = "IDX_SMS_TEMPLATE_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -172,6 +175,7 @@ public class SMSTemplate extends BaseModel  implements Command{
 	}
 
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_SMS_TEMPLATE_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

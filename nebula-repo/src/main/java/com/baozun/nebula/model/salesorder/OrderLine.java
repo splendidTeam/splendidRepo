@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -39,7 +40,7 @@ import com.baozun.nebula.model.BaseModel;
  * @see com.baozun.nebula.model.shoppingcart.ShoppingCartLine
  */
 @Entity
-@Table(name = "t_so_orderline")
+@Table(name = "T_SO_ORDERLINE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class OrderLine extends BaseModel{
 
@@ -157,6 +158,7 @@ public class OrderLine extends BaseModel{
      * @return the 订单id
      */
     @Column(name = "ORDER_ID")
+    @Index(name = "IDX_ORDERLINE_ORDER_ID")
     public Long getOrderId(){
         return orderId;
     }
@@ -177,6 +179,7 @@ public class OrderLine extends BaseModel{
      * @return the uPC
      */
     @Column(name = "EXTENTION_CODE",length = 200)
+    @Index(name = "IDX_ORDERLINE_EXTENTION_CODE")
     public String getExtentionCode(){
         return extentionCode;
     }
@@ -197,6 +200,7 @@ public class OrderLine extends BaseModel{
      * @return the sku表中的id
      */
     @Column(name = "SKU_ID")
+    @Index(name = "IDX_ORDERLINE_SKU_ID")
     public Long getSkuId(){
         return skuId;
     }
@@ -217,6 +221,7 @@ public class OrderLine extends BaseModel{
      * @return the 商品id
      */
     @Column(name = "ITEM_ID")
+    @Index(name = "IDX_ORDERLINE_ITEM_ID")
     public Long getItemId(){
         return itemId;
     }
@@ -397,6 +402,7 @@ public class OrderLine extends BaseModel{
      * @return the 行类型
      */
     @Column(name = "TYPE")
+    @Index(name = "IDX_ORDERLINE_TYPE")
     public Integer getType(){
         return type;
     }
@@ -417,6 +423,7 @@ public class OrderLine extends BaseModel{
      * @return the 分组号
      */
     @Column(name = "GROUP_ID")
+    @Index(name = "IDX_ORDERLINE_GROUP_ID")
     public Integer getGroupId(){
         return groupId;
     }
@@ -524,6 +531,7 @@ public class OrderLine extends BaseModel{
      * @since 5.3.1
      */
     @Column(name = "RELATED_ITEM_ID")
+    @Index(name = "IDX_ORDERLINE_RELATED_ITEM_ID")
     public Long getRelatedItemId(){
         return relatedItemId;
     }

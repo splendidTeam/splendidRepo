@@ -41,7 +41,7 @@ import com.baozun.nebula.model.BaseModel;
  */
 
 @Entity
-@Table(name = "t_so_salesorder")
+@Table(name = "T_SO_SALESORDER")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class SalesOrder extends BaseModel{
 
@@ -337,6 +337,7 @@ public class SalesOrder extends BaseModel{
      * @return the 订单号
      */
     @Column(name = "CODE",length = 50)
+    @Index(name = "IDX_SALESORDER_CODE")
     public String getCode(){
         return code;
     }
@@ -377,6 +378,7 @@ public class SalesOrder extends BaseModel{
      * @return the 会员id
      */
     @Column(name = "MEMBER_ID")
+    @Index(name = "IDX_SALESORDER_MEMBER_ID")
     public Long getMemberId(){
         return memberId;
     }
@@ -397,6 +399,7 @@ public class SalesOrder extends BaseModel{
      * @return the 店铺id
      */
     @Column(name = "SHOP_ID")
+    @Index(name = "IDX_SALESORDER_SHOP_ID")
     public Long getShopId(){
         return shopId;
     }
@@ -497,6 +500,7 @@ public class SalesOrder extends BaseModel{
      * @return the 物流状态
      */
     @Column(name = "LOGISTICS_STATUS")
+    @Index(name = "IDX_SALESORDER_LOGISTICS_STATUS")
     public Integer getLogisticsStatus(){
         return logisticsStatus;
     }
@@ -517,6 +521,7 @@ public class SalesOrder extends BaseModel{
      * @return the 财务状态
      */
     @Column(name = "FINANCIAL_STATUS")
+    @Index(name = "IDX_SALESORDER_FINANCIAL_STATUS")
     public Integer getFinancialStatus(){
         return financialStatus;
     }
@@ -537,6 +542,7 @@ public class SalesOrder extends BaseModel{
      * @return the 支付方式
      */
     @Column(name = "PAYMENT")
+    @Index(name = "IDX_SALESORDER_PAYMENT")
     public Integer getPayment(){
         return payment;
     }

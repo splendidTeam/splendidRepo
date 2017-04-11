@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_payno")
+@Table(name = "T_SO_PAYNO")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 @Deprecated
 public class PayNo extends BaseModel{
@@ -74,6 +75,7 @@ public class PayNo extends BaseModel{
 	}
 
 	@Column(name = "PAY_NO")
+    @Index(name = "IDX_PAYNO_PAY_NO")
 	public String getPayNo() {
 		return payNo;
 	}
@@ -84,6 +86,7 @@ public class PayNo extends BaseModel{
 	}
 
 	@Column(name = "PAY_INFO_ID")
+    @Index(name = "IDX_PAYNO_PAY_INFO_ID")
 	public Long getPayInfoId() {
 		return payInfoId;
 	}

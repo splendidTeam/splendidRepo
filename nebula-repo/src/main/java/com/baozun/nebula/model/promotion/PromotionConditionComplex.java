@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_prm_promotioncondition_complex")
+@Table(name = "T_PRM_PROMOTIONCONDITION_COMPLEX")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionConditionComplex extends BaseModel {
 
@@ -99,6 +100,7 @@ public class PromotionConditionComplex extends BaseModel {
 	}
 
 	@Column(name = "PROMOTION_ID")
+    @Index(name = "IDX_PROMOTIONCONDITION_COMPLEX_PROMOTION_ID")
 	public Long getPromotionId() {
 		return promotionId;
 	}
@@ -108,6 +110,7 @@ public class PromotionConditionComplex extends BaseModel {
 	}
 
 	@Column(name = "NORMAL_CONDITION_ID")
+    @Index(name = "IDX_PROMOTIONCONDITION_COMPLEX_NORMAL_CONDITION_ID")
 	public Long getNormalConditionId() {
 		return normalConditionId;
 	}
@@ -117,6 +120,7 @@ public class PromotionConditionComplex extends BaseModel {
 	}
 
 	@Column(name = "COMPLEX_TYPE", length = 10)
+    @Index(name = "IDX_PROMOTIONCONDITION_COMPLEX_COMPLEX_TYPE")
 	public String getComplexType() {
 		return complexType;
 	}

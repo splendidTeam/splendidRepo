@@ -29,6 +29,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -37,7 +38,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_prm_promotioncoupon")
+@Table(name = "T_PRM_PROMOTIONCOUPON")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionCoupon extends BaseModel {
 
@@ -109,6 +110,7 @@ public class PromotionCoupon extends BaseModel {
 	}
 
 	@Column(name = "TYPE")
+    @Index(name = "IDX_PROMOTIONCOUPON_TYPE")
 	public Integer getType() {
 		return type;
 	}
@@ -118,6 +120,7 @@ public class PromotionCoupon extends BaseModel {
 	}
 
 	@Column(name = "CREATE_ID")
+    @Index(name = "IDX_PROMOTIONCOUPON_CREATE_ID")
 	public Long getCreateId() {
 		return createId;
 	}

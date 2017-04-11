@@ -27,6 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -38,7 +39,7 @@ import com.baozun.nebula.model.BaseModel;
  * @creattime 2013-11-20
  */
 @Entity
-@Table(name = "t_so_orderpromotion")
+@Table(name = "T_SO_ORDERPROMOTION")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class OrderPromotion extends BaseModel{
 
@@ -110,6 +111,7 @@ public class OrderPromotion extends BaseModel{
      * @return the 订单id
      */
     @Column(name = "ORDER_ID")
+    @Index(name = "IDX_ORDERPROMOTION_ORDER_ID")
     public Long getOrderId(){
         return orderId;
     }
@@ -130,6 +132,7 @@ public class OrderPromotion extends BaseModel{
      * @return the 订单行id
      */
     @Column(name = "ORDER_LINE_ID")
+    @Index(name = "IDX_ORDERPROMOTION_ORDER_LINE_ID")
     public Long getOrderLineId(){
         return orderLineId;
     }
@@ -150,6 +153,7 @@ public class OrderPromotion extends BaseModel{
      * @return the 活动id(是否是促销以活动id为准)
      */
     @Column(name = "ACTIVITY_ID")
+    @Index(name = "IDX_ORDERPROMOTION_ACTIVITY_ID")
     public Long getActivityId(){
         return activityId;
     }
@@ -290,6 +294,7 @@ public class OrderPromotion extends BaseModel{
      * @return the 是否是运费优惠 *
      */
     @Column(name = "IS_SHIPDISCOUNT")
+    @Index(name = "IDX_ORDERPROMOTION_IS_SHIPDISCOUNT")
     public Boolean getIsShipDiscount(){
         return isShipDiscount;
     }

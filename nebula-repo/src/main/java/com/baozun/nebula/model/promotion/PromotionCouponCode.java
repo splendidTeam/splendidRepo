@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -39,7 +40,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author 项硕
  */
 @Entity
-@Table(name = "t_prm_promotioncouponcode")
+@Table(name = "T_PRM_PROMOTIONCOUPONCODE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionCouponCode extends BaseModel {
 
@@ -106,6 +107,7 @@ public class PromotionCouponCode extends BaseModel {
 	}
 
 	@Column(name = "COUPON_ID")
+    @Index(name = "IDX_PROMOTIONCOUPONCODE_COUPON_ID")
 	public Long getCouponId() {
 		return couponId;
 	}
@@ -115,6 +117,7 @@ public class PromotionCouponCode extends BaseModel {
 	}
 
 	@Column(name = "SHOP_ID")
+    @Index(name = "IDX_PROMOTIONCOUPONCODE_SHOP_ID")
 	public Long getShopId() {
 		return shopId;
 	}
@@ -124,6 +127,7 @@ public class PromotionCouponCode extends BaseModel {
 	}
 
 	@Column(name = "COUPON_CODE")
+    @Index(name = "IDX_PROMOTIONCOUPONCODE_COUPON_CODE")
 	public String getCouponCode() {
 		return couponCode;
 	}
@@ -150,8 +154,8 @@ public class PromotionCouponCode extends BaseModel {
 		this.endTime = endTime;
 	}
 	
-	
 	@Column(name = "ISUSED")
+    @Index(name = "IDX_PROMOTIONCOUPONCODE_ISUSED")
 	public Integer getIsused() {
 		return isused;
 	}
@@ -161,6 +165,7 @@ public class PromotionCouponCode extends BaseModel {
 	}
 	
 	@Column(name = "CREATE_ID")
+    @Index(name = "IDX_PROMOTIONCOUPONCODE_CREATE_ID")
 	public Long getCreateId() {
 		return createId;
 	}

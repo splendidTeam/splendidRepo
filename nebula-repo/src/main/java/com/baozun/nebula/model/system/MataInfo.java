@@ -15,6 +15,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 /**
@@ -145,6 +146,7 @@ public class MataInfo  implements Serializable {
 		this.id = id;
 	}
 	@Column(name = "CODE")
+    @Index(name = "IDX_MATA_INFO_CODE")
 	public String getCode() {
 		return code;
 	}
@@ -159,6 +161,7 @@ public class MataInfo  implements Serializable {
 		this.value = value;
 	}
 	@Column(name = "LIFECYCLE")
+    @Index(name = "IDX_MATA_INFO_LIFECYCLE")
 	public Integer getLifecycle() {
 		return lifecycle;
 	}

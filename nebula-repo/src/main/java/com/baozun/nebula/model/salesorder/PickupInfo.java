@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -143,6 +144,7 @@ public class PickupInfo extends BaseModel {
     }
 
     @Column(name = "ORDER_ID")
+    @Index(name = "IDX_PICKUPINFO_ORDER_ID")
     public Long getOrderId() {
         return orderId;
     }
@@ -269,6 +271,7 @@ public class PickupInfo extends BaseModel {
     }
 
     @Column(name = "BS_ORDER_CODE")
+    @Index(name = "IDX_PICKUPINFO_BS_ORDER_CODE")
     public String getBsOrdercode() {
         return bsOrdercode;
     }
@@ -279,6 +282,7 @@ public class PickupInfo extends BaseModel {
     }
 
     @Column(name = "LIFECYCLE")
+    @Index(name = "IDX_PICKUPINFO_LIFECYCLE")
     public Integer getLifecycle() {
         return lifecycle;
     }

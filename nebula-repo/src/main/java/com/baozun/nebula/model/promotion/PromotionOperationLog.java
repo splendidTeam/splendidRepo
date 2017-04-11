@@ -30,6 +30,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -39,7 +40,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_prm_operationlog")
+@Table(name = "T_PRM_OPERATIONLOG")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionOperationLog extends BaseModel {
 
@@ -107,6 +108,7 @@ public class PromotionOperationLog extends BaseModel {
 	}
 
 	@Column(name="PROMOTION_ID")
+    @Index(name = "IDX_OPERATIONLOG_PROMOTION_ID")
 	public Long getPromotionId() {
 		return promotionId;
 	}
@@ -125,6 +127,7 @@ public class PromotionOperationLog extends BaseModel {
 	}
 
 	@Column(name="OPERATION_TYPE")
+    @Index(name = "IDX_OPERATIONLOG_OPERATION_TYPE")
 	public Integer getOperationType() {
 		return operationType;
 	}
@@ -134,6 +137,7 @@ public class PromotionOperationLog extends BaseModel {
 	}
 
 	@Column(name="OPERATOR_ID")
+    @Index(name = "IDX_OPERATIONLOG_OPERATOR_ID")
 	public Long getOperatorId() {
 		return operatorId;
 	}

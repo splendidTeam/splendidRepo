@@ -11,6 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.command.Command;
@@ -72,6 +73,7 @@ public class EmailSendLog extends BaseModel  implements Command{
 
 	
 	@Column(name = "TEMPLATE_ID")
+    @Index(name = "IDX_EMAILSENDLOG_TEMPLATE_ID")
 	public Long getTemplateId() {
 		return templateId;
 	}

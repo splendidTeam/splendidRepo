@@ -35,7 +35,7 @@ import com.baozun.nebula.model.BaseModel;
  * @date:2016年01月06日
  */
 @Entity
-@Table(name = "t_prm_promotioninformation",uniqueConstraints = { @UniqueConstraint(columnNames = { "CATEGORY_CODE" }) })
+@Table(name = "T_PRM_PROMOTIONINFORMATION",uniqueConstraints = { @UniqueConstraint(columnNames = { "CATEGORY_CODE" }) })
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionInformation extends BaseModel{
 	

@@ -28,6 +28,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.OptimisticLockType;
 
 import com.baozun.nebula.model.BaseModel;
@@ -36,7 +37,7 @@ import com.baozun.nebula.model.BaseModel;
  * @author - 项硕
  */
 @Entity
-@Table(name = "t_prm_promotionscope")
+@Table(name = "T_PRM_PROMOTIONSCOPE")
 @org.hibernate.annotations.Entity(optimisticLock = OptimisticLockType.VERSION)
 public class PromotionScope extends BaseModel {
 
@@ -79,6 +80,7 @@ public class PromotionScope extends BaseModel {
 	}
 
 	@Column(name = "PROMOTION_ID")
+    @Index(name = "IDX_PROMOTIONSCOPE_PROMOTION_ID")
 	public Long getPromotionId() {
 		return promotionId;
 	}
@@ -88,6 +90,7 @@ public class PromotionScope extends BaseModel {
 	}
 
 	@Column(name = "PRODUCT_COMBO_ID")
+    @Index(name = "IDX_PROMOTIONSCOPE_PRODUCT_COMBO_ID")
 	public Long getComboId() {
 		return comboId;
 	}
@@ -97,6 +100,7 @@ public class PromotionScope extends BaseModel {
 	}
 
 	@Column(name = "PRODUCT_COMBO_TYPE")
+    @Index(name = "IDX_PROMOTIONSCOPE_PRODUCT_COMBO_TYPE")
 	public Integer getComboType() {
 		return comboType;
 	}
