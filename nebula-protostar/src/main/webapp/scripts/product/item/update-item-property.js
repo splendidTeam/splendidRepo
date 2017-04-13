@@ -70,6 +70,16 @@ function getKeyFromArray(array){
 }
 
 function getSkuInfoByProperyValueArray(pArray){
+	//-----------------start by sunchenbin-----------------------------
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的  by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
+		// 这里是转为多销售属性时，销售属性非必填所使用的
+		var currentSelectedPropertyIds = getSelectedPropertyIds();
+		if((initSelectedPropertyIds != "" && initSelectedPropertyIds != undefined) && currentSelectedPropertyIds != initSelectedPropertyIds){
+			return null;
+		}
+	}
+	//-------------------end by sunchenbin---------------------------
 	var itemPropertyIdArray = new Array();
 	var index = 0;
 	for(var i=0;i<pArray.length;i++){
@@ -129,6 +139,12 @@ function findItemPropertyByProvertyIdAndValue(propertyId,propertyValueId,propert
 }
 
 function showSkuTable(isLoadInit,saleInfo){
+	// -----------------start by sunchenbin----------------------
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的  by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
+		removeNoSelectInputName();
+	}
+	// -----------------end by sunchenbin----------------------
 	clickFlag = true;
 	if(i18nOnOff){
 		if(typeof(saleInfo)=='undefined'){
@@ -352,11 +368,17 @@ function showSkuTable(isLoadInit,saleInfo){
 		
 		return;
 	}
-	if(propertyValueInputArray.length!=propertyNameArray.length){//如果用户未把每个属性都填上值，则提示用户
-		html =  nps.i18n("CODING_TIPS");
-		saleInfo.find(".extensionTable").html(html);
-	}else{// 画表格
+	
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的  by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
 		drawTableContent(propertyValueArray,propertyNameArray,propertyValueInputArray,isLoadInit,saleInfo);
+	}else{		
+		if(propertyValueInputArray.length!=propertyNameArray.length){//如果用户未把每个属性都填上值，则提示用户
+			html =  nps.i18n("CODING_TIPS");
+			saleInfo.find(".extensionTable").html(html);
+		}else{// 画表格
+			drawTableContent(propertyValueArray,propertyNameArray,propertyValueInputArray,isLoadInit,saleInfo);
+		}
 	}
 	
 	saleInfo.find(".extensionTable").find("[loxiaType]").each(function(i,n){
@@ -366,7 +388,20 @@ function showSkuTable(isLoadInit,saleInfo){
 }
 
 function drawTableContent(propertyValueArray,propertyNameArray,propertyInputValueArray,isLoadInit,saleInfo){
-
+	// -----------------start by sunchenbin----------------------
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的  by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
+		// 仅作为销售属性非必填时，此时table的列标题是不确定的，所以这里动态加载
+		var propertyNameArrayNew = new Array();
+		$j.each(propertyValueArray,function(i){
+			$j.each(propertyValueArray[i],function(j){
+				propertyNameArrayNew[i] = ((propertyValueArray[i])[0])[2];
+			});
+		});
+		propertyNameArray = propertyNameArrayNew;
+	}
+	//--------------------end by sunchenbin--------------------
+	
 	var skuInfoList = new Array();
 	var skuInfoListIndex = 0;
 	var tableHeader="<tr>";
@@ -777,6 +812,7 @@ function  selectcheck(URL){
 	});
 }
 
+var initSelectedPropertyIds = "";
 $j(document).ready(function(){
 	//清空填充属性名称Array及属性idArray
 	propertyArray.splice(0,propertyArray.length);
@@ -792,7 +828,9 @@ $j(document).ready(function(){
 	mustCheckArray =eval("("+mustCheckArrayStr+")");
 	//自动编码
 	showSkuTable(true);
-
+	// -----------------start by sunchenbin----------------------
+	initSelectedPropertyIds = getSelectedPropertyIds();
+	// -----------------end by sunchenbin----------------------
 	//编码设置
 	$j(".func-button.extension").on("click",function(){
 		spChangedFlag = false;
@@ -937,3 +975,36 @@ $j(document).ready(function(){
     });
     formValidateList.push(propertyValidator);
 });
+
+/**
+ * 避免没有选的销售属性的propertyIds和propertyValueInputIds被提交，用于销售属性非必选时使用的
+ * @author sunchenbin
+ */
+function removeNoSelectInputName(){
+	$j("#propertySpace .ui-block-line").each(function(){
+		// 判断当前这一条销售属性是否有任何一个值被选中过，如果有是true，没有是false
+		var flag = $j(this).find("input[name='propertyValueIds']").is(':checked');
+		// false的情况,删除input的name属性，让其进行form表单提交的时候不将该属性提交到后台
+		if(!flag){
+			$j(this).find("input[name='propertyIds']").attr("name","propertyIds_remove");
+			$j(this).find("input[name='propertyValueInputIds']").attr("name","propertyValueInputIds_remove");
+		}else{
+			// true的情况,将input的name属性加上，让其进行form表单提交的时候可以讲该属性提交到后台
+			$j(this).find("input[name='propertyIds_remove']").attr("name","propertyIds");
+			$j(this).find("input[name='propertyValueInputIds_remove']").attr("name","propertyValueInputIds");
+		}
+	});
+}
+
+/**
+ * 获取当前已选过至少一个的销售属性的propertyId
+ * @author sunchenbin
+ * @returns 1,2,3,4,5,6
+ */
+function getSelectedPropertyIds(){
+	var propertyIds = [];
+	$j("#propertySpace .ui-block-line ").find("input[name='propertyIds']").each(function(i){
+		propertyIds[i] = $j(this).val();
+	});
+	return propertyIds.toString();
+}

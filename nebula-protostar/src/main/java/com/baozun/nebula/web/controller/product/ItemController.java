@@ -2251,7 +2251,10 @@ public class ItemController extends BaseController {
 		String categoryDisplayMode = sdkMataInfoManager.findValue(MataInfo.KEY_PTS_ITEM_LIST_PAGE_CATEGORYNAME_MODE);
 		model.addAttribute("categoryDisplayMode", categoryDisplayMode);
 		model.addAttribute("baseImageUrl", UPLOAD_IMG_DOMAIN);
-
+		
+		String 	salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
+		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
+		
 		return "/product/item/add-item-bundle";
 	}
 	
@@ -2360,7 +2363,10 @@ public class ItemController extends BaseController {
 		model.addAttribute("listPrices", listPrices);
 
 		model.addAttribute("isStyleEnable", isEnableStyle());
-
+		
+		String salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
+		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
+		
 		return "/product/item/update-item-simple";
 	}
 	

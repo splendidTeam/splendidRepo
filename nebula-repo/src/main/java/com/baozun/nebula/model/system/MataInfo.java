@@ -113,6 +113,12 @@ public class MataInfo  implements Serializable {
 	 * qs订单开关
 	 */
 	public static final String KEY_QS_QUEUE_SWITCH = "qs_queue_switch";
+	
+	/**
+	 * 用于标识pts多销售属性的情况下，允许普通商品的销售属性非必填的开关，如有需要请配置value=1
+	 */
+	public static final String 	SALES_OF_PROPERTY_IS_NOT_REQUIRED = "salesOfPropertyIsNotRequired";
+	
 	/**
 	 * PK
 	 */
