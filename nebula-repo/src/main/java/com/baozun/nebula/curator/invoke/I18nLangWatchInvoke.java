@@ -17,7 +17,6 @@ import com.baozun.nebula.curator.watcher.IWatcherInvoke;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
-import com.baozun.nebula.utilities.common.LangUtil;
 import com.baozun.nebula.utilities.common.ProfileConfigUtil;
 import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.feilong.core.Validator;
@@ -61,12 +60,12 @@ public class I18nLangWatchInvoke implements IWatcherInvoke{
 			AddressUtil.setDeliveryModeOn(true);
 			Properties pro = ProfileConfigUtil.findPro("config/metainfo.properties");
 			String jsPath = "";
-			if(Validator.isNotNullOrEmpty(pro)){
+			if(Validator.isNotNullOrEmpty(pro)&&Validator.isNotNullOrEmpty(pro.getProperty("delivery.area.js"))){
 				jsPath = StringUtils.trim(pro.getProperty("delivery.area.js"));
 			}
+            // 顺序 ,一般先有父 再有 子
+            Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
 			for(String language : languageList){
-				// 顺序 ,一般先有父 再有 子
-				Sort[] sorts = Sort.parse("PARENT_ID asc,sort_no asc");
 				Map<String, Map<String, String>> map = deliveryAreaManager.findAllDeliveryAreaByLang(language,sorts);
 				AddressUtil.initDeliveryArea(map, language, jsPath);
 			}

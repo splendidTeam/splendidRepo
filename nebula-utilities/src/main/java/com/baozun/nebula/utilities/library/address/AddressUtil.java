@@ -369,38 +369,38 @@ public class AddressUtil {
 			path = jsPath+"/area."+language+".min.js";
 		}
 		generateJsFile( path, map );
-		
-		Map<Long, List<Address>> tmpSubAddressMap = new HashMap<Long, List<Address>>();
-		Map<Long, Address> tmpAddressMap = new HashMap<Long, Address>();
-		Map<String, List<Address>> tmpAddressNameMap = new HashMap<String, List<Address>>();
-		
-		for (String parentId : map.keySet()) {
-			for(String key : map.get(parentId).keySet()){
-				Address address = new Address();
-				address.setId(Long.parseLong(key));
-				address.setName(map.get(parentId).get(key));
-				address.setpId(Long.parseLong(parentId));
-				address.setSpelling(key+"");
-				
-				gatherSubAddressMap(tmpSubAddressMap, address);
+		if(Validator.isNotNullOrEmpty(map)){
+    		Map<Long, List<Address>> tmpSubAddressMap = new HashMap<Long, List<Address>>();
+    		Map<Long, Address> tmpAddressMap = new HashMap<Long, Address>();
+    		Map<String, List<Address>> tmpAddressNameMap = new HashMap<String, List<Address>>();
+    	    for (String parentId : map.keySet()) {
+	            for(String key : map.get(parentId).keySet()){
+	                Address address = new Address();
+	                address.setId(Long.parseLong(key));
+	                address.setName(map.get(parentId).get(key));
+	                address.setpId(Long.parseLong(parentId));
+	                address.setSpelling(key+"");
+	                
+	                gatherSubAddressMap(tmpSubAddressMap, address);
 
-				tmpAddressMap.put(address.getId(), address);
+	                tmpAddressMap.put(address.getId(), address);
 
-				List<Address> addressList = tmpAddressNameMap.get(address.getName());
-				// 如果找不到，则新增
-				if (addressList == null) {
-					addressList = new ArrayList<Address>();
-					addressList.add(address);
-				} else {
-					// 如果找到了，则追加
-					addressList.add(address);
-				}
-				tmpAddressNameMap.put(address.getName(), addressList);
-			}
+	                List<Address> addressList = tmpAddressNameMap.get(address.getName());
+	                // 如果找不到，则新增
+	                if (addressList == null) {
+	                    addressList = new ArrayList<Address>();
+	                    addressList.add(address);
+	                } else {
+	                    // 如果找到了，则追加
+	                    addressList.add(address);
+	                }
+	                tmpAddressNameMap.put(address.getName(), addressList);
+	            }
+    	    }
+    	    subAddressLangMap.put(language, tmpSubAddressMap);
+    	    addressLangMap.put(language, tmpAddressMap);
+    	    addressNameLangMap.put(language, tmpAddressNameMap);
 		}
-		subAddressLangMap.put(language, tmpSubAddressMap);
-		addressLangMap.put(language, tmpAddressMap);
-		addressNameLangMap.put(language, tmpAddressNameMap);
 	}
 
 	/**
