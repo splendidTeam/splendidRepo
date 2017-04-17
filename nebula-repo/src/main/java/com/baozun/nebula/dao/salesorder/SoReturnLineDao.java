@@ -24,8 +24,8 @@ public interface SoReturnLineDao extends GenericEntityDao<SoReturnLine, Long> {
 	 * @param returnOrderCode
 	 * @return
 	 */
-	@NativeQuery(model = ReturnLineCommand.class,value = "SoReturnLine.findSoReturnLinesByReturnOrderId")
-	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderId(@QueryParam("returnOrderId")long returnOrderId);
+	@NativeQuery(model = ReturnLineCommand.class,value = "SoReturnLine.findSoReturnLinesByReturnOrderIds")
+	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(@QueryParam("returnOrderIds")List<Long> returnOrderIds);
 
 
 }

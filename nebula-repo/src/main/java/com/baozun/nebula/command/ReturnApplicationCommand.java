@@ -4,392 +4,493 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.baozun.nebula.model.salesorder.SalesOrder;
+import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
 
 public class ReturnApplicationCommand {
 
-	private Long id; // 主键
-	private String returnOrderCode; // 退换货申请编码(VR+0000001开始,V为平台特别代码)
-
 	/**
-	 * 退换货申请类型 <br>
-	 * 退货：1<br>
-	 * 换货：2<br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private int type;
+     * PK
+     */
+    private Long id;
 
-	private String soOrderCode; // 平台订单编码
-	private Long soOrderId; // 平台订单ID
+    /**
+     * 平台订单编码
+     */
+    private String soOrderCode;
 
-	/**
-	 * 退款方式 <br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private String refundType;
+    /**
+     * 退换货申请编码
+     */
+    private String returnApplicationCode;
 
-	/**
-	 * 退换货申请原因<br>
-	 * 7天无理由：R001A<br>
-	 * 商品质量问题：R002A<br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private String returnReason;
+    /**
+     * 退换货申请类型 <br>
+     */
+    private int type;
 
-	/**
-	 * 退款账户
-	 */
-	private String refundAccount;
+    /**
+     * 平台订单ID
+     */
+    private Long soOrderId;
 
-	/**
-	 * 退款银行总称
-	 */
-	private String refundBank;
+    /**
+     * 平台订单行ID
+     */
+    private Long soOrderLineId;
 
-	/**
-	 * 退款银行的开户所属的支行
-	 */
-	private String refundAccountBank;
+    /**
+     * 退换货创建时间
+     */
+    private Date createTime;
 
-	/**
-	 * 申请退款人（指当先登陆的账号）
-	 */
-	private String refundPayee;
+    /**
+     * Version
+     */
+    private Date version;
 
-	/**
-	 * 是否退货发票<br>
-	 * Y表示需要退回发票<br>
-	 * N表示不需要退回发票<br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private String isNeededReturnInvoice;
+    /**
+     * 退货来源.
+     */
+    private String source;
 
-	private String memo; // 用户备注
+    /**
+     * 退款方式 <br>
+     */
+    private String refundType;
 
-	/**
-	 * 退换货单审批说明<br>
-	 * 无论审批通过，或者不通过<br>
-	 * 都可以填写，也可以为null
-	 */
-	private String approvalDescription;
+    /**
+     * 
+     * /**
+     * 退换货申请原因<br>
+     */
+    private String returnReason;
 
-	/**
-	 * 退换货申请状态<br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private int status = -1;
+    /**
+     * 退款账户
+     */
+    private String refundAccount;
 
-	private int omsStatus; // oms处理状态
+    /**
+     * 退款银行总称
+     */
+    private String refundBank;
 
-	/**
-	 * 退款状态<br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private int refundStatus;
+    /**
+     * 退款银行的开户所属的支行
+     */
+    private String refundBankBranch;
 
-	/**
-	 * MQ同步状态<br>
-	 * 值域参见SoReturnApplicationConstants
-	 */
-	private int synType;
+    /**
+     * 是否退货发票<br>
+     */
+    private String isNeededReturnInvoice;
 
-	private String approver; // 审批人
-	private Date approveTime; // 审批时间
-	private String lastModifyUser;// 最后修改人
-	private Date createTime; // 退换货创建时间
-	private Date version; // Version
+    /**
+     * 用户备注
+     */
+    private String remark;
 
-	private Long memberId; // 会员id
-	private String accountName; // 账号名称
+    /**
+     * 退换货单审批说明<br>
+     * 无论审批通过，或者不通过<br>
+     * 都可以填写，也可以为null
+     */
+    private String approvalDescription;
 
-	/**
-	 * OMS退换货编码
-	 */
-	private String platformOMSCode;
+    /**
+     * 退换货申请状态<br>
+     */
+    private int status;
 
-	/**
-	 * 退货单的退款价
-	 */
-	private BigDecimal returnPrice;
+    /**
+     * 后端处理状态
+     */
+    private int omsStatus;
 
-	/**
-	 * 用户 退货时候填写 
-	 * 物流单号,只有当  退货单状态：已发货 时有此值
-	 */
-	private String transCode;
+    /**
+     * 退款状态<br>
+     */
+    private int refundStatus;
 
-	/**
-	 * 用户 退货时候填写 
-	 * 物流公司名称,只有当  退货单状态：已发货 时有此值
-	 */
-	private String transName;
-	
-	/**
-	 * 退货地址
-	 */
-	private String returnAddress;
+    /**
+     * 审批人
+     */
+    private String approver;
 
-	/**
-	 * 退货单退回运费
-	 */
-	private BigDecimal returnFreight;
+    /**
+     * 审批时间
+     */
+    private Date approveTime;
+
+    /**
+     * 最后修改人（系统用户）
+     */
+    private String lastModifyUser;
+
+    /**
+     * 会员id
+     */
+    private Long memberId;
+
+    /**
+     * OMS退换货编码
+     */
+    private String omsCode;
+
+    /**
+     * 退货单的退款价
+     */
+    private BigDecimal returnPrice;
+
+    /**
+     * 用户退货时候填写
+     * 物流单号,只有当退货单状态：已发货 时有此值
+     */
+    private String transCode;
+
+    /**
+     * 用户退货时候填写
+     * 物流公司名称,只有当退货单状态：已发货 时有此值
+     */
+    private String transName;
+
+    /**
+     * 退货地址
+     */
+    private String returnAddress;
+
+    /**
+     * 退回运费
+     */
+    private BigDecimal returnFreight;
+
 	
 	private List<SoReturnLine> returnLineList;
+	
+	private SoReturnApplicationDeliveryInfo soReturnApplicationDeliveryInfo;
+
+	public SoReturnApplicationDeliveryInfo getSoReturnApplicationDeliveryInfo() {
+		return soReturnApplicationDeliveryInfo;
+	}
+
+
+	public void setSoReturnApplicationDeliveryInfo(
+			SoReturnApplicationDeliveryInfo soReturnApplicationDeliveryInfo) {
+		this.soReturnApplicationDeliveryInfo = soReturnApplicationDeliveryInfo;
+	}
+
 
 	public Long getId() {
 		return id;
 	}
 
+
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getReturnOrderCode() {
-		return returnOrderCode;
-	}
-
-	public void setReturnOrderCode(String returnOrderCode) {
-		this.returnOrderCode = returnOrderCode;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
 
 	public String getSoOrderCode() {
 		return soOrderCode;
 	}
 
+
 	public void setSoOrderCode(String soOrderCode) {
 		this.soOrderCode = soOrderCode;
 	}
+
+
+	public String getReturnApplicationCode() {
+		return returnApplicationCode;
+	}
+
+
+	public void setReturnApplicationCode(String returnApplicationCode) {
+		this.returnApplicationCode = returnApplicationCode;
+	}
+
+
+	public int getType() {
+		return type;
+	}
+
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
 
 	public Long getSoOrderId() {
 		return soOrderId;
 	}
 
+
 	public void setSoOrderId(Long soOrderId) {
 		this.soOrderId = soOrderId;
 	}
 
-	public String getRefundType() {
-		return refundType;
+
+	public Long getSoOrderLineId() {
+		return soOrderLineId;
 	}
 
-	public void setRefundType(String refundType) {
-		this.refundType = refundType;
+
+	public void setSoOrderLineId(Long soOrderLineId) {
+		this.soOrderLineId = soOrderLineId;
 	}
 
-	public String getReturnReason() {
-		return returnReason;
-	}
-
-	public void setReturnReason(String returnReason) {
-		this.returnReason = returnReason;
-	}
-
-	public String getRefundAccount() {
-		return refundAccount;
-	}
-
-	public void setRefundAccount(String refundAccount) {
-		this.refundAccount = refundAccount;
-	}
-
-	public String getRefundBank() {
-		return refundBank;
-	}
-
-	public void setRefundBank(String refundBank) {
-		this.refundBank = refundBank;
-	}
-
-	public String getRefundAccountBank() {
-		return refundAccountBank;
-	}
-
-	public void setRefundAccountBank(String refundAccountBank) {
-		this.refundAccountBank = refundAccountBank;
-	}
-
-	public String getRefundPayee() {
-		return refundPayee;
-	}
-
-	public void setRefundPayee(String refundPayee) {
-		this.refundPayee = refundPayee;
-	}
-
-	public String getIsNeededReturnInvoice() {
-		return isNeededReturnInvoice;
-	}
-
-	public void setIsNeededReturnInvoice(String isNeededReturnInvoice) {
-		this.isNeededReturnInvoice = isNeededReturnInvoice;
-	}
-
-	public String getMemo() {
-		return memo;
-	}
-
-	public void setMemo(String memo) {
-		this.memo = memo;
-	}
-
-	public String getApprovalDescription() {
-		return approvalDescription;
-	}
-
-	public void setApprovalDescription(String approvalDescription) {
-		this.approvalDescription = approvalDescription;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public int getOmsStatus() {
-		return omsStatus;
-	}
-
-	public void setOmsStatus(int omsStatus) {
-		this.omsStatus = omsStatus;
-	}
-
-	public int getRefundStatus() {
-		return refundStatus;
-	}
-
-	public void setRefundStatus(int refundStatus) {
-		this.refundStatus = refundStatus;
-	}
-
-	public int getSynType() {
-		return synType;
-	}
-
-	public void setSynType(int synType) {
-		this.synType = synType;
-	}
-
-	public String getApprover() {
-		return approver;
-	}
-
-	public void setApprover(String approver) {
-		this.approver = approver;
-	}
-
-	public Date getApproveTime() {
-		return approveTime;
-	}
-
-	public void setApproveTime(Date approveTime) {
-		this.approveTime = approveTime;
-	}
-
-	public String getLastModifyUser() {
-		return lastModifyUser;
-	}
-
-	public void setLastModifyUser(String lastModifyUser) {
-		this.lastModifyUser = lastModifyUser;
-	}
 
 	public Date getCreateTime() {
 		return createTime;
 	}
 
+
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
+
 
 	public Date getVersion() {
 		return version;
 	}
 
+
 	public void setVersion(Date version) {
 		this.version = version;
 	}
+
+
+	public String getSource() {
+		return source;
+	}
+
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+
+	public String getRefundType() {
+		return refundType;
+	}
+
+
+	public void setRefundType(String refundType) {
+		this.refundType = refundType;
+	}
+
+
+	public String getReturnReason() {
+		return returnReason;
+	}
+
+
+	public void setReturnReason(String returnReason) {
+		this.returnReason = returnReason;
+	}
+
+
+	public String getRefundAccount() {
+		return refundAccount;
+	}
+
+
+	public void setRefundAccount(String refundAccount) {
+		this.refundAccount = refundAccount;
+	}
+
+
+	public String getRefundBank() {
+		return refundBank;
+	}
+
+
+	public void setRefundBank(String refundBank) {
+		this.refundBank = refundBank;
+	}
+
+
+	public String getRefundBankBranch() {
+		return refundBankBranch;
+	}
+
+
+	public void setRefundBankBranch(String refundBankBranch) {
+		this.refundBankBranch = refundBankBranch;
+	}
+
+
+	public String getIsNeededReturnInvoice() {
+		return isNeededReturnInvoice;
+	}
+
+
+	public void setIsNeededReturnInvoice(String isNeededReturnInvoice) {
+		this.isNeededReturnInvoice = isNeededReturnInvoice;
+	}
+
+
+	public String getRemark() {
+		return remark;
+	}
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+
+	public String getApprovalDescription() {
+		return approvalDescription;
+	}
+
+
+	public void setApprovalDescription(String approvalDescription) {
+		this.approvalDescription = approvalDescription;
+	}
+
+
+	public int getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+
+	public int getOmsStatus() {
+		return omsStatus;
+	}
+
+
+	public void setOmsStatus(int omsStatus) {
+		this.omsStatus = omsStatus;
+	}
+
+
+	public int getRefundStatus() {
+		return refundStatus;
+	}
+
+
+	public void setRefundStatus(int refundStatus) {
+		this.refundStatus = refundStatus;
+	}
+
+
+	public String getApprover() {
+		return approver;
+	}
+
+
+	public void setApprover(String approver) {
+		this.approver = approver;
+	}
+
+
+	public Date getApproveTime() {
+		return approveTime;
+	}
+
+
+	public void setApproveTime(Date approveTime) {
+		this.approveTime = approveTime;
+	}
+
+
+	public String getLastModifyUser() {
+		return lastModifyUser;
+	}
+
+
+	public void setLastModifyUser(String lastModifyUser) {
+		this.lastModifyUser = lastModifyUser;
+	}
+
 
 	public Long getMemberId() {
 		return memberId;
 	}
 
+
 	public void setMemberId(Long memberId) {
 		this.memberId = memberId;
 	}
 
-	public String getAccountName() {
-		return accountName;
+
+	public String getOmsCode() {
+		return omsCode;
 	}
 
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
+
+	public void setOmsCode(String omsCode) {
+		this.omsCode = omsCode;
 	}
 
-	public String getPlatformOMSCode() {
-		return platformOMSCode;
-	}
-
-	public void setPlatformOMSCode(String platformOMSCode) {
-		this.platformOMSCode = platformOMSCode;
-	}
 
 	public BigDecimal getReturnPrice() {
 		return returnPrice;
 	}
 
+
 	public void setReturnPrice(BigDecimal returnPrice) {
 		this.returnPrice = returnPrice;
 	}
+
 
 	public String getTransCode() {
 		return transCode;
 	}
 
+
 	public void setTransCode(String transCode) {
 		this.transCode = transCode;
 	}
+
 
 	public String getTransName() {
 		return transName;
 	}
 
+
 	public void setTransName(String transName) {
 		this.transName = transName;
 	}
+
 
 	public String getReturnAddress() {
 		return returnAddress;
 	}
 
+
 	public void setReturnAddress(String returnAddress) {
 		this.returnAddress = returnAddress;
 	}
+
 
 	public BigDecimal getReturnFreight() {
 		return returnFreight;
 	}
 
+
 	public void setReturnFreight(BigDecimal returnFreight) {
 		this.returnFreight = returnFreight;
 	}
+
 
 	public List<SoReturnLine> getReturnLineList() {
 		return returnLineList;
 	}
 
+
 	public void setReturnLineList(List<SoReturnLine> returnLineList) {
 		this.returnLineList = returnLineList;
 	}
+
+	
 	
 }

@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.baozun.nebula.command.OrderReturnCommand;
-import com.baozun.nebula.model.salesorder.SoReturnApplication;
-
 import loxia.annotation.NativeQuery;
 import loxia.annotation.NativeUpdate;
 import loxia.annotation.QueryParam;
@@ -14,6 +11,10 @@ import loxia.dao.GenericEntityDao;
 import loxia.dao.Page;
 import loxia.dao.Pagination;
 import loxia.dao.Sort;
+
+import com.baozun.nebula.command.OrderReturnCommand;
+import com.baozun.nebula.command.ReturnApplicationCommand;
+import com.baozun.nebula.model.salesorder.SoReturnApplication;
 
 
 
@@ -117,14 +118,16 @@ public interface SdkReturnApplicationDao extends GenericEntityDao<SoReturnApplic
 	Integer updateSoReturnApplicationSynType(@QueryParam("id") Long id,@QueryParam("syntype") int syntype);
 	
 	/**
-	 * 根据退换货单SoReturnApplication的编码platformcode查询SoReturnApplication
+	 * 根据退换货单SoReturnApplication的编码omsCode查询SoReturnApplication
 	 * 
 	 * @param platformcode
 	 * @return
 	 */
 	@NativeQuery(model = SoReturnApplication.class, value = "SoReturnApplication.findByPlatformCode")
-	SoReturnApplication findByPlatformCode(
-			@QueryParam("platformcode") String platformcode);
-
+	SoReturnApplication findByOmsCode(
+			@QueryParam("omsCode") String omsCode);
 	
+	@NativeQuery(model = ReturnApplicationCommand.class, value = "SoReturnApplication.findByIds")
+	List<ReturnApplicationCommand>  findReturnApplicationCommandByIds(@QueryParam("ids") List<Long> ids);
+
 }

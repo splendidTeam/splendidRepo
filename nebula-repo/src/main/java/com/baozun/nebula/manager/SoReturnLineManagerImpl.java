@@ -34,8 +34,8 @@ public class SoReturnLineManagerImpl implements SoReturnLineManager {
 
 	
 	@Override
-	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderId(long id) {
-		List<ReturnLineCommand> soReturnLines = soReturnLineDao.findSoReturnLinesByReturnOrderId(id);
+	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(List<Long> returnOrderIds) {
+		List<ReturnLineCommand> soReturnLines = soReturnLineDao.findSoReturnLinesByReturnOrderIds(returnOrderIds);
 		return soReturnLines;
 	}
 	

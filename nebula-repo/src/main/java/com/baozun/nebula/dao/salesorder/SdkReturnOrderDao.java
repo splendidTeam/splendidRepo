@@ -25,4 +25,5 @@ public interface SdkReturnOrderDao  extends GenericEntityDao<ReturnOrderApp, Lon
 
 	@NativeQuery(model = ReturnOrderCommand.class)
 	public ReturnOrderCommand findReturnOrderAppByCode(@QueryParam("orderCode") String orderCode);
+	
 }

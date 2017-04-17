@@ -22,6 +22,6 @@ public interface SoReturnLineManager  {
 	 * @param returnOrderCode
 	 * @return
 	 */
-	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderId(long id);
+	public List<ReturnLineCommand> findSoReturnLinesByReturnOrderIds(List<Long> returnOrderIds);
 	
 }

@@ -613,18 +613,17 @@ public class OrderReturnController extends BaseController {
 		}
 		 //保存退货单 
 		SoReturnApplication soReturnApp = new SoReturnApplication();
-		soReturnApp.setAccountName(returnOrderForm.getUserName());
 		soReturnApp.setCreateTime(date);
 			soReturnApp.setMemberId(saleOrder.getMemberId());
-		soReturnApp.setMemo(returnOrderForm.getMemo());
+		soReturnApp.setRemark(returnOrderForm.getMemo());
 		soReturnApp.setRefundAccount(returnOrderForm.getAccount());
 		soReturnApp.setVersion(date);
-		soReturnApp.setRefundAccountBank(returnOrderForm.getBranch());
+		soReturnApp.setRefundBankBranch(returnOrderForm.getBranch());
 		soReturnApp.setRefundBank(returnOrderForm.getBank());
 		soReturnApp.setType(SoReturnConstants.TYPE_RETURN);
 		soReturnApp.setSoOrderCode(returnOrderForm.getOrderCode());
 		soReturnApp.setSoOrderId(Long.parseLong(returnOrderForm.getOrderId()));
-		soReturnApp.setReturnOrderCode("VR" + new Date().getTime());
+		soReturnApp.setReturnApplicationCode("VR" + new Date().getTime());
 		soReturnApp.setRefundType(saleOrder.getPayment().toString());// 退款方式
 		soReturnApp.setIsNeededReturnInvoice(SoReturnConstants.NEEDED_RETURNINVOICE);
 		soReturnApp.setReturnReason("");
@@ -633,7 +632,6 @@ public class OrderReturnController extends BaseController {
 			soReturnApp.setMemberId(saleOrder.getMemberId());
 		} else {// 游客下单把下单 邮箱 作冗余过来
 			soReturnApp.setMemberId(-1L);// 游客
-			soReturnApp.setRefundPayee(saleOrder.getEmail());
 		}
 		List<SoReturnLine> returnLineList = new ArrayList<SoReturnLine>();
 
@@ -647,19 +645,7 @@ public class OrderReturnController extends BaseController {
 			OrderLine line = sdkOrderLineManager.findByPk(lineId);
 
 			String returnReason = reasonSelected[i].trim();
-			if (returnReason.equals("我改变主意了")) {
-				returnLine.setReturnReason(SoReturnConstants.CHEANGE_MIND);
-			} else if (returnReason.equals("商品质量有问题")) {
-				returnLine.setReturnReason(SoReturnConstants.DAMAGED_GOOD);
-			} else if (returnReason.equals("商品包装破损")) {
-				returnLine.setReturnReason(SoReturnConstants.DAMAGED_PACKAGE);
-			} else if (returnReason.equals("尺码不合适")) {
-				returnLine.setReturnReason(SoReturnConstants.SIZE_UNMATCH);
-			} else if (returnReason.equals("颜色/款式与商品不符")) {
-				returnLine.setReturnReason(SoReturnConstants.PRODUCT_UNMATCH);
-			}else if(returnReason.equals("其他原因")){
-				returnLine.setReturnReason(SoReturnConstants.OTHER_REASON);
-			}
+				returnLine.setReturnReason(returnReason);
 
 			returnLine.setQty(Integer.parseInt(sumSelected[i]));
 			returnLine.setSoLineId(lineId);

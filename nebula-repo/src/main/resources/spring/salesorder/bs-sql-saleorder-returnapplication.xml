@@ -184,7 +184,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="SoReturnLine.findSoReturnLinesByReturnOrderId" class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="SoReturnLine.findSoReturnLinesByReturnOrderIds" class="loxia.dao.support.DynamicQueryHolder">
 		<description>通过退货单编号查询退货订单行</description>
 		<constructor-arg>
 			<value><![CDATA[
@@ -211,8 +211,11 @@
 			     	on sku.item_id=iteminfo.item_id 
 			     left join t_pd_item item
 			     on sku.item_id=item.id
-			     	where
-				  soline.return_orderid =:returnOrderId
+			     	where  soline.return_orderid in(
+					#foreach($return_orderid in $returnOrderIds)
+    					$return_orderid,
+					 #end
+		       		 -1)
 			 ]]>
 			</value>
 		</constructor-arg>
@@ -355,7 +358,7 @@
 		<constructor-arg>
 			<value><![CDATA[
 				select DISTINCT
-				application.PLATFORM_OMS_CODE as platformOMSCode,application.ACCOUNT_NAME as refundPayee,
+				application.OMSCODE as omsCode,application.ACCOUNT_NAME as refundPayee,
 				application.SO_ORDER_CODE as soOrderCode,iteminfo.title as productName,line.rtn_extentioncode as code,
 				line.RETURN_PRICE as returnPrice,line.qty as qty,application.status as status ,application.approver as approver,
 				application.approve_time as approveTime,application.create_time as createTime,application.TRANSCODE as TRANSCODE,
@@ -375,7 +378,7 @@
 					   AND EXISTS ( SELECT member.* FROM t_mem_member member WHERE member.login_email LIKE '%$loginName%' AND member.id=application.memberid)
 					#end
 			        #if($returnCode)
-						AND application.platform_oms_code LIKE '%$returnCode%'
+						AND application.omscode LIKE '%$returnCode%'
 					#end
 					#if($oderCode)
 						AND application.so_order_code LIKE '%$oderCode%'
@@ -424,7 +427,7 @@
 			     		AND application.return_order_code = :returnOrderCode
 			     	#end
 			        #if($returnCode)
-						AND application.platform_oms_code = :returnCode
+						AND application.omscode = :returnCode
 					#end
 					#if($oderCode)
 						AND application.so_order_code = :orderCode
@@ -519,20 +522,44 @@
 		<description>根据状态查询退换货信息</description>
 		<constructor-arg>
 			<value><![CDATA[
-				select * from t_so_return_Application where (type = 1 or type = 2) and syntype = :syntype
+				select * from t_so_return_Application where (type = 1 or type = 2) and status = :status
 			 ]]>
 			</value>
 		</constructor-arg>
 	</bean>
 	
-	<bean id="SoReturnApplication.findByPlatformCode" class="loxia.dao.support.DynamicQueryHolder">
+	<bean id="SoReturnApplication.findByOmsCode" class="loxia.dao.support.DynamicQueryHolder">
 		<description>根据退换货单SoReturnApplication的编码platformcode查询SoReturnApplication
 		</description>
 		<constructor-arg>
 			<value><![CDATA[
 				SELECT application.*
 				FROM t_so_return_application application
-				WHERE application.platformcode = :platformcode
+				WHERE application.omscode = :omsCode
+			 ]]>
+			</value>
+		</constructor-arg>
+	</bean>
+	
+		<bean id="SoReturnApplication.findReturnApplicationCommandByIds" class="loxia.dao.support.DynamicQueryHolder">
+		<description>根据退换货单id集合查询退货单
+		</description>
+		<constructor-arg>
+			<value><![CDATA[
+				select * from t_so_return_application app
+					left join 
+					     T_SO_RETURN_APPLICATION_DELIVERYINFO delivery
+				     on
+				         app.id=delivery.retrunApplicationId
+					LEFT JOIN 
+					     t_so_return_line line
+					 on 
+					     app.id=line.return_orderid
+					where id in(
+					#foreach($id in $ids)
+    					$id,
+					 #end
+		       		 -1)
 			 ]]>
 			</value>
 		</constructor-arg>

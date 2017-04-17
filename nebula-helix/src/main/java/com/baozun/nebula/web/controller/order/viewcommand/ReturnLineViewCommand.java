@@ -19,7 +19,7 @@ public class ReturnLineViewCommand extends BaseViewCommand{
 	private static final long serialVersionUID = 3374821107740450392L;
 	//订单行id
 	private OrderLineCommand orderLineCommand;
-	//已完成的退货数量
+	//剩余可退货数量
 	private Integer count;
 	/**
 	 * @return the orderLineCommand

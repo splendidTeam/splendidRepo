@@ -19,8 +19,10 @@ import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnApplicationDao;
+import com.baozun.nebula.dao.salesorder.SdkSoReturnApplicationDeliveryInfoDao;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
+import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
@@ -30,10 +32,12 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	
 	@Autowired
 	private SdkReturnApplicationDao soReturnApplicationDao;
-	
+	@Autowired
 	private SdkOrderDao sdkOrderDao;
-	
+	@Autowired
 	private SoReturnLineManager soReturnLineManager;
+	@Autowired
+	private SdkSoReturnApplicationDeliveryInfoDao sdkSoReturnApplicationDeliveryInfoDao;
 	
 	public final static Integer[] statusArr = {new Integer(SoReturnConstants.RETURN_COMPLETE) };
 
@@ -69,9 +73,9 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 
 	@Transactional
 	@Override
-	public SoReturnApplication createReturnApplication(ReturnApplicationCommand returnCommand,SalesOrderCommand orderCommand) {
+	public SoReturnApplication createReturnApplication(ReturnApplicationCommand returnCommand,SalesOrderCommand orderCommand,
+			SoReturnApplicationDeliveryInfo deliveryInfo) {
 		SoReturnApplication app=new SoReturnApplication();
-		app.setAccountName(returnCommand.getAccountName());
 		app.setApprovalDescription(returnCommand.getApprovalDescription());
 		app.setApprover(returnCommand.getApprover());
 		app.setApproveTime(returnCommand.getApproveTime());
@@ -79,28 +83,36 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 		app.setIsNeededReturnInvoice(returnCommand.getIsNeededReturnInvoice());
 		app.setLastModifyUser(returnCommand.getLastModifyUser());
 		app.setMemberId(returnCommand.getMemberId());
-		app.setMemo(returnCommand.getMemo());
 		app.setOmsStatus(returnCommand.getOmsStatus());
-		app.setPlatformOMSCode(returnCommand.getPlatformOMSCode());
+		app.setOmsCode(returnCommand.getOmsCode());
 		app.setRefundAccount(returnCommand.getRefundAccount());
-		app.setRefundAccountBank(returnCommand.getRefundAccountBank());
 		app.setRefundBank(returnCommand.getRefundBank());
-		app.setRefundPayee(returnCommand.getRefundPayee());
 		app.setRefundStatus(returnCommand.getRefundStatus());
 		app.setRefundType(returnCommand.getRefundType());
 		app.setReturnAddress(returnCommand.getReturnAddress());
 		app.setReturnFreight(returnCommand.getReturnFreight());
-		app.setReturnOrderCode(returnCommand.getReturnOrderCode());
 		app.setReturnPrice(returnCommand.getReturnPrice());
 		app.setReturnReason(returnCommand.getReturnReason());
 		app.setSoOrderCode(returnCommand.getSoOrderCode());
 		app.setSoOrderId(returnCommand.getSoOrderId());
 		app.setStatus(returnCommand.getStatus());
-		app.setSynType(returnCommand.getSynType());
 		app.setTransCode(returnCommand.getTransCode());
 		app.setType(returnCommand.getType());
 		app.setVersion(returnCommand.getVersion());
+		app.setCreateTime(returnCommand.getCreateTime());
+		app.setReturnApplicationCode(returnCommand.getReturnApplicationCode());
+		app.setSoOrderLineId(returnCommand.getSoOrderLineId());
+		app.setSource(returnCommand.getSource());
+		app.setTransName(returnCommand.getTransName());
+		app.setRefundBankBranch(returnCommand.getRefundBankBranch());
+		
+		if(SoReturnConstants.TYPE_EXCHANGE==returnCommand.getType()){
+		}
 		app=this.saveSoReturnApplication(app);
+		if(null!=deliveryInfo){
+			deliveryInfo.setRetrunApplicationId(returnCommand.getId());
+			sdkSoReturnApplicationDeliveryInfoDao.save(deliveryInfo);
+		}
 		List<SoReturnLine> returnLine=returnCommand.getReturnLineList();
 		for(SoReturnLine line:returnLine){
 			line.setReturnOrderId(app.getId());
@@ -162,7 +174,7 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 				returnapp.setReturnAddress(returnAddress);
 			}
 			if(omsCode!=null&&omsCode!=""){
-				returnapp.setPlatformOMSCode(omsCode);
+				returnapp.setOmsCode(omsCode);
 			}
 			returnapp.setApprovalDescription(description);
 			// 当前退货状态为待审核，并且页面操作为审核
@@ -196,7 +208,7 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 			if (status == 5 && returnapp.getStatus() == 4) {
 				returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
 			}
-			returnapp.setPlatformOMSCode(omsCode);
+			returnapp.setOmsCode(omsCode);
 			returnapp.setLastModifyUser(lastModifier);
 			returnapp.setApprover(lastModifier);
 			returnapp.setApproveTime(now);
@@ -213,13 +225,11 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 			return orderReturn;
 		}
 		
+
 		@Override
-		public SoReturnApplication createReturnApplication(SoReturnApplication app, List<SoReturnLine> returnLine,SalesOrderCommand orderCommand)throws Exception {
-			app=this.saveSoReturnApplication(app);
-			for(SoReturnLine line:returnLine){
-				line.setReturnOrderId(app.getId());
-			}
-			soReturnLineManager.saveReturnLine(returnLine);
-			return app;
+		public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(
+				List<Long> ids) {
+		List<ReturnApplicationCommand>	 returnApplicationCommands=soReturnApplicationDao.findReturnApplicationCommandByIds(ids);
+			return returnApplicationCommands;
 		}
 }

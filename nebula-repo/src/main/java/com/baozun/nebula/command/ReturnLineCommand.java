@@ -1,18 +1,18 @@
 package com.baozun.nebula.command;
 import java.math.BigDecimal;
 import java.util.Date;
-
-import com.baozun.nebula.model.BaseModel;
-
 /**
- * 退换货<br>
+ * 退换货行<br>
  * 
  */
 
-public class ReturnLineCommand extends BaseModel {
+public class ReturnLineCommand implements Command {
 
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -3411890079966239231L;
+
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8527933589901392219L;
 
 	/** SoReturnApplication(退换货申请单)ID */
 	private Long returnOrderId;
@@ -150,7 +150,5 @@ public class ReturnLineCommand extends BaseModel {
 	public void setItemCode(String itemCode) {
 		this.itemCode = itemCode;
 	}
-    
-
 
 }

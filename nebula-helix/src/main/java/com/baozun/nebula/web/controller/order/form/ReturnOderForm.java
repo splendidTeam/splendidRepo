@@ -4,6 +4,8 @@
 package com.baozun.nebula.web.controller.order.form;
 
 
+import java.util.Date;
+
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
@@ -53,6 +55,9 @@ import com.baozun.nebula.web.controller.BaseForm;
  *  <tr valign="top" style="background-color:#eeeeff">
  * <td>备注</td>
  * <td></td>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>类型</td>
+ * <td>1：退货2：换货</td>
  * </tr>
  * </table>
  * </blockquote>
@@ -81,6 +86,244 @@ public class ReturnOderForm  extends BaseForm{
 	/** 退货单退货原因*/
 	private String RetrunReason;
 	
+	/**退换货类型1：退货 2：换货*/
+	private int returnType;
+	
+	/**以下部分为returnDelivery信息*/
+	
+	 /**
+     * 国家
+     */
+    private String country;
+
+    /**
+     * 省
+     */
+    private String province;
+
+    /**
+     * 市
+     */
+    private String city;
+
+    /**
+     * 区
+     */
+    private String district;
+
+    /**
+     * 镇.
+     */
+    private String town;
+
+    /**
+     * 换货地址详细地址
+     */
+    private String address;
+
+    /**
+     * 邮编
+     */
+    private String zipcode;
+
+    /**
+     * 收货人
+     */
+    private String receiver;
+
+    /**
+     * 收件人号码
+     */
+    private String receiverPhone;
+
+    /**
+     * 收货人手机
+     */
+    private String receiverMobile;
+
+    /**
+     * 物流商编号
+     */
+    private String transName;
+
+    /**
+     * 物流单号
+     */
+    private String transCode;
+
+    /**
+     * 备注 明细信息字符串
+     */
+    private String description;
+
+    
+
+	public String getProvince() {
+		return province;
+	}
+
+
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+
+
+	public String getDistrict() {
+		return district;
+	}
+
+
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+
+
+	public String getTown() {
+		return town;
+	}
+
+
+
+	public void setTown(String town) {
+		this.town = town;
+	}
+
+
+
+	public String getZipcode() {
+		return zipcode;
+	}
+
+
+
+	public void setZipcode(String zipcode) {
+		this.zipcode = zipcode;
+	}
+
+
+
+	public String getReceiver() {
+		return receiver;
+	}
+
+
+
+	public void setReceiver(String receiver) {
+		this.receiver = receiver;
+	}
+
+
+
+	public String getReceiverPhone() {
+		return receiverPhone;
+	}
+
+
+
+	public void setReceiverPhone(String receiverPhone) {
+		this.receiverPhone = receiverPhone;
+	}
+
+
+
+	public String getReceiverMobile() {
+		return receiverMobile;
+	}
+
+
+
+	public void setReceiverMobile(String receiverMobile) {
+		this.receiverMobile = receiverMobile;
+	}
+
+
+
+	public String getTransName() {
+		return transName;
+	}
+
+
+
+	public void setTransName(String transName) {
+		this.transName = transName;
+	}
+
+
+
+	public String getTransCode() {
+		return transCode;
+	}
+
+
+
+	public void setTransCode(String transCode) {
+		this.transCode = transCode;
+	}
+
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+
+
+	public String getAddress() {
+		return address;
+	}
+
+
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+
+
+	public String getCountry() {
+		return country;
+	}
+
+
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+
+
+	public String getCity() {
+		return city;
+	}
+
+
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+
+
+	public int getReturnType() {
+		return returnType;
+	}
+
+
+
+	public void setReturnType(int returnType) {
+		this.returnType = returnType;
+	}
+
 
 
 	/**
