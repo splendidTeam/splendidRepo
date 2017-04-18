@@ -59,6 +59,58 @@ import com.baozun.nebula.web.controller.BaseForm;
  * <td>类型</td>
  * <td>1：退货2：换货</td>
  * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>国家</td>
+ * <td></td>
+ * </tr>
+ *  <tr valign="top" style="background-color:#eeeeff">
+ * <td>省份</td>
+ * <td></td>
+ * </tr>
+ *  <tr valign="top" style="background-color:#eeeeff">
+ * <td>市</td>
+ * <td></td>
+ * </tr>
+ *  <tr valign="top" style="background-color:#eeeeff">
+ * <td>区</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>镇</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>详细地址</td>
+ * <td></td>
+ * </tr>
+ *  <tr valign="top" style="background-color:#eeeeff">
+ * <td>邮编</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>收货人</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>收件人号码</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>收件人手机</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>物流商编号</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>物流编号</td>
+ * <td></td>
+ * </tr>
+ * <tr valign="top" style="background-color:#eeeeff">
+ * <td>备注 明细信息字符串</td>
+ * <td></td>
+ * </tr>
  * </table>
  * </blockquote>
  *

@@ -108,18 +108,18 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 		
 		if(SoReturnConstants.TYPE_EXCHANGE==returnCommand.getType()){
 		}
-		app=this.saveSoReturnApplication(app);
+		SoReturnApplication	returnApplication=this.saveSoReturnApplication(app);
 		if(null!=deliveryInfo){
 			deliveryInfo.setRetrunApplicationId(returnCommand.getId());
 			sdkSoReturnApplicationDeliveryInfoDao.save(deliveryInfo);
 		}
 		List<SoReturnLine> returnLine=returnCommand.getReturnLineList();
 		for(SoReturnLine line:returnLine){
-			line.setReturnOrderId(app.getId());
+			line.setReturnOrderId(returnApplication.getId());
 		}
 		soReturnLineManager.saveReturnLine(returnLine);
-		if(null!=app){
-			return app;
+		if(null!=returnApplication){
+			return returnApplication;
 		}else{
 			return null;
 		}
