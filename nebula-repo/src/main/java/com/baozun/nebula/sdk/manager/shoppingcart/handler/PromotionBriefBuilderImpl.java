@@ -87,4 +87,25 @@ public class PromotionBriefBuilderImpl implements PromotionBriefBuilder{
                         shoppingCartCommand.getCurrentTime());
     }
 
+    @Override
+    public List<PromotionBrief> getCoarsePromotionBriefList(ShoppingCartCommand shoppingCartCommand){
+        List<PromotionCommand> promotionCommandList = getPromotionCommandList(shoppingCartCommand);
+        if(Validator.isNotNullOrEmpty(promotionCommandList)){
+            List<PromotionBrief> briefList = new ArrayList<PromotionBrief>();
+            PromotionBrief brief = null;
+            for (PromotionCommand command : promotionCommandList){
+                brief = new PromotionBrief();
+                brief.setPromotionId(command.getPromotionId()); 
+                briefList.add(brief);
+            }
+            return briefList;
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<PromotionBrief> getFinePromotionBriefList(ShoppingCartCommand shoppingCartCommand,List<PromotionCommand> promotionCommandList){
+        return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionCommandList);
+    }
+
 }
