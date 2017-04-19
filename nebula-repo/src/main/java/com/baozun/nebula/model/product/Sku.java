@@ -94,6 +94,20 @@ public class Sku extends BaseModel{
      * by D.C 2016/4/12
      */
     private String              barcode;
+    
+    /** 1 组合商品的组合extentionCode. 在数据库中以|分割 如[8,4,6]|[1,,4,5] */
+    private String              groupCode;
+    
+
+    @Column(name = "group_code")
+    public String getGroupCode(){
+        return groupCode;
+    }
+
+    public void setGroupCode(String groupCode){
+        this.groupCode = groupCode;
+    }
+
 
     /**
      * Gets the pK.
