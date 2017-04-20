@@ -3,9 +3,9 @@ $j.extend(loxia.regional['zh-CN'], {
 	"UPDATEITEM_FAIL" : "修改商品库存失败",
 	"UPDATEITEM_SUCCESS" : "修改商品库存成功",
 	"MERCHANT_CODING" : "商家编码",
-	"MERCHANT_GROUPCODE" : "组合商品编码",
 	"MERCHANT_SALEPRICE" : "销售价",
 	"MERCHANT_LISTPRICE" : "吊牌价",
+	"MERCHANT_GROUPCODE" : "组合商品编码",
 	"CODING_TIPS" : "您需要选择所有的属性，才能组合成完整的规格信息!",
 	"NOT_DATA_FORMAT" : "数据格式不正确",
 	"STORE_MANAGER" : "库存管理",// add by hr 20140417

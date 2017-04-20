@@ -215,6 +215,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 						Sku skuToBeUpdate = skuDao.getByPrimaryKey(skuId);
 						skuToBeUpdate.setListPrice(spc.getListPrice());
 						skuToBeUpdate.setOutid(spc.getCode());
+						skuToBeUpdate.setGroupCode(spc.getGroupCode());
 						skuToBeUpdate.setSalePrice(spc.getSalePrice());
 						savedSku = skuDao.save(skuToBeUpdate);
 					} else {
@@ -350,6 +351,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 		sku.setItemId(itemId);
 		sku.setCreateTime(new Date());
 		sku.setOutid(spc.getCode());
+		sku.setGroupCode(spc.getGroupCode());
 		sku.setSalePrice(spc.getSalePrice());
 		sku.setListPrice(spc.getListPrice());
 		sku.setLifecycle(Sku.LIFECYCLE_ENABLE);
@@ -627,6 +629,7 @@ public class ItemLangManagerImpl implements ItemLangManager {
 	* void   
 	* @throws
 	 */
+	@Override
 	public  void saveOrUpdateItemInfoLang(String title,String subTitle,String description,String sketch,
 			String seoDescription,String seoKeyword,String seoTitle,String lang,Long itemInfoId){
 		ItemInfoLang itemInfoLang = itemInfoDao.findItemInfoLang(itemInfoId, lang);

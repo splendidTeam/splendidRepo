@@ -112,7 +112,6 @@ import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.ItemSortScore;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
-import com.baozun.nebula.model.system.ChooseOption;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkI18nLangManager;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
@@ -476,8 +475,10 @@ public class ItemController extends BaseController {
 			String codeKey = "skuCode";
 			String spKey = "skuSalePrice";
 			String lpKey = "skuListPrice";
+			String groupCodeKey = "groupCode";
 
 			String code = request.getParameter(codeKey);
+			String groupCode = request.getParameter(groupCodeKey);
 			BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
 			String listPriceStr = request.getParameter(lpKey);
 			BigDecimal listPrice = getPriceFromStr(listPriceStr);
@@ -485,6 +486,7 @@ public class ItemController extends BaseController {
 
 			spc.setId(skuId);
 			spc.setCode(code);
+			spc.setGroupCode(groupCode);
 			spc.setListPrice(listPrice);
 			spc.setSalePrice(salePrice);
 			spc.setPropertyList(new ArrayList<ItemPropertyMutlLangCommand>());
@@ -539,12 +541,17 @@ public class ItemController extends BaseController {
 				String spKey = input + "_salePrice";
 				String lpKey = input + "_listPrice";
 				String idKey = input + "_id";
+				String groupCodeKey = input + "_groupCode";
 				Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 				String code = request.getParameter(codeKey);
+				String groupCode = request.getParameter(groupCodeKey);
 
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
+					continue;
+				}
+				if (groupCode == null || "".equals(groupCode.trim())) {
 					continue;
 				}
 				String[] values = getValues(propertyValueInputs);
@@ -563,6 +570,7 @@ public class ItemController extends BaseController {
 				BigDecimal listPrice = getPriceFromStr(listPriceStr);
 
 				spc.setCode(code);
+				spc.setGroupCode(groupCode);
 				spc.setListPrice(listPrice);
 				spc.setSalePrice(salePrice);
 				spc.setPropertyList(ipcList);
@@ -727,9 +735,11 @@ public class ItemController extends BaseController {
 					String spKey = prefix + "salePrice";
 					String lpKey = prefix + "listPrice";
 					String idKey = prefix + "id";
+					String groupCodeKey = prefix + "groupCode";
 					Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 					String code = request.getParameter(codeKey);
+					String groupCode = request.getParameter(groupCodeKey);
 
 					if (code == null || "".equals(code.trim())) {// 如果没有填写skuCode
 																	// ,那么就认为
@@ -737,7 +747,12 @@ public class ItemController extends BaseController {
 																	// 不进行保存或者修改
 						continue;
 					}
-
+					if (groupCode == null || "".equals(groupCode.trim())) {// 如果没有填写skuCode
+						// ,那么就认为
+						// 没有该属性的sku
+						// 不进行保存或者修改
+						continue;
+					}
 					SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
 
 					BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
@@ -749,6 +764,7 @@ public class ItemController extends BaseController {
 
 					spc.setId(skuId);
 					spc.setCode(code);
+					spc.setGroupCode(groupCode);
 					spc.setListPrice(listPrice);
 					spc.setSalePrice(salePrice);
 					spc.setPropertyList(ipcList);
@@ -875,12 +891,17 @@ public class ItemController extends BaseController {
 				String spKey = input + "_salePrice";
 				String lpKey = input + "_listPrice";
 				String idKey = input + "_id";
+				String groupCodeKey = input + "_groupCode";
 				Long skuId = getSkuIdFromStr(request.getParameter(idKey));
 
 				String code = request.getParameter(codeKey);
+				String groupCode = request.getParameter(groupCodeKey);
 
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
+					continue;
+				}
+				if (groupCode == null || "".equals(groupCode.trim())) {
 					continue;
 				}
 				String[] values = getValues(propertyValueInputs);
@@ -899,6 +920,7 @@ public class ItemController extends BaseController {
 				BigDecimal listPrice = getPriceFromStr(listPriceStr);
 
 				spc.setCode(code);
+				spc.setGroupCode(groupCode);
 				spc.setListPrice(listPrice);
 				spc.setSalePrice(salePrice);
 				spc.setPropertyList(ipcList);
@@ -2339,6 +2361,7 @@ public class ItemController extends BaseController {
 		List<BigDecimal> salePrices = new ArrayList<BigDecimal>();
 		// sku销售价
 		List<BigDecimal> listPrices = new ArrayList<BigDecimal>();
+		List<String> groupCode = new ArrayList<String>();
 
 		for (Sku sku : skuList) {
 
@@ -2351,6 +2374,9 @@ public class ItemController extends BaseController {
 				if (sku.getListPrice() != null) {
 					listPrices.add(sku.getListPrice());
 				}
+				if (sku.getGroupCode() != null) {
+					groupCode.add(sku.getGroupCode());
+				}
 			}
 
 		}
@@ -2360,6 +2386,7 @@ public class ItemController extends BaseController {
 
 		model.addAttribute("skuList", skuJaStr);
 		model.addAttribute("salePrices", salePrices);
+		model.addAttribute("groupCode", groupCode);
 		model.addAttribute("listPrices", listPrices);
 
 		model.addAttribute("isStyleEnable", isEnableStyle());
@@ -2530,6 +2557,7 @@ public class ItemController extends BaseController {
 		itemInfo.setDescription(addDefinedDomainInDesc(itemInfo.getDescription(), UPLOAD_IMG_DOMAIN));
 		model.addAttribute("salePrice", itemInfo.getSalePrice());
 		model.addAttribute("listPrice", itemInfo.getListPrice());
+		model.addAttribute("groupCode", itemInfo.getGroupCode());
 
 		model.addAttribute("title", itemInfo.getTitle());
 		model.addAttribute("subTilte", itemInfo.getSubTitle());

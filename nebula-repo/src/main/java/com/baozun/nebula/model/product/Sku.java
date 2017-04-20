@@ -63,7 +63,8 @@ public class Sku extends BaseModel{
      * @deprecated sku所对应的销售属性的中文名字串，格式如：pid1:vid1:pid_name1:vid_name1;pid2:vid2
      *             :pid_name2: vid_name2……
      */
-    private String              propertiesName;
+    @Deprecated
+	private String              propertiesName;
 
     /** 创建时间. */
     private Date                createTime;
@@ -95,11 +96,11 @@ public class Sku extends BaseModel{
      */
     private String              barcode;
     
-    /** 1 组合商品的组合extentionCode. 在数据库中以|分割 如[8,4,6]|[1,,4,5] */
+	/** 1 组合商品的组合extentionCode. 在数据库中以:分割 如[8,4,6]:[1,,4,5] */
     private String              groupCode;
     
 
-    @Column(name = "group_code")
+    @Column(name = "GROUP_CODE")
     public String getGroupCode(){
         return groupCode;
     }

@@ -412,8 +412,8 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 	}
 
 	tableHeader += ("<td style='width:150px'>" + nps.i18n("MERCHANT_CODING") + "</td>" + "<td style='width:150px'>"
-			+ nps.i18n("MERCHANT_GROUPCODE") + "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_SALEPRICE")
-			+ "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_LISTPRICE") + "</td>" + "</tr>");
+			+ nps.i18n("MERCHANT_SALEPRICE") + "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_LISTPRICE")
+			+ "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_GROUPCODE") + "</td>" + "</tr>");
 
 	var tableContent = "";
 	if (propertyValueArray.length > 0) {
@@ -441,9 +441,9 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 
 				var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
 						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>"
 						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>";
+						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
 
 				proHtml = proHtml.replace('codesNameToReplace', codesName);
 				proHtml = proHtml.replace('salePriceNameToReplace', salePriceName);
@@ -491,9 +491,9 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 
 		var proHtml = "<input type='hidden' name='skuId' value = 'idValueTOReplace' />"
 				+ "<td style='width:150px'><input type='text' mandatory='true' class = 'dynamicInputNameSkuCode' name='skuCode' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
-				+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='skuGroupCode' loxiaType='input'  value='groupCode_value'/></td>"
 				+ "<td style='width:150px'><input type='text' id='salePrices' class = 'dynamicInputNameSalePrices' mandatory='true' name='skuSalePrice' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-				+ "<td style='width:150px'><input type='text' id='listPrices' class = 'dynamicInputNameListPrices' name='skuListPrice' decimal='2' loxiaType='number' value='listPrices_value'/></td>";
+				+ "<td style='width:150px'><input type='text' id='listPrices' class = 'dynamicInputNameListPrices' name='skuListPrice' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+				+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCode' loxiaType='input'  value='groupCode_value'/></td>";
 
 		var salePrice = $j("#salePrice").val();
 		var listPrice = $j("#listPrice").val();
@@ -553,9 +553,9 @@ function bulidTable(table, data, dataRowIndex, isLoadInit) {
 
 			var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
 					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  skuId='idValueTOReplace' name='codesNameToReplace' loxiaType='input'  value='CODE_VALUE'/></td>"
-					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>"
 					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
-					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>";
+					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
+					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
 
 			proHtml = proHtml.replace('idNameToReplace', idName);
 			proHtml = proHtml.replace('codesNameToReplace', codesName);
