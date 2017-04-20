@@ -16,7 +16,6 @@
  */
 package com.baozun.nebula.web.controller.shoppingcart.resolver;
 
-
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.MAX_THAN_INVENTORY;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
 import static com.baozun.nebula.web.controller.shoppingcart.resolver.ShoppingcartResult.SHOPPING_CART_LINE_SIZE_NOT_EXPECT;
@@ -41,6 +40,7 @@ import com.baozun.nebula.sdk.manager.shoppingcart.extractor.ShoppingCartAddSameL
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingcartAddDetermineSameLineElementsBuilder;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ToggleCheckStatusShoppingCartLinePredicateBuilder;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineAddForm;
 import com.baozun.nebula.web.controller.shoppingcart.form.ShoppingCartLineUpdateSkuForm;
 import com.baozun.nebula.web.controller.shoppingcart.persister.ShoppingcartCountPersister;
@@ -97,6 +97,9 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
     @Autowired
     private ShoppingcartAddDetermineSameLineElementsBuilder shoppingcartAddDetermineSameLineElementsBuilder;
+
+    @Autowired
+    private ToggleCheckStatusShoppingCartLinePredicateBuilder toggleCheckStatusShoppingCartLinePredicateBuilder;
 
     /*
      * (non-Javadoc)
@@ -385,10 +388,11 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
 
         //--------------商品验证----------------------------------------------------------------------------
 
-        Long skuId = needChangeCheckedCommand.getSkuId();
-        Sku sku = sdkSkuManager.findSkuById(skuId);
-
         if (checkStatus){ //如果是选中
+
+            Long skuId = needChangeCheckedCommand.getSkuId();
+            Sku sku = sdkSkuManager.findSkuById(skuId);
+
             //公共校验
             ShoppingcartResult commonValidateShoppingcartResult = shoppingcartLineOperateCommonValidator.validate(sku, needChangeCheckedCommand.getQuantity());
 
@@ -572,11 +576,7 @@ public abstract class AbstractShoppingcartResolver implements ShoppingcartResolv
         }
 
         //--------------------------------------------------------------------------------------------
-
-        //找到需要处理的数据
-        //如果全选,那么我们找到没有选中的购物车行; (可能这家伙已经在其他窗口中操作过了)
-        //如果全不选,那么我们找到选中的购物车行
-        List<ShoppingCartLineCommand> toDoNeedChangeCheckedCommandList = select(needChangeCheckedCommandList, "settlementState", checkStatus ? 0 : 1);
+        List<ShoppingCartLineCommand> toDoNeedChangeCheckedCommandList = select(needChangeCheckedCommandList, toggleCheckStatusShoppingCartLinePredicateBuilder.build(shoppingCartLineCommandList, checkStatus));
         if (isNullOrEmpty(toDoNeedChangeCheckedCommandList)){
             return SUCCESS;
         }
