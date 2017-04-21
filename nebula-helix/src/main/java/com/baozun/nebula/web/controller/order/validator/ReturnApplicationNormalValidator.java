@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
+import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.manager.SoReturnApplicationManager;
 import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
@@ -44,7 +45,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 		//检查退货数量书否超出可退数量限制
 		List<OrderLineCommand> lineCommandList = saleOrder.getOrderLines();
 		
-		String[] selectedLineId=form.getLineIdSelected().split(",");
+		String[] selectedLineId=form.getLineIdSelected();
 		for (OrderLineCommand line : lineCommandList) {
 			//将订单中的订单行跟页面中选中的订单行id进行匹配，然后判断是否是不允许退款的商品
 			for(int i=0;i<selectedLineId.length;i++){
@@ -53,7 +54,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 					//通过订单行id查询该订单行已经完成的退货数量
 					Integer returnedCount=	soReturnApplicationManager.countCompletedAppsByPrimaryLineId(Long.parseLong(selectedLineId[i]));
 					Integer count=line.getCount();
-					if(count-Integer.parseInt(form.getSumSelected().split(",")[i])<returnedCount){
+					if(count-Integer.parseInt(form.getSumSelected()[i])<returnedCount){
 						// 退货数量超出限制。
 						errors.rejectValue("returnCount", "return.count.outrange");
 					
@@ -62,7 +63,7 @@ public  class ReturnApplicationNormalValidator extends ReturnApplicationValidato
 			}
 			
 			SoReturnApplication app = soReturnApplicationManager.findLastApplicationByOrderLineId(line.getId());
-			if (null != app && app.getStatus() != 5&&app.getStatus()!=1) {
+			if (null != app && app.getStatus() != SoReturnConstants.RETURN_COMPLETE&&app.getStatus()!=SoReturnConstants.REFUS_RETURN) {
 				// 当前订单尚有一笔未完成的退货单！无法再次申请
 				errors.rejectValue("returnOrder", "return.unfinish");
 			}

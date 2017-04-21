@@ -1,5 +1,6 @@
 package com.baozun.nebula.manager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.springframework.util.Assert;
 
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
+import com.baozun.nebula.command.ReturnApplicationViewCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.dao.salesorder.SdkOrderDao;
 import com.baozun.nebula.dao.salesorder.SdkReturnApplicationDao;
@@ -24,7 +26,12 @@ import com.baozun.nebula.model.salesorder.SalesOrder;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
+import com.baozun.nebula.sdk.command.OrderLineCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
+import com.baozun.nebula.sdk.command.SkuProperty;
+import com.baozun.nebula.sdk.manager.SdkSkuManager;
+import com.baozun.nebula.sdk.manager.order.OrderManager;
+import com.feilong.core.Validator;
 
 public class SoReturnApplicationManagerImpl implements SoReturnApplicationManager{
 	
@@ -38,6 +45,12 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	private SoReturnLineManager soReturnLineManager;
 	@Autowired
 	private SdkSoReturnApplicationDeliveryInfoDao sdkSoReturnApplicationDeliveryInfoDao;
+	
+	@Autowired
+	private SdkSkuManager sdkSkuManager;
+	
+	@Autowired
+	private OrderManager orderManager;
 	
 	public final static Integer[] statusArr = {new Integer(SoReturnConstants.RETURN_COMPLETE) };
 
@@ -57,7 +70,13 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 			log.error("===orderLineId is null ==");
 			return null;
 		}
-		return soReturnApplicationDao.findLastApplicationByOrderLineId(orderLineId);
+		List<SoReturnApplication> returnApplications=soReturnApplicationDao.findLastApplicationByOrderLineId(orderLineId);
+		//获得的returnApplication是根据创建时间倒序排列，因此取第一个就是最新的一笔退货
+		if(Validator.isNotNullOrEmpty(returnApplications)){
+			return returnApplications.get(0);
+		}
+		return null;
+		
 	}
 
 	@Override
@@ -67,62 +86,32 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 			return false;
 		}
 		SalesOrder salesOrder = sdkOrderDao.findFinishedOrderById(orderId, SalesOrder.SALES_ORDER_STATUS_FINISHED);
-		return salesOrder!=null;
+		return null!=salesOrder;
 		
 	}
 
 	@Transactional
 	@Override
-	public SoReturnApplication createReturnApplication(ReturnApplicationCommand returnCommand,SalesOrderCommand orderCommand,
-			SoReturnApplicationDeliveryInfo deliveryInfo) {
-		SoReturnApplication app=new SoReturnApplication();
-		app.setApprovalDescription(returnCommand.getApprovalDescription());
-		app.setApprover(returnCommand.getApprover());
-		app.setApproveTime(returnCommand.getApproveTime());
-		app.setId(returnCommand.getId());
-		app.setIsNeededReturnInvoice(returnCommand.getIsNeededReturnInvoice());
-		app.setLastModifyUser(returnCommand.getLastModifyUser());
-		app.setMemberId(returnCommand.getMemberId());
-		app.setOmsStatus(returnCommand.getOmsStatus());
-		app.setOmsCode(returnCommand.getOmsCode());
-		app.setRefundAccount(returnCommand.getRefundAccount());
-		app.setRefundBank(returnCommand.getRefundBank());
-		app.setRefundStatus(returnCommand.getRefundStatus());
-		app.setRefundType(returnCommand.getRefundType());
-		app.setReturnAddress(returnCommand.getReturnAddress());
-		app.setReturnFreight(returnCommand.getReturnFreight());
-		app.setReturnPrice(returnCommand.getReturnPrice());
-		app.setReturnReason(returnCommand.getReturnReason());
-		app.setSoOrderCode(returnCommand.getSoOrderCode());
-		app.setSoOrderId(returnCommand.getSoOrderId());
-		app.setStatus(returnCommand.getStatus());
-		app.setTransCode(returnCommand.getTransCode());
-		app.setType(returnCommand.getType());
-		app.setVersion(returnCommand.getVersion());
-		app.setCreateTime(returnCommand.getCreateTime());
-		app.setReturnApplicationCode(returnCommand.getReturnApplicationCode());
-		app.setSoOrderLineId(returnCommand.getSoOrderLineId());
-		app.setSource(returnCommand.getSource());
-		app.setTransName(returnCommand.getTransName());
-		app.setRefundBankBranch(returnCommand.getRefundBankBranch());
-		
-		if(SoReturnConstants.TYPE_EXCHANGE==returnCommand.getType()){
-		}
+	public ReturnApplicationCommand createReturnApplication(ReturnApplicationCommand returnCommand,SalesOrderCommand orderCommand) {
+		SoReturnApplication app=returnCommand.getReturnApplication();
 		SoReturnApplication	returnApplication=this.saveSoReturnApplication(app);
-		if(null!=deliveryInfo){
-			deliveryInfo.setRetrunApplicationId(returnCommand.getId());
-			sdkSoReturnApplicationDeliveryInfoDao.save(deliveryInfo);
+		
+		//如果是换货请求，需要保存换货物流对象
+		if(SoReturnConstants.TYPE_EXCHANGE==returnApplication.getType()){
+			SoReturnApplicationDeliveryInfo deliveryInfo=returnCommand.getSoReturnApplicationDeliveryInfo();
+				deliveryInfo.setRetrunApplicationId(returnApplication.getId());
+				deliveryInfo=sdkSoReturnApplicationDeliveryInfoDao.save(deliveryInfo);
+				returnCommand.setSoReturnApplicationDeliveryInfo(deliveryInfo);
 		}
-		List<SoReturnLine> returnLine=returnCommand.getReturnLineList();
-		for(SoReturnLine line:returnLine){
+		List<SoReturnLine> returnLines=returnCommand.getReturnLineList();
+		for(SoReturnLine line:returnLines){
 			line.setReturnOrderId(returnApplication.getId());
 		}
-		soReturnLineManager.saveReturnLine(returnLine);
-		if(null!=returnApplication){
-			return returnApplication;
-		}else{
-			return null;
-		}
+		 returnLines=soReturnLineManager.saveReturnLine(returnLines);
+		
+	    returnCommand.setReturnLineList(returnLines);
+		returnCommand.setReturnApplication(returnApplication);
+		return returnCommand;
 		
 	}
 	
@@ -138,8 +127,9 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 	
 	@Override
 	public SoReturnApplication findLastApplicationByOrderId(Long orderId) {
-		SoReturnApplication app=soReturnApplicationDao.findLastApplicationByOrderId(orderId);
-		return app;
+		List<SoReturnApplication> returnApplication=soReturnApplicationDao.findLastApplicationByOrderId(orderId);
+		//获得的returnApplication是根据创建时间倒序排序，因此取第一个就是最新的一笔退货
+		return returnApplication.get(0);
 	}
 
 	@Override
@@ -178,7 +168,7 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 			}
 			returnapp.setApprovalDescription(description);
 			// 当前退货状态为待审核，并且页面操作为审核
-			if (status.intValue() == 2 && returnapp.getStatus() == 0) {// 审核通过
+			if (status.intValue() == SoReturnConstants.TO_DELIVERY && returnapp.getStatus() ==SoReturnConstants.AUDITING) {// 审核通过
 				// status为2时，表示已进行审核操作，需要判断当前退货单是否已审核过
 				if (returnapp.getStatus() == SoReturnConstants.TO_DELIVERY
 						|| returnapp.getStatus() == SoReturnConstants.REFUS_RETURN) {
@@ -187,7 +177,7 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 					returnapp.setStatus(SoReturnConstants.TO_DELIVERY);// 审核通过
 				}
 			}
-			if (status == 1 && returnapp.getStatus() == 0) {// 审核退回
+			if (status == SoReturnConstants.REFUS_RETURN && returnapp.getStatus() == SoReturnConstants.AUDITING) {// 审核退回
 				// status为1时，表示已进行审核操作，需要判断当前退货单是否已审核过
 				if (returnapp.getStatus() == SoReturnConstants.TO_DELIVERY
 						|| returnapp.getStatus() == SoReturnConstants.REFUS_RETURN) {
@@ -197,15 +187,15 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 				}
 			}
 				// 拒绝退款
-				if (status == 1) {
+				if (status ==  SoReturnConstants.REFUS_RETURN) {
 					returnapp.setStatus(SoReturnConstants.REFUS_RETURN);
 				}
 				// 同意退款
-				if (status == 4) {
+				if (status ==SoReturnConstants.AGREE_REFUND) {
 					returnapp.setStatus(SoReturnConstants.AGREE_REFUND);
 				}
 			// 当前状态为同意退款并且页面操作为退款完成
-			if (status == 5 && returnapp.getStatus() == 4) {
+			if (status == SoReturnConstants.RETURN_COMPLETE && returnapp.getStatus() == SoReturnConstants.AGREE_REFUND) {
 				returnapp.setStatus(SoReturnConstants.RETURN_COMPLETE);
 			}
 			returnapp.setOmsCode(omsCode);
@@ -231,5 +221,29 @@ public class SoReturnApplicationManagerImpl implements SoReturnApplicationManage
 				List<Long> ids) {
 		List<ReturnApplicationCommand>	 returnApplicationCommands=soReturnApplicationDao.findReturnApplicationCommandByIds(ids);
 			return returnApplicationCommands;
+		}
+
+		@Override
+		public List<ReturnApplicationViewCommand> findReturnApplicationViewCommand(
+				List<ReturnApplicationCommand> returnApplications) {
+			List<ReturnApplicationViewCommand> viewCommands=new ArrayList<ReturnApplicationViewCommand>();
+			
+			for(ReturnApplicationCommand returnApp:returnApplications){
+				ReturnApplicationViewCommand viewCommand=new ReturnApplicationViewCommand();
+				SoReturnApplication returnApplication=returnApp.getReturnApplication();
+				if(Validator.isNotNullOrEmpty(returnApplication)){
+					SalesOrderCommand salesOrder = orderManager.findOrderById(Long
+							.valueOf(returnApp.getReturnApplication().getSoOrderId()), null);
+					for (OrderLineCommand line : salesOrder.getOrderLines()) {
+						String properties = line.getSaleProperty();
+						List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
+						line.setSkuPropertys(propList);
+					}
+					viewCommand.setOrderLineCommands(salesOrder.getOrderLines());
+					viewCommand.setReturnApplicationCommand(returnApp);
+					viewCommands.add(viewCommand);
+				}
+			}
+			return viewCommands;
 		}
 }

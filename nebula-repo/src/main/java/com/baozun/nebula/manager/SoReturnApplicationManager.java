@@ -10,8 +10,8 @@ import loxia.dao.Sort;
 
 import com.baozun.nebula.command.OrderReturnCommand;
 import com.baozun.nebula.command.ReturnApplicationCommand;
+import com.baozun.nebula.command.ReturnApplicationViewCommand;
 import com.baozun.nebula.model.salesorder.SoReturnApplication;
-import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 
 public interface SoReturnApplicationManager {
@@ -29,8 +29,7 @@ public interface SoReturnApplicationManager {
 	
 	/** 新增退换货申请单
 	 * @return */
-	public SoReturnApplication createReturnApplication(ReturnApplicationCommand appCommand,SalesOrderCommand orderCommand,
-			SoReturnApplicationDeliveryInfo deliveryInfo);
+	public ReturnApplicationCommand createReturnApplication(ReturnApplicationCommand appCommand,SalesOrderCommand orderCommand);
 	
 	/**
 	 * 根据订单id查询最近的退货单
@@ -62,6 +61,14 @@ public interface SoReturnApplicationManager {
 	 * @return
 	 */
 	public List<ReturnApplicationCommand> findReturnApplicationCommandsByIds(List<Long> ids);
+	
+	/**
+	 * 通过ReturnApplicationCommand集合获得returnApplicationViewCommand集合对象
+	 * @param returnApplications
+	 * @return
+	 */
+	public List<ReturnApplicationViewCommand> findReturnApplicationViewCommand(List<ReturnApplicationCommand> returnApplications);
+	
 	
 	
 	

@@ -31,18 +31,18 @@ public interface SdkReturnApplicationDao extends GenericEntityDao<SoReturnApplic
 	SoReturnApplication findByApplicationId(@QueryParam("id") Long id);
 	
 	/**
-	 * 根据orderLineId orderId 查询退换货订单(时间最近的一个)
+	 * 根据orderLineId orderId 查询退换货订单
 	 */
 	@NativeQuery(model = SoReturnApplication.class)
-	SoReturnApplication findLastApplicationByOrderLineId(@QueryParam("orderLineId") Long orderLineId);
+	List<SoReturnApplication> findLastApplicationByOrderLineId(@QueryParam("orderLineId") Long orderLineId);
 	
 	/**
-	 * 根据orderId查询退货单（时间最近的一个）
+	 * 根据orderId查询退货单
 	 * @param orderId
 	 * @return
 	 */
 	@NativeQuery(model = SoReturnApplication.class)
-	SoReturnApplication findLastApplicationByOrderId(@QueryParam("orderId") Long orderId);
+	List<SoReturnApplication> findLastApplicationByOrderId(@QueryParam("orderId") Long orderId);
 	
 	/**
 	 * 普通商品 退货 <br/>
@@ -55,7 +55,7 @@ public interface SdkReturnApplicationDao extends GenericEntityDao<SoReturnApplic
 	 * 根据退单ids查询SoReturnApplication
 	 */
 	@NativeQuery(model = SoReturnApplication.class)
-	List<SoReturnApplication> findSoReturnAppsByIds(@QueryParam("appIds") Set<Long> appIds);
+	List<SoReturnApplication> findSoReturnAppsByIds(@QueryParam("returnIds") Set<Long> returnIds);
 
 	/**
 	 * 根据memberId查询SoReturnApplication
@@ -86,7 +86,7 @@ public interface SdkReturnApplicationDao extends GenericEntityDao<SoReturnApplic
 	 * @return
 	 */
 	@NativeQuery(model = SoReturnApplication.class)
-	 SoReturnApplication  findApplicationByCode(@QueryParam("code") String code);
+	SoReturnApplication  findApplicationByCode(@QueryParam("code") String code);
 
 	/*
 	 * 查询需要导出的数据（OrderReturnCommand）
@@ -123,11 +123,11 @@ public interface SdkReturnApplicationDao extends GenericEntityDao<SoReturnApplic
 	 * @param platformcode
 	 * @return
 	 */
-	@NativeQuery(model = SoReturnApplication.class, value = "SoReturnApplication.findByPlatformCode")
+	@NativeQuery(model = SoReturnApplication.class, value = "SoReturnApplication.findByOmsCode")
 	SoReturnApplication findByOmsCode(
 			@QueryParam("omsCode") String omsCode);
 	
-	@NativeQuery(model = ReturnApplicationCommand.class, value = "SoReturnApplication.findByIds")
+	@NativeQuery(model = ReturnApplicationCommand.class, value = "SoReturnApplication.findReturnApplicationCommandByIds")
 	List<ReturnApplicationCommand>  findReturnApplicationCommandByIds(@QueryParam("ids") List<Long> ids);
 
 }

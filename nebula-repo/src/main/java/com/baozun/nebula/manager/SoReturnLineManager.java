@@ -15,7 +15,7 @@ public interface SoReturnLineManager  {
 
 	
 	//保存退货订单行
-	public void saveReturnLine(List<SoReturnLine> soReturnLine);
+	public List<SoReturnLine> saveReturnLine(List<SoReturnLine> soReturnLine);
 	
 	/**
 	 * 通过退货单编号查询退货订单行

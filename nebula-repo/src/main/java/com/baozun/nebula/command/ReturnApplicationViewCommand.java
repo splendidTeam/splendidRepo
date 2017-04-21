@@ -1,17 +1,12 @@
-package com.baozun.nebula.web.controller.order.viewcommand;
+package com.baozun.nebula.command;
 
 import java.util.List;
 
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
-import com.baozun.nebula.web.controller.BaseViewCommand;
 
-public class ReturnApplicationViewCommand  extends BaseViewCommand{
+public class ReturnApplicationViewCommand  {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2389091935575015185L;
 
 	private ReturnApplicationCommand returnApplicationCommand;
 	

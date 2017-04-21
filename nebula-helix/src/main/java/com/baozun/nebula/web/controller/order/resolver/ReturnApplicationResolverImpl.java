@@ -14,6 +14,7 @@ import com.baozun.nebula.dao.salesorder.SdkReturnApplicationDao;
 import com.baozun.nebula.manager.SoReturnApplicationManager;
 import com.baozun.nebula.manager.SoReturnLineManager;
 import com.baozun.nebula.model.salesorder.OrderLine;
+import com.baozun.nebula.model.salesorder.SoReturnApplication;
 import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.model.salesorder.SoReturnLine;
 import com.baozun.nebula.sdk.command.OrderLineCommand;
@@ -23,7 +24,6 @@ import com.baozun.nebula.sdk.manager.SdkSkuManager;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOderForm;
-import com.baozun.nebula.web.controller.order.viewcommand.ReturnApplicationViewCommand;
 import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
 
 public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
@@ -53,28 +53,29 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 	public ReturnApplicationCommand toReturnApplicationCommand(
 			MemberDetails memberDetails,ReturnOderForm returnOrderForm, SalesOrderCommand salesOrder) {
 		ReturnApplicationCommand appCommand=new ReturnApplicationCommand();
+		SoReturnApplication returnApplication=new SoReturnApplication();
 		Date date=new Date();
-		appCommand.setCreateTime(date);
-		appCommand.setMemberId(memberDetails.getMemberId());
-		appCommand.setRemark(returnOrderForm.getMemo());
-		appCommand.setRefundAccount(returnOrderForm.getAccount());
-		appCommand.setVersion(date);
-		appCommand.setRefundBankBranch(returnOrderForm.getBranch());
-		appCommand.setRefundBank(returnOrderForm.getBank());
-		appCommand.setType(returnOrderForm.getReturnType());
-		appCommand.setSoOrderCode(returnOrderForm.getOrderCode());
-		appCommand.setSoOrderId(Long.parseLong(returnOrderForm.getOrderId()));
-		appCommand.setReturnApplicationCode("VR" + new Date().getTime());
-		appCommand.setRefundType(salesOrder.getPayment().toString());// 退款方式
-		appCommand.setIsNeededReturnInvoice(SoReturnConstants.NEEDED_RETURNINVOICE);
-		appCommand.setReturnReason(returnOrderForm.getRetrunReason());
-		appCommand.setStatus(SoReturnConstants.AUDITING);
+		returnApplication.setCreateTime(date);
+		returnApplication.setMemberId(memberDetails.getMemberId());
+		returnApplication.setRemark(returnOrderForm.getMemo());
+		returnApplication.setRefundAccount(returnOrderForm.getAccount());
+		returnApplication.setVersion(date);
+		returnApplication.setRefundBankBranch(returnOrderForm.getBranch());
+		returnApplication.setRefundBank(returnOrderForm.getBank());
+		returnApplication.setType(returnOrderForm.getReturnType());
+		returnApplication.setSoOrderCode(returnOrderForm.getOrderCode());
+		returnApplication.setSoOrderId(Long.parseLong(returnOrderForm.getOrderId()));
+		returnApplication.setReturnApplicationCode("VR" + new Date().getTime());
+		returnApplication.setRefundType(salesOrder.getPayment().toString());// 退款方式
+		returnApplication.setIsNeededReturnInvoice(SoReturnConstants.NEEDED_RETURNINVOICE);
+		returnApplication.setReturnReason(returnOrderForm.getRetrunReason());
+		returnApplication.setStatus(SoReturnConstants.AUDITING);
 		List<SoReturnLine> returnLineList = new ArrayList<SoReturnLine>();
 
 		// 总共的退款金额 
 		BigDecimal returnTotalMoney = new BigDecimal(0);
-		String[] linedIdSelected=returnOrderForm.getLineIdSelected().split(",");
-		String[] reasonSelected=returnOrderForm.getReasonSelected().split(",");
+		String[] linedIdSelected=returnOrderForm.getLineIdSelected();
+		String[] reasonSelected=returnOrderForm.getReasonSelected();
 		for (int i = 0; i < linedIdSelected.length; i++) {
 			SoReturnLine returnLine = new SoReturnLine();
 			Long lineId = Long.parseLong(linedIdSelected[i]);
@@ -83,7 +84,7 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 			String returnReason = reasonSelected[i].trim();
 				returnLine.setReturnReason(returnReason);
 		
-			String[] sumSelected=returnOrderForm.getSumSelected().split(",");
+			String[] sumSelected=returnOrderForm.getSumSelected();
 			returnLine.setQty(Integer.parseInt(sumSelected[i]));
 			returnLine.setSoLineId(lineId);
 			returnLine.setMemo(returnOrderForm.getMemo());
@@ -107,8 +108,11 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 			}
 			returnLineList.add(returnLine);
 		}
+		returnApplication.setReturnPrice(returnTotalMoney);
+		SoReturnApplicationDeliveryInfo	delivery=returnOrderForm.getReturnDeliveryInfo();
 		appCommand.setReturnLineList(returnLineList);
-		appCommand.setReturnPrice(returnTotalMoney);
+		appCommand.setSoReturnApplicationDeliveryInfo(delivery);
+		appCommand.setReturnApplication(returnApplication);
 		return appCommand;
 	}
 
@@ -133,51 +137,5 @@ public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 		}
 		return soReturnLineViews;
 	}
-
-
-	@Override
-	public List<ReturnApplicationViewCommand> toTurnReturnApplicationViewCommand(
-			List<ReturnApplicationCommand> returnApplications) {
-
-		List<ReturnApplicationViewCommand> viewCommands=new ArrayList<ReturnApplicationViewCommand>();
-		
-		for(ReturnApplicationCommand returnApp:returnApplications){
-			ReturnApplicationViewCommand viewCommand=new ReturnApplicationViewCommand();
-			SalesOrderCommand salesOrder = orderManager.findOrderById(Long
-					.valueOf(returnApp.getSoOrderId()), null);
-			for (OrderLineCommand line : salesOrder.getOrderLines()) {
-				String properties = line.getSaleProperty();
-				List<SkuProperty> propList = sdkSkuManager.getSkuPros(properties);
-				line.setSkuPropertys(propList);
-			}
-			viewCommand.setOrderLineCommands(salesOrder.getOrderLines());
-			viewCommand.setReturnApplicationCommand(returnApp);
-			viewCommands.add(viewCommand);
-		}
-		return viewCommands;
-	}
-
-	@Override
-	public SoReturnApplicationDeliveryInfo toReturnApplicationDelivery(
-			ReturnOderForm returnOrderForm) {
-		SoReturnApplicationDeliveryInfo	delivery=new SoReturnApplicationDeliveryInfo();
-		delivery.setAddress(returnOrderForm.getAddress());
-		delivery.setCity(returnOrderForm.getCity());
-		delivery.setCountry(returnOrderForm.getCountry());
-		delivery.setCreateTime(new Date());
-		delivery.setDescription(returnOrderForm.getDescription());
-		delivery.setProvince(returnOrderForm.getProvince());
-		delivery.setReceiver(returnOrderForm.getReceiver());
-		delivery.setReceiverMobile(returnOrderForm.getReceiverMobile());
-		delivery.setReceiverPhone(returnOrderForm.getReceiverPhone());
-		delivery.setTown(returnOrderForm.getTown());
-		delivery.setTransCode(returnOrderForm.getTransCode());
-		delivery.setTransName(returnOrderForm.getTransName());
-		delivery.setZipcode(returnOrderForm.getZipcode());
-		return delivery;
-	}
-
-
-
 
 }

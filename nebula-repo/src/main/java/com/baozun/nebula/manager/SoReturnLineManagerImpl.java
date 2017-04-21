@@ -1,5 +1,6 @@
 package com.baozun.nebula.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -26,10 +27,13 @@ public class SoReturnLineManagerImpl implements SoReturnLineManager {
 	@Autowired
 	private SoReturnLineDao soReturnLineDao;
 	@Override
-	public void saveReturnLine(List<SoReturnLine> soReturnLine) {
+	public List<SoReturnLine> saveReturnLine(List<SoReturnLine> soReturnLine) {
+		List<SoReturnLine> returnLines=new ArrayList<SoReturnLine>();
 		for(SoReturnLine so:soReturnLine){
-			soReturnLineDao.save(so);
+			SoReturnLine returnLine=soReturnLineDao.save(so);
+			returnLines.add(returnLine);
 		}
+		return returnLines;
 	}
 
 	

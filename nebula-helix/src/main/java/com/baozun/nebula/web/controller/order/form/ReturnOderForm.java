@@ -3,9 +3,7 @@
  */
 package com.baozun.nebula.web.controller.order.form;
 
-
-import java.util.Date;
-
+import com.baozun.nebula.model.salesorder.SoReturnApplicationDeliveryInfo;
 import com.baozun.nebula.web.controller.BaseForm;
 
 /**
@@ -124,10 +122,12 @@ public class ReturnOderForm  extends BaseForm{
 	 * 
 	 */
 	private static final long serialVersionUID = -9020507259783914085L;
-	private String lineIdSelected;
-	private String sumSelected;
+	
+	//js '[1,2,3,4]'
+	private String[] lineIdSelected;
+	private String[] sumSelected;
 	/**退货单行退货理由*/
-	private String reasonSelected;
+	private String[] reasonSelected;
 	private String bank;
 	private String branch;
 	private String account;
@@ -136,444 +136,110 @@ public class ReturnOderForm  extends BaseForm{
 	private String orderCode;
 	private String memo;
 	/** 退货单退货原因*/
-	private String RetrunReason;
+	//属性名
+	private String retrunReason;
 	
 	/**退换货类型1：退货 2：换货*/
 	private int returnType;
 	
 	/**以下部分为returnDelivery信息*/
 	
-	 /**
-     * 国家
-     */
-    private String country;
+	private SoReturnApplicationDeliveryInfo returnDeliveryInfo;
 
-    /**
-     * 省
-     */
-    private String province;
-
-    /**
-     * 市
-     */
-    private String city;
-
-    /**
-     * 区
-     */
-    private String district;
-
-    /**
-     * 镇.
-     */
-    private String town;
-
-    /**
-     * 换货地址详细地址
-     */
-    private String address;
-
-    /**
-     * 邮编
-     */
-    private String zipcode;
-
-    /**
-     * 收货人
-     */
-    private String receiver;
-
-    /**
-     * 收件人号码
-     */
-    private String receiverPhone;
-
-    /**
-     * 收货人手机
-     */
-    private String receiverMobile;
-
-    /**
-     * 物流商编号
-     */
-    private String transName;
-
-    /**
-     * 物流单号
-     */
-    private String transCode;
-
-    /**
-     * 备注 明细信息字符串
-     */
-    private String description;
-
-    
-
-	public String getProvince() {
-		return province;
+	public SoReturnApplicationDeliveryInfo getReturnDeliveryInfo() {
+		return returnDeliveryInfo;
 	}
 
-
-
-	public void setProvince(String province) {
-		this.province = province;
+	public void setReturnDeliveryInfo(
+			SoReturnApplicationDeliveryInfo returnDeliveryInfo) {
+		this.returnDeliveryInfo = returnDeliveryInfo;
 	}
-
-
-
-	public String getDistrict() {
-		return district;
-	}
-
-
-
-	public void setDistrict(String district) {
-		this.district = district;
-	}
-
-
-
-	public String getTown() {
-		return town;
-	}
-
-
-
-	public void setTown(String town) {
-		this.town = town;
-	}
-
-
-
-	public String getZipcode() {
-		return zipcode;
-	}
-
-
-
-	public void setZipcode(String zipcode) {
-		this.zipcode = zipcode;
-	}
-
-
-
-	public String getReceiver() {
-		return receiver;
-	}
-
-
-
-	public void setReceiver(String receiver) {
-		this.receiver = receiver;
-	}
-
-
-
-	public String getReceiverPhone() {
-		return receiverPhone;
-	}
-
-
-
-	public void setReceiverPhone(String receiverPhone) {
-		this.receiverPhone = receiverPhone;
-	}
-
-
-
-	public String getReceiverMobile() {
-		return receiverMobile;
-	}
-
-
-
-	public void setReceiverMobile(String receiverMobile) {
-		this.receiverMobile = receiverMobile;
-	}
-
-
-
-	public String getTransName() {
-		return transName;
-	}
-
-
-
-	public void setTransName(String transName) {
-		this.transName = transName;
-	}
-
-
-
-	public String getTransCode() {
-		return transCode;
-	}
-
-
-
-	public void setTransCode(String transCode) {
-		this.transCode = transCode;
-	}
-
-
-
-	public String getDescription() {
-		return description;
-	}
-
-
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-
-
-	public String getAddress() {
-		return address;
-	}
-
-
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-
-
-	public String getCountry() {
-		return country;
-	}
-
-
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-
-
-	public String getCity() {
-		return city;
-	}
-
-
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-
-
 	public int getReturnType() {
 		return returnType;
 	}
-
-
-
 	public void setReturnType(int returnType) {
 		this.returnType = returnType;
 	}
-
-
-
-	/**
-	 * @return the lineIdSelected
-	 */
-	public String getLineIdSelected() {
+	public String[] getLineIdSelected() {
 		return lineIdSelected;
 	}
-
-
-
-	/**
-	 * @param lineIdSelected the lineIdSelected to set
-	 */
-	public void setLineIdSelected(String lineIdSelected) {
+	public void setLineIdSelected(String[] lineIdSelected) {
 		this.lineIdSelected = lineIdSelected;
 	}
-
-
-
-	/**
-	 * @return the sumSelected
-	 */
-	public String getSumSelected() {
+	public String[] getSumSelected() {
 		return sumSelected;
 	}
-
-
-
-	/**
-	 * @param sumSelected the sumSelected to set
-	 */
-	public void setSumSelected(String sumSelected) {
+	public void setSumSelected(String[] sumSelected) {
 		this.sumSelected = sumSelected;
 	}
 
-
-
-	/**
-	 * @return the reasonSelected
-	 */
-	public String getReasonSelected() {
+	public String[] getReasonSelected() {
 		return reasonSelected;
 	}
-
-
-
-	/**
-	 * @param reasonSelected the reasonSelected to set
-	 */
-	public void setReasonSelected(String reasonSelected) {
+	public void setReasonSelected(String[] reasonSelected) {
 		this.reasonSelected = reasonSelected;
 	}
-
-
-
-	/**
-	 * @return the bank
-	 */
 	public String getBank() {
 		return bank;
 	}
-
-
-
-	/**
-	 * @param bank the bank to set
-	 */
 	public void setBank(String bank) {
 		this.bank = bank;
 	}
-
-
-
-	/**
-	 * @return the branch
-	 */
 	public String getBranch() {
 		return branch;
 	}
-
-
-
-	/**
-	 * @param branch the branch to set
-	 */
 	public void setBranch(String branch) {
 		this.branch = branch;
 	}
-
-
-
-	/**
-	 * @return the account
-	 */
 	public String getAccount() {
 		return account;
 	}
-
-
-
-	/**
-	 * @param account the account to set
-	 */
 	public void setAccount(String account) {
 		this.account = account;
 	}
-
-
-
-	/**
-	 * @return the userName
-	 */
 	public String getUserName() {
 		return userName;
 	}
 
-
-
-	/**
-	 * @param userName the userName to set
-	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
 
-
-
-	/**
-	 * @return the orderId
-	 */
 	public String getOrderId() {
 		return orderId;
 	}
 
-
-
-	/**
-	 * @param orderId the orderId to set
-	 */
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
 
-
-
-	/**
-	 * @return the orderCode
-	 */
 	public String getOrderCode() {
 		return orderCode;
 	}
 
-
-
-	/**
-	 * @param orderCode the orderCode to set
-	 */
 	public void setOrderCode(String orderCode) {
 		this.orderCode = orderCode;
 	}
 
-
-
-	/**
-	 * @return the memo
-	 */
 	public String getMemo() {
 		return memo;
 	}
 
-
-
-	/**
-	 * @param memo the memo to set
-	 */
 	public void setMemo(String memo) {
 		this.memo = memo;
 	}
+	
+	public String getRetrunReason() {
+		return retrunReason;
+	}
 
+	public void setRetrunReason(String retrunReason) {
+		this.retrunReason = retrunReason;
+	}
 
-	/**
-	 * 
-	 */
 	public ReturnOderForm() {
 		super();
 	}
 
-
-
-	public String getRetrunReason() {
-		return RetrunReason;
-	}
-
-
-
-	public void setRetrunReason(String retrunReason) {
-		RetrunReason = retrunReason;
-	}
 	
 }

@@ -18,7 +18,7 @@
 	</bean>
 	
 	<bean id="SoReturnApplication.findLastApplicationByOrderLineId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据orderLineId 查询退换货订单(时间最近的一个)</description>
+		<description>根据orderLineId 查询退换货订单</description>
 		<constructor-arg>
 			<value><![CDATA[
 				select 
@@ -27,7 +27,7 @@
 			       where
 			       application.id = (
 			         select t1.return_orderid from  t_so_return_line t1 left join t_so_orderline t2 on t1.so_lineid = t2.id 
-			         where t2.id =:orderLineId  order by t1.create_time desc limit 1 
+			         where t2.id =:orderLineId  order by t1.create_time desc 
 			       )
 			 ]]>
 			</value>
@@ -36,14 +36,14 @@
 	
 	
 	<bean id="SoReturnApplication.findLastApplicationByOrderId" class="loxia.dao.support.DynamicQueryHolder">
-		<description>根据orderId 查询退换货订单(时间最近的一个)</description>
+		<description>根据orderId 查询退换货订单</description>
 		<constructor-arg>
 			<value><![CDATA[
 				select 
 				  application.*
 			    from t_so_return_application application 
 			       where application.so_order_id=:orderId
-			        order by application.create_time desc limit 1 
+			        order by application.create_time desc
 			 ]]>
 			</value>
 		</constructor-arg>
@@ -76,7 +76,7 @@
 				 application.*
 			    from t_so_return_application application where application.id 
 			    in (
-			       		#foreach( $id in $appIds )
+			       		#foreach( $id in $returnIds )
 	    					$id,
 					    #end
 				-1);
