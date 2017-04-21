@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.baozun.nebula.command.OrderReturnCommand;
+import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.command.ReturnLineCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
 import com.baozun.nebula.manager.SoReturnApplicationManager;
@@ -133,7 +134,9 @@ public class OrderReturnController extends BaseController {
 	@RequestMapping({ "/saleOrder/returnDetail.htm" })
 	public String orderDetail(Model model, @RequestParam("id") Long id) {
 		// 查询退货单关联的订单行
-		List<ReturnLineCommand> soLine = line.findSoReturnLinesByReturnOrderId(id);
+		List<Long> ids=new ArrayList<Long>();
+		ids.add(id);
+		List<ReturnLineCommand> soLine = line.findSoReturnLinesByReturnOrderIds(ids);
 		SoReturnApplication app = soReturnApplicationManager.findByApplicationId(id);
 		model.addAttribute("SoReturnLine", soLine);
 		model.addAttribute("SoReturnApplication", app);
@@ -663,9 +666,10 @@ public class OrderReturnController extends BaseController {
 
 		}
 		soReturnApp.setReturnPrice(returnTotalMoney);
+		ReturnApplicationCommand command=new ReturnApplicationCommand();
+		command.setReturnApplication(soReturnApp);
 		try {
-			soReturnApplicationManager.createReturnApplication(soReturnApp,
-					returnLineList, saleOrder);
+			soReturnApplicationManager.createReturnApplication(command, saleOrder);
 			return SUCCESS;
 		} catch (Exception e) {
 			e.printStackTrace();
