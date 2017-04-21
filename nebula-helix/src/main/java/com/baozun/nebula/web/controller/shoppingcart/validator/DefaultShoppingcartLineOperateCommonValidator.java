@@ -48,6 +48,7 @@ import static com.feilong.core.DatePattern.COMMON_DATE_AND_TIME_WITH_MILLISECOND
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @version 5.3.1 2016年5月25日 下午4:48:40
  * @since 5.3.1
+ * @since 5.3.2.14 change name
  */
 @Component("shoppingcartLineOperateCommonValidator")
 public class DefaultShoppingcartLineOperateCommonValidator implements ShoppingcartLineOperateCommonValidator{

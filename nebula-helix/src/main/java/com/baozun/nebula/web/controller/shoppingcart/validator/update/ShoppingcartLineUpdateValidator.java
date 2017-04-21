@@ -30,6 +30,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartLineO
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.3
+ * @since 5.3.2.14 move new package
  */
 public interface ShoppingcartLineUpdateValidator{
 

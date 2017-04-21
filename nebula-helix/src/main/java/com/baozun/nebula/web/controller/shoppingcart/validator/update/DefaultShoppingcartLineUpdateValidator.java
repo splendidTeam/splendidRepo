@@ -51,6 +51,7 @@ import static com.feilong.core.util.CollectionsUtil.find;
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.3
+ * @since 5.3.2.14 move new package
  */
 @Component("shoppingcartLineUpdateValidator")
 public class DefaultShoppingcartLineUpdateValidator extends AbstractShoppingcartLineOperateValidator implements ShoppingcartLineUpdateValidator{

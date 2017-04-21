@@ -49,6 +49,7 @@ import com.baozun.nebula.web.controller.shoppingcart.validator.ShoppingcartTotal
  *
  * @author <a href="http://feitianbenyue.iteye.com/">feilong</a>
  * @since 5.3.2.3
+ * @since 5.3.2.14 move new package
  */
 @Component("shoppingcartLineAddValidator")
 public class DefaultShoppingcartLineAddValidator extends AbstractShoppingcartLineOperateValidator implements ShoppingcartLineAddValidator{
