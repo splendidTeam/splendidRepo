@@ -37,6 +37,8 @@ public class SkuPropertyMUtlLangCommand  implements Command{
 	
 	//upcCode
 	private String code ;
+	// upcCode
+	private String groupCode;
 	
 	//表征 sku 的property 和 propertyValue
 	private List<ItemPropertyMutlLangCommand> propertyList = null;
@@ -47,6 +49,18 @@ public class SkuPropertyMUtlLangCommand  implements Command{
 	
 	private int availableQty;
 
+	/**
+	 * @return the groupCode
+	 */
+	public String getGroupCode() {
+		return groupCode;
+	}
+	/**
+	 * @param groupCode the groupCode to set
+	 */
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
 	/**
 	 * @return the availableQty
 	 */

@@ -267,15 +267,43 @@ public class NavigationManagerImpl implements NavigationManager{
 			if (Validator.isNotNullOrEmpty(navigationLangs)) {
 				String[] values = new String[MutlLang.i18nSize()];
 				String[] langs = new String[MutlLang.i18nSize()];
+				String[] seoTitlevalues = new String[MutlLang.i18nSize()];
+				String[] seoKeyWordsvalues = new String[MutlLang.i18nSize()];
+				String[] seoDescriptionvalues = new String[MutlLang.i18nSize()];
+				String[] extentionvalues = new String[MutlLang.i18nSize()];
 				for (int i = 0; i < navigationLangs.size(); i++) {
 					NavigationLang navigationLang = navigationLangs.get(i);
 					values[i] = navigationLang.getName();
 					langs[i] = navigationLang.getLang();
+					seoTitlevalues[i] = navigationLang.getSeoTitle();
+					seoKeyWordsvalues[i] = navigationLang.getSeoKeywords();
+					seoDescriptionvalues[i] = navigationLang.getSeoDescription();
+					extentionvalues[i] = navigationLang.getExtention();
 				}
 				MutlLang mutlLang = new MutlLang();
 				mutlLang.setValues(values);
 				mutlLang.setLangs(langs);
 				navigationCommand.setName(mutlLang);
+				
+				MutlLang seoTitle = new MutlLang();
+				seoTitle.setValues(seoTitlevalues);
+				seoTitle.setLangs(langs);
+				navigationCommand.setSeoTitle(seoTitle);
+				
+				MutlLang seoKeyWords = new MutlLang();
+				seoKeyWords.setValues(seoKeyWordsvalues);
+				seoKeyWords.setLangs(langs);
+				navigationCommand.setSeoKeyWords(seoKeyWords);
+				
+				MutlLang seoDescription = new MutlLang();
+				seoDescription.setValues(seoDescriptionvalues);
+				seoDescription.setLangs(langs);
+				navigationCommand.setSeoDescription(seoDescription);
+				
+				MutlLang extention = new MutlLang();
+				extention.setValues(extentionvalues);
+				extention.setLangs(langs);
+				navigationCommand.setExtention(extention);
 			}
 		} else {
 			SingleLang singleLang = new SingleLang();
