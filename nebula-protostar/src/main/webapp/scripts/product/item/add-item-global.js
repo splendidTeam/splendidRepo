@@ -33,6 +33,8 @@ $j.extend(loxia.regional['zh-CN'], {
 	"SALES_PROPERTY_CHANGED" : "销售属性已经更新，但是没有重新进行编码设置",
 	"PLEASE_INPUT_ONE_SKU_CODE" : "请输入至少一个sku编码",
 	"PLEASE_SET_DEF_CATEGORY" : "请设定默认分类",
+	"GROUP_CODE_FORMAT_ERROR" : "组合商品编码格式以:分割",
+	"GROUP_CODE_FORMAT_EQUAL" : "同一个输入框的组合商品编码不能相同",
 	"PLEASE_SELECT_PROPERTY_GROUP" : "请选择属性分组"
 });
 

@@ -465,7 +465,7 @@ public class ItemController extends BaseController {
 	}
 
 	private SkuPropertyMUtlLangCommand[] getCmdArrrayFromRequestI18n(HttpServletRequest request, Long[] propertyIds,
-			String[] propertyValueInputs, String[] propertyValueInputIds) {
+			String[] propertyValueInputs, String[] propertyValueInputIds) throws Exception {
 		List<SkuPropertyMUtlLangCommand> cmdList = new ArrayList<SkuPropertyMUtlLangCommand>();
 		// 说明是没有销售属性的 只有一个sku
 		if (Validator.isNullOrEmpty(propertyValueInputs) && Validator.isNullOrEmpty(propertyValueInputIds)) {
@@ -1272,6 +1272,34 @@ public class ItemController extends BaseController {
 			}
 		}
 		return ipc;
+	}
+	@RequestMapping("/item/validateGroupCodes.json")
+	@ResponseBody
+	public Object validateGroupCodes(@ArrayCommand(dataBind = true) String[] gpCodes) {
+		// 对groupCode做校验开始
+		boolean flag = true;
+		BackWarnEntity backWarnEntity = new BackWarnEntity(flag, null);
+		for (int i = 0; i < gpCodes.length; i++) {
+			if (StringUtils.isNotBlank(gpCodes[i])) {
+				if (gpCodes[i].indexOf(":") > 0) {
+					String[] codes = gpCodes[i].split(":");
+					for (int j = 0; j < codes.length; j++) {
+						Sku sku = sdkSkuManager.findSkuByOutId(codes[j]);
+					if (sku == null) {
+							flag = false;
+							backWarnEntity = new BackWarnEntity(flag, null);
+							backWarnEntity.setDescription(codes[j].concat("该商品编码不存在！"));
+							return backWarnEntity;
+					}
+				}
+			} else {
+					flag = false;
+					backWarnEntity.setDescription("组合商品编码必须以:分割！");
+					return backWarnEntity;
+			}
+			}
+		}
+		return backWarnEntity;
 	}
 
 	@RequestMapping("/item/validateUpdateSkuCodes.json")
@@ -2361,7 +2389,7 @@ public class ItemController extends BaseController {
 		List<BigDecimal> salePrices = new ArrayList<BigDecimal>();
 		// sku销售价
 		List<BigDecimal> listPrices = new ArrayList<BigDecimal>();
-		List<String> groupCode = new ArrayList<String>();
+		List<String> groupCodes = new ArrayList<String>();
 
 		for (Sku sku : skuList) {
 
@@ -2375,7 +2403,7 @@ public class ItemController extends BaseController {
 					listPrices.add(sku.getListPrice());
 				}
 				if (sku.getGroupCode() != null) {
-					groupCode.add(sku.getGroupCode());
+					groupCodes.add(sku.getGroupCode());
 				}
 			}
 
@@ -2386,7 +2414,7 @@ public class ItemController extends BaseController {
 
 		model.addAttribute("skuList", skuJaStr);
 		model.addAttribute("salePrices", salePrices);
-		model.addAttribute("groupCode", groupCode);
+		model.addAttribute("groupCode", groupCodes);
 		model.addAttribute("listPrices", listPrices);
 
 		model.addAttribute("isStyleEnable", isEnableStyle());
@@ -2661,6 +2689,7 @@ public class ItemController extends BaseController {
 
 	/**
 	 * 保存普通商品
+	 * @throws Exception
 	 */
 	@RequestMapping("/i18n/item/saveSimpleItem.json")
 	@ResponseBody
@@ -2688,10 +2717,10 @@ public class ItemController extends BaseController {
 		itemCommand.setShopId(shopId);
 		// 将传过来的上传图片中 是上传的图片替换为不含域名的图片
 		dealDescImgUrl(itemCommand);
-		SkuPropertyMUtlLangCommand[] skuPropertyCommandArray = getCmdArrrayFromRequestI18n(request, propertyIds,
-				propertyValueInputs, propertyValueInputIds);
-		// List<ItemProValGroupRelation> groupRelation =
-		// getItemProValueGroupRelation(request,propertyIds);
+		SkuPropertyMUtlLangCommand[]
+			skuPropertyCommandArray = getCmdArrrayFromRequestI18n(request, propertyIds, propertyValueInputs,
+					propertyValueInputIds);
+
 		// 保存商品
 		Item item = itemLangManager.createOrUpdateSimpleItem(itemCommand, propertyValueIds, categoriesIds, defaultCategoryId, 
 				iProperties, skuPropertyCommandArray);

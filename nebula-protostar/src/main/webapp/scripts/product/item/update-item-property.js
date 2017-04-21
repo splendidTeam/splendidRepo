@@ -11,6 +11,7 @@ var itemcolorrefcheckURL = "/itemColor/itemcolorcheck.json";
 var saveitemcolorrefURL = "/itemColor/savecolorvalue.htm";
 var manageImagUrl = base + '/i18n/itemImage/toAddItemImage.htm?itemId=';
 var validateUpdateSkuCodesUrl = base + '/item/validateUpdateSkuCodes.json';
+var validateGroupCodesCodesUrl = base + '/item/validateGroupCodes.json';
 
 function saveitemcolorref() {
 	var selestrefre = selestref();
@@ -984,6 +985,44 @@ $j(document).ready(function() {
 		if (spChangedFlag) {
 			return nps.i18n("SALES_PROPERTY_CHANGED");
 		}
+		// 验证groupCodes开始==============
+		var groupCodesArray = new Array();
+		$j(".extensionTable").find(".dynamicInputNameGroupCode").each(function(i, n) {
+			groupCodesArray[i] = $j(this).val();
+		});
+
+		for (var i = 0; i < groupCodesArray.length; i++) {
+			var codeStrs = groupCodesArray[i];
+			if (codeStrs.indexOf(":") == -1) {
+				return nps.i18n("GROUP_CODE_FORMAT_ERROR");
+			}
+
+			// groupCodes同一行的每个编码不可重复 但是不同行可以重复
+			var strs = new Array(); // 定义一数组
+			strs = codeStrs.split(":"); // 字符分割
+			for (var j = 0; j < strs.length; j++) {
+				curCode = strs[j];
+				for (var k = 0; k < strs.length; k++) {
+					if (k != j && curCode != "" && curCode == strs[k]) {
+						return nps.i18n("GROUP_CODE_FORMAT_ERROR");
+						// return "同一个输入框的组合商品编码不能相同";
+					}
+				}
+			}
+		}
+
+		if (groupCodesArray.length > 0) {
+			var json = {
+				"gpCodes" : groupCodesArray
+			};
+			var data = loxia.syncXhr(validateGroupCodesCodesUrl, json, {
+				type : 'post'
+			});
+			if (data.isSuccess == false) {
+				return data.description;
+			}
+		}
+		// 验证groupCodes结束==============
 
 		// 验证是否至少填写了一个sku编码 PLEASE_INPUT_ONE_SKU_CODE
 		var atLeastOneCode = false;
