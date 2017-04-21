@@ -66,14 +66,7 @@ public interface SdkSkuManager extends BaseManager{
      * @return the list< sku>
      */
     List<Sku> findSkuByOutIds(List<String> outIdList);
-	/**
-	 * @Title: findSkuByOutId
-	 * @Description: 通过outId查询sku(lifecycle=1).
-	 * @param outIdList
-	 * @return
-	 * @return: Sku
-	 */
-	Sku findSkuByOutId(String outId);
+
 
     /**
      * 同步商品价格(sku级别).
@@ -120,4 +113,12 @@ public interface SdkSkuManager extends BaseManager{
      * @return the sku command
      */
     SkuCommand findSkuQSVirtualInventoryById(Long skuId,String extCode);
+	/**
+	 * @Title: findSkuByOutId
+	 * @Description: 通过outId查询sku(lifecycle=1).
+	 * @param outIdList
+	 * @return
+	 * @return: Sku
+	 */
+	Sku findSkuByOutId(String outId);
 }
