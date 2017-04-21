@@ -45,6 +45,7 @@ public interface ShippingTemeplateDao extends
 	 *            运费模板名称
 	 * @param calculationType
 	 *            计算方式
+	 * @param beanName 
 	 * @param isDefault
 	 *            是否默认
 	 * @return
@@ -53,6 +54,7 @@ public interface ShippingTemeplateDao extends
 	public Integer updateShippingTemeplate( @QueryParam("id") Long id,
 											@QueryParam("name") String name,
 											@QueryParam("calculationType") String calculationType,
+											@QueryParam("beanName") String beanName, 
 											@QueryParam("isDefault") boolean isDefault,
 											@QueryParam("defaultFee") BigDecimal defaultFee);
 	

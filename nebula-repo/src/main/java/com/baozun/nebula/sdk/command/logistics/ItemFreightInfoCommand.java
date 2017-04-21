@@ -41,6 +41,11 @@ public class ItemFreightInfoCommand extends BaseModel implements Command{
      * 单个商品重量（如果是按照重量计费）
      */
     private Double            weight;
+    
+    /**
+     * 单个商品体积
+     */
+    private Double volume;
 
     /**
      * @return the itemId
@@ -78,6 +83,14 @@ public class ItemFreightInfoCommand extends BaseModel implements Command{
 
     public Double getWeight(){
         return weight;
+    }
+
+    public Double getVolume(){
+        return volume;
+    }
+    
+    public void setVolume(Double volume){
+        this.volume = volume;
     }
 
 }

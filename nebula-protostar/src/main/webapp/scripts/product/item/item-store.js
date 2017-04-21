@@ -95,6 +95,13 @@ function findItemPropertyByProvertyIdAndValue(propertyId, propertyValueId, prope
 	return null;
 }
 function showSkuTable() {
+	// -----------------start by sunchenbin----------------------
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的 by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
+		removeNoSelectInputName();
+	}
+	// -----------------end by sunchenbin----------------------
+	
 	clickFlag = true;
 	// console.log(skuList);
 	$j("#exten").css("display", "block");
@@ -217,18 +224,38 @@ function showSkuTable() {
 		$j("#extensionTable").html(html);
 		return;
 	}
-	if (propertyValueInputArray.length != propertyNameArray.length) {// 如果用户未把每个属性都填上值，则提示用户
-		html = nps.i18n("CODING_TIPS");
-		$j("#extensionTable").html(html);
-	} else {// 画表格
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的 by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
 		drawTableContent(propertyValueArray, propertyNameArray, propertyValueInputArray);
+	} else {
+		if (propertyValueInputArray.length != propertyNameArray.length) {// 如果用户未把每个属性都填上值，则提示用户
+			html = nps.i18n("CODING_TIPS");
+			$j("#extensionTable").html(html);
+		} else {// 画表格
+			drawTableContent(propertyValueArray, propertyNameArray, propertyValueInputArray);
+		}
 	}
+	
 	$j("#extensionTable").find("[loxiaType]").each(function(i, n) {
 		// console.log("sss");
 		loxia.initLoxiaWidget(this);
 	});
 }
 function drawTableContent(propertyValueArray, propertyNameArray, propertyInputValueArray) {
+	
+	// -----------------start by sunchenbin----------------------
+	// 这里判断是否验证销售属性必填，这一项是在系统参数里面配置的 by sunchenbin
+	if (salesOfPropertyIsNotRequired != "" && "1" == salesOfPropertyIsNotRequired) {
+		// 仅作为销售属性非必填时，此时table的列标题是不确定的，所以这里动态加载
+		var propertyNameArrayNew = new Array();
+		$j.each(propertyValueArray, function(i) {
+			$j.each(propertyValueArray[i], function(j) {
+				propertyNameArrayNew[i] = ((propertyValueArray[i])[0])[2];
+			});
+		});
+		propertyNameArray = propertyNameArrayNew;
+	}
+	// --------------------end by sunchenbin--------------------
 
 	var skuInfoList = new Array();
 	var tableHeader = "<tr>";
@@ -614,3 +641,24 @@ $j(document).ready(function() {
 	loxia.initContext($j(".ui-block "));
 
 });
+
+/**
+ * 避免没有选的销售属性的propertyIds和propertyValueInputIds被提交，用于销售属性非必选时使用的
+ * @author sunchenbin
+ */
+function removeNoSelectInputName() {
+	$j("#propertySpace .ui-block-line").each(function() {
+		// 判断当前这一条销售属性是否有任何一个值被选中过，如果有是true，没有是false
+		var flag = $j(this).find("input[name='propertyValueIds']").is(':checked');
+		// false的情况,删除input的name属性，让其进行form表单提交的时候不将该属性提交到后台
+		if (!flag) {
+			$j(this).find("input[name='propertyIds']").attr("name", "propertyIds_remove");
+			$j(this).find("input[name='propertyValueInputIds']").attr("name", "propertyValueInputIds_remove");
+		} else {
+			// true的情况,将input的name属性加上，让其进行form表单提交的时候可以讲该属性提交到后台
+			$j(this).find("input[name='propertyIds_remove']").attr("name", "propertyIds");
+			$j(this).find("input[name='propertyValueInputIds_remove']").attr("name", "propertyValueInputIds");
+		}
+	});
+}
+
