@@ -11,6 +11,7 @@
 		       		update T_SF_SHIPPING_TEMEPALTE
 		       		set NAME = :name,
 		       			CALCULATION_TYPE = :calculationType,
+		       			BEAN_NAME = :beanName,
 		       			ISDEFAULT = :isDefault,
 		       			default_fee = :defaultFee
 		       		where id = :id

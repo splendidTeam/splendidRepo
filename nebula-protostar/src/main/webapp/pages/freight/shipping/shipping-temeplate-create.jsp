@@ -24,7 +24,7 @@
 <div class="ui-block">	
 	<div class="ui-block-title1">运费模板</div>
 			<div class="ui-block-content border-grey">
-		   
+		    <input type="text" value="${shippingTemplate.calculationType}" style="display: none;" id="templateType"/>
 		    <div class="ui-block-line ">
 		         <label>模板名称</label>
 		         <div>
@@ -43,14 +43,23 @@
 					<option value="base">基础</option>
 					<option value="weight">计重</option>
 					<option value="unit">计件</option>
+					<option value="custom">自定义</option>
            			 </c:when>
            			 <c:when test="${shippingTemplate.calculationType eq 'unit'}">
 					<option value="unit">计件</option>
 					<option value="base">基础</option>
 					<option value="weight">计重</option>
+					<option value="custom">自定义</option>
 					
            			 </c:when>
            			 <c:when test="${shippingTemplate.calculationType eq 'weight'}">
+					<option value="weight">计重</option>
+           			 <option value="base">基础</option>
+					<option value="unit">计件</option>
+					<option value="custom">自定义</option>
+           			 </c:when>
+           			 <c:when test="${shippingTemplate.calculationType eq 'custom'}">
+					<option value="custom">自定义</option>
 					<option value="weight">计重</option>
            			 <option value="base">基础</option>
 					<option value="unit">计件</option>
@@ -59,10 +68,18 @@
 					<option value="base">基础</option>
 					<option value="weight">计重</option>
 					<option value="unit">计件</option>
+					<option value="custom">自定义</option>
            			 </c:otherwise>
            			 </c:choose> 
                 </select>
 		           </div>	
+		    </div>
+		    
+		    <div class="ui-block-line color-select-line" id="beanNameDiv" style="display: block;">
+		         <label>自定义类名</label>
+		         <div>
+		         <input type="text" loxiaType="input" value="${shippingTemplate.beanName }" mandatory="true" id="beanName"/>
+		         </div>
 		    </div>
 		    
 		    <div class="ui-block-line color-select-line">

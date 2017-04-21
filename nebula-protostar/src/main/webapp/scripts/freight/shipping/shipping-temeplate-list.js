@@ -3,6 +3,7 @@ $j.extend(loxia.regional['zh-CN'], {
 	"LABEL_SHIPPING_CALCULATIONTYPE" : "计价类型",
 	"LABEL_SHIPPING_DEFAULTFEE" : "默认邮费",
 	"LABEL_SHIPPING_ISDEFAULT" : "默认模板",
+	"LABEL_SHIPPING_BEANNAME" : "自定义类名",
 	"LABEL_SHIPPING_OPERATE" : "操作",
 	"INFO_TITLE_DATA" : "提示信息",
 	"TO_VIEW" : "查看运费表",
@@ -90,6 +91,8 @@ function drawCalculationType(data, args, idx) {
 		result = "计重";
 	} else if (type == "base") {
 		result = "基础";
+	} else if (type == "custom") {
+		result = "自定义";
 	}
 	return result;
 }
@@ -136,6 +139,10 @@ $j(document).ready(function() {
 			label : nps.i18n("LABEL_SHIPPING_ISDEFAULT"),
 			width : "8%",
 			template : "drawIsdefault"
+		}, {
+			name : "beanName",
+			label : nps.i18n("LABEL_SHIPPING_BEANNAME"),
+			width : "16%"
 		}, {
 			name : nps.i18n("LABEL_SHIPPING_OPERATE"),
 			label : nps.i18n("LABEL_SHIPPING_OPERATE"),
