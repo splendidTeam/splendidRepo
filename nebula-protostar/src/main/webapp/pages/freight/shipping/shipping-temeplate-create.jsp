@@ -78,7 +78,7 @@
 		    <div class="ui-block-line color-select-line" id="beanNameDiv" style="display: block;">
 		         <label>自定义类名</label>
 		         <div>
-		         <input type="text" loxiaType="input" value="${shippingTemplate.beanName }" mandatory="true" id="beanName"/>
+		         <input type="text" loxiaType="input" value="${shippingTemplate.beanName }" name="beanName" mandatory="true" id="beanName"/>
 		         </div>
 		    </div>
 		    
