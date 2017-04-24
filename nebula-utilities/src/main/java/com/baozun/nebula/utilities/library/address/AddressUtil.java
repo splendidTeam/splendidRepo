@@ -78,7 +78,7 @@ public class AddressUtil {
 	/** 精简后的地址JSON 字符串 **/
 	// private static String addressJson = null;
 
-	private static final Long ROOT_ID = 0L;
+	public static final Long ROOT_ID = 1L;
 
 	/*********************************** 国际化 ***********************************/
 	/** 多语言地址信息文件存放的目录 **/
@@ -91,7 +91,7 @@ public class AddressUtil {
 	private static final String LANGUAGE_CONFIG_FILE_SUFFIX = ".json";
 
 	/** 多语言开关, 默认为不开启国际化, 设置为false时, languageList无效 **/
-	private static Boolean i18nOffOn = true;
+	private static Boolean i18nOffOn = false;
 	
 	/** 物流配送地址开关，默认不开启；开启后获取地址信息方式切换至从DB获取  **/
 	private static Boolean deliveryModeOn = false;
