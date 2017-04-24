@@ -29,9 +29,10 @@ $j.extend(loxia.regional['zh-CN'], {
 	"CUSTOM_PROPERTY_SAME" : "填写的自定义属性相同",
 	"SALES_PROPERTY_CHANGED" : "销售属性已经更新，但是没有重新进行编码设置",
 	"PLEASE_INPUT_ONE_SKU_CODE" : "请输入至少一个sku编码",
+	"GROUP_CODE_FORMAT_ERROR" : "组合商品编码格式以:分割",
+	"GROUP_CODE_FORMAT_EQUAL" : "同一个输入框的组合商品编码不能相同",
 	"PLEASE_SET_DEF_CATEGORY" : "请设定默认分类"
 });
-
 var oldval = "";
 var itemId = 0;
 

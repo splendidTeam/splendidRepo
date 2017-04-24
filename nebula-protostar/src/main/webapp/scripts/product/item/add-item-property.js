@@ -13,6 +13,7 @@ var clickFlag = false;
 var spChangedFlag = false;
 
 var validateSkuCodesUrl = base + '/item/validateSkuCode.json';
+var validateGroupCodesCodesUrl = base + '/item/validateGroupCodes.json';
 
 // 属性数量,全局范围，分组切换使用
 var num = 0;
@@ -1578,7 +1579,45 @@ $j(document).ready(function() {
 			}
 
 		}
+		// 验证groupCodes开始==============
+		var groupCodesArray = new Array();
+		$j("#extensionTable").find(".dynamicInputNameGroupCode").each(function(i, n) {
+			groupCodesArray[i] = $j(this).val();
+		});
+		for (var i = 0; i < groupCodesArray.length; i++) {
+			var codeStrs = groupCodesArray[i];
+			if (codeStrs != null && codeStrs != "") {
+				if (codeStrs.indexOf(":") == -1) {
+					return nps.i18n("GROUP_CODE_FORMAT_ERROR");
+				}
 
+				// groupCodes同一行的每个编码不可重复 但是不同行可以重复
+				var strs = new Array(); // 定义一数组
+				strs = codeStrs.split(":"); // 字符分割
+				for (var j = 0; j < strs.length; j++) {
+					curCode = strs[j];
+					for (var k = 0; k < strs.length; k++) {
+						if (k != j && curCode != "" && curCode == strs[k]) {
+							return nps.i18n("GROUP_CODE_FORMAT_EQUAL");
+							// return "同一个输入框的组合商品编码不能相同";
+						}
+					}
+				}
+			}
+		}
+
+		if (groupCodesArray.length > 0) {
+			var json = {
+				"gpCodes" : groupCodesArray
+			};
+			var data = loxia.syncXhr(validateGroupCodesCodesUrl, json, {
+				type : 'post'
+			});
+			if (data.isSuccess == false) {
+				return data.description;
+			}
+		}
+		// 验证groupCodes结束==============
 		if (!atLeastOneCode) {
 			return nps.i18n("PLEASE_INPUT_ONE_SKU_CODE");
 		}

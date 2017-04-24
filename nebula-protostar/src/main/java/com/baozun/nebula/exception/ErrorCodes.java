@@ -672,4 +672,6 @@ public interface ErrorCodes {
 	public static final Integer	IMPORT_SKU_LISTPRICE_ERROR					= 180016;
 	public static final Integer	IMPORT_SKU_SALEPRICE_ERROR					= 180017;
 	public static final Integer	IMPORT_SKU_UPC_COUNT_ERROR					= 180018;
+	/** 组合商品编码格式错误errorCode */
+	public static final Integer GROUP_CODE_FORMAT_ERROR = 180019;
 }
