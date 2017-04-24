@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Column;
-
 import com.baozun.nebula.command.Command;
 import com.baozun.nebula.command.i18n.LangProperty;
 import com.baozun.nebula.model.product.ItemImage;
@@ -205,7 +203,6 @@ public class ItemInfoCommand implements Command {
 	/** 1 组合商品的组合extentionCode. 在数据库中以|分割 如[8,4,6]|[1,,4,5] */
 	private String groupCode;
 
-	@Column(name = "group_code")
 	public String getGroupCode() {
 		return groupCode;
 	}

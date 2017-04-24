@@ -551,9 +551,6 @@ public class ItemController extends BaseController {
 				if (code == null || "".equals(code.trim())) {
 					continue;
 				}
-				if (groupCode == null || "".equals(groupCode.trim())) {
-					continue;
-				}
 				String[] values = getValues(propertyValueInputs);
 				String[] langs = getLangs(propertyValueInputs);
 				SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
@@ -747,12 +744,6 @@ public class ItemController extends BaseController {
 																	// 不进行保存或者修改
 						continue;
 					}
-					if (groupCode == null || "".equals(groupCode.trim())) {// 如果没有填写skuCode
-						// ,那么就认为
-						// 没有该属性的sku
-						// 不进行保存或者修改
-						continue;
-					}
 					SkuPropertyMUtlLangCommand spc = new SkuPropertyMUtlLangCommand();
 
 					BigDecimal salePrice = getPriceFromStr(request.getParameter(spKey));
@@ -899,9 +890,6 @@ public class ItemController extends BaseController {
 
 				// 如果没有填写skuCode ,那么就认为 没有该属性的sku 不进行保存或者修改
 				if (code == null || "".equals(code.trim())) {
-					continue;
-				}
-				if (groupCode == null || "".equals(groupCode.trim())) {
 					continue;
 				}
 				String[] values = getValues(propertyValueInputs);
