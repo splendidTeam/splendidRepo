@@ -20,8 +20,6 @@ import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
-import com.baozun.nebula.utilities.common.LangUtil;
-import com.baozun.nebula.utilities.library.address.AddressUtil;
 import com.feilong.core.Validator;
 
 @Transactional
@@ -117,7 +115,7 @@ public class SdkDeliveryAreaManagerImpl implements SdkDeliveryAreaManager{
                 findAllSubDeliveryAreaByParentId(area, map);
                 countryMap.put(area.getCode(), area.getArea());
             }
-            map.put(AddressUtil.ROOT_ID.toString(), countryMap);
+            map.put("0", countryMap);
         }
         return map;
     }
