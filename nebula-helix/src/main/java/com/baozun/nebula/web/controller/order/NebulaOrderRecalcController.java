@@ -36,7 +36,6 @@ import com.baozun.nebula.web.controller.order.builder.ShoppingCartCommandShowBui
 import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
-import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
@@ -51,10 +50,6 @@ public class NebulaOrderRecalcController extends NebulaAbstractTransactionContro
     /** The order manager. */
     @Autowired
     private OrderManager orderManager;
-
-    /**  */
-    @Autowired
-    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
     /**  */
     @Autowired
@@ -103,7 +98,7 @@ public class NebulaOrderRecalcController extends NebulaAbstractTransactionContro
                     BindingResult bindingResult,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         CouponInfoSubForm couponInfoSubForm = orderForm.getCouponInfoSubForm();
 
         //----------------------------------------------------

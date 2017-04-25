@@ -37,7 +37,6 @@ import com.baozun.nebula.web.controller.order.builder.OrderConfirmViewCommandBui
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.handler.OrderConfirmBeforeHandler;
 import com.baozun.nebula.web.controller.order.viewcommand.OrderConfirmViewCommand;
-import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 
 /**
  * 订单确认控制器.
@@ -118,9 +117,6 @@ public class NebulaOrderConfirmController extends NebulaAbstractTransactionContr
     private OrderConfirmViewCommandBuilder orderConfirmViewCommandBuilder;
 
     @Autowired
-    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
-
-    @Autowired
     private CalcFreightCommandBuilder calcFreightCommandBuilder;
 
     @Autowired
@@ -143,7 +139,7 @@ public class NebulaOrderConfirmController extends NebulaAbstractTransactionContr
      * @NeedLogin (guest=true)
      * @RequestMapping(value = "/transaction/check", method = RequestMethod.GET)
      */
-    public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,HttpServletResponse response,Model model){
+    public String showTransactionCheck(@LoginMember MemberDetails memberDetails,@RequestParam(value = "key",required = false) String key,HttpServletRequest request,@SuppressWarnings("unused") HttpServletResponse response,Model model){
         List<ContactCommand> contactCommandList = contactCommandListBuilder.build(memberDetails);
         ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, key, contactCommandList, null, request);
 

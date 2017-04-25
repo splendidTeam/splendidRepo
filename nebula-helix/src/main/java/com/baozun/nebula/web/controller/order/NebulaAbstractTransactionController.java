@@ -18,8 +18,10 @@ package com.baozun.nebula.web.controller.order;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baozun.nebula.web.controller.BaseController;
+import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 
 /**
  * 交易类型的controller的base 类.
@@ -30,4 +32,7 @@ import com.baozun.nebula.web.controller.BaseController;
 public abstract class NebulaAbstractTransactionController extends BaseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NebulaAbstractTransactionController.class);
+
+    @Autowired
+    protected ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 }

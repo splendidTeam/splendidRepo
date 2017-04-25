@@ -36,6 +36,7 @@ import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
 import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartCommandCheckedBuilderHandler;
 
 import static com.feilong.core.Validator.isNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
@@ -49,24 +50,29 @@ import static com.feilong.core.bean.ConvertUtil.toList;
 @Component("shoppingCartCommandBuilder")
 public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilder{
 
-    /**  */
-    @Autowired
-    private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
-
     /** The shoppingcart factory. */
     @Autowired
     private ShoppingcartFactory shoppingcartFactory;
-
-    /** The shopping cart command builder. */
-    @Autowired
-    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
     /**  */
     @Autowired
     private CalcFreightCommandBuilder calcFreightCommandBuilder;
 
-    /* (non-Javadoc)
-     * @see com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder#buildShoppingCartCommandWithCheckStatus(com.baozun.nebula.web.MemberDetails, java.lang.String, com.baozun.nebula.web.controller.order.form.OrderForm, javax.servlet.http.HttpServletRequest)
+    /**  */
+    @Autowired
+    private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
+
+    /**
+     * 
+     */
+    @Autowired(required = false)
+    private ShoppingCartCommandCheckedBuilderHandler shoppingCartCommandCheckedBuilderHandler;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder#buildShoppingCartCommandWithCheckStatus(com.baozun.nebula.web.MemberDetails, java.lang.String, com.baozun.nebula.web.controller.order.form.OrderForm,
+     * javax.servlet.http.HttpServletRequest)
      */
     @Override
     public ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,OrderForm orderForm,HttpServletRequest request){
@@ -76,7 +82,7 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
         //地址
         ShippingInfoSubForm shippingInfoSubForm = orderForm.getShippingInfoSubForm();
         CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(shippingInfoSubForm);
-        return shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, calcFreightCommand, couponList, request);
+        return buildShoppingCartCommandWithCheckStatus(memberDetails, key, calcFreightCommand, couponList, request);
     }
 
     /*
@@ -93,12 +99,22 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
         //购物行为空，抛出异常
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
+        if (null != shoppingCartLineCommandList){
+            shoppingCartCommandCheckedBuilderHandler.preHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
+        }
+
+        ShoppingCartCommand shoppingCartCommand = buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
 
         //购物车为空，抛出异常
         Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
+
+        if (null != shoppingCartLineCommandList){
+            shoppingCartCommandCheckedBuilderHandler.postHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
+        }
         return shoppingCartCommand;
     }
+
+    //------------------------------------------------------------------------------------------
 
     /*
      * (non-Javadoc)

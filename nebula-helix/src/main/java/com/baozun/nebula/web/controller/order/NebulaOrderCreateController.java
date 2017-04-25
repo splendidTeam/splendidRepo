@@ -46,8 +46,6 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderReturnObject;
 import com.baozun.nebula.web.controller.order.validator.OrderFormValidator;
 import com.baozun.nebula.web.controller.order.validator.SalesOrderCreateValidator;
-import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
-import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.feilong.accessor.AutoKeyAccessor;
@@ -138,16 +136,10 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
     private AutoKeyAccessor autoKeyAccessor;
 
     @Autowired
-    private ShoppingcartFactory shoppingcartFactory;
-
-    @Autowired
     private SalesOrderResolver salesOrderResolver;
 
     @Autowired
     private SdkOrderCreateManager sdkOrderCreateManager;
-
-    @Autowired
-    private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
     @Autowired
     private ShoppingcartOrderCreateSuccessHandler shoppingcartOrderCreateSuccessHandler;
@@ -190,7 +182,7 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
                     BindingResult bindingResult,
                     HttpServletRequest request,
                     HttpServletResponse response,
-                    Model model){
+                    @SuppressWarnings("unused") Model model){
         // 校验表单数据
         orderFormValidator.validate(orderForm, bindingResult);
         // 如果校验失败，返回错误
