@@ -32,8 +32,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionCalculationManager;
 import com.baozun.nebula.sdk.manager.promotion.SdkPromotionRuleFilterManager;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueSet;
 
 /**
  *
@@ -62,7 +63,7 @@ public class PromotionBriefBuilderImpl implements PromotionBriefBuilder{
     public List<PromotionBrief> getPromotionBriefList(ShoppingCartCommand shoppingCartCommand){
         List<PromotionCommand> promotionCommandList = getPromotionCommandList(shoppingCartCommand);
 
-        if (Validator.isNotNullOrEmpty(promotionCommandList)){
+        if (isNotNullOrEmpty(promotionCommandList)){
             // 通过购物车和促销集合计算商品促销
             return sdkPromotionCalculationManager.calculationPromotion(shoppingCartCommand, promotionCommandList);
         }
@@ -78,7 +79,7 @@ public class PromotionBriefBuilderImpl implements PromotionBriefBuilder{
         Set<String> memboSet = shoppingCartCommand.getUserDetails().getMemComboList();
 
         // 获取人群和商品促销的交集
-        Set<Long> shopIdSet = CollectionsUtil.getPropertyValueSet(shoppingCartLineCommandList, "shopId");
+        Set<Long> shopIdSet = getPropertyValueSet(shoppingCartLineCommandList, "shopId");
         Set<String> itemComboIdsSet = ShoppingCartUtil.getItemComboIds(shoppingCartLineCommandList);
         return sdkPromotionRuleFilterManager.getIntersectActivityRuleData(
                         new ArrayList<Long>(shopIdSet),

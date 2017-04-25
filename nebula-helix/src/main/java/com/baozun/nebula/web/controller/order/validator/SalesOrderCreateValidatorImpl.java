@@ -28,7 +28,9 @@ import com.baozun.nebula.sdk.command.shoppingcart.PromotionSKUDiscAMTBySetting;
 import com.baozun.nebula.sdk.command.shoppingcart.PromotionSettingDetail;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
-import com.feilong.core.Validator;
+
+import static com.feilong.core.Validator.isNotNullOrEmpty;
+import static com.feilong.core.Validator.isNullOrEmpty;
 
 /**
  *
@@ -48,12 +50,12 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
      */
     @Override
     public SalesOrderResult validate(ShoppingCartCommand shoppingCartCommand,String couponCode){
-        if (Validator.isNullOrEmpty(shoppingCartCommand) || Validator.isNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){// 購物車不能為空
+        if (isNullOrEmpty(shoppingCartCommand) || isNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){// 購物車不能為空
             return SalesOrderResult.ORDER_SHOPPING_CART_LINE_COMMAND_NOT_FOUND;
         }
 
         //** 如果输入了优惠券则要进行优惠券验证
-        if (Validator.isNotNullOrEmpty(couponCode)){
+        if (isNotNullOrEmpty(couponCode)){
             //** 校驗优惠券促销 
             SalesOrderResult salesOrderResult = checkCoupon(shoppingCartCommand, couponCode);
             if (null != salesOrderResult){
@@ -70,21 +72,27 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
     private SalesOrderResult checkCoupon(ShoppingCartCommand shoppingCartCommand,String couponCode){
         List<PromotionBrief> cartPromotionBriefList = shoppingCartCommand.getCartPromotionBriefList();
 
-        if (Validator.isNullOrEmpty(cartPromotionBriefList)){// 無效
+        if (isNullOrEmpty(cartPromotionBriefList)){// 無效
             return SalesOrderResult.ORDER_COUPON_NOT_AVALIBLE;
         }
+
+        //-------------------------------------------------------------------------------------
 
         for (PromotionBrief promotionBrief : cartPromotionBriefList){// 從活動中取記錄校驗
 
             List<PromotionSettingDetail> details = promotionBrief.getDetails();
 
-            if (Validator.isNotNullOrEmpty(details)){
-                for (PromotionSettingDetail settingDetail : details){// 遍曆活動詳情
-                    if (Validator.isNullOrEmpty(settingDetail.getCouponCodes())){// 先校驗整單優惠券有沒有
-                        if (Validator.isNotNullOrEmpty(settingDetail.getAffectSKUDiscountAMTList())){
-                            for (PromotionSKUDiscAMTBySetting skuSetting : settingDetail.getAffectSKUDiscountAMTList()){// 遍曆商品行優惠記錄
-                                Set<String> couponCodes = skuSetting.getCouponCodes();
-                                if (Validator.isNullOrEmpty(couponCodes)){// 如果整單優惠券沒有，校驗商品行優惠券
+            if (isNotNullOrEmpty(details)){
+                for (PromotionSettingDetail promotionSettingDetail : details){// 遍曆活動詳情
+
+                    if (isNullOrEmpty(promotionSettingDetail.getCouponCodes())){// 先校驗整單優惠券有沒有
+
+                        List<PromotionSKUDiscAMTBySetting> promotionSKUDiscAMTBySettingList = promotionSettingDetail.getAffectSKUDiscountAMTList();
+                        if (isNotNullOrEmpty(promotionSKUDiscAMTBySettingList)){
+                            for (PromotionSKUDiscAMTBySetting promotionSKUDiscAMTBySetting : promotionSKUDiscAMTBySettingList){// 遍曆商品行優惠記錄
+                                Set<String> couponCodes = promotionSKUDiscAMTBySetting.getCouponCodes();
+
+                                if (isNullOrEmpty(couponCodes)){// 如果整單優惠券沒有，校驗商品行優惠券
                                     continue;
                                 }
                                 if (couponCodes.contains(couponCode)){
@@ -94,7 +102,7 @@ public class SalesOrderCreateValidatorImpl implements SalesOrderCreateValidator{
                         }
                         continue;
                     }
-                    if (settingDetail.getCouponCodes().contains(couponCode)){
+                    if (promotionSettingDetail.getCouponCodes().contains(couponCode)){
                         return null;
                     }
                 }
