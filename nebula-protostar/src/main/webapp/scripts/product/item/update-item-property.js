@@ -437,7 +437,6 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 
 				var tmpArray = new Array();
 				tmpArray[0] = propertyValueArray[0][i];
-
 				var sku = getSkuInfoByProperyValueArray(tmpArray);
 
 				var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
@@ -489,7 +488,6 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 		$j("#jsonSku").val(JSON.stringify(skuInfoList));
 	} else {
 		var sku = skuList[0];
-
 		var proHtml = "<input type='hidden' name='skuId' value = 'idValueTOReplace' />"
 				+ "<td style='width:150px'><input type='text' mandatory='true' class = 'dynamicInputNameSkuCode' name='skuCode' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
 				+ "<td style='width:150px'><input type='text' id='salePrices' class = 'dynamicInputNameSalePrices' mandatory='true' name='skuSalePrice' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
@@ -549,7 +547,6 @@ function bulidTable(table, data, dataRowIndex, isLoadInit) {
 			var listPriceName = getMoreDynamicInputName("listPrice", arrays);
 			var groupCodeName = getMoreDynamicInputName("groupCode", arrays);
 			var tmpArray = clone(arrays);
-
 			var sku = getSkuInfoByProperyValueArray(tmpArray);
 
 			var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"

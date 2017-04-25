@@ -173,9 +173,9 @@ function showSkuTable(saleInfo) {
 	}
 	// -----------------end by sunchenbin----------------------
 	clickFlag = true;
-	// showSth();
 	saleInfo.find("#exten").css("display", "block");
 	saleInfo.find("#extensionTable").html("");
+
 	// 拿到 销售属性, 根据销售属性 确定 列
 	var salesProperty = new Array();
 
@@ -431,36 +431,60 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 			+ "</td>" + "<td style='width:150px'>" + nps.i18n("MERCHANT_GROUPCODE") + "</td>" + "</tr>");
 
 	var tableContent = "";
+	var idName = "";
 	if (propertyValueArray.length > 0) {
-
 		if (propertyValueArray.length == 1) {// 销售属性只有1个
 			for (var i = 0; i < propertyValueArray[0].length; i++) {
 				var dynamicStr = "<td style='width:150px'>" + propertyValueArray[0][i][0] + "</td>";
 				var codesName = getDynamicInputName("code", propertyValueArray[0][i], null);
-				var groupCodeName = getDynamicInputName("groupCode", propertyValueArray[0][i], null);
 				var salePriceName = getDynamicInputName("salePrice", propertyValueArray[0][i], null);
 				var listPriceName = getDynamicInputName("listPrice", propertyValueArray[0][i], null);
+				idName = getDynamicInputName("id", propertyValueArray[0][i], null);
+				var groupCodeName = getDynamicInputName("groupCode", propertyValueArray[0][i], null);
 
-				var proHtml = "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input'  value='CODE_VALUE'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices'  name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
+				var tmpArray = new Array();
+				tmpArray[0] = propertyValueArray[0][i];
+				var sku = getSkuInfoByProperyValueArray(tmpArray);
+
+				var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
+						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  name='codesNameToReplace' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
+						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
 						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode' mandatory='false' name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
+						+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
 
 				proHtml = proHtml.replace('codesNameToReplace', codesName);
 				proHtml = proHtml.replace('salePriceNameToReplace', salePriceName);
 				proHtml = proHtml.replace('listPriceToReplace', listPriceName);
+				proHtml = proHtml.replace('idNameToReplace', idName);
 				proHtml = proHtml.replace('groupCodeNameToReplace', groupCodeName);
 
 				var salePrice = $j("#salePrice").val();
 				var listPrice = $j("#listPrice").val();
-				proHtml = proHtml.replace('CODE_VALUE', "");
+				var code = "";
+				var groupCode = "";
+				var skuId = null;
+				if (sku != null) {
+					salePrice = ((sku.salePrice == null || sku.salePrice == "") ? salePrice : sku.salePrice);
+					listPrice = ((sku.listPrice == null || sku.listPrice == "") ? listPrice : sku.listPrice);
+					code = (sku.outid == null || sku.outid == "") ? code : sku.outid;
+					groupCode = (sku.groupCode == null || sku.groupCode == "") ? groupCode : sku.groupCode;
+					skuId = (sku.id == null || sku.id == "") ? skuId : sku.id;
+				}
+
+				// if (isLoadInit) {// 如果是初始化的时候，就不显示没有skuId的情况。
+				// if (skuId == null) {
+				// continue;
+				// }
+				// }
+
+				proHtml = proHtml.replace(/idValueTOReplace/g, skuId);
+				proHtml = proHtml.replace('CODE_VALUE', code);
 				proHtml = proHtml.replace('salePrices_value', salePrice);
 				proHtml = proHtml.replace('listPrices_value', listPrice);
-				proHtml = proHtml.replace('groupCode_value', "");
+				proHtml = proHtml.replace('groupCode_value', groupCode);
 
 				tableContent += ("<tr>" + dynamicStr + proHtml + "</tr>");
 			}
-
 		} else {
 			// 多个销售属性的展示
 			tableContent = buildTable(null, propertyValueArray, 0);
@@ -469,18 +493,30 @@ function drawTableContent(propertyValueArray, propertyNameArray, propertyInputVa
 
 		$j("#jsonSku").val(JSON.stringify(skuInfoList));
 	} else {
-
-		var proHtml = "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode' mandatory='true' name='skuCode' loxiaType='input'  value='CODE_VALUE'/></td>"
+		var sku = skuList[0];
+		var proHtml = "<input type='hidden' name='skuId' value = 'idValueTOReplace' />"
+				+ "<td style='width:150px'><input type='text' mandatory='true' class = 'dynamicInputNameSkuCode' name='skuCode' loxiaType='input' skuId='idValueTOReplace'  value='CODE_VALUE'/></td>"
 				+ "<td style='width:150px'><input type='text' id='salePrices' class = 'dynamicInputNameSalePrices' mandatory='true' name='skuSalePrice' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
 				+ "<td style='width:150px'><input type='text' id='listPrices' class = 'dynamicInputNameListPrices' name='skuListPrice' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-				+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  mandatory='false'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>"
+				+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCode' loxiaType='input'  value='groupCode_value'/></td>";
 
-				+ "";
+		var salePrice = $j("#salePrice").val();
+		var listPrice = $j("#listPrice").val();
+		var groupCode = "";
+		var code = "";
+		var skuId = null;
+		if (sku != null) {
+			salePrice = ((sku.salePrice == null || sku.salePrice == "") ? salePrice : sku.salePrice);
+			listPrice = ((sku.listPrice == null || sku.listPrice == "") ? listPrice : sku.listPrice);
+			code = (sku.outid == null || sku.outid == "") ? code : sku.outid;
+			groupCode = (sku.groupCode == null || sku.groupCode == "") ? groupCode : sku.groupCode;
+			skuId = (sku.id == null || sku.id == "") ? skuId : sku.id;
+		}
 
-		proHtml = proHtml.replace('CODE_VALUE', "");
-		proHtml = proHtml.replace('salePrices_value', "");
-		proHtml = proHtml.replace('listPrices_value', "");
-		proHtml = proHtml.replace('groupCode_value', "");
+		proHtml = proHtml.replace('CODE_VALUE', code);
+		proHtml = proHtml.replace('salePrices_value', salePrice);
+		proHtml = proHtml.replace('listPrices_value', listPrice);
+		proHtml = proHtml.replace('groupCode_value', groupCode);
 
 		tableContent += ("<tr>" + proHtml + "</tr>");
 		list = "[ {'itemId': '','properties': '[]','propertiesName': '[]','outid': ''}]";
@@ -510,17 +546,21 @@ function buildTable(table, data, dataRowIndex) {
 				arrays.push(table[i][j]);
 			}
 
+			var idName = getMoreDynamicInputName("id", arrays);
 			var codesName = getMoreDynamicInputName("code", arrays);
 			var salePriceName = getMoreDynamicInputName("salePrice", arrays);
 			var listPriceName = getMoreDynamicInputName("listPrice", arrays);
 			var groupCodeName = getMoreDynamicInputName("groupCode", arrays);
 			var tmpArray = clone(arrays);
+			var sku = getSkuInfoByProperyValueArray(tmpArray);
 
-			var proHtml = "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode' name='codesNameToReplace' loxiaType='input'  value='CODE_VALUE'/></td>"
-			"<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices'  name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
+			var proHtml = "<input type='hidden' name='idNameToReplace' value = 'idValueTOReplace' />"
+					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSkuCode'  skuId='idValueTOReplace' name='codesNameToReplace' loxiaType='input'  value='CODE_VALUE'/></td>"
+					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameSalePrices' id='salePrices' name='salePriceNameToReplace' decimal='2' loxiaType='number' value='salePrices_value'/></td>"
 					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameListPrices' id='listPrices' name='listPriceToReplace' decimal='2' loxiaType='number' value='listPrices_value'/></td>"
-					+ +"<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode' mandatory='false' name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
+					+ "<td style='width:150px'><input type='text' class = 'dynamicInputNameGroupCode'  name='groupCodeNameToReplace' loxiaType='input'  value='groupCode_value'/></td>";
 
+			proHtml = proHtml.replace('idNameToReplace', idName);
 			proHtml = proHtml.replace('codesNameToReplace', codesName);
 			proHtml = proHtml.replace('salePriceNameToReplace', salePriceName);
 			proHtml = proHtml.replace('listPriceToReplace', listPriceName);
@@ -530,10 +570,25 @@ function buildTable(table, data, dataRowIndex) {
 			var listPrice = $j("#listPrice").val();
 			var code = "";
 			var groupCode = "";
+			var skuId = null;
+			if (sku != null) {
+				salePrice = ((sku.salePrice == null || sku.salePrice == "") ? salePrice : sku.salePrice);
+				listPrice = ((sku.listPrice == null || sku.listPrice == "") ? listPrice : sku.listPrice);
+				code = (sku.outid == null || sku.outid == "") ? code : sku.outid;
+				groupCode = (sku.groupCode == null || sku.groupCode == "") ? groupCode : sku.groupCode;
+				skuId = (sku.id == null || sku.id == "") ? skuId : sku.id;
+			}
+
+			// if (isLoadInit) {// 如果是初始化的时候，就不显示没有skuId的情况。
+			// if (skuId == null) {
+			// continue;
+			// }
+			// }
 
 			proHtml = proHtml.replace('CODE_VALUE', code);
 			proHtml = proHtml.replace('salePrices_value', salePrice);
 			proHtml = proHtml.replace('listPrices_value', listPrice);
+			proHtml = proHtml.replace(/idValueTOReplace/g, skuId);
 			proHtml = proHtml.replace('groupCode_value', groupCode);
 
 			if (htmlLine.length != 0) {
