@@ -45,16 +45,6 @@ public interface PromotionBriefBuilder{
      *	<p>binrui.dong
      *  <p>2017年4月19日 下午3:29:19
      */
-    List<PromotionBrief> getCoarsePromotionBriefList(ShoppingCartCommand shoppingCartCommand);
-    
-    /**
-     * 根据购物车获取细过滤的活动
-     *  <br>采用购物车详情，和促销列表过滤
-     *  @param shoppingCartCommand
-     *  @return
-     *  <p>binrui.dong
-     *  <p>2017年4月19日 下午3:29:19
-     */
-    List<PromotionBrief> getFinePromotionBriefList(ShoppingCartCommand shoppingCartCommand,List<PromotionCommand> promotionCommandList);
+    List<PromotionCommand> getCoarsePromotionBriefList(ShoppingCartCommand shoppingCartCommand);
     
 }

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.baozun.nebula.command.ReturnApplicationCommand;
 import com.baozun.nebula.constant.SoReturnConstants;
@@ -26,6 +27,7 @@ import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.controller.order.form.ReturnOderForm;
 import com.baozun.nebula.web.controller.order.viewcommand.ReturnLineViewCommand;
 
+@Service("returnApplicationResolver")
 public class ReturnApplicationResolverImpl implements ReturnApplicationResolver{
 	
 	@Autowired
