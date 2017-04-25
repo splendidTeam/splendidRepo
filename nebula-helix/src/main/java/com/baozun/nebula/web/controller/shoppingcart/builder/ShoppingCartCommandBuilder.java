@@ -24,6 +24,7 @@ import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
 
 /**
  * The Interface ShoppingCartCommandBuilder.
@@ -62,15 +63,37 @@ public interface ShoppingCartCommandBuilder{
      */
     ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLines,CalcFreightCommand calcFreightCommand,List<String> coupons);
 
+    //------------------------------------------------------------------
     /**
+     * 基于 calcFreightCommand couponList,来构造选择状态的购物车信息.
+     * 
+     * <p>
+     * 常用于订单确认页面
+     * </p>
      * 
      * @param memberDetails
      * @param key
      * @param calcFreightCommand
      * @param couponList
      * @param request
-     * @return
+     * @return 如果没有选择状态的购物车信息,将会抛出异常 {@link NullPointerException}
      * @since 5.3.2.15
      */
     ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,CalcFreightCommand calcFreightCommand,List<String> couponList,HttpServletRequest request);
+
+    /**
+     * 基于 orderForm 来构造选择状态的购物车信息.
+     * 
+     * <p>
+     * 常用于订单确认页面
+     * </p>
+     * 
+     * @param memberDetails
+     * @param key
+     * @param orderForm
+     * @param request
+     * @return 如果没有选择状态的购物车信息,将会抛出异常 {@link NullPointerException}
+     * @since 5.3.2.15
+     */
+    ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,OrderForm orderForm,HttpServletRequest request);
 }

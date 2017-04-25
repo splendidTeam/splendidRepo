@@ -16,8 +16,6 @@
  */
 package com.baozun.nebula.web.controller.order;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,14 +26,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.model.promotion.PromotionCouponCode;
-import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.manager.order.OrderManager;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultReturnResult;
 import com.baozun.nebula.web.controller.NebulaReturnResult;
-import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
 import com.baozun.nebula.web.controller.order.builder.ShoppingCartCommandShowBuilder;
 import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
 import com.baozun.nebula.web.controller.order.form.OrderForm;
@@ -43,7 +39,6 @@ import com.baozun.nebula.web.controller.order.resolver.SalesOrderResult;
 import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
-import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
  * 
@@ -57,12 +52,11 @@ public class NebulaOrderRecalcController extends NebulaAbstractTransactionContro
     @Autowired
     private OrderManager orderManager;
 
+    /**  */
     @Autowired
     private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
 
-    @Autowired
-    private CalcFreightCommandBuilder calcFreightCommandBuilder;
-
+    /**  */
     @Autowired
     private ShoppingCartCommandShowBuilder shoppingCartCommandShowBuilder;
 
@@ -126,14 +120,9 @@ public class NebulaOrderRecalcController extends NebulaAbstractTransactionContro
             }
         }
 
-        List<String> list = toList(couponCode);
-
         //----------------------------------------------------
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, orderForm, request);
 
-        //地址
-        CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(orderForm.getShippingInfoSubForm());
-
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, calcFreightCommand, list, request);
         shoppingCartCommand = shoppingCartCommandShowBuilder.build(shoppingCartCommand);
         return toNebulaReturnResult(shoppingCartCommand);
 

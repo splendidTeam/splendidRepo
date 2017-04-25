@@ -31,7 +31,6 @@ import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
-import com.baozun.nebula.web.controller.BaseController;
 import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
 import com.baozun.nebula.web.controller.order.builder.ContactCommandListBuilder;
 import com.baozun.nebula.web.controller.order.builder.OrderConfirmViewCommandBuilder;
@@ -109,7 +108,7 @@ import com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommand
  * @version 5.3.1 2016年4月28日 上午11:42:30
  * @since 5.3.1
  */
-public class NebulaOrderConfirmController extends BaseController{
+public class NebulaOrderConfirmController extends NebulaAbstractTransactionController{
 
     /** The confirm before handler. */
     @Autowired(required = false)

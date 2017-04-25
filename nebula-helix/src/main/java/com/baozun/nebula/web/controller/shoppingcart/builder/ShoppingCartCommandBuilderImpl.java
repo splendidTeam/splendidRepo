@@ -31,8 +31,14 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.shoppingcart.SdkShoppingCartCommandBuilder;
 import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
+import com.baozun.nebula.web.controller.order.builder.CalcFreightCommandBuilder;
+import com.baozun.nebula.web.controller.order.form.CouponInfoSubForm;
+import com.baozun.nebula.web.controller.order.form.OrderForm;
+import com.baozun.nebula.web.controller.order.form.ShippingInfoSubForm;
 import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory;
-import com.feilong.core.Validator;
+
+import static com.feilong.core.Validator.isNullOrEmpty;
+import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
  *
@@ -43,6 +49,7 @@ import com.feilong.core.Validator;
 @Component("shoppingCartCommandBuilder")
 public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilder{
 
+    /**  */
     @Autowired
     private SdkShoppingCartCommandBuilder sdkShoppingCartCommandBuilder;
 
@@ -53,6 +60,24 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
     /** The shopping cart command builder. */
     @Autowired
     private ShoppingCartCommandBuilder shoppingCartCommandBuilder;
+
+    /**  */
+    @Autowired
+    private CalcFreightCommandBuilder calcFreightCommandBuilder;
+
+    /* (non-Javadoc)
+     * @see com.baozun.nebula.web.controller.shoppingcart.builder.ShoppingCartCommandBuilder#buildShoppingCartCommandWithCheckStatus(com.baozun.nebula.web.MemberDetails, java.lang.String, com.baozun.nebula.web.controller.order.form.OrderForm, javax.servlet.http.HttpServletRequest)
+     */
+    @Override
+    public ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,OrderForm orderForm,HttpServletRequest request){
+        CouponInfoSubForm couponInfoSubForm = orderForm.getCouponInfoSubForm();
+        List<String> couponList = toList(couponInfoSubForm.getCouponCode());
+
+        //地址
+        ShippingInfoSubForm shippingInfoSubForm = orderForm.getShippingInfoSubForm();
+        CalcFreightCommand calcFreightCommand = calcFreightCommandBuilder.build(shippingInfoSubForm);
+        return shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, calcFreightCommand, couponList, request);
+    }
 
     /*
      * (non-Javadoc)
@@ -94,7 +119,7 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
      */
     @Override
     public ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLines,CalcFreightCommand calcFreightCommand,List<String> coupons){
-        if (Validator.isNullOrEmpty(shoppingCartLines)){
+        if (isNullOrEmpty(shoppingCartLines)){
             return null;
         }
 

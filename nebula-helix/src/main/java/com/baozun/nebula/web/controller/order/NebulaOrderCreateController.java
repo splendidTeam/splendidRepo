@@ -17,7 +17,6 @@
 package com.baozun.nebula.web.controller.order;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,11 +33,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.baozun.nebula.sdk.command.SalesOrderCommand;
 import com.baozun.nebula.sdk.command.SalesOrderCreateOptions;
-import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.sdk.manager.order.SdkOrderCreateManager;
-import com.baozun.nebula.utils.ShoppingCartUtil;
 import com.baozun.nebula.web.MemberDetails;
 import com.baozun.nebula.web.bind.LoginMember;
 import com.baozun.nebula.web.controller.DefaultResultMessage;
@@ -55,8 +51,6 @@ import com.baozun.nebula.web.controller.shoppingcart.factory.ShoppingcartFactory
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartOrderCreateBeforeHandler;
 import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingcartOrderCreateSuccessHandler;
 import com.feilong.accessor.AutoKeyAccessor;
-import com.feilong.core.Validator;
-import com.feilong.core.util.CollectionsUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 
@@ -206,20 +200,7 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
         }
 
         //---------------------------------------------------------------------------------
-
-        // 获取购物车信息
-        List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingcartFactory.getShoppingCartLineCommandList(memberDetails, key, request);
-        shoppingCartLineCommandList = ShoppingCartUtil.getMainShoppingCartLineCommandListWithCheckStatus(shoppingCartLineCommandList, true);
-
-        //---------------------------------------------------------------------------------
-
-        // 封装订单信息
-        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
-        List<String> couponList = CollectionsUtil.getPropertyValueList(salesOrderCommand.getCouponCodes(), "couponCode");
-
-        CalcFreightCommand calcFreightCommand = salesOrderCommand.getCalcFreightCommand();
-        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommand(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList);
-
+        ShoppingCartCommand shoppingCartCommand = shoppingCartCommandBuilder.buildShoppingCartCommandWithCheckStatus(memberDetails, key, orderForm, request);
         //---------------------------------------------------------------------------------
         // 校验购物车信息和促销
         //TODO feilong 多张优惠券
@@ -243,6 +224,8 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
         Set<String> memCombos = null == memberDetails ? null : memberDetails.getMemComboList();
 
         //----------------------新建订单-----------------------------------------------------
+        // 封装订单信息
+        SalesOrderCommand salesOrderCommand = salesOrderResolver.toSalesOrderCommand(memberDetails, orderForm, request);
         String subOrdinate = sdkOrderCreateManager.saveOrder(shoppingCartCommand, salesOrderCommand, memCombos, salesOrderCreateOptions);
 
         //---------------------------------------------------------------------------------
@@ -266,7 +249,7 @@ public class NebulaOrderCreateController extends NebulaAbstractTransactionContro
         SalesOrderCreateOptions salesOrderCreateOptions = new SalesOrderCreateOptions();
 
         //设置立即购买标志
-        if (Validator.isNotNullOrEmpty(key)){
+        if (isNotNullOrEmpty(key)){
             salesOrderCreateOptions.setIsImmediatelyBuy(true);
         }
         return salesOrderCreateOptions;
