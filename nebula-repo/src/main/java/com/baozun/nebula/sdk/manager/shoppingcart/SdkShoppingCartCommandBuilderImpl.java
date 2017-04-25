@@ -16,10 +16,9 @@
  */
 package com.baozun.nebula.sdk.manager.shoppingcart;
 
-import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
+import static org.apache.commons.collections4.CollectionUtils.addIgnoreNull;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang3.Validate;
@@ -41,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.command.UserDetails;
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
-import com.baozun.nebula.sdk.command.shoppingcart.PromotionBrief;
 import com.baozun.nebula.sdk.command.shoppingcart.ShopCartCommandByShop;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -50,18 +47,15 @@ import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.SdkShoppingCartLineCommandBehaviourFactory;
 import com.baozun.nebula.sdk.manager.shoppingcart.behaviour.proxy.ShoppingCartLineCommandBehaviour;
 import com.baozun.nebula.sdk.manager.shoppingcart.handler.ChoosedShoppingCartLineCommandListPacker;
-import com.baozun.nebula.sdk.manager.shoppingcart.handler.PromotionBriefBuilder;
-import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShopCartCommandByShopBuilder;
+import com.baozun.nebula.sdk.manager.shoppingcart.handler.ShoppingCartPromotionWrapper;
 import com.baozun.nebula.utils.ShoppingCartUtil;
-import com.feilong.core.Validator;
-import com.feilong.core.bean.ConvertUtil;
-import com.feilong.core.util.AggregateUtil;
 import com.feilong.core.util.CollectionsUtil;
 import com.feilong.core.util.predicate.BeanPredicateUtil;
-import com.feilong.tools.jsonlib.JsonUtil;
 
 import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
+import static com.feilong.core.util.CollectionsUtil.find;
+import static com.feilong.core.util.CollectionsUtil.getPropertyValueMap;
 
 /**
  * 专门用来构建 ShoppingCartCommand.
@@ -87,21 +81,12 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
     @Autowired
     private SdkEngineManager sdkEngineManager;
 
-    /** The sdk shopping cart group manager. */
-    @Autowired
-    private SdkShoppingCartGroupManager sdkShoppingCartGroupManager;
-
     /** The sdk mata info manager. */
     @Autowired
     private SdkMataInfoManager sdkMataInfoManager;
 
-    /** The shop cart command by shop builder. */
     @Autowired
-    private ShopCartCommandByShopBuilder shopCartCommandByShopBuilder;
-
-    /** The promotion brief builder. */
-    @Autowired
-    private PromotionBriefBuilder promotionBriefBuilder;
+    private ShoppingCartPromotionWrapper shoppingCartPromotionWrapper;
 
     @Autowired(required = false)
     private ChoosedShoppingCartLineCommandListPacker choosedShoppingCartLineCommandListPacker;
@@ -121,7 +106,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         packShoppingCartLineCommandList(shoppingCartLineCommandList);
         //**************************************************************************************
 
-        Map<Long, Long> lineIdAndShopIdMapList = CollectionsUtil.getPropertyValueMap(shoppingCartLineCommandList, "id", "shopId");
+        Map<Long, Long> lineIdAndShopIdMapList = getPropertyValueMap(shoppingCartLineCommandList, "id", "shopId");
 
         //*******************************************************************************************************
         List<ShoppingCartLineCommand> chooseLinesShoppingCartLineCommandList = new ArrayList<>();// 被选中的购物车行
@@ -131,7 +116,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
 
         //*******since 5.3.2.7********************************************************
         if (null != choosedShoppingCartLineCommandListPacker){
-            choosedShoppingCartLineCommandListPacker.packChoosedShoppingCartLineCommandList(chooseLinesShoppingCartLineCommandList, calcFreightCommand,coupons);
+            choosedShoppingCartLineCommandListPacker.packChoosedShoppingCartLineCommandList(chooseLinesShoppingCartLineCommandList, calcFreightCommand, coupons);
         }
 
         // 封装购物车的基本信息
@@ -143,9 +128,9 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         shoppingCartCommand.setShoppingCartByShopIdMap(shopIdAndShoppingCartCommandMap);
 
         //XXX feilong 全不选的情况
-        if (Validator.isNotNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){
+        if (isNotNullOrEmpty(shoppingCartCommand.getShoppingCartLineCommands())){
             // 设置购物车促销信息
-            setShopCartPromotionInfos(shoppingCartCommand, calcFreightCommand);
+            shoppingCartPromotionWrapper.wrapPromotion(shoppingCartCommand, calcFreightCommand);
         }
 
         //***************************************************************************************
@@ -169,7 +154,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         int i = 0;
         for (ShoppingCartLineCommand shoppingCartLineCommand : shoppingCartLineCommandList){
             if (shoppingCartLineCommand.getId() == null){
-                shoppingCartLineCommand.setId(new Long(--i));
+                shoppingCartLineCommand.setId(new Long(--i));//游客购物车行
             }
 
             ShoppingCartLineCommandBehaviour shoppingCartLineCommandBehaviour = sdkShoppingCartLineCommandBehaviourFactory.getShoppingCartLineCommandBehaviour(shoppingCartLineCommand);
@@ -190,7 +175,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * @param shopIdAndShoppingCartCommandMap
      *            the shop id and shopping cart command map
      */
-    private void doWithRebuildShoppingCartLineCommands(
+    private static void doWithRebuildShoppingCartLineCommands(
                     ShoppingCartCommand shoppingCartCommand,
                     List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,
                     Map<Long, Long> lineIdAndShopIdMapList,
@@ -205,8 +190,8 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
             Long lineId = entry.getKey();
             Long shopId = entry.getValue();
 
-            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
-            CollectionUtils.addIgnoreNull(newLineList, CollectionsUtil.find(noChooseShoppingCartLineCommandList, "id", lineId));
+            addIgnoreNull(newLineList, find(shoppingCartCommand.getShoppingCartLineCommands(), "id", lineId));
+            addIgnoreNull(newLineList, find(noChooseShoppingCartLineCommandList, "id", lineId));
 
             //****************************************************************************************
             ShoppingCartLineCommand tempShopLine = getTempShopLine(shopId, lineId, newLineList, shopIdAndShoppingCartCommandMap);
@@ -266,13 +251,13 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      *            the shop id and shopping cart command map
      * @return the temp shop line
      */
-    private ShoppingCartLineCommand getTempShopLine(Long shopId,Long lineId,List<ShoppingCartLineCommand> newLines,Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
+    private static ShoppingCartLineCommand getTempShopLine(Long shopId,Long lineId,List<ShoppingCartLineCommand> newLines,Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
         ShoppingCartCommand shopShoppingCartCommand = shopIdAndShoppingCartCommandMap.get(shopId);
         List<ShoppingCartLineCommand> shopShoppingCartLineList = shopShoppingCartCommand.getShoppingCartLineCommands();// 店铺的商品行数据
 
-        ShoppingCartLineCommand tempShopLine = CollectionsUtil.find(shopShoppingCartLineList, "id", lineId);
+        ShoppingCartLineCommand tempShopLine = find(shopShoppingCartLineList, "id", lineId);
         if (null == tempShopLine){
-            tempShopLine = CollectionsUtil.find(newLines, PredicateUtils.<ShoppingCartLineCommand> andPredicate(BeanPredicateUtil.equalPredicate("id", lineId), BeanPredicateUtil.equalPredicate("shopId", shopId)));
+            tempShopLine = find(newLines, PredicateUtils.<ShoppingCartLineCommand> andPredicate(BeanPredicateUtil.equalPredicate("id", lineId), BeanPredicateUtil.equalPredicate("shopId", shopId)));
         }
         return tempShopLine;
     }
@@ -287,7 +272,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      * @param shopIdAndShoppingCartCommandMap
      *            the shop id and shopping cart command map
      *///XXX feilong 感觉下面的逻辑没有用
-    private void doWithNoChoose(List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,ShoppingCartCommand shoppingCartCommand,Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
+    private static void doWithNoChoose(List<ShoppingCartLineCommand> noChooseShoppingCartLineCommandList,ShoppingCartCommand shoppingCartCommand,Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
 
         // 因为某些NOTCHOOSE的购物车行不进行促销计算,如果全是无效数据,shopCartByShopIdMap中的值为空,所以这里帮助进行初始化shopCartByShopIdMap的数据
         for (ShoppingCartLineCommand noChooseShoppingCartLineCommand : noChooseShoppingCartLineCommandList){
@@ -306,7 +291,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
                 shopCartCommandByShop.setRealPayAmount(ZERO);
                 shopCartCommandByShop.setShopId(shopId);
 
-                shoppingCartCommand.setSummaryShopCartList(ConvertUtil.toList(shopCartCommandByShop));
+                shoppingCartCommand.setSummaryShopCartList(toList(shopCartCommandByShop));
             }
         }
     }
@@ -388,7 +373,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      *            the valided lines
      * @return the shopping cart command
      */
-    private ShoppingCartCommand buildShoppingCartCommand(UserDetails userDetails,List<String> coupons,List<ShoppingCartLineCommand> validedLines){
+    private static ShoppingCartCommand buildShoppingCartCommand(UserDetails userDetails,List<String> coupons,List<ShoppingCartLineCommand> validedLines){
         ShoppingCartCommand shoppingCartCommand = new ShoppingCartCommand();// 购物车对象
 
         // 设置应付金额
@@ -414,138 +399,6 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
         return shoppingCartCommand;
     }
 
-    /**
-     * 设置购物车的促销信息.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart
-     * @param calcFreightCommand
-     *            the calc freight command
-     */
-    private void setShopCartPromotionInfos(ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand){
-        // 获取促销数据.需要调用促销引擎计算优惠价格
-        List<PromotionBrief> promotionBriefList = promotionBriefBuilder.getPromotionBriefList(shoppingCartCommand);
-
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug(JsonUtil.format(promotionBriefList));
-        }
-
-        Map<Long, List<PromotionBrief>> shopIdAndPromotionBriefListMap = CollectionsUtil.group(promotionBriefList, "shopId");
-
-        // 区分店铺的购物车
-        Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap = shoppingCartCommand.getShoppingCartByShopIdMap();
-
-        List<ShopCartCommandByShop> summaryShopCartList = buildShopCartCommandByShopList(calcFreightCommand, shopIdAndPromotionBriefListMap, shopIdAndShoppingCartCommandMap);
-
-        //********************************************************************************************
-
-        shoppingCartCommand.setSummaryShopCartList(summaryShopCartList);
-
-        // 购物车促销简介信息
-        shoppingCartCommand.setCartPromotionBriefList(promotionBriefList);
-
-        // 所有购物车行(可能包含了礼品\有效、无效)
-        List<ShoppingCartLineCommand> allShoppingCartLines = getAllShoppingCartLines(shopIdAndShoppingCartCommandMap);
-        shoppingCartCommand.setShoppingCartLineCommands(allShoppingCartLines);
-
-        setShoppingCartCommandPrice(shoppingCartCommand, summaryShopCartList, allShoppingCartLines);
-    }
-
-    /**
-     * 设置 shopping cart command price.
-     *
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param summaryShopCartList
-     *            the summary shop cart list
-     * @param allShoppingCartLines
-     *            the all shopping cart lines
-     */
-    private static void setShoppingCartCommandPrice(ShoppingCartCommand shoppingCartCommand,List<ShopCartCommandByShop> summaryShopCartList,List<ShoppingCartLineCommand> allShoppingCartLines){
-        // 设置应付金额
-        shoppingCartCommand.setOriginPayAmount(ShoppingCartUtil.getOriginPayAmount(allShoppingCartLines));
-
-        Map<String, BigDecimal> priceMap = AggregateUtil.sum(summaryShopCartList, "realPayAmount", "originShoppingFee", "offersShipping");
-
-        // 实际支付金额
-        shoppingCartCommand.setCurrentPayAmount(priceMap.get("realPayAmount").setScale(2, ROUND_HALF_UP));
-
-        // 应付运费
-        shoppingCartCommand.setOriginShoppingFee(priceMap.get("originShoppingFee").setScale(2, ROUND_HALF_UP));
-
-        // 运费优惠
-        BigDecimal offersShippingAmount = priceMap.get("offersShipping");
-
-        // 计算实付运费
-        BigDecimal originShoppingFee = shoppingCartCommand.getOriginShoppingFee();
-        BigDecimal currentShippingAmountByShopCart = originShoppingFee.compareTo(offersShippingAmount) >= 0 ? originShoppingFee.subtract(offersShippingAmount) : ZERO;
-        // 实付运费
-        shoppingCartCommand.setCurrentShippingFee(currentShippingAmountByShopCart);
-    }
-
-    /**
-     * Builds the shop cart command by shop list.
-     *
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param shopIdAndPromotionBriefListMap
-     *            the pro briefs map
-     * @param shopIdAndShoppingCartCommandMap
-     *            the shop id and shopping cart command map
-     * @return the list< shop cart command by shop>
-     */
-    private List<ShopCartCommandByShop> buildShopCartCommandByShopList(CalcFreightCommand calcFreightCommand,Map<Long, List<PromotionBrief>> shopIdAndPromotionBriefListMap,Map<Long, ShoppingCartCommand> shopIdAndShoppingCartCommandMap){
-        List<ShopCartCommandByShop> summaryShopCartList = new ArrayList<>();
-
-        for (Map.Entry<Long, ShoppingCartCommand> entry : shopIdAndShoppingCartCommandMap.entrySet()){
-            List<PromotionBrief> promotionBriefList = shopIdAndPromotionBriefListMap.get(entry.getKey());
-            ShopCartCommandByShop shopCartCommandByShop = buildShopCartCommandByShop(entry.getKey(), entry.getValue(), calcFreightCommand, promotionBriefList);
-            summaryShopCartList.add(shopCartCommandByShop);
-        }
-        return summaryShopCartList;
-    }
-
-    /**
-     * Builds the shop cart command by shop.
-     *
-     * @param shopId
-     *            the shop id
-     * @param shoppingCartCommand
-     *            the shopping cart command
-     * @param calcFreightCommand
-     *            the calc freight command
-     * @param promotionBriefList
-     *            the promotion brief list
-     * @return the shop cart command by shop
-     */
-    private ShopCartCommandByShop buildShopCartCommandByShop(Long shopId,ShoppingCartCommand shoppingCartCommand,CalcFreightCommand calcFreightCommand,List<PromotionBrief> promotionBriefList){
-        if (isNotNullOrEmpty(promotionBriefList)){
-            // 计算分店铺的优惠.只计算有效的购物车行
-            ShopCartCommandByShop shopCartCommandByShop = shopCartCommandByShopBuilder.build(shoppingCartCommand, calcFreightCommand, promotionBriefList);
-
-            shoppingCartCommand.setShoppingCartLineCommands(sdkShoppingCartGroupManager.groupShoppingCartLinesToDisplayByLinePromotionResult(shoppingCartCommand, promotionBriefList));
-            return shopCartCommandByShop;
-        }
-
-        return shopCartCommandByShopBuilder.build(shopId, shoppingCartCommand, calcFreightCommand);
-    }
-
-    /**
-     * 返回整个购物车数据.
-     *
-     * @param shopCartMap
-     *            the shop cart map
-     * @return the all shopping cart lines
-     */
-    private List<ShoppingCartLineCommand> getAllShoppingCartLines(Map<Long, ShoppingCartCommand> shopCartMap){
-        List<ShoppingCartLineCommand> allLines = new ArrayList<>();
-
-        for (Map.Entry<Long, ShoppingCartCommand> entry : shopCartMap.entrySet()){
-            allLines.addAll(entry.getValue().getShoppingCartLineCommands());
-        }
-        return allLines;
-    }
-
     //**********************************************************************************************
 
     /**
@@ -555,7 +408,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      *            the shop cart
      * @return the shop cart by shop id
      */
-    private Map<Long, ShoppingCartCommand> buildShopCartByShopIdMap(ShoppingCartCommand shoppingCartCommand){
+    private static Map<Long, ShoppingCartCommand> buildShopCartByShopIdMap(ShoppingCartCommand shoppingCartCommand){
         // 获取区分了店铺的购物车对象
         List<ShoppingCartLineCommand> shoppingCartLineCommandList = shoppingCartCommand.getShoppingCartLineCommands();
 
@@ -585,7 +438,7 @@ public class SdkShoppingCartCommandBuilderImpl implements SdkShoppingCartCommand
      *            the shopping cart line command list
      * @return the shop id and shopping cart line command list
      */
-    private Map<Long, List<ShoppingCartLineCommand>> getShopIdAndShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
+    private static Map<Long, List<ShoppingCartLineCommand>> getShopIdAndShoppingCartLineCommandList(List<ShoppingCartLineCommand> shoppingCartLineCommandList){
 
         //TODO feilong 提取
         return CollectionsUtil.group(shoppingCartLineCommandList, "shopId", new Predicate<ShoppingCartLineCommand>(){
