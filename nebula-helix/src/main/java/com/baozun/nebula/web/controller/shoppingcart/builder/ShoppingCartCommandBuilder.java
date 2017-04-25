@@ -18,6 +18,8 @@ package com.baozun.nebula.web.controller.shoppingcart.builder;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.baozun.nebula.sdk.command.shoppingcart.CalcFreightCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
@@ -59,4 +61,16 @@ public interface ShoppingCartCommandBuilder{
      * @return 如果 <code>shoppingCartLines</code> 是null或者 empty,返回 null
      */
     ShoppingCartCommand buildShoppingCartCommand(MemberDetails memberDetails,List<ShoppingCartLineCommand> shoppingCartLines,CalcFreightCommand calcFreightCommand,List<String> coupons);
+
+    /**
+     * 
+     * @param memberDetails
+     * @param key
+     * @param calcFreightCommand
+     * @param couponList
+     * @param request
+     * @return
+     * @since 5.3.2.15
+     */
+    ShoppingCartCommand buildShoppingCartCommandWithCheckStatus(MemberDetails memberDetails,String key,CalcFreightCommand calcFreightCommand,List<String> couponList,HttpServletRequest request);
 }
