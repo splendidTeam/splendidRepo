@@ -693,7 +693,7 @@
 					from T_PD_ITEM_RATE tpir 
 					LEFT JOIN t_mem_member tmm on tmm.id = tpir.member_id
 					LEFT JOIN t_pd_item ti on tpir.item_id = ti.id
-					where tpir.lifecycle = 1 and tpir.item_code = :itemCode
+					where tpir.lifecycle = 1 and ti.code = :itemCode
                  ]]>
 			</value>
 		</constructor-arg>
