@@ -488,7 +488,7 @@ public abstract class NebulaAbstractPdpController extends NebulaBasePdpControlle
     		for(RelationItemViewCommand relationItemViewCommand : itemRecommendList){
     			ItemBaseInfoViewCommand itemBaseInfo = new ItemBaseInfoViewCommand();
     			itemBaseInfo.setCode(relationItemViewCommand.getItemCode());
-    			
+    			itemBaseInfo.setId(relationItemViewCommand.getItemId());
     			ItemExtraViewCommand itemExtraViewCommand = buildItemExtraViewCommand(itemBaseInfo);
     			relationItemViewCommand.setExtra(itemExtraViewCommand);
     		}
