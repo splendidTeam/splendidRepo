@@ -577,7 +577,7 @@ public class AddressUtil {
 		AddressUtil.deliveryModeOn = deliveryModeOn;
 	}
 
-    public static List<Address> getOurProviences(){
+    public static List<Address> getAllProviences(){
         return getSubAddressByPid(COUNTY_ID);
     }
 
