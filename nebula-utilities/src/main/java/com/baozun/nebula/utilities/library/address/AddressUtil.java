@@ -79,6 +79,8 @@ public class AddressUtil {
 	// private static String addressJson = null;
 
 	private static final Long ROOT_ID = 1L;
+	
+	private static final Long COUNTY_ID = 0L;
 
 	/*********************************** 国际化 ***********************************/
 	/** 多语言地址信息文件存放的目录 **/
@@ -116,7 +118,7 @@ public class AddressUtil {
 	 */
 	public static List<Address> getSubAddressByPid(Long pid) {
 		if (i18nOffOn) {
-			Map<Long, List<Address>> subAddressMap = subAddressLangMap.get(LangUtil.getCurrentLang());
+			Map<Long, List<Address>> subAddressMap = subAddressLangMap.get(LangUtil.ZH_CN);
 			if (subAddressMap != null) {
 				return subAddressMap.get(pid);
 			}
@@ -574,6 +576,10 @@ public class AddressUtil {
 	public static void setDeliveryModeOn(Boolean deliveryModeOn) {
 		AddressUtil.deliveryModeOn = deliveryModeOn;
 	}
+
+    public static List<Address> getAllProviences(){
+        return getSubAddressByPid(COUNTY_ID);
+    }
 
 //	public static void main(String[] args) throws Exception {
 //		List<String> langList = new ArrayList<String>();

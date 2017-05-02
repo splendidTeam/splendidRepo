@@ -200,6 +200,15 @@ public class ItemInfoCommand implements Command {
 
 	private Long lastSelectPropertyId;
 	private Long lastSelectPropertyValueId;
+	/** 1 组合商品的组合extentionCode. 在数据库中以|分割 如[8,4,6]|[1,,4,5] */
+	private String groupCode;
+
+	public String getGroupCode() {
+		return groupCode;
+	}
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
+	}
 	public BigDecimal getSalePrice() {
 		return salePrice;
 	}

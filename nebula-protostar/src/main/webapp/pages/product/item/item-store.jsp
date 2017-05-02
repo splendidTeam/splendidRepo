@@ -16,6 +16,9 @@ var dynamicPropertyCommandListJsonStr=<c:out value="${dynamicPropertyCommandList
 var itemPropertiesStr = <c:out value="${itemPropertiesStr}" default = "[]" escapeXml="false"></c:out>;
 var storeNumStr=<c:out value="${storeNumStr}" default="[]" escapeXml="false"></c:out>;
 </SCRIPT>
+<script type="text/javascript">
+var salesOfPropertyIsNotRequired = "${salesOfPropertyIsNotRequired}";
+</script>
 </head>
 <body>
 

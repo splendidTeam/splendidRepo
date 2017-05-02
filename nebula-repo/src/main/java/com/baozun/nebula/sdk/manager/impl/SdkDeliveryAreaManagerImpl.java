@@ -20,7 +20,6 @@ import com.baozun.nebula.model.delivery.AreaDeliveryMode;
 import com.baozun.nebula.model.delivery.DeliveryArea;
 import com.baozun.nebula.sdk.manager.SdkAreaDeliveryModeManager;
 import com.baozun.nebula.sdk.manager.SdkDeliveryAreaManager;
-import com.baozun.nebula.utilities.common.LangUtil;
 import com.feilong.core.Validator;
 
 @Transactional

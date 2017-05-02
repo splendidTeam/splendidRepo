@@ -56,7 +56,9 @@ import com.baozun.nebula.model.product.ItemProperties;
 import com.baozun.nebula.model.product.Property;
 import com.baozun.nebula.model.product.Sku;
 import com.baozun.nebula.model.product.SkuInventory;
+import com.baozun.nebula.model.system.MataInfo;
 import com.baozun.nebula.sdk.manager.SdkItemManager;
+import com.baozun.nebula.sdk.manager.SdkMataInfoManager;
 import com.baozun.nebula.web.UserDetails;
 import com.baozun.nebula.web.bind.ArrayCommand;
 import com.baozun.nebula.web.command.BackWarnEntity;
@@ -89,6 +91,8 @@ public class ItemStoreController extends BaseController {
 	private SdkItemManager		sdkItemManager;
 	@Autowired
 	private PropertyManager		propertyManager;
+	@Autowired
+	private SdkMataInfoManager  sdkMataInfoManager;
 
 	/**
 	 * 上传图片的域名
@@ -197,6 +201,9 @@ public class ItemStoreController extends BaseController {
 		model.addAttribute("itemPropertiesStr", itemPropertiesStr);
 		model.addAttribute("categoryList", categoryList);
 		model.addAttribute("mustCheckArray", mustCheckArray);
+		
+		String 	salesOfPropertyIsNotRequired = sdkMataInfoManager.findValue(MataInfo.SALES_OF_PROPERTY_IS_NOT_REQUIRED);
+		model.addAttribute("salesOfPropertyIsNotRequired",salesOfPropertyIsNotRequired);
 		return "/product/item/item-store";
 	}
 

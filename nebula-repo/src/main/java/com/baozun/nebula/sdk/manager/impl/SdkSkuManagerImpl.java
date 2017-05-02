@@ -192,4 +192,16 @@ public class SdkSkuManagerImpl implements SdkSkuManager{
         }
         return skuCommand;
     }
+    /*
+	 * (non Javadoc)
+	 * @Title: findSkuByOutId
+	 * @Description: TODO
+	 * @param outId
+	 * @return
+	 * @see com.baozun.nebula.sdk.manager.SdkSkuManager#findSkuByOutId(java.lang.String)
+	 */
+	@Override
+	public Sku findSkuByOutId(String outId) {
+		return skuDao.findSkuByExtentionCode(outId);
+	}
 }

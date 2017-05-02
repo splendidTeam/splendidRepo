@@ -50,6 +50,11 @@ public class ShippingTemeplateCommand extends BaseModel{
 	private String calculationType;
 	
 	/**
+	 * 自定义模板类名
+	 */
+	private String beanName;
+	
+	/**
 	 * 是否默认
 	 */
 	private boolean isDefault;
@@ -119,8 +124,16 @@ public class ShippingTemeplateCommand extends BaseModel{
 	public void setCalculationType(String calculationType) {
 		this.calculationType = calculationType;
 	}
+	
+    public String getBeanName(){
+        return beanName;
+    }
 
-	/**
+    public void setBeanName(String beanName){
+        this.beanName = beanName;
+    }
+
+    /**
 	 * @return the isDefault
 	 */
 	public boolean isDefault() {

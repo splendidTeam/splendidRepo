@@ -21,8 +21,24 @@ var entryShippingTemplateUrl = base + "/freight/shippingTemeplateList.htm";
 
 
 
-
 $j(document).ready(function() {
+	
+	var beanName = $j("#templateType").attr("value");
+	if (beanName == "custom") {
+		$j("#beanNameDiv").attr("style","display:block;");
+	} else {
+		$j("#beanNameDiv").attr("style","display:none;");
+	}
+	
+	$j("#calculationType").change(function() {
+		var type = $j(this).val();
+		if (type == "custom") {
+			$j("#beanNameDiv").attr("style","display:block;");
+		} else {
+			$j("#beanNameDiv").attr("style","display:none;");
+			$j("#beanNameDiv").find("input").attr("value","");
+		}
+	});
 	
 	
 	//编辑保存按钮
@@ -35,6 +51,7 @@ $j(document).ready(function() {
 			return;
 		}
 		var calculationType = $j("#calculationType").val();
+		var beanName = $j("#beanName").val();
 		var defaultFee = $j("#defaultFee").val();
 		var isDefault = $j("#isDefault").val();
 		var distributionModeIds = "";
@@ -49,6 +66,7 @@ $j(document).ready(function() {
 				'id':currentId,
 				'name' : currentName,
 				'calculationType':calculationType,
+				'beanName':beanName,
 				'defaultFee':defaultFee,
 				'default':isDefault,
 				'distributionModeIds':distributionModeIds

@@ -11,6 +11,29 @@
 var itemCodeValidMsg = "${itemCodeValidMsg}";
 var pdValidCode = "${pdValidCode}";
 var baseUrl='${base}'; 
+
+var categoryzNodes  = [
+				{id:0, name:"ROOT",state:"0", open:true,root:"true",nocheck:true},
+              <c:forEach var="category" items="${categoryList}" varStatus="status">
+              	{id:${category.id}, pId:${category.parentId}, 
+              		name:"${category.name}",
+              		code:"${category.code}", sortNo:${category.sortNo}, 
+              		<c:forEach var="checkedCategory" items="${categories}">
+              		       <c:if test="${checkedCategory.id ==category.id}">
+              		            checked:true,
+              		       </c:if>
+              		</c:forEach>
+              		drag:false, open:true,
+              		lifecycle:${category.lifecycle} } 
+              	<c:if test="${!status.last}">,</c:if>
+              </c:forEach>
+         ];
+
+var skuList=<c:out value="${skuList}" default="[]" escapeXml="false" ></c:out>;
+var dynamicPropertyCommandListJsonStr=<c:out value="${dynamicPropertyCommandListJsonStr}" default="[]" escapeXml="false"></c:out>;
+var lastSelectPropertyId=<c:out value="${lastSelectPropertyId}" default="[]" escapeXml="false"></c:out>;
+var lastSelectPropertyValueId=<c:out value="${lastSelectPropertyValueId}" default="[]" escapeXml="false"></c:out>;
+var itemPropertiesStr = <c:out value="${itemPropertiesStr}" default = "[]" escapeXml="false"></c:out>;
 </script>
 
 <style type="text/css">

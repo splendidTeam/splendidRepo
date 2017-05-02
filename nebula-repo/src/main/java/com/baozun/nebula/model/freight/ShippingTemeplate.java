@@ -55,6 +55,8 @@ public class ShippingTemeplate extends BaseModel {
 	
 	public static final String CAL_TYPE_BY_BASE = "base";
 	
+	public static final String CAL_TYPE_BY_CUSTOM = "custom";
+	
 	/**
 	 * id
 	 */
@@ -69,6 +71,11 @@ public class ShippingTemeplate extends BaseModel {
 	 * 计件，计重，基础(重量/重量单位*单价，低于基础价时使用基础价)
 	 */
 	private String calculationType;
+	
+	/**
+	 * 自定义模板类名
+	 */
+	private String beanName;
 	
 	/**
 	 * 是否默认
@@ -126,13 +133,23 @@ public class ShippingTemeplate extends BaseModel {
 		return calculationType;
 	}
 
-	/**
+    /**
 	 * @param type the type to set
 	 */
 	public void setCalculationType(String calculationType) {
 		this.calculationType = calculationType;
 	}
 
+	@Column(name = "BEAN_NAME")
+	public String getBeanName(){
+	    return beanName;
+	}
+	
+	
+	public void setBeanName(String beanName){
+	    this.beanName = beanName;
+	}
+	
 	/**
 	 * @return the isDefault
 	 */

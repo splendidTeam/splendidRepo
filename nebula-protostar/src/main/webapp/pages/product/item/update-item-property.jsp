@@ -1,6 +1,8 @@
 <%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <script type="text/javascript" src="${base}/scripts/product/item/update-item-property.js"></script>
-
+<script type="text/javascript">
+var salesOfPropertyIsNotRequired = "${salesOfPropertyIsNotRequired}";
+</script>
 <div class="ui-block-title1 ui-block-title">
 	<spring:message code="item.update.generalProperty" />
 </div>
