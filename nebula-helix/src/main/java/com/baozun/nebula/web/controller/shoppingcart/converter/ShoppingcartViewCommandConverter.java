@@ -32,12 +32,13 @@ import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartCommand;
 import com.baozun.nebula.sdk.command.shoppingcart.ShoppingCartLineCommand;
 import com.baozun.nebula.web.controller.BaseConverter;
 import com.baozun.nebula.web.controller.UnsupportDataTypeException;
+import com.baozun.nebula.web.controller.shoppingcart.handler.ShoppingCartLineSubViewCommandListSorter;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShopSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartLineSubViewCommand;
 import com.baozun.nebula.web.controller.shoppingcart.viewcommand.ShoppingCartViewCommand;
-import com.feilong.core.Validator;
 import com.feilong.core.util.CollectionsUtil;
 
+import static com.feilong.core.Validator.isNotNullOrEmpty;
 import static com.feilong.core.bean.ConvertUtil.toList;
 
 /**
@@ -55,6 +56,9 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
     @Autowired
     private ShopManager shopManager;
 
+    @Autowired
+    private ShoppingCartLineSubViewCommandListSorter shoppingCartLineSubViewCommandListSorter;
+
     /**
      * 店铺 command 转成view command 的转换器 (可以spring 注入,如果没有注入,默认会 new 一个 ShopCommandToViewCommandTransformer).
      * 
@@ -68,14 +72,6 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
      * @since 5.3.2.13
      */
     private ShoppingCartLineCommandToViewCommandTransformer shoppingCartLineCommandToViewCommandTransformer;
-
-    /**
-     * 地址簿默认行数.
-     * 
-     * @deprecated 这是什么东东,怎么放这里, 不只有有没有项目在使用,将来统计下 删掉
-     */
-    @Deprecated
-    public static final int MEMBERADDRESSDEFAULTSIZE = 5;
 
     /*
      * (non-Javadoc)
@@ -167,14 +163,18 @@ public class ShoppingcartViewCommandConverter extends BaseConverter<ShoppingCart
 
         for (ShoppingCartLineCommand shoppingCartLineCommand : lineList){
             // 过滤赠品标题行
-            if (Validator.isNotNullOrEmpty(shoppingCartLineCommand.getLineCaption())){
+            if (isNotNullOrEmpty(shoppingCartLineCommand.getLineCaption())){
                 continue;
             }
 
             result.add(useShoppingCartLineCommandToViewCommandTransformer.transform(shoppingCartLineCommand));
         }
+
+        result = shoppingCartLineSubViewCommandListSorter.sort(result);
         return result;
     }
+
+    //------------
 
     /**
      * 设置 店铺 command 转成view command 的转换器 (可以spring 注入,如果没有注入,默认会 new 一个 ShopCommandToViewCommandTransformer).
