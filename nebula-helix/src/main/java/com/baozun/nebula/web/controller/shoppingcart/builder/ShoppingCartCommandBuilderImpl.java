@@ -99,7 +99,7 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
         //购物行为空，抛出异常
         Validate.notEmpty(shoppingCartLineCommandList, "shoppingCartLineCommandList can't be null/empty!");
 
-        if (null != shoppingCartLineCommandList){
+        if (null != shoppingCartCommandCheckedBuilderHandler){
             shoppingCartCommandCheckedBuilderHandler.preHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
         }
 
@@ -108,7 +108,7 @@ public class ShoppingCartCommandBuilderImpl implements ShoppingCartCommandBuilde
         //购物车为空，抛出异常
         Validate.notNull(shoppingCartCommand, "shoppingCartCommand can't be null");
 
-        if (null != shoppingCartLineCommandList){
+        if (null != shoppingCartCommandCheckedBuilderHandler){
             shoppingCartCommandCheckedBuilderHandler.postHandle(memberDetails, shoppingCartLineCommandList, calcFreightCommand, couponList, request);
         }
         return shoppingCartCommand;
