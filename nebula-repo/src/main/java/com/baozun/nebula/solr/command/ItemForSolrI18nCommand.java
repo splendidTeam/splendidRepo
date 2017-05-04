@@ -326,9 +326,11 @@ public class ItemForSolrI18nCommand implements Serializable {
 	@Field
 	private List<String> channels;
 
-	
+	/**
+     * 动态排序字段，用于扩展默认排序以外的排序
+     */
     @Field("dynamic_sort_*")
-    private Map<String, Long> dynamicSort;
+    private Map<String, Long> dynamicSortMap;
     
 
 	public Long getId() {
@@ -792,15 +794,19 @@ public class ItemForSolrI18nCommand implements Serializable {
 		this.navigationTree = navigationTree;
 	}
 
-    
-    public Map<String, Long> getDynamicSort(){
-        return dynamicSort;
+    /**
+     * @return the dynamicSortMap
+     */
+    public Map<String, Long> getDynamicSortMap(){
+        return dynamicSortMap;
+    }
+
+    /**
+     * @param dynamicSortMap the dynamicSortMap to set
+     */
+    public void setDynamicSortMap(Map<String, Long> dynamicSortMap){
+        this.dynamicSortMap = dynamicSortMap;
     }
 
     
-    public void setDynamicSort(Map<String, Long> dynamicSort){
-        this.dynamicSort = dynamicSort;
-    }
-	
-	
 }
